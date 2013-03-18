@@ -1,0 +1,2 @@
+lessc --yui-compress v2.less > v2.css
+#lessc --yui-compress css.less > css.css

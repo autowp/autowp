@@ -1,0 +1,3 @@
+RewriteEngine On
+
+RewriteRule (.*) /js/get.php?file=$1

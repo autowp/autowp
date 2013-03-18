@@ -1,0 +1,56 @@
+div#SpecificationContainer
+{
+  width: 100%;
+  overflow: auto;
+}
+
+table#SpecificationTable
+{
+    margin: 10px 0;
+    background-color: #EDE9DE;
+}
+
+table#SpecificationTable img
+{
+    display: block;
+    margin: 0 auto;
+}
+
+table#SpecificationTable tbody tr td,
+table#SpecificationTable tbody tr th
+{
+  background-color: white;
+  padding: 2px 4px;
+}
+
+table#SpecificationTable tbody tr th
+{
+  text-align: left;
+  vertical-align: middle;
+}
+
+table#SpecificationTable tbody tr th,
+table#SpecificationTable tbody tr th *
+{
+  font-weight: bold;
+}
+
+table#SpecificationTable tbody tr td
+{
+  text-align: center;
+  vertical-align: middle;
+}
+
+table#SpecificationTable tbody tr td.ThumbCell
+{
+  padding: 0;
+}
+
+table#SpecificationTable tbody tr td.delimeter
+{
+  background-color: #F6FFf0;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 2px 10px;
+  text-align: left;
+}

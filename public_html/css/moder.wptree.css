@@ -1,0 +1,24 @@
+table#wptree {
+	text-align: center;
+	margin: 0 auto;
+	border-collapse: separate; 
+	border-spacing: 1px;
+}
+
+table#wptree tr td {
+	background-color: #eeeeee;
+	padding: 2px 4px;
+}
+
+table#wptree tr.subgroup td {
+	background-color: #537088;
+}
+
+table#wptree tr.header td {
+	font-weight: bold;
+	text-align: center;
+}
+
+table#wptree tr td input {
+	border: 0;
+}

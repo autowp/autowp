@@ -1,0 +1,46 @@
+table.aticleList th
+{
+  text-align: center;
+}
+
+table.aticleList td, table.aticleList th
+{
+  padding: 1px 4px;
+  vertical-align: middle;
+}
+
+table.aticleList td.userDate
+{
+  text-align: center;
+}
+
+table.aticleList td.userDate, table.aticleList td.userDate *
+{
+  font-size: 10px
+}
+
+table.aticleList p.catName
+{
+  color: #aaaaaa;
+  font-size: 11px;
+}
+
+.article_enable_button
+{
+    color: white;
+    cursor: pointer;
+    height: 20px;
+    border: 1px black solid;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.article_enable_button.enabled
+{
+    background-color: darkgreen;
+}
+
+.article_enable_button.disabled
+{
+    background-color: darkred;
+}
