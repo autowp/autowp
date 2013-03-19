@@ -10,11 +10,12 @@ build:
 	@echo "Building autowp..."
 	@echo "${HR}\n"
 	
-	@lessc --yui-compress ./public_source/less/v2.less > ./public_html/css/v2.css
-	@lessc --yui-compress ./public_source/less/shared.less > ./public_html/css/shared.css
+	@lessc --yui-compress ./public_source/less/styles.less > ./public_html/css/styles.css
 	
 	@echo "Build css ...             ${CHECK} Done"
 	
-	@uglifyjs ./public_source/js/v2.js > ./public_html/js/v2.js
+	@cat ./vendor/twitter/bootstrap/bootstrap/js/bootstrap.js ./public_source/js/v2.js > ./public_source/js/scripts.js
+	@uglifyjs ./public_source/js/scripts.js > ./public_html/js/scripts.js
+	@rm ./public_source/js/scripts.js
 	
 	@echo "Build js ...              ${CHECK} Done"
