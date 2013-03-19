@@ -7,5 +7,5 @@ if ($uri != $uriClean) {
 	exit;
 }
 
-require '/home/autowp/autowp.ru/application/bs11.php';
+require '/home/autowp/autowp.ru/application/bs.php';
 exit;

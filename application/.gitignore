@@ -1,15 +1,9 @@
-/application.ini
 /basic.php
-/boot.php
-/bootstrap.php
 /bs.php
-/bs11.php
-/cacheindex.statistics
-/config.ini
+/config*
 /run.php
 
 /cache
-/configs
 /Console
 /cron
 /data
@@ -17,6 +11,5 @@
 /library*
 /models
 /modules
-/resources
 /trash
 /views
