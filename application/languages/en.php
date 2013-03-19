@@ -37,7 +37,7 @@ return array (
     'forward'   => 'forward',
 
     'Picture of the day'    => 'Picture of the day',
-	'car-of-day'   			=> 'car of the day',
+	'car-of-day'   			=> 'car of the day',
     'day ahead'             => 'day ahead',
     'day ago'               => 'day ago',
     'Cars by destination'   => 'Cars by destination',

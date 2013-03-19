@@ -37,7 +37,7 @@ return array (
     'forward'   => 'вперед',
 
     'Picture of the day'    => 'Картинка дня',
-	'car-of-day'   			=> 'автомобиль дня',
+	'car-of-day'   			=> 'автомобиль дня',
     'day ahead'             => 'день вперед',
     'day ago'               => 'день назад',
     'Cars by destination'   => 'Автомобили по назначению',
