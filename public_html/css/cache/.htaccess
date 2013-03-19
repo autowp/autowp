@@ -1,3 +1,0 @@
-RewriteEngine On
-
-RewriteRule (.*) /css/get.php?file=$1
