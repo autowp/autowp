@@ -1,0 +1,12 @@
+[submodule "vendor/phpmyadmin/phpmyadmin"]
+	path = vendor/phpmyadmin/phpmyadmin
+	url = git://github.com/phpmyadmin/phpmyadmin.git
+[submodule "vendor/tapmodo/Jcrop"]
+	path = vendor/tapmodo/Jcrop
+	url = git://github.com/tapmodo/Jcrop.git
+[submodule "vendor/tinymce/tinymce"]
+	path = vendor/tinymce/tinymce
+	url = git://github.com/tinymce/tinymce.git
+[submodule "vendor/twitter/bootstrap"]
+	path = vendor/twitter/bootstrap
+	url = git://github.com/twitter/bootstrap.git
