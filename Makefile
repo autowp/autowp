@@ -14,7 +14,7 @@ build:
 	
 	@echo "Build css ...             ${CHECK} Done"
 	
-	@cat ./vendor/twitter/bootstrap/bootstrap/js/bootstrap.js ./public_source/js/v2.js > ./public_source/js/scripts.js
+	@cat ./vendor/autowp/bootstrap/bootstrap/js/bootstrap.js ./public_source/js/v2.js > ./public_source/js/scripts.js
 	@uglifyjs ./public_source/js/scripts.js > ./public_html/js/scripts.js
 	@rm ./public_source/js/scripts.js
 	
