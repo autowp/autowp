@@ -1,31 +1,19 @@
-.navbar .container {
-	width: 940px;
-}
-
-@media (max-width: 767px) {
-	.navbar .container {
-		width: auto;
-	}
+body {
+	padding-top: 60px;
 }
 
 @media (min-width: 768px) and (max-width: 979px) {
-	.navbar .container {
-		width: 724px;
+	/* Remove any padding from the body */
+	body {
+		padding-top: 0;
 	}
 }
 
-@media (min-width: 1200px) {
-	.navbar .container {
-		width: 1170px;
+@media (max-width: 767px) {
+	/* Remove any padding from the body */
+	body {
+		padding-top: 0;
 	}
-}
-
-/*html, body {
-	background-color: #ede9de;
-}*/
-
-.navbar-static-top {
-	margin-bottom: 20px;
 }
 
 .page-header, legend {
@@ -357,5 +345,20 @@ span.count {
 .brands-switch.nav-tabs > .active {
 	> a, > a:hover, > a:focus {
 		background: @white;
+	}
+}
+
+.user {
+	a {
+		font-weight: bold;
+		color: #3333CC;
+	}
+	
+	&.green-man a {
+		color: #339933;
+	}
+	
+	&.long-away a {
+		color: #999;
 	}
 }
