@@ -72,10 +72,17 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$defaultLocale = 'en_US';
 		$availLanguages = array('en', 'ru');
 		
-		$longCache = $this->bootstrap('cachemanager')->getResource('cachemanager')->getCache('long');
+		//$db = $this->bootstrap('locale');
 		
-		Zend_Locale_Data::setCache($longCache);
-		Zend_Date::setOptions(array('cache' => $longCache));
+		$cachemanager = $this->bootstrap('cachemanager')->getResource('cachemanager');
+		
+		$longCache = $cachemanager->getCache('long');
+		
+		$localeCache = $cachemanager->getCache('locale');
+		
+		Zend_Locale_Data::setCache($localeCache);
+		Zend_Date::setOptions(array('cache' => $localeCache));
+		//Zend_Locale_Data::disableCache(true);
 		
 		// Locale
 		try {
@@ -84,27 +91,26 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		    $locale = new Zend_Locale($defaultLocale);
 		}
 		
+		if (!in_array($locale->getLanguage(), $availLanguages)) {
+			// when user requests a not available language reroute to default
+			$locale->setLocale($defaultLocale);
+		}
+		
 		// Translation
 		Zend_Translate::setCache($longCache);
 		$translate = new Zend_Translate('Array', APPLICATION_PATH . '/languages', null, array(
-		    'scan'              =>  Zend_Translate::LOCALE_FILENAME,
-		    'disableNotices'    =>  true,
-		    'logUntranslated'   =>  false,
-			//'locale'  			=> 'en',
+		    'scan'              =>	Zend_Translate::LOCALE_FILENAME,
+		    'disableNotices'    =>	true,
+		    'logUntranslated'   =>	false,
+			'locale'  			=>	$locale,
 		));
 		
-		$zendTranslate = new Zend_Translate('Array', PROJECT_DIR . '/vendor/zendframework/ZendFramework/resources/languages/', null, array(
-			'scan'              =>  Zend_Translate::LOCALE_DIRECTORY,
-			'disableNotices'    =>  true,
-			'logUntranslated'   =>  false,
-			//'locale'  			=> 'en',
+		$translate->addTranslation(array(
+			'content'	=>	PROJECT_DIR . '/vendor/zendframework/ZendFramework/resources/languages/',
+			'scan'		=>	Zend_Translate::LOCALE_DIRECTORY,
+			'locale'	=>	$locale,
 		));
-		$translate->addTranslation($zendTranslate);
-		
-		if (!in_array($locale->getLanguage(), $availLanguages)) {
-		    // when user requests a not available language reroute to default
-		    $translate->setLocale($defaultLocale);
-		}
+		$translate->setLocale($locale);
 		
 		// populate for wide-engine
 		Zend_Registry::set('Zend_Translate', $translate);
