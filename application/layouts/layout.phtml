@@ -1,0 +1,133 @@
+<?php
+	$moderMenu = '';
+	if (!$this->blankPage && $this->user && $this->acl()->inheritsRole($this->user->role, 'moder')) {
+		$moderMenu = $this->action('moder-menu', 'index', 'moder');
+	}
+
+	$mainMenu = '';
+	if (!$this->blankPage) {
+		$mainMenu = $this->action('main-menu2', 'pages', 'default');
+	}
+
+	if ($this->jQuery()->uiIsEnabled()) {
+		$this->headLink()->appendStylesheet('/js/libs/jquery/ui/theme/ui.all.css');
+	}
+		
+	$endTag = ' />';
+	if (!$this->doctype()->isXhtml()) {
+		$endTag= '>';
+	}
+	
+?>
+<?=$this->doctype() . PHP_EOL; ?>
+<html dir="ltr">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<?php
+			echo $this->headMeta();
+			echo $this->headTitle();
+			echo $this->headLink(array('rel' => 'shortcut icon', 'href' => '/favicon.ico', 'type' => 'image/x-icon'), 'PREPEND');
+			
+			//echo $this->stylesheets();
+			echo $this->jQuery();
+			echo $this->headScript()->appendFile(
+				'http://html5shim.googlecode.com/svn/trunk/html5.js',
+				'text/javascript',
+				array('conditional' => 'lt IE 9')
+			);
+			echo $this->headStyle();
+		?>
+	</head>
+	<body>
+		<?=$moderMenu ?>
+		
+		<?php 
+			$spanLeft = $this->needLeft ? 3 : 0;
+			$spanRight = $this->needRight ? 3 : 0;
+			$spanCenter = 12 - $spanLeft - $spanRight;
+		?>
+		
+		<?php if (!$this->blankPage) { ?>
+			<?=$mainMenu ?>
+		<?php }  ?>
+
+		<div class="container">
+			<?php if ($this->needLeft || $this->needRight) { ?>
+				<div class="row">
+				<?php if ($this->needLeft) { ?>
+					<div class="span<?=$spanLeft?>">
+						<?=$this->layout()->sidebar ?>
+					</div>
+				<?php } ?>
+				<div class="span<?=$spanCenter?>">
+			<?php } ?>
+			
+			<?php if (isset($this->flashMessages) && $this->flashMessages) { ?>
+				<?php foreach($this->flashMessages as $message) { ?>
+					<div class="alert alert-info">
+						<?=$message ?>
+					</div>
+				<?php } ?>
+			<?php } ?>
+			
+			<?=$this->breadcrumbs(); ?>
+			<?=$this->pageTitle() ?>
+
+			<?=$this->layout()->content; ?>
+
+			<?php if ($this->needLeft || $this->needRight) { ?>
+				</div>
+				<?php if ($this->needRight) { ?>
+					<div class="span<?=$spanRight?>">
+						<?php if ($this->page) { ?>
+							<?php foreach ($this->blocks($this->page->id) as $block) { ?>
+								<?=$block->getHtml(); ?>
+							<?php } ?>
+						<?php } ?>
+					</div>
+				<?php } ?>
+				</div>
+			<?php } ?>
+
+			<?php if ((!$this->blankPage) && (!$this->isAdminPage) ) { ?>
+				<div class="bottom-line"><p><strong>AutoWP.ru '2005&ndash;<?=$this->escape($this->translate('present-time-abbr'))?></strong></p></div>
+ 
+				<footer class="footer">
+					<div class="row">
+						<div class="span6">
+							<?=$this->htmlA(
+								'http://www.liveinternet.ru/click',
+								$this->htmlImg(array(
+									'src'	=>	'http://counter.yadro.ru/hit?t16.11;r' . urlencode(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '') . ';' . rand(),
+									'alt'	=>	'liveinternet.ru',
+									'title'	=>	'liveinternet.ru'
+								)),
+								false
+							)?>
+<?php $this->inlineScript()->captureStart() ?>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-24654784-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+<?php $this->inlineScript()->captureEnd() ?>
+<?=$this->inlineScript(); ?>
+						</div>
+						<div class="span6">
+							<p class="copyrights">
+								Обращаем Ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br<?=$endTag?>
+								Администрация сайта не располагает информацией о правомерности публикования этих материалов.<br<?=$endTag?>
+								Все изображения размещены в ознакомительных целях.<br<?=$endTag?>
+								<a href="mailto:autowp@yandex.ru">Сообщить о нарушении авторских прав</a>.
+							</p>
+						</div>
+					</div>
+				</footer>
+			<?php } ?>
+		</div>
+	</body>
+</html>
