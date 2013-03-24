@@ -1,0 +1,25 @@
+<?php
+	$title = 'Тюнинг ' . $this->brand->caption . ' ' . $this->model->name . ' ' . $this->generation->name;
+	$this->pageTitle($title);
+	$this->headTitle($title, 'SET');
+?>
+
+<?=$this->partial('catalogue/partial/model-generation-menu.phtml', array(
+	'title'	=>	$this->brand->caption . ' ' . $this->model->name . ' ' . $this->generation->name,
+	'stock'	=>	array(
+		'count'		=>	$this->stockCount,
+		'active'	=>	false
+	),
+	'tuning'	=>	array(
+		'count'		=>	$this->tuningCount,
+		'active'	=>	true
+	),
+	'pictures'	=>	array(
+		'count'		=>	$this->picturesCount,
+		'active'	=>	false
+	),
+)) ?>
+
+<?=$this->cars2($this->paginator->getCurrentItems()) ?>
+
+<?=$this->paginationControl($this->paginator); ?>

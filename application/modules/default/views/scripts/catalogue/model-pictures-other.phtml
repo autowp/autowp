@@ -1,0 +1,7 @@
+<?php
+	$title = $this->page->name . ' ' . $this->brand->caption . ' ' . $this->model->name;
+	$this->pageTitle($title);
+	$this->headTitle($title, 'SET');
+?>
+<?=$this->pictures2($this->paginator->getCurrentItems(), 4) ?>
+<?=$this->paginationControl($this->paginator) ?>

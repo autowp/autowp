@@ -1,0 +1,41 @@
+<?php
+	$brandName = $this->brandLanguage ? $this->brandLanguage->name : $this->brand->caption;
+	$title = $brandName . ' ' . $this->model->name;
+	$this->pageTitle($title);
+	$this->headTitle($title, 'SET');
+?>
+
+<?=$this->partial('catalogue/partial/model-menu.phtml', array(
+	'title'	=>	$brandName . ' ' . $this->model->name,
+	'stock'	=>	array(
+		'count'		=>	$this->stockCount,
+		'active'	=>	true
+	),
+	'tuning'	=>	array(
+		'count'		=>	$this->tuningCount,
+		'active'	=>	false
+	),
+	'pictures'	=>	array(
+		'count'		=>	$this->picturesCount,
+		'active'	=>	false
+	),
+)) ?>
+
+<?=$this->cars2($this->paginator->getCurrentItems()) ?>
+	
+<?php if ($this->modelPictures && count($this->modelPictures)) { ?>
+	
+	<h3>Прочие изображения</h3>
+	<?=$this->pictureListHorizontal2($this->modelPictures) ?>
+	  
+	<?php if (count($this->modelPictures) < $this->modelPicturesCount) { ?> 
+		<div style="margin-bottom:20px">
+			<?=$this->htmlA($this->url(array(
+				'action' => 'model-pictures-other',
+				'page'   => null
+			)), '<i class="icon-th"></i> все картинки ('.$this->modelPicturesCount.')', false) ?>
+		</div>
+	<?php } ?>
+<?php } ?>
+
+<?=$this->paginationControl($this->paginator); ?>

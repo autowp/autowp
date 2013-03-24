@@ -1,0 +1,7 @@
+<?php 
+	$this->pageTitle('Другие ' . $this->brand->caption . ' ' . $this->model->name);
+	$this->headTitle('Другие ' . $this->brand->caption . ' ' . $this->model->name, 'SET');
+?>
+
+<?=$this->cars2($this->paginator->getCurrentItems()) ?>
+<?=$this->paginationControl($this->paginator) ?>

@@ -1,0 +1,30 @@
+<?php
+	$title = $this->brand->caption . ' ' . $this->model->name . ' ' . $this->generation->name;  
+	$this->pageTitle($title);
+	$this->headTitle($title, 'SET');
+?>
+
+<?=$this->partial('catalogue/partial/model-generation-menu.phtml', array(
+	'title'	=>	$this->brand->caption . ' ' . $this->model->name . ' ' . $this->generation->name,
+	'stock'	=>	array(
+		'count'		=>	$this->stockCount,
+		'active'	=>	true
+	),
+	'tuning'	=>	array(
+		'count'		=>	$this->tuningCount,
+		'active'	=>	false
+	),
+	'pictures'	=>	array(
+		'count'		=>	$this->picturesCount,
+		'active'	=>	false
+	),
+)) ?>
+<ul class="nav nav-pills">
+	<?php foreach ($this->carTypes as $carType) { ?>
+		<li<?=$carType['active'] ? ' class="active"' : ''?>><?=$this->htmlA($carType['url'], $carType['name'])?></li>
+	<?php } ?>
+</ul>
+
+<?=$this->cars2($this->paginator->getCurrentItems()) ?>
+
+<?=$this->paginationControl($this->paginator); ?>

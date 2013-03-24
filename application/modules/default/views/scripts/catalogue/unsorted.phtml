@@ -1,0 +1,5 @@
+<?php 
+	$this->headTitle($this->page->name.' '.$this->brand->caption, 'SET');
+?>
+<?=$this->pictures2($this->paginator->getCurrentItems(), 4) ?>
+<?=$this->paginationControl($this->paginator, 'Sliding', 'pagination_control.phtml'); ?>

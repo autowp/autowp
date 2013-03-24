@@ -1,0 +1,7 @@
+<?php
+	$title = $this->page->name . ' ' . $this->carList->current()->getFullName();
+	$this->headTitle($title, 'SET'); 
+	$this->pageTitle($title); 
+?>
+
+<?=$this->specifications($this->carList) ?>

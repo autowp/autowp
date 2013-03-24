@@ -1,0 +1,22 @@
+<?php
+	$this->pageTitle($this->brand->caption . ' ' . $this->designProject->name);
+?>
+
+<ul class="nav nav-pills">
+	<li class="active">
+		<?=$this->htmlA($this->url(array(
+	        'action'    => 'design-project-cars',
+	        'page'      => 1
+	    )), $this->brand->caption.' '.$this->designProject->name); ?>
+	</li>
+	<li>
+		<?=$this->htmlA($this->url(array(
+	        'action'    => 'design-project-pictures',
+	        'page'      => 1
+	    )), 'Все изображения '.$this->brand->caption.' '.$this->designProject->name); ?>
+	</li>
+</ul>
+
+<?=$this->cars2($this->paginator->getCurrentItems()) ?>
+
+<?=$this->paginationControl($this->paginator) ?>

@@ -1,0 +1,6 @@
+<?php
+	$title = $this->page->name.' '.$this->brand->caption.' '.$this->model->name;
+	$this->pageTitle($title);
+	$this->headTitle($title, 'SET');
+?>
+<?=$this->specifications($this->cars) ?>
