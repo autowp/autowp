@@ -1,6 +1,9 @@
 <?php
 
 return array (
+	/* Common words */
+	'and'	=>	'и',
+	
 	'few seconds ago'		=>	'несколько секунд назад',
 	'a minute ago'			=>	'минуту назад',
 	'%1$s minutes ago/1'	=>	'%1$s минуту назад',
@@ -46,6 +49,12 @@ return array (
 	'all-link'				=>	'все',
 	
 	'brands/new-cars-of-brand'	=>	'Новые автомобили %s',
+	
+	'brands/more-companies'	=>	array(
+		'ещё %s компания',
+		'ещё %s компании',
+		'ещё %s компаний'
+	),
 
 	/* Layout */
 	'breadcrumbs/title'			=>	'Путь - дорога',
@@ -65,5 +74,17 @@ return array (
 	'carlist/produced/one'		=>	'Произведен в единственном экземпляре',
 	'carlist/specifications'	=>	'технические характеристики',
 
-	'present-time-abbr'			=>	'н.в.'
+	'present-time-abbr'			=>	'н.в.',
+	
+	/* Categories */
+	'category/%s cars'				=>	array(
+		'%s автомобиль',
+		'%s автомобиля',
+		'%s автомобилей'
+	),
+	'category/%s new cars'			=>	array(
+		'%s новый',
+		'%s новых',
+		'%s новых'
+	)
 );

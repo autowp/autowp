@@ -80,7 +80,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		Zend_Locale_Data::setCache($localeCache);
 		Zend_Date::setOptions(array('cache' => $localeCache));
-		//Zend_Locale_Data::disableCache(true);
 		
 		// Locale
 		try {

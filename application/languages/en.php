@@ -1,6 +1,9 @@
 <?php
 
 return array (
+	/* Common words */
+	'and'	=>	'and',
+	
 	'few seconds ago'		=>	'few seconds ago',
 	'a minute ago'			=>	'a minute ago',
 	'%1$s minutes ago/1'	=>	'%1$s minutes ago',
@@ -46,6 +49,11 @@ return array (
 	'all-link'				=>	'all',
 	
 	'brands/new-cars-of-brand'		=>	'New %s cars',
+	
+	'brands/more-companies'	=>	array(
+		'more %s company',
+		'more %s companies'
+	),
 
 	/* Layout */
 	'breadcrumbs/title'				=>	'Way',
@@ -65,5 +73,15 @@ return array (
 	'carlist/produced/one'			=>	'Produced in a single copy',
 	'carlist/specifications'		=>	'specifications',
 
-	'present-time-abbr'				=>	'pr.'
+	'present-time-abbr'				=>	'pr.',
+	
+	/* Categories */
+	'category/%s cars'				=>	array(
+		'%s car',
+		'%s cars'
+	),
+	'category/%s new cars'			=>	array(
+		'%s new',
+		'%s new'
+	)
 );
