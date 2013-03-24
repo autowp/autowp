@@ -1,0 +1,10 @@
+<?php
+	$this->pageTitle('Добавление картинок');
+?>
+<div class="alert alert-success">
+	<p>Спасибо. Картинка успешно закачена на сайт.</p>
+	<p>В ближайшее время её рассмотрят модераторы сайта</p>
+	<form action="<?=$this->escape($this->moreUrl) ?>" method="get">
+		<p>Вы можете закачать ещё несколько картинок. Для этого нажмите кнопку <input type="submit" value="закачать" class="btn btn-primary" /></p>
+	</form>
+</div>

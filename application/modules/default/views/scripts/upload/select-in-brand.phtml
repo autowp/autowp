@@ -1,0 +1,186 @@
+<?php
+	$this->pageTitle('Выбор бренда');
+?>
+<?php $this->jQuery()->onLoadCaptureStart() ?>
+$('.arrow').on('click', function(e) {
+	e.preventDefault();
+	
+	var $content = $(this).next('div:first');
+	var $icon = $(this).children('i');
+	
+	if ($content.is(':visible')) {
+		$icon.removeClass('icon-minus-sign').addClass('icon-plus-sign');
+		$content.slideUp();
+	} else {
+		$icon.removeClass('icon-plus-sign').addClass('icon-minus-sign');
+		$content.slideDown();
+	}
+	
+	
+});
+<?php $this->jQuery()->onLoadCaptureEnd() ?>
+
+
+<?php foreach ($this->models as $model) { ?>
+	<div>
+		<?=$this->htmlA(array(
+			'href'	=>	'#',
+			'class'	=>	'arrow'
+		), '<i class="icon-plus-sign"></i> ' . $this->escape($this->brand->caption . ' ' . $model['name']), false) ?>
+		<div style="margin:0 0 4px 12px;display:none">
+			<?php if (count($model['generations'])) { ?>
+				<?php foreach ($model['generations'] as $generation) { ?>
+					<div>
+						<?=$this->htmlA(array(
+							'href'	=>	'#',
+							'class'	=>	'arrow'
+						), '<i class="icon-plus-sign"></i> ' . $this->escape($generation['name']), false) ?>
+						<div style="margin:0 0 4px 12px;display:none">
+							<?php foreach ($generation['cars'] as $car) { ?>
+								<?=$this->htmlA(array(
+									'href'	=>	$this->url(array(
+										'action'	=>	'index',
+										'type'		=>	Pictures::CAR_TYPE_ID,
+										'car_id'	=>	$car->id
+									))
+								), $car->getFullName()) ?>
+								<br />
+							<?php } ?>
+						</div>
+					</div>
+				<?php } ?>
+	
+				<?php if (count($model['cars'])) { ?>
+					<div>
+						<?=$this->htmlA(array(
+							'href'	=>	'#',
+							'class'	=>	'arrow'
+						), '<i class="icon-plus-sign"></i> не вошедшие в поколения', false) ?>
+						<div style="margin:0 0 4px 12px;display:none">
+							<?php foreach ($model['cars'] as $car) { ?>
+								<?=$this->htmlA(array(
+									'href'	=>	$this->url(array(
+										'action'	=>	'index',
+										'type'		=>	Pictures::CAR_TYPE_ID,
+										'car_id'	=>	$car->id
+									))
+								), $car->getFullName()) ?>
+								<br />
+							<?php } ?>
+						</div>
+					</div>
+				<?php } ?>
+			<?php } else { ?>
+				<?php foreach ($model['cars'] as $car) { ?>
+					<?=$this->htmlA(array(
+						'href'	=>	$this->url(array(
+							'action'	=>	'index',
+							'type'		=>	Pictures::CAR_TYPE_ID,
+							'car_id'	=>	$car->id
+						))
+					), $car->getFullName()) ?>
+					<br />
+				<?php } ?>
+			<?php } ?>
+			<?=$this->htmlA(array(
+				'href'	=>	$this->url(array(
+					'action'	=>	'index',
+					'type'		=>	Pictures::MODEL_TYPE_ID,
+					'model_id'	=>	$model['id']
+				))
+			), 'другая модификация') ?>
+		</div>
+	</div>
+<?php } ?>
+
+<?php if (count($this->concepts)) { ?>
+	<div style="margin: 5px 0">
+		<?=$this->htmlA(array(
+			'href'	=>	'#',
+			'class'	=>	'arrow'
+		), '<i class="icon-plus-sign"></i> Концепты и прототипы', false) ?>
+		<div style="margin:0 0 4px 12px;display:none">
+			<?php foreach ($this->concepts as $car) { ?>
+				<?=$this->htmlA(array(
+					'href'	=>	$this->url(array(
+						'action'	=>	'index',
+						'type'		=>	Pictures::CAR_TYPE_ID,
+						'car_id'	=>	$car->id
+					))
+				), $car->getFullName()) ?>
+				<br />
+			<?php } ?>
+		</div>
+	</div>
+<?php } ?>
+
+<?php if (count($this->cars) > 0) { ?>
+	<div style="margin: 5px 0">
+		<?php if (count($this->models) > 3) { ?>
+			<?=$this->htmlA(array(
+				'href'	=>	'#',
+				'class'	=>	'arrow'
+			), '<i class="icon-plus-sign"></i> Другие автомобили', false) ?>
+			<div style="margin:0 0 4px 12px;display:none">
+				<?php foreach ($this->cars as $car) { ?>
+					<?=$this->htmlA(array(
+						'href'	=>	$this->url(array(
+							'action'	=>	'index',
+							'type'		=>	Pictures::CAR_TYPE_ID,
+							'car_id'	=>	$car->id
+						))
+					), $car->getFullName()) ?>
+					<br />
+				<?php } ?>
+			</div>
+		<?php } else { ?>
+			<?php foreach ($this->cars as $car) { ?>
+				<?=$this->htmlA(array(
+					'href'	=>	$this->url(array(
+						'action'	=>	'index',
+						'type'		=>	Pictures::CAR_TYPE_ID,
+						'car_id'	=>	$car->id
+					))
+				), $car->getFullName()) ?>
+				<br />
+			<?php } ?>
+		<?php } ?>
+	</div>
+<?php } ?>
+
+<?php if (count($this->engines) > 0) { ?>
+	<div style="margin: 5px 0">
+		<?=$this->htmlA(array(
+			'href'	=>	'#',
+			'class'	=>	'arrow',
+		), '<i class="icon-plus-sign"></i> Двигатели', false)?>
+		<div style="margin:0 0 4px 12px;display:none">
+			<?php foreach ($this->engines as $engine) { ?>
+				<?=$this->htmlA(array(
+					'href'	=>	$this->url(array(
+						'action'	=>	'index',
+						'type'		=>	Pictures::ENGINE_TYPE_ID,
+						'engine_id'	=>	$engine->id
+					))
+				), $engine->getMetaCaption()) ?>
+				<br />
+			<?php } ?>
+
+		</div>
+	</div>
+<?php } ?>
+
+<div style="margin: 5px 0">
+	<?=$this->htmlA($this->url(array(
+		'action'	=>	'index',
+		'type'		=>	Pictures::LOGO_TYPE_ID
+	)), 'логотип ' . $this->brand->caption) ?><br />
+	<?=$this->htmlA($this->url(array(
+		'action'	=>	'index',
+		'type'		=>	Pictures::MIXED_TYPE_ID
+	)), 'разное (несколько автомобилей на одной картинке)') ?><br />
+	<?=$this->htmlA($this->url(array(
+		'action'	=>	'index',
+		'type'		=>	Pictures::UNSORTED_TYPE_ID
+	)), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
+</div>
