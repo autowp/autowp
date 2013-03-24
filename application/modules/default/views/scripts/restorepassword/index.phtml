@@ -1,0 +1,13 @@
+<div class="row">
+	<div class="span8 offset2">
+		<p>Если вы забыли свой пароль - введите ваш e-mail (который вы указали при регистрации) и на него будет выслан пароль.</p>
+		<?=$this->form->render($this) ?>
+		<?php if ($this->message) { ?>
+			<?php if ($this->success) { ?>
+				<p class="alert alert-block alert-success"><?=$this->message ?></p>
+			<?php } else { ?>
+				<p class="alert alert-block alert-error"><?=$this->message ?></p>
+			<?php } ?>
+		<?php } ?>
+	</div>
+</div>
