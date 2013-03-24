@@ -72,8 +72,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$defaultLocale = 'en_US';
 		$availLanguages = array('en', 'ru');
 		
-		//$db = $this->bootstrap('locale');
-		
 		$cachemanager = $this->bootstrap('cachemanager')->getResource('cachemanager');
 		
 		$longCache = $cachemanager->getCache('long');

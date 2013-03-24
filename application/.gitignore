@@ -1,15 +1,10 @@
 /basic.php
-/bs.php
-/config*
 /run.php
 
 /cache
 /Console
 /cron
 /data
-/layouts
-/library*
 /models
 /modules
 /trash
-/views
