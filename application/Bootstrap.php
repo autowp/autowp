@@ -69,6 +69,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initLocaleAndTranslate()
 	{
+		$defaultLocale = 'en_US';
+		$availLanguages = array('en', 'ru');
+		
 		$longCache = $this->bootstrap('cachemanager')->getResource('cachemanager')->getCache('long');
 		
 		Zend_Locale_Data::setCache($longCache);
@@ -78,7 +81,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		try {
 		    $locale = new Zend_Locale(Zend_Locale::BROWSER);
 		} catch (Exception $e) {
-		    $locale = new Zend_Locale('en_US');
+		    $locale = new Zend_Locale($defaultLocale);
 		}
 		
 		// Translation
@@ -90,8 +93,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			//'locale'  			=> 'en',
 		));
 		
-		$availLanguages = array('en', 'ru');
-		
 		$zendTranslate = new Zend_Translate('Array', PROJECT_DIR . '/vendor/zendframework/ZendFramework/resources/languages/', null, array(
 			'scan'              =>  Zend_Translate::LOCALE_DIRECTORY,
 			'disableNotices'    =>  true,
@@ -102,7 +103,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		if (!in_array($locale->getLanguage(), $availLanguages)) {
 		    // when user requests a not available language reroute to default
-		    $translate->setLocale(DEFAULT_LOCALE);
+		    $translate->setLocale($defaultLocale);
 		}
 		
 		// populate for wide-engine
