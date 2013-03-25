@@ -532,3 +532,51 @@ function showPMWindow(userId, anchorNode) {
 		}
 	});
 }
+
+function votingVotingPage() {
+	$('.who-vote').each(function() {
+		var 
+			$a = $(this),
+			$modal = null,
+			$body = null,
+			$btnRefresh = null,
+			url = $a.attr('href');
+		
+		function reload() {
+			if (!$modal) {
+				$modal = $(
+					'<div class="modal hide fade">' +
+						'<div class="modal-header">' +
+							'<a data-dismiss="modal" class="close">×</a>' +
+							'<h3></h3>' +
+						'</div>' +
+						'<div class="modal-body"></div>' +
+						'<div class="modal-footer">' +
+							'<a class="btn btn-primary" href="#">Обновить</a>' +
+							'<a data-dismiss="modal" class="btn" href="#">Закрыть</a>' +
+						'</div>' +
+					'</div>'
+				);
+				$modal.find('h3').text($a.text());
+				$body = $modal.find('.modal-body');
+				$btnRefresh = $modal.find('.btn-primary').click(function(e) {
+					e.preventDefault();
+					reload();
+				});
+			}
+			$body.empty();
+			$modal.modal();
+			
+			$btnRefresh.button('loading');
+			$.get(url, {}, function(html) {
+				$body.html(html);
+				$btnRefresh.button('reset');
+			});
+		}
+		
+		$(this).click(function(e) {
+			e.preventDefault();
+			reload();
+		});
+	});
+}
