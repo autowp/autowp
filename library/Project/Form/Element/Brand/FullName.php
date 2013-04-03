@@ -1,17 +1,20 @@
 <?php
 
-class Project_Form_Element_Model_Name extends Zend_Form_Element_Text
+class Project_Form_Element_Brand_FullName extends Zend_Form_Element_Text
 {
+    const MIN_LENGTH = 2;
+    const MAX_LENGTH = 255;
+
     /**
      * Element label
      * @var string
      */
-    protected $_label = 'Название';
+    protected $_label = 'Полное название';
 
     /**
      * @var string
      */
-    protected $maxlength = '80';
+    protected $maxlength = self::MAX_LENGTH;
 
     /**
      * @var string
@@ -28,7 +31,7 @@ class Project_Form_Element_Model_Name extends Zend_Form_Element_Text
         ));
 
         $this->addValidators(array(
-            array('StringLength', true, array(1, 80))
+            array('StringLength', true, array(self::MIN_LENGTH, self::MAX_LENGTH))
         ));
     }
 }

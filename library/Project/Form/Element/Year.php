@@ -2,14 +2,25 @@
 
 class Project_Form_Element_Year extends Zend_Form_Element_Text
 {
-    public function init()
-    {
-        parent::init();
+    /**
+     * Element label
+     * @var string
+     */
+    protected $_label = 'Год';
 
-        $this->setOptions(array(
-            'maxlength' => 4,
-            'size'      => 4
-        ));
+    /**
+     * @var string
+     */
+    protected $maxlength = '4';
+
+    /**
+     * @var string
+     */
+    protected $size = '4';
+
+    public function __construct($spec, $options = null)
+    {
+        parent::__construct($spec, $options);
 
         $this->addFilters(array(
             'StringTrim',

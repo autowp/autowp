@@ -14,7 +14,7 @@ class Application_Form_Moder_Page_Edit extends Project_Form
         parent::init();
 
         $subForms = array();
-        foreach ($this->_languages as $i    => $language) {
+        foreach ($this->_languages as $i => $language) {
             $subForms[] = array(
                 array(
                     'description' => 'Fields for ' . $language,

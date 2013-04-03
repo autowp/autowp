@@ -1,6 +1,6 @@
 <?php
 
-class Project_Form_Element_Model_Name extends Zend_Form_Element_Text
+class Project_Form_Element_Brand_Name extends Zend_Form_Element_Text
 {
     /**
      * Element label
@@ -28,7 +28,7 @@ class Project_Form_Element_Model_Name extends Zend_Form_Element_Text
         ));
 
         $this->addValidators(array(
-            array('StringLength', true, array(1, 80))
+            array ('StringLength', true, array (2, 80))
         ));
     }
 }
