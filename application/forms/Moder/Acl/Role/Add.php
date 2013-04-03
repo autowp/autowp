@@ -1,6 +1,6 @@
 <?php
 
-class Application_Form_Moder_Engine extends Project_Form
+class Application_Form_Moder_Acl_Role_Add extends Project_Form
 {
     public function init()
     {
@@ -8,7 +8,7 @@ class Application_Form_Moder_Engine extends Project_Form
 
         $this->setOptions(array(
             'method'     => 'post',
-            'legend'     => 'Двигатель',
+            'legend'     => 'Добавить роль',
             'decorators' => array(
                 'PrepareElements',
                 array('viewScript', array(
@@ -16,13 +16,18 @@ class Application_Form_Moder_Engine extends Project_Form
                 )),
                 'Form'
             ),
-            'elements' => array(
-                array('Engine_Name', 'caption', array (
+            'elements'   => array(
+                array('text', 'role', array(
+                    'label'      => 'Роль',
                     'required'   => true,
                     'decorators' => array('ViewHelper')
                 )),
-                array('Brand', 'brand_id', array (
+                array('Select_Db_Table', 'parent_role_id', array(
+                    'label'      => 'Родительская роль',
                     'required'   => false,
+                    'table'      => new Acl_Roles(),
+                    'viewField'  => 'name',
+                    'valueField' => 'id',
                     'decorators' => array('ViewHelper')
                 )),
             )
