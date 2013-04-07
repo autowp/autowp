@@ -52,4 +52,22 @@ function pictureModerPage(options) {
             }, 'json');
         }
     });
+    
+    $('.files-repair').on('click', function() {
+        var $btn = $(this);
+        $btn.button('loading');
+        $.post(options.filesRepairUrl, {}, function(json) {
+            $btn.button('reset');
+            window.location = window.location;
+        }, 'json');
+    });
+    
+    $('.files-correct-names').on('click', function() {
+        var $btn = $(this);
+        $btn.button('loading');
+        $.post(options.filesCorrectNamesUrl, {}, function(json) {
+            $btn.button('reset');
+            window.location = window.location;
+        }, 'json');
+    });
 }
