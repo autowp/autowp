@@ -14,8 +14,8 @@ build:
 	
 	@echo "Build css ...             ${CHECK} Done"
 	
-	@cat ./vendor/autowp/bootstrap/bootstrap/js/bootstrap.js ./public_source/js/scripts.js > ./public_source/js/scripts.js
-	@uglifyjs ./public_source/js/scripts.js > ./public_html/js/scripts.js
-	@rm ./public_source/js/scripts.js
+	@cat ./vendor/autowp/bootstrap/bootstrap/js/bootstrap.js ./public_source/js/scripts.js ./public_source/js/moder.js > ./public_source/js/scripts.tmp.js
+	@uglifyjs ./public_source/js/scripts.tmp.js > ./public_html/js/scripts.js
+	@rm ./public_source/js/scripts.tmp.js
 	
 	@echo "Build js ...              ${CHECK} Done"
