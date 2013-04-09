@@ -85,7 +85,7 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
         if (Zend_Auth::getInstance()->hasIdentity()) {
             $userId = Zend_Auth::getInstance()->getIdentity();
         } else {
-            $userId = 0;
+            $userId = null;
         }
         return $userId;
     }
