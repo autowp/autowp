@@ -1,82 +1,77 @@
 <?php
-	$this->layout()->setLayout('bootstrap');
-	$this->pageTitle()->set('');
+    $this->pageTitle()->set('');
 ?>
 
 <header>
-	<div class="brand-hero-unit hero-unit">
-		<?php if ($image = $this->image($this->brand, 'logo', array(
-			'format'	=>	13,
-			'alt'		=>	'логотип ' . $this->brand->caption,
-			'class'		=>	'logo'
-		))) { ?>
-			<?php if ($image->exists()) { ?>
-				<?=$image ?>
-			<?php } ?>
-		<?php } ?>
-		<div class="content">
-			<?php if ($this->brandLanguage) { ?>
-				<h1><?=$this->escape($this->brandLanguage->name) ?></h1>
-				<p>
-					<?=$this->escape($this->brand->caption) ?>
-					<?php if ( $this->brand->full_caption && ($this->brand->full_caption != $this->brand->caption) ) { ?>
-						<small>(<?=$this->escape($this->brand->full_caption)?>)</small>
-					<?php } ?>
-				</p>
-			<?php } else { ?>
-				<h1>
-					<?=$this->escape($this->brand->caption) ?>
-					<?php if ( $this->brand->full_caption && ($this->brand->full_caption != $this->brand->caption) ) { ?>
-						<small>(<?=$this->escape($this->brand->full_caption)?>)</small>
-					<?php } ?>
-				</h1>
-			<?php } ?>
-			<?php if ($this->brand->description) { ?>
-				<?=$this->brand->description?>
-			<?php } ?>
-		</div>
-	</div>
-	<ul class="nav nav-pills">
-		<li>
-			<?=$this->htmlA($this->url(array(
-				'action' => 'cars'
-			), 'catalogue'), '<i class="icon-road"></i> Хронология', false)?>
-		</li>
-		<li>
-			<?=$this->htmlA($this->url(array(
-				'action' => 'recent'
-			), 'catalogue'), '<i class="icon-th"></i> Новые фото', false)?>
-		</li>
-		<?php if ($this->haveTwins) { ?>
-			<li>
-				<?=$this->htmlA($this->url(array(
-					'action'		=>	'brand',
-					'brand_catname'	=>	$this->brand->folder
-				), 'twins', true), '<i class="icon-adjust"></i> Twins', false)?>
-			</li>
-		<?php } ?>
-	</ul>
+    <div class="brand-hero-unit hero-unit">
+        <?=$this->image($this->brand, 'logo', array(
+            'format' => 13,
+            'alt'    => 'логотип ' . $this->brand->caption,
+            'class'  => 'logo'
+        ))?>
+        <div class="content">
+            <?php if ($this->brandLanguage) { ?>
+                <h1><?=$this->escape($this->brandLanguage->name) ?></h1>
+                <p>
+                    <?=$this->escape($this->brand->caption) ?>
+                    <?php if ( $this->brand->full_caption && ($this->brand->full_caption != $this->brand->caption) ) { ?>
+                        <small>(<?=$this->escape($this->brand->full_caption)?>)</small>
+                    <?php } ?>
+                </p>
+            <?php } else { ?>
+                <h1>
+                    <?=$this->escape($this->brand->caption) ?>
+                    <?php if ( $this->brand->full_caption && ($this->brand->full_caption != $this->brand->caption) ) { ?>
+                        <small>(<?=$this->escape($this->brand->full_caption)?>)</small>
+                    <?php } ?>
+                </h1>
+            <?php } ?>
+            <?php if ($this->brand->description) { ?>
+                <?=$this->brand->description?>
+            <?php } ?>
+        </div>
+    </div>
+    <ul class="nav nav-pills">
+        <li>
+            <?=$this->htmlA($this->url(array(
+                'action' => 'cars'
+            ), 'catalogue'), '<i class="icon-road"></i> Хронология', false)?>
+        </li>
+        <li>
+            <?=$this->htmlA($this->url(array(
+                'action' => 'recent'
+            ), 'catalogue'), '<i class="icon-th"></i> Новые фото', false)?>
+        </li>
+        <?php if ($this->haveTwins) { ?>
+            <li>
+                <?=$this->htmlA($this->url(array(
+                    'action'        => 'brand',
+                    'brand_catname' => $this->brand->folder
+                ), 'twins', true), '<i class="icon-adjust"></i> Twins', false)?>
+            </li>
+        <?php } ?>
+    </ul>
 </header>
 
 <section>
-	<h2><?=$this->escape('Популярные картинки') ?></h2>
-	<?php if ($this->topPictures) { ?>
-		<?=$this->pictures2($this->topPictures, 4) ?>
-	<?php } ?>
+    <h2><?=$this->escape('Популярные картинки') ?></h2>
+    <?php if ($this->topPictures) { ?>
+        <?=$this->pictures2($this->topPictures, 4) ?>
+    <?php } ?>
 </section>
 
 <?php if (count($this->link_types)) { ?>
-	<section>
-		<h2><?=$this->escape('Ссылки') ?></h2>
-		<?php foreach ($this->link_types as $type) { ?>
-			<?php if (count($type['links'])) { ?>
-				<p>
-					<strong><?=$this->escape($type['name']) ?></strong><br />
-					<?php foreach ($type['links'] as $link) { ?>
-						<a href="<?=$this->escape($link->url) ?>"><?=$this->escape($link->caption ? $link->caption : $link->url) ?></a><br />
-					<?php } ?>
-				</p>
-			<?php } ?>
-		<?php } ?>
-	</section>
+    <section>
+        <h2><?=$this->escape('Ссылки') ?></h2>
+        <?php foreach ($this->link_types as $type) { ?>
+            <?php if (count($type['links'])) { ?>
+                <p>
+                    <strong><?=$this->escape($type['name']) ?></strong><br />
+                    <?php foreach ($type['links'] as $link) { ?>
+                        <a href="<?=$this->escape($link->url) ?>"><?=$this->escape($link->caption ? $link->caption : $link->url) ?></a><br />
+                    <?php } ?>
+                </p>
+            <?php } ?>
+        <?php } ?>
+    </section>
 <?php } ?>
