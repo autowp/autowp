@@ -103,7 +103,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         ));
 
         $translate->addTranslation(array(
-            'content' => PROJECT_DIR . '/vendor/zendframework/ZendFramework/resources/languages/',
+            'content' => PROJECT_DIR . '/vendor/zendframework/zf1/resources/languages/',
             'scan'    => Zend_Translate::LOCALE_DIRECTORY,
             'locale'  => $locale,
         ));

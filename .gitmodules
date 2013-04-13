@@ -13,3 +13,9 @@
 [submodule "vendor/autowp/bootstrap"]
 	path = vendor/autowp/bootstrap
 	url = git://github.com/autowp/bootstrap.git
+[submodule "vendor/zendframework/zf1-extras"]
+	path = vendor/zendframework/zf1-extras
+	url = https://github.com/zendframework/zf1-extras.git
+[submodule "vendor/zendframework/zf1"]
+	path = vendor/zendframework/zf1
+	url = https://github.com/zendframework/zf1.git
