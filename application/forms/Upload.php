@@ -45,10 +45,6 @@ class Application_Form_Upload extends Project_Form
                     ),
                     'decorators'  => array('ViewHelper')
                 )),
-                array('submit', 'Создать', array (
-                    'required'    => false,
-                    'decorators'  => array('ViewHelper'),
-                )),
             )
         ));
     }
