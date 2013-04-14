@@ -54,6 +54,8 @@
     </publicDirectory>
     <projectProvidersDirectory>
       <projectProviderFile projectProviderName="maintenance" actionNames="dump"/>
+      <projectProviderFile projectProviderName="traffic" actionNames="autoban"/>
+      <projectProviderFile projectProviderName="pictures" actionNames="clearQueue"/>
     </projectProvidersDirectory>
     <temporaryDirectory enabled="false"/>
     <testsDirectory>

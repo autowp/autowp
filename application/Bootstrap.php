@@ -2,7 +2,7 @@
 
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
-    protected function _initPhpEnvotiment()
+    protected function _initPhpEnvoriment()
     {
         setlocale(LC_ALL, 'en_US.UTF-8');
         setlocale(LC_CTYPE, "UTF8", "en_US.UTF-8");
