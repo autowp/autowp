@@ -112,7 +112,6 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
         if ($user) {
             $image = $this->view->image($user, 'photo', array(
                 'format' => '15',
-                //'class'    =>    'avatar'
             ));
 
             if ($image && $image->exists()) {
@@ -121,10 +120,9 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
 
             if ($user->e_mail) {
                 // gravatar
-                $gravUrl = "http://www.gravatar.com/avatar/" . md5(mb_strtolower(trim($user->e_mail))) . "?s=70&d=http://www.autowp.ru/_.gif";
-
-                return $this->view->htmlImg(array(
-                    'src' => $gravUrl
+                return $this->view->gravatar($user->e_mail, array(
+                    'img_size'    => 70,
+                    'default_img' => 'http://www.autowp.ru/_.gif'
                 ));
             }
         }
