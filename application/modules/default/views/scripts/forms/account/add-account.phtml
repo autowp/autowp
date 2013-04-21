@@ -1,0 +1,10 @@
+<?php
+    $this->element->setAttrib('class', 'form-inline')
+?>
+<?php foreach ($this->element->getElements() as $element) { ?>
+    <label><?=$this->escape($element->getLabel())?> <?=$element?></label>
+<?php } ?>
+<?=$this->formButton('submit', 'Добавить', array(
+    'class' => 'btn btn-primary',
+    'type'  => 'submit'
+))?>
