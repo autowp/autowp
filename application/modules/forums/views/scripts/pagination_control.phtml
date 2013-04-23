@@ -1,0 +1,37 @@
+<?php if ($this->pageCount > 1) { ?>
+    <?php
+        $format = '%0'.max(2, strlen($this->pageCount)).'d'; 
+    ?> 
+    <div>
+        <p>
+            <?php if (isset($this->previous)) { ?>
+                <?=$this->htmlA($this->url(array('page' => $this->previous)), '←' . $this->translate('previous'))?>
+            <?php } else { ?> 
+                ←<?=$this->escape($this->translate('previous')) ?> 
+            <?php } ?>
+
+            <?php if (isset($this->next)) { ?>
+                <?=$this->htmlA($this->url(array('page' => $this->next)), $this->translate('next').'→')?> 
+            <?php } else { ?> 
+                <?=$this->escape($this->translate('next')) ?>→
+            <?php } ?>
+        </p>       
+        <p>
+            <?php if ($this->first < $this->firstPageInRange) { ?>
+                <?=$this->htmlA($this->url(array('page' => $this->first)), sprintf($format, $this->first))?>
+                <?php if ($this->first < $this->firstPageInRange - 1) { ?>…<?php } ?>
+            <?php } ?>
+            <?php foreach ($this->pagesInRange as $page) { ?> 
+                <?php if ($page != $this->current) { ?>
+                    <?=$this->htmlA($this->url(array('page' => $page)), sprintf($format, $page))?>
+                <?php } else { ?>
+                    <strong style="font-size:20px;margin:0 3px"><?=sprintf($format, $page); ?></strong>
+                <?php } ?>
+            <?php } ?>
+            <?php if ($this->last > $this->lastPageInRange) { ?>
+                <?php if ($this->last > $this->lastPageInRange + 1) { ?>…<?php } ?>
+                <?=$this->htmlA($this->url(array('page' => $this->last)), sprintf($format, $this->last))?>
+            <?php } ?>
+        </p>
+    </div>
+<?php } ?>

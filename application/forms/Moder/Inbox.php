@@ -105,7 +105,6 @@ class Application_Form_Moder_Inbox extends Project_Form
                     'required'     => false,
                     'label'        => 'Добавил',
                     'decorators'   => array('ViewHelper'),
-                    'filters'      => array('Int')
                 )),
                 array('select', 'requests', array(
                     'required'     => false,

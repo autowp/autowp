@@ -1,0 +1,15 @@
+<?php foreach ($this->themes as $theme) { ?>
+    <?php if ($theme->id == $this->topic->theme_id) { ?>
+        <h2><?=$this->escape($theme->caption)?></h2>
+    <?php } else { ?>
+        <h2>
+            <?=$this->htmlA($this->url(array(
+                'module'     => 'forums',
+                'controller' => 'topic',
+                'action'     => 'move',
+                'topic_id'   => $this->topic->id,
+                'theme_id'   => $theme->id
+            )), $theme->caption) ?>
+        </h2>
+    <?php } ?>
+<?php } ?>

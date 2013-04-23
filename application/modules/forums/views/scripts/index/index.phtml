@@ -1,0 +1,56 @@
+<?php foreach ($this->themes as $theme) { ?>
+    <div class="row">
+        <div class="span5">
+            <div class="well">
+                <p><i class="icon-th-list"></i> <strong><?=$this->htmlA(array(
+                    'href' => $theme['url'],
+                    'title' => 'Перейти в форум "'.$theme['name'].'"'
+                ), $theme['name']) ?></strong></p>
+                <?php if ($theme['description']) { ?>
+                    <p><?=$this->escape($theme['description']) ?></p>
+                <?php } ?>
+                <p>Тем: <?=$theme['topics'] ?>, Сообщений: <?=$theme['messages'] ?></p>
+                <?php if (count($theme['subthemes'])) { ?>
+                    Подфорумы:
+                    <?php foreach ($theme['subthemes'] as $idx => $subtheme) { 
+                        if ($idx) {
+                            print ', '; 
+                        } 
+                        print $this->htmlA($subtheme['url'], $subtheme['name']); 
+                    } ?>
+                <?php } else { ?>
+                    <p><?=$this->htmlA($theme['url'], 'Зайти в форум …') ?></p>
+                <?php } ?>
+            </div>
+        </div>
+        <?php if ($topic = $theme['lastTopic']) { ?>
+            <div class="span4">
+                <div class="well transparent">
+                    <?php if ($lastMessage = $theme['lastMessage']) { ?>
+                        <p><i class="icon-comment"></i> Последнее сообщение в теме «<?=$this->htmlA($this->url(array(
+                            'controller' => 'topic',
+                            'action'     => 'topic',
+                            'topic_id'   => $topic->id
+                        )), $topic->caption) ?>»</p>
+                        <p>
+                            <?php if ($date = $lastMessage->getDate('add_datetime')) { ?>
+                                <?=$this->pastTimeIndicator($date)?>
+                            <?php } ?>
+                            <?php if ($lastMessageAuthor = $lastMessage->findParentUsersByAuthor()) { ?>
+                                <?=$this->user($lastMessageAuthor) ?>
+                            <?php } ?>
+                            <?=$this->htmlA(array(
+                                'href'  => $this->url(array(
+                                    'controller' => 'topic',
+                                    'action'     => 'topic-message',
+                                    'message_id' => $lastMessage->id
+                                )),
+                                'title' => 'Перейти к последнему сообщению'
+                            ), '<img src="/img/forums/icon_latest_reply.gif" alt="-&gt;" style="width:18px;height:9px" />', false) ?>
+                        </p>
+                    <?php } ?>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+<?php } ?>
