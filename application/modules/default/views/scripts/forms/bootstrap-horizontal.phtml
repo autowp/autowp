@@ -5,26 +5,65 @@
     );
 ?>
 <fieldset>
-    <?php if ($description = $this->element->getDescription()) { ?>
-        <legend><?=$this->escape($description)?></legend>
+    <?php if ($legend = $this->element->getLegend()) { ?>
+        <legend><?=$this->escape($legend)?></legend>
     <?php } ?>
     <?php foreach ($this->element->getElements() as $element) { ?>
-        <?php
-            $errors = $element->getMessages();
-        ?>
-        <div class="control-group<?=$errors ? ' error' : ''?>">
-            <label class="control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
-            <div class="controls">
-                <?=$element?>
-                <?php foreach ($errors as $error) { ?>
-                    <span class="help-inline"><?=$this->escape($error)?></span>
-                <?php } ?>
+        <?php if ($element instanceof Zend_Form_Element) { ?>
+            <?php if (!$element instanceof Zend_Form_Element_Submit) { ?>
+                <div class="control-group<?=$element->hasErrors() ? ' error' : ''?>">
+                    <label class="control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
+                    <div class="controls">
+                        <?=$element?>
+                        <?php foreach ($element->getMessages() as $error) { ?>
+                            <span class="help-inline"><?=$this->escape($error)?></span>
+                        <?php } ?>
+                    </div>
+                </div>
+            <?php } ?>
+        <?php } elseif ($element instanceof Zend_Form) { ?>
+            <?=$element->render($this)?>
+        <?php } elseif ($element instanceof Zend_Form_DisplayGroup) { ?>
+            <div class="control-group">
+                <label class="control-label"><?=$this->escape($element->getLegend())?></label>
+                <div class="controls">
+                    <?=$element->render($this)?>
+                </div>
             </div>
+        <?php } ?>
+    <?php } ?>
+    <?php
+        $submitFound = false;
+    ?>
+    <?php foreach ($this->element as $element) { ?>
+        <?php if ($element instanceof Zend_Form_Element_Submit) { ?>
+            <?php
+                $element->setAttrib(
+                    'class',
+                    $element->getAttrib('class') . ($element->getAttrib('class') ? ' ' : '') . 'btn'
+                );
+                if (!$submitFound) {
+                    $element->setAttrib(
+                        'class',
+                        $element->getAttrib('class') . ' btn-primary'
+                    );
+                    $submitFound = true;
+                }
+            ?>
+            <div class="form-actions">
+                <?=$element ?>
+            </div>
+        <?php } ?>
+    <?php } ?>
+    <?php if ($desc = $this->element->getDescription()) { ?>
+        <p><?=$this->escape($desc)?></p>
+    <?php } ?>
+    <?php if (!$submitFound && !$this->element instanceof Zend_Form_SubForm) { ?>
+        <div class="form-actions">
+            <?=$this->formSubmit('submit', 'Отправить', array(
+                'class' => 'btn btn-primary'
+            ))?>
         </div>
     <?php } ?>
-    <div class="form-actions">
-        <?=$this->formSubmit('submit', 'Отправить', array(
-            'class' => 'btn btn-primary'
-        ))?>
-    </div>
+
 </fieldset>
