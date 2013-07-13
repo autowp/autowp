@@ -1,101 +1,92 @@
 <?php
-	$title = ($this->brandLanguage ? $this->brandLanguage->name : $this->brand->caption) . ' ' . $this->model->name;
-	$this->pageTitle($title);
-	$this->headTitle($title, 'SET');
+    $title = ($this->brandLanguage ? $this->brandLanguage->name : $this->brand->caption) . ' ' . $this->model->name;
+    $this->pageTitle($title);
+    $this->headTitle($title, 'SET');
 ?>
 
 <?=$this->partial('catalogue/partial/model-menu.phtml', array(
-	'title'	=>	$title,
-	'stock'	=>	array(
-		'count'		=>	$this->stockCount,
-		'active'	=>	true
-	),
-	'tuning'	=>	array(
-		'count'		=>	$this->tuningCount,
-		'active'	=>	false
-	),
-	'pictures'	=>	array(
-		'count'		=>	$this->picturesCount,
-		'active'	=>	false
-	),
+    'title'    => $title,
+    'stock'    => array(
+        'count'  => $this->stockCount,
+        'active' => true
+    ),
+    'tuning'   => array(
+        'count'  => $this->tuningCount,
+        'active' => false
+    ),
+    'pictures' => array(
+        'count'  => $this->picturesCount,
+        'active' => false
+    ),
 )) ?>
 
 <?php foreach ($this->generations as $generation) { ?>
-	<h2>
-		<?=$this->escape($generation['title'])?>
-		<?php if ($generation['totalCars'] > 0) { ?>
-			<small><?=$this->htmlA($generation['url'], 'подробнее…') ?></small>
-		<?php } ?>
-	</h2>
+    <h2>
+        <?=$this->escape($generation['title'])?>
+        <?php if ($generation['totalCars'] > 0) { ?>
+            <small><?=$this->htmlA($generation['url'], 'подробнее…') ?></small>
+        <?php } ?>
+    </h2>
 
-	<ul class="thumbnails">
-		<?php foreach ($generation['pictures'] as $idx => $picture) { ?>
-			<?php if ($picture) { ?>
-				<?php
-					$size = $idx ? 2 : 4;
-					$format = $idx ? 6 : 10;
-					$caption = $picture->getCaption();
-				?>
-				<li class="span<?=$size?>">
-					<?php if ($image = $this->image($picture, 'file_name', array(
-						'format' => $format,
-						'title'	=>	$caption
-					))) { ?>
-						<?php if ($image->exists()) { ?>
-							<?=$this->htmlA(array(
-								'href'	=>	$this->pic($picture)->url(),
-								'class'	=>	'thumbnail'
-							), $image, false)?>
-						<?php } ?>
-					<?php } ?>
-				</li>
-			<?php } ?>
-		<?php } ?>
-	</ul>
+    <div class="row thumbnails">
+        <?php foreach ($generation['pictures'] as $idx => $picture) { ?>
+            <?php if ($picture) { ?>
+                <div class="col-lg-<?=$idx ? 3 : 6?>">
+                    <?php if ($image = $this->image($picture, 'file_name', array(
+                        'format' => $idx ? 6 : 10,
+                        'title'  => $picture->getCaption()
+                    ))) { ?>
+                        <?php if ($image->exists()) { ?>
+                            <?=$this->htmlA(array(
+                                'href'  => $this->pic($picture)->url(),
+                                'class' => 'thumbnail'
+                            ), $image, false)?>
+                        <?php } ?>
+                    <?php } ?>
+                </div>
+            <?php } ?>
+        <?php } ?>
+    </div>
 
-	<?php if (count($generation['links'])) { ?>
-		<div style="margin-bottom: 30px">
-			<?php foreach ($generation['links'] as $idx => $link) { ?>
-				&#xa0;
-				<?=$this->htmlA(
-					$link['href'],
-					($link['icon'] ? '<i class="' . $link['icon'] . '"></i> ' : '') . $this->escape($link['title']),
-					false
-				)?>
-			<?php } ?>
-			
-		</div>
-	<?php } ?>
+    <?php if (count($generation['links'])) { ?>
+        <div style="margin-bottom: 30px">
+            <?php foreach ($generation['links'] as $idx => $link) { ?>
+                &#xa0;
+                <?=$link['icon'] ? '<span class="' . $link['icon'] . '"></span> ' : ''?>
+                <?=$this->htmlA($link['href'], $this->escape($link['title']))?>
+            <?php } ?>
+        </div>
+    <?php } ?>
 
 <?php } ?>
 
 <?php if (count($this->otherCarsPictures)) { ?>
-	<div style="margin-top: 60px">
-		<h2>
-			<?=$this->htmlA(array('href' => $this->url(array(
-				'action'		=> 'model-nogeneration',
-				'model_catname' => $this->model->folder
-			), 'catalogue')), 'Другие автомобили '.$this->escape($this->brand->caption . ' ' . $this->model->name)) ?>
-		</h2>
-		<?=$this->pictureListHorizontal2($this->otherCarsPictures) ?>
-	</div>
+    <div style="margin-top: 60px">
+        <h2>
+            <?=$this->htmlA(array('href' => $this->url(array(
+                'action'        => 'model-nogeneration',
+                'model_catname' => $this->model->folder
+            ), 'catalogue')), 'Другие автомобили '.$this->escape($this->brand->caption . ' ' . $this->model->name)) ?>
+        </h2>
+        <?=$this->pictureListHorizontal2($this->otherCarsPictures) ?>
+    </div>
 <?php } ?>
 
 <?php if (count($this->modelPictures)) { ?>
-	<div style="margin-top: 60px">
-		<h2>Прочие изображения</h2>
-		<div class="car">
-			<?=$this->pictureListHorizontal2($this->modelPictures) ?>
-			
-			<?php if ($this->modelPicturesCount > count($this->modelPictures)) { ?>
-				<div style="margin-bottom:20px">
-					<?=$this->htmlA(array('href' => $this->url(array(
-						'action'		=> 'model-pictures-other',
-						'model_catname' => $this->model->folder,
-						'page'		  => 1
-					), 'catalogue')), '<i class="icon-th"></i> все картинки ('.$this->modelPicturesCount.')', false) ?>
-				</div>
-			<?php } ?>
-		</div>
-	</div>
+    <div style="margin-top: 60px">
+        <h2>Прочие изображения</h2>
+        <div class="car">
+            <?=$this->pictureListHorizontal2($this->modelPictures) ?>
+
+            <?php if ($this->modelPicturesCount > count($this->modelPictures)) { ?>
+                <div style="margin-bottom:20px">
+                    <?=$this->htmlA(array('href' => $this->url(array(
+                        'action'        => 'model-pictures-other',
+                        'model_catname' => $this->model->folder,
+                        'page'          => 1
+                    ), 'catalogue')), '<span class="glyphicon glyphicon-th"></span> все картинки ('.$this->modelPicturesCount.')', false) ?>
+                </div>
+            <?php } ?>
+        </div>
+    </div>
 <?php } ?>

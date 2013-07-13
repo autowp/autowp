@@ -9,15 +9,19 @@ $(function() {
         function reload() {
             if (!$modal) {
                 $modal = $(
-                    '<div class="modal hide fade">' +
-                        '<div class="modal-header">' +
-                            '<a data-dismiss="modal" class="close">×</a>' +
-                            '<h3>Online</h3>' +
-                        '</div>' +
-                        '<div class="modal-body"></div>' +
-                        '<div class="modal-footer">' +
-                            '<a class="btn btn-primary" href="#">Обновить</a>' +
-                            '<a data-dismiss="modal" class="btn" href="#">Закрыть</a>' +
+                    '<div class="modal fade">' +
+                        '<div class="modal-dialog">' +
+                            '<div class="modal-content">' +
+                                '<div class="modal-header">' +
+                                    '<button type="button" data-dismiss="modal" class="close">×</button>' +
+                                    '<h3 class="modal-title">Online</h3>' +
+                                '</div>' +
+                                '<div class="modal-body"></div>' +
+                                '<div class="modal-footer">' +
+                                    '<a class="btn btn-primary" href="#">Обновить</a>' +
+                                    '<a data-dismiss="modal" class="btn btn-default" href="#">Закрыть</a>' +
+                                '</div>' +
+                            '</div>' +
                         '</div>' +
                     '</div>'
                 );

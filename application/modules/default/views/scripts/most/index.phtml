@@ -1,59 +1,60 @@
-<?php 
-	$this->layout()->setLayout('bootstrap');
-	$this->pageTitle($this->title);
+<?php
+    $this->pageTitle($this->title);
 ?>
 <?php $this->jQuery()->onLoadCaptureStart()?>
 mostIndexPage();
 <?php $this->jQuery()->onLoadCaptureEnd()?>
 <ul class="nav nav-pills">
-	<?php foreach ($this->years as $id => $year) { ?>
-		<li<?=!is_null($this->yearId) && ($id == $this->yearId) ? ' class="active"' : '' ?>>
-			<?=$this->htmlA($this->url(array(
-				'most_catname'  => $this->cMost['catName'],
-				'shape_catname' => $this->carType ? $this->carType->catname : null,
-				'years_catname' => $year['folder']
-			), 'most'), $year['name']) ?>
-		</li>
-	<?php } ?>
-	<li<?=is_null($this->yearId) ? ' class="active"' : '' ?>>
-		<?=$this->htmlA($this->url(array(
-			'most_catname' => $this->cMost['catName'],
-			'shape_catname' => $this->carType ? $this->carType->catname : null,
-			'years_catname' => null
-		), 'most'), 'за всю историю') ?>
-	</li>
+    <?php foreach ($this->years as $id => $year) { ?>
+        <li<?=!is_null($this->yearId) && ($id == $this->yearId) ? ' class="active"' : '' ?>>
+            <?=$this->htmlA($this->url(array(
+                'most_catname'  => $this->cMost['catName'],
+                'shape_catname' => $this->carType ? $this->carType->catname : null,
+                'years_catname' => $year['folder']
+            ), 'most'), $year['name']) ?>
+        </li>
+    <?php } ?>
+    <li<?=is_null($this->yearId) ? ' class="active"' : '' ?>>
+        <?=$this->htmlA($this->url(array(
+            'most_catname' => $this->cMost['catName'],
+            'shape_catname' => $this->carType ? $this->carType->catname : null,
+            'years_catname' => null
+        ), 'most'), 'за всю историю') ?>
+    </li>
 </ul>
 
-<?php $idx = 0; ?>
+<?php $idx = 0 ?>
 <?php foreach ($this->carList['cars'] as $car) { ?>
-	<div class="row">
-		<div class="span6">
-			<h3><?=$car['car']->getCaptionHtml() ?></h3>
-		</div>
-		<div class="span3">
-			<?php if ($idx++ == 0) { ?>
-				<h3><?=$this->escape($this->carList['paramName']) ?></h3>
-			<?php } ?>
-		</div>
-	</div>
-	<div class="row">
-		<div class="span6">
-			<?=$this->pictureListHorizontal2($car['car']->getOrientedPictureList($this->groupIds)); ?>
-			<?php if ($car['car']->description) { ?>
-				<div><?=$car['car']->description ?></div>
-			<?php } ?>
-		</div>
-		<div class="span3">
-			<h2>
-				<?php if (isset($car['valueHtml'])) { ?>
-					<?=$car['valueHtml']?>
-				<?php } else {?>
-					<?=$this->escape($car['valueText']) ?>
-				<?php } ?>
-				<?php if ($this->carList['unit']) { ?>
-					<small class="unit" title="<?=$this->escape($this->carList['unit']->name) ?>"><?=$this->escape($this->carList['unit']->abbr) ?></small>
-				<?php } ?>
-			</h2>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-lg-9">
+            <h3><?=$car['car']->getCaptionHtml() ?></h3>
+        </div>
+        <div class="col-lg-3">
+            <?php if ($idx++ == 0) { ?>
+                <h3><?=$this->escape($this->carList['paramName']) ?></h3>
+            <?php } ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-9">
+            <?=$this->pictureListHorizontal2($car['car']->getOrientedPictureList($this->groupIds), array(
+                'colClass' => 'col-lg-4'
+            )) ?>
+            <?php if ($car['car']->description) { ?>
+                <div><?=$car['car']->description ?></div>
+            <?php } ?>
+        </div>
+        <div class="col-lg-3">
+            <h2>
+                <?php if (isset($car['valueHtml'])) { ?>
+                    <?=$car['valueHtml']?>
+                <?php } else {?>
+                    <?=$this->escape($car['valueText']) ?>
+                <?php } ?>
+                <?php if ($this->carList['unit']) { ?>
+                    <small class="unit" title="<?=$this->escape($this->carList['unit']->name) ?>"><?=$this->escape($this->carList['unit']->abbr) ?></small>
+                <?php } ?>
+            </h2>
+        </div>
+    </div>
 <?php } ?>

@@ -9,19 +9,33 @@
         <?php
             $errors = $element->getMessages();
         ?>
-        <div class="control-group<?=$errors ? ' error' : ''?>">
-            <label class="control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
-            <div class="controls docs-input-sizes">
-                <?=$element?>
-                <?php foreach ($errors as $error) { ?>
-                    <span class="help-inline"><?=$this->escape($error)?></span>
-                <?php } ?>
-            </div>
+        <div class="row<?=$errors ? ' error' : ''?>">
+            <?php if ($element instanceof Zend_Form_Element_Checkbox) { ?>
+                <div class="col-offset-3 col-lg-9">
+                    <label class="checkbox" for="<?=$element->getId()?>">
+                        <?=$this->escape($element->getLabel())?>
+                        <?=$element?>
+                    </label>
+                    <?php foreach ($errors as $error) { ?>
+                        <span class="help-inline"><?=$this->escape($error)?></span>
+                    <?php } ?>
+                </div>
+            <?php } else { ?>
+                <label class="col-lg-3 control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
+                <div class="col-lg-9">
+                    <?=$element?>
+                    <?php foreach ($errors as $error) { ?>
+                        <span class="help-inline"><?=$this->escape($error)?></span>
+                    <?php } ?>
+                </div>
+            <?php } ?>
         </div>
     <?php } ?>
-    <div class="form-actions">
-        <?=$this->formSubmit('submit', 'Войти', array(
-            'class' => 'btn btn-primary'
-        ))?>
+    <div class="row">
+        <div class="col-lg-9 col-offset-3">
+            <?=$this->formSubmit('submit', 'Войти', array(
+                'class' => 'btn btn-primary'
+            ))?>
+        </div>
     </div>
 </fieldset>

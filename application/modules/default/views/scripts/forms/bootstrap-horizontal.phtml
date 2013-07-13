@@ -11,9 +11,9 @@
     <?php foreach ($this->element->getElements() as $element) { ?>
         <?php if ($element instanceof Zend_Form_Element) { ?>
             <?php if (!$element instanceof Zend_Form_Element_Submit) { ?>
-                <div class="control-group<?=$element->hasErrors() ? ' error' : ''?>">
-                    <label class="control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
-                    <div class="controls">
+                <div class="row<?=$element->hasErrors() ? ' error' : ''?>">
+                    <label class="col-lg-2 control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
+                    <div class="col-lg-10">
                         <?=$element?>
                         <?php foreach ($element->getMessages() as $error) { ?>
                             <span class="help-inline"><?=$this->escape($error)?></span>
@@ -24,9 +24,9 @@
         <?php } elseif ($element instanceof Zend_Form) { ?>
             <?=$element->render($this)?>
         <?php } elseif ($element instanceof Zend_Form_DisplayGroup) { ?>
-            <div class="control-group">
-                <label class="control-label"><?=$this->escape($element->getLegend())?></label>
-                <div class="controls">
+            <div class="row">
+                <label class="col-lg-2 control-label"><?=$this->escape($element->getLegend())?></label>
+                <div class="col-lg-10">
                     <?=$element->render($this)?>
                 </div>
             </div>
@@ -59,10 +59,12 @@
         <p><?=$this->escape($desc)?></p>
     <?php } ?>
     <?php if (!$submitFound && !$this->element instanceof Zend_Form_SubForm) { ?>
-        <div class="form-actions">
-            <?=$this->formSubmit('submit', 'Отправить', array(
-                'class' => 'btn btn-primary'
-            ))?>
+        <div class="row">
+            <div class="col-lg-10 col-offset-2">
+                <?=$this->formSubmit('submit', 'Отправить', array(
+                    'class' => 'btn btn-primary'
+                ))?>
+            </div>
         </div>
     <?php } ?>
 

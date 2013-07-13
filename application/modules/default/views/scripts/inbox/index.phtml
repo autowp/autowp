@@ -1,33 +1,33 @@
 <div>
-	<?=$this->formSelect('brand', $this->brand, array(
-		'onchange'	=>	'window.location = $(this).val()'
-	), $this->brands)?>
+    <?=$this->formSelect('brand', $this->brand, array(
+        'onchange'    =>    'window.location = $(this).val()'
+    ), $this->brands)?>
 </div>
 <div class="row">
-	<div class="span4">
-		<h3 style="text-align:left"><?php if ($this->prevDate) { ?>
-			&#x2190;
-			<?=$this->htmlA($this->url(array(
-				'date' => $this->prevDate->toString('yyyy-MM-dd')
-			), 'inbox'), $this->humanDate($this->prevDate)) ?>
-			<small>(<?=$this->prevCount ?>&#xa0;<?=numericDeclension($this->prevCount, 'картинка', 'картинки', 'картинок') ?>)</small>
-		<?php } ?></h3>
-	</div>
-	<div class="span4">
-		<h3 style="text-align:center">
-			<?=$this->humanDate($this->date)?>
-			<small>(<?=$this->count ?>&#xa0;<?=numericDeclension($this->count, 'картинка', 'картинки', 'картинок')?>)</small>
-		</h3>
-	</div>
-	<div class="span4">
-		<h3 style="text-align:right"><?php if ($this->nextDate) { ?>
-			<?=$this->htmlA($this->url(array(
-				'date' => $this->nextDate->toString('yyyy-MM-dd')
-			), 'inbox'), $this->humanDate($this->nextDate)) ?>
-			<small>(<?=$this->nextCount ?>&#xa0;<?=numericDeclension($this->nextCount, 'картинка', 'картинки', 'картинок') ?>)</small>
-			&#x2192;
-		<?php } ?></h3>
-	</div>
+    <div class="col-lg-4">
+        <h3 style="text-align:left"><?php if ($this->prevDate) { ?>
+            &#x2190;
+            <?=$this->htmlA($this->url(array(
+                'date' => $this->prevDate->toString('yyyy-MM-dd')
+            ), 'inbox'), $this->humanDate($this->prevDate)) ?>
+            <small>(<?=$this->prevCount ?>&#xa0;<?=numericDeclension($this->prevCount, 'картинка', 'картинки', 'картинок') ?>)</small>
+        <?php } ?></h3>
+    </div>
+    <div class="col-lg-4">
+        <h3 style="text-align:center">
+            <?=$this->humanDate($this->date)?>
+            <small>(<?=$this->count ?>&#xa0;<?=numericDeclension($this->count, 'картинка', 'картинки', 'картинок')?>)</small>
+        </h3>
+    </div>
+    <div class="col-lg-4">
+        <h3 style="text-align:right"><?php if ($this->nextDate) { ?>
+            <?=$this->htmlA($this->url(array(
+                'date' => $this->nextDate->toString('yyyy-MM-dd')
+            ), 'inbox'), $this->humanDate($this->nextDate)) ?>
+            <small>(<?=$this->nextCount ?>&#xa0;<?=numericDeclension($this->nextCount, 'картинка', 'картинки', 'картинок') ?>)</small>
+            &#x2192;
+        <?php } ?></h3>
+    </div>
 </div>
 <?=$this->pictures2($this->paginator->getCurrentItems(), 6) ?>
-<?=$this->paginationControl($this->paginator); ?>
+<?=$this->paginationControl($this->paginator) ?>

@@ -1,14 +1,14 @@
-<div class="row"><div class="span8 offset2 login-page">
-	<?=$this->render('login/menu.phtml')?>
-	<div class="wrapper">
-		<?=$this->form->render($this) ?>
-	</div>
-	
-	<?php if ($this->errorMessage) { ?>
-	    <p class="alert alert-block alert-error"><?=$this->escape($this->errorMessage) ?></p>
-	<?php } ?>
-		
-	<p>Если вы забыли свой логин или пароль, вы можете воспользоваться <a href="/restorepassword/">формой восстановления по e-mail</a></p>
-	<p>Если вы ещё не зарегистрированы на сайте, то можете <a href="/registration/">сделать это сейчас</a></p>
-	
+<div class="row"><div class="col-lg-8 col-offset-2 login-page">
+    <?=$this->render('login/menu.phtml')?>
+    <div class="well">
+        <?=$this->form->render($this) ?>
+    </div>
+
+    <?php if ($this->errorMessage) { ?>
+        <p class="alert alert-block alert-error"><?=$this->escape($this->errorMessage) ?></p>
+    <?php } ?>
+
+    <p>Если вы забыли свой логин или пароль, вы можете воспользоваться <a href="/restorepassword/">формой восстановления по e-mail</a></p>
+    <p>Если вы ещё не зарегистрированы на сайте, то можете <a href="/registration/">сделать это сейчас</a></p>
+
 </div></div>

@@ -57,7 +57,7 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
             if ($user) {
 
                 if ($user->deleted) {
-                    return '<span class="muted"><i class="icon-user"></i> удалённый пользователь</span>';
+                    return '<span class="muted"><span class="glyphicon glyphicon-user"></span> удалённый пользователь</span>';
                 }
 
                 $group = $this->_group($user->group_id);
@@ -88,7 +88,7 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
 
                 $result =
                     '<span class="'.implode(' ', $classes).'">' .
-                        '<i class="icon-user"></i>&#xa0;' .
+                        '<i class="glyphicon glyphicon-user"></i>&#xa0;' .
                         $this->view->htmlA(array(
                             'href'  => $url,
                             'style' => $style

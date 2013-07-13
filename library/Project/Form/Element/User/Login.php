@@ -11,7 +11,7 @@ class Project_Form_Element_User_Login extends Zend_Form_Element_Text
     /**
      * @var string
      */
-    protected $maxlength = '20';
+    protected $maxlength = '50';
 
     public function __construct($spec, $options = null)
     {

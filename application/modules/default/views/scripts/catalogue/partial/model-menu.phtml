@@ -1,26 +1,26 @@
 <ul class="nav nav-pills">
-	<?php if ($this->stock['count'] > 0) { ?>
-		<li<?=$this->stock['active'] ? ' class="active"' : ''?>>
-			<?=$this->htmlA($this->url(array(
-				'action'	=>	'model-cars',
-				'page'		=>	1,
-			)), '<i class="icon-list"></i> ' . $this->escape($this->title) . ' ('.$this->stock['count'].')', false); ?>
-		</li>
-	<?php } ?>
-	<?php if ($this->tuning['count'] > 0) { ?>
-		<li<?=$this->tuning['active'] ? ' class="active"' : ''?>>
-			<?=$this->htmlA($this->url(array(
-				'action'	=>	'model-cars-tuning',
-				'page'		=>	1,
-			)), '<i class="icon-list"></i> Тюнинг ' . $this->escape($this->title) . ' ('.$this->tuning['count'].')', false); ?>
-		</li>
-	<?php } ?>
-	<?php if ($this->pictures['count'] > 0) { ?>
-		<li<?=$this->pictures['active'] ? ' class="active"' : ''?>>
-			<?=$this->htmlA($this->url(array(
-				'action'	=>	'model-pictures',
-				'page'		=>	1,
-			)), '<i class="icon-th"></i> Все изображения ' . $this->escape($this->title) . ' ('.$this->pictures['count'].')', false); ?>
-		</li>
-	<?php } ?>
+    <?php if ($this->stock['count'] > 0) { ?>
+        <li<?=$this->stock['active'] ? ' class="active"' : ''?>>
+            <?=$this->htmlA($this->url(array(
+                'action' => 'model-cars',
+                'page'   => 1,
+            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->title) . ' ('.$this->stock['count'].')', false) ?>
+        </li>
+    <?php } ?>
+    <?php if ($this->tuning['count'] > 0) { ?>
+        <li<?=$this->tuning['active'] ? ' class="active"' : ''?>>
+            <?=$this->htmlA($this->url(array(
+                'action' => 'model-cars-tuning',
+                'page'   => 1,
+            )), '<span class="glyphicon glyphicon-list"></span> Тюнинг ' . $this->escape($this->title) . ' ('.$this->tuning['count'].')', false) ?>
+        </li>
+    <?php } ?>
+    <?php if ($this->pictures['count'] > 0) { ?>
+        <li<?=$this->pictures['active'] ? ' class="active"' : ''?>>
+            <?=$this->htmlA($this->url(array(
+                'action' => 'model-pictures',
+                'page'   => 1,
+            )), '<span class="glyphicon glyphicon-th"></span> Все изображения ' . $this->escape($this->title) . ' ('.$this->pictures['count'].')', false) ?>
+        </li>
+    <?php } ?>
 </ul>

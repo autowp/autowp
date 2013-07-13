@@ -3,7 +3,7 @@
 ?>
 
 <header>
-    <div class="brand-hero-unit hero-unit">
+    <div class="jumbotron brand-hero-unit">
         <?=$this->image($this->brand, 'logo', array(
             'format' => 13,
             'alt'    => 'логотип ' . $this->brand->caption,
@@ -35,19 +35,19 @@
         <li>
             <?=$this->htmlA($this->url(array(
                 'action' => 'cars'
-            ), 'catalogue'), '<i class="icon-road"></i> Хронология', false)?>
+            ), 'catalogue'), '<span class="glyphicon glyphicon-road"></span> Хронология', false)?>
         </li>
         <li>
             <?=$this->htmlA($this->url(array(
                 'action' => 'recent'
-            ), 'catalogue'), '<i class="icon-th"></i> Новые фото', false)?>
+            ), 'catalogue'), '<span class="glyphicon glyphicon-th"></span> Новые фото', false)?>
         </li>
         <?php if ($this->haveTwins) { ?>
             <li>
                 <?=$this->htmlA($this->url(array(
                     'action'        => 'brand',
                     'brand_catname' => $this->brand->folder
-                ), 'twins', true), '<i class="icon-adjust"></i> Twins', false)?>
+                ), 'twins', true), '<span class="glyphicon glyphicon-adjust"></span> Twins', false)?>
             </li>
         <?php } ?>
     </ul>
@@ -56,7 +56,7 @@
 <section>
     <h2><?=$this->escape('Популярные картинки') ?></h2>
     <?php if ($this->topPictures) { ?>
-        <?=$this->pictures2($this->topPictures, 4) ?>
+        <?=$this->pictures3($this->topPictures, 4) ?>
     <?php } ?>
 </section>
 

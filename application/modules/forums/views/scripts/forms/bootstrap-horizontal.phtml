@@ -1,6 +1,6 @@
-<?php 
+<?php
     $this->element->setAttrib(
-        'class', 
+        'class',
         $this->element->getAttrib('class') . ' form-horizontal'
     );
 ?>
@@ -9,12 +9,12 @@
         <legend><?=$this->escape($description)?></legend>
     <?php } ?>
     <?php foreach ($this->element->getElements() as $element) { ?>
-        <?php 
-            $errors = $element->getMessages(); 
+        <?php
+            $errors = $element->getMessages();
         ?>
-        <div class="control-group<?=$errors ? ' error' : ''?>">
-            <label class="control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
-            <div class="controls">
+        <div class="row<?=$errors ? ' error' : ''?>">
+            <label class="control-label col-lg-2" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
+            <div class="col-lg-10">
                 <?=$element?>
                 <?php foreach ($errors as $error) { ?>
                     <span class="help-inline"><?=$this->escape($error)?></span>
@@ -22,9 +22,11 @@
             </div>
         </div>
     <?php } ?>
-    <div class="form-actions">
-        <?=$this->formSubmit('submit', 'Отправить', array(
-            'class' => 'btn btn-primary'
-        ))?>
+    <div class="row">
+        <div class="col-lg-10 col-offset-2">
+            <?=$this->formSubmit('submit', 'Отправить', array(
+                'class' => 'btn btn-primary'
+            ))?>
+        </div>
     </div>
 </fieldset>

@@ -1,20 +1,20 @@
 <?php
-	$this->pageTitle($this->page->name.' '.$this->brand->caption . ' ' . $this->designProject->name);
+    $this->pageTitle($this->page->name.' '.$this->brand->caption . ' ' . $this->designProject->name);
 ?>
 
 <ul class="nav nav-pills">
-	<li>
-		<?=$this->htmlA($this->url(array(
-	        'action'    => 'design-project-cars',
-	        'page'      => 1
-	    )), $this->brand->caption.' '.$this->designProject->name); ?>
-	</li>
-	<li class="active">
-		<?=$this->htmlA($this->url(array(
-	        'action'    => 'design-project-pictures',
-	        'page'      => 1
-	    )), 'Все изображения '.$this->brand->caption.' '.$this->designProject->name); ?>
-	</li>
+    <li>
+        <?=$this->htmlA($this->url(array(
+            'action'    => 'design-project-cars',
+            'page'      => 1
+        )), $this->brand->caption.' '.$this->designProject->name) ?>
+    </li>
+    <li class="active">
+        <?=$this->htmlA($this->url(array(
+            'action'    => 'design-project-pictures',
+            'page'      => 1
+        )), 'Все изображения '.$this->brand->caption.' '.$this->designProject->name) ?>
+    </li>
 </ul>
 
 <?=$this->pictures2($this->paginator->getCurrentItems(), 4) ?>

@@ -1,8 +1,8 @@
 <?php foreach ($this->themes as $theme) { ?>
     <div class="row">
-        <div class="span5">
+        <div class="col-lg-6">
             <div class="well">
-                <p><i class="icon-th-list"></i> <strong><?=$this->htmlA(array(
+                <p><span class="glyphicon glyphicon-th-list"></span> <strong><?=$this->htmlA(array(
                     'href' => $theme['url'],
                     'title' => 'Перейти в форум "'.$theme['name'].'"'
                 ), $theme['name']) ?></strong></p>
@@ -12,11 +12,11 @@
                 <p>Тем: <?=$theme['topics'] ?>, Сообщений: <?=$theme['messages'] ?></p>
                 <?php if (count($theme['subthemes'])) { ?>
                     Подфорумы:
-                    <?php foreach ($theme['subthemes'] as $idx => $subtheme) { 
+                    <?php foreach ($theme['subthemes'] as $idx => $subtheme) {
                         if ($idx) {
-                            print ', '; 
-                        } 
-                        print $this->htmlA($subtheme['url'], $subtheme['name']); 
+                            print ', ';
+                        }
+                        print $this->htmlA($subtheme['url'], $subtheme['name']);
                     } ?>
                 <?php } else { ?>
                     <p><?=$this->htmlA($theme['url'], 'Зайти в форум …') ?></p>
@@ -24,10 +24,10 @@
             </div>
         </div>
         <?php if ($topic = $theme['lastTopic']) { ?>
-            <div class="span4">
+            <div class="col-lg-6">
                 <div class="well transparent">
                     <?php if ($lastMessage = $theme['lastMessage']) { ?>
-                        <p><i class="icon-comment"></i> Последнее сообщение в теме «<?=$this->htmlA($this->url(array(
+                        <p><span class="glyphicon glyphicon-comment"></span> Последнее сообщение в теме «<?=$this->htmlA($this->url(array(
                             'controller' => 'topic',
                             'action'     => 'topic',
                             'topic_id'   => $topic->id

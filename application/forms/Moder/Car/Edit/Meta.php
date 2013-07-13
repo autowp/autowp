@@ -20,57 +20,59 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'required'     => true,
                     'order'        => 1,
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span5'
+                    'class'        => 'col-lg-12'
                 )),
                 array('Car_Body', 'body', array(
                     'required'     => false,
                     'order'        => 2,
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span2'
+                    'class'        => 'col-lg-2'
                 )),
                 array('Car_Type', 'car_type_id', array(
                     'required'     => false,
                     'order'        => 3,
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span3'
+                    'class'        => 'col-lg-3'
                 )),
                 array('year', 'begin_model_year', array(
                     'required'     => false,
                     'label'        => 'с',
                     'placeholder'  => 'с',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span1'
+                    'class'        => 'col-lg-1',
                 )),
                 array('year', 'end_model_year', array(
                     'required'     => false,
                     'label'        => 'по',
                     'placeholder'  => 'по',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span1'
+                    'class'        => 'col-lg-1'
                 )),
                 array('year', 'begin_year', array(
                     'required'     => false,
                     'label'        => 'год',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span1'
+                    'class'        => 'col-lg-1',
+                    'placeholder'  => 'год',
                 )),
                 array('month', 'begin_month', array(
                     'required'     => false,
                     'label'        => 'месяц',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span2'
+                    'class'        => 'col-lg-2'
                 )),
                 array('year', 'end_year', array(
                     'required'     => false,
                     'label'        => 'год',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span1'
+                    'class'        => 'col-lg-1',
+                    'placeholder'  => 'год',
                 )),
                 array('month', 'end_month', array(
                     'required'     => false,
                     'label'        => 'месяц',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span2'
+                    'class'        => 'col-lg-2'
                 )),
                 array('select', 'today', array(
                     'required'     => false,
@@ -81,13 +83,13 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                         '2' => 'производится в н.в.'
                     ),
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span2'
+                    'class'        => 'col-lg-2'
                 )),
                 array('uint', 'produced', array(
                     'required'     => false,
                     'label'        => 'единиц',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span1'
+                    'class'        => 'col-lg-2'
                 )),
                 array('select', 'produced_exactly', array(
                     'required'     => false,
@@ -97,7 +99,7 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                         '1' => 'точно'
                     ),
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'span2'
+                    'class'        => 'col-lg-2'
                 )),
                 array('checkbox', 'is_concept', array(
                     'required'     => false,

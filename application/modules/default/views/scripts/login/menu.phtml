@@ -1,20 +1,20 @@
 <ul class="nav nav-tabs">
-	<?php foreach ($this->menu as $item) { ?>
-		<li<?=$item['active'] ? ' class="active"' : '' ?>>
-			<?php if (isset($item['icon'])) { ?>
-				<?=$this->htmlA($item['url'], '<i class="'.$item['icon'].'"></i> ' . $this->escape($item['name']), false)?>
-			<?php } elseif (isset($item['img'])) { ?>
-				<?=$this->htmlA(
-					$item['url'], 
-					$this->htmlImg(array(
-						'src'	=>	$item['img'],
-						'style'	=>	'float:left;margin-right:5px'
-					)) . ' ' . $this->escape($item['name']), 
-					false
-				)?>
-			<?php } else { ?>
-				<?=$this->htmlA($item['url'], $item['name'])?>
-			<?php } ?>
-		</li>
-	<?php } ?>
+    <?php foreach ($this->menu as $item) { ?>
+        <li<?=$item['active'] ? ' class="active"' : '' ?>>
+            <?php if (isset($item['icon'])) { ?>
+                <?=$this->htmlA($item['url'], '<span class="'.$item['icon'].'"></span> ' . $this->escape($item['name']), false)?>
+            <?php } elseif (isset($item['img'])) { ?>
+                <?=$this->htmlA(
+                    $item['url'],
+                    $this->htmlImg(array(
+                        'src'   => $item['img'],
+                        'style' => 'float:left;margin-right:5px'
+                    )) . ' ' . $this->escape($item['name']),
+                    false
+                )?>
+            <?php } else { ?>
+                <?=$this->htmlA($item['url'], $item['name'])?>
+            <?php } ?>
+        </li>
+    <?php } ?>
 </ul>

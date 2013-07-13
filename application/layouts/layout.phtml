@@ -6,20 +6,14 @@
 
     $mainMenu = '';
     if (!$this->blankPage) {
-        $mainMenu = $this->action('main-menu2', 'pages', 'default');
+        $mainMenu = $this->action('main-menu', 'pages', 'default');
     }
 
     if ($this->jQuery()->uiIsEnabled()) {
         $this->headLink()->appendStylesheet('/js/libs/jquery/ui/theme/ui.all.css');
     }
-
-    $endTag = ' />';
-    if (!$this->doctype()->isXhtml()) {
-        $endTag= '>';
-    }
-
 ?>
-<?=$this->doctype() . PHP_EOL; ?>
+<?=$this->doctype() . PHP_EOL ?>
 <html dir="ltr" lang="<?=$this->language()->get()?>">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,8 +36,8 @@
         <?=$moderMenu ?>
 
         <?php
-            $spanLeft = $this->needLeft ? 3 : 0;
-            $spanRight = $this->needRight ? 3 : 0;
+            $spanLeft = $this->needLeft ? 4 : 0;
+            $spanRight = $this->needRight ? 4 : 0;
             $spanCenter = 12 - $spanLeft - $spanRight;
         ?>
 
@@ -52,51 +46,49 @@
         <?php }  ?>
 
         <div class="container">
-            <?php if ($this->needLeft || $this->needRight) { ?>
-                <div class="row">
+            <div class="row">
+
+                <div class="col-lg-<?=$spanCenter?> col-push-<?=$spanLeft?>">
+                    <?php if (isset($this->flashMessages) && $this->flashMessages) { ?>
+                        <?php foreach($this->flashMessages as $message) { ?>
+                            <div class="alert alert-info">
+                                <?=$message ?>
+                            </div>
+                        <?php } ?>
+                    <?php } ?>
+
+                    <?=$this->breadcrumbs() ?>
+                    <?=$this->pageTitle() ?>
+
+                    <?=$this->layout()->content ?>
+
+                </div>
+
                 <?php if ($this->needLeft) { ?>
-                    <div class="span<?=$spanLeft?>">
+                    <div class="col-lg-<?=$spanLeft?> col-pull-<?=$spanCenter?>">
                         <?=$this->layout()->sidebar ?>
                     </div>
                 <?php } ?>
-                <div class="span<?=$spanCenter?>">
-            <?php } ?>
 
-            <?php if (isset($this->flashMessages) && $this->flashMessages) { ?>
-                <?php foreach($this->flashMessages as $message) { ?>
-                    <div class="alert alert-info">
-                        <?=$message ?>
-                    </div>
-                <?php } ?>
-            <?php } ?>
-
-            <?=$this->breadcrumbs(); ?>
-            <?=$this->pageTitle() ?>
-
-            <?=$this->layout()->content; ?>
-
-            <?php if ($this->needLeft || $this->needRight) { ?>
-                </div>
                 <?php if ($this->needRight) { ?>
-                    <div class="span<?=$spanRight?>">
+                    <div class="col-lg-<?=$spanRight?>">
                         <?php if ($this->page) { ?>
                             <?php foreach ($this->blocks($this->page->id) as $block) { ?>
-                                <?=$block->getHtml(); ?>
+                                <?=$block->getHtml() ?>
                             <?php } ?>
                         <?php } ?>
-                        <a class="twitter-timeline"  href="https://twitter.com/autowp_ru"  data-widget-id="323907714319253505" data-chrome="nofooter">Твиты пользователя @autowp_ru</a>
+                        <a class="twitter-timeline"  href="https://twitter.com/autowp_ru"  data-widget-id="323907714319253505" data-chrome="nofooter" width="370">Твиты пользователя @autowp_ru</a>
                         <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
                     </div>
                 <?php } ?>
-                </div>
-            <?php } ?>
+            </div>
 
             <?php if ((!$this->blankPage) && (!$this->isAdminPage) ) { ?>
                 <div class="bottom-line"><p><strong>AutoWP.ru '2005&ndash;<?=$this->escape($this->translate('present-time-abbr'))?></strong></p></div>
 
                 <footer class="footer">
                     <div class="row">
-                        <div class="span6">
+                        <div class="col-lg-6">
                             <?=$this->htmlA(
                                 'http://www.liveinternet.ru/click',
                                 $this->htmlImg(array(
@@ -117,13 +109,13 @@ ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www')
 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
 <?php $this->inlineScript()->captureEnd() ?>
-<?=$this->inlineScript(); ?>
+<?=$this->inlineScript() ?>
                         </div>
-                        <div class="span6">
+                        <div class="col-lg-6">
                             <p class="copyrights">
-                                Обращаем Ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br<?=$endTag?>
-                                Администрация сайта не располагает информацией о правомерности публикования этих материалов.<br<?=$endTag?>
-                                Все изображения размещены в ознакомительных целях.<br<?=$endTag?>
+                                Обращаем Ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br />
+                                Администрация сайта не располагает информацией о правомерности публикования этих материалов.<br />
+                                Все изображения размещены в ознакомительных целях.<br />
                                 <a href="mailto:autowp@yandex.ru">Сообщить о нарушении авторских прав</a>.
                             </p>
                         </div>

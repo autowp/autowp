@@ -1,38 +1,38 @@
-<ul class="destinations thumbnails">
-	<?php foreach ($this->categories as $idx => $category) { ?>
-		<?php if ($idx && ($idx % 6 == 0)) { ?></ul><ul class="destinations thumbnails"><?php }?>
-		<li class="span2">
-			<div class="thumbnail">
-				<?php if ($picture = $category['top_picture']) { ?>
-					<?php
-						$caption = $picture->getCaption(); 
-					?>
-					<?=$this->htmlA(
-						array(
-							'href'	=>	$category['url'],
-							//'class'	=>	'thumbnail'
-						), 
-						$this->image($picture, 'file_name', array(
-				            'format' => 6,
-				            'alt'    => $caption,
-				            'title'  => $caption
-				        )), 
-						false
-					) ?>
-				<?php } ?>
-				<div class="caption">
-					<h4><?=$this->htmlA(array(
-						'href'	=>	$category['url'],
-						'title'	=>	$category['name']
-					), $category['short_name']) ?></h4>
-					<p>
-						<?=$this->escape($this->translate(array('category/%s cars', null, $category['cars_count']), $category['cars_count']))?> 
-						<?php if ($category['new_cars_count'] > 0) { ?>
-							<small>(<?=$this->escape($this->translate(array('category/%s new cars', null, $category['new_cars_count']), $category['new_cars_count']))?>)</small>
-						<?php } ?>
-					</p>
-				</div>
-			</div>
-		</li>
-	<?php } ?>
-</ul>
+<div class="row destinations thumbnails">
+    <?php foreach ($this->categories as $idx => $category) { ?>
+        <?php if ($idx && ($idx % 6 == 0)) { ?></div><div class="row destinations thumbnails"><?php }?>
+        <div class="col-lg-2">
+            <div class="thumbnail">
+                <?php if ($picture = $category['top_picture']) { ?>
+                    <?php
+                        $caption = $picture->getCaption();
+                    ?>
+                    <?=$this->htmlA(
+                        array(
+                            'href'   => $category['url'],
+                            //'class'    =>    'thumbnail'
+                        ),
+                        $this->image($picture, 'file_name', array(
+                            'format' => 6,
+                            'alt'    => $caption,
+                            'title'  => $caption
+                        )),
+                        false
+                    ) ?>
+                <?php } ?>
+                <div class="caption">
+                    <h4><?=$this->htmlA(array(
+                        'href'  => $category['url'],
+                        'title' => $category['name']
+                    ), $category['short_name']) ?></h4>
+                    <p>
+                        <?=$this->escape($this->translate(array('category/%s cars', null, $category['cars_count']), $category['cars_count']))?>
+                        <?php if ($category['new_cars_count'] > 0) { ?>
+                            <small>(<?=$this->escape($this->translate(array('category/%s new cars', null, $category['new_cars_count']), $category['new_cars_count']))?>)</small>
+                        <?php } ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+    <?php } ?>
+</div>

@@ -1,44 +1,44 @@
 <?php
-	if (($current = $this->paginator->getCurrentPageNumber()) < $this->paginator->count() ) {
-		$this->headLink(array(
-			'rel'	=>	'prefetch',
-			'href'	=>	$this->url(array(
-				'page' => $this->paginator->getCurrentPageNumber()+1
-			), 'new', true)
-		));
-		$this->headLink(array(
-			'rel'	=>	'prerender',
-			'href'	=>	$this->url(array(
-				'page' => $this->paginator->getCurrentPageNumber()+1
-			), 'new', true)
-		));
-	}
+    if (($current = $this->paginator->getCurrentPageNumber()) < $this->paginator->count() ) {
+        $this->headLink(array(
+            'rel'  => 'prefetch',
+            'href' => $this->url(array(
+                'page' => $this->paginator->getCurrentPageNumber()+1
+            ), 'new', true)
+        ));
+        $this->headLink(array(
+            'rel'  => 'prerender',
+            'href' => $this->url(array(
+                'page' => $this->paginator->getCurrentPageNumber()+1
+            ), 'new', true)
+        ));
+    }
 ?>
 <div class="row">
-	<div class="span4">
-		<h3 style="text-align:left"><?php if ($this->prevDate) { ?>
-			&#x2190;
-			<?=$this->htmlA($this->url(array(
-				'date' => $this->prevDate->toString($this->urlDateFormat)
-			), 'new', true, true), $this->humanDate($this->prevDate)) ?>
-			<span class="badge badge-info"><?=$this->prevCount ?></span>
-		<?php } ?></h3>
-	</div>
-	<div class="span4">
-		<h3 style="text-align:center">
-			<?=$this->humanDate($this->date)?>
-			<span class="badge badge-info"><?=$this->count ?></span>
-		</h3>
-	</div>
-	<div class="span4">
-		<h3 style="text-align:right"><?php if ($this->nextDate) { ?>
-			<?=$this->htmlA($this->url(array(
-				'date' => $this->nextDate->toString($this->urlDateFormat)
-			), 'new', true, true), $this->humanDate($this->nextDate)) ?>
-			<span class="badge badge-info"><?=$this->nextCount ?></span>
-			&#x2192;
-		<?php } ?></h3>
-	</div>
+    <div class="col-lg-4">
+        <h3 style="text-align:left"><?php if ($this->prevDate) { ?>
+            &#x2190;
+            <?=$this->htmlA($this->url(array(
+                'date' => $this->prevDate->toString($this->urlDateFormat)
+            ), 'new', true, true), $this->humanDate($this->prevDate)) ?>
+            <span class="badge"><?=$this->prevCount ?></span>
+        <?php } ?></h3>
+    </div>
+    <div class="col-lg-4">
+        <h3 style="text-align:center">
+            <?=$this->humanDate($this->date)?>
+            <span class="badge"><?=$this->count ?></span>
+        </h3>
+    </div>
+    <div class="col-lg-4">
+        <h3 style="text-align:right"><?php if ($this->nextDate) { ?>
+            <?=$this->htmlA($this->url(array(
+                'date' => $this->nextDate->toString($this->urlDateFormat)
+            ), 'new', true, true), $this->humanDate($this->nextDate)) ?>
+            <span class="badge"><?=$this->nextCount ?></span>
+            &#x2192;
+        <?php } ?></h3>
+    </div>
 </div>
 <?=$this->pictures2($this->paginator->getCurrentItems(), 6) ?>
-<?=$this->paginationControl($this->paginator); ?>
+<?=$this->paginationControl($this->paginator) ?>

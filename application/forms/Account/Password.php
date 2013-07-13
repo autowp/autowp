@@ -11,7 +11,7 @@ class Application_Form_Account_Password extends Project_Form
             'decorators' => array(
                 'PrepareElements',
                 array('viewScript', array(
-                    'viewScript' => 'forms/account/password.phtml'
+                    'viewScript' => 'forms/bootstrap-horizontal.phtml'
                 )),
                 'Form'
             ),
