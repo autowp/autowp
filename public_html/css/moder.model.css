@@ -26,18 +26,18 @@ table#CarBrandTable th
 
 table#SelectGroupTable
 {
-	width: 100%;
+    width: 100%;
 }
 
 table#SelectGroupTable tr td
 {
-	background-color: #eeeeee;
-	padding: 10px;
+    background-color: #eeeeee;
+    padding: 10px;
 }
 
 table#SelectGroupTable tr td h2
 {
-	margin: 0;
+    margin: 0;
 }
 
 input.Flat, select.Flat, textarea.Flat

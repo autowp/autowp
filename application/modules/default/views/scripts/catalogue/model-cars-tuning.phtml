@@ -1,23 +1,23 @@
 <?php
-	$title = $this->brand->caption . ' ' . $this->model->name . ' Тюнинг'; 
-	$this->pageTitle($title);
-	$this->headTitle($title, 'SET');
+    $title = $this->brand->caption . ' ' . $this->model->name . ' Тюнинг';
+    $this->pageTitle($title);
+    $this->headTitle($title, 'SET');
 ?>
 
 <?=$this->partial('catalogue/partial/model-menu.phtml', array(
-	'title'	=>	$this->brand->caption . ' ' . $this->model->name,
-	'stock'	=>	array(
-		'count'		=>	$this->stockCount,
-		'active'	=>	false
-	),
-	'tuning'	=>	array(
-		'count'		=>	$this->tuningCount,
-		'active'	=>	true
-	),
-	'pictures'	=>	array(
-		'count'		=>	$this->picturesCount,
-		'active'	=>	false
-	),
+    'title'    => $this->brand->caption . ' ' . $this->model->name,
+    'stock'    => array(
+        'count'  => $this->stockCount,
+        'active' => false
+    ),
+    'tuning'   => array(
+        'count'  => $this->tuningCount,
+        'active' => true
+    ),
+    'pictures' => array(
+        'count'  => $this->picturesCount,
+        'active' => false
+    ),
 )) ?>
 
 <?=$this->cars2($this->paginator->getCurrentItems()) ?>

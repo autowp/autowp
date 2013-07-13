@@ -1,39 +1,39 @@
 <?php
-	$title = $this->brand->caption . ' ' . $this->dpBrand->caption;
-	$this->headTitle($title, 'SET');
-	$this->pageTitle($title); 
+    $title = $this->brand->caption . ' ' . $this->dpBrand->caption;
+    $this->headTitle($title, 'SET');
+    $this->pageTitle($title);
 ?>
 
 <?php foreach ($this->paginator->getCurrentItems() as $dp) { ?>
-	<div class="car">
-		<h3>
-			<?=$this->escape($dp->name)?>
-			<?php if ($dp->year) { ?> '<?=$dp->year?><?php } ?>
-		</h3>
-		<?=$this->pictureListHorizontal2(
-			$dp->findCarsByBrand($this->dpBrand)
-				 ->getOrientedPictureList(
-					$this->perspectivesGroups
-				 )
-		)?>
-	
-		<?php 
-			$items = array();
-		 
-			$totalPictures = $dp->getPicturesCount();
-			
-			if ($totalPictures > 4) {
-				$items[] = $this->htmlA($this->url(array(
-					'action' => 'design-project-pictures',
-					'design_project_catname' => $dp->catname
-				)), 'все картинки ('.$totalPictures.')');
-			} 
-		?>
-	
-		<?php if (count($items)) { ?>
-			<ul class="carLinks"><li><?=implode('</li><li>', $items)?></li></ul>
-		<?php } ?>
-	</div>
+    <div class="car">
+        <h3>
+            <?=$this->escape($dp->name)?>
+            <?php if ($dp->year) { ?> '<?=$dp->year?><?php } ?>
+        </h3>
+        <?=$this->pictureListHorizontal2(
+            $dp->findCarsByBrand($this->dpBrand)
+                 ->getOrientedPictureList(
+                    $this->perspectivesGroups
+                 )
+        )?>
+
+        <?php
+            $items = array();
+
+            $totalPictures = $dp->getPicturesCount();
+
+            if ($totalPictures > 4) {
+                $items[] = $this->htmlA($this->url(array(
+                    'action' => 'design-project-pictures',
+                    'design_project_catname' => $dp->catname
+                )), 'все картинки ('.$totalPictures.')');
+            }
+        ?>
+
+        <?php if (count($items)) { ?>
+            <ul class="carLinks"><li><?=implode('</li><li>', $items)?></li></ul>
+        <?php } ?>
+    </div>
 <?php } ?>
 
 <?=$this->paginationControl($this->paginator) ?>
