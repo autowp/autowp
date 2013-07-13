@@ -38,7 +38,7 @@ class Application_Form_Account_Password extends Project_Form
                     ),
                     'decorators'    => array('ViewHelper')
                 )),
-                array ('password', 'password_confirm', array (
+                array('password', 'password_confirm', array(
                     'required'   => true,
                     'label'      => 'Новый (ещё раз)',
                     'size'       => 20,

@@ -19,7 +19,7 @@ class Application_Form_Account_Photo extends Project_Form
                 'Form'
             ),
             'elements'   => array(
-                array('file', 'photo', array (
+                array('file', 'photo', array(
                     'label'       => 'Фотография',
                     'required'    => true,
                     'validators'  => array(
