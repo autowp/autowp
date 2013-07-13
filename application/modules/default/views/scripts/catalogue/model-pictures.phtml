@@ -1,25 +1,25 @@
 <?php
-	$brandName = $this->brandLanguage ? $this->brandLanguage->name : $this->brand->caption;
-	$title = $this->page->name . ' ' . $brandName . ' ' . $this->model->name;
-	$this->pageTitle($title);
-	$this->headTitle($title, 'SET');
+    $brandName = $this->brandLanguage ? $this->brandLanguage->name : $this->brand->caption;
+    $title = $this->page->name . ' ' . $brandName . ' ' . $this->model->name;
+    $this->pageTitle($title);
+    $this->headTitle($title, 'SET');
 ?>
 
 <?=$this->partial('catalogue/partial/model-menu.phtml', array(
-	'title'	=>	$brandName . ' ' . $this->model->name,
-	'stock'	=>	array(
-		'count'		=>	$this->stockCount,
-		'active'	=>	false
-	),
-	'tuning'	=>	array(
-		'count'		=>	$this->tuningCount,
-		'active'	=>	false
-	),
-	'pictures'	=>	array(
-		'count'		=>	$this->picturesCount,
-		'active'	=>	true
-	),
+    'title' => $brandName . ' ' . $this->model->name,
+    'stock' => array(
+        'count'  => $this->stockCount,
+        'active' => false
+    ),
+    'tuning' => array(
+        'count'  => $this->tuningCount,
+        'active' => false
+    ),
+    'pictures' => array(
+        'count'  => $this->picturesCount,
+        'active' => true
+    ),
 )) ?>
 
-<?=$this->pictures2($this->paginator->getCurrentItems(), 4) ?>
+<?=$this->pictures($this->paginator->getCurrentItems(), 4) ?>
 <?=$this->paginationControl($this->paginator) ?>
