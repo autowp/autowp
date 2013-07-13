@@ -3,5 +3,5 @@
     $this->headTitle('Другие ' . $this->brand->caption . ' ' . $this->model->name, 'SET');
 ?>
 
-<?=$this->cars2($this->paginator->getCurrentItems()) ?>
+<?=$this->cars($this->paginator->getCurrentItems()) ?>
 <?=$this->paginationControl($this->paginator) ?>

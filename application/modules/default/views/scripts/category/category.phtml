@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class="col-lg-8">
-        <?=$this->cars2($this->paginator->getCurrentItems()) ?>
+        <?=$this->cars($this->paginator->getCurrentItems()) ?>
         <?=$this->paginationControl($this->paginator) ?>
 
         <?php if (count($this->contributors)) { ?>

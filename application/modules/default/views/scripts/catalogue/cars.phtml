@@ -15,8 +15,5 @@
     <?php } ?>
 </ul>
 
-<section>
-    <?=$this->cars2($this->paginator->getCurrentItems()) ?>
-</section>
-
+<?=$this->cars($this->paginator->getCurrentItems()) ?>
 <?=$this->paginationControl($this->paginator) ?>
