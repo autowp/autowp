@@ -442,7 +442,7 @@ function popoverHandlers() {
                             trigger: 'manual',
                             content: html,
                             html: true,
-                            placement: get_popover_placement
+                            placement: 'bottom', //get_popover_placement
                         });
                         loaded = true;
                         if (over) {
@@ -468,7 +468,7 @@ function brandsPage() {
 }
 
 function showPMWindow(userId) {
-    var form = $(
+    var $modal = $(
         '<div class="modal fade">\
             <div class="modal-dialog">\
                 <form action="/account/send-personal-message" class="modal-content" method="post">\
@@ -488,18 +488,20 @@ function showPMWindow(userId) {
         </div>'
     );
     
-    var $btnSend = $('.btn-primary', form).button();
-    var $btnCancel = $('.cancel', form).button();
-    var $textarea = $('textarea', form);
+    var $form = $modal.find('form');
     
-    form.modal({
+    var $btnSend = $form.find('.btn-primary').button();
+    var $btnCancel = $form.find('.cancel').button();
+    var $textarea = $form.find('textarea');
+    
+    $modal.modal({
         show: true
     });
                  
-    form.on('hidden', function () {
-        form.remove();
+    $modal.on('hidden', function () {
+        $modal.remove();
     });
-    form.on('shown', function () {
+    $modal.on('shown', function () {
         $textarea.focus();
     });
     
@@ -509,12 +511,12 @@ function showPMWindow(userId) {
         $btnSend.text('отправить').removeClass('btn-success').prop('disabled', $(this).val().length <= 0);
     }).triggerHandler('change');
     
-    $('button.cancel, a.close', form).on('click', function(e) {
+    $form.find('button.cancel, a.close').on('click', function(e) {
         e.preventDefault();
-        form.modal('hide');
+        $modal.modal('hide');
     });
     
-    form.submit(function(e) {
+    $form.submit(function(e) {
         e.preventDefault();
         
         var text = $textarea.val();
@@ -525,7 +527,7 @@ function showPMWindow(userId) {
             $btnSend.button('loading');
             $btnCancel.prop("disabled", 1);
             $textarea.prop("disabled", 1);
-            $.post(form.attr('action'), {user_id: userId, message: text}, function(json) {
+            $.post($form.attr('action'), {user_id: userId, message: text}, function(json) {
                 $textarea.val('');
                 
                 $btnSend.button('reset').button('complete').addClass('btn-success disabled').prop("disabled", 1);
