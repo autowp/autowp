@@ -2,17 +2,6 @@
 class Project_View_Helper_HumanDate extends Zend_View_Helper_Abstract
 {
     /**
-     * @var Zend_View_Interface
-     */
-    public $view;
-    
-    
-    // ------------------------------------------------------------------------
-    public function setView(Zend_View_Interface $view)
-    {
-        $this->view = $view;
-    }
-    /**
      * Converts time to fuzzy time strings
      *
      * @param string|integer|Zend_Date|array $time
@@ -36,8 +25,7 @@ class Project_View_Helper_HumanDate extends Zend_View_Helper_Abstract
         } else {
             $s = $time->get(Zend_Date::DATE_MEDIUM);
         }
-        
+
         return $s;
-        
     }
 }

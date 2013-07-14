@@ -1,90 +1,94 @@
 <?php
 
 return array (
-	/* Common words */
-	'and'	=>	'и',
-	
-	'few seconds ago'		=>	'несколько секунд назад',
-	'a minute ago'			=>	'минуту назад',
-	'%1$s minutes ago/1'	=>	'%1$s минуту назад',
-	'%1$s minutes ago/2'	=>	'%1$s минуты назад',
-	'%1$s minutes ago/5'	=>	'%1$s минут назад',
-	'an hour ago'			=>	'час назад',
-	'%1$s hours ago/1'		=>	'%1$s час назад',
-	'%1$s hours ago/2'		=>	'%1$s часа назад',
-	'%1$s hours ago/5'		=>	'%1$s часов назад',
-	'yesterday'				=>	'вчера',
-	'today'					=>	'сегодня',
+    /* Common words */
+    'and' => 'и',
 
-	/* Picture preview */
-	'picture-preview/no-comments'	=>	'нет',
-	'picture-preview/no-ratio'		=>	'нет',
-	'Resolution'					=>	'Разрешение',
-	'Filesize'						=>	'Размер',
-	'Ratio'							=>	'Оценка',
-	'Views'							=>	'Просмотров',
-	'Comments count'				=>	'Комментариев',
+    'few seconds ago'    => 'несколько секунд назад',
+    'a minute ago'       => 'минуту назад',
+    '%1$s minutes ago'   => array(
+        '%1$s минуту назад',
+        '%1$s минуты назад',
+        '%1$s минут назад'
+    ),
+    'an hour ago'        => 'час назад',
+    '%1$s hours ago'     => array(
+        '%1$s час назад',
+        '%1$s часа назад',
+        '%1$s часов назад'
+    ),
+    'yesterday'          => 'вчера',
+    'today'              => 'сегодня',
 
-	/* SPECIFICATIONS*/
-	'rpm'	=>	'об/мин',
-	'Nm'	=>	'Нм',
-	'kW'	=>	'КВт',
-	'hp'	=>	'л.с.',
+    /* Picture preview */
+    'picture-preview/no-comments' => 'нет',
+    'picture-preview/no-ratio'    => 'нет',
+    'Resolution'                  => 'Разрешение',
+    'Filesize'                    => 'Размер',
+    'Ratio'                       => 'Оценка',
+    'Views'                       => 'Просмотров',
+    'Comments count'              => 'Комментариев',
 
-	/* PAGINATOR */
-	'next'		=>	'следующая',
-	'previous'	=>	'предыдущая',
+    /* SPECIFICATIONS*/
+    'rpm' => 'об/мин',
+    'Nm'  => 'Нм',
+    'kW'  => 'КВт',
+    'hp'  => 'л.с.',
 
-	/* INDEX */
-	'back'		=>	'назад',
-	'forward'	=>	'вперед',
+    /* PAGINATOR */
+    'next'     => 'следующая',
+    'previous' => 'предыдущая',
 
-	'Picture of the day'	=>	'Картинка дня',
-	'car-of-day'   			=>	'автомобиль дня',
-	'day ahead'				=>	'день вперед',
-	'day ago'				=>	'день назад',
-	'Cars by destination'	=>	'Автомобили по назначению',
-	'All new pictures'		=>	'все новые картинки',
-	
-	'all-link'				=>	'все',
-	
-	'brands/new-cars-of-brand'	=>	'Новые автомобили %s',
-	
-	'brands/more-companies'	=>	array(
-		'ещё %s компания',
-		'ещё %s компании',
-		'ещё %s компаний'
-	),
+    /* INDEX */
+    'back'    => 'назад',
+    'forward' => 'вперед',
 
-	/* Layout */
-	'breadcrumbs/title'			=>	'Путь - дорога',
+    'Picture of the day'       => 'Картинка дня',
+    'car-of-day'               => 'автомобиль дня',
+    'day ahead'                => 'день вперед',
+    'day ago'                  => 'день назад',
+    'Cars by destination'      => 'Автомобили по назначению',
+    'All new pictures'         => 'все новые картинки',
 
-	/* BRAND PAGE*/
-	'unsorted'					=>	'Несортировано',
-	'engines'					=>	'Двигатели',
-	'concepts and prototypes'	=>	'Концепты и прототипы',
-	'logotypes'					=>	'Логотипы',
-	'mixed'						=>	'Разное',
+    'all-link'                 => 'все',
 
-	'count 0'	=>	'нет',
+    'brands/new-cars-of-brand' => 'Новые автомобили %s',
 
-	/* CAR LIST */
-	'carlist/all pictures'		=>	'все картинки',
-	'carlist/twins'				=>	'автомобили-близнецы',
-	'carlist/produced/one'		=>	'Произведен в единственном экземпляре',
-	'carlist/specifications'	=>	'технические характеристики',
+    'brands/more-companies'    => array(
+        'ещё %s компания',
+        'ещё %s компании',
+        'ещё %s компаний'
+    ),
 
-	'present-time-abbr'			=>	'н.в.',
-	
-	/* Categories */
-	'category/%s cars'				=>	array(
-		'%s автомобиль',
-		'%s автомобиля',
-		'%s автомобилей'
-	),
-	'category/%s new cars'			=>	array(
-		'%s новый',
-		'%s новых',
-		'%s новых'
-	)
+    /* Layout */
+    'breadcrumbs/title'       => 'Путь - дорога',
+
+    /* BRAND PAGE*/
+    'unsorted'                => 'Несортировано',
+    'engines'                 => 'Двигатели',
+    'concepts and prototypes' => 'Концепты и прототипы',
+    'logotypes'               => 'Логотипы',
+    'mixed'                   => 'Разное',
+
+    'count 0'    => 'нет',
+
+    /* CAR LIST */
+    'carlist/all pictures'   => 'все картинки',
+    'carlist/twins'          => 'автомобили-близнецы',
+    'carlist/produced/one'   => 'Произведен в единственном экземпляре',
+    'carlist/specifications' => 'технические характеристики',
+
+    'present-time-abbr'      => 'н.в.',
+
+    /* Categories */
+    'category/%s cars'       => array(
+        '%s автомобиль',
+        '%s автомобиля',
+        '%s автомобилей'
+    ),
+    'category/%s new cars'   => array(
+        '%s новый',
+        '%s новых',
+        '%s новых'
+    )
 );

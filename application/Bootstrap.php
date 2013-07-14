@@ -36,7 +36,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         define('CACHE_DIR', APPLICATION_DIR . '/cache');
         define('DOMAIN', 'autowp.ru');
         define('DOMAIN_WWW', 'www.autowp.ru');
-        
+
         define('MYSQL_DATE', 'yyyy-MM-dd');
         define('MYSQL_TIME', 'HH:mm:ss');
         define('MYSQL_DATETIME', MYSQL_DATE . ' ' . MYSQL_TIME);

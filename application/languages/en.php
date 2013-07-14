@@ -1,87 +1,89 @@
 <?php
 
 return array (
-	/* Common words */
-	'and'	=>	'and',
-	
-	'few seconds ago'		=>	'few seconds ago',
-	'a minute ago'			=>	'a minute ago',
-	'%1$s minutes ago/1'	=>	'%1$s minutes ago',
-	'%1$s minutes ago/2'	=>	'%1$s minutes ago',
-	'%1$s minutes ago/5'	=>	'%1$s minutes ago',
-	'an hour ago'			=>	'an hour ago',
-	'%1$s hours ago/1'		=>	'%1$s hours ago',
-	'%1$s hours ago/2'		=>	'%1$s hours ago',
-	'%1$s hours ago/5'		=>	'%1$s hours ago',
-	'yesterday'				=>	'yesterday',
-	'today'					=>	'today',
+    /* Common words */
+    'and' => 'and',
 
-	/* Picture preview */
-	'picture-preview/no-comments'		=>'no',
-	'picture-preview/no-ratio'		=>	'no',
-	'Resolution'					=>	'Resolution',
-	'Filesize'						=>	'Filesize',
-	'Ratio'							=>	'Ratio',
-	'Views'							=>	'Views',
-	'Comments count'				=>	'Comments',
+    'few seconds ago'    => 'few seconds ago',
+    'a minute ago'       => 'a minute ago',
+    '%1$s minutes ago'   => array(
+        '%1$s minute ago',
+        '%1$s minutes ago'
+    ),
+    'an hour ago'        => 'an hour ago',
+    '%1$s hours ago'     => array(
+        '%1$s hour ago',
+        '%1$s hours ago'
+    ),
+    'yesterday'          => 'yesterday',
+    'today'              => 'today',
 
-	/* SPECIFICATIONS*/
-	'rpm'	=>	'rpm',
-	'Nm'	=>	'Nm',
-	'kW'	=>	'kW',
-	'hp'	=>	'hp',
+    /* Picture preview */
+    'picture-preview/no-comments' => 'no',
+    'picture-preview/no-ratio'    => 'no',
+    'Resolution'                  => 'Resolution',
+    'Filesize'                    => 'Filesize',
+    'Ratio'                       => 'Ratio',
+    'Views'                       => 'Views',
+    'Comments count'              => 'Comments',
 
-	/* PAGINATOR */
-	'next'		=>	'next',
-	'previous'	=>	'previous',
+    /* SPECIFICATIONS*/
+    'rpm' => 'rpm',
+    'Nm'  => 'Nm',
+    'kW'  => 'kW',
+    'hp'  => 'hp',
 
-	/* INDEX */
-	'back'		=>	'back',
-	'forward'	=>	'forward',
+    /* PAGINATOR */
+    'next'                     => 'next',
+    'previous'                 => 'previous',
 
-	'Picture of the day'	=>	'Picture of the day',
-	'car-of-day'   			=>	'car of the day',
-	'day ahead'				=>	'day ahead',
-	'day ago'				=>	'day ago',
-	'Cars by destination'	=>	'Cars by destination',
-	'All new pictures'		=>	'All new pictures',
-	
-	'all-link'				=>	'all',
-	
-	'brands/new-cars-of-brand'		=>	'New %s cars',
-	
-	'brands/more-companies'	=>	array(
-		'more %s company',
-		'more %s companies'
-	),
+    /* INDEX */
+    'back'                     => 'back',
+    'forward'                  => 'forward',
 
-	/* Layout */
-	'breadcrumbs/title'				=>	'Way',
+    'Picture of the day'       => 'Picture of the day',
+    'car-of-day'               => 'car of the day',
+    'day ahead'                => 'day ahead',
+    'day ago'                  => 'day ago',
+    'Cars by destination'      => 'Cars by destination',
+    'All new pictures'         => 'All new pictures',
 
-	/* BRAND PAGE*/
-	'unsorted'						=>'Unsorted',
-	'engines'						=>'Engines',
-	'concepts and prototypes'		=>'Concepts and prototypes',
-	'logotypes'						=>'Logotypes',
-	'mixed'							=>'Miscellaneous',
+    'all-link'                 => 'all',
 
-	'count 0'						=>'none',
+    'brands/new-cars-of-brand' => 'New %s cars',
 
-	/* CAR LIST */
-	'carlist/all pictures'			=>	'all pictures',
-	'carlist/twins'					=>	'twins',
-	'carlist/produced/one'			=>	'Produced in a single copy',
-	'carlist/specifications'		=>	'specifications',
+    'brands/more-companies'    => array(
+        'more %s company',
+        'more %s companies'
+    ),
 
-	'present-time-abbr'				=>	'pr.',
-	
-	/* Categories */
-	'category/%s cars'				=>	array(
-		'%s car',
-		'%s cars'
-	),
-	'category/%s new cars'			=>	array(
-		'%s new',
-		'%s new'
-	)
+    /* Layout */
+    'breadcrumbs/title'       => 'Way',
+
+    /* BRAND PAGE*/
+    'unsorted'                => 'Unsorted',
+    'engines'                 => 'Engines',
+    'concepts and prototypes' => 'Concepts and prototypes',
+    'logotypes'               => 'Logotypes',
+    'mixed'                   => 'Miscellaneous',
+
+    'count 0'                 => 'none',
+
+    /* CAR LIST */
+    'carlist/all pictures'    => 'all pictures',
+    'carlist/twins'           => 'twins',
+    'carlist/produced/one'    => 'Produced in a single copy',
+    'carlist/specifications'  => 'specifications',
+
+    'present-time-abbr'       => 'pr.',
+
+    /* Categories */
+    'category/%s cars'        => array(
+        '%s car',
+        '%s cars'
+    ),
+    'category/%s new cars'    => array(
+        '%s new',
+        '%s new'
+    )
 );
