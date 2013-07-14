@@ -9,21 +9,21 @@ $(function() {
         function reload() {
             if (!$modal) {
                 $modal = $(
-                    '<div class="modal fade">' +
-                        '<div class="modal-dialog">' +
-                            '<div class="modal-content">' +
-                                '<div class="modal-header">' +
-                                    '<button type="button" data-dismiss="modal" class="close">×</button>' +
-                                    '<h3 class="modal-title">Online</h3>' +
-                                '</div>' +
-                                '<div class="modal-body"></div>' +
-                                '<div class="modal-footer">' +
-                                    '<button class="btn btn-primary">Обновить</a>' +
-                                    '<button data-dismiss="modal" class="btn btn-default">Закрыть</button>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>'
+                    '<div class="modal fade">\
+                        <div class="modal-dialog">\
+                            <div class="modal-content">\
+                                <div class="modal-header">\
+                                    <button type="button" data-dismiss="modal" class="close">×</button>\
+                                    <h3 class="modal-title">Online</h3>\
+                                </div>\
+                                <div class="modal-body"></div>\
+                                <div class="modal-footer">\
+                                    <button class="btn btn-primary">Обновить</a>\
+                                    <button data-dismiss="modal" class="btn btn-default">Закрыть</button>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </div>'
                 );
                 $body = $modal.find('.modal-body');
                 $btnRefresh = $modal.find('.btn-primary').on('click', function(e) {
@@ -93,9 +93,8 @@ $(function() {
                 this.$details.css({
                     position: 'absolute',
                     left: 0,
-                    top: 0,
-                    display: 'none'
-                });
+                    top: 0
+                }).hide();
             }
         }.init(this);
     });
@@ -219,7 +218,7 @@ function mostIndexPage(options) {
 }
 
 function picturePage(options) {
-    $("#picture_voting_bar, #voting_bar_positive, #voting_bar_vote").mousemove(function(e) {
+    $("#picture_voting_bar, #voting_bar_positive, #voting_bar_vote").on('mousemove', function(e) {
         var bar = e.target;
         if ($(bar).attr("id") == "voting_bar_positive" || $(bar).attr("id") == "voting_bar_vote")
             bar = bar.parentNode;
@@ -229,11 +228,11 @@ function picturePage(options) {
 
         var x = e.pageX - $(bar).offset().left;
         x = Math.ceil(x / options.starWidth) * options.starWidth;
-        $("#voting_bar_positive").css({display:"none"});
-        $("#voting_bar_vote").css({display:"block", width: x+"px"});
+        $("#voting_bar_positive").hide();
+        $("#voting_bar_vote").show().css({width: x+"px"});
         bar.hide = false;
     });
-    $("#picture_voting_bar, #voting_bar_positive, #voting_bar_vote").mouseout(function(e) {
+    $("#picture_voting_bar, #voting_bar_positive, #voting_bar_vote").on('mouseout', function(e) {
         var bar = e.target;
         if ($(bar).attr("id") == "voting_bar_positive" || $(bar).attr("id") == "voting_bar_vote")
             bar = bar.parentNode;
@@ -246,8 +245,8 @@ function picturePage(options) {
         setTimeout(function() {
             if (bar.hide)
             {
-                $("#voting_bar_positive").css({display:"block"});
-                $("#voting_bar_vote").css({display:"none", width: "0px"});
+                $("#voting_bar_positive").show();
+                $("#voting_bar_vote").hide().css({width: "0px"});
                 bar.hide = false;
             }
         }, 500);
@@ -261,7 +260,7 @@ function picturePage(options) {
         var value = Math.ceil((e.pageX - $(bar).offset().left) / options.starWidth);
 
         $.post(options.voteUrl, { value: value },function(data) {
-            $("#voting_bar_vote").css({display:"none", width: "0px"});
+            $("#voting_bar_vote").hide().css({width: "0px"});
             $("#voting_bar_positive").animate({width: data.width+"px"}, 2000);
             $("#picture_voting_bar").addClass("voted");
             $("#picture_voting_bar, #voting_bar *").unbind();
@@ -376,11 +375,13 @@ function forumTopicPage() {
     $('.permanent-link').on('click', function() {
         var offset = $(this).offset();
 
-        var div = $('<div>' +
-                        '<img src="/design/del.gif" alt="X" title="close" style="cursor:pointer;margin:0 0 5px 5px;float:right" />' +
-                        '<p>Постоянная ссылка на сообщение</p>' +
-                        '<input type="text" readonly="readonly" style="width:98%" /><br />' +
-                     '</div>');
+        var div = $(
+            '<div>\
+                <img src="/design/del.gif" alt="X" title="close" style="cursor:pointer;margin:0 0 5px 5px;float:right" />\
+                <p>Постоянная ссылка на сообщение</p>\
+                <input type="text" readonly="readonly" style="width:98%" /><br />\
+             </div>'
+        );
 
         $('input', div).val(
             'http://www.autowp.ru' + $(this).attr('href')
@@ -548,17 +549,17 @@ function votingVotingPage() {
         function reload() {
             if (!$modal) {
                 $modal = $(
-                    '<div class="modal hide fade">' +
-                        '<div class="modal-header">' +
-                            '<a data-dismiss="modal" class="close">×</a>' +
-                            '<h3></h3>' +
-                        '</div>' +
-                        '<div class="modal-body"></div>' +
-                        '<div class="modal-footer">' +
-                            '<a class="btn btn-primary" href="#">Обновить</a>' +
-                            '<a data-dismiss="modal" class="btn" href="#">Закрыть</a>' +
-                        '</div>' +
-                    '</div>'
+                    '<div class="modal hide fade">\
+                        <div class="modal-header">\
+                            <a data-dismiss="modal" class="close">×</a>\
+                            <h3></h3>\
+                        </div>\
+                        <div class="modal-body"></div>\
+                        <div class="modal-footer">\
+                            <a class="btn btn-primary" href="#">Обновить</a>\
+                            <a data-dismiss="modal" class="btn" href="#">Закрыть</a>\
+                        </div>\
+                    </div>'
                 );
                 $modal.find('h3').text($a.text());
                 $body = $modal.find('.modal-body');
