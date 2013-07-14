@@ -126,7 +126,7 @@ $(function() {
             over();
             if (!element) {
                 var offset = anchor.offset();
-                element = $('<div style="position:absolute;width:170px"><img alt="loading" src="/img/library/jtip/loader.gif" style="background-color:white;padding:10px" /></div>');
+                element = $('<div style="position:absolute;width:170px">Loading ...</div>');
                 element.css({
                     left: offset.left,
                     top: offset.top + anchor.height()
@@ -466,26 +466,25 @@ function brandsPage() {
     popoverHandlers();
 }
 
-function showPMWindow(userId, anchorNode) {
-    var offset = $(anchorNode).offset();
-    var left = offset.left - 200;
-    if (left < 10)
-        left = 10;
-        
+function showPMWindow(userId) {
     var form = $(
-        '<form action="/account/send-personal-message" class="modal fade in" method="post">' +
-            '<div class="modal-header">' +
-                '<a class="close">×</a>' +
-                '<h3>Отправить личное сообщение</h3>' +
-            '</div>' +
-            '<div class="modal-body control-group">' +
-                '<textarea cols="65" rows="5" name="contents" style="width:520px" placeholder="Текст сообщения"></textarea>' +
-            '</div>' +
-            '<div class="modal-footer">' +
-                '<button class="btn btn-primary" data-loading-text="отправляется ..." data-complete-text="отправлено" data-send-text="отправить">отправить</button>' +
-                '<button class="btn cancel">отменить</button>' +
-            '</div>' +
-        '</form>'
+        '<div class="modal fade">\
+            <div class="modal-dialog">\
+                <form action="/account/send-personal-message" class="modal-content" method="post">\
+                    <div class="modal-header">\
+                        <a class="close">×</a>\
+                        <h3 class="modal-title">Отправить личное сообщение</h3>\
+                    </div>\
+                    <div class="modal-body">\
+                        <textarea cols="65" rows="5" name="contents" placeholder="Текст сообщения"></textarea>\
+                    </div>\
+                    <div class="modal-footer">\
+                        <button class="btn btn-primary" data-loading-text="отправляется ..." data-complete-text="отправлено" data-send-text="отправить">отправить</button>\
+                        <button class="btn btn-default cancel">отменить</button>\
+                    </div>\
+                </form>\
+            </div>\
+        </div>'
     );
     
     var $btnSend = $('.btn-primary', form).button();
