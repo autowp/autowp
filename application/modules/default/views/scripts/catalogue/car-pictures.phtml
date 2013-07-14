@@ -1,4 +1,9 @@
 <?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => true,
+        'needRight' => false
+    ));
     $title = $this->page->name.' '.$this->car->getFullName();
     $this->headTitle($title, 'SET');
     $this->pageTitle($title);

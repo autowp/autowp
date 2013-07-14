@@ -1,4 +1,10 @@
 <?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => false,
+        'needRight' => false
+    ));
+
     if (($current = $this->paginator->getCurrentPageNumber()) < $this->paginator->count() ) {
         $this->headLink(array(
             'rel'  => 'prefetch',

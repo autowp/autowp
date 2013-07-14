@@ -1,4 +1,9 @@
 <?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => true,
+        'needRight' => false
+    ));
     $title = $this->brand->caption . ' ' . $this->dpBrand->caption;
     $this->headTitle($title, 'SET');
     $this->pageTitle($title);

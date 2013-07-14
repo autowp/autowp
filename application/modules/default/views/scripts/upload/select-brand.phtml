@@ -1,7 +1,11 @@
 <?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => false,
+        'needRight' => false
+    ));
     $this->pageTitle('Выбор бренда');
-?>
-<?php
+
     $columns = 6;
     $count = count($this->brands);
     $perOne = ceil($count / $columns);

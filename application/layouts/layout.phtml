@@ -1,11 +1,15 @@
 <?php
+    $blankPage = isset($this->layout()->blankPage) ? $this->layout()->blankPage : $this->blankPage;
+    $needLeft  = isset($this->layout()->needLeft)  ? $this->layout()->needLeft  : $this->needLeft;
+    $needRight = isset($this->layout()->needRight) ? $this->layout()->needRight : $this->needRight;
+
     $moderMenu = '';
-    if (!$this->blankPage && $this->user()->logedIn() && $this->acl()->inheritsRole($this->user()->get()->role, 'moder')) {
+    if (!$blankPage && $this->user()->logedIn() && $this->acl()->inheritsRole($this->user()->get()->role, 'moder')) {
         $moderMenu = $this->action('moder-menu', 'index', 'moder');
     }
 
     $mainMenu = '';
-    if (!$this->blankPage) {
+    if (!$blankPage) {
         $mainMenu = $this->action('main-menu', 'pages', 'default');
     }
 
@@ -36,12 +40,12 @@
         <?=$moderMenu ?>
 
         <?php
-            $spanLeft = $this->needLeft ? 4 : 0;
-            $spanRight = $this->needRight ? 4 : 0;
+            $spanLeft = $needLeft ? 4 : 0;
+            $spanRight = $needRight ? 4 : 0;
             $spanCenter = 12 - $spanLeft - $spanRight;
         ?>
 
-        <?php if (!$this->blankPage) { ?>
+        <?php if (!$blankPage) { ?>
             <?=$mainMenu ?>
         <?php }  ?>
 
@@ -64,26 +68,67 @@
 
                 </div>
 
-                <?php if ($this->needLeft) { ?>
+                <?php if ($needLeft) { ?>
                     <div class="col-lg-<?=$spanLeft?> col-pull-<?=$spanCenter?>">
                         <?=$this->layout()->sidebar ?>
                     </div>
                 <?php } ?>
 
-                <?php if ($this->needRight) { ?>
+                <?php if ($needRight) { ?>
                     <div class="col-lg-<?=$spanRight?>">
-                        <?php if ($this->page) { ?>
-                            <?php foreach ($this->blocks($this->page->id) as $block) { ?>
-                                <?=$block->getHtml() ?>
+
+                        <h3>Авторизация</h3>
+                        <div class="well">
+                            <?php if ($this->user()->logedIn()) { ?>
+                                <div>
+                                    Здравствуйте, <?=$this->user() ?><br />
+                                    <a href="/account/profile/">Личная&#xa0;страница</a><br />
+                                    <a href="/login/logout/">Выход</a>
+                                </div>
+
+                                <?php
+                                    $db = Zend_Registry::get('db');
+                                    $count = $db->fetchOne(
+                                        $db->select()
+                                           ->from('personal_messages', array('COUNT(1)'))
+                                           ->where('to_user_id = ?', $this->user()->get()->id)
+                                           ->where('NOT readen')
+                                    );
+                                ?>
+
+                                <p>
+                                    <span class="glyphicon glyphicon-comment"></span>
+                                    <?php if ($count > 0) { ?>
+                                        <a href="/account/pm/" style="color:red">У вас <?=$count?> <?=numericDeclension($count, 'новое сообщение', 'новых сообщения', 'новых сообщений')?></a>
+                                    <?php } else { ?>
+                                        <a href="/account/pm/">Личные сообщения</a>
+                                    <?php } ?>
+                                </p>
+                            <?php } else { ?>
+                                <form action="/login/" method="post" class="login"><div>
+                                    <p><input type="text" name="login" placeholder="Логин или e-mail" /></p>
+                                    <p><input type="password" name="password" placeholder="Пароль" /></p>
+                                    <label class="checkbox inline">
+                                        <input type="checkbox" value="1" name="remember" /> запомнить?
+                                    </label>
+                                    <div>
+                                        <div class="pull-right text-right">
+                                            <a href="/registration/">Регистрация</a><br />
+                                            <a href="/restorepassword/">Забыли пароль?</a>
+                                        </div>
+                                        <input type="submit" value="войти" class="btn btn-primary" />
+                                    </div>
+                                </div></form>
                             <?php } ?>
-                        <?php } ?>
+                        </div>
+
                         <a class="twitter-timeline"  href="https://twitter.com/autowp_ru"  data-widget-id="323907714319253505" data-chrome="nofooter" width="370">Твиты пользователя @autowp_ru</a>
                         <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
                     </div>
                 <?php } ?>
             </div>
 
-            <?php if ((!$this->blankPage) && (!$this->isAdminPage) ) { ?>
+            <?php if ((!$blankPage) && (!$this->isAdminPage) ) { ?>
                 <div class="bottom-line"><p><strong>AutoWP.ru '2005&ndash;<?=$this->escape($this->translate('present-time-abbr'))?></strong></p></div>
 
                 <footer class="footer">

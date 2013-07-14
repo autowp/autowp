@@ -1,3 +1,10 @@
+<?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => false,
+        'needRight' => true
+    ));
+?>
 <div class="alert alert-warning">
     <p>Только зарегистрированный пользователи могут загружать изображения</p>
     <p><a href="/login/">Авторизируйтесь</a> или <a href="/registration/">зарегистрируйтесь</a></p>

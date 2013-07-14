@@ -1,4 +1,9 @@
 <?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => true,
+        'needRight' => false
+    ));
     $this->headTitle($this->page->name.' '.$this->brand->caption, 'SET');
 ?>
 <?=$this->pictures($this->paginator->getCurrentItems(), 4) ?>

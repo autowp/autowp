@@ -1,4 +1,10 @@
 <?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => false,
+        'needRight' => false
+    ));
+
     $categoryName = $this->categoryLang ? $this->categoryLang->name : $this->category->name;
     $this->headTitle($categoryName, 'SET');
     $this->pageTitle($categoryName, 'SET');

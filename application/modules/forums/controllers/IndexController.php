@@ -3,28 +3,25 @@ class Forums_IndexController extends My_Controller_Action
 {
     public function indexAction()
     {
-        $this->view->blankPage = false;
-        $this->view->needLeft = false;
-        $this->view->needRight = true;
         $this->initPage(42);
-        
+
         $themeTable = new Forums_Themes();
         $topicsTable = new Forums_Topics();
         $msgTable = new Forums_Messages();
-        
-        $isModearator = $this->user && 
+
+        $isModearator = $this->user &&
             $this->_helper->acl()->inheritsRole($this->user->role, 'moder');
-    
+
         $select = $themeTable->select(true)
             ->where('parent_id IS NULL')
             ->order('position');
-            
+
         if (!$isModearator) {
             $select->where('not is_moderator');
         }
-        
+
         $themes = array();
-        
+
         foreach ($themeTable->fetchAll($select) as $row) {
             $lastMessage = false;
             $lastTopic = $topicsTable->fetchRow(
@@ -39,17 +36,17 @@ class Forums_IndexController extends My_Controller_Action
                     'topic_id = ?'    => $lastTopic->id
                 ), 'add_datetime DESC');
             }
-            
+
             $subthemes = array();
-            
+
             $select = $themeTable->select()
                 ->where('parent_id = ?', $row->id)
                 ->order('position');
-                
+
             if (!$isModearator) {
                 $select->where('not is_moderator');
             }
-            
+
             foreach ($themeTable->fetchAll($select) as $srow) {
                 $subthemes[] = array(
                     'name' => $srow->caption,
@@ -60,7 +57,7 @@ class Forums_IndexController extends My_Controller_Action
                     )),
                 );
             }
-            
+
             $themes[] = array(
                 'url'         => $this->_helper->url->url(array(
                     'controller' => 'theme',
@@ -76,7 +73,7 @@ class Forums_IndexController extends My_Controller_Action
                 'subthemes'   => $subthemes
             );
         }
-            
+
         $this->view->themes = $themes;
     }
 }

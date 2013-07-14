@@ -1,4 +1,10 @@
 <?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => false,
+        'needRight' => true
+    ));
+
     $this->pageTitle($this->voting->name);
     $this->headTitle($this->voting->name, 'SET');
 ?>

@@ -1,4 +1,9 @@
 <?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => false,
+        'needRight' => false
+    ));
     $this->pageTitle('Выбор бренда');
 ?>
 <?php $this->jQuery()->onLoadCaptureStart() ?>

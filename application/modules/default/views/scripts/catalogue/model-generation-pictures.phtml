@@ -1,4 +1,9 @@
 <?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => true,
+        'needRight' => false
+    ));
     $brandName = $this->brandLanguage ? $this->brandLanguage->name : $this->brand->caption;
     $title = $this->page->name.' '.$brandName . ' ' . $this->model->name . ' ' . $this->generation->shortname;
     $this->pageTitle($title);
