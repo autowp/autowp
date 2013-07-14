@@ -18,8 +18,8 @@ $(function() {
                                 '</div>' +
                                 '<div class="modal-body"></div>' +
                                 '<div class="modal-footer">' +
-                                    '<a class="btn btn-primary" href="#">Обновить</a>' +
-                                    '<a data-dismiss="modal" class="btn btn-default" href="#">Закрыть</a>' +
+                                    '<button class="btn btn-primary">Обновить</a>' +
+                                    '<button data-dismiss="modal" class="btn btn-default">Закрыть</a>' +
                                 '</div>' +
                             '</div>' +
                         '</div>' +
