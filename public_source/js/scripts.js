@@ -19,14 +19,14 @@ $(function() {
                                 '<div class="modal-body"></div>' +
                                 '<div class="modal-footer">' +
                                     '<button class="btn btn-primary">Обновить</a>' +
-                                    '<button data-dismiss="modal" class="btn btn-default">Закрыть</a>' +
+                                    '<button data-dismiss="modal" class="btn btn-default">Закрыть</button>' +
                                 '</div>' +
                             '</div>' +
                         '</div>' +
                     '</div>'
                 );
                 $body = $modal.find('.modal-body');
-                $btnRefresh = $modal.find('.btn-primary').click(function(e) {
+                $btnRefresh = $modal.find('.btn-primary').on('click', function(e) {
                     e.preventDefault();
                     reload();
                 });
@@ -41,7 +41,7 @@ $(function() {
             });
         }
         
-        $(this).click(function(e) {
+        $(this).on('click', function(e) {
             e.preventDefault();
             reload();
         });
@@ -154,7 +154,7 @@ $(function() {
     });
     
     $('.brands-switch li a').each(function(i) {
-        $(this).click(function() {
+        $(this).on('click', function() {
             $(this).parent().siblings().removeClass('active');
             $(this).parent().addClass('active');
             $('#BrandGroupsContainer > ul').eq(i).show().siblings().hide();
@@ -178,7 +178,7 @@ function deletePM(id, tr) {
 function moderatorAttentionCompleteBtn(id) {
     $('#ma-' + id).each(function() {
         var $block = $(this);
-        $('.btn', this).click(function() {
+        $('.btn', this).on('click', function() {
             $(this).button('loading');
             $.post('/comments/complete', {id: id}, function() {
                 $block.remove();
@@ -188,7 +188,7 @@ function moderatorAttentionCompleteBtn(id) {
 }
 
 function commentsBlock(options) {
-    $('.remove-all-comments').click(function() {
+    $('.remove-all-comments').on('click', function() {
         var self = this;
         $.post('/comments/delete-all', {item_id: options.itemId, type: options.type}, function(json) {
             $(self).hide();
@@ -196,7 +196,7 @@ function commentsBlock(options) {
         }, 'json');
     });
     
-    $('.comment-remove-button').click(function() {
+    $('.comment-remove-button').on('click', function() {
         var node = this; 
         var id = parseInt($(node).attr('id').replace('comment-remove-button-', ''));
         $.post('/comments/delete', {comment_id: id}, function(json) {
@@ -252,7 +252,7 @@ function picturePage(options) {
             }
         }, 500);
     });
-    $("#voting_bar_vote").click(function(e) {
+    $("#voting_bar_vote").on('click', function(e) {
         var bar = e.target.parentNode;
 
         if ($(bar).hasClass("voted"))
@@ -268,7 +268,7 @@ function picturePage(options) {
         }, "json");
     });
     
-    $('.picture-preview-medium a').click(function() {
+    $('.picture-preview-medium a').on('click', function() {
         window.open($(this).attr('href'), '_blank');
         return false;
     });
@@ -320,7 +320,7 @@ function museumsIndexPage(options) {
                     infowindow.open(map, marker);
                 });
                 
-                $('#museum'+museum.id+'maplink').click(function() {
+                $('#museum'+museum.id+'maplink').on('click', function() {
                     infowindow.open(map, marker);
                     map.setCenter(position);
                     map.setZoom(18);
@@ -373,7 +373,7 @@ function museumsIndexPage(options) {
 }
 
 function forumTopicPage() {
-    $('.permanent-link').click(function() {
+    $('.permanent-link').on('click', function() {
         var offset = $(this).offset();
 
         var div = $('<div>' +
@@ -392,7 +392,7 @@ function forumTopicPage() {
             }, function() {
                 $(this).attr('src', '/design/del.gif')
             })
-            .click(function() {
+            .on('click', function() {
                 $(div).remove()
             });
 
@@ -418,7 +418,7 @@ function popoverHandlers() {
             over = false;
         
         $(this)
-            .click(function(e) {
+            .on('click', function(e) {
                 e.preventDefault();
             })
             .hover(function() {
@@ -508,7 +508,7 @@ function showPMWindow(userId) {
         $btnSend.text('отправить').removeClass('btn-success').prop('disabled', $(this).val().length <= 0);
     }).triggerHandler('change');
     
-    $('button.cancel, a.close', form).click(function(e) {
+    $('button.cancel, a.close', form).on('click', function(e) {
         e.preventDefault();
         form.modal('hide');
     });
@@ -562,7 +562,7 @@ function votingVotingPage() {
                 );
                 $modal.find('h3').text($a.text());
                 $body = $modal.find('.modal-body');
-                $btnRefresh = $modal.find('.btn-primary').click(function(e) {
+                $btnRefresh = $modal.find('.btn-primary').on('click', function(e) {
                     e.preventDefault();
                     reload();
                 });
@@ -577,7 +577,7 @@ function votingVotingPage() {
             });
         }
         
-        $(this).click(function(e) {
+        $(this).on('click', function(e) {
             e.preventDefault();
             reload();
         });
