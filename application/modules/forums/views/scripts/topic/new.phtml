@@ -1,4 +1,4 @@
-<?php if ($this->user) { ?>
+<?php if ($this->user()->logedIn()) { ?>
     <?php if ($this->needWait) { ?>
         <p class="alert alert-block alert-warning">Для добавления нового сообщения вам необходимо подождать некоторое время</p>
     <?php } ?>

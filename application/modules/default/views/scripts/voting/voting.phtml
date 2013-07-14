@@ -60,7 +60,7 @@ votingVotingPage();
         <?php } ?>
     <?php } ?>
 </div>
-<?php if (!$this->canVote && $this->user && $this->user->isAdminOrModerator()) { ?>
+<?php if (!$this->canVote && $this->user()->logedIn() && $this->user()->get()->isAdminOrModerator()) { ?>
     <p class="pull-right">
         <?php if ($this->filter) { ?>
             <?=$this->htmlA($this->url(array(

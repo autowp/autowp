@@ -1,6 +1,6 @@
 <?php
     $moderMenu = '';
-    if (!$this->blankPage && $this->user && $this->acl()->inheritsRole($this->user->role, 'moder')) {
+    if (!$this->blankPage && $this->user()->logedIn() && $this->acl()->inheritsRole($this->user()->get()->role, 'moder')) {
         $moderMenu = $this->action('moder-menu', 'index', 'moder');
     }
 

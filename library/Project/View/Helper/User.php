@@ -10,6 +10,15 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
 
     protected $_user = null;
 
+    /**
+     * @var Users_Row
+     */
+    protected $_logedInUser;
+    /**
+     * @var bool
+     */
+    protected $_logedInUserChecked = false;
+
     protected function _group($id)
     {
         if (!$this->_groupModel) {
@@ -35,8 +44,12 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
         return $this->_users[$id];
     }
 
-    public function user($user, array $options = array())
+    public function user($user = null, array $options = array())
     {
+        if ($user === null) {
+            $user = $this->_getLogedInUser();
+        }
+
         if (!$user instanceof Users_Row) {
             $user = $this->_user($user);
         }
@@ -44,6 +57,40 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
         $this->_user = $user;
 
         return $this;
+    }
+
+    /**
+     * @return Users_Row
+     */
+    protected function _getLogedInUser()
+    {
+        if (!$this->_logedInUserChecked) {
+            $this->_logedInUserChecked = true;
+
+            $auth = Zend_Auth::getInstance();
+            if ($auth->hasIdentity()) {
+                $table = new Users();
+                $this->_logedInUser = $table->find($auth->getIdentity())->current();
+            }
+        }
+
+        return $this->_logedInUser;
+    }
+
+    /**
+     * @return bool
+     */
+    public function logedIn()
+    {
+        return (bool)$this->_getLogedInUser();
+    }
+
+    /**
+     * @return Users_Row
+     */
+    public function get()
+    {
+        return $this->_user;
     }
 
     public function __toString()
