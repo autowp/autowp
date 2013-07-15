@@ -77,6 +77,14 @@ return array (
     'carlist/all pictures'    => 'all pictures',
     'carlist/twins'           => 'twins',
     'carlist/produced/one'    => 'Produced in a single copy',
+    'carlist/produced/%1$s'   => array(
+        'Produced in %1$s copy',
+        'Produced in %1$s copies'
+    ),
+    'carlist/produced-about/%1$s' => array(
+        'Produced in about %1$s copy',
+        'Produced in about %1$s copies'
+    ),
     'carlist/specifications'  => 'specifications',
 
     'present-time-abbr'       => 'pr.',
