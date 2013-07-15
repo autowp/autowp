@@ -7,6 +7,14 @@ return array (
         '%1$s picture',
         '%1$s pictures',
     ),
+    '%1$s vehicles'      => array(
+        '%1$s vehicle',
+        '%1$s vehicles',
+    ),
+    '%1$s comments'      => array(
+        '%1$s comment',
+        '%1$s comments',
+    ),
 
     'few seconds ago'    => 'few seconds ago',
     'a minute ago'       => 'a minute ago',
