@@ -3,6 +3,10 @@
 return array (
     /* Common words */
     'and' => 'and',
+    '%1$s picures'       => array(
+        '%1$s picture',
+        '%1$s pictures',
+    ),
 
     'few seconds ago'    => 'few seconds ago',
     'a minute ago'       => 'a minute ago',

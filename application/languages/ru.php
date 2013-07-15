@@ -3,6 +3,11 @@
 return array (
     /* Common words */
     'and' => 'и',
+    '%1$s picures'       => array(
+        '%1$s изобржение',
+        '%1$s изображения',
+        '%1$s изображений'
+    ),
 
     'few seconds ago'    => 'несколько секунд назад',
     'a minute ago'       => 'минуту назад',

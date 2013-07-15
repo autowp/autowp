@@ -7,7 +7,6 @@
 /CatalogueController.php
 /CategoryController.php
 /CommentsController.php
-/InboxController.php
 /IndexController.php
 /LoginController.php
 /MostController.php

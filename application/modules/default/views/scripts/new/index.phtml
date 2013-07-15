@@ -27,13 +27,13 @@
             <?=$this->htmlA($this->url(array(
                 'date' => $this->prevDate->toString($this->urlDateFormat)
             ), 'new', true, true), $this->humanDate($this->prevDate)) ?>
-            <span class="badge"><?=$this->prevCount ?></span>
+            <small>(<?=$this->translate(array('%1$s picures', null, $this->prevCount), $this->prevCount);?>)</small>
         <?php } ?></h3>
     </div>
     <div class="col-lg-4">
         <h3 style="text-align:center">
             <?=$this->humanDate($this->date)?>
-            <span class="badge"><?=$this->count ?></span>
+            <small>(<?=$this->translate(array('%1$s picures', null, $this->count), $this->count);?>)</small>
         </h3>
     </div>
     <div class="col-lg-4">
@@ -41,7 +41,7 @@
             <?=$this->htmlA($this->url(array(
                 'date' => $this->nextDate->toString($this->urlDateFormat)
             ), 'new', true, true), $this->humanDate($this->nextDate)) ?>
-            <span class="badge"><?=$this->nextCount ?></span>
+            <small>(<?=$this->translate(array('%1$s picures', null, $this->nextCount), $this->nextCount);?>)</small>
             &#x2192;
         <?php } ?></h3>
     </div>
