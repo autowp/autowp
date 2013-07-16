@@ -9,8 +9,9 @@ class Forums_IndexController extends My_Controller_Action
         $topicsTable = new Forums_Topics();
         $msgTable = new Forums_Messages();
 
-        $isModearator = $this->user &&
-            $this->_helper->acl()->inheritsRole($this->user->role, 'moder');
+        $user = $this->_helper->user()->get();
+        $isModearator = $user &&
+            $this->_helper->acl()->inheritsRole($user->role, 'moder');
 
         $select = $themeTable->select(true)
             ->where('parent_id IS NULL')

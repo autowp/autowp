@@ -10,15 +10,6 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
 
     protected $_user = null;
 
-    /**
-     * @var Users_Row
-     */
-    protected $_logedInUser;
-    /**
-     * @var bool
-     */
-    protected $_logedInUserChecked = false;
-
     protected function _group($id)
     {
         if (!$this->_groupModel) {
@@ -64,17 +55,13 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
      */
     protected function _getLogedInUser()
     {
-        if (!$this->_logedInUserChecked) {
-            $this->_logedInUserChecked = true;
+        $auth = Zend_Auth::getInstance();
 
-            $auth = Zend_Auth::getInstance();
-            if ($auth->hasIdentity()) {
-                $table = new Users();
-                $this->_logedInUser = $table->find($auth->getIdentity())->current();
-            }
+        if (!$auth->hasIdentity()) {
+            return false;
         }
 
-        return $this->_logedInUser;
+        return $this->_user($auth->getIdentity());
     }
 
     /**
@@ -135,7 +122,7 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
 
                 $result =
                     '<span class="'.implode(' ', $classes).'">' .
-                        '<i class="glyphicon glyphicon-user"></i>&#xa0;' .
+                        '<span class="glyphicon glyphicon-user"></span>&#xa0;' .
                         $this->view->htmlA(array(
                             'href'  => $url,
                             'style' => $style

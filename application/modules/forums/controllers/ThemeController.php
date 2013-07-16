@@ -9,8 +9,8 @@ class Forums_ThemeController extends My_Controller_Action
         $this->initPage(43);
 
         // определяем является ли пользователь администратором форума
-        $forumAdmin = $this->user && $this->_helper->acl()->isAllowed($this->user->role, 'forums', 'moderate');
-        $moder = $this->user && $this->_helper->acl()->inheritsRole($this->user->role, 'moder');
+        $forumAdmin = $this->_helper->user()->isAllowed('forums', 'moderate');
+        $moder = $this->_helper->user()->inheritsRole('moder');
 
         $themeTable = new Forums_Themes();
         $topicsTable = new Forums_Topics();

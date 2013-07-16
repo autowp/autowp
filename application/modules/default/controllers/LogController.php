@@ -3,21 +3,12 @@ class LogController extends My_Controller_Action
 {
     const EVENTS_PER_PAGE = 40;
 
-    public function preDispatch()
-    {
-        parent::preDispatch();
-
-        if (!$this->user) {
-            return $this->_forward('index', 'login');
-        }
-
-        if (!$this->_helper->acl()->inheritsRole($this->user->role, 'moder') ) {
-            return $this->_forward('forbidden', 'error');
-        }
-    }
-
     public function indexAction()
     {
+        if (!$this->_helper->user()->inheritsRole('moder') ) {
+            return $this->_forward('forbidden', 'error');
+        }
+
         $this->initPage(75);
 
         $logTable = new Log_Events();

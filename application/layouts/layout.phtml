@@ -28,11 +28,17 @@
 
             //echo $this->stylesheets();
             echo $this->jQuery();
-            echo $this->headScript()->appendFile(
-                'http://html5shim.googlecode.com/svn/trunk/html5.js',
-                'text/javascript',
-                array('conditional' => 'lt IE 9')
-            );
+            echo $this->headScript()
+                ->appendFile(
+                    'http://html5shim.googlecode.com/svn/trunk/html5.js',
+                    'text/javascript',
+                    array('conditional' => 'lt IE 9')
+                )
+                ->appendFile(
+                    '/vendor/scottjehl/Respond/respond.min.js',
+                    'text/javascript',
+                    array('conditional' => 'lt IE 9')
+                );
             echo $this->headStyle();
         ?>
     </head>
