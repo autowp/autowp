@@ -35,6 +35,14 @@ return array (
     'yesterday'          => 'вчера',
     'today'              => 'сегодня',
 
+    /* Layout */
+    'layout/personal-messages' => 'Личные сообщения',
+    'layout/you-have-%1$s-new-messages' => array(
+        'У вас %1$s новое сообщение',
+        'У вас %1$s новое сообщения',
+        'У вас %1$s новое сообщений',
+    ),
+
     /* Picture preview */
     'picture-preview/no-comments' => 'нет',
     'picture-preview/no-ratio'    => 'нет',

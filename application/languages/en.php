@@ -30,6 +30,13 @@ return array (
     'yesterday'          => 'yesterday',
     'today'              => 'today',
 
+    /* Layout */
+    'layout/personal-messages' => 'Personal messages',
+    'layout/you-have-%1$s-new-messages' => array(
+        'You have %1$s new message',
+        'You have %1$s new messages',
+    ),
+
     /* Picture preview */
     'picture-preview/no-comments' => 'no',
     'picture-preview/no-ratio'    => 'no',
