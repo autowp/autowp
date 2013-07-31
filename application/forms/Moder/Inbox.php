@@ -33,7 +33,7 @@ class Application_Form_Moder_Inbox extends Project_Form
             'decorators' => array(
                 'PrepareElements',
                 array('viewScript', array(
-                    'viewScript' => 'forms/pictures.phtml'
+                    'viewScript' => 'forms/bootstrap-vertical.phtml'
                 )),
                 'Form'
             ),

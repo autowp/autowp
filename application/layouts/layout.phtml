@@ -2,6 +2,7 @@
     $blankPage = isset($this->layout()->blankPage) ? $this->layout()->blankPage : $this->blankPage;
     $needLeft  = isset($this->layout()->needLeft)  ? $this->layout()->needLeft  : $this->needLeft;
     $needRight = isset($this->layout()->needRight) ? $this->layout()->needRight : $this->needRight;
+    $isAdminPage = isset($this->layout()->isAdminPage) ? $this->layout()->isAdminPage : $this->isAdminPage;
 
     $moderMenu = '';
     if (!$blankPage && $this->user()->logedIn() && $this->acl()->inheritsRole($this->user()->get()->role, 'moder')) {
@@ -56,6 +57,7 @@
         <?php }  ?>
 
         <div class="container">
+
             <div class="row">
                 <div class="col-lg-<?=$spanCenter?> col-push-<?=$spanLeft?>">
                     <?=$this->action('flash-messages', 'layout', 'default') ?>
@@ -75,7 +77,7 @@
                 <?php } ?>
             </div>
 
-            <?php if ((!$blankPage) && (!$this->isAdminPage) ) { ?>
+            <?php if ((!$blankPage) && (!$isAdminPage) ) { ?>
                 <div class="bottom-line"><p><strong>AutoWP.ru '2005&ndash;<?=$this->escape($this->translate('present-time-abbr'))?></strong></p></div>
 
                 <footer class="footer">

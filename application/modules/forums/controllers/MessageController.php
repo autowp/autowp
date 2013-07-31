@@ -3,7 +3,7 @@ class Forums_MessageController extends My_Controller_Action
 {
     protected function _isForumModer()
     {
-        return $user && $this->_helper->user()->isAllowed('forums', 'moderate');
+        return $this->_helper->user()->isAllowed('forums', 'moderate');
     }
 
     public function deleteAction()

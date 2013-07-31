@@ -477,7 +477,7 @@ function showPMWindow(userId) {
                         <h3 class="modal-title">Отправить личное сообщение</h3>\
                     </div>\
                     <div class="modal-body">\
-                        <textarea cols="65" rows="5" name="contents" placeholder="Текст сообщения"></textarea>\
+                        <textarea cols="65" rows="5" name="contents" placeholder="Текст сообщения" class="form-control"></textarea>\
                     </div>\
                     <div class="modal-footer">\
                         <button class="btn btn-primary" data-loading-text="отправляется ..." data-complete-text="отправлено" data-send-text="отправить">отправить</button>\

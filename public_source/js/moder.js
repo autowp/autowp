@@ -22,7 +22,7 @@ function pictureModerPage(options) {
         force_p_newlines : true,
         //remove_trailing_nbsp : true,
         //trim_span_elements : true,
-        valid_elements : "a[href|title]",
+        valid_elements : "a[href|title],p",
         language: "en"
     });
     

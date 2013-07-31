@@ -12,7 +12,7 @@ class Application_Form_Comment extends Project_Form
             'decorators'  => array(
                 'PrepareElements',
                 array('viewScript', array(
-                    'viewScript' => 'forms/comment.phtml'
+                    'viewScript' => 'forms/bootstrap-horizontal.phtml'
                 )),
                 'Form'
             ),
@@ -23,7 +23,7 @@ class Application_Form_Comment extends Project_Form
                     'label'      => 'Сообщение',
                     'cols'       => 80,
                     'rows'       => 8,
-                    'class'      => 'span5',
+                    'class'      => 'form-control',
                     'filters'    => array('StringTrim'),
                     'decorators' => array('ViewHelper')
                 )),

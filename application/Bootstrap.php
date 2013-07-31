@@ -66,7 +66,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             ->setEncoding('utf-8')
             ->strictVars(true);
 
-        $view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=utf-8')
+        $view->headMeta()
             ->appendName('keywords', 'auto, avto, автомобиль')
             ->appendName('description', 'Энциклопедия автомобилей в картинках. AutoWP.ru');
     }

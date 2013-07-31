@@ -51,6 +51,10 @@ return array (
     'Nm'  => 'Nm',
     'kW'  => 'kW',
     'hp'  => 'hp',
+    'spec/%1$s-gear' => array(
+        '%1$s gear',
+        '%1$s gears'
+    ),
 
     /* PAGINATOR */
     'next'                     => 'next',

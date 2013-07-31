@@ -34,16 +34,19 @@ body {
     }
 }
 
-.dropdown-menu a:visited, .btn:visited {
+/*.dropdown-menu a:visited {
     color: #333;
-}
+}*/
 
-.btn-primary:visited, 
-.btn-warning:visited, 
-.btn-danger:visited, 
-.btn-success:visited, 
-.btn-info:visited {
-    color: #fff;
+.btn-default,
+.btn-primary, 
+.btn-warning, 
+.btn-danger, 
+.btn-success, 
+.btn-info {
+    &:visited {
+        color: #fff;
+    }
 }
 
 .thumbnail > a > img {
@@ -200,7 +203,7 @@ img.avatar {
 }
 
 .nav-tree .nav .nav {
-    padding-right: 0;
+    padding-left: 15px;
 }
 
 .checkbox-tree {

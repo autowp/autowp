@@ -41,9 +41,68 @@ class Forums_ThemeController extends My_Controller_Action
                 ->setItemCountPerPage(self::TOPICS_PER_PAGE)
                 ->setCurrentPageNumber($this->_getParam('page'));
 
+            $topics = array();
+            foreach ($paginator->getCurrentItems() as $topicRow) {
+
+                $topicPaginator = Zend_Paginator::factory(
+                    $msgTable->select()
+                        ->where('topic_id = ?', $topicRow->id)
+                )
+                    ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
+                    ->setPageRange(10);
+
+                $topicPaginator->setCurrentPageNumber(count($topicPaginator));
+
+                $newMessages = 0;
+                if ($this->_helper->user()->logedIn()) {
+                    $newMessages = $topicRow->newMessagesCountFor($this->_helper->user()->get());
+                }
+                $oldMessages = $topicRow->messages - $newMessages;
+
+                $lastMessage = false;
+                $lastMessageDate = false;
+                $lastMessageAuthor = false;
+                $lastMessageUrl = false;
+                if ($topicRow->messages > 0) {
+                    if ($lastMessage = $topicRow->findLastMessage()) {
+                        $lastMessageDate = $lastMessage->getDate('add_datetime');
+                        $lastMessageAuthor = $lastMessage->findParentUsersByAuthor();
+                        $lastMessageUrl = $this->_helper->url->url(array(
+                            'module'     => 'forums',
+                            'controller' => 'topic',
+                            'action'     => 'topic-message',
+                            'message_id' => $lastMessage->id
+                        ), 'default', true);
+                    }
+                }
+
+                $topics[] = array(
+                    'id'                => $topicRow->id,
+                    'paginator'         => $topicPaginator,
+                    'url'               => $this->_helper->url->url(array(
+                        'module'     => 'forums',
+                        'controller' => 'topic',
+                        'action'     => 'topic',
+                        'topic_id'   => $topicRow->id,
+                        'page'       => null
+                    ), 'default', true),
+                    'name'              => $topicRow->caption,
+                    'messages'          => $topicRow->messages,
+                    'oldMessages'       => $oldMessages,
+                    'newMessages'       => $newMessages,
+                    'addDatetime'       => $topicRow->getDate('add_datetime'),
+                    'author'            => $topicRow->findParentUsersByAuthor(),
+                    'lastMessage'       => $lastMessage,
+                    'lastMessageUrl'    => $lastMessageUrl,
+                    'lastMessageDate'   => $lastMessageDate,
+                    'lastMessageAuthor' => $lastMessageAuthor,
+                    'status'            => $topicRow->status
+                );
+            }
         }
 
 
+        // Themes
         $select = $themeTable->select()
             ->where('parent_id = ?', $theme->id)
             ->order('position');
@@ -85,11 +144,11 @@ class Forums_ThemeController extends My_Controller_Action
         }
 
         $this->view->assign(array(
-            'paginator'       => $paginator,
-            'theme'           => $theme,
-            'forumAdmin'      => $forumAdmin,
-            'messagesPerPage' => self::MESSAGES_PER_PAGE,
-            'themes'          => $themes
+            'topics'     => $topics,
+            'paginator'  => $paginator,
+            'theme'      => $theme,
+            'forumAdmin' => $forumAdmin,
+            'themes'     => $themes
         ));
     }
 }
