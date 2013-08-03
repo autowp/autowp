@@ -102,6 +102,7 @@ return array (
 
     /* CAR LIST */
     'carlist/all pictures'   => 'все картинки',
+    'carlist/details'        => 'подробнее',
     'carlist/twins'          => 'автомобили-близнецы',
     'carlist/produced/one'   => 'Произведен в единственном экземпляре',
     'carlist/produced/%1$s'  => array(

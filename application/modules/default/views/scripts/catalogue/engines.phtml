@@ -6,5 +6,7 @@
     ));
     $this->headTitle($this->page->name.' '.$this->brand->caption, 'SET');
 ?>
-<?=$this->pictures($this->paginator->getCurrentItems(), 4) ?>
+<?=$this->pictures($this->paginator->getCurrentItems(), array(
+    'scheme' => '422'
+)) ?>
 <?=$this->paginationControl($this->paginator) ?>

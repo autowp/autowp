@@ -4,14 +4,16 @@
         'needLeft'  => true,
         'needRight' => false
     ));
-    $title = $this->cars[0]->getFullName();
-    $this->headTitle($title, 'SET');
+    $title = $this->page->name.' '.$this->car->getFullName();
     $this->pageTitle($title);
+    $this->headTitle($title, 'SET');
 ?>
+
 <?=$this->cars($this->cars, array(
     'disableDesctiption' => $this->hasHtml,
     'disableDetailsLink' => true
 )) ?>
+
 <?php if ($this->hasHtml) { ?>
     <div class="text">
         <?=$this->car->html ?>

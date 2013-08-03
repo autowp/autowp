@@ -61,7 +61,9 @@
 <section>
     <h2><?=$this->escape('Популярные картинки') ?></h2>
     <?php if ($this->topPictures) { ?>
-        <?=$this->pictures($this->topPictures, 4) ?>
+        <?=$this->pictures($this->topPictures, array(
+            'scheme' => '422',
+        )) ?>
     <?php } ?>
 </section>
 

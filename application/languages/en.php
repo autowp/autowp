@@ -94,6 +94,7 @@ return array (
 
     /* CAR LIST */
     'carlist/all pictures'    => 'all pictures',
+    'carlist/details'         => 'details',
     'carlist/twins'           => 'twins',
     'carlist/produced/one'    => 'Produced in a single copy',
     'carlist/produced/%1$s'   => array(

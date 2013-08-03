@@ -7,8 +7,8 @@ class Application_Form_Account_Email extends Project_Form
         parent::init();
 
         $this->setOptions(array(
-            'method'     =>    'post',
-            'decorators' =>    array(
+            'method'     => 'post',
+            'decorators' => array(
                 'PrepareElements',
                 array('viewScript', array(
                     'viewScript' => 'forms/bootstrap-horizontal.phtml'
@@ -22,7 +22,7 @@ class Application_Form_Account_Email extends Project_Form
                     'filters'    => array('StringTrim'),
                     'validators' => array(
                         'EmailAddress',
-                        new Validate_User_Email_Not_Exists()
+                        'User_EmailNotExists'
                     ),
                     'maxlength'  => 50,
                     'size'       => 30,

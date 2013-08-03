@@ -20,59 +20,58 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'required'     => true,
                     'order'        => 1,
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-12'
                 )),
                 array('Car_Body', 'body', array(
                     'required'     => false,
                     'order'        => 2,
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-2'
+                    'style'        => 'width: 30%'
                 )),
                 array('Car_Type', 'car_type_id', array(
                     'required'     => false,
                     'order'        => 3,
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-3'
+                    'style'        => 'width: 30%'
                 )),
                 array('year', 'begin_model_year', array(
                     'required'     => false,
                     'label'        => 'с',
                     'placeholder'  => 'с',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-1',
+                    'style'        => 'width: 10%'
                 )),
                 array('year', 'end_model_year', array(
                     'required'     => false,
                     'label'        => 'по',
                     'placeholder'  => 'по',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-1'
+                    'style'        => 'width: 10%'
                 )),
                 array('year', 'begin_year', array(
                     'required'     => false,
                     'label'        => 'год',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-1',
                     'placeholder'  => 'год',
+                    'style'        => 'width: 10%'
                 )),
                 array('month', 'begin_month', array(
                     'required'     => false,
                     'label'        => 'месяц',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-2'
+                    'style'        => 'width: 20%'
                 )),
                 array('year', 'end_year', array(
                     'required'     => false,
                     'label'        => 'год',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-1',
                     'placeholder'  => 'год',
+                    'style'        => 'width: 10%'
                 )),
                 array('month', 'end_month', array(
                     'required'     => false,
                     'label'        => 'месяц',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-2'
+                    'style'        => 'width: 20%'
                 )),
                 array('select', 'today', array(
                     'required'     => false,
@@ -83,13 +82,13 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                         '2' => 'производится в н.в.'
                     ),
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-2'
+                    'style'        => 'width: 20%'
                 )),
                 array('uint', 'produced', array(
                     'required'     => false,
                     'label'        => 'единиц',
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-2'
+                    'style'        => 'width: 10%'
                 )),
                 array('select', 'produced_exactly', array(
                     'required'     => false,
@@ -99,7 +98,7 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                         '1' => 'точно'
                     ),
                     'decorators'   => array('ViewHelper'),
-                    'class'        => 'col-lg-2'
+                    'style'        => 'width: 20%'
                 )),
                 array('checkbox', 'is_concept', array(
                     'required'     => false,
@@ -125,10 +124,11 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'options'  => array(
                         'legend'     => 'Модельный год',
                         'order'      => 4,
-                        'decorators' => array(
-                            'FormElements',
-                            array('HtmlTag', array('tag' => 'div', 'class' => 'controls-row'))
-                        )
+                        'decorators'  => array(
+                            array('viewScript', array(
+                                'viewScript' => 'forms/bootstrap-group-inline.phtml'
+                            )),
+                        ),
                     )
                 ),
                 'begin_group' =>    array(
@@ -136,10 +136,11 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'options'  => array(
                         'legend'     => 'Выпускалась с',
                         'order'      => 6,
-                        'decorators' => array(
-                            'FormElements',
-                            array('HtmlTag', array('tag' => 'div', 'class' => 'controls-row'))
-                        )
+                        'decorators'  => array(
+                            array('viewScript', array(
+                                'viewScript' => 'forms/bootstrap-group-inline.phtml'
+                            )),
+                        ),
                     )
                 ),
                 'end_group'      => array(
@@ -147,10 +148,11 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'options'  => array(
                         'legend' => 'Выпускалась по',
                         'order'  => 7,
-                        'decorators' => array(
-                            'FormElements',
-                            array('HtmlTag', array('tag' => 'div', 'class' => 'controls-row'))
-                        )
+                        'decorators'  => array(
+                            array('viewScript', array(
+                                'viewScript' => 'forms/bootstrap-group-inline.phtml'
+                            )),
+                        ),
                     )
                 ),
                 'produced_group' => array(
@@ -158,10 +160,11 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'options'  => array(
                         'legend' => 'Выпущено единиц',
                         'order'  => 8,
-                        'decorators' => array(
-                            'FormElements',
-                            array('HtmlTag', array('tag' => 'div', 'class' => 'controls-row'))
-                        )
+                        'decorators'  => array(
+                            array('viewScript', array(
+                                'viewScript' => 'forms/bootstrap-group-inline.phtml'
+                            )),
+                        ),
                     )
                 ),
             )

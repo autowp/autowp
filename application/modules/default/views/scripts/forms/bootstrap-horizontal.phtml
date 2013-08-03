@@ -20,6 +20,16 @@
                         <?php } ?>
                     </div>
                 </div>
+            <?php } elseif ($element instanceof Zend_Form_Element_Multicheckbox) { ?>
+                <div class="form-group<?=$element->hasErrors() ? ' has-error' : ''?>">
+                    <label class="col-lg-2 control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
+                    <div class="col-lg-10">
+                        <?=$element ?>
+                        <?php foreach ($element->getMessages() as $error) { ?>
+                            <p class="help-block"><?=$this->escape($error)?></p>
+                        <?php } ?>
+                    </div>
+                </div>
             <?php } elseif ($element instanceof Zend_Form_Element_Checkbox) { ?>
                 <div class="form-group">
                     <div class="col-lg-2">

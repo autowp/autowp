@@ -11,7 +11,7 @@ class Application_Form_Moder_Model_Edit extends Project_Form
             'decorators' => array(
                 'PrepareElements',
                 array('viewScript', array(
-                    'viewScript' => 'forms/bootstrap-horizontal.phtml'
+                    'viewScript' => 'forms/bootstrap-vertical.phtml'
                 )),
                 'Form'
             ),

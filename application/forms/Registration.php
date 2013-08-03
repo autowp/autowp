@@ -2,12 +2,11 @@
 
 class Application_Form_Registration extends Project_Form
 {
-
     public function init()
     {
         parent::init();
 
-         $this->setOptions(array(
+        $this->setOptions(array(
             'method'     => 'post',
             'decorators' => array(
                 'PrepareElements',
@@ -26,7 +25,7 @@ class Application_Form_Registration extends Project_Form
                     'validators' => array(
                         array('StringLength', true, array(null, 50)),
                         'EmailAddress',
-                        new My_Validate_User_Email_NotExists()
+                        'User_EmailNotExists'
                     ),
                     'decorators' => array('ViewHelper')
                 )),
