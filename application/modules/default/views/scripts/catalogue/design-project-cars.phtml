@@ -4,7 +4,15 @@
         'needLeft'  => true,
         'needRight' => false
     ));
-    $this->pageTitle($this->brand->caption . ' ' . $this->designProject->name);
+    $title = $this->brandName . ' ' . $this->designProject->name;
+    $this->pageTitle($title);
+    $this->headTitle($title, 'SET');
+    $this->breadcrumbs()->params(array(
+        'BRAND_NAME'             => $this->brandName,
+        'BRAND_CATNAME'          => $this->brand->folder,
+        'DESIGN_PROJECT_NAME'    => $this->designProject->name,
+        'DESIGN_PROJECT_CATNAME' => $this->designProject->catname
+    ));
 ?>
 
 <ul class="nav nav-pills">

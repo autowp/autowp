@@ -6,6 +6,7 @@
     ));
     $this->pageTitle($this->title);
     $this->headTitle($this->title, 'SET');
+    $this->breadcrumbs()->params($this->breadcrumbs);
 ?>
 
 <?=$this->partial('catalogue/partial/model-generation-menu.phtml', array(

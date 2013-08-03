@@ -4,7 +4,13 @@
         'needLeft'  => true,
         'needRight' => false
     ));
-    $this->headTitle($this->page->name.' '.$this->brand->caption, 'SET');
+    $title = $this->page->name . ' ' . $this->brandName;
+    $this->headTitle($title, 'SET');
+    $this->pageTitle($title);
+    $this->breadcrumbs()->params(array(
+        'BRAND_NAME'    => $this->brandName,
+        'BRAND_CATNAME' => $this->brand->folder,
+    ));
 ?>
 <?=$this->pictures($this->paginator->getCurrentItems(), array(
     'scheme' => '422'

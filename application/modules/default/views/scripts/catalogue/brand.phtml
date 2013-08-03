@@ -5,6 +5,11 @@
         'needRight' => false
     ));
     $this->pageTitle()->set('');
+    $this->headTitle($this->brandName, 'SET');
+    $this->breadcrumbs()->params(array(
+        'BRAND_NAME'    => $this->brandName,
+        'BRAND_CATNAME' => $this->brand->folder,
+    ));
 ?>
 
 <header>

@@ -4,7 +4,17 @@
         'needLeft'  => true,
         'needRight' => false
     ));
-    $this->pageTitle($this->brand->caption . ' ' . $this->model->name);
+    $title = $this->brandName . ' ' . $this->model->name . ' ' . $this->layout['name'];
+    $this->pageTitle($title);
+    $this->headTitle($title, 'SET');
+    $this->breadcrumbs()->params(array(
+        'BRAND_NAME'     => $this->brandName,
+        'BRAND_CATNAME'  => $this->brand->folder,
+        'MODEL_CATNAME'  => $this->model->folder,
+        'MODEL_NAME'     => $this->model->name,
+        'LAYOUT_CATNAME' => $this->layout['catname'],
+        'LAYOUT_NAME'    => $this->layout['name'],
+    ));
 ?>
 <?=$this->cars($this->paginator->getCurrentItems()) ?>
 <?=$this->paginationControl($this->paginator) ?>

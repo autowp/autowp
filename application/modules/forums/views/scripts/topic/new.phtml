@@ -4,6 +4,11 @@
         'needLeft'  => false,
         'needRight' => true
     ));
+    $this->headTitle($this->theme->caption, 'SET');
+    $this->breadcrumbs()->params(array(
+        'THEME_NAME'    => $this->theme->caption,
+        'THEME_ID'      => $this->theme->id
+    ));
 ?>
 <?php if ($this->user()->logedIn()) { ?>
     <?php if ($this->needWait) { ?>

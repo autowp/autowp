@@ -4,9 +4,15 @@
         'needLeft'  => true,
         'needRight' => false
     ));
-    $title = $this->page->name . ' ' . $this->carList->current()->getFullName();
+    $title = $this->page->name . ' ' . $this->car->getFullName();
     $this->headTitle($title, 'SET');
     $this->pageTitle($title);
+    $this->breadcrumbs()->params(array(
+        'BRAND_NAME'     => $this->brandName,
+        'BRAND_CATNAME'  => $this->brand->folder,
+        'CAR_ID'         => $this->car->id,
+        'SHORT_CAR_NAME' => $this->carShortName
+    ));
 ?>
 
 <?=$this->specifications($this->carList) ?>

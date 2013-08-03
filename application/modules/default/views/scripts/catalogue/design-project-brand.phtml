@@ -4,9 +4,15 @@
         'needLeft'  => true,
         'needRight' => false
     ));
-    $title = $this->brand->caption . ' ' . $this->dpBrand->caption;
+    $title = $this->brandName . ' ' . $this->dpBrand->caption;
     $this->headTitle($title, 'SET');
     $this->pageTitle($title);
+    $this->breadcrumbs()->params(array(
+        'BRAND_NAME'      => $this->brandName,
+        'BRAND_CATNAME'   => $this->brand->folder,
+        'DPBRAND_NAME'    => $this->dpBrand->caption,
+        'DPBRAND_CATNAME' => $this->dpBrand->folder
+    ));
 ?>
 
 <?php foreach ($this->paginator->getCurrentItems() as $dp) { ?>

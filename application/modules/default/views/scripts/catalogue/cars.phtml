@@ -4,7 +4,18 @@
         'needLeft'  => true,
         'needRight' => false
     ));
-    $this->pageTitle($this->page->name);
+    $title = $this->brandName . ' ' . $this->page->name;
+    $this->pageTitle($title);
+    $this->headTitle($title, 'SET');
+    $this->breadcrumbs()->params(array(
+        'BRAND_NAME'    => $this->brandName,
+        'BRAND_CATNAME' => $this->brand->folder,
+    ));
+    if ($this->cartype) {
+        $this->breadcrumbs($this->url(array(
+            'cartype_catname' => $this->cartype->catname
+        ), 'catalogue'), $this->cartype->name);
+    }
 ?>
 
 <ul class="nav nav-pills">
@@ -13,7 +24,7 @@
             <?=$this->htmlA(array(
                 'href' => $this->url(array(
                     'cartype_catname' => $cartype->catname,
-                    'page'  => 1
+                    'page'            => 1
                 ), 'catalogue')
             ), $this->escape($cartype->name) . ' <small>('.$cartype->cars_count.')</small>', false) ?>
         </li>

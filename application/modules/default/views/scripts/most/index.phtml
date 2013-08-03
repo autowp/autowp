@@ -5,6 +5,12 @@
         'needRight' => false
     ));
     $this->pageTitle($this->title);
+    $this->headTitle($this->title, 'SET');
+    $this->breadcrumbs($this->url(array(
+        'shape_catname' => $this->carType ? $this->carType->catname : null,
+        'years_catname' => $this->cYear['folder'],
+        'most_catname'  => $this->cMost['catName']
+    ), 'most'), $this->title);
 ?>
 <?php $this->jQuery()->onLoadCaptureStart()?>
 mostIndexPage();

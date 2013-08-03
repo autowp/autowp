@@ -4,9 +4,15 @@
         'needLeft'  => true,
         'needRight' => false
     ));
-    $title = ($this->brandLanguage ? $this->brandLanguage->name : $this->brand->caption) . ' ' . $this->model->name;
+    $title = $this->brandName . ' ' . $this->model->name;
     $this->pageTitle($title);
     $this->headTitle($title, 'SET');
+    $this->breadcrumbs()->params(array(
+        'BRAND_CATNAME'  => $this->brand->folder,
+        'BRAND_NAME'     => $this->brandName,
+        'MODEL_CATNAME'  => $this->model->folder,
+        'MODEL_NAME'     => $this->model->name,
+    ));
 ?>
 
 <?=$this->partial('catalogue/partial/model-menu.phtml', array(

@@ -4,14 +4,21 @@
         'needLeft'  => true,
         'needRight' => false
     ));
-    $brandName = $this->brandLanguage ? $this->brandLanguage->name : $this->brand->caption;
-    $title = $this->page->name.' '.$brandName . ' ' . $this->model->name . ' ' . $this->generation->shortname;
+    $title = $this->page->name.' '.$this->brandName . ' ' . $this->model->name . ' ' . $this->generation->shortname;
     $this->pageTitle($title);
     $this->headTitle($title, 'SET');
+    $this->breadcrumbs()->params(array(
+        'BRAND_CATNAME'      => $this->brand->folder,
+        'BRAND_NAME'         => $this->brandName,
+        'MODEL_CATNAME'      => $this->model->folder,
+        'MODEL_NAME'         => $this->model->name,
+        'GENERATION_CATNAME' => mb_strtolower($this->generation->shortname),
+        'GENERATION_NAME'    => $this->generation->name
+    ));
 ?>
 
 <?=$this->partial('catalogue/partial/model-generation-menu.phtml', array(
-    'title' => $brandName . ' ' . $this->model->name . ' ' . $this->generation->name,
+    'title' => $this->brandName . ' ' . $this->model->name . ' ' . $this->generation->name,
     'stock' => array(
         'count'  => $this->stockCount,
         'active' => false
