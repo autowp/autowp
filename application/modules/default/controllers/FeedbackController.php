@@ -1,9 +1,9 @@
 <?php
-class FeedbackController extends My_Controller_Action
+class FeedbackController extends Zend_Controller_Action
 {
     public function indexAction()
     {
-        $this->initPage(89);
+        $this->_helper->page->initPage(89);
 
         $form = new Application_Form_Feedback();
 
@@ -43,6 +43,6 @@ class FeedbackController extends My_Controller_Action
 
     public function sentAction()
     {
-        $this->initPage(93);
+        $this->_helper->page->initPage(93);
     }
 }

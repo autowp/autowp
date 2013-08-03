@@ -1,12 +1,12 @@
 <?php
-class Forums_ThemeController extends My_Controller_Action
+class Forums_ThemeController extends Zend_Controller_Action
 {
     const TOPICS_PER_PAGE = 20;
     const MESSAGES_PER_PAGE = 20;
 
     public function themeAction()
     {
-        $this->initPage(43);
+        $this->_helper->page->initPage(43);
 
         // определяем является ли пользователь администратором форума
         $forumAdmin = $this->_helper->user()->isAllowed('forums', 'moderate');

@@ -1,5 +1,5 @@
 <?php
-class Forums_MessageController extends My_Controller_Action
+class Forums_MessageController extends Zend_Controller_Action
 {
     protected function _isForumModer()
     {

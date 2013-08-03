@@ -43,7 +43,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
         require_once 'Functions.php';
         require_once 'BBDocument.php';
-        require_once 'Blocks.php';
     }
 
     protected function _initAutoloader()

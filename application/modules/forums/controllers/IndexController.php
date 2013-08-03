@@ -1,9 +1,9 @@
 <?php
-class Forums_IndexController extends My_Controller_Action
+class Forums_IndexController extends Zend_Controller_Action
 {
     public function indexAction()
     {
-        $this->initPage(42);
+        $this->_helper->page->initPage(42);
 
         $themeTable = new Forums_Themes();
         $topicsTable = new Forums_Topics();

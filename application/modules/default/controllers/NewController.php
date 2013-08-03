@@ -1,5 +1,5 @@
 <?php
-class NewController extends My_Controller_Action
+class NewController extends Zend_Controller_Action
 {
     protected $_perPage = 18;
     protected $_urlDateFormat = 'yyyy-MM-dd';
@@ -43,7 +43,7 @@ class NewController extends My_Controller_Action
 
     public function indexAction()
     {
-        $this->initPage(51);
+        $this->_helper->page->initPage(51);
 
         $pictureTable = $this->_helper->catalogue()->getPictureTable();
         $db = $pictureTable->getAdapter();

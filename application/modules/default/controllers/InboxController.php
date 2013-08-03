@@ -1,5 +1,5 @@
 <?php
-class InboxController extends My_Controller_Action
+class InboxController extends Zend_Controller_Action
 {
     protected $_perPage = 18;
     protected $_urlDateFormat = 'yyyy-MM-dd';
@@ -105,7 +105,7 @@ class InboxController extends My_Controller_Action
 
     public function indexAction()
     {
-        $this->initPage(76);
+        $this->_helper->page->initPage(76);
 
         $brandTable = $this->_helper->catalogue()->getBrandTable();
 

@@ -1,9 +1,9 @@
 <?php
-class CutawayController extends My_Controller_Action
+class CutawayController extends Zend_Controller_Action
 {
     public function indexAction()
     {
-        $this->initPage(109);
+        $this->_helper->page->initPage(109);
 
         $pictures = new Pictures();
 

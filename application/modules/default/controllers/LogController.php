@@ -1,5 +1,5 @@
 <?php
-class LogController extends My_Controller_Action
+class LogController extends Zend_Controller_Action
 {
     const EVENTS_PER_PAGE = 40;
 
@@ -9,7 +9,7 @@ class LogController extends My_Controller_Action
             return $this->_forward('forbidden', 'error');
         }
 
-        $this->initPage(75);
+        $this->_helper->page->initPage(75);
 
         $logTable = new Log_Events();
 

@@ -115,4 +115,14 @@ class Project_Controller_Action_Helper_User extends Zend_Controller_Action_Helpe
                 ->getHelper('acl')->direct()
                 ->inheritsRole($this->_user->role, $inherit);
     }
+
+    public function clearRememberCookie()
+    {
+        setcookie('remember', '', time() - 3600*24*30, '/', '.autowp.ru');
+    }
+
+    public function setRememberCookie($hash)
+    {
+        setcookie('remember', $hash, time() + 3600*24*30, '/', '.autowp.ru');
+    }
 }
