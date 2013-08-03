@@ -1,0 +1,18 @@
+<?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => false,
+        'needRight' => false
+    ));
+    $this->pageTitle($this->escape($this->page->name . ' ' . $this->group->name));
+    $this->headTitle($this->page->name . ' ' . $this->group->name, 'SET');
+    $this->breadcrumbs($this->url(array(
+        'action'         => 'group',
+        'twins_group_id' => $this->group->id
+    ), 'twins', true, true), $this->group->name);
+    $this->breadcrumbs($this->url(array(
+        'action'         => 'pictures',
+        'twins_group_id' => $this->group->id
+    ), 'twins', true, true), $this->page->name);
+?>
+<?=$this->specifications($this->carList) ?>

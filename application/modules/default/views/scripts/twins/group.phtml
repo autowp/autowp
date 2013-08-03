@@ -1,0 +1,25 @@
+<?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => true,
+        'needRight' => false
+    ));
+    $this->pageTitle($this->group->name);
+    $this->headTitle($this->group->name, 'SET');
+    $this->breadcrumbs($this->url(array(
+        'action'         => 'group',
+        'twins_group_id' => $this->group->id
+    ), 'twins', true, true), $this->group->name);
+?>
+
+<?=$this->getHelper('twinsGroupList')->detailed($this->group) ?>
+
+<?php if (strlen($this->group->description)){ ?>
+    <h3>Описание</h3>
+    <div class="well"><?=$this->group->description ?></div>
+<?php } ?>
+
+<?=$this->action('comments', 'comments', 'default', array(
+    'type'    => Comments_Messages::TWINS_TYPE_ID,
+    'item_id' => $this->group->id
+)) ?>
