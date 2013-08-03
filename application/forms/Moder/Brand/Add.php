@@ -22,7 +22,9 @@ class Application_Form_Moder_Brand_Add extends Project_Form
                     'label'        => 'Название',
                     'size'         => 60,
                     'filters'      => array('StringTrim'),
-                    'validators'   => array(new Validate_Brand_Name_Unique),
+                    'validators'   => array(
+                        'Brand_NameNotExists'
+                    ),
                     'decorators'   => array('ViewHelper')
                 )),
                 array('select', 'type_id', array(
