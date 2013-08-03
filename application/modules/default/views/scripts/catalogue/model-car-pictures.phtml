@@ -4,6 +4,7 @@
         'needLeft'  => true,
         'needRight' => false
     ));
+    $this->page(17)->initPage();
     $title = $this->page->name.' '.$this->car->getFullName();
     $this->pageTitle($title);
     $this->headTitle($title, 'SET');

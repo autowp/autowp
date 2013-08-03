@@ -4,6 +4,7 @@
         'needLeft'  => true,
         'needRight' => false
     ));
+    $this->page(16)->initPage();
     $title = $this->page->name . ' ' . $this->brandName . ' ' . $this->model->name;
     $this->pageTitle($title);
     $this->headTitle($title, 'SET');

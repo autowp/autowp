@@ -3,8 +3,6 @@ class Forums_IndexController extends Zend_Controller_Action
 {
     public function indexAction()
     {
-        $this->_helper->page->initPage(42);
-
         $themeTable = new Forums_Themes();
         $topicsTable = new Forums_Topics();
         $msgTable = new Forums_Messages();

@@ -4,6 +4,7 @@
         'needLeft'  => true,
         'needRight' => false
     ));
+    $this->page($this->pageId)->initPage();
     $this->pageTitle($this->title);
     $this->headTitle($this->title, 'SET');
     $this->breadcrumbs()->params($this->breadcrumbs);

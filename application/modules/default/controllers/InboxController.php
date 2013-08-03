@@ -105,8 +105,6 @@ class InboxController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        $this->_helper->page->initPage(76);
-
         $brandTable = $this->_helper->catalogue()->getBrandTable();
 
         $brand = $brandTable->findRowByCatname($this->_getParam('brand'));

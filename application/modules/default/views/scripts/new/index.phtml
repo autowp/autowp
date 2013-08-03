@@ -4,6 +4,7 @@
         'needLeft'  => false,
         'needRight' => false
     ));
+    $this->page(51)->initPage();
 
     if (($current = $this->paginator->getCurrentPageNumber()) < $this->paginator->count() ) {
         $this->headLink(array(

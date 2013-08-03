@@ -4,6 +4,7 @@
         'needLeft'  => true,
         'needRight' => false
     ));
+    $this->page(15)->initPage();
     $this->headTitle($this->page->name . ' ' . $this->brandName, 'SET');
     $this->breadcrumbs()->params(array(
         'BRAND_NAME'    => $this->brandName,

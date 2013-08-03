@@ -4,6 +4,7 @@
         'needLeft'  => false,
         'needRight' => false
     ));
+    $this->page(27)->initPage();
     $this->pageTitle($this->escape($this->page->name . ' ' . $this->group->name));
     $this->headTitle($this->page->name . ' ' . $this->group->name, 'SET');
     $this->breadcrumbs($this->url(array(

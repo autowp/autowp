@@ -4,6 +4,7 @@
         'needLeft'  => false,
         'needRight' => false
     ));
+    $this->page(22)->initPage();
 
     $categoryName = $this->categoryLang ? $this->categoryLang->name : $this->category->name;
     $this->headTitle($categoryName, 'SET');

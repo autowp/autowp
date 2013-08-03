@@ -43,8 +43,6 @@ class NewController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        $this->_helper->page->initPage(51);
-
         $pictureTable = $this->_helper->catalogue()->getPictureTable();
         $db = $pictureTable->getAdapter();
 

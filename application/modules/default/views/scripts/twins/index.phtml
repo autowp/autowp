@@ -4,6 +4,7 @@
         'needLeft'  => true,
         'needRight' => false
     ));
+    $this->page(25)->initPage();
 ?>
 <?=$this->twinsGroupList($this->paginator->getCurrentItems()) ?>
 <?=$this->paginationControl($this->paginator) ?>

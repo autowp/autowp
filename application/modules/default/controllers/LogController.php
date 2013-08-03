@@ -9,8 +9,6 @@ class LogController extends Zend_Controller_Action
             return $this->_forward('forbidden', 'error');
         }
 
-        $this->_helper->page->initPage(75);
-
         $logTable = new Log_Events();
 
         $select = $logTable->select(true)

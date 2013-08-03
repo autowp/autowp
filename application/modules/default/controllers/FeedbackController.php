@@ -3,8 +3,6 @@ class FeedbackController extends Zend_Controller_Action
 {
     public function indexAction()
     {
-        $this->_helper->page->initPage(89);
-
         $form = new Application_Form_Feedback();
 
         $request = $this->getRequest();
@@ -43,6 +41,5 @@ class FeedbackController extends Zend_Controller_Action
 
     public function sentAction()
     {
-        $this->_helper->page->initPage(93);
     }
 }

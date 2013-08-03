@@ -6,8 +6,6 @@ class Forums_ThemeController extends Zend_Controller_Action
 
     public function themeAction()
     {
-        $this->_helper->page->initPage(43);
-
         // определяем является ли пользователь администратором форума
         $forumAdmin = $this->_helper->user()->isAllowed('forums', 'moderate');
         $moder = $this->_helper->user()->inheritsRole('moder');

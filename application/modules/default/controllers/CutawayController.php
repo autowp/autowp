@@ -3,8 +3,6 @@ class CutawayController extends Zend_Controller_Action
 {
     public function indexAction()
     {
-        $this->_helper->page->initPage(109);
-
         $pictures = new Pictures();
 
         $select = $pictures->select(true)
