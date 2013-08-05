@@ -49,20 +49,18 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
         $radius     = $this->_attributesTable->find($wheel['radius'])->current();
         $radiusValuesTable = $radius->getValueTable()->info(Zend_Db_Table_Abstract::NAME);
 
-        //print $select; exit;
-
-           $select->join('equipes', 'cars.id=equipes.car_id', null)
-               ->join(array('tyrewidth' => $tyrewidthValuesTable), 'equipes.id=tyrewidth.item_id', null)
-               ->where('tyrewidth.item_type_id = ?', 2)
-               ->where('tyrewidth.attribute_id = ?', $tyrewidth->id)
+        $select->join('equipes', 'cars.id=equipes.car_id', null)
+            ->join(array('tyrewidth' => $tyrewidthValuesTable), 'equipes.id=tyrewidth.item_id', null)
+            ->where('tyrewidth.item_type_id = ?', 2)
+            ->where('tyrewidth.attribute_id = ?', $tyrewidth->id)
             ->where('tyrewidth.value > 0')
             ->join(array('tyreseries' => $tyreseriesValuesTable), 'equipes.id=tyreseries.item_id', null)
             ->where('tyreseries.item_type_id = ?', 2)
-               ->where('tyreseries.attribute_id = ?', $tyreseries->id)
+            ->where('tyreseries.attribute_id = ?', $tyreseries->id)
             ->where('tyreseries.value > 0')
             ->join(array('radius' => $radiusValuesTable), 'equipes.id=radius.item_id', null)
             ->where('radius.item_type_id = ?', 2)
-               ->where('radius.attribute_id = ?', $radius->id)
+            ->where('radius.attribute_id = ?', $radius->id)
             ->where('radius.value > 0')
             ->group('cars.id')
             ->order(new Zend_Db_Expr('tyrewidth.value*tyreseries.value/100+radius.value*25.4 ' . $this->_order));
