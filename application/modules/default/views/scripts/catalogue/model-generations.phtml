@@ -1,23 +1,22 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => true,
-        'needRight' => false
-    ));
-    $this->page(11)->initPage();
-    $title = $this->brandName . ' ' . $this->model->name;
-    $this->pageTitle($title);
-    $this->headTitle($title, 'SET');
-    $this->breadcrumbs()->params(array(
-        'BRAND_CATNAME'  => $this->brand->folder,
-        'BRAND_NAME'     => $this->brandName,
-        'MODEL_CATNAME'  => $this->model->folder,
-        'MODEL_NAME'     => $this->model->name,
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 11,
+        'args'   => array(
+            'BRAND_CATNAME'  => $this->brand->folder,
+            'BRAND_NAME'     => $this->brandName,
+            'MODEL_CATNAME'  => $this->model->folder,
+            'MODEL_NAME'     => $this->model->name,
+        )
     ));
 ?>
 
 <?=$this->partial('catalogue/partial/model-menu.phtml', array(
-    'title'    => $title,
+    'title'    => $this->brandName . ' ' . $this->model->name,
     'stock'    => array(
         'count'  => $this->stockCount,
         'active' => true

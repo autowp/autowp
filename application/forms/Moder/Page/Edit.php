@@ -31,7 +31,6 @@ class Application_Form_Moder_Page_Edit extends Project_Form
                             'required'   => false,
                             'filter'     => array('StringTrim'),
                             'maxlength'  => 255,
-                            'size'       => 80,
                             'decorators' => array('ViewHelper')
                         )),
                         array('text', 'title', array (
@@ -39,17 +38,23 @@ class Application_Form_Moder_Page_Edit extends Project_Form
                             'required'   => false,
                             'filter'     => array('StringTrim'),
                             'maxlength'  => 255,
-                            'size'       => 80,
+                            'decorators' => array('ViewHelper')
+                        )),
+                        array('text', 'breadcrumbs', array (
+                            'label'      => 'Breadcrumbs',
+                            'required'   => false,
+                            'filter'     => array('StringTrim'),
+                            'maxlength'  => 100,
                             'decorators' => array('ViewHelper')
                         )),
                     )
                 ),
                 $language,
-                $i + 4
+                $i + 5
             );
         }
 
-        $lskip = count($this->_languages) + 4;
+        $lskip = count($this->_languages) + 5;
 
         $this->setOptions(array(
             'method'            => 'post',
@@ -90,17 +95,17 @@ class Application_Form_Moder_Page_Edit extends Project_Form
                     'order'       => 3,
                     'decorators'  => array('ViewHelper')
                 )),
-                array('text', 'url', array (
-                    'label'       => 'URL',
+                array('text', 'breadcrumbs', array (
+                    'label'       => 'Breadcrumbs',
                     'required'    => false,
                     'filter'      => array('StringTrim'),
                     'maxlength'   => 255,
                     'size'        => 80,
-                    'order'       => $lskip,
+                    'order'       => 4,
                     'decorators'  => array('ViewHelper')
                 )),
-                array('text', 'breadcrumbs', array (
-                    'label'       => 'Breadcrumbs',
+                array('text', 'url', array (
+                    'label'       => 'URL',
                     'required'    => false,
                     'filter'      => array('StringTrim'),
                     'maxlength'   => 255,

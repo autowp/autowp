@@ -1,22 +1,16 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => true,
-        'needRight' => false
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 28,
+        'args'   => array(
+            'TWINS_GROUP_NAME' => $this->group->name,
+            'TWINS_GROUP_ID'   => $this->group->id
+        )
     ));
-    $this->page(28)->initPage();
-    $title = $this->page->name . ' ' . $this->group->name;
-    $this->pageTitle($title);
-    $this->headTitle($title, 'SET');
-    $this->breadcrumbs($this->url(array(
-        'action'         => 'group',
-        'twins_group_id' => $this->group->id
-    ), 'twins', true), $this->group->name);
-    $this->breadcrumbs($this->url(array(
-        'action'         => 'pictures',
-        'twins_group_id' => $this->group->id
-    ), 'twins', true), 'Все картинки');
-
 ?>
 <?=$this->pictures($this->paginator->getCurrentItems(), 4) ?>
 <?=$this->paginationControl($this->paginator) ?>

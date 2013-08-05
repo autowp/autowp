@@ -1,14 +1,15 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => true
-    ));
-    $this->page(45)->initPage();
-    $this->headTitle($this->theme->caption, 'SET');
-    $this->breadcrumbs()->params(array(
-        'THEME_NAME'    => $this->theme->caption,
-        'THEME_ID'      => $this->theme->id
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ),
+        'pageId' => 45,
+        'args'   => array(
+            'THEME_NAME' => $this->theme->caption,
+            'THEME_ID'   => $this->theme->id,
+        )
     ));
 ?>
 <?php if ($this->user()->logedIn()) { ?>

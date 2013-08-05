@@ -1,20 +1,19 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => true,
-        'needRight' => false
-    ));
-    $this->page(108)->initPage();
-    $title = $this->page->name.' '.$this->brandName . ' ' . $this->model->name . ' ' . $this->generation->shortname;
-    $this->pageTitle($title);
-    $this->headTitle($title, 'SET');
-    $this->breadcrumbs()->params(array(
-        'BRAND_CATNAME'      => $this->brand->folder,
-        'BRAND_NAME'         => $this->brandName,
-        'MODEL_CATNAME'      => $this->model->folder,
-        'MODEL_NAME'         => $this->model->name,
-        'GENERATION_CATNAME' => mb_strtolower($this->generation->shortname),
-        'GENERATION_NAME'    => $this->generation->name
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 108,
+        'args'   => array(
+            'BRAND_CATNAME'      => $this->brand->folder,
+            'BRAND_NAME'         => $this->brandName,
+            'MODEL_CATNAME'      => $this->model->folder,
+            'MODEL_NAME'         => $this->model->name,
+            'GENERATION_CATNAME' => mb_strtolower($this->generation->shortname),
+            'GENERATION_NAME'    => $this->generation->name
+        )
     ));
 ?>
 

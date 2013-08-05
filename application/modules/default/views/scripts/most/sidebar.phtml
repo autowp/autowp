@@ -5,9 +5,9 @@
             <li<?=($id == $this->mostId) ? ' class="active"' : '' ?>>
                 <?=$this->htmlA($this->url(array(
                     'most_catname' => $most['catName'],
-                    'shape_catname' => $this->carType ? $this->carType->catname : null,
+                    'shape_catname' => $this->carType ? $this->carType['catname'] : null,
                     'years_catname' => $this->cYear['folder']
-                ), 'most'), $most['name']) ?>
+                ), 'most'), $this->translate('most/'.$most['catName'])) ?>
             </li>
         <?php } ?>
         <li class="nav-header">среди …</li>
@@ -18,14 +18,14 @@
                     'shape_catname' => $carType['catname'],
                     'years_catname' => $this->cYear['folder']
                 ), 'most');
-                $active = ($this->carType && $carType['id'] == $this->carType->id);
+                $active = ($this->carType && $carType['id'] == $this->carType['id']);
             ?>
             <li<?= $active ? ' class="active"' : '' ?>>
                 <?=$this->htmlA($url, $carType['name']) ?>
                 <?php if ($carType['childs']) { ?>
                     <ul class="nav nav-list">
                         <?php foreach ($carType['childs'] as $child) { ?>
-                            <li<?= ($this->carType && $child['id'] == $this->carType->id) ? ' class="active"' : '' ?>>
+                            <li<?= ($this->carType && $child['id'] == $this->carType['id']) ? ' class="active"' : '' ?>>
                                 <?=$this->htmlA($this->url(array(
                                     'most_catname' => $this->cMost['catName'],
                                     'shape_catname' => $child['catname'],

@@ -1,11 +1,14 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => true
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ),
+        'pageId' => 42,
     ));
-    $this->page(42)->initPage();
 ?>
+
 <?php foreach ($this->themes as $theme) { ?>
     <div class="row">
         <div class="col-lg-6">

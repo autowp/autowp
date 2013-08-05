@@ -1,18 +1,17 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => true,
-        'needRight' => false
-    ));
-    $this->page(58)->initPage();
-    $title = $this->brandName . ' ' . $this->dpBrand->caption;
-    $this->headTitle($title, 'SET');
-    $this->pageTitle($title);
-    $this->breadcrumbs()->params(array(
-        'BRAND_NAME'      => $this->brandName,
-        'BRAND_CATNAME'   => $this->brand->folder,
-        'DPBRAND_NAME'    => $this->dpBrand->caption,
-        'DPBRAND_CATNAME' => $this->dpBrand->folder
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 58,
+        'args'   => array(
+            'BRAND_NAME'      => $this->brandName,
+            'BRAND_CATNAME'   => $this->brand->folder,
+            'DPBRAND_NAME'    => $this->dpBrand->caption,
+            'DPBRAND_CATNAME' => $this->dpBrand->folder
+        )
     ));
 ?>
 

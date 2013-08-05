@@ -1,18 +1,16 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => true,
-        'needRight' => false
-    ));
-    $this->page(37)->initPage();
-    $title = $this->page->name . ' ' . $this->brandName;
-    $this->pageTitle($title);
-    $this->headTitle($title, 'SET');
-    $this->breadcrumbs()->params(array(
-        'BRAND_NAME'    => $this->brandName,
-        'BRAND_CATNAME' => $this->brand->folder
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 37,
+        'args'   => array(
+            'BRAND_CATNAME' => $this->brand->folder,
+            'BRAND_NAME'    => $this->brandName,
+        )
     ));
 ?>
-
 <?=$this->cars($this->paginator->getCurrentItems()) ?>
 <?=$this->paginationControl($this->paginator) ?>

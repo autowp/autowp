@@ -1,19 +1,18 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => true,
-        'needRight' => false
-    ));
-    $this->page(36)->initPage();
-    $title = $this->page->name . ' ' . $this->car->getFullName();
-    $this->headTitle($title, 'SET');
-    $this->pageTitle($title);
-    $this->breadcrumbs()->params(array(
-        'BRAND_NAME'     => $this->brandName,
-        'BRAND_CATNAME'  => $this->brand->folder,
-        'CAR_ID'         => $this->car->id,
-        'SHORT_CAR_NAME' => $this->carShortName
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 36,
+        'args'   => array(
+            'BRAND_CATNAME'  => $this->brand->folder,
+            'BRAND_NAME'     => $this->brandName,
+            'CAR_ID'         => $this->car->id,
+            'CAR_NAME'       => $this->car->getFullName(),
+            'SHORT_CAR_NAME' => $this->carShortName
+        )
     ));
 ?>
-
 <?=$this->specifications($this->carList) ?>

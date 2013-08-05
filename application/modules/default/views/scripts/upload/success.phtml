@@ -1,11 +1,12 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => false
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 86
     ));
-    $this->pageTitle('Добавление картинок');
-    $this->page(86)->initPage();
 ?>
 <div class="alert alert-success">
     <p>Спасибо. Картинка успешно закачена на сайт.</p>

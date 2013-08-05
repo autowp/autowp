@@ -1,10 +1,12 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => false
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 51,
     ));
-    $this->page(51)->initPage();
 
     if (($current = $this->paginator->getCurrentPageNumber()) < $this->paginator->count() ) {
         $this->headLink(array(

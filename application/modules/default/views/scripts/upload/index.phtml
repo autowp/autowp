@@ -1,10 +1,12 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => false
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 29
     ));
-    $this->page(29)->initPage();
 ?>
 <div class="well">
     <p>Если у вас есть изображения, которых вы не нашли на этом сайте и они соответствуют тематике сайта, то вы можете добавить их в наш каталог, воспользовавшись формой, расположенной ниже.</p>

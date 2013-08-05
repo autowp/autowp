@@ -1,10 +1,12 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => false
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 22,
     ));
-    $this->page(22)->initPage();
 ?>
 <div class="row destinations thumbnails">
     <?php foreach ($this->categories as $idx => $category) { ?>

@@ -1,20 +1,17 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => false
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 23,
+        'args'   => array(
+            'CATEGORY_SHORT_NAME' => $this->categoryLang ? $this->categoryLang->short_name : $this->category->short_name,
+            'CATEGORY_NAME'       => $this->categoryLang ? $this->categoryLang->name : $this->category->name,
+            'CATEGORY_CATNAME'    => $this->category->catname
+        )
     ));
-    $this->page(22)->initPage();
-
-    $categoryName = $this->categoryLang ? $this->categoryLang->name : $this->category->name;
-    $this->headTitle($categoryName, 'SET');
-    $this->pageTitle($categoryName, 'SET');
-    $this->breadcrumbs(
-        $this->url(array(
-            'category_catname' => $this->category->catname
-        ), 'category'),
-        $this->categoryLang ? $this->categoryLang->short_name : $this->category->short_name
-    );
 ?>
 <div class="row">
     <div class="col-lg-4">

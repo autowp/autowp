@@ -1,17 +1,45 @@
 <?php
-    $this->layout()->assign(array(
+    $layout = array(
         'blankPage' => false,
         'needLeft'  => true,
         'needRight' => false
-    ));
-    $this->page(21)->initPage();
-    $this->pageTitle($this->title);
-    $this->headTitle($this->title, 'SET');
-    $this->breadcrumbs($this->url(array(
-        'shape_catname' => $this->carType ? $this->carType->catname : null,
-        'years_catname' => $this->cYear['folder'],
-        'most_catname'  => $this->cMost['catName']
-    ), 'most'), $this->title);
+    );
+    if ($this->carType) {
+        if ($this->cYear) {
+            $this->pageEnv(array(
+                'layout' => $layout,
+                'pageId' => 156,
+                'args'   => array(
+                    'MOST_CATNAME'     => $this->cMost['catName'],
+                    'MOST_NAME'        => $this->translate('most/'.$this->cMost['catName']),
+                    'CAR_TYPE_NAME'    => $this->carType['name_rp'],
+                    'CAR_TYPE_CARNAME' => $this->carType['catname'],
+                    'YEAR_NAME'        => $this->cYear['name'],
+                    'YEAR_CATNAME'     => $this->cYear['folder'],
+                )
+            ));
+        } else {
+            $this->pageEnv(array(
+                'layout' => $layout,
+                'pageId' => 155,
+                'args'   => array(
+                    'MOST_CATNAME'     => $this->cMost['catName'],
+                    'MOST_NAME'        => $this->translate('most/'.$this->cMost['catName']),
+                    'CAR_TYPE_NAME'    => $this->carType['name_rp'],
+                    'CAR_TYPE_CARNAME' => $this->carType['catname']
+                )
+            ));
+        }
+    } else {
+        $this->pageEnv(array(
+            'layout' => $layout,
+            'pageId' => 154,
+            'args'   => array(
+                'MOST_CATNAME' => $this->cMost['catName'],
+                'MOST_NAME'    => $this->translate('most/'.$this->cMost['catName']),
+            )
+        ));
+    }
 ?>
 <?php $this->jQuery()->onLoadCaptureStart()?>
 mostIndexPage();
@@ -21,15 +49,15 @@ mostIndexPage();
         <li<?=!is_null($this->yearId) && ($id == $this->yearId) ? ' class="active"' : '' ?>>
             <?=$this->htmlA($this->url(array(
                 'most_catname'  => $this->cMost['catName'],
-                'shape_catname' => $this->carType ? $this->carType->catname : null,
+                'shape_catname' => $this->carType ? $this->carType['catname'] : null,
                 'years_catname' => $year['folder']
             ), 'most'), $year['name']) ?>
         </li>
     <?php } ?>
     <li<?=is_null($this->yearId) ? ' class="active"' : '' ?>>
         <?=$this->htmlA($this->url(array(
-            'most_catname' => $this->cMost['catName'],
-            'shape_catname' => $this->carType ? $this->carType->catname : null,
+            'most_catname'  => $this->cMost['catName'],
+            'shape_catname' => $this->carType ? $this->carType['catname'] : null,
             'years_catname' => null
         ), 'most'), 'за всю историю') ?>
     </li>
@@ -43,7 +71,7 @@ mostIndexPage();
         </div>
         <div class="col-lg-3">
             <?php if ($idx++ == 0) { ?>
-                <h3><?=$this->escape($this->carList['paramName']) ?></h3>
+                <h3><?=$this->escape($this->translate('most/'.$this->cMost['catName'].'/param')) ?></h3> <?php /* $this->carList['paramName'] */ ?>
             <?php } ?>
         </div>
     </div>

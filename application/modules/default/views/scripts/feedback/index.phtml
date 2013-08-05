@@ -1,10 +1,12 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => false
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 89,
     ));
-    $this->page(89)->initPage();
 ?>
 <div class="row">
     <div class="col-lg-8 col-offset-2">

@@ -3,7 +3,6 @@
 class Project_View_Helper_Breadcrumbs extends Zend_View_Helper_Abstract
 {
     protected $_data = array();
-    protected $_params = array();
 
     public function reset()
     {
@@ -30,17 +29,6 @@ class Project_View_Helper_Breadcrumbs extends Zend_View_Helper_Abstract
         return $this;
     }
 
-    public function param($key, $value)
-    {
-        $this->_params[mb_strtoupper($key)] = $value;
-    }
-
-    public function params(array $array)
-    {
-        foreach ($array as $key => $value)
-            $this->param($key, $value);
-    }
-
     public function __toString()
     {
         try {
@@ -49,12 +37,6 @@ class Project_View_Helper_Breadcrumbs extends Zend_View_Helper_Abstract
 
                 $name = $node['name'];
                 $url = $node['url'];
-                foreach ($this->_params as $key => $value)
-                {
-                    $key = '%'.$key.'%';
-                    $url = str_replace($key, urlencode($value), $url);
-                    $name = str_replace($key, $value, $name);
-                }
 
                 if ($url)
                     $a[] = '<li>'.$this->view->htmlA(array('href' => $url), $name).'</li>';

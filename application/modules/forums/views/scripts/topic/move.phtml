@@ -1,11 +1,14 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => true
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ),
+        'pageId' => 83,
     ));
-    $this->page(83)->initPage();
 ?>
+
 <?php foreach ($this->themes as $theme) { ?>
     <?php if ($theme->id == $this->topic->theme_id) { ?>
         <h2><?=$this->escape($theme->caption)?></h2>

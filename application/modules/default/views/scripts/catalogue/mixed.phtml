@@ -1,16 +1,15 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => true,
-        'needRight' => false
-    ));
-    $this->page(40)->initPage();
-    $title = $this->page->name . ' ' . $this->brandName;
-    $this->headTitle($title, 'SET');
-    $this->pageTitle($title);
-    $this->breadcrumbs()->params(array(
-        'BRAND_NAME'    => $this->brandName,
-        'BRAND_CATNAME' => $this->brand->folder,
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 40,
+        'args'   => array(
+            'BRAND_NAME'    => $this->brandName,
+            'BRAND_CATNAME' => $this->brand->folder,
+        )
     ));
 ?>
 <?=$this->pictures($this->paginator->getCurrentItems(), array(

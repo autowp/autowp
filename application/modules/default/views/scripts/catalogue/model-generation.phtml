@@ -1,13 +1,13 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => true,
-        'needRight' => false
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => $this->pageId,
+        'args'   => $this->breadcrumbs
     ));
-    $this->page($this->pageId)->initPage();
-    $this->pageTitle($this->title);
-    $this->headTitle($this->title, 'SET');
-    $this->breadcrumbs()->params($this->breadcrumbs);
 ?>
 
 <?=$this->partial('catalogue/partial/model-generation-menu.phtml', array(

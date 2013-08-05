@@ -1,12 +1,12 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => false
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 30
     ));
-    $this->page(30)->initPage();
-    $this->pageTitle('Выбор бренда');
-
     $columns = 6;
     $count = count($this->brands);
     $perOne = ceil($count / $columns);

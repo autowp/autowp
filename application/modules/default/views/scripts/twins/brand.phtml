@@ -1,17 +1,16 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => true,
-        'needRight' => false
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 153,
+        'args'   => array(
+            'BRAND_NAME'    => $this->brand->caption,
+            'BRAND_CATNAME' => $this->brand->folder
+        )
     ));
-    $this->page(25)->initPage();
-    $title = $this->page->name . ' ' . $this->brand->caption;
-    $this->pageTitle($title);
-    $this->headTitle($title, 'SET');
-    $this->breadcrumbs($this->url(array(
-        'action'        => 'brand',
-        'brand_catname' => $this->brand->folder
-    ), 'twins', true), $this->brand->caption);
 ?>
 <?=$this->twinsGroupList($this->paginator->getCurrentItems()) ?>
 <?=$this->paginationControl($this->paginator) ?>
