@@ -97,7 +97,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         }
 
         // Translation
-        //Zend_Translate::setCache($longCache);
+        Zend_Translate::setCache($longCache);
         $translate = new Zend_Translate('Array', APPLICATION_PATH . '/languages', null, array(
             'scan'            => Zend_Translate::LOCALE_FILENAME,
             'disableNotices'  => true,
