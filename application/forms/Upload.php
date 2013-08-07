@@ -28,7 +28,7 @@ class Application_Form_Upload extends Project_Form
                         //array('IsImage',    true),
                         array('Extension',  true, 'jpg,jpeg,jpe'),
                         array('ImageSizeInArray',  true, array(
-                            'sizes' => Pictures::getResolutions()
+                            'sizes' => Picture::getResolutions()
                         )),
                     ),
                     'MaxFileSize' => $this->_maxFileSize,

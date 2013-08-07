@@ -21,10 +21,10 @@ class PicturesProvider extends Zend_Tool_Project_Provider_Abstract
             ->bootstrap('db');
 
 
-        $table = new Pictures();
+        $table = new Picture();
         $pictures = $table->fetchAll(
             $table->select(true)
-                ->where('status = ?', Pictures::STATUS_REMOVING)
+                ->where('status = ?', Picture::STATUS_REMOVING)
                 ->where('ISNULL(removing_date) OR (removing_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY) )')
                 ->limit(1000)
         );

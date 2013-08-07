@@ -44,12 +44,12 @@ class Application_Form_Moder_Inbox extends Project_Form
                     'required'     => false,
                     'label'        => 'Статус',
                     'multioptions' => array(
-                        ''                        => 'любой',
-                        Pictures::STATUS_INBOX    => 'инбокс',
-                        Pictures::STATUS_NEW      => 'немодерированые (old)',
-                        Pictures::STATUS_ACCEPTED => 'принятый',
-                        Pictures::STATUS_REMOVING => 'в очереди на удаление',
-                        'custom1'                 => 'все, кроме удалённых'
+                        ''                       => 'любой',
+                        Picture::STATUS_INBOX    => 'инбокс',
+                        Picture::STATUS_NEW      => 'немодерированые (old)',
+                        Picture::STATUS_ACCEPTED => 'принятый',
+                        Picture::STATUS_REMOVING => 'в очереди на удаление',
+                        'custom1'                => 'все, кроме удалённых'
                     ),
                     'decorators'   => array('ViewHelper')
                 )),
@@ -74,14 +74,14 @@ class Application_Form_Moder_Inbox extends Project_Form
                     'required'     => false,
                     'label'        => 'Тип',
                     'multioptions' => array(
-                        ''                         => 'любой',
-                        Pictures::CAR_TYPE_ID      => 'автомобиль',
-                        Pictures::MODEL_TYPE_ID    => 'модель',
-                        Pictures::LOGO_TYPE_ID     => 'логотип',
-                        Pictures::MIXED_TYPE_ID    => 'разное',
-                        Pictures::UNSORTED_TYPE_ID => 'несортировано',
-                        Pictures::INTERIOR_TYPE_ID => 'интерьер',
-                        Pictures::ENGINE_TYPE_ID   => 'двигатель'
+                        ''                        => 'любой',
+                        Picture::CAR_TYPE_ID      => 'автомобиль',
+                        Picture::MODEL_TYPE_ID    => 'модель',
+                        Picture::LOGO_TYPE_ID     => 'логотип',
+                        Picture::MIXED_TYPE_ID    => 'разное',
+                        Picture::UNSORTED_TYPE_ID => 'несортировано',
+                        Picture::INTERIOR_TYPE_ID => 'интерьер',
+                        Picture::ENGINE_TYPE_ID   => 'двигатель'
                     ),
                     'decorators'   => array('ViewHelper')
                 )),

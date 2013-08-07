@@ -8,9 +8,9 @@ class TwitterProvider extends Zend_Tool_Project_Provider_Abstract
     protected function _pictureByPerspective($pictureTable, $car, $perspective)
     {
         $select = $pictureTable->select(true)
-            ->where('pictures.type = ?', Pictures::CAR_TYPE_ID)
+            ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
             ->where('pictures.car_id = ?', $car->id)
-            ->where('pictures.status IN (?)', array(Pictures::STATUS_ACCEPTED, Pictures::STATUS_NEW))
+            ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
             ->order(array(
                 'pictures.ratio DESC', 'pictures.votes DESC',
                 'pictures.width DESC', 'pictures.height DESC',
@@ -56,7 +56,7 @@ class TwitterProvider extends Zend_Tool_Project_Provider_Abstract
             return;
         }
 
-        $pictureTable = new Pictures();
+        $pictureTable = new Picture();
 
         /* Hardcoded perspective priority list */
         $perspectives = array(10, 1, 7, 8, 11, 3, 7, 12, 4, 8);

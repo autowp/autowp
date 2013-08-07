@@ -3,7 +3,7 @@ class CutawayController extends Zend_Controller_Action
 {
     public function indexAction()
     {
-        $pictures = new Pictures();
+        $pictures = new Picture();
 
         $select = $pictures->select(true)
             ->where('status in (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))

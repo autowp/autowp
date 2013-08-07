@@ -43,7 +43,7 @@ $('.arrow').on('click', function(e) {
                                 <?=$this->htmlA(array(
                                     'href' => $this->url(array(
                                         'action' => 'index',
-                                        'type'   => Pictures::CAR_TYPE_ID,
+                                        'type'   => Picture::CAR_TYPE_ID,
                                         'car_id' => $car->id
                                     ))
                                 ), $car->getFullName()) ?>
@@ -64,7 +64,7 @@ $('.arrow').on('click', function(e) {
                                 <?=$this->htmlA(array(
                                     'href' => $this->url(array(
                                         'action' => 'index',
-                                        'type'   => Pictures::CAR_TYPE_ID,
+                                        'type'   => Picture::CAR_TYPE_ID,
                                         'car_id' => $car->id
                                     ))
                                 ), $car->getFullName()) ?>
@@ -78,7 +78,7 @@ $('.arrow').on('click', function(e) {
                     <?=$this->htmlA(array(
                         'href' => $this->url(array(
                             'action' => 'index',
-                            'type'   => Pictures::CAR_TYPE_ID,
+                            'type'   => Picture::CAR_TYPE_ID,
                             'car_id' => $car->id
                         ))
                     ), $car->getFullName()) ?>
@@ -88,7 +88,7 @@ $('.arrow').on('click', function(e) {
             <?=$this->htmlA(array(
                 'href' => $this->url(array(
                     'action'   => 'index',
-                    'type'     => Pictures::MODEL_TYPE_ID,
+                    'type'     => Picture::MODEL_TYPE_ID,
                     'model_id' => $model['id']
                 ))
             ), 'другая модификация') ?>
@@ -107,7 +107,7 @@ $('.arrow').on('click', function(e) {
                 <?=$this->htmlA(array(
                     'href' => $this->url(array(
                         'action' => 'index',
-                        'type'   => Pictures::CAR_TYPE_ID,
+                        'type'   => Picture::CAR_TYPE_ID,
                         'car_id' => $car->id
                     ))
                 ), $car->getFullName()) ?>
@@ -129,7 +129,7 @@ $('.arrow').on('click', function(e) {
                     <?=$this->htmlA(array(
                         'href' => $this->url(array(
                             'action' => 'index',
-                            'type'   => Pictures::CAR_TYPE_ID,
+                            'type'   => Picture::CAR_TYPE_ID,
                             'car_id' => $car->id
                         ))
                     ), $car->getFullName()) ?>
@@ -141,7 +141,7 @@ $('.arrow').on('click', function(e) {
                 <?=$this->htmlA(array(
                     'href' => $this->url(array(
                         'action' => 'index',
-                        'type'   => Pictures::CAR_TYPE_ID,
+                        'type'   => Picture::CAR_TYPE_ID,
                         'car_id' => $car->id
                     ))
                 ), $car->getFullName()) ?>
@@ -162,7 +162,7 @@ $('.arrow').on('click', function(e) {
                 <?=$this->htmlA(array(
                     'href' => $this->url(array(
                         'action'    => 'index',
-                        'type'      => Pictures::ENGINE_TYPE_ID,
+                        'type'      => Picture::ENGINE_TYPE_ID,
                         'engine_id' => $engine->id
                     ))
                 ), $engine->getMetaCaption()) ?>
@@ -176,14 +176,14 @@ $('.arrow').on('click', function(e) {
 <div style="margin: 5px 0">
     <?=$this->htmlA($this->url(array(
         'action' => 'index',
-        'type'   => Pictures::LOGO_TYPE_ID
+        'type'   => Picture::LOGO_TYPE_ID
     )), 'логотип ' . $this->brand->caption) ?><br />
     <?=$this->htmlA($this->url(array(
         'action' => 'index',
-        'type'   => Pictures::MIXED_TYPE_ID
+        'type'   => Picture::MIXED_TYPE_ID
     )), 'разное (несколько автомобилей на одной картинке)') ?><br />
     <?=$this->htmlA($this->url(array(
         'action' => 'index',
-        'type'   => Pictures::UNSORTED_TYPE_ID
+        'type'   => Picture::UNSORTED_TYPE_ID
     )), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
 </div>
