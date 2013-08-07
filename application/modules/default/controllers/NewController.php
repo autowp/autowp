@@ -11,7 +11,7 @@ class NewController extends Zend_Controller_Action
         return $db->fetchOne(
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
-                ->where('status = ?', Pictures::STATUS_ACCEPTED)
+                ->where('status = ?', Picture::STATUS_ACCEPTED)
                 ->where('accept_datetime >= ?', $date->toString('yyyy-MM-dd 00:00:00'))
                 ->where('accept_datetime <= ?', $date->toString('yyyy-MM-dd 23:59:59'))
                 ->limit(1)
@@ -23,7 +23,7 @@ class NewController extends Zend_Controller_Action
         $pictureTable = $this->_helper->catalogue()->getPictureTable();
 
         $lastPicture = $pictureTable->fetchRow(array(
-            'status = ?' => Pictures::STATUS_ACCEPTED
+            'status = ?' => Picture::STATUS_ACCEPTED
         ), 'accept_datetime desc');
 
         if (!$lastPicture) {
@@ -53,7 +53,7 @@ class NewController extends Zend_Controller_Action
 
         $anyPictureOfDate = $pictureTable->fetchRow(
             $pictureTable->select(true)
-                ->where('status = ?', Pictures::STATUS_ACCEPTED)
+                ->where('status = ?', Picture::STATUS_ACCEPTED)
                 ->where('accept_datetime >= ?', $date)
                 ->where('accept_datetime <= ?', $date.' 23:59:59')
                 ->limit(1)
@@ -75,7 +75,7 @@ class NewController extends Zend_Controller_Action
         $prevDate = $db->fetchOne(
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('DATE(accept_datetime)'))
-                ->where('status = ?', Pictures::STATUS_ACCEPTED)
+                ->where('status = ?', Picture::STATUS_ACCEPTED)
                 ->where('accept_datetime < ?', $date->toString('yyyy-MM-dd 00:00:00'))
                 ->order('accept_datetime DESC')
                 ->limit(1)
@@ -87,7 +87,7 @@ class NewController extends Zend_Controller_Action
         $nextDate = $db->fetchOne(
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('DATE(accept_datetime)'))
-                ->where('status = ?', Pictures::STATUS_ACCEPTED)
+                ->where('status = ?', Picture::STATUS_ACCEPTED)
                 ->where('accept_datetime > ?', $date->toString('yyyy-MM-dd 23:59:59'))
                 ->order('accept_datetime')
                 ->limit(1)
@@ -97,7 +97,7 @@ class NewController extends Zend_Controller_Action
         }
 
         $select = $pictureTable->select(true)
-            ->where('status = ?', Pictures::STATUS_ACCEPTED)
+            ->where('status = ?', Picture::STATUS_ACCEPTED)
             ->where('accept_datetime >= ?', $date->toString('yyyy-MM-dd 00:00:00'))
             ->where('accept_datetime <= ?', $date->toString('yyyy-MM-dd 23:59:59'))
             ->order('accept_datetime DESC');

@@ -6,7 +6,7 @@ class CutawayController extends Zend_Controller_Action
         $pictures = new Pictures();
 
         $select = $pictures->select(true)
-            ->where('status in (?)', array(Pictures::STATUS_ACCEPTED, Pictures::STATUS_NEW))
+            ->where('status in (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
             ->where('perspective_id = ?', 9)
             ->order('add_date DESC');
 

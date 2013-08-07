@@ -14,7 +14,7 @@ class InboxController extends Zend_Controller_Action
         $pictureTable = $this->_helper->catalogue()->getPictureTable();
 
         $select = $pictureTable->select(true)
-            ->where('pictures.status = ?', Pictures::STATUS_INBOX);
+            ->where('pictures.status = ?', Picture::STATUS_INBOX);
         if ($brand) {
             $select
                 ->join('brands_pictures_cache', 'brands_pictures_cache.picture_id = pictures.id', null)
@@ -30,7 +30,7 @@ class InboxController extends Zend_Controller_Action
 
         $select = $db->select()
             ->from($pictureTable->info('name'), new Zend_Db_Expr('COUNT(1)'))
-            ->where('pictures.status = ?', Pictures::STATUS_INBOX)
+            ->where('pictures.status = ?', Picture::STATUS_INBOX)
             ->where('pictures.add_date >= ?', $date->toString('yyyy-MM-dd 00:00:00'))
             ->where('pictures.add_date <= ?', $date->toString('yyyy-MM-dd 23:59:59'));
         if ($brand) {
@@ -74,7 +74,7 @@ class InboxController extends Zend_Controller_Action
             $brandTable->select(true)
                 ->join('brands_pictures_cache', 'brands.id = brands_pictures_cache.brand_id', null)
                 ->join('pictures', 'brands_pictures_cache.picture_id=pictures.id', null)
-                ->where('pictures.status = ?', Pictures::STATUS_INBOX)
+                ->where('pictures.status = ?', Picture::STATUS_INBOX)
                 ->group('brands.id')
                 ->order(array('brands.position', 'brands.caption'))
         );
