@@ -57,6 +57,7 @@
       <projectProviderFile projectProviderName="traffic" actionNames="autoban"/>
       <projectProviderFile projectProviderName="pictures" actionNames="clearQueue"/>
       <projectProviderFile projectProviderName="twitter" actionNames="carOfDay"/>
+      <projectProviderFile projectProviderName="midnight" actionNames="carOfDay"/>
     </projectProvidersDirectory>
     <temporaryDirectory enabled="false"/>
     <testsDirectory>

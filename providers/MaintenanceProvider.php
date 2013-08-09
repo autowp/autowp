@@ -53,4 +53,128 @@ class MaintenanceProvider extends Zend_Tool_Project_Provider_Abstract
     }
 
 
+    public function clearDeletedPM()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db');
+
+        $pm = new Personal_Messages();
+        $count = $pm->delete(array(
+            'deleted_by_to',
+            'deleted_by_from OR from_user_id IS NULL'
+        ));
+
+        printf("%d messages was deleted\n", $count);
+    }
+
+    public function clearIpMonitoring()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db');
+
+        $ipMon = new Ip_Monitoring();
+
+        $count = $ipMon->delete(array(
+            'day_date < CURDATE()'
+        ));
+
+        printf("%d ip monitoring rows was deleted\n", $count);
+    }
+
+    public function clearRefererMonitoring()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db');
+
+        $table = new Referer();
+
+        $count = $table->delete(array(
+            'last_date < DATE_SUB(NOW(), INTERVAL 1 DAY)'
+        ));
+
+        printf("%d referer monitoring rows was deleted\n", $count);
+    }
+
+    public function clearBannedIp()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db');
+
+
+        $bannedIp = new Banned_Ip();
+        $count = $bannedIp->delete(
+            'up_to < NOW()'
+        );
+
+        printf("%d banned ip rows was deleted\n", $count);
+    }
+
+    public function clearUserHashes()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db');
+
+        $urTable = new User_Remember();
+        $count = $urTable->delete(array(
+            'date < DATE_SUB(NOW(), INTERVAL 60 DAY)'
+        ));
+
+        printf("%d user remember rows was deleted\n", $count);
+
+        $uprTable = new User_Password_Remind();
+        $count = $uprTable->delete(array(
+            'created < DATE_SUB(NOW(), INTERVAL 10 DAY)'
+        ));
+
+        printf("%d password remind rows was deleted\n", $count);
+    }
+
+    public function clearUserRenames()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db');
+
+        $urTable = new User_Renames();
+        $count = $urTable->delete(array(
+            'date < DATE_SUB(NOW(), INTERVAL 3 MONTH)'
+        ));
+
+        printf("%d user rename rows was deleted\n", $count);
+    }
 }

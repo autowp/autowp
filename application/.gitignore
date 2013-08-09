@@ -1,7 +1,2 @@
-/basic.php
-/run.php
-/cache
-/Console
-/cron
+/cache/*
 /data
-/trash

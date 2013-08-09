@@ -28,6 +28,8 @@ class Forums_ThemeController extends Zend_Controller_Action
         }
 
         $paginator = false;
+        $topics = array();
+
         if (!$theme->disable_topics) {
 
             $select = $topicsTable->select(true)
@@ -39,7 +41,6 @@ class Forums_ThemeController extends Zend_Controller_Action
                 ->setItemCountPerPage(self::TOPICS_PER_PAGE)
                 ->setCurrentPageNumber($this->_getParam('page'));
 
-            $topics = array();
             foreach ($paginator->getCurrentItems() as $topicRow) {
 
                 $topicPaginator = Zend_Paginator::factory(
