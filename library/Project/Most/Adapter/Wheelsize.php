@@ -94,9 +94,8 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
             $radius = $this->_attributesTable->find($wheel['radius'])->current();
             //$wheel['rimwidth'] = $attributes->find($wheel['rimwidth'])->current();
 
-            foreach ($car->findEquipes() as $equipe)
-            {
-                $wheelObj = new Wheel_Size(
+            foreach ($car->findEquipes() as $equipe) {
+                $wheelObj = new Project_WheelSize(
                     $tyrewidth->getActualValue($this->_equipeItemType, $equipe->id),
                     $tyreseries->getActualValue($this->_equipeItemType, $equipe->id),
                     $radius->getActualValue($this->_equipeItemType, $equipe->id),
