@@ -27,7 +27,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
         define('PROJECT_DIR', '/home/autowp/autowp.ru');
         define('RESOURCES_DIR', APPLICATION_PATH . '/resources');
-        define('FOLDER', APPLICATION_PATH . '/'); // путь к public-папке
         define('IMAGES_DIR', PUBLIC_DIR . '/img');
         define('IMAGES_URL', '/img');
         define('DOMAIN', 'autowp.ru');

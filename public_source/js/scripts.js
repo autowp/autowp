@@ -377,7 +377,7 @@ function forumTopicPage() {
 
         var div = $(
             '<div>\
-                <img src="/design/del.gif" alt="X" title="close" style="cursor:pointer;margin:0 0 5px 5px;float:right" />\
+                <a href="#" class="close">&times;</a>\
                 <p>Постоянная ссылка на сообщение</p>\
                 <input type="text" readonly="readonly" style="width:98%" /><br />\
              </div>'
@@ -387,15 +387,10 @@ function forumTopicPage() {
             'http://www.autowp.ru' + $(this).attr('href')
         );
 
-        $('img', div)
-            .hover(function() {
-                $(this).attr('src', '/design/del.hover.gif')
-            }, function() {
-                $(this).attr('src', '/design/del.gif')
-            })
-            .on('click', function() {
-                $(div).remove()
-            });
+        $('.close', div).on('click', function(e) {
+            e.preventDefault();
+            $(div).remove()
+        });
 
         $(div).css({
             position: 'absolute',
