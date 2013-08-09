@@ -20,7 +20,7 @@ class Application_Form_Moder_Car_Add extends Project_Form
                 array('Car_Caption', 'caption', array(
                     'required'   => true,
                     'id'         => 'car_caption',
-                    'validators' => array(new Validate_Car_Unique),
+                    'validators' => array('Car_NameNotExists'),
                     'decorators' => array('ViewHelper')
                 )),
                 array('Car_Body', 'body', array(

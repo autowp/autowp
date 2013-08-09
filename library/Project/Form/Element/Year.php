@@ -24,7 +24,7 @@ class Project_Form_Element_Year extends Zend_Form_Element_Text
 
         $this->addFilters(array(
             'StringTrim',
-            new Filter_IntOrNull
+            new Project_Filter_IntOrNull
         ));
 
         $this->addValidators(array(

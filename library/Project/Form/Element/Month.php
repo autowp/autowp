@@ -29,7 +29,7 @@ class Project_Form_Element_Month extends Zend_Form_Element_Select
 
         $this->addFilters(array(
             'StringTrim',
-            new Filter_IntOrNull
+            new Project_Filter_IntOrNull
         ));
 
         $this->addValidators(array(
