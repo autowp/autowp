@@ -2,21 +2,6 @@
 
 class Project_Form extends Zend_Form
 {
-    /*'prefixPath'    =>    array(
-        array(
-            'prefix'    =>    'Project_Form_Element',
-            'path'        =>    'Project/Form/Element',
-            'type'        =>    Zend_Form::ELEMENT
-        )
-    ),
-    'elementPrefixPath'    =>    array(
-        array(
-            'prefix'    =>    'Project_Filter',
-            'path'        =>    'Project/Filter',
-            'type'        =>    Zend_Form_Element::FILTER
-        )
-    ),*/
-
     /**
      * Constructor
      *

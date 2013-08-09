@@ -25,15 +25,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
         Zend_Registry::set('db', $db);
 
-        define('APPLICATION_DIR', APPLICATION_PATH);
         define('PROJECT_DIR', '/home/autowp/autowp.ru');
-        define('LIBRARY_DIR', PROJECT_DIR . '/library');
         define('RESOURCES_DIR', APPLICATION_PATH . '/resources');
-        define('ROOT_FOLDER', PROJECT_DIR . '/'); // путь к корневой папке
         define('FOLDER', APPLICATION_PATH . '/'); // путь к public-папке
         define('IMAGES_DIR', PUBLIC_DIR . '/img');
         define('IMAGES_URL', '/img');
-        define('CACHE_DIR', APPLICATION_DIR . '/cache');
         define('DOMAIN', 'autowp.ru');
         define('DOMAIN_WWW', 'www.autowp.ru');
 
@@ -41,7 +37,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         define('MYSQL_TIME', 'HH:mm:ss');
         define('MYSQL_DATETIME', MYSQL_DATE . ' ' . MYSQL_TIME);
 
-        require_once 'Functions.php';
         require_once 'BBDocument.php';
     }
 

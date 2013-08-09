@@ -146,11 +146,6 @@ class Application_Form_Moder_Page_Edit extends Project_Form
             )
         ));
 
-        /*$this->addPrefixPath('My_Form_Element', 'My/Form/Element', 'Element');
-        $this->addPrefixPath('My_Form_Decorator', 'My/Form/Decorator', 'Decorator');*/
-
-
-
         $this->addSubForms($subForms);
     }
 }
