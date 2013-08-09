@@ -46,7 +46,7 @@ class Application_Form_Account_Password extends Project_Form
                     'filters'    => array('StringTrim'),
                     'validators' => array(
                         array('StringLength', true, array(4, 20)),
-                        new My_Validate_PasswordConfirm()
+                        'PasswordConfirm'
                     ),
                     'decorators' => array('ViewHelper')
                 )),

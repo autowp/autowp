@@ -22,7 +22,7 @@ class Project_Form_Element_User_Login extends Zend_Form_Element_Text
         ));
 
         $this->addValidators(array(
-            new My_Validate_User_Login()
+            new Project_Validate_User_Login()
         ));
     }
 }

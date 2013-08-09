@@ -48,7 +48,7 @@ class Application_Form_Registration extends Project_Form
                     'filters'    => array('StringTrim'),
                     'validators' => array(
                         array('StringLength', true, array(6, 50)),
-                        new My_Validate_PasswordConfirm()
+                        'PasswordConfirm'
                     ),
                     'decorators' => array('ViewHelper')
                 )),
