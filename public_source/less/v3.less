@@ -2,20 +2,6 @@ body {
     padding-top: 60px;
 }
 
-@media (min-width: 768px) and (max-width: 979px) {
-    /* Remove any padding from the body */
-    body {
-        padding-top: 0;
-    }
-}
-
-@media (max-width: 767px) {
-    /* Remove any padding from the body */
-    body {
-        padding-top: 0;
-    }
-}
-
 .page-header, legend {
     border-bottom-color: #FFF;
 }
@@ -34,16 +20,12 @@ body {
     }
 }
 
-/*.dropdown-menu a:visited {
-    color: #333;
-}*/
-
 .btn-default:visited { color: @btn-default-color }
 .btn-primary:visited { color: @btn-primary-color }
 .btn-warning:visited { color: @btn-warning-color }
-.btn-danger:visited { color: @btn-danger-color }
+.btn-danger:visited  { color: @btn-danger-color  }
 .btn-success:visited { color: @btn-success-color }
-.btn-info:visited { color: @btn-info-color }
+.btn-info:visited    { color: @btn-info-color    }
 
 .thumbnail > a > img {
     display: block;
@@ -382,4 +364,21 @@ ul.articleList {
         font-size: 11px;
         color: #666666;
     }
+}
+
+ul.carLinks {
+    margin: 0 0 20px 0;
+    list-style-type: none;
+    clear: both;
+    padding: 0;
+    
+    li {
+        display: inline;
+        padding: 0;
+        margin: 0 10px 0 0;
+    }
 } 
+
+span.unit {
+    color: #999999;
+}
