@@ -11,7 +11,7 @@ abstract class Project_User_LoginService_OAuth extends Project_User_LoginService
     }
 
     /**
-     * @return My_Oauth2
+     * @return Project_Oauth2
      */
     protected function _getOauth()
     {
@@ -19,7 +19,7 @@ abstract class Project_User_LoginService_OAuth extends Project_User_LoginService
             throw new Exception("'oauthOptions' not found");
         }
 
-        $oauth2 = new My_Oauth2($this->_options['oauthOptions']);
+        $oauth2 = new Project_Oauth2($this->_options['oauthOptions']);
         $oauth2->setSession($this->_getOauthSession());
 
         return $oauth2;

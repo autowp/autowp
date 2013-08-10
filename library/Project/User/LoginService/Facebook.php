@@ -4,7 +4,7 @@ class Project_User_LoginService_Facebook extends Project_User_LoginService_Abstr
 {
     protected function _getFacebook()
     {
-        return new My_Service_Facebook($this->_options);
+        return new Project_Service_Facebook($this->_options);
     }
 
     /**
