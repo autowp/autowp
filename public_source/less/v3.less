@@ -38,16 +38,12 @@ body {
     color: #333;
 }*/
 
-.btn-default,
-.btn-primary, 
-.btn-warning, 
-.btn-danger, 
-.btn-success, 
-.btn-info {
-    &:visited {
-        color: #fff;
-    }
-}
+.btn-default:visited { color: @btn-default-color }
+.btn-primary:visited { color: @btn-primary-color }
+.btn-warning:visited { color: @btn-warning-color }
+.btn-danger:visited { color: @btn-danger-color }
+.btn-success:visited { color: @btn-success-color }
+.btn-info:visited { color: @btn-info-color }
 
 .thumbnail > a > img {
     display: block;

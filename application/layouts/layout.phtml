@@ -59,14 +59,14 @@
         <div class="container">
 
             <div class="row">
-                <div class="col-lg-<?=$spanCenter?> col-sm-<?=$spanCenter?> col-push-<?=$spanLeft?>">
+                <div class="col-lg-<?=$spanCenter?> col-sm-<?=$spanCenter?> col-lg-push-<?=$spanLeft?> col-sm-push-<?=$spanLeft?>">
                     <?=$this->action('flash-messages', 'layout', 'default') ?>
                     <?=$this->breadcrumbs() ?>
                     <?=$this->pageTitle() ?>
                     <?=$this->layout()->content ?>
                 </div>
                 <?php if ($needLeft) { ?>
-                    <div class="col-lg-<?=$spanLeft?> col-sm-<?=$spanLeft?> col-pull-<?=$spanCenter?>">
+                    <div class="col-lg-<?=$spanLeft?> col-sm-<?=$spanLeft?> col-lg-pull-<?=$spanCenter?> col-sm-pull-<?=$spanCenter?>">
                         <?=$this->layout()->sidebar ?>
                     </div>
                 <?php } ?>
