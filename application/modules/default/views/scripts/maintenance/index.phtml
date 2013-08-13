@@ -1,0 +1,38 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => true,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'title'     => 'Maintenance',
+        'pageTitle' => 'Maintenance',
+    ));
+    $precission = 4;
+?>
+<?php $this->jQuery()->onLoadCaptureStart()?>
+setInterval(function() {
+    $.getJSON('/maintenance/progress', function(json) {
+        $('.progress-bar')
+            .width(json.progress + '%')
+            .text(json.progress.toFixed(<?=$precission?>) + '%');
+    });
+}, 10000);
+<?php $this->jQuery()->onLoadCaptureEnd()?>
+<div class="row"><div class="col-lg-8 col-lg-offset-2">
+
+    <div class="well">
+
+        <p>Идёт техническое обслуживание, сайт временно недоступен</p>
+        <p>Website temporary unavailable due hardware maintenance</p>
+
+        <?php if ($this->progress) { ?>
+            <p>Прогресс</p>
+            <div class="progress progress-striped active">
+                <div class="progress-bar progress-bar-danger" style="width:<?=$this->progress?>%"><?=round($this->progress, $precission)?>%</div>
+            </div>
+        <?php } ?>
+
+    </div>
+
+</div></div>

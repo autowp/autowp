@@ -1,10 +1,8 @@
 /Acl
-/Category.php
 /Links.php
 /Pictures
 /Articles
 /Comments
-/Log
 /Articles.php
 /Design
 /Models
@@ -15,7 +13,6 @@
 /Referer.php
 /Banned
 /Engines.php
-/Museum.php
 /Rusip.php
 /Brand
 /Equipes
@@ -35,18 +32,14 @@
 /Users
 /Car
 /Generations
-/Perspective
 /Users.php
 /Cars
 /Generations.php
-/Perspectives
 /Votes.php
 /Cars.php
 /Htmls.php
-/Perspectives.php
 /Voting
 /Catalogue.php
 /Image
 /Voting.php
-/Category
 /Ip

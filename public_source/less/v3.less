@@ -27,6 +27,16 @@ body {
 .btn-success:visited { color: @btn-success-color }
 .btn-info:visited    { color: @btn-info-color    }
 
+.label-default,
+.label-danger,
+.label-success,
+.label-warning,
+.label-info {
+    &[href]:visited {
+        color: @label-color;
+    }
+}
+
 .thumbnail > a > img {
     display: block;
     margin-left: auto;

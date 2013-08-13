@@ -16,6 +16,6 @@ class Project_View_Helper_PastTimeIndicator extends Zend_View_Helper_Abstract
     {
         $icon = $date->isLater($this->_pastLimit) ? 'glyphicon-time' : 'glyphicon-calendar';
 
-        return '<i class="glyphicon ' . $icon . '"></i> ' . $this->view->escape($this->view->humanTime($date));
+        return '<span class="glyphicon ' . $icon . '"></span> ' . $this->view->escape($this->view->humanTime($date));
     }
 }
