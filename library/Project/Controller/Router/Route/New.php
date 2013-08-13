@@ -107,7 +107,7 @@ class Project_Controller_Router_Route_New extends Project_Controller_Router_Rout
 
         switch ($data['action']) {
             case 'index':
-                if (isset($data['date'])) {
+                if (isset($data['date']) && $data['date']) {
                     $url[] = $data['date'];
                     if (isset($data['page']) && $data['page'] > 1) {
                         $url[] = 'page' . $data['page'];
