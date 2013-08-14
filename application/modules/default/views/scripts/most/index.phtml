@@ -49,7 +49,7 @@ mostIndexPage();
         <li<?=!is_null($this->yearId) && ($id == $this->yearId) ? ' class="active"' : '' ?>>
             <?=$this->htmlA($this->url(array(
                 'most_catname'  => $this->cMost['catName'],
-                'shape_catname' => $this->carType ? $this->carType['catname'] : null,
+                'shape_catname' => $this->carType ? $this->carType['catname'] : 'car',
                 'years_catname' => $year['folder']
             ), 'most'), $year['name']) ?>
         </li>
