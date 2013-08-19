@@ -1,12 +1,16 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => true
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ),
+        'pageId' => 157,
+        'args'   => array(
+            'VOTING_NAME' => $this->voting->name,
+            'VOTING_ID'   => $this->voting->id
+        )
     ));
-
-    $this->pageTitle($this->voting->name);
-    $this->headTitle($this->voting->name, 'SET');
 ?>
 <?php $this->jQuery()->onLoadCaptureStart() ?>
 votingVotingPage();
@@ -17,8 +21,8 @@ votingVotingPage();
 
     <?php if ($this->canVote) { ?>
         <form action="<?=$this->escape($this->url(array(
-            'action'    => 'vote',
-            'id'        => $this->voting->id
+            'action' => 'vote',
+            'id'     => $this->voting->id
         )))?>" method="post">
             <ul class="unstyled">
                 <?php foreach ($this->variants as $variant) { ?>
@@ -42,7 +46,7 @@ votingVotingPage();
                 <?php } ?>
             </ul>
             <?=$this->formSubmit('submit', 'Голосовать', array(
-                'class'    => 'btn btn-primary'
+                'class' => 'btn btn-primary'
             ))?>
         </form>
     <?php } else { ?>
@@ -60,13 +64,13 @@ votingVotingPage();
             <?php if ($variant['text']) { ?>
                 <p class="text-info"><?=nl2br($this->escape($variant['text']))?></p>
             <?php } ?>
-            <div style="clear:both" class="progress<?=$variant['isMax'] ? ' progress-success' : ''?><?=$variant['isMin'] ? ' progress-danger' : ''?>">
-                <div class="bar" style="width:<?=$variant['percent']?>%"><?=$variant['votes'] > 0 ? $variant['votes'] : ''?></div>
+            <div style="clear:both" class="progress">
+                <div class="progress-bar<?=$variant['isMax'] ? ' progress-bar-success' : ''?><?=$variant['isMin'] ? ' progress-bar-danger' : ''?>" style="width:<?=$variant['percent']?>%"><?=$variant['votes'] > 0 ? $variant['votes'] : ''?></div>
             </div>
         <?php } ?>
     <?php } ?>
 </div>
-<?php if (!$this->canVote && $this->user()->logedIn() && $this->user()->get()->isAdminOrModerator()) { ?>
+<?php if (!$this->canVote && $this->user()->inheritsRole('moder')) { ?>
     <p class="pull-right">
         <?php if ($this->filter) { ?>
             <?=$this->htmlA($this->url(array(
