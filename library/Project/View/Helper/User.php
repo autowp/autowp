@@ -109,24 +109,18 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
                     if (Zend_Date::now()->subMonth(6)->isLater($lastOnline)) {
                         $classes[] = 'long-away';
                     }
+                } else {
+                    $classes[] = 'long-away';
                 }
 
-                if ($group->color == '339933') {
+                if ($this->isAllowed('status', 'be-green')) {
                     $classes[] = 'green-man';
-                    $style = null;
-                } elseif ($group->color == '3333CC') {
-                    $style = null;
-                } else {
-                    $style = 'color:#'.$group->color;
                 }
 
                 $result =
                     '<span class="'.implode(' ', $classes).'">' .
                         '<span class="glyphicon glyphicon-user"></span>&#xa0;' .
-                        $this->view->htmlA(array(
-                            'href'  => $url,
-                            'style' => $style
-                        ), $user->getCompoundName()) .
+                        $this->view->htmlA($url, $user->getCompoundName()) .
                     '</span>';
             }
 
