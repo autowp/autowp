@@ -163,4 +163,29 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
 
         return '';
     }
+
+    /**
+     * @param  Zend_Acl_Resource_Interface|string $resource
+     * @param  string                             $privilege
+     * @return boolean
+     */
+    public function isAllowed($resource = null, $privilege = null)
+    {
+        return $this->_user
+            && $this->_user->role
+            && $this->view->acl()
+                ->isAllowed($this->_user->role, $resource, $privilege);
+    }
+
+    /**
+     * @param  Zend_Acl_Role_Interface|string $inherit
+     * @return boolean
+     */
+    public function inheritsRole($inherit)
+    {
+        return $this->_user
+            && $this->_user->role
+            && $this->view->acl()
+                ->inheritsRole($this->_user->role, $inherit);
+    }
 }
