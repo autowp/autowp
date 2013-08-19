@@ -2,26 +2,10 @@
 
 class Project_View_Helper_User extends Zend_View_Helper_Abstract
 {
-    protected $_groupModel;
-    protected $_groups = array();
-
     protected $_userModel;
     protected $_users = array();
 
     protected $_user = null;
-
-    protected function _group($id)
-    {
-        if (!$this->_groupModel) {
-            $this->_groupModel = new User_Groups();
-        }
-
-        if (!isset($this->_groups[$id])) {
-            $this->_groups[$id] = $this->_groupModel->find($id)->current();
-        }
-
-        return $this->_groups[$id];
-    }
 
     protected function _user($id)
     {
@@ -93,8 +77,6 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
                 if ($user->deleted) {
                     return '<span class="muted"><span class="glyphicon glyphicon-user"></span> удалённый пользователь</span>';
                 }
-
-                $group = $this->_group($user->group_id);
 
                 $url = $this->view->url(array(
                     'module'     => 'default',
