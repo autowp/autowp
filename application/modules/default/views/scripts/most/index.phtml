@@ -66,25 +66,25 @@ mostIndexPage();
 <?php $idx = 0 ?>
 <?php foreach ($this->carList['cars'] as $car) { ?>
     <div class="row">
-        <div class="col-lg-9">
+        <div class="col-lg-9 col-md-9">
             <h3><?=$car['car']->getCaptionHtml() ?></h3>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-3 col-md-3">
             <?php if ($idx++ == 0) { ?>
                 <h3><?=$this->escape($this->translate('most/'.$this->cMost['catName'].'/param')) ?></h3> <?php /* $this->carList['paramName'] */ ?>
             <?php } ?>
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-9">
+        <div class="col-lg-9 col-md-9">
             <?=$this->pictureListHorizontal2($car['car']->getOrientedPictureList($this->groupIds), array(
-                'colClass' => 'col-lg-4'
+                'colClass' => 'col-lg-4 col-md-4'
             )) ?>
             <?php if ($car['car']->description) { ?>
                 <div><?=$car['car']->description ?></div>
             <?php } ?>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-3 col-md-3">
             <h2>
                 <?php if (isset($car['valueHtml'])) { ?>
                     <?=$car['valueHtml']?>

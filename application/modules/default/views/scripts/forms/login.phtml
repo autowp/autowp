@@ -11,7 +11,7 @@
         ?>
         <div class="form-group<?=$errors ? ' has-error' : ''?>">
             <?php if ($element instanceof Zend_Form_Element_Checkbox) { ?>
-                <div class="col-lg-offset-3 col-lg-9">
+                <div class="col-lg-offset-3 col-lg-9 col-md-offset-3 col-md-9">
                     <label class="checkbox" for="<?=$element->getId()?>">
                         <?=$this->escape($element->getLabel())?>
                         <?=$element?>
@@ -21,8 +21,8 @@
                     <?php } ?>
                 </div>
             <?php } else { ?>
-                <label class="col-lg-3 control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
-                <div class="col-lg-9">
+                <label class="col-lg-3 col-md-3 control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
+                <div class="col-lg-9 col-md-9">
                     <?=$element->setAttrib('class', $element->getAttrib('class') . ' form-control')?>
                     <?php foreach ($errors as $error) { ?>
                         <p class="help-block"><?=$this->escape($error)?></p>
@@ -32,7 +32,7 @@
         </div>
     <?php } ?>
     <div class="form-group">
-        <div class="col-lg-9 col-lg-offset-3">
+        <div class="col-lg-9 col-lg-offset-3 col-md-9 col-md-offset-3">
             <?=$this->formSubmit('submit', 'Войти', array(
                 'class' => 'btn btn-primary'
             ))?>

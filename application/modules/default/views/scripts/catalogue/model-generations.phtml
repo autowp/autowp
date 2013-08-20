@@ -42,7 +42,7 @@
     <div class="row thumbnails">
         <?php foreach ($generation['pictures'] as $idx => $picture) { ?>
             <?php if ($picture) { ?>
-                <div class="col-lg-<?=$idx ? 3 : 6?>">
+                <div class="col-lg-<?=$idx ? 3 : 6?> col-md-<?=$idx ? 3 : 6?> col-sm-<?=$idx ? 6 : 12?>">
                     <?php if ($image = $this->image($picture, 'file_name', array(
                         'format' => $idx ? 6 : 10,
                         'title'  => $picture->getCaption()

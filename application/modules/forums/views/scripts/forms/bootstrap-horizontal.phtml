@@ -12,8 +12,8 @@
         <?php if ($element instanceof Zend_Form_Element) { ?>
             <?php if ($element instanceof Zend_Form_Element_File) { ?>
                 <div class="form-group<?=$element->hasErrors() ? ' has-error' : ''?>">
-                    <label class="col-lg-2 control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
-                    <div class="col-lg-10">
+                    <label class="col-lg-2 col-md-2 control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
+                    <div class="col-lg-10 col-md-10">
                         <?=$element?>
                         <?php foreach ($element->getMessages() as $error) { ?>
                             <p class="help-block"><?=$this->escape($error)?></p>
@@ -22,9 +22,9 @@
                 </div>
             <?php } elseif ($element instanceof Zend_Form_Element_Checkbox) { ?>
                 <div class="form-group">
-                    <div class="col-lg-2">
+                    <div class="col-lg-2 col-md-2">
                     </div>
-                    <div class="col-lg-10">
+                    <div class="col-lg-10 col-md-10">
                         <div class="checkbox<?=$element->hasErrors() ? ' has-error' : ''?>">
                             <label>
                                 <?=$element?>
@@ -38,8 +38,8 @@
                 </div>
             <?php } elseif (!$element instanceof Zend_Form_Element_Submit) { ?>
                 <div class="form-group<?=$element->hasErrors() ? ' has-error' : ''?>">
-                    <label class="col-lg-2 control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
-                    <div class="col-lg-10">
+                    <label class="col-lg-2 col-md-2 control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
+                    <div class="col-lg-10 col-md-10">
                         <?=$element->setAttrib('class', $element->getAttrib('class') . ' form-control')?>
                         <?php foreach ($element->getMessages() as $error) { ?>
                             <p class="help-block"><?=$this->escape($error)?></p>
@@ -51,8 +51,8 @@
             <?=$element->render($this)?>
         <?php } elseif ($element instanceof Zend_Form_DisplayGroup) { ?>
             <div class="form-group">
-                <label class="col-lg-2 control-label"><?=$this->escape($element->getLegend())?></label>
-                <div class="col-lg-10">
+                <label class="col-lg-2 col-md-2 control-label"><?=$this->escape($element->getLegend())?></label>
+                <div class="col-lg-10 col-md-10">
                     <?=$element->render($this)?>
                 </div>
             </div>
@@ -77,8 +77,8 @@
                 }
             ?>
             <div class="form-group">
-                <div class="col-lg-2"></div>
-                <div class="col-lg-10">
+                <div class="col-lg-2 col-md-2"></div>
+                <div class="col-lg-10 col-md-10">
                     <?=$element ?>
                 </div>
             </div>
@@ -89,7 +89,7 @@
     <?php } ?>
     <?php if (!$submitFound && !$this->element instanceof Zend_Form_SubForm) { ?>
         <div class="row">
-            <div class="col-lg-10 col-lg-offset-2">
+            <div class="col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2">
                 <?=$this->formSubmit('submit', 'Отправить', array(
                     'class' => 'btn btn-primary'
                 ))?>

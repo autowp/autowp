@@ -60,19 +60,19 @@
         <div class="container">
 
             <div class="row">
-                <div class="col-lg-<?=$spanCenter?> col-sm-<?=$spanCenter?> col-lg-push-<?=$spanLeft?> col-sm-push-<?=$spanLeft?>">
+                <div class="col-lg-<?=$spanCenter?> col-md-<?=$spanCenter?> col-sm-<?=$spanCenter?> col-lg-push-<?=$spanLeft?> col-md-push-<?=$spanLeft?> col-sm-push-<?=$spanLeft?>">
                     <?=$this->action('flash-messages', 'layout', 'default') ?>
                     <?=$this->breadcrumbs() ?>
                     <?=$this->pageTitle() ?>
                     <?=$this->layout()->content ?>
                 </div>
                 <?php if ($needLeft) { ?>
-                    <div class="col-lg-<?=$spanLeft?> col-sm-<?=$spanLeft?> col-lg-pull-<?=$spanCenter?> col-sm-pull-<?=$spanCenter?>">
+                    <div class="col-lg-<?=$spanLeft?> col-md-<?=$spanLeft?> col-sm-<?=$spanLeft?> col-lg-pull-<?=$spanCenter?> col-md-pull-<?=$spanCenter?> col-sm-pull-<?=$spanCenter?>">
                         <?=$this->layout()->sidebar ?>
                     </div>
                 <?php } ?>
                 <?php if ($needRight) { ?>
-                    <div class="col-lg-<?=$spanRight?> col-sm-<?=$spanRight?>">
+                    <div class="col-lg-<?=$spanRight?> col-md-<?=$spanRight?> col-sm-<?=$spanRight?>">
                         <?=$this->action('sidebar-right', 'layout', 'default') ?>
                     </div>
                 <?php } ?>
@@ -83,7 +83,7 @@
 
                 <footer class="footer">
                     <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-lg-6 col-md-6">
                             <?=$this->htmlA(
                                 'http://www.liveinternet.ru/click',
                                 $this->htmlImg(array(
@@ -106,7 +106,7 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga
 <?php $this->inlineScript()->captureEnd() ?>
 <?=$this->inlineScript() ?>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-6 col-md-6">
                             <p class="copyrights">
                                 Обращаем Ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br />
                                 Администрация сайта не располагает информацией о правомерности публикования этих материалов.<br />

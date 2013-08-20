@@ -5,7 +5,7 @@ class Project_View_Helper_PictureListHorizontal2 extends Zend_View_Helper_Abstra
     public function pictureListHorizontal2($list, array $options = array())
     {
         $defaults = array(
-            'colClass' => 'col-lg-3',
+            'colClass' => 'col-lg-3 col-md-3',
         );
         $options = array_merge($defaults, $options);
 
