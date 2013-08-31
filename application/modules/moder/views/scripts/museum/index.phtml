@@ -1,0 +1,63 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 115,
+    ));
+?>
+<p><?=$this->htmlA(array(
+    'href'    =>    $this->url(array(
+        'action' => 'new'
+    )),
+    'class'    =>    'btn btn-success'
+), 'Добавить музей')?></p>
+
+<table class="table table-bordered table-striped">
+    <caption>Музеи</caption>
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>картинка</th>
+            <th>название</th>
+            <th>адрес</th>
+            <th>url</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator->getCurrentItems() as $museum) { ?>
+            <tr>
+                <td><?=$museum->id?></td>
+                <td>
+                    <?=$this->img($museum->img, array(
+                        'format' => 'icon'
+                    ))?>
+                </td>
+                <td>
+                    <?=$this->htmlA($this->url(array(
+                        'module'     => 'moder',
+                        'controller' => 'museum',
+                        'action'     => 'edit',
+                        'museum_id'  => $museum->id
+                    ), 'default', true), $museum->name)?>
+                </td>
+                <td>
+                    <?php if ($museum->img) { ?>
+                        <?=$museum->lat?>×<?=$museum->lng?><br />
+                    <?php } ?>
+                    <?=$this->escape($museum->address)?>
+                </td>
+                <td>
+                    <?php if ($museum->url) { ?>
+                        <?=$this->htmlA($museum->url, $museum->url)?>
+                    <?php } ?>
+                </td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>
+
+<?=$this->paginator?>
