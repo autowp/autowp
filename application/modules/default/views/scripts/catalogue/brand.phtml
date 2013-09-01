@@ -16,8 +16,8 @@
 
 <header>
     <div class="jumbotron brand-hero-unit">
-        <?=$this->image($this->brand, 'logo', array(
-            'format' => 13,
+        <?=$this->img($this->brand->img, array(
+            'format' => 'logo',
             'alt'    => 'логотип ' . $this->brand->caption,
             'class'  => 'logo'
         ))?>

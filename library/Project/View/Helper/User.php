@@ -120,8 +120,8 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
         $user = $this->_user;
 
         if ($user) {
-            $image = $this->view->image($user, 'photo', array(
-                'format' => '15',
+            $image = $this->view->img($user->img, array(
+                'format' => 'avatar',
             ));
 
             if ($image && $image->exists()) {

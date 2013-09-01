@@ -40,7 +40,7 @@ class Project_User_LoginService_Facebook extends Project_User_LoginService_Abstr
         );
         if (isset($json['id']) && $json['id']) {
             $uaData['external_id'] = $json['id'];
-            $uaData['photo'] = 'https://graph.facebook.com/'.$json['id'].'/picture';
+            $uaData['photo'] = 'https://graph.facebook.com/'.$json['id'].'/picture?type=large';
         }
         if (isset($json['name']) && $json['name']) {
             $uaData['name'] = $json['name'];
