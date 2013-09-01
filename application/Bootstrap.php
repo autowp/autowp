@@ -11,9 +11,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
         mb_internal_encoding("UTF-8");
         mb_regex_encoding("UTF-8");
-        ini_set('iconv.internal_encoding', 'UTF-8');
-
-        date_default_timezone_set('Europe/Moscow');
     }
 
     /**
@@ -25,6 +22,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
         Zend_Registry::set('db', $db);
 
+        define('PUBLIC_DIR', realpath(APPLICATION_PATH . '/../public_html'));
         define('PROJECT_DIR', '/home/autowp/autowp.ru');
         define('RESOURCES_DIR', APPLICATION_PATH . '/resources');
         define('IMAGES_DIR', PUBLIC_DIR . '/img');
