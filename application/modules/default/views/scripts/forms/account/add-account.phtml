@@ -2,7 +2,7 @@
     $this->element->setAttrib('class', 'form-inline')
 ?>
 <?php foreach ($this->element->getElements() as $element) { ?>
-    <label><?=$this->escape($element->getLabel())?> <?=$element?></label>
+    <label><?=$this->escape($element->getLabel())?> <?=$element->setAttrib('class', 'form-control')?></label>
 <?php } ?>
 <?=$this->formButton('submit', 'Добавить', array(
     'class' => 'btn btn-primary',
