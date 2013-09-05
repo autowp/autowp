@@ -11,7 +11,6 @@
 /LoginController.php
 /MostController.php
 /MuseumsController.php
-/OauthController.php
 /PagesController.php
 /PictureController.php
 /PictureFileController.php

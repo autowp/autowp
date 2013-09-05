@@ -98,9 +98,9 @@ class Project_Controller_Action_Helper_User extends Zend_Controller_Action_Helpe
     {
         return $this->_user
             && $this->_user->role
-            && $this->getActionController()
-                    ->getHelper('acl')->direct()
-                    ->isAllowed($this->_user->role, $resource, $privilege);
+            && Zend_Controller_Action_HelperBroker::getStaticHelper('acl')
+                ->direct()
+                ->isAllowed($this->_user->role, $resource, $privilege);
     }
 
     /**
@@ -111,8 +111,8 @@ class Project_Controller_Action_Helper_User extends Zend_Controller_Action_Helpe
     {
         return $this->_user
             && $this->_user->role
-            && $this->getActionController()
-                ->getHelper('acl')->direct()
+            && Zend_Controller_Action_HelperBroker::getStaticHelper('acl')
+                ->direct()
                 ->inheritsRole($this->_user->role, $inherit);
     }
 

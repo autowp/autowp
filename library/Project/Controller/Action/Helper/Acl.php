@@ -7,7 +7,7 @@ class Project_Controller_Action_Helper_Acl extends Zend_Controller_Action_Helper
      */
     public function direct()
     {
-        return $bootstrap = $this->getActionController()
-            ->getInvokeArg('bootstrap')->getResource('acl');
+        return Zend_Controller_Front::getInstance()
+            ->getParam('bootstrap')->getResource('acl');
     }
 }
