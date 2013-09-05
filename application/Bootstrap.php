@@ -6,11 +6,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {
         setlocale(LC_ALL, 'en_US.UTF-8');
         setlocale(LC_CTYPE, "UTF8", "en_US.UTF-8");
-
-        error_reporting(E_ALL);
-
-        mb_internal_encoding("UTF-8");
-        mb_regex_encoding("UTF-8");
     }
 
     /**
@@ -18,10 +13,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
      */
     protected function _initBackCompatibility()
     {
-        $db = $this->bootstrap('db')->getResource('db');
-
-        Zend_Registry::set('db', $db);
-
         define('PUBLIC_DIR', realpath(APPLICATION_PATH . '/../public_html'));
         define('PROJECT_DIR', '/home/autowp/autowp.ru');
         define('RESOURCES_DIR', APPLICATION_PATH . '/resources');
@@ -47,19 +38,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {
         Zend_Paginator::setDefaultScrollingStyle('Sliding');
         Zend_View_Helper_PaginationControl::setDefaultViewPartial('pagination_control.phtml');
-    }
-
-    protected function _initViewSetup()
-    {
-        $view = $this->bootstrap('view')->getResource('view');
-
-        $view
-            ->setEncoding('utf-8')
-            ->strictVars(true);
-
-        $view->headMeta()
-            ->appendName('keywords', 'auto, avto, автомобиль')
-            ->appendName('description', 'Энциклопедия автомобилей в картинках. AutoWP.ru');
     }
 
     protected function _initLocaleAndTranslate()
