@@ -1,6 +1,6 @@
 define(
     'application',
-    ['jquery', 'bootstrap', 'navbar'],
+    ['jquery', 'bootstrap', 'navbar', 'domReady!'],
     function($, Bootstrap, Navbar) {
         return {
             init: function() {

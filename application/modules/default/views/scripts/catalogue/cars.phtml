@@ -32,13 +32,8 @@
 
 <ul class="nav nav-pills">
     <?php foreach ($this->cartypes as $cartype) { ?>
-        <li<?=$this->cartype && $this->cartype->id == $cartype->id ? ' class="active"' : '' ?>>
-            <?=$this->htmlA(array(
-                'href' => $this->url(array(
-                    'cartype_catname' => $cartype->catname,
-                    'page'            => 1
-                ), 'catalogue')
-            ), $this->escape($cartype->name) . ' <small>('.$cartype->cars_count.')</small>', false) ?>
+        <li<?=$this->cartype && $this->cartype->id == $cartype['id'] ? ' class="active"' : '' ?>>
+            <?=$this->htmlA($cartype['url'], $this->escape($cartype['name']) . ' <small>('.$cartype['carsCount'].')</small>', false) ?>
         </li>
     <?php } ?>
 </ul>

@@ -1,0 +1,52 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 63,
+        'args'   => array(
+            'USER_NAME'     => $this->user->getCompoundName(),
+            'USER_IDENTITY' => $this->user->identity ? $this->user->identity : 'user' . $this->user->id,
+        )
+    ));
+
+    $cols = 4;
+    $count = count($this->brands);
+    $rows = ceil($count / $cols);
+?>
+
+<?php for ($i=0; $i<$rows; $i++) { ?>
+    <div class="row">
+        <?php for ($j=0; $j<$cols; $j++) { ?>
+            <div class="col-lg-3 col-md-3"><div class="row">
+                <?php
+                    $idx = $j*$rows+$i;
+                    $brand = $idx < $count ? $this->brands[$idx] : 0;
+                ?>
+                <?php if ($brand) { ?>
+                    <?php
+                        $image = $this->img($brand['img'], array(
+                            'alt'    => 'логотип '. $brand['name'],
+                            'title'  => 'логотип '. $brand['name'],
+                            'format' => 'brandicon'
+                        ));
+                    ?>
+                    <div class="col-lg-4 col-md-4">
+                        <?php if ($image->exists()) { ?>
+                            <?=$this->htmlA($brand['url'], $image, false);?>
+                        <?php } else { ?>
+                            &#xa0;
+                        <?php } ?>
+                    </div>
+                    <div class="col-lg-8 col-md-8">
+                        <h4><?=$this->htmlA($brand['url'], $brand['name'])?> <span class="count">(<?=$brand['picturesCount'] ?>)</span></h4>
+                    </div>
+                <?php } else { ?>
+                    <div class="col-lg-12 col-md-12">&#xa0;</div>
+                <?php } ?>
+            </div></div>
+        <?php } ?>
+    </div>
+<?php } ?>

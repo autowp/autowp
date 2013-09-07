@@ -1,6 +1,6 @@
 define(
     'default/account/pm',
-    ['jquery', 'message'],
+    ['jquery', 'message', 'domReady!'],
     function($, Message) {
         return {
             init: function() {

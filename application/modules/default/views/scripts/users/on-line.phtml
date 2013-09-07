@@ -1,0 +1,10 @@
+<?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => false,
+        'needRight' => false
+    ));
+?>
+<?php foreach ($this->users as $user) { ?>
+    <?=$this->user($user) . ' ' ?>
+<?php } ?>

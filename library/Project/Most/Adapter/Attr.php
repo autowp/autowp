@@ -57,13 +57,10 @@ class Project_Most_Adapter_Attr extends Project_Most_Adapter_Abstract
                 $funct = $this->_order == 'ASC' ? 'min' : 'max';
                 $expr = $funct.'('.$tableName.'.value)';
                 $select
-                    ->columns(array(
-                        'V' => new Zend_Db_Expr($expr)
-                    ))
                     ->group('cars.id')
-                    ->join('equipes', 'cars.id=equipes.car_id', null)
-                    ->join($tableName, 'equipes.id='.$tableName.'.item_id', null)
-                    ->order('V '.$this->_order);
+                    ->join('equipes', 'cars.id = equipes.car_id', null)
+                    ->join($tableName, 'equipes.id = '.$tableName.'.item_id', null)
+                    ->order(new Zend_Db_Expr($expr . ' ' . $this->_order));
                 break;
         }
 
