@@ -11,10 +11,9 @@
             'VOTING_ID'   => $this->voting->id
         )
     ));
+
+    $this->layout()->moduleName = 'default/voting/voting';
 ?>
-<?php $this->jQuery()->onLoadCaptureStart() ?>
-votingVotingPage();
-<?php $this->jQuery()->onLoadCaptureEnd() ?>
 <div class="well">
     <p><?=nl2br($this->escape($this->voting->text))?></p>
     <hr />

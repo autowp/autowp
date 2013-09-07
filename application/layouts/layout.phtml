@@ -14,9 +14,6 @@
         $mainMenu = $this->action('main-menu', 'pages', 'default');
     }
 
-    if ($this->jQuery()->uiIsEnabled()) {
-        $this->headLink()->appendStylesheet('/js/libs/jquery/ui/theme/ui.all.css');
-    }
 ?>
 <?=$this->doctype() . PHP_EOL ?>
 <html dir="ltr" lang="<?=$this->language()->get()?>">
@@ -28,10 +25,8 @@
                 ->appendName('keywords', 'auto, avto, автомобиль')
                 ->appendName('description', 'Энциклопедия автомобилей в картинках. AutoWP.ru');
             echo $this->headTitle();
-            echo $this->headLink(array('rel' => 'shortcut icon', 'href' => '/favicon.ico', 'type' => 'image/x-icon'), 'PREPEND');
-
-            //echo $this->stylesheets();
-            echo $this->jQuery();
+            echo $this->headLink(array('rel' => 'shortcut icon', 'href' => '/favicon.ico', 'type' => 'image/x-icon'), 'PREPEND')
+                      ->appendStylesheet('/css/styles.css', 'screen');
             echo $this->headScript()
                 ->appendFile(
                     'http://html5shim.googlecode.com/svn/trunk/html5.js',
@@ -45,6 +40,33 @@
                 );
             echo $this->headStyle();
         ?>
+        <script type="text/javascript" src="/js/require.js"></script>
+        <script type="text/javascript">
+require.config({
+    baseUrl: '/js',
+    paths: {
+        async: 'lib/requirejs-plugins/async',
+        normalize: 'lib/requirejs-plugins/normalize',
+        css: 'lib/requirejs-plugins/css',
+        jquery: 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min',
+        tinymce: '/tiny_mce/jquery.tinymce.min',
+        'jquery.cookie': '/js/lib/jquery.cookie'
+    }
+});
+require(['application'], function(App) {
+    App.init();
+    <?php
+        $moduleOptions = isset($this->layout()->moduleOptions)
+            ? $this->layout()->moduleOptions
+            : null;
+    ?>
+    <?php if (isset($this->layout()->moduleName)) { ?>
+        require([<?=Zend_Json::encode($this->layout()->moduleName)?>], function(Module) {
+            Module.init(<?=Zend_Json::encode($moduleOptions)?>);
+        });
+    <?php } ?>
+});
+        </script>
     </head>
     <body>
         <?=$moderMenu ?>

@@ -40,10 +40,9 @@
             )
         ));
     }
+
+    $this->layout()->moduleName = 'default/most';
 ?>
-<?php $this->jQuery()->onLoadCaptureStart()?>
-mostIndexPage();
-<?php $this->jQuery()->onLoadCaptureEnd()?>
 <ul class="nav nav-pills">
     <?php foreach ($this->years as $id => $year) { ?>
         <li<?=!is_null($this->yearId) && ($id == $this->yearId) ? ' class="active"' : '' ?>>

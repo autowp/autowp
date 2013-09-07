@@ -5,24 +5,9 @@
         'needRight' => false
     ));
     $this->pageTitle('Выбор бренда');
+
+    $this->layout()->moduleName = 'default/upload/select-in-brand';
 ?>
-<?php $this->jQuery()->onLoadCaptureStart() ?>
-$('.arrow').on('click', function(e) {
-    e.preventDefault();
-
-    var $content = $(this).next('div:first');
-    var $icon = $(this).children('i');
-
-    if ($content.is(':visible')) {
-        $icon.removeClass('icon-minus-sign').addClass('icon-plus-sign');
-        $content.slideUp();
-    } else {
-        $icon.removeClass('icon-plus-sign').addClass('icon-minus-sign');
-        $content.slideDown();
-    }
-});
-<?php $this->jQuery()->onLoadCaptureEnd() ?>
-
 
 <?php foreach ($this->models as $model) { ?>
     <div>
