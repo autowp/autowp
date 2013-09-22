@@ -1,1 +1,0 @@
-define("default/cars/engine-spec-editor",["jquery"],function(e){return{init:function(t){e(".spec-editor-form .subform-header").hover(function(){e(this).addClass("hover"),e("."+e(this).attr("id")).addClass("hover")},function(){e(this).removeClass("hover"),e("."+e(this).attr("id")).removeClass("hover")})}}});

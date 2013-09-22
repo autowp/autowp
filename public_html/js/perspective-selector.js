@@ -1,1 +1,0 @@
-define("perspective-selector",["jquery"],function(e){var t=function(t){e(t).find(':input[name="perspective_id"]').on("change",function(){e.post(e(this.form).attr("action"),{perspective_id:e(this).val()},function(e){},"json")})};return function(e){new t(e)}});

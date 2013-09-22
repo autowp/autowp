@@ -1,1 +1,0 @@
-define("moder/traffic/index",["jquery"],function(e){return{init:function(t){e(".host-name").each(function(){var n=e(this);e.getJSON(t.hostByAddrUrl,{ip:n.text()},function(e){n.text(e.host)})})}}});

@@ -1,1 +1,0 @@
-define("moder-vote-reason",["jquery"],function(e){var t=function(t){var n=e(t),r=n.find("select"),i=n.find(":text");r.on("change",function(){e(this).val()=="своя"?(e(this).hide(),i.val("").show().focus()):i.val(e(this).val())})};return function(e){new t(e)}});

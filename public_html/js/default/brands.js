@@ -1,1 +1,0 @@
-define("default/brands",["jquery","bootstrap","brand-popover"],function(e,t,n){return{init:function(){n.apply(".popover-handler")}}});

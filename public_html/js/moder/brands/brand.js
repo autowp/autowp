@@ -1,1 +1,0 @@
-define("moder/brands/brand",["jquery","tinymce"],function(e){return{init:function(t){e("textarea#description").tinymce({script_url:"/tiny_mce/tinymce.min.js",plugins:["link"],theme:"modern",menubar:!1,toolbar:"undo redo link unlink",resize:!0,object_resizing:!1,convert_fonts_to_spans:!0,force_p_newlines:!0,valid_elements:"a[href|title],p",language:"en"})}}});

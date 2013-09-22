@@ -1,1 +1,0 @@
-define("default/maintenance",["jquery","bootstrap"],function(e,t){return{init:function(){setInterval(function(){e.getJSON("/maintenance/progress",function(t){e(".progress-bar").width(t.progress+"%").text(t.progress.toFixed(4)+"%")})},1e4)}}});
