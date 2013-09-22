@@ -14,3 +14,8 @@ build:
 	
 	@echo "Build css ...             ${CHECK} Done"
 	
+	
+	@r.js -o public_source/build.js
+	
+	@echo "Build js ...              ${CHECK} Done"
+	

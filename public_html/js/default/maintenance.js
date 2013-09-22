@@ -1,17 +1,1 @@
-define(
-    'default/maintenance',
-    ['jquery', 'bootstrap'],
-    function($, Bootstrap) {
-        return {
-            init: function() {
-                setInterval(function() {
-                    $.getJSON('/maintenance/progress', function(json) {
-                        $('.progress-bar')
-                            .width(json.progress + '%')
-                            .text(json.progress.toFixed(4) + '%');
-                    });
-                }, 10000);
-            }
-        }
-    }
-);
+define("default/maintenance",["jquery","bootstrap"],function(e,t){return{init:function(){setInterval(function(){e.getJSON("/maintenance/progress",function(t){e(".progress-bar").width(t.progress+"%").text(t.progress.toFixed(4)+"%")})},1e4)}}});

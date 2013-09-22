@@ -1,0 +1,39 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 158,
+        'args'   => array(
+            'BRAND_CATNAME'  => $this->brand->folder,
+            'BRAND_NAME'     => $this->brandName,
+            'MODEL_CATNAME'  => $this->model->folder,
+            'MODEL_NAME'     => $this->model->name,
+        )
+    ));
+?>
+
+<?=$this->partial('catalogue/partial/model-menu.phtml', array(
+    'title'    => $this->brand->caption . ' ' . $this->model->name,
+    'stock'    => array(
+        'count'  => $this->stockCount,
+        'active' => false
+    ),
+    'tuning'   => array(
+        'count'  => $this->tuningCount,
+        'active' => false
+    ),
+    'sport' => array(
+        'count'  => $this->sportCount,
+        'active' => true
+    ),
+    'pictures' => array(
+        'count'  => $this->picturesCount,
+        'active' => false
+    ),
+)) ?>
+
+<?=$this->cars($this->paginator->getCurrentItems()) ?>
+<?=$this->paginationControl($this->paginator) ?>

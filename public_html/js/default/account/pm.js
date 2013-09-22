@@ -1,18 +1,1 @@
-define(
-    'default/account/pm',
-    ['jquery', 'message', 'domReady!'],
-    function($, Message) {
-        return {
-            init: function() {
-                $('[data-trigger=delete-pm]').on('click', function(e) {
-                    e.preventDefault();
-                    
-                    var $element = $(this);
-                    Message.deleteMessage($element.data('id'), function() {
-                        $element.closest('.message').remove();
-                    });
-                });
-            }
-        }
-    }
-);
+define("default/account/pm",["jquery","message","domReady!"],function(e,t){return{init:function(){e("[data-trigger=delete-pm]").on("click",function(n){n.preventDefault();var r=e(this);t.deleteMessage(r.data("id"),function(){r.closest(".message").remove()})})}}});

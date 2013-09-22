@@ -37,23 +37,12 @@
                     '/vendor/scottjehl/Respond/respond.min.js',
                     'text/javascript',
                     array('conditional' => 'lt IE 9')
-                );
+                )
+                ->appendFile('/js/require.js')
+                ->appendFile('/js/config.js');
             echo $this->headStyle();
         ?>
-        <script type="text/javascript" src="/js/require.js"></script>
         <script type="text/javascript">
-require.config({
-    baseUrl: '/js',
-    paths: {
-        async: 'lib/requirejs-plugins/async',
-        normalize: 'lib/requirejs-plugins/normalize',
-        css: 'lib/requirejs-plugins/css',
-        domReady: 'lib/requirejs-plugins/domReady',
-        jquery: 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min',
-        tinymce: '/tiny_mce/jquery.tinymce.min',
-        'jquery.cookie': '/js/lib/jquery.cookie'
-    }
-});
 require(['application'], function(App) {
     App.init();
     <?php

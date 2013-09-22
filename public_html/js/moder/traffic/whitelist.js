@@ -1,16 +1,1 @@
-define(
-    'moder/traffic/whitelist',
-    ['jquery'],
-    function($) {
-        return {
-            init: function(options) {
-                $('.host-name').each(function() {
-                    var $this = $(this);
-                    $.getJSON(options.hostByAddrUrl, {ip: $this.text()}, function(json) {
-                        $this.text(json.host);
-                    })
-                });
-            }
-        }
-    }
-);
+define("moder/traffic/whitelist",["jquery"],function(e){return{init:function(t){e(".host-name").each(function(){var n=e(this);e.getJSON(t.hostByAddrUrl,{ip:n.text()},function(e){n.text(e.host)})})}}});

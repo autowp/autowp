@@ -5,6 +5,7 @@
                 'action'           => 'model-generation',
                 'car_type_catname' => null,
                 'tuning'           => null,
+                'sport'            => null,
                 'page'             => 1,
             )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->title) . ' ('.$this->stock['count'].')', false) ?>
         </li>
@@ -15,8 +16,20 @@
                 'action'           => 'model-generation',
                 'car_type_catname' => null,
                 'tuning'           => true,
+                'sport'            => null,
                 'page'             => 1,
             )), '<span class="glyphicon glyphicon-list"></span> Тюнинг ' . $this->escape($this->title) . ' ('.$this->tuning['count'].')', false) ?>
+        </li>
+    <?php } ?>
+    <?php if ($this->sport['count'] > 0) { ?>
+        <li<?=$this->sport['active'] ? ' class="active"' : ''?>>
+            <?=$this->htmlA($this->url(array(
+                'action'           => 'model-generation',
+                'car_type_catname' => null,
+                'tuning'           => null,
+                'sport'            => true,
+                'page'             => 1,
+            )), '<span class="glyphicon glyphicon-list"></span> Спорт ' . $this->escape($this->title) . ' ('.$this->sport['count'].')', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->pictures['count'] > 0) { ?>

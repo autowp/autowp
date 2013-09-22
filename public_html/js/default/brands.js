@@ -1,11 +1,1 @@
-define(
-    'default/brands',
-    ['jquery', 'bootstrap', 'brand-popover'],
-    function($, Bootstrap, BrandPopover) {
-        return {
-            init: function() {
-                BrandPopover.apply('.popover-handler');
-            }
-        }
-    }
-);
+define("default/brands",["jquery","bootstrap","brand-popover"],function(e,t,n){return{init:function(){n.apply(".popover-handler")}}});

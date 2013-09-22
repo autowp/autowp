@@ -120,12 +120,14 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
         $user = $this->_user;
 
         if ($user) {
-            $image = $this->view->img($user->img, array(
-                'format' => 'avatar',
-            ));
+            if ($user->img) {
+                $image = $this->view->img($user->img, array(
+                    'format' => 'avatar',
+                ));
 
-            if ($image && $image->exists()) {
-                return $image;
+                if ($image && $image->exists()) {
+                    return $image;
+                }
             }
 
             if ($user->e_mail) {

@@ -1,13 +1,1 @@
-define(
-    'default/most',
-    ['jquery', 'bootstrap'],
-    function($, Bootstrap) {
-        return {
-            init: function() {
-                $('small.unit').tooltip({
-                    placement: 'bottom'
-                });
-            }
-        }
-    }
-);
+define("default/most",["jquery","bootstrap"],function(e,t){return{init:function(){e("small.unit").tooltip({placement:"bottom"})}}});
