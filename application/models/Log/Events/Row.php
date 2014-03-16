@@ -22,10 +22,6 @@ class Log_Events_Row extends My_Db_Table_Row
                     $col = 'car_id';
                     $tableName = 'log_events_cars';
                     break;
-                case $table instanceof Models:
-                    $col = 'model_id';
-                    $tableName = 'log_events_models';
-                    break;
                 case $table instanceof Brands:
                     $col = 'brand_id';
                     $tableName = 'log_events_brands';

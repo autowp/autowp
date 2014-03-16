@@ -1,0 +1,51 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+    ));
+?>
+<table class="table table-bordered table-striped">
+    <caption>Пользователи</caption>
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>Логин</th>
+            <th>E-mail</th>
+            <th>Имя</th>
+            <th>Роль</th>
+            <th>Профиль</th>
+            <th>Последний заход</th>
+            <th>Регистрация</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator->getCurrentItems() as $user) { ?>
+            <tr>
+                <td><?=$user->id?></td>
+                <td>
+                    <?=$this->escape($user->login)?>
+                </td>
+                <td><?=$this->escape($user->e_mail)?></td>
+                <td><?=$this->escape($user->name)?></td>
+                <td><?=$this->escape($user->role)?></td>
+                <td><?=$this->user($user)?></td>
+                <td>
+                    <?php if ($date = $user->getDate('last_online')) { ?>
+                        <?=$this->humanTime($date)?>
+                    <?php } ?>
+                </td>
+                <td>
+                    <?php if ($date = $user->getDate('reg_date')) { ?>
+                        <?=$this->humanTime($date)?>
+                    <?php } ?>
+                </td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>
+
+<?=$this->paginator?>
