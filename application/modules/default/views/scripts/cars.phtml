@@ -105,11 +105,13 @@
                 <?php } ?>
             <?php } ?>
 
-            <?php foreach ($item['twinsGroups'] as $twinsGroup) { ?>
-                <li>
-                    <span class="glyphicon glyphicon-adjust"></span>
-                    <?=$this->htmlA($twinsGroup['url'], $this->translate('carlist/twins')) ?>
-                </li>
+            <?php if (isset($item['twinsGroups'])) { ?>
+                <?php foreach ($item['twinsGroups'] as $twinsGroup) { ?>
+                    <li>
+                        <span class="glyphicon glyphicon-adjust"></span>
+                        <?=$this->htmlA($twinsGroup['url'], $this->translate('carlist/twins')) ?>
+                    </li>
+                <?php } ?>
             <?php } ?>
 
             <?php foreach ($item['categories'] as $category) { ?>

@@ -13,10 +13,7 @@
     ));
 ?>
 
-<?php foreach ($this->cars as $car) { ?>
-    <h3><?=$this->escape($car['name'])?></h3>
-    <?=$this->pictureListHorizontal2($car['pictures'])?>
-<?php } ?>
+<?=$this->partial('cars.phtml', $this->cars)?>
 
 <ul class="carLinks">
     <?php if ($this->hasSpecs) {?>

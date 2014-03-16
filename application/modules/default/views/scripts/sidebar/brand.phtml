@@ -1,0 +1,9 @@
+<div id="BrandGroupsContainer" class="well">
+    <ul class="nav nav-list">
+        <?php foreach ($this->groups as $group) { ?>
+            <li<?=isset($group['childs']) && (count($group['childs']) > 0) ? ' class="dropdown"' : ''?>>
+                <?=$this->htmlA($group['url'], $this->escape($group['caption']) . (isset($group['count']) ? ' ' .$this->count($group['count']) : ''), false) ?>
+            </li>
+        <?php } ?>
+    </ul>
+</div>
