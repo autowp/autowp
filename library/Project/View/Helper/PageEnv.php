@@ -32,7 +32,8 @@ class Project_View_Helper_PageEnv extends Zend_View_Helper_Abstract
             'layout'    => array(),
             'pageId'    => null,
             'pageTitle' => null,
-            'args'      => array()
+            'args'      => array(),
+            'breadcrumbsReplace' => null
         );
 
         $options = array_merge($defaults, $options);
@@ -73,23 +74,35 @@ class Project_View_Helper_PageEnv extends Zend_View_Helper_Abstract
 
             $view->breadcrumbs()->reset();
 
+            if (isset($options['breadcrumbsReplace'])) {
+                $replace = $options['breadcrumbsReplace'];
+            } else {
+                $replace = false;
+            }
 
             $currentDoc = $page;
             do {
                 if (!$currentDoc->is_group_node) {
-                    $currentUrl = $this->_replaceArgs(
-                        $currentDoc->url,
-                        $preparedUrlArgs
-                    );
+                    if ($replace && ($replace['pageId'] == $currentDoc->id)) {
+                        foreach (array_reverse($replace['breadcrumbs']) as $breadcrumb) {
+                            $view->breadcrumbs($breadcrumb['url'], $breadcrumb['name'], 'prepend');
+                        }
+                    } else {
 
-                    $currentName = $this->_replaceArgs(
-                        $currentDoc->breadcrumbs
-                            ? $view->page($currentDoc)->breadcrumbs
-                            : $view->page($currentDoc)->name,
-                        $preparedNameArgs
-                    );
+                        $currentUrl = $this->_replaceArgs(
+                            $currentDoc->url,
+                            $preparedUrlArgs
+                        );
 
-                    $view->breadcrumbs($currentUrl, $currentName, 'prepend');
+                        $currentName = $this->_replaceArgs(
+                            $currentDoc->breadcrumbs
+                                ? $view->page($currentDoc)->breadcrumbs
+                                : $view->page($currentDoc)->name,
+                            $preparedNameArgs
+                        );
+
+                        $view->breadcrumbs($currentUrl, $currentName, 'prepend');
+                    }
                 }
                 $currentDoc = $this->_pageTable->find($currentDoc->parent_id)->current();
             } while($currentDoc);

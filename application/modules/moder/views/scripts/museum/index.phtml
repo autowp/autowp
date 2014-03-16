@@ -45,8 +45,8 @@
                     ), 'default', true), $museum->name)?>
                 </td>
                 <td>
-                    <?php if ($museum->img) { ?>
-                        <?=$museum->lat?>×<?=$museum->lng?><br />
+                    <?php if ($museum->lat && $museum->lng) { ?>
+                        <?=$museum->lat?>,<?=$museum->lng?><br />
                     <?php } ?>
                     <?=$this->escape($museum->address)?>
                 </td>

@@ -35,7 +35,7 @@
     ),
 )) ?>
 
-<?=$this->cars($this->paginator->getCurrentItems()) ?>
+<?=$this->partial('cars.phtml', $this->listData)?>
 
 <?php if ($this->modelPictures && count($this->modelPictures)) { ?>
 

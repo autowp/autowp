@@ -25,7 +25,7 @@
         </div>
     </div>
     <div class="col-lg-8 col-md-8">
-        <?=$this->cars($this->paginator->getCurrentItems()) ?>
+        <?=$this->partial('cars.phtml', $this->listData)?>
         <?=$this->paginationControl($this->paginator) ?>
 
         <?php if (count($this->contributors)) { ?>

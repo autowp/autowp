@@ -17,7 +17,7 @@
         {
             name: "application",
             include: [
-                "brand-popover", "default/index", "message", "comments"
+                "requireLib", "config", "brand-popover", "default/index", "message", "comments"
             ]
         }
     ]

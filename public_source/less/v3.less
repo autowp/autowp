@@ -104,6 +104,23 @@ ul.pictures2 .picture-preview .moder-votes {
 
 .message {
     margin-bottom: 20px;
+    
+    &.deleted {
+        .comment-restore-button {
+            display: inline-block;
+        }
+        .deleted-message {
+            display: block;
+        }
+        .photo, .text, .vote, .comment-remove-button {
+            display: none;
+        }
+    }
+    
+    .comment-restore-button, .deleted-message {
+        display: none;
+    }
+    
     .text { 
         background: white;
         border: 1px solid #DDDDDD;
@@ -111,7 +128,37 @@ ul.pictures2 .picture-preview .moder-votes {
         .box-shadow(0 1px 1px rgba(0, 0, 0, 0.075));
         padding: 10px;
         min-height: 100px;
+        margin-bottom: 10px;
     }
+    
+    .vote {
+        margin-right: 20px;
+        
+        .vote-up { 
+            color: #000;
+            &:hover, &.active {
+                color: #009900;
+            }
+        }
+        
+        .vote-down {
+            color: #000;
+            &:hover, &.active {
+                color: #cc0000;
+            }
+        }
+        
+        .value {
+            font-weight: bold;
+            
+            &.zero {
+                cursor: default;
+                text-decoration: none;
+                color: #000;
+            }
+        }
+    }
+    
 }
 
 .thumbnail { background: white }
@@ -142,9 +189,17 @@ img.avatar {
 
 .brand-hero-unit {
     background-color: #f5f5f5;
+    font-size: 18px;
+    
     .logo {
         float: left;
         margin: -30px 20px 20px -30px;
+    }
+    
+    h1 small {
+        font-size: 20px;
+        display: block;
+        line-height: 30px;
     }
 }
 
@@ -176,6 +231,7 @@ img.avatar {
     display: inline-block;
     *display: inline;
     zoom: 1;
+    margin-bottom: 0;
 }
 
 .inline-picture-details {
@@ -399,4 +455,48 @@ span.unit {
     img {
         max-width: 100%;
     }
+}
+
+.picture-preview-medium .languages sup {
+    font-family: monospace;
+}
+
+.car-node {
+    > a {
+        > .glyphicon-folder-open {
+            display: none;
+        }
+        > .glyphicon-folder-close {
+            display: inline-block;
+        }
+    }
+    
+    > ul {
+        display: none;
+    }
+    
+    &.open {
+        > a {
+            > .glyphicon-folder-open {
+                display: inline-block;
+            }
+            > .glyphicon-folder-close {
+                display: none;
+            }
+        }
+        
+        > ul {
+            display: block;
+        }
+    }
+}
+
+.tree.stock-only {
+    .tuning, .sport {
+        display: none;
+    }
+}
+
+.produced {
+    white-space: nowrap;
 }

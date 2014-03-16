@@ -65,7 +65,7 @@ class Application_Form_Museum extends Project_Form
                 )),
                 array('textarea', 'description', array(
                     'required'    => false,
-                    'label'       => 'Краткое описание',
+                    'label'       => 'Описание',
                     'cols'        => 80,
                     'rows'        => 8,
                     'filters'     => array('StringTrim'),

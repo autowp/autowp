@@ -44,7 +44,7 @@
                             'topic_id'   => $topic->id
                         )), $topic->caption) ?>»</p>
                         <p>
-                            <?php if ($date = $lastMessage->getDate('add_datetime')) { ?>
+                            <?php if ($date = $lastMessage->getDate('datetime')) { ?>
                                 <?=$this->pastTimeIndicator($date)?>
                             <?php } ?>
                             <?php if ($lastMessageAuthor = $lastMessage->findParentUsersByAuthor()) { ?>
@@ -57,7 +57,7 @@
                                     'message_id' => $lastMessage->id
                                 )),
                                 'title' => 'Перейти к последнему сообщению'
-                            ), '<img src="/img/forums/icon_latest_reply.gif" alt="-&gt;" style="width:18px;height:9px" />', false) ?>
+                            ), '<span class="glyphicon glyphicon-share-alt"></span>', false) ?>
                         </p>
                     <?php } ?>
                 </div>

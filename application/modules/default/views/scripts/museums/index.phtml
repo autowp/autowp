@@ -1,0 +1,47 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 117,
+    ));
+
+    $this->layout()->moduleName = 'default/museums/index';
+    $this->layout()->moduleOptions = array(
+        'museums' => $this->mapData
+    );
+?>
+
+<div id="google-map" style="width:100%;height:400px;margin: 0 0 40px">карта</div>
+
+<div class="museums thumbnails row">
+    <?php foreach ($this->museums as $idx => $museum) { ?>
+        <?php if ($idx && ($idx % 6 == 0)) { ?></div><div class="museums thumbnails row"><?php } ?>
+        <div class="col-lg-2 col-md-2">
+            <div class="thumbnail">
+                <h4><?=$this->htmlA($this->url(array(
+                    'action' => 'museum',
+                    'id'     => $museum->id
+                )), $museum->name)?></h4>
+                <?=$this->img($museum->img, array(
+                    'format' => 'format9'
+                ))?>
+                <?php if ($museum->address) { ?>
+                    <address>
+                        Адрес: <?=$this->escape($museum->address)?>
+                        (<?=$this->htmlA(array(
+                            'href' => '#',
+                            'id'   => 'museum' . $museum->id . 'maplink'
+                        ), 'на карте')?>)
+                    </address>
+                <?php } ?>
+                <?php if ($museum->url) { ?>
+                    <p>Web-сайт: <?=$this->getHelper('htmlA')->url($museum->url)?></p>
+                <?php } ?>
+            </div>
+
+        </div>
+    <?php } ?>
+</div>

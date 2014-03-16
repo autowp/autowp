@@ -9,6 +9,18 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
 
     protected $_monthFormat = '<small class="month">%02d.</small>';
 
+    /**
+     * @var Car_Language
+     */
+    protected $_carLangTable;
+
+    protected function _getCarLanguageTable()
+    {
+        return $this->_carLangTable
+            ? $this->_carLangTable
+            : $this->_carLangTable = new Car_Language();
+    }
+
     public function car(Cars_Row $car = null)
     {
         $this->_car = $car;
@@ -25,7 +37,12 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
         $car = $this->_car;
         $view = $this->view;
 
-        $result = $view->escape($car->caption);
+        $carLangRow = $this->_getCarLanguageTable()->fetchRow(array(
+            'car_id = ?'   => $this->_car->id,
+            'language = ?' => $view->language()->get()
+        ));
+
+        $result = $view->escape($carLangRow ? $carLangRow->name : $car->caption);
 
         if (strlen($car->body) > 0) {
             $result .= ' ('.$view->escape($car->body).')';
@@ -146,6 +163,50 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
                     }
                 }
             }
+        }
+
+        return $result;
+    }
+
+    public function catalogueLinks()
+    {
+        $result = array();
+
+        if (!$this->_car) {
+            return $result;
+        }
+
+        $car = $this->_car;
+        $view = $this->view;
+
+
+
+        foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+            $result[] = array(
+                'url' => $view->url(array(
+                    'module'        => 'default',
+                    'controller'    => 'catalogue',
+                    'action'        => 'car',
+                    'brand_catname' => $brand->folder,
+                    'car_id'        => $car->id
+                ), 'catalogue', true)
+            );
+        }
+
+        foreach ($car->findModels_Cars() as $modelCars) {
+            $model = $modelCars->findParentModels();
+            $brand = $model->findParentBrands();
+
+            $result[] = array(
+                'url' => $view->url(array(
+                    'module'        => 'default',
+                    'controller'    => 'catalogue',
+                    'action'        => 'model-car',
+                    'brand_catname' => $brand->folder,
+                    'model_catname' => $model->folder,
+                    'car_id'        => $car->id
+                ), 'catalogue', true)
+            );
         }
 
         return $result;

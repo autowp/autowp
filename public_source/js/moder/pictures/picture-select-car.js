@@ -5,11 +5,11 @@ define(
         return {
             init: function(options) {
                 
-                $('.model, .generation, .design-project, .concepts').children('p').each(function() {
+                $('.model, .generation, .design-project, .concepts, .car').children('p').each(function() {
                     var $p = $(this),
                         $content = $p.next();
 
-                    $p.children('a').on('click', function(e) {
+                    $p.children('a').first().on('click', function(e) {
                         e.preventDefault();
 
                         if ($content.is(':visible')) {

@@ -4,6 +4,7 @@ define(
     function($) {
         
         var Comments = function(element) {
+            var self = this;
             
             var $element = $(element);
             
@@ -51,19 +52,111 @@ define(
                 }, 'json');
             });
             
-            $element.find('.comment-remove-button').on('click', function() {
-                var node = this; 
-                var id = parseInt($(node).attr('id').replace('comment-remove-button-', ''));
-                $.post('/comments/delete', {comment_id: id}, function(json) {
+            $element.find('.comment-remove-button').on('click', function(e) {
+                e.preventDefault();
+                
+                var $message = $(this).closest('.message');
+                var params = {
+                    comment_id: $message.data('id')
+                };
+                $.post('/comments/delete', params, function(json) {
                     if (json.ok) {
-                        $(node).parents('.message:first').fadeOut(function() {
-                            $(this).remove();
-                        });
+                        $message.addClass('deleted');
                     } else {
                         window.alert(json.message);
                     }
                 }, 'json');
-                return false; 
+            });
+            
+            $element.find('.comment-restore-button').on('click', function(e) {
+                e.preventDefault();
+                
+                var $message = $(this).closest('.message');
+                var params = {
+                    comment_id: $message.data('id')
+                };
+                $.post('/comments/restore', params, function(json) {
+                    if (json.ok) {
+                        $message.removeClass('deleted');
+                    } else {
+                        window.alert(json.message);
+                    }
+                }, 'json');
+            });
+            
+            $element.find('.message .vote').each(function() {
+                var $vote = $(this);
+                
+                function postVote(value) {
+                    self.postVote($vote.data('id'), value, function(data) {
+                        var newVote = parseInt(data.vote);
+                        $vote.find('.value')
+                            .text((newVote > 0 ? '+' : '') + newVote)
+                            .removeClass('zero');
+                        
+                        if (value > 0) {
+                            $vote.find('.vote-up').addClass('active');
+                            $vote.find('.vote-down').removeClass('active');
+                        } else {
+                            $vote.find('.vote-down').addClass('active');
+                            $vote.find('.vote-up').removeClass('active');
+                        }
+                    })
+                }
+                
+                $vote.find('.vote-down').on('click', function(e) {
+                    e.preventDefault();
+                    if (!$(this).hasClass('active')) {
+                        postVote(-1);
+                    }
+                });
+                
+                $vote.find('.vote-up').on('click', function(e) {
+                    e.preventDefault();
+                    if (!$(this).hasClass('active')) {
+                        postVote(+1);
+                    }
+                });
+                
+                $vote.find('a.value').on('click', function(e) {
+                    e.preventDefault();
+                    
+                    if ($(this).hasClass('zero')) {
+                        return;
+                    }
+                    
+                    var $modal = $(
+                        '<div class="modal fade">\
+                            <div class="modal-dialog">\
+                                <div class="modal-content">\
+                                    <div class="modal-header">\
+                                        <button type="button" data-dismiss="modal" class="close">×</button>\
+                                        <h3 class="modal-title">Голоса</h3>\
+                                    </div>\
+                                    <div class="modal-body"></div>\
+                                    <div class="modal-footer">\
+                                        <button data-dismiss="modal" class="btn btn-default">Закрыть</button>\
+                                    </div>\
+                                </div>\
+                            </div>\
+                        </div>'
+                    );
+                    
+                    var $body = $modal.find('.modal-body');
+                    
+                    $modal.modal();
+                    $modal.on('hidden.bs.modal', function() {
+                        $modal.remove();
+                    });
+                    
+                    var $btnClose = $modal.find('.btn-default')
+                    
+                    $btnClose.button('loading');
+                    $.get('/comments/votes/', {id: $vote.data('id')}, function(html) {
+                        $body.html(html);
+                        $btnClose.button('reset');
+                    });
+                });
             });
         };
         
@@ -74,6 +167,22 @@ define(
                         success();
                     }
                 });
+            },
+            postVote: function(id, value, success) {
+                var params = {
+                    id: id,
+                    vote: value
+                };
+                
+                $.post('/comments/vote', params, function(json) {
+                    if (json.ok) {
+                        if (success) {
+                            success(json);
+                        }
+                    } else {
+                        window.alert(json.error);
+                    }
+                }, 'json');
             }
         });
         

@@ -41,6 +41,11 @@ class Application_Form_Moder_Car_Add extends Project_Form
                     'required'   => false,
                     'decorators' => array('ViewHelper')
                 )),
+                array('checkbox', 'is_group', array(
+                    'required'     => false,
+                    'label'        => 'Группа',
+                    'decorators'   => array('ViewHelper')
+                )),
             )
         ));
     }

@@ -43,16 +43,16 @@ class Project_Form_Decorator_Unit extends Zend_Form_Decorator_Abstract
 
         $view = $this->getElement()->getView();
 
-        $response = '<span title="' . $view->escape($unit->name) . '" class="unit">' .
+        $response = '<span class="input-group-addon" title="' . $view->escape($unit->name) . '" class="unit">' .
                         $view->escape($unit->abbr) .
                     '</span>';
         //call_user_func($callback, $content, $this->getElement(), $this->getOptions());
 
         switch ($placement) {
             case self::APPEND:
-                return $content . $separator . $response;
+                return '<div class="input-group">' . $content . $separator . $response . '</div>';
             case self::PREPEND:
-                return $response . $separator . $content;
+                return '<div class="input-group">' . $response . $separator . $content . '</div>';
             default:
                 // replace content
                 return $response;

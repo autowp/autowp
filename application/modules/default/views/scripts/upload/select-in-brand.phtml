@@ -9,166 +9,78 @@
     $this->layout()->moduleName = 'default/upload/select-in-brand';
 ?>
 
-<?php foreach ($this->models as $model) { ?>
-    <div>
-        <?=$this->htmlA(array(
-            'href'  => '#',
-            'class' => 'arrow'
-        ), '<span class="glyphicon glyphicon-plus-sign"></span> ' . $this->escape($this->brand->caption . ' ' . $model['name']), false) ?>
-        <div style="margin:0 0 4px 12px;display:none">
-            <?php if (count($model['generations'])) { ?>
-                <?php foreach ($model['generations'] as $generation) { ?>
-                    <div>
-                        <?=$this->htmlA(array(
-                            'href' => '#',
-                            'class' => 'arrow'
-                        ), '<span class="glyphicon glyphicon-plus-sign"></span> ' . $this->escape($generation['name']), false) ?>
-                        <div style="margin:0 0 4px 12px;display:none">
-                            <?php foreach ($generation['cars'] as $car) { ?>
-                                <?=$this->htmlA(array(
-                                    'href' => $this->url(array(
-                                        'action' => 'index',
-                                        'type'   => Picture::CAR_TYPE_ID,
-                                        'car_id' => $car->id
-                                    ))
-                                ), $car->getFullName()) ?>
-                                <br />
-                            <?php } ?>
-                        </div>
-                    </div>
-                <?php } ?>
-
-                <?php if (count($model['cars'])) { ?>
-                    <div>
-                        <?=$this->htmlA(array(
-                            'href' => '#',
-                            'class' => 'arrow'
-                        ), '<span class="glyphicon glyphicon-plus-sign"></span> не вошедшие в поколения', false) ?>
-                        <div style="margin:0 0 4px 12px;display:none">
-                            <?php foreach ($model['cars'] as $car) { ?>
-                                <?=$this->htmlA(array(
-                                    'href' => $this->url(array(
-                                        'action' => 'index',
-                                        'type'   => Picture::CAR_TYPE_ID,
-                                        'car_id' => $car->id
-                                    ))
-                                ), $car->getFullName()) ?>
-                                <br />
-                            <?php } ?>
-                        </div>
-                    </div>
-                <?php } ?>
-            <?php } else { ?>
-                <?php foreach ($model['cars'] as $car) { ?>
-                    <?=$this->htmlA(array(
-                        'href' => $this->url(array(
-                            'action' => 'index',
-                            'type'   => Picture::CAR_TYPE_ID,
-                            'car_id' => $car->id
-                        ))
-                    ), $car->getFullName()) ?>
-                    <br />
-                <?php } ?>
-            <?php } ?>
+<div class="select-in-brand">
+    <?php foreach ($this->models as $model) { ?>
+        <div>
             <?=$this->htmlA(array(
-                'href' => $this->url(array(
-                    'action'   => 'index',
-                    'type'     => Picture::MODEL_TYPE_ID,
-                    'model_id' => $model['id']
-                ))
-            ), 'другая модификация') ?>
-        </div>
-    </div>
-<?php } ?>
-
-<?php if (count($this->concepts)) { ?>
-    <div style="margin: 5px 0">
-        <?=$this->htmlA(array(
-            'href' => '#',
-            'class' => 'arrow'
-        ), '<span class="glyphicon glyphicon-plus-sign"></span> Концепты и прототипы', false) ?>
-        <div style="margin:0 0 4px 12px;display:none">
-            <?php foreach ($this->concepts as $car) { ?>
-                <?=$this->htmlA(array(
-                    'href' => $this->url(array(
-                        'action' => 'index',
-                        'type'   => Picture::CAR_TYPE_ID,
-                        'car_id' => $car->id
-                    ))
-                ), $car->getFullName()) ?>
-                <br />
-            <?php } ?>
-        </div>
-    </div>
-<?php } ?>
-
-<?php if (count($this->cars) > 0) { ?>
-    <div style="margin: 5px 0">
-        <?php if (count($this->models) > 3) { ?>
-            <?=$this->htmlA(array(
-                'href' => '#',
-                'class' => 'arrow'
-            ), '<span class="glyphicon glyphicon-plus-sign"></span> Другие автомобили', false) ?>
-            <div style="margin:0 0 4px 12px;display:none">
-                <?php foreach ($this->cars as $car) { ?>
-                    <?=$this->htmlA(array(
-                        'href' => $this->url(array(
-                            'action' => 'index',
-                            'type'   => Picture::CAR_TYPE_ID,
-                            'car_id' => $car->id
-                        ))
-                    ), $car->getFullName()) ?>
-                    <br />
-                <?php } ?>
+                'href'      => '#',
+                'class'     => 'arrow',
+                'data-load' => $model['loadUrl']
+            ), '<span class="glyphicon glyphicon-plus-sign"></span> ' . $this->escape($this->brand->caption . ' ' . $model['name']), false) ?>
+            <div style="margin:0 0 4px 18px;display:none">
+                <div class="loading"><em>Loading ...</em></div>
             </div>
-        <?php } else { ?>
-            <?php foreach ($this->cars as $car) { ?>
-                <?=$this->htmlA(array(
-                    'href' => $this->url(array(
-                        'action' => 'index',
-                        'type'   => Picture::CAR_TYPE_ID,
-                        'car_id' => $car->id
-                    ))
-                ), $car->getFullName()) ?>
-                <br />
-            <?php } ?>
-        <?php } ?>
-    </div>
-<?php } ?>
-
-<?php if (count($this->engines) > 0) { ?>
-    <div style="margin: 5px 0">
-        <?=$this->htmlA(array(
-            'href' => '#',
-            'class' => 'arrow',
-        ), '<span class="glyphicon glyphicon-plus-sign"></span> Двигатели', false)?>
-        <div style="margin:0 0 4px 12px;display:none">
-            <?php foreach ($this->engines as $engine) { ?>
-                <?=$this->htmlA(array(
-                    'href' => $this->url(array(
-                        'action'    => 'index',
-                        'type'      => Picture::ENGINE_TYPE_ID,
-                        'engine_id' => $engine->id
-                    ))
-                ), $engine->getMetaCaption()) ?>
-                <br />
-            <?php } ?>
-
         </div>
-    </div>
-<?php } ?>
+    <?php } ?>
 
-<div style="margin: 5px 0">
-    <?=$this->htmlA($this->url(array(
-        'action' => 'index',
-        'type'   => Picture::LOGO_TYPE_ID
-    )), 'логотип ' . $this->brand->caption) ?><br />
-    <?=$this->htmlA($this->url(array(
-        'action' => 'index',
-        'type'   => Picture::MIXED_TYPE_ID
-    )), 'разное (несколько автомобилей на одной картинке)') ?><br />
-    <?=$this->htmlA($this->url(array(
-        'action' => 'index',
-        'type'   => Picture::UNSORTED_TYPE_ID
-    )), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
+    <?php if (count($this->haveConcepts)) { ?>
+        <div style="margin: 5px 0">
+            <?=$this->htmlA(array(
+                'href'      => '#',
+                'class'     => 'arrow',
+                'data-load' => $this->conceptsUrl
+            ), '<span class="glyphicon glyphicon-plus-sign"></span> Концепты и прототипы', false) ?>
+            <div style="margin:0 0 4px 18px;display:none">
+                <div class="loading"><em>Loading ...</em></div>
+            </div>
+        </div>
+    <?php } ?>
+
+    <?php if (count($this->cars) > 0) { ?>
+        <div style="margin: 5px 0">
+            <?php if (count($this->models) > 3) { ?>
+                <?=$this->htmlA(array(
+                    'href'  => '#',
+                    'class' => 'arrow'
+                ), '<span class="glyphicon glyphicon-plus-sign"></span> Другие автомобили', false) ?>
+                <div style="margin:0 0 4px 18px;display:none">
+                    <?=$this->partial('upload/select-in-brand-cars.phtml', array(
+                        'cars' => $this->cars
+                    ))?>
+                </div>
+            <?php } else { ?>
+                <?=$this->partial('upload/select-in-brand-cars.phtml', array(
+                    'cars' => $this->cars
+                ))?>
+            <?php } ?>
+        </div>
+    <?php } ?>
+
+    <?php if ($this->haveEngines) { ?>
+        <div style="margin: 5px 0">
+            <?=$this->htmlA(array(
+                'href'      => '#',
+                'class'     => 'arrow',
+                'data-load' => $this->enginesUrl
+            ), '<span class="glyphicon glyphicon-plus-sign"></span> Двигатели', false)?>
+            <div style="margin:0 0 4px 18px;display:none">
+                <div class="loading"><em>Loading ...</em></div>
+            </div>
+        </div>
+    <?php } ?>
+
+    <div style="margin: 5px 0">
+        <?=$this->htmlA($this->url(array(
+            'action' => 'index',
+            'type'   => Picture::LOGO_TYPE_ID
+        )), 'логотип ' . $this->brand->caption) ?><br />
+        <?=$this->htmlA($this->url(array(
+            'action' => 'index',
+            'type'   => Picture::MIXED_TYPE_ID
+        )), 'разное (несколько автомобилей на одной картинке)') ?><br />
+        <?=$this->htmlA($this->url(array(
+            'action' => 'index',
+            'type'   => Picture::UNSORTED_TYPE_ID
+        )), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
+    </div>
 </div>

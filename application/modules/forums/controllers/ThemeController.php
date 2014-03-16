@@ -12,7 +12,8 @@ class Forums_ThemeController extends Zend_Controller_Action
 
         $themeTable = new Forums_Themes();
         $topicsTable = new Forums_Topics();
-        $msgTable = new Forums_Messages();
+        $msgTable = new Comment_Message();
+        $commentTopicTable = new Comment_Topic();
 
         $select = $themeTable->select(true)
             ->where('id = ?', (int)$this->_getParam('theme_id'));
@@ -33,9 +34,11 @@ class Forums_ThemeController extends Zend_Controller_Action
         if (!$theme->disable_topics) {
 
             $select = $topicsTable->select(true)
-                ->where('theme_id = ?', $theme->id)
-                ->where('status IN (?)', array(Forums_Topics::STATUS_CLOSED, Forums_Topics::STATUS_NORMAL))
-                ->order('update_datetime DESC');
+                ->where('forums_topics.theme_id = ?', $theme->id)
+                ->where('forums_topics.status IN (?)', array(Forums_Topics::STATUS_CLOSED, Forums_Topics::STATUS_NORMAL))
+                ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', null)
+                ->where('comment_topic.type_id = ?', Comment_Message::FORUMS_TYPE_ID)
+                ->order('comment_topic.last_update DESC');
 
             $paginator = Zend_Paginator::factory($select)
                 ->setItemCountPerPage(self::TOPICS_PER_PAGE)
@@ -45,26 +48,44 @@ class Forums_ThemeController extends Zend_Controller_Action
 
                 $topicPaginator = Zend_Paginator::factory(
                     $msgTable->select()
-                        ->where('topic_id = ?', $topicRow->id)
+                        ->where('item_id = ?', $topicRow->id)
+                        ->where('type_id = ?', Comment_Message::FORUMS_TYPE_ID)
                 )
                     ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
                     ->setPageRange(10);
 
                 $topicPaginator->setCurrentPageNumber(count($topicPaginator));
 
-                $newMessages = 0;
                 if ($this->_helper->user()->logedIn()) {
-                    $newMessages = $topicRow->newMessagesCountFor($this->_helper->user()->get());
+                    $stat = $commentTopicTable->getTopicStatForUser(
+                        Comment_Message::FORUMS_TYPE_ID,
+                        $topicRow->id,
+                        $this->_helper->user()->get()->id
+                    );
+                    $messages = $stat['messages'];
+                    $newMessages = $stat['newMessages'];
+                } else {
+                    $stat = $commentTopicTable->getTopicStat(
+                        Comment_Message::FORUMS_TYPE_ID,
+                        $topicRow->id
+                    );
+                    $messages = $stat['messages'];
+                    $newMessages = 0;
                 }
-                $oldMessages = $topicRow->messages - $newMessages;
+
+                $oldMessages = $messages - $newMessages;
 
                 $lastMessage = false;
                 $lastMessageDate = false;
                 $lastMessageAuthor = false;
                 $lastMessageUrl = false;
-                if ($topicRow->messages > 0) {
-                    if ($lastMessage = $topicRow->findLastMessage()) {
-                        $lastMessageDate = $lastMessage->getDate('add_datetime');
+                if ($messages > 0) {
+                    $lastMessage = $msgTable->getLastMessage(
+                        Comment_Message::FORUMS_TYPE_ID,
+                        $topicRow->id
+                    );
+                    if ($lastMessage) {
+                        $lastMessageDate = $lastMessage->getDate('datetime');
                         $lastMessageAuthor = $lastMessage->findParentUsersByAuthor();
                         $lastMessageUrl = $this->_helper->url->url(array(
                             'module'     => 'forums',
@@ -86,7 +107,7 @@ class Forums_ThemeController extends Zend_Controller_Action
                         'page'       => null
                     ), 'default', true),
                     'name'              => $topicRow->caption,
-                    'messages'          => $topicRow->messages,
+                    'messages'          => $messages,
                     'oldMessages'       => $oldMessages,
                     'newMessages'       => $newMessages,
                     'addDatetime'       => $topicRow->getDate('add_datetime'),
@@ -119,12 +140,15 @@ class Forums_ThemeController extends Zend_Controller_Action
                     ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', null)
                     ->where('forums_topics.status IN (?)', array(Forums_Topics::STATUS_NORMAL, Forums_Topics::STATUS_CLOSED))
                     ->where('forums_theme_parent.parent_id = ?', $row->id)
-                    ->order('forums_topics.update_datetime DESC')
+                    ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', null)
+                    ->where('comment_topic.type_id = ?', Comment_Message::FORUMS_TYPE_ID)
+                    ->order('comment_topic.last_update DESC')
             );
             if ($lastTopic) {
                 $lastMessage = $msgTable->fetchRow(array(
-                    'topic_id = ?'    => $lastTopic->id
-                ), 'add_datetime DESC');
+                    'type_id = ?' => Comment_Message::FORUMS_TYPE_ID,
+                    'item_id = ?' => $lastTopic->id
+                ), 'datetime DESC');
             }
 
             $themes[] = array(

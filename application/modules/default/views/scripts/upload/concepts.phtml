@@ -1,0 +1,6 @@
+<?php
+    $this->layout()->disableLayout();
+?>
+<?php foreach ($this->concepts as $car) { ?>
+    <?=$this->htmlA($car['url'], $car['name']) ?><br />
+<?php } ?>

@@ -76,7 +76,6 @@ class Application_Form_Moder_Inbox extends Project_Form
                     'multioptions' => array(
                         ''                        => 'любой',
                         Picture::CAR_TYPE_ID      => 'автомобиль',
-                        Picture::MODEL_TYPE_ID    => 'модель',
                         Picture::LOGO_TYPE_ID     => 'логотип',
                         Picture::MIXED_TYPE_ID    => 'разное',
                         Picture::UNSORTED_TYPE_ID => 'несортировано',
@@ -136,7 +135,8 @@ class Application_Form_Moder_Inbox extends Project_Form
                         5 => 'Размер (большие)',
                         6 => 'Размер (маленькие)',
                         7 => 'Комментируемые',
-                        8 => 'Просмотры'
+                        8 => 'Просмотры',
+                        9 => 'Заявки на принятие/удаление'
                     ),
                     'decorators'   => array('ViewHelper')
                 )),

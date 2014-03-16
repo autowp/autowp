@@ -43,6 +43,8 @@ return array (
         'У вас %1$s новое сообщений',
     ),
 
+    'layout/search' => 'Поиск',
+
     /* Picture preview */
     'picture-preview/no-comments' => 'нет',
     'picture-preview/no-ratio'    => 'нет',

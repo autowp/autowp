@@ -11,11 +11,9 @@ class Project_View_Helper_Breadcrumbs extends Zend_View_Helper_Abstract
 
     public function breadcrumbs($url = null, $name = null, $placement = 'append')
     {
-        if ($url || $name)
-        {
+        if ($url || $name) {
             $node = array('url' => $url, 'name' => $name);
-            switch ($placement)
-            {
+            switch ($placement) {
                 case 'append':
                     $this->_data[] = $node;
                     break;
@@ -23,7 +21,6 @@ class Project_View_Helper_Breadcrumbs extends Zend_View_Helper_Abstract
                     array_unshift($this->_data, $node);
                     break;
             }
-
         }
 
         return $this;

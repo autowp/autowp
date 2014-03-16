@@ -9,16 +9,13 @@
         'args'   => array(
             'BRAND_CATNAME'  => $this->brand->folder,
             'BRAND_NAME'     => $this->brandName,
-            'CAR_ID'         => $this->car->id,
+            'CAR_CATNAME'    => 'car' . $this->car->id,
             'CAR_NAME'       => $this->car->getFullName(),
             'SHORT_CAR_NAME' => $this->carShortName
         )
     ));
 ?>
-<?=$this->cars($this->cars, array(
-    'disableDesctiption' => $this->hasHtml,
-    'disableDetailsLink' => true
-)) ?>
+<?=$this->partial('cars.phtml', $this->listData)?>
 <?php if ($this->hasHtml) { ?>
     <div class="text">
         <?=$this->car->html ?>

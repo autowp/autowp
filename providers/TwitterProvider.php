@@ -14,7 +14,7 @@ class TwitterProvider extends Zend_Tool_Project_Provider_Abstract
             ->order(array(
                 'pictures.ratio DESC', 'pictures.votes DESC',
                 'pictures.width DESC', 'pictures.height DESC',
-                'pictures.comments DESC', 'pictures.views DESC'
+                'pictures.views DESC'
             ))
             ->limit(1);
         if ($perspective) {

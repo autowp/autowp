@@ -1,0 +1,61 @@
+<?php foreach ($this->groups as $twinsGroup) { ?>
+    <h3><?=$this->escape($twinsGroup['name'])?></h3>
+
+    <div class="thumbnails twins row">
+        <?php foreach ($twinsGroup['cars'] as $car) { ?>
+            <div class="col-lg-3 col-md-3">
+                <div class="thumbnail">
+                    <?php if ($car['picture']) { ?>
+                        <?=$this->htmlA(
+                            array(
+                                'href' => $this->pic($car['picture'])->url(),
+                            ),
+                            $this->image($car['picture'], 'file_name', array(
+                                'format' => 6,
+                                'alt'    => $car['picture']->getCaption(),
+                                'title'  => $car['picture']->getCaption(),
+                            )),
+                            false
+                        )?>
+                    <?php } else { ?>
+                        &#xa0;
+                    <?php } ?>
+                    <p><?=$this->escape($car['name'])?></p>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+
+    <? /*while ($items = array_splice($bHtml, 0, 4)) {
+        $html .= '' . implode($items) . '';
+    }*/ ?>
+
+    <ul class="carLinks">
+        <li>
+            <span class="glyphicon glyphicon-file"></span>
+            <?php if ($twinsGroup['msgCount'] > 0) { ?>
+                <?=$this->htmlA($twinsGroup['detailsUrl'], 'подробнее … (' . $this->translate(array('%1$s comments', null, $twinsGroup['msgCount']), $twinsGroup['msgCount']) . ')')?>
+            <?php } else { ?>
+                <?=$this->htmlA($twinsGroup['detailsUrl'], 'подробнее …')?>
+            <?php } ?>
+        </li>
+        <?php if ($twinsGroup['hasSpecs']) { ?>
+            <li>
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <?=$this->htmlA($twinsGroup['specsUrl'], 'технические характеристики')?>
+            </li>
+        <?php }?>
+        <?php if ($twinsGroup['picturesCount'] > $twinsGroup['picturesShown']) { ?>
+            <li>
+                <span class="glyphicon glyphicon-th"></span>
+                <?=$this->htmlA($twinsGroup['picturesUrl'], 'все картинки ('.$twinsGroup['picturesCount'].')')?>
+            </li>
+        <?php } ?>
+        <?php if ($this->canEdit) { ?>
+            <li>
+                <span class="glyphicon glyphicon-cog"></span>
+                <?=$this->htmlA($twinsGroup['moderUrl'], 'управление')?>
+            </li>
+        <?php } ?>
+    </ul>
+<?php } ?>

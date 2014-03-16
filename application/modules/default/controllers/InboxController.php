@@ -17,8 +17,10 @@ class InboxController extends Zend_Controller_Action
             ->where('pictures.status = ?', Picture::STATUS_INBOX);
         if ($brand) {
             $select
-                ->join('brands_pictures_cache', 'brands_pictures_cache.picture_id = pictures.id', null)
-                ->where('brands_pictures_cache.brand_id = ?', $brand->id);
+                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                ->where('brands_cars.brand_id = ?', $brand->id);
         }
         return $select;
     }
@@ -35,8 +37,10 @@ class InboxController extends Zend_Controller_Action
             ->where('pictures.add_date <= ?', $date->toString('yyyy-MM-dd 23:59:59'));
         if ($brand) {
             $select
-                ->join('brands_pictures_cache', 'brands_pictures_cache.picture_id=pictures.id', null)
-                ->where('brands_pictures_cache.brand_id = ?', $brand->id);
+                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                ->where('brands_cars.brand_id = ?', $brand->id);
         }
 
         return $db->fetchOne($select);
@@ -72,8 +76,10 @@ class InboxController extends Zend_Controller_Action
 
         $brandRows = $brandTable->fetchAll(
             $brandTable->select(true)
-                ->join('brands_pictures_cache', 'brands.id = brands_pictures_cache.brand_id', null)
-                ->join('pictures', 'brands_pictures_cache.picture_id=pictures.id', null)
+                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                ->join('pictures', 'car_parent_cache.car_id = pictures.car_id', null)
+                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
                 ->where('pictures.status = ?', Picture::STATUS_INBOX)
                 ->group('brands.id')
                 ->order(array('brands.position', 'brands.caption'))

@@ -1,0 +1,93 @@
+<?php
+    $carFullName = $this->car->getFullName();
+
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 33,
+        'args'   => array(
+            'BRAND_CATNAME'  => $this->brand->folder,
+            'BRAND_NAME'     => $this->brandName,
+            'CAR_CATNAME'    => $this->carCatname,
+            'CAR_NAME'       => $carFullName,
+            'SHORT_CAR_NAME' => $this->carShortName
+        ),
+        'breadcrumbsReplace' => array(
+            'pageId'      => 33,
+            'breadcrumbs' => $this->breadcrumbs
+        )
+    ));
+?>
+
+<?php $this->pageTitle()->setAutoEscape(false)->captureStart('SET') ?>
+    <?=$this->car($this->car)->title()?>
+    <?php if ($this->design) { ?>
+        <sup class="designBrand">дизайн <?=$this->htmlA($this->design['url'], $this->design['name']) ?></sup>
+    <?php } ?>
+    <?php if ($this->car['produced'] > 0) { ?>
+        <small class="produced">
+            <?php if ($this->car['produced'] > 1) { ?>
+                <?=$this->escape(
+                    $this->translate(array(
+                        $this->car['produced_exactly'] ? 'carlist/produced/%1$s' : 'carlist/produced-about/%1$s',
+                        null,
+                        $this->car['produced']
+                    ), $this->car['produced'])
+                )?>
+            <?php } else {?>
+                <?=$this->escape($this->translate('carlist/produced/one'))?>
+            <?php } ?>
+        </small>
+    <?php } ?>
+<?php $this->pageTitle()->captureEnd() ?>
+
+<?php if ($this->user()->inheritsRole('moder')) { ?>
+    <p>
+        <span class="glyphicon glyphicon-cog"></span>
+        <?=$this->htmlA($this->url(array(
+            'module'     => 'moder',
+            'controller' => 'cars',
+            'action'     => 'car',
+            'car_id'     => $this->car->id
+        ), 'default', true), 'управление')?>
+    </p>
+<?php } ?>
+
+<?=$this->partial('catalogue/partial/brand-car-menu.phtml', array(
+    'title' => $carFullName,
+    'stock' => array(
+        'count'  => $this->stockCount,
+        'active' => $this->type == Car_Parent::TYPE_DEFAULT
+    ),
+    'tuning' => array(
+        'count'  => $this->tuningCount,
+        'active' => $this->type == Car_Parent::TYPE_TUNING
+    ),
+    'sport' => array(
+        'count'  => $this->sportCount,
+        'active' => $this->type == Car_Parent::TYPE_SPORT
+    ),
+    'pictures' => array(
+        'count'  => $this->picturesCount,
+        'active' => false
+    ),
+)) ?>
+
+<?php if ($this->hasHtml) { ?>
+    <div class="text">
+        <?=$this->car->html ?>
+    </div>
+<?php } ?>
+<?=$this->partial('cars.phtml', $this->childListData)?>
+
+<?php if ($this->currentPicturesCount) { ?>
+    <h3>Другие изображения <?=$this->escape($carFullName) ?></h3>
+    <?=$this->pictureListHorizontal2($this->currentPictures) ?>
+    <?php if ($this->currentPicturesCount > 4) { ?>
+        <span class="glyphicon glyphicon-th"></span>
+        <?=$this->htmlA($this->currentPicturesUrl, $this->translate('carlist/all pictures').' ('.$this->currentPicturesCount.')')?>
+    <?php } ?>
+<?php } ?>

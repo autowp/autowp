@@ -1,0 +1,41 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ),
+        'pageId' => 159,
+        'args'   => array(
+            'MUSEUM_ID'   => $this->museum->id,
+            'MUSEUM_NAME' => $this->museum->name
+        )
+    ));
+
+    $this->layout()->moduleName = 'default/museums/museum';
+    $this->layout()->moduleOptions = array(
+        'lat' => (float)$this->museum->lat,
+        'lng' => (float)$this->museum->lng,
+    );
+?>
+
+<div id="google-map"></div>
+
+<div class="well">
+    <?php if ($this->museum->address) { ?>
+        <p>Адрес: <?=$this->escape($this->museum->address)?></p>
+    <?php } ?>
+
+    <?php if ($this->museum->url) { ?>
+        <p>Web: <?=$this->htmlA($this->museum->url, $this->museum->url)?></p>
+    <?php } ?>
+
+    <?=$this->museum->description ?>
+</div>
+
+<div id="comments">
+    <?=$this->action('comments', 'comments', 'default', array(
+        'type'    => Comment_Message::MUSEUMS_TYPE_ID,
+        'item_id' => $this->museum->id
+    )) ?>
+</div>

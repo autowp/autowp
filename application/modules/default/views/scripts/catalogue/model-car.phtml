@@ -18,10 +18,10 @@
     ));
 ?>
 
-<?=$this->cars($this->cars, array(
-    'disableDesctiption' => $this->hasHtml,
-    'disableDetailsLink' => true
-)) ?>
+<?=$this->partial('cars.phtml', $this->listData)?>
+<?php if (count($this->childListData['items']) > 0) { ?>
+    <?=$this->partial('cars.phtml', $this->childListData)?>
+<?php } ?>
 
 <?php if ($this->hasHtml) { ?>
     <div class="text">

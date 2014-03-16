@@ -12,5 +12,8 @@
         )
     ));
 ?>
-<?=$this->twinsGroupList($this->paginator->getCurrentItems()) ?>
+<?=$this->partial('twins/partial/list.phtml', array(
+    'groups'  => $this->groups,
+    'canEdit' => $this->canEdit
+))?>
 <?=$this->paginationControl($this->paginator) ?>

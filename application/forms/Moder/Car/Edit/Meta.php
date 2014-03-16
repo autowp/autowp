@@ -2,6 +2,15 @@
 
 class Application_Form_Moder_Car_Edit_Meta extends Project_Form
 {
+    protected $_isGroupDisabled = false;
+
+    protected function setIsGroupDisabled($value)
+    {
+        $this->_isGroupDisabled = (bool)$value;
+
+        return $this;
+    }
+
     public function init()
     {
         parent::init();
@@ -105,6 +114,13 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'label'        => 'Концепт (прототип)',
                     'order'        => 9,
                     'decorators'   => array('ViewHelper')
+                )),
+                array('checkbox', 'is_group', array(
+                    'required'     => false,
+                    'label'        => 'Группа',
+                    'order'        => 10,
+                    'decorators'   => array('ViewHelper'),
+                    'disabled'     => $this->_isGroupDisabled ? true : null
                 )),
                 array('description', 'description', array(
                     'required'     => false,

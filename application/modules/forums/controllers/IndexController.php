@@ -1,11 +1,12 @@
 <?php
+
 class Forums_IndexController extends Zend_Controller_Action
 {
     public function indexAction()
     {
         $themeTable = new Forums_Themes();
         $topicsTable = new Forums_Topics();
-        $msgTable = new Forums_Messages();
+        $msgTable = new Comment_Message();
 
         $user = $this->_helper->user()->get();
         $isModearator = $user &&
@@ -28,12 +29,15 @@ class Forums_IndexController extends Zend_Controller_Action
                     ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', null)
                     ->where('forums_topics.status IN (?)', array(Forums_Topics::STATUS_NORMAL, Forums_Topics::STATUS_CLOSED))
                     ->where('forums_theme_parent.parent_id = ?', $row->id)
-                    ->order('forums_topics.update_datetime DESC')
+                    ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', null)
+                    ->where('comment_topic.type_id = ?', Comment_Message::FORUMS_TYPE_ID)
+                    ->order('comment_topic.last_update DESC')
             );
             if ($lastTopic) {
                 $lastMessage = $msgTable->fetchRow(array(
-                    'topic_id = ?'    => $lastTopic->id
-                ), 'add_datetime DESC');
+                    'type_id = ?' => Comment_Message::FORUMS_TYPE_ID,
+                    'item_id = ?' => $lastTopic->id
+                ), 'datetime DESC');
             }
 
             $subthemes = array();

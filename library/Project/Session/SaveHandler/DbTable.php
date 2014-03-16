@@ -2,7 +2,7 @@
 
 class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTable
 {
-    const USERID_COLUMN = 'userIdColumn';  
+    const USERID_COLUMN = 'userIdColumn';
 
     /**
      * Session table userId column
@@ -10,7 +10,7 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
      * @var string
      */
     protected $_userIdColumn = null;
-    
+
     /**
      * Constructor
      *
@@ -37,7 +37,7 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
      * dataColumn        => (string) Session table data column
      *
      * lifetime          => (integer) Session lifetime (optional; default: ini_get('session.gc_maxlifetime'))
-     * 
+     *
      * userIdColumn      => (string) Session table userId column
      *
      * overrideLifetime  => (boolean) Whether or not the lifetime of an existing session should be overridden
@@ -67,7 +67,7 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
                 case self::USERID_COLUMN:
                     $this->_userIdColumn = (string)$value;
                     unset($config[$key]);
-                    break;    
+                    break;
                 default:
                     // unrecognized options passed to parent::__construct()
                     break;
@@ -76,7 +76,7 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
 
         parent::__construct($config);
     }
-    
+
     /**
      * @return int
      */
@@ -89,7 +89,7 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
         }
         return $userId;
     }
-    
+
     /**
      * Write session data
      *

@@ -38,7 +38,12 @@ class Project_Form extends Zend_Form
                 'prefix' => 'Project_Validate_File',
                 'path'   => 'Project/Validate/File',
                 'type'   => Zend_Form_Element::VALIDATE
-            )
+            ),
+            array(
+                'prefix' => 'Autowp_Filter',
+                'path'   => 'Autowp/Filter',
+                'type'   => Zend_Form_Element::FILTER
+            ),
         ));
 
         parent::__construct($options);

@@ -35,5 +35,5 @@
     ),
 )) ?>
 
-<?=$this->cars($this->paginator->getCurrentItems()) ?>
+<?=$this->partial('cars.phtml', $this->listData)?>
 <?=$this->paginationControl($this->paginator) ?>

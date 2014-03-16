@@ -13,7 +13,26 @@
     ));
 ?>
 
-<?=$this->getHelper('twinsGroupList')->detailed($this->group) ?>
+<?php foreach ($this->cars as $car) { ?>
+    <h3><?=$this->escape($car['name'])?></h3>
+    <?=$this->pictureListHorizontal2($car['pictures'])?>
+<?php } ?>
+
+<ul class="carLinks">
+    <?php if ($this->hasSpecs) {?>
+        <li>
+            <span class="glyphicon glyphicon-list-alt"></span>
+            <?=$this->htmlA($this->specsUrl, 'технические характеристики')?>
+        </li>
+    <?php } ?>
+
+    <?php if ($this->picturesCount) { ?>
+        <li>
+            <span class="glyphicon glyphicon-th"></span>
+            <?=$this->htmlA($this->picturesUrl, 'все картинки ('.$this->picturesCount.')')?>
+        </li>
+    <?php } ?>
+</ul>
 
 <?php if (strlen($this->group->description)){ ?>
     <h3>Описание</h3>
@@ -21,6 +40,6 @@
 <?php } ?>
 
 <?=$this->action('comments', 'comments', 'default', array(
-    'type'    => Comments_Messages::TWINS_TYPE_ID,
+    'type'    => Comment_Message::TWINS_TYPE_ID,
     'item_id' => $this->group->id
 )) ?>

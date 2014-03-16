@@ -37,6 +37,8 @@ return array (
         'You have %1$s new messages',
     ),
 
+    'layout/search' => 'Search',
+
     /* Picture preview */
     'picture-preview/no-comments' => 'no',
     'picture-preview/no-ratio'    => 'no',

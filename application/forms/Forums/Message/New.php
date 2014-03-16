@@ -27,8 +27,11 @@ class Application_Form_Forums_Message_New extends Project_Form
                         array('StringLength', true, array(0, 1024*4))
                     ),
                     'decorators' => array('ViewHelper'),
-                    'class'      => 'span6'
-                ))
+                )),
+                array('checkbox', 'moderator_attention', array(
+                    'label'      => 'Требуется внимание модераторов',
+                    'decorators' => array('ViewHelper')
+                )),
             )
         ));
     }

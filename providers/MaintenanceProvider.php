@@ -177,4 +177,29 @@ class MaintenanceProvider extends Zend_Tool_Project_Provider_Abstract
 
         printf("%d user rename rows was deleted\n", $count);
     }
+
+    public function clearSessions()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db')
+            ->bootstrap('session');
+
+        $bootstrap = $zendApp->getBootstrap();
+
+        $options = $zendApp->getOptions();
+        $maxlifetime = $options['resources']['session']['gc_maxlifetime'];
+        if (!$maxlifetime) {
+            throw new Exception('Option session.gc_maxlifetime not found');
+        }
+
+        Zend_Session::getSaveHandler()->gc($maxlifetime);
+
+        print "Garabage collected\n";
+    }
 }
