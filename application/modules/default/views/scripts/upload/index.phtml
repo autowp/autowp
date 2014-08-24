@@ -7,6 +7,8 @@
         ),
         'pageId' => 29
     ));
+
+    $this->layout()->moduleName = 'default/upload/index';
 ?>
 <div class="well">
     <p>Если у вас есть изображения, которых вы не нашли на этом сайте и они соответствуют тематике сайта, то вы можете добавить их в наш каталог, воспользовавшись формой, расположенной ниже.</p>
@@ -40,9 +42,20 @@
             </p>
             <?=$this->form->render($this) ?>
         </div>
+
+        <?php if (!$this->isSimple) { ?>
+            <p>Если имеют место проблемы с добавлением фото, можно попробовать использовать <?=$this->htmlA($this->url(array(
+                'simple' => '1'
+            )), 'упрощенный интерфес')?></p>
+        <?php } ?>
+
+        <div class="progress-area"></div>
     <?php } else { ?>
-        <p style="margin:10px">&gt; &gt; &gt; <?=$this->htmlA($this->url(array(
-            'action' => 'select-brand'
-        )), 'ДОБАВИТЬ ИЗОБРАЖЕНИЕ') ?></p>
+        <p style="margin:10px"><?=$this->htmlA(array(
+            'class' => 'btn btn-primary btn-lg',
+            'href'  => $this->url(array(
+                'action' => 'select-brand'
+            ))
+        ), '<span class="glyphicon glyphicon-upload"></span> Добавить изображение', false) ?></p>
     <?php } ?>
 </div>

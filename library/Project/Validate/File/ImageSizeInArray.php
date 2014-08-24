@@ -35,7 +35,7 @@ class Project_Validate_File_ImageSizeInArray extends Zend_Validate_Abstract
      * @var array
      */
     protected $_sizes = array();
-    
+
     /**
      * @var array
      */
@@ -81,8 +81,8 @@ class Project_Validate_File_ImageSizeInArray extends Zend_Validate_Abstract
     }
 
     /**
-     * @param  array $sizes               
-     * @throws Zend_Validate_Exception      
+     * @param  array $sizes
+     * @throws Zend_Validate_Exception
      * @return Project_Validate_File_ImageSizeInArray Provides a fluent interface
      */
     public function setSizes($sizes)
@@ -92,28 +92,28 @@ class Project_Validate_File_ImageSizeInArray extends Zend_Validate_Abstract
         {
             if (!isset($size['width']))
                 throw new Zend_Validate_Exception('Width expected');
-                
+
             $width = (int)$size['width'];
             if ($width <= 0)
                 throw new Zend_Validate_Exception('Width must be positive value');
-                
+
             if (!isset($size['height']))
                 throw new Zend_Validate_Exception('Height expected');
-                
+
             $height = (int)$size['height'];
             if ($height <= 0)
                 throw new Zend_Validate_Exception('Height must be positive value');
-                
+
             $this->_sizes[] = array(
                 'width'     =>  $width,
                 'height'    =>  $height
             );
         }
-        
+
         $a = array();
         foreach ($this->_sizes as $size)
-            $a[] = $size['width'] . 'x' . $size['height'];
-            
+            $a[] = $size['width'] . '×' . $size['height'];
+
         $this->_sizesstr = implode(', ', $a);
 
         return $this;
@@ -143,7 +143,7 @@ class Project_Validate_File_ImageSizeInArray extends Zend_Validate_Abstract
 
         $this->_width  = $size[0];
         $this->_height = $size[1];
-        
+
         $found = false;
         foreach ($this->_sizes as $size)
         {
@@ -153,7 +153,7 @@ class Project_Validate_File_ImageSizeInArray extends Zend_Validate_Abstract
                 break;
             }
         }
-        
+
         if (!$found) {
             $this->_throw($file, self::NOT_IN_ARRAY);
         }

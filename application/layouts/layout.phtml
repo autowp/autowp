@@ -107,7 +107,7 @@ require(['application'], function(App) {
                                 )),
                                 false
                             ) */?>
-<?php /* $this->inlineScript()->captureStart() ?>
+<?php $this->inlineScript()->captureStart() ?>
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-24654784-1']);
 _gaq.push(['_trackPageview']);
@@ -118,7 +118,7 @@ ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www')
 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
 <?php $this->inlineScript()->captureEnd() ?>
-<?=$this->inlineScript() */ ?>
+<?=$this->inlineScript() ?>
                         </div>
                         <div class="col-lg-6 col-md-6">
                             <p class="copyrights">

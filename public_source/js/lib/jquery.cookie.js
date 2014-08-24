@@ -1,1 +1,1 @@
-../../../vendor/carhartl/jquery-cookie/jquery.cookie.js
+../../../vendor/carhartl/jquery-cookie/src/jquery.cookie.js

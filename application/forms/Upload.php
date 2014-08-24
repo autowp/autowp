@@ -23,16 +23,17 @@ class Application_Form_Upload extends Project_Form
                     'label'       => 'Файл картинки',
                     'required'    => true,
                     'validators'  => array(
-                        array('Count', true, 1),
                         array('Size',  true, $this->_maxFileSize),
                         array('IsImage',    true),
                         array('Extension',  true, 'jpg,jpeg,jpe,png'),
-                        array('ImageSizeInArray',  true, array(
+                        array('ImageSizeInArray', true, array(
                             'sizes' => Picture::getResolutions()
                         )),
                     ),
                     'MaxFileSize' => $this->_maxFileSize,
                     'decorators'  => array('File'),
+                    'multiple'    => 'multiple',
+                    'isArray'     => true
                 )),
                 array ('text', 'note', array (
                     'required'    => false,
