@@ -44,29 +44,18 @@
     $this->layout()->moduleName = 'default/most';
 ?>
 <ul class="nav nav-pills">
-    <?php foreach ($this->years as $id => $year) { ?>
-        <li<?=!is_null($this->yearId) && ($id == $this->yearId) ? ' class="active"' : '' ?>>
-            <?=$this->htmlA($this->url(array(
-                'most_catname'  => $this->cMost['catName'],
-                'shape_catname' => $this->carType ? $this->carType['catname'] : 'car',
-                'years_catname' => $year['folder']
-            ), 'most'), $year['name']) ?>
+    <?php foreach ($this->years as $year) { ?>
+        <li<?=$year['active'] ? ' class="active"' : '' ?>>
+            <?=$this->htmlA($year['url'], $year['name']) ?>
         </li>
     <?php } ?>
-    <li<?=is_null($this->yearId) ? ' class="active"' : '' ?>>
-        <?=$this->htmlA($this->url(array(
-            'most_catname'  => $this->cMost['catName'],
-            'shape_catname' => $this->carType ? $this->carType['catname'] : null,
-            'years_catname' => null
-        ), 'most'), 'за всю историю') ?>
-    </li>
 </ul>
 
 <?php $idx = 0 ?>
 <?php foreach ($this->carList['cars'] as $car) { ?>
     <div class="row">
         <div class="col-lg-9 col-md-9">
-            <h3><?=$car['car']->getCaptionHtml() ?></h3>
+            <h3><?=$this->car($car['car'])->title()?></h3>
         </div>
         <div class="col-lg-3 col-md-3">
             <?php if ($idx++ == 0) { ?>
@@ -76,7 +65,7 @@
     </div>
     <div class="row">
         <div class="col-lg-9 col-md-9">
-            <?=$this->pictureListHorizontal2($car['car']->getOrientedPictureList($this->groupIds), array(
+            <?=$this->pictureListHorizontal2($car['pictures'], array(
                 'colClass' => 'col-lg-4 col-md-4'
             )) ?>
             <?php if ($car['car']->description) { ?>

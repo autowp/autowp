@@ -20,6 +20,14 @@ class Project_Validate_Car_NameNotExists extends Zend_Validate_Abstract
             if ($ey <= 0) {
                 $ey = null;
             }
+            $bmy = isset($context['begin_model_year']) ? (int)$context['begin_model_year'] : 0;
+            if ($bmy <= 0) {
+                $bmy = null;
+            }
+            $emy = isset($context['end_model_year']) ? (int)$context['end_model_year'] : 0;
+            if ($emy <= 0) {
+                $emy = null;
+            }
             $isGroup = (bool)isset($context['is_group']) && $context['is_group'];
 
             $select = $cars->select()
@@ -36,6 +44,18 @@ class Project_Validate_Car_NameNotExists extends Zend_Validate_Abstract
                 $select->where('end_year IS NULL');
             } else {
                 $select->where('end_year = ?', $ey);
+            }
+
+            if (is_null($bmy)) {
+                $select->where('begin_model_year IS NULL');
+            } else {
+                $select->where('begin_model_year = ?', $bmy);
+            }
+
+            if (is_null($emy)) {
+                $select->where('end_model_year IS NULL');
+            } else {
+                $select->where('end_model_year = ?', $emy);
             }
 
             if ($isGroup) {

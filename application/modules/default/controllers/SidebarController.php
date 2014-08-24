@@ -13,6 +13,14 @@ class SidebarController extends Zend_Controller_Action
             $aliases[] = $brandAliasRow->name;
         }
 
+        $brandLangTable = new Brand_Language();
+        $brandLangRows = $brandLangTable->fetchAll(array(
+            'brand_id = ?'    => $brand->id
+        ));
+        foreach ($brandLangRows as $brandLangRow) {
+            $aliases[] = $brandLangRow->name;
+        }
+
         usort($aliases, function($a, $b) {
             $la = mb_strlen($a);
             $lb = mb_strlen($b);
@@ -32,8 +40,8 @@ class SidebarController extends Zend_Controller_Action
 
         $select = $brandTable->select(true)
             ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.car_id', null)
-            ->join('cars', 'car_parent_cache.parent_id = cars.id', null)
+            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+            ->join('cars', 'car_parent_cache.car_id = cars.id', null)
             ->join('design_projects', 'cars.design_project_id = design_projects.id', null)
             ->where('design_projects.brand_id = ?', $brand->id)
             ->where('brands.id <> ?', $brand->id)
@@ -82,52 +90,62 @@ class SidebarController extends Zend_Controller_Action
         $carTable = $this->_helper->catalogue()->getCarTable();
 
         $brandCarTable = new Brand_Car();
+        $db = $brandCarTable->getAdapter();
 
-        $select = $brandCarTable->select(true)
-            ->join('cars', 'cars.id = brands_cars.car_id', null)
+        $select = $db->select()
+            ->from($brandCarTable->info('name'), array(
+                'brand_car_catname' => 'catname'
+            ))
+            ->join('cars', 'cars.id = brands_cars.car_id', array(
+                'car_id'   => 'id',
+                'car_name' => 'cars.caption'
+            ))
             ->where('brands_cars.brand_id = ?', $brand->id);
         if ($conceptsSeparatly) {
             $select->where('NOT cars.is_concept');
         }
 
-        $brandCarRows = $brandCarTable->fetchAll($select);
-
         $aliases = $this->_getBrandAliases($brand);
 
-        foreach ($brandCarRows as $brandCarRow) {
+        $language = $this->_helper->language();
 
-            $car = $carTable->find($brandCarRow->car_id)->current();
-            if (!$car) {
-                continue;
-            }
+        $carLanguageTable = new Car_Language();
 
-            if ($brandCarRow->catname) {
+        $groups = array();
+        foreach ($db->fetchAll($select) as $brandCarRow) {
+
+            if ($brandCarRow['brand_car_catname']) {
                 $url = $this->_helper->url->url(array(
                     'action'        => 'brand-car',
                     'brand_catname' => $brand->folder,
-                    'car_catname'   => $brandCarRow->catname
+                    'car_catname'   => $brandCarRow['brand_car_catname']
                 ), 'catalogue', true);
             } else {
                 $url = $this->_helper->url->url(array(
                     'action'        => 'car',
                     'brand_catname' => $brand->folder,
-                    'car_id'        => $car->id
+                    'car_id'        => $brandCarRow['car_id']
                 ), 'catalogue', true);
             }
 
-            $caption = $car->caption;
+            $carLangRow = $carLanguageTable->fetchRow(array(
+                'car_id = ?'   => (int)$brandCarRow['car_id'],
+                'language = ?' => (string)$language
+            ));
+
+            $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
             foreach ($aliases as $alias) {
                 $caption = str_ireplace('by '.$alias, '', $caption);
                 $caption = str_ireplace($alias.'-', '', $caption);
                 $caption = str_ireplace('-'.$alias, '', $caption);
 
-                $caption = preg_replace('/\b'.preg_quote($alias, '/').'\b/u', '', $caption);
+                $caption = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $caption);
             }
 
             $caption = trim(preg_replace("|[[:space:]]+|", ' ', $caption));
             $caption = ltrim($caption, '/');
             if (!$caption) {
-                $caption = $car->caption;
+                $caption = $brandCarRow['car_name'];
             }
             $groups[] = array(
                 'url'     => $url,
@@ -149,8 +167,9 @@ class SidebarController extends Zend_Controller_Action
             $db = $carTable->getAdapter();
             $select = $db->select()
                 ->from('cars', array(new Zend_Db_Expr('1')))
-                ->join('brands_cars_cache', 'cars.id=brands_cars_cache.car_id', null)
-                ->where('brands_cars_cache.brand_id = ?', $brand->id)
+                ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
+                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                ->where('brands_cars.brand_id = ?', $brand->id)
                 ->where('cars.is_concept')
                 ->limit(1);
             if ($db->fetchOne($select) > 0) {
@@ -185,7 +204,6 @@ class SidebarController extends Zend_Controller_Action
                 ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
                 ->where('type = ?', Picture::LOGO_TYPE_ID)
                 ->where('brand_id = ?', $brand->id)
-                ->limit(1)
         );
         if ($logoPicturesCount > 0)
             $groups[] = array(
@@ -204,7 +222,6 @@ class SidebarController extends Zend_Controller_Action
                 ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
                 ->where('type = ?', Picture::MIXED_TYPE_ID)
                 ->where('brand_id = ?', $brand->id)
-                ->limit(1)
         );
         if ($mixedPicturesCount > 0)
             $groups[] = array(
@@ -223,12 +240,12 @@ class SidebarController extends Zend_Controller_Action
                 ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
                 ->where('type = ?', Picture::UNSORTED_TYPE_ID)
                 ->where('brand_id = ?', $brand->id)
-                ->limit(1)
         );
+
         if ($unsortedPicturesCount > 0) {
             $groups[] = array(
-                'url' => $this->_helper->url->url(array(
-                    'action'        => 'unsorted',
+                'url'     => $this->_helper->url->url(array(
+                    'action'        => 'other',
                     'brand_catname' => $brand->folder
                 ), 'catalogue', true),
                 'caption' => $this->view->translate('unsorted'),

@@ -6,6 +6,33 @@ class Project_Controller_Action_Helper_Car
     protected $_perspectiveCache = array();
 
     /**
+     * @var Car_Language
+     */
+    protected $_carLangTable;
+
+    /**
+     * @var Twins_Groups
+     */
+    protected $_twinsGroupsTable;
+
+    protected function _getCarLanguageTable()
+    {
+        return $this->_carLangTable
+            ? $this->_carLangTable
+            : $this->_carLangTable = new Car_Language();
+    }
+
+    /**
+     * @return Twins_Groups
+     */
+    protected function _getTwinsGroupsTable()
+    {
+        return $this->_twinsGroupsTable
+            ? $this->_twinsGroupsTable
+            : $this->_twinsGroupsTable = new Twins_Groups();
+    }
+
+    /**
      * @return Project_Controller_Action_Helper_Car
      */
     public function direct()
@@ -47,7 +74,16 @@ class Project_Controller_Action_Helper_Car
         $urlHelper = $this->getActionController()->getHelper('Url');
 
         $twinsGroups = array();
-        foreach ($car->findTwins_GroupsViaTwins_Groups_Cars() as $twinsGroup) {
+
+        $rows = $this->_getTwinsGroupsTable()->fetchAll(
+            $this->_getTwinsGroupsTable()->select(true)
+                ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
+                ->join('car_parent_cache', 'twins_groups_cars.car_id=car_parent_cache.parent_id', null)
+                ->where('car_parent_cache.car_id = ?', $car->id)
+                ->group('twins_groups.id')
+        );
+
+        foreach ($rows as $twinsGroup) {
             $twinsGroups[] = array(
                 'url' => $urlHelper->url(array(
                     'module'         => 'default',
@@ -76,6 +112,8 @@ class Project_Controller_Action_Helper_Car
         $disableTwins         = isset($options['disableTwins']) && $options['disableTwins'];
         $disableLargePictures = isset($options['disableLargePictures']) && $options['disableLargePictures'];
         $disableSpecs         = isset($options['disableSpecs']) && $options['disableSpecs'];
+        $disableCategories    = isset($options['disableCategories']) && $options['disableCategories'];
+        $picturesDateSort     = isset($options['picturesDateSort']) && $options['picturesDateSort'];
 
         $controller = $this->getActionController();
         $urlHelper = $controller->getHelper('Url');
@@ -122,7 +160,7 @@ class Project_Controller_Action_Helper_Car
                     $designProjectData = array(
                         'brandName' => $brand->caption,
                         'url'       => $urlHelper->url(array(
-                            'action'                 => 'model-design-project',
+                            'action'                 => 'design-project',
                             'brand_catname'          => $brand->folder,
                             'design_project_catname' => $designProject->catname
                         ), 'catalogue', true)
@@ -131,33 +169,37 @@ class Project_Controller_Action_Helper_Car
             }
 
             $categories = array();
-            $categoryRows = $categoryTable->fetchAll(
-                $categoryTable->select(true)
-                    ->join('category_car', 'category.id = category_car.category_id', null)
-                    ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
-                    ->where('car_parent_cache.car_id = ?', $car->id)
-                    ->group('category.id')
-            );
-            foreach ($categoryRows as $category) {
-                $langRow = $categoryLanguageTable->fetchRow(array(
-                    'language = ?'    => $language,
-                    'category_id = ?' => $category->id
-                ));
-                $categories[] = array(
-                    'name' => $langRow ? $langRow['name'] : $category['name'],
-                    'url'  => $urlHelper->url(array(
-                        'controller'       => 'category',
-                        'action'           => 'category',
-                        'category_catname' => $category['catname'],
-                    ), 'category', true),
+            if (!$disableCategories) {
+                $categoryRows = $categoryTable->fetchAll(
+                    $categoryTable->select(true)
+                        ->join('category_car', 'category.id = category_car.category_id', null)
+                        ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
+                        ->where('car_parent_cache.car_id = ?', $car->id)
+                        ->group('category.id')
                 );
+                foreach ($categoryRows as $category) {
+                    $langRow = $categoryLanguageTable->fetchRow(array(
+                        'language = ?'    => $language,
+                        'category_id = ?' => $category->id
+                    ));
+                    $categories[] = array(
+                        'name' => $langRow ? $langRow['name'] : $category['name'],
+                        'url'  => $urlHelper->url(array(
+                            'controller'       => 'category',
+                            'action'           => 'category',
+                            'category_catname' => $category['catname'],
+                        ), 'category', true),
+                    );
+                }
             }
 
             $useLargeFormat = $totalPictures > 30 && !$disableLargePictures;
 
             $g = $this->_getPerspectiveGroupIds($useLargeFormat ? 5 : 4);
 
-            $pictureRows = $this->_getOrientedPictureList($car, $g, $oep, $type);
+            $pictureRows = $this->_getOrientedPictureList(
+                $car, $g, $oep, $type, $picturesDateSort
+            );
             $pictures = array();
             foreach ($pictureRows as $pictureRow) {
                 if ($pictureRow) {
@@ -203,76 +245,19 @@ class Project_Controller_Action_Helper_Car
                 } else {
 
                     $hasEquipes = count($car->findEquipes()) > 0;
-
                     if ($hasEquipes) {
-                        $modelsCars = $car->findModels_Cars();
-                        if (count($modelsCars) > 1) {
-                            $item = array();
-                            foreach ($modelsCars as $modelCar) {
-                                $model = $modelCar->findParentModels();
-                                $generation = $modelCar->findParentGenerations();
-                                $brand = $model->findParentBrands();
-                                if ($generation) {
-                                    $specsLinks[] = array(
-                                        'name' => $brand->caption . ' ' . $model->name . ' ' . $generation->shortname,
-                                        'url'  => $urlHelper->url(array(
-                                            'action'             => 'model-generation-specifications',
-                                            'brand_catname'      => $brand->folder,
-                                            'model_catname'      => $model->folder,
-                                            'generation_catname' => mb_strtolower($generation->shortname)
-                                        ), 'catalogue', true)
-                                    );
-                                } else {
-                                    $specsLinks[] = array(
-                                        'name' => $brand->caption . ' ' . $model->name,
-                                        'url'  => $urlHelper->url(array(
-                                            'action'        => 'model-specifications',
-                                            'brand_catname' => $brand->folder,
-                                            'model_catname' => $model->folder
-                                        ), 'catalogue', true)
-                                    );
-                                }
-                            }
-                        } elseif (count($modelsCars) > 0) {
-                            foreach ($modelsCars as $modelCar) {
-                                $model = $modelCar->findParentModels();
-                                $generation = $modelCar->findParentGenerations();
-                                $brand = $model->findParentBrands();
-                                if ($generation) {
-                                    $specsLinks[] = array(
-                                        'name' => null,
-                                        'url'  => $urlHelper->url(array(
-                                            'action'             => 'model-generation-specifications',
-                                            'brand_catname'      => $brand->folder,
-                                            'model_catname'      => $model->folder,
-                                            'generation_catname' => mb_strtolower($generation->shortname)
-                                        ), 'catalogue', true)
-                                    );
-                                } else {
-                                    $specsLinks[] = array(
-                                        'name' => null,
-                                        'url'  => $urlHelper->url(array(
-                                            'action'        => 'model-specifications',
-                                            'brand_catname' => $brand->folder,
-                                            'model_catname' => $model->folder
-                                        ), 'catalogue', true)
-                                    );
-                                }
-                            }
-                        } else {
-                            foreach ($car->findBrandsViaBrands_Cars() as $brand) {
-                                $specsLinks[] = array(
-                                    'name' => null,
-                                    'url'  => $urlHelper->url(array(
-                                        'module'        => 'default',
-                                        'contoller'     => 'catalogue',
-                                        'action'        => 'car-specifications',
-                                        'brand_catname' => $brand->folder,
-                                        'car_id'        => $car->id
-                                    ), 'catalogue', true)
-                                );
-                                break;
-                            }
+                        foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+                            $specsLinks[] = array(
+                                'name' => null,
+                                'url'  => $urlHelper->url(array(
+                                    'module'        => 'default',
+                                    'contoller'     => 'catalogue',
+                                    'action'        => 'car-specifications',
+                                    'brand_catname' => $brand->folder,
+                                    'car_id'        => $car->id
+                                ), 'catalogue', true)
+                            );
+                            break;
                         }
                     }
                 }
@@ -284,9 +269,16 @@ class Project_Controller_Action_Helper_Car
                     ->where('parent_id = ?', $car->id)
             );
 
+            $carLangRow = $this->_getCarLanguageTable()->fetchRow(array(
+                'car_id = ?'   => $car->id,
+                'language = ?' => $language
+            ));
+
             $item = array(
                 'id'               => $car->id,
                 'row'              => $car,
+                'name'             => $car->caption,
+                'langName'         => $carLangRow ? $carLangRow->name : null,
                 'produced'         => $car->produced,
                 'produced_exactly' => $car->produced_exactly,
                 'designProject'    => $designProjectData,
@@ -307,7 +299,9 @@ class Project_Controller_Action_Helper_Car
             if (count($item['pictures']) < $item['totalPictures']) {
 
                 if ($allPicturesUrl) {
+
                     $item['allPicturesUrl'] = $allPicturesUrl($car);
+
                 } else {
 
                     $brandCars = $car->findBrands_Cars();
@@ -333,20 +327,6 @@ class Project_Controller_Action_Helper_Car
                             }
                             break;
                         }
-                    } else {
-                        foreach ($car->findModelsViaModels_Cars() as $model) {
-                            $brand = $model->findParentBrands();
-
-                            $item['allPicturesUrl'] = $urlHelper->url(array(
-                                'module'        => 'default',
-                                'controller'    => 'catalogue',
-                                'action'        => 'model-car-pictures',
-                                'brand_catname' => $brand->folder,
-                                'model_catname' => $model->folder,
-                                'car_id'        => $car->id
-                            ), 'catalogue', true);
-                            break;
-                        }
                     }
                 }
             }
@@ -360,46 +340,31 @@ class Project_Controller_Action_Helper_Car
 
                 } else {
 
-                    $modelCars = $car->findModelsViaModels_Cars();
-                    if (count($modelCars)) {
-                        foreach ($modelCars as $model) {
-                            $brand = $model->findParentBrands();
-                            $url = $urlHelper->url(array(
-                                'module'        => 'default',
-                                'controller'    => 'catalogue',
-                                'action'        => 'model-car',
-                                'brand_catname' => $brand->folder,
-                                'model_catname' => $model->folder,
-                                'car_id'        => $car->id
-                            ), 'catalogue', true);
-                        }
-                    } else {
-                        $brandCarRows = $brandCarTable->fetchAll(array(
-                            'car_id = ?' => $car->id
-                        ));
-                        foreach ($brandCarRows as $brandCarRow) {
-                            $brand = $brandTable->find($brandCarRow->brand_id)->current();
-                            if ($brand) {
-                                if ($brandCarRow->catname) {
-                                    $url = $urlHelper->url(array(
-                                        'module'        => 'default',
-                                        'controller'    => 'catalogue',
-                                        'action'        => 'brand-car',
-                                        'brand_catname' => $brand->folder,
-                                        'car_catname'   => $brandCarRow->catname
-                                    ), 'catalogue', true);
-                                } else {
-                                    $url = $urlHelper->url(array(
-                                        'module'        => 'default',
-                                        'controller'    => 'catalogue',
-                                        'action'        => 'car',
-                                        'brand_catname' => $brand->folder,
-                                        'car_id'        => $car->id
-                                    ), 'catalogue', true);
-                                }
+                    $brandCarRows = $brandCarTable->fetchAll(array(
+                        'car_id = ?' => $car->id
+                    ));
+                    foreach ($brandCarRows as $brandCarRow) {
+                        $brand = $brandTable->find($brandCarRow->brand_id)->current();
+                        if ($brand) {
+                            if ($brandCarRow->catname) {
+                                $url = $urlHelper->url(array(
+                                    'module'        => 'default',
+                                    'controller'    => 'catalogue',
+                                    'action'        => 'brand-car',
+                                    'brand_catname' => $brand->folder,
+                                    'car_catname'   => $brandCarRow->catname
+                                ), 'catalogue', true);
+                            } else {
+                                $url = $urlHelper->url(array(
+                                    'module'        => 'default',
+                                    'controller'    => 'catalogue',
+                                    'action'        => 'car',
+                                    'brand_catname' => $brand->folder,
+                                    'car_id'        => $car->id
+                                ), 'catalogue', true);
                             }
-                            break;
                         }
+                        break;
                     }
                 }
 
@@ -501,7 +466,8 @@ class Project_Controller_Action_Helper_Car
             'perspectiveGroup'    => false,
             'allowModifications'  => false,
             'type'                => null,
-            'exclude'             => array()
+            'exclude'             => array(),
+            'dateSort'            => false
         );
         $options = array_merge($defaults, $options);
 
@@ -576,12 +542,20 @@ class Project_Controller_Action_Helper_Car
             $select->where('pictures.id not in (?)', $options['exclude']);
         }
 
-        $select->order(array_merge($order, $picturesOrder));
+        if ($options['dateSort']) {
+            $select->join(array('picture_car' => 'cars'), 'cars.id = picture_car.id', null);
+            $order = array_merge($order, array('picture_car.begin_order_cache', 'picture_car.end_order_cache'));
+        } else {
+            $order = array_merge($order, $picturesOrder);
+        }
+
+        $select->order($order);
 
         return $pictureTable->fetchRow($select);
     }
 
-    protected function _getOrientedPictureList($car, array $perspective_group_ids, $onlyExactlyPictures, $type)
+    protected function _getOrientedPictureList($car,
+        array $perspective_group_ids, $onlyExactlyPictures, $type, $dateSort)
     {
         $pictures = array();
         $usedIds = array();
@@ -592,7 +566,8 @@ class Project_Controller_Action_Helper_Car
                 'perspectiveGroup'    => $groupId,
                 'allowModifications'  => false,
                 'type'                => $type,
-                'exclude'             => $usedIds
+                'exclude'             => $usedIds,
+                'dateSort'            => $dateSort
             ));
 
             if (!$picture) {
@@ -601,7 +576,8 @@ class Project_Controller_Action_Helper_Car
                     'perspectiveGroup'    => $groupId,
                     'allowModifications'  => true,
                     'type'                => $type,
-                    'exclude'             => $usedIds
+                    'exclude'             => $usedIds,
+                    'dateSort'            => $dateSort
                 ));
             }
 
@@ -620,7 +596,8 @@ class Project_Controller_Action_Helper_Car
                         'onlyExactlyPictures' => $onlyExactlyPictures,
                         'allowModifications'  => $allowModification,
                         'type'                => $type,
-                        'exclude'             => $usedIds
+                        'exclude'             => $usedIds,
+                        'dateSort'            => $dateSort
                     ));
 
                     if ($pic) {

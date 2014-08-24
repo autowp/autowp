@@ -9,7 +9,7 @@
     <?php foreach ($this->brands as $brand) { ?>
         <ul class="nav nav-list"<?=$brand['active'] ? '' : ' style="display:none"'?>>
             <?php foreach ($brand['groups'] as $group) { ?>
-                <li<?=isset($group['childs']) && (count($group['childs']) > 0) ? ' class="dropdown-submenu"' : ''?>>
+                <li>
                     <?=$this->htmlA($group['url'], $this->escape($group['caption']) . (isset($group['count']) ? ' ' .$this->count($group['count']) : ''), false) ?>
                 </li>
             <?php } ?>

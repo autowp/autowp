@@ -1,4 +1,20 @@
+<?php
+    $lastType = null;
+?>
 <?php foreach ($this->cars as $car) { ?>
+    <?php if ($lastType != $car['type']) { ?>
+        <?php
+            $lastType = $car['type'];
+        ?>
+        <div class="text-muted">
+            <?php
+                switch ($car['type']) {
+                    case Car_Parent::TYPE_TUNING: print 'Tuning'; break;
+                    case Car_Parent::TYPE_SPORT:  print 'Sport'; break;
+                }
+            ?>
+        </div>
+    <?php } ?>
     <?php if ($car['haveChilds']) { ?>
         <div>
             <?=$this->htmlA(array(

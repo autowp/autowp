@@ -5,7 +5,7 @@
             <h3>
                 <?=$this->car($item['row'])->title()?>
                 <?php if ($item['designProject']) { ?>
-                    <sup class="designBrand">дизайн <?=$this->htmlA($item['designProject']['url'], $item['designProject']['brandName']) ?></sup>
+                    <sup class="designBrand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($item['designProject']['url'], $item['designProject']['brandName']))?></sup>
                 <?php } ?>
                 <?php if ($item['produced'] > 0) { ?>
                     <small>
@@ -23,6 +23,10 @@
                     </small>
                 <?php } ?>
             </h3>
+        <?php } ?>
+
+        <?php if ($item['langName'] && ($item['name'] != $item['langName'])) { ?>
+            <h4><?=$this->escape($item['langName'])?></h4>
         <?php } ?>
 
         <div class="row thumbnails">

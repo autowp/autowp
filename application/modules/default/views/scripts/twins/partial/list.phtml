@@ -1,34 +1,32 @@
 <?php foreach ($this->groups as $twinsGroup) { ?>
     <h3><?=$this->escape($twinsGroup['name'])?></h3>
 
-    <div class="thumbnails twins row">
-        <?php foreach ($twinsGroup['cars'] as $car) { ?>
-            <div class="col-lg-3 col-md-3">
-                <div class="thumbnail">
-                    <?php if ($car['picture']) { ?>
-                        <?=$this->htmlA(
-                            array(
-                                'href' => $this->pic($car['picture'])->url(),
-                            ),
-                            $this->image($car['picture'], 'file_name', array(
-                                'format' => 6,
-                                'alt'    => $car['picture']->getCaption(),
-                                'title'  => $car['picture']->getCaption(),
-                            )),
-                            false
-                        )?>
-                    <?php } else { ?>
-                        &#xa0;
-                    <?php } ?>
-                    <p><?=$this->escape($car['name'])?></p>
+    <?php while ($items = array_splice($twinsGroup['cars'], 0, 4)) { ?>
+        <div class="thumbnails twins row">
+            <?php foreach ($items as $car) { ?>
+                <div class="col-lg-3 col-md-3">
+                    <div class="thumbnail">
+                        <?php if ($car['picture']) { ?>
+                            <?=$this->htmlA(
+                                array(
+                                    'href' => $this->pic($car['picture'])->url(),
+                                ),
+                                $this->image($car['picture'], 'file_name', array(
+                                    'format' => 6,
+                                    'alt'    => $car['picture']->getCaption(),
+                                    'title'  => $car['picture']->getCaption(),
+                                )),
+                                false
+                            )?>
+                        <?php } else { ?>
+                            &#xa0;
+                        <?php } ?>
+                        <p><?=$this->escape($car['name'])?></p>
+                    </div>
                 </div>
-            </div>
-        <?php } ?>
-    </div>
-
-    <? /*while ($items = array_splice($bHtml, 0, 4)) {
-        $html .= '' . implode($items) . '';
-    }*/ ?>
+            <?php } ?>
+        </div>
+    <?php } ?>
 
     <ul class="carLinks">
         <li>

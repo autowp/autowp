@@ -5,11 +5,16 @@
             'needLeft'  => false,
             'needRight' => false
         ),
+        'pageTitle' => $this->title,
         'pageId' => 23,
         'args'   => array(
             'CATEGORY_SHORT_NAME' => $this->categoryLang ? $this->categoryLang->short_name : $this->category->short_name,
             'CATEGORY_NAME'       => $this->categoryLang ? $this->categoryLang->name : $this->category->name,
             'CATEGORY_CATNAME'    => $this->category->catname
+        ),
+        'breadcrumbsReplace' => array(
+            'pageId'      => 23,
+            'breadcrumbs' => $this->breadcrumbs
         )
     ));
 ?>

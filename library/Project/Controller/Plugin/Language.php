@@ -12,6 +12,16 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
      */
     protected $_languageWhitelist = array('en', 'ru');
 
+    protected $_skipHostname = array('i.wheelsage.org');
+
+    protected $_skipAction = array(
+        'default' => array(
+            'picture-file' => array(
+                'index'
+            )
+        )
+    );
+
     /**
      * @var string
      */
@@ -33,6 +43,22 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
         $language = $this->_defaultLanguage;
 
         $hostname = $request->getServer('HTTP_HOST');
+
+        if (in_array($hostname, $this->_skipHostname)) {
+            $controller = $request->getControllerName();
+            $module = $request->getModuleName();
+            if ($module === null) {
+                $module = 'default';
+            }
+
+            if (isset($this->_skipAction[$module][$controller])) {
+                $action = $request->getActionName();
+
+                if (in_array($action, $this->_skipAction[$module][$controller])) {
+                    return;
+                }
+            }
+        }
 
         $parts = explode('.', $hostname);
         if (count($parts) > 0) {

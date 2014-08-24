@@ -1,6 +1,6 @@
 <?php
 
-class Project_Form_Element_Year extends Zend_Form_Element_Text
+class Project_Form_Element_Year extends Project_Form_Element_Number
 {
     /**
      * Element label

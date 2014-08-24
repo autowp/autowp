@@ -10,16 +10,19 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
     protected $_monthFormat = '<small class="month">%02d.</small>';
 
     /**
-     * @var Car_Language
+     * @var Brands_Cars
      */
-    protected $_carLangTable;
+    protected $_brandCarTable;
 
-    protected function _getCarLanguageTable()
-    {
-        return $this->_carLangTable
-            ? $this->_carLangTable
-            : $this->_carLangTable = new Car_Language();
-    }
+    /**
+     * @var Car_Parent
+     */
+    protected $_carParentTable;
+
+    /**
+     * @var Brands
+     */
+    protected $_brandTable;
 
     public function car(Cars_Row $car = null)
     {
@@ -37,12 +40,7 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
         $car = $this->_car;
         $view = $this->view;
 
-        $carLangRow = $this->_getCarLanguageTable()->fetchRow(array(
-            'car_id = ?'   => $this->_car->id,
-            'language = ?' => $view->language()->get()
-        ));
-
-        $result = $view->escape($carLangRow ? $carLangRow->name : $car->caption);
+        $result = $view->escape($car->caption);
 
         if (strlen($car->body) > 0) {
             $result .= ' ('.$view->escape($car->body).')';
@@ -65,11 +63,11 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
         $ems = (int)($emy/100);
 
         $useModelYear = (bool)$bmy;
-        if ($useModelYear) {
+        /*if ($useModelYear) {
             if ($bmy == $by && $emy == $ey) {
                 $useModelYear = false;
             }
-        }
+        }*/
 
         $equalS = $bs && $es && ($bs == $es);
         $equalY = $equalS && $by && $ey && ($by == $ey);
@@ -77,11 +75,21 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
 
         if ($useModelYear) {
 
-            $mylabel = "<span title=\"модельный год\">";
+            $mylabel = '<span title="модельный год">';
             if ($emy == $bmy) {
                 $mylabel .= $bmy;
             } elseif ($bms == $ems) {
                 $mylabel .= $bmy.'–'.sprintf('%02d', $emy%100);
+            } elseif (!$emy) {
+                if ($car->today) {
+                    if ($bmy >= $cy) {
+                        $mylabel .= $bmy;
+                    } else {
+                        $mylabel .= $bmy.'–'.$view->translate('present-time-abbr');
+                    }
+                } else {
+                    $mylabel .= $bmy.'–??';
+                }
             } else {
                 $mylabel .= $bmy.'–'.$emy;
             }
@@ -91,7 +99,7 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
             $result = $mylabel . ' ' . $result;
 
             if ($by > 0 || $ey > 0) {
-                $result .= ' \'<span class="realyears" title="года выпуска">';
+                $result .= '<small> \'<span class="realyears" title="года выпуска">';
 
                 if ($equalM) {
                     $result .= sprintf($this->_monthFormat, $bm).$by;
@@ -114,18 +122,18 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
                                     '–'.($em ? sprintf($this->_monthFormat, $em) : '').$ey
                                     :
                                     (
-                                            $car->today
-                                            ?
-                                            ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
-                                            :
-                                            ($by < $cy ? '–????' : '')
+                                        $car->today
+                                        ?
+                                        ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
+                                        :
+                                        ($by < $cy ? '–????' : '')
                                     )
                             );
                         }
                     }
                 }
 
-                $result .= "</span>";
+                $result .= "</span></small>";
             }
         } else {
 
@@ -170,45 +178,102 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
 
     public function catalogueLinks()
     {
+        if (!$this->_car) {
+            return array();
+        }
+
         $result = array();
 
-        if (!$this->_car) {
-            return $result;
-        }
-
-        $car = $this->_car;
-        $view = $this->view;
-
-
-
-        foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+        foreach ($this->_carPublicUrls($this->_car) as $url) {
             $result[] = array(
-                'url' => $view->url(array(
+                'url' => $this->view->url(array(
                     'module'        => 'default',
                     'controller'    => 'catalogue',
-                    'action'        => 'car',
-                    'brand_catname' => $brand->folder,
-                    'car_id'        => $car->id
-                ), 'catalogue', true)
-            );
-        }
-
-        foreach ($car->findModels_Cars() as $modelCars) {
-            $model = $modelCars->findParentModels();
-            $brand = $model->findParentBrands();
-
-            $result[] = array(
-                'url' => $view->url(array(
-                    'module'        => 'default',
-                    'controller'    => 'catalogue',
-                    'action'        => 'model-car',
-                    'brand_catname' => $brand->folder,
-                    'model_catname' => $model->folder,
-                    'car_id'        => $car->id
+                    'action'        => 'brand-car',
+                    'brand_catname' => $url['brand_catname'],
+                    'car_catname'   => $url['car_catname'],
+                    'path'          => $url['path']
                 ), 'catalogue', true)
             );
         }
 
         return $result;
+    }
+
+    public function cataloguePaths()
+    {
+        return $this->_carPublicUrls($this->_car);
+    }
+
+    /**
+     * @return Brands_Cars
+     */
+    protected function _getBrandCarTable()
+    {
+        return $this->_brandCarTable
+            ? $this->_brandCarTable
+            : $this->_brandCarTable = new Brands_Cars();
+    }
+
+    /**
+     * @return Brands
+     */
+    protected function _getBrandTable()
+    {
+        return $this->_brandTable
+            ? $this->_brandTable
+            : $this->_brandTable = new Brands();
+    }
+
+    /**
+     * @return Car_Parent
+     */
+    protected function _getCarParentTable()
+    {
+        return $this->_carParentTable
+            ? $this->_carParentTable
+            : $this->_carParentTable = new Car_Parent();
+    }
+
+    protected function _carPublicUrls(Cars_Row $car)
+    {
+        return $this->_walkUpUntilBrand($car->id, array());
+    }
+
+    protected function _walkUpUntilBrand($id, array $path)
+    {
+        $urls = array();
+
+        $brandCarRows = $this->_getBrandCarTable()->fetchAll(array(
+            'car_id = ?' => $id
+        ));
+
+        foreach ($brandCarRows as $brandCarRow) {
+
+            $brand = $this->_getBrandTable()->find($brandCarRow->brand_id)->current();
+            if (!$brand) {
+                throw new Exception("Broken link `{$brandCarRow->brand_id}`");
+            }
+
+            $urls[] = array(
+                'brand_catname' => $brand->folder,
+                'car_catname'   => $brandCarRow->catname ? $brandCarRow->catname : 'car' . $brandCarRow->car_id,
+                'path'          => $path
+            );
+        }
+
+        $carParentTable = $this->_getCarParentTable();
+
+        $parentRows = $this->_getCarParentTable()->fetchAll(array(
+            'car_id = ?' => $id
+        ));
+        foreach ($parentRows as $parentRow) {
+            $urls = array_merge(
+                $urls,
+                $this->_walkUpUntilBrand($parentRow->parent_id, array_merge(array($parentRow->catname), $path))
+            );
+        }
+
+        return $urls;
     }
 }

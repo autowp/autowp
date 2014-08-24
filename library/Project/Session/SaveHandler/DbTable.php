@@ -101,7 +101,45 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
     {
         $return = false;
 
-        $data = array(
+        $db = $this->getAdapter();
+        $userIdColumn = $db->quoteIdentifier($this->_userIdColumn);
+        $modifiedColumn = $db->quoteIdentifier($this->_modifiedColumn);
+        $dataColumn = $db->quoteIdentifier($this->_dataColumn);
+        $lifetimeColumn = $db->quoteIdentifier($this->_lifetimeColumn);
+
+        if ($this->_overrideLifetime) {
+            $lifetime = $this->_lifetime;
+        } else {
+            $lifetime = new Zend_Db_Expr($lifetimeColumn);
+        }
+
+        $colNames = array($userIdColumn, $modifiedColumn, $dataColumn, $lifetimeColumn);
+        $colValues = array('?', '?', '?', '?');
+        $args = array($this->getUserId(), time(), (string)$data, $this->_lifetime);
+        $updateExprs = array(
+            $userIdColumn . ' = values('.$userIdColumn.')',
+            $modifiedColumn . ' = values('.$modifiedColumn.')',
+            $dataColumn . ' = values('.$dataColumn.')',
+            $lifetimeColumn . ' = '.$db->quote($lifetime)
+        );
+
+        $primary = $this->_getPrimary($id, self::PRIMARY_TYPE_ASSOC);
+        foreach ($primary as $column => $value) {
+            $colNames[] = $db->quoteIdentifier($column);
+            $colValues[] = '?';
+            $args[] = $value;
+        }
+
+        $sql = 'insert into ' . $db->quoteIdentifier($this->info('name')) .
+                   ' ('.implode(', ', $colNames) . ') ' .
+               'values (' . implode(', ', $colValues) . ') ' .
+               'on duplicate key update ' . implode(', ', $updateExprs);
+
+        $stmt = $db->query($sql, $args);
+
+        return $stmt->rowCount() > 0;
+
+        /*$data = array(
             $this->_userIdColumn   => $this->getUserId(),
             $this->_modifiedColumn => time(),
             $this->_dataColumn     => (string)$data
@@ -123,6 +161,6 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
             }
         }
 
-        return $return;
+        return $return;*/
     }
 }

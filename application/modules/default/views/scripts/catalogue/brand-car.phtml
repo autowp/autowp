@@ -53,6 +53,16 @@
             'action'     => 'car',
             'car_id'     => $this->car->id
         ), 'default', true), 'управление')?>
+
+        <?php if ($this->user()->isAllowed('car', 'add')) { ?>
+            <span class="glyphicon glyphicon-plus"></span>
+            <?=$this->htmlA($this->url(array(
+                'module'     => 'moder',
+                'controller' => 'cars',
+                'action'     => 'new',
+                'parent_id'     => $this->car->id
+            ), 'default', true), 'добавить автомобиль')?>
+        <?php } ?>
     </p>
 <?php } ?>
 
@@ -79,6 +89,10 @@
 <?php if ($this->hasHtml) { ?>
     <div class="text">
         <?=$this->car->html ?>
+    </div>
+<?php } elseif ($this->car->description) { ?>
+    <div class="text">
+        <?=$this->car->description ?>
     </div>
 <?php } ?>
 <?=$this->partial('cars.phtml', $this->childListData)?>

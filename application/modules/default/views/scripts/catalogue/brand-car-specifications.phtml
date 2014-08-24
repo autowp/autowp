@@ -19,4 +19,8 @@
         )
     ));
 ?>
-<?=$this->specifications($this->carList) ?>
+<?php if (isset($this->specs)) { ?>
+    <?=$this->specs->render($this)?>
+<?php } else { ?>
+    <?=$this->specifications($this->carList) ?>
+<?php } ?>

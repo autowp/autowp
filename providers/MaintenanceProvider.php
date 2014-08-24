@@ -202,4 +202,55 @@ class MaintenanceProvider extends Zend_Tool_Project_Provider_Abstract
 
         print "Garabage collected\n";
     }
+
+    public function rebuildCategoryParent()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db')
+            ->bootstrap('session');
+
+        $bootstrap = $zendApp->getBootstrap();
+
+        $cpTable = new Category_Parent();
+
+        $cpTable->rebuild();
+
+        print "Ok\n";
+    }
+
+    public function rebuildCarOrderCache()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('backCompatibility')
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db')
+            ->bootstrap('session');
+
+        $carTable = new Cars();
+
+        $paginator = Zend_Paginator::factory($carTable->select(true)->order('id'))
+            ->setItemCountPerPage(100);
+
+        $pagesCount = $paginator->count();
+        for ($i=1; $i<=$pagesCount; $i++) {
+            $paginator->setCurrentPageNumber($i);
+            foreach ($paginator->getCurrentItems() as $carRow) {
+                print $carRow->id . "\n";
+                $carRow->updateOrderCache();
+            }
+        }
+
+        print "ok\n";
+    }
 }

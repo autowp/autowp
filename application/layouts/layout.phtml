@@ -98,7 +98,7 @@ require(['application'], function(App) {
                 <footer class="footer">
                     <div class="row">
                         <div class="col-lg-6 col-md-6">
-                            <?=$this->htmlA(
+                            <? /*=$this->htmlA(
                                 'http://www.liveinternet.ru/click',
                                 $this->htmlImg(array(
                                     'src'   => 'http://counter.yadro.ru/hit?t16.11;r' . urlencode(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '') . ';' . rand(),
@@ -106,8 +106,8 @@ require(['application'], function(App) {
                                     'title' => 'liveinternet.ru'
                                 )),
                                 false
-                            )?>
-<?php $this->inlineScript()->captureStart() ?>
+                            ) */?>
+<?php /* $this->inlineScript()->captureStart() ?>
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-24654784-1']);
 _gaq.push(['_trackPageview']);
@@ -118,7 +118,7 @@ ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www')
 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
 <?php $this->inlineScript()->captureEnd() ?>
-<?=$this->inlineScript() ?>
+<?=$this->inlineScript() */ ?>
                         </div>
                         <div class="col-lg-6 col-md-6">
                             <p class="copyrights">

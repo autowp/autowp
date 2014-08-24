@@ -10,16 +10,11 @@
 ?>
 
 <div class="select-in-brand">
-    <?php foreach ($this->models as $model) { ?>
-        <div>
-            <?=$this->htmlA(array(
-                'href'      => '#',
-                'class'     => 'arrow',
-                'data-load' => $model['loadUrl']
-            ), '<span class="glyphicon glyphicon-plus-sign"></span> ' . $this->escape($this->brand->caption . ' ' . $model['name']), false) ?>
-            <div style="margin:0 0 4px 18px;display:none">
-                <div class="loading"><em>Loading ...</em></div>
-            </div>
+    <?php if (count($this->cars) > 0) { ?>
+        <div style="margin: 5px 0">
+            <?=$this->partial('upload/select-in-brand-cars.phtml', array(
+                'cars' => $this->cars
+            ))?>
         </div>
     <?php } ?>
 
@@ -33,26 +28,6 @@
             <div style="margin:0 0 4px 18px;display:none">
                 <div class="loading"><em>Loading ...</em></div>
             </div>
-        </div>
-    <?php } ?>
-
-    <?php if (count($this->cars) > 0) { ?>
-        <div style="margin: 5px 0">
-            <?php if (count($this->models) > 3) { ?>
-                <?=$this->htmlA(array(
-                    'href'  => '#',
-                    'class' => 'arrow'
-                ), '<span class="glyphicon glyphicon-plus-sign"></span> Другие автомобили', false) ?>
-                <div style="margin:0 0 4px 18px;display:none">
-                    <?=$this->partial('upload/select-in-brand-cars.phtml', array(
-                        'cars' => $this->cars
-                    ))?>
-                </div>
-            <?php } else { ?>
-                <?=$this->partial('upload/select-in-brand-cars.phtml', array(
-                    'cars' => $this->cars
-                ))?>
-            <?php } ?>
         </div>
     <?php } ?>
 

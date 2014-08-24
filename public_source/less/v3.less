@@ -88,16 +88,30 @@ dl.picture-behaviour {
     }
 }
 
-ul.pictures2 .picture-preview .moder-votes {
-    margin: 5px 3px 0;
-}
-
 .picture-preview {
     .thumbnail {
         margin: 0 auto 20px;
         max-width: 170px;
         .caption {
             padding: 2px 0 0;
+        }
+    }
+    
+    &.vote-accept {
+        .thumbnail {
+            .box-shadow(0 0 3px rgba(0,128,0,0.7));
+        }
+    }
+    
+    &.vote-remove {
+        .thumbnail {
+            .box-shadow(0 0 3px rgba(255,0,0,0.7));
+        }
+    }
+    
+    &.vote-neutral {
+        .thumbnail {
+            .box-shadow(0 0 3px rgba(240,173,78,0.7));
         }
     }
 }

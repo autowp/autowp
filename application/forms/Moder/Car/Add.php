@@ -27,15 +27,29 @@ class Application_Form_Moder_Car_Add extends Project_Form
                     'required'   => false,
                     'decorators' => array('ViewHelper')
                 )),
+                array('year', 'begin_model_year', array(
+                    'required'     => false,
+                    'label'        => 'Модельный год',
+                    'placeholder'  => 'с',
+                    'decorators'   => array('ViewHelper'),
+                )),
+                array('year', 'end_model_year', array(
+                    'required'     => false,
+                    'label'        => 'Модельный год',
+                    'placeholder'  => 'по',
+                    'decorators'   => array('ViewHelper'),
+                )),
                 array('year', 'begin_year', array(
-                    'required'   => false,
-                    'label'      => 'Выпускалась с',
-                    'decorators' => array('ViewHelper')
+                    'required'    => false,
+                    'label'       => 'Выпускалась',
+                    'placeholder' => 'с',
+                    'decorators'  => array('ViewHelper')
                 )),
                 array('year', 'end_year', array(
-                    'required'   => false,
-                    'label'      => 'Выпускалась по',
-                    'decorators' => array('ViewHelper')
+                    'required'    => false,
+                    'label'       => 'Выпускалась',
+                    'placeholder' => 'по',
+                    'decorators'  => array('ViewHelper')
                 )),
                 array('Car_Type', 'car_type_id', array(
                     'required'   => false,

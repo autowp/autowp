@@ -70,6 +70,8 @@ return array (
     'previous' => 'предыдущая',
 
     /* INDEX */
+    'index/brands'             => 'Компании',
+
     'back'    => 'назад',
     'forward' => 'вперед',
 
@@ -118,6 +120,7 @@ return array (
         'Произведено примерно %1$s единиц'
     ),
     'carlist/specifications' => 'технические характеристики',
+    'carlist/designed by %s'  => 'дизайн %s',
 
     'present-time-abbr'      => 'н.в.',
 

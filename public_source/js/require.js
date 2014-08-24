@@ -1,1 +1,0 @@
-../../vendor/jrburke/requirejs/require.js

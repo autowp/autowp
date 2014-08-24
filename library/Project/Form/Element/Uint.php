@@ -1,6 +1,6 @@
 <?php
 
-class Project_Form_Element_Uint extends Zend_Form_Element_Text
+class Project_Form_Element_Uint extends Project_Form_Element_Number
 {
     /**
      * @var string

@@ -1,0 +1,19 @@
+<tr>
+    <td style="padding-left:<?=5 + $this->deep*16?>px">
+        <?=$this->escape($this->attribute['name'])?>
+    </td>
+    <?php foreach ($this->table->getCars() as $car) { ?>
+        <td>
+            <?=$this->table->renderValue($this, $this->attribute, $car) ?>
+        </td>
+    <?php } ?>
+</tr>
+<?php if (!$this->table->preventedRenderSubAttributes($this->attribute['id'])) { ?>
+    <?php foreach ($this->attribute['childs'] as $child) { ?>
+        <?=$this->partial('specs-row.phtml', array(
+            'attribute' => $child,
+            'table'     => $this->table,
+            'deep'      => $this->deep + 1
+        ))?>
+    <?php } ?>
+<?php } ?>

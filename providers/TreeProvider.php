@@ -205,4 +205,42 @@ class TreeProvider extends Zend_Tool_Project_Provider_Abstract
 
         print "ok\n";
     }
+
+    public function carMeta($carId = null)
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+
+        $bootstrapResource = $this->_loadedProfile->search('BootstrapFile'); //get application bootstrap
+
+        /* @var $zendApp Zend_Application */
+        $zendApp = $bootstrapResource->getApplicationInstance(); //initialize application instance
+
+        $zendApp
+            ->bootstrap('backCompatibility')
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db')
+            ->bootstrap('session');
+
+        $carTable = new Cars();
+
+        $select = $carTable->select(true)->order('id');
+        if ($carId) {
+            $select->where('id = ?', $carId);
+        }
+
+        $paginator = Zend_Paginator::factory($select)
+            ->setItemCountPerPage(100);
+
+        $pagesCount = $paginator->count();
+        for ($i=1; $i<=$pagesCount; $i++) {
+            $paginator->setCurrentPageNumber($i);
+            foreach ($paginator->getCurrentItems() as $carRow) {
+                print $carRow->id . "\n";
+                $carTable->updateInteritance($carRow);
+            }
+        }
+
+        print "ok\n";
+    }
 }

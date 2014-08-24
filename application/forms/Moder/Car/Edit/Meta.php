@@ -4,6 +4,29 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
 {
     protected $_isGroupDisabled = false;
 
+    protected $_inheritedCarType = null;
+
+    protected $_inheritedIsConcept = null;
+
+    /**
+     * @var Car_Types
+     */
+    protected $_carTypeTable = null;
+
+    public function setInheritedCarType($value)
+    {
+        $this->_inheritedCarType = $value;
+
+        return $this;
+    }
+
+    public function setInheritedIsConcept($value)
+    {
+        $this->_inheritedIsConcept = $value === null ? null : (bool)$value;
+
+        return $this;
+    }
+
     protected function setIsGroupDisabled($value)
     {
         $this->_isGroupDisabled = (bool)$value;
@@ -11,9 +34,70 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
         return $this;
     }
 
+    /**
+     * @return Car_Types
+     */
+    protected function _getCarTypeTable()
+    {
+        return $this->_carTypeTable
+            ? $this->_carTypeTable
+            : $this->_carTypeTable = new Car_Types();
+    }
+
+    protected function _getCarTypeOptions($parentId = null)
+    {
+        if ($parentId) {
+            $filter = array(
+                'parent_id = ?' => $parentId
+            );
+        } else {
+            $filter = 'parent_id is null';
+        }
+
+        $rows = $this->_getCarTypeTable()->fetchAll($filter, 'position');
+        $result = array();
+        foreach ($rows as $row) {
+            $result[$row->id] = $row->name;
+
+            foreach ($this->_getCarTypeOptions($row->id) as $key => $value) {
+                $result[$key] = '...' . $value;
+            }
+        }
+
+        return $result;
+    }
+
     public function init()
     {
         parent::init();
+
+        $carTypeOptions = $this->_getCarTypeOptions();
+
+        $carTypeOptions = array('' => '-') + $carTypeOptions;
+
+        if (!is_null($this->_inheritedCarType)) {
+
+            $carType = $this->_getCarTypeTable()->find($this->_inheritedCarType)->current();
+            $carTypeName = $carType ? $carType->name : '-';
+
+            $carTypeOptions = array('inherited' => 'inherited (' . $carTypeName . ')') + $carTypeOptions;
+        } else {
+            $carTypeOptions = array('inherited' => 'inherited') + $carTypeOptions;
+        }
+
+        $isConceptOptions = array(
+            '0' => 'нет',
+            '1' => 'да',
+        );
+        if (!is_null($this->_inheritedIsConcept)) {
+            $isConceptOptions = array_merge(array(
+                'inherited' => 'inherited (' . ($this->_inheritedIsConcept ? 'да' : 'нет') . ')'
+            ), $isConceptOptions);
+        } else {
+            $isConceptOptions = array_merge(array(
+                'inherited' => 'inherited'
+            ), $isConceptOptions);
+        }
 
         $this->setOptions(array(
             'method'      => 'post',
@@ -36,10 +120,12 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'decorators'   => array('ViewHelper'),
                     'style'        => 'width: 30%'
                 )),
-                array('Car_Type', 'car_type_id', array(
+                array('select', 'car_type_id', array(
+                    'label'        => 'Тип кузова',
                     'required'     => false,
                     'order'        => 3,
                     'decorators'   => array('ViewHelper'),
+                    'multioptions' => $carTypeOptions,
                     'style'        => 'width: 30%'
                 )),
                 array('year', 'begin_model_year', array(
@@ -47,34 +133,38 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'label'        => 'с',
                     'placeholder'  => 'с',
                     'decorators'   => array('ViewHelper'),
-                    'style'        => 'width: 10%'
+                    'style'        => 'width: 10%',
+                    'min'          => 1800,
                 )),
                 array('year', 'end_model_year', array(
                     'required'     => false,
                     'label'        => 'по',
                     'placeholder'  => 'по',
                     'decorators'   => array('ViewHelper'),
-                    'style'        => 'width: 10%'
+                    'style'        => 'width: 10%',
+                    'min'          => 1800,
                 )),
                 array('year', 'begin_year', array(
                     'required'     => false,
                     'label'        => 'год',
                     'decorators'   => array('ViewHelper'),
                     'placeholder'  => 'год',
-                    'style'        => 'width: 10%'
+                    'style'        => 'width: 10%',
+                    'min'          => 1800,
                 )),
                 array('month', 'begin_month', array(
                     'required'     => false,
                     'label'        => 'месяц',
                     'decorators'   => array('ViewHelper'),
-                    'style'        => 'width: 20%'
+                    'style'        => 'width: 20%',
                 )),
                 array('year', 'end_year', array(
                     'required'     => false,
                     'label'        => 'год',
                     'decorators'   => array('ViewHelper'),
                     'placeholder'  => 'год',
-                    'style'        => 'width: 10%'
+                    'style'        => 'width: 10%',
+                    'min'          => 1800,
                 )),
                 array('month', 'end_month', array(
                     'required'     => false,
@@ -97,7 +187,9 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'required'     => false,
                     'label'        => 'единиц',
                     'decorators'   => array('ViewHelper'),
-                    'style'        => 'width: 10%'
+                    'style'        => 'width: 10%',
+                    'min'          => 0,
+                    'max'          => 100000000
                 )),
                 array('select', 'produced_exactly', array(
                     'required'     => false,
@@ -109,11 +201,13 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'decorators'   => array('ViewHelper'),
                     'style'        => 'width: 20%'
                 )),
-                array('checkbox', 'is_concept', array(
+                array('select', 'is_concept', array(
                     'required'     => false,
                     'label'        => 'Концепт (прототип)',
                     'order'        => 9,
-                    'decorators'   => array('ViewHelper')
+                    'multioptions' => $isConceptOptions,
+                    'decorators'   => array('ViewHelper'),
+                    'style'        => 'width: 20%'
                 )),
                 array('checkbox', 'is_group', array(
                     'required'     => false,

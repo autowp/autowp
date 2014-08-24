@@ -7,44 +7,25 @@
         ),
         'pageId' => 51,
     ));
-
-    if (($current = $this->paginator->getCurrentPageNumber()) < $this->paginator->count() ) {
-        $this->headLink(array(
-            'rel'  => 'prefetch',
-            'href' => $this->url(array(
-                'page' => $this->paginator->getCurrentPageNumber()+1
-            ), 'new', true)
-        ));
-        $this->headLink(array(
-            'rel'  => 'prerender',
-            'href' => $this->url(array(
-                'page' => $this->paginator->getCurrentPageNumber()+1
-            ), 'new', true)
-        ));
-    }
 ?>
 <div class="row">
     <div class="col-lg-4 col-md-4">
-        <h3 style="text-align:left"><?php if ($this->prevDate) { ?>
+        <h3 class="text-left"><?php if ($this->prev['date']) { ?>
             &#x2190;
-            <?=$this->htmlA($this->url(array(
-                'date' => $this->prevDate->toString($this->urlDateFormat)
-            ), 'new', true, true), $this->humanDate($this->prevDate)) ?>
-            <small>(<?=$this->translate(array('%1$s picures', null, $this->prevCount), $this->prevCount);?>)</small>
+            <?=$this->htmlA($this->prev['url'], $this->user()->humanDate($this->prev['date'])) ?>
+            <small>(<?=$this->translate(array('%1$s picures', null, $this->prev['count']), $this->prev['count'])?>)</small>
         <?php } ?></h3>
     </div>
     <div class="col-lg-4 col-md-4">
-        <h3 style="text-align:center">
-            <?=$this->humanDate($this->date)?>
-            <small>(<?=$this->translate(array('%1$s picures', null, $this->count), $this->count);?>)</small>
+        <h3 class="text-center">
+            <?=$this->user()->humanDate($this->current['date'])?>
+            <small>(<?=$this->translate(array('%1$s picures', null, $this->current['count']), $this->current['count'])?>)</small>
         </h3>
     </div>
     <div class="col-lg-4 col-md-4">
-        <h3 style="text-align:right"><?php if ($this->nextDate) { ?>
-            <?=$this->htmlA($this->url(array(
-                'date' => $this->nextDate->toString($this->urlDateFormat)
-            ), 'new', true, true), $this->humanDate($this->nextDate)) ?>
-            <small>(<?=$this->translate(array('%1$s picures', null, $this->nextCount), $this->nextCount);?>)</small>
+        <h3 class="text-right"><?php if ($this->next['date']) { ?>
+            <?=$this->htmlA($this->next['url'], $this->user()->humanDate($this->next['date'])) ?>
+            <small>(<?=$this->translate(array('%1$s picures', null, $this->next['count']), $this->next['count'])?>)</small>
             &#x2192;
         <?php } ?></h3>
     </div>

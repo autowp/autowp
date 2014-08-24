@@ -27,7 +27,7 @@ class Project_Controller_Router_Route_Most extends Project_Controller_Router_Rou
 
     public function match($path)
     {
-    $data = $this->_defaults;
+        $data = $this->_defaults;
 
         $path = trim($path, self::DELIMETER);
         $path = explode(self::DELIMETER, $path);
@@ -40,7 +40,7 @@ class Project_Controller_Router_Route_Most extends Project_Controller_Router_Rou
             return false;
         }
 
-        if ($path[0] != $this->_defaults['controller']) {
+        if ($path[0] != 'mosts') {
             return false;
         }
 
@@ -105,7 +105,7 @@ class Project_Controller_Router_Route_Most extends Project_Controller_Router_Rou
             }
         }
 
-        $url = array($data['controller']);
+        $url = array('mosts');
 
         switch ($data['action']) {
             case 'index':

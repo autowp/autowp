@@ -125,4 +125,11 @@ class Project_Controller_Action_Helper_User extends Zend_Controller_Action_Helpe
     {
         setcookie('remember', $hash, time() + 3600*24*30, '/', '.autowp.ru');
     }
+
+    public function timezone()
+    {
+        return $this->_user && $this->_user->timezone
+            ? $this->_user->timezone
+            : 'UTC';
+    }
 }

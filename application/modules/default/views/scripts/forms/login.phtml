@@ -12,10 +12,12 @@
         <div class="form-group<?=$errors ? ' has-error' : ''?>">
             <?php if ($element instanceof Zend_Form_Element_Checkbox) { ?>
                 <div class="col-lg-offset-3 col-lg-9 col-md-offset-3 col-md-9">
-                    <label class="checkbox" for="<?=$element->getId()?>">
-                        <?=$this->escape($element->getLabel())?>
-                        <?=$element?>
-                    </label>
+                    <div class="checkbox">
+                        <label for="<?=$element->getId()?>">
+                            <?=$element?>
+                            <?=$this->escape($element->getLabel())?>
+                        </label>
+                    </div>
                     <?php foreach ($errors as $error) { ?>
                         <p class="help-block"><?=$this->escape($error)?></p>
                     <?php } ?>

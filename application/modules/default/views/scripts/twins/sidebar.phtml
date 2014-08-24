@@ -1,17 +1,8 @@
 <div class="well">
-    <ul class="nav nav-list">
+    <ul class="nav nav-pills">
         <?php foreach ($this->brandList as $brand) { ?>
-            <?php
-                $selected = in_array($brand->id, $this->selected_brand_ids) ? ' class="selected"' : '';
-                $url = $this->url(array(
-                    'action' => 'brand',
-                    'brand_catname' => $brand->folder
-                ), 'twins', true, true);
-            ?>
-            <li<?= $selected ? ' class="active"' : ''?>>
-                <?=$this->htmlA(array(
-                    'href' => $url
-                ), $this->escape($brand->caption) . ' ' . $this->count($brand->twins_groups_count, $brand->new_twins_groups_count), false) ?>
+            <li<?= $brand['selected'] ? ' class="active"' : ''?>>
+                <?=$this->htmlA($brand['url'], $this->escape($brand['name']) . ' ' . $this->count($brand['count'], $brand['new_count']), false) ?>
             </li>
         <?php } ?>
     </ul>

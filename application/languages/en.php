@@ -63,6 +63,8 @@ return array (
     'previous'                 => 'previous',
 
     /* INDEX */
+    'index/brands'             => 'Brands',
+
     'back'                     => 'back',
     'forward'                  => 'forward',
 
@@ -108,6 +110,7 @@ return array (
         'Produced in about %1$s copies'
     ),
     'carlist/specifications'  => 'specifications',
+    'carlist/designed by %s'  => 'designed by %s',
 
     'present-time-abbr'       => 'pr.',
 

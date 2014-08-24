@@ -2,29 +2,17 @@
 
 class Project_Most
 {
-    /**
-     * @var Zend_Db_Adapter
-     */
-    protected $_db;
-
-    /**
-     * @var Zend_Db_Table
-     */
-    protected $_carsTable;
-
-    /**
-     * @var Zend_Db_Table
-     */
-    protected $_equipesTable;
-
     protected $_carsCount = 10;
+
+    /**
+     * @var Zend_Db_Table_Select
+     */
+    protected $_carsSelect;
 
     /**
      * @var Project_Most_Adapter_Abstract
      */
     protected $_adapter = array();
-
-    protected $_wheres = array();
 
     public function __construct(array $options)
     {
@@ -56,13 +44,6 @@ class Project_Most
     public function getCarsCount()
     {
         return $this->_carsCount;
-    }
-
-    public function setWheres($wheres)
-    {
-        $this->_wheres = $wheres;
-
-        return $this;
     }
 
     public function setAdapter($options)
@@ -103,23 +84,20 @@ class Project_Most
 
     public function getData()
     {
-        $select = $this->_carsTable->select(true)
-            ->limit($this->_carsCount);
+        $select = clone $this->_carsSelect;
 
-        foreach ($this->_wheres as $key => $value) {
-            if (is_numeric($key)) {
-                $select->where($value);
-            } else {
-                $select->where($key, $value);
-            }
-        }
+        $select->limit($this->_carsCount);
 
         return $this->_adapter->getCars($select);
     }
 
-    public function setCarsTable($table)
+    /**
+     * @param Zend_Db_Table_Select $select
+     * @return Project_Most
+     */
+    public function setCarsSelect(Zend_Db_Table_Select $select)
     {
-        $this->_carsTable = $table;
+        $this->_carsSelect = $select;
 
         return $this;
     }

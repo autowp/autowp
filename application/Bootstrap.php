@@ -24,6 +24,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         define('MYSQL_DATE', 'yyyy-MM-dd');
         define('MYSQL_TIME', 'HH:mm:ss');
         define('MYSQL_DATETIME', MYSQL_DATE . ' ' . MYSQL_TIME);
+        define('MYSQL_TIMEZONE', 'Europe/Moscow');
 
         require_once 'BBDocument.php';
     }
@@ -52,14 +53,4 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         Zend_Translate::setCache($longCache);
     }
 
-    protected function _initMail()
-    {
-        $options = $this->getOption('mail');
-        $host = $options['host'];
-        $params = $options;
-        unset($params['host']);
-
-        $transport = new Zend_Mail_Transport_Smtp($options['host'], $params);
-        Zend_Mail::setDefaultTransport($transport);
-    }
 }

@@ -166,4 +166,45 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
             && $this->view->acl()
                 ->inheritsRole($this->_user->role, $inherit);
     }
+
+    public function timezone()
+    {
+        return $this->_user && $this->_user->timezone
+            ? $this->_user->timezone
+            : 'UTC';
+    }
+
+    public function humanTime($time = null)
+    {
+        if ($time === null) {
+            require_once 'Zend/View/Exception.php';
+            throw new Zend_View_Exception('Expected parameter $time was not provided.');
+        }
+
+        require_once 'Zend/Date.php';
+        if (!($time instanceof Zend_Date)) {
+            $time = new Zend_Date($time);
+        }
+
+        $time->setTimeZone($this->timezone());
+
+        return $this->view->humanTime($time);
+    }
+
+    public function humanDate($time = null)
+    {
+        if ($time === null) {
+            require_once 'Zend/View/Exception.php';
+            throw new Zend_View_Exception('Expected parameter $time was not provided.');
+        }
+
+        require_once 'Zend/Date.php';
+        if (!($time instanceof Zend_Date)) {
+            $time = new Zend_Date($time);
+        }
+
+        $time->setTimeZone($this->timezone());
+
+        return $this->view->humanDate($time);
+    }
 }

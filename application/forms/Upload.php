@@ -2,7 +2,7 @@
 
 class Application_Form_Upload extends Project_Form
 {
-    protected $_maxFileSize = 4194304; //1024*1024*4;
+    protected $_maxFileSize = 10485760; //1024*1024*4;
 
     public function init()
     {
@@ -25,8 +25,8 @@ class Application_Form_Upload extends Project_Form
                     'validators'  => array(
                         array('Count', true, 1),
                         array('Size',  true, $this->_maxFileSize),
-                        //array('IsImage',    true),
-                        array('Extension',  true, 'jpg,jpeg,jpe'),
+                        array('IsImage',    true),
+                        array('Extension',  true, 'jpg,jpeg,jpe,png'),
                         array('ImageSizeInArray',  true, array(
                             'sizes' => Picture::getResolutions()
                         )),

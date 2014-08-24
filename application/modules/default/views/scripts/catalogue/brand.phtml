@@ -62,6 +62,14 @@
                 ), 'twins', true), '<span class="glyphicon glyphicon-adjust"></span> Twins', false)?>
             </li>
         <?php } ?>
+        <?php if ($this->mostsActive) { ?>
+            <li>
+                <?=$this->htmlA($this->url(array(
+                    'action'        => 'brand-mosts',
+                    'brand_catname' => $this->brand->folder
+                ), 'catalogue', true), '<span class="glyphicon glyphicon-sort-by-attributes-alt"></span> Mosts', false)?>
+            </li>
+        <?php } ?>
     </ul>
 </header>
 
