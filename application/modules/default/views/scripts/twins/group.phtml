@@ -7,8 +7,8 @@
         ),
         'pageId' => 26,
         'args'   => array(
-            'TWINS_GROUP_NAME' => $this->group->name,
-            'TWINS_GROUP_ID'   => $this->group->id
+            'TWINS_GROUP_NAME' => $this->group['name'],
+            'TWINS_GROUP_ID'   => $this->group['id']
         )
     ));
 ?>
@@ -31,12 +31,12 @@
     <?php } ?>
 </ul>
 
-<?php if (strlen($this->group->description)){ ?>
+<?php if (strlen($this->group['description'])){ ?>
     <h3>Описание</h3>
-    <div class="well"><?=$this->group->description ?></div>
+    <div class="well"><?=$this->group['description'] ?></div>
 <?php } ?>
 
 <?=$this->action('comments', 'comments', 'default', array(
     'type'    => Comment_Message::TWINS_TYPE_ID,
-    'item_id' => $this->group->id
+    'item_id' => $this->group['id']
 )) ?>

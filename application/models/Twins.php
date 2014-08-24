@@ -87,8 +87,8 @@ class Twins
                 'id',
                 'name'      => 'IFNULL(brand_language.name, brands.caption)',
                 'folder'    => 'folder',
-                'count'     => 'count(distinct tg.id)',
-                'new_count' => 'count(distinct if(tg.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), tg.id, null))',
+                'count'     => new Zend_Db_Expr('count(distinct tg.id)'),
+                'new_count' => new Zend_Db_Expr('count(distinct if(tg.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), tg.id, null))'),
             ))
             ->joinLeft('brand_language', $langExpr, null)
             ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
@@ -247,5 +247,50 @@ class Twins
         }
 
         return Zend_Paginator::factory($select);
+    }
+
+    /**
+     * @param int $groupId
+     * @return NULL|array
+     */
+    public function getGroup($groupId)
+    {
+        $row = $this->_getGroupsTable()->find($groupId)->current();
+        if (!$row) {
+            return null;
+        }
+
+        return array(
+            'id'          => $row->id,
+            'name'        => $row->name,
+            'description' => $row->description
+        );
+    }
+
+    /**
+     * @param int $carId
+     * @return array
+     */
+    public function getCarGroups($carId)
+    {
+        $groupTable = $this->_getGroupsTable();
+
+        $rows = $groupTable->fetchAll(
+            $groupTable->select(true)
+                ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
+                ->join('car_parent_cache', 'twins_groups_cars.car_id=car_parent_cache.parent_id', null)
+                ->where('car_parent_cache.car_id = ?', (int)$carId)
+                ->group('twins_groups.id')
+        );
+
+        $result = array();
+        foreach ($rows as $row) {
+            $result[] = array(
+                'id'   => $row->id,
+                'name' => $row->name
+            );
+        }
+
+        return $result;
     }
 }

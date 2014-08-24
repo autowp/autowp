@@ -11,9 +11,9 @@ class Project_Controller_Action_Helper_Car
     protected $_carLangTable;
 
     /**
-     * @var Twins_Groups
+     * @var Twins
      */
-    protected $_twinsGroupsTable;
+    protected $_twins;
 
     protected function _getCarLanguageTable()
     {
@@ -23,13 +23,13 @@ class Project_Controller_Action_Helper_Car
     }
 
     /**
-     * @return Twins_Groups
+     * @return Twins
      */
-    protected function _getTwinsGroupsTable()
+    protected function _getTwins()
     {
-        return $this->_twinsGroupsTable
-            ? $this->_twinsGroupsTable
-            : $this->_twinsGroupsTable = new Twins_Groups();
+        return $this->_twins
+            ? $this->_twins
+            : $this->_twins = new Twins();
     }
 
     /**
@@ -75,21 +75,13 @@ class Project_Controller_Action_Helper_Car
 
         $twinsGroups = array();
 
-        $rows = $this->_getTwinsGroupsTable()->fetchAll(
-            $this->_getTwinsGroupsTable()->select(true)
-                ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
-                ->join('car_parent_cache', 'twins_groups_cars.car_id=car_parent_cache.parent_id', null)
-                ->where('car_parent_cache.car_id = ?', $car->id)
-                ->group('twins_groups.id')
-        );
-
-        foreach ($rows as $twinsGroup) {
+        foreach ($this->_getTwins()->getCarGroups($car->id) as $twinsGroup) {
             $twinsGroups[] = array(
                 'url' => $urlHelper->url(array(
                     'module'         => 'default',
                     'controller'     => 'twins',
                     'action'         => 'group',
-                    'twins_group_id' => $twinsGroup->id
+                    'twins_group_id' => $twinsGroup['id']
                 ), 'twins', true),
             );
         }

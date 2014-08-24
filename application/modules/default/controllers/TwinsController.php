@@ -54,50 +54,48 @@ class TwinsController extends Zend_Controller_Action
 
     public function specificationsAction()
     {
-        $twinsGroupTable = new Twins_Groups();
-        $group = $twinsGroupTable->find($this->_getParam('twins_group_id'))->current();
-
+        $group = $this->_getTwins()->getGroup($this->_getParam('twins_group_id'));
         if (!$group) {
             return $this->_forward('notfound', 'error');
         }
 
         $this->view->assign(array(
             'group'   => $group,
-            'carList' => $this->_getTwins()->getGroupCars($group->id)
+            'carList' => $this->_getTwins()->getGroupCars($group['id'])
         ));
     }
 
     public function picturesAction()
     {
-        $twinsGroupTable = new Twins_Groups();
-        $group = $twinsGroupTable->find($this->_getParam('twins_group_id'))->current();
+        $twins = $this->_getTwins();
 
+        $group = $twins->getGroup($this->_getParam('twins_group_id'));
         if (!$group) {
             return $this->_forward('notfound', 'error');
         }
 
         $this->view->assign(array(
             'group'     => $group,
-            'paginator' => $this->_getTwins()->getGroupPicturesPaginator($group->id, array(
+            'paginator' => $twins->getGroupPicturesPaginator($group['id'], array(
                     'ordering' => $this->_helper->catalogue()->picturesOrdering()
                 ))
                 ->setItemCountPerPage(16)
                 ->setCurrentPageNumber($this->_getParam('page')),
         ));
 
-        $this->_loadBrands($this->_getTwins()->getGroupBrandIds($group->id));
+        $this->_loadBrands($twins->getGroupBrandIds($group['id']));
     }
 
     public function groupAction()
     {
-        $twinsGroupTable = new Twins_Groups();
+        $twins = $this->_getTwins();
 
-        $group = $twinsGroupTable->find($this->_getParam('twins_group_id'))->current();
+        $group = $twins->getGroup($this->_getParam('twins_group_id'));
         if (!$group) {
             return $this->_forward('notfound', 'error');
         }
 
-        $carList = $this->_getTwins()->getGroupCars($group->id);
+        $carList = $twins->getGroupCars($group['id']);
 
         $hasSpecs = false;
 
@@ -105,7 +103,7 @@ class TwinsController extends Zend_Controller_Action
             $hasSpecs = $hasSpecs || count($car->findEquipes()) > 0;
         }
 
-        $picturesCount = $this->_getTwins()->getGroupPicturesCount($group->id);
+        $picturesCount = $twins->getGroupPicturesCount($group['id']);
 
         $this->view->assign(array(
             'group'              => $group,
@@ -117,16 +115,16 @@ class TwinsController extends Zend_Controller_Action
             'picturesCount'      => $picturesCount,
             'hasSpecs'           => $hasSpecs,
             'specsUrl'           => $this->_helper->url->url(array(
-                'twins_group_id' => $group->id,
+                'twins_group_id' => $group['id'],
                 'action'         => 'specifications'
             ), 'twins', true),
             'picturesUrl'        => $this->_helper->url->url(array(
-                'twins_group_id' => $group->id,
+                'twins_group_id' => $group['id'],
                 'action'         => 'pictures'
             ), 'twins', true),
         ));
 
-        $this->_loadBrands($this->_getTwins()->getGroupBrandIds($group->id));
+        $this->_loadBrands($this->_getTwins()->getGroupBrandIds($group['id']));
     }
 
     protected function _prepareList($list)

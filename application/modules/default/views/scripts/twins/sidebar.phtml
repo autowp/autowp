@@ -1,5 +1,5 @@
 <div class="well">
-    <ul class="nav nav-pills">
+    <ul class="nav nav-pills nav-stacked">
         <?php foreach ($this->brandList as $brand) { ?>
             <li<?= $brand['selected'] ? ' class="active"' : ''?>>
                 <?=$this->htmlA($brand['url'], $this->escape($brand['name']) . ' ' . $this->count($brand['count'], $brand['new_count']), false) ?>
