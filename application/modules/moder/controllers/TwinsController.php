@@ -14,7 +14,7 @@ class Moder_TwinsController extends Zend_Controller_Action
      * @param My_Db_Table_Row $car
      * @return string
      */
-    private function twinsGroupModerUrl(Twins_Groups_Row $group)
+    private function twinsGroupModerUrl($group)
     {
         return $this->_helper->url->url(array(
             'module'          => 'moder',

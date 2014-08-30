@@ -116,63 +116,110 @@ dl.picture-behaviour {
     }
 }
 
-.message {
-    margin-bottom: 20px;
+.comments {
     
-    &.deleted {
-        .comment-restore-button {
-            display: inline-block;
-        }
-        .deleted-message {
-            display: block;
-        }
-        .photo, .text, .vote, .comment-remove-button {
+    .replies {
+        legend {
             display: none;
         }
+        form {
+            margin-left: 100px; 
+        }
+        .cancel {
+            display: block;
+        }
     }
     
-    .comment-restore-button, .deleted-message {
+    .cancel {
         display: none;
     }
-    
-    .text { 
-        background: white;
-        border: 1px solid #DDDDDD;
-        border-radius: 4px;
-        .box-shadow(0 1px 1px rgba(0, 0, 0, 0.075));
-        padding: 10px;
-        min-height: 100px;
-        margin-bottom: 10px;
-    }
-    
-    .vote {
-        margin-right: 20px;
+
+    .message {
+        margin-bottom: 20px;
         
-        .vote-up { 
-            color: #000;
-            &:hover, &.active {
-                color: #009900;
-            }
-        }
-        
-        .vote-down {
-            color: #000;
-            &:hover, &.active {
-                color: #cc0000;
-            }
-        }
-        
-        .value {
-            font-weight: bold;
+        .photo {
+            width: 70px;
+            float: left;
             
-            &.zero {
-                cursor: default;
-                text-decoration: none;
-                color: #000;
+            img {
+                max-width: 70px;
             }
         }
+        
+        .content {
+            margin-left: 100px;
+            min-height: 70px;
+            margin-bottom: 20px;
+        }
+        
+        &.deleted {
+            > .content {
+                > .deleted-message {
+                    display: block;
+                }
+                > .text {
+                    display: none;
+                }
+                > div {
+                    > .vote, > .comment-remove-button {
+                        display: none;
+                    }
+                    > .comment-restore-button {
+                        display: inline-block;
+                    }
+                }
+            }
+            > .photo {
+                display: none;
+            }
+        }
+        
+        .comment-restore-button, .deleted-message {
+            display: none;
+        }
+        
+        .text { 
+            background: white;
+            border: 1px solid #DDDDDD;
+            border-radius: 4px;
+            .box-shadow(0 1px 1px rgba(0, 0, 0, 0.075));
+            padding: 10px;
+            min-height: 70px;
+            margin-bottom: 10px;
+        }
+        
+        .vote {
+            margin-right: 20px;
+            
+            .vote-up { 
+                color: #000;
+                &:hover, &.active {
+                    color: #009900;
+                }
+            }
+            
+            .vote-down {
+                color: #000;
+                &:hover, &.active {
+                    color: #cc0000;
+                }
+            }
+            
+            .value {
+                font-weight: bold;
+                
+                &.zero {
+                    cursor: default;
+                    text-decoration: none;
+                    color: #000;
+                }
+            }
+        }
+        
+        .replies {
+            margin-left: 30px;
+        }
     }
-    
 }
 
 .thumbnail { background: white }
@@ -332,45 +379,8 @@ sup.designBrand {
     padding: 1px 2px;
     background-color: white;
     font-weight: normal;
+    white-space: nowrap;
 } 
-
-/** ex picture.css **/
-#picture_voting_bar {
-    background-image: url(/img/stars.gif);
-    background-repeat: repeat-x;
-    background-position: 0 0;
-    height: 25px;
-    width: 250px;
-    cursor: pointer;
-    margin: 0 auto 10px;
-}
-
-#voting_bar_positive {
-    background-image: url(/img/stars.gif);
-    background-repeat: repeat-x;
-    background-position: 0 -25px;
-    height: 25px;
-    width: 0px;
-    cursor: pointer;
-    margin: 0 auto 0 0;
-}
-
-#voting_bar_vote {
-    background-image: url(/img/stars.gif);
-    background-repeat: repeat-x;
-    background-position: 0 -50px;
-    height: 25px;
-    width: 0px;
-    cursor: pointer;
-    display: none;
-    margin: 0 auto 0 0;
-}
-
-.voted { 
-    #voting_bar_positive, #voting_bar_vote, &#picture_voting_bar {
-        cursor: default;
-       }
-}
 
 span.count {
     font-size: 11px;

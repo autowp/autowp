@@ -8,7 +8,8 @@
         domReady: 'lib/requirejs-plugins/domReady',
         jquery: 'lib/jquery',
         tinymce: '/tiny_mce/jquery.tinymce.min',
-        'jquery.cookie': '/js/lib/jquery.cookie'
+        'jquery.cookie': 'lib/jquery.cookie',
+        raphael: 'lib/raphael'
     },
     //name: "application",
     mainConfigFile: 'js/config.js',

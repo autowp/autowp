@@ -12,7 +12,7 @@ class Forums_ThemeController extends Zend_Controller_Action
 
         $themeTable = new Forums_Themes();
         $topicsTable = new Forums_Topics();
-        $msgTable = new Comment_Message();
+        $comments = new Comments();
         $commentTopicTable = new Comment_Topic();
 
         $select = $themeTable->select(true)
@@ -45,12 +45,7 @@ class Forums_ThemeController extends Zend_Controller_Action
                 ->setCurrentPageNumber($this->_getParam('page'));
 
             foreach ($paginator->getCurrentItems() as $topicRow) {
-
-                $topicPaginator = Zend_Paginator::factory(
-                    $msgTable->select()
-                        ->where('item_id = ?', $topicRow->id)
-                        ->where('type_id = ?', Comment_Message::FORUMS_TYPE_ID)
-                )
+                $topicPaginator = $comments->getMessagePaginator(Comment_Message::FORUMS_TYPE_ID, $topicRow->id)
                     ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
                     ->setPageRange(10);
 
@@ -80,10 +75,7 @@ class Forums_ThemeController extends Zend_Controller_Action
                 $lastMessageAuthor = false;
                 $lastMessageUrl = false;
                 if ($messages > 0) {
-                    $lastMessage = $msgTable->getLastMessage(
-                        Comment_Message::FORUMS_TYPE_ID,
-                        $topicRow->id
-                    );
+                    $lastMessage = $comments->getLastMessageRow(Comment_Message::FORUMS_TYPE_ID, $topicRow->id);
                     if ($lastMessage) {
                         $lastMessageDate = $lastMessage->getDate('datetime');
                         $lastMessageAuthor = $lastMessage->findParentUsersByAuthor();
@@ -145,10 +137,7 @@ class Forums_ThemeController extends Zend_Controller_Action
                     ->order('comment_topic.last_update DESC')
             );
             if ($lastTopic) {
-                $lastMessage = $msgTable->fetchRow(array(
-                    'type_id = ?' => Comment_Message::FORUMS_TYPE_ID,
-                    'item_id = ?' => $lastTopic->id
-                ), 'datetime DESC');
+                $lastMessage = $comments->getLastMessageRow(Comment_Message::FORUMS_TYPE_ID, $lastTopic->id);
             }
 
             $themes[] = array(

@@ -4,9 +4,35 @@ class Application_Form_Upload extends Project_Form
 {
     protected $_maxFileSize = 10485760; //1024*1024*4;
 
+    protected $_miltipleFiles = false;
+
     public function init()
     {
         parent::init();
+
+        $pictureOptions = array (
+            'label'       => 'Файл картинки',
+            'required'    => true,
+            'validators'  => array(
+                array('Size', true, $this->_maxFileSize),
+                array('IsImage', true),
+                array('Extension', true, 'jpg,jpeg,jpe,png'),
+                array('ImageSizeInArray', true, array(
+                    'sizes' => Picture::getResolutions()
+                )),
+            ),
+            'MaxFileSize' => $this->_maxFileSize,
+            'decorators'  => array('File'),
+        );
+
+        if ($this->_miltipleFiles) {
+            $pictureOptions['multiple'] = 'multiple';
+            $pictureOptions['isArray'] = true;
+            array_unshift(
+                $pictureOptions['validators'],
+                array('Count', true, 1)
+            );
+        }
 
         $this->setOptions(array(
             'method'     => 'post',
@@ -19,22 +45,7 @@ class Application_Form_Upload extends Project_Form
                 'Form'
             ),
             'elements' => array(
-                array ('file', 'picture', array (
-                    'label'       => 'Файл картинки',
-                    'required'    => true,
-                    'validators'  => array(
-                        array('Size',  true, $this->_maxFileSize),
-                        array('IsImage',    true),
-                        array('Extension',  true, 'jpg,jpeg,jpe,png'),
-                        array('ImageSizeInArray', true, array(
-                            'sizes' => Picture::getResolutions()
-                        )),
-                    ),
-                    'MaxFileSize' => $this->_maxFileSize,
-                    'decorators'  => array('File'),
-                    'multiple'    => 'multiple',
-                    'isArray'     => true
-                )),
+                array ('file', 'picture', $pictureOptions),
                 array ('text', 'note', array (
                     'required'    => false,
                     'label'       => 'Примечание к картинке',
@@ -48,5 +59,16 @@ class Application_Form_Upload extends Project_Form
                 )),
             )
         ));
+    }
+
+    /**
+     * @param boolean $value
+     * @return Application_Form_Upload
+     */
+    public function setMultipleFiles($value)
+    {
+        $this->_miltipleFiles = (bool)$value;
+
+        return $this;
     }
 }

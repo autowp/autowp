@@ -1,0 +1,38 @@
+<?php
+    $this->element->setAttrib(
+        'class',
+        $this->element->getAttrib('class') . ' add-message'
+    );
+?>
+<fieldset>
+    <?php if ($legend = $this->element->getLegend()) { ?>
+        <legend><?=$this->escape($legend)?></legend>
+    <?php } ?>
+    <?php if ($element = $this->element->getElement('message')) { ?>
+        <div class="form-group <?=$element->hasErrors() ? ' has-error' : ''?>">
+            <div class="controls">
+                <?=$element?>
+                <?php foreach ($element->getMessages() as $error) { ?>
+                    <div class="alert alert-danger" role="alert"><?=$this->escape($error)?></div>
+                <?php } ?>
+            </div>
+        </div>
+    <?php } ?>
+    <?php if ($element = $this->element->getElement('moderator_attention')) { ?>
+        <div class="form-group <?=$element->hasErrors() ? ' has-error' : ''?>">
+            <div class="controls checkbox">
+                <div class="pull-right cancel">
+                    <button class="btn btn-xs btn-warning">Отменить</button>
+                </div>
+                <label for="moderator_attention">
+                    <?=$element?> <?=$this->escape($element->getLabel())?>
+                </label>
+            </div>
+        </div>
+    <?php } ?>
+    <?=$this->element->getElement('parent_id')?>
+    <?=$this->element->getElement('resolve')?>
+    <div>
+        <button type="submit" class="btn btn-primary">Отправить</button>
+    </div>
+</fieldset>

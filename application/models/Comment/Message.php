@@ -29,16 +29,6 @@ class Comment_Message extends Zend_Db_Table
         )
     );
 
-    private static $_addForm;
-
-    public static function getAddForm($options)
-    {
-        if (!self::$_addForm) {
-            self::$_addForm = new Application_Form_Comment($options);
-        }
-        return self::$_addForm;
-    }
-
     public function getMessagesCount($typeId, $itemId)
     {
         return $this->getAdapter()->fetchOne(
@@ -68,4 +58,6 @@ class Comment_Message extends Zend_Db_Table
             'type_id = ?' => $typeId
         ), 'datetime DESC');
     }
+
+
 }

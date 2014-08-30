@@ -1,0 +1,24 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 80,
+    ));
+
+    $this->layout()->moduleName = 'default/account/pm';
+?>
+<?php if ($this->paginator->count()) { ?>
+    <form action="<?=$this->escape($this->url(array(
+        'controller' => 'account',
+        'action'     => 'clear-sent-messages'
+    )))?>" method="post">
+        <input type="submit" value="Удалить все отправленные сообщения" class="btn btn-danger" />
+    </form>
+<?php } ?>
+<div class="comments">
+    <?=$this->personalMessages($this->paginator->getCurrentItems()) ?>
+</div>
+<?=$this->paginationControl($this->paginator) ?>

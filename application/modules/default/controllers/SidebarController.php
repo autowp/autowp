@@ -85,9 +85,20 @@ class SidebarController extends Zend_Controller_Action
         return $groups;
     }
 
-    protected function _carGroups($brand, $conceptsSeparatly)
+    protected function _carGroups($brand, $conceptsSeparatly, $carId)
     {
         $carTable = $this->_helper->catalogue()->getCarTable();
+
+        $selectedIds = array();
+        if ($carId) {
+            $db = $carTable->getAdapter();
+            $selectedIds = $db->fetchCol(
+                $db->select()
+                    ->distinct()
+                    ->from('car_parent_cache', 'parent_id')
+                    ->where('car_id = ?', $carId)
+            );
+        }
 
         $brandCarTable = new Brand_Car();
         $db = $brandCarTable->getAdapter();
@@ -150,13 +161,14 @@ class SidebarController extends Zend_Controller_Action
             $groups[] = array(
                 'url'     => $url,
                 'caption' => $caption,
+                'active'  => in_array($brandCarRow['car_id'], $selectedIds)
             );
         }
 
         return $groups;
     }
 
-    public function _otherGroups($brand, $conceptsSeparatly)
+    public function _otherGroups($brand, $conceptsSeparatly, $type, $isConcepts, $isEngines)
     {
         $groups = array();
 
@@ -178,7 +190,8 @@ class SidebarController extends Zend_Controller_Action
                         'action'        => 'concepts',
                         'brand_catname' => $brand->folder
                     ), 'catalogue', true),
-                    'caption' => $this->view->translate('concepts and prototypes')
+                    'caption' => $this->view->translate('concepts and prototypes'),
+                    'active'  => $isEngines
                 );
             }
         }
@@ -190,7 +203,8 @@ class SidebarController extends Zend_Controller_Action
                     'action'        => 'engines',
                     'brand_catname' => $brand->folder
                 ), 'catalogue', true),
-                'caption' => $this->view->translate('engines')
+                'caption' => $this->view->translate('engines'),
+                'active'  => $isConcepts
             );
 
 
@@ -213,6 +227,7 @@ class SidebarController extends Zend_Controller_Action
                 ), 'catalogue', true),
                 'caption' => $this->view->translate('logotypes'),
                 'count'   => $logoPicturesCount,
+                'active'  => isset($type) && $type == Picture::LOGO_TYPE_ID
             );
 
         // ссылка на страницу с разным
@@ -231,6 +246,7 @@ class SidebarController extends Zend_Controller_Action
                 ), 'catalogue', true),
                 'caption' => $this->view->translate('mixed'),
                 'count'   => $mixedPicturesCount,
+                'active'  => isset($type) && $type == Picture::MIXED_TYPE_ID
             );
 
         // ссылка на страницу с несортированным
@@ -250,24 +266,26 @@ class SidebarController extends Zend_Controller_Action
                 ), 'catalogue', true),
                 'caption' => $this->view->translate('unsorted'),
                 'count'   => $unsortedPicturesCount,
+                'active'  => isset($type) && $type == Picture::UNSORTED_TYPE_ID
             );
         }
 
         return $groups;
     }
 
+
     protected function _getNamespace()
     {
         return new Zend_Session_Namespace(__CLASS__);
     }
 
-    protected function _brandGroups($brand)
+    protected function _brandGroups($brand, $type, $carId, $isConcepts, $isEngines)
     {
         $conceptsSeparatly = !in_array($brand->type_id, array(3, 4));
 
         // создаем массив групп
         $groups = array_merge(
-            $this->_carGroups($brand, $conceptsSeparatly),
+            $this->_carGroups($brand, $conceptsSeparatly, $carId),
             $this->_subBrandGroups($brand),
             $this->_designProjectBrandGroups($brand)
         );
@@ -280,7 +298,7 @@ class SidebarController extends Zend_Controller_Action
 
         $groups = array_merge(
             $groups,
-            $this->_otherGroups($brand, $conceptsSeparatly)
+            $this->_otherGroups($brand, $conceptsSeparatly, $type, $isConcepts, $isEngines)
         );
 
         return $groups;
@@ -294,10 +312,16 @@ class SidebarController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
         }
 
+        $carId = (int)$this->_getParam('car_id');
+        $type = $this->_getParam('type');
+        $type = strlen($type) ? (int)$type : null;
+        $isConcepts = (bool)$this->getParam('is_concepts');
+        $isEngines = (bool)$this->getParam('is_engines');
+
         $namespace = $this->_getNamespace();
         $namespace->selected = $brand->id;
 
-        $this->view->groups = $this->_brandGroups($brand);
+        $this->view->groups = $this->_brandGroups($brand, $type, $carId, $isConcepts, $isEngines);
         $this->_helper->viewRenderer->setResponseSegment('sidebar');
     }
 
@@ -313,6 +337,12 @@ class SidebarController extends Zend_Controller_Action
 
         $ids = (array)$this->_getParam('brand_id');
 
+        $carId = (int)$this->_getParam('car_id');
+        $type = $this->_getParam('type');
+        $type = strlen($type) ? (int)$type : null;
+        $isConcepts = (bool)$this->getParam('is_concepts');
+        $isEngines = (bool)$this->getParam('is_engines');
+
         $result = array();
 
         if ($ids) {
@@ -323,7 +353,7 @@ class SidebarController extends Zend_Controller_Action
             foreach ($brands as $brand) {
                 $result[] = array(
                     'brand'  => $brand,
-                    'groups' => $this->_brandGroups($brand),
+                    'groups' => $this->_brandGroups($brand, $type, $carId, $isConcepts, $isEngines),
                     'active' => false
                 );
             }

@@ -6,7 +6,7 @@ class Forums_IndexController extends Zend_Controller_Action
     {
         $themeTable = new Forums_Themes();
         $topicsTable = new Forums_Topics();
-        $msgTable = new Comment_Message();
+        $comments = new Comments();
 
         $user = $this->_helper->user()->get();
         $isModearator = $user &&
@@ -34,10 +34,7 @@ class Forums_IndexController extends Zend_Controller_Action
                     ->order('comment_topic.last_update DESC')
             );
             if ($lastTopic) {
-                $lastMessage = $msgTable->fetchRow(array(
-                    'type_id = ?' => Comment_Message::FORUMS_TYPE_ID,
-                    'item_id = ?' => $lastTopic->id
-                ), 'datetime DESC');
+                $lastMessage = $comments->getLastMessageRow(Comment_Message::FORUMS_TYPE_ID, $lastTopic->id);
             }
 
             $subthemes = array();

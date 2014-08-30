@@ -1,0 +1,16 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 128,
+    ));
+
+    $this->layout()->moduleName = 'default/account/pm';
+?>
+<div class="comments">
+    <?=$this->personalMessages($this->paginator->getCurrentItems()) ?>
+</div>
+<?=$this->paginationControl($this->paginator) ?>

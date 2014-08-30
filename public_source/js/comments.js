@@ -11,7 +11,7 @@ define(
             var itemId = $element.data('commentsItemId');
             var type = $element.data('commentsType');
             
-            $element.find('.moderator-attention-sign').each(function() {
+            /*$element.find('.moderator-attention-sign').each(function() {
                 var $block = $(this);
                 var id = $block.data('id');
                 var $btn = $('.btn', this);
@@ -50,7 +50,7 @@ define(
                     $(self).hide();
                     $element.find('.message').remove()
                 }, 'json');
-            });
+            });*/
             
             $element.find('.comment-remove-button').on('click', function(e) {
                 e.preventDefault();
@@ -157,6 +157,43 @@ define(
                         $btnClose.button('reset');
                     });
                 });
+            });
+            
+            var $form = $element.find('form.add-message');
+            var $textarea = $form.find(':input[name=message]');
+            var resolveText = 'fixed';
+            
+            $element.on('click', '.reply', function() {
+                var $msg = $(this).closest('.message');
+                $msg.children('.replies').prepend($form);
+                $form.find(':input[name=parent_id]').val($msg.data('id'));
+                $form.find(':input[name=resolve]').val('');
+                
+                if ($textarea.val() == resolveText) {
+                    $textarea.val('');
+                }
+            });
+            
+            $element.on('click', '.resolve', function() {
+                var $msg = $(this).closest('.message');
+                $msg.children('.replies').prepend($form);
+                $form.find(':input[name=parent_id]').val($msg.data('id'));
+                $form.find(':input[name=resolve]').val('1');
+                
+                if ($textarea.val().length == 0) {
+                    $textarea.val(resolveText);
+                }
+            });
+            
+            $form.find('.cancel .btn').on('click', function(e) {
+                e.preventDefault();
+                $form.find(':input[name=parent_id]').val('');
+                $element.find('.form-holder').append($form);
+                $form.find(':input[name=resolve]').val('');
+                
+                if ($textarea.val() == resolveText) {
+                    $textarea.val('');
+                }
             });
         };
         

@@ -105,6 +105,16 @@ class Application_Form_Moder_Inbox extends Project_Form
                     'label'        => 'Добавил',
                     'decorators'   => array('ViewHelper'),
                 )),
+                array('select', 'replace', array(
+                    'required'     => false,
+                    'label'        => 'Замена',
+                    'multioptions' => array(
+                        ''  => 'не важно',
+                        '1' => 'замена',
+                        '0' => 'кроме замен',
+                    ),
+                    'decorators'   => array('ViewHelper')
+                )),
                 array('select', 'requests', array(
                     'required'     => false,
                     'label'        => 'Заявки на принятие/удаление',

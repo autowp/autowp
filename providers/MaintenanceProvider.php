@@ -253,4 +253,23 @@ class MaintenanceProvider extends Zend_Tool_Project_Provider_Abstract
 
         print "ok\n";
     }
+
+    public function commentsRepliesCount()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('backCompatibility')
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db');
+
+        $comments = new Comments();
+
+        $affected = $comments->updateRepliesCount();
+
+        print "ok $affected\n";
+    }
 }

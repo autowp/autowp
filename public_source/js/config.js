@@ -9,7 +9,8 @@ require.config({
         jquery: 'lib/jquery.min',
         tinymce: '/tiny_mce/jquery.tinymce.min',
         'jquery.cookie': '/js/lib/jquery.cookie',
-        typeahead: 'lib/bootstrap3-typeahead'
+        typeahead: 'lib/bootstrap3-typeahead',
+        raphael: 'lib/raphael'
     },
     shim: {
         'bootstrap': {
