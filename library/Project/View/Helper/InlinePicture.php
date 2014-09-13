@@ -14,18 +14,28 @@ class Project_View_Helper_InlinePicture extends Zend_View_Helper_Abstract
 
         $caption = $picture->getCaption();
 
-        $html = (string)$this->view->image($picture, 'file_name', array(
-            'format' => 6,
-            'alt'    => $caption,
-            'title'  => $caption,
-            //'style'  => $style
-        ));
+        if ($picture->image_id) {
+            $imageHtml = $this->view->img($picture->getFormatRequest(), array(
+                'format'  => 'picture-thumb',
+                'alt'     => $caption,
+                'title'   => $caption,
+                'shuffle' => true
+            ));
+        } else {
+            $image = $this->view->image($picture, 'file_name', array(
+                'format'  => 6,
+                'alt'     => $caption,
+                'title'   => $caption,
+                'shuffle' => true
+            ));
+            $imageHtml = $image->exists() ? $image : '';
+        }
 
         return
             $view->htmlA(array(
                 'href'  => $url,
                 'class' => 'inline-picture-preview thumbnail thumbnail-inline'
-            ), $html, false) .
+            ), $imageHtml, false) .
             '<div class="inline-picture-details" style="display:none;">'.
                 '<h5>' . $view->htmlA($url, $picture->getCaption()) . '</h5>' .
                 $view->getHelper('pictures')->behaviour($picture) .

@@ -470,4 +470,58 @@ class Comments
             set comments_messages.replies_count = __cms.count
         ');
     }
+
+    private function _moveMessageRecursive($parentId, $newTypeId, $newItemId)
+    {
+        $newTypeId = (int)$newTypeId;
+        $newItemId = (int)$newItemId;
+        $parentId = (int)$parentId;
+
+        $rows = $this->_getMessageTable()->fetchAll(array(
+            'parent_id = ?' => $parentId
+        ));
+
+        foreach ($rows as $row) {
+            $row->setFromArray(array(
+                'item_id' => $newItemId,
+                'type_id' => $newTypeId
+            ));
+            $row->save();
+
+            $this->_moveMessageRecursive($row->id, $newTypeId, $newItemId);
+        }
+    }
+
+    public function moveMessage($id, $newTypeId, $newItemId)
+    {
+        $messageRow = $this->getMessageRow($id);
+        if (!$messageRow) {
+            return false;
+        }
+
+        $newTypeId = (int)$newTypeId;
+        $newItemId = (int)$newItemId;
+
+        if ($messageRow->item_id == $newItemId && $messageRow->type_id == $newTypeId) {
+            return false;
+        }
+
+        $oldTypeId = $messageRow->type_id;
+        $oldItemId = $messageRow->item_id;
+
+        $messageRow->setFromArray(array(
+            'item_id'   => $newItemId,
+            'type_id'   => $newTypeId,
+            'parent_id' => null
+        ));
+        $messageRow->save();
+
+        $this->_moveMessageRecursive($messageRow->id, $newTypeId, $newItemId);
+
+        $commentTopicTable = new Comment_Topic();
+        $commentTopicTable->updateTopicStat($oldTypeId, $oldItemId);
+        $commentTopicTable->updateTopicStat($newTypeId, $newItemId);
+
+        return true;
+    }
 }

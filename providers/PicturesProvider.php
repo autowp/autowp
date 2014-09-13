@@ -16,16 +16,20 @@ class PicturesProvider extends Zend_Tool_Project_Provider_Abstract
         $zendApp = $bootstrapResource->getApplicationInstance(); //initialize application instance
 
         $zendApp
+            ->bootstrap('backCompatibility')
             ->bootstrap('phpEnvoriment')
             ->bootstrap('autoloader')
-            ->bootstrap('db');
+            ->bootstrap('db')
+            ->bootstrap('imageStorage');
+
+        $imageStorage = $zendApp->getBootstrap()->getResource('imageStorage');
 
 
         $table = new Picture();
         $pictures = $table->fetchAll(
             $table->select(true)
                 ->where('status = ?', Picture::STATUS_REMOVING)
-                ->where('ISNULL(removing_date) OR (removing_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY) )')
+                ->where('removing_date is null OR (removing_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY) )')
                 ->limit(1000)
         );
 
@@ -46,7 +50,12 @@ class PicturesProvider extends Zend_Tool_Project_Provider_Abstract
             $progressBar = new Zend_ProgressBar($adapter, 0, count($pictures));
 
             foreach ($pictures as $idx => $picture) {
-                $picture->delete();
+                if ($picture->image_id) {
+                    $picture->delete();
+                    $imageStorage->removeImage($picture->image_id);
+                } else {
+                    print "Brokern image `{$picture->id}`. Skip\n";
+                }
 
                 $progressBar->update($idx + 1, $picture->id);
             }

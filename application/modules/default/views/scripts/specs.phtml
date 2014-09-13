@@ -15,10 +15,14 @@
             <?php foreach ($this->table->getCars() as $car) { ?>
                 <td style="padding:0">
                     <?php if ($car['topPicture']) { ?>
-                        <?=$this->htmlA($this->pic($car['topPicture'])->url(), $this->image($car['topPicture'], 'file_name', array(
-                            'format'  => 6,
-                            'shuffle' => true
-                        )), false)?>
+                        <?=$this->htmlA(
+                            $this->pic($car['topPicture'])->url(),
+                            $this->img($car['topPicture']->getFormatRequest(), array(
+                                'format'  => 'picture-thumb',
+                                'shuffle' => true
+                            )),
+                            false
+                        )?>
                     <?php } ?>
                 </td>
             <?php } ?>
@@ -40,10 +44,14 @@
             <?php foreach ($this->table->getCars() as $car) { ?>
                 <td style="padding:0">
                     <?php if ($car['bottomPicture']) { ?>
-                        <?=$this->htmlA($this->pic($car['bottomPicture'])->url(), $this->image($car['bottomPicture'], 'file_name', array(
-                            'format'  => 6,
-                            'shuffle' => true
-                        )), false)?>
+                        <?=$this->htmlA(
+                            $this->pic($car['bottomPicture'])->url(),
+                            $this->image($car['bottomPicture']->getFormatRequest(), array(
+                                'format'  => 'picture-thumb',
+                                'shuffle' => true
+                            )),
+                            false
+                        )?>
                     <?php } ?>
                 </td>
             <?php } ?>

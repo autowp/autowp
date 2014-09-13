@@ -1,0 +1,28 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ),
+        'pageId' => 83,
+    ));
+?>
+
+<?php if (!$this->theme) { ?>
+    <?php foreach ($this->themes as $theme) { ?>
+        <h2>
+            <?=$this->htmlA($this->url(array(
+                'theme_id' => $theme->id
+            )), $theme->caption) ?>
+        </h2>
+    <?php } ?>
+<?php } else { ?>
+    <?php foreach ($this->topics as $topic) { ?>
+        <p>
+            <?=$this->htmlA($this->url(array(
+                'topic_id' => $topic->id
+            )), $topic->caption) ?>
+        </p>
+    <?php } ?>
+<?php } ?>

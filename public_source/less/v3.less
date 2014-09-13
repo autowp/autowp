@@ -524,3 +524,193 @@ span.unit {
 .produced {
     white-space: nowrap;
 }
+
+body.gallery-shown {
+    overflow: hidden;
+}
+
+.gallery {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 999999;
+    overflow: hidden;
+    background: #000;
+    background: rgba(0,0,0,.9);
+    -ms-touch-action: none;
+    touch-action: none;
+    display: none;
+    
+    .carousel {
+        width: 100%;
+        height: 100%;
+        
+        .item {
+            text-align: center;
+            height: 100%;
+            overflow: hidden;
+            
+            img {
+                margin: 0 auto;
+                max-height: none;
+                max-width: none;
+                position: absolute;
+                
+                .transition(.6s ease-in-out width, .6s ease-in-out height, .6s ease-in-out left, .6s ease-in-out top, .6s ease-in-out opacity;);
+            }
+            
+            img.full {
+                .opacity(1);
+            } 
+            
+            img.crop {
+                .opacity(0);
+            }
+            
+            &.crop {
+                img.full {
+                    .opacity(0);
+                } 
+                img.crop {
+                    .opacity(1);
+                }
+            }
+            
+            &:hover {
+                .carousel-control.full {
+                    display: block;
+                }
+            }
+            
+            &.loading {
+                .carousel-control.full {
+                    display: none;
+                }
+                .loading {
+                    display: block;
+                }
+            }
+            
+            .loading {
+                display: none;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                margin-top: -20px;
+                margin-left: -20px;
+                font-size: 40px;
+                color: #fff;
+                line-height: 0.7;
+                
+                -webkit-animation: spin 1s linear infinite;
+                -moz-animation: spin 1s linear infinite;
+                animation: spin 1s linear infinite;
+            }
+        }
+        
+        .carousel-inner {
+            height: 100%;
+        }
+    }
+    
+    .carousel-indicators {
+        bottom: auto;
+        top: 20px;
+        height: 15%;
+        
+        li {
+            .box-shadow(e("inset 0 0px 4px rgba(0,0,0,0.5), 0 0px 4px rgba(0,0,0,0.5)"));
+            
+            &.active {
+                .box-shadow(0 0px 4px rgba(0,0,0,0.5));
+            }
+        }
+    }
+    
+    .carousel-control.close {
+        right: 0;
+        left: auto;
+        height: 15%;
+        width: 15%;
+        
+        .glyphicon {
+            margin-top: -15px;
+            top: 50%;
+        }
+    }
+    
+    @controlWidth: 7.5%;
+    
+    .carousel-control {
+        &.download, &.details, &.comments {
+            top: auto;
+            bottom: 20px;
+            height: auto;
+            width: @controlWidth;
+            .opacity(1);
+            text-shadow: 0 0px 4px #000;
+            
+            .badge {
+                position: absolute;
+                top: 0;
+                left: 50%;
+                margin-top: -6px;
+                font-size: 10px;
+                padding: 2px 5px;
+                
+                span {
+                    color: #cc0000;
+                }
+            }
+        }
+        
+        &:visited {
+            color: #fff;
+        }
+    }
+    
+    .carousel-control.download {
+        left: 50% - @controlWidth * 1.5;
+    }
+    
+    .carousel-control.details {
+        left: 50% - @controlWidth * 0.5;
+    }
+    
+    .carousel-control.comments {
+        left: 50% + @controlWidth * 0.5;
+    }
+    
+    .carousel-control.full {
+        display: none;
+        left: 50%;
+        top: 50%;
+        right: auto;
+        bottom: auto;
+        width: 20px;
+        margin-left: -10px;
+        margin-top: -10px;
+        .opacity(1);
+    }
+    
+    .carousel-caption {
+        text-shadow: 0 0px 4px #000;
+        .opacity(1);
+        margin-bottom: 30px;
+        padding-bottom: 0;
+    }
+}
+
+@-moz-keyframes spin { 
+    100% { -moz-transform: rotate(360deg); } 
+}
+@-webkit-keyframes spin { 
+    100% { -webkit-transform: rotate(360deg); } 
+}
+@keyframes spin { 
+    100% { 
+        -webkit-transform: rotate(360deg); transform:rotate(360deg); 
+    } 
+}

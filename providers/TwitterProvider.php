@@ -12,7 +12,6 @@ class TwitterProvider extends Zend_Tool_Project_Provider_Abstract
             ->where('pictures.car_id = ?', $car->id)
             ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
             ->order(array(
-                'pictures.ratio DESC', 'pictures.votes DESC',
                 'pictures.width DESC', 'pictures.height DESC',
                 'pictures.views DESC'
             ))

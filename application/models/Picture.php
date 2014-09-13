@@ -8,7 +8,6 @@ class Picture extends Project_Db_Table
         LOGO_TYPE_ID     = 2,
         MIXED_TYPE_ID    = 3,
         ENGINE_TYPE_ID   = 4,
-        MODEL_TYPE_ID    = 5,
         INTERIOR_TYPE_ID = 6;
 
     const
@@ -19,8 +18,6 @@ class Picture extends Project_Db_Table
         STATUS_INBOX    = 'inbox',
         DEFAULT_STATUS  = self::STATUS_INBOX;
 
-    const SOURCE_FOLDER = 'pictures/';
-
     protected $_name = 'pictures';
 
     protected $_rowClass = 'Pictures_Row';
@@ -29,11 +26,6 @@ class Picture extends Project_Db_Table
         'Car' => array(
             'columns'       => array('car_id'),
             'refTableClass' => 'Cars',
-            'refColumns'    => array('id')
-        ),
-        'Model' => array(
-            'columns'       => array('model_id'),
-            'refTableClass' => 'Models',
             'refColumns'    => array('id')
         ),
         'Brand' => array(
@@ -66,10 +58,6 @@ class Picture extends Project_Db_Table
             'refTableClass' => 'Sources',
             'refColumns'    => array('id')
         ),
-    );
-
-    protected $_images = array(
-        'file_name' => array ('dir' => 'pictures')
     );
 
     protected static $_resolutions = array (

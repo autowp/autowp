@@ -191,7 +191,7 @@ class SidebarController extends Zend_Controller_Action
                         'brand_catname' => $brand->folder
                     ), 'catalogue', true),
                     'caption' => $this->view->translate('concepts and prototypes'),
-                    'active'  => $isEngines
+                    'active'  => $isConcepts
                 );
             }
         }
@@ -204,7 +204,7 @@ class SidebarController extends Zend_Controller_Action
                     'brand_catname' => $brand->folder
                 ), 'catalogue', true),
                 'caption' => $this->view->translate('engines'),
-                'active'  => $isConcepts
+                'active'  => $isEngines
             );
 
 

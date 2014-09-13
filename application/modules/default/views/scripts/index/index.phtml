@@ -21,17 +21,33 @@
                         <?php if ($idx == 0) { ?>
                             <?php if ($picture) { ?>
                                 <div class="col-lg-8 col-md-8 col-sm-8">
-                                    <?php if ($image = $this->image($picture, 'file_name', array(
-                                        'format' => 10,
-                                        'title'  => $picture->getCaption(array(
-                                            'language' => $this->language()->get()
-                                        ))
-                                    ))) { ?>
-                                        <?php if ($image->exists()) { ?>
-                                            <?=$this->htmlA(array(
-                                                'href'  => $this->pic($picture)->url(),
-                                                'class' => 'thumbnail'
-                                            ), $image, false)?>
+                                    <?php if ($picture->image_id) { ?>
+                                        <?php if ($image = $this->img($picture->getFormatRequest(), array(
+                                            'format' => 'picture-medium',
+                                            'title'  => $picture->getCaption(array(
+                                                'language' => $this->language()->get()
+                                            ))
+                                        ))) { ?>
+                                            <?php if ($image->exists()) { ?>
+                                                <?=$this->htmlA(array(
+                                                    'href'  => $this->pic($picture)->url(),
+                                                    'class' => 'thumbnail'
+                                                ), $image, false)?>
+                                            <?php } ?>
+                                        <?php } ?>
+                                    <?php } else { ?>
+                                        <?php if ($image = $this->image($picture, 'file_name', array(
+                                            'format' => 10,
+                                            'title'  => $picture->getCaption(array(
+                                                'language' => $this->language()->get()
+                                            ))
+                                        ))) { ?>
+                                            <?php if ($image->exists()) { ?>
+                                                <?=$this->htmlA(array(
+                                                    'href'  => $this->pic($picture)->url(),
+                                                    'class' => 'thumbnail'
+                                                ), $image, false)?>
+                                            <?php } ?>
                                         <?php } ?>
                                     <?php } ?>
                                 </div>
@@ -42,8 +58,8 @@
                         <?php foreach ($this->carOfDayPictures as $idx => $picture) { ?>
                             <?php if ($idx == 1 || $idx == 2) { ?>
                                 <?php if ($picture) { ?>
-                                    <?php if ($image = $this->image($picture, 'file_name', array(
-                                        'format' => 6,
+                                    <?php if ($image = $this->img($picture->getFormatRequest(), array(
+                                        'format' => 'picture-thumb',
                                         'title'  => $picture->getCaption(array(
                                             'language' => $this->language()->get()
                                         ))
@@ -67,8 +83,8 @@
                                 <?php if ($idx > 2) { ?>
                                     <?php if ($picture) { ?>
                                         <div class="col-lg-4 col-md-4 col-sm-4 col-6">
-                                            <?php if ($image = $this->image($picture, 'file_name', array(
-                                                'format' => 6,
+                                            <?php if ($image = $this->img($picture->getFormatRequest(), array(
+                                                'format' => 'picture-thumb',
                                                 'title'  => $picture->getCaption(array(
                                                     'language' => $this->language()->get()
                                                 ))

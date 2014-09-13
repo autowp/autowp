@@ -16,16 +16,28 @@ class Project_View_Helper_PictureListHorizontal2 extends Zend_View_Helper_Abstra
                 $caption = $picture->getCaption(array(
                     'language' => $language
                 ));
-                $img = $this->view->image($picture, 'file_name', array(
-                    'format' => 6,
-                    'alt'    => $caption,
-                    'title'  => $caption,
-                ));
+
+                if ($picture->image_id) {
+                    $imageHtml = $this->view->img($picture->getFormatRequest(), array(
+                            'format'  => 'picture-thumb',
+                            'alt'     => $caption,
+                            'title'   => $caption,
+                            'shuffle' => true
+                    ));
+                } else {
+                    $image = $this->view->image($picture, 'file_name', array(
+                            'format'  => 6,
+                            'alt'     => $caption,
+                            'title'   => $caption,
+                            'shuffle' => true
+                    ));
+                    $imageHtml = $image->exists() ? $image : '';
+                }
 
                 $pictureHtml = $this->view->htmlA(array(
                     'href'  => $this->view->pic($picture)->url(),
                     'class' => 'thumbnail'
-                ), $img, false);
+                ), $imageHtml, false);
             } else {
                 $pictureHtml = '&#xa0;';
             }

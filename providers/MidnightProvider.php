@@ -86,12 +86,12 @@ class MidnightProvider extends Zend_Tool_Project_Provider_Abstract
         $db->query($sql);
 
 
-        $brands = new Brands();
+        /*$brands = new Brands();
         foreach ($brands->fetchAll() as $brand) {
             $brand->refreshActivePicturesCount();
         }
 
-        echo "\r\nUpdated brands active pictures count\r\n";
+        echo "\r\nUpdated brands active pictures count\r\n";*/
     }
 
     public function expiredPictureVotes()

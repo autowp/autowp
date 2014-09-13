@@ -16,11 +16,11 @@ class Application_Form_Moder_Car_Organize extends Application_Form_Moder_Car_New
         parent::init();
 
         $this->addElements(array(
-            array('checkbox', 'is_group', array(
+            array('hidden', 'is_group', array(
                 'required'     => false,
                 'label'        => 'Группа',
                 'decorators'   => array('ViewHelper'),
-                'disabled'     => true,
+                'readonly'     => true,
                 'order'        => 10,
             )),
             array('MultiCheckbox', 'childs', array(

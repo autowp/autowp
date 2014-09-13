@@ -464,9 +464,7 @@ class Project_Controller_Action_Helper_Car
         $options = array_merge($defaults, $options);
 
         $picturesOrder = array(
-            'pictures.ratio DESC', 'pictures.votes DESC',
-            'pictures.width DESC', 'pictures.height DESC',
-            'pictures.views DESC'
+            'pictures.width DESC', 'pictures.height DESC'
         );
 
         $pictureTable = $this->_getPictureTable();
