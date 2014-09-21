@@ -179,4 +179,8 @@ return array (
     'most/bigclearance/param' => 'clearance',
     'most/smallclearance' => 'small clearance',
     'most/smallclearance/param' => 'clearance',
+
+    /* upload */
+    'upload/picture/crop' => 'crop',
+    'upload/picture/cropped-to' => 'cropped to %s',
 );

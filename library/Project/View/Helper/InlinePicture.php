@@ -14,22 +14,12 @@ class Project_View_Helper_InlinePicture extends Zend_View_Helper_Abstract
 
         $caption = $picture->getCaption();
 
-        if ($picture->image_id) {
-            $imageHtml = $this->view->img($picture->getFormatRequest(), array(
-                'format'  => 'picture-thumb',
-                'alt'     => $caption,
-                'title'   => $caption,
-                'shuffle' => true
-            ));
-        } else {
-            $image = $this->view->image($picture, 'file_name', array(
-                'format'  => 6,
-                'alt'     => $caption,
-                'title'   => $caption,
-                'shuffle' => true
-            ));
-            $imageHtml = $image->exists() ? $image : '';
-        }
+        $imageHtml = $this->view->img($picture->getFormatRequest(), array(
+            'format'  => 'picture-thumb',
+            'alt'     => $caption,
+            'title'   => $caption,
+            'shuffle' => true
+        ));
 
         return
             $view->htmlA(array(

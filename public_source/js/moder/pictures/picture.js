@@ -1,7 +1,7 @@
 define(
     'moder/pictures/picture',
-    ['jquery', 'bootstrap', 'tinymce'],
-    function($, Bootstrap, Tinymce) {
+    ['jquery', 'bootstrap', 'tinymce', 'crop-dialog'],
+    function($, Bootstrap, Tinymce, CropDialog) {
         return {
             init: function(options) {
                 
@@ -74,6 +74,22 @@ define(
                     }, 'json');
                 });
                 
+                var cropDialog;
+                $('.crop').on('click', function() {
+                    if (!cropDialog) {
+                        cropDialog = new CropDialog({
+                            sourceUrl: options.sourceUrl,
+                            crop: options.crop,
+                            width: options.width,
+                            height: options.height,
+                            onSave: function(crop, callback) {
+                                $.post(options.cropSaveUrl, crop, callback);
+                            }
+                        });
+                    }
+                    
+                    cropDialog.show();
+                });
             }
         }
     }

@@ -22,8 +22,8 @@
                             'href'   => $category['url'],
                             //'class'    =>    'thumbnail'
                         ),
-                        $this->image($picture, 'file_name', array(
-                            'format' => 6,
+                        $this->img($picture->getFormatRequest(), array(
+                            'format' => 'picture-thumb',
                             'alt'    => $caption,
                             'title'  => $caption
                         )),

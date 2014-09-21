@@ -191,4 +191,8 @@ return array (
     'most/bigclearance/param' => 'дорожный просвет',
     'most/smallclearance' => 'маленький клиренс',
     'most/smallclearance/param' => 'дорожный просвет',
+
+    /* upload */
+    'upload/picture/crop' => 'кадрировать',
+    'upload/picture/cropped-to' => 'кадрировано %s',
 );

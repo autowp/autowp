@@ -1,10 +1,18 @@
 define(
     'default/upload/index',
-    ['jquery', 'bootstrap'],
-    function($, Bootstrap) {
+    ['jquery', 'bootstrap', 'crop-dialog'],
+    function($, Bootstrap, CropDialog) {
         return {
-            init: function() {
+            init: function(options) {
+                
+                var self = this;
+                
+                this.cropMsg = options.cropMsg;
+                this.croppedToMsg = options.croppedToMsg;
+                this.cropSaveUrl = options.cropSaveUrl;
+                
                 var $progress = $('.progress-area');
+                this.$pictures = $('.pictures');
                 $('form:not(.disable-ajax)').each(function() {
                     var $form = $(this);
                     $form.on('submit', function(e) {
@@ -76,12 +84,20 @@ define(
 
                                         if (data) {
                                             var $container = $bar.find('.percentage').empty();
-                                            $.map(data, function(url) {
+                                            /*$.map(data, function(url) {
                                                 $('<p />')
                                                     .append(
                                                         $('<a />').attr('href', url).text(url)
                                                     )
                                                     .insertAfter($bar);
+                                            });*/
+                                            
+                                            $bar.fadeOut(function() {
+                                                $(this).remove();
+                                            });
+                                            
+                                            $.map(data, function(picture) {
+                                                self.insertPicture(picture);
                                             });
                                         }
                                     },
@@ -133,6 +149,70 @@ define(
                         })
                     });
                 });
+            },
+            insertPicture: function(picture) {
+                var self = this;
+                var $picture = $(picture.html);
+                
+                $picture.addClass('col-lg-2 col-md-2 col-sm-2');
+                
+                var $row = this.$pictures.find('.row').filter(function() {
+                    return $(this).find('.picture-preview').length < 6;
+                }).first();
+                
+                if ($row.length <= 0) {
+                    $row = $('<div class="row"></div>').appendTo(this.$pictures);
+                }
+                
+                $row.append($picture);
+                
+                var cropDialog;
+                
+                var $cropBtn = $('<a href="#"></a>')
+                    .text(this.cropMsg)
+                    .prepend('<i class="fa fa-crop"></i> ')
+                    .on('click', function(e) {
+                        e.preventDefault();
+                        
+                        if (!cropDialog) {
+                            cropDialog = new CropDialog({
+                                sourceUrl: picture.src,
+                                crop: {
+                                    x: 0, 
+                                    y: 0, 
+                                    w: picture.width, 
+                                    h: picture.height
+                                },
+                                width: picture.width,
+                                height: picture.height,
+                                onSave: function(crop, callback) {
+                                    var params = $.extend(crop, {
+                                        id: picture.id
+                                    });
+                                    $.post(self.cropSaveUrl, params, function(json) {
+                                        var cropStr = Math.round(crop.w) + '×' 
+                                                    + Math.round(crop.h) + '+' 
+                                                    + Math.round(crop.x) + '+' 
+                                                    + Math.round(crop.y);
+                                        
+                                        $cropBtn
+                                            .text(self.croppedToMsg.replace('%s', cropStr))
+                                            .prepend('<i class="fa fa-crop"></i> ');
+                                        
+                                        $picture.find('img').attr('src', json.src + '?' + Math.random());
+                                        
+                                        cropDialog.hide();
+                                        
+                                        callback();
+                                    });
+                                }
+                            });
+                        }
+                        
+                        cropDialog.show();
+                    });
+                
+                $picture.append($cropBtn);
             }
         }
     }

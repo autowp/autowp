@@ -67,7 +67,10 @@ class Picture extends Project_Db_Table
         array('width' => 1280,  'height' => 960),
         array('width' => 1600,  'height' => 1200),
         array('width' => 1920,  'height' => 1440),
-        array('width' => 2048,  'height' => 1536)
+        array('width' => 2048,  'height' => 1536),
+        array('width' => 2560,  'height' => 1920),
+        array('width' => 2800,  'height' => 2100),
+        array('width' => 3200,  'height' => 2400),
     );
 
     public static function getResolutions()

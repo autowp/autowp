@@ -17,16 +17,6 @@
                                     )),
                                     false
                                 )?>
-                            <?php } else { ?>
-                                <?=$this->htmlA(
-                                    $this->pic($car['picture'])->url(),
-                                    $this->image($car['picture'], 'file_name', array(
-                                        'format' => 6,
-                                        'alt'    => $car['picture']->getCaption(),
-                                        'title'  => $car['picture']->getCaption(),
-                                    )),
-                                    false
-                                )?>
                             <?php } ?>
                         <?php } else { ?>
                             &#xa0;

@@ -23,21 +23,7 @@
                                 <div class="col-lg-8 col-md-8 col-sm-8">
                                     <?php if ($picture->image_id) { ?>
                                         <?php if ($image = $this->img($picture->getFormatRequest(), array(
-                                            'format' => 'picture-medium',
-                                            'title'  => $picture->getCaption(array(
-                                                'language' => $this->language()->get()
-                                            ))
-                                        ))) { ?>
-                                            <?php if ($image->exists()) { ?>
-                                                <?=$this->htmlA(array(
-                                                    'href'  => $this->pic($picture)->url(),
-                                                    'class' => 'thumbnail'
-                                                ), $image, false)?>
-                                            <?php } ?>
-                                        <?php } ?>
-                                    <?php } else { ?>
-                                        <?php if ($image = $this->image($picture, 'file_name', array(
-                                            'format' => 10,
+                                            'format' => 'picture-thumb-medium',
                                             'title'  => $picture->getCaption(array(
                                                 'language' => $this->language()->get()
                                             ))

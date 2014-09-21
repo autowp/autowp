@@ -20,7 +20,7 @@ define(
                     }
                 };
                 
-                var id = 'carousel-example-generic';
+                var id = 'picture-carousel';
                 
                 var markup = 
                     '<div class="gallery">' +
@@ -62,7 +62,7 @@ define(
                         appendTo: $indicators
                     });
                     
-                    var $loading = $('<div class="loading"><span class="glyphicon glyphicon-repeat"></span></div>');
+                    var $loading = $('<div class="loading-icon"><span class="glyphicon glyphicon-repeat"></span></div>');
                     
                     var $source = $(
                         '<a class="download carousel-control" role="button">' +

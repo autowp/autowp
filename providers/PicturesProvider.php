@@ -50,9 +50,10 @@ class PicturesProvider extends Zend_Tool_Project_Provider_Abstract
             $progressBar = new Zend_ProgressBar($adapter, 0, count($pictures));
 
             foreach ($pictures as $idx => $picture) {
-                if ($picture->image_id) {
+                $imageId = $picture->image_id;
+                if ($imageId) {
                     $picture->delete();
-                    $imageStorage->removeImage($picture->image_id);
+                    $imageStorage->removeImage($imageId);
                 } else {
                     print "Brokern image `{$picture->id}`. Skip\n";
                 }
