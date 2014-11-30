@@ -421,18 +421,44 @@ class Comments
 
     /**
      * @param Zend_Db_Table_Row $message
+     * @return int
+     */
+    private function _getMessageRoot($message)
+    {
+        $root = $message;
+
+        $table = $this->_getMessageTable();
+
+        while ($root->parent_id) {
+            $root = $table->fetchRow(array(
+                'item_id = ?' => $root->item_id,
+                'type_id = ?' => $root->type_id,
+                'id = ?'      => $root->parent_id
+            ));
+        }
+
+        return $root;
+    }
+
+    /**
+     * @param Zend_Db_Table_Row $message
      * @param int $perPage
      * @return int
      */
     public function getMessagePage($message, $perPage)
     {
-        $db = $this->_getMessageTable()->getAdapter();
+        $root = $this->_getMessageRoot($message);
+
+        $table = $this->_getMessageTable();
+        $db = $table->getAdapter();
+
         $count = $db->fetchOne(
             $db->select()
-                ->from($this->_getMessageTable()->info('name'), 'COUNT(1)')
-                ->where('item_id = ?', $message->item_id)
-                ->where('type_id = ?', $message->type_id)
-                ->where('datetime < ?', $message->datetime)
+                ->from($table->info('name'), 'COUNT(1)')
+                ->where('item_id = ?', $root->item_id)
+                ->where('type_id = ?', $root->type_id)
+                ->where('datetime < ?', $root->datetime)
+                ->where('parent_id is null')
         );
         return ceil(($count+1) / $perPage);
     }

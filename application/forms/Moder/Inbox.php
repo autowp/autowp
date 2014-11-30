@@ -70,6 +70,11 @@ class Application_Form_Moder_Inbox extends Project_Form
                     'multioptions' => $this->_brandMultioptions,
                     'decorators'   => array('ViewHelper')
                 )),
+                array('text', 'car_id', array(
+                    'required'     => false,
+                    'label'        => 'Автомобиль (id)',
+                    'decorators'   => array('ViewHelper')
+                )),
                 array('select', 'type_id', array(
                     'required'     => false,
                     'label'        => 'Тип',

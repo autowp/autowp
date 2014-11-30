@@ -186,12 +186,6 @@ class Application_Service_Specifications
         return $this->_getForm($engine->id, $zoneId, $user, $options);
     }
 
-    public function getEquipeForm(Equipes_Row $equipe, Users_Row $user, array $options)
-    {
-        $zoneId = 4;
-        return $this->_getForm($equipe->id, $zoneId, $user, $options);
-    }
-
     protected function _collectFormData($zone, $attributes, $values)
     {
         $result = array();
@@ -343,19 +337,6 @@ class Application_Service_Specifications
                         'item_type_id = ?' => $itemTypeId,
                         'user_id = ?'      => $uid
                     ));
-                    if (!$userValue) {
-                        $userValue = $userValueTable->createRow(array(
-                            'attribute_id' => $attribute->id,
-                            'item_id'      => $itemId,
-                            'item_type_id' => $itemTypeId,
-                            'user_id'      => $uid,
-                            'add_date'     => new Zend_Db_Expr('NOW()')
-                        ));
-                    }
-                    $userValue->setFromArray(array(
-                        'update_date' => new Zend_Db_Expr('NOW()')
-                    ));
-                    $userValue->save();
 
                     // вставляем/обновляем значение
                     $userValueData = $userValueDataTable->fetchRow(array(
@@ -364,19 +345,39 @@ class Application_Service_Specifications
                         'item_type_id = ?' => $itemTypeId,
                         'user_id = ?'      => $uid
                     ));
-                    if (!$userValueData) {
-                        $userValueData = $userValueDataTable->fetchNew();
-                        $userValueData->setFromArray(array(
-                            'attribute_id' => $attribute->id,
-                            'item_id'      => $itemId,
-                            'item_type_id' => $itemTypeId,
-                            'user_id'      => $uid
-                        ));
-                    }
-                    $userValueData->value = $value;
-                    $userValueData->save();
 
-                    $somethingChanged = $this->_updateActualValue($attribute, $itemTypeId, $itemId);
+                    if (!$userValue || !$userValueData || $userValueData->value != $value) {
+
+                        if (!$userValue) {
+                            $userValue = $userValueTable->createRow(array(
+                                'attribute_id' => $attribute->id,
+                                'item_id'      => $itemId,
+                                'item_type_id' => $itemTypeId,
+                                'user_id'      => $uid,
+                                'add_date'     => new Zend_Db_Expr('NOW()')
+                            ));
+                        }
+
+                        $userValue->setFromArray(array(
+                            'update_date' => new Zend_Db_Expr('NOW()')
+                        ));
+                        $userValue->save();
+
+                        if (!$userValueData) {
+                            $userValueData = $userValueDataTable->fetchNew();
+                            $userValueData->setFromArray(array(
+                                'attribute_id' => $attribute->id,
+                                'item_id'      => $itemId,
+                                'item_type_id' => $itemTypeId,
+                                'user_id'      => $uid
+                            ));
+                        }
+
+                        $userValueData->value = $value;
+                        $userValueData->save();
+
+                        $somethingChanged = $this->_updateActualValue($attribute, $itemTypeId, $itemId);
+                    }
 
                 } else {
 
@@ -483,14 +484,19 @@ class Application_Service_Specifications
         );
     }
 
-    protected function _getAttributes($parent = null)
+    protected function _getAttributes($zoneId, $parent = null)
     {
-        $select = $this->_getAttributeTable()->select(true)
-            ->order('position');
-            /*->join('attrs_values', 'attrs_attributes.id = attrs_values.attribute_id', null)
-            ->where('attrs_values.item_id in (?)', $itemIds)
-            ->where('attrs_values.item_type_id = 1') //TODO: parametrize
-            ->group('attrs_attributes.id');*/
+        $select = $this->_getAttributeTable()->select(true);
+
+        if ($zoneId) {
+            $select
+                ->join('attrs_zone_attributes', 'attrs_zone_attributes.attribute_id = attrs_attributes.id', null)
+                ->where('attrs_zone_attributes.zone_id = ?', $zoneId)
+                ->order('attrs_zone_attributes.position');
+        } else {
+            $select
+                ->order('position');
+        }
 
         if ($parent) {
             $select->where('parent_id = ?', $parent->id);
@@ -509,7 +515,7 @@ class Application_Service_Specifications
                 'unitId'     => $row->unit_id,
                 'isMultiple' => $row->isMultiple(),
                 'precision'  => $row->precision,
-                'childs'     => $this->_getAttributes($row)
+                'childs'     => $this->_getAttributes($zoneId, $row)
             );
         }
 
@@ -598,29 +604,30 @@ class Application_Service_Specifications
             $ids[] = $car->id;
         }
 
-        $attributes = $this->_getAttributes();
-
         $result = array();
+        $attributes = array();
+
+        $zoneIds = array();
+        foreach ($cars as $car) {
+            $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
+
+            $zoneIds[$zoneId] = true;
+        }
+
+        $zoneMixed = count($zoneIds) > 1;
+
+        if ($zoneMixed) {
+            $specsZoneId = null;
+        } else {
+            $keys = array_keys($zoneIds);
+            $specsZoneId = reset($keys);
+        }
+
+        $attributes = $this->_getAttributes($specsZoneId);
 
         foreach ($cars as $car) {
 
             $carType = $carTypeTable->find($car->car_type_id)->current();
-
-            /*$attributeRows = $attributeTable->fetchAll(array(
-                'parent_id is null'
-            ));
-
-            foreach ($attributeRows as $attribute) {
-                $rows = array();
-
-                $cellGroups = $this->_buildCellGroups($attribute, $carItemType, $cars);
-                $rows[] = array($attribute->name, $cellGroups);
-                $cellGroups = $this->_buildCellGroups($attribute, $equipeItemType, $cars);
-                $rows[] = array($attribute->name, $cellGroups);
-
-                //$html .= $this->getRowHtml($attribute->name, $cellGroups, true);
-                $html .= $this->PrintSection($attribute->name, $rows, $totalColumns);
-            }*/
 
             $result[] = array(
                 'id'               => $car->id,
@@ -714,7 +721,7 @@ class Application_Service_Specifications
         return null;
     }
 
-    protected function _getUserValueDataTable($type)
+    public function getUserValueDataTable($type)
     {
         if (!isset($this->_userValueDataTables[$type])) {
             $this->_userValueDataTables[$type] = $this->_createUserValueDataTable($type);
@@ -805,7 +812,7 @@ class Application_Service_Specifications
     {
         //$uTable = new Users();
         $userValuesTable = $this->_getUserValueTable();
-        $userValuesDataTable = $this->_getUserValueDataTable($attribute->type_id);
+        $userValuesDataTable = $this->getUserValueDataTable($attribute->type_id);
 
         $userValueDataRows = $userValuesDataTable->fetchAll(array(
             'attribute_id = ?' => $attribute->id,
@@ -1081,6 +1088,12 @@ class Application_Service_Specifications
         }
 
         return $somethingChanges;
+    }
+
+    public function updateActualValue($attributeId, $itemTypeId, $itemId)
+    {
+        $attribute = $this->_getAttributeRow($attributeId);
+        return $this->_updateActualValue($attribute, $itemTypeId, $itemId);
     }
 
     protected function _updateActualValue($attribute, $itemTypeId, $itemId)

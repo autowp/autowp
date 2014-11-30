@@ -16,6 +16,8 @@ define(
                         '<div class="modal-body">' +
                         '</div>' +
                         '<div class="modal-footer">' +
+                            '<button type="button" class="btn btn-default pull-left select-all"><i class="fa fa-arrows-alt"></i> Select all</button>' +
+                            '<button type="button" disabled class="btn btn-default pull-left selection"></button>' +
                             '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
                             '<button type="button" class="btn btn-primary">Save changes</button>' +
                         '</div>' +
@@ -40,6 +42,7 @@ define(
                 this.$modal = $(markup);
                 
                 this.$body = this.$modal.find('.modal-body');
+                this.$selection = this.$modal.find('.selection');
                 
                 this.jcrop = null;
                 this.currentCrop = options.crop;
@@ -59,9 +62,20 @@ define(
                     });
                 });
                 
+                this.$modal.find('.select-all').on('click', function() {
+                    self.jcrop.setSelect([0, 0, self.width, self.height]);
+                });
+                
                 this.$modal.modal({
                     show: false
                 });
+            },
+            updateSelectionText: function() {
+                var text = Math.round(this.currentCrop.w) + '×' + Math.round(this.currentCrop.h);
+                var pw = 4;
+                var ph = pw * this.currentCrop.h / this.currentCrop.w;
+                var phRound = Math.round(ph * 10) / 10;
+                this.$selection.text(text + ' (aspect is about ' + pw + ':' + phRound + ')');
             },
             afterShown: function() {
                 var scale = this.width / this.$body.width(),
@@ -85,6 +99,7 @@ define(
                         self.jcrop = $.Jcrop($img[0], {
                             onSelect: function(c) {
                                 self.currentCrop = c;
+                                self.updateSelectionText();
                             },
                             setSelect: [
                                 self.currentCrop.x,

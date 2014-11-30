@@ -99,8 +99,10 @@ class TwinsController extends Zend_Controller_Action
 
         $hasSpecs = false;
 
+        $specService = new Application_Service_Specifications();
+
         foreach ($carList as $car) {
-            $hasSpecs = $hasSpecs || count($car->findEquipes()) > 0;
+            $hasSpecs = $hasSpecs || $specService->hasSpecs(1, $car->id);
         }
 
         $picturesCount = $twins->getGroupPicturesCount($group['id']);
@@ -132,6 +134,8 @@ class TwinsController extends Zend_Controller_Action
         $ctTable = new Comment_Topic();
         $pictureTable = new Picture();
 
+        $specService = new Application_Service_Specifications();
+
         $groups = array();
         foreach ($list as $group) {
             $carList = $this->_getTwins()->getGroupCars($group->id);
@@ -157,7 +161,7 @@ class TwinsController extends Zend_Controller_Action
                     $picturesShown++;
                 }
 
-                $hasSpecs = $hasSpecs || count($car->findEquipes()) > 0;
+                $hasSpecs = $hasSpecs || $specService->hasSpecs(1, $car->id);
 
                 $cars[] = array(
                     'picture' => $picture,

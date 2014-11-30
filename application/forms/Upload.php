@@ -2,7 +2,7 @@
 
 class Application_Form_Upload extends Project_Form
 {
-    protected $_maxFileSize = 10485760; //1024*1024*4;
+    protected $_maxFileSize = 20485760; //1024*1024*4;
 
     protected $_miltipleFiles = false;
 
@@ -21,7 +21,7 @@ class Application_Form_Upload extends Project_Form
                     'minwidth'  => 640,
                     'minheight' => 360,
                     'maxwidth'  => 4096,
-                    'maxheight' => 3072
+                    'maxheight' => 4096
                 )),
                 /*array('ImageSizeInArray', true, array(
                     'sizes' => Picture::getResolutions()

@@ -8,7 +8,7 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
 
     protected $_attributesTable;
 
-    protected $_equipeItemType;
+    protected $_carItemType;
 
     public function __construct(array $options)
     {
@@ -17,7 +17,7 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
         $this->_attributesTable = new Attrs_Attributes();
 
         $itemTypes = new Attrs_Item_Types();
-        $this->_equipeItemType = $itemTypes->find(2)->current();
+        $this->_carItemType = $itemTypes->find(1)->current();
     }
 
     public function setAttributes(array $value)
@@ -49,17 +49,17 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
         $radius     = $this->_attributesTable->find($wheel['radius'])->current();
         $radiusValuesTable = $radius->getValueTable()->info(Zend_Db_Table_Abstract::NAME);
 
-        $select->join('equipes', 'cars.id=equipes.car_id', null)
-            ->join(array('tyrewidth' => $tyrewidthValuesTable), 'equipes.id=tyrewidth.item_id', null)
-            ->where('tyrewidth.item_type_id = ?', 2)
+        $select
+            ->join(array('tyrewidth' => $tyrewidthValuesTable), 'cars.id = tyrewidth.item_id', null)
+            ->where('tyrewidth.item_type_id = ?', 1)
             ->where('tyrewidth.attribute_id = ?', $tyrewidth->id)
             ->where('tyrewidth.value > 0')
-            ->join(array('tyreseries' => $tyreseriesValuesTable), 'equipes.id=tyreseries.item_id', null)
-            ->where('tyreseries.item_type_id = ?', 2)
+            ->join(array('tyreseries' => $tyreseriesValuesTable), 'cars.id = tyreseries.item_id', null)
+            ->where('tyreseries.item_type_id = ?', 1)
             ->where('tyreseries.attribute_id = ?', $tyreseries->id)
             ->where('tyreseries.value > 0')
-            ->join(array('radius' => $radiusValuesTable), 'equipes.id=radius.item_id', null)
-            ->where('radius.item_type_id = ?', 2)
+            ->join(array('radius' => $radiusValuesTable), 'cars.id = radius.item_id', null)
+            ->where('radius.item_type_id = ?', 1)
             ->where('radius.attribute_id = ?', $radius->id)
             ->where('radius.value > 0')
             ->group('cars.id')
@@ -94,17 +94,15 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
             $radius = $this->_attributesTable->find($wheel['radius'])->current();
             //$wheel['rimwidth'] = $attributes->find($wheel['rimwidth'])->current();
 
-            foreach ($car->findEquipes() as $equipe) {
-                $wheelObj = new Project_WheelSize(
-                    $tyrewidth->getActualValue($this->_equipeItemType, $equipe->id),
-                    $tyreseries->getActualValue($this->_equipeItemType, $equipe->id),
-                    $radius->getActualValue($this->_equipeItemType, $equipe->id),
-                    null
-                );
-                $value = $wheelObj->getTyreName();
-                if ($value) {
-                    $text[$value] = 0;
-                }
+            $wheelObj = new Project_WheelSize(
+                $tyrewidth->getActualValue($this->_carItemType, $car->id),
+                $tyreseries->getActualValue($this->_carItemType, $car->id),
+                $radius->getActualValue($this->_carItemType, $car->id),
+                null
+            );
+            $value = $wheelObj->getTyreName();
+            if ($value) {
+                $text[$value] = 0;
             }
         }
 

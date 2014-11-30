@@ -63,6 +63,28 @@
                 'parent_id'     => $this->car->id
             ), 'default', true), 'добавить автомобиль')?>
         <?php } ?>
+
+        <?php if ($this->canAcceptPicture && $this->inboxCount) { ?>
+            <span class="glyphicon glyphicon-th"></span>
+            <?=$this->htmlA($this->url(array(
+                'module'     => 'moder',
+                'controller' => 'pictures',
+                'action'     => 'index',
+                'car_id'     => $this->car->id,
+                'status'     => 'inbox'
+            ), 'default', true), 'inbox ('.$this->inboxCount.')')?>
+        <?php } ?>
+
+        <?php if ($this->requireAttention) { ?>
+            <span class="glyphicon glyphicon-comment"></span>
+            <?=$this->htmlA($this->url(array(
+                'module'     => 'moder',
+                'controller' => 'comments',
+                'action'     => 'index',
+                'car_id'     => $this->car->id,
+                'moderator_attention' => '1'
+            ), 'default', true), 'comments ('.$this->requireAttention.')')?>
+        <?php } ?>
     </p>
 <?php } ?>
 

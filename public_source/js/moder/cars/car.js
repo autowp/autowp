@@ -152,12 +152,14 @@ define(
                         e.preventDefault();
                         
                         var $form = $(this),
-                            $input = $form.find(':text');
+                            $input = $form.find(':text'),
+                            data = $form.serializeArray();
 
                         $input.prop('disabled', true);
-                        $.post($form.attr('action'), {catname: $input.val()}, function(json) {
+                        $.post($form.attr('action'), data, function(json) {
                             if (json.ok) {
-                                $input.val(json.catname);
+                                $input.filter('[name=name]').val(json.name);
+                                $input.filter('[name=catname]').val(json.catname);
                                 
                                 $.map(json.urls, function(urls, id) {
                                     $catalogueTab.find('tr').filter(function() {

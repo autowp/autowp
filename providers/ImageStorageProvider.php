@@ -27,13 +27,13 @@ class ImageStorageProvider extends Zend_Tool_Project_Provider_Abstract
             ->join('formated_image', 'pictures.image_id = formated_image.image_id', null)
             ->where('formated_image.format = ?', 'picture-thumb')
             ->join('image', 'formated_image.formated_image_id = image.id', null)
-            ->where('image.filesize > 35000')
-            ->where('image.date_add < ?', "2014-09-19 12:00:00")
+            ->where('image.width > 155')
+            ->where('image.date_add < ?', "2014-09-24 00:00:00")
             ->where('pictures.id')
             ->order(array('id asc'));
 
         $paginator = Zend_Paginator::factory($select)
-            ->setItemCountPerPage(300);
+            ->setItemCountPerPage(150);
 
         $pages = $paginator->count();
 

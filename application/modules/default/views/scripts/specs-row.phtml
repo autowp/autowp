@@ -3,7 +3,7 @@
         <?=$this->escape($this->attribute['name'])?>
     </td>
     <?php foreach ($this->table->getCars() as $car) { ?>
-        <td>
+        <td data-specs-attr="<?=$this->attribute['id']?>" data-specs-item="<?=$car['id']?>">
             <?=$this->table->renderValue($this, $this->attribute, $car) ?>
         </td>
     <?php } ?>

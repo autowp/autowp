@@ -8,7 +8,7 @@ class Application_Service_Mosts
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 47,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'DESC'
             )
         ),
@@ -17,7 +17,7 @@ class Application_Service_Mosts
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 47,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'ASC'
             )
         ),
@@ -26,7 +26,7 @@ class Application_Service_Mosts
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 48,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'ASC'
             )
         ),
@@ -35,7 +35,7 @@ class Application_Service_Mosts
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 48,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'DESC'
             )
         ),
@@ -78,7 +78,7 @@ class Application_Service_Mosts
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 31,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'DESC'
             )
         ),
@@ -87,7 +87,7 @@ class Application_Service_Mosts
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 31,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'ASC'
             )
         ),
@@ -107,7 +107,7 @@ class Application_Service_Mosts
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 81,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'ASC'
             )
         ),
@@ -116,26 +116,26 @@ class Application_Service_Mosts
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 81,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'DESC'
             )
         ),
 
         array(
-            'catName'   => 'ecologicalclenaly',
+            'catName'   => 'clenaly',
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 82,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'ASC'
             )
         ),
         array(
-            'catName'   => 'ecologicaldirty',
+            'catName'   => 'dirty',
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 82,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'DESC'
             )
         ),
@@ -144,7 +144,7 @@ class Application_Service_Mosts
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 72,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'DESC'
             )
         ),
@@ -153,7 +153,7 @@ class Application_Service_Mosts
             'adapter'   => array(
                 'name'      => 'attr',
                 'attribute' => 72,
-                'itemType'  => 2,
+                'itemType'  => 1,
                 'order'     => 'ASC'
             )
         ),
@@ -539,6 +539,7 @@ class Application_Service_Mosts
             $select
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                ->where('not car_parent_cache.tuning')
                 ->where('brands_cars.brand_id = ?', $brandId);
         }
 
@@ -612,6 +613,7 @@ class Application_Service_Mosts
             $select = $carsTable->select(true)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                ->where('not car_parent_cache.tuning')
                 ->where('brands_cars.brand_id = ?', $brandId)
                 ->limit(1);
 

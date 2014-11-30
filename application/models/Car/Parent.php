@@ -91,7 +91,8 @@ class Car_Parent extends Project_Db_Table
 
         $defaults = array(
             'type'    => self::TYPE_DEFAULT,
-            'catname' => $id
+            'catname' => $id,
+            'name'    => null
         );
         $options = array_merge($defaults, $options);
 
@@ -109,6 +110,7 @@ class Car_Parent extends Project_Db_Table
                 'car_id'    => $id,
                 'parent_id' => $parentId,
                 'catname'   => $options['catname'],
+                'name'      => $options['name'],
                 'timestamp' => new Zend_Db_Expr('now()'),
                 'type'      => $options['type']
             ));

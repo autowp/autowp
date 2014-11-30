@@ -1,4 +1,4 @@
-<table class="table table-condensed table-striped table-bordered" style="width:auto">
+<table class="table table-condensed table-striped table-bordered" style="width:auto" data-specs="1">
     <thead>
         <tr>
             <td></td>
@@ -28,12 +28,20 @@
             <?php } ?>
         </tr>
         <?php foreach ($this->table->getAttributes() as $attribute) { ?>
-            <tr>
-                <th colspan="<?=count($this->table->getCars()) + 1?>"><?=$this->escape($attribute['name'])?></th>
-            </tr>
-            <?php foreach ($attribute['childs'] as $child) { ?>
+            <?php if (count($attribute['childs'])) { ?>
+                <tr>
+                    <th colspan="<?=count($this->table->getCars()) + 1?>"><?=$this->escape($attribute['name'])?></th>
+                </tr>
+                <?php foreach ($attribute['childs'] as $child) { ?>
+                    <?=$this->partial('specs-row.phtml', array(
+                        'attribute' => $child,
+                        'table'     => $this->table,
+                        'deep'      => 0
+                    ))?>
+                <?php } ?>
+            <?php } else { ?>
                 <?=$this->partial('specs-row.phtml', array(
-                    'attribute' => $child,
+                    'attribute' => $attribute,
                     'table'     => $this->table,
                     'deep'      => 0
                 ))?>
@@ -46,7 +54,7 @@
                     <?php if ($car['bottomPicture']) { ?>
                         <?=$this->htmlA(
                             $this->pic($car['bottomPicture'])->url(),
-                            $this->image($car['bottomPicture']->getFormatRequest(), array(
+                            $this->img($car['bottomPicture']->getFormatRequest(), array(
                                 'format'  => 'picture-thumb',
                                 'shuffle' => true
                             )),
