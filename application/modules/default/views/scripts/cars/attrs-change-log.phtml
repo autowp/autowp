@@ -1,0 +1,53 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 103,
+    ));
+?>
+<div class="well">
+    <?=$this->filter->render($this) ?>
+    <table class="specs-log">
+        <thead>
+            <tr>
+               <th>Дата</th>
+               <th>Пользователь</th>
+               <th>Объект</th>
+               <th>Аттрибут</th>
+               <th>Значение</th>
+               <th>Редактор</th>
+            </tr>
+        </thead>
+        <?php foreach ($this->items as $idx => $item) { ?>
+            <tr class="<?=$idx%2 ? 'odd' : 'even'?>">
+                <td><?=$this->escape($this->humanTime($item['date'])) ?></td>
+                <td><?=$this->user($item['user']) ?></td>
+                <td>
+                    <?php if ($item['itemType']) { ?>
+                        <?=$this->escape($item['itemType']['name']) ?>
+                    <?php } ?>
+                    <?=$this->escape($item['object']['name']) ?>
+                </td>
+                <td class="attribute">
+                    <?php foreach ($item['path'] as $j => $node) { ?>
+                        <?php if ($j) { ?> / <?php } ?>
+                        <span><?=$this->escape($node)?></span>
+                    <?php } ?>
+                </td>
+                <td style="text-align:center">
+                    <?=$this->escape($item['value'])?>
+                    <?php if ($item['unit']) { ?>
+                        <span class="unit"><?=$this->escape($item['unit']->abbr) ?></span>
+                    <?php } ?>
+                </td>
+                <td class="link">
+                    <?=$this->htmlA($item['object']['editorUrl'], 'в редактор') ?>
+                </td>
+            </tr>
+        <?php } ?>
+    </table>
+</div>
+<?=$this->paginationControl($this->paginator) ?>

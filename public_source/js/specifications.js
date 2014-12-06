@@ -2,7 +2,6 @@ define(
     'specifications',
     ['jquery', 'bootstrap'],
     function($, Bootstrap) {
-        
         var modal = 
             '<div class="modal fade">\
                 <div class="modal-dialog">\
@@ -21,12 +20,31 @@ define(
                 </div>\
             </div>';
             
-            var $form = $modal.find('form');
-        
-        $('[data-specs]').each(function() {
-            $(this).on('click', '[data-specs-attr]', function() {
-                var $modal = $(modal);
-            });
-        });
+        return {
+            init: function(element) {
+                var $element = $(element);
+                
+                console.log($element);
+                
+                $element.each(function() {
+                    $(this).on('click', '[data-specs-attr]', function() {
+                        var $this = $(this);
+                        console.log('click');
+                        var $modal = $(modal);
+                        var $form = $modal.find('form');
+                        $modal.modal('show');
+                        
+                        var params = {
+                            attr: $this.data('specsAttr')
+                        }
+                        
+                        $.get('/cars/edit-value', params, function(html) {
+                            $modal.find('.modal-body').html(html);
+                        })
+                    });
+                });
+                
+            }
+        }
     }
 );

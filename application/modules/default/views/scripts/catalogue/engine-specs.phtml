@@ -1,0 +1,17 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 168,
+        'args'   => array(
+            'BRAND_CATNAME' => $this->brand->folder,
+            'BRAND_NAME'    => $this->brandName,
+            'ENGINE_ID'     => $this->engine['id'],
+            'ENGINE_NAME'   => $this->engine['name'],
+        ),
+    ));
+?>
+<?=$this->specs->render($this)?>

@@ -18,5 +18,17 @@
             'breadcrumbs' => $this->breadcrumbs
         )
     ));
+    $this->layout()->moduleName = 'default/catalogue/brand-car-specifications';
+    $this->layout()->moduleOptions = array(
+        'disabled' => true
+    );
 ?>
 <?=$this->specs->render($this)?>
+<?php if (count($this->contributors)) { ?>
+    <p>
+        Составители:
+        <?php foreach ($this->contributors as $contributor) { ?>
+            <?=$this->user($contributor)?>
+        <?php } ?>
+    </p>
+<?php } ?>

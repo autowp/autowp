@@ -18,7 +18,7 @@ class Project_WheelSize
         $this->series = $series ? $series : null;
         $this->radius = $radius ? $radius : null;
         $this->rimWidth = $rimWidth ? $rimWidth : null;
-  }
+    }
 
     public function getWidth()
     {

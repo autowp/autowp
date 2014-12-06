@@ -2,6 +2,11 @@
 
 class Application_Service_Specifications
 {
+    const ITEM_TYPE_CAR = 1;
+    const ITEM_TYPE_ENGINE = 3;
+
+    const ENGINE_ZONE_ID = 5;
+
     protected $_zones = null;
 
     /**
@@ -38,6 +43,11 @@ class Application_Service_Specifications
     protected $_attributeRows = null;
 
     /**
+     * @var Cars
+     */
+    protected $_carTable = null;
+
+    /**
      * @var Car_Parent
      */
     protected $_carParentTable = null;
@@ -58,6 +68,11 @@ class Application_Service_Specifications
     protected $_actualValueCache = array();
 
     /**
+     * @var array
+     */
+    protected $_engineAttributes = null;
+
+    /**
      * @return Attrs_Values
      */
     protected function _getValueTable()
@@ -75,6 +90,16 @@ class Application_Service_Specifications
         return $this->_carParentTable
             ? $this->_carParentTable
             : $this->_carParentTable = new Car_Parent();
+    }
+
+    /**
+     * @return Cars
+     */
+    protected function _getCarTable()
+    {
+        return $this->_carTable
+            ? $this->_carTable
+            : $this->_carTable = new Cars();
     }
 
     protected function _getAttributeTable()
@@ -223,6 +248,7 @@ class Application_Service_Specifications
 
         return $result;
     }
+
 
     protected function _getAttributeRow($id)
     {
@@ -412,9 +438,62 @@ class Application_Service_Specifications
 
             if ($somethingChanged) {
                 $this->_propagateInheritance($attribute, $itemTypeId, $itemId);
+
+                $this->_propageteEngine($attribute, $itemTypeId, $itemId);
             }
         }
     }
+
+    protected function _getEngineAttributeIds()
+    {
+        if (!$this->_engineAttributes) {
+            $table = $this->_getAttributeTable();
+            $db = $table->getAdapter();
+
+            $this->_engineAttributes = $db->fetchCol(
+                    $db->select()
+                    ->from($table->info('name'), 'id')
+                    ->join('attrs_zone_attributes', 'attrs_attributes.id = attrs_zone_attributes.attribute_id', null)
+                    ->where('attrs_zone_attributes.zone_id = ?', self::ENGINE_ZONE_ID)
+            );
+        }
+
+        return $this->_engineAttributes;
+    }
+
+    /**
+     * @param array $attribute
+     * @param int $itemTypeId
+     * @param int $parentId
+     */
+    protected function _propageteEngine($attribute, $itemTypeId, $itemId)
+    {
+        if ($itemTypeId != self::ITEM_TYPE_ENGINE) {
+            return;
+        }
+
+        if (!$this->_isEngineAttributeId($attribute->id)) {
+            return;
+        }
+
+        if (!$attribute->type_id) {
+            return;
+        }
+
+        $carRows = $this->_getCarTable()->fetchAll(array(
+            'engine_id = ?' => $itemId
+        ));
+
+        foreach ($carRows as $carRow) {
+            $this->_updateActualValue($attribute, self::ITEM_TYPE_CAR, $carRow->id);
+        }
+    }
+
+    /**
+     * @param array $attribute
+     * @param int $itemTypeId
+     * @param int $parentId
+     */
 
     protected function _getChildItemIds($parentId)
     {
@@ -464,14 +543,32 @@ class Application_Service_Specifications
         }
     }
 
+    protected function _specEnginePicture($engine)
+    {
+        $pictureTable = new Picture();
+
+        return $pictureTable->fetchRow(
+            $pictureTable->select(true)
+                ->where('pictures.type = ?', Picture::ENGINE_TYPE_ID)
+                ->where('pictures.engine_id = ?', $engine['id'])
+                ->where('pictures.status in (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+                ->order('pictures.id desc')
+                ->limit(1)
+        );
+    }
+
     protected function _specPicture($car, $perspectives)
     {
         $pictureTable = new Picture();
         $pictureTableAdapter = $pictureTable->getAdapter();
 
         $order = array();
-        foreach ($perspectives as $pid) {
-            $order[] = new Zend_Db_Expr($pictureTableAdapter->quoteInto('pictures.perspective_id = ? DESC', $pid));
+        if ($perspectives) {
+            foreach ($perspectives as $pid) {
+                $order[] = new Zend_Db_Expr($pictureTableAdapter->quoteInto('pictures.perspective_id = ? DESC', $pid));
+            }
+        } else {
+            $order[] = 'pictures.id desc';
         }
         return $pictureTable->fetchRow(
             $pictureTable->select(true)
@@ -637,7 +734,7 @@ class Application_Service_Specifications
                 'topPicture'       => $this->_specPicture($car, $topPerspectives),
                 'bottomPicture'    => $this->_specPicture($car, $bottomPerspectives),
                 'carType'          => $carType ? $carType->name : null,
-                'values'           => $this->_loadValues($attributes, $car->id, 1)
+                'values'           => $this->_loadValues($attributes, $car->id, self::ITEM_TYPE_CAR)
             );
         }
 
@@ -647,7 +744,40 @@ class Application_Service_Specifications
         // load units
         $this->_addUnitsToAttributes($attributes);
 
-        return new Project_Spec_Table($result, $attributes);
+        return new Project_Spec_Table_Car($result, $attributes);
+    }
+
+    public function engineSpecifications($engines, array $options)
+    {
+        $options = array_merge(array(
+            'language' => 'en'
+        ), $options);
+
+        $language = $options['language'];
+
+        $attributeTable = $this->_getAttributeTable();
+
+        $result = array();
+        $attributes = array();
+
+        $attributes = $this->_getAttributes(self::ENGINE_ZONE_ID);
+
+        foreach ($engines as $engine) {
+            $result[] = array(
+                'id'      => $engine['id'],
+                'name'    => $engine['name'],
+                'picture' => $this->_specEnginePicture($engine),
+                'values'  => $this->_loadValues($attributes, $engine['id'], self::ITEM_TYPE_ENGINE)
+            );
+        }
+
+        // remove empty attributes
+        $this->_removeEmpty($attributes, $result);
+
+        // load units
+        $this->_addUnitsToAttributes($attributes);
+
+        return new Project_Spec_Table_Engine($result, $attributes);
     }
 
     protected function _addUnitsToAttributes(&$attributes)
@@ -694,6 +824,7 @@ class Application_Service_Specifications
         return $this->_valueDataTables[$type];
     }
 
+
     protected function _createValueDataTable($type)
     {
         switch ($type) {
@@ -720,6 +851,7 @@ class Application_Service_Specifications
         }
         return null;
     }
+
 
     public function getUserValueDataTable($type)
     {
@@ -914,6 +1046,75 @@ class Application_Service_Specifications
         return $actualValue;
     }
 
+    /**
+     * @param int $attrId
+     * @return boolean
+     */
+    protected function _isEngineAttributeId($attrId)
+    {
+        return in_array($attrId, $this->_getEngineAttributeIds());
+    }
+
+    /**
+     * @param array $attribute
+     * @param int $itemTypeId
+     * @param int $itemId
+     * @return mixed
+     */
+    protected function _calcEngineValue($attribute, $itemTypeId, $itemId)
+    {
+        if ($itemTypeId != self::ITEM_TYPE_CAR) {
+            return null;
+        }
+
+        if (!$this->_isEngineAttributeId($attribute->id)) {
+            return null;
+        }
+
+        $carRow = $this->_getCarTable()->fetchRow(array(
+            'id = ?' => $itemId
+        ));
+
+        if (!$carRow) {
+            return null;
+        }
+
+        if (!$carRow->engine_id) {
+            return null;
+        }
+
+        $valueDataTable = $this->_getValueDataTable($attribute->type_id);
+
+        if (!$attribute->isMultiple()) {
+
+            $valueDataRow = $valueDataTable->fetchRow(array(
+                'attribute_id = ?' => $attribute->id,
+                'item_id = ?'      => $carRow->engine_id,
+                'item_type_id = ?' => self::ITEM_TYPE_ENGINE,
+                'value IS NOT NULL'
+            ));
+
+            $value = $valueDataRow ? $valueDataRow->value : null;
+
+        } else {
+
+            $valueDataRows = $valueDataTable->fetchAll(array(
+                'attribute_id = ?' => $attribute->id,
+                'item_id = ?'      => $carRow->engine_id,
+                'item_type_id = ?' => self::ITEM_TYPE_ENGINE,
+                'value IS NOT NULL'
+            ));
+
+            $value = array();
+            foreach ($valueDataRows as $valueDataRow) {
+                $value[] = $valueDataRow->value;
+            }
+
+        }
+
+        return $value;
+    }
+
     protected function _calcInheritedValue($attribute, $itemTypeId, $itemId)
     {
         $actualValue = null;
@@ -1101,6 +1302,10 @@ class Application_Service_Specifications
         $actualValue = $this->_calcAvgUserValue($attribute, $itemTypeId, $itemId);
 
         if ($actualValue === null) {
+            $actualValue = $this->_calcEngineValue($attribute, $itemTypeId, $itemId);
+        }
+
+        if ($actualValue === null) {
             $actualValue = $this->_calcInheritedValue($attribute, $itemTypeId, $itemId);
         }
 
@@ -1108,6 +1313,11 @@ class Application_Service_Specifications
 
     }
 
+    /**
+     * @param int $itemTypeId
+     * @param int $itemId
+     * @return boolean
+     */
     public function hasSpecs($itemTypeId, $itemId)
     {
         return (bool)$this->_getValueTable()->fetchRow(array(
@@ -1115,6 +1325,7 @@ class Application_Service_Specifications
             'item_type_id = ?' => $itemTypeId
         ));
     }
+
 
     public function hasChildSpecs($itemTypeId, $itemId)
     {
@@ -1142,6 +1353,10 @@ class Application_Service_Specifications
         }
     }
 
+    /**
+     * @param int $itemTypeId
+     * @param int $itemId
+     */
     public function updateInheritedValues($itemTypeId, $itemId)
     {
         foreach ($this->_getAttributeTable()->fetchAll() as $attribute) {
@@ -1152,5 +1367,54 @@ class Application_Service_Specifications
                 }
             }
         }
+    }
+
+    /**
+     * @param int $attrId
+     * @param int $itemTypeId
+     * @param int $itemId
+     * @return NULL|Project_Form
+     */
+    public function getEditValueForm($attrId, $itemTypeId, $itemId, $language)
+    {
+        $attributeRow = $this->_getAttributeTable()->find($attrId)->current();
+        if (!$attributeRow) {
+            return null;
+        }
+        $elementType = $attributeRow->getFormElementType();
+        if (!$elementType) {
+            return null;
+        }
+        $elementOptions = $attributeRow->getFormElementOptions($language);
+
+        $form = new Project_Form(array(
+            'method'   => 'post',
+            'elements' => array(
+                array($elementType, 'value', $elementOptions)
+            )
+        ));
+
+        return $form;
+    }
+
+    public function getContributors($itemTypeId, $itemId)
+    {
+        if (!$itemId) {
+            return array();
+        }
+
+        $uvTable = $this->_getUserValueTable();
+        $db = $uvTable->getAdapter();
+
+        $pairs = $db->fetchPairs(
+            $db->select(true)
+                ->from($uvTable->info('name'), array('user_id', 'c' => new Zend_Db_Expr('COUNT(1)')))
+                ->where('attrs_user_values.item_type_id = ?', (int)$itemTypeId)
+                ->where('attrs_user_values.item_id IN (?)', (array)$itemId)
+                ->group('attrs_user_values.user_id')
+                ->order('c desc')
+        );
+
+        return $pairs;
     }
 }

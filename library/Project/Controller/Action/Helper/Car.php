@@ -116,6 +116,7 @@ class Project_Controller_Action_Helper_Car
         $specEditor = $userHelper->isAllowed('specifications', 'edit');
         $isCarModer = $userHelper->logedIn() && $aclHelper->inheritsRole($user->role, 'cars-moder');
         $language = $controller->getHelper('Language')->direct();
+        $catalogue = $controller->getHelper('catalogue')->direct();
 
         $designProjectTable = new Design_Projects();
         $pictureTable = $this->_getPictureTable();
@@ -125,6 +126,8 @@ class Project_Controller_Action_Helper_Car
         $brandTable = new Brands();
         $brandCarTable = new Brand_Car();
         $categoryTable = new Category();
+
+        $specService = new Application_Service_Specifications();
 
 
         $items = array();
@@ -236,17 +239,17 @@ class Project_Controller_Action_Helper_Car
                     }
                 } else {
 
-                    $hasEquipes = count($car->findEquipes()) > 0;
-                    if ($hasEquipes) {
-                        foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+                    if ($specService->hasSpecs(1, $car->id)) {
+                        foreach ($catalogue->cataloguePaths($car) as $path) {
                             $specsLinks[] = array(
                                 'name' => null,
                                 'url'  => $urlHelper->url(array(
                                     'module'        => 'default',
-                                    'contoller'     => 'catalogue',
-                                    'action'        => 'car-specifications',
-                                    'brand_catname' => $brand->folder,
-                                    'car_id'        => $car->id
+                                    'controller'    => 'catalogue',
+                                    'action'        => 'brand-car-specifications',
+                                    'brand_catname' => $path['brand_catname'],
+                                    'car_catname'   => $path['car_catname'],
+                                    'path'          => $path['path']
                                 ), 'catalogue', true)
                             );
                             break;

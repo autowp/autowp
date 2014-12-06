@@ -13,6 +13,24 @@ define(
                     $('.' + $(this).attr('id')).removeClass('hover');
                 });
                 
+                $('a[data-toggle="tab"][data-load]').on('show.bs.tab', function (e) {
+                    var $this = $(this)
+                        , selector = $this.attr('data-target')
+                        , $target
+
+                    if (!selector) {
+                        selector = $this.attr('href')
+                        selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
+                    }
+
+                    $target = $(selector);
+
+                    $target.load($(this).data('load'), function() {
+                        $target.trigger('tabload');
+                    });
+
+                    $(this).removeData('load').removeAttr('data-load');
+                });
             }
         }
     }
