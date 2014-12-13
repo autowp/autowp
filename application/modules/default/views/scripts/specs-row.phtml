@@ -2,9 +2,32 @@
     <td style="padding-left:<?=5 + $this->deep*16?>px">
         <?=$this->escape($this->attribute['name'])?>
     </td>
-    <?php foreach ($this->table->getCars() as $car) { ?>
-        <td data-specs-attr="<?=$this->attribute['id']?>" data-specs-item="<?=$car['id']?>">
-            <?=$this->table->renderValue($this, $this->attribute, $car) ?>
+    <?php
+        $cells = array();
+
+        foreach ($this->table->getCars() as $car) {
+            $value = $this->table->renderValue($this, $this->attribute, $car);
+            $lastColIdx = count($cells)-1;
+            if ($lastColIdx >= 0) {
+                $lastCol = $cells[$lastColIdx];
+                $isSame = $lastCol['value'] === $value;
+            } else {
+                $isSame = false;
+            }
+            if ($isSame) {
+                $cells[$lastColIdx]['colspan']++;
+            } else {
+                $cells[] = array(
+                    'carId'   => $car['id'],
+                    'value'   => $value,
+                    'colspan' => 1
+                );
+            }
+        }
+    ?>
+    <?php foreach ($cells as $cell) { ?>
+        <td data-specs-attr="<?=$this->attribute['id']?>" data-specs-item="<?=$cell['carId']?>" class="text-center" <?=$cell['colspan'] > 1 ? ' colspan="'.$cell['colspan'].'"' : ''?>>
+            <?=$cell['value'] ?>
         </td>
     <?php } ?>
 </tr>

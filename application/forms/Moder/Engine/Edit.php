@@ -1,6 +1,6 @@
 <?php
 
-class Application_Form_Moder_Engine extends Project_Form
+class Application_Form_Moder_Engine_Edit extends Project_Form
 {
     public function init()
     {
@@ -19,10 +19,6 @@ class Application_Form_Moder_Engine extends Project_Form
             'elements' => array(
                 array('Engine_Name', 'caption', array (
                     'required'   => true,
-                    'decorators' => array('ViewHelper')
-                )),
-                array('Brand', 'brand_id', array (
-                    'required'   => false,
                     'decorators' => array('ViewHelper')
                 )),
             )

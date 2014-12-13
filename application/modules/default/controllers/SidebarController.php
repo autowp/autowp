@@ -197,6 +197,14 @@ class SidebarController extends Zend_Controller_Action
         }
 
         // ссылка на страницу с двигателями
+        $engineTable = $this->_helper->catalogue()->getEngineTable();
+        $db = $engineTable->getAdapter();
+        $enginesCount = $db->fetchOne(
+            $db->select()
+                ->from($engineTable->info('name'), new Zend_Db_Expr('count(1)'))
+                ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
+                ->where('brand_engine.brand_id = ?', $brand->id)
+        );
         if ($brand->enginepictures_count > 0)
             $groups[] = array(
                 'url' => $this->_helper->url->url(array(
@@ -204,6 +212,7 @@ class SidebarController extends Zend_Controller_Action
                     'brand_catname' => $brand->folder
                 ), 'catalogue', true),
                 'caption' => $this->view->translate('engines'),
+                'count'   => $enginesCount,
                 'active'  => $isEngines
             );
 

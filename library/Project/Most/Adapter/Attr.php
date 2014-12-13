@@ -54,15 +54,11 @@ class Project_Most_Adapter_Attr extends Project_Most_Adapter_Abstract
                 break;
 
             case 2:
-                $funct = $this->_order == 'ASC' ? 'min' : 'max';
-                $expr = $funct.'('.$tableName.'.value)';
-                $select
-                    ->group('cars.id')
-                    ->join('equipes', 'cars.id = equipes.car_id', null)
-                    ->join($tableName, 'equipes.id = '.$tableName.'.item_id', null)
-                    ->order(new Zend_Db_Expr($expr . ' ' . $this->_order));
+                throw new Exception("Equipes deprecated");
                 break;
         }
+
+        //print $select; exit;
 
         $cars = $select->getTable()->fetchAll($select);
 

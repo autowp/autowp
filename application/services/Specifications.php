@@ -58,6 +58,11 @@ class Application_Service_Specifications
     protected $_carChildsCache = array();
 
     /**
+     * @var array
+     */
+    protected $_engineChildsCache = array();
+
+    /**
      * @var Attrs_Values
      */
     protected $_valueTable = null;
@@ -71,6 +76,11 @@ class Application_Service_Specifications
      * @var array
      */
     protected $_engineAttributes = null;
+
+    /**
+     * @var Engines
+     */
+    protected $_engineTable = null;
 
     /**
      * @return Attrs_Values
@@ -90,6 +100,16 @@ class Application_Service_Specifications
         return $this->_carParentTable
             ? $this->_carParentTable
             : $this->_carParentTable = new Car_Parent();
+    }
+
+    /**
+     * @return Engines
+     */
+    protected function _getEngineTable()
+    {
+        return $this->_engineTable
+            ? $this->_engineTable
+            : $this->_engineTable = new Engines();
     }
 
     /**
@@ -495,7 +515,7 @@ class Application_Service_Specifications
      * @param int $parentId
      */
 
-    protected function _getChildItemIds($parentId)
+    protected function _getChildCarIds($parentId)
     {
         if (!isset($this->_carChildsCache[$parentId])) {
             $carParentTable = $this->_getCarParentTable();
@@ -508,6 +528,21 @@ class Application_Service_Specifications
         }
 
         return $this->_carChildsCache[$parentId];
+    }
+
+    protected function _getChildEngineIds($parentId)
+    {
+        if (!isset($this->_engineChildsCache[$parentId])) {
+            $engineTable = $this->_getEngineTable();
+            $db = $engineTable->getAdapter();
+            $this->_engineChildsCache[$parentId] = $db->fetchCol(
+                $db->select()
+                    ->from($engineTable->info('name'), 'id')
+                    ->where('parent_id = ?', $parentId)
+            );
+        }
+
+        return $this->_engineChildsCache[$parentId];
     }
 
     protected function _haveOwnAttributeValue($attribute, $itemTypeId, $itemId)
@@ -523,9 +558,7 @@ class Application_Service_Specifications
     {
         if ($itemTypeId == 1) {
 
-            $userValueTable = $this->_getUserValueTable();
-
-            $childIds = $this->_getChildItemIds($itemId);
+            $childIds = $this->_getChildCarIds($itemId);
 
             foreach ($childIds as $childId) {
                 // update only if row use inheritance
@@ -535,6 +568,25 @@ class Application_Service_Specifications
 
                     $value = $this->_calcInheritedValue($attribute, $itemTypeId, $childId);
                     $changed = $this->_setActualValue($attribute, $itemTypeId, $childId, $value);
+                    if ($changed) {
+                        $this->_propagateInheritance($attribute, $itemTypeId, $childId);
+                    }
+                }
+            }
+
+        } else if ($itemTypeId == 3) {
+
+            $childIds = $this->_getChildEngineIds($itemId);
+
+            foreach ($childIds as $childId) {
+                // update only if row use inheritance
+                $haveValue = $this->_haveOwnAttributeValue($attribute, $itemTypeId, $childId);
+
+                if (!$haveValue) {
+
+                    $value = $this->_calcInheritedValue($attribute, $itemTypeId, $childId);
+                    $changed = $this->_setActualValue($attribute, $itemTypeId, $childId, $value);
+
                     if ($changed) {
                         $this->_propagateInheritance($attribute, $itemTypeId, $childId);
                     }
@@ -950,7 +1002,6 @@ class Application_Service_Specifications
             'attribute_id = ?' => $attribute->id,
             'item_id = ?'      => $itemId,
             'item_type_id = ?' => $itemTypeId,
-            'value IS NOT NULL'
         ));
         if (count($userValueDataRows)) {
 
@@ -1006,8 +1057,6 @@ class Application_Service_Specifications
                     $matchRegIdx = $idx;
                     $idx++;
                 }
-
-                //$registry[$idx] = $valueRow->value;
 
                 if (!isset($ratios[$matchRegIdx])) {
                     $ratios[$matchRegIdx] = 0;
@@ -1188,6 +1237,35 @@ class Application_Service_Specifications
                     //TODO: multiple attr inheritance
                 }
             }
+
+        } else if ($itemTypeId == 3) {
+
+            $engineRow = $this->_getEngineTable()->find($itemId)->current();
+            if ($engineRow) {
+                $parentEngineRow = $this->_getEngineTable()->find($engineRow->parent_id)->current();
+
+                if ($parentEngineRow) {
+
+                    $valueDataTable = $this->_getValueDataTable($attribute->type_id);
+
+                    if (!$attribute->isMultiple()) {
+
+                        $valueDataRow = $valueDataTable->fetchRow(array(
+                            'attribute_id = ?' => $attribute->id,
+                            'item_id = ?'      => $parentEngineRow->id,
+                            'item_type_id = ?' => $itemTypeId,
+                            'value IS NOT NULL'
+                        ));
+
+                        if ($valueDataRow) {
+                            $actualValue = $valueDataRow->value;
+                        }
+
+                    } else {
+                        //TODO: multiple attr inheritance
+                    }
+                }
+            }
         }
 
         return $actualValue;
@@ -1324,6 +1402,23 @@ class Application_Service_Specifications
             'item_id = ?'      => $itemId,
             'item_type_id = ?' => $itemTypeId
         ));
+    }
+
+    /**
+     * @param int $itemTypeId
+     * @param int $itemId
+     * @return int
+     */
+    public function getSpecsCount($itemTypeId, $itemId)
+    {
+        $table = $this->_getValueTable();
+        $db = $table->getAdapter();
+        return (int)$db->fetchOne(
+            $db->select()
+                ->from($table->info('name'), new Zend_Db_Expr('count(1)'))
+                ->where('item_id = ?', (int)$itemId)
+                ->where('item_type_id = ?', (int)$itemTypeId)
+        );
     }
 
 

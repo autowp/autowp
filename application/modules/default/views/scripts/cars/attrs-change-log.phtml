@@ -29,7 +29,11 @@
                     <?php if ($item['itemType']) { ?>
                         <?=$this->escape($item['itemType']['name']) ?>
                     <?php } ?>
-                    <?=$this->escape($item['object']['name']) ?>
+                    <?php if ($this->isModerator) { ?>
+                        <?=$this->htmlA($item['object']['moderUrl'], $item['object']['name']) ?>
+                    <?php } else { ?>
+                        <?=$this->escape($item['object']['name']) ?>
+                    <?php } ?>
                 </td>
                 <td class="attribute">
                     <?php foreach ($item['path'] as $j => $node) { ?>

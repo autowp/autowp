@@ -5,14 +5,87 @@
             'needLeft'  => true,
             'needRight' => false
         ),
-        'pageId' => 38,
+        'pageId' => $this->engine ? 168 : 38,
         'args'   => array(
             'BRAND_NAME'    => $this->brandName,
             'BRAND_CATNAME' => $this->brand->folder,
+            'ENGINE_NAME'   => $this->engine ? $this->engine->caption : null
         )
     ));
 ?>
-<?=$this->pictures($this->paginator->getCurrentItems(), array(
-    'scheme' => '422'
-)) ?>
+<?php if ($this->user()->isAllowed('engine', 'add')) { ?>
+    <span class="glyphicon glyphicon-plus"></span>
+    <?php if ($this->engine) { ?>
+        <?=$this->htmlA($this->url(array(
+            'module'     => 'moder',
+            'controller' => 'engines',
+            'action'     => 'add',
+            'parent_id'  => $this->engine->id
+        ), 'default', true), 'добавить двигатель')?>
+    <?php } else { ?>
+        <?=$this->htmlA($this->url(array(
+            'module'     => 'moder',
+            'controller' => 'engines',
+            'action'     => 'add',
+            'brand_id'   => $this->brand->id
+        ), 'default', true), 'добавить двигатель')?>
+    <?php } ?>
+<?php } ?>
+<?php foreach ($this->engines as $engine) { ?>
+    <div>
+        <h3><?=$this->escape($engine['name'])?></h3>
+        <div class="row thumbnails">
+            <?php foreach ($engine['pictures'] as $picture) { ?>
+                <div class="col-lg-3 col-md-3 col-sm-6">
+                    <?php if ($picture->image_id) { ?>
+                        <?=$this->htmlA(
+                            array(
+                                'href'  => $this->pic($picture)->url(),
+                                'class' =>'thumbnail'
+                            ),
+                            $this->img($picture->getFormatRequest(), array(
+                                'format' => 'picture-thumb',
+                            )),
+                            false
+                        )?>
+                    <?php } ?>
+                </div>
+            <?php } ?>
+        </div>
+        <?php if (count($engine['cars'])) { ?>
+            <p>Устанавливался на:</p>
+            <ul>
+                <?php foreach ($engine['cars'] as $car) { ?>
+                    <li><?=$this->htmlA($car['url'], $car['name'])?></li>
+                <?php } ?>
+            </ul>
+        <?php } ?>
+        <ul class="list-inline">
+            <?php if ($engine['detailsUrl']) { ?>
+                <li>
+                    <span class="glyphicon glyphicon-align-left"></span>
+                    <?=$this->htmlA($engine['detailsUrl'], $this->translate('carlist/details') . ' (' . $engine['childsCount'] . ')')?>
+                </li>
+            <?php } ?>
+            <?php if ($engine['moderUrl']) { ?>
+                <li>
+                    <span class="glyphicon glyphicon-cog"></span>
+                    <?=$this->htmlA($engine['moderUrl'], 'управление')?>
+                </li>
+            <?php } ?>
+            <?php if ($engine['specsUrl']) { ?>
+                <li>
+                    <span class="glyphicon glyphicon-list-alt"></span>
+                    <?=$this->htmlA($engine['specsUrl'], $this->translate('carlist/specifications'))?>
+                </li>
+            <?php } ?>
+            <?php if ($engine['specsEditUrl']) { ?>
+                <li>
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    <?=$this->htmlA($engine['specsEditUrl'], 'ввод ттх')?>
+                </li>
+            <?php } ?>
+        </ul>
+    </div>
+<?php } ?>
 <?=$this->paginationControl($this->paginator) ?>

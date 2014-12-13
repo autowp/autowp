@@ -24,9 +24,11 @@ class Application_Service_Mosts
         array(
             'catName'   => 'dynamic',
             'adapter'   => array(
-                'name'      => 'attr',
-                'attribute' => 48,
-                'itemType'  => 1,
+                'name'      => 'acceleration',
+                'attributes' => array(
+                    'to100kmh' => 48,
+                    'to60mph'  => 175,
+                ),
                 'order'     => 'ASC'
             )
         ),
@@ -281,6 +283,42 @@ class Application_Service_Mosts
         ),
 
         array(
+            'catName'   => 'bigbrakes',
+            'adapter'   => array(
+                'name'       => 'brakes',
+                'order'      => 'DESC',
+                'attributes' => array(
+                    'rear' => array(
+                        'diameter'  => 147,
+                        'thickness' => 149,
+                    ),
+                    'front' => array(
+                        'diameter'  => 146,
+                        'thickness' => 148,
+                    ),
+                )
+            )
+        ),
+        array(
+            'catName'   => 'smallbrakes',
+            'adapter'   => array(
+                'name'       => 'brakes',
+                'order'      => 'ASC',
+                'attributes' => array(
+                    'rear' => array(
+                        'diameter'  => 147,
+                        'thickness' => 149,
+                    ),
+                    'front' => array(
+                        'diameter'  => 146,
+                        'thickness' => 148,
+                    ),
+                )
+            )
+        ),
+
+
+        array(
             'catName'   => 'bigclearance',
             'adapter'   => array(
                 'name'      => 'attr',
@@ -342,7 +380,8 @@ class Application_Service_Mosts
                 array(
                     'name'   => 'до 1920го',
                     'folder' => 'before1920',
-                    'where'  => 'cars.begin_order_cache > 0 and cars.begin_order_cache < 1920'
+                    'where'  => 'cars.begin_order_cache <= "1919-12-31" or ' .
+                                'cars.end_order_cache <= "1919-12-31"'
                 ),
                 array(
                     'name'   => '1920-29ых',
@@ -540,7 +579,8 @@ class Application_Service_Mosts
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('not car_parent_cache.tuning')
-                ->where('brands_cars.brand_id = ?', $brandId);
+                ->where('brands_cars.brand_id = ?', $brandId)
+                ->group('cars.id');
         }
 
         $most = new Project_Most(array(

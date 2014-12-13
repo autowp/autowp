@@ -79,7 +79,7 @@
             <?php } ?>
         </div>
         <div class="col-lg-3 col-md-3">
-            <h2>
+            <h3>
                 <?php if (isset($car['valueHtml'])) { ?>
                     <?=$car['valueHtml']?>
                 <?php } else {?>
@@ -88,7 +88,7 @@
                 <?php if ($this->carList['unit']) { ?>
                     <small class="unit" title="<?=$this->escape($this->carList['unit']->name) ?>"><?=$this->escape($this->carList['unit']->abbr) ?></small>
                 <?php } ?>
-            </h2>
+            </h3>
         </div>
     </div>
 <?php } ?>
