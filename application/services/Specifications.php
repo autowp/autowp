@@ -20,6 +20,13 @@ class Application_Service_Specifications
     protected $_listOptionsTable = null;
 
     /**
+     * @var array
+     */
+    private $_listOptions = array();
+
+    private $_listOptionsChilds = array();
+
+    /**
      * @var Attrs_Units
      */
     protected $_unitTable = null;
@@ -41,6 +48,14 @@ class Application_Service_Specifications
     protected $_userValuesTable = null;
 
     protected $_attributeRows = null;
+
+    protected $_attributes = null;
+
+    protected $_childs = null;
+
+    protected $_attributeChilds = null;
+
+    protected $_zoneAttrs = array();
 
     /**
      * @var Cars
@@ -81,6 +96,60 @@ class Application_Service_Specifications
      * @var Engines
      */
     protected $_engineTable = null;
+
+    /**
+     * @var Attrs_Types
+     */
+    protected $_typeTable;
+
+    /**
+     * @var array
+     */
+    protected $_types = null;
+
+    /**
+     * @var Users
+     */
+    protected $_userTable;
+
+    /**
+     * @var array
+     */
+    protected $_users = array();
+
+    /**
+     * @return Users
+     */
+    private function _getUserTable()
+    {
+        return $this->_userTable
+            ? $this->_userTable
+            : $this->_userTable = new Users();
+    }
+
+    /**
+     * @param int $userId
+     * @return array
+     */
+    private function _getUser($userId)
+    {
+        if (!isset($this->_users[$userId])) {
+            $userRow = $this->_getUserTable()->find($userId)->current();
+            $this->_users[$userId] = $userRow;
+        }
+
+        return $this->_users[$userId];
+    }
+
+    /**
+     * @return Attrs_Types
+     */
+    private function _getTypeTable()
+    {
+        return $this->_typeTable
+            ? $this->_typeTable
+            : $this->_typeTable = new Attrs_Types();
+    }
 
     /**
      * @return Attrs_Values
@@ -167,14 +236,13 @@ class Application_Service_Specifications
         return $this->_zones[$id];
     }
 
-    protected function _getUnit($id)
+    public function getUnit($id)
     {
-        $id = (int)$id;
-
         if ($this->_units === null) {
             $units = array();
             foreach ($this->_getUnitTable()->fetchAll() as $unit) {
                 $units[$unit->id] = array(
+                    'id'   => (int)$unit->id,
                     'name' => $unit->name,
                     'abbr' => $unit->abbr
                 );
@@ -182,6 +250,8 @@ class Application_Service_Specifications
 
             $this->_units = $units;
         }
+
+        $id = (int)$id;
 
         return isset($this->_units[$id]) ? $this->_units[$id] : null;
     }
@@ -203,15 +273,192 @@ class Application_Service_Specifications
         return $zoneId;
     }
 
-    protected function _getForm($itemId, $zoneId, Users_Row $user, array $options)
+    private function _walkTree($zoneId, Callable $callback)
     {
-        $options = array_merge($options, array(
-            'user'   => $user,
-            'zone'   => $this->_getZone($zoneId),
-            'itemId' => $itemId,
+        $this->_loadAttributes();
+        $this->_loadZone($zoneId);
+
+        return $this->_walkTreeStep($zoneId, 0, $callback);
+    }
+
+    private function _walkTreeStep($zoneId, $parent, Callable $callback)
+    {
+        $attributes = $this->getAttributes(array(
+            'parent' => (int)$parent,
+            'zone'   => $zoneId
         ));
 
-        return new Application_Form_Attrs_Zone_Attributes($options);
+        $result = array();
+
+        foreach ($attributes as $attribute) {
+            $key = 'attr_' . $attribute['id'];
+            $haveChilds = isset($this->_childs[$attribute['id']]);
+            if ($haveChilds) {
+                $result[$key] = $this->_walkTreeStep($zoneId, $attribute['id'], $callback);
+            } else {
+                $result[$key] = $callback($attribute);
+            }
+        }
+
+        return $result;
+    }
+
+    private function _loadListOptions(array $attributeIds)
+    {
+        $ids = array_diff($attributeIds, array_keys($this->_listOptions));
+
+        if (count($ids)) {
+            $rows = $this->_getListOptionsTable()->fetchAll(array(
+                'attribute_id IN (?)' => $ids
+            ), 'position');
+
+            foreach ($rows as $row) {
+                $aid = (int)$row->attribute_id;
+                $id = (int)$row->id;
+                $pid = (int)$row->parent_id;
+                if (!isset($this->_listOptions[$aid])) {
+                    $this->_listOptions[$aid] = array();
+                }
+                $this->_listOptions[$aid][$id] = $row->name;
+                if (!isset($this->_listOptionsChilds[$aid][$pid])) {
+                    $this->_listOptionsChilds[$aid][$pid] = array($id);
+                } else {
+                    $this->_listOptionsChilds[$aid][$pid][] = $id;
+                }
+            }
+        }
+    }
+
+    private function _getListsOptions(array $attributeIds)
+    {
+        $this->_loadListOptions($attributeIds);
+
+        $result = array();
+        foreach ($attributeIds as $aid) {
+            if (isset($this->_listOptions[$aid])) {
+                $result[$aid] = $this->_getListOptions($aid, 0);
+            }
+        }
+
+        return $result;
+    }
+
+    private function _getListOptions($aid, $parentId)
+    {
+        $parentId = (int)$parentId;
+
+        $result = array();
+        if (isset($this->_listOptionsChilds[$aid][$parentId])) {
+            foreach ($this->_listOptionsChilds[$aid][$parentId] as $childId) {
+                $result[$childId] = $this->_listOptions[$aid][$childId];
+                $childOptions = $this->_getListOptions($aid, $childId);
+                foreach ($childOptions as &$value) {
+                    $value = '…' . $value;
+                }
+                unset($value); // prevent future bugs
+                $result = array_replace($result, $childOptions);
+            }
+        }
+        return $result;
+    }
+
+    private function _getListOptionsText($attributeId, $id)
+    {
+        $this->_loadListOptions(array($attributeId));
+
+        if (!isset($this->_listOptions[$attributeId][$id])) {
+            throw new Exception("list option `$id` not found");
+        }
+
+        return $this->_listOptions[$attributeId][$id];
+    }
+
+    /**
+     * @param int $itemId
+     * @param int $zoneId
+     * @param Users_Row $user
+     * @param array $options
+     * @return Application_Form_Attrs_Zone_Attributes
+     */
+    protected function _getForm($itemId, $zoneId, Users_Row $user, array $options)
+    {
+        $multioptions = $this->_getListsOptions($this->_loadZone($zoneId));
+
+        $zoneUserValues = $this->getZoneUsersValues($zoneId, $itemId);
+
+        $zone = $this->_getZone($zoneId);
+        $itemTypeId = $zone->item_type_id;
+
+        $userValueTable = $this->_getUserValueTable();
+
+        // fetch values dates
+        $dates = array();
+        if (count($zoneUserValues)) {
+            $valueDescRows = $userValueTable->fetchAll(array(
+                'attribute_id IN (?)' => array_keys($zoneUserValues),
+                'item_id = ?'         => $itemId,
+                'item_type_id = ?'    => $itemTypeId,
+            ));
+            foreach ($valueDescRows as $valueDescRow) {
+                $dates[$valueDescRow->attribute_id][$valueDescRow->user_id] = $valueDescRow->getDate('update_date');
+            }
+        }
+
+        $currentUserValues = array();
+        $allValues = array();
+        foreach ($zoneUserValues as $attributeId => $users) {
+            foreach ($users as $userId => $value) {
+                $date = null;
+                if (isset($dates[$attributeId][$userId])) {
+                    $date = $dates[$attributeId][$userId];
+                }
+
+                $attribute = $this->_getAttribute($attributeId);
+                if (!$attribute) {
+                    throw new Exception("Attribute `$attributeId` not found");
+                }
+
+                $allValues[$attributeId][] = array(
+                    'user'  => $this->_getUser($userId),
+                    'value' => $this->_valueToText($attribute, $value),
+                    'date'  => $date
+                );
+
+                if ($userId == $user->id) {
+                    $currentUserValues[$attributeId] = $value;
+                }
+            }
+        }
+
+        $zoneActualValues = $this->getZoneActualValues($zoneId, $itemId);
+        $actualValues = array();
+        foreach ($zoneActualValues as $attributeId => $value) {
+            $attribute = $this->_getAttribute($attributeId);
+            if (!$attribute) {
+                throw new Exception("Attribute `$attributeId` not found");
+            }
+
+            $actualValues[$attributeId] = $this->_valueToText($attribute, $value);
+        }
+
+        $options = array_merge($options, array(
+            'service'      => $this,
+            'zone'         => $this->_getZone($zoneId),
+            'itemId'       => $itemId,
+            'allValues'    => $allValues,
+            'actualValues' => $actualValues,
+            'multioptions' => $multioptions
+        ));
+
+        //$currentUserValues = $this->getZoneUserValues($zoneId, $itemId, $user->id);
+
+        $form = new Application_Form_Attrs_Zone_Attributes($options);
+        $formValues = $this->_walkTree($zoneId, function($attribute) use ($currentUserValues) {
+            return isset($currentUserValues[$attribute['id']]) ? $currentUserValues[$attribute['id']] : null;
+        });
+        $form->populate($formValues);
+
+        return $form;
     }
 
     /**
@@ -225,96 +472,136 @@ class Application_Service_Specifications
         return $this->_getForm($car->id, $zoneId, $user, $options);
     }
 
+    /**
+     * @param Engines_Row $engine
+     * @param Users_Row $user
+     * @param array $options
+     * @return Application_Form_Attrs_Zone_Attributes
+     */
     public function getEngineForm(Engines_Row $engine, Users_Row $user, array $options)
     {
         $zoneId = 5;
         return $this->_getForm($engine->id, $zoneId, $user, $options);
     }
 
-    protected function _collectFormData($zone, $attributes, $values)
+    protected function _collectFormData($zoneId, $attributes, $values)
     {
         $result = array();
         foreach ($attributes as $attribute) {
-            $nodeName = 'attr_' . $attribute->id;
-            $subAttributes = $zone->findAttributes($attribute);
-            if (count($subAttributes)) {
-                $subvalues = $this->_collectFormData(
-                    $zone,
-                    $zone->findAttributes($attribute),
-                    $values[$nodeName]
-                );
-                foreach ($subvalues as $id => $value) {
-                    $result[$id] = $value;
-                }
-            } else {
-                $value = $values[$nodeName];
-                /*switch ($attribute->type_id) {
-                 case 3:
-                if (strlen($value)) {
-                $value = Zend_Locale_Format::getFloat($value, array(
-                    'locale' => Zend_Registry::get('Zend_Locale')
-                ));
-                } else {
-                $value = null;
-                }
-                break;
-                default:
-                break;
-                }*/
+            $id = (int)$attribute['id'];
+            $value = $values['attr_' . $id];
 
-                $result[$attribute->id] = $value;
+            $subAttributes = $this->getAttributes(array(
+                'zone'   => $zoneId,
+                'parent' => $id
+            ));
+
+            if (count($subAttributes)) {
+                $subvalues = $this->_collectFormData($zoneId, $subAttributes, $value);
+                $result = array_replace($result, $subvalues);
+            } else {
+                $result[$id] = $value;
             }
         }
 
         return $result;
     }
 
-
-    protected function _getAttributeRow($id)
+    protected function _loadZone($id)
     {
-        if ($this->_attributeRows === null) {
-            $attributeTable = $this->_getAttributeTable();
-            $array = array();
-            foreach ($attributeTable->fetchAll() as $row) {
-                $array[$row->id] = $row;
-            }
-
-            $this->_attributeRows = $array;
+        $id = (int)$id;
+        if (!isset($this->_zoneAttrs[$id])) {
+            $db = $this->_getAttributeTable()->getAdapter();
+            $this->_zoneAttrs[$id] = $db->fetchCol(
+                $db->select()
+                    ->from('attrs_zone_attributes', 'attribute_id')
+                    ->where('zone_id = ?', $id)
+                    ->order('position')
+            );
         }
 
-        if (!isset($this->_attributeRows[$id])) {
-            throw new Exception("Аттрибут $id не найден");
-        }
-
-        return $this->_attributeRows[$id];
+        return $this->_zoneAttrs[$id];
     }
 
-    public function saveAttrsZoneAttributes($form)
+    /**
+     * @return Application_Service_Specifications
+     */
+    protected function _loadAttributes()
+    {
+        if ($this->_attributes === null) {
+            $array = array();
+            $childs = array();
+            foreach ($this->_getAttributeTable()->fetchAll(null, 'position') as $row) {
+                $id = (int)$row->id;
+                $pid = (int)$row->parent_id;
+                $array[$id] = array(
+                    'id'          => $id,
+                    'name'        => $row->name,
+                    'description' => $row->description,
+                    'typeId'      => (int)$row->type_id,
+                    'unitId'      => (int)$row->unit_id,
+                    'isMultiple'  => $row->isMultiple(),
+                    'precision'   => $row->precision
+                );
+                if (!isset($childs[$pid])) {
+                    $childs[$pid] = array($id);
+                } else {
+                    $childs[$pid][] = $id;
+                }
+            }
+
+            $this->_attributes = $array;
+            $this->_childs = $childs;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int $id
+     * @return NULL|array
+     */
+    protected function _getAttribute($id)
+    {
+        $this->_loadAttributes();
+
+        $id = (int)$id;
+        return isset($this->_attributes[$id]) ? $this->_attributes[$id] : null;
+    }
+
+    /**
+     * @param Application_Form_Attrs_Zone_Attributes $form
+     * @param Users_Row $user
+     */
+    public function saveAttrsZoneAttributes(Application_Form_Attrs_Zone_Attributes $form, Users_Row $user)
     {
         $values = $form->getValues();
 
         $zone = $form->getZone();
         $itemId = $form->getItemId();
 
-        $values = $this->_collectFormData($zone, $zone->findAttributes(), $values);
+        $attributes = $this->getAttributes(array(
+            'zone'   => $zone->id,
+            'parent' => 0
+        ));
+
+        $values = $this->_collectFormData($zone->id, $attributes, $values);
         $userValueTable = $this->_getUserValueTable();
         $itemTypeId = $zone->item_type_id;
-
-        $user = $form->getUser();
 
         $uid = $user->id;
 
         foreach ($values as $attribute_id => $value) {
-            $attribute = $this->_getAttributeRow($attribute_id);
+            $attribute = $this->_getAttribute($attribute_id);
             $somethingChanged = false;
 
-            $userValueDataTable = $attribute->getUserValueTable();
+            $userValueDataTable = $this->getUserValueDataTable($attribute['typeId']);
 
-            if ($attribute->isMultiple()) {
+            if ($attribute['isMultiple']) {
 
                 // удаляем дескрипторы значений
                 $userValues = $userValueTable->fetchAll(array(
-                    'attribute_id = ?' => $attribute->id,
+                    'attribute_id = ?' => $attribute['id'],
                     'item_id = ?'      => $itemId,
                     'item_type_id = ?' => $itemTypeId,
                     'user_id = ?'      => $uid,
@@ -324,7 +611,7 @@ class Application_Service_Specifications
                 }
                 // удаляем значение
                 $userValueDataRows = $userValueDataTable->fetchAll(array(
-                    'attribute_id = ?' => $attribute->id,
+                    'attribute_id = ?' => $attribute['id'],
                     'item_id = ?'      => $itemId,
                     'item_type_id = ?' => $itemTypeId,
                     'user_id = ?'      => $uid
@@ -346,7 +633,7 @@ class Application_Service_Specifications
                     if (!$empty) {
                         // вставляем новые дексрипторы и значения
                         $userValueTable->insert(array(
-                            'attribute_id' => $attribute->id,
+                            'attribute_id' => $attribute['id'],
                             'item_id'      => $itemId,
                             'item_type_id' => $itemTypeId,
                             'user_id'      => $uid,
@@ -357,7 +644,7 @@ class Application_Service_Specifications
                         foreach ($value as $oneValue) {
                             if ($oneValue) {
                                 $userValueDataTable->insert(array(
-                                    'attribute_id' => $attribute->id,
+                                    'attribute_id' => $attribute['id'],
                                     'item_id'      => $itemId,
                                     'item_type_id' => $itemTypeId,
                                     'user_id'      => $uid,
@@ -378,7 +665,7 @@ class Application_Service_Specifications
                 if (strlen($value) > 0) {
                     // вставлям/обновляем дескриптор значения
                     $userValue = $userValueTable->fetchRow(array(
-                        'attribute_id = ?' => $attribute->id,
+                        'attribute_id = ?' => $attribute['id'],
                         'item_id = ?'      => $itemId,
                         'item_type_id = ?' => $itemTypeId,
                         'user_id = ?'      => $uid
@@ -386,7 +673,7 @@ class Application_Service_Specifications
 
                     // вставляем/обновляем значение
                     $userValueData = $userValueDataTable->fetchRow(array(
-                        'attribute_id = ?' => $attribute->id,
+                        'attribute_id = ?' => $attribute['id'],
                         'item_id = ?'      => $itemId,
                         'item_type_id = ?' => $itemTypeId,
                         'user_id = ?'      => $uid
@@ -396,7 +683,7 @@ class Application_Service_Specifications
 
                         if (!$userValue) {
                             $userValue = $userValueTable->createRow(array(
-                                'attribute_id' => $attribute->id,
+                                'attribute_id' => $attribute['id'],
                                 'item_id'      => $itemId,
                                 'item_type_id' => $itemTypeId,
                                 'user_id'      => $uid,
@@ -412,7 +699,7 @@ class Application_Service_Specifications
                         if (!$userValueData) {
                             $userValueData = $userValueDataTable->fetchNew();
                             $userValueData->setFromArray(array(
-                                'attribute_id' => $attribute->id,
+                                'attribute_id' => $attribute['id'],
                                 'item_id'      => $itemId,
                                 'item_type_id' => $itemTypeId,
                                 'user_id'      => $uid
@@ -430,7 +717,7 @@ class Application_Service_Specifications
                     $needUpdate = false;
                     // удаляем дескриптор значения
                     $userValue = $userValueTable->fetchRow(array(
-                        'attribute_id = ?' => $attribute->id,
+                        'attribute_id = ?' => $attribute['id'],
                         'item_id = ?'      => $itemId,
                         'item_type_id = ?' => $itemTypeId,
                         'user_id = ?'      => $uid,
@@ -441,7 +728,7 @@ class Application_Service_Specifications
                     }
                     // удаляем значение
                     $userValueData = $userValueDataTable->fetchRow(array(
-                        'attribute_id = ?' => $attribute->id,
+                        'attribute_id = ?' => $attribute['id'],
                         'item_id = ?'      => $itemId,
                         'item_type_id = ?' => $itemTypeId,
                         'user_id = ?'      => $uid,
@@ -462,6 +749,7 @@ class Application_Service_Specifications
                 $this->_propageteEngine($attribute, $itemTypeId, $itemId);
             }
         }
+
     }
 
     protected function _getEngineAttributeIds()
@@ -492,11 +780,11 @@ class Application_Service_Specifications
             return;
         }
 
-        if (!$this->_isEngineAttributeId($attribute->id)) {
+        if (!$this->_isEngineAttributeId($attribute['id'])) {
             return;
         }
 
-        if (!$attribute->type_id) {
+        if (!$attribute['typeId']) {
             return;
         }
 
@@ -514,7 +802,6 @@ class Application_Service_Specifications
      * @param int $itemTypeId
      * @param int $parentId
      */
-
     protected function _getChildCarIds($parentId)
     {
         if (!isset($this->_carChildsCache[$parentId])) {
@@ -529,6 +816,12 @@ class Application_Service_Specifications
 
         return $this->_carChildsCache[$parentId];
     }
+
+    /**
+     * @param array $attribute
+     * @param int $itemTypeId
+     * @param int $itemId
+     */
 
     protected function _getChildEngineIds($parentId)
     {
@@ -545,12 +838,12 @@ class Application_Service_Specifications
         return $this->_engineChildsCache[$parentId];
     }
 
-    protected function _haveOwnAttributeValue($attribute, $itemTypeId, $itemId)
+    protected function _haveOwnAttributeValue($attributeId, $itemTypeId, $itemId)
     {
         return (bool)$this->_getUserValueTable()->fetchRow(array(
-            'attribute_id = ?' => $attribute->id,
-            'item_type_id = ?' => $itemTypeId,
-            'item_id = ?'      => $itemId
+            'attribute_id = ?' => (int)$attributeId,
+            'item_type_id = ?' => (int)$itemTypeId,
+            'item_id = ?'      => (int)$itemId
         ));
     }
 
@@ -562,7 +855,7 @@ class Application_Service_Specifications
 
             foreach ($childIds as $childId) {
                 // update only if row use inheritance
-                $haveValue = $this->_haveOwnAttributeValue($attribute, $itemTypeId, $childId);
+                $haveValue = $this->_haveOwnAttributeValue($attribute['id'], $itemTypeId, $childId);
 
                 if (!$haveValue) {
 
@@ -580,7 +873,7 @@ class Application_Service_Specifications
 
             foreach ($childIds as $childId) {
                 // update only if row use inheritance
-                $haveValue = $this->_haveOwnAttributeValue($attribute, $itemTypeId, $childId);
+                $haveValue = $this->_haveOwnAttributeValue($attribute['id'], $itemTypeId, $childId);
 
                 if (!$haveValue) {
 
@@ -589,6 +882,7 @@ class Application_Service_Specifications
 
                     if ($changed) {
                         $this->_propagateInheritance($attribute, $itemTypeId, $childId);
+                        $this->_propageteEngine($attribute, $itemTypeId, $childId);
                     }
                 }
             }
@@ -633,42 +927,70 @@ class Application_Service_Specifications
         );
     }
 
-    protected function _getAttributes($zoneId, $parent = null)
+    public function getAttributes(array $options = array())
     {
-        $select = $this->_getAttributeTable()->select(true);
+        $defaults = array(
+            'zone'      => null,
+            'parent'    => null,
+            'recursive' => false
+        );
+        $options = array_merge($defaults, $options);
 
-        if ($zoneId) {
-            $select
-                ->join('attrs_zone_attributes', 'attrs_zone_attributes.attribute_id = attrs_attributes.id', null)
-                ->where('attrs_zone_attributes.zone_id = ?', $zoneId)
-                ->order('attrs_zone_attributes.position');
+        $zone = $options['zone'];
+        $parent = $options['parent'];
+        $recursive = $options['recursive'];
+
+        $this->_loadAttributes();
+
+        if ($zone) {
+            $this->_loadZone($zone);
+        }
+
+        if ($recursive) {
+            $attributes = array();
+            $ids = array();
+            if ($zone) {
+                if (isset($this->_childs[$parent])) {
+                    $ids = array_intersect($this->_childs[$parent], $this->_zoneAttrs[$zone]);
+                }
+            } else {
+                if (isset($this->_childs[$parent])) {
+                    $ids = $this->_childs[$parent];
+                }
+            }
+            foreach ($ids as $id) {
+                $attributes[] = $this->_attributes[$id];
+            }
         } else {
-            $select
-                ->order('position');
+            if ($zone) {
+                $attributes = array();
+                if ($parent !== null) {
+                    $ids = array();
+                    if (isset($this->_childs[$parent])) {
+                        $ids = array_intersect($this->_childs[$parent], $this->_zoneAttrs[$zone]);
+                    }
+                } else {
+                    $ids = $this->_zoneAttrs[$zone];
+                }
+                foreach ($ids as $id) {
+                    $attributes[] = $this->_attributes[$id];
+                }
+            } else {
+                $attributes = $this->_attributes;
+            }
         }
 
-        if ($parent) {
-            $select->where('parent_id = ?', $parent->id);
-        } else {
-            $select->where('parent_id is null');
+        if ($recursive) {
+            foreach ($attributes as &$attr) {
+                $attr['childs'] = $this->getAttributes(array(
+                    'zone'      => $zone,
+                    'parent'    => $attr['id'],
+                    'recursive' => $recursive
+                ));
+            }
         }
 
-        $rows = $this->_getAttributeTable()->fetchAll($select);
-
-        $result = array();
-        foreach ($rows as $row) {
-            $result[] = array(
-                'id'         => $row->id,
-                'name'       => $row->name,
-                'typeId'     => $row->type_id,
-                'unitId'     => $row->unit_id,
-                'isMultiple' => $row->isMultiple(),
-                'precision'  => $row->precision,
-                'childs'     => $this->_getAttributes($zoneId, $row)
-            );
-        }
-
-        return $result;
+        return $attributes;
     }
 
     public function getActualValue($attribute, $itemId, $itemTypeId)
@@ -677,9 +999,15 @@ class Application_Service_Specifications
             throw new Exception("Item_id not set");
         }
 
+        if ($attribute instanceof Attrs_Attributes_Row) {
+            $attribute = $this->_getAttribute($attribute->id);
+        } elseif (is_numeric($attribute)) {
+            $attribute = $this->_getAttribute($attribute);
+        }
+
         //if (!isset($this->_actualValueCache[]))
 
-        $valuesTable = $this->_getValueDataTable($attribute['typeId']);
+        $valuesTable = $this->getValueDataTable($attribute['typeId']);
         if (!$valuesTable) {
             return null;
         }
@@ -772,11 +1100,28 @@ class Application_Service_Specifications
             $specsZoneId = reset($keys);
         }
 
-        $attributes = $this->_getAttributes($specsZoneId);
+        $attributes = $this->getAttributes(array(
+            'zone'      => $specsZoneId,
+            'recursive' => true,
+            'parent'    => 0
+        ));
+
+        $engineTable = $this->_getEngineTable();
+        $engineNameAttr = 100;
 
         foreach ($cars as $car) {
 
             $carType = $carTypeTable->find($car->car_type_id)->current();
+
+            $values = $this->_loadValues($attributes, $car->id, self::ITEM_TYPE_CAR);
+
+            // append engine name
+            if (!(isset($values[$engineNameAttr]) && $values[$engineNameAttr]) && $car->engine_id) {
+                $engineRow = $engineTable->find($car->engine_id)->current();
+                if ($engineRow) {
+                    $values[$engineNameAttr] = $engineRow->caption;
+                }
+            }
 
             $result[] = array(
                 'id'               => $car->id,
@@ -786,7 +1131,7 @@ class Application_Service_Specifications
                 'topPicture'       => $this->_specPicture($car, $topPerspectives),
                 'bottomPicture'    => $this->_specPicture($car, $bottomPerspectives),
                 'carType'          => $carType ? $carType->name : null,
-                'values'           => $this->_loadValues($attributes, $car->id, self::ITEM_TYPE_CAR)
+                'values'           => $values
             );
         }
 
@@ -812,7 +1157,11 @@ class Application_Service_Specifications
         $result = array();
         $attributes = array();
 
-        $attributes = $this->_getAttributes(self::ENGINE_ZONE_ID);
+        $attributes = $this->getAttributes(array(
+            'zone'      => self::ENGINE_ZONE_ID,
+            'recursive' => true,
+            'parent'    => 0
+        ));
 
         foreach ($engines as $engine) {
             $result[] = array(
@@ -836,7 +1185,7 @@ class Application_Service_Specifications
     {
         foreach ($attributes as &$attribute) {
             if ($attribute['unitId']) {
-                $attribute['unit'] = $this->_getUnit($attribute['unitId']);
+                $attribute['unit'] = $this->getUnit($attribute['unitId']);
             }
 
             $this->_addUnitsToAttributes($attribute['childs']);
@@ -867,7 +1216,7 @@ class Application_Service_Specifications
         }
     }
 
-    protected function _getValueDataTable($type)
+    public function getValueDataTable($type)
     {
         if (!isset($this->_valueDataTables[$type])) {
             $this->_valueDataTables[$type] = $this->_createValueDataTable($type);
@@ -972,19 +1321,16 @@ class Application_Service_Specifications
                 return is_null($value) ? null : ($value ? 'да' : 'нет');
 
             case 6: // select
-                if ($value) {
-                    $row = $this->_getListOptionsTable()->find($value)->current();
-                    if ($row) {
-                        return $row->name;
-                    }
-                }
-                break;
-
             case 7: // select
                 if ($value) {
-                    $row = $this->_getListOptionsTable()->find($value)->current();
-                    if ($row) {
-                        return $row->name;
+                    if (is_array($value)) {
+                        $text = array();
+                        foreach ($value as $v) {
+                            $text[] = $this->_getListOptionsText($attribute['id'], $v);
+                        }
+                        return implode(', ', $text);
+                    } else {
+                        return $this->_getListOptionsText($attribute['id'], $value);
                     }
                 }
                 break;
@@ -994,12 +1340,11 @@ class Application_Service_Specifications
 
     protected function _calcAvgUserValue($attribute, $itemTypeId, $itemId)
     {
-        //$uTable = new Users();
         $userValuesTable = $this->_getUserValueTable();
-        $userValuesDataTable = $this->getUserValueDataTable($attribute->type_id);
+        $userValuesDataTable = $this->getUserValueDataTable($attribute['typeId']);
 
         $userValueDataRows = $userValuesDataTable->fetchAll(array(
-            'attribute_id = ?' => $attribute->id,
+            'attribute_id = ?' => $attribute['id'],
             'item_id = ?'      => $itemId,
             'item_type_id = ?' => $itemTypeId,
         ));
@@ -1023,7 +1368,7 @@ class Application_Service_Specifications
                     throw new Exception('User not found');
                 }*/
 
-                if ($attribute->isMultiple()) {
+                if ($attribute['isMultiple']) {
                     $value = array();
                     foreach ($valueRows as $valueRow) {
                         $value[$valueRow->ordering] = $valueRow->value;
@@ -1035,7 +1380,7 @@ class Application_Service_Specifications
                 }
 
                 $row = $userValuesTable->fetchRow(array(
-                    'attribute_id = ?' => $attribute->id,
+                    'attribute_id = ?' => $attribute['id'],
                     'item_id = ?'      => $itemId,
                     'item_type_id = ?' => $itemTypeId,
                     'user_id = ?'      => $uid
@@ -1116,7 +1461,7 @@ class Application_Service_Specifications
             return null;
         }
 
-        if (!$this->_isEngineAttributeId($attribute->id)) {
+        if (!$this->_isEngineAttributeId($attribute['id'])) {
             return null;
         }
 
@@ -1132,12 +1477,12 @@ class Application_Service_Specifications
             return null;
         }
 
-        $valueDataTable = $this->_getValueDataTable($attribute->type_id);
+        $valueDataTable = $this->getValueDataTable($attribute['typeId']);
 
-        if (!$attribute->isMultiple()) {
+        if (!$attribute['isMultiple']) {
 
             $valueDataRow = $valueDataTable->fetchRow(array(
-                'attribute_id = ?' => $attribute->id,
+                'attribute_id = ?' => $attribute['id'],
                 'item_id = ?'      => $carRow->engine_id,
                 'item_type_id = ?' => self::ITEM_TYPE_ENGINE,
                 'value IS NOT NULL'
@@ -1148,7 +1493,7 @@ class Application_Service_Specifications
         } else {
 
             $valueDataRows = $valueDataTable->fetchAll(array(
-                'attribute_id = ?' => $attribute->id,
+                'attribute_id = ?' => $attribute['id'],
                 'item_id = ?'      => $carRow->engine_id,
                 'item_type_id = ?' => self::ITEM_TYPE_ENGINE,
                 'value IS NOT NULL'
@@ -1170,7 +1515,7 @@ class Application_Service_Specifications
 
         if ($itemTypeId == 1) {
 
-            $valueDataTable = $this->_getValueDataTable($attribute->type_id);
+            $valueDataTable = $this->getValueDataTable($attribute['typeId']);
             $db = $valueDataTable->getAdapter();
 
             $parentIds = $db->fetchCol(
@@ -1181,13 +1526,13 @@ class Application_Service_Specifications
 
             if (count($parentIds) > 0) {
 
-                if (!$attribute->isMultiple()) {
+                if (!$attribute['isMultiple']) {
                     $idx = 0;
                     $registry = array();
                     $ratios = array();
 
                     $valueDataRows = $valueDataTable->fetchAll(array(
-                        'attribute_id = ?' => $attribute->id,
+                        'attribute_id = ?' => $attribute['id'],
                         'item_id in (?)'   => $parentIds,
                         'item_type_id = ?' => $itemTypeId,
                         'value IS NOT NULL'
@@ -1246,12 +1591,12 @@ class Application_Service_Specifications
 
                 if ($parentEngineRow) {
 
-                    $valueDataTable = $this->_getValueDataTable($attribute->type_id);
+                    $valueDataTable = $this->getValueDataTable($attribute['typeId']);
 
-                    if (!$attribute->isMultiple()) {
+                    if (!$attribute['isMultiple']) {
 
                         $valueDataRow = $valueDataTable->fetchRow(array(
-                            'attribute_id = ?' => $attribute->id,
+                            'attribute_id = ?' => $attribute['id'],
                             'item_id = ?'      => $parentEngineRow->id,
                             'item_type_id = ?' => $itemTypeId,
                             'value IS NOT NULL'
@@ -1262,7 +1607,21 @@ class Application_Service_Specifications
                         }
 
                     } else {
-                        //TODO: multiple attr inheritance
+
+                        $valueDataRows = $valueDataTable->fetchAll(array(
+                            'attribute_id = ?' => $attribute['id'],
+                            'item_id = ?'      => $parentEngineRow->id,
+                            'item_type_id = ?' => $itemTypeId,
+                            'value IS NOT NULL'
+                        ));
+
+                        $a = array();
+                        foreach ($valueDataRows as $valueDataRow) {
+                            $a[] = $valueDataRow->value;
+                        }
+
+                        $actualValue = count($a) ? $a : null;
+
                     }
                 }
             }
@@ -1274,7 +1633,7 @@ class Application_Service_Specifications
     protected function _setActualValue($attribute, $itemTypeId, $itemId, $actualValue)
     {
         $valueTable = $this->_getValueTable();
-        $valueDataTable = $this->_getValueDataTable($attribute->type_id);
+        $valueDataTable = $this->getValueDataTable($attribute['typeId']);
 
         $somethingChanges = false;
 
@@ -1282,7 +1641,7 @@ class Application_Service_Specifications
 
             // descriptor
             $row = $valueTable->fetchRow(array(
-                'attribute_id = ?' => $attribute->id,
+                'attribute_id = ?' => $attribute['id'],
                 'item_id = ?'      => $itemId,
                 'item_type_id = ?' => $itemTypeId
             ));
@@ -1293,7 +1652,7 @@ class Application_Service_Specifications
 
             // value
             $rows = $valueDataTable->fetchAll(array(
-                'attribute_id = ?' => $attribute->id,
+                'attribute_id = ?' => $attribute['id'],
                 'item_id = ?'      => $itemId,
                 'item_type_id = ?' => $itemTypeId
             ));
@@ -1305,13 +1664,13 @@ class Application_Service_Specifications
 
             // descriptor
             $row = $valueTable->fetchRow(array(
-                'attribute_id = ?' => $attribute->id,
+                'attribute_id = ?' => $attribute['id'],
                 'item_id = ?'      => $itemId,
                 'item_type_id = ?' => $itemTypeId
             ));
             if (!$row) {
                 $row = $valueTable->createRow(array(
-                    'attribute_id' => $attribute->id,
+                    'attribute_id' => $attribute['id'],
                     'item_id'      => $itemId,
                     'item_type_id' => $itemTypeId
                 ));
@@ -1320,9 +1679,9 @@ class Application_Service_Specifications
             }
 
             // value
-            if ($attribute->isMultiple()) {
+            if ($attribute['isMultiple']) {
                 $rows = $valueDataTable->fetchAll(array(
-                    'attribute_id = ?' => $attribute->id,
+                    'attribute_id = ?' => $attribute['id'],
                     'item_id = ?'      => $itemId,
                     'item_type_id = ?' => $itemTypeId
                 ));
@@ -1333,7 +1692,7 @@ class Application_Service_Specifications
 
                 foreach ($actualValue as $ordering => $value) {
                     $rows = $valueDataTable->insert(array(
-                        'attribute_id' => $attribute->id,
+                        'attribute_id' => $attribute['id'],
                         'item_id'      => $itemId,
                         'item_type_id' => $itemTypeId,
                         'ordering'     => $ordering,
@@ -1344,13 +1703,13 @@ class Application_Service_Specifications
 
             } else {
                 $row = $valueDataTable->fetchRow(array(
-                    'attribute_id = ?' => $attribute->id,
+                    'attribute_id = ?' => $attribute['id'],
                     'item_id = ?'      => $itemId,
                     'item_type_id = ?' => $itemTypeId,
                 ));
                 if (!$row) {
                     $row = $valueDataTable->createRow(array(
-                        'attribute_id' => $attribute->id,
+                        'attribute_id' => $attribute['id'],
                         'item_id'      => $itemId,
                         'item_type_id' => $itemTypeId,
                         'value'        => $actualValue
@@ -1371,7 +1730,7 @@ class Application_Service_Specifications
 
     public function updateActualValue($attributeId, $itemTypeId, $itemId)
     {
-        $attribute = $this->_getAttributeRow($attributeId);
+        $attribute = $this->_getAttribute($attributeId);
         return $this->_updateActualValue($attribute, $itemTypeId, $itemId);
     }
 
@@ -1426,7 +1785,6 @@ class Application_Service_Specifications
     {
         if ($itemTypeId == 1) {
             $table = $this->_getValueTable();
-            //var_dump($itemTypeId, $itemId);
             return (bool)$table->fetchRow(
                 $table->select(true)
                     ->where('attrs_values.item_type_id = ?', $itemTypeId)
@@ -1441,8 +1799,8 @@ class Application_Service_Specifications
 
     public function updateActualValues($itemTypeId, $itemId)
     {
-        foreach ($this->_getAttributeTable()->fetchAll() as $attribute) {
-            if ($attribute->type_id) {
+        foreach ($this->getAttributes() as $attribute) {
+            if ($attribute['typeId']) {
                 $this->_updateActualValue($attribute, $itemTypeId, $itemId);
             }
         }
@@ -1454,42 +1812,14 @@ class Application_Service_Specifications
      */
     public function updateInheritedValues($itemTypeId, $itemId)
     {
-        foreach ($this->_getAttributeTable()->fetchAll() as $attribute) {
-            if ($attribute->type_id) {
-                $haveValue = $this->_haveOwnAttributeValue($attribute, $itemTypeId, $itemId);
+        foreach ($this->getAttributes() as $attribute) {
+            if ($attribute['typeId']) {
+                $haveValue = $this->_haveOwnAttributeValue($attribute['id'], $itemTypeId, $itemId);
                 if (!$haveValue) {
                     $this->_updateActualValue($attribute, $itemTypeId, $itemId);
                 }
             }
         }
-    }
-
-    /**
-     * @param int $attrId
-     * @param int $itemTypeId
-     * @param int $itemId
-     * @return NULL|Project_Form
-     */
-    public function getEditValueForm($attrId, $itemTypeId, $itemId, $language)
-    {
-        $attributeRow = $this->_getAttributeTable()->find($attrId)->current();
-        if (!$attributeRow) {
-            return null;
-        }
-        $elementType = $attributeRow->getFormElementType();
-        if (!$elementType) {
-            return null;
-        }
-        $elementOptions = $attributeRow->getFormElementOptions($language);
-
-        $form = new Project_Form(array(
-            'method'   => 'post',
-            'elements' => array(
-                array($elementType, 'value', $elementOptions)
-            )
-        ));
-
-        return $form;
     }
 
     public function getContributors($itemTypeId, $itemId)
@@ -1511,5 +1841,379 @@ class Application_Service_Specifications
         );
 
         return $pairs;
+    }
+
+    private function _prepareValue($typeId, $value)
+    {
+        switch ($typeId) {
+            case 1: // строка
+                return $value;
+
+            case 2: // int
+                return $value;
+
+            case 3: // float
+                return $value;
+
+            case 4: // textarea
+                return $value;
+
+            case 5: // checkbox
+                return is_null($value) ? null : ($value ? 1 : 0);
+
+            case 6: // select
+            case 7: // tree select
+                return is_null($value) ? null : (int)$value;
+                break;
+        }
+        return null;
+    }
+
+    /**
+     * @param int $zoneId
+     * @param int $itemId
+     * @param int $userId
+     * @throws Exception
+     * @return array
+     */
+    public function getZoneUserValues($zoneId, $itemId, $userId)
+    {
+        if (!$itemId) {
+            throw new Exception("Item_id not set");
+        }
+
+        $zone = $this->_getZone($zoneId);
+        $itemTypeId = $zone->item_type_id;
+
+        $this->_loadZone($zoneId);
+
+        $attributes = $this->getAttributes(array(
+            'zone'   => $zoneId,
+            'parent' => null
+        ));
+
+        $requests = array();
+
+        foreach ($attributes as $attribute) {
+            $typeId = $attribute['typeId'];
+            $isMultiple = $attribute['isMultiple'] ? 1 : 0;
+            if ($typeId) {
+                if (!isset($requests[$typeId][$isMultiple])) {
+                    $requests[$typeId][$isMultiple] = array();
+                }
+                $requests[$typeId][$isMultiple][] = $attribute['id'];
+            }
+        }
+
+        $values = array();
+        foreach ($requests as $typeId => $multiples) {
+            foreach ($multiples as $isMultiple => $ids) {
+                $valuesTable = $this->getUserValueDataTable($typeId);
+                if (!$valuesTable) {
+                    throw new Exception("ValueTable not found");
+                }
+
+                $select = $valuesTable->select()
+                    ->where('attribute_id in (?)', $ids)
+                    ->where('item_id = ?', (int)$itemId)
+                    ->where('item_type_id = ?', (int)$itemTypeId)
+                    ->where('user_id = ?', (int)$userId);
+
+                if ($isMultiple) {
+                    $select->order('ordering');
+                }
+
+                foreach ($valuesTable->fetchAll($select) as $row) {
+                    $aid = (int)$row->attribute_id;
+                    $value = $this->_prepareValue($typeId, $row->value);
+                    if ($isMultiple) {
+                        if (!isset($values[$aid])) {
+                            $values[$aid] = array();
+                        }
+                        $values[$aid][] = $value;
+                    } else {
+                        $values[$aid] = $value;
+                    }
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * @param int $zoneId
+     * @param int $itemId
+     * @param int $userId
+     * @throws Exception
+     * @return array
+     */
+    public function getZoneUsersValues($zoneId, $itemId)
+    {
+        if (!$itemId) {
+            throw new Exception("Item_id not set");
+        }
+
+        $zone = $this->_getZone($zoneId);
+        $itemTypeId = $zone->item_type_id;
+
+        $this->_loadZone($zoneId);
+
+        $attributes = $this->getAttributes(array(
+            'zone'   => $zoneId,
+            'parent' => null
+        ));
+
+        $requests = array();
+
+        foreach ($attributes as $attribute) {
+            $typeId = $attribute['typeId'];
+            $isMultiple = $attribute['isMultiple'] ? 1 : 0;
+            if ($typeId) {
+                if (!isset($requests[$typeId][$isMultiple])) {
+                    $requests[$typeId][$isMultiple] = array();
+                }
+                $requests[$typeId][$isMultiple][] = $attribute['id'];
+            }
+        }
+
+        $values = array();
+        foreach ($requests as $typeId => $multiples) {
+            foreach ($multiples as $isMultiple => $ids) {
+                $valuesTable = $this->getUserValueDataTable($typeId);
+                if (!$valuesTable) {
+                    throw new Exception("ValueTable not found");
+                }
+
+                $select = $valuesTable->select()
+                    ->where('attribute_id in (?)', $ids)
+                    ->where('item_id = ?', (int)$itemId)
+                    ->where('item_type_id = ?', (int)$itemTypeId);
+
+                if ($isMultiple) {
+                    $select->order('ordering');
+                }
+
+                foreach ($valuesTable->fetchAll($select) as $row) {
+                    $aid = (int)$row->attribute_id;
+                    $uid = (int)$row->user_id;
+                    $value = $this->_prepareValue($typeId, $row->value);
+                    if (!isset($values[$aid])) {
+                        $values[$aid] = array();
+                    }
+                    if ($isMultiple) {
+                        if (!isset($values[$aid][$uid])) {
+                            $values[$aid][$uid] = array();
+                        }
+                        $values[$aid][$uid][] = $value;
+                    } else {
+                        $values[$aid][$uid] = $value;
+                    }
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    public function getUserValue($attributeId, $itemTypeId, $itemId, $userId)
+    {
+        if (!$itemId) {
+            throw new Exception("Item_id not set");
+        }
+
+        $attribute = $this->_getAttribute($attributeId);
+        if (!$attribute) {
+            throw new Exception("attribute not found");
+        }
+
+        $valuesTable = $this->getUserValueDataTable($attribute['typeId']);
+        if (!$valuesTable) {
+            return null;
+        }
+
+        $select = $valuesTable->select()
+            ->where('attribute_id = ?', (int)$attribute['id'])
+            ->where('item_id = ?', (int)$itemId)
+            ->where('item_type_id = ?', (int)$itemTypeId)
+            ->where('user_id = ?', (int)$userId);
+
+        if ($attribute['isMultiple']) {
+            $select->order('ordering');
+        }
+
+        $values = array();
+        foreach ($valuesTable->fetchAll($select) as $row) {
+            $values[] = $this->_prepareValue($attribute['typeId'], $row->value);
+        }
+
+        if (count($values) <= 0) {
+            return null;
+        }
+
+        return $attribute['isMultiple'] ? $values : $values[0];
+    }
+
+    public function getUserValueText($attributeId, $itemTypeId, $itemId, $userId)
+    {
+        if (!$itemId) {
+            throw new Exception("Item_id not set");
+        }
+
+        $attribute = $this->_getAttribute($attributeId);
+        if (!$attribute) {
+            throw new Exception("attribute not found");
+        }
+
+        $valuesTable = $this->getUserValueDataTable($attribute['typeId']);
+        if (!$valuesTable) {
+            return null;
+        }
+
+        $select = $valuesTable->select()
+            ->where('attribute_id = ?', (int)$attribute['id'])
+            ->where('item_id = ?', (int)$itemId)
+            ->where('item_type_id = ?', (int)$itemTypeId)
+            ->where('user_id = ?', (int)$userId);
+
+        if ($attribute['isMultiple']) {
+            $select->order('ordering');
+        }
+
+        $values = array();
+        foreach ($valuesTable->fetchAll($select) as $row) {
+            $values[] = $this->_valueToText($attribute, $row->value);
+        }
+
+        if (count($values)) {
+            return implode(', ', $values);
+        }
+
+        return null;
+    }
+
+    public function getActualValueText($attributeId, $itemTypeId, $itemId)
+    {
+        if (!$itemId) {
+            throw new Exception("Item_id not set");
+        }
+
+        $attribute = $this->_getAttribute($attributeId);
+        if (!$attribute) {
+            throw new Exception("attribute not found");
+        }
+
+        $value = $this->getActualValue($attribute, $itemId, $itemTypeId);
+
+
+        if ($attribute['isMultiple'] && is_array($value)) {
+
+            $text = array();
+            foreach ($value as $v) {
+                $text[] = $this->_valueToText($attribute, $v);
+            }
+            return implode(', ', $text);
+
+        } else {
+
+            return $this->_valueToText($attribute, $value);
+        }
+    }
+
+    /**
+     * @param int $zoneId
+     * @param int $itemId
+     * @param int $userId
+     * @throws Exception
+     * @return array
+     */
+    public function getZoneActualValues($zoneId, $itemId)
+    {
+        if (!$itemId) {
+            throw new Exception("Item_id not set");
+        }
+
+        $zone = $this->_getZone($zoneId);
+        $itemTypeId = $zone->item_type_id;
+
+        $this->_loadZone($zoneId);
+
+        $attributes = $this->getAttributes(array(
+            'zone'   => $zoneId,
+            'parent' => null
+        ));
+
+        $requests = array();
+
+        foreach ($attributes as $attribute) {
+            $typeId = $attribute['typeId'];
+            $isMultiple = $attribute['isMultiple'] ? 1 : 0;
+            if ($typeId) {
+                if (!isset($requests[$typeId][$isMultiple])) {
+                    $requests[$typeId][$isMultiple] = array();
+                }
+                $requests[$typeId][$isMultiple][] = $attribute['id'];
+            }
+        }
+
+        $values = array();
+        foreach ($requests as $typeId => $multiples) {
+            foreach ($multiples as $isMultiple => $ids) {
+                $valuesTable = $this->getValueDataTable($typeId);
+                if (!$valuesTable) {
+                    throw new Exception("ValueTable not found");
+                }
+
+                $select = $valuesTable->select()
+                    ->where('attribute_id in (?)', $ids)
+                    ->where('item_id = ?', (int)$itemId)
+                    ->where('item_type_id = ?', (int)$itemTypeId);
+
+                if ($isMultiple) {
+                    $select->order('ordering');
+                }
+
+                foreach ($valuesTable->fetchAll($select) as $row) {
+                    $aid = (int)$row->attribute_id;
+                    $value = $this->_prepareValue($typeId, $row->value);
+                    if ($isMultiple) {
+                        if (!isset($values[$aid])) {
+                            $values[$aid] = array();
+                        }
+                        $values[$aid][] = $value;
+                    } else {
+                        $values[$aid] = $value;
+                    }
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * @param int $typeId
+     * @return array
+     */
+    public function getType($typeId)
+    {
+        if ($this->_types === null) {
+            $this->_types = array();
+            foreach ($this->_getTypeTable()->fetchAll() as $row) {
+                $this->_types[(int)$row->id] = array(
+                    'id'        => (int)$row->id,
+                    'name'      => $row->name,
+                    'element'   => $row->element,
+                    'maxlength' => $row->maxlength,
+                    'size'      => $row->size
+                );
+            }
+        }
+
+        if (!isset($this->_types[$typeId])) {
+            throw new Exception("Type `$typeId` not found");
+        }
+
+        return $this->_types[$typeId];
     }
 }

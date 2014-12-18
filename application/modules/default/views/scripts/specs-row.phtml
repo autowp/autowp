@@ -6,7 +6,7 @@
         $cells = array();
 
         foreach ($this->table->getCars() as $car) {
-            $value = $this->table->renderValue($this, $this->attribute, $car);
+            $value = $this->table->renderValue($this, $this->attribute, $car['values'], 1, $car['id']);
             $lastColIdx = count($cells)-1;
             if ($lastColIdx >= 0) {
                 $lastCol = $cells[$lastColIdx];

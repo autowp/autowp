@@ -205,7 +205,7 @@ class SidebarController extends Zend_Controller_Action
                 ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
                 ->where('brand_engine.brand_id = ?', $brand->id)
         );
-        if ($brand->enginepictures_count > 0)
+        if ($enginesCount > 0)
             $groups[] = array(
                 'url' => $this->_helper->url->url(array(
                     'action'        => 'engines',

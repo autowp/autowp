@@ -59,9 +59,14 @@ class TwinsController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
         }
 
+        $service = new Application_Service_Specifications();
+        $specs = $service->specifications($this->_getTwins()->getGroupCars($group['id']), array(
+            'language' => 'en'
+        ));
+
         $this->view->assign(array(
-            'group'   => $group,
-            'carList' => $this->_getTwins()->getGroupCars($group['id'])
+            'group' => $group,
+            'specs' => $specs,
         ));
     }
 

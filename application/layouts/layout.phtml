@@ -34,7 +34,7 @@
                     array('conditional' => 'lt IE 9')
                 )
                 ->appendFile(
-                    '/vendor/scottjehl/Respond/respond.min.js',
+                    '/vendor/scottjehl/Respond/dest/respond.min.js',
                     'text/javascript',
                     array('conditional' => 'lt IE 9')
                 )
@@ -93,7 +93,7 @@ require(['application'], function(App) {
             </div>
 
             <?php if ((!$blankPage) && (!$isAdminPage) ) { ?>
-                <div class="bottom-line"><p><strong>AutoWP.ru '2005&ndash;<?=$this->escape($this->translate('present-time-abbr'))?></strong></p></div>
+                <div class="bottom-line"><p><strong>AutoWP.ru "10th Anniversary" '2005&ndash;<?=$this->escape($this->translate('present-time-abbr'))?></strong></p></div>
 
                 <footer class="footer">
                     <div class="row">

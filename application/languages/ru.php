@@ -35,6 +35,9 @@ return array (
     'yesterday'          => 'вчера',
     'today'              => 'сегодня',
 
+    'contributor' => 'составитель',
+    'contributors' => 'составители',
+
     /* Layout */
     'layout/personal-messages' => 'Личные сообщения',
     'layout/you-have-%1$s-new-messages' => array(

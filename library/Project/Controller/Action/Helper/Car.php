@@ -106,6 +106,9 @@ class Project_Controller_Action_Helper_Car
         $disableSpecs         = isset($options['disableSpecs']) && $options['disableSpecs'];
         $disableCategories    = isset($options['disableCategories']) && $options['disableCategories'];
         $picturesDateSort     = isset($options['picturesDateSort']) && $options['picturesDateSort'];
+        $perspectiveGroup     = isset($options['perspectiveGroup']) ? (int)$options['perspectiveGroup'] : null;
+        $callback             = isset($options['callback']) && $options['callback'] ? $options['callback'] : null;
+        $allowUpPictures      = isset($options['allowUpPictures']) && $options['allowUpPictures'];
 
         $controller = $this->getActionController();
         $urlHelper = $controller->getHelper('Url');
@@ -188,12 +191,20 @@ class Project_Controller_Action_Helper_Car
                 }
             }
 
-            $useLargeFormat = $totalPictures > 30 && !$disableLargePictures;
+            $pGroupId = null;
+            $useLargeFormat = false;
+            if ($perspectiveGroup) {
+                $pGroupId = $perspectiveGroup;
+            } else {
+                $useLargeFormat = $totalPictures > 30 && !$disableLargePictures;
+                $pGroupId = $useLargeFormat ? 5 : 4;
+            }
 
-            $g = $this->_getPerspectiveGroupIds($useLargeFormat ? 5 : 4);
+
+            $g = $this->_getPerspectiveGroupIds($pGroupId);
 
             $pictureRows = $this->_getOrientedPictureList(
-                $car, $g, $oep, $type, $picturesDateSort
+                $car, $g, $oep, $type, $picturesDateSort, $allowUpPictures
             );
             $pictures = array();
             foreach ($pictureRows as $pictureRow) {
@@ -335,30 +346,18 @@ class Project_Controller_Action_Helper_Car
 
                 } else {
 
-                    $brandCarRows = $brandCarTable->fetchAll(array(
-                        'car_id = ?' => $car->id
-                    ));
-                    foreach ($brandCarRows as $brandCarRow) {
-                        $brand = $brandTable->find($brandCarRow->brand_id)->current();
-                        if ($brand) {
-                            if ($brandCarRow->catname) {
-                                $url = $urlHelper->url(array(
-                                    'module'        => 'default',
-                                    'controller'    => 'catalogue',
-                                    'action'        => 'brand-car',
-                                    'brand_catname' => $brand->folder,
-                                    'car_catname'   => $brandCarRow->catname
-                                ), 'catalogue', true);
-                            } else {
-                                $url = $urlHelper->url(array(
-                                    'module'        => 'default',
-                                    'controller'    => 'catalogue',
-                                    'action'        => 'car',
-                                    'brand_catname' => $brand->folder,
-                                    'car_id'        => $car->id
-                                ), 'catalogue', true);
-                            }
-                        }
+                    $cataloguePaths = $catalogue->cataloguePaths($car);
+
+                    $url = null;
+                    foreach ($cataloguePaths as $cPath) {
+                        $url = $urlHelper->url(array(
+                            'module'        => 'default',
+                            'controller'    => 'catalogue',
+                            'action'        => 'brand-car',
+                            'brand_catname' => $cPath['brand_catname'],
+                            'car_catname'   => $cPath['car_catname'],
+                            'path'          => $cPath['path']
+                        ), 'catalogue', true);
                         break;
                     }
                 }
@@ -418,6 +417,10 @@ class Project_Controller_Action_Helper_Car
                         'url'   => $typeUrl($car, Car_Parent::TYPE_SPORT)
                     );
                 }
+            }
+
+            if ($callback) {
+                $callback($item);
             }
 
             $items[] = $item;
@@ -547,13 +550,13 @@ class Project_Controller_Action_Helper_Car
         return $pictureTable->fetchRow($select);
     }
 
-    protected function _getOrientedPictureList($car,
-        array $perspective_group_ids, $onlyExactlyPictures, $type, $dateSort)
+    protected function _getOrientedPictureList($car, array $perspectiveGroupIds,
+            $onlyExactlyPictures, $type, $dateSort, $allowUpPictures)
     {
         $pictures = array();
         $usedIds = array();
 
-        foreach ($perspective_group_ids as $groupId) {
+        foreach ($perspectiveGroupIds as $groupId) {
             $picture = $this->_fetchPicture($car, array(
                 'onlyExactlyPictures' => $onlyExactlyPictures,
                 'perspectiveGroup'    => $groupId,
@@ -602,6 +605,14 @@ class Project_Controller_Action_Helper_Car
                 }
             }
         }
+
+        /*$nothingFound = true;
+        foreach ($pictures as $picture) {
+            if ($picture) {
+                $nothingFound = false;
+                break;
+            }
+        }*/
 
         return $pictures;
     }

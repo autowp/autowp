@@ -4,7 +4,7 @@
     </td>
     <?php foreach ($this->table->getEngines() as $engine) { ?>
         <td data-specs-attr="<?=$this->attribute['id']?>" data-specs-item="<?=$engine['id']?>">
-            <?=$this->table->renderValue($this, $this->attribute, $engine) ?>
+            <?=$this->table->renderValue($this, $this->attribute, $engine['values'], 3, $engine['id']) ?>
         </td>
     <?php } ?>
 </tr>

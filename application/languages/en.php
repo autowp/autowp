@@ -30,6 +30,9 @@ return array (
     'yesterday'          => 'yesterday',
     'today'              => 'today',
 
+    'contributor' => 'contributor',
+    'contributors' => 'contributors',
+
     /* Layout */
     'layout/personal-messages' => 'Personal messages',
     'layout/you-have-%1$s-new-messages' => array(

@@ -1,0 +1,135 @@
+<?php
+    $cols = 2;
+    $items = count($this->items);
+    $rows = ceil($items / $cols);
+?>
+<?php for ($i=0; $i<$rows; $i++) { ?>
+    <div class="row">
+        <?php foreach (array_slice($this->items, $i*$rows, $cols) as $item) { ?>
+            <div class="col-lg-6 col-md-6">
+                <div class="car" style="margin-bottom: 2em">
+
+                    <h3>
+                        <?=$this->car($item['row'])->title()?>
+                        <?php if ($item['designProject']) { ?>
+                            <sup class="designBrand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($item['designProject']['url'], $item['designProject']['brandName']))?></sup>
+                        <?php } ?>
+                    </h3>
+
+                    <div class="row thumbnails">
+                        <?php foreach ($item['pictures'] as $idx => $picture) { ?>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <?php if ($picture) { ?>
+                                    <?php if ($picture['row']->image_id) { ?>
+                                        <?=$this->htmlA(
+                                            array(
+                                                'href'  => $this->pic($picture['row'])->url(),
+                                                'class' =>'thumbnail'
+                                            ),
+                                            $this->img($picture['row']->getFormatRequest(), array(
+                                                'format' => 'picture-thumb',
+                                                'alt'    => $picture['name'],
+                                                'title'  => $picture['name'],
+                                            )),
+                                            false
+                                        )?>
+                                    <?php } ?>
+                                <?php } else { ?>
+                                    <div class="no-photo">&#xa0;</div>
+                                <?php } ?>
+                            </div>
+                        <?php } ?>
+                    </div>
+
+
+                    <ul class="list-inline">
+
+                        <?php if (!$this->disableDetailsLink && ($item['hasHtml'] || $item['childsCount']) && isset($item['details']['url'])) { ?>
+                            <li>
+                                <span class="glyphicon glyphicon-align-left"></span>
+                                <?=$this->htmlA($item['details']['url'], $this->translate('carlist/details') . ( $item['childsCount'] > 1 ? ' (' . $item['childsCount'] . ')' : '')) ?>
+                            </li>
+                        <?php } ?>
+
+                        <?php if (isset($item['tuning']) && $item['tuning']) { ?>
+                            <li>
+                                <span class="glyphicon glyphicon-align-left"></span>
+                                <?=$this->htmlA($item['tuning']['url'], 'Тюнинг ('.$item['tuning']['count'].')')?>
+                            </li>
+                        <?php } ?>
+
+                        <?php if (isset($item['sport']) && $item['sport']) { ?>
+                            <li>
+                                <span class="glyphicon glyphicon-align-left"></span>
+                                <?=$this->htmlA($item['sport']['url'], 'Спорт ('.$item['sport']['count'].')')?>
+                            </li>
+                        <?php } ?>
+
+                        <?php if (isset($item['allPicturesUrl']) && $item['allPicturesUrl']) { ?>
+                            <li>
+                                <span class="fa fa-th"></span>
+                                <?=$this->htmlA($item['allPicturesUrl'], $this->translate('carlist/all pictures').' ('.$item['totalPictures'].')')?>
+                            </li>
+                        <?php } ?>
+
+                        <?php if (count($item['specsLinks']) > 1) { ?>
+                            <li>
+                                <span class="glyphicon glyphicon-list-alt"></span>
+                                <?=$this->escape($this->translate('carlist/specifications'))?>
+                                <?php foreach ($item['specsLinks'] as $specLink) { ?>
+                                    <?=$this->htmlA($specLink['url'], $specLink['name'])?>
+                                <?php } ?>
+                            </li>
+                        <?php } else { ?>
+                            <?php foreach ($item['specsLinks'] as $specLink) { ?>
+                                <li>
+                                    <span class="glyphicon glyphicon-list-alt"></span>
+                                    <?=$this->htmlA($specLink['url'], $this->translate('carlist/specifications'))?>
+                                </li>
+                            <?php } ?>
+                        <?php } ?>
+
+                        <?php if (isset($item['twinsGroups'])) { ?>
+                            <?php foreach ($item['twinsGroups'] as $twinsGroup) { ?>
+                                <li>
+                                    <span class="glyphicon glyphicon-adjust"></span>
+                                    <?=$this->htmlA($twinsGroup['url'], $this->translate('carlist/twins')) ?>
+                                </li>
+                            <?php } ?>
+                        <?php } ?>
+
+                        <?php foreach ($item['categories'] as $category) { ?>
+                            <li>
+                                <span class="glyphicon glyphicon-tag"></span>
+                                <?=$this->htmlA($category['url'], $category['name'])?>
+                            </li>
+                        <?php } ?>
+
+                        <?php if ($this->isCarModer) { ?>
+                            <li>
+                                <span class="glyphicon glyphicon-cog"></span>
+                                <?=$this->htmlA($item['moderUrl'], 'управление') ?>
+                            </li>
+                        <?php } ?>
+
+                        <?php if ($this->specEditor) { ?>
+                            <li>
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <?=$this->htmlA($item['specEditorUrl'], 'ввод ттх') ?>
+                            </li>
+                        <?php } ?>
+                    </ul>
+
+                    <?php if (count($item['contributors'])) { ?>
+                        <p>
+                            <?=$this->escape($this->translate(count($item['contributors']) > 1 ? 'contributors' : 'contributor'))?>:
+                            <?php foreach ($item['contributors'] as $contributor) { ?>
+                                <?=$this->user($contributor)?>
+                            <?php } ?>
+                        </p>
+                    <?php } ?>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+<?php } ?>

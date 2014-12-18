@@ -14,6 +14,11 @@ class Project_Most
      */
     protected $_adapter = array();
 
+    /**
+     * @var Application_Service_Specifications
+     */
+    protected $_specs;
+
     public function __construct(array $options)
     {
         $this->setOptions($options);
@@ -44,6 +49,25 @@ class Project_Most
     public function getCarsCount()
     {
         return $this->_carsCount;
+    }
+
+    /**
+     * @param Application_Service_Specifications $value
+     * @return Project_Most
+     */
+    public function setSpecs(Application_Service_Specifications $value)
+    {
+        $this->_specs = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return Application_Service_Specifications
+     */
+    public function getSpecs()
+    {
+        return $this->_specs;
     }
 
     public function setAdapter($options)

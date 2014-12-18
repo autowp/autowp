@@ -38,42 +38,27 @@ class Project_Most_Adapter_Attr extends Project_Most_Adapter_Abstract
             throw new Exception("Item type '{$this->_itemType}' not found");
         }
 
-        $valuesTable = $attribute->getValueTable();
+        $specService = $this->_most->getSpecs();
+
+        $valuesTable = $specService->getValueDataTable($attribute->type_id);
         $tableName = $valuesTable->info(Zend_Db_Table_Abstract::NAME);
 
         $select
             ->where($tableName.'.item_type_id = ?', $itemType->id)
             ->where($tableName.'.attribute_id = ?', $attribute->id)
-            ->where($tableName.'.value IS NOT NULL');
-
-        switch ($itemType->id) {
-            case 1:
-                $select
-                    ->join($tableName, 'cars.id='.$tableName.'.item_id', null)
-                    ->order($tableName.'.value ' . $this->_order);
-                break;
-
-            case 2:
-                throw new Exception("Equipes deprecated");
-                break;
-        }
-
-        //print $select; exit;
+            ->where($tableName.'.value IS NOT NULL')
+            ->join($tableName, 'cars.id='.$tableName.'.item_id', null)
+            ->order($tableName.'.value ' . $this->_order);
 
         $cars = $select->getTable()->fetchAll($select);
 
         $result = array();
         foreach ($cars as $car) {
 
-            $valueText = '';
-            if ($itemType->id == 1) {
-                $valueText = $attribute->getActualValueText($itemType, $car->id);
-            } elseif ($itemType->id == 2) {
-                $valueText = $attribute->getActualValuesRangeText($itemType, $car->getEquipesIds());
-            }
+            $valueText = $specService->getActualValueText($attribute->id, $itemType->id, $car->id);
 
             $result[] = array(
-                'car'       =>  $car,
+                'car'       => $car,
                 'valueText' => $valueText,
             );
         }

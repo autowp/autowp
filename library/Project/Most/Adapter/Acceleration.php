@@ -8,8 +8,6 @@ class Project_Most_Adapter_Acceleration extends Project_Most_Adapter_Abstract
 
     protected $_attributesTable;
 
-    protected $_carItemType;
-
     const MPH60_TO_KMH100 = 0.98964381346271110050637609692728;
 
     public function __construct(array $options)
@@ -17,9 +15,6 @@ class Project_Most_Adapter_Acceleration extends Project_Most_Adapter_Abstract
         $this->_attributesTable = new Attrs_Attributes();
 
         parent::__construct($options);
-
-        $itemTypes = new Attrs_Item_Types();
-        $this->_carItemType = $itemTypes->find(1)->current();
     }
 
     public function setAttributes(array $value)
@@ -66,12 +61,15 @@ class Project_Most_Adapter_Acceleration extends Project_Most_Adapter_Abstract
         }
         $axisSelect->reset(Zend_Db_Table::COLUMNS);
 
+        $specService = $this->_most->getSpecs();
+
         $selects = array();
         foreach ($axises as $axis) {
             $axisSelect = clone $axisBaseSelect;
 
             $attr = $axis['attr'];
-            $attrValuesTable = $attr->getValueTable()->info(Zend_Db_Table_Abstract::NAME);
+
+            $attrValuesTable = $specService->getValueDataTable($attr->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
             $valueColumn = $axis['q'] != 1 ? new Zend_Db_Expr('axis.value / ' . $axis['q']) : 'axis.value';
 
@@ -135,13 +133,14 @@ class Project_Most_Adapter_Acceleration extends Project_Most_Adapter_Abstract
             )
         );
 
+        $specService = $this->_most->getSpecs();
+
         foreach ($axises as $axis) {
 
-            $value = $axis['attr']->getActualValue($this->_carItemType, $car->id);
+            $value = $specService->getActualValueText($axis['attr']->id, 1, $car->id);
 
             if ($value > 0) {
-                $text[] = number_format($value, $axis['attr']->precision, ".", "") .
-                         ' <span class="unit">' . $axis['unit'] . '</span>';
+                $text[] = $value . ' <span class="unit">' . $axis['unit'] . '</span>';
             }
         }
 

@@ -13,23 +13,54 @@
         )
     ));
 ?>
-<?php if ($this->user()->isAllowed('engine', 'add')) { ?>
-    <span class="glyphicon glyphicon-plus"></span>
-    <?php if ($this->engine) { ?>
-        <?=$this->htmlA($this->url(array(
-            'module'     => 'moder',
-            'controller' => 'engines',
-            'action'     => 'add',
-            'parent_id'  => $this->engine->id
-        ), 'default', true), 'добавить двигатель')?>
-    <?php } else { ?>
-        <?=$this->htmlA($this->url(array(
-            'module'     => 'moder',
-            'controller' => 'engines',
-            'action'     => 'add',
-            'brand_id'   => $this->brand->id
-        ), 'default', true), 'добавить двигатель')?>
-    <?php } ?>
+<?php if ($this->user()->inheritsRole('moder')) { ?>
+    <p>
+        <?php if ($this->engine) { ?>
+            <span class="glyphicon glyphicon-cog"></span>
+            <?=$this->htmlA($this->url(array(
+                'module'     => 'moder',
+                'controller' => 'engines',
+                'action'     => 'engine',
+                'engine_id'  => $this->engine->id
+            ), 'default', true), 'управление')?>
+        <?php } ?>
+        <?php if ($this->user()->isAllowed('engine', 'add')) { ?>
+            <span class="glyphicon glyphicon-plus"></span>
+            <?php if ($this->engine) { ?>
+                <?=$this->htmlA($this->url(array(
+                    'module'     => 'moder',
+                    'controller' => 'engines',
+                    'action'     => 'add',
+                    'parent_id'  => $this->engine->id
+                ), 'default', true), 'добавить двигатель')?>
+            <?php } else { ?>
+                <?=$this->htmlA($this->url(array(
+                    'module'     => 'moder',
+                    'controller' => 'engines',
+                    'action'     => 'add',
+                    'brand_id'   => $this->brand->id
+                ), 'default', true), 'добавить двигатель')?>
+            <?php } ?>
+        <?php } ?>
+    </p>
+<?php } ?>
+
+<?php if ($this->engine) { ?>
+    <?=$this->partial('catalogue/partial/brand-engine-menu.phtml', array(
+        'title' => $this->engine->caption,
+        'tree'  => array(
+            'count'  => $this->childsCount,
+            'active' => true
+        ),
+        'cars'  => array(
+            'count'  => $this->carsCount,
+            'active' => false
+        ),
+        'specs' => array(
+            'count'  => $this->specsCount,
+            'active' => false
+        ),
+    )) ?>
 <?php } ?>
 <?php foreach ($this->engines as $engine) { ?>
     <div>

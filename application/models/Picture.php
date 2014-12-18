@@ -20,7 +20,7 @@ class Picture extends Project_Db_Table
 
     protected $_name = 'pictures';
 
-    protected $_rowClass = 'Pictures_Row';
+    protected $_rowClass = 'Picture_Row';
 
     protected $_referenceMap = array(
         'Car' => array(

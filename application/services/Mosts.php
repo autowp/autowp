@@ -347,9 +347,14 @@ class Application_Service_Mosts
 
     protected $_perspectiveGroups = null;
 
-    public function __construct()
-    {
+    /**
+     * @var Application_Service_Specifications
+     */
+    protected $_specs = null;
 
+    public function __construct(array $options = array())
+    {
+        $this->_specs = $options['specs'];
     }
 
     /**
@@ -584,6 +589,7 @@ class Application_Service_Mosts
         }
 
         $most = new Project_Most(array(
+            'specs'      => $this->_specs,
             'carsSelect' => $select,
             'adapter'    => $cMost['adapter'],
             'carsCount'  => 7,

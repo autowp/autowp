@@ -47,6 +47,8 @@ class Project_Most_Adapter_Brakes extends Project_Most_Adapter_Abstract
 
         $limit = $this->_most->getCarsCount();
 
+        $specService = $this->_most->getSpecs();
+
         $selects = array();
         foreach (array($rear, $front) as $axis) {
             $axisSelect = $select->getAdapter()->select()
@@ -62,10 +64,10 @@ class Project_Most_Adapter_Brakes extends Project_Most_Adapter_Abstract
             $axisSelect->reset(Zend_Db_Table::COLUMNS);
 
             $diameter  = $this->_attributesTable->find($axis['diameter'])->current();
-            $diameterValuesTable = $diameter->getValueTable()->info(Zend_Db_Table_Abstract::NAME);
+            $diameterValuesTable = $specService->getValueDataTable($diameter->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
             $thickness = $this->_attributesTable->find($axis['thickness'])->current();
-            $thicknessValuesTable = $thickness->getValueTable()->info(Zend_Db_Table_Abstract::NAME);
+            $thicknessValuesTable = $specService->getValueDataTable($thickness->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
             $axisSelect
                 ->columns(array('car_id' => 'cars.id', 'size_value' => new Zend_Db_Expr('diameter.value*thickness.value')))
@@ -126,13 +128,12 @@ class Project_Most_Adapter_Brakes extends Project_Most_Adapter_Abstract
         $rear = $this->_attributes['rear'];
         $front = $this->_attributes['front'];
 
+        $specService = $this->_most->getSpecs();
+
         foreach (array($front, $rear) as $axis) {
 
-            $diameter = $this->_attributesTable->find($axis['diameter'])->current();
-            $thickness = $this->_attributesTable->find($axis['thickness'])->current();
-
-            $diameterValue = $diameter->getActualValue($this->_carItemType, $car->id);
-            $thicknessValue = $thickness->getActualValue($this->_carItemType, $car->id);
+            $diameterValue = $specService->getActualValue($axis['diameter'], $car->id, 1);
+            $thicknessValue = $specService->getActualValue($axis['thickness'], $car->id, 1);
 
             if ($diameterValue || $thicknessValue) {
                 $value = $diameterValue . ' × ' . $thicknessValue . ' <span class="unit">мм</span>';

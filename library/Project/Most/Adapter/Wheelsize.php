@@ -40,14 +40,16 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
     {
         $wheel = $this->_attributes['rear'];
 
+        $specService = $this->_most->getSpecs();
+
         $tyrewidth  = $this->_attributesTable->find($wheel['tyrewidth'])->current();
-        $tyrewidthValuesTable = $tyrewidth->getValueTable()->info(Zend_Db_Table_Abstract::NAME);
+        $tyrewidthValuesTable = $specService->getValueDataTable($tyrewidth->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
         $tyreseries = $this->_attributesTable->find($wheel['tyreseries'])->current();
-        $tyreseriesValuesTable = $tyreseries->getValueTable()->info(Zend_Db_Table_Abstract::NAME);
+        $tyreseriesValuesTable = $specService->getValueDataTable($tyreseries->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
         $radius     = $this->_attributesTable->find($wheel['radius'])->current();
-        $radiusValuesTable = $radius->getValueTable()->info(Zend_Db_Table_Abstract::NAME);
+        $radiusValuesTable = $specService->getValueDataTable($radius->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
         $select
             ->join(array('tyrewidth' => $tyrewidthValuesTable), 'cars.id = tyrewidth.item_id', null)
@@ -87,17 +89,14 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
     {
         $text = array();
 
+        $specService = $this->_most->getSpecs();
+
         foreach ($this->_attributes as $wheel) {
 
-            $tyrewidth = $this->_attributesTable->find($wheel['tyrewidth'])->current();
-            $tyreseries = $this->_attributesTable->find($wheel['tyreseries'])->current();
-            $radius = $this->_attributesTable->find($wheel['radius'])->current();
-            //$wheel['rimwidth'] = $attributes->find($wheel['rimwidth'])->current();
-
             $wheelObj = new Project_WheelSize(
-                $tyrewidth->getActualValue($this->_carItemType, $car->id),
-                $tyreseries->getActualValue($this->_carItemType, $car->id),
-                $radius->getActualValue($this->_carItemType, $car->id),
+                $specService->getActualValue($wheel['tyrewidth'], $car->id, 1),
+                $specService->getActualValue($wheel['tyreseries'], $car->id, 1),
+                $specService->getActualValue($wheel['radius'], $car->id, 1),
                 null
             );
             $value = $wheelObj->getTyreName();
