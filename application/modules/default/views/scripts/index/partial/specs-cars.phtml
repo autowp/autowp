@@ -17,23 +17,21 @@
                     </h3>
 
                     <div class="row thumbnails">
-                        <?php foreach ($item['pictures'] as $idx => $picture) { ?>
+                        <?php foreach ($item['pictures'] as $picture) { ?>
                             <div class="col-lg-4 col-md-4 col-sm-4">
                                 <?php if ($picture) { ?>
-                                    <?php if ($picture['row']->image_id) { ?>
-                                        <?=$this->htmlA(
-                                            array(
-                                                'href'  => $this->pic($picture['row'])->url(),
-                                                'class' =>'thumbnail'
-                                            ),
-                                            $this->img($picture['row']->getFormatRequest(), array(
-                                                'format' => 'picture-thumb',
-                                                'alt'    => $picture['name'],
-                                                'title'  => $picture['name'],
-                                            )),
-                                            false
-                                        )?>
-                                    <?php } ?>
+                                    <?=$this->htmlA(
+                                        array(
+                                            'href'  => $picture['url'],
+                                            'class' =>'thumbnail'
+                                        ),
+                                        $this->img($picture['request'], array(
+                                            'format' => 'picture-thumb',
+                                            'alt'    => $picture['name'],
+                                            'title'  => $picture['name'],
+                                        )),
+                                        false
+                                    )?>
                                 <?php } else { ?>
                                     <div class="no-photo">&#xa0;</div>
                                 <?php } ?>

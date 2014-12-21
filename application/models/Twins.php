@@ -293,4 +293,38 @@ class Twins
 
         return $result;
     }
+
+    /**
+     * @param array $carIds
+     * @return array
+     */
+    public function getCarsGroups(array $carIds)
+    {
+        $groupTable = $this->_getGroupsTable();
+
+        $db = $groupTable->getAdapter();
+
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from($groupTable->info('name'), array('id', 'name'))
+                ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
+                ->join('car_parent_cache', 'twins_groups_cars.car_id = car_parent_cache.parent_id', 'car_id')
+                ->where('car_parent_cache.car_id IN (?)', $carIds)
+                ->group(array('car_parent_cache.car_id', 'twins_groups.id'))
+        );
+
+        $result = array();
+        foreach ($carIds as $carId) {
+            $result[(int)$carId] = array();
+        }
+        foreach ($rows as $row) {
+            $carId = (int)$row['car_id'];
+            $result[$carId][] = array(
+                'id'   => $row['id'],
+                'name' => $row['name']
+            );
+        }
+
+        return $result;
+    }
 }

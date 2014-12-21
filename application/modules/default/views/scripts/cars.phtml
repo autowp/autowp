@@ -34,28 +34,22 @@
                 <?php
                     $col = $item['largeFormat'] && $idx == 0  ? 6 : 3;
                     $colSm = $item['largeFormat'] && $idx == 0  ? 12 : 6;
-                    if ($picture && $picture['row']->image_id) {
-                        $format = $item['largeFormat'] && $idx == 0 ? 'picture-thumb-medium' : 'picture-thumb';
-                    } else {
-                        $format = $item['largeFormat'] && $idx == 0 ? 10 : 6;
-                    }
+                    $format = $item['largeFormat'] && $idx == 0 ? 'picture-thumb-medium' : 'picture-thumb';
                 ?>
                 <div class="col-lg-<?=$col?> col-md-<?=$col?> col-sm-<?=$colSm?>">
                     <?php if ($picture) { ?>
-                        <?php if ($picture['row']->image_id) { ?>
-                            <?=$this->htmlA(
-                                array(
-                                    'href'  => $this->pic($picture['row'])->url(),
-                                    'class' =>'thumbnail'
-                                ),
-                                $this->img($picture['row']->getFormatRequest(), array(
-                                    'format' => $format,
-                                    'alt'    => $picture['name'],
-                                    'title'  => $picture['name'],
-                                )),
-                                false
-                            )?>
-                        <?php } ?>
+                        <?=$this->htmlA(
+                            array(
+                                'href'  => $picture['url'],
+                                'class' =>'thumbnail'
+                            ),
+                            $this->img($picture['request'], array(
+                                'format' => $format,
+                                'alt'    => $picture['name'],
+                                'title'  => $picture['name'],
+                            )),
+                            false
+                        )?>
                     <?php } else { ?>
                         <div class="no-photo">&#xa0;</div>
                     <?php } ?>

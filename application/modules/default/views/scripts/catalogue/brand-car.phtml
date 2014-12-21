@@ -127,3 +127,7 @@
         <?=$this->htmlA($this->currentPicturesUrl, $this->translate('carlist/all pictures').' ('.$this->currentPicturesCount.')')?>
     <?php } ?>
 <?php } ?>
+
+<?php if (isset($this->paginator)) { ?>
+    <?=$this->paginationControl($this->paginator) ?>
+<?php } ?>

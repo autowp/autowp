@@ -1,0 +1,38 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ),
+        'pageId' => 173,
+    ));
+?>
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th></th>
+            <th></th>
+            <th class="text-right">Specs volume</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->users as $idx => $user) { ?>
+            <tr>
+                <td><?=$idx + 1?></td>
+                <td><?=$this->user($user['row'])?></td>
+                <td>
+                    <?php if (count($user['brands'])) { ?>
+                        <?php foreach ($user['brands'] as $j => $brand) {
+                            if ($j != 0) { ?>, <?php }
+                            echo $this->htmlA($brand['url'], $brand['name']);
+                            //echo ' <span class="label label-default">'.$brand['value'] .'</span>';
+                        } ?>, …
+                    <?php } ?>
+                </td>
+                <td class="text-right"><?=number_format($user['volume'], 0 , '.', ' ')?></td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>

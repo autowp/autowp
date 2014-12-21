@@ -272,4 +272,23 @@ class MaintenanceProvider extends Zend_Tool_Project_Provider_Abstract
 
         print "ok $affected\n";
     }
+
+    public function updateSpecsVolumes()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('backCompatibility')
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db');
+
+        $userTable = new Users();
+
+        $userTable->updateSpecsVolumes();
+
+        print "ok\n";
+    }
 }

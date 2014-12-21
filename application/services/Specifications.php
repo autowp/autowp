@@ -951,7 +951,7 @@ class Application_Service_Specifications
             $ids = array();
             if ($zone) {
                 if (isset($this->_childs[$parent])) {
-                    $ids = array_intersect($this->_childs[$parent], $this->_zoneAttrs[$zone]);
+                    $ids = array_intersect($this->_zoneAttrs[$zone], $this->_childs[$parent]);
                 }
             } else {
                 if (isset($this->_childs[$parent])) {
@@ -967,7 +967,7 @@ class Application_Service_Specifications
                 if ($parent !== null) {
                     $ids = array();
                     if (isset($this->_childs[$parent])) {
-                        $ids = array_intersect($this->_childs[$parent], $this->_zoneAttrs[$zone]);
+                        $ids = array_intersect($this->_zoneAttrs[$zone], $this->_childs[$parent]);
                     }
                 } else {
                     $ids = $this->_zoneAttrs[$zone];
@@ -1065,16 +1065,19 @@ class Application_Service_Specifications
     public function specifications($cars, array $options)
     {
         $options = array_merge(array(
-            'language' => 'en'
+            'contextCarId' => null,
+            'language'   => 'en'
         ), $options);
 
         $language = $options['language'];
+        $contextCarId = (int)$options['contextCarId'];
 
         $topPerspectives = array(10, 1, 7, 8, 11, 12, 2, 4, 13, 5);
         $bottomPerspectives = array(13, 2, 9, 6, 5);
 
         $carTypeTable = new Car_Types();
         $attributeTable = $this->_getAttributeTable();
+        $carParentTable = new Car_Parent();
 
         $ids = array();
         foreach ($cars as $car) {
@@ -1109,11 +1112,38 @@ class Application_Service_Specifications
         $engineTable = $this->_getEngineTable();
         $engineNameAttr = 100;
 
+        $carIds = array();
         foreach ($cars as $car) {
+            $carIds[] = $car->id;
+        }
+
+        if ($specsZoneId) {
+            $this->_loadListOptions($this->_zoneAttrs[$specsZoneId]);
+            $actualValues = $this->_getZoneItemsActualValues($specsZoneId, $carIds);
+        } else {
+            $actualValues = $this->_getItemsActualValues($carIds, self::ITEM_TYPE_CAR);
+        }
+
+        foreach ($actualValues as &$itemActualValues) {
+            foreach ($itemActualValues as $attributeId => &$value) {
+                $attribute = $this->_getAttribute($attributeId);
+                if (!$attribute) {
+                    throw new Exception("Attribute `$attributeId` not found");
+                }
+                $value = $this->_valueToText($attribute, $value);
+            }
+            unset($value); // prevent future bugs
+        }
+        unset($itemActualValues); // prevent future bugs
+
+        foreach ($cars as $car) {
+
+            $itemId = (int)$car->id;
 
             $carType = $carTypeTable->find($car->car_type_id)->current();
 
-            $values = $this->_loadValues($attributes, $car->id, self::ITEM_TYPE_CAR);
+            //$values = $this->_loadValues($attributes, $itemId, self::ITEM_TYPE_CAR);
+            $values = isset($actualValues[$itemId]) ? $actualValues[$itemId] : array();
 
             // append engine name
             if (!(isset($values[$engineNameAttr]) && $values[$engineNameAttr]) && $car->engine_id) {
@@ -1123,9 +1153,22 @@ class Application_Service_Specifications
                 }
             }
 
+            $carParentName = null;
+            if ($contextCarId) {
+                $carParentRow = $carParentTable->fetchRow(array(
+                    'car_id = ?'    => $car->id,
+                    'parent_id = ?' => $contextCarId
+                ));
+                if ($carParentRow) {
+                    $carParentName = $carParentRow->name;
+                }
+            }
+
             $result[] = array(
-                'id'               => $car->id,
-                'name'             => $car->getFullName($language),
+                'id'               => $itemId,
+                'name'             => $carParentName ? $carParentName : $car->getFullName($language),
+                'beginYear'        => $car->begin_year,
+                'endYear'          => $car->end_year,
                 'produced'         => $car->produced,
                 'produced_exactly' => $car->produced_exactly,
                 'topPicture'       => $this->_specPicture($car, $topPerspectives),
@@ -1752,15 +1795,35 @@ class Application_Service_Specifications
 
     /**
      * @param int $itemTypeId
-     * @param int $itemId
-     * @return boolean
+     * @param int|array $itemId
+     * @return boolean|array
      */
     public function hasSpecs($itemTypeId, $itemId)
     {
-        return (bool)$this->_getValueTable()->fetchRow(array(
-            'item_id = ?'      => $itemId,
-            'item_type_id = ?' => $itemTypeId
-        ));
+        $valueTable = $this->_getValueTable();
+        $db = $valueTable->getAdapter();
+        $select = $db->select()
+            ->from($valueTable->info('name'), 'item_id')
+            ->where('item_type_id = ?', $itemTypeId);
+        if (is_array($itemId)) {
+            $ids = $db->fetchCol(
+                $select
+                    ->distinct()
+                    ->where('item_id in (?)', $itemId)
+            );
+            $result = array();
+            foreach ($itemId as $id) {
+                $result[(int)$id] = false;
+            }
+            foreach ($ids as $id) {
+                $result[(int)$id] = true;
+            }
+            return $result;
+        } else {
+            return (bool)$db->fetchOne(
+                $select->where('item_id = ?', (int)$itemId)
+            );
+        }
     }
 
     /**
@@ -1780,22 +1843,48 @@ class Application_Service_Specifications
         );
     }
 
+    /**
+     * @param int $itemTypeId
+     * @param int|array $itemId
+     * @return boolean|array
+     */
+
 
     public function hasChildSpecs($itemTypeId, $itemId)
     {
         if ($itemTypeId == 1) {
-            $table = $this->_getValueTable();
-            return (bool)$table->fetchRow(
-                $table->select(true)
-                    ->where('attrs_values.item_type_id = ?', $itemTypeId)
-                    ->join('car_parent', 'attrs_values.item_id = car_parent.car_id', null)
-                    ->where('car_parent.parent_id = ?', $itemId)
-            );
+            $valueTable = $this->_getValueTable();
+            $db = $valueTable->getAdapter();
+            $select = $db->select()
+                ->from($valueTable->info('name'), 'car_parent.parent_id')
+                ->where('attrs_values.item_type_id = ?', $itemTypeId)
+                ->join('car_parent', 'attrs_values.item_id = car_parent.car_id', null);
+            if (is_array($itemId)) {
+                $ids = $db->fetchCol(
+                    $select
+                        ->distinct()
+                        ->where('car_parent.parent_id IN (?)', $itemId)
+                );
+                $result = array();
+                foreach ($itemId as $id) {
+                    $result[(int)$id] = false;
+                }
+                foreach ($ids as $id) {
+                    $result[(int)$id] = true;
+                }
+                return $result;
+            } else {
+                return (bool)$db->fetchOne(
+                    $select
+                        ->where('car_parent.parent_id = ?', $itemId)
+                );
+            }
         }
 
         return false;
 
     }
+
 
     public function updateActualValues($itemTypeId, $itemId)
     {
@@ -2118,6 +2207,137 @@ class Application_Service_Specifications
 
             return $this->_valueToText($attribute, $value);
         }
+    }
+
+    /**
+     * @param array $itemIds
+     * @param int $itemTypeId
+     * @return array
+     */
+    private function _getItemsActualValues($itemIds, $itemTypeId)
+    {
+        if (count($itemIds) <= 0) {
+            return array();
+        }
+
+        $requests = array(
+            1 => array(false),
+            2 => array(false), /* , 5*/
+            3 => array(false),
+            4 => array(false),
+            6 => array(false, true), /* , 7 */
+        );
+
+        $values = array();
+        foreach ($requests as $typeId => $multiples) {
+            foreach ($multiples as $isMultiple) {
+                $valuesTable = $this->getValueDataTable($typeId);
+                if (!$valuesTable) {
+                    throw new Exception("ValueTable not found");
+                }
+
+                $select = $valuesTable->select()
+                    ->where('item_id in (?)', $itemIds)
+                    ->where('item_type_id = ?', (int)$itemTypeId);
+
+                if ($isMultiple) {
+                    $select->order('ordering');
+                }
+
+                foreach ($valuesTable->fetchAll($select) as $row) {
+                    $aid = (int)$row->attribute_id;
+                    $id = (int)$row->item_id;
+                    $value = $this->_prepareValue($typeId, $row->value);
+                    if (!isset($values[$id])) {
+                        $values[$id] = array();
+                    }
+                    if ($isMultiple) {
+                        if (!isset($values[$id][$aid])) {
+                            $values[$id][$aid] = array();
+                        }
+                        $values[$id][$aid][] = $value;
+                    } else {
+                        $values[$id][$aid] = $value;
+                    }
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * @param unknown $zoneId
+     * @param array $itemIds
+     * @param int $itemTypeId
+     * @return array
+     */
+    private function _getZoneItemsActualValues($zoneId, array $itemIds)
+    {
+        if (count($itemIds) <= 0) {
+            return array();
+        }
+
+        $zone = $this->_getZone($zoneId);
+        $itemTypeId = $zone->item_type_id;
+
+        $this->_loadZone($zoneId);
+
+        $attributes = $this->getAttributes(array(
+            'zone'   => $zoneId,
+            'parent' => null
+        ));
+
+        $requests = array();
+
+        foreach ($attributes as $attribute) {
+            $typeId = $attribute['typeId'];
+            $isMultiple = $attribute['isMultiple'] ? 1 : 0;
+            if ($typeId) {
+                if (!isset($requests[$typeId][$isMultiple])) {
+                    $requests[$typeId][$isMultiple] = array();
+                }
+                $requests[$typeId][$isMultiple][] = $attribute['id'];
+            }
+        }
+
+        $values = array();
+        foreach ($requests as $typeId => $multiples) {
+            foreach ($multiples as $isMultiple => $ids) {
+                $valuesTable = $this->getValueDataTable($typeId);
+                if (!$valuesTable) {
+                    throw new Exception("ValueTable not found");
+                }
+
+                $select = $valuesTable->select()
+                    ->where('attribute_id in (?)', $ids)
+                    ->where('item_id in (?)', $itemIds)
+                    ->where('item_type_id = ?', (int)$itemTypeId);
+
+                if ($isMultiple) {
+                    $select->order('ordering');
+                }
+
+                foreach ($valuesTable->fetchAll($select) as $row) {
+                    $aid = (int)$row->attribute_id;
+                    $id = (int)$row->item_id;
+                    $value = $this->_prepareValue($typeId, $row->value);
+                    if (!isset($values[$id])) {
+                        $values[$id] = array();
+                    }
+                    if ($isMultiple) {
+                        if (!isset($values[$id][$aid])) {
+                            $values[$id][$aid] = array();
+                        }
+                        $values[$id][$aid][] = $value;
+                    } else {
+                        $values[$id][$aid] = $value;
+                    }
+                }
+            }
+        }
+
+        return $values;
     }
 
     /**

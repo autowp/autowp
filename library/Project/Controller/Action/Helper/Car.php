@@ -40,53 +40,36 @@ class Project_Controller_Action_Helper_Car
         return $this;
     }
 
-    /**
-     * @param Cars_Row $car
-     */
-    protected function _totalPictures(Cars_Row $car, $onlyExactly)
+    protected function _carsTotalPictures(array $carIds, $onlyExactly)
     {
-        $pictureTable = $this->_getPictureTable();
-        $pictureTableAdapter = $pictureTable->getAdapter();
-
-        $select = $pictureTableAdapter->select()
-            ->from($pictureTable->info('name'), new Zend_Db_Expr('COUNT(1)'))
-            ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-            ->where('pictures.status IN (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED));
-
-        if ($onlyExactly) {
-            $select
-                ->where('pictures.car_id = ?', $car->id);
-        } else {
-            $select
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id);
+        $result = array();
+        foreach ($carIds as $carId) {
+            $result[$carId] = null;
         }
+        if (count($carIds)) {
+            $pictureTable = $this->_getPictureTable();
+            $pictureTableAdapter = $pictureTable->getAdapter();
 
-        return $pictureTableAdapter->fetchOne($select);
-    }
+            $select = $pictureTableAdapter->select()
+                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.status IN (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED));
 
-    /**
-     * @param Cars_Row $car
-     * @return array
-     */
-    protected function _twinsGroups(Cars_Row $car)
-    {
-        $urlHelper = $this->getActionController()->getHelper('Url');
+            if ($onlyExactly) {
+                $select
+                    ->from($pictureTable->info('name'), array('pictures.car_id', new Zend_Db_Expr('COUNT(1)')))
+                    ->where('pictures.car_id IN (?)', $carIds)
+                    ->group('pictures.car_id');
+            } else {
+                $select
+                    ->from($pictureTable->info('name'), array('car_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')))
+                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->where('car_parent_cache.parent_id IN (?)', $carIds)
+                    ->group('car_parent_cache.parent_id');
+            }
 
-        $twinsGroups = array();
-
-        foreach ($this->_getTwins()->getCarGroups($car->id) as $twinsGroup) {
-            $twinsGroups[] = array(
-                'url' => $urlHelper->url(array(
-                    'module'         => 'default',
-                    'controller'     => 'twins',
-                    'action'         => 'group',
-                    'twins_group_id' => $twinsGroup['id']
-                ), 'twins', true),
-            );
+            $result = array_replace($result, $pictureTableAdapter->fetchPairs($select));
         }
-
-        return $twinsGroups;
+        return $result;
     }
 
     public function listData($cars, array $options = array())
@@ -95,11 +78,11 @@ class Project_Controller_Action_Helper_Car
         $disableTitle         = isset($options['disableTitle']) && $options['disableTitle'];
         $disableDescription   = isset($options['disableDescription']) && $options['disableDescription'];
         $disableDetailsLink   = isset($options['disableDetailsLink']) && $options['disableDetailsLink'];
-        $detailsUrl           = isset($options['detailsUrl']) && $options['detailsUrl'] ? $options['detailsUrl'] : null;
+        $detailsUrl           = isset($options['detailsUrl']) ? $options['detailsUrl'] : null;
         $allPicturesUrl       = isset($options['allPicturesUrl']) && $options['allPicturesUrl'] ? $options['allPicturesUrl'] : null;
         $typeUrl              = isset($options['typeUrl']) && $options['typeUrl'] ? $options['typeUrl'] : null;
         $specificationsUrl    = isset($options['specificationsUrl']) && $options['specificationsUrl'] ? $options['specificationsUrl'] : null;
-        $onlyExactlyPictures  = isset($options['onlyExactlyPictures']) && $options['onlyExactlyPictures'] ? $options['onlyExactlyPictures'] : null;
+        $onlyExactlyPictures  = isset($options['onlyExactlyPictures']) ? $options['onlyExactlyPictures'] : null;
         $hideEmpty            = isset($options['hideEmpty']) && $options['hideEmpty'];
         $disableTwins         = isset($options['disableTwins']) && $options['disableTwins'];
         $disableLargePictures = isset($options['disableLargePictures']) && $options['disableLargePictures'];
@@ -121,7 +104,6 @@ class Project_Controller_Action_Helper_Car
         $language = $controller->getHelper('Language')->direct();
         $catalogue = $controller->getHelper('catalogue')->direct();
 
-        $designProjectTable = new Design_Projects();
         $pictureTable = $this->_getPictureTable();
         $categoryLanguageTable = new Category_Language();
         $carParentTable = new Car_Parent();
@@ -130,65 +112,155 @@ class Project_Controller_Action_Helper_Car
         $brandCarTable = new Brand_Car();
         $categoryTable = new Category();
 
+        $carIds = array();
+        foreach ($cars as $car) {
+            $carIds[] = (int)$car->id;
+        }
+
         $specService = new Application_Service_Specifications();
 
+        $hasSpecs = array();
+        if (!$disableSpecs && !$specificationsUrl) {
+            $hasSpecs = $specService->hasSpecs(1, $carIds);
+        }
+
+        if ($carIds) {
+            $childsCounts = $carParentAdapter->fetchPairs(
+                $carParentAdapter->select()
+                    ->from($carParentTable->info('name'), array('parent_id', new Zend_Db_Expr('count(1)')))
+                    ->where('parent_id IN (?)', $carIds)
+                    ->group('parent_id')
+            );
+        } else {
+            $childsCounts = array();
+        }
+
+        // categories
+        $carsCategories = array();
+        if ($carIds && !$disableCategories) {
+            $db = $categoryTable->getAdapter();
+            $langExpr = $db->quoteInto('category.id = category_language.category_id and category_language.language = ?', $language);
+            $categoryRows = $db->fetchAll(
+                $db->select()
+                    ->from($categoryTable->info('name'), array('name', 'catname'))
+                    ->join('category_car', 'category.id = category_car.category_id', null)
+                    ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', 'car_id')
+                    ->joinLeft('category_language', $langExpr, array('lang_name' => 'name'))
+                    ->where('car_parent_cache.car_id IN (?)', $carIds)
+                    ->group(array('car_parent_cache.car_id', 'category.id'))
+            );
+
+            foreach ($categoryRows as $category) {
+                $carId = (int)$category['car_id'];
+                if (!isset($carsCategories[$carId])) {
+                    $carsCategories[$carId] = array();
+                }
+                $carsCategories[$carId][] = array(
+                    'name' => $category['lang_name'] ? $category['lang_name'] : $category['name'],
+                    'url'  => $urlHelper->url(array(
+                        'controller'       => 'category',
+                        'action'           => 'category',
+                        'category_catname' => $category['catname'],
+                    ), 'category', true),
+                );
+            }
+        }
+
+        // twins
+        $carsTwinsGroups = array();
+        if ($carIds && !$disableTwins) {
+
+            $carsTwinsGroups = array();
+
+            foreach ($this->_getTwins()->getCarsGroups($carIds) as $carId => $twinsGroups) {
+                $carsTwinsGroups[$carId] = array();
+                foreach ($twinsGroups as $twinsGroup) {
+                    $carsTwinsGroups[$carId][] = array(
+                        'url'  => $urlHelper->url(array(
+                            'module'         => 'default',
+                            'controller'     => 'twins',
+                            'action'         => 'group',
+                            'twins_group_id' => $twinsGroup['id']
+                        ), 'twins', true),
+                    );
+                }
+            }
+        }
+
+        // typecount
+        $carsTypeCounts = array();
+        if ($carIds && $typeUrl) {
+            $rows = $carParentAdapter->fetchAll(
+                $carParentAdapter->select()
+                    ->from($carParentTable->info('name'), array('parent_id', 'type', 'count' => 'count(1)'))
+                    ->where('parent_id IN (?)', $carIds)
+                    ->where('type IN (?)', array(Car_Parent::TYPE_TUNING, Car_Parent::TYPE_SPORT))
+                    ->group(array('parent_id', 'type'))
+            );
+
+            foreach ($rows as $row) {
+                $carId = (int)$row['parent_id'];
+                $typeId = (int)$row['type'];
+                if (!isset($carsTypeCounts[$carId])) {
+                    $carsTypeCounts[$carId] = array();
+                }
+                $carsTypeCounts[$carId][$typeId] = (int)$row['count'];
+            }
+        }
+
+        // lang names
+        $carsLangName = array();
+        if ($carIds) {
+            $carLangRows = $this->_getCarLanguageTable()->fetchAll(array(
+                'car_id IN (?)' => $carIds,
+                'language = ?'  => $language,
+                'length(name) > 0'
+            ));
+            foreach ($carLangRows as $carLangRow) {
+                $carsLangName[$carLangRow->car_id] = $carLangRow->name;
+            }
+        }
+
+        // design projects
+        $carsDesignProject = array();
+        $designProjectTable = new Design_Projects();
+        $db = $designProjectTable->getAdapter();
+        $designProjectRows = $db->fetchAll(
+            $db->select()
+                ->from($designProjectTable->info('name'), array('catname', 'brand_id'))
+                ->join('cars', 'design_projects.id = cars.design_project_id', null)
+                ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', 'car_id')
+                ->join('brands', 'design_projects.brand_id = brands.id', array('brand_name' => 'caption', 'brand_catname' => 'folder'))
+                ->where('car_parent_cache.car_id = ?', $car->id)
+                ->group('car_parent_cache.car_id')
+        );
+        foreach ($designProjectRows as $row) {
+            $carsDesignProject[$row['car_id']] = array(
+                'brandName' => $row['brand_name'],
+                'url'       => $urlHelper->url(array(
+                    'action'                 => 'design-project',
+                    'brand_catname'          => $row['brand_catname'],
+                    'design_project_catname' => $row['catname']
+                ), 'catalogue', true)
+            );
+        }
+
+        // total pictures
+        $carsTotalPictures = $this->_carsTotalPictures($carIds, $onlyExactlyPictures);
 
         $items = array();
         foreach ($cars as $car) {
 
-            if ($onlyExactlyPictures) {
-                $oep = $onlyExactlyPictures($car);
-            } else {
-                $oep = false;
-            }
-
-            $totalPictures = $this->_totalPictures($car, $oep);
+            $totalPictures = isset($carsTotalPictures[$car->id]) ? $carsTotalPictures[$car->id] : null;
 
             $designProjectData = false;
-            $designProject = $designProjectTable->fetchRow(
-                $designProjectTable->select(true)
-                    ->join('cars', 'design_projects.id = cars.design_project_id', null)
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
-                    ->where('car_parent_cache.car_id = ?', $car->id)
-                    ->limit(1)
-            );
-            if ($designProject) {
-                $brand = $designProject->findParentBrands();
-                if ($brand) {
-                    $designProjectData = array(
-                        'brandName' => $brand->caption,
-                        'url'       => $urlHelper->url(array(
-                            'action'                 => 'design-project',
-                            'brand_catname'          => $brand->folder,
-                            'design_project_catname' => $designProject->catname
-                        ), 'catalogue', true)
-                    );
-                }
+            if (isset($carsDesignProject[$car->id])) {
+                $designProjectData = $carsDesignProject[$car->id];
             }
 
             $categories = array();
             if (!$disableCategories) {
-                $categoryRows = $categoryTable->fetchAll(
-                    $categoryTable->select(true)
-                        ->join('category_car', 'category.id = category_car.category_id', null)
-                        ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
-                        ->where('car_parent_cache.car_id = ?', $car->id)
-                        ->group('category.id')
-                );
-                foreach ($categoryRows as $category) {
-                    $langRow = $categoryLanguageTable->fetchRow(array(
-                        'language = ?'    => $language,
-                        'category_id = ?' => $category->id
-                    ));
-                    $categories[] = array(
-                        'name' => $langRow ? $langRow['name'] : $category['name'],
-                        'url'  => $urlHelper->url(array(
-                            'controller'       => 'category',
-                            'action'           => 'category',
-                            'category_catname' => $category['catname'],
-                        ), 'category', true),
-                    );
-                }
+                $categories = isset($carsCategories[$car->id]) ? $carsCategories[$car->id] : array();
             }
 
             $pGroupId = null;
@@ -200,27 +272,11 @@ class Project_Controller_Action_Helper_Car
                 $pGroupId = $useLargeFormat ? 5 : 4;
             }
 
-
             $g = $this->_getPerspectiveGroupIds($pGroupId);
 
-            $pictureRows = $this->_getOrientedPictureList(
-                $car, $g, $oep, $type, $picturesDateSort, $allowUpPictures
+            $pictures = $this->_getOrientedPictureList(
+                $car, $g, $onlyExactlyPictures, $type, $picturesDateSort, $allowUpPictures, $language, $urlHelper, $catalogue
             );
-            $pictures = array();
-            foreach ($pictureRows as $pictureRow) {
-                if ($pictureRow) {
-                    $picture = array(
-                        'row'  => $pictureRow,
-                        'name' => $pictureRow->getCaption(array(
-                            'language' => $language
-                        ))
-                    );
-                } else {
-                    $picture = false;
-                }
-
-                $pictures[] = $picture;
-            }
 
             if ($hideEmpty) {
                 $hasPictures = false;
@@ -249,8 +305,7 @@ class Project_Controller_Action_Helper_Car
                         );
                     }
                 } else {
-
-                    if ($specService->hasSpecs(1, $car->id)) {
+                    if ($hasSpecs[$car->id]) {
                         foreach ($catalogue->cataloguePaths($car) as $path) {
                             $specsLinks[] = array(
                                 'name' => null,
@@ -269,22 +324,13 @@ class Project_Controller_Action_Helper_Car
                 }
             }
 
-            $childsCount = (int)$carParentAdapter->fetchOne(
-                $carParentAdapter->select()
-                    ->from($carParentTable->info('name'), new Zend_Db_Expr('count(1)'))
-                    ->where('parent_id = ?', $car->id)
-            );
-
-            $carLangRow = $this->_getCarLanguageTable()->fetchRow(array(
-                'car_id = ?'   => $car->id,
-                'language = ?' => $language
-            ));
+            $childsCount = isset($childsCounts[$car->id]) ? $childsCounts[$car->id] : 0;
 
             $item = array(
                 'id'               => $car->id,
                 'row'              => $car,
                 'name'             => $car->caption,
-                'langName'         => $carLangRow ? $carLangRow->name : null,
+                'langName'         => isset($carsLangName[$car->id]) ? $carsLangName[$car->id] : null,
                 'produced'         => $car->produced,
                 'produced_exactly' => $car->produced_exactly,
                 'designProject'    => $designProjectData,
@@ -299,7 +345,7 @@ class Project_Controller_Action_Helper_Car
             );
 
             if (!$disableTwins) {
-                $item['twinsGroups'] = $this->_twinsGroups($car);
+                $item['twinsGroups'] = isset($carsTwinsGroups[$car->id]) ? $carsTwinsGroups[$car->id] : array();
             }
 
             if (count($item['pictures']) < $item['totalPictures']) {
@@ -308,57 +354,34 @@ class Project_Controller_Action_Helper_Car
 
                     $item['allPicturesUrl'] = $allPicturesUrl($car);
 
-                } else {
-
-                    $brandCars = $car->findBrands_Cars();
-                    if (count($brandCars) > 0) {
-                        foreach ($brandCars as $brandCar) {
-                            $brand = $brandCar->findParentBrands();
-                            if ($brandCar->catname) {
-                                $item['allPicturesUrl'] = $urlHelper->url(array(
-                                    'module'        => 'default',
-                                    'controller'    => 'catalogue',
-                                    'action'        => 'brand-car-pictures',
-                                    'brand_catname' => $brand->folder,
-                                    'car_catname'   => $brandCar->catname
-                                ), 'catalogue', true);
-                            } else {
-                                $item['allPicturesUrl'] = $urlHelper->url(array(
-                                    'module'        => 'default',
-                                    'controller'    => 'catalogue',
-                                    'action'        => 'car-pictures',
-                                    'brand_catname' => $brand->folder,
-                                    'car_id'        => $car->id
-                                ), 'catalogue', true);
-                            }
-                            break;
-                        }
-                    }
                 }
             }
 
             if (!$disableDetailsLink && ($hasHtml || $childsCount > 0)) {
                 $url = null;
 
-                if ($detailsUrl) {
+                if (is_callable($detailsUrl)) {
 
                     $url = $detailsUrl($car);
 
                 } else {
 
-                    $cataloguePaths = $catalogue->cataloguePaths($car);
+                    if ($detailsUrl !== false) {
 
-                    $url = null;
-                    foreach ($cataloguePaths as $cPath) {
-                        $url = $urlHelper->url(array(
-                            'module'        => 'default',
-                            'controller'    => 'catalogue',
-                            'action'        => 'brand-car',
-                            'brand_catname' => $cPath['brand_catname'],
-                            'car_catname'   => $cPath['car_catname'],
-                            'path'          => $cPath['path']
-                        ), 'catalogue', true);
-                        break;
+                        $cataloguePaths = $catalogue->cataloguePaths($car);
+
+                        $url = null;
+                        foreach ($cataloguePaths as $cPath) {
+                            $url = $urlHelper->url(array(
+                                'module'        => 'default',
+                                'controller'    => 'catalogue',
+                                'action'        => 'brand-car',
+                                'brand_catname' => $cPath['brand_catname'],
+                                'car_catname'   => $cPath['car_catname'],
+                                'path'          => $cPath['path']
+                            ), 'catalogue', true);
+                            break;
+                        }
                     }
                 }
 
@@ -392,12 +415,8 @@ class Project_Controller_Action_Helper_Car
             }
 
             if ($typeUrl) {
-                $tuningCount = $carParentAdapter->fetchOne(
-                    $carParentAdapter->select()
-                        ->from($carParentTable->info('name'), 'count(1)')
-                        ->where('parent_id = ?', $car->id)
-                        ->where('type = ?', Car_Parent::TYPE_TUNING)
-                );
+
+                $tuningCount = isset($carsTypeCounts[$car->id][Car_Parent::TYPE_TUNING]) ? $carsTypeCounts[$car->id][Car_Parent::TYPE_TUNING] : 0;
                 if ($tuningCount) {
                     $item['tuning'] = array(
                         'count' => $tuningCount,
@@ -405,12 +424,7 @@ class Project_Controller_Action_Helper_Car
                     );
                 }
 
-                $sportCount = $carParentAdapter->fetchOne(
-                    $carParentAdapter->select()
-                        ->from($carParentTable->info('name'), 'count(1)')
-                        ->where('parent_id = ?', $car->id)
-                        ->where('type = ?', Car_Parent::TYPE_SPORT)
-                );
+                $sportCount = isset($carsTypeCounts[$car->id][Car_Parent::TYPE_SPORT]) ? $carsTypeCounts[$car->id][Car_Parent::TYPE_SPORT] : 0;
                 if ($sportCount) {
                     $item['sport'] = array(
                         'count' => $sportCount,
@@ -457,38 +471,34 @@ class Project_Controller_Action_Helper_Car
         return $this->_perspectiveCache[$pageId];
     }
 
-    protected function _fetchPicture($car, array $options)
+    protected function _getPictureSelect($car, array $options)
     {
         $defaults = array(
             'onlyExactlyPictures' => false,
             'perspectiveGroup'    => false,
-            'allowModifications'  => false,
             'type'                => null,
             'exclude'             => array(),
             'dateSort'            => false
         );
         $options = array_merge($defaults, $options);
 
-        $picturesOrder = array(
-            'pictures.width DESC', 'pictures.height DESC'
-        );
-
         $pictureTable = $this->_getPictureTable();
+        $db = $pictureTable->getAdapter();
 
-        $select = $pictureTable->select(true)
+        $select = $db->select()
+            ->from(
+                $pictureTable->info('name'),
+                array(
+                    'id', 'name', 'type', 'brand_id', 'engine_id', 'car_id',
+                    'perspective_id', 'image_id', 'crop_left', 'crop_top',
+                    'crop_width', 'crop_height', 'width', 'height', 'identity'
+                )
+            )
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
             ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
             ->limit(1);
 
         $order = array();
-
-        if ($options['perspectiveGroup']) {
-            $select
-                ->join(array('mp' => 'perspectives_groups_perspectives'), 'pictures.perspective_id=mp.perspective_id', null)
-                ->where('mp.group_id = ?', $options['perspectiveGroup']);
-
-            $order[] = 'mp.position';
-        }
 
         if ($options['onlyExactlyPictures']) {
 
@@ -501,28 +511,13 @@ class Project_Controller_Action_Helper_Car
                 ->join('cars', 'pictures.car_id = cars.id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id);
 
-            if (!$options['allowModifications']) {
-                $select->where('not cars.is_concept');
-
-                if (isset($options['type'])) {
-                    switch ($options['type']) {
-                        case Car_Parent::TYPE_DEFAULT:
-                            $select
-                                ->where('not car_parent_cache.sport')
-                                ->where('not car_parent_cache.tuning');
-                            break;
-                    }
-                }
-            }
+            $order[] = 'cars.is_concept asc';
+            $order[] = 'car_parent_cache.sport asc';
+            $order[] = 'car_parent_cache.tuning asc';
 
             if (isset($options['type'])) {
                 switch ($options['type']) {
                     case Car_Parent::TYPE_DEFAULT:
-                        if ($options['allowModifications']) { // prevent double
-                            $select
-                                ->where('not car_parent_cache.sport')
-                                ->where('not car_parent_cache.tuning');
-                        }
                         break;
                     case Car_Parent::TYPE_TUNING:
                         $select->where('car_parent_cache.tuning');
@@ -534,6 +529,14 @@ class Project_Controller_Action_Helper_Car
             }
         }
 
+        if ($options['perspectiveGroup']) {
+            $select
+                ->join(array('mp' => 'perspectives_groups_perspectives'), 'pictures.perspective_id = mp.perspective_id', null)
+                ->where('mp.group_id = ?', $options['perspectiveGroup']);
+
+            $order[] = 'mp.position';
+        }
+
         if ($options['exclude']) {
             $select->where('pictures.id not in (?)', $options['exclude']);
         }
@@ -541,67 +544,68 @@ class Project_Controller_Action_Helper_Car
         if ($options['dateSort']) {
             $select->join(array('picture_car' => 'cars'), 'cars.id = picture_car.id', null);
             $order = array_merge($order, array('picture_car.begin_order_cache', 'picture_car.end_order_cache'));
-        } else {
-            $order = array_merge($order, $picturesOrder);
         }
+        $order = array_merge($order, array('pictures.width DESC', 'pictures.height DESC'));
 
         $select->order($order);
 
-        return $pictureTable->fetchRow($select);
+        return $select;
     }
 
     protected function _getOrientedPictureList($car, array $perspectiveGroupIds,
-            $onlyExactlyPictures, $type, $dateSort, $allowUpPictures)
+            $onlyExactlyPictures, $type, $dateSort, $allowUpPictures, $language, $urlHelper, $catalogue)
     {
         $pictures = array();
         $usedIds = array();
 
+        $pictureTable = $this->_getPictureTable();
+        $db = $pictureTable->getAdapter();
+
         foreach ($perspectiveGroupIds as $groupId) {
-            $picture = $this->_fetchPicture($car, array(
+
+            $select = $this->_getPictureSelect($car, array(
                 'onlyExactlyPictures' => $onlyExactlyPictures,
                 'perspectiveGroup'    => $groupId,
-                'allowModifications'  => false,
                 'type'                => $type,
                 'exclude'             => $usedIds,
                 'dateSort'            => $dateSort
             ));
 
-            if (!$picture) {
-                $picture = $this->_fetchPicture($car, array(
-                    'onlyExactlyPictures' => $onlyExactlyPictures,
-                    'perspectiveGroup'    => $groupId,
-                    'allowModifications'  => true,
-                    'type'                => $type,
-                    'exclude'             => $usedIds,
-                    'dateSort'            => $dateSort
-                ));
-            }
+            $picture = $db->fetchRow($select);
 
             if ($picture) {
                 $pictures[] = $picture;
-                $usedIds[] = $picture->id;
+                $usedIds[] = (int)$picture['id'];
             } else {
                 $pictures[] = null;
             }
         }
 
-        foreach (array(false, true) as $allowModification) {
-            foreach ($pictures as $key => $picture) {
-                if (!$picture) {
-                    $pic = $this->_fetchPicture($car, array(
-                        'onlyExactlyPictures' => $onlyExactlyPictures,
-                        'allowModifications'  => $allowModification,
-                        'type'                => $type,
-                        'exclude'             => $usedIds,
-                        'dateSort'            => $dateSort
-                    ));
+        $needMore = count($perspectiveGroupIds) - count($usedIds);
 
-                    if ($pic) {
-                        $pictures[$key] = $pic;
-                        $usedIds[] = $pic->id;
-                    } else {
-                        break;
-                    }
+        if ($needMore > 0) {
+
+            $select = $this->_getPictureSelect($car, array(
+                'onlyExactlyPictures' => $onlyExactlyPictures,
+                'type'                => $type,
+                'exclude'             => $usedIds,
+                'dateSort'            => $dateSort
+            ));
+
+            $rows = $db->fetchAll(
+                $select->limit($needMore)
+            );
+            $morePictures = array();
+            foreach ($rows as $row) {
+                $morePictures[] = $row;
+            }
+
+            foreach ($pictures as $key => $picture) {
+                if (count($morePictures) <= 0) {
+                    break;
+                }
+                if (!$picture) {
+                    $pictures[$key] = array_shift($morePictures);
                 }
             }
         }
@@ -614,6 +618,35 @@ class Project_Controller_Action_Helper_Car
             }
         }*/
 
-        return $pictures;
+        $notEmptyPics = array();
+        foreach ($pictures as $picture) {
+            if ($picture) {
+                $notEmptyPics[] = $picture;
+            }
+        }
+
+        $pictureNames = $catalogue->buildPicturesName($notEmptyPics, $language);
+
+        $result = array();
+        foreach ($pictures as $picture) {
+            if ($picture) {
+                $pictureId = $picture['id'];
+
+                $result[] = array(
+                    'url'     => $urlHelper->url(array(
+                        'module'     => 'default',
+                        'controller' => 'picture',
+                        'action'     => 'index',
+                        'picture_id' => $picture['identity'] ? $picture['identity'] : $pictureId
+                    ), 'picture', true),
+                    'request' => $catalogue->getPictureFormatRequest($picture),
+                    'name'    => isset($pictureNames[$pictureId]) ? $pictureNames[$pictureId] : null
+                );
+            } else {
+                $result[] = false;
+            }
+        }
+
+        return $result;
     }
 }

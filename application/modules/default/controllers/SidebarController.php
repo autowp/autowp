@@ -87,6 +87,81 @@ class SidebarController extends Zend_Controller_Action
 
     protected function _carGroups($brand, $conceptsSeparatly, $carId)
     {
+        $cache = $this->getInvokeArg('bootstrap')
+            ->getResource('cachemanager')->getCache('long');
+
+        $language = $this->_helper->language();
+
+        $cacheKey = 'SIDEBAR_' . $brand->id . '_' . $language;
+
+        if (!($groups = $cache->load($cacheKey))) {
+
+            $brandCarTable = new Brand_Car();
+            $db = $brandCarTable->getAdapter();
+
+            $select = $db->select()
+                ->from($brandCarTable->info('name'), array(
+                    'brand_car_catname' => 'catname'
+                ))
+                ->join('cars', 'cars.id = brands_cars.car_id', array(
+                    'car_id'   => 'id',
+                    'car_name' => 'cars.caption'
+                ))
+                ->where('brands_cars.brand_id = ?', $brand->id);
+            if ($conceptsSeparatly) {
+                $select->where('NOT cars.is_concept');
+            }
+
+            $aliases = $this->_getBrandAliases($brand);
+
+            $carLanguageTable = new Car_Language();
+
+            $groups = array();
+            foreach ($db->fetchAll($select) as $brandCarRow) {
+
+                if ($brandCarRow['brand_car_catname']) {
+                    $url = $this->_helper->url->url(array(
+                        'action'        => 'brand-car',
+                        'brand_catname' => $brand->folder,
+                        'car_catname'   => $brandCarRow['brand_car_catname']
+                    ), 'catalogue', true);
+                } else {
+                    $url = $this->_helper->url->url(array(
+                        'action'        => 'car',
+                        'brand_catname' => $brand->folder,
+                        'car_id'        => $brandCarRow['car_id']
+                    ), 'catalogue', true);
+                }
+
+                $carLangRow = $carLanguageTable->fetchRow(array(
+                    'car_id = ?'   => (int)$brandCarRow['car_id'],
+                    'language = ?' => (string)$language
+                ));
+
+                $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
+                foreach ($aliases as $alias) {
+                    $caption = str_ireplace('by '.$alias, '', $caption);
+                    $caption = str_ireplace($alias.'-', '', $caption);
+                    $caption = str_ireplace('-'.$alias, '', $caption);
+
+                    $caption = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $caption);
+                }
+
+                $caption = trim(preg_replace("|[[:space:]]+|", ' ', $caption));
+                $caption = ltrim($caption, '/');
+                if (!$caption) {
+                    $caption = $brandCarRow['car_name'];
+                }
+                $groups[] = array(
+                    'car_id'  => $brandCarRow['car_id'],
+                    'url'     => $url,
+                    'caption' => $caption,
+                );
+            }
+
+            $cache->save($groups, $cacheKey, array(), 300);
+        }
+
         $carTable = $this->_helper->catalogue()->getCarTable();
 
         $selectedIds = array();
@@ -100,69 +175,9 @@ class SidebarController extends Zend_Controller_Action
             );
         }
 
-        $brandCarTable = new Brand_Car();
-        $db = $brandCarTable->getAdapter();
-
-        $select = $db->select()
-            ->from($brandCarTable->info('name'), array(
-                'brand_car_catname' => 'catname'
-            ))
-            ->join('cars', 'cars.id = brands_cars.car_id', array(
-                'car_id'   => 'id',
-                'car_name' => 'cars.caption'
-            ))
-            ->where('brands_cars.brand_id = ?', $brand->id);
-        if ($conceptsSeparatly) {
-            $select->where('NOT cars.is_concept');
-        }
-
-        $aliases = $this->_getBrandAliases($brand);
-
-        $language = $this->_helper->language();
-
-        $carLanguageTable = new Car_Language();
-
-        $groups = array();
-        foreach ($db->fetchAll($select) as $brandCarRow) {
-
-            if ($brandCarRow['brand_car_catname']) {
-                $url = $this->_helper->url->url(array(
-                    'action'        => 'brand-car',
-                    'brand_catname' => $brand->folder,
-                    'car_catname'   => $brandCarRow['brand_car_catname']
-                ), 'catalogue', true);
-            } else {
-                $url = $this->_helper->url->url(array(
-                    'action'        => 'car',
-                    'brand_catname' => $brand->folder,
-                    'car_id'        => $brandCarRow['car_id']
-                ), 'catalogue', true);
-            }
-
-            $carLangRow = $carLanguageTable->fetchRow(array(
-                'car_id = ?'   => (int)$brandCarRow['car_id'],
-                'language = ?' => (string)$language
-            ));
-
-            $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
-            foreach ($aliases as $alias) {
-                $caption = str_ireplace('by '.$alias, '', $caption);
-                $caption = str_ireplace($alias.'-', '', $caption);
-                $caption = str_ireplace('-'.$alias, '', $caption);
-
-                $caption = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $caption);
-            }
-
-            $caption = trim(preg_replace("|[[:space:]]+|", ' ', $caption));
-            $caption = ltrim($caption, '/');
-            if (!$caption) {
-                $caption = $brandCarRow['car_name'];
-            }
-            $groups[] = array(
-                'url'     => $url,
-                'caption' => $caption,
-                'active'  => in_array($brandCarRow['car_id'], $selectedIds)
-            );
+        foreach ($groups as &$group) {
+            $group['active'] = in_array($group['car_id'], $selectedIds);
+            unset($group['car_id']);
         }
 
         return $groups;
