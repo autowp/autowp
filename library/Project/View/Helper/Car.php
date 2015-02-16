@@ -24,6 +24,21 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
      */
     protected $_brandTable;
 
+    /**
+     * @var Spec
+     */
+    private $_specTable;
+
+    /**
+     * @return Spec
+     */
+    private function _getSpecTable()
+    {
+        return $this->_specTable
+            ? $this->_specTable
+            : $this->_specTable = new Spec();
+        }
+
     public function car(Cars_Row $car = null)
     {
         $this->_car = $car;
@@ -41,6 +56,13 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
         $view = $this->view;
 
         $result = $view->escape($car->caption);
+
+        if ($this->_car->spec_id) {
+            $specRow = $this->_getSpecTable()->find($this->_car->spec_id)->current();
+            if ($specRow) {
+                $result .= ' <span class="label label-primary">' . $view->escape($specRow->short_name) . '</span>';
+            }
+        }
 
         if (strlen($car->body) > 0) {
             $result .= ' ('.$view->escape($car->body).')';

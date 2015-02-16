@@ -42,6 +42,10 @@ class Log_Events_Row extends Project_Db_Table_Row
                     $col = 'user_id';
                     $tableName = 'log_events_user';
                     break;
+                case $table instanceof Factory:
+                    $col = 'factory_id';
+                    $tableName = 'log_events_factory';
+                    break;
                 default:
                     throw new Exception('Неизвестный тип данных');
             }

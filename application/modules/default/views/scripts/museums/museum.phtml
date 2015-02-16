@@ -13,10 +13,12 @@
     ));
 
     $this->layout()->moduleName = 'default/museums/museum';
-    $this->layout()->moduleOptions = array(
-        'lat' => (float)$this->museum->lat,
-        'lng' => (float)$this->museum->lng,
-    );
+    if ($this->point) {
+        $this->layout()->moduleOptions = array(
+            'lat' => $this->point->y(),
+            'lng' => $this->point->x(),
+        );
+    }
 ?>
 
 <div id="google-map"></div>

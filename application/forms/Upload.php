@@ -52,14 +52,13 @@ class Application_Form_Upload extends Project_Form
             ),
             'elements' => array(
                 array ('file', 'picture', $pictureOptions),
-                array ('text', 'note', array (
+                array ('textarea', 'note', array (
                     'required'    => false,
-                    'label'       => 'Примечание к картинке',
-                    'size'        => 50,
-                    'maxlength'   => 255,
+                    'label'       => 'Примечание к изображению',
                     'filters'     => array('StringTrim'),
+                    'rows'        => 3,
                     'validators'  => array(
-                        array('StringLength', true, array(3, 255))
+                        array('StringLength', true, array(3, 4096))
                     ),
                     'decorators'  => array('ViewHelper')
                 )),

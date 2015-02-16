@@ -1,0 +1,59 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ),
+        'pageId' => 181,
+        'args'   => array(
+            'FACTORY_ID'   => $this->factory->id,
+            'FACTORY_NAME' => $this->factory->name
+        )
+    ));
+
+    $this->layout()->moduleName = 'default/factory/factory';
+    if ($this->point) {
+        $this->layout()->moduleOptions = array(
+            'lat' => $this->point->y(),
+            'lng' => $this->point->x(),
+        );
+    }
+?>
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <li class="active">
+        <?=$this->htmlA($this->url(array(
+            'action' => 'factory',
+            'page'   => null
+        )), $this->factory->name) ?>
+    </li>
+    <li>
+        <?=$this->htmlA($this->url(array(
+            'action' => 'factory-cars',
+        )), 'Автомобили') ?>
+    </li>
+</ul>
+
+<div id="google-map" style="height:300px;margin:0 0 40px;width:100%"></div>
+
+<?php if ($this->factory->description) { ?>
+    <div class="well">
+        <?=$this->factory->description ?>
+    </div>
+<?php } ?>
+
+<?php if (count($this->pictures) > 0) { ?>
+    <h3>Фотографии</h3>
+    <?=$this->pictures($this->pictures, 4) ?>
+<?php } ?>
+
+<?php if (count($this->carPictures) > 0) { ?>
+    <h3>Автомобили</h3>
+    <?=$this->pictures($this->carPictures, array(
+        'width'            => 4,
+        'disableBehaviour' => true
+    )) ?>
+    <p><?=$this->htmlA($this->url(array(
+        'action' => 'factory-cars'
+    )), 'подробнее ...')?></p>
+<?php } ?>

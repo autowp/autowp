@@ -23,7 +23,7 @@ define(
                 var id = 'picture-carousel';
                 
                 var markup = 
-                    '<div class="gallery">' +
+                    '<div class="gallery" tabindex="0">' +
                         '<div class="carousel slide">' +
                             '<ol class="carousel-indicators"></ol>' +
                             '<div class="carousel-inner"></div>' +
@@ -379,6 +379,8 @@ define(
                 this.fixSize(this.$e.find('.item'));
                 
                 $(document).on('keyup', this.escHandler);
+                
+                this.$e.find('a.carousel-control.right').focus();
             },
             rewindToId: function(id) {
                 var self = this;

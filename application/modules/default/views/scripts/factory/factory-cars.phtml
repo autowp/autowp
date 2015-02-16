@@ -1,0 +1,31 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ),
+        'pageId' => 182,
+        'args'   => array(
+            'FACTORY_ID'   => $this->factory->id,
+            'FACTORY_NAME' => $this->factory->name
+        )
+    ));
+?>
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <li>
+        <?=$this->htmlA($this->url(array(
+            'action' => 'factory',
+            'page'   => null
+        )), $this->factory->name) ?>
+    </li>
+    <li class="active">
+        <?=$this->htmlA($this->url(array(
+            'action' => 'factory-cars',
+        )), 'Автомобили') ?>
+    </li>
+</ul>
+<?=$this->partial('cars.phtml', $this->carsData)?>
+<?php if (isset($this->paginator)) { ?>
+    <?=$this->paginationControl($this->paginator) ?>
+<?php } ?>

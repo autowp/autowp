@@ -21,7 +21,7 @@ class Application_Form_Moder_Car_Organize extends Application_Form_Moder_Car_New
                 'label'        => 'Группа',
                 'decorators'   => array('ViewHelper'),
                 'readonly'     => true,
-                'order'        => 10,
+                'order'        => 11,
             )),
             array('MultiCheckbox', 'childs', array(
                 'label'        => 'Автомобили',
@@ -31,7 +31,7 @@ class Application_Form_Moder_Car_Organize extends Application_Form_Moder_Car_New
                 'multioptions' => $this->_childOptions,
                 'label_class'  => 'checkbox',
                 'separator'    => '',
-                'order'        => 11,
+                'order'        => 12,
             )),
         ));
     }

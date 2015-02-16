@@ -8,13 +8,25 @@
         'pageId' => 173,
     ));
 ?>
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <li<?=$this->rating == 'specs' ? ' class="active"' : ''?>>
+        <?=$this->htmlA($this->url(array(
+            'rating' => null
+        )), 'Specs')?>
+    </li>
+    <li<?=$this->rating == 'pictures' ? ' class="active"' : ''?>>
+        <?=$this->htmlA($this->url(array(
+            'rating' => 'pictures'
+        )), 'Pictures')?>
+    </li>
+</ul>
 <table class="table">
     <thead>
         <tr>
             <th>#</th>
             <th></th>
             <th></th>
-            <th class="text-right">Specs volume</th>
+            <th class="text-right"><?=$this->escape($this->valueTitle)?></th>
         </tr>
     </thead>
     <tbody>

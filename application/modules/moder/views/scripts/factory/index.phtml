@@ -1,0 +1,70 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 175,
+    ));
+?>
+<div class="row">
+    <div class="col-lg-4 col-md-4">
+        <h2>Фильтр</h2>
+        <div class="well">
+            <?=$this->form->render($this)?>
+        </div>
+
+        <ul class="list-unstyled">
+            <?php if ($this->user()->isAllowed('factory', 'add')) { ?>
+                <li>
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <?=$this->htmlA($this->url(array(
+                        'module'     => 'moder',
+                        'controller' => 'factory',
+                        'action'     => 'add',
+                    ), 'default', true), 'добавить завод')?>
+                </li>
+            <?php } ?>
+        </ul>
+    </div>
+    <div class="col-lg-8 col-md-8">
+        <h2>
+            Заводы
+            <?php if ($count = $this->paginator->getTotalItemCount()) {?>
+                <small><?=$this->translate(array('%1$s factories', null, $count), $count)?></small>
+            <?php } ?>
+        </h2>
+        <?php foreach ($this->factories as $factory) { ?>
+            <div class="car">
+                <h3><?=$this->escape($factory['name'])?></h3>
+                <div class="row thumbnails">
+                    <?php foreach ($factory['pictures'] as $picture) { ?>
+                        <div class="col-lg-3 col-md-3 col-sm-6">
+                            <?php if ($picture->image_id) { ?>
+                                <?=$this->htmlA(
+                                    array(
+                                        'href'  => $this->pic($picture)->url(),
+                                        'class' =>'thumbnail'
+                                    ),
+                                    $this->img($picture->getFormatRequest(), array(
+                                        'format' => 'picture-thumb',
+                                    )),
+                                    false
+                                )?>
+                            <?php } ?>
+                        </div>
+                    <?php } ?>
+                </div>
+                <ul class="list-inline">
+                    <li>
+                        <span class="glyphicon glyphicon-cog"></span>
+                        <?=$this->htmlA($factory['moderUrl'], 'управление')?>
+                    </li>
+                </ul>
+            </div>
+        <?php } ?>
+        <?=$this->paginationControl($this->paginator) ?>
+    </div>
+</div>

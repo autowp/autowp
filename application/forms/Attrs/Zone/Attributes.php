@@ -177,7 +177,12 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
             throw new Exception('$this->_itemType not set');
         }
 
-        $value = isset($this->_actualValues[$attribute['id']]) ? $this->_actualValues[$attribute['id']] : null;
+        $valueExists = array_key_exists($attribute['id'], $this->_actualValues);
+        if ($valueExists) {
+            $value = $this->_actualValues[$attribute['id']];
+        } else {
+            $value = null;
+        }
 
         $unit = null;
         if (!is_null($value)) {
@@ -198,13 +203,14 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
             'decorators'                   => array(
                 'ViewHelper',
                 array('viewScript', array(
-                    'viewScript' => 'forms/specs-element.phtml',
-                    'placement'  => false,
-                    'deep'       => $deep,
-                    'classes'    => $parents,
-                    'actual'     => $value,
-                    'unit'       => $unit,
-                    'allValues'  => $allValues
+                    'viewScript'   => 'forms/specs-element.phtml',
+                    'placement'    => false,
+                    'deep'         => $deep,
+                    'classes'      => $parents,
+                    'actualExists' => $valueExists,
+                    'actual'       => $value,
+                    'unit'         => $unit,
+                    'allValues'    => $allValues
                 ))
             )
         );
@@ -230,14 +236,14 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
                 case 2: // int
                     $options['filters'] = array('StringTrim');
                     $options['validators'] = array(
-                        array('Int', false, array('en_US'))
+                        array('Attrs_IntOrNull', false, array('en_US'))
                     );
                     break;
 
                 case 3: // float
                     $options['filters'] = array('StringTrim');
                     $options['validators'] = array(
-                        array('Float', false, array('en_US'))
+                        array('Attrs_FloatOrNull', false, array('en_US'))
                     );
                     break;
 
@@ -248,6 +254,7 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
                 case 5: // checkbox
                     $options['multioptions'] = array(
                         ''  => '—',
+                        '-' => 'нет значения',
                         '0' => 'нет',
                         '1' => 'да'
                     );
@@ -256,7 +263,8 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
                 case 6: // select
                 case 7: // treeselect
                     $multioptions = array(
-                        ''  => '—'
+                        ''  => '—',
+                        '-' => 'нет значения',
                     );
                     if (isset($this->_multioptions[$attribute['id']])) {
                         $multioptions = array_replace($multioptions, $this->_multioptions[$attribute['id']]);

@@ -34,7 +34,7 @@ define(
 
                                 formData.append(name, file);
 
-                                $form.find(':text').each(function() {
+                                $form.find('textarea').each(function() {
                                     formData.append($(this).attr('name'), $(this).val());
                                 });
 

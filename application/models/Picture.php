@@ -7,7 +7,8 @@ class Picture extends Project_Db_Table
         CAR_TYPE_ID      = 1,
         LOGO_TYPE_ID     = 2,
         MIXED_TYPE_ID    = 3,
-        ENGINE_TYPE_ID   = 4;
+        ENGINE_TYPE_ID   = 4,
+        FACTORY_TYPE_ID  = 7;
 
     const
         STATUS_NEW      = 'new',
@@ -35,6 +36,11 @@ class Picture extends Project_Db_Table
         'Engine' => array(
             'columns'       => array('engine_id'),
             'refTableClass' => 'Engines',
+            'refColumns'    => array('id')
+        ),
+        'Factory' => array(
+            'columns'       => array('factory_id'),
+            'refTableClass' => 'Factory',
             'refColumns'    => array('id')
         ),
         'Owner' => array(

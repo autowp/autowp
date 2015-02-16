@@ -84,7 +84,9 @@ class Comments
             'author_id'           => $authorId,
             'message'             => (string)$data['message'],
             'ip'                  => $data['ip'],
-            'moderator_attention' => (bool)$data['moderatorAttention']
+            'moderator_attention' => $data['moderatorAttention']
+                ? Comment_Message::MODERATOR_ATTENTION_REQUIRED
+                : Comment_Message::MODERATOR_ATTENTION_NONE
         );
 
         $messageTable = $this->_getMessageTable();

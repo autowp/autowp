@@ -12,6 +12,7 @@ class Project_Validate_Car_NameNotExists extends Zend_Validate_Abstract
 
         if (is_array($context)) {
             $body = isset($context['body']) ? (string)$context['body'] : '';
+            $spec = isset($context['spec_id']) ? (string)$context['spec_id'] : '';
             $by = isset($context['begin_year']) ? (int)$context['begin_year'] : 0;
             if ($by <= 0) {
                 $by = null;
@@ -62,6 +63,12 @@ class Project_Validate_Car_NameNotExists extends Zend_Validate_Abstract
                 $select->where('is_group');
             } else {
                 $select->where('not is_group');
+            }
+
+            if ($spec) {
+                $select->where('spec_id = ?', $spec);
+            } else {
+                $select->where('spec_id IS NULL');
             }
 
             $row = $cars->fetchAll($select)->current();

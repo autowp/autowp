@@ -25,8 +25,9 @@
                 ->appendName('keywords', 'auto, avto, автомобиль')
                 ->appendName('description', 'Энциклопедия автомобилей в картинках. AutoWP.ru');
             echo $this->headTitle();
-            echo $this->headLink(array('rel' => 'shortcut icon', 'href' => '/favicon.ico', 'type' => 'image/x-icon'), 'PREPEND')
-                      ->appendStylesheet('/css/styles.css', 'screen');
+            echo $this
+                ->headLink(array('rel' => 'shortcut icon', 'href' => '/favicon.ico', 'type' => 'image/x-icon'), 'PREPEND')
+                ->appendStylesheet('/css/styles.css', 'screen');
             echo $this->headScript()
                 ->appendFile(
                     'http://html5shim.googlecode.com/svn/trunk/html5.js',

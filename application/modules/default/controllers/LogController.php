@@ -50,6 +50,12 @@ class LogController extends Zend_Controller_Action
                    ->where('log_events_twins_groups.twins_group_id = ?', $groupId);
         }
 
+        $factoryId = (int)$this->_getParam('factory_id');
+        if ($factoryId) {
+            $select->join('log_events_factory', 'log_events.id = log_events_factory.log_event_id', null)
+                ->where('log_events_factory.factory_id = ?', $factoryId);
+        }
+
         $userId = (int)$this->_getParam('user_id');
         if ($userId) {
             $select->where('log_events.user_id = ?', $userId);

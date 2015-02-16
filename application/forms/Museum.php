@@ -71,7 +71,6 @@ class Application_Form_Museum extends Project_Form
                     'filters'     => array('StringTrim'),
                     'decorators'  => array('ViewHelper'),
                     'class'       => 'span6'
-
                 )),
                 array('file', 'photo', array(
                     'required'    => false,

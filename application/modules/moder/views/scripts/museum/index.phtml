@@ -10,10 +10,10 @@
     ));
 ?>
 <p><?=$this->htmlA(array(
-    'href'    =>    $this->url(array(
+    'href' => $this->url(array(
         'action' => 'new'
     )),
-    'class'    =>    'btn btn-success'
+    'class' => 'btn btn-success'
 ), 'Добавить музей')?></p>
 
 <table class="table table-bordered table-striped">
@@ -45,9 +45,6 @@
                     ), 'default', true), $museum->name)?>
                 </td>
                 <td>
-                    <?php if ($museum->lat && $museum->lng) { ?>
-                        <?=$museum->lat?>,<?=$museum->lng?><br />
-                    <?php } ?>
                     <?=$this->escape($museum->address)?>
                 </td>
                 <td>

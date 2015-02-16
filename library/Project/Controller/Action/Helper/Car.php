@@ -15,6 +15,21 @@ class Project_Controller_Action_Helper_Car
      */
     protected $_twins;
 
+    /**
+     * @var Spec
+     */
+    private $_specTable;
+
+    /**
+     * @return Spec
+     */
+    private function _getSpecTable()
+    {
+        return $this->_specTable
+            ? $this->_specTable
+            : $this->_specTable = new Spec();
+    }
+
     protected function _getCarLanguageTable()
     {
         return $this->_carLangTable
@@ -92,6 +107,7 @@ class Project_Controller_Action_Helper_Car
         $perspectiveGroup     = isset($options['perspectiveGroup']) ? (int)$options['perspectiveGroup'] : null;
         $callback             = isset($options['callback']) && $options['callback'] ? $options['callback'] : null;
         $allowUpPictures      = isset($options['allowUpPictures']) && $options['allowUpPictures'];
+        $onlyChilds           = isset($options['onlyChilds']) && is_array($options['onlyChilds']) ? $options['onlyChilds'] : array();
 
         $controller = $this->getActionController();
         $urlHelper = $controller->getHelper('Url');
@@ -225,24 +241,26 @@ class Project_Controller_Action_Helper_Car
         $carsDesignProject = array();
         $designProjectTable = new Design_Projects();
         $db = $designProjectTable->getAdapter();
-        $designProjectRows = $db->fetchAll(
-            $db->select()
-                ->from($designProjectTable->info('name'), array('catname', 'brand_id'))
-                ->join('cars', 'design_projects.id = cars.design_project_id', null)
-                ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', 'car_id')
-                ->join('brands', 'design_projects.brand_id = brands.id', array('brand_name' => 'caption', 'brand_catname' => 'folder'))
-                ->where('car_parent_cache.car_id = ?', $car->id)
-                ->group('car_parent_cache.car_id')
-        );
-        foreach ($designProjectRows as $row) {
-            $carsDesignProject[$row['car_id']] = array(
-                'brandName' => $row['brand_name'],
-                'url'       => $urlHelper->url(array(
-                    'action'                 => 'design-project',
-                    'brand_catname'          => $row['brand_catname'],
-                    'design_project_catname' => $row['catname']
-                ), 'catalogue', true)
+        if ($carIds) {
+            $designProjectRows = $db->fetchAll(
+                $db->select()
+                    ->from($designProjectTable->info('name'), array('catname', 'brand_id'))
+                    ->join('cars', 'design_projects.id = cars.design_project_id', null)
+                    ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', 'car_id')
+                    ->join('brands', 'design_projects.brand_id = brands.id', array('brand_name' => 'caption', 'brand_catname' => 'folder'))
+                    ->where('car_parent_cache.car_id IN (?)', $carIds)
+                    ->group('car_parent_cache.car_id')
             );
+            foreach ($designProjectRows as $row) {
+                $carsDesignProject[$row['car_id']] = array(
+                    'brandName' => $row['brand_name'],
+                    'url'       => $urlHelper->url(array(
+                        'action'                 => 'design-project',
+                        'brand_catname'          => $row['brand_catname'],
+                        'design_project_catname' => $row['catname']
+                    ), 'catalogue', true)
+                );
+            }
         }
 
         // total pictures
@@ -274,8 +292,10 @@ class Project_Controller_Action_Helper_Car
 
             $g = $this->_getPerspectiveGroupIds($pGroupId);
 
+            $carOnlyChilds = isset($onlyChilds[$car->id]) ? $onlyChilds[$car->id] : null;
+
             $pictures = $this->_getOrientedPictureList(
-                $car, $g, $onlyExactlyPictures, $type, $picturesDateSort, $allowUpPictures, $language, $urlHelper, $catalogue
+                $car, $g, $onlyExactlyPictures, $type, $picturesDateSort, $allowUpPictures, $language, $urlHelper, $catalogue, $carOnlyChilds
             );
 
             if ($hideEmpty) {
@@ -326,6 +346,14 @@ class Project_Controller_Action_Helper_Car
 
             $childsCount = isset($childsCounts[$car->id]) ? $childsCounts[$car->id] : 0;
 
+            /*$spec = null;
+            if ($car->spec_id) {
+                $specRow = $this->_getSpecTable()->find($car->spec_id)->current();
+                if ($specRow) {
+                    $spec = $specRow->short_name;
+                }
+            }*/
+
             $item = array(
                 'id'               => $car->id,
                 'row'              => $car,
@@ -341,7 +369,7 @@ class Project_Controller_Action_Helper_Car
                 'hasChilds'        => $childsCount > 0,
                 'childsCount'      => $childsCount,
                 'specsLinks'       => $specsLinks,
-                'largeFormat'      => $useLargeFormat
+                'largeFormat'      => $useLargeFormat,
             );
 
             if (!$disableTwins) {
@@ -478,7 +506,8 @@ class Project_Controller_Action_Helper_Car
             'perspectiveGroup'    => false,
             'type'                => null,
             'exclude'             => array(),
-            'dateSort'            => false
+            'dateSort'            => false,
+            'onlyChilds'          => null
         );
         $options = array_merge($defaults, $options);
 
@@ -549,11 +578,22 @@ class Project_Controller_Action_Helper_Car
 
         $select->order($order);
 
+        if ($options['onlyChilds']) {
+            $select
+                ->join(
+                    array('cpc_oc' => 'car_parent_cache'),
+                    'cpc_oc.car_id = pictures.car_id',
+                    null
+                )
+                ->where('cpc_oc.parent_id IN (?)', $options['onlyChilds']);
+        }
+
         return $select;
     }
 
     protected function _getOrientedPictureList($car, array $perspectiveGroupIds,
-            $onlyExactlyPictures, $type, $dateSort, $allowUpPictures, $language, $urlHelper, $catalogue)
+            $onlyExactlyPictures, $type, $dateSort, $allowUpPictures, $language,
+            $urlHelper, $catalogue, $onlyChilds)
     {
         $pictures = array();
         $usedIds = array();
@@ -568,7 +608,8 @@ class Project_Controller_Action_Helper_Car
                 'perspectiveGroup'    => $groupId,
                 'type'                => $type,
                 'exclude'             => $usedIds,
-                'dateSort'            => $dateSort
+                'dateSort'            => $dateSort,
+                'onlyChilds'          => $onlyChilds
             ));
 
             $picture = $db->fetchRow($select);
@@ -589,7 +630,8 @@ class Project_Controller_Action_Helper_Car
                 'onlyExactlyPictures' => $onlyExactlyPictures,
                 'type'                => $type,
                 'exclude'             => $usedIds,
-                'dateSort'            => $dateSort
+                'dateSort'            => $dateSort,
+                'onlyChilds'          => $onlyChilds
             ));
 
             $rows = $db->fetchAll(

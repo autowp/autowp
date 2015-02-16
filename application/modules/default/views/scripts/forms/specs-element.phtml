@@ -35,14 +35,24 @@
         <?php } ?>
     </td>
     <td class="actual">
-        <?=$this->escape($this->actual)?>
-        <?php if ($this->unit) { ?>
-            <span class="unit" title="<?=$this->escape($this->unit['name'])?>"><?=$this->escape($this->unit['abbr'])?></span>
+        <?php if ($this->actualExists) { ?>
+            <?php if ($this->actual === null) { ?>
+                <em>нет</em>
+            <?php } else { ?>
+                <?=$this->escape($this->actual)?>
+                <?php if ($this->unit) { ?>
+                    <span class="unit" title="<?=$this->escape($this->unit['name'])?>"><?=$this->escape($this->unit['abbr'])?></span>
+                <?php } ?>
+            <?php } ?>
         <?php } ?>
     </td>
     <td>
         <?php foreach ($this->allValues as $value) { ?>
-            <?=$this->escape($value['value'])?>
+            <?php if ($value['value'] === null) { ?>
+                <em>нет</em>
+            <?php } else { ?>
+                <?=$this->escape($value['value'])?>
+            <?php } ?>
             <?=$this->user($value['user'])?>
             <span class="date">[<?=$this->escape($this->humanTime($value['date']))?>]</span>
             <br />

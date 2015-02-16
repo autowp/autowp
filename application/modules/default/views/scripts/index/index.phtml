@@ -13,7 +13,9 @@
 <div class="row">
     <div class="col-lg-6 col-md-6">
         <?php if ($this->carOfDay) { ?>
-            <h2><?=$this->escape($this->carOfDay->getFullName())?> <small><?=$this->escape($this->translate('car-of-day'))?></small></h2>
+            <h2>
+                <?=$this->escape($this->carOfDay->getFullName())?> <small><?=$this->escape($this->translate('car-of-day')) ?></small>
+            </h2>
 
             <?php if ($this->carOfDayPictures) { ?>
                 <div class="row thumbnails">

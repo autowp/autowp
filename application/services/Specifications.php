@@ -7,6 +7,8 @@ class Application_Service_Specifications
 
     const ENGINE_ZONE_ID = 5;
 
+    const NULL_VALUE_STR = '-';
+
     protected $_zones = null;
 
     /**
@@ -454,7 +456,21 @@ class Application_Service_Specifications
 
         $form = new Application_Form_Attrs_Zone_Attributes($options);
         $formValues = $this->_walkTree($zoneId, function($attribute) use ($currentUserValues) {
-            return isset($currentUserValues[$attribute['id']]) ? $currentUserValues[$attribute['id']] : null;
+            if (array_key_exists($attribute['id'], $currentUserValues)) {
+                $value = $currentUserValues[$attribute['id']];
+                if (is_array($value)) {
+                    foreach ($value as $oneValue) {
+                        if ($oneValue === null) {
+                            return array(self::NULL_VALUE_STR);
+                        }
+                    }
+                    return $value;
+                } else {
+                    return $value === null ? self::NULL_VALUE_STR : $value;
+                }
+            } else {
+                return null;
+            }
         });
         $form->populate($formValues);
 
@@ -623,14 +639,19 @@ class Application_Service_Specifications
                 if ($value) {
 
                     $empty = true;
+                    $valueNot = false;
                     foreach ($value as $oneValue) {
                         if ($oneValue) {
                             $empty = false;
-                            break;
+                        }
+
+                        if ($oneValue == self::NULL_VALUE_STR) {
+                            $valueNot = true;
                         }
                     }
 
                     if (!$empty) {
+
                         // вставляем новые дексрипторы и значения
                         $userValueTable->insert(array(
                             'attribute_id' => $attribute['id'],
@@ -641,21 +662,25 @@ class Application_Service_Specifications
                             'update_date'  => new Zend_Db_Expr('NOW()'),
                         ));
                         $ordering = 1;
+
+                        if ($valueNot) {
+                            $value = array(null);
+                        }
+
                         foreach ($value as $oneValue) {
-                            if ($oneValue) {
-                                $userValueDataTable->insert(array(
-                                    'attribute_id' => $attribute['id'],
-                                    'item_id'      => $itemId,
-                                    'item_type_id' => $itemTypeId,
-                                    'user_id'      => $uid,
-                                    'ordering'     => $ordering,
-                                    'value'        => $oneValue
-                                ));
-                            }
+                            $userValueDataTable->insert(array(
+                                'attribute_id' => $attribute['id'],
+                                'item_id'      => $itemId,
+                                'item_type_id' => $itemTypeId,
+                                'user_id'      => $uid,
+                                'ordering'     => $ordering,
+                                'value'        => $oneValue
+                            ));
 
                             $ordering++;
                         }
                     }
+
                 }
 
                 $somethingChanged = $this->_updateActualValue($attribute, $itemTypeId, $itemId);
@@ -679,7 +704,17 @@ class Application_Service_Specifications
                         'user_id = ?'      => $uid
                     ));
 
-                    if (!$userValue || !$userValueData || $userValueData->value != $value) {
+                    if ($value == self::NULL_VALUE_STR) {
+                        $value = null;
+                    }
+
+                    if ($userValueData) {
+                        $valueChanged = $value === null ? $userValueData->value !== null : $userValueData->value != $value;
+                    }  else {
+                        $valueChanged = true;
+                    }
+
+                    if (!$userValue || $valueChanged) {
 
                         if (!$userValue) {
                             $userValue = $userValueTable->createRow(array(
@@ -993,6 +1028,72 @@ class Application_Service_Specifications
         return $attributes;
     }
 
+    public function getActualValueRangeText($attributeId, array $itemId, $itemTypeId)
+    {
+        $attribute = $this->_getAttribute($attributeId);
+
+        $range = $this->getActualValueRange($attributeId, $itemId, $itemTypeId);
+        if ($range['min'] !== null) {
+            $range['min'] = $this->_valueToText($attribute, $range['min']);
+        }
+        if ($range['max'] !== null) {
+            $range['max'] = $this->_valueToText($attribute, $range['max']);
+        }
+
+        if ($attribute['unitId']) {
+            $range['unit'] = $this->getUnit($attribute['unitId']);
+        }
+
+        return $range;
+    }
+
+    public function getActualValueRange($attributeId, array $itemId, $itemTypeId)
+    {
+        if (count($itemId) <= 0) {
+            throw new Exception("Empty set");
+        }
+
+        $attribute = $this->_getAttribute($attributeId);
+
+        $numericTypes = array(2, 3);
+
+        if (!in_array($attribute['typeId'], $numericTypes)) {
+            throw new Exception("Range only for numeric types");
+        }
+
+
+        //if (!isset($this->_actualValueCache[]))
+
+        $valuesTable = $this->getValueDataTable($attribute['typeId']);
+        if (!$valuesTable) {
+            return null;
+        }
+
+        $select = $valuesTable->select(true)
+            ->where('attribute_id = ?', $attribute['id'])
+            ->where('item_id IN (?)', $itemId)
+            ->where('item_type_id = ?', (int)$itemTypeId);
+
+
+        $min = $max = null;
+
+        foreach ($valuesTable->fetchAll($select) as $row) {
+            $value = $row->value;
+            if ($min === null || $value < $min) {
+                $min = $value;
+            }
+
+            if ($max === null || $value > $max) {
+                $max = $value;
+            }
+        }
+
+        return array(
+            'min' => $min,
+            'max' => $max
+        );
+    }
+
     public function getActualValue($attribute, $itemId, $itemTypeId)
     {
         if (!$itemId) {
@@ -1015,7 +1116,7 @@ class Application_Service_Specifications
         $select = $valuesTable->select(true)
             ->where('attribute_id = ?', $attribute['id'])
             ->where('item_id = ?', $itemId)
-            ->where('item_type_id = ?', $itemTypeId);
+            ->where('item_type_id = ?', (int)$itemTypeId);
 
         if ($attribute['isMultiple']) {
 
@@ -1041,6 +1142,53 @@ class Application_Service_Specifications
         }
 
         return null;
+    }
+
+    /**
+     * @param int $attributeId
+     * @param int $itemTypeId
+     * @param int $itemId
+     * @param int $userId
+     * @throws Exception
+     */
+    public function deleteUserValue($attributeId, $itemTypeId, $itemId, $userId)
+    {
+        if (!$itemId) {
+            throw new Exception("Item_id not set");
+        }
+
+        $attribute = $this->_getAttribute($attributeId);
+        if (!$attribute) {
+            throw new Exception("attribute not found");
+        }
+
+        $valueTable = $this->_getUserValueTable();
+        $row = $valueTable->fetchRow(array(
+            'attribute_id = ?' => (int)$attribute['id'],
+            'item_id = ?'      => (int)$itemId,
+            'item_type_id = ?' => (int)$itemTypeId,
+            'user_id = ?'      => (int)$userId
+        ));
+
+        $valueDataTable = $this->getUserValueDataTable($attribute['typeId']);
+        if (!$valueDataTable) {
+            throw new Exception("Failed to allocate data table");
+        }
+
+        $dataRows = $valueDataTable->fetchAll(array(
+            'attribute_id = ?' => (int)$attribute['id'],
+            'item_id = ?'      => (int)$itemId,
+            'item_type_id = ?' => (int)$itemTypeId,
+            'user_id = ?'      => (int)$userId
+        ));
+
+        foreach ($dataRows as $dataRow) {
+            $dataRow->delete();
+        }
+
+        $row->delete();
+
+        $this->updateActualValue($attribute['id'], $itemTypeId, $itemId);
     }
 
     protected function _loadValues($attributes, $itemId, $itemTypeId)
@@ -1282,7 +1430,8 @@ class Application_Service_Specifications
                 return new Attrs_Values_Float();
 
             case 4: // textarea
-                return new Attrs_Values_Text();
+                throw new Exception("Unexpected type 4");
+                //return new Attrs_Values_Text();
 
             case 5: // checkbox
                 return new Attrs_Values_Int();
@@ -1319,7 +1468,8 @@ class Application_Service_Specifications
                 return new Attrs_User_Values_Float();
 
             case 4: // textarea
-                return new Attrs_User_Values_Text();
+                throw new Exception("Unexpected type 4");
+                //return new Attrs_User_Values_Text();
 
             case 5: // checkbox
                 return new Attrs_User_Values_Int();
@@ -1368,10 +1518,16 @@ class Application_Service_Specifications
                 if ($value) {
                     if (is_array($value)) {
                         $text = array();
+                        $nullText = false;
                         foreach ($value as $v) {
-                            $text[] = $this->_getListOptionsText($attribute['id'], $v);
+                            if ($v === null) {
+                                $text[] = null;
+                                $nullText = true;
+                            } else {
+                                $text[] = $this->_getListOptionsText($attribute['id'], $v);
+                            }
                         }
-                        return implode(', ', $text);
+                        return $nullText ? null : implode(', ', $text);
                     } else {
                         return $this->_getListOptionsText($attribute['id'], $value);
                     }
@@ -1475,12 +1631,16 @@ class Application_Service_Specifications
                 }
             }
             $actualValue = $registry[$maxValueIdx];
-
+            $empty = false;
         } else {
             $actualValue = null;
+            $empty = true;
         }
 
-        return $actualValue;
+        return array(
+            'value' => $actualValue,
+            'empty' => $empty
+        );
     }
 
     /**
@@ -1501,11 +1661,17 @@ class Application_Service_Specifications
     protected function _calcEngineValue($attribute, $itemTypeId, $itemId)
     {
         if ($itemTypeId != self::ITEM_TYPE_CAR) {
-            return null;
+            return array(
+                'empty' => true,
+                'value' => null
+            );
         }
 
         if (!$this->_isEngineAttributeId($attribute['id'])) {
-            return null;
+            return array(
+                'empty' => true,
+                'value' => null
+            );
         }
 
         $carRow = $this->_getCarTable()->fetchRow(array(
@@ -1513,11 +1679,17 @@ class Application_Service_Specifications
         ));
 
         if (!$carRow) {
-            return null;
+            return array(
+                'empty' => true,
+                'value' => null
+            );
         }
 
         if (!$carRow->engine_id) {
-            return null;
+            return array(
+                'empty' => true,
+                'value' => null
+            );
         }
 
         $valueDataTable = $this->getValueDataTable($attribute['typeId']);
@@ -1531,7 +1703,17 @@ class Application_Service_Specifications
                 'value IS NOT NULL'
             ));
 
-            $value = $valueDataRow ? $valueDataRow->value : null;
+            if ($valueDataRow) {
+                return array(
+                    'empty' => false,
+                    'value' => $valueDataRow->value
+                );
+            } else {
+                return array(
+                    'empty' => true,
+                    'value' => null
+                );
+            }
 
         } else {
 
@@ -1542,19 +1724,31 @@ class Application_Service_Specifications
                 'value IS NOT NULL'
             ));
 
-            $value = array();
-            foreach ($valueDataRows as $valueDataRow) {
-                $value[] = $valueDataRow->value;
+            if (count($valueDataRows)) {
+                $value = array();
+                foreach ($valueDataRows as $valueDataRow) {
+                    $value[] = $valueDataRow->value;
+                }
+
+                return array(
+                    'empty' => false,
+                    'value' => $value
+                );
+            } else {
+                return array(
+                    'empty' => true,
+                    'value' => null
+                );
             }
-
         }
-
-        return $value;
     }
 
     protected function _calcInheritedValue($attribute, $itemTypeId, $itemId)
     {
-        $actualValue = null;
+        $actualValue = array(
+            'empty' => true,
+            'value' => null
+        );
 
         if ($itemTypeId == 1) {
 
@@ -1577,8 +1771,7 @@ class Application_Service_Specifications
                     $valueDataRows = $valueDataTable->fetchAll(array(
                         'attribute_id = ?' => $attribute['id'],
                         'item_id in (?)'   => $parentIds,
-                        'item_type_id = ?' => $itemTypeId,
-                        'value IS NOT NULL'
+                        'item_type_id = ?' => $itemTypeId
                     ));
 
                     foreach ($valueDataRows as $valueDataRow) {
@@ -1601,7 +1794,6 @@ class Application_Service_Specifications
 
                         if (!isset($ratios[$matchRegIdx])) {
                             $ratios[$matchRegIdx] = 0;
-                            $freshness[$matchRegIdx] = null;
                         }
                         $ratios[$matchRegIdx] += 1;
                     }
@@ -1619,7 +1811,10 @@ class Application_Service_Specifications
                         }
                     }
                     if ($maxValueIdx !== null) {
-                        $actualValue = $registry[$maxValueIdx];
+                        $actualValue = array(
+                            'empty' => false,
+                            'value' => $registry[$maxValueIdx]
+                        );
                     }
                 } else {
                     //TODO: multiple attr inheritance
@@ -1641,12 +1836,14 @@ class Application_Service_Specifications
                         $valueDataRow = $valueDataTable->fetchRow(array(
                             'attribute_id = ?' => $attribute['id'],
                             'item_id = ?'      => $parentEngineRow->id,
-                            'item_type_id = ?' => $itemTypeId,
-                            'value IS NOT NULL'
+                            'item_type_id = ?' => $itemTypeId
                         ));
 
                         if ($valueDataRow) {
-                            $actualValue = $valueDataRow->value;
+                            $actualValue = array(
+                                'empty' => false,
+                                'value' => $valueDataRow->value
+                            );
                         }
 
                     } else {
@@ -1655,15 +1852,19 @@ class Application_Service_Specifications
                             'attribute_id = ?' => $attribute['id'],
                             'item_id = ?'      => $parentEngineRow->id,
                             'item_type_id = ?' => $itemTypeId,
-                            'value IS NOT NULL'
                         ));
 
-                        $a = array();
-                        foreach ($valueDataRows as $valueDataRow) {
-                            $a[] = $valueDataRow->value;
-                        }
+                        if (count($valueDataRows)) {
+                            $a = array();
+                            foreach ($valueDataRows as $valueDataRow) {
+                                $a[] = $valueDataRow->value;
+                            }
 
-                        $actualValue = count($a) ? $a : null;
+                            $actualValue = array(
+                                'empty' => false,
+                                'value' => $a
+                            );
+                        }
 
                     }
                 }
@@ -1673,14 +1874,14 @@ class Application_Service_Specifications
         return $actualValue;
     }
 
-    protected function _setActualValue($attribute, $itemTypeId, $itemId, $actualValue)
+    protected function _setActualValue($attribute, $itemTypeId, $itemId, array $actualValue)
     {
         $valueTable = $this->_getValueTable();
         $valueDataTable = $this->getValueDataTable($attribute['typeId']);
 
         $somethingChanges = false;
 
-        if ($actualValue === null) {
+        if ($actualValue['empty']) {
 
             // descriptor
             $row = $valueTable->fetchRow(array(
@@ -1733,7 +1934,7 @@ class Application_Service_Specifications
                     $somethingChanges = true;
                 }
 
-                foreach ($actualValue as $ordering => $value) {
+                foreach ($actualValue['value'] as $ordering => $value) {
                     $rows = $valueDataTable->insert(array(
                         'attribute_id' => $attribute['id'],
                         'item_id'      => $itemId,
@@ -1755,14 +1956,21 @@ class Application_Service_Specifications
                         'attribute_id' => $attribute['id'],
                         'item_id'      => $itemId,
                         'item_type_id' => $itemTypeId,
-                        'value'        => $actualValue
+                        'value'        => $actualValue['value']
                     ));
                     $row->save();
                     $somethingChanges = true;
-                } elseif ($row->value != $actualValue) {
-                    $row->value = $actualValue;
-                    $row->save();
-                    $somethingChanges = true;
+                } else {
+                    if ($actualValue['value'] === null || $row->value === null) {
+                        $valueDifferent = $actualValue['value'] !== $row->value;
+                    } else {
+                        $valueDifferent = $actualValue['value'] != $row->value;
+                    }
+                    if ($valueDifferent) {
+                        $row->value = $actualValue['value'];
+                        $row->save();
+                        $somethingChanges = true;
+                    }
                 }
 
             }
@@ -1781,11 +1989,11 @@ class Application_Service_Specifications
     {
         $actualValue = $this->_calcAvgUserValue($attribute, $itemTypeId, $itemId);
 
-        if ($actualValue === null) {
+        if ($actualValue['empty']) {
             $actualValue = $this->_calcEngineValue($attribute, $itemTypeId, $itemId);
         }
 
-        if ($actualValue === null) {
+        if ($actualValue['empty']) {
             $actualValue = $this->_calcInheritedValue($attribute, $itemTypeId, $itemId);
         }
 
@@ -1806,6 +2014,9 @@ class Application_Service_Specifications
             ->from($valueTable->info('name'), 'item_id')
             ->where('item_type_id = ?', $itemTypeId);
         if (is_array($itemId)) {
+            if (count($itemId) <= 0) {
+                return false;
+            }
             $ids = $db->fetchCol(
                 $select
                     ->distinct()
@@ -1860,6 +2071,9 @@ class Application_Service_Specifications
                 ->where('attrs_values.item_type_id = ?', $itemTypeId)
                 ->join('car_parent', 'attrs_values.item_id = car_parent.car_id', null);
             if (is_array($itemId)) {
+                if (count($itemId) <= 0) {
+                    return array();
+                }
                 $ids = $db->fetchCol(
                     $select
                         ->distinct()
@@ -2194,7 +2408,6 @@ class Application_Service_Specifications
 
         $value = $this->getActualValue($attribute, $itemId, $itemTypeId);
 
-
         if ($attribute['isMultiple'] && is_array($value)) {
 
             $text = array();
@@ -2221,44 +2434,45 @@ class Application_Service_Specifications
         }
 
         $requests = array(
-            1 => array(false),
-            2 => array(false), /* , 5*/
-            3 => array(false),
-            4 => array(false),
-            6 => array(false, true), /* , 7 */
+            1 => false,
+            2 => false, /* , 5*/
+            3 => false,
+            //4 => array(false),
+            6 => true, /* , 7 */
         );
 
         $values = array();
-        foreach ($requests as $typeId => $multiples) {
-            foreach ($multiples as $isMultiple) {
-                $valuesTable = $this->getValueDataTable($typeId);
-                if (!$valuesTable) {
-                    throw new Exception("ValueTable not found");
+        foreach ($requests as $typeId => $isMultiple) {
+            $valuesTable = $this->getValueDataTable($typeId);
+            if (!$valuesTable) {
+                throw new Exception("ValueTable not found");
+            }
+
+            $select = $valuesTable->select()
+                ->where('item_id in (?)', $itemIds)
+                ->where('item_type_id = ?', (int)$itemTypeId);
+
+            if ($isMultiple) {
+                $select->order('ordering');
+            }
+
+            foreach ($valuesTable->fetchAll($select) as $row) {
+                $aid = (int)$row->attribute_id;
+                $id = (int)$row->item_id;
+                $value = $this->_prepareValue($typeId, $row->value);
+                if (!isset($values[$id])) {
+                    $values[$id] = array();
                 }
 
-                $select = $valuesTable->select()
-                    ->where('item_id in (?)', $itemIds)
-                    ->where('item_type_id = ?', (int)$itemTypeId);
+                $attribute = $this->_getAttribute($aid);
 
-                if ($isMultiple) {
-                    $select->order('ordering');
-                }
-
-                foreach ($valuesTable->fetchAll($select) as $row) {
-                    $aid = (int)$row->attribute_id;
-                    $id = (int)$row->item_id;
-                    $value = $this->_prepareValue($typeId, $row->value);
-                    if (!isset($values[$id])) {
-                        $values[$id] = array();
+                if ($attribute['isMultiple']) {
+                    if (!isset($values[$id][$aid])) {
+                        $values[$id][$aid] = array();
                     }
-                    if ($isMultiple) {
-                        if (!isset($values[$id][$aid])) {
-                            $values[$id][$aid] = array();
-                        }
-                        $values[$id][$aid][] = $value;
-                    } else {
-                        $values[$id][$aid] = $value;
-                    }
+                    $values[$id][$aid][] = $value;
+                } else {
+                    $values[$id][$aid] = $value;
                 }
             }
         }

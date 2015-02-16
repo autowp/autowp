@@ -1,4 +1,7 @@
 <?php
+
+require_once APPLICATION_PATH . '/../vendor/phayes/geoPHP/geoPHP.inc';
+
 class Moder_MuseumController extends Zend_Controller_Action
 {
     private $_table;
@@ -57,21 +60,44 @@ class Moder_MuseumController extends Zend_Controller_Action
             'action' => $this->_helper->url->url()
         ));
 
-        $form->populate($museum->toArray());
+        $point = null;
+        if ($museum->point) {
+            $point = geoPHP::load(substr($museum->point, 4), 'wkb');
+        }
+
+        $form->populate(array(
+            'name'        => $museum['name'],
+            'lat'         => $point ? $point->y() : null,
+            'lng'         => $point ? $point->x() : null,
+            'url'         => $museum['url'],
+            'description' => $museum['description'],
+            'address'     => $museum['address']
+        ));
 
         $request = $this->getRequest();
         if ($request->isPost()) {
             if ($form->isValid($request->getPost())) {
                 $values = $form->getValues();
 
-                $museum->setFromArray($values);
+                if (strlen($values['lat']) && strlen($values['lng'])) {
+                    $point = new Point($values['lng'], $values['lat']);
+                    $point = new Zend_Db_Expr($this->_table->getAdapter()->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
+                } else {
+                    $point = null;
+                }
+
+                $museum->setFromArray(array(
+                    'name'        => $values['name'],
+                    'url'         => $values['url'],
+                    'address'     => $values['address'],
+                    'point'       => $point,
+                    'description' => $values['description']
+                ));
                 $museum->save();
 
                 if ($values['photo']) {
                     $imageStorage = $this->getInvokeArg('bootstrap')
                         ->getResource('imagestorage');
-
-
 
                     $newImageId = null;
                     $tempFilepath = $form->photo->getFileName();
@@ -116,8 +142,21 @@ class Moder_MuseumController extends Zend_Controller_Action
             if ($form->isValid($request->getPost())) {
                 $values = $form->getValues();
 
+                if (strlen($values['lat']) && strlen($values['lng'])) {
+                    $point = new Point($values['lng'], $values['lat']);
+                    $point = new Zend_Db_Expr($this->_table->getAdapter()->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
+                } else {
+                    $point = null;
+                }
+
                 $museum = $this->_table->fetchNew();
-                $museum->setFromArray($values);
+                $museum->setFromArray(array(
+                    'name'        => $values['name'],
+                    'url'         => $values['url'],
+                    'address'     => $values['address'],
+                    'point'       => $point,
+                    'description' => $values['description']
+                ));
                 $museum->save();
 
                 return $this->_redirect($this->_museumEditUrl($museum));

@@ -52,6 +52,25 @@ class MaintenanceProvider extends Zend_Tool_Project_Provider_Abstract
         print 'ok' . PHP_EOL;
     }
 
+    public function clearOldSystemPM()
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db');
+
+        $pm = new Personal_Messages();
+        $count = $pm->delete(array(
+            'from_user_id is null',
+            'add_datetime < date_sub(now(), interval 6 month)'
+        ));
+
+        printf("%d messages was deleted\n", $count);
+    }
 
     public function clearDeletedPM()
     {

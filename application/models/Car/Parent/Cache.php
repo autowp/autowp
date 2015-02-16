@@ -170,8 +170,8 @@ class Car_Parent_Cache extends Project_Db_Table
                     'car_id'    => $id,
                     'parent_id' => $parentId,
                     'diff'      => $info['diff'],
-                    'tuning'    => $info['tuning'],
-                    'sport'     => $info['sport']
+                    'tuning'    => $info['tuning'] ? 1 : 0,
+                    'sport'     => $info['sport'] ? 1 : 0
                 ));
                 $updates++;
                 $row->save();
@@ -183,12 +183,12 @@ class Car_Parent_Cache extends Project_Db_Table
             }
 
             if ($row->tuning xor $info['tuning']) {
-                $row->tuning = $info['tuning'];
+                $row->tuning = $info['tuning'] ? 1 : 0;
                 $changes = true;
             }
 
             if ($row->sport xor $info['sport']) {
-                $row->sport = $info['sport'];
+                $row->sport = $info['sport'] ? 1 : 0;
                 $changes = true;
             }
 
