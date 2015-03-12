@@ -7,17 +7,15 @@
                 <div class="col-lg-3 col-md-3">
                     <div class="thumbnail">
                         <?php if ($car['picture']) { ?>
-                            <?php if ($car['picture']->image_id) { ?>
-                                <?=$this->htmlA(
-                                    $this->pic($car['picture'])->url(),
-                                    $this->img($car['picture']->getFormatRequest(), array(
-                                        'format' => 'picture-thumb',
-                                        'alt'    => $car['picture']->getCaption(),
-                                        'title'  => $car['picture']->getCaption(),
-                                    )),
-                                    false
-                                )?>
-                            <?php } ?>
+                            <?=$this->htmlA(
+                                $car['picture']['url'],
+                                $this->htmlImg(array(
+                                    'src'   => $car['picture']['src'],
+                                    'alt'   => $car['name'],
+                                    'title' => $car['name'],
+                                )),
+                                false
+                            )?>
                         <?php } else { ?>
                             &#xa0;
                         <?php } ?>
@@ -32,21 +30,21 @@
         <li>
             <span class="glyphicon glyphicon-file"></span>
             <?php if ($twinsGroup['msgCount'] > 0) { ?>
-                <?=$this->htmlA($twinsGroup['detailsUrl'], 'подробнее … (' . $this->translate(array('%1$s comments', null, $twinsGroup['msgCount']), $twinsGroup['msgCount']) . ')')?>
+                <?=$this->htmlA($twinsGroup['detailsUrl'], $this->translate('carlist/details') . ' … (' . $this->translate(array('%1$s comments', null, $twinsGroup['msgCount']), $twinsGroup['msgCount']) . ')')?>
             <?php } else { ?>
-                <?=$this->htmlA($twinsGroup['detailsUrl'], 'подробнее …')?>
+                <?=$this->htmlA($twinsGroup['detailsUrl'], $this->translate('carlist/details') . ' …')?>
             <?php } ?>
         </li>
         <?php if ($twinsGroup['hasSpecs']) { ?>
             <li>
                 <span class="glyphicon glyphicon-list-alt"></span>
-                <?=$this->htmlA($twinsGroup['specsUrl'], 'технические характеристики')?>
+                <?=$this->htmlA($twinsGroup['specsUrl'], $this->translate('carlist/specifications'))?>
             </li>
         <?php }?>
         <?php if ($twinsGroup['picturesCount'] > $twinsGroup['picturesShown']) { ?>
             <li>
                 <span class="fa fa-th"></span>
-                <?=$this->htmlA($twinsGroup['picturesUrl'], 'все картинки ('.$twinsGroup['picturesCount'].')')?>
+                <?=$this->htmlA($twinsGroup['picturesUrl'], $this->translate('carlist/all pictures') . ' ('.$twinsGroup['picturesCount'].')')?>
             </li>
         <?php } ?>
         <?php if ($this->canEdit) { ?>

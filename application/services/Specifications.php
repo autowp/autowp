@@ -2032,9 +2032,32 @@ class Application_Service_Specifications
             return $result;
         } else {
             return (bool)$db->fetchOne(
-                $select->where('item_id = ?', (int)$itemId)
+                $select
+                    ->where('item_id = ?', (int)$itemId)
+                    ->limit(1)
             );
         }
+    }
+
+    /**
+     * @param array $itemId
+     * @return array
+     */
+    public function twinsGroupsHasSpecs(array $groupIds)
+    {
+        if (count($groupIds) <= 0) {
+            return array();
+        }
+
+        $valueTable = $this->_getValueTable();
+        $db = $valueTable->getAdapter();
+        $select = $db->select()
+            ->from($valueTable->info('name'), array('twins_groups_cars.twins_group_id', new Zend_Db_Expr('1')))
+            ->where('attrs_values.item_type_id = ?', self::ITEM_TYPE_CAR)
+            ->join('twins_groups_cars', 'attrs_values.item_id = twins_groups_cars.car_id', null)
+            ->where('twins_groups_cars.twins_group_id in (?)', $groupIds);
+
+        return $db->fetchPairs($select);
     }
 
     /**

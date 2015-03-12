@@ -6,10 +6,17 @@ class Project_View_Helper_PageEnv extends Zend_View_Helper_Abstract
      * @var Zend_Db_Table
      */
     protected $_pageTable;
+
     /**
      * @var Zend_Db_Table
      */
     protected $_pageLanguageTable;
+
+    /**
+     * @var array
+     */
+    protected $_onPath = array();
+
     /**
      * @var int
      */
@@ -28,11 +35,15 @@ class Project_View_Helper_PageEnv extends Zend_View_Helper_Abstract
 
     public function pageEnv(array $options = array())
     {
+        if ($options === array()) {
+            return $this;
+        }
+
         $defaults = array(
-            'layout'    => array(),
-            'pageId'    => null,
-            'pageTitle' => null,
-            'args'      => array(),
+            'layout'             => array(),
+            'pageId'             => null,
+            'pageTitle'          => null,
+            'args'               => array(),
             'breadcrumbsReplace' => null
         );
 
@@ -82,6 +93,9 @@ class Project_View_Helper_PageEnv extends Zend_View_Helper_Abstract
 
             $currentDoc = $page;
             do {
+
+                $this->_onPath[] = $currentDoc->id;
+
                 if (!$currentDoc->is_group_node) {
                     if ($replace && ($replace['pageId'] == $currentDoc->id)) {
                         foreach (array_reverse($replace['breadcrumbs']) as $breadcrumb) {
@@ -120,4 +134,10 @@ class Project_View_Helper_PageEnv extends Zend_View_Helper_Abstract
         }
         return $str;
     }
+
+    public function isOnPath($id)
+    {
+        return in_array($id, $this->_onPath);
+    }
+
 }

@@ -73,14 +73,15 @@
     </ul>
 </header>
 
-<section>
-    <h2><?=$this->escape('Популярные картинки') ?></h2>
-    <?php if ($this->topPictures) { ?>
+<?php if ($this->topPictures && count($this->topPictures)) { ?>
+    <section>
+        <h2><?=$this->escape('Популярные картинки') ?></h2>
+
         <?=$this->pictures($this->topPictures, array(
             'scheme' => '422',
         )) ?>
-    <?php } ?>
-</section>
+    </section>
+<?php } ?>
 
 <?php if (count($this->link_types)) { ?>
     <section>

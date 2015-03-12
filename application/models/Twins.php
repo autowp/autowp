@@ -121,22 +121,47 @@ class Twins
     }
 
     /**
-     * @param int $groupId
+     * @param int|array $groupId
      * @return int
      */
     public function getGroupPicturesCount($groupId)
     {
         $pictureTable = $this->_getPictureTable();
 
-        return (int)$pictureTable->getAdapter()->fetchOne(
-            $pictureTable->select()
-                ->from($pictureTable, 'COUNT(1)')
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                ->join(array('tgc' => 'twins_groups_cars'), 'tgc.car_id = car_parent_cache.parent_id', null)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-                ->where('tgc.twins_group_id = ?', (int)$groupId)
-                ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
-        );
+        $db = $pictureTable->getAdapter();
+
+        $select = $db->select()
+            ->from($pictureTable->info('name'), null)
+            ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+            ->join(array('tgc' => 'twins_groups_cars'), 'tgc.car_id = car_parent_cache.parent_id', null)
+            ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+            ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW));
+
+        if (is_array($groupId)) {
+
+            if ($groupId) {
+
+                $select
+                    ->columns(array('tgc.twins_group_id', 'COUNT(1)'))
+                    ->group('tgc.twins_group_id')
+                    ->where('tgc.twins_group_id in (?)', $groupId);
+
+                $result = $db->fetchPairs($select);
+
+            } else {
+
+                $result = array();
+            }
+
+        } else {
+            $select
+                ->columns('COUNT(1)')
+                ->where('tgc.twins_group_id = ?', (int)$groupId);
+
+            $result = (int)$db->fetchOne($select);
+        }
+
+        return $result;
     }
 
     /**

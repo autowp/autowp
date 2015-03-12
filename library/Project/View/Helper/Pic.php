@@ -24,7 +24,7 @@ class Project_View_Helper_Pic extends Zend_View_Helper_HtmlElement
                 'controller' => 'picture',
                 'action'     => 'index',
                 'picture_id' => $identity
-            ), 'picture', true, true);
+            ), 'picture', true);
         }
         return false;
     }

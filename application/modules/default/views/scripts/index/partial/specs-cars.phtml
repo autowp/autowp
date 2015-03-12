@@ -25,10 +25,10 @@
                                             'href'  => $picture['url'],
                                             'class' =>'thumbnail'
                                         ),
-                                        $this->img($picture['request'], array(
-                                            'format' => 'picture-thumb',
-                                            'alt'    => $picture['name'],
-                                            'title'  => $picture['name'],
+                                        $this->htmlImg(array(
+                                            'src'   => $picture['src'],
+                                            'alt'   => $picture['name'],
+                                            'title' => $picture['name'],
                                         )),
                                         false
                                     )?>

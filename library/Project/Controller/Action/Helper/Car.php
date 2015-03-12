@@ -295,7 +295,7 @@ class Project_Controller_Action_Helper_Car
             $carOnlyChilds = isset($onlyChilds[$car->id]) ? $onlyChilds[$car->id] : null;
 
             $pictures = $this->_getOrientedPictureList(
-                $car, $g, $onlyExactlyPictures, $type, $picturesDateSort, $allowUpPictures, $language, $urlHelper, $catalogue, $carOnlyChilds
+                $car, $g, $onlyExactlyPictures, $type, $picturesDateSort, $allowUpPictures, $language, $urlHelper, $catalogue, $carOnlyChilds, $useLargeFormat
             );
 
             if ($hideEmpty) {
@@ -468,6 +468,46 @@ class Project_Controller_Action_Helper_Car
             $items[] = $item;
         }
 
+        // collect all pictures
+        $allPictures = array();
+        $allFormatRequests = array();
+        foreach ($items as $item) {
+            foreach ($item['pictures'] as $picture) {
+                if ($picture) {
+                    $row = $picture['row'];
+                    $allPictures[] = $row;
+                    $allFormatRequests[$picture['format']][$row['id']] = $catalogue->getPictureFormatRequest($row);
+                }
+            }
+        }
+
+
+        // prefetch names
+        $pictureNames = $catalogue->buildPicturesName($allPictures, $language);
+
+        // prefetch images
+        $imageStorage = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('imagestorage');
+
+        $imagesInfo = array();
+        foreach ($allFormatRequests as $format => $requests) {
+            $imagesInfo[$format] = $imageStorage->getFormatedImages($requests, $format);
+        }
+
+        // populate prefetched
+        foreach ($items as &$item) {
+            foreach ($item['pictures'] as &$picture) {
+                if ($picture) {
+                    $id = $picture['row']['id'];
+                    $format = $picture['format'];
+
+                    $picture['name'] = isset($pictureNames[$id]) ? $pictureNames[$id] : null;
+                    $picture['src'] = isset($imagesInfo[$format][$id]) ? $imagesInfo[$format][$id]->getSrc() : null;
+                    unset($picture['row'], $picture['format']);
+                }
+            }
+        }
+        unset($item, $picture);
+
         return array(
             'specEditor'         => $specEditor,
             'isCarModer'         => $isCarModer,
@@ -518,7 +558,7 @@ class Project_Controller_Action_Helper_Car
             ->from(
                 $pictureTable->info('name'),
                 array(
-                    'id', 'name', 'type', 'brand_id', 'engine_id', 'car_id',
+                    'id', 'name', 'type', 'brand_id', 'engine_id', 'car_id', 'factory_id',
                     'perspective_id', 'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 )
@@ -593,7 +633,7 @@ class Project_Controller_Action_Helper_Car
 
     protected function _getOrientedPictureList($car, array $perspectiveGroupIds,
             $onlyExactlyPictures, $type, $dateSort, $allowUpPictures, $language,
-            $urlHelper, $catalogue, $onlyChilds)
+            $urlHelper, $catalogue, $onlyChilds, $useLargeFormat)
     {
         $pictures = array();
         $usedIds = array();
@@ -667,22 +707,22 @@ class Project_Controller_Action_Helper_Car
             }
         }
 
-        $pictureNames = $catalogue->buildPicturesName($notEmptyPics, $language);
-
         $result = array();
-        foreach ($pictures as $picture) {
+        foreach ($pictures as $idx => $picture) {
             if ($picture) {
                 $pictureId = $picture['id'];
 
+                $format = $useLargeFormat && $idx == 0 ? 'picture-thumb-medium' : 'picture-thumb';
+
                 $result[] = array(
-                    'url'     => $urlHelper->url(array(
+                    'format' => $format,
+                    'row'    => $picture,
+                    'url'    => $urlHelper->url(array(
                         'module'     => 'default',
                         'controller' => 'picture',
                         'action'     => 'index',
                         'picture_id' => $picture['identity'] ? $picture['identity'] : $pictureId
                     ), 'picture', true),
-                    'request' => $catalogue->getPictureFormatRequest($picture),
-                    'name'    => isset($pictureNames[$pictureId]) ? $pictureNames[$pictureId] : null
                 );
             } else {
                 $result[] = false;

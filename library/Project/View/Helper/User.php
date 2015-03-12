@@ -9,6 +9,10 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
 
     protected function _user($id)
     {
+        if (!$id) {
+            return null;
+        }
+
         if (!isset($this->_users[$id])) {
             if (!$this->_userModel) {
                 $this->_userModel = new Users();

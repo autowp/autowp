@@ -89,72 +89,161 @@ class Comment_Topic extends Project_Db_Table
 
     /**
      * @param int $typeId
-     * @param int $itemId
+     * @param int|array $itemId
      * @return array
      */
     public function getTopicStat($typeId, $itemId)
     {
-        $messages = 0;
+        if (is_array($itemId)) {
 
-        $topic = $this->fetchRow(array(
-            'item_id = ?' => $itemId,
-            'type_id = ?' => $typeId
-        ));
+            $result = array();
 
-        if ($topic) {
-            $messages = (int)$topic->messages;
+            if ($itemId) {
+
+                $db = $this->getAdapter();
+
+                $pairs = $db->fetchPairs(
+                    $db->select()
+                        ->from($this->info('name'), array('item_id', 'messages'))
+                        ->where('item_id in (?)', $itemId)
+                        ->where('type_id = ?', $typeId)
+                );
+
+                foreach ($pairs as $itemId => $count) {
+                    $result[$itemId] = array(
+                        'messages' => $count
+                    );
+                }
+
+            }
+
+        } else {
+
+            $messages = 0;
+
+            $topic = $this->fetchRow(array(
+                'item_id = ?' => $itemId,
+                'type_id = ?' => $typeId
+            ));
+
+            if ($topic) {
+                $messages = (int)$topic->messages;
+            }
+
+            $result = array(
+                'messages' => $messages,
+            );
         }
 
-        return array(
-            'messages' => $messages,
-        );
+        return $result;
     }
 
     /**
      * @param int $typeId
-     * @param int $itemId
+     * @param int|array $itemId
      * @param int $userId
      * @return array
      */
     public function getTopicStatForUser($typeId, $itemId, $userId)
     {
-        $messages = 0;
-        $newMessages = 0;
+        $db = $this->getAdapter();
 
-        $topic = $this->fetchRow(array(
-            'item_id = ?' => $itemId,
-            'type_id = ?' => $typeId
-        ));
+        $newMessagesSelect = $db->select()
+            ->from('comments_messages', 'count(1)')
+            ->where('comments_messages.item_id = :item_id')
+            ->where('comments_messages.type_id = :type_id')
+            ->where('comments_messages.datetime > :datetime');
 
-        if ($topic) {
-            $messages = (int)$topic->messages;
+        if (is_array($itemId)) {
 
-            $db = $this->getAdapter();
+            $result = array();
 
-            $viewTime = $db->fetchRow(
-                $db->select()
-                    ->from('comment_topic_view', 'timestamp')
-                    ->where('comment_topic_view.item_id = ?', $itemId)
-                    ->where('comment_topic_view.type_id = ?', $typeId)
-                    ->where('comment_topic_view.user_id = ?', $userId)
-            );
+            if (count($itemId) > 0) {
+                $select = $db->select()
+                    ->from('comment_topic', array('item_id', 'messages'))
+                    ->where('comment_topic.type_id = :type_id')
+                    ->where('comment_topic.item_id in (?)', $itemId)
+                    ->joinLeft(
+                        'comment_topic_view',
+                        'comment_topic.type_id = comment_topic_view.type_id ' .
+                        'and comment_topic.item_id = comment_topic_view.item_id ' .
+                        'and comment_topic_view.user_id = :user_id',
+                        'timestamp'
+                    );
 
-            if (!$viewTime) {
-                $newMessages = $messages;
+                $rows = $db->fetchAll($select, array(
+                    'user_id' => $userId,
+                    'type_id' => $typeId
+                ));
             } else {
-                $newMessages = (int)$db->fetchOne(
-                    $db->select()
-                        ->from('comments_messages', 'count(1)')
-                        ->where('comments_messages.item_id = ?', $itemId)
-                        ->where('comments_messages.type_id = ?', $typeId)
-                        ->where('comments_messages.datetime > ?', $viewTime)
+                $rows = array();
+            }
+
+            foreach ($rows as $row) {
+                $id = $row['item_id'];
+                $viewTime = $row['timestamp'];
+                $messages = (int)$row['messages'];
+
+                if (!$viewTime) {
+                    $newMessages = $messages;
+                } else {
+                    $newMessages = (int)$db->fetchOne($newMessagesSelect, array(
+                        'item_id'  => $id,
+                        'type_id'  => $typeId,
+                        'datetime' => $viewTime,
+                    ));
+                }
+
+                $result[$id] = array(
+                    'messages'    => $messages,
+                    'newMessages' => $newMessages
                 );
             }
-        }
 
-        return array(
-            'messages'    => $messages,
-            'newMessages' => $newMessages
-        );
+            return $result;
+
+        } else {
+            $messages = 0;
+            $newMessages = 0;
+
+            $topic = $this->fetchRow(array(
+                'item_id = ?' => $itemId,
+                'type_id = ?' => $typeId
+            ));
+
+            if ($topic) {
+                $messages = (int)$topic->messages;
+
+                $db = $this->getAdapter();
+
+                $viewTime = $db->fetchOne(
+                    $db->select()
+                        ->from('comment_topic_view', 'timestamp')
+                        ->where('comment_topic_view.item_id = :item_id')
+                        ->where('comment_topic_view.type_id = :type_id')
+                        ->where('comment_topic_view.user_id = :user_id'),
+                    array(
+                        'item_id' => $itemId,
+                        'type_id' => $typeId,
+                        'user_id' => $userId,
+                    )
+                );
+
+                if (!$viewTime) {
+                    $newMessages = $messages;
+                } else {
+                    $newMessages = (int)$db->fetchOne($newMessagesSelect, array(
+                        'item_id'  => $itemId,
+                        'type_id'  => $typeId,
+                        'datetime' => $viewTime,
+                    ));
+                }
+            }
+
+            return array(
+                'messages'    => $messages,
+                'newMessages' => $newMessages
+            );
+        }
     }
 }

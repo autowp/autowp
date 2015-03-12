@@ -139,20 +139,70 @@ class TwinsController extends Zend_Controller_Action
         $ctTable = new Comment_Topic();
         $pictureTable = new Picture();
 
+        $imageStorage = $this->getInvokeArg('bootstrap')->getResource('imagestorage');
+
+        $language = $this->_helper->language();
+
         $specService = new Application_Service_Specifications();
 
-        $groups = array();
+        $ids = array();
         foreach ($list as $group) {
-            $carList = $this->_getTwins()->getGroupCars($group->id);
+            $ids[] = $group->id;
+        }
+
+        $picturesCounts = $this->_getTwins()->getGroupPicturesCount($ids);
+
+        $commentsStats = $ctTable->getTopicStat(
+            Comment_Message::TWINS_TYPE_ID,
+            $ids
+        );
+
+        $hasSpecs = $specService->twinsGroupsHasSpecs($ids);
+
+        $carLists = array();
+        if (count($ids)) {
+
+            $carTable = new Cars();
+
+            $db = $carTable->getAdapter();
+
+            $langJoinExpr = 'cars.id = car_language.car_id and ' .
+                $db->quoteInto('car_language.language = ?', $language);
+
+            $rows = $db->fetchAll(
+                $db->select()
+                    ->from('cars', array(
+                        'cars.id',
+                        'name' => 'if(length(car_language.name), car_language.name, cars.caption)',
+                        'cars.body', 'cars.begin_model_year', 'cars.end_model_year',
+                        'cars.begin_year', 'cars.end_year', 'cars.today',
+                        'spec' => 'spec.short_name'
+                    ))
+                    ->join('twins_groups_cars', 'cars.id = twins_groups_cars.car_id', 'twins_group_id')
+                    ->joinLeft('car_language', $langJoinExpr, null)
+                    ->joinLeft('spec', 'cars.spec_id = spec.id', null)
+                    ->where('twins_groups_cars.twins_group_id in (?)', $ids)
+                    ->order('name')
+            );
+            foreach ($rows as $row) {
+                $carLists[$row['twins_group_id']][] = $row;
+            }
+        }
+
+        $groups = array();
+        $requests = array();
+        foreach ($list as $group) {
+
+            $carList = isset($carLists[$group->id]) ? $carLists[$group->id] : array();
+
             $picturesShown = 0;
             $cars = array();
-            $hasSpecs = false;
 
             foreach ($carList as $car) {
-                $picture = $pictureTable->fetchRow(
+                $pictureRow = $pictureTable->fetchRow(
                     $pictureTable->select(true)
                         ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                        ->where('car_parent_cache.parent_id = ?', $car->id)
+                        ->where('car_parent_cache.parent_id = ?', (int)$car['id'])
                         ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
                         ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                         ->order(array(
@@ -162,32 +212,50 @@ class TwinsController extends Zend_Controller_Action
                         ->limit(1)
                 );
 
-                if ($picture) {
+                $picture = null;
+                if ($pictureRow) {
                     $picturesShown++;
+
+                    $key = 'g' . $group->id . 'p' . $pictureRow->id;
+
+                    $request = $pictureRow->getFormatRequest();
+                    $requests[$key] = $request;
+
+                    $picture = array(
+                        'key' => $key,
+                        'url' => $this->_helper->pic->url($pictureRow->id, $pictureRow->identity),
+                        'src' => null
+                    );
                 }
 
-                $hasSpecs = $hasSpecs || $specService->hasSpecs(1, $car->id);
+                $name = Cars_Row::buildFullName(array(
+                    'begin_model_year' => $car['begin_model_year'],
+                    'end_model_year'   => $car['end_model_year'],
+                    'spec'             => $car['spec'],
+                    'body'             => $car['body'],
+                    'name'             => $car['name'],
+                    'begin_year'       => $car['begin_year'],
+                    'end_year'         => $car['end_year'],
+                    'today'            => $car['today']
+                ));
 
                 $cars[] = array(
-                    'picture' => $picture,
-                    'name'    => $car->getFullName()
+                    'name'    => $name,
+                    'picture' => $picture
                 );
             }
 
-            $commentsStat = $ctTable->getTopicStat(
-                Comment_Message::TWINS_TYPE_ID,
-                $group->id
-            );
-            $msgCount = $commentsStat['messages'];
+            $commentsStat = isset($commentsStats[$group->id]) ? $commentsStats[$group->id] : null;
+            $msgCount = $commentsStat ? $commentsStat['messages'] : 0;
 
-            $picturesCount = $this->_getTwins()->getGroupPicturesCount($group->id);
+            $picturesCount = isset($picturesCounts[$group->id]) ? $picturesCounts[$group->id] : null;
 
             $groups[] = array(
                 'name'          => $group->name,
                 'cars'          => $cars,
                 'picturesShown' => $picturesShown,
                 'picturesCount' => $picturesCount,
-                'hasSpecs'      => $hasSpecs,
+                'hasSpecs'      => isset($hasSpecs[$group->id]) && $hasSpecs[$group->id],
                 'msgCount'      => $msgCount,
                 'detailsUrl'    => $this->_helper->url->url(array(
                     'action'         => 'group',
@@ -209,6 +277,23 @@ class TwinsController extends Zend_Controller_Action
                 ), 'default', true)
             );
         }
+
+
+        // fetch images from storage
+        $imagesInfo = $imageStorage->getFormatedImages($requests, 'picture-thumb');
+
+        foreach ($groups as &$group) {
+            foreach ($group['cars'] as &$car) {
+                if ($car['picture']) {
+                    $key = $car['picture']['key'];
+                    if (isset($imagesInfo[$key])) {
+                        $car['picture']['src'] = $imagesInfo[$key]->getSrc();
+                    }
+                }
+            }
+            unset($car);
+        }
+        unset($group);
 
         return $groups;
     }

@@ -185,116 +185,142 @@ class SidebarController extends Zend_Controller_Action
 
     public function _otherGroups($brand, $conceptsSeparatly, $type, $isConcepts, $isEngines)
     {
-        $groups = array();
+        $cache = $this->getInvokeArg('bootstrap')
+            ->getResource('cachemanager')->getCache('long');
 
-        if ($conceptsSeparatly) {
-            // ссылка на страницу с концептами
-            $carTable = $this->_helper->catalogue()->getCarTable();
+        $language = $this->_helper->language();
 
-            $db = $carTable->getAdapter();
-            $select = $db->select()
-                ->from('cars', array(new Zend_Db_Expr('1')))
-                ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand->id)
-                ->where('cars.is_concept')
-                ->limit(1);
-            if ($db->fetchOne($select) > 0) {
-                $groups[] = array(
+        $cacheKey = 'SIDEBAR_OTHER_' . $brand->id . '_' . $language . '_' . ($conceptsSeparatly ? '1' : '0');
+
+        if (!($groups = $cache->load($cacheKey))) {
+            $groups = array();
+
+            if ($conceptsSeparatly) {
+                // ссылка на страницу с концептами
+                $carTable = $this->_helper->catalogue()->getCarTable();
+
+                $db = $carTable->getAdapter();
+                $select = $db->select()
+                    ->from('cars', array(new Zend_Db_Expr('1')))
+                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
+                    ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                    ->where('brands_cars.brand_id = ?', $brand->id)
+                    ->where('cars.is_concept')
+                    ->limit(1);
+                if ($db->fetchOne($select) > 0) {
+                    $groups['concepts'] = array(
+                        'url' => $this->_helper->url->url(array(
+                            'action'        => 'concepts',
+                            'brand_catname' => $brand->folder
+                        ), 'catalogue', true),
+                        'caption' => $this->view->translate('concepts and prototypes'),
+                    );
+                }
+            }
+
+            // ссылка на страницу с двигателями
+            $engineTable = $this->_helper->catalogue()->getEngineTable();
+            $db = $engineTable->getAdapter();
+            $enginesCount = $db->fetchOne(
+                $db->select()
+                    ->from($engineTable->info('name'), new Zend_Db_Expr('count(1)'))
+                    ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
+                    ->where('brand_engine.brand_id = ?', $brand->id)
+            );
+            if ($enginesCount > 0)
+                $groups['engines'] = array(
                     'url' => $this->_helper->url->url(array(
-                        'action'        => 'concepts',
+                        'action'        => 'engines',
                         'brand_catname' => $brand->folder
                     ), 'catalogue', true),
-                    'caption' => $this->view->translate('concepts and prototypes'),
-                    'active'  => $isConcepts
+                    'caption' => $this->view->translate('engines'),
+                    'count'   => $enginesCount
+                );
+
+
+            $picturesTable = $this->_helper->catalogue()->getPictureTable();
+            $picturesAdapter = $picturesTable->getAdapter();
+
+            // ссылка на страницу с логотипами
+            $logoPicturesCount = $picturesAdapter->fetchOne(
+                $select = $picturesAdapter->select()
+                    ->from('pictures', new Zend_Db_Expr('count(*)'))
+                    ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
+                    ->where('type = ?', Picture::LOGO_TYPE_ID)
+                    ->where('brand_id = ?', $brand->id)
+            );
+            if ($logoPicturesCount > 0)
+                $groups['logo'] = array(
+                    'url' => $this->_helper->url->url(array(
+                        'action'        => 'logotypes',
+                        'brand_catname' => $brand->folder
+                    ), 'catalogue', true),
+                    'caption' => $this->view->translate('logotypes'),
+                    'count'   => $logoPicturesCount
+                );
+
+            // ссылка на страницу с разным
+            $mixedPicturesCount = $picturesAdapter->fetchOne(
+                $select = $picturesAdapter->select()
+                    ->from('pictures', new Zend_Db_Expr('count(*)'))
+                    ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
+                    ->where('type = ?', Picture::MIXED_TYPE_ID)
+                    ->where('brand_id = ?', $brand->id)
+            );
+            if ($mixedPicturesCount > 0)
+                $groups['mixed'] = array(
+                    'url' => $this->_helper->url->url(array(
+                        'action' => 'mixed',
+                        'brand_catname' => $brand->folder
+                    ), 'catalogue', true),
+                    'caption' => $this->view->translate('mixed'),
+                    'count'   => $mixedPicturesCount
+                );
+
+            // ссылка на страницу с несортированным
+            $unsortedPicturesCount = $picturesAdapter->fetchOne(
+                $select = $picturesAdapter->select()
+                    ->from('pictures', new Zend_Db_Expr('count(*)'))
+                    ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
+                    ->where('type = ?', Picture::UNSORTED_TYPE_ID)
+                    ->where('brand_id = ?', $brand->id)
+            );
+
+            if ($unsortedPicturesCount > 0) {
+                $groups['unsorted'] = array(
+                    'url'     => $this->_helper->url->url(array(
+                        'action'        => 'other',
+                        'brand_catname' => $brand->folder
+                    ), 'catalogue', true),
+                    'caption' => $this->view->translate('unsorted'),
+                    'count'   => $unsortedPicturesCount
                 );
             }
+
+            $cache->save($groups, $cacheKey, array(), 300);
         }
 
-        // ссылка на страницу с двигателями
-        $engineTable = $this->_helper->catalogue()->getEngineTable();
-        $db = $engineTable->getAdapter();
-        $enginesCount = $db->fetchOne(
-            $db->select()
-                ->from($engineTable->info('name'), new Zend_Db_Expr('count(1)'))
-                ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
-                ->where('brand_engine.brand_id = ?', $brand->id)
-        );
-        if ($enginesCount > 0)
-            $groups[] = array(
-                'url' => $this->_helper->url->url(array(
-                    'action'        => 'engines',
-                    'brand_catname' => $brand->folder
-                ), 'catalogue', true),
-                'caption' => $this->view->translate('engines'),
-                'count'   => $enginesCount,
-                'active'  => $isEngines
-            );
-
-
-        $picturesTable = $this->_helper->catalogue()->getPictureTable();
-        $picturesAdapter = $picturesTable->getAdapter();
-
-        // ссылка на страницу с логотипами
-        $logoPicturesCount = $picturesAdapter->fetchOne(
-            $select = $picturesAdapter->select()
-                ->from('pictures', new Zend_Db_Expr('count(*)'))
-                ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
-                ->where('type = ?', Picture::LOGO_TYPE_ID)
-                ->where('brand_id = ?', $brand->id)
-        );
-        if ($logoPicturesCount > 0)
-            $groups[] = array(
-                'url' => $this->_helper->url->url(array(
-                    'action'        => 'logotypes',
-                    'brand_catname' => $brand->folder
-                ), 'catalogue', true),
-                'caption' => $this->view->translate('logotypes'),
-                'count'   => $logoPicturesCount,
-                'active'  => isset($type) && $type == Picture::LOGO_TYPE_ID
-            );
-
-        // ссылка на страницу с разным
-        $mixedPicturesCount = $picturesAdapter->fetchOne(
-            $select = $picturesAdapter->select()
-                ->from('pictures', new Zend_Db_Expr('count(*)'))
-                ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
-                ->where('type = ?', Picture::MIXED_TYPE_ID)
-                ->where('brand_id = ?', $brand->id)
-        );
-        if ($mixedPicturesCount > 0)
-            $groups[] = array(
-                'url' => $this->_helper->url->url(array(
-                    'action' => 'mixed',
-                    'brand_catname' => $brand->folder
-                ), 'catalogue', true),
-                'caption' => $this->view->translate('mixed'),
-                'count'   => $mixedPicturesCount,
-                'active'  => isset($type) && $type == Picture::MIXED_TYPE_ID
-            );
-
-        // ссылка на страницу с несортированным
-        $unsortedPicturesCount = $picturesAdapter->fetchOne(
-            $select = $picturesAdapter->select()
-                ->from('pictures', new Zend_Db_Expr('count(*)'))
-                ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
-                ->where('type = ?', Picture::UNSORTED_TYPE_ID)
-                ->where('brand_id = ?', $brand->id)
-        );
-
-        if ($unsortedPicturesCount > 0) {
-            $groups[] = array(
-                'url'     => $this->_helper->url->url(array(
-                    'action'        => 'other',
-                    'brand_catname' => $brand->folder
-                ), 'catalogue', true),
-                'caption' => $this->view->translate('unsorted'),
-                'count'   => $unsortedPicturesCount,
-                'active'  => isset($type) && $type == Picture::UNSORTED_TYPE_ID
-            );
+        if (isset($groups['concepts'])) {
+            $groups['concepts']['active'] = $isConcepts;
         }
 
-        return $groups;
+        if (isset($groups['engines'])) {
+            $groups['engines']['active'] = $isEngines;
+        }
+
+        if (isset($groups['logo'])) {
+            $groups['logo']['active'] = isset($type) && $type == Picture::LOGO_TYPE_ID;
+        }
+
+        if (isset($groups['mixed'])) {
+            $groups['mixed']['active'] = isset($type) && $type == Picture::MIXED_TYPE_ID;
+        }
+
+        if (isset($groups['unsorted'])) {
+            $groups['unsorted']['active'] = isset($type) && $type == Picture::UNSORTED_TYPE_ID;
+        }
+
+        return array_values($groups);
     }
 
 

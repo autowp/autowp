@@ -34,19 +34,18 @@
                 <?php
                     $col = $item['largeFormat'] && $idx == 0  ? 6 : 3;
                     $colSm = $item['largeFormat'] && $idx == 0  ? 12 : 6;
-                    $format = $item['largeFormat'] && $idx == 0 ? 'picture-thumb-medium' : 'picture-thumb';
                 ?>
                 <div class="col-lg-<?=$col?> col-md-<?=$col?> col-sm-<?=$colSm?>">
                     <?php if ($picture) { ?>
                         <?=$this->htmlA(
                             array(
                                 'href'  => $picture['url'],
-                                'class' =>'thumbnail'
+                                'class' => 'thumbnail'
                             ),
-                            $this->img($picture['request'], array(
-                                'format' => $format,
-                                'alt'    => $picture['name'],
-                                'title'  => $picture['name'],
+                            $this->htmlImg(array(
+                                'src'   => $picture['src'],
+                                'alt'   => $picture['name'],
+                                'title' => $picture['name'],
                             )),
                             false
                         )?>

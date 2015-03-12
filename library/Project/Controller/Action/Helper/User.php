@@ -33,7 +33,11 @@ class Project_Controller_Action_Helper_User extends Zend_Controller_Action_Helpe
      */
     protected function _user($id)
     {
-        if (!isset($this->_users[$id])) {
+        if (!$id) {
+            return null;
+        }
+
+        if (!array_key_exists($id, $this->_users)) {
             $this->_users[$id] = $this->_getUserTable()->find($id)->current();
         }
 
