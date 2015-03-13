@@ -13,7 +13,8 @@ class NewController extends Zend_Controller_Action
             'select'       => $pictureTable->select(true)
                 ->where('pictures.status = ?', Picture::STATUS_ACCEPTED),
             'orderColumn'  => 'accept_datetime',
-            'currentDate'  => $this->_getParam('date')
+            'minDate'      => Zend_Date::now()->subMonth(1),
+            'currentDate'  => $this->_getParam('date'),
         ));
 
         if (!$service->haveCurrentDate()) {

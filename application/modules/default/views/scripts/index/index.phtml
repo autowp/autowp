@@ -12,9 +12,10 @@
 ?>
 <div class="row">
     <div class="col-lg-6 col-md-6">
-        <?php if ($this->carOfDay) { ?>
+        <?php if ($this->carOfDayName) { ?>
             <h2>
-                <?=$this->escape($this->carOfDay->getFullName())?> <small><?=$this->escape($this->translate('car-of-day')) ?></small>
+                <?=$this->escape($this->carOfDayName)?>
+                <small><?=$this->escape($this->translate('car-of-day')) ?></small>
             </h2>
 
             <?php if ($this->carOfDayPictures) { ?>
@@ -23,21 +24,14 @@
                         <?php if ($idx == 0) { ?>
                             <?php if ($picture) { ?>
                                 <div class="col-lg-8 col-md-8 col-sm-8">
-                                    <?php if ($picture->image_id) { ?>
-                                        <?php if ($image = $this->img($picture->getFormatRequest(), array(
-                                            'format' => 'picture-thumb-medium',
-                                            'title'  => $picture->getCaption(array(
-                                                'language' => $this->language()->get()
-                                            ))
-                                        ))) { ?>
-                                            <?php if ($image->exists()) { ?>
-                                                <?=$this->htmlA(array(
-                                                    'href'  => $this->pic($picture)->url(),
-                                                    'class' => 'thumbnail'
-                                                ), $image, false)?>
-                                            <?php } ?>
-                                        <?php } ?>
-                                    <?php } ?>
+                                    <?=$this->htmlA(array(
+                                        'href'  => $picture['url'],
+                                        'class' => 'thumbnail'
+                                    ), $this->htmlImg(array(
+                                        'src'   => $picture['src'],
+                                        'title' => $picture['name'],
+                                        'alt'   => $picture['name'],
+                                    )), false)?>
                                 </div>
                             <?php } ?>
                         <?php } ?>
@@ -46,19 +40,14 @@
                         <?php foreach ($this->carOfDayPictures as $idx => $picture) { ?>
                             <?php if ($idx == 1 || $idx == 2) { ?>
                                 <?php if ($picture) { ?>
-                                    <?php if ($image = $this->img($picture->getFormatRequest(), array(
-                                        'format' => 'picture-thumb',
-                                        'title'  => $picture->getCaption(array(
-                                            'language' => $this->language()->get()
-                                        ))
-                                    ))) { ?>
-                                        <?php if ($image->exists()) { ?>
-                                            <?=$this->htmlA(array(
-                                                'href'  => $this->pic($picture)->url(),
-                                                'class' => 'thumbnail'
-                                            ), $image, false)?>
-                                        <?php } ?>
-                                    <?php } ?>
+                                    <?=$this->htmlA(array(
+                                        'href'  => $picture['url'],
+                                        'class' => 'thumbnail'
+                                    ), $this->htmlImg(array(
+                                        'src'   => $picture['src'],
+                                        'title' => $picture['name'],
+                                        'alt'   => $picture['name'],
+                                    )), false)?>
                                 <?php } ?>
                             <?php } ?>
                         <?php } ?>
@@ -71,19 +60,14 @@
                                 <?php if ($idx > 2) { ?>
                                     <?php if ($picture) { ?>
                                         <div class="col-lg-4 col-md-4 col-sm-4 col-6">
-                                            <?php if ($image = $this->img($picture->getFormatRequest(), array(
-                                                'format' => 'picture-thumb',
-                                                'title'  => $picture->getCaption(array(
-                                                    'language' => $this->language()->get()
-                                                ))
-                                            ))) { ?>
-                                                <?php if ($image->exists()) { ?>
-                                                    <?=$this->htmlA(array(
-                                                        'href'  => $this->pic($picture)->url(),
-                                                        'class' => 'thumbnail'
-                                                    ), $image, false)?>
-                                                <?php } ?>
-                                            <?php } ?>
+                                            <?=$this->htmlA(array(
+                                                'href'  => $picture['url'],
+                                                'class' => 'thumbnail'
+                                            ), $this->htmlImg(array(
+                                                'src'   => $picture['src'],
+                                                'title' => $picture['name'],
+                                                'alt'   => $picture['name'],
+                                            )), false)?>
                                         </div>
                                     <?php } ?>
                                 <?php } ?>
@@ -98,7 +82,7 @@
         <?php } ?>
 
         <div class="page-header-small">
-            <h3><?=$this->escape($this->page(51)->name) ?> <small><?=$this->htmlA('/new/', $this->translate('all-link'))?></small></h3>
+            <h3><?=$this->escape($this->pageData['new']['name']) ?> <small><?=$this->htmlA($this->pageData['new']['url'], $this->translate('all-link'))?></small></h3>
         </div>
         <?=$this->pictures($this->newPictures) ?>
         <p>
@@ -116,7 +100,7 @@
         <div class="row">
 
             <div class="col-lg-6 col-md-6">
-                <h4><?=$this->escape($this->page(25)->name) ?> <small><?=$this->htmlA('/twins/', $this->translate('all-link'))?></small></h4>
+                <h4><?=$this->escape($this->pageData['twins']['name']) ?> <small><?=$this->htmlA($this->pageData['twins']['url'], $this->translate('all-link'))?></small></h4>
                 <p>
                     <?php foreach ($this->twinsBlock['brands'] as $brand) { ?>
                         <?=$this->htmlA($brand['url'], $brand['name']) ?>
@@ -137,7 +121,7 @@
             </div>
 
             <div class="col-lg-6 col-md-6">
-                <h4><?=$this->escape($this->page(22)->name) ?> <small><?=$this->htmlA('/category/', $this->translate('all-link'))?></small></h4>
+                <h4><?=$this->escape($this->pageData['category']['name']) ?> <small><?=$this->htmlA($this->pageData['category']['url'], $this->translate('all-link'))?></small></h4>
                 <p>
                     <?php foreach ($this->categories as $category) { ?>
                         <?=$this->htmlA($category['url'], $category['short_name'])?>&#xa0;<span class="count">(<?=$category['cars_count']-$category['new_cars_count'] ?><?php if ($category['new_cars_count'] > 0) { ?><span>+<?=$category['new_cars_count'] ?></span><?php } ?>)</span>,
@@ -151,7 +135,7 @@
 
         <div class="row">
             <div class="col-lg-6 col-md-6">
-                <h4><?=$this->escape($this->page(21)->name) ?> <small><?=$this->htmlA('/mosts/', $this->translate('all-link'))?></small></h4>
+                <h4><?=$this->escape($this->pageData['mosts']['name']) ?> <small><?=$this->htmlA($this->pageData['mosts']['url'], $this->translate('all-link'))?></small></h4>
                 <p>
                     <?php foreach ($this->mosts as $url => $name) { ?>
                         <?=$this->htmlA($url, $name) ?>,
@@ -166,5 +150,5 @@
     </div>
 </div>
 
-<h4>Specifications <small><?=$this->htmlA('/users/rating', $this->page(173)->name)?></small></h4>
+<h4>Specifications <small><?=$this->htmlA($this->pageData['statistics']['url'], $this->pageData['statistics']['name'])?></small></h4>
 <?=$this->partial('index/partial/specs-cars.phtml', $this->specsCars)?>

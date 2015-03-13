@@ -48,6 +48,11 @@ class Application_Service_DayPictures
     protected $_nextDate = null;
 
     /**
+     * @var Zend_Date
+     */
+    protected $_minDate = null;
+
+    /**
      * @var Zend_Paginaotr
      */
     protected $_paginator = null;
@@ -110,6 +115,17 @@ class Application_Service_DayPictures
         $this->_select = $select;
 
         return $this->_reset();
+    }
+
+    /**
+     * @param Zend_Date $date
+     * @return Application_Service_DayPictures
+     */
+    public function setMinDate(Zend_Date $date)
+    {
+        $this->_minDate = $date;
+
+        return $this;
     }
 
     /**
@@ -242,6 +258,10 @@ class Application_Service_DayPictures
             $select = $this->_selectClone()
                 ->where($column . ' < ?', $this->_startOfDayDbValue($this->_currentDate))
                 ->order($this->_orderColumn . ' DESC');
+
+            if ($this->_minDate) {
+                $select->where($column . ' >= ?', $this->_startOfDayDbValue($this->_minDate));
+            }
 
             $prevDatePicture = $select->getTable()->fetchRow($select);
 
@@ -381,6 +401,10 @@ class Application_Service_DayPictures
                 ->where($column . ' >= ?', $this->_startOfDayDbValue($this->_currentDate))
                 ->where($column . ' <= ?', $this->_endOfDayDbValue($this->_currentDate))
                 ->order($this->_orderColumn . ' DESC');
+
+            if ($this->_minDate) {
+                $select->where($column . ' >= ?', $this->_startOfDayDbValue($this->_minDate));
+            }
 
             $this->_paginator = Zend_Paginator::factory($select);
         }
