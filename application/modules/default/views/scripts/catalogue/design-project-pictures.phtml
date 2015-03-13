@@ -15,7 +15,7 @@
     ));
 ?>
 
-<ul class="nav nav-pills">
+<ul class="nav nav-pills" style="margin-bottom:10px">
     <li>
         <?=$this->htmlA($this->url(array(
             'action'    => 'design-project-cars',
@@ -30,5 +30,5 @@
     </li>
 </ul>
 
-<?=$this->pictures($this->paginator->getCurrentItems(), 4) ?>
+<?=$this->partial('pictures.phtml', $this->picturesData)?>
 <?=$this->paginationControl($this->paginator) ?>

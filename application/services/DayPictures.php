@@ -395,16 +395,7 @@ class Application_Service_DayPictures
 
         if ($this->_paginator === null) {
 
-            $column = $this->_quotedOrderColumn();
-
-            $select = $this->_selectClone()
-                ->where($column . ' >= ?', $this->_startOfDayDbValue($this->_currentDate))
-                ->where($column . ' <= ?', $this->_endOfDayDbValue($this->_currentDate))
-                ->order($this->_orderColumn . ' DESC');
-
-            if ($this->_minDate) {
-                $select->where($column . ' >= ?', $this->_startOfDayDbValue($this->_minDate));
-            }
+            $select = $this->getCurrentDateSelect();
 
             $this->_paginator = Zend_Paginator::factory($select);
         }
@@ -492,6 +483,25 @@ class Application_Service_DayPictures
     protected function _selectClone()
     {
         return clone $this->_select;
+    }
+
+    /**
+     * @return Zend_Db_Table_Select
+     */
+    public function getCurrentDateSelect()
+    {
+        $column = $this->_quotedOrderColumn();
+
+        $select = $this->_selectClone()
+            ->where($column . ' >= ?', $this->_startOfDayDbValue($this->_currentDate))
+            ->where($column . ' <= ?', $this->_endOfDayDbValue($this->_currentDate))
+            ->order($this->_orderColumn . ' DESC');
+
+        if ($this->_minDate) {
+            $select->where($column . ' >= ?', $this->_startOfDayDbValue($this->_minDate));
+        }
+
+        return $select;
     }
 
     /**

@@ -30,7 +30,5 @@
         <?php } ?></h3>
     </div>
 </div>
-<?=$this->pictures($this->paginator->getCurrentItems(), array(
-    'scheme' => '631'
-)) ?>
+<?=$this->partial('pictures.phtml', $this->picturesData)?>
 <?=$this->paginationControl($this->paginator) ?>

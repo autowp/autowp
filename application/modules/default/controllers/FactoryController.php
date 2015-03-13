@@ -20,9 +20,12 @@ class FactoryController extends Zend_Controller_Action
 
         $pictureTable = new Picture();
 
-        $pictures = $pictureTable->fetchAll(array(
-            'type = ?'       => Picture::FACTORY_TYPE_ID,
-            'factory_id = ?' => $factory->id
+        $select = $pictureTable->select(true)
+            ->where('type = ?', Picture::FACTORY_TYPE_ID)
+            ->where('factory_id = ?', $factory->id);
+
+        $pictures = $this->_helper->pic->listData($select, array(
+            'width' => 4
         ));
 
         $carPictures = array();
@@ -65,6 +68,11 @@ class FactoryController extends Zend_Controller_Action
                 $carPictures[] = $pictureTable->fetchRow($select);
             }
         }
+
+        $carPictures = $this->_helper->pic->listData($carPictures, array(
+            'width'            => 4,
+            'disableBehaviour' => true
+        ));
 
         $point = null;
         if ($factory->point) {

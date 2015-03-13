@@ -84,7 +84,7 @@
         <div class="page-header-small">
             <h3><?=$this->escape($this->pageData['new']['name']) ?> <small><?=$this->htmlA($this->pageData['new']['url'], $this->translate('all-link'))?></small></h3>
         </div>
-        <?=$this->pictures($this->newPictures) ?>
+        <?=$this->partial('pictures.phtml', $this->newPictures)?>
         <p>
             <span class="fa fa-th"></span>
             <?=$this->htmlA($this->url(array(

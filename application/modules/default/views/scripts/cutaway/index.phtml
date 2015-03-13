@@ -8,5 +8,5 @@
         'pageId' => 109,
     ));
 ?>
-<?=$this->pictures($this->paginator->getCurrentItems(), 6) ?>
+<?=$this->partial('pictures.phtml', $this->picturesData)?>
 <?=$this->paginationControl($this->paginator) ?>

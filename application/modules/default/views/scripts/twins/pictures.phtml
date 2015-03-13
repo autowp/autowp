@@ -12,5 +12,5 @@
         )
     ));
 ?>
-<?=$this->pictures($this->paginator->getCurrentItems(), 4) ?>
+<?=$this->partial('pictures.phtml', $this->picturesData)?>
 <?=$this->paginationControl($this->paginator) ?>

@@ -84,7 +84,8 @@ class Application_Form_Moder_Inbox extends Project_Form
                         Picture::LOGO_TYPE_ID     => 'логотип',
                         Picture::MIXED_TYPE_ID    => 'разное',
                         Picture::UNSORTED_TYPE_ID => 'несортировано',
-                        Picture::ENGINE_TYPE_ID   => 'двигатель'
+                        Picture::ENGINE_TYPE_ID   => 'двигатель',
+                        Picture::FACTORY_TYPE_ID  => 'завод'
                     ),
                     'decorators'   => array('ViewHelper')
                 )),

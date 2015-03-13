@@ -144,6 +144,87 @@ class Comment_Topic extends Project_Db_Table
      * @param int $userId
      * @return array
      */
+    public function getNewMessages($typeId, $itemId, $userId)
+    {
+        $db = $this->getAdapter();
+
+        $newMessagesSelect = $db->select()
+            ->from('comments_messages', 'count(1)')
+            ->where('comments_messages.item_id = :item_id')
+            ->where('comments_messages.type_id = :type_id')
+            ->where('comments_messages.datetime > :datetime');
+
+        if (is_array($itemId)) {
+
+            $result = array();
+
+            if (count($itemId) > 0) {
+                $select = $db->select()
+                    ->from('comment_topic_view', array('item_id', 'timestamp'))
+                    ->where('comment_topic_view.type_id = :type_id')
+                    ->where('comment_topic_view.user_id = :user_id')
+                    ->where('comment_topic_view.item_id in (?)', $itemId);
+
+                $pairs = $db->fetchPairs($select, array(
+                    'user_id' => $userId,
+                    'type_id' => $typeId
+                ));
+            } else {
+                $pairs = array();
+            }
+
+            foreach ($pairs as $id => $viewTime) {
+                if ($viewTime) {
+                    $newMessages = (int)$db->fetchOne($newMessagesSelect, array(
+                        'item_id'  => $id,
+                        'type_id'  => $typeId,
+                        'datetime' => $viewTime,
+                    ));
+
+                    $result[$id] = $newMessages;
+                }
+            }
+
+            return $result;
+
+        } else {
+            $newMessages = 0;
+
+            $db = $this->getAdapter();
+
+            $viewTime = $db->fetchOne(
+                $db->select()
+                    ->from('comment_topic_view', 'timestamp')
+                    ->where('comment_topic_view.item_id = :item_id')
+                    ->where('comment_topic_view.type_id = :type_id')
+                    ->where('comment_topic_view.user_id = :user_id'),
+                array(
+                    'item_id' => $itemId,
+                    'type_id' => $typeId,
+                    'user_id' => $userId,
+                )
+            );
+
+            if (!$viewTime) {
+                $newMessages = null;
+            } else {
+                $newMessages = (int)$db->fetchOne($newMessagesSelect, array(
+                    'item_id'  => $itemId,
+                    'type_id'  => $typeId,
+                    'datetime' => $viewTime,
+                ));
+            }
+
+            return $newMessages;
+        }
+    }
+
+    /**
+     * @param int $typeId
+     * @param int|array $itemId
+     * @param int $userId
+     * @return array
+     */
     public function getTopicStatForUser($typeId, $itemId, $userId)
     {
         $db = $this->getAdapter();

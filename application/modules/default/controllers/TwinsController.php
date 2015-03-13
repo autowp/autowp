@@ -79,13 +79,25 @@ class TwinsController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
         }
 
+        $select = $twins->getGroupPicturesSelect($group['id'], array(
+            'ordering' => $this->_helper->catalogue()->picturesOrdering()
+        ));
+
+
+        $paginator = Zend_Paginator::factory($select)
+            ->setItemCountPerPage($this->_helper->catalogue()->getPicturesPerPage())
+            ->setCurrentPageNumber($this->_getParam('page'));
+
+        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
+
+        $picturesData = $this->_helper->pic->listData($select, array(
+            'width' => 4
+        ));
+
         $this->view->assign(array(
-            'group'     => $group,
-            'paginator' => $twins->getGroupPicturesPaginator($group['id'], array(
-                    'ordering' => $this->_helper->catalogue()->picturesOrdering()
-                ))
-                ->setItemCountPerPage(16)
-                ->setCurrentPageNumber($this->_getParam('page')),
+            'group'        => $group,
+            'paginator'    => $paginator,
+            'picturesData' => $picturesData
         ));
 
         $this->_loadBrands($twins->getGroupBrandIds($group['id']));

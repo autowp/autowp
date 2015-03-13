@@ -44,15 +44,12 @@
 
 <?php if (count($this->pictures) > 0) { ?>
     <h3>Фотографии</h3>
-    <?=$this->pictures($this->pictures, 4) ?>
+    <?=$this->partial('pictures.phtml', $this->pictures)?>
 <?php } ?>
 
 <?php if (count($this->carPictures) > 0) { ?>
     <h3>Автомобили</h3>
-    <?=$this->pictures($this->carPictures, array(
-        'width'            => 4,
-        'disableBehaviour' => true
-    )) ?>
+    <?=$this->partial('pictures.phtml', $this->carPictures)?>
     <p><?=$this->htmlA($this->url(array(
         'action' => 'factory-cars'
     )), 'подробнее ...')?></p>

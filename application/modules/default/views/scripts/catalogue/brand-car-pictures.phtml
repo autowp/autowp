@@ -20,5 +20,25 @@
     ));
 ?>
 
-<?=$this->pictures($this->paginator->getCurrentItems(), 4) ?>
+<?=$this->partial('catalogue/partial/brand-car-menu.phtml', array(
+    'title' => $this->car->getFullName(),
+    'stock' => array(
+        'count'  => $this->stockCount,
+        'active' => false
+    ),
+    'tuning' => array(
+        'count'  => $this->tuningCount,
+        'active' => false
+    ),
+    'sport' => array(
+        'count'  => $this->sportCount,
+        'active' => false
+    ),
+    'pictures' => array(
+        'count'  => $this->picturesCount,
+        'active' => true
+    ),
+)) ?>
+
+<?=$this->partial('pictures.phtml', $this->picturesData)?>
 <?=$this->paginationControl($this->paginator) ?>

@@ -76,10 +76,7 @@
 <?php if ($this->topPictures && count($this->topPictures)) { ?>
     <section>
         <h2><?=$this->escape('Популярные картинки') ?></h2>
-
-        <?=$this->pictures($this->topPictures, array(
-            'scheme' => '422',
-        )) ?>
+        <?=$this->partial('pictures.phtml', $this->topPictures)?>
     </section>
 <?php } ?>
 

@@ -11,7 +11,7 @@
             <li<?=$carType['active'] ? ' class="active"' : '' ?>>
                 <?=$this->htmlA($carType['url'], $carType['name']) ?>
                 <?php if ($carType['childs']) { ?>
-                    <ul class="nav nav-list">
+                    <ul class="nav nav-pills nav-stacked">
                         <?php foreach ($carType['childs'] as $child) { ?>
                             <li<?=$child['active'] ? ' class="active"' : '' ?>>
                                 <?=$this->htmlA($child['url'], $child['name']) ?>

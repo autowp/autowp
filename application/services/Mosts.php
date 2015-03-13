@@ -724,10 +724,15 @@ class Application_Service_Mosts
                 'childs' => array()
             );
 
+            $childActive = false;
             if ($carType['childs']) {
                 foreach ($carType['childs'] as $child) {
+                    $active = $carTypeData && $child['id'] == $carTypeData['id'];
+                    if ($active) {
+                        $childActive = true;
+                    }
                     $sidebarCarType['childs'][] = array(
-                        'active' => $carTypeData && $child['id'] == $carTypeData['id'],
+                        'active' => $active,
                         'name'   => $child['name'],
                         'params' => array(
                             'most_catname'  => $cMost['catName'],
@@ -736,6 +741,10 @@ class Application_Service_Mosts
                         )
                     );
                 }
+            }
+
+            if ($childActive) {
+                $sidebarCarType['active'] = true;
             }
 
             $sidebarCarTypes[] = $sidebarCarType;

@@ -88,9 +88,17 @@ class InboxController extends Zend_Controller_Action
             ->setItemCountPerPage($this->_perPage)
             ->setCurrentPageNumber($this->_getParam('page'));
 
+        $select = $service->getCurrentDateSelect()
+            ->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
+
+        $picturesData = $this->_helper->pic->listData($select, array(
+            'width' => 6
+        ));
+
         $this->_assignBrandControl($brand);
 
         $this->view->assign(array(
+            'picturesData' => $picturesData,
             'paginator' => $paginator,
             'prev'      => array(
                 'date'  => $service->getPrevDate(),

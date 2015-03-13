@@ -251,7 +251,7 @@ class Twins
      * @param array $options
      * @return Zend_Paginator
      */
-    public function getGroupPicturesPaginator($groupId, array $options = array())
+    public function getGroupPicturesSelect($groupId, array $options = array())
     {
         $defaults = array(
             'ordering' => null
@@ -271,7 +271,7 @@ class Twins
             $select->order($ordering);
         }
 
-        return Zend_Paginator::factory($select);
+        return $select;
     }
 
     /**

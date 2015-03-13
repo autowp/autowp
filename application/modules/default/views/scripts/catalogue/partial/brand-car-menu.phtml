@@ -2,25 +2,28 @@
     <?php if ($this->stock['count'] > 0) { ?>
         <li<?=$this->stock['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url(array(
-                'type' => null,
-                'page' => 1,
-            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->title) . ' ('.$this->stock['count'].')', false) ?>
+                'action' => 'brand-car',
+                'type'   => null,
+                'page'   => 1,
+            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->title) . ' <span class="badge">'.$this->stock['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->tuning['count'] > 0) { ?>
         <li<?=$this->tuning['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url(array(
-                'type' => 'tuning',
-                'page' => 1,
-            )), '<span class="glyphicon glyphicon-list"></span> Тюнинг ' . $this->escape($this->title) . ' ('.$this->tuning['count'].')', false) ?>
+                'action' => 'brand-car',
+                'type'   => 'tuning',
+                'page'   => 1,
+            )), '<span class="glyphicon glyphicon-list"></span> Тюнинг ' . $this->escape($this->title) . ' <span class="badge">'.$this->tuning['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->sport['count'] > 0) { ?>
         <li<?=$this->sport['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url(array(
-                'type' => 'sport',
-                'page' => 1,
-            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->title) . ' Спорт ('.$this->sport['count'].')', false) ?>
+                'action' => 'brand-car',
+                'type'   => 'sport',
+                'page'   => 1,
+            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->title) . ' Спорт <span class="badge">'.$this->sport['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->pictures['count'] > 0) { ?>
@@ -28,7 +31,7 @@
             <?=$this->htmlA($this->url(array(
                 'action' => 'brand-car-pictures',
                 'page'   => 1,
-            )), '<span class="glyphicon glyphicon-th"></span> Все изображения ' . $this->escape($this->title) . ' ('.$this->pictures['count'].')', false) ?>
+            )), '<span class="glyphicon glyphicon-th"></span> Все изображения ' . $this->escape($this->title) . ' <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
         </li>
     <?php } ?>
 </ul>
