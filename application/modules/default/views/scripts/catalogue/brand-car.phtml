@@ -1,6 +1,4 @@
 <?php
-    $carFullName = $this->car->getFullName();
-
     $this->pageEnv(array(
         'layout' => array(
             'blankPage' => false,
@@ -12,7 +10,7 @@
             'BRAND_CATNAME'  => $this->brand->folder,
             'BRAND_NAME'     => $this->brandName,
             'CAR_CATNAME'    => $this->carCatname,
-            'CAR_NAME'       => $carFullName,
+            'CAR_NAME'       => $this->carFullName,
             'SHORT_CAR_NAME' => $this->carShortName
         ),
         'breadcrumbsReplace' => array(
@@ -23,9 +21,9 @@
 ?>
 
 <?php $this->pageTitle()->setAutoEscape(false)->captureStart('SET') ?>
-    <?=$this->car($this->car)->title()?>
+    <?=$this->car()->htmlTitle($this->car)?>
     <?php if ($this->design) { ?>
-        <sup class="designBrand">дизайн <?=$this->htmlA($this->design['url'], $this->design['name']) ?></sup>
+        <sup class="designBrand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($this->design['url'], $this->design['name']))?></sup>
     <?php } ?>
     <?php if ($this->car['produced'] > 0) { ?>
         <small class="produced">
@@ -51,7 +49,7 @@
             'module'     => 'moder',
             'controller' => 'cars',
             'action'     => 'car',
-            'car_id'     => $this->car->id
+            'car_id'     => $this->car['id']
         ), 'default', true), 'управление')?>
 
         <?php if ($this->user()->isAllowed('car', 'add')) { ?>
@@ -60,7 +58,7 @@
                 'module'     => 'moder',
                 'controller' => 'cars',
                 'action'     => 'new',
-                'parent_id'     => $this->car->id
+                'parent_id'     => $this->car['id']
             ), 'default', true), 'добавить автомобиль')?>
         <?php } ?>
 
@@ -70,7 +68,7 @@
                 'module'     => 'moder',
                 'controller' => 'pictures',
                 'action'     => 'index',
-                'car_id'     => $this->car->id,
+                'car_id'     => $this->car['id'],
                 'status'     => 'inbox'
             ), 'default', true), 'inbox ('.$this->inboxCount.')')?>
         <?php } ?>
@@ -81,7 +79,7 @@
                 'module'     => 'moder',
                 'controller' => 'comments',
                 'action'     => 'index',
-                'car_id'     => $this->car->id,
+                'car_id'     => $this->car['id'],
                 'moderator_attention' => '1'
             ), 'default', true), 'comments ('.$this->requireAttention.')')?>
         <?php } ?>
@@ -89,7 +87,7 @@
 <?php } ?>
 
 <?=$this->partial('catalogue/partial/brand-car-menu.phtml', array(
-    'title' => $carFullName,
+    'title' => $this->carFullName,
     'stock' => array(
         'count'  => $this->stockCount,
         'active' => $this->type == Car_Parent::TYPE_DEFAULT
@@ -110,17 +108,17 @@
 
 <?php if ($this->hasHtml) { ?>
     <div class="text">
-        <?=$this->car->html ?>
+        <?=$this->car['html'] ?>
     </div>
-<?php } elseif ($this->car->description) { ?>
+<?php } elseif ($this->car['description']) { ?>
     <div class="text">
-        <?=$this->car->description ?>
+        <?=$this->car['description'] ?>
     </div>
 <?php } ?>
 <?=$this->partial('cars.phtml', $this->childListData)?>
 
 <?php if ($this->currentPicturesCount) { ?>
-    <h3>Другие изображения <?=$this->escape($carFullName) ?></h3>
+    <h3>Другие изображения <?=$this->escape($this->carFullName) ?></h3>
     <?=$this->pictureListHorizontal2($this->currentPictures) ?>
     <?php if ($this->currentPicturesCount > 4) { ?>
         <span class="glyphicon glyphicon-th"></span>

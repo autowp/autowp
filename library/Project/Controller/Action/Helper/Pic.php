@@ -45,10 +45,13 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
     {
         $defaults = array(
             'width'            => null,
-            'disableBehaviour' => false
+            'disableBehaviour' => false,
+            'url'              => null
         );
 
         $options = array_replace($defaults, $options);
+
+        $urlCallback = $options['url'];
 
         $colClass = '';
         $width = null;
@@ -159,9 +162,11 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                     'moder_votes_count' => 'count(pictures_moder_votes.picture_id)'
                 ));
 
+
+
             if (!$options['disableBehaviour']) {
                 $select
-                    ->joinLeft('picture_view', 'pictures.id = picture_view.picture_id', 'views')
+                    ->joinLeft(array('pv' => 'picture_view'), 'pictures.id = pv.picture_id', 'views')
                     ->joinLeft(array('ct' => 'comment_topic'), 'ct.type_id = :type_id and ct.item_id = pictures.id', 'messages');
 
                 $bind['type_id'] = Comment_Message::PICTURES_TYPE_ID;
@@ -217,10 +222,16 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
 
             $name = isset($names[$id]) ? $names[$id] : null;
 
+            if ($urlCallback) {
+                $url = $urlCallback($row);
+            } else {
+                $url = $this->url($row['id'], $row['identity']);
+            }
+
             $item = array(
                 'id'        => $id,
                 'name'      => $name,
-                'url'       => $this->url($row['id'], $row['identity']),
+                'url'       => $url,
                 'src'       => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
                 'moderVote' => $row['moder_votes_count'] > 0 ? $row['moder_votes'] : null,
             );
@@ -255,5 +266,549 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             'isModer'          => $isModer,
             'width'            => $width
         );
+    }
+
+    public function picPageData($picture, $picSelect, $brandIds)
+    {
+        $controller = $this->getActionController();
+        $userHelper = $controller->getHelper('user');
+        $catalogue = $controller->getHelper('catalogue')->getCatalogue();
+        $urlHelper = $controller->getHelper('url');
+
+        $isModer = $userHelper->direct()->inheritsRole('moder');
+
+        $pictureTable = $catalogue->getPictureTable();
+
+        $engine = null;
+        $engineCars = array();
+        $engineHasSpecs = false;
+        $engineSpecsUrl = false;
+        $factory = null;
+        $factoryCars = array();
+        $factoryCarsMore = false;
+        $altNames2 = array();
+        $currentLangName = null;
+        $designProject = null;
+        $categories = array();
+
+        $language = $controller->getHelper('language')->direct();
+
+        switch ($picture->type) {
+            case Picture::ENGINE_TYPE_ID:
+                if ($engine = $picture->findParentEngines()) {
+
+                    $carIds = $engine->getRelatedCarGroupId();
+                    if ($carIds) {
+                        $carTable = $catalogue->getCarTable();
+
+                        $carRows = $carTable->fetchAll(array(
+                            'id in (?)' => $carIds
+                        ), $catalogue->carsOrdering());
+
+                        foreach ($carRows as $carRow) {
+                            $cataloguePaths = $catalogue->cataloguePaths($carRow);
+
+                            foreach ($cataloguePaths as $cPath) {
+                                $engineCars[] = array(
+                                    'name' => $carRow->getFullName($language),
+                                    'url'  => $urlHelper->url(array(
+                                        'module'        => 'default',
+                                        'controller'    => 'catalogue',
+                                        'action'        => 'brand-car',
+                                        'brand_catname' => $cPath['brand_catname'],
+                                        'car_catname'   => $cPath['car_catname'],
+                                        'path'          => $cPath['path']
+                                    ), 'catalogue', true)
+                                );
+                                break;
+                            }
+                        }
+                    }
+
+                    $specService = new Application_Service_Specifications();
+                    $engineHasSpecs = $specService->hasSpecs(3, $engine->id);
+
+                    if ($engineHasSpecs) {
+
+                        $cataloguePaths = $catalogue->engineCataloguePaths($engine, array(
+                            'limit' => 1
+                        ));
+
+                        foreach ($cataloguePaths as $cataloguePath) {
+                            $engineSpecsUrl = $urlHelper->url(array(
+                                'module'        => 'default',
+                                'controller'    => 'catalogue',
+                                'action'        => 'engine-specs',
+                                'brand_catname' => $cataloguePath['brand_catname'],
+                                'path'          => $cataloguePath['path']
+                            ), 'catalogue', true);
+                        }
+                    }
+
+                }
+
+                break;
+
+            case Picture::LOGO_TYPE_ID:
+            case Picture::MIXED_TYPE_ID:
+            case Picture::UNSORTED_TYPE_ID:
+                break;
+
+            case Picture::FACTORY_TYPE_ID:
+                if ($factory = $picture->findParentFactory()) {
+                    $carIds = $factory->getRelatedCarGroupId();
+                    if ($carIds) {
+                        $carTable = $catalogue->getCarTable();
+
+                        $carRows = $carTable->fetchAll(array(
+                            'id in (?)' => $carIds
+                        ), $catalogue->carsOrdering());
+
+                        $limit = 10;
+
+                        if (count($carRows) > $limit) {
+                            $a = array();
+                            foreach ($carRows as $carRow) {
+                                $a[] = $carRow;
+                            }
+                            $carRows = array_slice($a, 0, $limit);
+                            $factoryCarsMore = true;
+                        }
+
+                        foreach ($carRows as $carRow) {
+                            $cataloguePaths = $catalogue->cataloguePaths($carRow);
+
+                            foreach ($cataloguePaths as $cPath) {
+                                $factoryCars[] = array(
+                                    'name' => $carRow->getFullName($language),
+                                    'url'  => $urlHelper->url(array(
+                                        'module'        => 'default',
+                                        'controller'    => 'catalogue',
+                                        'action'        => 'brand-car',
+                                        'brand_catname' => $cPath['brand_catname'],
+                                        'car_catname'   => $cPath['car_catname'],
+                                        'path'          => $cPath['path']
+                                    ), 'catalogue', true)
+                                );
+                                break;
+                            }
+                        }
+                    }
+                }
+                break;
+            case Picture::CAR_TYPE_ID:
+                if ($car = $picture->findParentCars()) {
+
+                    // alt names
+                    $altNames = array();
+
+                    $carLangTable = new Car_Language();
+                    $carLangRows = $carLangTable->fetchAll(array(
+                        'car_id = ?' => $car->id
+                    ));
+
+                    $defaultName = $car->caption;
+                    foreach ($carLangRows as $carLangRow) {
+                        $name = $carLangRow->name;
+                        if (!isset($altNames[$name])) {
+                            $altNames[$carLangRow->name] = array();
+                        }
+                        $altNames[$name][] = $carLangRow->language;
+
+                        if ($language == $carLangRow->language) {
+                            $currentLangName = $name;
+                        }
+                    }
+
+                    foreach ($altNames as $name => $codes) {
+                        if (strcmp($name, $defaultName) != 0) {
+                            $altNames2[$name] = $codes;
+                        }
+                    }
+
+                    if ($currentLangName) {
+                        unset($altNames2[$currentLangName]);
+                    }
+
+                    $designProjectTable = new Design_Projects();
+                    $designProjectRow = $designProjectTable->fetchRow(
+                        $designProjectTable->select(true)
+                            ->join('cars', 'design_projects.id = cars.design_project_id', null)
+                            ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
+                            ->where('car_parent_cache.car_id = ?', $car->id)
+                            ->limit(1)
+                    );
+
+                    if ($designProjectRow) {
+                        $dbBrand = $designProjectRow->findParentBrands();
+                        $designProject = array(
+                            'url'   => $urlHelper->url(array(
+                                'action'                 => 'design-project',
+                                'brand_catname'          => $dbBrand->folder,
+                                'design_project_catname' => $designProjectRow->catname
+                            ), 'catalogue', true),
+                            'brand' => $dbBrand->caption
+                        );
+                    }
+
+                    $cdTable = new Category();
+                    $cdlTable = new Category_Language();
+
+                    $categoryRows = $cdTable->fetchAll(
+                        $cdTable->select(true)
+                            ->join('category_car', 'category.id = category_car.category_id', null)
+                            ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
+                            ->where('car_parent_cache.car_id = ?', $car->id)
+                    );
+
+                    foreach ($categoryRows as $row) {
+                        $lRow = $cdlTable->fetchRow(array(
+                            'language = ?'    => $language,
+                            'category_id = ?' => $row->id
+                        ));
+                        $categories[$row->id] = array(
+                            'name' => $lRow ? $lRow->name : $row->name,
+                            'url'  => $urlHelper->url(array(
+                                'controller'       => 'category',
+                                'action'           => 'category',
+                                'category_catname' => $row['catname'],
+                            ), 'category', true)
+                        );
+                    }
+                }
+                break;
+        }
+
+
+
+        // ссылки на офсайты
+        $ofLinks = array();
+        $linksTable = new Links();
+        if (count($brandIds)) {
+            $links = $linksTable->fetchAll(
+                $linksTable->select(true)
+                    ->where('brandId in (?)', $brandIds)
+                    ->where('type = ?', 'official')
+            );
+            foreach ($links as $link) {
+                $ofLinks[$link->id] = $link;
+            }
+        }
+
+        $replacePicture = null;
+        if ($picture->replace_picture_id) {
+            $replacePicture = $pictureTable->find($picture->replace_picture_id)->current();
+
+            if ($replacePicture->status == Picture::STATUS_REMOVING) {
+                if (!$userHelper->direct()->inheritsRole('moder')) {
+                    $replacePicture = null;
+                }
+            }
+        }
+
+        $moderLinks = array();
+        if ($isModer) {
+            $links = array();
+            $links[$urlHelper->url(array(
+                'module'     => 'moder',
+                'controller' => 'pictures',
+                'action'     => 'picture',
+                'picture_id' => $picture->id
+            ), 'default', true)] = 'Управление изображением №'.$picture->id;
+
+            switch ($picture->type) {
+                case Picture::CAR_TYPE_ID:
+                    $car = $picture->findParentCars();
+                    if ($car) {
+                        $url = $urlHelper->url(array(
+                            'module'     => 'moder',
+                            'controller' => 'cars',
+                            'action'     => 'car',
+                            'car_id'     => $car->id
+                        ), 'default', true);
+                        $links[$url] = 'Управление автомобилем ' . $car->getFullName();
+
+                        foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+                            $url = $urlHelper->url(array(
+                                'module'     => 'moder',
+                                'controller' => 'brands',
+                                'action'     => 'brand',
+                                'brand_id'   => $brand->id
+                            ), 'default', true);
+                            $links[$url] = 'Управление брендом ' . $brand->caption;
+                        }
+
+                        if ($dp = $car->findParentDesign_Projects()) {
+                            if ($brand = $dp->findParentBrands()) {
+                                $url = $urlHelper->url(array(
+                                    'module'     => 'moder',
+                                    'controller' => 'brands',
+                                    'action'     => 'brand',
+                                    'brand_id'   => $brand->id
+                                ), 'default', true);
+                                $links[$url] = 'Управление брендом ' . $brand->caption;
+                            }
+                        }
+                    }
+
+                    break;
+
+                case Picture::ENGINE_TYPE_ID:
+                    if ($engine = $picture->findParentEngines()) {
+                        $url = $urlHelper->url(array(
+                            'module'     => 'moder',
+                            'controller' => 'engines',
+                            'action'     => 'engine',
+                            'engine_id'  => $engine->id
+                        ), 'default', true);
+                        $links[$url] = 'Управление двигателем ' . $engine->caption;
+                    }
+                    break;
+
+                case Picture::FACTORY_TYPE_ID:
+                    if ($factory = $picture->findParentFactory()) {
+                        $links[$urlHelper->url(array(
+                            'module'     => 'moder',
+                            'controller' => 'factory',
+                            'action'     => 'factory',
+                            'factory_id' => $factory->id
+                        ), 'default', true)] = 'Управление заводом ' . $factory->name;
+                    }
+                    break;
+
+                case Picture::MIXED_TYPE_ID:
+                case Picture::LOGO_TYPE_ID:
+                case Picture::UNSORTED_TYPE_ID:
+                    if ($brand = $picture->findParentBrands()) {
+                        $url = $urlHelper->url(array(
+                            'module'     => 'moder',
+                            'controller' => 'brands',
+                            'action'     => 'brand',
+                            'brand_id'   => $brand->id
+                        ), 'default', true);
+                        $links[$url] = 'Управление брендом ' . $brand->caption;
+                    }
+                    break;
+            }
+
+            $moderLinks = $links;
+        }
+
+        $userTable = new Users();
+
+        $moderVotes = array();
+        foreach ($picture->findPictures_Moder_Votes() as $moderVote) {
+            $moderVotes[] = array(
+                'vote'   => $moderVote->vote,
+                'reason' => $moderVote->reason,
+                'user'   => $userTable->find($moderVote->user_id)->current()
+            );
+        }
+
+        $imageStorage = $controller->getInvokeArg('bootstrap')
+            ->getResource('imagestorage');
+
+        $image = $imageStorage->getImage($picture->image_id);
+        $sourceUrl = $image ? $image->getSrc() : null;
+
+        $preview = $imageStorage->getFormatedImage($picture->getFormatRequest(), 'picture-medium');
+        $previewUrl = $preview ? $preview->getSrc() : null;
+
+
+        $gallery = false;
+        $paginator = false;
+        $paginatorPictures = false;
+
+        if ($picSelect) {
+            $gallery = $this->_gallery($picSelect);
+            $paginatorPictures = $pictureTable->fetchAll($picSelect);
+
+            $pageNumber = 0;
+            foreach ($paginatorPictures as $n => $p) {
+                if ($p->id == $picture->id) {
+                    $pageNumber = $n+1;
+                    break;
+                }
+            }
+
+            $paginator = Zend_Paginator::factory($picSelect)
+                ->setItemCountPerPage(1)
+                ->setPageRange(15)
+                ->setCurrentPageNumber($pageNumber);
+        }
+
+        $name = $picture->getCaption(array(
+            'language' => $language
+        ));
+
+        $data = array(
+            'name'              => $name,
+            'picture'           => $picture,
+            'owner'             => $picture->findParentUsersByOwner(),
+            'addDate'           => $picture->getDate('add_date'),
+            'ofLinks'           => $ofLinks,
+            'moderVotes'        => $moderVotes,
+            'sourceUrl'         => $sourceUrl,
+            'previewUrl'        => $previewUrl,
+            'replacePicture'    => $replacePicture,
+            'gallery'           => array(
+                'current' => $picture->id,
+                'items'   => $gallery
+            ),
+            'paginator'         => $paginator,
+            'paginatorPictures' => $paginatorPictures,
+            'engine'            => $engine,
+            'engineCars'        => $engineCars,
+            'engineHasSpecs'    => $engineHasSpecs,
+            'engineSpecsUrl'    => $engineSpecsUrl,
+            'factory'           => $factory,
+            'factoryCars'       => $factoryCars,
+            'factoryCarsMore'   => $factoryCarsMore,
+            'moderLinks'        => $moderLinks,
+            'altNames'          => $altNames2,
+            'langName'          => $currentLangName,
+            'designProject'     => $designProject,
+            'categories'        => $categories
+        );
+
+        // Обвновляем количество просмотров
+        $views = new Picture_View();
+        $views->inc($picture);
+
+        return $data;
+    }
+
+    private function _gallery(Zend_Db_Table_Select $picSelect)
+    {
+        $galleryStatuses = array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW);
+
+        $gallery = array();
+
+        $commentTopicTable = new Comment_Topic();
+
+        $controller = $this->getActionController();
+        $userHelper = $controller->getHelper('user');
+        $catalogue = $controller->getHelper('catalogue')->getCatalogue();
+        $view = $controller->view;
+
+        $language = $controller->getHelper('language')->direct();
+
+        $select = clone $picSelect;
+
+        $select
+            ->reset(Zend_Db_Select::COLUMNS)
+            ->setIntegrityCheck(false)
+            ->columns(array(
+                'pictures.id', 'pictures.identity', 'pictures.name',
+                'pictures.width', 'pictures.height',
+                'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
+                'pictures.image_id', 'pictures.filesize',
+                'pictures.brand_id', 'pictures.car_id', 'pictures.engine_id',
+                'pictures.perspective_id', 'pictures.type', 'pictures.factory_id'
+            ))
+            ->joinLeft(array('ct' => 'comment_topic'), 'ct.type_id = :type_id and ct.item_id = pictures.id', 'messages');
+
+        $rows = $select->getAdapter()->fetchAll($select, array(
+            'type_id' => Comment_Message::PICTURES_TYPE_ID
+        ));
+
+
+
+        // prefetch
+        $fullRequests = array();
+        $cropRequests = array();
+        $imageIds = array();
+        foreach ($rows as $idx => $picture) {
+            $request = Pictures_Row::buildFormatRequest($picture);
+            $fullRequests[$idx] = $request;
+            if (Pictures_Row::checkCropParameters($picture)) {
+                $cropRequests[$idx] = $request;
+            }
+            $ids[] = (int)$picture['id'];
+            $imageIds[] = (int)$picture['image_id'];
+        }
+
+        // images
+        $imageStorage = $controller->getInvokeArg('bootstrap')
+            ->getResource('imagestorage');
+        $images = $imageStorage->getImages($imageIds);
+        $fullImagesInfo = $imageStorage->getFormatedImages($fullRequests, 'picture-gallery-full');
+        $cropImagesInfo = $imageStorage->getFormatedImages($cropRequests, 'picture-gallery');
+
+
+        // names
+        $pictureTable = new Picture();
+        $names = $pictureTable->getNames($rows, array(
+            'language' => $language
+        ));
+
+        // comments
+        $userId = null;
+        if ($userHelper->direct()->logedIn()) {
+            $userId = $userHelper->direct()->get()->id;
+        }
+
+        if ($userId) {
+            $ctTable = new Comment_Topic();
+            $newMessages = $ctTable->getNewMessages(
+                Comment_Message::PICTURES_TYPE_ID,
+                $ids,
+                $userId
+            );
+        }
+
+
+        foreach ($rows as $idx => $row) {
+
+            $imageId = (int)$row['image_id'];
+
+            if ($imageId) {
+
+                $id = (int)$row['id'];
+
+                $image = isset($images[$imageId]) ? $images[$imageId] : null;
+                if ($image) {
+                    $sUrl = $image->getSrc();
+
+                    if (Pictures_Row::checkCropParameters($row)) {
+                        $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
+
+                        $crop['crop'] = array(
+                            'left'   => $row['crop_left'] / $image->getWidth(),
+                            'top'    => $row['crop_top'] / $image->getHeight(),
+                            'width'  => $row['crop_width'] / $image->getWidth(),
+                            'height' => $row['crop_height'] / $image->getHeight(),
+                        );
+
+                    } else {
+                        $crop = null;
+                    }
+
+                    $full = isset($fullImagesInfo[$idx]) ? $fullImagesInfo[$idx]->toArray() : null;
+
+                    $msgCount = $row['messages'];
+                    $newMsgCount = 0;
+                    if ($userId) {
+                        $newMsgCount = isset($newMessages[$id]) ? $newMessages[$id] : $msgCount;
+                    }
+
+                    $name = isset($names[$id]) ? $names[$id] : null;
+
+                    $gallery[] = array(
+                        'id'          => $id,
+                        'url'         => $this->url($id, $row['identity']),
+                        'sourceUrl'   => $sUrl,
+                        'crop'        => $crop,
+                        'full'        => $full,
+                        'messages'    => $msgCount,
+                        'newMessages' => $newMsgCount,
+                        'name'        => $name,
+                        'filesize'    => $view->fileSize($row['filesize'])
+                    );
+                }
+            }
+        }
+
+        return $gallery;
     }
 }

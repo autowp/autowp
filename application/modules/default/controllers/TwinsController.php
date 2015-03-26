@@ -91,7 +91,15 @@ class TwinsController extends Zend_Controller_Action
         $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
         $picturesData = $this->_helper->pic->listData($select, array(
-            'width' => 4
+            'width' => 4,
+            'url'   => function($row) use ($group) {
+                return $this->_helper->url->url(array(
+                    'controller'     => 'twins',
+                    'action'         => 'picture',
+                    'twins_group_id' => $group['id'],
+                    'picture_id'     => $row['identity'] ? $row['identity'] : $row['id']
+                ));
+            }
         ));
 
         $this->view->assign(array(
@@ -129,7 +137,15 @@ class TwinsController extends Zend_Controller_Action
             'cars'               => $this->_helper->car->listData($carList, array(
                 'disableTwins'         => true,
                 'disableLargePictures' => true,
-                'disableSpecs'         => true
+                'disableSpecs'         => true,
+                'pictureUrl'           => function($car, $picture) use ($group) {
+                    return $this->_helper->url->url(array(
+                        'controller'     => 'twins',
+                        'action'         => 'picture',
+                        'twins_group_id' => $group['id'],
+                        'picture_id'     => $picture['identity'] ? $picture['identity'] : $picture['id']
+                    ));
+                }
             )),
             'picturesCount'      => $picturesCount,
             'hasSpecs'           => $hasSpecs,
@@ -233,9 +249,16 @@ class TwinsController extends Zend_Controller_Action
                     $request = $pictureRow->getFormatRequest();
                     $requests[$key] = $request;
 
+                    $url = $this->_helper->url->url(array(
+                        'controller'     => 'twins',
+                        'action'         => 'picture',
+                        'twins_group_id' => $group['id'],
+                        'picture_id'     => $pictureRow['identity'] ? $pictureRow['identity'] : $pictureRow['id']
+                    ));
+
                     $picture = array(
                         'key' => $key,
-                        'url' => $this->_helper->pic->url($pictureRow->id, $pictureRow->identity),
+                        'url' => $url,
                         'src' => null
                     );
                 }
@@ -355,5 +378,47 @@ class TwinsController extends Zend_Controller_Action
         ));
 
         $this->_loadBrands(array());
+    }
+
+    public function pictureAction()
+    {
+        $twins = $this->_getTwins();
+
+        $group = $twins->getGroup($this->_getParam('twins_group_id'));
+        if (!$group) {
+            return $this->_forward('notfound', 'error');
+        }
+
+        $pictureId = (string)$this->_getParam('picture_id');
+
+        $select = $twins->getGroupPicturesSelect($group['id'])
+            ->where('pictures.id = ?', $pictureId)
+            ->where('pictures.identity IS NULL');
+
+        $picture = $select->getTable()->fetchRow($select);
+
+        if (!$picture) {
+            $select = $twins->getGroupPicturesSelect($group['id'])
+                ->where('pictures.identity = ?', $pictureId);
+
+            $picture = $select->getTable()->fetchRow($select);
+        }
+
+        if (!$picture) {
+            return $this->_forward('notfound', 'error');
+        }
+
+        $this->_loadBrands($twins->getGroupBrandIds($group['id']));
+
+        $picSelect = $twins->getGroupPicturesSelect($this->_getParam('twins_group_id'), array(
+            'ordering' => $this->_helper->catalogue()->picturesOrdering()
+        ));
+
+        $data = $this->_helper->pic->picPageData($picture, $picSelect, array());
+
+        $this->view->assign($data);
+        $this->view->assign(array(
+            'group' => $group,
+        ));
     }
 }

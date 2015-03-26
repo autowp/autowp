@@ -46,37 +46,43 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
         return $this;
     }
 
-    public function title()
+    public function htmlTitle(array $car)
     {
-        if (!$this->_car) {
-            return false;
-        }
+        $defaults = array(
+            'begin_model_year' => null,
+            'end_model_year'   => null,
+            'spec'             => null,
+            'body'             => null,
+            'name'             => null,
+            'begin_year'       => null,
+            'end_year'         => null,
+            'today'            => null,
+            'begin_month'      => null,
+            'end_month'        => null
+        );
+        $car = array_replace($defaults, $car);
 
-        $car = $this->_car;
         $view = $this->view;
 
-        $result = $view->escape($car->caption);
+        $result = $view->escape($car['name']);
 
-        if ($this->_car->spec_id) {
-            $specRow = $this->_getSpecTable()->find($this->_car->spec_id)->current();
-            if ($specRow) {
-                $result .= ' <span class="label label-primary">' . $view->escape($specRow->short_name) . '</span>';
-            }
+        if ($car['spec']) {
+            $result .= ' <span class="label label-primary">' . $view->escape($car['spec']) . '</span>';
         }
 
-        if (strlen($car->body) > 0) {
-            $result .= ' ('.$view->escape($car->body).')';
+        if (strlen($car['body']) > 0) {
+            $result .= ' ('.$view->escape($car['body']).')';
         }
 
-        $by = $car->begin_year;
-        $bm = $car->begin_month;
-        $ey = $car->end_year;
-        $em = $car->end_month;
+        $by = $car['begin_year'];
+        $bm = $car['begin_month'];
+        $ey = $car['end_year'];
+        $em = $car['end_month'];
         $cy = (int)date('Y');
         $cm = (int)date('m');
 
-        $bmy = $car->begin_model_year;
-        $emy = $car->end_model_year;
+        $bmy = $car['begin_model_year'];
+        $emy = $car['end_model_year'];
 
         $bs = (int)($by/100);
         $es = (int)($ey/100);
@@ -86,9 +92,9 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
 
         $useModelYear = (bool)$bmy;
         /*if ($useModelYear) {
-            if ($bmy == $by && $emy == $ey) {
-                $useModelYear = false;
-            }
+         if ($bmy == $by && $emy == $ey) {
+        $useModelYear = false;
+        }
         }*/
 
         $equalS = $bs && $es && ($bs == $es);
@@ -103,7 +109,7 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
             } elseif ($bms == $ems) {
                 $mylabel .= $bmy.'–'.sprintf('%02d', $emy%100);
             } elseif (!$emy) {
-                if ($car->today) {
+                if ($car['today']) {
                     if ($bmy >= $cy) {
                         $mylabel .= $bmy;
                     } else {
@@ -139,17 +145,13 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
                         } else {
                             $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').($by ? $by : '????')).
                             (
-                                    $ey
-                                    ?
-                                    '–'.($em ? sprintf($this->_monthFormat, $em) : '').$ey
-                                    :
-                                    (
-                                        $car->today
-                                        ?
-                                        ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
-                                        :
-                                        ($by < $cy ? '–????' : '')
-                                    )
+                                $ey
+                                ? '–'.($em ? sprintf($this->_monthFormat, $em) : '').$ey
+                                : (
+                                    $car['today']
+                                    ? ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
+                                    : ($by < $cy ? '–????' : '')
+                                )
                             );
                         }
                     }
@@ -176,18 +178,18 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
                     } else {
                         if ($equalS) {
                             $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').$by).
-                                        '–'.
-                                        ($em ? sprintf($this->_monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
+                            '–'.
+                            ($em ? sprintf($this->_monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
                         } else {
                             $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').($by ? $by : '????')).
                             (
-                                    $ey
-                                        ? '–'.($em ? sprintf($this->_monthFormat, $em) : '').$ey
-                                        : (
-                                            $car->today
-                                                ? ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
-                                                :($by < $cy ? '–????' : '')
-                                        )
+                                $ey
+                                ? '–'.($em ? sprintf($this->_monthFormat, $em) : '').$ey
+                                : (
+                                    $car['today']
+                                    ? ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
+                                    :($by < $cy ? '–????' : '')
+                                )
                             );
                         }
                     }
@@ -196,6 +198,36 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
         }
 
         return $result;
+    }
+
+    public function title()
+    {
+        if (!$this->_car) {
+            return false;
+        }
+
+        $car = $this->_car;
+
+        $spec = null;
+        if ($car->spec_id) {
+            $specRow = $this->_getSpecTable()->find($car->spec_id)->current();
+            if ($specRow) {
+                $spec = $specRow->short_name;
+            }
+        }
+
+        return $this->htmlTitle(array(
+            'begin_model_year' => $car['begin_model_year'],
+            'end_model_year'   => $car['end_model_year'],
+            'spec'             => $spec,
+            'body'             => $car['body'],
+            'name'             => $car['caption'],
+            'begin_year'       => $car['begin_year'],
+            'end_year'         => $car['end_year'],
+            'today'            => $car['today'],
+            'begin_month'      => $car['begin_month'],
+            'end_month'        => $car['end_month']
+        ));
     }
 
     public function catalogueLinks()

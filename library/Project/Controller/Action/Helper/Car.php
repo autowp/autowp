@@ -108,6 +108,7 @@ class Project_Controller_Action_Helper_Car
         $callback             = isset($options['callback']) && $options['callback'] ? $options['callback'] : null;
         $allowUpPictures      = isset($options['allowUpPictures']) && $options['allowUpPictures'];
         $onlyChilds           = isset($options['onlyChilds']) && is_array($options['onlyChilds']) ? $options['onlyChilds'] : array();
+        $pictureUrlCallback   = isset($options['pictureUrl']) ? $options['pictureUrl'] : false;
 
         $controller = $this->getActionController();
         $urlHelper = $controller->getHelper('Url');
@@ -295,7 +296,9 @@ class Project_Controller_Action_Helper_Car
             $carOnlyChilds = isset($onlyChilds[$car->id]) ? $onlyChilds[$car->id] : null;
 
             $pictures = $this->_getOrientedPictureList(
-                $car, $g, $onlyExactlyPictures, $type, $picturesDateSort, $allowUpPictures, $language, $urlHelper, $catalogue, $carOnlyChilds, $useLargeFormat
+                $car, $g, $onlyExactlyPictures, $type, $picturesDateSort,
+                $allowUpPictures, $language, $urlHelper, $catalogue,
+                $carOnlyChilds, $useLargeFormat, $pictureUrlCallback
             );
 
             if ($hideEmpty) {
@@ -633,7 +636,7 @@ class Project_Controller_Action_Helper_Car
 
     protected function _getOrientedPictureList($car, array $perspectiveGroupIds,
             $onlyExactlyPictures, $type, $dateSort, $allowUpPictures, $language,
-            $urlHelper, $catalogue, $onlyChilds, $useLargeFormat)
+            $urlHelper, $catalogue, $onlyChilds, $useLargeFormat, $urlCallback)
     {
         $pictures = array();
         $usedIds = array();
@@ -714,15 +717,21 @@ class Project_Controller_Action_Helper_Car
 
                 $format = $useLargeFormat && $idx == 0 ? 'picture-thumb-medium' : 'picture-thumb';
 
-                $result[] = array(
-                    'format' => $format,
-                    'row'    => $picture,
-                    'url'    => $urlHelper->url(array(
+                if ($urlCallback) {
+                    $url = $urlCallback($car, $picture);
+                } else {
+                    $url = $urlHelper->url(array(
                         'module'     => 'default',
                         'controller' => 'picture',
                         'action'     => 'index',
                         'picture_id' => $picture['identity'] ? $picture['identity'] : $pictureId
-                    ), 'picture', true),
+                    ), 'picture', true);
+                }
+
+                $result[] = array(
+                    'format' => $format,
+                    'row'    => $picture,
+                    'url'    => $url,
                 );
             } else {
                 $result[] = false;

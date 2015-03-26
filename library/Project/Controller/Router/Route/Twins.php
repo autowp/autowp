@@ -119,6 +119,19 @@ class Project_Controller_Router_Route_Twins extends Project_Controller_Router_Ro
 
                         return false;
                     }
+
+                    $pictureId = $path[0];
+                    array_pop($path);
+
+                    if (!$path) {
+                        // twins/groupX/pictures/:picture
+                        return $this->_assembleMatch(array(
+                            'action'         => 'picture',
+                            'twins_group_id' => $twinsGroupId,
+                            'picture_id'     => $pictureId
+                        ));
+                    }
+
                     break;
             }
 
@@ -201,6 +214,12 @@ class Project_Controller_Router_Route_Twins extends Project_Controller_Router_Ro
                 if (isset($data['page']) && $data['page'] > 1) {
                     $url[] = 'page' . $data['page'];
                 }
+                break;
+
+            case 'picture':
+                $url[] = 'group' . $data['twins_group_id'];
+                $url[] = 'pictures';
+                $url[] = $data['picture_id'];
                 break;
 
             case 'index':
