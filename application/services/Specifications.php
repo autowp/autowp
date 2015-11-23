@@ -9,6 +9,12 @@ class Application_Service_Specifications
 
     const NULL_VALUE_STR = '-';
 
+    const WEIGHT_NONE          =  0,
+          WEIGHT_FIRST_ACTUAL  =  1,
+          WEIGHT_SECOND_ACTUAL =  0.1,
+          WEIGHT_WRONG         = -1;
+
+
     protected $_zones = null;
 
     /**
@@ -118,6 +124,8 @@ class Application_Service_Specifications
      * @var array
      */
     protected $_users = array();
+
+    protected $_valueWeights = [];
 
     /**
      * @return Users
@@ -557,7 +565,8 @@ class Application_Service_Specifications
                     'typeId'      => (int)$row->type_id,
                     'unitId'      => (int)$row->unit_id,
                     'isMultiple'  => $row->isMultiple(),
-                    'precision'   => $row->precision
+                    'precision'   => $row->precision,
+                    'parentId'    => $pid ? $pid : null
                 );
                 if (!isset($childs[$pid])) {
                     $childs[$pid] = array($id);
@@ -585,204 +594,211 @@ class Application_Service_Specifications
         return isset($this->_attributes[$id]) ? $this->_attributes[$id] : null;
     }
 
+    public function setUserValue($uid, $attributeId, $itemTypeId, $itemId, $value)
+    {
+        $attribute = $this->_getAttribute($attributeId);
+        $somethingChanged = false;
+
+        $userValueTable = $this->_getUserValueTable();
+        $userValueDataTable = $this->getUserValueDataTable($attribute['typeId']);
+
+        if ($attribute['isMultiple']) {
+
+            // удаляем дескрипторы значений
+            $userValues = $userValueTable->fetchAll(array(
+                'attribute_id = ?' => $attribute['id'],
+                'item_id = ?'      => $itemId,
+                'item_type_id = ?' => $itemTypeId,
+                'user_id = ?'      => $uid,
+            ));
+            foreach ($userValues as $userValue) {
+                $userValue->delete();
+            }
+            // удаляем значение
+            $userValueDataRows = $userValueDataTable->fetchAll(array(
+                'attribute_id = ?' => $attribute['id'],
+                'item_id = ?'      => $itemId,
+                'item_type_id = ?' => $itemTypeId,
+                'user_id = ?'      => $uid
+            ));
+            foreach ($userValueDataRows as $userValueDataRow) {
+                $userValueDataRow->delete();
+            }
+
+            if ($value) {
+
+                $empty = true;
+                $valueNot = false;
+                foreach ($value as $oneValue) {
+                    if ($oneValue) {
+                        $empty = false;
+                    }
+
+                    if ($oneValue == self::NULL_VALUE_STR) {
+                        $valueNot = true;
+                    }
+                }
+
+                if (!$empty) {
+
+                    // вставляем новые дексрипторы и значения
+                    $userValueTable->insert(array(
+                        'attribute_id' => $attribute['id'],
+                        'item_id'      => $itemId,
+                        'item_type_id' => $itemTypeId,
+                        'user_id'      => $uid,
+                        'add_date'     => new Zend_Db_Expr('NOW()'),
+                        'update_date'  => new Zend_Db_Expr('NOW()'),
+                    ));
+                    $ordering = 1;
+
+                    if ($valueNot) {
+                        $value = array(null);
+                    }
+
+                    foreach ($value as $oneValue) {
+                        $userValueDataTable->insert(array(
+                            'attribute_id' => $attribute['id'],
+                            'item_id'      => $itemId,
+                            'item_type_id' => $itemTypeId,
+                            'user_id'      => $uid,
+                            'ordering'     => $ordering,
+                            'value'        => $oneValue
+                        ));
+
+                        $ordering++;
+                    }
+                }
+
+            }
+
+            $somethingChanged = $this->_updateActualValue($attribute, $itemTypeId, $itemId);
+
+        } else {
+
+            if (strlen($value) > 0) {
+                // вставлям/обновляем дескриптор значения
+                $userValue = $userValueTable->fetchRow(array(
+                    'attribute_id = ?' => $attribute['id'],
+                    'item_id = ?'      => $itemId,
+                    'item_type_id = ?' => $itemTypeId,
+                    'user_id = ?'      => $uid
+                ));
+
+                // вставляем/обновляем значение
+                $userValueData = $userValueDataTable->fetchRow(array(
+                    'attribute_id = ?' => $attribute['id'],
+                    'item_id = ?'      => $itemId,
+                    'item_type_id = ?' => $itemTypeId,
+                    'user_id = ?'      => $uid
+                ));
+
+                if ($value == self::NULL_VALUE_STR) {
+                    $value = null;
+                }
+
+                if ($userValueData) {
+                    $valueChanged = $value === null ? $userValueData->value !== null : $userValueData->value != $value;
+                }  else {
+                    $valueChanged = true;
+                }
+
+                if (!$userValue || $valueChanged) {
+
+                    if (!$userValue) {
+                        $userValue = $userValueTable->createRow(array(
+                            'attribute_id' => $attribute['id'],
+                            'item_id'      => $itemId,
+                            'item_type_id' => $itemTypeId,
+                            'user_id'      => $uid,
+                            'add_date'     => new Zend_Db_Expr('NOW()')
+                        ));
+                    }
+
+                    $userValue->setFromArray(array(
+                        'update_date' => new Zend_Db_Expr('NOW()')
+                    ));
+                    $userValue->save();
+
+                    if (!$userValueData) {
+                        $userValueData = $userValueDataTable->fetchNew();
+                        $userValueData->setFromArray(array(
+                            'attribute_id' => $attribute['id'],
+                            'item_id'      => $itemId,
+                            'item_type_id' => $itemTypeId,
+                            'user_id'      => $uid
+                        ));
+                    }
+
+                    $userValueData->value = $value;
+                    $userValueData->save();
+
+                    $somethingChanged = $this->_updateActualValue($attribute, $itemTypeId, $itemId);
+                }
+
+            } else {
+
+                $needUpdate = false;
+                // удаляем дескриптор значения
+                $userValue = $userValueTable->fetchRow(array(
+                    'attribute_id = ?' => $attribute['id'],
+                    'item_id = ?'      => $itemId,
+                    'item_type_id = ?' => $itemTypeId,
+                    'user_id = ?'      => $uid,
+                ));
+                if ($userValue) {
+                    $userValue->delete();
+                    $needUpdate = true;
+                }
+                // удаляем значение
+                $userValueData = $userValueDataTable->fetchRow(array(
+                    'attribute_id = ?' => $attribute['id'],
+                    'item_id = ?'      => $itemId,
+                    'item_type_id = ?' => $itemTypeId,
+                    'user_id = ?'      => $uid,
+                ));
+                if ($userValueData) {
+                    $userValueData->delete();
+                    $needUpdate = true;
+                }
+                if ($needUpdate) {
+                    $somethingChanged = $this->_updateActualValue($attribute, $itemTypeId, $itemId);
+                }
+            }
+        }
+
+        if ($somethingChanged) {
+            $this->_propagateInheritance($attribute, $itemTypeId, $itemId);
+
+            $this->_propageteEngine($attribute, $itemTypeId, $itemId);
+
+            $this->refreshConflictFlag($attribute['id'], $itemTypeId, $itemId);
+        }
+    }
+
     /**
      * @param Application_Form_Attrs_Zone_Attributes $form
      * @param Users_Row $user
      */
     public function saveAttrsZoneAttributes(Application_Form_Attrs_Zone_Attributes $form, Users_Row $user)
     {
-        $values = $form->getValues();
-
         $zone = $form->getZone();
-        $itemId = $form->getItemId();
 
         $attributes = $this->getAttributes(array(
             'zone'   => $zone->id,
             'parent' => 0
         ));
 
-        $values = $this->_collectFormData($zone->id, $attributes, $values);
-        $userValueTable = $this->_getUserValueTable();
-        $itemTypeId = $zone->item_type_id;
+        $values = $this->_collectFormData($zone->id, $attributes, $form->getValues());
 
-        $uid = $user->id;
-
-        foreach ($values as $attribute_id => $value) {
-            $attribute = $this->_getAttribute($attribute_id);
-            $somethingChanged = false;
-
-            $userValueDataTable = $this->getUserValueDataTable($attribute['typeId']);
-
-            if ($attribute['isMultiple']) {
-
-                // удаляем дескрипторы значений
-                $userValues = $userValueTable->fetchAll(array(
-                    'attribute_id = ?' => $attribute['id'],
-                    'item_id = ?'      => $itemId,
-                    'item_type_id = ?' => $itemTypeId,
-                    'user_id = ?'      => $uid,
-                ));
-                foreach ($userValues as $userValue) {
-                    $userValue->delete();
-                }
-                // удаляем значение
-                $userValueDataRows = $userValueDataTable->fetchAll(array(
-                    'attribute_id = ?' => $attribute['id'],
-                    'item_id = ?'      => $itemId,
-                    'item_type_id = ?' => $itemTypeId,
-                    'user_id = ?'      => $uid
-                ));
-                foreach ($userValueDataRows as $userValueDataRow) {
-                    $userValueDataRow->delete();
-                }
-
-                if ($value) {
-
-                    $empty = true;
-                    $valueNot = false;
-                    foreach ($value as $oneValue) {
-                        if ($oneValue) {
-                            $empty = false;
-                        }
-
-                        if ($oneValue == self::NULL_VALUE_STR) {
-                            $valueNot = true;
-                        }
-                    }
-
-                    if (!$empty) {
-
-                        // вставляем новые дексрипторы и значения
-                        $userValueTable->insert(array(
-                            'attribute_id' => $attribute['id'],
-                            'item_id'      => $itemId,
-                            'item_type_id' => $itemTypeId,
-                            'user_id'      => $uid,
-                            'add_date'     => new Zend_Db_Expr('NOW()'),
-                            'update_date'  => new Zend_Db_Expr('NOW()'),
-                        ));
-                        $ordering = 1;
-
-                        if ($valueNot) {
-                            $value = array(null);
-                        }
-
-                        foreach ($value as $oneValue) {
-                            $userValueDataTable->insert(array(
-                                'attribute_id' => $attribute['id'],
-                                'item_id'      => $itemId,
-                                'item_type_id' => $itemTypeId,
-                                'user_id'      => $uid,
-                                'ordering'     => $ordering,
-                                'value'        => $oneValue
-                            ));
-
-                            $ordering++;
-                        }
-                    }
-
-                }
-
-                $somethingChanged = $this->_updateActualValue($attribute, $itemTypeId, $itemId);
-
-            } else {
-
-                if (strlen($value) > 0) {
-                    // вставлям/обновляем дескриптор значения
-                    $userValue = $userValueTable->fetchRow(array(
-                        'attribute_id = ?' => $attribute['id'],
-                        'item_id = ?'      => $itemId,
-                        'item_type_id = ?' => $itemTypeId,
-                        'user_id = ?'      => $uid
-                    ));
-
-                    // вставляем/обновляем значение
-                    $userValueData = $userValueDataTable->fetchRow(array(
-                        'attribute_id = ?' => $attribute['id'],
-                        'item_id = ?'      => $itemId,
-                        'item_type_id = ?' => $itemTypeId,
-                        'user_id = ?'      => $uid
-                    ));
-
-                    if ($value == self::NULL_VALUE_STR) {
-                        $value = null;
-                    }
-
-                    if ($userValueData) {
-                        $valueChanged = $value === null ? $userValueData->value !== null : $userValueData->value != $value;
-                    }  else {
-                        $valueChanged = true;
-                    }
-
-                    if (!$userValue || $valueChanged) {
-
-                        if (!$userValue) {
-                            $userValue = $userValueTable->createRow(array(
-                                'attribute_id' => $attribute['id'],
-                                'item_id'      => $itemId,
-                                'item_type_id' => $itemTypeId,
-                                'user_id'      => $uid,
-                                'add_date'     => new Zend_Db_Expr('NOW()')
-                            ));
-                        }
-
-                        $userValue->setFromArray(array(
-                            'update_date' => new Zend_Db_Expr('NOW()')
-                        ));
-                        $userValue->save();
-
-                        if (!$userValueData) {
-                            $userValueData = $userValueDataTable->fetchNew();
-                            $userValueData->setFromArray(array(
-                                'attribute_id' => $attribute['id'],
-                                'item_id'      => $itemId,
-                                'item_type_id' => $itemTypeId,
-                                'user_id'      => $uid
-                            ));
-                        }
-
-                        $userValueData->value = $value;
-                        $userValueData->save();
-
-                        $somethingChanged = $this->_updateActualValue($attribute, $itemTypeId, $itemId);
-                    }
-
-                } else {
-
-                    $needUpdate = false;
-                    // удаляем дескриптор значения
-                    $userValue = $userValueTable->fetchRow(array(
-                        'attribute_id = ?' => $attribute['id'],
-                        'item_id = ?'      => $itemId,
-                        'item_type_id = ?' => $itemTypeId,
-                        'user_id = ?'      => $uid,
-                    ));
-                    if ($userValue) {
-                        $userValue->delete();
-                        $needUpdate = true;
-                    }
-                    // удаляем значение
-                    $userValueData = $userValueDataTable->fetchRow(array(
-                        'attribute_id = ?' => $attribute['id'],
-                        'item_id = ?'      => $itemId,
-                        'item_type_id = ?' => $itemTypeId,
-                        'user_id = ?'      => $uid,
-                    ));
-                    if ($userValueData) {
-                        $userValueData->delete();
-                        $needUpdate = true;
-                    }
-                    if ($needUpdate) {
-                        $somethingChanged = $this->_updateActualValue($attribute, $itemTypeId, $itemId);
-                    }
-                }
-            }
-
-            if ($somethingChanged) {
-                $this->_propagateInheritance($attribute, $itemTypeId, $itemId);
-
-                $this->_propageteEngine($attribute, $itemTypeId, $itemId);
-            }
+        foreach ($values as $attributeId => $value) {
+            $this->setUserValue(
+                $user->id,
+                $attributeId,
+                $zone->item_type_id,
+                $form->getItemId(),
+                $value
+            );
         }
 
     }
@@ -1606,7 +1622,7 @@ class Application_Service_Specifications
                     $ratios[$matchRegIdx] = 0;
                     $freshness[$matchRegIdx] = null;
                 }
-                $ratios[$matchRegIdx] += 1; // $user->getExpertLevel()
+                $ratios[$matchRegIdx] += $this->getUserValueWeight($uid);
                 if ($freshness[$matchRegIdx] < $row->update_date) {
                     $freshness[$matchRegIdx] = $row->update_date;
                 }
@@ -1907,18 +1923,19 @@ class Application_Service_Specifications
         } else {
 
             // descriptor
-            $row = $valueTable->fetchRow(array(
+            $valueRow = $valueTable->fetchRow(array(
                 'attribute_id = ?' => $attribute['id'],
                 'item_id = ?'      => $itemId,
                 'item_type_id = ?' => $itemTypeId
             ));
-            if (!$row) {
-                $row = $valueTable->createRow(array(
+            if (!$valueRow) {
+                $valueRow = $valueTable->createRow(array(
                     'attribute_id' => $attribute['id'],
                     'item_id'      => $itemId,
-                    'item_type_id' => $itemTypeId
+                    'item_type_id' => $itemTypeId,
+                    'update_date'  => new Zend_Db_Expr('now()')
                 ));
-                $row->save();
+                $valueRow->save();
                 $somethingChanges = true;
             }
 
@@ -1973,6 +1990,11 @@ class Application_Service_Specifications
                     }
                 }
 
+            }
+
+            if ($somethingChanges) {
+                $valueRow->update_date = new Zend_Db_Expr('now()');
+                $valueRow->save();
             }
         }
 
@@ -2411,8 +2433,14 @@ class Application_Service_Specifications
             $values[] = $this->_valueToText($attribute, $row->value);
         }
 
-        if (count($values)) {
+        if (count($values) > 1) {
             return implode(', ', $values);
+        } elseif (count($values) == 1) {
+            if ($values[0] === null) {
+                return null;
+            } else {
+                return $values[0];
+            }
         }
 
         return null;
@@ -2672,5 +2700,360 @@ class Application_Service_Specifications
         }
 
         return $this->_types[$typeId];
+    }
+
+    public function refreshConflictFlag($attributeId, $itemTypeId, $itemId)
+    {
+        if (!$attributeId) {
+            throw new Exception("attributeId not provided");
+        }
+
+        if (!$itemTypeId) {
+            throw new Exception("itemTypeId not provided");
+        }
+
+        if (!$itemId) {
+            throw new Exception("itemId not provided");
+        }
+
+        $attribute = $this->_getAttribute($attributeId);
+        if (!$attribute) {
+            throw new Exception("Attribute not found");
+        }
+
+        $userValueTable = $this->_getUserValueTable();
+        $userValueRows = $userValueTable->fetchAll(array(
+            'attribute_id = ?' => $attribute['id'],
+            'item_id = ?'      => $itemId,
+            'item_type_id = ?' => $itemTypeId
+        ));
+
+        $userValues = [];
+        $uniqueValues = [];
+        foreach ($userValueRows as $userValueRow) {
+            $v = $this->getUserValue($attribute['id'], $itemTypeId, $itemId, $userValueRow['user_id']);
+            $serializedValue = serialize($v);
+            $uniqueValues[] = $serializedValue;
+            $userValues[$userValueRow['user_id']] = array(
+                'value' => $serializedValue,
+                'date'  => $userValueRow['update_date']
+            );
+        }
+
+        $uniqueValues = array_unique($uniqueValues);
+        $hasConflict = count($uniqueValues) > 1;
+
+        $valueRow = $this->_getValueTable()->fetchRow(array(
+            'attribute_id = ?' => $attribute['id'],
+            'item_id = ?'      => $itemId,
+            'item_type_id = ?' => $itemTypeId
+        ));
+
+        if (!$valueRow) {
+            return;
+            //throw new Exception("Value row not found");
+        }
+
+        $valueRow->conflict = $hasConflict ? 1 : 0;
+        $valueRow->save();
+
+        $affectedUserIds = [];
+
+        if ($hasConflict) {
+            $actualValue = serialize($this->getActualValue($attributeId, $itemId, $itemTypeId));
+
+            $minDate = null; // min date of actual value
+            $actualValueVoters = 0;
+            foreach ($userValues as $userId => $userValue) {
+                if ($userValue['value'] == $actualValue) {
+                    $actualValueVoters++;
+                    if ($minDate === null || $minDate > $userValue['date']) {
+                        $minDate = $userValue['date'];
+                    }
+                }
+            }
+
+            foreach ($userValues as $userId => $userValue) {
+                $matchActual = $userValue['value'] == $actualValue;
+                $conflict = $matchActual ? -1 : 1;
+
+                if ($actualValueVoters > 1) {
+                    if ($matchActual) {
+                        $isFirstMatchActual = $userValue['date'] == $minDate;
+                        $weight = $isFirstMatchActual ? self::WEIGHT_FIRST_ACTUAL : self::WEIGHT_SECOND_ACTUAL;
+                    } else {
+                        $weight = self::WEIGHT_WRONG;
+                    }
+                } else {
+                    $weight = self::WEIGHT_NONE;
+                }
+
+                $affectedRows = $userValueTable->update(array(
+                    'conflict' => $conflict,
+                    'weight'   => $weight
+                ), array(
+                    'user_id = ?'      => $userId,
+                    'attribute_id = ?' => $attributeId,
+                    'item_id = ?'      => $itemId,
+                    'item_type_id = ?' => $itemTypeId
+                ));
+
+                if ($affectedRows) {
+                    $affectedUserIds[] = $userId;
+                }
+            }
+        } else {
+            $affectedRows = $userValueTable->update(array(
+                'conflict' => 0,
+                'weight'   => self::WEIGHT_NONE
+            ), array(
+                'attribute_id = ?' => $attributeId,
+                'item_id = ?'      => $itemId,
+                'item_type_id = ?' => $itemTypeId
+            ));
+
+            if ($affectedRows) {
+                $affectedUserIds = array_keys($userValues);
+            }
+        }
+
+        $this->refreshUserConflicts($affectedUserIds);
+    }
+
+    public function refreshUserConflicts($userId)
+    {
+        $userId = (array)$userId;
+
+        if (count($userId)) {
+            $userValueTable = $this->_getUserValueTable();
+            $db = $userValueTable->getAdapter();
+
+            $pSelect = $db->select()
+                ->from($userValueTable->info('name'), 'sum(weight)')
+                ->where('user_id = users.id')
+                ->where('weight > 0')
+                ->assemble();
+
+            $nSelect = $db->select()
+                ->from($userValueTable->info('name'), 'abs(sum(weight))')
+                ->where('user_id = users.id')
+                ->where('weight < 0')
+                ->assemble();
+
+            $expr = new Zend_Db_Expr(
+                '1.5 * ((1 + IFNULL((' . $pSelect . '), 0)) / (1 + IFNULL((' . $nSelect . '), 0)))'
+            );
+
+            //print $expr . PHP_EOL;
+
+            $db->update('users', array(
+                'specs_weight' => $expr,
+            ), array(
+                'id IN (?)' => $userId
+            ));
+        }
+
+    }
+
+    public function refreshConflictFlags()
+    {
+        $valueTable = $this->_getValueTable();
+        $select = $valueTable->select(true)
+            ->distinct()
+            ->join(
+                'attrs_user_values',
+                'attrs_values.attribute_id = attrs_user_values.attribute_id ' .
+                    'and attrs_values.item_id = attrs_user_values.item_id ' .
+                    'and attrs_values.item_type_id = attrs_user_values.item_type_id',
+                null
+            )
+            ->where('attrs_user_values.conflict');
+
+        foreach ($valueTable->fetchAll($select) as $valueRow) {
+            print $valueRow['attribute_id'] . '#' . $valueRow['item_type_id'] . '#' . $valueRow['item_id'] . PHP_EOL;
+            $this->refreshConflictFlag($valueRow['attribute_id'], $valueRow['item_type_id'], $valueRow['item_id']);
+        }
+    }
+
+    public function refreshItemConflictFlags($typeId, $itemId)
+    {
+        $valueTable = $this->_getUserValueTable();
+        $select = $valueTable->select(true)
+            ->where('attrs_user_values.item_id = ?', (int)$itemId)
+            ->where('attrs_user_values.item_type_id = ?', (int)$typeId);
+
+        foreach ($valueTable->fetchAll($select) as $valueRow) {
+            //print $valueRow['attribute_id'] . '#' . $valueRow['item_type_id'] . '#' . $valueRow['item_id'] . PHP_EOL;
+            $this->refreshConflictFlag($valueRow['attribute_id'], $valueRow['item_type_id'], $valueRow['item_id']);
+        }
+    }
+
+    public function getConflicts($userId, $filter, $page, $perPage)
+    {
+        $userId = (int)$userId;
+
+        $valueTable = $this->_getValueTable();
+        $select = $valueTable->select(true)
+            ->join(
+                'attrs_user_values',
+                'attrs_values.attribute_id = attrs_user_values.attribute_id ' .
+                    'and attrs_values.item_id = attrs_user_values.item_id ' .
+                    'and attrs_values.item_type_id = attrs_user_values.item_type_id',
+                null
+            )
+            ->where('attrs_user_values.user_id = ?', $userId)
+            ->order('attrs_values.update_date desc');
+
+        if ($filter == 'minus-weight') {
+            $select->where('attrs_user_values.weight < 0');
+        } elseif ($filter == 0) {
+            $select->where('attrs_values.conflict');
+        } elseif ($filter > 0) {
+            $select->where('attrs_user_values.conflict > 0');
+        } elseif ($filter < 0) {
+            $select->where('attrs_user_values.conflict < 0');
+        }
+
+        $userValueTable = $this->_getUserValueTable();
+
+        $paginator = Zend_Paginator::factory($select)
+            ->setItemCountPerPage($perPage)
+            ->setCurrentPageNumber($page);
+
+        $conflicts = [];
+        foreach ($paginator->getCurrentItems() as $valueRow) {
+
+            // other users values
+            $userValueRows = $userValueTable->fetchAll(array(
+                'attribute_id = ?' => $valueRow['attribute_id'],
+                'item_id = ?'      => $valueRow['item_id'],
+                'item_type_id = ?' => $valueRow['item_type_id'],
+                'user_id <> ?'     => $userId
+            ));
+
+            $values = [];
+            foreach ($userValueRows as $userValueRow) {
+                $values[] = array(
+                    'value'  => $this->getUserValueText(
+                        $userValueRow['attribute_id'],
+                        $userValueRow['item_type_id'],
+                        $userValueRow['item_id'],
+                        $userValueRow['user_id']
+                    ),
+                    'userId' => $userValueRow['user_id']
+                );
+            }
+
+            // my value
+            $userValueRow = $userValueTable->fetchRow(array(
+                'attribute_id = ?' => $valueRow['attribute_id'],
+                'item_id = ?'      => $valueRow['item_id'],
+                'item_type_id = ?' => $valueRow['item_type_id'],
+                'user_id = ?'      => $userId
+            ));
+            $value = null;
+            if ($userValueRow) {
+                $value = $this->getUserValueText(
+                    $userValueRow['attribute_id'],
+                    $userValueRow['item_type_id'],
+                    $userValueRow['item_id'],
+                    $userValueRow['user_id']
+                );
+            }
+
+            $attribute = $this->_getAttribute($valueRow['attribute_id']);
+
+            $unit = null;
+            if ($attribute['unitId']) {
+                $unit = $this->getUnit($attribute['unitId']);
+            }
+
+            $attributeName = [];
+            $cAttr = $attribute;
+            do {
+                $attributeName[] = $cAttr['name'];
+                $cAttr = $this->_getAttribute($cAttr['parentId']);
+            } while ($cAttr);
+
+            $conflicts[] = array(
+                'itemId'     => $valueRow['item_id'],
+                'itemTypeId' => $valueRow['item_type_id'],
+                'attribute'  => implode(' / ', array_reverse($attributeName)),
+                'unit'       => $unit,
+                'values'     => $values,
+                'value'      => $value
+            );
+        }
+
+        return array(
+            'conflicts' => $conflicts,
+            'paginator' => $paginator
+        );
+    }
+
+    public function refreshUserConflictsStat()
+    {
+        $userValueTable = $this->_getUserValueTable();
+        $db = $userValueTable->getAdapter();
+
+        $userIds = $db->fetchCol(
+            $db->select()
+                ->distinct()
+                ->from($userValueTable->info('name'), array('user_id'))
+        );
+
+        $this->refreshUserConflicts($userIds);
+    }
+
+    public function refreshUsersConflictsStat()
+    {
+        $userValueTable = $this->_getUserValueTable();
+        $db = $userValueTable->getAdapter();
+
+        $pSelect = $db->select()
+            ->from($userValueTable->info('name'), 'sum(weight)')
+            ->where('user_id = users.id')
+            ->where('weight > 0')
+            ->assemble();
+
+        $nSelect = $db->select()
+            ->from($userValueTable->info('name'), 'abs(sum(weight))')
+            ->where('user_id = users.id')
+            ->where('weight < 0')
+            ->assemble();
+
+        $expr = new Zend_Db_Expr(
+            '1.5 * ((1 + IFNULL((' . $pSelect . '), 0)) / (1 + IFNULL((' . $nSelect . '), 0)))'
+        );
+
+        //print $expr . PHP_EOL;
+
+        $db->update('users', array(
+            'specs_weight' => $expr,
+        ));
+    }
+
+    /*public static function valueWeight($positives, $negatives) {
+        if ($negatives <= 1) {
+            $negatives = 1;
+        }
+        if ($positives <= 1) {
+            $positives = 1;
+        }
+        return 1 * $positives / ($negatives / 1.5);
+    }*/
+
+    public function getUserValueWeight($userId)
+    {
+        if (!array_key_exists($userId, $this->_valueWeights)) {
+            $userRow = $this->_getUserTable()->find($userId)->current();
+            if ($userRow) {
+                $this->_valueWeights[$userId] = $userRow->specs_weight;
+            } else {
+                $this->_valueWeights[$userId] = 1;
+            }
+        }
+
+        return $this->_valueWeights[$userId];
     }
 }

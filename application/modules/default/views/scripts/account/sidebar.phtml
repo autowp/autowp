@@ -62,6 +62,18 @@
             'count'    => $this->subscribesCount,
         ),
         array(
+            'name'   => 'Specifications',
+        ),
+        array(
+            'active' => $this->page(188)->onPath,
+            'url'    => $this->url(array(
+                'controller' => 'account',
+                'action'     => 'specs-conflicts'
+            ), 'account', true),
+            'icon'   => 'folder-close',
+            'name'   => $this->page(188)->name
+        ),
+        array(
             'name'   => $this->page(49)->name,
         ),
         array(
@@ -96,6 +108,7 @@
             'count'    => $this->smCount,
             'newCount' => $this->newSmCount
         ),
+
     );
 ?>
 <div class="well">

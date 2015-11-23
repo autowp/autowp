@@ -1,33 +1,46 @@
 define(
     'default/picture',
-    ['jquery', 'bootstrap', 'gallery'],
-    function($, Bootstrap, Gallery) {
+    ['jquery', 'bootstrap', 'gallery', 'gallery2'],
+    function($, Bootstrap, Gallery, Gallery2) {
         return {
             init: function(options) {
                 
                 var gallery;
                 
-                if (options.gallery && options.gallery.items && options.gallery.items.length) {
+                $('.picture-preview-medium a').on('click', function(e) {
+                    e.preventDefault();
                     
-                    $('.picture-preview-medium a').on('click', function(e) {
-                        e.preventDefault();
+                    if (options.gallery2) {
                         
                         if (!gallery) {
-                            gallery = new Gallery(options.gallery);
+                            gallery = new Gallery2({
+                                url: options.galleryUrl,
+                                current: options.gallery.current
+                            });
                             gallery.show();
                         } else {
                             gallery.show();
                             gallery.rewindToId(options.gallery.current);
                         }
                         
-                    });
+                    } else {
                     
-                } else {
-                    $('.picture-preview-medium a').on('click', function() {
-                        window.open($(this).attr('href'), '_blank');
-                        return false;
-                    });
-                }
+                        if (!gallery) {
+                            $.get(options.galleryUrl, function(data) {
+                                gallery = new Gallery({
+                                    current: options.gallery.current,
+                                    items: data
+                                });
+                                gallery.show();
+                            });
+                        } else {
+                            gallery.show();
+                            gallery.rewindToId(options.gallery.current);
+                        }
+                        
+                    }
+                    
+                });
             }
         }
     }

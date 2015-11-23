@@ -1,5 +1,8 @@
 <?php
-    $classes = array('picture-preview', $this->colClass);
+    $classes = array('picture-preview');
+    if (isset($this->colClass)) {
+        $classes[] = $this->colClass;
+    }
     if ($this->moderVote !== null) {
         if ($this->moderVote > 0) {
             $classes[] = 'vote-accept';
@@ -21,53 +24,7 @@
         <div class="caption">
             <p><?=$this->htmlA($this->url, $this->name)?></p>
             <?php if (!$this->disableBehaviour) { ?>
-                <p class="picture-behaviour">
-                    <?php if ($this->isModer) { ?>
-                        <span title="Status">
-                            <?php
-                                switch ($this->status) {
-                                    case Picture::STATUS_ACCEPTED: ?><span class="glyphicon glyphicon-ok text-success"></span><?php break;
-                                    case Picture::STATUS_NEW:      ?><span class="glyphicon glyphicon-hourglass text-warning"></span><?php break;
-                                    case Picture::STATUS_INBOX:    ?><span class="glyphicon glyphicon-hourglass text-warning"></span><?php break;
-                                    case Picture::STATUS_REMOVED:  ?><span class="glyphicon glyphicon-trash text-danger"></span><?php break;
-                                    case Picture::STATUS_REMOVING: ?><span class="glyphicon glyphicon-trash text-danger"></span><?php break;
-                                }
-                            ?>
-                        </span>
-                    <?php } ?>
-
-                    <span title="<?=$this->escape($this->translate('Resolution'))?>">
-                        <?=$this->escape($this->resolution)?>
-                        <?php if ($this->isModer && $this->cropped) { ?>
-                            <span class="glyphicon glyphicon-scissors" style="cursor:help" title="На картинке выделена область автомобиля (<?=$this->escape($this->cropResolution)?>)"></span>
-                        <?php } ?>
-                        <?php /*<i class="fa fa-file-image-o"></i>*/?>
-                    </span>
-
-                    <span class="pull-right">
-
-                        <span title="<?=$this->escape($this->translate('Views'))?>">
-                            <?=$this->escape($this->views > 1000 ? round($this->views / 1000) . 'K' : $this->views)?>
-                            <span class="glyphicon glyphicon-eye-open"></span>
-                        </span>
-
-                        <span title="<?=$this->escape($this->translate('Comments count'))?>">
-                            <?php if ($this->newMsgCount > 0) { ?>
-                                <?=$this->htmlA(
-                                    $this->url. '#comments',
-                                    ($this->msgCount > $this->newMsgCount ? $this->msgCount - $this->newMsgCount : '') .
-                                    '<span class="text-danger">' . $this->escape('+'.$this->newMsgCount) .'</span> ' .
-                                    '<span class="glyphicon glyphicon-comment text-danger"></span>',
-                                    false
-                                )?>
-                            <?php } elseif ($this->msgCount > 0) { ?>
-                                <?=$this->htmlA($this->url. '#comments', $this->msgCount . ' <span class="glyphicon glyphicon-comment"></span>', false)?>
-                            <?php } else { ?>
-
-                            <?php } ?>
-                        </span>
-                    </span>
-                </p>
+                <?=$this->render('picture-behaviour.phtml')?>
             <?php } ?>
         </div>
     </div>

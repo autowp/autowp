@@ -20,7 +20,6 @@ class Project_View_Helper_Pic extends Zend_View_Helper_HtmlElement
             $identity = $this->_picture->identity ? $this->_picture->identity : $this->_picture->id;
 
             return $this->view->url(array(
-                'module'     => 'default',
                 'controller' => 'picture',
                 'action'     => 'index',
                 'picture_id' => $identity

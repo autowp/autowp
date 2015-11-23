@@ -19,6 +19,7 @@ class Application_Form_Login extends Project_Form
             'elements'   => array(
                 array('User_Login', 'login', array(
                     'required'   => true,
+                    'autocomplete' => 'email',
                     'decorators' => array('ViewHelper'),
                 )),
                 array('password', 'password', array(

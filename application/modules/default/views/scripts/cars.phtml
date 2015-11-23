@@ -15,7 +15,7 @@
                                     $item['produced_exactly'] ? 'carlist/produced/%1$s' : 'carlist/produced-about/%1$s',
                                     null,
                                     $item['produced']
-                                ), $item['produced'])
+                                ), Zend_Locale_Format::toNumber($item['produced']))
                             )?>
                         <?php } else {?>
                             <?=$this->escape($this->translate('carlist/produced/one'))?>

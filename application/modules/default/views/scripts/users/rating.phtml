@@ -27,6 +27,9 @@
             <th></th>
             <th></th>
             <th class="text-right"><?=$this->escape($this->valueTitle)?></th>
+            <?php if ($this->rating == 'specs') { ?>
+                <th class="text-right">Weight</th>
+            <?php } ?>
         </tr>
     </thead>
     <tbody>
@@ -44,6 +47,18 @@
                     <?php } ?>
                 </td>
                 <td class="text-right"><?=number_format($user['volume'], 0 , '.', ' ')?></td>
+                <?php if ($this->rating == 'specs') { ?>
+                    <?php
+                        if ($user['weight'] < 0.50) {
+                            $class = 'danger';
+                        } elseif ($user['weight'] < 1.50) {
+                            $class = 'warning';
+                        } else {
+                            $class = '';
+                        }
+                    ?>
+                    <td class="text-right <?=$class?>"><?=number_format($user['weight'], 2 , '.', ' ')?></td>
+                <?php } ?>
             </tr>
         <?php } ?>
     </tbody>

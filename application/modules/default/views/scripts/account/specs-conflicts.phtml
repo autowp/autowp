@@ -1,0 +1,89 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 188,
+    ));
+
+    //$this->layout()->moduleName = 'default/account/specs-conflicts';
+?>
+
+<p class="pull-right">
+    Weight: <?=number_format($this->weight, 2 , '.', ' ')?>
+</p>
+
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <li<?=$this->filter == '0' ? ' class="active"' : ''?>>
+        <?=$this->htmlA($this->url(array(
+            'conflict' => null,
+            'page'     => null
+        )), 'Все')?>
+    </li>
+    <li<?=$this->filter == '-1' ? ' class="active"' : ''?>>
+        <?=$this->htmlA($this->url(array(
+            'conflict' => -1,
+            'page'     => null
+        )), 'Я не согласен')?>
+    </li>
+    <li<?=$this->filter == '1' ? ' class="active"' : ''?>>
+        <?=$this->htmlA($this->url(array(
+            'conflict' => 1,
+            'page'     => null
+        )), 'Не согласны со мной')?>
+    </li>
+    <li<?=$this->filter == 'minus-weight' ? ' class="active"' : ''?>>
+        <?=$this->htmlA($this->url(array(
+            'conflict' => 'minus-weight',
+            'page'     => null
+        )), 'Ошибки')?>
+    </li>
+</ul>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Объект</th>
+            <th>Характеристика</th>
+            <th>Моё значение</th>
+            <th>Другие значения</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->conflicts as $conflict) { ?>
+            <tr>
+                <td>
+                    <?=$this->escape($conflict['object'])?>
+                </td>
+                <td><?=$this->escape($conflict['attribute'])?></td>
+                <td>
+                    <?php if ($conflict['value'] === null) { ?>
+                        <em>нет</em>
+                    <?php } else { ?>
+                        <?=$this->escape($conflict['value'])?>
+                        <?php if ($conflict['unit']) { ?>
+                            <?=$this->escape($conflict['unit']['abbr'])?>
+                        <?php } ?>
+                    <?php } ?>
+
+                    <?=$this->htmlA($conflict['url'], '<span class="glyphicon glyphicon-pencil"></span>', false)?>
+                </td>
+                <td>
+                    <?php foreach ($conflict['values'] as $value) { ?>
+                        <?php if ($value['value'] === null) { ?>
+                            <em>нет</em>
+                        <?php } else { ?>
+                            <?=$this->escape($value['value'])?>
+                            <?=$this->escape($conflict['unit']['abbr'])?>
+                        <?php } ?>
+                        <?=$this->user($value['user'])?>
+                        <br />
+                    <?php } ?>
+                </td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>
+<?=$this->paginationControl($this->paginator) ?>

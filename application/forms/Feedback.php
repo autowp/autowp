@@ -24,7 +24,8 @@ class Application_Form_Feedback extends Project_Form
                     'maxlength'  => 255,
                     'size'       => 80,
                     'decorators' => array('ViewHelper'),
-                    'class'      => 'span5'
+                    'class'      => 'span5',
+                    'autocomplete' => 'name',
                 )),
                 array('text', 'email', array(
                     'label'      => 'E-mail',
@@ -34,7 +35,8 @@ class Application_Form_Feedback extends Project_Form
                     'maxlength'  => 255,
                     'size'       => 80,
                     'decorators' => array('ViewHelper'),
-                    'class'      => 'span5'
+                    'class'      => 'span5',
+                    'autocomplete' => 'email',
                 )),
                 array('textarea', 'message', array(
                     'required'   => true,

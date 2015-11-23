@@ -106,7 +106,7 @@ class Project_Controller_Router_Route_Twins extends Project_Controller_Router_Ro
 
                     if (preg_match('|^page([0-9]+)$|', $path[0], $match)) {
                         $page = intval($match[1]);
-                        array_pop($path);
+                        array_shift($path);
 
                         if (!$path) {
                             // twins/groupX/pictures/pageX
@@ -121,7 +121,7 @@ class Project_Controller_Router_Route_Twins extends Project_Controller_Router_Ro
                     }
 
                     $pictureId = $path[0];
-                    array_pop($path);
+                    array_shift($path);
 
                     if (!$path) {
                         // twins/groupX/pictures/:picture
@@ -130,6 +130,21 @@ class Project_Controller_Router_Route_Twins extends Project_Controller_Router_Ro
                             'twins_group_id' => $twinsGroupId,
                             'picture_id'     => $pictureId
                         ));
+                    }
+
+                    if ($path[0] == 'gallery') {
+                        array_shift($path);
+
+                        if (!$path) {
+                            // twins/groupX/pictures/:picture
+                            return $this->_assembleMatch(array(
+                                'action'         => 'picture-gallery',
+                                'twins_group_id' => $twinsGroupId,
+                                'picture_id'     => $pictureId
+                            ));
+                        }
+
+                        return false;
                     }
 
                     break;
@@ -220,6 +235,13 @@ class Project_Controller_Router_Route_Twins extends Project_Controller_Router_Ro
                 $url[] = 'group' . $data['twins_group_id'];
                 $url[] = 'pictures';
                 $url[] = $data['picture_id'];
+                break;
+
+            case 'picture-gallery':
+                $url[] = 'group' . $data['twins_group_id'];
+                $url[] = 'pictures';
+                $url[] = $data['picture_id'];
+                $url[] = 'gallery';
                 break;
 
             case 'index':

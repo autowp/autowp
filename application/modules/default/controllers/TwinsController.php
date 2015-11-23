@@ -380,7 +380,7 @@ class TwinsController extends Zend_Controller_Action
         $this->_loadBrands(array());
     }
 
-    public function pictureAction()
+    private function _pictureAction($callback)
     {
         $twins = $this->_getTwins();
 
@@ -408,17 +408,47 @@ class TwinsController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
         }
 
-        $this->_loadBrands($twins->getGroupBrandIds($group['id']));
+        $callback($group, $picture);
+    }
 
-        $picSelect = $twins->getGroupPicturesSelect($this->_getParam('twins_group_id'), array(
-            'ordering' => $this->_helper->catalogue()->picturesOrdering()
-        ));
+    public function pictureAction()
+    {
+        $this->_pictureAction(function($group, $picture) {
 
-        $data = $this->_helper->pic->picPageData($picture, $picSelect, array());
+            $twins = $this->_getTwins();
 
-        $this->view->assign($data);
-        $this->view->assign(array(
-            'group' => $group,
-        ));
+            $this->_loadBrands($twins->getGroupBrandIds($group['id']));
+
+            $select = $twins->getGroupPicturesSelect($group['id'], array(
+                'ordering' => $this->_helper->catalogue()->picturesOrdering()
+            ));
+
+            $data = $this->_helper->pic->picPageData($picture, $select, array());
+
+            $this->view->assign($data);
+            $this->view->assign(array(
+                'group'      => $group,
+                'gallery2'   => true,
+                'galleryUrl' => $this->_helper->url->url(array(
+                    'action' => 'picture-gallery'
+                ))
+            ));
+        });
+    }
+
+    public function pictureGalleryAction()
+    {
+        $this->_pictureAction(function($group, $picture) {
+
+            $select = $this->_getTwins()->getGroupPicturesSelect($group['id'], array(
+                'ordering' => $this->_helper->catalogue()->picturesOrdering()
+            ));
+
+            return $this->_helper->json($this->_helper->pic->gallery2($select, array(
+                'page'      => $this->getParam('page'),
+                'pictureId' => $this->getParam('pictureId')
+            )));
+
+        });
     }
 }

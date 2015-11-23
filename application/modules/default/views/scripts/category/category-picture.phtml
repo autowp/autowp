@@ -1,0 +1,35 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 184,
+        'args'   => array(
+            'PICTURE_NAME'        => $this->picture['name'],
+            'CATEGORY_SHORT_NAME' => $this->categoryLang ? $this->categoryLang->short_name : $this->category->short_name,
+            'CATEGORY_NAME'       => $this->categoryLang ? $this->categoryLang->name : $this->category->name,
+            'CATEGORY_CATNAME'    => $this->category->catname
+        ),
+        'breadcrumbsReplace' => array(
+            'pageId'      => 23,
+            'breadcrumbs' => $this->breadcrumbs
+        )
+    ));
+?>
+<div class="row">
+    <div class="col-lg-4 col-md-4">
+        <div class="well nav-tree">
+            <?=$this->partial('category/menu.phtml', array(
+                'categories' => $this->categories,
+                'category'   => $this->category,
+                'isOther'    => $this->isOther,
+                'deep'       => 1
+            ))?>
+        </div>
+    </div>
+    <div class="col-lg-8 col-md-8">
+        <?=$this->partial('picture/picture.phtml', $this->picture)?>
+    </div>
+</div>

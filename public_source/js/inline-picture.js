@@ -29,8 +29,9 @@ define(
             }).hide();
             
             this.over = function() {
-                if (this.timer)
+                if (this.timer) {
                     clearTimeout(this.timer);
+                }
                     
                 var $img = this.$element;
                 var offset = $img.position();
@@ -44,6 +45,7 @@ define(
             }
             
             this.out = function() {
+                console.log('inline-picture-preview', 'out');
                 var self = this;
                 this.timer = setTimeout(function() {
                     self.$details.fadeOut(300);

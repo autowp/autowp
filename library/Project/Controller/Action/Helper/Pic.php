@@ -34,10 +34,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         $urlHelper = $this->getActionController()->getHelper('Url');
 
         return $urlHelper->url(array(
-            'module'     => 'default',
-            'controller' => 'picture',
-            'action'     => 'index',
-            'picture_id' => $identity ? $identity : $id
+            'picture_id' => $identity ? $identity : $id,
         ), 'picture', true);
     }
 
@@ -115,6 +112,19 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                 $views = $this->getPictureViewTable()->getValues($ids);
             }
 
+            // messages
+            $messages = array();
+            if (!$options['disableBehaviour'] && count($ids)) {
+                $ctTable = new Comment_Topic();
+                $db = $ctTable->getAdapter();
+                $messages = $db->fetchPairs(
+                    $ctTable->select()
+                        ->from($ctTable->info('name'), array('item_id', 'messages'))
+                        ->where('item_id in (?)', $ids)
+                        ->where('type_id = ?', Comment_Message::PICTURES_TYPE_ID)
+                );
+            }
+
             foreach ($rows as &$row) {
                 $id = $row['id'];
                 if (isset($moderVotes[$id])) {
@@ -130,6 +140,11 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                         $row['views'] = $views[$id];
                     } else {
                         $row['views'] = 0;
+                    }
+                    if (isset($messages[$id])) {
+                        $row['messages'] = $messages[$id];
+                    } else {
+                        $row['messages'] = 0;
                     }
                 }
             }
@@ -291,6 +306,9 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         $designProject = null;
         $categories = array();
 
+        $car = null;
+        $carDetailsUrl = null;
+
         $language = $controller->getHelper('language')->direct();
 
         switch ($picture->type) {
@@ -397,7 +415,8 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                 }
                 break;
             case Picture::CAR_TYPE_ID:
-                if ($car = $picture->findParentCars()) {
+                $car = $picture->findParentCars();
+                if ($car) {
 
                     // alt names
                     $altNames = array();
@@ -475,6 +494,20 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                             ), 'category', true)
                         );
                     }
+
+                    if ($car->html) {
+                        foreach ($catalogue->cataloguePaths($car) as $path) {
+                            $carDetailsUrl = $urlHelper->url(array(
+                                'module'        => 'default',
+                                'controller'    => 'catalogue',
+                                'action'        => 'brand-car',
+                                'brand_catname' => $path['brand_catname'],
+                                'car_catname'   => $path['car_catname'],
+                                'path'          => $path['path']
+                            ), 'catalogue', true);
+                            break;
+                        }
+                    }
                 }
                 break;
         }
@@ -518,7 +551,6 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
 
             switch ($picture->type) {
                 case Picture::CAR_TYPE_ID:
-                    $car = $picture->findParentCars();
                     if ($car) {
                         $url = $urlHelper->url(array(
                             'module'     => 'moder',
@@ -615,26 +647,63 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         $previewUrl = $preview ? $preview->getSrc() : null;
 
 
-        $gallery = false;
         $paginator = false;
-        $paginatorPictures = false;
+        $pageNumbers = false;
 
         if ($picSelect) {
-            $gallery = $this->_gallery($picSelect);
-            $paginatorPictures = $pictureTable->fetchAll($picSelect);
 
-            $pageNumber = 0;
-            foreach ($paginatorPictures as $n => $p) {
-                if ($p->id == $picture->id) {
-                    $pageNumber = $n+1;
-                    break;
+            $paginator = Zend_Paginator::factory($picSelect);
+
+            $total = $paginator->getTotalItemCount();
+
+            if ($total < 500) {
+
+                $db = $pictureTable->getAdapter();
+
+                $paginatorPictures = $db->fetchAll(
+                    $db->select()
+                        ->from(array('_pic' => new Zend_Db_Expr('('.$picSelect->assemble() .')')), array('id', 'identity'))
+                );
+
+                //$paginatorPictures = $pictureTable->fetchAll($picSelect);
+
+                $pageNumber = 0;
+                foreach ($paginatorPictures as $n => $p) {
+                    if ($p['id'] == $picture->id) {
+                        $pageNumber = $n+1;
+                        break;
+                    }
                 }
-            }
 
-            $paginator = Zend_Paginator::factory($picSelect)
-                ->setItemCountPerPage(1)
-                ->setPageRange(15)
-                ->setCurrentPageNumber($pageNumber);
+                $paginator
+                    ->setItemCountPerPage(1)
+                    ->setPageRange(15)
+                    ->setCurrentPageNumber($pageNumber);
+
+                $pages = $paginator->getPages();
+
+                $pageNumbers = $pages->pagesInRange;
+                if (isset($pages->previous)) {
+                    $pageNumbers[] = $pages->previous;
+                }
+                if (isset($pages->next)) {
+                    $pageNumbers[] = $pages->next;
+                }
+
+                $pageNumbers = array_unique($pageNumbers);
+                $pageNumbers = array_combine($pageNumbers, $pageNumbers);
+
+                foreach($pageNumbers as $page => &$val) {
+                    $pic = $paginatorPictures[$page - 1];
+                    $val = $urlHelper->url(array(
+                        'picture_id' => $pic['identity'] ? $pic['identity'] : $pic['id']
+                    ));
+                }
+                unset($val);
+
+            } else {
+                $paginator = false;
+            }
         }
 
         $name = $picture->getCaption(array(
@@ -652,11 +721,10 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             'previewUrl'        => $previewUrl,
             'replacePicture'    => $replacePicture,
             'gallery'           => array(
-                'current' => $picture->id,
-                'items'   => $gallery
+                'current' => $picture->id
             ),
             'paginator'         => $paginator,
-            'paginatorPictures' => $paginatorPictures,
+            'paginatorPictures' => $pageNumbers,
             'engine'            => $engine,
             'engineCars'        => $engineCars,
             'engineHasSpecs'    => $engineHasSpecs,
@@ -668,7 +736,10 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             'altNames'          => $altNames2,
             'langName'          => $currentLangName,
             'designProject'     => $designProject,
-            'categories'        => $categories
+            'categories'        => $categories,
+            'carDetailsUrl'     => $carDetailsUrl,
+            'carHtml'           => $car ? $car->html : null,
+            'carDescription'    => $car ? $car->description : null,
         );
 
         // Обвновляем количество просмотров
@@ -678,17 +749,17 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         return $data;
     }
 
-    private function _gallery(Zend_Db_Table_Select $picSelect)
+    public function gallery(Zend_Db_Table_Select $picSelect)
     {
         $galleryStatuses = array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW);
 
         $gallery = array();
 
-        $commentTopicTable = new Comment_Topic();
-
         $controller = $this->getActionController();
         $userHelper = $controller->getHelper('user');
         $catalogue = $controller->getHelper('catalogue')->getCatalogue();
+        $urlHelper = $controller->getHelper('Url');
+
         $view = $controller->view;
 
         $language = $controller->getHelper('language')->direct();
@@ -794,9 +865,14 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
 
                     $name = isset($names[$id]) ? $names[$id] : null;
 
+                    $url = $urlHelper->url(array(
+                        'picture_id' => $row['identity'] ? $row['identity'] : $id,
+                        'gallery'    => null
+                    ));
+
                     $gallery[] = array(
                         'id'          => $id,
-                        'url'         => $this->url($id, $row['identity']),
+                        'url'         => $url,
                         'sourceUrl'   => $sUrl,
                         'crop'        => $crop,
                         'full'        => $full,
@@ -810,5 +886,196 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         }
 
         return $gallery;
+    }
+
+    public function gallery2(Zend_Db_Table_Select $picSelect, array $options = array())
+    {
+        $defaults = array(
+            'page'      => 1,
+            'pictureId' => null,
+            'route'     => null,
+            'urlParams' => []
+        );
+        $options = array_replace($defaults, $options);
+
+        $itemsPerPage = 10;
+
+        $galleryStatuses = array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW);
+
+        $gallery = array();
+
+        $controller = $this->getActionController();
+        $userHelper = $controller->getHelper('user');
+        $catalogue = $controller->getHelper('catalogue')->getCatalogue();
+        $urlHelper = $controller->getHelper('Url');
+
+        $view = $controller->view;
+
+        $language = $controller->getHelper('language')->direct();
+
+        if ($options['pictureId']) {
+            // look for page of that picture
+            $select = clone $picSelect;
+
+            $select
+                ->setIntegrityCheck(false)
+                ->reset(Zend_Db_Select::COLUMNS)
+                ->columns(array(
+                    'pictures.id'
+                ));
+
+            $col = $select->getAdapter()->fetchCol($select);
+            foreach ($col as $index => $id) {
+                if ($id == $options['pictureId']) {
+                    $options['page'] = ceil(($index+1) / $itemsPerPage);
+                    break;
+                }
+            }
+        }
+
+        $select = clone $picSelect;
+
+        $select
+            ->setIntegrityCheck(false)
+            ->reset(Zend_Db_Select::COLUMNS)
+            ->columns(array(
+                'pictures.id', 'pictures.identity', 'pictures.name',
+                'pictures.width', 'pictures.height',
+                'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
+                'pictures.image_id', 'pictures.filesize',
+                'pictures.brand_id', 'pictures.car_id', 'pictures.engine_id',
+                'pictures.perspective_id', 'pictures.type', 'pictures.factory_id'
+            ))
+            ->joinLeft(
+                array('ct' => 'comment_topic'),
+                'ct.type_id = :type_id and ct.item_id = pictures.id',
+                'messages'
+            )
+            ->bind(array(
+                'type_id' => Comment_Message::PICTURES_TYPE_ID
+            ));
+
+        $count = Zend_Paginator::factory($select)->getTotalItemCount();
+
+
+
+        $paginator = Zend_Paginator::factory($count)
+            ->setItemCountPerPage($itemsPerPage)
+            ->setCurrentPageNumber($options['page']);
+
+        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
+
+        $rows = $select->getAdapter()->fetchAll($select);
+
+
+
+        // prefetch
+        $fullRequests = array();
+        $cropRequests = array();
+        $imageIds = array();
+        foreach ($rows as $idx => $picture) {
+            $request = Pictures_Row::buildFormatRequest($picture);
+            $fullRequests[$idx] = $request;
+            if (Pictures_Row::checkCropParameters($picture)) {
+                $cropRequests[$idx] = $request;
+            }
+            $ids[] = (int)$picture['id'];
+            $imageIds[] = (int)$picture['image_id'];
+        }
+
+        // images
+        $imageStorage = $controller->getInvokeArg('bootstrap')
+            ->getResource('imagestorage');
+        $images = $imageStorage->getImages($imageIds);
+        $fullImagesInfo = $imageStorage->getFormatedImages($fullRequests, 'picture-gallery-full');
+        $cropImagesInfo = $imageStorage->getFormatedImages($cropRequests, 'picture-gallery');
+
+
+        // names
+        $pictureTable = new Picture();
+        $names = $pictureTable->getNames($rows, array(
+            'language' => $language
+        ));
+
+        // comments
+        $userId = null;
+        if ($userHelper->direct()->logedIn()) {
+            $userId = $userHelper->direct()->get()->id;
+        }
+
+        if ($userId) {
+            $ctTable = new Comment_Topic();
+            $newMessages = $ctTable->getNewMessages(
+                Comment_Message::PICTURES_TYPE_ID,
+                $ids,
+                $userId
+            );
+        }
+
+        $route = $options['route'] ? $options['route'] : null;
+
+
+        foreach ($rows as $idx => $row) {
+
+            $imageId = (int)$row['image_id'];
+
+            if ($imageId) {
+
+                $id = (int)$row['id'];
+
+                $image = isset($images[$imageId]) ? $images[$imageId] : null;
+                if ($image) {
+                    $sUrl = $image->getSrc();
+
+                    if (Pictures_Row::checkCropParameters($row)) {
+                        $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
+
+                        $crop['crop'] = array(
+                            'left'   => $row['crop_left'] / $image->getWidth(),
+                            'top'    => $row['crop_top'] / $image->getHeight(),
+                            'width'  => $row['crop_width'] / $image->getWidth(),
+                            'height' => $row['crop_height'] / $image->getHeight(),
+                        );
+
+                    } else {
+                        $crop = null;
+                    }
+
+                    $full = isset($fullImagesInfo[$idx]) ? $fullImagesInfo[$idx]->toArray() : null;
+
+                    $msgCount = $row['messages'];
+                    $newMsgCount = 0;
+                    if ($userId) {
+                        $newMsgCount = isset($newMessages[$id]) ? $newMessages[$id] : $msgCount;
+                    }
+
+                    $name = isset($names[$id]) ? $names[$id] : null;
+
+                    $url = $urlHelper->url(array_replace($options['urlParams'], array(
+                        'picture_id' => $row['identity'] ? $row['identity'] : $id,
+                        'gallery'    => null,
+                    )), $route);
+
+                    $gallery[] = array(
+                        'id'          => $id,
+                        'url'         => $url,
+                        'sourceUrl'   => $sUrl,
+                        'crop'        => $crop,
+                        'full'        => $full,
+                        'messages'    => $msgCount,
+                        'newMessages' => $newMsgCount,
+                        'name'        => $name,
+                        'filesize'    => $view->fileSize($row['filesize'])
+                    );
+                }
+            }
+        }
+
+        return array(
+            'page'  => $paginator->getCurrentPageNumber(),
+            'pages' => $paginator->count(),
+            'count' => $paginator->getTotalItemCount(),
+            'items' => $gallery
+        );
     }
 }

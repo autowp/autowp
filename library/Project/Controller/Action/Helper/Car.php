@@ -721,9 +721,6 @@ class Project_Controller_Action_Helper_Car
                     $url = $urlCallback($car, $picture);
                 } else {
                     $url = $urlHelper->url(array(
-                        'module'     => 'default',
-                        'controller' => 'picture',
-                        'action'     => 'index',
                         'picture_id' => $picture['identity'] ? $picture['identity'] : $pictureId
                     ), 'picture', true);
                 }

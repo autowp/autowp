@@ -341,9 +341,13 @@ class SidebarController extends Zend_Controller_Action
         );
 
         // сортируем группы
-        $coll = new Collator($this->_helper->language());
+        /*$coll = new Collator($this->_helper->language());
         usort($groups, function($a, $b) use($coll) {
             return $coll->compare($a['caption'], $b['caption']);
+        });*/
+
+        usort($groups, function($a, $b) {
+            return strnatcasecmp($a['caption'], $b['caption']);
         });
 
         $groups = array_merge(
