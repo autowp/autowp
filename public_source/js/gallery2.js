@@ -101,6 +101,7 @@ define(
             '<div class="gallery" tabindex="0">' +
                 '<div class="carousel slide">' +
                     '<ol class="carousel-indicators"></ol>' +
+                    '<div class="carousel-numbers"></div>' +
                     '<div class="carousel-inner"></div>' +
                     '<a class="left carousel-control" href="#" role="button">' +
                         '<span class="glyphicon glyphicon-chevron-left"></span>' +
@@ -120,6 +121,7 @@ define(
         }
         
         Gallery.prototype = {
+            MAX_INDICATORS: 80,
             init: function(options) {
                 
                 var self = this;
@@ -148,6 +150,7 @@ define(
                 this.$e.appendTo(document.body);
                 
                 this.$indicators = this.$e.find('.carousel-indicators');
+                this.$numbers = this.$e.find('.carousel-numbers');
                 
                 this.carousel = new Carousel(this.$carousel[0], {
                     wrap: false,
@@ -158,6 +161,9 @@ define(
                         self.fixArrows($item);
                         
                         var position = $item.data('position');
+                        
+                        self.position = position;
+                        self.refreshIndicator();
                         
                         self.loadSiblingPages(position);
                         
@@ -235,15 +241,17 @@ define(
                 this.load(self.current);
             },
             renderIndicator: function() {
-                if (!this.indicatorRendered) {
-                    for (var i=0; i<this.count; i++) {
-                        $('<li></li>', {
-                            'data-target': i,
-                            appendTo: this.$indicators
-                        });
+                if (this.count < this.MAX_INDICATORS) {
+                    if (!this.indicatorRendered) {
+                        for (var i=0; i<this.count; i++) {
+                            $('<li></li>', {
+                                'data-target': i,
+                                appendTo: this.$indicators
+                            });
+                        }
+                        
+                        this.indicatorRendered = true;
                     }
-                    
-                    this.indicatorRendered = true;
                 }
             },
             loadSiblingPages: function(index) {
@@ -307,10 +315,12 @@ define(
                         
                         if (active) {
                             $activeItem = $item;
+                            self.position = position;
                         }
                     });
                     
                     self.renderIndicator();
+                    self.refreshIndicator();
                     
                     if ($activeItem) {
                         $activeItem.addClass('active');
@@ -576,6 +586,8 @@ define(
             },
             rewindToPosition: function(position) {
                 var self = this;
+                this.position = position;
+                this.refreshIndicator();
                 this.$e.find('.item').each(function(idx) {
                     if ($(this).data('position') == position) {
                         self.carousel.to(idx)
@@ -589,12 +601,20 @@ define(
                     if ($(this).data('id') == id) {
                         self.$carousel.carousel(idx)
                         
+                        self.position = $(this).data('position');
+                        self.refreshIndicator();
+                        
                         return false;
                     }
                 });
             },
             positionPage: function(index) {
                 return Math.floor(index / this.perPage) + 1;
+            },
+            refreshIndicator: function() {
+                if (this.count >= this.MAX_INDICATORS) {
+                    this.$numbers.text(this.position + ' of ' + this.count);
+                }
             }
         };
         

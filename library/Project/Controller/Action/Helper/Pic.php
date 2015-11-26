@@ -711,6 +711,8 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         ));
 
         $data = array(
+            'id'                => $picture['id'],
+            'identity'          => $picture['identity'],
             'name'              => $name,
             'picture'           => $picture,
             'owner'             => $picture->findParentUsersByOwner(),

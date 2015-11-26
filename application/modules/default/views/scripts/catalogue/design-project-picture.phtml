@@ -1,0 +1,18 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 193,
+        'args'   => array(
+            'BRAND_NAME'             => $this->brandName,
+            'BRAND_CATNAME'          => $this->brand->folder,
+            'DESIGN_PROJECT_NAME'    => $this->designProject->name,
+            'DESIGN_PROJECT_CATNAME' => $this->designProject->catname,
+            'PICTURE_NAME'           => $this->picture['name'],
+        )
+    ));
+?>
+<?=$this->partial('picture/picture.phtml', $this->picture)?>

@@ -21,7 +21,26 @@
             <?=$this->escape($dp['name'])?>
             <?php if ($dp['year']) { ?> '<?=$dp['year']?><?php } ?>
         </h3>
-        <?=$this->pictureListHorizontal2($dp['pictures'])?>
+        <div class="row thumbnails">
+            <?php foreach ($dp['pictures'] as $picture) { ?>
+                <div class="col-md-3">
+                    <?php if ($picture) { ?>
+                        <?=$this->htmlA(array(
+                            'href'  => $picture['url'],
+                            'class' => 'thumbnail'
+                        ), $this->img($picture['img'], array(
+                            'format'  => 'picture-thumb',
+                            'alt'     => $picture['name'],
+                            'title'   => $picture['name'],
+                            'shuffle' => true
+                        )), false)?>
+                    <?php } else { ?>
+                        &#xa0;
+                    <?php } ?>
+                </div>
+            <?php } ?>
+        </div>
+
         <?php if ($dp['totalPictures'] > 4) { ?>
             <ul class="carLinks"><li>
                 <?=$this->htmlA($dp['allPicturesUrl'], 'все картинки ('.$dp['totalPictures'].')') ?>
