@@ -92,7 +92,7 @@ class SidebarController extends Zend_Controller_Action
 
         $language = $this->_helper->language();
 
-        $cacheKey = 'SIDEBAR_' . $brand->id . '_' . $language;
+        $cacheKey = 'SIDEBAR_' . $brand->id . '_' . $language . '_1';
 
         if (!($groups = $cache->load($cacheKey))) {
 
@@ -140,6 +140,7 @@ class SidebarController extends Zend_Controller_Action
 
                 $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
                 foreach ($aliases as $alias) {
+                    $caption = str_ireplace('by The ' . $alias . ' Company', '', $caption);
                     $caption = str_ireplace('by '.$alias, '', $caption);
                     $caption = str_ireplace($alias.'-', '', $caption);
                     $caption = str_ireplace('-'.$alias, '', $caption);

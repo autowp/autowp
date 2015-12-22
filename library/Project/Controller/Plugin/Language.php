@@ -109,7 +109,7 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
         ));
 
         $translate->addTranslation(array(
-            'content' => PROJECT_DIR . '/vendor/zendframework/zf1/resources/languages/',
+            'content' => PROJECT_DIR . '/vendor/zendframework/zendframework1/resources/languages/',
             'scan'    => Zend_Translate::LOCALE_DIRECTORY,
             'locale'  => $locale,
         ));

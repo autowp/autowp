@@ -13,16 +13,31 @@ class Car_Parent extends Project_Db_Table
     /**
      * @var Brand_Car
      */
-    protected $_brandCarTable;
+    private $_brandCarTable;
+
+    /**
+     * @var Brands
+     */
+    private $_brandTable;
 
     /**
      * @return Brand_Car
      */
-    protected function _getBrandCarTable()
+    private function _getBrandCarTable()
     {
         return $this->_brandCarTable
-        ? $this->_brandCarTable
-        : $this->_brandCarTable = new Brand_Car();
+            ? $this->_brandCarTable
+            : $this->_brandCarTable = new Brand_Car();
+    }
+
+    /**
+     * @return Brands
+     */
+    private function _getBrandTable()
+    {
+        return $this->_brandTable
+            ? $this->_brandTable
+            : $this->_brandTable = new Brands();
     }
 
     protected $_referenceMap = array(
@@ -176,6 +191,64 @@ class Car_Parent extends Project_Db_Table
                 $result[] = array(
                     'car_catname' => $path['car_catname'],
                     'path'        => array_merge($path['path'], array($parent->catname))
+                );
+            }
+
+            if ($breakOnFirst && count($result)) {
+                return $result;
+            }
+        }
+
+        return $result;
+    }
+
+    public function getPaths($carId, array $options = array())
+    {
+        $carId = (int)$carId;
+        if (!$carId) {
+            throw new Exception("carId not provided");
+        }
+
+        $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
+
+        $result = array();
+
+        $db = $this->_getBrandCarTable()->getAdapter();
+
+        $select = $db->select()
+            ->from('brands_cars', 'catname')
+            ->join('brands', 'brands_cars.brand_id = brands.id', 'folder')
+            ->where('brands_cars.car_id = ?', $carId);
+
+        if ($breakOnFirst) {
+            $select->limit(1);
+        }
+
+        $brandCarRows = $db->fetchAll($select);
+        foreach ($brandCarRows as $brandCarRow) {
+            $result[] = array(
+                'brand_catname' => $brandCarRow['folder'],
+                'car_catname'   => $brandCarRow['catname'],
+                'path'          => array()
+            );
+        }
+
+        if ($breakOnFirst && count($result)) {
+            return $result;
+        }
+
+        $parents = $this->fetchAll(array(
+            'car_id = ?' => $carId
+        ));
+
+        foreach ($parents as $parent) {
+            $paths = $this->getPaths($parent->parent_id, $options);
+
+            foreach ($paths as $path) {
+                $result[] = array(
+                    'brand_catname' => $path['brand_catname'],
+                    'car_catname'   => $path['car_catname'],
+                    'path'          => array_merge($path['path'], array($parent->catname))
                 );
             }
 

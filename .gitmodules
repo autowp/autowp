@@ -1,21 +1,6 @@
-[submodule "vendor/phpmyadmin/phpmyadmin"]
-	path = vendor/phpmyadmin/phpmyadmin
-	url = git://github.com/phpmyadmin/phpmyadmin.git
 [submodule "vendor/tapmodo/Jcrop"]
 	path = vendor/tapmodo/Jcrop
 	url = git://github.com/tapmodo/Jcrop.git
-[submodule "vendor/tinymce/tinymce"]
-	path = vendor/tinymce/tinymce
-	url = git://github.com/tinymce/tinymce.git
-[submodule "vendor/twitter/bootstrap"]
-	path = vendor/twitter/bootstrap
-	url = git://github.com/twitter/bootstrap.git
 [submodule "vendor/autowp/bootstrap"]
 	path = vendor/autowp/bootstrap
 	url = git://github.com/autowp/bootstrap.git
-[submodule "vendor/zendframework/zf1-extras"]
-	path = vendor/zendframework/zf1-extras
-	url = https://github.com/zendframework/zf1-extras.git
-[submodule "vendor/zendframework/zf1"]
-	path = vendor/zendframework/zf1
-	url = https://github.com/zendframework/zf1.git

@@ -1,1 +1,1 @@
-../../vendor/twitter/bootstrap3/dist/js/bootstrap.js
+../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js

@@ -112,6 +112,7 @@ class Project_Controller_Action_Helper_Car
 
         $controller = $this->getActionController();
         $urlHelper = $controller->getHelper('Url');
+        $picHelper = $controller->getHelper('Pic');
         $userHelper = $controller->getHelper('User')->direct();
         $aclHelper = $controller->getHelper('Acl')->direct();
 
@@ -297,7 +298,7 @@ class Project_Controller_Action_Helper_Car
 
             $pictures = $this->_getOrientedPictureList(
                 $car, $g, $onlyExactlyPictures, $type, $picturesDateSort,
-                $allowUpPictures, $language, $urlHelper, $catalogue,
+                $allowUpPictures, $language, $picHelper, $catalogue,
                 $carOnlyChilds, $useLargeFormat, $pictureUrlCallback
             );
 
@@ -636,7 +637,7 @@ class Project_Controller_Action_Helper_Car
 
     protected function _getOrientedPictureList($car, array $perspectiveGroupIds,
             $onlyExactlyPictures, $type, $dateSort, $allowUpPictures, $language,
-            $urlHelper, $catalogue, $onlyChilds, $useLargeFormat, $urlCallback)
+            $picHelper, $catalogue, $onlyChilds, $useLargeFormat, $urlCallback)
     {
         $pictures = array();
         $usedIds = array();
@@ -720,9 +721,7 @@ class Project_Controller_Action_Helper_Car
                 if ($urlCallback) {
                     $url = $urlCallback($car, $picture);
                 } else {
-                    $url = $urlHelper->url(array(
-                        'picture_id' => $picture['identity'] ? $picture['identity'] : $pictureId
-                    ), 'picture', true);
+                    $url = $picHelper->href($picture);
                 }
 
                 $result[] = array(

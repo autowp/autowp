@@ -29,6 +29,120 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             : $this->_pictureViewTable = new Picture_View();
     }
 
+    public function href($row, array $options = array())
+    {
+        $defaults = array(
+            'fallback' => true
+        );
+        $options = array_replace($defaults, $options);
+
+        $urlHelper = $this->getActionController()->getHelper('Url');
+
+        $brandTable = new Brands();
+
+        $url = null;
+        switch ($row['type']) {
+            case Picture::LOGO_TYPE_ID:
+                $brandRow = $brandTable->find($row['brand_id'])->current();
+                if ($brandRow) {
+                    $url = $urlHelper->url(array(
+                        'module'        => 'default',
+                        'controller'    => 'catalogue',
+                        'action'        => 'logotypes-picture',
+                        'brand_catname' => $brandRow->folder,
+                        'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                    ), 'catalogue', true);
+                }
+                break;
+
+            case Picture::MIXED_TYPE_ID:
+                $brandRow = $brandTable->find($row['brand_id'])->current();
+                if ($brandRow) {
+                    $url = $urlHelper->url(array(
+                        'module'        => 'default',
+                        'controller'    => 'catalogue',
+                        'action'        => 'mixed-picture',
+                        'brand_catname' => $brandRow->folder,
+                        'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                    ), 'catalogue', true);
+                }
+                break;
+
+            case Picture::UNSORTED_TYPE_ID:
+                $brandRow = $brandTable->find($row['brand_id'])->current();
+                if ($brandRow) {
+                    $url = $urlHelper->url(array(
+                        'module'        => 'default',
+                        'controller'    => 'catalogue',
+                        'action'        => 'other-picture',
+                        'brand_catname' => $brandRow->folder,
+                        'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                    ), 'catalogue', true);
+                }
+                break;
+
+            case Picture::CAR_TYPE_ID:
+                if ($row['car_id']) {
+                    $carParentTable = new Car_Parent();
+                    $paths = $carParentTable->getPaths($row['car_id'], array(
+                        'breakOnFirst' => true
+                    ));
+
+                    if (count($paths) > 0) {
+                        $path = $paths[0];
+
+                        $url = $urlHelper->url(array(
+                            'module'        => 'default',
+                            'controller'    => 'catalogue',
+                            'action'        => 'brand-car-picture',
+                            'brand_catname' => $path['brand_catname'],
+                            'car_catname'   => $path['car_catname'],
+                            'path'          => $path['path'],
+                            'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                        ), 'catalogue', true);
+                    }
+                }
+                break;
+
+            case Picture::ENGINE_TYPE_ID:
+                if ($row['engine_id']) {
+                    $engineTable = new Engines();
+
+                    $parentId = $row['engine_id'];
+                    $path = [];
+                    do {
+                        $engineRow = $engineTable->find($parentId)->current();
+                        $path[] = $engineRow->id;
+
+                        $brandRow = $brandTable->fetchRow(
+                            $brandTable->select(true)
+                                ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
+                                ->where('brand_engine.engine_id = ?', $engineRow->id)
+                        );
+                        $parentId = $engineRow->parent_id;
+                    } while ($parentId && !$brandRow);
+
+                    if ($brandRow && $path) {
+                        $url = $urlHelper->url(array(
+                            'module'        => 'default',
+                            'controller'    => 'catalogue',
+                            'action'        => 'engine-picture',
+                            'brand_catname' => $brandRow['folder'],
+                            'path'          => array_reverse($path),
+                            'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                        ), 'catalogue', true);
+                    }
+                }
+                break;
+        }
+
+        if ($options['fallback'] && !$url) {
+            $url = $this->url($row['id'], $row['identity']);
+        }
+
+        return $url;
+    }
+
     public function url($id, $identity)
     {
         $urlHelper = $this->getActionController()->getHelper('Url');
@@ -62,6 +176,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
 
         $controller = $this->getActionController();
         $userHelper = $controller->getHelper('user');
+        $urlHelper = $controller->getHelper('url');
         $isModer = $userHelper->inheritsRole('pictures-moder');
         $userId = null;
         if ($userHelper->logedIn()) {
@@ -229,6 +344,8 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             }
         }
 
+        $brandTable = new Brands();
+        $carParentTable = new Car_Parent();
 
         $items = array();
         foreach ($rows as $idx => $row) {
@@ -240,7 +357,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             if ($urlCallback) {
                 $url = $urlCallback($row);
             } else {
-                $url = $this->url($row['id'], $row['identity']);
+                $url = $this->href($row);
             }
 
             $item = array(
@@ -283,7 +400,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         );
     }
 
-    public function picPageData($picture, $picSelect, $brandIds)
+    public function picPageData($picture, $picSelect, $brandIds = array())
     {
         $controller = $this->getActionController();
         $userHelper = $controller->getHelper('user');
@@ -293,6 +410,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         $isModer = $userHelper->direct()->inheritsRole('moder');
 
         $pictureTable = $catalogue->getPictureTable();
+        $db = $pictureTable->getAdapter();
 
         $engine = null;
         $engineCars = array();
@@ -314,6 +432,12 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         switch ($picture->type) {
             case Picture::ENGINE_TYPE_ID:
                 if ($engine = $picture->findParentEngines()) {
+
+                    $brandIds = $db->fetchCol(
+                        $db->select()
+                            ->from('brand_engine', 'brand_id')
+                            ->where('engine_id = ?', $engine->id)
+                    );
 
                     $carIds = $engine->getRelatedCarGroupId();
                     if ($carIds) {
@@ -370,6 +494,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             case Picture::LOGO_TYPE_ID:
             case Picture::MIXED_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:
+                $brandIds = [$picture->brand_id];
                 break;
 
             case Picture::FACTORY_TYPE_ID:
@@ -417,6 +542,13 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             case Picture::CAR_TYPE_ID:
                 $car = $picture->findParentCars();
                 if ($car) {
+
+                    $brandIds = $db->fetchCol(
+                        $db->select()
+                            ->from('brands_cars', 'brand_id')
+                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                            ->where('car_parent_cache.car_id = ?', $car->id)
+                    );
 
                     // alt names
                     $altNames = array();
@@ -530,9 +662,12 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
 
         $replacePicture = null;
         if ($picture->replace_picture_id) {
-            $replacePicture = $pictureTable->find($picture->replace_picture_id)->current();
+            $replacePictureRow = $pictureTable->find($picture->replace_picture_id)->current();
 
-            if ($replacePicture->status == Picture::STATUS_REMOVING) {
+            $picHelper = $controller->getHelper('pic');
+            $replacePicture = $picHelper->href($replacePictureRow->toArray());
+
+            if ($replacePictureRow->status == Picture::STATUS_REMOVING) {
                 if (!$userHelper->direct()->inheritsRole('moder')) {
                     $replacePicture = null;
                 }
@@ -972,6 +1107,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
 
 
         // prefetch
+        $ids = [];
         $fullRequests = array();
         $cropRequests = array();
         $imageIds = array();

@@ -33,13 +33,14 @@ class MidnightProvider extends Zend_Tool_Project_Provider_Abstract
             $sql =  '
                 SELECT c.id, count(p.id) AS p_count
                 FROM cars AS c
-                    INNER JOIN pictures AS p ON c.id=p.car_id
+                    INNER JOIN car_parent_cache AS cpc ON c.id=cpc.parent_id
+                    INNER JOIN pictures AS p ON cpc.car_id=p.car_id
                 WHERE p.type=? AND p.status=?
-                    AND c.begin_year AND c.end_year
+                    AND (c.begin_year AND c.end_year OR c.begin_model_year AND c.end_model_year)
                     AND c.id NOT IN (SELECT car_id FROM of_day WHERE car_id)
                 GROUP BY c.id
-                HAVING p_count >= 3
-                ORDER BY p_count DESC, RAND()
+                HAVING p_count >= 5
+                ORDER BY RAND()
                 LIMIT 1
             ';
             $row = $db->fetchRow($sql, array(Picture::CAR_TYPE_ID, Picture::STATUS_ACCEPTED));

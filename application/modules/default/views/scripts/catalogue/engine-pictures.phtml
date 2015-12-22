@@ -5,13 +5,13 @@
             'needLeft'  => true,
             'needRight' => false
         ),
-        'pageId' => 168,
+        'pageId' => 195,
         'args'   => array(
-            'BRAND_CATNAME' => $this->brand->folder,
             'BRAND_NAME'    => $this->brandName,
+            'BRAND_CATNAME' => $this->brand->folder,
             'ENGINE_ID'     => $this->engine['id'],
-            'ENGINE_NAME'   => $this->engine['name'],
-        ),
+            'ENGINE_NAME'   => $this->engine['name']
+        )
     ));
 ?>
 <?=$this->partial('catalogue/partial/brand-engine-menu.phtml', array(
@@ -26,11 +26,12 @@
     ),
     'specs' => array(
         'count'  => $this->specsCount,
-        'active' => true
+        'active' => false
     ),
     'pictures' => array(
         'count'  => $this->picturesCount,
-        'active' => false
+        'active' => true
     ),
 )) ?>
-<?=$this->specs->render($this)?>
+<?=$this->partial('pictures.phtml', $this->picturesData)?>
+<?=$this->paginationControl($this->paginator) ?>

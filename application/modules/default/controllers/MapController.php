@@ -1,6 +1,6 @@
 <?php
 
-require_once APPLICATION_PATH . '/../vendor/phayes/geoPHP/geoPHP.inc';
+require_once APPLICATION_PATH . '/../vendor/phayes/geophp/geoPHP.inc';
 
 class MapController extends Zend_Controller_Action
 {

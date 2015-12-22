@@ -60,6 +60,10 @@
             'count'  => $this->specsCount,
             'active' => false
         ),
+        'pictures' => array(
+            'count'  => $this->picturesCount,
+            'active' => false
+        ),
     )) ?>
 <?php } ?>
 <?php foreach ($this->engines as $engine) { ?>
@@ -68,18 +72,15 @@
         <div class="row thumbnails">
             <?php foreach ($engine['pictures'] as $picture) { ?>
                 <div class="col-lg-3 col-md-3 col-sm-6">
-                    <?php if ($picture->image_id) { ?>
-                        <?=$this->htmlA(
-                            array(
-                                'href'  => $this->pic($picture)->url(),
-                                'class' =>'thumbnail'
-                            ),
-                            $this->img($picture->getFormatRequest(), array(
-                                'format' => 'picture-thumb',
-                            )),
-                            false
-                        )?>
-                    <?php } ?>
+                    <?=$this->htmlA(array(
+                        'href'  => $picture['url'],
+                        'class' => 'thumbnail'
+                    ), $this->img($picture['img'], array(
+                        'format'  => 'picture-thumb',
+                        'alt'     => $picture['name'],
+                        'title'   => $picture['name'],
+                        'shuffle' => true
+                    )), false)?>
                 </div>
             <?php } ?>
         </div>

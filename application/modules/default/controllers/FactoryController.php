@@ -28,6 +28,9 @@ class FactoryController extends Zend_Controller_Action
             'width' => 4
         ));
 
+        $language = $this->_helper->language();
+        $imageStorage = $this->getInvokeArg('bootstrap')->getResource('imagestorage');
+
         $carPictures = array();
         $groups = $factory->getRelatedCarGroups();
         if (count($groups) > 0) {
@@ -36,6 +39,9 @@ class FactoryController extends Zend_Controller_Action
             $cars = $carTable->fetchAll(array(
                 'id in (?)' => array_keys($groups)
             ), $this->_helper->catalogue()->carsOrdering());
+
+            $catalogue = $this->_helper->catalogue();
+            $carParentTable = new Car_Parent();
 
             foreach ($cars as $car) {
 
@@ -65,14 +71,42 @@ class FactoryController extends Zend_Controller_Action
                         ->where('cpc_oc.parent_id IN (?)', $groups[$car->id]);
                 }
 
-                $carPictures[] = $pictureTable->fetchRow($select);
+                $pictureRow = $pictureTable->fetchRow($select);
+                $src = null;
+                if ($pictureRow) {
+                    $request = $catalogue->getPictureFormatRequest($pictureRow->toArray());
+                    $imagesInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
+                    $src = $imagesInfo->getSrc();
+                }
+
+                $cataloguePaths = $carParentTable->getPaths($car->id, array(
+                    'breakOnFirst' => true
+                ));
+
+                $url = null;
+                foreach ($cataloguePaths as $cataloguePath) {
+                    $url = $this->_helper->url->url(array(
+                        'module'        => 'default',
+                        'controller'    => 'catalogue',
+                        'action'        => 'brand-car',
+                        'brand_catname' => $cataloguePath['brand_catname'],
+                        'car_catname'   => $cataloguePath['car_catname'],
+                        'path'          => $cataloguePath['path']
+                    ), 'catalogue', true);
+                }
+
+                $carPictures[] = array(
+                    'name' => $car->getFullName($language),
+                    'src'  => $src,
+                    'url'  => $url
+                );
             }
         }
 
-        $carPictures = $this->_helper->pic->listData($carPictures, array(
+        /*$carPictures = $this->_helper->pic->listData($carPictures, array(
             'width'            => 4,
             'disableBehaviour' => true
-        ));
+        ));*/
 
         $point = null;
         if ($factory->point) {

@@ -1,1 +1,1 @@
-../../../vendor/jquery/jquery/dist/jquery.js
+../../../vendor/components/jquery/jquery.min.js

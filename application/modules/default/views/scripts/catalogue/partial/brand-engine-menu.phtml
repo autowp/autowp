@@ -20,4 +20,11 @@
             )), '<span class="fa fa-car"></span> Автомобили  <span class="badge">'.$this->cars['count'].'</span>', false) ?>
         </li>
     <?php } ?>
+    <?php if ($this->pictures['count'] > 0) { ?>
+        <li<?=$this->pictures['active'] ? ' class="active"' : ''?>>
+            <?=$this->htmlA($this->url(array(
+                'action' => 'engine-pictures',
+            )), '<span class="glyphicon glyphicon-th"></span> Изображения  <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
+        </li>
+    <?php } ?>
 </ul>

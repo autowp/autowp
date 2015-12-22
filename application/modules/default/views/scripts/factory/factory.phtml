@@ -42,14 +42,35 @@
     </div>
 <?php } ?>
 
-<?php if ($this->pictures && count($this->pictures) > 0) { ?>
+<?php if ($this->pictures && count($this->pictures['items']) > 0) { ?>
     <h3>Фотографии</h3>
     <?=$this->partial('pictures.phtml', $this->pictures)?>
 <?php } ?>
 
 <?php if (count($this->carPictures) > 0) { ?>
     <h3>Автомобили</h3>
-    <?=$this->partial('pictures.phtml', $this->carPictures)?>
+    <?php
+        $items = $this->carPictures;
+    ?>
+    <?php while ($currentItems = array_splice($items, 0, 4)) { ?>
+        <div class="row">
+            <?php foreach ($currentItems as $item) { ?>
+                <div class="picture-preview col-md-3">
+                    <div class="thumbnail">
+                        <?=$this->htmlA($item['url'], $this->htmlImg(array(
+                            'src'     => $item['src'],
+                            'alt'     => $item['name'],
+                            'title'   => $item['name'],
+                            'shuffle' => true
+                        )), false) ?>
+                        <div class="caption">
+                            <p><?=$this->htmlA($item['url'], $item['name'])?></p>
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+    <?php } ?>
     <p><?=$this->htmlA($this->url(array(
         'action' => 'factory-cars'
     )), 'подробнее ...')?></p>

@@ -1,0 +1,21 @@
+{
+    "name": "autowp/autowp.ru",
+    "description": "AutoWP.ru, the website",
+    "require": {
+        "zendframework/zendframework1": "1.*",
+        "twbs/bootstrap": "3.*",
+        "phpmyadmin/phpmyadmin": "4.5.0.1",
+        "fortawesome/font-awesome": "^4.5",
+        "components/jquery": "^2.1",
+        "tinymce/tinymce": "^4.3",
+        "phayes/geoPHP": "^1.2",
+        "irazasyed/telegram-bot-sdk": "^1.0",
+        "components/jquery-cookie": "1.4.1.2"
+    },
+    "authors": [
+        {
+            "name": "autowp",
+            "email": "dmitry@pereslegin.ru"
+        }
+    ]
+}
