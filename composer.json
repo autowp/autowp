@@ -9,13 +9,19 @@
         "components/jquery": "^2.1",
         "tinymce/tinymce": "^4.3",
         "phayes/geoPHP": "^1.2",
-        "irazasyed/telegram-bot-sdk": "^1.0",
+        "irazasyed/telegram-bot-sdk": "dev-master",
         "components/jquery-cookie": "1.4.1.2"
     },
     "authors": [
         {
             "name": "autowp",
             "email": "dmitry@pereslegin.ru"
+        }
+    ],
+    "repositories":[
+        {
+            "type": "git",
+            "url": "https://github.com/irazasyed/telegram-bot-sdk"
         }
     ]
 }

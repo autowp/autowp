@@ -398,7 +398,18 @@ span.count {
 }
 
 .brand-icons {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    
+    > div {
+        width: 25%;
+        margin-bottom: 20px;
+        align-self: center;
+    }
 }
 
 .article { 

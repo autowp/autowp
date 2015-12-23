@@ -31,6 +31,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
     protected function _initAutoloader()
     {
+        require_once realpath(APPLICATION_PATH . '/../vendor/autoload.php');
+
         $autoloader = Zend_Loader_Autoloader::getInstance();
         $autoloader->setFallbackAutoloader(true);
     }
