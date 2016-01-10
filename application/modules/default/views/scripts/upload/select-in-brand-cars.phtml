@@ -9,7 +9,7 @@
         <div class="text-muted">
             <?php
                 switch ($car['type']) {
-                    case Car_Parent::TYPE_TUNING: print 'Tuning'; break;
+                    case Car_Parent::TYPE_TUNING: print $this->escape($this->translate('catalogue/related')); break;
                     case Car_Parent::TYPE_SPORT:  print 'Sport'; break;
                 }
             ?>

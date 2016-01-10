@@ -39,6 +39,7 @@ return array (
     'contributors' => 'составители',
 
     /* Layout */
+    'layout/brand' => 'AutoWP.ru',
     'layout/personal-messages' => 'Личные сообщения',
     'layout/you-have-%1$s-new-messages' => array(
         'У вас %1$s новое сообщение',
@@ -47,6 +48,10 @@ return array (
     ),
 
     'layout/search' => 'Поиск',
+    'layout/footer' => 'Обращаем Ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br />' .
+                       'Администрация сайта не располагает информацией о правомерности публикования этих материалов.<br />' .
+                       'Все изображения размещены в ознакомительных целях.<br />' .
+                       '<a href="mailto:autowp@yandex.ru">Сообщить о нарушении авторских прав</a>.',
 
     /* Picture preview */
     'picture-preview/no-comments' => 'нет',
@@ -74,6 +79,10 @@ return array (
 
     /* INDEX */
     'index/brands'             => 'Компании',
+    'mosts/fastest/roadster'          => 'Самые быстрые родстеры',
+    'mosts/mighty/sedan/today'        => 'Самые мощные седаны нашего времени',
+    'mosts/dynamic/universal/2000-09' => 'Самые динамичные универсалы 2000ых',
+    'mosts/heavy/truck'               => 'Самые тяжелые грузовики',
 
     'back'    => 'назад',
     'forward' => 'вперед',
@@ -124,6 +133,7 @@ return array (
     ),
     'carlist/specifications' => 'технические характеристики',
     'carlist/designed by %s'  => 'дизайн %s',
+    'carlist/edit-specs' => 'ввод ттх',
 
     'present-time-abbr'      => 'н.в.',
 
@@ -202,4 +212,26 @@ return array (
     /* upload */
     'upload/picture/crop' => 'кадрировать',
     'upload/picture/cropped-to' => 'кадрировано %s',
+
+    /* catalogue */
+    'catalogue/other-pictures-of-%1$s' => 'Другие изображения %1$s',
+    'catalogue/all-pictures-of-%1$s' => 'Все изображения %1$s',
+    'catalogue/brand/links' => 'Ссылки',
+    'catalogue/brand/popular-images' => 'Популярные картинки',
+    'catalogue/brand/new-pictures' => 'Новые фото',
+    'catalogue/link-category/official' => 'Официальные сайты',
+    'catalogue/link-category/helper'   => 'Помогли созданию проекта',
+    'catalogue/link-category/club'     => 'Автомобильные клубы',
+    'catalogue/link-category/default'  => 'Другие',
+    'catalogue/chronological' => 'Хронология',
+    'catalogue/related' => 'Связанные',
+    'catalogue/related-with-%1$s' => 'Связанные с %1$s',
+
+    /* comments */
+    'comments/title' => 'Комментарии',
+    'comments/reply' => 'ответить',
+    'comments/what-to-do-for-write-comments' => 'Чтобы иметь возможность оставлять комментарии, необходимо <a href="/login/">зарегистрироваться или войти на сайт с помощью учётной записи в одной из социальных сетей</a>',
+    'comments/it-requires-attention-of-moderators' => 'Требуется внимание модераторов',
+    'comments/form-title' => 'Добавить комментарий',
+    'comments/message' => 'Сообщение',
 );

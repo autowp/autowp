@@ -18,7 +18,7 @@ class Application_Form_Comment extends Project_Form
         $elements = array(
             array('textarea', 'message', array (
                 'required'   => true,
-                'label'      => 'Сообщение',
+                'label'      => 'comments/message',
                 'cols'       => 80,
                 'rows'       => 5,
                 'class'      => 'form-control',
@@ -29,7 +29,7 @@ class Application_Form_Comment extends Project_Form
 
         if ($this->_canModeratorAttention) {
             $elements[] = array('checkbox', 'moderator_attention', array(
-                'label'      => 'Требуется внимание модераторов',
+                'label'      => 'comments/it-requires-attention-of-moderators',
                 'decorators' => array('ViewHelper')
             ));
         }
@@ -45,7 +45,7 @@ class Application_Form_Comment extends Project_Form
 
         $this->setOptions(array(
             'method'     => 'post',
-            'legend'     => 'Добавить комментарий',
+            'legend'     => 'comments/form-title',
             'decorators' => array(
                 'PrepareElements',
                 array('viewScript', array(

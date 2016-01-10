@@ -34,6 +34,7 @@ return array (
     'contributors' => 'contributors',
 
     /* Layout */
+    'layout/brand' => 'WheelsAge.org',
     'layout/personal-messages' => 'Personal messages',
     'layout/you-have-%1$s-new-messages' => array(
         'You have %1$s new message',
@@ -41,6 +42,10 @@ return array (
     ),
 
     'layout/search' => 'Search',
+    'layout/footer' => 'S\'il vous plaît noter que tous les matériaux sur ce serveur ont été ajoutés par les visiteurs.<br />' .
+        'L\'administration du site ne dispose pas d\'informations sur la légalité de la publication de ces matériaux.<br />' .
+        'Toutes les images sont affichées à des fins éducatives.<br />' .
+        '<a href="mailto:autowp@yandex.ru">Rapport violation de copyright</a>.',
 
     /* Picture preview */
     'picture-preview/no-comments' => 'no',
@@ -67,6 +72,10 @@ return array (
 
     /* INDEX */
     'index/brands'             => 'Brands',
+    'mosts/fastest/roadster'          => 'Most fastest roadsters',
+    'mosts/mighty/sedan/today'        => 'Most mighty sedans today',
+    'mosts/dynamic/universal/2000-09' => 'Most dynamic universals in 2000\'s',
+    'mosts/heavy/truck'               => 'Most heavy trucks',
 
     'back'                     => 'back',
     'forward'                  => 'forward',
@@ -114,6 +123,7 @@ return array (
     ),
     'carlist/specifications'  => 'specifications',
     'carlist/designed by %s'  => 'designed by %s',
+    'carlist/edit-specs' => 'edit specs',
 
     'present-time-abbr'       => 'pr.',
 
@@ -190,4 +200,26 @@ return array (
     /* upload */
     'upload/picture/crop' => 'crop',
     'upload/picture/cropped-to' => 'cropped to %s',
+
+    /* catalogue */
+    'catalogue/other-pictures-of-%1$s' => 'Other pictures of %1$s',
+    'catalogue/all-pictures-of-%1$s' => 'All pictures of %1$s',
+    'catalogue/brand/links' => 'Links',
+    'catalogue/brand/popular-images' => 'Popular images',
+    'catalogue/brand/new-pictures' => 'New pictures',
+    'catalogue/link-category/official' => 'Official websites',
+    'catalogue/link-category/helper'   => 'Helped create the project',
+    'catalogue/link-category/club'     => 'Car clubs',
+    'catalogue/link-category/default'  => 'Other',
+    'catalogue/chronological' => 'Chronological',
+    'catalogue/related' => 'Related',
+    'catalogue/related-with-%1$s' => 'Related with %1$s',
+
+    /* comments */
+    'comments/title' => 'Comments',
+    'comments/reply' => 'reply',
+    'comments/what-to-do-for-write-comments' => 'To be able to post a comment, you must <a href="/login/">create an account or sign in using social networks account</a>',
+    'comments/it-requires-attention-of-moderators' => 'It requires attention of moderators',
+    'comments/form-title' => 'Add comment',
+    'comments/message' => 'Message',
 );

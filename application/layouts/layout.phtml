@@ -78,39 +78,30 @@ require(['application'], function(App) {
         <div class="container">
 
             <div class="row">
-                <div class="col-lg-<?=$spanCenter?> col-md-<?=$spanCenter?> col-sm-<?=$spanCenter?> col-lg-push-<?=$spanLeft?> col-md-push-<?=$spanLeft?> col-sm-push-<?=$spanLeft?>">
+                <div class="col-sm-<?=$spanCenter?> col-sm-push-<?=$spanLeft?>">
                     <?=$this->action('flash-messages', 'layout', 'default') ?>
                     <?=$this->breadcrumbs() ?>
                     <?=$this->pageTitle() ?>
                     <?=$this->layout()->content ?>
                 </div>
                 <?php if ($needLeft) { ?>
-                    <div class="col-lg-<?=$spanLeft?> col-md-<?=$spanLeft?> col-sm-<?=$spanLeft?> col-lg-pull-<?=$spanCenter?> col-md-pull-<?=$spanCenter?> col-sm-pull-<?=$spanCenter?>">
+                    <div class="col-sm-<?=$spanLeft?> col-sm-pull-<?=$spanCenter?>">
                         <?=$this->layout()->sidebar ?>
                     </div>
                 <?php } ?>
                 <?php if ($needRight) { ?>
-                    <div class="col-lg-<?=$spanRight?> col-md-<?=$spanRight?> col-sm-<?=$spanRight?>">
+                    <div class="col-sm-<?=$spanRight?>">
                         <?=$this->action('sidebar-right', 'layout', 'default') ?>
                     </div>
                 <?php } ?>
             </div>
 
             <?php if ((!$blankPage) && (!$isAdminPage) ) { ?>
-                <div class="bottom-line"><p><strong>AutoWP.ru "10th Anniversary" '2005&ndash;<?=$this->escape($this->translate('present-time-abbr'))?></strong></p></div>
+                <div class="bottom-line"><p><strong>AutoWP.ru '2005&ndash;<?=$this->escape($this->translate('present-time-abbr'))?></strong></p></div>
 
                 <footer class="footer">
                     <div class="row">
-                        <div class="col-lg-6 col-md-6">
-                            <? /*=$this->htmlA(
-                                'http://www.liveinternet.ru/click',
-                                $this->htmlImg(array(
-                                    'src'   => 'http://counter.yadro.ru/hit?t16.11;r' . urlencode(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '') . ';' . rand(),
-                                    'alt'   => 'liveinternet.ru',
-                                    'title' => 'liveinternet.ru'
-                                )),
-                                false
-                            ) */?>
+                        <div class="col-md-6">
 <?php $this->inlineScript()->captureStart() ?>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -122,13 +113,8 @@ ga('send', 'pageview');
 <?php $this->inlineScript()->captureEnd() ?>
 <?=$this->inlineScript() ?>
                         </div>
-                        <div class="col-lg-6 col-md-6">
-                            <p class="copyrights">
-                                Обращаем Ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br />
-                                Администрация сайта не располагает информацией о правомерности публикования этих материалов.<br />
-                                Все изображения размещены в ознакомительных целях.<br />
-                                <a href="mailto:autowp@yandex.ru">Сообщить о нарушении авторских прав</a>.
-                            </p>
+                        <div class="col-md-6">
+                            <p class="copyrights"><?=$this->translate('layout/footer')?></p>
                         </div>
                     </div>
                 </footer>

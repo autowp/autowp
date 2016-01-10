@@ -47,19 +47,19 @@
         <li>
             <?=$this->htmlA($this->url(array(
                 'action' => 'cars'
-            ), 'catalogue'), '<span class="glyphicon glyphicon-road"></span> Хронология', false)?>
+            ), 'catalogue'), '<span class="glyphicon glyphicon-road"></span> ' . $this->escape($this->translate('catalogue/chronological')), false)?>
         </li>
         <li>
             <?=$this->htmlA($this->url(array(
                 'action' => 'recent'
-            ), 'catalogue'), '<span class="glyphicon glyphicon-th"></span> Новые фото', false)?>
+            ), 'catalogue'), '<span class="glyphicon glyphicon-th"></span> '. $this->escape($this->translate('catalogue/brand/new-pictures')), false)?>
         </li>
         <?php if ($this->haveTwins) { ?>
             <li>
                 <?=$this->htmlA($this->url(array(
                     'action'        => 'brand',
                     'brand_catname' => $this->brand->folder
-                ), 'twins', true), '<span class="glyphicon glyphicon-adjust"></span> Twins', false)?>
+                ), 'twins', true), '<span class="glyphicon glyphicon-adjust"></span> ' . $this->escape($this->page(25)->name), false)?>
             </li>
         <?php } ?>
         <?php if ($this->mostsActive) { ?>
@@ -67,7 +67,7 @@
                 <?=$this->htmlA($this->url(array(
                     'action'        => 'brand-mosts',
                     'brand_catname' => $this->brand->folder
-                ), 'catalogue', true), '<span class="glyphicon glyphicon-sort-by-attributes-alt"></span> Mosts', false)?>
+                ), 'catalogue', true), '<span class="glyphicon glyphicon-sort-by-attributes-alt"></span> ' . $this->escape($this->page(21)->name), false)?>
             </li>
         <?php } ?>
     </ul>
@@ -75,20 +75,20 @@
 
 <?php if ($this->topPictures && count($this->topPictures)) { ?>
     <section>
-        <h2><?=$this->escape('Популярные картинки') ?></h2>
+        <h2><?=$this->escape($this->translate('catalogue/brand/popular-images')) ?></h2>
         <?=$this->partial('pictures.phtml', $this->topPictures)?>
     </section>
 <?php } ?>
 
 <?php if (count($this->link_types)) { ?>
     <section>
-        <h2><?=$this->escape('Ссылки') ?></h2>
-        <?php foreach ($this->link_types as $type) { ?>
+        <h2><?=$this->escape($this->translate('catalogue/brand/links')) ?></h2>
+        <?php foreach ($this->link_types as $key => $type) { ?>
             <?php if (count($type['links'])) { ?>
                 <p>
-                    <strong><?=$this->escape($type['name']) ?></strong><br />
+                    <strong><?=$this->escape($this->translate('catalogue/link-category/' . $key)) ?></strong><br />
                     <?php foreach ($type['links'] as $link) { ?>
-                        <a href="<?=$this->escape($link->url) ?>"><?=$this->escape($link->caption ? $link->caption : $link->url) ?></a><br />
+                        <?=$this->htmlA($link->url, $link->caption ? $link->caption : $link->url)?><br />
                     <?php } ?>
                 </p>
             <?php } ?>

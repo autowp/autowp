@@ -6,7 +6,7 @@
 ?>
 <fieldset>
     <?php if ($legend = $this->element->getLegend()) { ?>
-        <legend><?=$this->escape($legend)?></legend>
+        <legend><?=$this->escape($this->translate($legend))?></legend>
     <?php } ?>
     <?php if ($element = $this->element->getElement('message')) { ?>
         <div class="form-group <?=$element->hasErrors() ? ' has-error' : ''?>">

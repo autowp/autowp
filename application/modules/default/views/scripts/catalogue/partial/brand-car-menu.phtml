@@ -14,7 +14,7 @@
                 'action' => 'brand-car',
                 'type'   => 'tuning',
                 'page'   => 1,
-            )), '<span class="glyphicon glyphicon-list"></span> Тюнинг ' . $this->escape($this->title) . ' <span class="badge">'.$this->tuning['count'].'</span>', false) ?>
+            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->translate('catalogue/related-with-%1$s', $this->title)) . ' <span class="badge">'.$this->tuning['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->sport['count'] > 0) { ?>
@@ -31,7 +31,7 @@
             <?=$this->htmlA($this->url(array(
                 'action' => 'brand-car-pictures',
                 'page'   => 1,
-            )), '<span class="glyphicon glyphicon-th"></span> Все изображения ' . $this->escape($this->title) . ' <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
+            )), '<span class="glyphicon glyphicon-th"></span> ' . $this->escape($this->translate('catalogue/all-pictures-of-%1$s', $this->title)) . ' <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
         </li>
     <?php } ?>
 </ul>

@@ -16,16 +16,16 @@ return array (
         '%1$s commentaires',
     ),
 
-    'few seconds ago'    => 'few seconds ago',
-    'a minute ago'       => 'a minute ago',
+    'few seconds ago'    => 'il ya quelques secondes',
+    'a minute ago'       => 'il y\'a une minute',
     '%1$s minutes ago'   => array(
-        '%1$s minute ago',
-        '%1$s minutes ago'
+        'il y\'a %1$s minute',
+        'il y\'a %1$s minutes'
     ),
-    'an hour ago'        => 'an hour ago',
+    'an hour ago'        => 'il ya une heure',
     '%1$s hours ago'     => array(
-        '%1$s hour ago',
-        '%1$s hours ago'
+        'il ya %1$s heure',
+        'il ya %1$s heures'
     ),
     'yesterday'          => 'hier',
     'today'              => 'aujourd\'hui',
@@ -42,6 +42,10 @@ return array (
     ),
 
     'layout/search' => 'Recherche',
+    'layout/footer' => 'Обращаем Ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br />' .
+        'Администрация сайта не располагает информацией о правомерности публикования этих материалов.<br />' .
+        'Все изображения размещены в ознакомительных целях.<br />' .
+        '<a href="mailto:autowp@yandex.ru">Сообщить о нарушении авторских прав</a>.',
 
     /* Picture preview */
     'picture-preview/no-comments' => 'non',
@@ -68,6 +72,10 @@ return array (
 
     /* INDEX */
     'index/brands'             => 'Marques',
+    'mosts/fastest/roadster'          => 'La plupart des roadsters les plus rapides',
+    'mosts/mighty/sedan/today'        => 'La plupart puissantes berlines aujourd\'hui',
+    'mosts/dynamic/universal/2000-09' => 'La plupart des universaux dynamiques années 2000',
+    'mosts/heavy/truck'               => 'La plupart des camions lourds',
 
     'back'                     => 'arrière',
     'forward'                  => 'vers l\'avant',
@@ -113,8 +121,9 @@ return array (
         'Produit en environ %1$s copie',
         'Produit en environ %1$s copies'
     ),
-    'carlist/specifications'  => 'Caractéristiques',
+    'carlist/specifications'  => 'caractéristiques',
     'carlist/designed by %s'  => 'dessinée par %s',
+    'carlist/edit-specs' => 'modifier spécifications',
 
     'present-time-abbr'       => 'pr.',
 
@@ -191,4 +200,26 @@ return array (
     /* upload */
     'upload/picture/crop' => 'recadrer',
     'upload/picture/cropped-to' => 'recadrée à %s',
+
+    /* catalogue */
+    'catalogue/other-pictures-of-%1$s' => 'Autres photos de %1$s',
+    'catalogue/all-pictures-of-%1$s' => 'Toutes les images de %1$s',
+    'catalogue/brand/links' => 'Références',
+    'catalogue/brand/popular-images' => 'Images populaires',
+    'catalogue/brand/new-pictures' => 'Nouvelles photos',
+    'catalogue/link-category/official' => 'Les sites officiels',
+    'catalogue/link-category/helper'   => 'Aider à créer le projet',
+    'catalogue/link-category/club'     => 'Clubs de voitures',
+    'catalogue/link-category/default'  => 'Autres',
+    'catalogue/chronological' => 'Chronologique',
+    'catalogue/related' => 'Associé',
+    'catalogue/related-with-%1$s' => 'Associé à %1$s',
+
+    /* comments */
+    'comments/title' => 'Commentaires',
+    'comments/reply' => 'répondre',
+    'comments/what-to-do-for-write-comments' => 'Pour pouvoir poster un commentaire, vous devez <a href="/login/">créer un compte ou de vous connecter en utilisant le compte des réseaux sociaux</a>',
+    'comments/it-requires-attention-of-moderators' => 'Il nécessite une attention des modérateurs',
+    'comments/form-title' => 'Ajouter un commentaire',
+    'comments/message' => 'Message',
 );

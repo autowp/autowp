@@ -52,7 +52,7 @@
                         <?php if (isset($item['tuning']) && $item['tuning']) { ?>
                             <li>
                                 <span class="glyphicon glyphicon-align-left"></span>
-                                <?=$this->htmlA($item['tuning']['url'], 'Тюнинг ('.$item['tuning']['count'].')')?>
+                                <?=$this->htmlA($item['tuning']['url'], $this->translate('catalogue/related') . ' ('.$item['tuning']['count'].')')?>
                             </li>
                         <?php } ?>
 
@@ -113,7 +113,7 @@
                         <?php if ($this->specEditor) { ?>
                             <li>
                                 <span class="glyphicon glyphicon-pencil"></span>
-                                <?=$this->htmlA($item['specEditorUrl'], 'ввод ттх') ?>
+                                <?=$this->htmlA($item['specEditorUrl'], $this->translate('carlist/edit-specs')) ?>
                             </li>
                         <?php } ?>
                     </ul>

@@ -115,11 +115,30 @@
         <?=$this->car['description'] ?>
     </div>
 <?php } ?>
+
+<?=$this->render('catalogue/partial/modification-filter.phtml')?>
+
 <?=$this->partial('cars.phtml', $this->childListData)?>
 
 <?php if ($this->currentPicturesCount) { ?>
-    <h3>Другие изображения <?=$this->escape($this->carFullName) ?></h3>
-    <?=$this->pictureListHorizontal2($this->currentPictures) ?>
+    <h3><?=$this->escape($this->translate('catalogue/other-pictures-of-%1$s', $this->carFullName)) ?></h3>
+
+    <div class="row thumbnails">
+        <?php foreach ($this->currentPictures as $picture) { ?>
+            <div class="col-md-3">
+                <?=$this->htmlA(array(
+                    'href'  => $picture['url'],
+                    'class' => 'thumbnail'
+                ), $this->htmlImg($picture['src'], array(
+                    'format'  => 'picture-thumb',
+                    'alt'     => $picture['name'],
+                    'title'   => $picture['name'],
+                    'shuffle' => true
+                )), false)?>
+            </div>
+        <?php } ?>
+    </div>
+
     <?php if ($this->currentPicturesCount > 4) { ?>
         <span class="glyphicon glyphicon-th"></span>
         <?=$this->htmlA($this->currentPicturesUrl, $this->translate('carlist/all pictures').' ('.$this->currentPicturesCount.')')?>
