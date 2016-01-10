@@ -1,7 +1,5 @@
 <?php
 
-require_once APPLICATION_PATH . '/../vendor/phayes/geophp/geoPHP.inc';
-
 class MapController extends Zend_Controller_Action
 {
     protected $_googleClient;
@@ -23,6 +21,8 @@ class MapController extends Zend_Controller_Action
 
     public function dataAction()
     {
+        geoPHP::version(); // for autoload classes
+
         $bounds = $this->_getParam('bounds');
         $bounds = explode(',', $bounds);
 

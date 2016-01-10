@@ -19,7 +19,7 @@ define(
                             if (loaded) {
                                 $(this).popover('show');
                             } else {
-                                $.get($(this).attr('href'), {}, function(html) {
+                                $.get($(this).data('href'), {}, function(html) {
                                     
                                     function get_popover_placement(pop, dom_el) {
                                         var width = window.innerWidth;

@@ -1,25 +1,23 @@
 <?php
 
-require_once APPLICATION_PATH . '/../vendor/phayes/geoPHP/geoPHP.inc';
-
 class Moder_FactoryController extends Zend_Controller_Action
 {
     /**
      * @var Factory
      */
-    protected $_factoryTable = null;
+    private $_factoryTable = null;
 
     /**
      * @return Factory
      */
-    protected function _getFactoryTable()
+    private function _getFactoryTable()
     {
         return $this->_factoryTable
             ? $this->_factoryTable
             : $this->_factoryTable = new Factory();
     }
 
-    protected function _factoryModerUrl($id)
+    private function _factoryModerUrl($id)
     {
         return $this->_helper->url->url(array(
             'action'     => 'factory',
@@ -36,6 +34,8 @@ class Moder_FactoryController extends Zend_Controller_Action
         if (!$this->_helper->user()->inheritsRole('moder') ) {
             return $this->_forward('forbidden', 'error', 'default');
         }
+
+        geoPHP::version(); // for autoload classes
     }
 
     public function factoryAction()
@@ -74,7 +74,8 @@ class Moder_FactoryController extends Zend_Controller_Action
 
                 if (strlen($values['lat']) && strlen($values['lng'])) {
                     $point = new Point($values['lng'], $values['lat']);
-                    $point = new Zend_Db_Expr($factoryTable->getAdapter()->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
+
+                    $point = new Zend_Db_Expr($factoryTable->getAdapter()->quoteInto('GeomFromText(?)', $point->out('wkt')));
                 } else {
                     $point = null;
                 }

@@ -122,12 +122,14 @@ class Project_Controller_Action_Helper_User extends Zend_Controller_Action_Helpe
 
     public function clearRememberCookie()
     {
-        setcookie('remember', '', time() - 3600*24*30, '/', '.autowp.ru');
+        $domain = Zend_Registry::get('cookie_domain');
+        setcookie('remember', '', time() - 3600*24*30, '/', $domain);
     }
 
     public function setRememberCookie($hash)
     {
-        setcookie('remember', $hash, time() + 3600*24*30, '/', '.autowp.ru');
+        $domain = Zend_Registry::get('cookie_domain');
+        setcookie('remember', $hash, time() + 3600*24*30, '/', $domain);
     }
 
     public function timezone()

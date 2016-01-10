@@ -1,7 +1,5 @@
 <?php
 
-require_once APPLICATION_PATH . '/../vendor/phayes/geoPHP/geoPHP.inc';
-
 class Moder_MuseumController extends Zend_Controller_Action
 {
     private $_table;

@@ -12,12 +12,7 @@
                     '&#xa0;<span class="count">('.
                         ($brand['cars_count'] - $brand['new_cars_count']).
                         ($brand['new_cars_count'] > 0
-                            ?
-                                $this->htmlA(array(
-                                    'class' => 'popover-handler',
-                                    'title' => sprintf($this->translate('brands/new-cars-of-brand'), $brand['name']), //$brand['new_cars_title'],
-                                    'href'  => $brand['new_cars_url']
-                                ), '+'.$brand['new_cars_count'])
+                            ? '<span data-href="'.$this->escape($brand['new_cars_url']).'" data-toggle="popover" data-container="body" class="popover-handler" title="'.$this->escape(sprintf($this->translate('brands/new-cars-of-brand'), $brand['name'])).'">+'.$brand['new_cars_count'].'</span>'
                             : ''
                         ).
                     ')</span>';

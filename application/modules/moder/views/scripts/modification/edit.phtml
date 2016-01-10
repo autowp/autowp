@@ -1,0 +1,26 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 78
+    ));
+?>
+<div class="row">
+    <div class="col-md-6">
+        <h3>Модификация</h3>
+        <p><?=$this->htmlA($this->carUrl, '&larr; назад к автомобилю', false)?></p>
+        <?=$this->form->render($this)?>
+    </div>
+    <div class="col-md-6">
+        <h3>Значения</h3>
+        <ol>
+            <?php foreach ($this->values as $value) { ?>
+                <li><?=$this->escape($value['name'])?></li>
+            <?php } ?>
+        </ol>
+    </div>
+</div>

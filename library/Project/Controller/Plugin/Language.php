@@ -10,11 +10,37 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
     /**
      * @var array
      */
-    protected $_languageWhitelist = array('en', 'ru');
+    private $_languageWhitelist = ['ru', 'en', 'fr'];
 
-    protected $_skipHostname = array('i.wheelsage.org');
+    /**
+     * @var array
+     */
+    private $_whitelist = array(
+        'fr.wheelsage.org' => 'fr',
+        'en.wheelsage.org' => 'en',
+        'autowp.ru'        => 'ru',
+        'www.autowp.ru'    => 'ru',
+        'ru.autowp.ru'     => 'ru'
+    );
 
-    protected $_skipAction = array(
+    /**
+     * @var array
+     */
+    private $_redirects = array(
+        'wheelsage.org' => 'en.wheelsage.org',
+        'en.autowp.ru'  => 'en.wheelsage.org',
+        'ru.autowp.ru'  => 'www.autowp.ru'
+    );
+
+    /**
+     * @var array
+     */
+    private $_skipHostname = array('i.wheelsage.org');
+
+    /**
+     * @var array
+     */
+    private $_skipAction = array(
         'default' => array(
             'picture-file' => array(
                 'index'
@@ -25,12 +51,12 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
     /**
      * @var string
      */
-    protected $_defaultLanguage = 'en';
+    private $_defaultLanguage = 'en';
 
     /**
      * @var string
      */
-    protected $_hostname = '.autowp.ru';
+    private $_hostname = '.autowp.ru';
 
     /**
      * @param  Zend_Controller_Request_Abstract $request
@@ -60,7 +86,32 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
             }
         }
 
-        $parts = explode('.', $hostname);
+        if (isset($this->_redirects[$hostname])) {
+            $request->setDispatched(true);
+
+            $redirectUrl = $request->getScheme() . '://' .
+                $this->_redirects[$hostname] . $request->getRequestUri();
+
+            $this->getResponse()->setRedirect($redirectUrl, 301);
+            return;
+        }
+
+        if (isset($this->_whitelist[$hostname])) {
+            $language = $this->_whitelist[$hostname];
+        } else {
+
+            try {
+                $locale = new Zend_Locale(Zend_Locale::BROWSER);
+                $localeLanguage = $locale->getLanguage();
+                $isAllowed = in_array($localeLanguage, $this->_languageWhitelist);
+                if ($isAllowed) {
+                    $language = $localeLanguage;
+                }
+            } catch (Exception $e) {
+            }
+        }
+
+        /*$parts = explode('.', $hostname);
         if (count($parts) > 0) {
             $langPart = $parts[0];
             $isAllowed = in_array($langPart, $this->_languageWhitelist);
@@ -86,7 +137,7 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
             } else {
                 $language = $langPart;
             }
-        }
+        }*/
 
         $this->_initLocaleAndTranslate($language);
     }
@@ -94,7 +145,7 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
     /**
      * @param string $language
      */
-    protected function _initLocaleAndTranslate($language)
+    private function _initLocaleAndTranslate($language)
     {
 
         // Locale

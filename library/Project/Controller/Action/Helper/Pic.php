@@ -845,6 +845,46 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             'language' => $language
         ));
 
+        $mTable = new Modification();
+        $mRows = $mTable->fetchAll(
+            $mTable->select(true)
+                ->join('modification_picture', 'modification.id = modification_picture.modification_id', null)
+                ->where('modification_picture.picture_id = ?', $picture['id'])
+                ->order('modification.name')
+        );
+
+        $modifications = [];
+        foreach ($mRows as $mRow) {
+
+            $url = null;
+            $carTable = new Cars();
+            $carRow = $carTable->find($mRow->car_id)->current();
+            if ($carRow) {
+                $carParentTable = new Car_Parent();
+                $paths = $carParentTable->getPaths($carRow->id, array(
+                    'breakOnFirst' => true
+                ));
+                if (count($paths) > 0) {
+                    $path = $paths[0];
+
+                    $url = $urlHelper->url(array(
+                        'module'        => 'default',
+                        'controller'    => 'catalogue',
+                        'action'        => 'brand-car-pictures',
+                        'brand_catname' => $path['brand_catname'],
+                        'car_catname'   => $path['car_catname'],
+                        'path'          => $path['path'],
+                        'mod'           => $mRow->id
+                    ), 'catalogue', true);
+                }
+            }
+
+            $modifications[] = array(
+                'name' => $mRow->name,
+                'url'  => $url
+            );
+        }
+
         $data = array(
             'id'                => $picture['id'],
             'identity'          => $picture['identity'],
@@ -877,6 +917,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             'carDetailsUrl'     => $carDetailsUrl,
             'carHtml'           => $car ? $car->html : null,
             'carDescription'    => $car ? $car->description : null,
+            'modifications'     => $modifications
         );
 
         // Обвновляем количество просмотров

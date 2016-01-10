@@ -1,0 +1,22 @@
+<?php if (count($this->modificationGroups) > 0) { ?>
+    <div style="margin: 30px 0">
+        <h4>Модификации</h4>
+        <?php foreach ($this->modificationGroups as $group) { ?>
+            <?php if (count($group['modifications'])) { ?>
+                <div>
+                    <small><?=$this->escape($group['name'] ? $group['name'] : 'Другие')?></small>
+                    <div class="btn-group" role="group">
+                        <?php foreach ($group['modifications'] as $modification) { ?>
+                            <?php if ($modification['count'] > 0) { ?>
+                                <a href="<?=$this->escape($modification['url'])?>" class="btn btn-sm <?=$modification['active'] ? 'btn-primary active' : 'btn-default'?>">
+                                    <?=$this->escape($modification['name'])?>
+                                    (<?=$this->escape($modification['count'])?>)
+                                </a>
+                            <?php } ?>
+                        <?php } ?>
+                    </div>
+                </div>
+            <?php } ?>
+        <?php } ?>
+    </div>
+<?php } ?>

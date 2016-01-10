@@ -1,6 +1,3 @@
 [submodule "vendor/tapmodo/Jcrop"]
 	path = vendor/tapmodo/Jcrop
 	url = git://github.com/tapmodo/Jcrop.git
-[submodule "vendor/autowp/bootstrap"]
-	path = vendor/autowp/bootstrap
-	url = git://github.com/autowp/bootstrap.git

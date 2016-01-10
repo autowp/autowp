@@ -2,10 +2,31 @@
 
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
+    private $_cookieDomains = array(
+        'wheelsage.org'     => '.wheelsage.org',
+        'fr.wheelsage.org'  => '.wheelsage.org',
+        'en.wheelsage.org'  => '.wheelsage.org',
+        'www.wheelsage.org' => '.wheelsage.org',
+        'en.autowp.ru'      => '.autowp.ru',
+        'autowp.ru'         => '.autowp.ru',
+        'www.autowp.ru'     => '.autowp.ru',
+        'ru.autowp.ru'      => '.autowp.ru'
+    );
+
     protected function _initPhpEnvoriment()
     {
         setlocale(LC_ALL, 'en_US.UTF-8');
         setlocale(LC_CTYPE, "UTF8", "en_US.UTF-8");
+
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $hostname = $_SERVER['HTTP_HOST'];
+            if (isset($this->_cookieDomains[$hostname])) {
+                Zend_Registry::set('cookie_domain', $this->_cookieDomains[$hostname]);
+                Zend_Session::setOptions(array(
+                    'cookie_domain' => $this->_cookieDomains[$hostname]
+                ));
+            }
+        }
     }
 
     /**

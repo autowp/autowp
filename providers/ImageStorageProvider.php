@@ -5,10 +5,9 @@ require_once 'Zend/Tool/Project/Provider/Exception.php';
 
 class ImageStorageProvider extends Zend_Tool_Project_Provider_Abstract
 {
-    public function migrate()
+    /*public function migrate()
     {
         $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
-        /* @var $zendApp Zend_Application */
         $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
 
         $zendApp
@@ -62,6 +61,56 @@ class ImageStorageProvider extends Zend_Tool_Project_Provider_Abstract
 
                 usleep(200000);
 
+            }
+        }
+    }*/
+
+    public function clearEmptyDirs($dirname)
+    {
+        $this->_loadProfile(self::NO_PROFILE_THROW_EXCEPTION); //load .zfproject.xml
+        /* @var $zendApp Zend_Application */
+        $zendApp = $this->_loadedProfile->search('BootstrapFile')->getApplicationInstance();
+
+        $zendApp
+            ->bootstrap('backCompatibility')
+            ->bootstrap('phpEnvoriment')
+            ->bootstrap('autoloader')
+            ->bootstrap('db')
+            ->bootstrap('imageStorage');
+
+        $imageStorage = $zendApp->getBootstrap()->getResource('imageStorage');
+
+        $dir = $imageStorage->getDir($dirname);
+        if (!$dir) {
+            throw new Exception("Dir '$dirname' not found");
+        }
+
+        $this->_recursiveDirectory(realpath($dir->getPath()));
+    }
+
+    private function _recursiveDirectory($dir) {
+        $stack[] = $dir;
+
+        while ($stack) {
+            $currentDir = array_pop($stack);
+            //print realpath($currentDir) . PHP_EOL;
+            if ($dh = opendir($currentDir)){
+                $count = 0;
+                while (($file = readdir($dh)) !== false) {
+                    if ($file !== '.' AND $file !== '..') {
+                        $count++;
+                        $currentFile = $currentDir . DIRECTORY_SEPARATOR . $file;
+                        if (is_dir($currentFile)) {
+                            $stack[] = $currentFile;
+                        }
+                    }
+                }
+
+                if ($count <= 0) {
+                    print $currentDir . ' - empty' . PHP_EOL;
+                    rmdir($currentDir);
+                    //return;
+                }
             }
         }
     }

@@ -40,5 +40,7 @@
     ),
 )) ?>
 
+<?=$this->render('catalogue/partial/modification-filter.phtml')?>
+
 <?=$this->partial('pictures.phtml', $this->picturesData)?>
 <?=$this->paginationControl($this->paginator) ?>

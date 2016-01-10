@@ -2,7 +2,7 @@
 
 class Application_Service_Mosts
 {
-    protected $_ratings = array (
+    private $_ratings = array (
         array(
             'catName'   => 'fastest',
             'adapter'   => array(
@@ -338,19 +338,19 @@ class Application_Service_Mosts
         ),
     );
 
-    protected $_years = null;
+    private $_years = null;
 
     /**
      * @var Car_Type_Language
      */
-    protected $_carTypeLangTable = null;
+    private $_carTypeLangTable = null;
 
-    protected $_perspectiveGroups = null;
+    private $_perspectiveGroups = null;
 
     /**
      * @var Application_Service_Specifications
      */
-    protected $_specs = null;
+    private $_specs = null;
 
     public function __construct(array $options = array())
     {
@@ -360,14 +360,14 @@ class Application_Service_Mosts
     /**
      * @return Car_Type_Language
      */
-    protected function _getCarTypeLangTable()
+    private function _getCarTypeLangTable()
     {
         return $this->_carTypeLangTable
             ? $this->_carTypeLangTable
             : $this->_carTypeLangTable = new Car_Type_Language();
     }
 
-    protected function _betweenYearsExpr($from, $to)
+    private function _betweenYearsExpr($from, $to)
     {
         return 'cars.begin_order_cache between "'.$from.'-01-01" and "'.$to.'-12-31" or ' .
                'cars.end_order_cache between "'.$from.'-01-01" and "'.$to.'-12-31" or ' .
@@ -441,7 +441,7 @@ class Application_Service_Mosts
                 array(
                     'name'   => 'нашего времени',
                     'folder' => 'today',
-                    'where'  => 'cars.end_order_cache >="'.$cy.'-01-01" or cars.end_order_cache is null and cars.today'
+                    'where'  => 'cars.end_order_cache >="'.$cy.'-01-01" and cars.end_order_cache<"2100-01-01" or cars.end_order_cache is null and cars.today'
                 )
             );
         }
@@ -605,7 +605,7 @@ class Application_Service_Mosts
         return $data;
     }
 
-    protected function _getCarTypesIds($carType)
+    private function _getCarTypesIds($carType)
     {
         $result = array($carType->id);
         foreach ($carType->findCar_Types() as $child) {

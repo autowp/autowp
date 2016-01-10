@@ -54,7 +54,7 @@ define(
                     force_p_newlines : true,
                     //remove_trailing_nbsp : true,
                     //trim_span_elements : true,
-                    valid_elements : "a[href|title],p",
+                    valid_elements : "a[href|title],p,br",
                     language: "en"
                 });
 

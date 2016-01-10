@@ -1,7 +1,5 @@
 <?php
 
-require_once APPLICATION_PATH . '/../vendor/phayes/geoPHP/geoPHP.inc';
-
 class FactoryController extends Zend_Controller_Action
 {
     public function indexAction()

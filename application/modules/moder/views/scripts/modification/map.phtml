@@ -1,0 +1,22 @@
+<table class="table table-hover table-condensed">
+    <tbody>
+        <tr>
+            <td></td>
+            <?php foreach ($this->rows as $row) { ?>
+                <th><?=$this->escape($row['name'])?></th>
+            <?php } ?>
+        </tr>
+        <?php foreach ($this->rows as $idx1 => $row1) { ?>
+            <tr>
+                <th><?=$this->escape($row1['name'])?></th>
+                <?php foreach ($this->rows as $idx2 => $row2) { ?>
+                    <?php if (($row1['group_id'] != $row2['group_id'])) { ?>
+                        <td><input type="checkbox" /></td>
+                    <?php } else { ?>
+                        <td></td>
+                    <?php } ?>
+                <?php } ?>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>

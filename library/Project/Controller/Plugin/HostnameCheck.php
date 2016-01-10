@@ -10,7 +10,7 @@ class Project_Controller_Plugin_HostnameCheck extends Zend_Controller_Plugin_Abs
     /**
      * @var array
      */
-    protected $_hostnameWhitelist = array('www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru', 'i.wheelsage.org');
+    protected $_hostnameWhitelist = array('www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru', 'i.wheelsage.org', 'en.wheelsage.org', 'fr.wheelsage.org', 'www.wheelsage.org', 'wheelsage.org');
 
     /**
      * @var string

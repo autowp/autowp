@@ -8,9 +8,10 @@
         "fortawesome/font-awesome": "^4.5",
         "components/jquery": "^2.1",
         "tinymce/tinymce": "^4.3",
-        "phayes/geoPHP": "^1.2",
         "irazasyed/telegram-bot-sdk": "dev-master",
-        "components/jquery-cookie": "1.4.1.2"
+        "components/jquery-cookie": "1.4.1.2",
+        "zendframework/zend-mail": "^2.5",
+        "phayes/geophp": "^1.2"
     },
     "authors": [
         {

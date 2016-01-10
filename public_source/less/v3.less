@@ -10,6 +10,10 @@ body {
     font-weight: inherit;
 }
 
+a.label:visited {
+    color: #fff;
+}
+
 .page-header-small {
     border-bottom: 1px solid #FFF;
     margin: 18px 0;
@@ -18,6 +22,18 @@ body {
     h3 {
         line-height: 1;
     }
+}
+
+a {
+    .transition(color .2s);
+}
+
+.btn {
+    .transition(color .2s, background-color .2s, border-color .2s;);
+}
+
+.nav-pills>li>a {
+    .transition(color .2s, background-color .2s;);
 }
 
 .btn-default:visited { color: @btn-default-color }
@@ -335,7 +351,7 @@ img.avatar {
 
 .bottom-line { 
     border-top: 1px solid #D1CAB8; 
-    margin: 20px 0;
+    margin: 50px 0;
     
     p {
         text-align: center;
@@ -742,5 +758,20 @@ body.gallery-shown {
     }
     tr.odd td {
         background-color: #f8f8f8;
+    }
+}
+
+.multicheckbox-pictures {
+    .btn {
+        img {
+            .opacity(.5);
+            .transition(opacity .2s);
+        }
+        
+        &.active {
+            img {
+                .opacity(1);
+            }
+        }
     }
 }

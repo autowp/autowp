@@ -24,7 +24,7 @@ class MaintenanceProvider extends Zend_Tool_Project_Provider_Abstract
         print 'Dumping ... ';
 
         $cmd = sprintf(
-            'mysqldump -u%s -p%s -h%s %s > %s',
+            'mysqldump -u%s -p%s -h%s --set-gtid-purged=OFF %s > %s',
             escapeshellarg($config['username']),
             escapeshellarg($config['password']),
             escapeshellarg($config['host']),

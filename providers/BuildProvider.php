@@ -52,7 +52,7 @@ class BuildProvider extends Zend_Tool_Project_Provider_Abstract
         $cssDir = PUBLIC_DIR . '/css';
         $bootstrapLessDir = realpath(APPLICATION_PATH . '/../vendor/twitter/bootstrap3/less');
 
-        $cmdTemplate = 'lessc --yui-compress --include-path=.:'.$bootstrapLessDir.' %s > %s';
+        $cmdTemplate = 'lessc --clean-css="--s1 --advanced --compatibility=ie8" --include-path=.:'.$bootstrapLessDir.' %s > %s';
 
         foreach ($files as $file) {
             $srcPath = $lessDir . '/' . $file;
