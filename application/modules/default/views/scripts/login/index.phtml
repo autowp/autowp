@@ -18,7 +18,7 @@
         <p class="alert alert-block alert-error"><?=$this->escape($this->errorMessage) ?></p>
     <?php } ?>
 
-    <p>Если вы забыли свой логин или пароль, вы можете воспользоваться <a href="/restorepassword/">формой восстановления по e-mail</a></p>
-    <p>Если вы ещё не зарегистрированы на сайте, то можете <a href="/registration/">сделать это сейчас</a></p>
+    <p><?=$this->translate('login/if-you-lose-password')?></p>
+    <p><?=$this->translate('login/if-you-not-registered')?></p>
 
 </div></div>

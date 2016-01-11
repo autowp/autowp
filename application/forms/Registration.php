@@ -31,7 +31,7 @@ class Application_Form_Registration extends Project_Form
                 )),
                 array('password', 'password', array(
                     'required'   => true,
-                    'label'      => 'Пароль',
+                    'label'      => 'login/password',
                     'size'       => 20,
                     'maxlength'  => 50,
                     'filters'    => array('StringTrim'),
@@ -42,7 +42,7 @@ class Application_Form_Registration extends Project_Form
                 )),
                 array('password', 'password_confirm', array(
                     'required'   => true,
-                    'label'      => 'Пароль (ещё раз)',
+                    'label'      => 'login/password-confirm',
                     'size'       => 20,
                     'maxlength'  => 50,
                     'filters'    => array('StringTrim'),
@@ -54,7 +54,7 @@ class Application_Form_Registration extends Project_Form
                 )),
                 array('text', 'name', array(
                     'required'   => true,
-                    'label'      => 'Имя',
+                    'label'      => 'login/name',
                     'size'       => 20,
                     'maxlength'  => 30,
                     'filters'    => array('StringTrim'),
@@ -62,7 +62,7 @@ class Application_Form_Registration extends Project_Form
                 )),
                 array('captcha', 'captcha', array(
                     'required'       => true,
-                    'label'          => 'Введите код защиты',
+                    'label'          => 'login/captcha',
                     'captcha'        => 'Image',
                     'captchaOptions' => array(
                         'wordLen' => 6,

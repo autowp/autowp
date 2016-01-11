@@ -8,7 +8,7 @@ class Application_Form_Login extends Project_Form
 
         $this->setOptions(array(
             'method'     => 'post',
-            'legend'     => 'Вход',
+            'legend'     => 'login/sign-in',
             'decorators' => array(
                 'PrepareElements',
                 array('viewScript', array(
@@ -18,17 +18,17 @@ class Application_Form_Login extends Project_Form
             ),
             'elements'   => array(
                 array('User_Login', 'login', array(
-                    'required'   => true,
+                    'required'     => true,
                     'autocomplete' => 'email',
-                    'decorators' => array('ViewHelper'),
+                    'decorators'   => array('ViewHelper'),
                 )),
                 array('password', 'password', array(
                     'required'   => true,
-                    'label'      => 'пароль',
+                    'label'      => 'login/password',
                     'decorators' => array('ViewHelper'),
                 )),
                 array('checkbox', 'remember', array(
-                    'label'      => 'запомнить',
+                    'label'      => 'login/remember',
                     'decorators' => array('ViewHelper'),
                 )),
             ),

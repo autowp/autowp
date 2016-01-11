@@ -1,7 +1,8 @@
 <?php
+
 class NewController extends Zend_Controller_Action
 {
-    protected $_perPage = 18;
+    private $_perPage = 18;
 
     public function indexAction()
     {

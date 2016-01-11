@@ -3,7 +3,7 @@
 ?>
 <fieldset>
     <?php if ($legend = $this->element->getLegend()) { ?>
-        <legend><?=$this->escape($legend)?></legend>
+        <legend><?=$this->escape($this->translate($legend))?></legend>
     <?php } ?>
     <?php foreach ($this->element->getElements() as $element) { ?>
         <?php
@@ -35,7 +35,7 @@
     <?php } ?>
     <div class="form-group">
         <div class="col-lg-9 col-lg-offset-3 col-md-9 col-md-offset-3">
-            <?=$this->formSubmit('submit', 'Войти', array(
+            <?=$this->formSubmit('submit', $this->translate('login/sign-in'), array(
                 'class' => 'btn btn-primary'
             ))?>
         </div>

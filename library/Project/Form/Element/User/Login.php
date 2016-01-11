@@ -6,7 +6,7 @@ class Project_Form_Element_User_Login extends Zend_Form_Element_Text
      * Element label
      * @var string
      */
-    protected $_label = 'логин или e-mail';
+    protected $_label = 'login/login-or-email';
 
     /**
      * @var string

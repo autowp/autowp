@@ -42,10 +42,10 @@ return array (
     ),
 
     'layout/search' => 'Search',
-    'layout/footer' => 'S\'il vous plaît noter que tous les matériaux sur ce serveur ont été ajoutés par les visiteurs.<br />' .
-        'L\'administration du site ne dispose pas d\'informations sur la légalité de la publication de ces matériaux.<br />' .
-        'Toutes les images sont affichées à des fins éducatives.<br />' .
-        '<a href="mailto:autowp@yandex.ru">Rapport violation de copyright</a>.',
+    'layout/footer' => 'Please note that all material on this server autowp.ru, added visitors.<br />' .
+                       'The site administration does not have information on the legality of the publication of these materials.<br />' .
+                       'All images are posted for educational purposes.<br />' .
+                       '<a href="mailto:autowp@yandex.ru">Report copyright violation</a>.',
 
     /* Picture preview */
     'picture-preview/no-comments' => 'no',
@@ -214,6 +214,8 @@ return array (
     'catalogue/chronological' => 'Chronological',
     'catalogue/related' => 'Related',
     'catalogue/related-with-%1$s' => 'Related with %1$s',
+    'catalogue/sport' => 'Sport',
+    'catalogue/sport-of-%1$s' => '%1$s Sport',
 
     /* comments */
     'comments/title' => 'Comments',
@@ -245,4 +247,20 @@ return array (
     'perspective/bottom'         => 'bottom',
     'perspective/dashboard'      => 'dashboard',
     'perspective/boot'           => 'boot',
+
+    'login/sign-in' => 'Sign in',
+    'login/sign-out' => 'Sign out',
+    'login/name' => 'name',
+    'login/login-or-email' => 'login or e-mail',
+    'login/password' => 'password',
+    'login/password-confirm' => 'password (again)',
+    'login/captcha' => 'enter security code',
+    'login/registration' => 'Sign up',
+    'login/forgot-password?' => 'Forgot your password?',
+    'login/success-text' => 'We are glad to welcome you to our website',
+    'login/remember' => 'remember',
+    'login/if-you-lose-password' => 'If you have forgotten your username or password, you can use the <a href="/restorepassword/">form of recovery by e-mail</a>',
+    'login/if-you-not-registered' => 'If you are not registered on the website, you can <a href="/registration/">do it now</a>!',
+
+    'registration/if-you-registered' => 'If you are already registered, then you should not do it again, but only need to enter your username and password in the form on the right.',
 );

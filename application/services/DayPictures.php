@@ -5,57 +5,57 @@ class Application_Service_DayPictures
     /**
      * @var string
      */
-    protected $_timezone = 'UTC';
+    private $_timezone = 'UTC';
 
     /**
      * @var string
      */
-    protected $_dbTimezone = 'UTC';
+    private $_dbTimezone = 'UTC';
 
     /**
      * @var Zend_Db_Table_Select
      */
-    protected $_select = null;
+    private $_select = null;
 
     /**
      * @var string
      */
-    protected $_orderColumn = null;
+    private $_orderColumn = null;
 
     /**
      * @var string
      */
-    protected $_externalDateFormat = 'yyyy-MM-dd';
+    private $_externalDateFormat = 'yyyy-MM-dd';
 
     /**
      * @var string
      */
-    protected $_dbDateTimeFormat = MYSQL_DATETIME;
+    private $_dbDateTimeFormat = MYSQL_DATETIME;
 
     /**
      * @var Zend_Date
      */
-    protected $_currentDate = null;
+    private $_currentDate = null;
 
     /**
      * @var Zend_Date
      */
-    protected $_prevDate = null;
+    private $_prevDate = null;
 
     /**
      * @var Zend_Date
      */
-    protected $_nextDate = null;
+    private $_nextDate = null;
 
     /**
      * @var Zend_Date
      */
-    protected $_minDate = null;
+    private $_minDate = null;
 
     /**
      * @var Zend_Paginaotr
      */
-    protected $_paginator = null;
+    private $_paginator = null;
 
     /**
      * @param array $options
@@ -245,7 +245,7 @@ class Application_Service_DayPictures
     /**
      * @return Application_Service_DayPictures
      */
-    protected function _calcPrevDate()
+    private function _calcPrevDate()
     {
         if (!$this->_currentDate) {
             return $this;
@@ -318,7 +318,7 @@ class Application_Service_DayPictures
     /**
      * @return Application_Service_DayPictures
      */
-    protected function _calcNextDate()
+    private function _calcNextDate()
     {
         if (!$this->_currentDate) {
             return $this;
@@ -407,7 +407,7 @@ class Application_Service_DayPictures
      * @param Zend_Date $date
      * @return int
      */
-    protected function _dateCount(Zend_Date $date)
+    private function _dateCount(Zend_Date $date)
     {
         $column = $this->_quotedOrderColumn();
 
@@ -422,7 +422,7 @@ class Application_Service_DayPictures
     /**
      * @return Application_Service_DayPictures
      */
-    protected function _reset()
+    private function _reset()
     {
         $this->_nextDate = null;
         $this->_prevDate = null;
@@ -435,7 +435,7 @@ class Application_Service_DayPictures
      * @param Zend_Date $date
      * @return Zend_Date
      */
-    protected function _endOfDay(Zend_Date $date)
+    private function _endOfDay(Zend_Date $date)
     {
         $d = clone $date;
         return $d
@@ -448,7 +448,7 @@ class Application_Service_DayPictures
      * @param Zend_Date $date
      * @return Zend_Date
      */
-    protected function _startOfDay(Zend_Date $date)
+    private function _startOfDay(Zend_Date $date)
     {
         $d = clone $date;
         return $d
@@ -461,7 +461,7 @@ class Application_Service_DayPictures
      * @param Zend_Date $date
      * @return string
      */
-    protected function _startOfDayDbValue(Zend_Date $date)
+    private function _startOfDayDbValue(Zend_Date $date)
     {
         $d = $this->_startOfDay($date)->setTimezone($this->_dbTimezone);
         return $d->get($this->_dbDateTimeFormat);
@@ -471,7 +471,7 @@ class Application_Service_DayPictures
      * @param Zend_Date $date
      * @return string
      */
-    protected function _endOfDayDbValue(Zend_Date $date)
+    private function _endOfDayDbValue(Zend_Date $date)
     {
         $d = $this->_endOfDay($date)->setTimezone($this->_dbTimezone);
         return $d->get($this->_dbDateTimeFormat);
@@ -480,7 +480,7 @@ class Application_Service_DayPictures
     /**
      * @return Zend_Db_Table_Select
      */
-    protected function _selectClone()
+    private function _selectClone()
     {
         return clone $this->_select;
     }
@@ -508,7 +508,7 @@ class Application_Service_DayPictures
      * @return string
      * @throws Exception
      */
-    protected function _quotedOrderColumn()
+    private function _quotedOrderColumn()
     {
         if (!$this->_orderColumn) {
             throw new Exception('Order column not configured');

@@ -3,12 +3,12 @@
         'layout' => array(
             'blankPage' => false,
             'needLeft'  => false,
-            'needRight' => false
+            'needRight' => true
         ),
         'pageId' => 52,
     ));
 ?>
 <div class="well">
-    <p>Если вы уже зарегистрированы, то вам не следует делать этого снова, а нужно лишь ввести свой логин и пароль в форме справа.</p>
+    <p><?=$this->escape($this->translate('registration/if-you-registered'))?></p>
     <?=$this->form->render($this) ?>
 </div>

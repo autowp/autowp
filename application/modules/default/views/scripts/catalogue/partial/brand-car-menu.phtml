@@ -23,7 +23,7 @@
                 'action' => 'brand-car',
                 'type'   => 'sport',
                 'page'   => 1,
-            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->title) . ' Спорт <span class="badge">'.$this->sport['count'].'</span>', false) ?>
+            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->translate('catalogue/sport-of-%1$s', $this->title)) . ' <span class="badge">'.$this->sport['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->pictures['count'] > 0) { ?>

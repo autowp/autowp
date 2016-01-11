@@ -20,6 +20,8 @@ class Project_View_Helper_HumanDate extends Zend_View_Helper_Abstract
             }
             $dt = new DateTime();
             $dt->setTimestamp($time->getTimestamp());
+            $tz = new DateTimeZone($time->getTimezone());
+            $dt->setTimezone($tz);
             $time = $dt;
         }
 

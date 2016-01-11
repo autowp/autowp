@@ -42,10 +42,10 @@ return array (
     ),
 
     'layout/search' => 'Recherche',
-    'layout/footer' => 'Обращаем Ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br />' .
-        'Администрация сайта не располагает информацией о правомерности публикования этих материалов.<br />' .
-        'Все изображения размещены в ознакомительных целях.<br />' .
-        '<a href="mailto:autowp@yandex.ru">Сообщить о нарушении авторских прав</a>.',
+    'layout/footer' => 'S\'il vous plaît noter que tous les documents sur ce autowp.ru, sont ajouté par  les visiteurs.<br />' .
+                       'L\'administration du site ne dispose pas d\'informations de la légalité de la publication de ces matériaux.<br />' .
+                       'Toutes les images sont disponibles à des fins éducatives.<br />' .
+                       '<a href="mailto:autowp@yandex.ru">Signaler une violation de copyright</a>.',
 
     /* Picture preview */
     'picture-preview/no-comments' => 'non',
@@ -214,6 +214,8 @@ return array (
     'catalogue/chronological' => 'Chronologique',
     'catalogue/related' => 'Associé',
     'catalogue/related-with-%1$s' => 'Associé à %1$s',
+    'catalogue/sport' => 'Sport',
+    'catalogue/sport-of-%1$s' => '%1$s Sport',
 
     /* comments */
     'comments/title' => 'Commentaires',
@@ -245,4 +247,20 @@ return array (
     'perspective/bottom'         => 'bas',
     'perspective/dashboard'      => 'tableau de bord',
     'perspective/boot'           => 'coffre',
+
+    'login/sign-in' => 'Entrée',
+    'login/sign-out' => 'Sortie',
+    'login/name' => 'nom',
+    'login/login-or-email' => 'login ou e-mail',
+    'login/password' => 'mot de passe',
+    'login/password-confirm' => 'mot de passe (bis)',
+    'login/captcha' => 'entrez le code de sécurité',
+    'login/registration' => 'Enregistrement',
+    'login/forgot-password?' => 'Récupérer mot de passe',
+    'login/success-text' => 'Nous sommes heureux de vous revoir sur notre site',
+    'login/remember' => 'rappeller',
+    'login/if-you-lose-password' => 'Si vous avez oublié votre login ou mot de passe, vous pouvez utiliser <a href="/restorepassword/">le formulaire de récupération par e-mail</a>',
+    'login/if-you-not-registered' => 'Si vous n\'êtes pas enregistré sur le site, vous <a href="/registration/">pouvez le faire maintenant</a>!',
+
+    'registration/if-you-registered' => 'Si vous êtes déjà enregistré, vous ne devriez pas le faire à nouveau, mais seulement besoin de saisir votre login et mot de passe dans le formulaire à droite.',
 );

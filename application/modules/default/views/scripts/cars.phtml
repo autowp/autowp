@@ -73,14 +73,14 @@
             <?php if (isset($item['tuning']) && $item['tuning']) { ?>
                 <li>
                     <span class="glyphicon glyphicon-align-left"></span>
-                    <?=$this->htmlA($item['tuning']['url'], 'Тюнинг ('.$item['tuning']['count'].')')?>
+                    <?=$this->htmlA($item['tuning']['url'], mb_strtolower($this->translate('catalogue/related')) . ' ('.$item['tuning']['count'].')')?>
                 </li>
             <?php } ?>
 
             <?php if (isset($item['sport']) && $item['sport']) { ?>
                 <li>
                     <span class="glyphicon glyphicon-align-left"></span>
-                    <?=$this->htmlA($item['sport']['url'], 'Спорт ('.$item['sport']['count'].')')?>
+                    <?=$this->htmlA($item['sport']['url'], mb_strtolower($this->translate('catalogue/sport')) . ' ('.$item['sport']['count'].')')?>
                 </li>
             <?php } ?>
 

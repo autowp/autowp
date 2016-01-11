@@ -48,7 +48,7 @@ return array (
     ),
 
     'layout/search' => 'Поиск',
-    'layout/footer' => 'Обращаем Ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br />' .
+    'layout/footer' => 'Обращаем ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br />' .
                        'Администрация сайта не располагает информацией о правомерности публикования этих материалов.<br />' .
                        'Все изображения размещены в ознакомительных целях.<br />' .
                        '<a href="mailto:autowp@yandex.ru">Сообщить о нарушении авторских прав</a>.',
@@ -226,6 +226,8 @@ return array (
     'catalogue/chronological' => 'Хронология',
     'catalogue/related' => 'Связанные',
     'catalogue/related-with-%1$s' => 'Связанные с %1$s',
+    'catalogue/sport' => 'Спорт',
+    'catalogue/sport-of-%1$s' => '%1$s Спорт',
 
     /* comments */
     'comments/title' => 'Комментарии',
@@ -257,4 +259,20 @@ return array (
     'perspective/bottom'         => 'снизу',
     'perspective/dashboard'      => 'комбинация приборов',
     'perspective/boot'           => 'багажник',
+
+    'login/sign-in' => 'Вход',
+    'login/sign-out' => 'Выход',
+    'login/name' => 'имя',
+    'login/login-or-email' => 'логин или e-mail',
+    'login/password' => 'пароль',
+    'login/password-confirm' => 'пароль (ещё раз)',
+    'login/captcha' => 'введите код защиты',
+    'login/registration' => 'Регистрация',
+    'login/forgot-password?' => 'Забыли пароль?',
+    'login/success-text' => 'Рады снова приветствовать вас на нашем сайте',
+    'login/remember' => 'запомнить',
+    'login/if-you-lose-password' => 'Если вы забыли свой логин или пароль, вы можете воспользоваться <a href="/restorepassword/">формой восстановления по e-mail</a>',
+    'login/if-you-not-registered' => 'Если вы ещё не зарегистрированы на сайте, то можете <a href="/registration/">сделать это сейчас</a>',
+
+    'registration/if-you-registered' => 'Если вы уже зарегистрированы, то вам не следует делать этого снова, а нужно лишь ввести свой логин и пароль в форме справа.',
 );

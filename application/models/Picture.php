@@ -182,11 +182,12 @@ class Picture extends Project_Db_Table
             }
         }
 
+        $translate = Zend_Registry::get('Zend_Translate');
+
         $perspectives = array();
         if (count($perspectiveIds)) {
             $perspectiveTable = new Perspectives();
             $pRows = $perspectiveTable->find(array_keys($perspectiveIds));
-            $translate = Zend_Registry::get('Zend_Translate');
 
             foreach ($pRows as $row) {
                 $name = $translate->translate($row->name, $language);

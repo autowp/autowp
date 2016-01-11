@@ -1,10 +1,9 @@
-<h3>Авторизация</h3>
-<div class="well">
-    <?php if ($this->user()->logedIn()) { ?>
+<?php if ($this->user()->logedIn()) { ?>
+    <div class="well">
         <div>
-            Здравствуйте, <?=$this->user() ?><br />
-            <a href="/account/profile/">Личная страница</a><br />
-            <a href="/login/logout/">Выход</a>
+            <?=$this->user() ?><br />
+            <?=$this->htmlA('/account/profile/', $this->page(48)->name)?><br />
+            <?=$this->htmlA('/login/logout/', $this->translate('login/sign-out'))?>
         </div>
         <p>
             <span class="glyphicon glyphicon-comment"></span>
@@ -17,25 +16,29 @@
                 <?=$this->htmlA('/account/pm/', $this->translate('layout/personal-messages'))?>
             <?php } ?>
         </p>
-    <?php } else { ?>
+    </div>
+<?php } else { ?>
+    <h3><?=$this->escape($this->translate('login/sign-in'))?></h3>
+    <div class="well">
         <form action="/login/" method="post" class="login"><div>
-            <p><input type="text" name="login" placeholder="Логин или e-mail" class="form-control" /></p>
-            <p><input type="password" name="password" placeholder="Пароль" class="form-control" /></p>
+            <p><input type="text" name="login" placeholder="<?=$this->escape($this->translate('login/login-or-email'))?>" class="form-control" /></p>
+            <p><input type="password" name="password" placeholder="<?=$this->escape($this->translate('login/password'))?>" class="form-control" /></p>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" value="1" name="remember" /> запомнить?
+                    <input type="checkbox" value="1" name="remember" />
+                    <?=$this->escape($this->translate('login/remember'))?>
                 </label>
             </div>
             <div>
                 <div class="pull-right text-right">
-                    <a href="/registration/">Регистрация</a><br />
-                    <a href="/restorepassword/">Забыли пароль?</a>
+                    <?=$this->htmlA('/registration/', $this->translate('login/registration'))?><br />
+                    <?=$this->htmlA('/restorepassword/', $this->translate('login/forgot-password?'))?>
                 </div>
-                <input type="submit" value="войти" class="btn btn-primary" />
+                <input type="submit" value="<?=$this->escape($this->translate('login/sign-in'))?>" class="btn btn-primary" />
             </div>
         </div></form>
-    <?php } ?>
-</div>
+    </div>
+<?php } ?>
 
 <a class="twitter-timeline"  href="https://twitter.com/autowp_ru"  data-widget-id="323907714319253505" data-chrome="nofooter" width="370" height="730">Твиты пользователя @autowp_ru</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
