@@ -49,6 +49,8 @@ return array (
     'contributors' => 'составители',
 
     /* Layout */
+    'layout/meta/description' => 'Энциклопедия автомобилей в картинках. AutoWP.ru',
+    'layout/meta/keywords' => 'car, vehicle, auto, avto, автомобиль',
     'layout/brand' => 'AutoWP.ru',
     'layout/personal-messages' => 'Личные сообщения',
     'layout/you-have-%1$s-new-messages' => array(

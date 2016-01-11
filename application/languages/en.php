@@ -42,6 +42,8 @@ return array (
     'contributors' => 'contributors',
 
     /* Layout */
+    'layout/meta/description' => 'Encyclopedia of cars in the pictures. WheelsAge.org',
+    'layout/meta/keywords' => 'car, vehicle, auto, avto',
     'layout/brand' => 'WheelsAge.org',
     'layout/personal-messages' => 'Personal messages',
     'layout/you-have-%1$s-new-messages' => array(

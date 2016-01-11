@@ -42,6 +42,8 @@ return array (
     'contributors' => 'contributeurs',
 
     /* Layout */
+    'layout/meta/description' => 'Encyclopédie de voitures en images. WheelsAge.org',
+    'layout/meta/keywords' => 'car, vehicle, auto, avto, voiture',
     'layout/brand' => 'WheelsAge.org',
     'layout/personal-messages' => 'Messages personnels',
     'layout/you-have-%1$s-new-messages' => array(

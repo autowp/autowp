@@ -25,8 +25,8 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="#ede9de">
         <?php
             echo $this->headMeta()
-                ->appendName('keywords', 'auto, avto, автомобиль')
-                ->appendName('description', 'Энциклопедия автомобилей в картинках. AutoWP.ru');
+                ->appendName('keywords', $this->translate('layout/meta/keywords'))
+                ->appendName('description', $this->translate('layout/meta/description'));
             echo $this->headTitle();
             echo $this
                 ->headLink(array('rel' => 'shortcut icon', 'href' => '/favicon.ico', 'type' => 'image/x-icon'), 'PREPEND')
@@ -41,26 +41,11 @@
                     '/vendor/scottjehl/Respond/dest/respond.min.js',
                     'text/javascript',
                     array('conditional' => 'lt IE 9')
-                )
-                ->appendFile('/js/application.js');
+                );
 
             echo $this->headStyle();
         ?>
-        <script type="text/javascript">
-require(['application'], function(App) {
-    App.init();
-    <?php
-        $moduleOptions = isset($this->layout()->moduleOptions)
-            ? $this->layout()->moduleOptions
-            : null;
-    ?>
-    <?php if (isset($this->layout()->moduleName)) { ?>
-        require([<?=Zend_Json::encode($this->layout()->moduleName)?>], function(Module) {
-            Module.init(<?=Zend_Json::encode($moduleOptions)?>);
-        });
-    <?php } ?>
-});
-        </script>
+
     </head>
     <body>
         <?=$moderMenu ?>
@@ -102,7 +87,33 @@ require(['application'], function(App) {
                 <footer class="footer">
                     <div class="row">
                         <div class="col-md-6">
-<?php $this->inlineScript()->captureStart() ?>
+
+                        </div>
+                        <div class="col-md-6">
+                            <p class="copyrights"><?=$this->translate('layout/footer')?></p>
+                        </div>
+                    </div>
+                </footer>
+            <?php } ?>
+        </div>
+
+        <script type="text/javascript" src="/js/application.js"></script>
+        <script type="text/javascript">
+require(['application'], function(App) {
+    App.init();
+    <?php
+        $moduleOptions = isset($this->layout()->moduleOptions)
+            ? $this->layout()->moduleOptions
+            : null;
+    ?>
+    <?php if (isset($this->layout()->moduleName)) { ?>
+        require([<?=Zend_Json::encode($this->layout()->moduleName)?>], function(Module) {
+            Module.init(<?=Zend_Json::encode($moduleOptions)?>);
+        });
+    <?php } ?>
+});
+        </script>
+        <?php $this->inlineScript()->captureStart() ?>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -112,13 +123,5 @@ ga('require', 'displayfeatures');
 ga('send', 'pageview');
 <?php $this->inlineScript()->captureEnd() ?>
 <?=$this->inlineScript() ?>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="copyrights"><?=$this->translate('layout/footer')?></p>
-                        </div>
-                    </div>
-                </footer>
-            <?php } ?>
-        </div>
     </body>
 </html>
