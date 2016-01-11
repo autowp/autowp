@@ -178,7 +178,7 @@ class Comments
                 'author'              => $author,
                 'message'             => $row->message,
                 'datetime'            => $row->getDate('datetime'),
-                'ip'                  => inet_ntop($row->ip),
+                'ip'                  => $row->ip ? inet_ntop($row->ip) : null,
                 'vote'                => $row->vote,
                 'moderator_attention' => $row->moderator_attention,
                 'userVote'            => $vote,

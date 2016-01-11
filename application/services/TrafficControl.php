@@ -109,42 +109,36 @@ class Application_Service_TrafficControl
      * @param int|null $byUserId
      * @param string $reason
      */
-    private function _ban($ip, $seconds, $byUserId, $reason)
+    public function ban($ip, $seconds, $byUserId, $reason)
     {
         $table = $this->_getBannedTable();
 
         $row = $table->fetchRow(array(
-            'ip = unhex(?)' => bin2hex($ip)
+            'ip = INET6_ATON(?)' => $ip
         ));
-
-        if (!$row) {
-            $expr = $table->getAdapter()->quoteInto('UNHEX(?)', bin2hex($ip));
-            $row = $table->createRow(array(
-                'ip' => new Zend_Db_Expr($expr)
-            ));
-        }
 
         $datetime = new DateTime();
         $datetime->setTimezone(new DateTimeZone(MYSQL_TIMEZONE));
         $datetime->add(new DateInterval('PT'.$seconds.'S'));
+        $dateStr = $datetime->format(MYSQL_DATETIME_FORMAT);
 
-        $row->setFromArray(array(
-            'up_to'      => $datetime->format(MYSQL_DATETIME_FORMAT),
+        $data = array(
+            'up_to'      => $dateStr,
             'by_user_id' => $byUserId,
             'reason'     => $reason
-        ));
-        $row->save();
-    }
+        );
 
-    /**
-     * @param string $ip
-     * @param int $seconds
-     * @param int|null $byUserId
-     * @param string $reason
-     */
-    public function ban($ip, $seconds, $byUserId, $reason)
-    {
-        $this->_ban($this->_ip2binary($ip), $seconds, $byUserId, $reason);
+        if (!$row) {
+            $expr = $table->getAdapter()->quoteInto('INET6_ATON(?)', $ip);
+
+            $table->insert(array_replace($data, array(
+                'ip' => new Zend_Db_Expr($expr),
+            )));
+        } else {
+            $table->update($data, array(
+                'ip = INET6_ATON(?)' => $ip
+            ));
+        }
     }
 
     /**
@@ -163,8 +157,6 @@ class Application_Service_TrafficControl
      */
     private function _autoBanByProfile(array $profile)
     {
-        print $profile['reason'] . PHP_EOL;
-
         $table = $this->_getBannedTable();
 
         $db = $table->getAdapter();
@@ -179,13 +171,15 @@ class Application_Service_TrafficControl
                 ->having('c > ?', $profile['limit'])
                 );
         foreach ($rows as $row) {
-            $ip = $row['ip'];
+            $ip = inet_ntop($row['ip']);
 
-            if ($this->_inWhiteList($ip)) {
+            if ($this->inWhiteList($ip)) {
                 continue;
             }
 
-            $this->_ban($ip, $profile['time'], 9, $profile['reason']);
+            print $profile['reason'] . ' ' . $ip . PHP_EOL;
+
+            $this->ban($ip, $profile['time'], 9, $profile['reason']);
         }
     }
 
@@ -218,7 +212,11 @@ class Application_Service_TrafficControl
      */
     public function inWhiteList($ip)
     {
-        return $this->_inWhiteList($this->_ip2binary($ip));
+        $table = $this->_getWhitelistTable();
+
+        return (bool)$table->fetchRow(array(
+            'ip = INET6_ATON(?)' => $ip
+        ));
     }
 
     /**
@@ -362,29 +360,36 @@ class Application_Service_TrafficControl
 
     public function autoWhitelist()
     {
-        /*$monitoringTable = $this->_getMonitoringTable();
+        $monitoringTable = $this->_getMonitoringTable();
         $whitelistTable = $this->_getWhitelistTable();
         $bannedTable = $this->_getBannedTable();
 
-        $sql =  'SELECT ip, SUM(count) AS count FROM ip_monitoring4 '.
-                'WHERE day_date=CURDATE() GROUP BY ip '.
-                'ORDER BY count DESC limit 1000';
-        $rows = $monitoringTable->getAdapter()->fetchAll($sql);
+        $db = $monitoringTable->getAdapter();
+
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from($monitoringTable->info('name'), ['ip', 'count' => 'SUM(count)'])
+                ->where('day_date = CURDATE()')
+                ->group('ip')
+                ->order('count DESC')
+                ->limit(1000)
+        );
 
         foreach ($rows as &$row) {
             $ip = $row['ip'];
+            $ipText = inet_ntop($ip);
 
-            print bin2hex($ip). ': ';
+            print $ipText. ': ';
 
 
-            if (false && $this->_inWhitelist($ip)) {
+            if ($this->inWhitelist($ipText)) {
                 print 'whitelist, skip';
             } else {
 
                 $whitelist = false;
                 $whitelistDesc = '';
 
-                $host = gethostbyaddr($ip);
+                $host = gethostbyaddr($ipText);
 
                 if ($host === false) {
                     $host = 'unknown.host';
@@ -392,10 +397,10 @@ class Application_Service_TrafficControl
 
                 print $host;
 
-                $msnHost = 'msnbot-' . str_replace('.', '-', $ip) . '.search.msn.com';
-                $yandexComHost = 'spider-'.str_replace('.', '-', $ip).'.yandex.com';
+                $msnHost = 'msnbot-' . str_replace('.', '-', $ipText) . '.search.msn.com';
+                $yandexComHost = 'spider-'.str_replace('.', '-', $ipText).'.yandex.com';
                 $mailHostPattern = '/^fetcher[0-9]-[0-9]\.p\.mail.ru$/';
-                $googlebotHost = 'crawl-' . str_replace('.', '-', $ip) . '.googlebot.com';
+                $googlebotHost = 'crawl-' . str_replace('.', '-', $ipText) . '.googlebot.com';
                 if ($host == $msnHost) {
                     $whitelist = true;
                     $whitelistDesc = 'msnbot autodetect';
@@ -412,26 +417,15 @@ class Application_Service_TrafficControl
 
 
                 if ($whitelist) {
-                    $wr = $whitelistTable->fetchRow(array(
-                        'ip = ?' => $ip
-                    ));
-                    if (!$wr) {
-                        $whitelistTable->insert(array(
-                            'ip'          => $ip,
-                            'description' => $whitelistDesc
-                        ));
-                    }
-
-                    $banRow = $bannedTable->fetchRow(array(
-                        'ip = ?' => ip2long($ip)
+                    $whitelistTable->insert(array(
+                        'ip'          => $ip,
+                        'description' => $whitelistDesc
                     ));
 
-                    if ($banRow) {
-                        $banRow->delete();
-                    }
+                    $this->unban($ipText);
 
                     $monitoringTable->delete(array(
-                        'ip = ?' => $ip
+                        'ip = INET6_ATON(?)' => $ipText
                     ));
 
                     print ' whitelisted';
@@ -439,6 +433,6 @@ class Application_Service_TrafficControl
             }
 
             print PHP_EOL;
-        }*/
+        }
     }
 }
