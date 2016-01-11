@@ -236,7 +236,7 @@ return array (
     'perspective/front-strict'   => 'avant (strictement)',
     'perspective/left-strict'    => 'gauche (strictement)',
     'perspective/right-strict'   => 'droit (strictement)',
-    'perspective/back-strict'    => 'arrière (strictement)',
+    'perspective/back-strict'    => 'derrière (strictement)',
     'perspective/n/a'            => 'n/a',
     'perspective/label'          => 'label',
     'perspective/upper'          => 'haut',
