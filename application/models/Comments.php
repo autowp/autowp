@@ -76,6 +76,9 @@ class Comments
             }
         }
 
+        $messageTable = $this->_getMessageTable();
+        $db = $messageTable->getAdapter();
+
         $data = array(
             'datetime'            => new Zend_Db_Expr('NOW()'),
             'type_id'             => $typeId,
@@ -83,13 +86,12 @@ class Comments
             'parent_id'           => $parentMessage ? $parentMessage->id : null,
             'author_id'           => $authorId,
             'message'             => (string)$data['message'],
-            'ip'                  => inet_pton($data['ip']),
+            'ip'                  => new Zend_Db_Expr($db->quoteInto('INET6_ATON(?)', $data['ip'])),
             'moderator_attention' => $data['moderatorAttention']
                 ? Comment_Message::MODERATOR_ATTENTION_REQUIRED
                 : Comment_Message::MODERATOR_ATTENTION_NONE
         );
 
-        $messageTable = $this->_getMessageTable();
         $messageId = $messageTable->insert($data);
 
         if ($parentMessage) {

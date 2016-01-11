@@ -184,14 +184,13 @@ class Picture extends Project_Db_Table
 
         $perspectives = array();
         if (count($perspectiveIds)) {
-            $perspectiveLangTable = new Perspective_Language();
-            $pRows = $perspectiveLangTable->fetchAll(array(
-                'perspective_id in (?)' => array_keys($perspectiveIds),
-                'language = ?'          => $language
-            ));
+            $perspectiveTable = new Perspectives();
+            $pRows = $perspectiveTable->find(array_keys($perspectiveIds));
+            $translate = Zend_Registry::get('Zend_Translate');
 
             foreach ($pRows as $row) {
-                $perspectives[$row->perspective_id] = self::mbUcfirst($row->name) . ' ';
+                $name = $translate->translate($row->name, $language);
+                $perspectives[$row->id] = self::mbUcfirst($name) . ' ';
             }
         }
 

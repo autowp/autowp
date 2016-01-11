@@ -13,17 +13,21 @@ class Project_View_Helper_HumanTime extends Zend_View_Helper_Abstract
             throw new Zend_View_Exception('Expected parameter $time was not provided.');
         }
 
-        require_once 'Zend/Date.php';
-        if (!($time instanceof Zend_Date)) {
-           $time = new Zend_Date($time);
+        if (!$time instanceof DateTime) {
+            require_once 'Zend/Date.php';
+            if (!$time instanceof Zend_Date) {
+                $time = new Zend_Date($time);
+            }
+            $dt = new DateTime();
+            $dt->setTimestamp($time->getTimestamp());
+            $time = $dt;
         }
 
-        $now = new Zend_Date();
-        $now->sub($time);
+        $now = new DateTime('now');
 
-        $diff = $now->getTimestamp();
+        $diff = $now->getTimestamp() - $time->getTimestamp();
 
-        if ($diff <= 50) {
+        if ($diff > 0 && $diff <= 50) {
             //less than 50 seconds
             $s = $this->view->translate('few seconds ago');
 

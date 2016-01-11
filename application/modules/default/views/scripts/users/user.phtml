@@ -1,0 +1,246 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 62,
+        'args'   => array(
+            'USER_NAME'     => $this->current_user->getCompoundName(),
+            'USER_IDENTITY' => $this->current_user->identity ? $this->current_user->identity : 'user' . $this->current_user->id,
+        )
+    ));
+?>
+<div class="row">
+    <div class="col-md-6">
+
+        <div class="user-photo">
+            <?php if ($this->current_user->img) { ?>
+                <?=$this->img($this->current_user->img, array(
+                    'format' => 'photo',
+                    'alt'    => 'фотография ' . $this->current_user->getCompoundName(),
+                ))?>
+            <?php } elseif ($this->current_user->e_mail) { ?>
+                <?=$this->gravatar($this->current_user->e_mail, array(
+                    'img_size'    => 270,
+                    'default_img' => 'http://www.autowp.ru/_.gif'
+                )) ?>
+            <?php } ?>
+        </div>
+
+        <p>
+            Представился как: <strong>«<?=$this->escape($this->current_user->getCompoundName()) ?>»</strong>
+            <?php foreach ($this->renames as $rename) { ?>
+                <div style="color:#666666;margin-left:40px;cursor:help" title="<?=$this->escape($this->humanTime($rename->getDate('date')))?>">ранее известен как <strong style="color:#666666">«<?=$this->escape($rename->old_name) ?>»</strong></div>
+            <?php } ?>
+        </p>
+
+        <p>Тип учетной записи: <strong>
+        <?php if ($this->user($this->current_user)->inheritsRole('moder')) { ?>
+            Модератор
+        <?php } else { ?>
+            Посетитель
+        <?php } ?>
+        </strong></p>
+
+        <p>Зарегистрирован: <strong><?=$this->escape($this->humanDate($this->current_user->getDate('reg_date')))?></strong></p>
+        <p>Последний раз был на сайте: <strong><?=$this->escape($this->humanTime($this->current_user->getDate('last_online')))?></strong></p>
+        <?php if ($this->user()->logedIn()) { ?>
+            <p>
+                <span class="glyphicon glyphicon-comment"></span>
+                <?=$this->htmlA(array(
+                    'href'         => '#',
+                    'data-trigger' => 'show-pm-dialog',
+                    'data-user-id' => $this->current_user->id
+                ), 'Отправить личное сообщение')?>
+            </p>
+        <?php } ?>
+
+        <?php if ($this->current_user->icq) { ?>
+            <p>ICQ: <?=number_format($this->current_user->icq, 0, '.', '-') ?></p>
+        <?php } ?>
+        <?php if (count($this->accounts)) { ?>
+            <?php foreach ($this->accounts as $account) { ?>
+                <p>
+                    <?=$this->htmlImg(array(
+                        'src' => '/img/uat/' . $account->service_id . '.png'
+                    ))?>
+                    <?php if ($account->link) { ?>
+                        <?=$this->htmlA($account->link, $account->name)?>
+                    <?php } else { ?>
+                        <?=$this->escape($account->name)?>
+                    <?php } ?>
+                </p>
+            <?php } ?>
+        <?php } ?>
+
+        <h2>Активность на сайте</h2>
+        <div class="well">
+            <?php if ($this->current_user->pictures_added > 0) { ?>
+                <p>Добавил изображений: <strong><?=$this->current_user->pictures_added ?></strong></p>
+                <?php if ($this->picturesExists < $this->current_user->pictures_added) { ?>
+                    <p>из них на сайте осталось: <strong><?=$this->picturesExists?></strong></p>
+                <?php } ?>
+
+                <p><a href="<?=$this->escape($this->url(array(
+                    'action'   => 'pictures',
+                    'user_id'  => $this->current_user->id,
+                    'identity' => $this->current_user->identity,
+                ),'users')) ?>">Добавленные изображения</a></p>
+            <?php } else { ?>
+                <p>Не добавлял изображений</p>
+            <?php } ?>
+
+
+            <?php if ($this->user()->logedIn() && $this->acl()->inheritsRole($this->user()->get()->role, 'moder')) { ?>
+                <p><?=$this->htmlA($this->url(array(
+                    'module'     => 'default',
+                    'controller' => 'log',
+                    'action'     => 'index',
+                    'user_id'    => $this->current_user->id
+                ), 'default', true), 'Журнал событий пользователя') ?></p>
+            <?php } ?>
+        </div>
+
+
+        <?php if (count($this->last_pictures)) { ?>
+            <h2>Последние добавленные изображения</h2>
+            <div class="well">
+                <ul>
+                    <?php foreach ($this->last_pictures as $picture) { ?>
+                        <li><?=$this->htmlA(array(
+                            'href'  => $this->pic($picture)->url(),
+                            'class' => 'picture-hover-preview'
+                        ), $picture->getCaption())?></li>
+                    <?php } ?>
+                </ul>
+            </div>
+        <?php } ?>
+
+        <?php if (count($this->last_comments)) { ?>
+            <h2>Последние комментарии</h2>
+            <div class="well">
+                <ul class="comments">
+                    <?php foreach ($this->last_comments as $comment) { ?>
+                        <li>
+                            <?=$this->htmlA($comment->getUrl(), $comment->getMessagePreview())?>
+                        </li>
+                    <?php } ?>
+                    <li>&#xa0;...</li>
+                </ul>
+            </div>
+        <?php } ?>
+
+
+    </div>
+    <div class="col-md-6">
+
+        <?php if ($this->current_user->own_car || $this->current_user->dream_car) { ?>
+            <h2>Автомобиль</h2>
+            <div class="well">
+                <?php if ($this->current_user->own_car) { ?>
+                    <p>Личный: <strong><?=$this->escape($this->current_user->own_car) ?></strong></p>
+                <?php } ?>
+                <?php if ($this->current_user->dream_car) { ?>
+                    <p>Желаемый: <strong><?=$this->escape($this->current_user->dream_car) ?></strong></p>
+                <?php } ?>
+            </div>
+        <?php } ?>
+
+        <?php if ($this->canViewIp) { ?>
+            <h2>Для модераторов</h2>
+            <div class="well">
+                <?php if ($this->canRemovePhoto && $this->current_user->photo) { ?>
+                    <form action="<?=$this->escape($this->url(array(
+                        'module'     => 'moder',
+                        'controller' => 'users',
+                        'action'     => 'remove-user-photo',
+                        'id'         => $this->current_user->id
+                    ), 'default', true))?>" method="post">
+                        <button type="submit" class="btn btn-warning btn-block">Удалить фотографию пользователя</button>
+                    </form>
+                <?php } ?>
+
+                <?php if ($this->canDeleteUser) { ?>
+                    <form action="<?=$this->escape($this->url(array(
+                        'module'     => 'moder',
+                        'controller' => 'users',
+                        'action'     => 'delete-user',
+                        'id'         => $this->current_user->id
+                    ), 'default', true))?>" method="post">
+                        <button type="submit" class="btn btn-danger btn-block">Удалить пользователя</button>
+                    </form>
+                <?php } ?>
+
+                <p>
+                    Последний раз заходил с IP-адреса:
+                    <?=inet_ntop($this->current_user->last_ip) ?>
+                </p>
+
+                <?php if ($this->ban) { ?>
+                    <p>
+                        Этот адрес забанил
+                        <?php if ($this->ban['user']) { ?>
+                            <?=$this->user($this->ban['user']) ?>
+                        <?php } ?>
+                        <?php if ($this->ban['up_to']) { ?>
+                            до
+                            <?=$this->escape($this->humanTime($this->ban['up_to'])) ?>
+                            <?php if ($this->ban['reason']) { ?>
+                                (<?=$this->escape($this->ban['reason'])?>)
+                            <?php } ?>
+                        <?php } ?>
+                    </p>
+
+                    <?php if ($this->canBan) { ?>
+                        <form action="<?=$this->url(array(
+                            'controller' => 'ban',
+                            'action'     => 'unban-user',
+                            'user_id'    => $this->current_user->id
+                        ), 'default', true) ?>" method="post" style="margin:10px 0">
+                            <input type="submit" value="снять бан" />
+                        </form>
+                    <?php } ?>
+                <?php } ?>
+
+                <?php if ($this->canBan) { ?>
+                    <form action="<?=$this->escape($this->url(array(
+                        'controller' => 'ban',
+                        'action'     => 'ban-user',
+                        'user_id'    => $this->current_user->id
+                    ), 'default', true)) ?>" method="post" class="form-horizontal">
+                        <fieldset>
+                            <legend>Забанить</legend>
+                            <div class="control-group">
+                                <label class="control-label" for="period">На время</label>
+                                <div class="controls">
+                                    <?=$this->formSelect('period', '1', array(), array(
+                                        1  => 'час',
+                                        2  => '2 часа',
+                                        4  => '4 часа',
+                                        8  => '8 часов',
+                                        16 => '16 часов',
+                                        24 => 'сутки',
+                                        48 => 'двое суток',
+                                    ))?>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="period">Причина</label>
+                                <div class="controls">
+                                    <?=$this->formText('reason', '')?>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button class="btn btn-danger" type="submit">забанить</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                <?php } ?>
+
+            </div>
+        <?php } ?>
+
+    </div>
+</div>

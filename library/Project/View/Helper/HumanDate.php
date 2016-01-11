@@ -13,17 +13,35 @@ class Project_View_Helper_HumanDate extends Zend_View_Helper_Abstract
             throw new Zend_View_Exception('Expected parameter $time was not provided.');
         }
 
-        require_once 'Zend/Date.php';
-        if (!($time instanceof Zend_Date)) {
-           $time = new Zend_Date($time);
+        if (!$time instanceof DateTime) {
+            require_once 'Zend/Date.php';
+            if (!$time instanceof Zend_Date) {
+                $time = new Zend_Date($time);
+            }
+            $dt = new DateTime();
+            $dt->setTimestamp($time->getTimestamp());
+            $time = $dt;
         }
 
-        if ($time->isToday()) {
+        $now = new DateTime('now');
+        $ymd = $time->format('Ymd');
+        $isToday = $ymd == $now->format('Ymd');
+
+        if ($isToday) {
             $s = $this->view->translate('today');
-        } elseif ($time->isYesterday()) {
-            $s = $this->view->translate('yesterday');
         } else {
-            $s = $time->get(Zend_Date::DATE_MEDIUM);
+
+            $now->sub(new DateInterval('P1D'));
+            $isYesterday = $ymd == $now->format('Ymd');
+
+            if ($isYesterday) {
+                $s = $this->view->translate('yesterday');
+            } else {
+                $locale = Zend_Registry::get('Zend_Locale');
+                $df = new IntlDateFormatter($locale->toString(), IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                $s = $df->format($time);
+                //$s = $time->get(Zend_Date::DATE_MEDIUM);
+            }
         }
 
         return $s;
