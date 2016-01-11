@@ -15,6 +15,14 @@ return array (
         '%1$s commentaire',
         '%1$s commentaires',
     ),
+    '%1$s messages'      => array(
+        '%1$s message',
+        '%1$s messages',
+    ),
+    '%1$s topics'      => array(
+        '%1$s sujet',
+        '%1$s sujets',
+    ),
 
     'few seconds ago'    => 'il ya quelques secondes',
     'a minute ago'       => 'il y\'a une minute',
@@ -263,4 +271,25 @@ return array (
     'login/if-you-not-registered' => 'Si vous n\'êtes pas enregistré sur le site, vous <a href="/registration/">pouvez le faire maintenant</a>!',
 
     'registration/if-you-registered' => 'Si vous êtes déjà enregistré, vous ne devriez pas le faire à nouveau, mais seulement besoin de saisir votre login et mot de passe dans le formulaire à droite.',
+
+    'forums/go-to-theme-%1$s' => 'Accédez à la rubrique "%1$s"',
+    'forums/go-to-theme' => 'Accédez à la rubrique …',
+    'forums/subforums' => 'Sous-forums',
+    'forums/last-message-in-topic-%1$s' => 'Dernier message dans le sujet «%1$s»',
+    'forums/go-to-last-message' => 'Aller au dernier message',
+    'forums/theme/all-other' => 'Tout les autres',
+    'forums/theme/photos' => 'Thèmes de la photo',
+    'forums/theme/classifier' => 'Classifier',
+    'forums/theme/this-cite' => 'Ce site',
+    'forums/theme/german-cars' => 'Voitures Allemandes',
+    'forums/theme/italian-cars' => 'Voitures Italiennes',
+    'forums/theme/french-cars' => 'Voitures Françaises',
+    'forums/theme/japan-cars' => 'Voitures Japon',
+    'forums/theme/korean-cars' => 'Les voitures Coréennes',
+    'forums/theme/chinese-cars' => 'Voitures Chinoises',
+    'forums/theme/russian-cars' => 'les voitures russes',
+    'forums/theme/american-cars' => 'Voitures américaines',
+    'forums/theme/british-cars' => 'Voitures britanniques',
+    'forums/theme/moderators' => 'Modérateurs',
+    'forums/theme/cars' => 'Des voitures',
 );

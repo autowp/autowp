@@ -18,6 +18,16 @@ return array (
         '%1$s комментария',
         '%1$s комментариев',
     ),
+    '%1$s messages'      => array(
+        '%1$s сообщение',
+        '%1$s сообщения',
+        '%1$s сообщений',
+    ),
+    '%1$s topics'      => array(
+        '%1$s тема',
+        '%1$s темы',
+        '%1$s тем',
+    ),
 
     'few seconds ago'    => 'несколько секунд назад',
     'a minute ago'       => 'минуту назад',
@@ -275,4 +285,25 @@ return array (
     'login/if-you-not-registered' => 'Если вы ещё не зарегистрированы на сайте, то можете <a href="/registration/">сделать это сейчас</a>',
 
     'registration/if-you-registered' => 'Если вы уже зарегистрированы, то вам не следует делать этого снова, а нужно лишь ввести свой логин и пароль в форме справа.',
+
+    'forums/go-to-theme-%1$s' => 'Перейти в форум "%1$s"',
+    'forums/go-to-theme' => 'Зайти в форум …',
+    'forums/subforums' => 'Подфорумы',
+    'forums/last-message-in-topic-%1$s' => 'Последнее сообщение в теме «%1$s»',
+    'forums/go-to-last-message' => 'Перейти к последнему сообщению',
+    'forums/theme/all-other' => 'Обо всём',
+    'forums/theme/photos' => 'Фото-темы',
+    'forums/theme/classifier' => 'Классификатор',
+    'forums/theme/this-cite' => 'Работа сайта',
+    'forums/theme/german-cars' => 'Немецкие автомобили',
+    'forums/theme/italian-cars' => 'Итальянские автомобили',
+    'forums/theme/french-cars' => 'Французские автомобили',
+    'forums/theme/japan-cars' => 'Японские автомобили',
+    'forums/theme/korean-cars' => 'Корейские автомобили',
+    'forums/theme/chinese-cars' => 'Китайские автомобили',
+    'forums/theme/russian-cars' => 'Российские автомобили',
+    'forums/theme/american-cars' => 'Американские автомобили',
+    'forums/theme/british-cars' => 'Британские автомобили',
+    'forums/theme/moderators' => 'Модераторский форум',
+    'forums/theme/cars' => 'Автомобили',
 );

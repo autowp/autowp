@@ -15,6 +15,14 @@ return array (
         '%1$s comment',
         '%1$s comments',
     ),
+    '%1$s messages'      => array(
+        '%1$s message',
+        '%1$s messages',
+    ),
+    '%1$s topics'      => array(
+        '%1$s topic',
+        '%1$s topics',
+    ),
 
     'few seconds ago'    => 'few seconds ago',
     'a minute ago'       => 'a minute ago',
@@ -263,4 +271,25 @@ return array (
     'login/if-you-not-registered' => 'If you are not registered on the website, you can <a href="/registration/">do it now</a>!',
 
     'registration/if-you-registered' => 'If you are already registered, then you should not do it again, but only need to enter your username and password in the form on the right.',
+
+    'forums/go-to-theme-%1$s' => 'Go to forum "%1$s"',
+    'forums/go-to-theme' => 'Go to forum …',
+    'forums/subforums' => 'Subforums',
+    'forums/last-message-in-topic-%1$s' => 'Last message in topic «%1$s»',
+    'forums/go-to-last-message' => 'Go to last message',
+    'forums/theme/all-other' => 'All other',
+    'forums/theme/photos' => 'Photo themes',
+    'forums/theme/classifier' => 'Classifier',
+    'forums/theme/this-cite' => 'This website',
+    'forums/theme/german-cars' => 'German cars',
+    'forums/theme/italian-cars' => 'Italian cars',
+    'forums/theme/french-cars' => 'Francais cars',
+    'forums/theme/japan-cars' => 'Japan cars',
+    'forums/theme/korean-cars' => 'Korean cars',
+    'forums/theme/chinese-cars' => 'Chinese Cars',
+    'forums/theme/russian-cars' => 'Russian cars',
+    'forums/theme/american-cars' => 'American cars',
+    'forums/theme/british-cars' => 'British cars',
+    'forums/theme/moderators' => 'Moderators',
+    'forums/theme/cars' => 'Cars',
 );

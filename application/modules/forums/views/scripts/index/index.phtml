@@ -11,18 +11,21 @@
 
 <?php foreach ($this->themes as $theme) { ?>
     <div class="row">
-        <div class="col-lg-6 col-md-6">
+        <div class="col-md-6">
             <div class="well">
                 <p><span class="glyphicon glyphicon-th-list"></span> <strong><?=$this->htmlA(array(
-                    'href' => $theme['url'],
-                    'title' => 'Перейти в форум "'.$theme['name'].'"'
-                ), $theme['name']) ?></strong></p>
+                    'href'  => $theme['url'],
+                    'title' => $this->translate('forums/go-to-theme-%1$s', $this->translate($theme['name']))
+                ), $this->translate($theme['name'])) ?></strong></p>
                 <?php if ($theme['description']) { ?>
                     <p><?=$this->escape($theme['description']) ?></p>
                 <?php } ?>
-                <p>Тем: <?=$theme['topics'] ?>, Сообщений: <?=$theme['messages'] ?></p>
+                <p>
+                    <?=$this->translate(['%1$s topics', null, $theme['topics']], $theme['topics'])?>,
+                    <?=$this->translate(['%1$s messages', null, $theme['messages']], $theme['messages'])?>
+                </p>
                 <?php if (count($theme['subthemes'])) { ?>
-                    Подфорумы:
+                    <?=$this->escape($this->translate('forums/subforums'))?>:
                     <?php foreach ($theme['subthemes'] as $idx => $subtheme) {
                         if ($idx) {
                             print ', ';
@@ -30,33 +33,28 @@
                         print $this->htmlA($subtheme['url'], $subtheme['name']);
                     } ?>
                 <?php } else { ?>
-                    <p><?=$this->htmlA($theme['url'], 'Зайти в форум …') ?></p>
+                    <p><?=$this->htmlA($theme['url'], $this->translate('forums/go-to-theme')) ?></p>
                 <?php } ?>
             </div>
         </div>
-        <?php if ($topic = $theme['lastTopic']) { ?>
-            <div class="col-lg-6 col-md-6">
+        <?php if ($theme['lastTopic']) { ?>
+            <div class="col-md-6">
                 <div class="well transparent">
                     <?php if ($lastMessage = $theme['lastMessage']) { ?>
-                        <p><span class="glyphicon glyphicon-comment"></span> Последнее сообщение в теме «<?=$this->htmlA($this->url(array(
-                            'controller' => 'topic',
-                            'action'     => 'topic',
-                            'topic_id'   => $topic->id
-                        )), $topic->caption) ?>»</p>
                         <p>
-                            <?php if ($date = $lastMessage->getDate('datetime')) { ?>
-                                <?=$this->pastTimeIndicator($date)?>
+                            <span class="glyphicon glyphicon-comment"></span>
+                            <?=$this->translate('forums/last-message-in-topic-%1$s', $this->htmlA($lastMessage['url'], $theme['lastTopic']['name']))?>
+                        </p>
+                        <p>
+                            <?php if ($lastMessage['date']) { ?>
+                                <?=$this->pastTimeIndicator($lastMessage['date'])?>
                             <?php } ?>
-                            <?php if ($lastMessageAuthor = $lastMessage->findParentUsersByAuthor()) { ?>
-                                <?=$this->user($lastMessageAuthor) ?>
+                            <?php if ($lastMessage['author']) { ?>
+                                <?=$this->user($lastMessage['author']) ?>
                             <?php } ?>
                             <?=$this->htmlA(array(
-                                'href'  => $this->url(array(
-                                    'controller' => 'topic',
-                                    'action'     => 'topic-message',
-                                    'message_id' => $lastMessage->id
-                                )),
-                                'title' => 'Перейти к последнему сообщению'
+                                'href'  => $lastMessage['message-url'],
+                                'title' => $this->translate('forums/go-to-last-message')
                             ), '<span class="glyphicon glyphicon-share-alt"></span>', false) ?>
                         </p>
                     <?php } ?>

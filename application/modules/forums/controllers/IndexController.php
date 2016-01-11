@@ -23,8 +23,9 @@ class Forums_IndexController extends Zend_Controller_Action
         $themes = array();
 
         foreach ($themeTable->fetchAll($select) as $row) {
+            $lastTopic = false;
             $lastMessage = false;
-            $lastTopic = $topicsTable->fetchRow(
+            $lastTopicRow = $topicsTable->fetchRow(
                 $topicsTable->select(true)
                     ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', null)
                     ->where('forums_topics.status IN (?)', array(Forums_Topics::STATUS_NORMAL, Forums_Topics::STATUS_CLOSED))
@@ -33,8 +34,28 @@ class Forums_IndexController extends Zend_Controller_Action
                     ->where('comment_topic.type_id = ?', Comment_Message::FORUMS_TYPE_ID)
                     ->order('comment_topic.last_update DESC')
             );
-            if ($lastTopic) {
-                $lastMessage = $comments->getLastMessageRow(Comment_Message::FORUMS_TYPE_ID, $lastTopic->id);
+            if ($lastTopicRow) {
+                $lastTopic = array(
+                    'name' => $lastTopicRow->caption
+                );
+
+                $lastMessageRow = $comments->getLastMessageRow(Comment_Message::FORUMS_TYPE_ID, $lastTopicRow->id);
+                if ($lastMessageRow) {
+                    $lastMessage = array(
+                        'message-url' => $this->_helper->url->url(array(
+                            'controller' => 'topic',
+                            'action'     => 'topic-message',
+                            'message_id' => $lastMessageRow->id
+                        )),
+                        'url'  => $this->_helper->url->url(array(
+                            'controller' => 'topic',
+                            'action'     => 'topic',
+                            'topic_id'   => $lastTopicRow->id
+                        )),
+                        'date' => $lastMessageRow->getDate('datetime'),
+                        'author' => $lastMessageRow->findParentUsersByAuthor()
+                    );
+                }
             }
 
             $subthemes = array();
