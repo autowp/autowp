@@ -29,7 +29,7 @@ class Project_Controller_Plugin_LastOnline extends Zend_Controller_Plugin_Abstra
                     $changes = true;
                 }
 
-                $ip = ip2long($request->getServer('REMOTE_ADDR'));
+                $ip = inet_pton($request->getServer('REMOTE_ADDR'));
                 if ($ip != $user->last_ip) {
                     $user->last_ip = $ip;
                     $changes = true;

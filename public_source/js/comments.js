@@ -52,6 +52,8 @@ define(
                 }, 'json');
             });*/
             
+            $element.find('[data-toggle="tooltip"]').tooltip();
+            
             $element.find('.comment-remove-button').on('click', function(e) {
                 e.preventDefault();
                 

@@ -150,8 +150,10 @@
     </div>
 </div>
 
-<h4>
-    <?=$this->escape($this->translate('carlist/specifications'))?>
-    <small><?=$this->htmlA($this->pageData['statistics']['url'], $this->pageData['statistics']['name'])?></small>
-</h4>
-<?=$this->partial('index/partial/specs-cars.phtml', $this->specsCars)?>
+<?php if (count($this->specsCars) > 0) { ?>
+    <h4>
+        <?=$this->escape($this->translate('carlist/specifications'))?>
+        <small><?=$this->htmlA($this->pageData['statistics']['url'], $this->pageData['statistics']['name'])?></small>
+    </h4>
+    <?=$this->partial('index/partial/specs-cars.phtml', $this->specsCars)?>
+<?php } ?>

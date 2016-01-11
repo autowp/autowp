@@ -83,7 +83,7 @@ class Comments
             'parent_id'           => $parentMessage ? $parentMessage->id : null,
             'author_id'           => $authorId,
             'message'             => (string)$data['message'],
-            'ip'                  => $data['ip'],
+            'ip'                  => inet_pton($data['ip']),
             'moderator_attention' => $data['moderatorAttention']
                 ? Comment_Message::MODERATOR_ATTENTION_REQUIRED
                 : Comment_Message::MODERATOR_ATTENTION_NONE
@@ -178,7 +178,7 @@ class Comments
                 'author'              => $author,
                 'message'             => $row->message,
                 'datetime'            => $row->getDate('datetime'),
-                'ip'                  => long2ip($row->ip),
+                'ip'                  => inet_ntop($row->ip),
                 'vote'                => $row->vote,
                 'moderator_attention' => $row->moderator_attention,
                 'userVote'            => $vote,

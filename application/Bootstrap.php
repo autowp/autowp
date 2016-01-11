@@ -45,7 +45,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         define('MYSQL_DATE', 'yyyy-MM-dd');
         define('MYSQL_TIME', 'HH:mm:ss');
         define('MYSQL_DATETIME', MYSQL_DATE . ' ' . MYSQL_TIME);
-        define('MYSQL_TIMEZONE', 'Europe/Moscow');
+        define('MYSQL_TIMEZONE', 'UTC');
+        define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
 
         require_once 'BBDocument.php';
     }
