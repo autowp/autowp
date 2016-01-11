@@ -1,0 +1,108 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 67,
+    ));
+?>
+<div class="row">
+    <div class="col-md-6">
+        <?php if ($this->user()->inheritsRole('cars-moder')) { ?>
+            <h3>Автомобили</h3>
+            <div class="well">
+                <ul class="list-unstyled">
+                    <li>
+                        <span class="glyphicon glyphicon-align-left"></span>
+                        <?=$this->htmlA($this->url(array(
+                            'module'     => 'moder',
+                            'controller' => 'cars',
+                            'action'     => 'index',
+                        ), 'default', true), 'Автомобили')?>
+                    </li>
+
+                    <li>
+                        <span class="glyphicon glyphicon-sort-by-alphabet"></span>
+                        <?=$this->htmlA($this->url(array(
+                            'module'     => 'moder',
+                            'controller' => 'cars',
+                            'action'     => 'alpha',
+                        ), 'default', true), 'Алфавитный список автомобилей')?>
+                    </li>
+
+                    <?php if ($this->user()->isAllowed('car', 'add')) { ?>
+                        <li>
+                            <span class="glyphicon glyphicon-plus"></span>
+                            <?=$this->htmlA($this->url(array(
+                                'module'     => 'moder',
+                                'controller' => 'cars',
+                                'action'     => 'new',
+                            ), 'default', true), 'добавить')?>
+                        </li>
+                    <?php } ?>
+                </ul>
+            </div>
+        <?php } ?>
+        <h3>Двигатели</h3>
+        <div class="well">
+            <ul class="list-unstyled">
+                <li>
+                    <span class="glyphicon glyphicon-align-left"></span>
+                    <?=$this->htmlA($this->url(array(
+                        'module'     => 'moder',
+                        'controller' => 'engines',
+                        'action'     => 'index',
+                    ), 'default', true), 'Двигатели')?>
+                </li>
+                <?php if ($this->user()->isAllowed('engine', 'add')) { ?>
+                    <li>
+                        <span class="glyphicon glyphicon-plus"></span>
+                        <?=$this->htmlA($this->url(array(
+                            'module'     => 'moder',
+                            'controller' => 'engines',
+                            'action'     => 'add',
+                        ), 'default', true), 'добавить')?>
+                    </li>
+                <?php } ?>
+            </ul>
+        </div>
+        <h3>Заводы</h3>
+        <div class="well">
+            <ul class="list-unstyled">
+                <li>
+                    <span class="glyphicon glyphicon-align-left"></span>
+                    <?=$this->htmlA($this->url(array(
+                        'module'     => 'moder',
+                        'controller' => 'factory',
+                        'action'     => 'index',
+                    ), 'default', true), 'Заводы')?>
+                </li>
+                <?php if ($this->user()->isAllowed('factory', 'add')) { ?>
+                    <li>
+                        <span class="glyphicon glyphicon-plus"></span>
+                        <?=$this->htmlA($this->url(array(
+                            'module'     => 'moder',
+                            'controller' => 'factory',
+                            'action'     => 'add',
+                        ), 'default', true), 'добавить')?>
+                    </li>
+                <?php } ?>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <?php if ($this->addBrandForm) { ?>
+            <div class="well"><?=$this->addBrandForm->render($this) ?></div>
+        <?php } ?>
+        <h2>Другие инструменты</h2>
+        <div class="well">
+            <?php foreach ($this->menu as $url => $name) { ?>
+                <?=$this->htmlA($url, $name) ?>
+                <br />
+            <?php } ?>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 <?php
 
-class Moder_TraficController extends Zend_Controller_Action
+class Moder_TrafficController extends Zend_Controller_Action
 {
     public function preDispatch()
     {

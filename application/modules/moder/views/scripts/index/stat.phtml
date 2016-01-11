@@ -1,0 +1,22 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 119,
+    ));
+?>
+<ul>
+    <?php foreach ($this->data as $i => $data) { ?>
+        <li style="margin-bottom:20px">
+            <h3><?=$this->escape($data['name'])?></h3>
+            <p><?=$data['value']?> / <?=$data['total']?></p>
+            <div class="progress">
+                <div class="progress-bar" style="width:<?=100*$data['value']/$data['total']?>%"></div>
+            </div>
+        </li>
+    <?php } ?>
+</ul>

@@ -322,7 +322,7 @@ class UploadController extends Zend_Controller_Action
                     'parentId'           => null,
                     'authorId'           => $user->id,
                     'message'            => $values['note'],
-                    'ip'                 => ip2long($this->getRequest()->getServer('REMOTE_ADDR')),
+                    'ip'                 => $this->getRequest()->getServer('REMOTE_ADDR'),
                     'moderatorAttention' => Comment_Message::MODERATOR_ATTENTION_NONE
                 ));
             }
@@ -521,6 +521,7 @@ class UploadController extends Zend_Controller_Action
         ));
     }
 
+
     public function enginesAction()
     {
         $user = $this->_helper->user()->get();
@@ -559,6 +560,7 @@ class UploadController extends Zend_Controller_Action
         ));
     }
 
+
     public function conceptsAction()
     {
         $user = $this->_helper->user()->get();
@@ -589,6 +591,7 @@ class UploadController extends Zend_Controller_Action
             'concepts' => $concepts,
         ));
     }
+
 
     public function cropSaveAction()
     {
