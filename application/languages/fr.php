@@ -4,8 +4,8 @@ return array (
     /* Common words */
     'and' => 'et',
     '%1$s picures'       => array(
-        '%1$s photo',
-        '%1$s photos',
+        '%1$s image',
+        '%1$s images',
     ),
     '%1$s vehicles'      => array(
         '%1$s véhicule',
@@ -57,10 +57,10 @@ return array (
     'Comments count'              => 'Commentaires',
 
     /* SPECIFICATIONS*/
-    'rpm' => 'rpm',
+    'rpm' => 'tr/min',
     'Nm'  => 'Nm',
     'kW'  => 'kW',
-    'hp'  => 'hp',
+    'hp'  => 'cv',
     'spec/%1$s-gear' => array(
         '%1$s vitesse',
         '%1$s vitesses'
@@ -84,7 +84,7 @@ return array (
     'car-of-day'               => 'voiture de la journée',
     'day ahead'                => 'journée à l\'avance',
     'day ago'                  => 'il ya jour',
-    'Cars by destination'      => 'Cars by destination',
+    'Cars by destination'      => 'Voitures par destination',
     'All new pictures'         => 'toutes les nouvelles images',
 
     'all-link'                 => 'tous',
@@ -115,11 +115,11 @@ return array (
     'carlist/produced/one'    => 'Produit en un seul exemplaire',
     'carlist/produced/%1$s'   => array(
         'Produit en %1$s exemplaire',
-        'Produit en %1$s exemplaires'
+        'Produit à %1$s exemplaires'
     ),
     'carlist/produced-about/%1$s' => array(
-        'Produit en environ %1$s copie',
-        'Produit en environ %1$s copies'
+        'Produit dans environ %1$s exemplaire',
+        'Produit dans environ %1$s exemplaires'
     ),
     'carlist/specifications'  => 'caractéristiques',
     'carlist/designed by %s'  => 'dessinée par %s',
@@ -225,7 +225,7 @@ return array (
 
     /*perspectives*/
     'perspective/front'          => 'avant',
-    'perspective/back'           => 'arrière',
+    'perspective/back'           => 'derrière',
     'perspective/left'           => 'gauche',
     'perspective/right'          => 'droit',
     'perspective/interior'       => 'intérieur',
@@ -233,16 +233,16 @@ return array (
     'perspective/3/4-left'       => '¾ gauche',
     'perspective/3/4-right'      => '¾ droit',
     'perspective/cutaway'        => 'cutaway',
-    'perspective/front-strict'   => 'avant (strict)',
-    'perspective/left-strict'    => 'gauche (strict)',
-    'perspective/right-strict'   => 'droit (strict)',
-    'perspective/back-strict'    => 'arrière (strict)',
+    'perspective/front-strict'   => 'avant (strictement)',
+    'perspective/left-strict'    => 'gauche (strictement)',
+    'perspective/right-strict'   => 'droit (strictement)',
+    'perspective/back-strict'    => 'arrière (strictement)',
     'perspective/n/a'            => 'n/a',
-    'perspective/label'          => 'étiquette',
+    'perspective/label'          => 'label',
     'perspective/upper'          => 'haut',
     'perspective/under-the-hood' => 'sous la capuche',
-    'perspective/upper-strict'   => 'haut (strict)',
+    'perspective/upper-strict'   => 'haut (strictement)',
     'perspective/bottom'         => 'bas',
     'perspective/dashboard'      => 'tableau de bord',
-    'perspective/boot'           => 'botte',
+    'perspective/boot'           => 'coffre',
 );
