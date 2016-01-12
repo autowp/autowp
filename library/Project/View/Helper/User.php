@@ -2,12 +2,13 @@
 
 class Project_View_Helper_User extends Zend_View_Helper_Abstract
 {
-    protected $_userModel;
-    protected $_users = array();
+    private $_userModel;
 
-    protected $_user = null;
+    private $_users = array();
 
-    protected function _user($id)
+    private $_user = null;
+
+    private function _user($id)
     {
         if (!$id) {
             return null;
@@ -41,7 +42,7 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
     /**
      * @return Users_Row
      */
-    protected function _getLogedInUser()
+    private function _getLogedInUser()
     {
         $auth = Zend_Auth::getInstance();
 
@@ -79,7 +80,9 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
             if ($user) {
 
                 if ($user->deleted) {
-                    return '<span class="muted"><span class="glyphicon glyphicon-user"></span> удалённый пользователь</span>';
+                    return '<span class="muted"><span class="glyphicon glyphicon-user"></span> ' .
+                               $this->view->escape($this->view->translate('deleted-user')).
+                           '</span>';
                 }
 
                 $url = $this->view->url(array(

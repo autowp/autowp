@@ -48,6 +48,10 @@ return array (
     'contributor' => 'составитель',
     'contributors' => 'составители',
 
+    'deleted-user' => 'удалённый пользователь',
+
+    'sumbit' => 'Отправить',
+
     /* Layout */
     'layout/meta/description' => 'Энциклопедия автомобилей в картинках. AutoWP.ru',
     'layout/meta/keywords' => 'car, vehicle, auto, avto, автомобиль',
@@ -248,6 +252,8 @@ return array (
     'comments/it-requires-attention-of-moderators' => 'Требуется внимание модераторов',
     'comments/form-title' => 'Добавить комментарий',
     'comments/message' => 'Сообщение',
+    'comments/send' => 'Отправить',
+    'comments/cancel' => 'Отменить',
 
     /*perspectives*/
     'perspective/front'          => 'спереди',
@@ -293,6 +299,11 @@ return array (
     'forums/subforums' => 'Подфорумы',
     'forums/last-message-in-topic-%1$s' => 'Последнее сообщение в теме «%1$s»',
     'forums/go-to-last-message' => 'Перейти к последнему сообщению',
+    'forums/create-new-topic' => 'Создать новую тему',
+    'forums/theme/topics' => 'Топики',
+    'forums/theme/author' => 'Автор',
+    'forums/theme/last-message' => 'Последнее сообщение',
+    'forums/theme/total:' => 'Всего',
     'forums/theme/all-other' => 'Обо всём',
     'forums/theme/photos' => 'Фото-темы',
     'forums/theme/classifier' => 'Классификатор',
@@ -308,6 +319,9 @@ return array (
     'forums/theme/british-cars' => 'Британские автомобили',
     'forums/theme/moderators' => 'Модераторский форум',
     'forums/theme/cars' => 'Автомобили',
+    'forums/topic/name' => 'Тема топика',
+    'forums/topic/text' => 'Сообщение',
+    'forums/topic/subscribe-to-new-messages' => 'Подписаться на новые сообщения',
 
     'account/personal-message/reply' => 'ответить',
     'account/personal-message/delete' => 'удалить',

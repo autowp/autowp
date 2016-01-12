@@ -41,6 +41,10 @@ return array (
     'contributor' => 'contributor',
     'contributors' => 'contributors',
 
+    'deleted-user' => 'deleted user',
+
+    'sumbit' => 'Submit',
+
     /* Layout */
     'layout/meta/description' => 'Encyclopedia of cars in the pictures. WheelsAge.org',
     'layout/meta/keywords' => 'car, vehicle, auto, avto',
@@ -234,6 +238,8 @@ return array (
     'comments/it-requires-attention-of-moderators' => 'It requires attention of moderators',
     'comments/form-title' => 'Add comment',
     'comments/message' => 'Message',
+    'comments/send' => 'Send',
+    'comments/cancel' => 'Cancel',
 
     /*perspectives*/
     'perspective/front'          => 'front',
@@ -279,6 +285,11 @@ return array (
     'forums/subforums' => 'Subforums',
     'forums/last-message-in-topic-%1$s' => 'Last message in topic «%1$s»',
     'forums/go-to-last-message' => 'Go to last message',
+    'forums/create-new-topic' => 'Create new topic',
+    'forums/theme/topics' => 'Topics',
+    'forums/theme/author' => 'Author',
+    'forums/theme/last-message' => 'Last message',
+    'forums/theme/total:' => 'Total',
     'forums/theme/all-other' => 'All other',
     'forums/theme/photos' => 'Photo themes',
     'forums/theme/classifier' => 'Classifier',
@@ -294,6 +305,9 @@ return array (
     'forums/theme/british-cars' => 'British cars',
     'forums/theme/moderators' => 'Moderators',
     'forums/theme/cars' => 'Cars',
+    'forums/topic/name' => 'Title',
+    'forums/topic/text' => 'Message',
+    'forums/topic/subscribe-to-new-messages' => 'Subscribe to new messages',
 
     'account/personal-message/reply' => 'reply',
     'account/personal-message/delete' => 'delete',

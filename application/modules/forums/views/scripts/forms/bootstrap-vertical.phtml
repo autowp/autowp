@@ -67,7 +67,7 @@
         <p><?=$this->escape($desc)?></p>
     <?php } ?>
     <?php if (!$submitFound && !$this->element instanceof Zend_Form_SubForm) { ?>
-        <?=$this->formSubmit('submit', 'Отправить', array(
+        <?=$this->formSubmit('submit', $this->translate('sumbit'), array(
             'class' => 'btn btn-primary'
         ))?>
     <?php } ?>

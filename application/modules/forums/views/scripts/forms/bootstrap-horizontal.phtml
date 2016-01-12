@@ -90,7 +90,7 @@
     <?php if (!$submitFound && !$this->element instanceof Zend_Form_SubForm) { ?>
         <div class="row">
             <div class="col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2">
-                <?=$this->formSubmit('submit', 'Отправить', array(
+                <?=$this->formSubmit('submit', $this->translate('sumbit'), array(
                     'class' => 'btn btn-primary'
                 ))?>
             </div>

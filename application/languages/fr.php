@@ -41,6 +41,10 @@ return array (
     'contributor' => 'contributeur',
     'contributors' => 'contributeurs',
 
+    'deleted-user' => 'utilisateur supprimé',
+
+    'sumbit' => 'Envoyer',
+
     /* Layout */
     'layout/meta/description' => 'Encyclopédie de voitures en images. WheelsAge.org',
     'layout/meta/keywords' => 'car, vehicle, auto, avto, voiture',
@@ -234,6 +238,8 @@ return array (
     'comments/it-requires-attention-of-moderators' => 'Il nécessite une attention des modérateurs',
     'comments/form-title' => 'Ajouter un commentaire',
     'comments/message' => 'Message',
+    'comments/send' => 'Envoyer',
+    'comments/cancel' => 'Annuler',
 
     /*perspectives*/
     'perspective/front'          => 'avant',
@@ -279,6 +285,11 @@ return array (
     'forums/subforums' => 'Sous-forums',
     'forums/last-message-in-topic-%1$s' => 'Dernier message dans le sujet «%1$s»',
     'forums/go-to-last-message' => 'Aller au dernier message',
+    'forums/create-new-topic' => 'Créer un nouveau sujet',
+    'forums/theme/topics' => 'Sujets',
+    'forums/theme/author' => 'Auteur',
+    'forums/theme/last-message' => 'Dernier message',
+    'forums/theme/total:' => 'Total',
     'forums/theme/all-other' => 'Tout les autres',
     'forums/theme/photos' => 'Thèmes de la photo',
     'forums/theme/classifier' => 'Classifier',
@@ -294,6 +305,9 @@ return array (
     'forums/theme/british-cars' => 'Voitures britanniques',
     'forums/theme/moderators' => 'Modérateurs',
     'forums/theme/cars' => 'Des voitures',
+    'forums/topic/name' => 'Titre',
+    'forums/topic/text' => 'Message',
+    'forums/topic/subscribe-to-new-messages' => 'Abonnez-vous à de nouveaux messages',
 
     'account/personal-message/reply' => 'répondre',
     'account/personal-message/delete' => 'effacer',

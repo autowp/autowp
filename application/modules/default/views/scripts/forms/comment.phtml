@@ -22,7 +22,9 @@
         <div class="form-group <?=$element->hasErrors() ? ' has-error' : ''?>">
             <div class="controls checkbox">
                 <div class="pull-right cancel">
-                    <button class="btn btn-xs btn-warning">Отменить</button>
+                    <button class="btn btn-xs btn-warning">
+                        <?=$this->escape($this->translate('comments/cancel'))?>
+                    </button>
                 </div>
                 <label for="moderator_attention">
                     <?=$element?> <?=$this->escape($element->getLabel())?>
@@ -33,6 +35,8 @@
     <?=$this->element->getElement('parent_id')?>
     <?=$this->element->getElement('resolve')?>
     <div>
-        <button type="submit" class="btn btn-primary">Отправить</button>
+        <button type="submit" class="btn btn-primary">
+            <?=$this->escape($this->translate('comments/send'))?>
+        </button>
     </div>
 </fieldset>

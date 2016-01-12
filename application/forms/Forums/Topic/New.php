@@ -18,7 +18,7 @@ class Application_Form_Forums_Topic_New extends Project_Form
             'elements'   => array(
                 array('text', 'name', array(
                     'required'   => true,
-                    'label'      => 'Тема топика',
+                    'label'      => 'forums/topic/name',
                     'size'       => 80,
                     'maxlength'  => 100,
                     'filters'    => array('StringTrim'),
@@ -29,7 +29,7 @@ class Application_Form_Forums_Topic_New extends Project_Form
                 )),
                 array('textarea', 'text', array(
                     'required'   => true,
-                    'label'      => 'Сообщение',
+                    'label'      => 'forums/topic/text',
                     'cols'       => 140,
                     'rows'       => 15,
                     'filters'    => array('StringTrim'),
@@ -39,12 +39,12 @@ class Application_Form_Forums_Topic_New extends Project_Form
                     'decorators' => array('ViewHelper'),
                 )),
                 array('checkbox', 'moderator_attention', array(
-                    'label'      => 'Требуется внимание модераторов',
+                    'label'      => 'comments/it-requires-attention-of-moderators',
                     'decorators' => array('ViewHelper')
                 )),
                 array('checkbox', 'subscribe', array(
                     'required'   => false,
-                    'label'      => 'Подписаться на новые сообщения',
+                    'label'      => 'forums/topic/subscribe-to-new-messages',
                     'decorators' => array('ViewHelper')
                 )),
             )
