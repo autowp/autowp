@@ -120,7 +120,7 @@ return array (
     'logotypes'               => 'Logotypes',
     'mixed'                   => 'Varié',
 
-    'count 0'                 => 'aucun',
+    'count 0'                 => 'non',
 
     /* CAR LIST */
     'carlist/all pictures'    => 'toutes les images',
@@ -318,6 +318,14 @@ return array (
     'account/personal-message/system-notification' => 'Système notification',
     'account/personal-message/delete-all-sent' => 'Supprimer tous les messages envoyés',
     'account/personal-message/delete-all-system' => 'Supprimer toutes les notifications système',
+    'account/profile/personal' => 'Les données personnelles',
+    'account/profile/photo' => 'Photo',
+    'account/profile/use-gravatar' => 'Vous pouvez télécharger votre photo ou utiliser le service <a href="http://gravatar.com/">Gravatar</a>',
+    'account/profile/photo/delete' => 'Supprimer la photo',
+    'account/profile/other' => 'Autre',
+    'account/profile/votes-per-day' => 'Votes par jour',
+    'account/profile/votes-left' => 'Votes gauche',
+    'account/profile/timezone' => 'Fuseau horaire',
 
     'feedback/title' => 'Retour d\'information',
     'feedback/name'  => 'Votre nom',
@@ -332,4 +340,14 @@ return array (
     'picture/status/new' => 'Nouveau',
     'picture/status/accepted' => 'Reçu',
     'picture/status/removing' => 'Retrait en attente',
+    'picture/propose-image-replacement' => 'Propose de remplacer l\'image',
+    'picture/moderators-about-this-picture' => 'L\'opinion des modérateurs',
+    'picture/all-images-have-owners' => 'Toutes les images ont propriétaires.',
+    'picture/if-you-found-error' => 'Si vous pensez que utilisateurs du site s\'est trompé en affichant cette image dans cette section, ce serait bien si vous avez écrit à ce sujet dans les commentaires et ont indiqué à l\'erreur.',
+    'picture/where-to-talk' => 'Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur <a href="/forums/">notre forum</a>',
+
+    'users/rating/specifications' => 'Caractéristiques',
+    'users/rating/pictures' => 'Images',
+    'users/rating/specs-volume' => 'Volume',
+    'users/rating/weight' => 'Poids',
 );

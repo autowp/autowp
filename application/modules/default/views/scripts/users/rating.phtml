@@ -12,12 +12,12 @@
     <li<?=$this->rating == 'specs' ? ' class="active"' : ''?>>
         <?=$this->htmlA($this->url(array(
             'rating' => null
-        )), 'Specs')?>
+        )), $this->translate('users/rating/specifications'))?>
     </li>
     <li<?=$this->rating == 'pictures' ? ' class="active"' : ''?>>
         <?=$this->htmlA($this->url(array(
             'rating' => 'pictures'
-        )), 'Pictures')?>
+        )), $this->translate('users/rating/pictures'))?>
     </li>
 </ul>
 <table class="table">
@@ -26,9 +26,9 @@
             <th>#</th>
             <th></th>
             <th></th>
-            <th class="text-right"><?=$this->escape($this->valueTitle)?></th>
+            <th class="text-right"><?=$this->escape($this->translate($this->valueTitle))?></th>
             <?php if ($this->rating == 'specs') { ?>
-                <th class="text-right">Weight</th>
+                <th class="text-right"><?=$this->escape($this->translate('users/rating/specs-volume'))?></th>
             <?php } ?>
         </tr>
     </thead>

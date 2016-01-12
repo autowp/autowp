@@ -19,7 +19,7 @@ class Application_Form_Account_Profile extends Project_Form
             'elements'   => array(
                 array('text', 'name', array(
                     'required'   => true,
-                    'label'      => 'Имя',
+                    'label'      => 'login/name',
                     'maxlength'  => 30,
                     'size'       => 30,
                     'decorators' => array('ViewHelper')
@@ -32,7 +32,7 @@ class Application_Form_Account_Profile extends Project_Form
                     'size'       => 30,
                     'decorators' => array('ViewHelper')
                 )),
-                array('text', 'url', array(
+                /*array('text', 'url', array(
                     'required'   => false,
                     'label'      => 'Web-сайт',
                     'filters'    => array('StringTrim'),
@@ -56,7 +56,7 @@ class Application_Form_Account_Profile extends Project_Form
                     'maxlength'  => 100,
                     'size'       => 80,
                     'decorators' => array('ViewHelper')
-                )),
+                )),*/
             ),
         ));
     }

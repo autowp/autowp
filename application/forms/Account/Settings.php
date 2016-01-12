@@ -2,7 +2,7 @@
 
 class Application_Form_Account_Settings extends Project_Form
 {
-    protected $_timezones = array();
+    private $_timezones = array();
 
     public function setTimezoneList(array $list)
     {
@@ -27,7 +27,7 @@ class Application_Form_Account_Settings extends Project_Form
             'elements'   => array(
                 array('select', 'timezone', array(
                     'required'     => true,
-                    'label'        => 'Часовой пояс',
+                    'label'        => 'account/profile/timezone',
                     'multioptions' => array_combine($this->_timezones, $this->_timezones),
                     'decorators'   => array('ViewHelper')
                 )),

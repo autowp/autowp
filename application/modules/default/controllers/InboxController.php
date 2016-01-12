@@ -1,34 +1,42 @@
 <?php
+
 class InboxController extends Zend_Controller_Action
 {
-    protected $_perPage = 18;
+    private $_perPage = 18;
 
-    protected function _assignBrandControl(Brands_Row $brand = null)
+    private function _assignBrandControl(Brands_Row $brand = null)
     {
         $brandTable = $this->_helper->catalogue()->getBrandTable();
 
-        $brandRows = $brandTable->fetchAll(
-            $brandTable->select(true)
+        $db = $brandTable->getAdapter();
+
+        $brandRows = $db->fetchAll(
+            $db->select()
+                ->from('brands', ['folder', 'name' => 'IFNULL(brand_language.name, brands.caption)'])
+                ->joinLeft('brand_language', 'brands.id = brand_language.brand_id and brand_language.language = :language', null)
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
                 ->join('pictures', 'car_parent_cache.car_id = pictures.car_id', null)
                 ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
                 ->where('pictures.status = ?', Picture::STATUS_INBOX)
                 ->group('brands.id')
-                ->order(array('brands.position', 'brands.caption'))
+                ->order(array('brands.position', 'name'))
+                ->bind(array(
+                    'language' => $this->_helper->language()
+                ))
         );
         $url = $this->_helper->url->url(array(
             'brand' => null
         ));
         $brandOptions = array(
-            $url => 'все'
+            $url => $this->view->translate('all-link')
         );
         foreach ($brandRows as $brandRow) {
             $url = $this->_helper->url->url(array(
-                'brand' => $brandRow->folder,
+                'brand' => $brandRow['folder'],
                 'page'  => null
             ));
-            $brandOptions[$url] = $brandRow->caption;
+            $brandOptions[$url] = $brandRow['name'];
         }
 
         $currentBrandUrl = $this->_helper->url->url(array(

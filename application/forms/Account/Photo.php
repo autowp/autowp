@@ -2,7 +2,7 @@
 
 class Application_Form_Account_Photo extends Project_Form
 {
-    protected $_maxFileSize = 4194304; //1024*1024*4;
+    private $_maxFileSize = 4194304; //1024*1024*4;
 
     public function init()
     {
@@ -20,7 +20,7 @@ class Application_Form_Account_Photo extends Project_Form
             ),
             'elements'   => array(
                 array('file', 'photo', array(
-                    'label'       => 'Фотография',
+                    'label'       => 'account/profile/photo',
                     'required'    => true,
                     'validators'  => array(
                         array('Count', true, 1),
