@@ -90,7 +90,9 @@ define(
                     require([module], function(Module) {
                         Module(element);
                     });
-                })
+                });
+                
+                $('footer [data-toggle="tooltip"]').tooltip();
             }
         };
     }
