@@ -308,4 +308,11 @@ return array (
     'forums/theme/british-cars' => 'Британские автомобили',
     'forums/theme/moderators' => 'Модераторский форум',
     'forums/theme/cars' => 'Автомобили',
+
+    'account/personal-message/reply' => 'ответить',
+    'account/personal-message/delete' => 'удалить',
+    'account/personal-message/entire-dialog' => 'вся переписка',
+    'account/personal-message/system-notification' => 'Системное уведомление',
+    'account/personal-message/delete-all-sent' => 'Удалить все отправленные сообщения',
+    'account/personal-message/delete-all-system' => 'Удалить все уведомления',
 );

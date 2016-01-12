@@ -15,10 +15,10 @@
         'controller' => 'account',
         'action'     => 'clear-system-messages'
     )))?>" method="post">
-        <input type="submit" value="Удалить все уведомления" class="btn btn-danger" />
+        <input type="submit" value="<?=$this->escape($this->translate('account/personal-message/delete-all-system'))?>" class="btn btn-danger" />
     </form>
 <?php } ?>
-<div class="comments">
-    <?=$this->personalMessages($this->paginator->getCurrentItems()) ?>
-</div>
+<?=$this->partial('account/partial/personal-messages.phtml', array(
+    'messages' => $this->messages
+))?>
 <?=$this->paginationControl($this->paginator) ?>

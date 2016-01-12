@@ -5,17 +5,35 @@ class Project_View_Helper_PastTimeIndicator extends Zend_View_Helper_Abstract
     /**
      * @var Zend_Date
      */
-    protected $_pastLimit;
+    private $_pastLimit;
 
     public function __construct()
     {
-        $this->_pastLimit = Zend_Date::now()->subDay(1);
+        $date = new DateTime('now');
+        $date->sub(new DateInterval('P1D'));
+        $this->_pastLimit = $date;
     }
 
-    public function pastTimeIndicator(Zend_Date $date)
+    /**
+     * @param Zend_Date|DateTime $date
+     * @return string
+     */
+    public function pastTimeIndicator($time)
     {
-        $icon = $date->isLater($this->_pastLimit) ? 'glyphicon-time' : 'glyphicon-calendar';
+        if (!$time instanceof DateTime) {
+            require_once 'Zend/Date.php';
+            if (!$time instanceof Zend_Date) {
+                $time = new Zend_Date($time);
+            }
+            $dt = new DateTime();
+            $dt->setTimestamp($time->getTimestamp());
+            $tz = new DateTimeZone($time->getTimezone());
+            $dt->setTimezone($tz);
+            $time = $dt;
+        }
 
-        return '<span class="glyphicon ' . $icon . '"></span> ' . $this->view->escape($this->view->user()->humanTime($date));
+        $icon = $time > $this->_pastLimit ? 'glyphicon-time' : 'glyphicon-calendar';
+
+        return '<span class="glyphicon ' . $icon . '"></span> ' . $this->view->escape($this->view->user()->humanTime($time));
     }
 }

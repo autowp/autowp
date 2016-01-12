@@ -10,7 +10,7 @@
 
     $this->layout()->moduleName = 'default/account/pm';
 ?>
-<div class="comments">
-    <?=$this->personalMessages($this->paginator->getCurrentItems()) ?>
-</div>
+<?=$this->partial('account/partial/personal-messages.phtml', array(
+    'messages' => $this->messages
+))?>
 <?=$this->paginationControl($this->paginator) ?>

@@ -185,12 +185,17 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
             throw new Zend_View_Exception('Expected parameter $time was not provided.');
         }
 
-        require_once 'Zend/Date.php';
-        if (!($time instanceof Zend_Date)) {
-            $time = new Zend_Date($time);
-        }
+        $tz = $this->timezone();
 
-        $time->setTimeZone($this->timezone());
+        if ($time instanceof DateTime) {
+            $time->setTimezone(new DateTimeZone($tz));
+        } else {
+            require_once 'Zend/Date.php';
+            if (!($time instanceof Zend_Date)) {
+                $time = new Zend_Date($time);
+            }
+            $time->setTimeZone($tz);
+        }
 
         return $this->view->humanTime($time);
     }
@@ -202,12 +207,18 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
             throw new Zend_View_Exception('Expected parameter $time was not provided.');
         }
 
-        require_once 'Zend/Date.php';
-        if (!($time instanceof Zend_Date)) {
-            $time = new Zend_Date($time);
-        }
+        $tz = $this->timezone();
 
-        $time->setTimeZone($this->timezone());
+        if ($time instanceof DateTime) {
+            $time->setTimezone(new DateTimeZone($tz));
+        } else {
+            require_once 'Zend/Date.php';
+            if (!($time instanceof Zend_Date)) {
+                $time = new Zend_Date($time);
+            }
+
+            $time->setTimeZone($tz);
+        }
 
         return $this->view->humanDate($time);
     }

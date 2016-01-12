@@ -294,4 +294,11 @@ return array (
     'forums/theme/british-cars' => 'British cars',
     'forums/theme/moderators' => 'Moderators',
     'forums/theme/cars' => 'Cars',
+
+    'account/personal-message/reply' => 'reply',
+    'account/personal-message/delete' => 'delete',
+    'account/personal-message/entire-dialog' => 'entire dialog',
+    'account/personal-message/system-notification' => 'System notification',
+    'account/personal-message/delete-all-sent' => 'Delete all sent messages',
+    'account/personal-message/delete-all-system' => 'Delete all system notifications',
 );

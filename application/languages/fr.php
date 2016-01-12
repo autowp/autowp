@@ -294,4 +294,11 @@ return array (
     'forums/theme/british-cars' => 'Voitures britanniques',
     'forums/theme/moderators' => 'Modérateurs',
     'forums/theme/cars' => 'Des voitures',
+
+    'account/personal-message/reply' => 'répondre',
+    'account/personal-message/delete' => 'effacer',
+    'account/personal-message/entire-dialog' => 'dialogue entière',
+    'account/personal-message/system-notification' => 'Système notification',
+    'account/personal-message/delete-all-sent' => 'Supprimer tous les messages envoyés',
+    'account/personal-message/delete-all-system' => 'Supprimer toutes les notifications système',
 );
