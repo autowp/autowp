@@ -1,7 +1,7 @@
 <?php
 class SidebarController extends Zend_Controller_Action
 {
-    protected function _getBrandAliases(Brands_Row $brand)
+    private function _getBrandAliases(Brands_Row $brand)
     {
         $aliases = array($brand->caption);
 
@@ -34,7 +34,7 @@ class SidebarController extends Zend_Controller_Action
         return $aliases;
     }
 
-    protected function _designProjectBrandGroups($brand)
+    private function _designProjectBrandGroups($brand)
     {
         $brandTable = $this->_helper->catalogue()->getBrandTable();
 
@@ -63,7 +63,7 @@ class SidebarController extends Zend_Controller_Action
         return $groups;
     }
 
-    protected function _subBrandGroups($brand)
+    private function _subBrandGroups($brand)
     {
         $brandTable = $this->_helper->catalogue()->getBrandTable();
 
@@ -85,7 +85,7 @@ class SidebarController extends Zend_Controller_Action
         return $groups;
     }
 
-    protected function _carGroups($brand, $conceptsSeparatly, $carId)
+    private function _carGroups($brand, $conceptsSeparatly, $carId)
     {
         $cache = $this->getInvokeArg('bootstrap')
             ->getResource('cachemanager')->getCache('long');
@@ -184,7 +184,7 @@ class SidebarController extends Zend_Controller_Action
         return $groups;
     }
 
-    public function _otherGroups($brand, $conceptsSeparatly, $type, $isConcepts, $isEngines)
+    private function _otherGroups($brand, $conceptsSeparatly, $type, $isConcepts, $isEngines)
     {
         $cache = $this->getInvokeArg('bootstrap')
             ->getResource('cachemanager')->getCache('long');
@@ -325,12 +325,12 @@ class SidebarController extends Zend_Controller_Action
     }
 
 
-    protected function _getNamespace()
+    private function _getNamespace()
     {
         return new Zend_Session_Namespace(__CLASS__);
     }
 
-    protected function _brandGroups($brand, $type, $carId, $isConcepts, $isEngines)
+    private function _brandGroups($brand, $type, $carId, $isConcepts, $isEngines)
     {
         $conceptsSeparatly = !in_array($brand->type_id, array(3, 4));
 

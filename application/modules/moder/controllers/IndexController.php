@@ -99,7 +99,7 @@ class Moder_IndexController extends Zend_Controller_Action
                 'href'  => '/moder/pictures/index/order/1/status/inbox',
                 'label' => 'Инбокс',
                 'count' => $inboxCount,
-                'icon'  => 'glyphicon glyphicon-th'
+                'icon'  => 'fa fa-th'
             );
 
             $cmTable = new Comment_Message();
@@ -118,7 +118,7 @@ class Moder_IndexController extends Zend_Controller_Action
                 ), 'default', true),
                 'label' => 'Комментарии',
                 'count' => $attentionCount,
-                'icon'  => 'glyphicon glyphicon-comment'
+                'icon'  => 'fa fa-comment'
             );
 
             if ($this->_helper->user()->inheritsRole('pages-moder')) {
@@ -130,7 +130,7 @@ class Moder_IndexController extends Zend_Controller_Action
                         'action'     => 'index'
                     ), 'default', true),
                     'label' => 'Страницы сайта',
-                    'icon'  => 'glyphicon glyphicon-book'
+                    'icon'  => 'fa fa-book'
                 );
             }
 

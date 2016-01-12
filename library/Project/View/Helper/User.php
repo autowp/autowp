@@ -80,7 +80,7 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
             if ($user) {
 
                 if ($user->deleted) {
-                    return '<span class="muted"><span class="glyphicon glyphicon-user"></span> ' .
+                    return '<span class="muted"><i class="fa fa-user"></i> ' .
                                $this->view->escape($this->view->translate('deleted-user')).
                            '</span>';
                 }
@@ -108,7 +108,7 @@ class Project_View_Helper_User extends Zend_View_Helper_Abstract
 
                 $result =
                     '<span class="'.implode(' ', $classes).'">' .
-                        '<span class="glyphicon glyphicon-user"></span>&#xa0;' .
+                        '<i class="fa fa-user"></i>&#xa0;' .
                         $this->view->htmlA($url, $user->getCompoundName()) .
                     '</span>';
             }

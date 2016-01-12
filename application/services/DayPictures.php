@@ -2,13 +2,15 @@
 
 class Application_Service_DayPictures
 {
+    const DEFAULT_TIMEZONE = 'UTC';
+
     /**
-     * @var string
+     * @var DateTimeZone
      */
     private $_timezone = 'UTC';
 
     /**
-     * @var string
+     * @var DateTimeZone
      */
     private $_dbTimezone = 'UTC';
 
@@ -25,30 +27,30 @@ class Application_Service_DayPictures
     /**
      * @var string
      */
-    private $_externalDateFormat = 'yyyy-MM-dd';
+    private $_externalDateFormat = 'Y-m-d';
 
     /**
      * @var string
      */
-    private $_dbDateTimeFormat = MYSQL_DATETIME;
+    private $_dbDateTimeFormat = MYSQL_DATETIME_FORMAT;
 
     /**
-     * @var Zend_Date
+     * @var DateTime
      */
     private $_currentDate = null;
 
     /**
-     * @var Zend_Date
+     * @var DateTime
      */
     private $_prevDate = null;
 
     /**
-     * @var Zend_Date
+     * @var DateTime
      */
     private $_nextDate = null;
 
     /**
-     * @var Zend_Date
+     * @var DateTime
      */
     private $_minDate = null;
 
@@ -62,6 +64,9 @@ class Application_Service_DayPictures
      */
     public function __construct(array $options = array())
     {
+        $this->_timezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
+        $this->_dbTimezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
+
         $this->setOptions($options);
     }
 
@@ -90,7 +95,7 @@ class Application_Service_DayPictures
      */
     public function setTimeZone($timezone)
     {
-        $this->_timezone = (string)$timezone;
+        $this->_timezone = new DateTimeZone($timezone);
 
         return $this->_reset();
     }
@@ -101,7 +106,7 @@ class Application_Service_DayPictures
      */
     public function setDbTimeZone($timezone)
     {
-        $this->_dbTimezone = (string)$timezone;
+        $this->_dbTimezone = new DateTimeZone($timezone);
 
         return $this->_reset();
     }
@@ -118,10 +123,10 @@ class Application_Service_DayPictures
     }
 
     /**
-     * @param Zend_Date $date
+     * @param DateTime $date
      * @return Application_Service_DayPictures
      */
-    public function setMinDate(Zend_Date $date)
+    public function setMinDate(DateTime $date)
     {
         $this->_minDate = $date;
 
@@ -161,7 +166,7 @@ class Application_Service_DayPictures
     public function getCurrentDateStr()
     {
         return $this->_currentDate
-            ? $this->_currentDate->get($this->_externalDateFormat)
+            ? $this->_currentDate->format($this->_externalDateFormat)
             : false;
     }
 
@@ -174,7 +179,7 @@ class Application_Service_DayPictures
     }
 
     /**
-     * @param string|Zend_Date $date
+     * @param string|DateTime $date
      * @throws Exception
      * @return Application_Service_DayPictures
      */
@@ -184,19 +189,13 @@ class Application_Service_DayPictures
 
         if (!empty($date)) {
             if (is_string($date)) {
-                $dateStr = $date . ' ' . $this->_timezone;
-                $format = $this->_externalDateFormat . ' zzzz';
-
-                $dateObj = new Zend_Date($dateStr, $format);
-            } elseif ($date instanceof Zend_Date) {
+                $dateObj = DateTime::createFromFormat($this->_externalDateFormat, $date, $this->_timezone);
+            } elseif ($date instanceof DateTime) {
                 $dateObj = $date;
+                $dateObj->setTimeZone($this->_timezone);
             } else {
                 throw new Exception("Unexpected type of date");
             }
-        }
-
-        if ($dateObj) {
-            $dateObj->setTimeZone($this->_timezone);
         }
 
         $this->_currentDate = $dateObj;
@@ -232,14 +231,14 @@ class Application_Service_DayPictures
             return null;
         }
 
-        $lastDate = $lastPicture->getDate($this->_orderColumn);
+        $lastDate = $lastPicture->getDateTime($this->_orderColumn);
         if (!$lastDate) {
             return null;
         }
 
         return $lastDate
             ->setTimeZone($this->_timezone)
-            ->get($this->_externalDateFormat);
+            ->format($this->_externalDateFormat);
     }
 
     /**
@@ -267,7 +266,7 @@ class Application_Service_DayPictures
 
             $prevDate = false;
             if ($prevDatePicture) {
-                $date = $prevDatePicture->getDate($this->_orderColumn);
+                $date = $prevDatePicture->getDateTime($this->_orderColumn);
                 if ($date) {
                     $prevDate = $date;
                 }
@@ -284,7 +283,7 @@ class Application_Service_DayPictures
     }
 
     /**
-     * @return false|Zend_Date
+     * @return false|DateTime
      */
     public function getPrevDate()
     {
@@ -301,7 +300,7 @@ class Application_Service_DayPictures
         $this->_calcPrevDate();
 
         return $this->_prevDate
-            ? $this->_prevDate->get($this->_externalDateFormat)
+            ? $this->_prevDate->format($this->_externalDateFormat)
             : false;
     }
 
@@ -336,7 +335,7 @@ class Application_Service_DayPictures
 
             $nextDate = false;
             if ($nextDatePicture) {
-                $date = $nextDatePicture->getDate($this->_orderColumn);
+                $date = $nextDatePicture->getDateTime($this->_orderColumn);
                 if ($date) {
                     $nextDate = $date;
                 }
@@ -353,7 +352,7 @@ class Application_Service_DayPictures
     }
 
     /**
-     * @return false|Zend_Date
+     * @return false|DateTime
      */
     public function getNextDate()
     {
@@ -370,7 +369,7 @@ class Application_Service_DayPictures
         $this->_calcNextDate();
 
         return $this->_nextDate
-            ? $this->_nextDate->get($this->_externalDateFormat)
+            ? $this->_nextDate->format($this->_externalDateFormat)
             : false;
     }
 
@@ -404,10 +403,10 @@ class Application_Service_DayPictures
     }
 
     /**
-     * @param Zend_Date $date
+     * @param DateTime $date
      * @return int
      */
-    private function _dateCount(Zend_Date $date)
+    private function _dateCount(DateTime $date)
     {
         $column = $this->_quotedOrderColumn();
 
@@ -432,49 +431,43 @@ class Application_Service_DayPictures
     }
 
     /**
-     * @param Zend_Date $date
-     * @return Zend_Date
+     * @param DateTime $date
+     * @return DateTime
      */
-    private function _endOfDay(Zend_Date $date)
+    private function _endOfDay(DateTime $date)
     {
         $d = clone $date;
-        return $d
-            ->setHour(23)
-            ->setMinute(59)
-            ->setSecond(59);
+        return $d->setTime(23, 59, 59);
     }
 
     /**
-     * @param Zend_Date $date
-     * @return Zend_Date
+     * @param DateTime $date
+     * @return DateTime
      */
-    private function _startOfDay(Zend_Date $date)
+    private function _startOfDay(DateTime $date)
     {
         $d = clone $date;
-        return $d
-            ->setHour(0)
-            ->setMinute(0)
-            ->setSecond(0);
+        return $d->setTime(0, 0, 0);
     }
 
     /**
-     * @param Zend_Date $date
+     * @param DateTime $date
      * @return string
      */
-    private function _startOfDayDbValue(Zend_Date $date)
+    private function _startOfDayDbValue(DateTime $date)
     {
         $d = $this->_startOfDay($date)->setTimezone($this->_dbTimezone);
-        return $d->get($this->_dbDateTimeFormat);
+        return $d->format($this->_dbDateTimeFormat);
     }
 
     /**
-     * @param Zend_Date $date
+     * @param DateTime $date
      * @return string
      */
-    private function _endOfDayDbValue(Zend_Date $date)
+    private function _endOfDayDbValue(DateTime $date)
     {
         $d = $this->_endOfDay($date)->setTimezone($this->_dbTimezone);
-        return $d->get($this->_dbDateTimeFormat);
+        return $d->format($this->_dbDateTimeFormat);
     }
 
     /**

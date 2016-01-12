@@ -6,12 +6,12 @@
                 <?php foreach ($this->items as $item) { ?>
                     <li><?=$this->htmlA(
                         $item['href'],
-                        (isset($item['icon']) ? '<span class="'.$item['icon'].'"></span> ' : '') . $this->escape($item['label']) . (isset($item['count']) ? ' <span class="badge">'.$item['count'].'</span>' : ''),
+                        (isset($item['icon']) ? '<i class="'.$item['icon'].'"></i> ' : '') . $this->escape($item['label']) . (isset($item['count']) ? ' <span class="badge">'.$item['count'].'</span>' : ''),
                         false
                     ) ?></li>
                 <?php } ?>
                 <li class="divider"></li>
-                <li><a href="/moder/"><span class="glyphicon glyphicon-cog"></span> Страница&#xa0;модератора</a></li>
+                <li><a href="/moder/"><i class="fa fa-cog"></i> Страница&#xa0;модератора</a></li>
             </ul>
         </div>
     </div>

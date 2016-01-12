@@ -47,19 +47,19 @@
         <li>
             <?=$this->htmlA($this->url(array(
                 'action' => 'cars'
-            ), 'catalogue'), '<span class="glyphicon glyphicon-road"></span> ' . $this->escape($this->translate('catalogue/chronological')), false)?>
+            ), 'catalogue'), '<i class="fa fa-road"></i> ' . $this->escape($this->translate('catalogue/chronological')), false)?>
         </li>
         <li>
             <?=$this->htmlA($this->url(array(
                 'action' => 'recent'
-            ), 'catalogue'), '<span class="glyphicon glyphicon-th"></span> '. $this->escape($this->translate('catalogue/brand/new-pictures')), false)?>
+            ), 'catalogue'), '<i class="fa fa-th"></i> '. $this->escape($this->translate('catalogue/brand/new-pictures')), false)?>
         </li>
         <?php if ($this->haveTwins) { ?>
             <li>
                 <?=$this->htmlA($this->url(array(
                     'action'        => 'brand',
                     'brand_catname' => $this->brand->folder
-                ), 'twins', true), '<span class="glyphicon glyphicon-adjust"></span> ' . $this->escape($this->page(25)->name), false)?>
+                ), 'twins', true), '<i class="fa fa-adjust"></i> ' . $this->escape($this->page(25)->name), false)?>
             </li>
         <?php } ?>
         <?php if ($this->mostsActive) { ?>
@@ -67,7 +67,7 @@
                 <?=$this->htmlA($this->url(array(
                     'action'        => 'brand-mosts',
                     'brand_catname' => $this->brand->folder
-                ), 'catalogue', true), '<span class="glyphicon glyphicon-sort-by-attributes-alt"></span> ' . $this->escape($this->page(21)->name), false)?>
+                ), 'catalogue', true), '<i class="fa fa-sort-amount-desc"></i> ' . $this->escape($this->page(21)->name), false)?>
             </li>
         <?php } ?>
     </ul>

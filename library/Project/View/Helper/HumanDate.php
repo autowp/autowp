@@ -26,6 +26,7 @@ class Project_View_Helper_HumanDate extends Zend_View_Helper_Abstract
         }
 
         $now = new DateTime('now');
+        $now->setTimezone($time->getTimezone());
         $ymd = $time->format('Ymd');
         $isToday = $ymd == $now->format('Ymd');
 
@@ -41,7 +42,9 @@ class Project_View_Helper_HumanDate extends Zend_View_Helper_Abstract
             } else {
                 $locale = Zend_Registry::get('Zend_Locale');
                 $df = new IntlDateFormatter($locale->toString(), IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                $df->setTimezone($time->getTimezone());
                 $s = $df->format($time);
+                //$s = $time->format(MYSQL_DATETIME_FORMAT);
                 //$s = $time->get(Zend_Date::DATE_MEDIUM);
             }
         }
