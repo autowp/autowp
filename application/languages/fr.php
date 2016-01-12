@@ -230,6 +230,9 @@ return array (
     'catalogue/related-with-%1$s' => 'Associé à %1$s',
     'catalogue/sport' => 'Sport',
     'catalogue/sport-of-%1$s' => '%1$s Sport',
+    'catalogue/specifications-of-%1$s' => 'Caractéristiques de %1$s',
+    'catalogue/specifications' => 'Caractéristiques',
+    'catalogue/other-photos' => 'Plus d\'images',
 
     /* comments */
     'comments/title' => 'Commentaires',
@@ -315,4 +318,18 @@ return array (
     'account/personal-message/system-notification' => 'Système notification',
     'account/personal-message/delete-all-sent' => 'Supprimer tous les messages envoyés',
     'account/personal-message/delete-all-system' => 'Supprimer toutes les notifications système',
+
+    'feedback/title' => 'Retour d\'information',
+    'feedback/name'  => 'Votre nom',
+    'feedback/message' => 'Message',
+
+    'map/museums-and-factories' => 'Les musées et les usines',
+
+    'picture/image-specifications' => 'Caractéristiques de l\'image',
+    'picture/added-by:' => 'Ajouté:',
+    'picture/status:' => 'Titre de l\'image:',
+    'picture/status/inbox' => 'Une décision ne se fait pas',
+    'picture/status/new' => 'Nouveau',
+    'picture/status/accepted' => 'Reçu',
+    'picture/status/removing' => 'Retrait en attente',
 );

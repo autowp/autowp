@@ -230,6 +230,9 @@ return array (
     'catalogue/related-with-%1$s' => 'Related with %1$s',
     'catalogue/sport' => 'Sport',
     'catalogue/sport-of-%1$s' => '%1$s Sport',
+    'catalogue/specifications-of-%1$s' => 'Specifications of %1$s',
+    'catalogue/specifications' => 'Specifications',
+    'catalogue/other-photos' => 'Other photos',
 
     /* comments */
     'comments/title' => 'Comments',
@@ -315,4 +318,18 @@ return array (
     'account/personal-message/system-notification' => 'System notification',
     'account/personal-message/delete-all-sent' => 'Delete all sent messages',
     'account/personal-message/delete-all-system' => 'Delete all system notifications',
+
+    'feedback/title' => 'Feedback',
+    'feedback/name'  => 'Your name',
+    'feedback/message' => 'Message',
+
+    'map/museums-and-factories' => 'Museums and factories',
+
+    'picture/image-specifications' => 'Image specifications',
+    'picture/added-by:' => 'Added by:',
+    'picture/status:' => 'Picture status:',
+    'picture/status/inbox' => 'Undecided',
+    'picture/status/new' => 'New',
+    'picture/status/accepted' => 'Accepted',
+    'picture/status/removing' => 'Removing',
 );

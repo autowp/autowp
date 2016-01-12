@@ -6,7 +6,7 @@
 ?>
 <fieldset>
     <?php if ($legend = $this->element->getLegend()) { ?>
-        <legend><?=$this->escape($legend)?></legend>
+        <legend><?=$this->escape($this->translate($legend))?></legend>
     <?php } ?>
     <?php foreach ($this->element->getElements() as $element) { ?>
         <?php if ($element instanceof Zend_Form_Element) { ?>

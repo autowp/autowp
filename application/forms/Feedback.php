@@ -8,7 +8,7 @@ class Application_Form_Feedback extends Project_Form
 
         $this->setOptions(array(
             'method'     => 'post',
-            'legend'     => 'Обратная связь',
+            'legend'     => 'feedback/title',
             'decorators' => array(
                 'PrepareElements',
                 array('viewScript', array(
@@ -18,13 +18,12 @@ class Application_Form_Feedback extends Project_Form
             ),
             'elements'   => array(
                 array('text', 'name', array(
-                    'label'      => 'Ваше имя',
+                    'label'      => 'feedback/name',
                     'required'   => true,
                     'filters'    => array('StringTrim'),
                     'maxlength'  => 255,
                     'size'       => 80,
                     'decorators' => array('ViewHelper'),
-                    'class'      => 'span5',
                     'autocomplete' => 'name',
                 )),
                 array('text', 'email', array(
@@ -35,21 +34,19 @@ class Application_Form_Feedback extends Project_Form
                     'maxlength'  => 255,
                     'size'       => 80,
                     'decorators' => array('ViewHelper'),
-                    'class'      => 'span5',
                     'autocomplete' => 'email',
                 )),
                 array('textarea', 'message', array(
                     'required'   => true,
-                    'label'      => 'Сообщение',
+                    'label'      => 'feedback/message',
                     'cols'       => 80,
                     'rows'       => 8,
                     'filters'    => array('StringTrim'),
                     'decorators' => array('ViewHelper'),
-                    'class'      => 'span5'
                 )),
                 array('captcha', 'captcha', array(
                     'required'   => true,
-                    'label'      => 'Введите код защиты',
+                    'label'      => 'login/captcha',
                     'captcha'    => array(
                         'captcha' => 'Image',
                         'wordLen' => 4,
@@ -58,7 +55,6 @@ class Application_Form_Feedback extends Project_Form
                         'imgDir'  => PUBLIC_DIR . '/img/captcha/',
                         'imgUrl'  => '/img/captcha/'
                     ),
-                    'class'      => 'span5',
                     'decorators' => array('Captcha'),
                 )),
             )

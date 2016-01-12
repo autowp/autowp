@@ -244,6 +244,9 @@ return array (
     'catalogue/related-with-%1$s' => 'Связанные с %1$s',
     'catalogue/sport' => 'Спорт',
     'catalogue/sport-of-%1$s' => '%1$s Спорт',
+    'catalogue/specifications-of-%1$s' => 'Технические характеристики %1$s',
+    'catalogue/specifications' => 'Технические характеристики',
+    'catalogue/other-photos' => 'Другие фото',
 
     /* comments */
     'comments/title' => 'Комментарии',
@@ -329,4 +332,18 @@ return array (
     'account/personal-message/system-notification' => 'Системное уведомление',
     'account/personal-message/delete-all-sent' => 'Удалить все отправленные сообщения',
     'account/personal-message/delete-all-system' => 'Удалить все уведомления',
+
+    'feedback/title' => 'Обратная связь',
+    'feedback/name'  => 'Ваше имя',
+    'feedback/message' => 'Сообщение',
+
+    'map/museums-and-factories' => 'музеи и заводы',
+
+    'picture/image-specifications' => 'Характеристики изображения',
+    'picture/added-by:' => 'Добавил:',
+    'picture/status:' => 'Статус изображения:',
+    'picture/status/inbox' => 'Решение не вынесено',
+    'picture/status/new' => 'Новое',
+    'picture/status/accepted' => 'Принято',
+    'picture/status/removing' => 'Поставлено в очередь на удаление',
 );
