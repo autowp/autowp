@@ -1,0 +1,79 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 61,
+    ));
+
+    $this->layout()->moduleName = 'default/brands';
+?>
+<div><div class="btn-group">
+    <?php foreach ($this->brandList as $char => $info) { ?>
+        <?php if (preg_match('/[A-Za-z0-9]/isu', $char)) { ?>
+            <?=$this->htmlA(array(
+                'class' => 'btn btn-default',
+                'href'  => '#char' . $info['id']
+            ), $char)?>
+        <?php } ?>
+    <?php } ?>
+</div></div>
+<div><div class="btn-group">
+    <?php foreach ($this->brandList as $char => $info) { ?>
+        <?php if (!preg_match('/[A-Za-z0-9]/isu', $char)) { ?>
+            <?=$this->htmlA(array(
+                'class' => 'btn btn-default',
+                'href'  => '#char' . $info['id']
+            ), $char)?>
+        <?php } ?>
+    <?php } ?>
+</div></div>
+
+
+<?php foreach ($this->brandList as $char => $info) { ?>
+    <h2 id="char<?=urlencode($info['id'])?>">→ <?=$this->escape($char)?></h2>
+    <div class="brand-icons">
+        <?php foreach ($info['brands'] as $idx => $brand) {
+            $activePictures = $brand['activePictures'];
+            $oldPictures = $brand['totalPictures']-$activePictures;
+            $newCars = $brand['newCars'];
+            $oldCars = $brand['totalCars'] - $newCars;
+
+            /*if ($idx && ($idx % 4 == 0)) {
+                ?></div><div class="row brand-icons"><?php
+            }*/
+
+            ?><div class="row">
+                <div class="col-md-4">
+                    <?php if ($brand['logo']) { ?>
+                        <?=$this->htmlA($brand['url'], $this->htmlImg(array_merge(array(
+                            'src' => $brand['logo']['src']
+                        ), array(
+                            'alt'   => 'логотип '. $brand['name'],
+                            'title' => 'логотип '. $brand['name'],
+                            'class' => 'max-width'
+                        ))), false) ?>
+                    <?php } else { ?>
+                        &#xa0;
+                    <?php } ?>
+                </div>
+                <div class="col-md-8">
+                    <h4>
+                        <?=$this->htmlA($brand['url'], $brand['name'])?>
+                        <small>(<?=$oldCars ?><?php if ($newCars > 0) {
+                            echo $this->htmlA(array(
+                                'title' => 'Новые автомобили ' . $brand['name'],
+                                'class' => "popover-handler",
+                                'id'    => "brand_new_cars_" . $brand['id'],
+                                'href'  => $brand['newCarsUrl']
+                            ), '+' . $newCars);
+                        } ?>)</small>
+                    </h4>
+                    <p><small>картинок: (<?=$oldPictures ?><?php if ($activePictures > 0) { ?><small>+<?=$activePictures ?></small><?php } ?>)</small></p>
+                </div><?php
+            ?></div><?php
+        } ?>
+    </div>
+<?php } ?>

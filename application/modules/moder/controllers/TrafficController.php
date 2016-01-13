@@ -101,9 +101,9 @@ class Moder_TrafficController extends Zend_Controller_Action
         $users = new Users();
 
         foreach ($data as &$row) {
-            $row['users'] = $users->fetchAll(array(
+            $row['users'] = []; /*$users->fetchAll(array(
                 'last_ip = INET_ATON(?)' => $row['ip']
-            ));
+            ));*/
             $row['delete_url'] = $this->_helper->url->url(array(
                 'action' => 'whitelist-remove',
                 'ip'     => $row['ip']

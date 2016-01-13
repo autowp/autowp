@@ -695,7 +695,17 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                         ), 'default', true);
                         $links[$url] = 'Управление автомобилем ' . $car->getFullName();
 
-                        foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+                        $brandTable = new Brands();
+
+                        $brandRows = $brandTable->fetchAll(
+                            $brandTable->select(true)
+                                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+                                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                                ->where('car_parent_cache.car_id = ?', $car->id)
+                                ->group('brands.id')
+                        );
+
+                        foreach ($brandRows as $brand) {
                             $url = $urlHelper->url(array(
                                 'module'     => 'moder',
                                 'controller' => 'brands',

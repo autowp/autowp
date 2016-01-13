@@ -1,5 +1,4 @@
 define(
-    'moder/cars/car',
     ['jquery', 'tinymce', 'bootstrap', 'typeahead'],
     function($) {
         return {

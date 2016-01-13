@@ -364,4 +364,25 @@ return array (
     'users/rating/pictures' => 'Изображения',
     'users/rating/specs-volume' => 'Х-ки',
     'users/rating/weight' => 'Вес',
+
+    'users/registration/email-confirm-subject' => 'Регистрация на %1$s',
+    'users/registration/email-confirm-message' =>
+        "Здравствуйте.\n" .
+        "Вы зарегистрировались на сайте %1\$s\n" .
+        "Ваши регистрационные данные:\n" .
+        "E-mail: %2\$s\n" .
+        "Для подтверждения регистрации и указанного вами адреса электронной почты, вам необходимо перейти по ссылке %3\$s\n\n" .
+        "Если вы не регистрировались на сайте, то просто удалите это сообщение\n\n" .
+        "С Уважением, Робот %4\$s",
+    'users/registration/email-confirm/token-not-found' => 'Ссылка, по которой вы перешли на сайт - устарела',
+    'users/registration/email-confirm/success-text' => 'Ваш адрес электронной почты успешно подтвержден.',
+    'users/registration/success/email-sent' => 'На электронный адрес, указанный при регистрации, отправлено письмо с инструкциями для подтверждения адреса email.',
+    'users/change-email/confirm-subject' => 'Подтверждение e-mail на %1$s',
+    'users/change-email/confirm-message' =>
+        "Здравствуйте.\n\n" .
+        "Вы или кто-то другой запросили измнение контактного адреса своего аккаунта на сайте %1\$s на %2\$s\n" .
+        "Для подтверждения указанного действия, вам необходимо перейти по ссылке %3\$s\n\n" .
+        "Если сообщение попало к вам по ошибке - просто удалите его\n\n" .
+        "С Уважением, Робот %1\$s\n",
+    'users/change-email/confirmation-message-sent' => 'E-mail with a confirmation code was sent',
 );

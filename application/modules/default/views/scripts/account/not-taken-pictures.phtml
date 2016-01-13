@@ -1,0 +1,12 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 94,
+    ));
+?>
+<?=$this->partial('pictures.phtml', $this->picturesData)?>
+<?=$this->paginationControl($this->paginator) ?>

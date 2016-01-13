@@ -350,4 +350,25 @@ return array (
     'users/rating/pictures' => 'Pictures',
     'users/rating/specs-volume' => 'Specs volume',
     'users/rating/weight' => 'Weight',
+
+    'users/registration/email-confirm-subject' => 'Registration on %1$s',
+    'users/registration/email-confirm-message' =>
+        "Hello.\n" .
+        "You are registered on website %1\$s\n" .
+        "Your registration details:\n" .
+        "E-mail: %2\$s\n" .
+        "To confirm registration, and your e-mail address, you will need to click on the link %3\$s\n\n" .
+        "If you are not registered on the site, simply remove this message\n\n" .
+        "Sincerely, Robot %4\$s",
+    'users/registration/email-confirm/token-not-found' => 'The link you clicked is expires',
+    'users/registration/email-confirm/success-text' => 'Your e-mail address is successfully confirmed.',
+    'users/registration/success/email-sent' => 'Message with instructions to verify your e-mail sent.',
+    'users/change-email/confirm-subject' => 'E-mail confirm on %1$s',
+    'users/change-email/confirm-message' =>
+        "Hello.\n\n" .
+        "On the %1\$s you or someone else asked to change contact address of account to %2\$s\n" .
+        "For confirmation of this action, you must click on the link %3\$s\n\n" .
+        "If the message has got to you by mistake - just delete it\n\n" .
+        "Sincerely, Robot %1\$s\n",
+    'users/change-email/confirmation-message-sent' => 'E-mail with confirmation code was sent',
 );

@@ -350,4 +350,26 @@ return array (
     'users/rating/pictures' => 'Images',
     'users/rating/specs-volume' => 'Volume',
     'users/rating/weight' => 'Poids',
+
+    'users/registration/email-confirm-subject' => 'Enregistrement pour %1$s',
+    'users/registration/email-confirm-message' =>
+        "Bonjour.\n" .
+        "Vous êtes inscrit sur le site %1\$s\n" .
+        "Vos données d'enregistrement:\n" .
+        "E-mail: %2\$s\n" .
+        "Pour confirmer votre inscription, et votre e-mail, vous devrez cliquer sur le lien %3\$s\n\n" .
+        "Si vous n'êtes pas inscrit sur le site, il suffit de retirer ce message\n\n" .
+        "Sincèrement, le Robot de %4\$s",
+    'users/registration/email-confirm/token-not-found' => 'Le lien que vous avez cliqué est expiré',
+    'users/registration/email-confirm/success-text' => 'Votre adresse e-mail est confirmé avec succès.',
+    'users/registration/success/email-sent' => 'Message contenant des instructions pour vérifier votre e-mail envoyé.',
+    'users/change-email/confirm-subject' => 'E-mail confirm pour %1$s',
+    'users/change-email/confirm-message' =>
+        "Bonjour.\n\n" .
+        "Vous ou quelqu'un d'autre a demandé un changement dans l'adresse de votre compte de contact à %2\$s sur le site de %1\$s" .
+        "On the %1\$s you or someone else asked outcome variables contact address on your account %2\$s\n" .
+        "Pour la confirmation de cette action, vous devez cliquer sur le lien %3\$s\n\n" .
+        "Si le message a eu à vous par erreur - il suffit de le supprimer\n\n" .
+        "Sincèrement, le Robot de %1\$s\n",
+    'users/change-email/confirmation-message-sent' => 'Vous avez envoyé un e-mail avec un code de confirmation',
 );
