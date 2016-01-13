@@ -119,10 +119,10 @@ define(
 
                         $(this).find('.checkbox-tree > li').each(function() {
                             var $li = $(this);
-                            $li.children('.glyphicon-plus-sign').on('click', function() {
+                            $li.children('.fa-plus-circle').on('click', function() {
                                 $li.addClass('active');
                             });
-                            $li.children('.glyphicon-minus-sign').on('click', function() {
+                            $li.children('.fa-minus-circle').on('click', function() {
                                 $li.removeClass('active');
                             });
                         });
@@ -248,7 +248,7 @@ define(
                                         isGroup = true;
                                     }
                                     var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
-                                    return (isGroup ? '<span class="glyphicon glyphicon-folder-close"></span> ' : '') + item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+                                    return (isGroup ? '<i class="fa fa-folder-o"></i> ' : '') + item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
                                         return '<strong>' + match + '</strong>';
                                     });
                                 },

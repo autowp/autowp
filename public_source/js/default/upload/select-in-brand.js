@@ -21,10 +21,10 @@ define(
                     var $icon = $(this).children('span');
 
                     if ($content.is(':visible')) {
-                        $icon.removeClass('glyphicon-minus-sign').addClass('glyphicon-plus-sign');
+                        $icon.removeClass('fa-minus-circle').addClass('fa-plus-circle');
                         $content.slideUp();
                     } else {
-                        $icon.removeClass('glyphicon-plus-sign').addClass('glyphicon-minus-sign');
+                        $icon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
                         $content.slideDown();
                     }
                 });

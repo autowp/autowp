@@ -104,13 +104,13 @@ define(
                     '<div class="carousel-numbers"></div>' +
                     '<div class="carousel-inner"></div>' +
                     '<a class="left carousel-control" href="#" role="button">' +
-                        '<span class="glyphicon glyphicon-chevron-left"></span>' +
+                        '<i class="fa fa-chevron-left glyphicon glyphicon-chevron-left"></i>' +
                     '</a>' +
                     '<a class="right carousel-control" href="#" role="button">' +
-                        '<span class="glyphicon glyphicon-chevron-right"></span>' +
+                        '<i class="fa fa-chevron-right glyphicon glyphicon-chevron-right"></i>' +
                     '</a>' +
                     '<a class="close carousel-control" href="#" role="button">' +
-                        '<span class="glyphicon glyphicon-remove"></span>' +
+                        '<i class="fa fa-times"></i>' +
                     '</a>' +
                 '</div>' +
             '</div>';
@@ -336,11 +336,11 @@ define(
                 });
             },
             renderItem: function(item) {
-                var $loading = $('<div class="loading-icon"><span class="glyphicon glyphicon-repeat"></span></div>');
+                var $loading = $('<div class="loading-icon"><i class="fa fa-spinner"></i></div>');
                 
                 var $source = $(
                     '<a class="download carousel-control" role="button">' +
-                        '<span class="glyphicon glyphicon-download"></span>' +
+                        '<i class="fa fa-download"></i>' +
                         '<div class="badge badge-info"></div>' +
                     '</a>'
                 ).attr('href', item.sourceUrl);
@@ -349,13 +349,13 @@ define(
                 
                 var $details = $(
                     '<a class="details carousel-control" role="button">' +
-                        '<span class="glyphicon glyphicon-picture"></span>' +
+                        '<i class="fa fa-picture-o"></i>' +
                     '</a>'
                 ).attr('href', item.url);
                 
                 var $comments = $(
                     '<a class="comments carousel-control" role="button">' +
-                        '<span class="glyphicon glyphicon-comment"></span>' +
+                        '<i class="fa fa-comment"></i>' +
                     '</a>'
                 ).attr('href', item.url + '#comments');
                 
@@ -398,7 +398,7 @@ define(
                 if (item.crop) {
                     $(
                         '<a class="full carousel-control" role="button">' +
-                            '<span class="glyphicon glyphicon-fullscreen"></span>' +
+                            '<i class="fa fa-arrows-alt"></i>' +
                         '</a>'
                     ).appendTo($item);
                     

@@ -24,8 +24,6 @@ define(
             init: function(element) {
                 var $element = $(element);
                 
-                console.log($element);
-                
                 $element.each(function() {
                     $(this).on('click', '[data-specs-attr]', function() {
                         var $this = $(this);

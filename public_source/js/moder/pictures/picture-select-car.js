@@ -14,10 +14,10 @@ define(
 
                         if ($content.is(':visible')) {
                             $content.slideUp();
-                            $(this).find('span').removeClass('glyphicon-minus-sign').addClass('glyphicon-plus-sign');
+                            $(this).find('span').removeClass('fa-minus-circle').addClass('fa-plus-circle');
                         } else {
                             $content.slideDown();
-                            $(this).find('span').removeClass('glyphicon-plus-sign').addClass('glyphicon-minus-sign');
+                            $(this).find('span').removeClass('fa-plus-circle').addClass('fa-minus-circle');
                         }
                     });
                 });*/
@@ -39,10 +39,10 @@ define(
                     var $icon = $(this).children('span');
 
                     if ($content.is(':visible')) {
-                        $icon.removeClass('glyphicon-minus-sign').addClass('glyphicon-plus-sign');
+                        $icon.removeClass('fa-minus-circle').addClass('fa-plus-circle');
                         $content.slideUp();
                     } else {
-                        $icon.removeClass('glyphicon-plus-sign').addClass('glyphicon-minus-sign');
+                        $icon.removeClass('fa-plus-circle').addClass('fa-minus-circle');
                         $content.slideDown();
                     }
                 });
