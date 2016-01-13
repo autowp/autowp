@@ -28,7 +28,7 @@
 
     <ul class="carLinks">
         <li>
-            <span class="glyphicon glyphicon-file"></span>
+            <i class="fa fa-file"></i>
             <?php if ($twinsGroup['msgCount'] > 0) { ?>
                 <?=$this->htmlA($twinsGroup['detailsUrl'], $this->translate('carlist/details') . ' … (' . $this->translate(array('%1$s comments', null, $twinsGroup['msgCount']), $twinsGroup['msgCount']) . ')')?>
             <?php } else { ?>
@@ -37,7 +37,7 @@
         </li>
         <?php if ($twinsGroup['hasSpecs']) { ?>
             <li>
-                <span class="glyphicon glyphicon-list-alt"></span>
+                <i class="fa fa-list-alt"></i>
                 <?=$this->htmlA($twinsGroup['specsUrl'], $this->translate('carlist/specifications'))?>
             </li>
         <?php }?>
@@ -49,7 +49,7 @@
         <?php } ?>
         <?php if ($this->canEdit) { ?>
             <li>
-                <span class="glyphicon glyphicon-cog"></span>
+                <i class="fa fa-cog"></i>
                 <?=$this->htmlA($twinsGroup['moderUrl'], 'управление')?>
             </li>
         <?php } ?>

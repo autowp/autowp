@@ -19,7 +19,7 @@
         <ul class="list-unstyled">
             <?php if ($this->user()->isAllowed('factory', 'add')) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-plus"></span>
+                    <i class="fa fa-plus"></i>
                     <?=$this->htmlA($this->url(array(
                         'module'     => 'moder',
                         'controller' => 'factory',
@@ -59,7 +59,7 @@
                 </div>
                 <ul class="list-inline">
                     <li>
-                        <span class="glyphicon glyphicon-cog"></span>
+                        <i class="fa fa-cog"></i>
                         <?=$this->htmlA($factory['moderUrl'], 'управление')?>
                     </li>
                 </ul>

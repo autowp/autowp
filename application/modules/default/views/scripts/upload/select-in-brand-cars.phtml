@@ -21,7 +21,7 @@
                 'href'      => '#',
                 'class'     => 'arrow',
                 'data-load' => $car['loadUrl']
-            ), '<span class="glyphicon glyphicon-plus-sign"></span> ' . $this->escape($car['name']), false) ?>
+            ), '<i class="fa fa-plus-circle"></i> ' . $this->escape($car['name']), false) ?>
             <div style="margin:0 0 4px 18px;display:none">
                 <?php if (!$car['isGroup']) { ?>
                     <?=$this->htmlA($car['url'], $car['name']) ?><br />

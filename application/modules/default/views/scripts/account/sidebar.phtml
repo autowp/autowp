@@ -13,7 +13,7 @@
             'url'    => $this->url(array(
                 'action' => 'email'
             )),
-            'icon'   => 'envelope',
+            'icon'   => 'envelope-o',
             'name'   => $this->page(55)->name,
         ),
         array(
@@ -70,7 +70,7 @@
                 'controller' => 'account',
                 'action'     => 'specs-conflicts'
             ), 'account', true),
-            'icon'   => 'folder-close',
+            'icon'   => 'exclamation-triangle',
             'name'   => $this->page(188)->name
         ),
         array(
@@ -82,7 +82,7 @@
                 'controller' => 'account',
                 'action'     => 'personal-messages-inbox'
             ), 'account', true),
-            'icon'   => 'folder-close',
+            'icon'   => 'comments-o',
             'name'   => $this->page(128)->name,
             'count'    => $this->pmCount,
             'newCount' => $this->newPmCount
@@ -93,7 +93,7 @@
                 'controller' => 'account',
                 'action'     => 'personal-messages-sent'
             ), 'account', true),
-            'icon'   => 'folder-close',
+            'icon'   => 'comments-o',
             'name'   => $this->page(80)->name,
             'count'    => $this->omCount,
         ),
@@ -103,7 +103,7 @@
                 'controller' => 'account',
                 'action'     => 'personal-messages-system'
             ), 'account', true),
-            'icon'   => 'folder-close',
+            'icon'   => 'comments',
             'name'   => $this->page(81)->name,
             'count'    => $this->smCount,
             'newCount' => $this->newSmCount
@@ -134,7 +134,7 @@
 
                 $icon = '';
                 if (isset($item['icon'])) {
-                    $icon = '<span class="glyphicon glyphicon-'.$item['icon'].'"></span> ';
+                    $icon = '<i class="fa fa-'.$item['icon'].'"></i> ';
                 }
                 $active = isset($item['active']) && $item['active'];
             ?>

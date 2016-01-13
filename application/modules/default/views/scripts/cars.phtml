@@ -65,21 +65,21 @@
 
             <?php if (!$this->disableDetailsLink && ($item['hasHtml'] || $item['childsCount']) && isset($item['details']['url'])) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-align-left"></span>
+                    <i class="fa fa-align-left"></i>
                     <?=$this->htmlA($item['details']['url'], $this->translate('carlist/details') . ( $item['childsCount'] > 1 ? ' (' . $item['childsCount'] . ')' : '')) ?>
                 </li>
             <?php } ?>
 
             <?php if (isset($item['tuning']) && $item['tuning']) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-align-left"></span>
+                    <i class="fa fa-align-left"></i>
                     <?=$this->htmlA($item['tuning']['url'], mb_strtolower($this->translate('catalogue/related')) . ' ('.$item['tuning']['count'].')')?>
                 </li>
             <?php } ?>
 
             <?php if (isset($item['sport']) && $item['sport']) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-align-left"></span>
+                    <i class="fa fa-align-left"></i>
                     <?=$this->htmlA($item['sport']['url'], mb_strtolower($this->translate('catalogue/sport')) . ' ('.$item['sport']['count'].')')?>
                 </li>
             <?php } ?>
@@ -93,7 +93,7 @@
 
             <?php if (count($item['specsLinks']) > 1) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-list-alt"></span>
+                    <i class="fa fa-list-alt"></i>
                     <?=$this->escape($this->translate('carlist/specifications'))?>
                     <?php foreach ($item['specsLinks'] as $specLink) { ?>
                         <?=$this->htmlA($specLink['url'], $specLink['name'])?>
@@ -102,7 +102,7 @@
             <?php } else { ?>
                 <?php foreach ($item['specsLinks'] as $specLink) { ?>
                     <li>
-                        <span class="glyphicon glyphicon-list-alt"></span>
+                        <i class="fa fa-list-alt"></i>
                         <?=$this->htmlA($specLink['url'], $this->translate('carlist/specifications'))?>
                     </li>
                 <?php } ?>
@@ -111,7 +111,7 @@
             <?php if (isset($item['twinsGroups'])) { ?>
                 <?php foreach ($item['twinsGroups'] as $twinsGroup) { ?>
                     <li>
-                        <span class="glyphicon glyphicon-adjust"></span>
+                        <i class="fa fa-adjust"></i>
                         <?=$this->htmlA($twinsGroup['url'], $this->translate('carlist/twins')) ?>
                     </li>
                 <?php } ?>
@@ -119,21 +119,21 @@
 
             <?php foreach ($item['categories'] as $category) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-tag"></span>
+                    <i class="fa fa-tag"></i>
                     <?=$this->htmlA($category['url'], $category['name'])?>
                 </li>
             <?php } ?>
 
             <?php if ($this->isCarModer) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-cog"></span>
+                    <i class="fa fa-cog"></i>
                     <?=$this->htmlA($item['moderUrl'], 'управление') ?>
                 </li>
             <?php } ?>
 
             <?php if ($this->specEditor) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-pencil"></span>
+                    <i class="fa fa-pencil"></i>
                     <?=$this->htmlA($item['specEditorUrl'], $this->translate('carlist/edit-specs')) ?>
                 </li>
             <?php } ?>

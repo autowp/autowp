@@ -18,14 +18,14 @@
 <ul class="carLinks">
     <?php if ($this->hasSpecs) {?>
         <li>
-            <span class="glyphicon glyphicon-list-alt"></span>
+            <i class="fa fa-list-alt"></i>
             <?=$this->htmlA($this->specsUrl, 'технические характеристики')?>
         </li>
     <?php } ?>
 
     <?php if ($this->picturesCount) { ?>
         <li>
-            <span class="glyphicon glyphicon-th"></span>
+            <i class="fa fa-th"></i>
             <?=$this->htmlA($this->picturesUrl, 'все картинки ('.$this->picturesCount.')')?>
         </li>
     <?php } ?>

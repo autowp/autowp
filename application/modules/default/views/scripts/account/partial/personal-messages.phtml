@@ -27,10 +27,10 @@
                             'class'        => 'pull-right',
                             'data-trigger' => 'delete-pm',
                             'data-id'      => $message['id']
-                        ), '<span class="glyphicon glyphicon-trash"></span> ' . $this->escape($this->translate('account/personal-message/delete')), false)?>
+                        ), '<i class="fa fa-trash"></i> ' . $this->escape($this->translate('account/personal-message/delete')), false)?>
                     <?php } ?>
                     <?php if ($message['canReply']) { ?>
-                        <span class="glyphicon glyphicon-share-alt"></span>
+                        <i class="fa fa-reply"></i>
                         <?=$this->htmlA(array(
                             'href'         => '#',
                             'data-trigger' => 'show-pm-dialog',
@@ -38,7 +38,7 @@
                         ), $this->translate('account/personal-message/reply')) ?>
                         &nbsp;
                         <?php if ($message['allMessagesLink']) { ?>
-                            <span class="glyphicon glyphicon-align-justify"></span>
+                            <i class="fa fa-comments-o"></i>
                             <?=$this->htmlA($this->url(array(
                                 'controller' => 'account',
                                 'action'     => 'personal-messages-user',
@@ -49,7 +49,7 @@
                         <?php } ?>
                     <?php } ?>
                     <?php if ($message['date']) { ?>
-                        <span class="glyphicon glyphicon-time"></span>
+                        <i class="fa fa-clock-o"></i>
                         <?=$this->escape($this->user()->humanTime($message['date']))?>
                     <?php } ?>
                 </div>

@@ -3,28 +3,28 @@
         <li<?=$this->tree['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url(array(
                 'action' => 'engines',
-            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->title) . ' <span class="badge">'.$this->tree['count'].'</span>', false) ?>
+            )), '<i class="fa fa-list"></i> ' . $this->escape($this->title) . ' <span class="badge">'.$this->tree['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->specs['count'] > 0) { ?>
         <li<?=$this->specs['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url(array(
                 'action' => 'engine-specs',
-            )), '<span class="glyphicon glyphicon-list-alt"></span> ' . $this->escape($this->translate('carlist/specifications')) . ' <span class="badge">'.$this->specs['count'].'</span>', false) ?>
+            )), '<i class="fa fa-list-alt"></i> ' . $this->escape($this->translate('carlist/specifications')) . ' <span class="badge">'.$this->specs['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->cars['count'] > 0) { ?>
         <li<?=$this->cars['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url(array(
                 'action' => 'engine-cars',
-            )), '<span class="fa fa-car"></span> Автомобили  <span class="badge">'.$this->cars['count'].'</span>', false) ?>
+            )), '<span class="fa fa-car"></span> Автомобили <span class="badge">'.$this->cars['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->pictures['count'] > 0) { ?>
         <li<?=$this->pictures['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url(array(
                 'action' => 'engine-pictures',
-            )), '<span class="glyphicon glyphicon-th"></span> Изображения  <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
+            )), '<i class="fa fa-th"></i> Изображения <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
         </li>
     <?php } ?>
 </ul>

@@ -36,9 +36,9 @@
 
 <?php foreach ($this->themes as $theme) { ?>
     <div class="row">
-        <div class="col-lg-6 col-md-6">
+        <div class="col-md-6">
             <div class="well">
-                <p><span class="glyphicon glyphicon-th-list"></span> <strong><?=$this->htmlA(array(
+                <p><i class="fa fa-th-list"></i> <strong><?=$this->htmlA(array(
                     'href'  => $theme['url'],
                     'title' => $this->translate('forums/go-to-theme-%1$s', $this->translate($theme['name']))
                 ), $this->translate($theme['name'])) ?></strong></p>
@@ -53,11 +53,11 @@
             </div>
         </div>
         <?php if ($topic = $theme['lastTopic']) { ?>
-            <div class="col-lg-6 col-md-6">
+            <div class="col-md-6">
                 <div class="well transparent">
                     <?php if ($lastMessage = $theme['lastMessage']) { ?>
                         <p>
-                            <span class="glyphicon glyphicon-comment"></span>
+                            <i class="fa fa-comment"></i>
                             <?=$this->translate('forums/last-message-in-topic-%1$s', $this->htmlA($this->url(array(
                                 'controller' => 'topic',
                                 'action'     => 'topic',
@@ -94,7 +94,7 @@
             'controller' => 'topic',
             'action'     => 'new'
         )),
-    ), '<span class="glyphicon glyphicon-comment"></span> ' . $this->escape($this->translate('forums/create-new-topic')), false) ?>
+    ), '<i class="fa fa-comment"></i> ' . $this->escape($this->translate('forums/create-new-topic')), false) ?>
 
     <table class="table table-striped">
         <thead>
@@ -146,11 +146,11 @@
                             <div class="btn-group">
                                 <?php if ($topic['status'] == Forums_Topics::STATUS_CLOSED) { ?>
                                     <button title="открыть" class="btn btn-xs btn-warning open" id="open-topic-<?=$topic['id'] ?>">
-                                        <span class="glyphicon glyphicon-ok-circle"></span>
+                                        <i class="fa fa-check-circle"></i>
                                     </button>
                                 <?php } else { ?>
                                     <button title="закрыть" class="btn btn-xs btn-warning close-topic" id="close-topic-<?=$topic['id'] ?>">
-                                        <span class="glyphicon glyphicon-remove-circle"></span>
+                                        <i class="fa fa-times-circle"></i>
                                     </button>
                                 <?php } ?>
                                 <?=$this->htmlA(array(
@@ -163,9 +163,9 @@
                                     )),
                                     'class' => 'btn btn-default btn-xs',
                                     'title' => 'переместить'
-                                ), '<span class="glyphicon glyphicon-share-alt"></span>', false) ?>
+                                ), '<i class="fa fa-share"></i>', false) ?>
                                 <button title="удалить" class="btn btn-xs btn-danger delete" id="delete-topic-<?=$topic['id'] ?>">
-                                    <span class="glyphicon glyphicon-ban-circle"></span>
+                                    <i class="fa fa-ban"></i>
                                 </button>
                             </div>
                         </td>

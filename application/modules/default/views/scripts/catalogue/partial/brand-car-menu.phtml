@@ -5,7 +5,7 @@
                 'action' => 'brand-car',
                 'type'   => null,
                 'page'   => 1,
-            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->title) . ' <span class="badge">'.$this->stock['count'].'</span>', false) ?>
+            )), '<i class="fa fa-list"></i> ' . $this->escape($this->title) . ' <span class="badge">'.$this->stock['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->tuning['count'] > 0) { ?>
@@ -14,7 +14,7 @@
                 'action' => 'brand-car',
                 'type'   => 'tuning',
                 'page'   => 1,
-            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->translate('catalogue/related-with-%1$s', $this->title)) . ' <span class="badge">'.$this->tuning['count'].'</span>', false) ?>
+            )), '<i class="fa fa-list"></i> ' . $this->escape($this->translate('catalogue/related-with-%1$s', $this->title)) . ' <span class="badge">'.$this->tuning['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->sport['count'] > 0) { ?>
@@ -23,7 +23,7 @@
                 'action' => 'brand-car',
                 'type'   => 'sport',
                 'page'   => 1,
-            )), '<span class="glyphicon glyphicon-list"></span> ' . $this->escape($this->translate('catalogue/sport-of-%1$s', $this->title)) . ' <span class="badge">'.$this->sport['count'].'</span>', false) ?>
+            )), '<i class="fa fa-list"></i> ' . $this->escape($this->translate('catalogue/sport-of-%1$s', $this->title)) . ' <span class="badge">'.$this->sport['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->pictures['count'] > 0) { ?>
@@ -31,7 +31,7 @@
             <?=$this->htmlA($this->url(array(
                 'action' => 'brand-car-pictures',
                 'page'   => 1,
-            )), '<span class="glyphicon glyphicon-th"></span> ' . $this->escape($this->translate('catalogue/all-pictures-of-%1$s', $this->title)) . ' <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
+            )), '<i class="fa fa-th"></i> ' . $this->escape($this->translate('catalogue/all-pictures-of-%1$s', $this->title)) . ' <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
         </li>
     <?php } ?>
 </ul>

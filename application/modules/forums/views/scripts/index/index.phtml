@@ -13,7 +13,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="well">
-                <p><span class="glyphicon glyphicon-th-list"></span> <strong><?=$this->htmlA(array(
+                <p><i class="fa fa-th-list"></i> <strong><?=$this->htmlA(array(
                     'href'  => $theme['url'],
                     'title' => $this->translate('forums/go-to-theme-%1$s', $this->translate($theme['name']))
                 ), $this->translate($theme['name'])) ?></strong></p>
@@ -42,7 +42,7 @@
                 <div class="well transparent">
                     <?php if ($lastMessage = $theme['lastMessage']) { ?>
                         <p>
-                            <span class="glyphicon glyphicon-comment"></span>
+                            <i class="fa fa-comment"></i>
                             <?=$this->translate('forums/last-message-in-topic-%1$s', $this->htmlA($lastMessage['url'], $theme['lastTopic']['name']))?>
                         </p>
                         <p>
@@ -55,7 +55,7 @@
                             <?=$this->htmlA(array(
                                 'href'  => $lastMessage['message-url'],
                                 'title' => $this->translate('forums/go-to-last-message')
-                            ), '<span class="glyphicon glyphicon-share-alt"></span>', false) ?>
+                            ), '<i class="fa fa-share"></i>', false) ?>
                         </p>
                     <?php } ?>
                 </div>

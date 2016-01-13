@@ -32,8 +32,8 @@ class Project_View_Helper_PastTimeIndicator extends Zend_View_Helper_Abstract
             $time = $dt;
         }
 
-        $icon = $time > $this->_pastLimit ? 'glyphicon-time' : 'glyphicon-calendar';
+        $icon = $time > $this->_pastLimit ? 'fa-clock-o' : 'fa-calendar';
 
-        return '<span class="glyphicon ' . $icon . '"></span> ' . $this->view->escape($this->view->user()->humanTime($time));
+        return '<i class="fa ' . $icon . '"></i> ' . $this->view->escape($this->view->user()->humanTime($time));
     }
 }

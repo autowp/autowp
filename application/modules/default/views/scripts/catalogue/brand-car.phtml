@@ -44,7 +44,7 @@
 
 <?php if ($this->user()->inheritsRole('moder')) { ?>
     <p>
-        <span class="glyphicon glyphicon-cog"></span>
+        <i class="fa fa-cog"></i>
         <?=$this->htmlA($this->url(array(
             'module'     => 'moder',
             'controller' => 'cars',
@@ -53,7 +53,7 @@
         ), 'default', true), 'управление')?>
 
         <?php if ($this->user()->isAllowed('car', 'add')) { ?>
-            <span class="glyphicon glyphicon-plus"></span>
+            <i class="fa fa-plus"></i>
             <?=$this->htmlA($this->url(array(
                 'module'     => 'moder',
                 'controller' => 'cars',
@@ -63,7 +63,7 @@
         <?php } ?>
 
         <?php if ($this->canAcceptPicture && $this->inboxCount) { ?>
-            <span class="glyphicon glyphicon-th"></span>
+            <i class="fa fa-th"></i>
             <?=$this->htmlA($this->url(array(
                 'module'     => 'moder',
                 'controller' => 'pictures',
@@ -74,7 +74,7 @@
         <?php } ?>
 
         <?php if ($this->requireAttention) { ?>
-            <span class="glyphicon glyphicon-comment"></span>
+            <i class="fa fa-comment"></i>
             <?=$this->htmlA($this->url(array(
                 'module'     => 'moder',
                 'controller' => 'comments',
@@ -140,7 +140,7 @@
     </div>
 
     <?php if ($this->currentPicturesCount > 4) { ?>
-        <span class="glyphicon glyphicon-th"></span>
+        <i class="fa fa-th"></i>
         <?=$this->htmlA($this->currentPicturesUrl, $this->translate('carlist/all pictures').' ('.$this->currentPicturesCount.')')?>
     <?php } ?>
 <?php } ?>

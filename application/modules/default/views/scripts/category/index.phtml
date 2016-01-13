@@ -11,7 +11,7 @@
 <div class="row destinations thumbnails">
     <?php foreach ($this->categories as $idx => $category) { ?>
         <?php if ($idx && ($idx % 6 == 0)) { ?></div><div class="row destinations thumbnails"><?php }?>
-        <div class="col-lg-2 col-md-2">
+        <div class="col-md-2">
             <div class="thumbnail">
                 <?php if ($picture = $category['top_picture']) { ?>
                     <?php

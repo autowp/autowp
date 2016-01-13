@@ -48,7 +48,7 @@
         <p>Последний раз был на сайте: <strong><?=$this->escape($this->humanTime($this->current_user->getDate('last_online')))?></strong></p>
         <?php if ($this->user()->logedIn()) { ?>
             <p>
-                <span class="glyphicon glyphicon-comment"></span>
+                <i class="fa fa-reply"></i>
                 <?=$this->htmlA(array(
                     'href'         => '#',
                     'data-trigger' => 'show-pm-dialog',
@@ -136,7 +136,7 @@
     </div>
     <div class="col-md-6">
 
-        <?php if ($this->current_user->own_car || $this->current_user->dream_car) { ?>
+        <?php /* if ($this->current_user->own_car || $this->current_user->dream_car) { ?>
             <h2>Автомобиль</h2>
             <div class="well">
                 <?php if ($this->current_user->own_car) { ?>
@@ -146,7 +146,7 @@
                     <p>Желаемый: <strong><?=$this->escape($this->current_user->dream_car) ?></strong></p>
                 <?php } ?>
             </div>
-        <?php } ?>
+        <?php } */ ?>
 
         <?php if ($this->canViewIp) { ?>
             <h2>Для модераторов</h2>

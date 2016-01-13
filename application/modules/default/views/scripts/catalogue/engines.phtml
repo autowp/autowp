@@ -16,7 +16,7 @@
 <?php if ($this->user()->inheritsRole('moder')) { ?>
     <p>
         <?php if ($this->engine) { ?>
-            <span class="glyphicon glyphicon-cog"></span>
+            <i class="fa fa-cog"></i>
             <?=$this->htmlA($this->url(array(
                 'module'     => 'moder',
                 'controller' => 'engines',
@@ -25,7 +25,7 @@
             ), 'default', true), 'управление')?>
         <?php } ?>
         <?php if ($this->user()->isAllowed('engine', 'add')) { ?>
-            <span class="glyphicon glyphicon-plus"></span>
+            <i class="fa fa-plus"></i>
             <?php if ($this->engine) { ?>
                 <?=$this->htmlA($this->url(array(
                     'module'     => 'moder',
@@ -95,25 +95,25 @@
         <ul class="list-inline">
             <?php if ($engine['detailsUrl']) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-align-left"></span>
+                    <i class="fa fa-align-left"></i>
                     <?=$this->htmlA($engine['detailsUrl'], $this->translate('carlist/details') . ' (' . $engine['childsCount'] . ')')?>
                 </li>
             <?php } ?>
             <?php if ($engine['moderUrl']) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-cog"></span>
+                    <i class="fa fa-cog"></i>
                     <?=$this->htmlA($engine['moderUrl'], 'управление')?>
                 </li>
             <?php } ?>
             <?php if ($engine['specsUrl']) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-list-alt"></span>
+                    <i class="fa fa-list-alt"></i>
                     <?=$this->htmlA($engine['specsUrl'], $this->translate('carlist/specifications'))?>
                 </li>
             <?php } ?>
             <?php if ($engine['specsEditUrl']) { ?>
                 <li>
-                    <span class="glyphicon glyphicon-pencil"></span>
+                    <i class="fa fa-pencil"></i>
                     <?=$this->htmlA($engine['specsEditUrl'], 'ввод ттх')?>
                 </li>
             <?php } ?>

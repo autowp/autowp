@@ -36,7 +36,9 @@
                 <td><?=$this->htmlA('http://nic.ru/whois/?query='.$row['ip'], 'whois') ?></td>
                 <td>
                     <form class="form-inline" style="margin:0" method="post" action="<?=$this->escape($row['delete_url'])?>">
-                        <button type="submit" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                        <button type="submit" class="btn btn-xs btn-danger">
+                            <i class="fa fa-times"></i>
+                        </button>
                     </form>
                 </td>
             </tr>

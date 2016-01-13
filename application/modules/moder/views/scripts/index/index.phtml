@@ -16,7 +16,7 @@
             <div class="well">
                 <ul class="list-unstyled">
                     <li>
-                        <span class="glyphicon glyphicon-align-left"></span>
+                        <i class="fa fa-align-left"></i>
                         <?=$this->htmlA($this->url(array(
                             'module'     => 'moder',
                             'controller' => 'cars',
@@ -25,7 +25,7 @@
                     </li>
 
                     <li>
-                        <span class="glyphicon glyphicon-sort-by-alphabet"></span>
+                        <i class="fa fa-sort-alpha-asc"></i>
                         <?=$this->htmlA($this->url(array(
                             'module'     => 'moder',
                             'controller' => 'cars',
@@ -35,7 +35,7 @@
 
                     <?php if ($this->user()->isAllowed('car', 'add')) { ?>
                         <li>
-                            <span class="glyphicon glyphicon-plus"></span>
+                            <i class="fa fa-plus"></i>
                             <?=$this->htmlA($this->url(array(
                                 'module'     => 'moder',
                                 'controller' => 'cars',
@@ -50,7 +50,7 @@
         <div class="well">
             <ul class="list-unstyled">
                 <li>
-                    <span class="glyphicon glyphicon-align-left"></span>
+                    <i class="fa fa-align-left"></i>
                     <?=$this->htmlA($this->url(array(
                         'module'     => 'moder',
                         'controller' => 'engines',
@@ -59,7 +59,7 @@
                 </li>
                 <?php if ($this->user()->isAllowed('engine', 'add')) { ?>
                     <li>
-                        <span class="glyphicon glyphicon-plus"></span>
+                        <i class="fa fa-plus"></i>
                         <?=$this->htmlA($this->url(array(
                             'module'     => 'moder',
                             'controller' => 'engines',
@@ -73,7 +73,7 @@
         <div class="well">
             <ul class="list-unstyled">
                 <li>
-                    <span class="glyphicon glyphicon-align-left"></span>
+                    <i class="fa fa-align-left"></i>
                     <?=$this->htmlA($this->url(array(
                         'module'     => 'moder',
                         'controller' => 'factory',
@@ -82,7 +82,7 @@
                 </li>
                 <?php if ($this->user()->isAllowed('factory', 'add')) { ?>
                     <li>
-                        <span class="glyphicon glyphicon-plus"></span>
+                        <i class="fa fa-plus"></i>
                         <?=$this->htmlA($this->url(array(
                             'module'     => 'moder',
                             'controller' => 'factory',
