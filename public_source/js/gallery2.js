@@ -336,7 +336,7 @@ define(
                 });
             },
             renderItem: function(item) {
-                var $loading = $('<div class="loading-icon"><i class="fa fa-spinner"></i></div>');
+                var $loading = $('<div class="loading-icon"><i class="fa fa-spinner fa-pulse"></i></div>');
                 
                 var $source = $(
                     '<a class="download carousel-control" role="button">' +

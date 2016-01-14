@@ -51,7 +51,7 @@ class Application_Service_Users
      */
     private function _emailCheckCode($email)
     {
-        return md5('emailCheckCode'. $email . microtime());
+        return md5($this->_emailSalt. $email . microtime());
     }
 
     /**

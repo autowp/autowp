@@ -76,7 +76,9 @@
                                         $classes[] = 'visible-md visible-sm';
                                     }
                                 ?>
-                                <li<?=$classes ? ' class="'.implode(' ', $classes).'"' : ''?>><?=$this->htmlA($page['url'], $page['name']) ?></li>
+                                <li<?=$classes ? ' class="'.implode(' ', $classes).'"' : ''?>>
+                                    <?=$this->htmlA($page['url'], $page['name']) ?>
+                                </li>
                             <?php } ?>
                         <?php } ?>
                         <li class="divider visible-sm visible-md"></li>
@@ -85,7 +87,11 @@
                                 <li class="divider"></li>
                             <?php } ?>
                             <li class="<?=$page['class'] ? $this->escape($page['class']) : ''?> <?=$this->pageEnv()->isOnPath($page['id']) ? 'active' : ''?>">
-                                <?=$this->htmlA($page['url'], $page['name']) ?>
+                                <?php if (isset($page['icon'])) { ?>
+                                    <?=$this->htmlA($page['url'], '<i class="'.$this->escape($page['icon']).'"></i> ' . $page['name'], false) ?>
+                                <?php } else { ?>
+                                    <?=$this->htmlA($page['url'], $page['name']) ?>
+                                <?php } ?>
                             </li>
                         <?php } ?>
                     </ul>
