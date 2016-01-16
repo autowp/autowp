@@ -63,9 +63,7 @@
         <?php if (count($this->accounts)) { ?>
             <?php foreach ($this->accounts as $account) { ?>
                 <p>
-                    <?=$this->htmlImg(array(
-                        'src' => '/img/uat/' . $account->service_id . '.png'
-                    ))?>
+                    <i class="fa fa-fw fa-<?=$this->escape($account->service_id)?>"></i>
                     <?php if ($account->link) { ?>
                         <?=$this->htmlA($account->link, $account->name)?>
                     <?php } else { ?>

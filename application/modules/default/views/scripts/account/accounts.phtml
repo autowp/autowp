@@ -18,7 +18,7 @@
                             <i class="fa fa-times"></i>
                         </button>
                         &#xa0;
-                        <i class="<?=$account['icon']?>"></i>
+                        <i class="fa-fw <?=$account['icon']?>"></i>
                         <?php if ($account['link']) { ?>
                             <?=$this->htmlA($account['link'], $account['name'])?>
                         <?php } else { ?>
@@ -26,9 +26,7 @@
                         <?php } ?>
                     </form>
                 <?php } else { ?>
-                    <?=$this->htmlImg(array(
-                        'src' => $account['icon']
-                    ))?>
+                    <i class="fa-fw <?=$account['icon']?>"></i>
                     <?php if ($account['link']) { ?>
                         <?=$this->htmlA($account['link'], $account['name'])?>
                     <?php } else { ?>

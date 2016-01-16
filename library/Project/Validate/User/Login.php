@@ -5,7 +5,7 @@ class Project_Validate_User_Login implements Zend_Validate_Interface
     const USER_NOT_FOUND = 1;
 
     protected $_errors = array(
-        self::USER_NOT_FOUND => 'Пользователь с именем или e-mail "%s" не найден'
+        self::USER_NOT_FOUND => 'login/user-%s-not-found'
     );
 
     protected $_messages = array();

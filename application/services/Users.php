@@ -106,6 +106,8 @@ class Application_Service_Users
         $user->updateVotesLimit();
 
         $this->sendRegistrationConfirmEmail($user, $host['hostname']);
+
+        return $user;
     }
 
     /**
