@@ -280,6 +280,9 @@ return array (
     'login/remember' => 'remember',
     'login/if-you-lose-password' => 'If you have forgotten your username or password, you can use the <a href="/restorepassword/">form of recovery by e-mail</a>',
     'login/if-you-not-registered' => 'If you are not registered on the website, you can <a href="/registration/">do it now</a>!',
+    'login/sign-in-using-account' => 'Sign in using existing account',
+    'login/login-or-password-is-incorrect' => 'Login or password is incorrect',
+    'login/user-%s-not-found' => 'User with login or e-mail "%s" not found',
 
     'registration/if-you-registered' => 'If you are already registered, then you should not do it again, but only need to enter your username and password in the form on the right.',
 
