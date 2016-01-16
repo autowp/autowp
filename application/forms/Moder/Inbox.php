@@ -2,13 +2,13 @@
 
 class Application_Form_Moder_Inbox extends Project_Form
 {
-    protected $_perspectiveMultioptions = array();
+    private $_perspectiveMultioptions = array();
 
-    protected $_brandMultioptions = array();
+    private $_brandMultioptions = array();
 
-    protected $_resolutionMultioptions = array();
+    private $_resolutionMultioptions = array();
 
-    protected $_userMultioptions = array();
+    private $_userMultioptions = array();
 
     public function setPerspectiveMultioptions($options)
     {
@@ -137,6 +137,12 @@ class Application_Form_Moder_Inbox extends Project_Form
                     'label'        => 'Только с особым названием',
                     'value'        => '1',
                     'decorators'   => array('ViewHelper')
+                )),
+                array('checkbox', 'lost', array(
+                    'label'        => 'Без привязки',
+                    'decorators'   => array(
+                        'ViewHelper'
+                    )
                 )),
                 array('select', 'order', array(
                     'required'     => false,
