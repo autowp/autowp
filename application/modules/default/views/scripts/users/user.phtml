@@ -57,9 +57,6 @@
             </p>
         <?php } ?>
 
-        <?php if ($this->current_user->icq) { ?>
-            <p>ICQ: <?=number_format($this->current_user->icq, 0, '.', '-') ?></p>
-        <?php } ?>
         <?php if (count($this->accounts)) { ?>
             <?php foreach ($this->accounts as $account) { ?>
                 <p>

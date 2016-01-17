@@ -8,7 +8,8 @@ require.config({
         tinymce: '/tiny_mce/jquery.tinymce.min',
         'jquery.cookie': '/js/lib/jquery.cookie',
         typeahead: 'lib/bootstrap3-typeahead',
-        raphael: 'lib/raphael'
+        raphael: 'lib/raphael',
+        css: 'lib/requirejs-plugins/css'
     },
     shim: {
         'bootstrap': {
