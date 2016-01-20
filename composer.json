@@ -28,7 +28,8 @@
         "league/oauth2-google": "^1.0",
         "league/oauth2-instagram": "^0.2.1",
         "autowp/oauth2-vk": "^1.0",
-        "league/oauth2-linkedin": "^0.4.0"
+        "league/oauth2-linkedin": "^0.4.0",
+        "michelf/php-markdown": "^1.6"
     },
     "authors": [
         {

@@ -375,4 +375,17 @@ return array (
         "Si le message a eu à vous par erreur - il suffit de le supprimer\n\n" .
         "Sincèrement, le Robot de %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'Vous avez envoyé un e-mail avec un code de confirmation',
+
+    'donate/text' => 'Malgré le fait que nous positionnons notre Encyclopédie comme un but non lucratif, tout à fait se passer de l\'argent est impossible.
+
+Le contenu du site nécessite certains coûts.
+
+Si vous avez le désir et la capacité de nous soutenir vous pouvez le faire en nous envoyant un peu d\'argent par Paypal ou Yandex.Money.
+
+Avec un don, vous pouvez nous envoyer  quelques lignes sur l\'endroit où vous souhaitez voir le développement du site et nous nous sentirons un peu plus obligés.
+
+Nous ne recueillons pas d\'informations sur les donateurs, mais, si vous insistez, nous pouvons noter votre contribution.',
+    'donate/target' => 'Sur le site',
+    'donate/project' => 'WheelsAge.org',
+    'donate/comment-hint' => 'Votre souhait',
 );

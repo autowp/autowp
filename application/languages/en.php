@@ -374,4 +374,17 @@ return array (
         "If the message has got to you by mistake - just delete it\n\n" .
         "Sincerely, Robot %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'E-mail with confirmation code was sent',
+
+    'donate/text' => 'Despite the fact that we are positioning our encyclopedia as a non-profit, completely impossible to do without money.
+
+Support site requires some costs.
+
+If you have the desire and ability to support us, you can do this by sending us a little bit of money through PayPal or Yandex.Money.
+
+Together with a donation you can give us a line on where you would like to see the movement of the site and we will feel a little more obligated.
+
+We do not collect information about the donors, but if you insist, we can note your contribution.',
+    'donate/target' => 'For website work',
+    'donate/project' => 'WheelsAge.org',
+    'donate/comment-hint' => 'Your wish',
 );
