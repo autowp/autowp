@@ -333,6 +333,7 @@ return array (
     'feedback/title' => 'Retour d\'information',
     'feedback/name'  => 'Votre nom',
     'feedback/message' => 'Message',
+    'feedback/donate-text' => 'Si vous êtes venu ici pour exprimer des mots de soutien, il est possible [de l\'exprimer en devises](/donate)',
 
     'map/museums-and-factories' => 'Les musées et les usines',
 
@@ -388,4 +389,7 @@ Nous ne recueillons pas d\'informations sur les donateurs, mais, si vous insiste
     'donate/target' => 'Sur le site',
     'donate/project' => 'WheelsAge.org',
     'donate/comment-hint' => 'Votre souhait',
+    'donate/success-text' => 'Merci pour votre soutien.
+
+Allons essayer de ne pas vous décevoir.',
 );

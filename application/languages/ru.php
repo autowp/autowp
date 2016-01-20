@@ -347,6 +347,7 @@ return array (
     'feedback/title' => 'Обратная связь',
     'feedback/name'  => 'Ваше имя',
     'feedback/message' => 'Сообщение',
+    'feedback/donate-text' => 'Если вы пришли сюда, чтобы высказать слова поддержки, есть возможность [выразить её в твердой валюте](/donate)',
 
     'map/museums-and-factories' => 'музеи и заводы',
 
@@ -401,4 +402,7 @@ return array (
     'donate/target' => 'На работу сайта',
     'donate/project' => 'AutoWP.ru',
     'donate/comment-hint' => 'Ваши пожелания',
+    'donate/success-text' => 'Благодарим вас за оказанную поддержку.
+
+Постараемся вас не разочаровать.',
 );

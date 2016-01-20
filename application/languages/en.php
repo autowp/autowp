@@ -333,6 +333,7 @@ return array (
     'feedback/title' => 'Feedback',
     'feedback/name'  => 'Your name',
     'feedback/message' => 'Message',
+    'feedback/donate-text' => 'If you have come here to express words of support, it is possible to [express it in hard currency](/donate)',
 
     'map/museums-and-factories' => 'Museums and factories',
 
@@ -375,16 +376,19 @@ return array (
         "Sincerely, Robot %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'E-mail with confirmation code was sent',
 
-    'donate/text' => 'Despite the fact that we are positioning our encyclopedia as a non-profit, completely impossible to do without money.
+    'donate/text' => 'Despite the fact that we always try to work as non-comercial project, it is absolutely impossible to support encyclopedia without money.
 
-Support site requires some costs.
+Support and site development requires a permanent costs.
 
-If you have the desire and ability to support us, you can do this by sending us a little bit of money through PayPal or Yandex.Money.
+If you want to help to our everyday work, you can send us some money through PayPal or Yandex.Money.
 
-Together with a donation you can give us a line on where you would like to see the movement of the site and we will feel a little more obligated.
+With a money donation you can send us your vision about the future of the encyclopedia and the way it must move and we\'ll be much more obligated and grateful to your words.
 
-We do not collect information about the donors, but if you insist, we can note your contribution.',
+We do not collect information about our donators, however if you wish, we can mark your contribution.',
     'donate/target' => 'For website work',
     'donate/project' => 'WheelsAge.org',
     'donate/comment-hint' => 'Your wish',
+    'donate/success-text' => 'Thank you for your support.
+        
+We will try not to disappoint you.',
 );
