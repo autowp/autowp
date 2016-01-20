@@ -127,7 +127,7 @@ class Application_Form_Moder_Inbox extends Project_Form
                         ''  => 'не важно',
                         '0' => 'нет',
                         '1' => 'есть на принятие',
-                        '2' => 'есть на удалени',
+                        '2' => 'есть на удаление',
                         '3' => 'есть любые',
                     ),
                     'decorators'   => array('ViewHelper')
