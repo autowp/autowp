@@ -1,0 +1,6 @@
+<?=$this->form->render($this) ?>
+<?php if (!$this->tiny) { ?>
+    <?php if ($user = $this->picture->findParentUsersByChange_Perspective_User()) { ?>
+        <p>Установил: <?=$this->user($user) ?></p>
+    <?php } ?>
+<?php } ?>

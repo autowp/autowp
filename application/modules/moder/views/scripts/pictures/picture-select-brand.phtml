@@ -1,0 +1,32 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 149,
+        'args'   => array(
+            'PICTURE_ID'   => $this->picture->id,
+            'PICTURE_NAME' => 'Изображение № "'.$this->picture->id.'"'
+        )
+    ));
+?>
+<?php
+    $columns = 6;
+    $count = count($this->brands);
+    $perOne = ceil($count / $columns);
+    $idx = 0;
+?>
+<div class="row">
+    <div class="col-lg-2 col-md-2">
+        <?php foreach ($this->brands as $brand) { ?>
+            <?php if ($idx && ($idx%$perOne == 0)) { ?>
+                </div><div class="col-lg-2 col-md-2">
+            <?php } ?>
+            <?=$this->htmlA($this->url(array('brand_id' => $brand->id)), $brand->caption) ?><br />
+            <?php $idx++ ?>
+        <?php } ?>
+    </div>
+</div>

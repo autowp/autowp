@@ -1,0 +1,82 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 73,
+    ));
+    $this->layout()->moduleName = 'moder/pictures/index';
+    $this->layout()->moduleOptions = array(
+        'acceptUrl' => $this->url(array(
+            'action' => 'accept'
+        )),
+        'voteUrl' => $this->url(array(
+            'action' => 'vote'
+        )),
+    );
+?>
+<ul class="nav nav-pills">
+    <li>
+        <?=$this->htmlA('/moder/pictures/index/order/1/status/inbox', 'Входящие')?>
+    </li>
+    <li>
+        <?=$this->htmlA('/moder/pictures/index/order/1/status/accepted/perspective_id/null/type_id/1', 'Пропущен ракурс')?>
+    </li>
+    <li>
+        <?=$this->htmlA('/moder/pictures/index/order/1/status/removing', 'Очередь удаления')?>
+    </li>
+    <li>
+        <?=$this->htmlA('/moder/pictures/index/order/1/requests/3/status/custom1', 'Голоса')?>
+    </li>
+    <li>
+        <?=$this->htmlA('/moder/pictures/index/order/7/comments/1', 'Зафлудили')?>
+    </li>
+    <li>
+        <?=$this->htmlA('/moder/pictures/index/order/9/requests/3/status/custom1/', 'Новые заявки')?>
+    </li>
+    <li>
+        <?=$this->htmlA('/moder/pictures/index/order/1/status/inbox/replace/1', 'Новые замены')?>
+    </li>
+</ul>
+<div class="row">
+    <div class="col-lg-4 col-md-4">
+        <h2>Фильтр</h2>
+        <div class="well">
+            <?=$this->form->render($this) ?>
+        </div>
+    </div>
+    <div class="col-lg-8 col-md-8">
+
+        <div class="toolbar clearfix">
+            <button class="btn btn-success btn-accept pull-left" disabled="disabled">Принять</button>
+
+            <div class="input-group-btn pull-left" style="margin-left:20px">
+                <button type="button" class="btn btn-default dropdown-toggle dropdown-reason-toggle" data-toggle="dropdown" aria-expanded="true">Сообщение <span class="caret"></span></button>
+                <ul class="dropdown-menu dropdown-reason" role="menu">
+                    <?php foreach ($this->reasons as $reason) { ?>
+                        <li><?=$this->htmlA(array(
+                            'href'        => '#',
+                            'data-reason' => $reason
+                        ), $reason)?></li>
+                    <?php } ?>
+                    <?php /*<li class="divider"></li>
+                    <li><a href="#">Своя</a></li>*/?>
+                </ul>
+                <button name="vote" class="btn btn-success btn-vote" data-vote="1">Хочу принять</button>
+                <button name="vote" class="btn btn-danger btn-vote" data-vote="0">Хочу удалить</button>
+            </div>
+        </div>
+
+        <h2>
+            Картинки
+            <?php if ($count = $this->paginator->getTotalItemCount()) {?>
+                <small><?=$this->translate(array('%1$s picures', null, $count), $count);?></small>
+            <?php } ?>
+        </h2>
+        <?=$this->partial('pictures/partial/pictures.phtml', $this->picturesData)?>
+        <?=$this->paginationControl($this->paginator) ?>
+    </div>
+</div>

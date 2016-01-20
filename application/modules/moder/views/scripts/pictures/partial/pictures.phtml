@@ -1,0 +1,11 @@
+<?php while ($currentItems = array_splice($this->items, 0, $this->width)) { ?>
+    <div class="row">
+        <?php foreach ($currentItems as $item) { ?>
+            <?=$this->partial('pictures/partial/picture.phtml', array_replace($item, array(
+                'isModer'          => $this->isModer,
+                'disableBehaviour' => $this->disableBehaviour,
+                'colClass'         => $this->colClass
+            )))?>
+        <?php } ?>
+    </div>
+<?php } ?>

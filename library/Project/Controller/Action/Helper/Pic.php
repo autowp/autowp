@@ -362,6 +362,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
 
             $item = array(
                 'id'        => $id,
+                'type'      => $row['type'],
                 'name'      => $name,
                 'url'       => $url,
                 'src'       => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
