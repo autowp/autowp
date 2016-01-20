@@ -142,6 +142,7 @@ class SidebarController extends Zend_Controller_Action
                 foreach ($aliases as $alias) {
                     $caption = str_ireplace('by The ' . $alias . ' Company', '', $caption);
                     $caption = str_ireplace('by '.$alias, '', $caption);
+                    $caption = str_ireplace('par '.$alias, '', $caption);
                     $caption = str_ireplace($alias.'-', '', $caption);
                     $caption = str_ireplace('-'.$alias, '', $caption);
 
