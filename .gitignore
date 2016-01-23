@@ -1,2 +1,4 @@
 /components
 /mysql
+/composer.lock
+/composer.phar

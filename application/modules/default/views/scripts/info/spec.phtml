@@ -9,10 +9,8 @@
     ));
 ?>
 <table class="table"><tbody>
-    <?php foreach ($this->items as $item) { ?>
-        <tr>
-            <td><?=$this->escape($item['short_name'])?></td>
-            <td><?=$this->escape($item['name'])?></td>
-        </tr>
-    <?php } ?>
+    <?=$this->partial('info/spec-row.phtml', array(
+        'items' => $this->items,
+        'deep'  => 0
+    ))?>
 </tbody></table>

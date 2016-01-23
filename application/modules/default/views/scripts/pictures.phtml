@@ -1,5 +1,5 @@
 <?php while ($currentItems = array_splice($this->items, 0, $this->width)) { ?>
-    <div class="row">
+    <div class="row" data-module="car-list">
         <?php foreach ($currentItems as $item) { ?>
             <?=$this->partial('picture.phtml', array_replace($item, array(
                 'isModer'          => $this->isModer,

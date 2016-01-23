@@ -49,9 +49,11 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
     public function htmlTitle(array $car)
     {
         $defaults = array(
+            'perspective'      => null,
             'begin_model_year' => null,
             'end_model_year'   => null,
             'spec'             => null,
+            'spec_full'        => null,
             'body'             => null,
             'name'             => null,
             'begin_year'       => null,
@@ -66,8 +68,16 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
 
         $result = $view->escape($car['name']);
 
+        if ($car['perspective']) {
+            $result = $view->escape($car['perspective']) . $result;
+        }
+
         if ($car['spec']) {
-            $result .= ' <span class="label label-primary">' . $view->escape($car['spec']) . '</span>';
+            if ($car['spec_full']) {
+                $result .= ' <span class="label label-primary" title="'.$view->escape($car['spec_full']).'" data-toggle="tooltip" data-placement="top">' . $view->escape($car['spec']) . '</span>';
+            } else {
+                $result .= ' <span class="label label-primary">' . $view->escape($car['spec']) . '</span>';
+            }
         }
 
         if (strlen($car['body']) > 0) {
@@ -209,10 +219,12 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
         $car = $this->_car;
 
         $spec = null;
+        $specFull = null;
         if ($car->spec_id) {
             $specRow = $this->_getSpecTable()->find($car->spec_id)->current();
             if ($specRow) {
                 $spec = $specRow->short_name;
+                $specFull = $specRow->name;
             }
         }
 
@@ -220,6 +232,7 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
             'begin_model_year' => $car['begin_model_year'],
             'end_model_year'   => $car['end_model_year'],
             'spec'             => $spec,
+            'spec_full'        => $specFull,
             'body'             => $car['body'],
             'name'             => $car['caption'],
             'begin_year'       => $car['begin_year'],

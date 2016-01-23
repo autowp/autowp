@@ -1,0 +1,10 @@
+<?php foreach ($this->items as $item) { ?>
+    <tr>
+        <td><?=str_repeat('&nbsp;', $this->deep * 4)?><?=$this->escape($item['short_name'])?></td>
+        <td><?=$this->escape($item['name'])?></td>
+    </tr>
+    <?=$this->partial('info/spec-row.phtml', array(
+        'items' => $item['childs'],
+        'deep'  => $this->deep + 1
+    ))?>
+<?php } ?>

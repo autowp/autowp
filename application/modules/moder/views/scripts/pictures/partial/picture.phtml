@@ -22,7 +22,13 @@
             'shuffle' => true
         )), false) ?>
         <div class="caption">
-            <p><?=$this->htmlA($this->url, $this->name)?></p>
+            <p>
+                <?php if (($this->type == Picture::CAR_TYPE_ID) && is_array($this->name)) { ?>
+                    <?=$this->htmlA($this->url, $this->car()->htmlTitle($this->name), false)?>
+                <?php } else { ?>
+                    <?=$this->htmlA($this->url, $this->name)?>
+                <?php } ?>
+            </p>
             <?php if (!$this->disableBehaviour) { ?>
                 <?=$this->render('picture-behaviour.phtml')?>
             <?php } ?>

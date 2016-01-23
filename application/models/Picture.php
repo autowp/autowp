@@ -160,6 +160,7 @@ class Picture extends Project_Db_Table
                     'id',
                     'begin_model_year', 'end_model_year',
                     'spec' => 'spec.short_name',
+                    'spec_full' => 'spec.name',
                     'body',
                     'name' => 'if(length(car_language.name) > 0, car_language.name, cars.caption)',
                     'begin_year', 'end_year', 'today',
@@ -169,16 +170,17 @@ class Picture extends Project_Db_Table
                 ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :language', null);
 
             foreach ($db->fetchAll($select, array('language' => $language)) as $row) {
-                $cars[$row['id']] = Cars_Row::buildFullName(array(
+                $cars[$row['id']] = array(
                     'begin_model_year' => $row['begin_model_year'],
                     'end_model_year'   => $row['end_model_year'],
                     'spec'             => $row['spec'],
+                    'spec_full'        => $row['spec_full'],
                     'body'             => $row['body'],
                     'name'             => $row['name'],
                     'begin_year'       => $row['begin_year'],
                     'end_year'         => $row['end_year'],
                     'today'            => $row['today']
-                ));
+                );
             }
         }
 
@@ -231,8 +233,11 @@ class Picture extends Project_Db_Table
                 case Picture::CAR_TYPE_ID:
                     $car = isset($cars[$row['car_id']]) ? $cars[$row['car_id']] : null;
                     if ($car) {
-                        $perspective = isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : '';
-                        $caption = $perspective . $car;
+                        //$perspective = isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : '';
+                        //$caption = $perspective . $car;
+                        $caption = array_replace($car, array(
+                            'perspective' => isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : null
+                        ));
                     }
                     break;
 
