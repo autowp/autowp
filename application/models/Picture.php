@@ -275,4 +275,171 @@ class Picture extends Project_Db_Table
 
         return $result;
     }
+
+    public function getNameData($rows, array $options = array())
+    {
+        $result = array();
+
+        $language = isset($options['language']) ? $options['language'] : 'en';
+
+        // prefetch
+        $carIds = array();
+        $perspectiveIds = array();
+        $engineIds = array();
+        $brandIds = array();
+        $factoryIds = array();
+        foreach ($rows as $index => $row) {
+            switch ($row['type']) {
+                case Picture::CAR_TYPE_ID:
+                    $carIds[$row['car_id']] = true;
+                    if (in_array($row['perspective_id'], $this->_prefixedPerspectives)) {
+                        $perspectiveIds[$row['perspective_id']] = true;
+                    }
+                    break;
+
+                case Picture::ENGINE_TYPE_ID:
+                    $engineIds[$row['engine_id']] = true;
+                    break;
+
+                case Picture::LOGO_TYPE_ID:
+                case Picture::MIXED_TYPE_ID:
+                case Picture::UNSORTED_TYPE_ID:
+                    $brandIds[$row['brand_id']] = true;
+                    break;
+
+                case Picture::FACTORY_TYPE_ID:
+                    $factoryIds[$row['factory_id']] = true;
+                    break;
+            }
+        }
+
+        $cars = array();
+        if (count($carIds)) {
+            $table = new Cars();
+
+            $db = $table->getAdapter();
+
+            $select = $db->select()
+                ->from('cars', array(
+                    'id',
+                    'begin_model_year', 'end_model_year',
+                    'spec' => 'spec.short_name',
+                    'spec_full' => 'spec.name',
+                    'body',
+                    'name' => 'if(length(car_language.name) > 0, car_language.name, cars.caption)',
+                    'begin_year', 'end_year', 'today',
+                ))
+                ->where('cars.id in (?)', array_keys($carIds))
+                ->joinLeft('spec', 'cars.spec_id = spec.id', null)
+                ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :language', null);
+
+            foreach ($db->fetchAll($select, array('language' => $language)) as $row) {
+                $cars[$row['id']] = array(
+                    'begin_model_year' => $row['begin_model_year'],
+                    'end_model_year'   => $row['end_model_year'],
+                    'spec'             => $row['spec'],
+                    'spec_full'        => $row['spec_full'],
+                    'body'             => $row['body'],
+                    'name'             => $row['name'],
+                    'begin_year'       => $row['begin_year'],
+                    'end_year'         => $row['end_year'],
+                    'today'            => $row['today']
+                );
+            }
+        }
+
+        $perspectives = array();
+        if (count($perspectiveIds)) {
+            $perspectiveTable = new Perspectives();
+            $pRows = $perspectiveTable->find(array_keys($perspectiveIds));
+
+            foreach ($pRows as $row) {
+                $perspectives[$row->id] = $row->name;
+            }
+        }
+
+        $engines = array();
+        if (count($engineIds)) {
+            $table = new Engines();
+            foreach ($table->find(array_keys($engineIds)) as $row) {
+                $engines[$row->id] = $row->caption;
+            }
+        }
+
+        $factories = array();
+        if (count($factoryIds)) {
+            $table = new Factory();
+            foreach ($table->find(array_keys($factoryIds)) as $row) {
+                $factories[$row->id] = $row->name;
+            }
+        }
+
+        $brands = array();
+        if (count($brandIds)) {
+            $table = new Brands();
+            foreach ($table->find(array_keys($brandIds)) as $row) {
+                $brands[$row->id] = $row->getLanguageName($language);
+            }
+        }
+
+        foreach ($rows as $index => $row) {
+            if ($row['name']) {
+                $result[$row['id']] = array(
+                    'type' => $row['type'],
+                    'name' => $row['name']
+                );
+                continue;
+            }
+
+            $caption = array();
+
+            switch ($row['type']) {
+                case Picture::CAR_TYPE_ID:
+                    $car = isset($cars[$row['car_id']]) ? $cars[$row['car_id']] : null;
+                    if ($car) {
+                        $caption = array(
+                            'type' => $row['type'],
+                            'car' => $car,
+                            'perspective' => isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : null
+                        );
+                    }
+                    break;
+
+                case Picture::ENGINE_TYPE_ID:
+                    $engine = isset($engines[$row['engine_id']]) ? $engines[$row['engine_id']] : null;
+                    $caption = array(
+                        'type' => $row['type'],
+                        'engine' => $engine
+                    );
+                    break;
+
+                case Picture::LOGO_TYPE_ID:
+                case Picture::MIXED_TYPE_ID:
+                case Picture::UNSORTED_TYPE_ID:
+                    $brand = isset($brands[$row['brand_id']]) ? $brands[$row['brand_id']] : null;
+                    $caption = array(
+                        'type' => $row['type'],
+                        'brand' => $brand
+                    );
+                    break;
+
+                case Picture::FACTORY_TYPE_ID:
+                    $caption = array(
+                        'type' => $row['type'],
+                        'factory' => isset($factories[$row['factory_id']]) ? $factories[$row['factory_id']] : null
+                    );
+                    break;
+
+                default:
+                    $caption = [
+                        'type' => $row['type']
+                    ];
+                    break;
+            }
+
+            $result[$row['id']] = $caption;
+        }
+
+        return $result;
+    }
 }

@@ -8,7 +8,7 @@
         'pageId' => 190,
         'args'   => array(
             'PICTURE_ID'    => $this->picture['identity'] ? $this->picture['identity'] : $this->picture['id'],
-            'PICTURE_NAME'  => $this->picture['name'],
+            'PICTURE_NAME'  => $this->pic()->textTitle($this->picture['name']),
             'BRAND_NAME'    => $this->brandName,
             'BRAND_CATNAME' => $this->brand->folder,
         )

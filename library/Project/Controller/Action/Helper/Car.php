@@ -487,7 +487,10 @@ class Project_Controller_Action_Helper_Car
 
 
         // prefetch names
-        $pictureNames = $catalogue->buildPicturesName($allPictures, $language);
+        $pictureNames = $pictureTable->getNameData($allPictures, array(
+            'language' => $language
+        ));
+        //$pictureNames = $catalogue->buildPicturesName($allPictures, $language);
 
         // prefetch images
         $imageStorage = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('imagestorage');

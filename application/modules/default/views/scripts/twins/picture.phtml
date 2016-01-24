@@ -7,7 +7,7 @@
         ),
         'pageId' => 183,
         'args'   => array(
-            'PICTURE_NAME'     => $this->name,
+            'PICTURE_NAME'     => $this->pic()->textTitle($this->name),
             'TWINS_GROUP_NAME' => $this->group['name'],
             'TWINS_GROUP_ID'   => $this->group['id']
         )

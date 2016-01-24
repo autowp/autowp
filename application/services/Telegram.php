@@ -8,10 +8,13 @@ class Application_Service_Telegram
 
     private $_webhook;
 
+    private $_token;
+
     public function __construct(array $options = array())
     {
         $this->_accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
         $this->_webhook = isset($options['webhook']) ? $options['webhook'] : null;
+        $this->_token = isset($options['token']) ? $options['token'] : null;
     }
 
     /**
@@ -30,11 +33,16 @@ class Application_Service_Telegram
         return $api;
     }
 
+    public function checkTokenMatch($token)
+    {
+        return $this->_token == (string)$token;
+    }
+
     public function registerWebhook()
     {
         $message = $this->_getApi()->setWebhook(array(
             'url'         => $this->_webhook,
-            'certificate' => APPLICATION_PATH . '/certificates/autowp.ru.pem'
+            'certificate' => ''
         ));
     }
 

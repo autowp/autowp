@@ -151,6 +151,15 @@ return array (
     'carlist/designed by %s'  => 'дизайн %s',
     'carlist/edit-specs' => 'ввод ттх',
 
+    'picturelist/engine' => 'Engine',
+    'picturelist/engine-%s' => 'Двигатель %s',
+    'picturelist/logotype' => 'Логотип',
+    'picturelist/logotype-%s' => 'Логотип %s',
+    'picturelist/mixed' => 'Разное',
+    'picturelist/mixed-%s' => '%s разное',
+    'picturelist/unsorted' => 'Несортировано',
+    'picturelist/unsorted-%s' => '%s несортировано',
+
     'present-time-abbr'      => 'н.в.',
 
     /* Categories */

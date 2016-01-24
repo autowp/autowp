@@ -139,6 +139,15 @@ return array (
     'carlist/designed by %s'  => 'dessinée par %s',
     'carlist/edit-specs' => 'modifier spécifications',
 
+    'picturelist/engine' => 'Moteur',
+    'picturelist/engine-%s' => '%s moteur',
+    'picturelist/logotype' => 'Logotype',
+    'picturelist/logotype-%s' => '%s logotype',
+    'picturelist/mixed' => 'Varié',
+    'picturelist/mixed-%s' => '%s varié',
+    'picturelist/unsorted' => 'Non triés',
+    'picturelist/unsorted-%s' => '%s non triés',
+
     'present-time-abbr'       => 'pr.',
 
     /* Categories */

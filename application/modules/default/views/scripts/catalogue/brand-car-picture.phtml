@@ -12,7 +12,7 @@
             'CAR_CATNAME'    => $this->carCatname,
             'CAR_NAME'       => $this->carFullName,
             'SHORT_CAR_NAME' => $this->carShortName,
-            'PICTURE_NAME'   => $this->picture['name'],
+            'PICTURE_NAME'   => $this->pic()->textTitle($this->picture['name']),
         ),
         'breadcrumbsReplace' => array(
             'pageId'      => 33,

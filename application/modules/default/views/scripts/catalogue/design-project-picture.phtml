@@ -11,7 +11,7 @@
             'BRAND_CATNAME'          => $this->brand->folder,
             'DESIGN_PROJECT_NAME'    => $this->designProject->name,
             'DESIGN_PROJECT_CATNAME' => $this->designProject->catname,
-            'PICTURE_NAME'           => $this->picture['name'],
+            'PICTURE_NAME'           => $this->pic()->textTitle($this->picture['name']),
         )
     ));
 ?>

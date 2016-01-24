@@ -35,7 +35,7 @@
                     $col = $item['largeFormat'] && $idx == 0  ? 6 : 3;
                     $colSm = $item['largeFormat'] && $idx == 0  ? 12 : 6;
                 ?>
-                <div class="col-lg-<?=$col?> col-md-<?=$col?> col-sm-<?=$colSm?>">
+                <div class="col-md-<?=$col?> col-sm-<?=$colSm?>">
                     <?php if ($picture) { ?>
                         <?=$this->htmlA(
                             array(
@@ -44,8 +44,8 @@
                             ),
                             $this->htmlImg(array(
                                 'src'   => $picture['src'],
-                                'alt'   => $picture['name'],
-                                'title' => $picture['name'],
+                                'alt'   => $this->pic()->textTitle($picture['name']),
+                                'title' => $this->pic()->textTitle($picture['name']),
                             )),
                             false
                         )?>

@@ -177,6 +177,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         $controller = $this->getActionController();
         $userHelper = $controller->getHelper('user');
         $urlHelper = $controller->getHelper('url');
+        $imageStorage = $controller->getHelper('imageStorage')->direct();
         $isModer = $userHelper->inheritsRole('pictures-moder');
         $userId = null;
         if ($userHelper->logedIn()) {
@@ -321,14 +322,11 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             $requests[$idx] = Pictures_Row::buildFormatRequest($picture);
         }
 
-        // images
-        $imageStorage = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('imagestorage');
-
         $imagesInfo = $imageStorage->getFormatedImages($requests, 'picture-thumb');
 
         // names
         $pictureTable = new Picture();
-        $names = $pictureTable->getNames($rows, array(
+        $names = $pictureTable->getNameData($rows, array(
             'language' => $language
         ));
 
@@ -407,6 +405,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         $userHelper = $controller->getHelper('user');
         $catalogue = $controller->getHelper('catalogue')->getCatalogue();
         $urlHelper = $controller->getHelper('url');
+        $imageStorage = $controller->getHelper('imageStorage')->direct();
 
         $isModer = $userHelper->direct()->inheritsRole('moder');
 
@@ -783,9 +782,6 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             );
         }
 
-        $imageStorage = $controller->getInvokeArg('bootstrap')
-            ->getResource('imagestorage');
-
         $image = $imageStorage->getImage($picture->image_id);
         $sourceUrl = $image ? $image->getSrc() : null;
 
@@ -852,9 +848,10 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             }
         }
 
-        $name = $picture->getCaption(array(
+        $names = $pictureTable->getNameData([$picture->toArray()], array(
             'language' => $language
         ));
+        $name = $names[$picture->id];
 
         $mTable = new Modification();
         $mRows = $mTable->fetchAll(
@@ -948,6 +945,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         $userHelper = $controller->getHelper('user');
         $catalogue = $controller->getHelper('catalogue')->getCatalogue();
         $urlHelper = $controller->getHelper('Url');
+        $imageStorage = $controller->getHelper('imageStorage')->direct();
 
         $view = $controller->view;
 
@@ -989,8 +987,6 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         }
 
         // images
-        $imageStorage = $controller->getInvokeArg('bootstrap')
-            ->getResource('imagestorage');
         $images = $imageStorage->getImages($imageIds);
         $fullImagesInfo = $imageStorage->getFormatedImages($fullRequests, 'picture-gallery-full');
         $cropImagesInfo = $imageStorage->getFormatedImages($cropRequests, 'picture-gallery');
@@ -1097,6 +1093,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         $userHelper = $controller->getHelper('user');
         $catalogue = $controller->getHelper('catalogue')->getCatalogue();
         $urlHelper = $controller->getHelper('Url');
+        $imageStorage = $controller->getHelper('imageStorage')->direct();
 
         $view = $controller->view;
 
@@ -1133,7 +1130,8 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                 'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                 'pictures.image_id', 'pictures.filesize',
                 'pictures.brand_id', 'pictures.car_id', 'pictures.engine_id',
-                'pictures.perspective_id', 'pictures.type', 'pictures.factory_id'
+                'pictures.perspective_id', 'pictures.type', 'pictures.factory_id',
+                'pictures.type'
             ))
             ->joinLeft(
                 array('ct' => 'comment_topic'),
@@ -1174,8 +1172,6 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         }
 
         // images
-        $imageStorage = $controller->getInvokeArg('bootstrap')
-            ->getResource('imagestorage');
         $images = $imageStorage->getImages($imageIds);
         $fullImagesInfo = $imageStorage->getFormatedImages($fullRequests, 'picture-gallery-full');
         $cropImagesInfo = $imageStorage->getFormatedImages($cropRequests, 'picture-gallery');
@@ -1240,6 +1236,11 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                     }
 
                     $name = isset($names[$id]) ? $names[$id] : null;
+                    if (($row['type'] == Picture::CAR_TYPE_ID) && is_array($name)) {
+                        $name = $view->car()->htmlTitle($name);
+                    } else {
+                        $name = $view->escape($name);
+                    }
 
                     $url = $urlHelper->url(array_replace($options['urlParams'], array(
                         'picture_id' => $row['identity'] ? $row['identity'] : $id,

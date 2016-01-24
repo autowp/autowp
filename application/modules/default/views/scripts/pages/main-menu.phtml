@@ -107,11 +107,10 @@
                     <ul class="dropdown-menu">
                         <?php foreach ($this->languages as $item) { ?>
                             <?php
-                                $url = 'http://' . $item['hostname'] . $this->url();
-                                $this->headLink(array('rel' => 'alternate', 'href' => $url, 'hreflang' => $item['language']));
+                                $this->headLink(array('rel' => 'alternate', 'href' => $item['url'], 'hreflang' => $item['language']));
                             ?>
                             <li<?=$item['active'] ? ' class="active"' : ''?>>
-                                <a href="<?=$this->escape($url)?>">
+                                <a href="<?=$this->escape($item['url'])?>">
                                     <i class="<?=$this->escape($item['flag'])?>"></i>
                                     <?=$this->escape($item['name'])?>
                                 </a>
@@ -121,7 +120,7 @@
                 </li>
             </ul>
 
-            <form action="http://www.google.com/search" method="get" class="navbar-form navbar-right">
+            <form action="//www.google.com/search" method="get" class="navbar-form navbar-right">
                 <input type="hidden" name="ie" value="utf-8" />
                 <input type="hidden" name="domains" value="<?=$this->escape($this->searchHostname)?>" />
                 <input type="hidden" name="sitesearch" value="<?=$this->escape($this->searchHostname)?>" />

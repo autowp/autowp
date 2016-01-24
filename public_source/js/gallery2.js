@@ -381,7 +381,8 @@ define(
                     '</div>'
                 );
                 
-                $caption.find('h3').text(item.name);
+                $caption.find('h3').html(item.name);
+                $caption.find('[data-toggle="tooltip"]').tooltip();
                 
                 var $item = $('<div class="item loading"></div>')
                     .data({

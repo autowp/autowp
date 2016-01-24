@@ -17,18 +17,12 @@
     <div class="thumbnail clearfix">
         <?=$this->htmlA($this->url, $this->htmlImg(array(
             'src'     => $this->src,
-            'alt'     => $this->name,
-            'title'   => $this->name,
+            'alt'     => $this->pic()->textTitle($this->name),
+            'title'   => $this->pic()->textTitle($this->name),
             'shuffle' => true
         )), false) ?>
         <div class="caption">
-            <p>
-                <?php if (($this->type == Picture::CAR_TYPE_ID) && is_array($this->name)) { ?>
-                    <?=$this->htmlA($this->url, $this->car()->htmlTitle($this->name), false)?>
-                <?php } else { ?>
-                    <?=$this->htmlA($this->url, $this->name)?>
-                <?php } ?>
-            </p>
+            <p><?=$this->htmlA($this->url, $this->pic()->htmlTitle($this->name), false)?></p>
             <?php if (!$this->disableBehaviour) { ?>
                 <?=$this->render('picture-behaviour.phtml')?>
             <?php } ?>

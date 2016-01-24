@@ -139,6 +139,15 @@ return array (
     'carlist/designed by %s'  => 'designed by %s',
     'carlist/edit-specs' => 'edit specs',
 
+    'picturelist/engine' => 'Engine',
+    'picturelist/engine-%s' => '%s engine',
+    'picturelist/logotype' => 'Logotype',
+    'picturelist/logotype-%s' => '%s logotype',
+    'picturelist/mixed' => 'Miscellaneous',
+    'picturelist/mixed-%s' => '%s miscellaneous',
+    'picturelist/unsorted' => 'Unsorted',
+    'picturelist/unsorted-%s' => '%s unsorted',
+
     'present-time-abbr'       => 'pr.',
 
     /* Categories */

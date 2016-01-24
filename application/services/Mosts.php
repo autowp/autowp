@@ -560,6 +560,72 @@ class Application_Service_Mosts
         );
     }
 
+    private function _getOrientedPictureList($carId, array $perspective_group_ids)
+    {
+        $pictureTable = new Picture();
+        $pictures = array();
+        $db = $pictureTable->getAdapter();
+
+        foreach ($perspective_group_ids as $groupId) {
+            $picture = $pictureTable->fetchRow(
+                $pictureTable->select(true)
+                    ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join(array('mp' => 'perspectives_groups_perspectives'), 'pictures.perspective_id=mp.perspective_id', null)
+                    ->where('mp.group_id = ?', $groupId)
+                    ->where('car_parent_cache.parent_id = ?', $carId)
+                    ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
+                    ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+                    ->order(array(
+                        'mp.position',
+                        new Zend_Db_expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
+                        'pictures.width DESC', 'pictures.height DESC'
+                    ))
+                    ->limit(1)
+            );
+
+            if ($picture) {
+                $pictures[] = $picture;
+            } else {
+                $pictures[] = null;
+            }
+        }
+
+        $ids = array();
+        foreach ($pictures as $picture) {
+            if ($picture) {
+                $ids[] = $picture->id;
+            }
+        }
+
+        foreach ($pictures as $key => $picture) {
+            if (!$picture) {
+                $select = $pictureTable->select(true)
+                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->where('pictures.type=?', Picture::CAR_TYPE_ID)
+                    ->where('car_parent_cache.parent_id = ?', $carId)
+                    ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
+                    ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+                    ->limit(1);
+
+                if (count($ids) > 0) {
+                    $select->where('id NOT IN (?)', $ids);
+                }
+
+                $pic = $pictureTable->fetchAll($select)->current();
+
+                if ($pic) {
+                    $pictures[$key] = $pic;
+                    $ids[] = $pic->id;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        return $pictures;
+    }
+
     public function getCarsData($cMost, $carType, $cYear, $brandId)
     {
         $carsTable = new Cars();
@@ -599,7 +665,7 @@ class Application_Service_Mosts
 
         $data = $most->getData();
         foreach ($data['cars'] as &$car) {
-            $car['pictures'] = $car['car']->getOrientedPictureList($g);
+            $car['pictures'] = $this->_getOrientedPictureList($car['car']->id, $g);
         }
 
         return $data;

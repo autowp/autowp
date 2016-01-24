@@ -12,15 +12,15 @@
 ?>
 <div class="row">
     <div class="col-md-6">
-        <?php if ($this->carOfDayName) { ?>
+        <?php if ($this->carOfDay['name']) { ?>
             <h2>
-                <?=$this->escape($this->carOfDayName)?>
+                <?=$this->car()->htmlTitle($this->carOfDay['name'])?>
                 <small><?=$this->escape($this->translate('car-of-day')) ?></small>
             </h2>
 
-            <?php if ($this->carOfDayPictures) { ?>
+            <?php if ($this->carOfDay['pictures']) { ?>
                 <div class="row thumbnails">
-                    <?php foreach ($this->carOfDayPictures as $idx => $picture) { ?>
+                    <?php foreach ($this->carOfDay['pictures'] as $idx => $picture) { ?>
                         <?php if ($idx == 0) { ?>
                             <?php if ($picture) { ?>
                                 <div class="col-sm-8">
@@ -29,15 +29,15 @@
                                         'class' => 'thumbnail'
                                     ), $this->htmlImg(array(
                                         'src'   => $picture['src'],
-                                        'title' => $picture['name'],
-                                        'alt'   => $picture['name'],
+                                        'title' => $this->pic()->textTitle($picture['name']),
+                                        'alt'   => $this->pic()->textTitle($picture['name']),
                                     )), false)?>
                                 </div>
                             <?php } ?>
                         <?php } ?>
                     <?php } ?>
                     <div class="col-sm-4">
-                        <?php foreach ($this->carOfDayPictures as $idx => $picture) { ?>
+                        <?php foreach ($this->carOfDay['pictures'] as $idx => $picture) { ?>
                             <?php if ($idx == 1 || $idx == 2) { ?>
                                 <?php if ($picture) { ?>
                                     <?=$this->htmlA(array(
@@ -45,8 +45,8 @@
                                         'class' => 'thumbnail'
                                     ), $this->htmlImg(array(
                                         'src'   => $picture['src'],
-                                        'title' => $picture['name'],
-                                        'alt'   => $picture['name'],
+                                        'title' => $this->pic()->textTitle($picture['name']),
+                                        'alt'   => $this->pic()->textTitle($picture['name']),
                                     )), false)?>
                                 <?php } ?>
                             <?php } ?>
@@ -56,7 +56,7 @@
                 <div class="row thumbnails">
                     <div class="col-md-12">
                         <div class="row">
-                            <?php foreach ($this->carOfDayPictures as $idx => $picture) { ?>
+                            <?php foreach ($this->carOfDay['pictures'] as $idx => $picture) { ?>
                                 <?php if ($idx > 2) { ?>
                                     <?php if ($picture) { ?>
                                         <div class="col-sm-4">
@@ -65,8 +65,8 @@
                                                 'class' => 'thumbnail'
                                             ), $this->htmlImg(array(
                                                 'src'   => $picture['src'],
-                                                'title' => $picture['name'],
-                                                'alt'   => $picture['name'],
+                                                'title' => $this->pic()->textTitle($picture['name']),
+                                                'alt'   => $this->pic()->textTitle($picture['name']),
                                             )), false)?>
                                         </div>
                                     <?php } ?>
@@ -75,8 +75,8 @@
                         </div>
                     </div>
                 </div>
-                <?php if ($this->carOfDayLinks) { ?>
-                    <p><?=implode(' &#xa0; ', $this->carOfDayLinks)?></p>
+                <?php if ($this->carOfDay['links']) { ?>
+                    <p><?=implode(' &#xa0; ', $this->carOfDay['links'])?></p>
                 <?php } ?>
             <?php } ?>
         <?php } ?>

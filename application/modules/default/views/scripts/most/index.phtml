@@ -54,25 +54,42 @@
 <?php $idx = 0 ?>
 <?php foreach ($this->carList['cars'] as $car) { ?>
     <div class="row">
-        <div class="col-lg-9 col-md-9">
-            <h3><?=$this->car($car['car'])->title()?></h3>
+        <div class="col-md-9">
+            <h3><?=$this->car()->htmlTitle($car['name'])?></h3>
         </div>
-        <div class="col-lg-3 col-md-3">
+        <div class="col-md-3">
             <?php if ($idx++ == 0) { ?>
                 <h3><?=$this->escape($this->translate('most/'.$this->cMost['catName'].'/param')) ?></h3> <?php /* $this->carList['paramName'] */ ?>
             <?php } ?>
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-9 col-md-9">
-            <?=$this->pictureListHorizontal2($car['pictures'], array(
-                'colClass' => 'col-lg-4 col-md-4'
-            )) ?>
+        <div class="col-md-9">
+            <div class="row thumbnails">
+                <?php foreach ($car['pictures'] as $picture) { ?>
+                    <div class="col-md-4">
+                        <?php if ($picture) { ?>
+                            <?=$this->htmlA(array(
+                                'href'  => $picture['url'],
+                                'class' => 'thumbnail'
+                            ), $this->htmlImg(array(
+                                'src'     => $picture['src'],
+                                'format'  => 'picture-thumb',
+                                'alt'     => $this->pic()->textTitle($picture['name']),
+                                'title'   => $this->pic()->textTitle($picture['name']),
+                                'shuffle' => true
+                            )), false)?>
+                        <?php } else { ?>
+                            &#xa0;
+                        <?php } ?>
+                    </div>
+                <?php } ?>
+            </div>
             <?php if ($car['car']->description) { ?>
                 <div><?=$car['car']->description ?></div>
             <?php } ?>
         </div>
-        <div class="col-lg-3 col-md-3">
+        <div class="col-md-3">
             <h3>
                 <?php if (isset($car['valueHtml'])) { ?>
                     <?=$car['valueHtml']?>
