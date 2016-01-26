@@ -2,7 +2,7 @@
 
 class Application_Form_Moder_Brand_Edit extends Project_Form
 {
-    protected $_languages = array();
+    private $_languages = array();
 
     public function setLanguages(array $languages)
     {
@@ -32,10 +32,6 @@ class Application_Form_Moder_Brand_Edit extends Project_Form
 
         $elements = array_merge($elements, array(
             array ('Brand_FullName', 'full_caption', array (
-                'required'   => false,
-                'decorators' => array('ViewHelper'),
-            )),
-            array ('Brand_Description', 'description', array (
                 'required'   => false,
                 'decorators' => array('ViewHelper'),
             )),

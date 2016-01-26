@@ -31,9 +31,9 @@
     <?php } ?>
 </ul>
 
-<?php if (strlen($this->group['description'])){ ?>
+<?php if (strlen($this->description)){ ?>
     <h3>Описание</h3>
-    <div class="well"><?=$this->group['description'] ?></div>
+    <div class="well"><?=$this->markdown($this->description) ?></div>
 <?php } ?>
 
 <?=$this->action('comments', 'comments', 'default', array(

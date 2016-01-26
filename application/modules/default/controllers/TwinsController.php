@@ -132,8 +132,15 @@ class TwinsController extends Zend_Controller_Action
 
         $picturesCount = $twins->getGroupPicturesCount($group['id']);
 
+        $description = null;
+        if ($group['text_id']) {
+            $textStorage = $this->_helper->textStorage();
+            $description = $textStorage->getText($group['text_id']);
+        }
+
         $this->view->assign(array(
             'group'              => $group,
+            'description'        => $description,
             'cars'               => $this->_helper->car->listData($carList, array(
                 'disableTwins'         => true,
                 'disableLargePictures' => true,
@@ -167,7 +174,7 @@ class TwinsController extends Zend_Controller_Action
         $ctTable = new Comment_Topic();
         $pictureTable = new Picture();
 
-        $imageStorage = $this->getInvokeArg('bootstrap')->getResource('imagestorage');
+        $imageStorage = $this->_helper->imageStorage();
 
         $language = $this->_helper->language();
 

@@ -27,8 +27,8 @@
                                         ),
                                         $this->htmlImg(array(
                                             'src'   => $picture['src'],
-                                            'alt'   => $picture['name'],
-                                            'title' => $picture['name'],
+                                            'alt'   => $this->pic()->textTitle($picture['name']),
+                                            'title' => $this->pic()->textTitle($picture['name']),
                                         )),
                                         false
                                     )?>

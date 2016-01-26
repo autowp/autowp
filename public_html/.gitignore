@@ -1,11 +1,10 @@
-/.htaccess
 /a7p*
 /i
 /pictures
 /temp
 /tiny_mce
-/apc.php
 /google*.html
 /yandex_*.txt
 /js
 /37582904f658.html
+/.well-known

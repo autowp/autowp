@@ -38,7 +38,9 @@
                     <?php } ?>
                 </h1>
             <?php } ?>
-            <?php if ($this->brand->description) { ?>
+            <?php if ($this->description) { ?>
+                <?=$this->markdown($this->description)?>
+            <?php } elseif ($this->brand->description) { ?>
                 <?=$this->brand->description?>
             <?php } ?>
         </div>

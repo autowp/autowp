@@ -286,9 +286,9 @@ class Twins
         }
 
         return array(
-            'id'          => $row->id,
-            'name'        => $row->name,
-            'description' => $row->description
+            'id'      => $row->id,
+            'name'    => $row->name,
+            'text_id' => $row->text_id
         );
     }
 

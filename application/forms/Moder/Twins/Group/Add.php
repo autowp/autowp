@@ -30,17 +30,6 @@ class Application_Form_Moder_Twins_Group_Add extends Project_Form
                     ),
                     'decorators' => array('ViewHelper')
                 )),
-                array('textarea', 'description', array(
-                    'required'   => false,
-                    'label'      => 'Описание',
-                    'rows'       => 10,
-                    'cols'       => 80,
-                    'filters'    => array('StringTrim'),
-                    'validators' =>  array(
-                        array('StringLength', true, array(0, 4096))
-                    ),
-                    'decorators' => array('ViewHelper')
-                )),
             )
         ));
     }

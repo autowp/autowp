@@ -9,7 +9,8 @@ require.config({
         'jquery.cookie': '/js/lib/jquery.cookie',
         typeahead: 'lib/bootstrap3-typeahead',
         raphael: 'lib/raphael',
-        css: 'lib/requirejs-plugins/css'
+        css: 'lib/requirejs-plugins/css',
+        markdown: 'lib/markdown.min'
     },
     shim: {
         'bootstrap': {
@@ -20,6 +21,9 @@ require.config({
         },
         'typeahead': {
             deps: ['bootstrap']
+        },
+        markdown: {
+            exports: 'markdown'
         }
     }
 });

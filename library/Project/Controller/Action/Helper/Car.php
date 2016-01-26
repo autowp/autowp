@@ -115,6 +115,7 @@ class Project_Controller_Action_Helper_Car
         $picHelper = $controller->getHelper('Pic');
         $userHelper = $controller->getHelper('User')->direct();
         $aclHelper = $controller->getHelper('Acl')->direct();
+        $imageStorage = $controller->getHelper('imageStorage')->direct();
 
         $user = $userHelper->get();
         $specEditor = $userHelper->isAllowed('specifications', 'edit');
@@ -490,11 +491,8 @@ class Project_Controller_Action_Helper_Car
         $pictureNames = $pictureTable->getNameData($allPictures, array(
             'language' => $language
         ));
-        //$pictureNames = $catalogue->buildPicturesName($allPictures, $language);
 
         // prefetch images
-        $imageStorage = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('imagestorage');
-
         $imagesInfo = array();
         foreach ($allFormatRequests as $format => $requests) {
             $imagesInfo[$format] = $imageStorage->getFormatedImages($requests, $format);
