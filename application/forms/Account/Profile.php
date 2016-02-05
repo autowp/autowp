@@ -24,14 +24,14 @@ class Application_Form_Account_Profile extends Project_Form
                     'size'       => 30,
                     'decorators' => array('ViewHelper')
                 )),
-                array('text', 'icq', array(
+                /*array('text', 'icq', array(
                     'required'   => false,
                     'label'      => 'ICQ',
                     'filters'    => array('Digits'),
                     'maxlength'  => 30,
                     'size'       => 30,
                     'decorators' => array('ViewHelper')
-                )),
+                )),*/
                 /*array('text', 'url', array(
                     'required'   => false,
                     'label'      => 'Web-сайт',

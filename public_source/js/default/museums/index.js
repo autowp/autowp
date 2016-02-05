@@ -1,5 +1,4 @@
 define(
-    'default/museums/index',
     ['jquery', 'googlemaps'],
     function($, googlemaps) {
         return {

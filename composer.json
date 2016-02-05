@@ -41,7 +41,8 @@
     "autoload": {
         "psr-4": {
             "Autowp\\OAuth2\\Client\\": "vendor/autowp/oauth2-vk/src/",
-            "Autowp\\": "vendor/autowp/textstorage/src/"
+            "Autowp\\": "vendor/autowp/textstorage/src/",
+            "Application\\Model\\": "application/models"
         }
     },
     "repositories":[

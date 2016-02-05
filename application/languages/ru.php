@@ -95,6 +95,7 @@ return array (
 
     /* INDEX */
     'index/brands'             => 'Компании',
+    'index/factories'          => 'Заводы',
     'mosts/fastest/roadster'          => 'Самые быстрые родстеры',
     'mosts/mighty/sedan/today'        => 'Самые мощные седаны нашего времени',
     'mosts/dynamic/universal/2000-09' => 'Самые динамичные универсалы 2000ых',
@@ -158,7 +159,7 @@ return array (
     'picturelist/mixed' => 'Разное',
     'picturelist/mixed-%s' => '%s разное',
     'picturelist/unsorted' => 'Несортировано',
-    'picturelist/unsorted-%s' => '%s несортировано',
+    'picturelist/unsorted-%s' => '%s',
 
     'present-time-abbr'      => 'н.в.',
 
@@ -266,6 +267,11 @@ return array (
     'comments/message' => 'Сообщение',
     'comments/send' => 'Отправить',
     'comments/cancel' => 'Отменить',
+	'comments/need-wait-text' => 'К сожалению вам нужно немного подождать, чтобы получить возможность оставить комментарий.
+		
+Это связано с наличием порога "сообщений в час", необходимого для борьбы со спамом и некоторыми другими негативными моментами.
+		
+Следующий комментарий вы сможете оставить в "%s", а пока у вас есть время уточнить ту мысль, которую вы хотели донести до общественности:',
 
     /*perspectives*/
     'perspective/front'          => 'спереди',
@@ -352,6 +358,7 @@ return array (
     'account/profile/votes-per-day' => 'Голосов в день',
     'account/profile/votes-left' => 'Голосов осталось',
     'account/profile/timezone' => 'Часовой пояс',
+    'account/profile/language' => 'Язык',
 
     'feedback/title' => 'Обратная связь',
     'feedback/name'  => 'Ваше имя',
@@ -414,4 +421,6 @@ return array (
     'donate/success-text' => 'Благодарим вас за оказанную поддержку.
 
 Постараемся вас не разочаровать.',
+    
+    'message/user-cancel-car-engine' => '%1$s отменил двигатель %2$s для автомобиля %3$s ( %4$s )',
 );

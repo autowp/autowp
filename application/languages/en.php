@@ -86,6 +86,7 @@ return array (
 
     /* INDEX */
     'index/brands'             => 'Brands',
+    'index/factories'          => 'Factories',
     'mosts/fastest/roadster'          => 'Most fastest roadsters',
     'mosts/mighty/sedan/today'        => 'Most mighty sedans today',
     'mosts/dynamic/universal/2000-09' => 'Most dynamic universals in 2000\'s',
@@ -252,6 +253,11 @@ return array (
     'comments/message' => 'Message',
     'comments/send' => 'Send',
     'comments/cancel' => 'Cancel',
+	'comments/need-wait-text' => 'Unfortunately you have to wait a bit to be able to leave a comment.
+
+This is due to the presence of the threshold "messages per hour", necessary to prevent spam and some other negative aspects.
+
+Next, you can leave a comment in the "%s", as long as you have the time to clarify the idea you want to convey to the public:',
 
     /*perspectives*/
     'perspective/front'          => 'front',
@@ -338,6 +344,7 @@ return array (
     'account/profile/votes-per-day' => 'Votes per day',
     'account/profile/votes-left' => 'Votes left',
     'account/profile/timezone' => 'Timezone',
+    'account/profile/language' => 'Language',
 
     'feedback/title' => 'Feedback',
     'feedback/name'  => 'Your name',
@@ -400,4 +407,6 @@ We do not collect information about our donators, however if you wish, we can ma
     'donate/success-text' => 'Thank you for your support.
         
 We will try not to disappoint you.',
+    
+    'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s )',
 );

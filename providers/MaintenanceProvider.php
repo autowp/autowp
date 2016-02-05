@@ -1,7 +1,6 @@
 <?php
 
-require_once 'Zend/Tool/Project/Provider/Abstract.php';
-require_once 'Zend/Tool/Project/Provider/Exception.php';
+use Application\Model\Message;
 
 class MaintenanceProvider extends Zend_Tool_Project_Provider_Abstract
 {
@@ -62,12 +61,9 @@ class MaintenanceProvider extends Zend_Tool_Project_Provider_Abstract
             ->bootstrap('phpEnvoriment')
             ->bootstrap('autoloader')
             ->bootstrap('db');
-
-        $pm = new Personal_Messages();
-        $count = $pm->delete(array(
-            'from_user_id is null',
-            'add_datetime < date_sub(now(), interval 6 month)'
-        ));
+        
+        $mModel = new Message();
+        $count = $mModel->recycleSystem();
 
         printf("%d messages was deleted\n", $count);
     }
@@ -83,11 +79,8 @@ class MaintenanceProvider extends Zend_Tool_Project_Provider_Abstract
             ->bootstrap('autoloader')
             ->bootstrap('db');
 
-        $pm = new Personal_Messages();
-        $count = $pm->delete(array(
-            'deleted_by_to',
-            'deleted_by_from OR from_user_id IS NULL'
-        ));
+        $mModel = new Message();
+        $count = $mModel->recycle();
 
         printf("%d messages was deleted\n", $count);
     }

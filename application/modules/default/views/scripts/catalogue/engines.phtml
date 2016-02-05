@@ -88,7 +88,7 @@
             <p>Устанавливался на:</p>
             <ul>
                 <?php foreach ($engine['cars'] as $car) { ?>
-                    <li><?=$this->htmlA($car['url'], $car['name'])?></li>
+                    <li><?=$this->htmlA($car['url'], $this->car()->htmlTitle($car['name']), false)?></li>
                 <?php } ?>
             </ul>
         <?php } ?>

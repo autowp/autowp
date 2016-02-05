@@ -10,7 +10,9 @@ require.config({
         typeahead: 'lib/bootstrap3-typeahead',
         raphael: 'lib/raphael',
         css: 'lib/requirejs-plugins/css',
-        markdown: 'lib/markdown.min'
+        markdown: 'lib/markdown.min',
+        moment: 'lib/moment',
+        Chart: 'lib/Chart'
     },
     shim: {
         'bootstrap': {

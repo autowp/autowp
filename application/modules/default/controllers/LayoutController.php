@@ -1,5 +1,7 @@
 <?php
 
+use Application\Model\Message;
+
 class LayoutController extends Zend_Controller_Action
 {
     public function flashMessagesAction()
@@ -10,15 +12,8 @@ class LayoutController extends Zend_Controller_Action
     public function sidebarRightAction()
     {
         if ($this->_helper->user()->logedIn()) {
-            $pmTable = new Personal_Messages();
-            $pmAdapter = $pmTable->getAdapter();
-
-            $count = $pmAdapter->fetchOne(
-                $pmAdapter->select()
-                    ->from($pmTable->info('name'), array('count(1)'))
-                    ->where('to_user_id = ?', $this->_helper->user()->get()->id)
-                    ->where('NOT readen')
-            );
+            $mModel = new Message();
+            $count = $mModel->getNewCount($this->_helper->user()->get()->id);
 
             $this->view->newPersonalMessages = $count;
         }

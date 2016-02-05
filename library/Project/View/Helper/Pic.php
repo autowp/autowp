@@ -77,7 +77,7 @@ class Project_View_Helper_Pic extends Zend_View_Helper_HtmlElement
 
             case Picture::ENGINE_TYPE_ID:
                 if ($picture['engine']) {
-                    return $view->translate('picturelist/engine-%s', $picture['engine']);
+                    return sprintf($view->translate('picturelist/engine-%s'), $picture['engine']);
                 } else {
                     return $view->translate('picturelist/engine');
                 }
@@ -85,7 +85,7 @@ class Project_View_Helper_Pic extends Zend_View_Helper_HtmlElement
 
             case Picture::LOGO_TYPE_ID:
                 if ($picture['brand']) {
-                    return $view->translate('picturelist/logotype-%s', $picture['brand']);
+                    return sprintf($view->translate('picturelist/logotype-%s'), $picture['brand']);
                 } else {
                     return $view->translate('picturelist/logotype');
                 }
@@ -93,7 +93,7 @@ class Project_View_Helper_Pic extends Zend_View_Helper_HtmlElement
 
             case Picture::MIXED_TYPE_ID:
                 if ($picture['brand']) {
-                    return $view->translate('picturelist/mixed-%s', $picture['brand']);
+                    return sprintf($view->translate('picturelist/mixed-%s'), $picture['brand']);
                 } else {
                     return $view->translate('picturelist/mixed');
                 }
@@ -101,7 +101,7 @@ class Project_View_Helper_Pic extends Zend_View_Helper_HtmlElement
 
             case Picture::UNSORTED_TYPE_ID:
                 if ($picture['brand']) {
-                    return $view->translate('picturelist/unsorted-%s', $picture['brand']);
+                    return sprintf($view->translate('picturelist/unsorted-%s'), $picture['brand']);
                 } else {
                     return $view->translate('picturelist/unsorted');
                 }

@@ -96,7 +96,8 @@ class Application_Service_Users
             'reg_date'         => new Zend_Db_Expr('NOW()'),
             'last_online'      => new Zend_Db_Expr('NOW()'),
             'timezone'         => $host['timezone'],
-            'last_ip'          => new Zend_Db_Expr($ipExpr)
+            'last_ip'          => new Zend_Db_Expr($ipExpr),
+            'language'         => $language
         ));
         $user->save();
 

@@ -86,6 +86,7 @@ return array (
 
     /* INDEX */
     'index/brands'             => 'Marques',
+    'index/factories'          => 'Usines',
     'mosts/fastest/roadster'          => 'La plupart des roadsters les plus rapides',
     'mosts/mighty/sedan/today'        => 'La plupart puissantes berlines aujourd\'hui',
     'mosts/dynamic/universal/2000-09' => 'La plupart des universaux dynamiques années 2000',
@@ -252,6 +253,11 @@ return array (
     'comments/message' => 'Message',
     'comments/send' => 'Envoyer',
     'comments/cancel' => 'Annuler',
+	'comments/need-wait-text' => 'Malheureusement, il faut attendre un peu pour obtenir la possibilité de laisser un commentaire.
+		
+Cela est dû à la présence d\'un seuil "messages par heure" nécessaire pour lutter contre le spam et autres moments négatifs.
+		
+Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le temps de clarifier l\'idée que vous voulez transmettre au public:',
 
     /*perspectives*/
     'perspective/front'          => 'avant',
@@ -338,6 +344,7 @@ return array (
     'account/profile/votes-per-day' => 'Votes par jour',
     'account/profile/votes-left' => 'Votes gauche',
     'account/profile/timezone' => 'Fuseau horaire',
+    'account/profile/language' => 'Langue',
 
     'feedback/title' => 'Retour d\'information',
     'feedback/name'  => 'Votre nom',
@@ -401,4 +408,6 @@ Nous ne recueillons pas d\'informations sur les donateurs, mais, si vous insiste
     'donate/success-text' => 'Merci pour votre soutien.
 
 Allons essayer de ne pas vous décevoir.',
+    
+    'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s )',
 );
