@@ -32,13 +32,23 @@
             'action' => 'factory-cars',
         )), 'Автомобили') ?>
     </li>
+    <?php if ($this->canEdit) { ?>
+        <li>
+            <?=$this->htmlA($this->url(array(
+                'module'     => 'moder',
+                'controller' => 'factory',
+                'action'     => 'factory',
+                'factory_id' => $this->factory->id
+            )), '<i class="fa fa-cog"></i> Управление', false) ?>
+        </li>
+    <?php } ?>
 </ul>
 
 <div id="google-map" style="height:300px;margin:0 0 40px;width:100%"></div>
 
-<?php if ($this->factory->description) { ?>
+<?php if ($this->description) { ?>
     <div class="well">
-        <?=$this->factory->description ?>
+        <?=$this->markdown($this->description) ?>
     </div>
 <?php } ?>
 

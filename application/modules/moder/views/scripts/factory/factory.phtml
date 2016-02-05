@@ -15,7 +15,7 @@
     $this->layout()->moduleName = 'moder/factory/edit';
 ?>
 <div class="row">
-    <div class="col-lg-8 col-md-8">
+    <div class="col-md-8">
         <div class="well">
             <p>В базе данных чиcлится под номером <strong><?=$this->factory->id ?></strong></p>
             <p><?=$this->htmlA($this->url(array(
@@ -40,8 +40,30 @@
                 <?=$this->formModerFactoryEdit->render($this) ?>
             <?php } ?>
         </div>
+
+        <h3>Краткое описание</h3>
+        <div class="well">
+            <?php if ($this->canEdit) { ?>
+                <?=$this->descriptionForm->render($this)?>
+            <?php } else { ?>
+                <?=$this->markup($this->description)?>
+            <?php } ?>
+            <?php if ($this->factory->text_id) { ?>
+                <p>
+                    <?=$this->htmlA(array(
+                        'class' => 'pull-right',
+                        'href'  => $this->url(array(
+                            'module'     => 'default',
+                            'controller' => 'info',
+                            'action'     => 'text',
+                            'id'         => $this->factory->text_id
+                        ), null, true)
+                    ), 'History')?>
+                </p>
+            <?php } ?>
+        </div>
     </div>
-    <div class="col-lg-4 col-md-4">
+    <div class="col-md-4">
         <h3>Автомобили завода</h3>
         <div class="well">
             <?php  foreach ($this->cars as $car) { ?>

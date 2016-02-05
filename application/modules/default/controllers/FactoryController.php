@@ -20,7 +20,8 @@ class FactoryController extends Zend_Controller_Action
 
         $select = $pictureTable->select(true)
             ->where('type = ?', Picture::FACTORY_TYPE_ID)
-            ->where('factory_id = ?', $factory->id);
+            ->where('factory_id = ?', $factory->id)
+            ->where('status = ?', Picture::STATUS_ACCEPTED);
 
         $pictures = $this->_helper->pic->listData($select, array(
             'width' => 4
@@ -111,11 +112,19 @@ class FactoryController extends Zend_Controller_Action
             $point = geoPHP::load(substr($factory->point, 4), 'wkb');
         }
 
+        $description = null;
+        if ($factory['text_id']) {
+            $textStorage = $this->_helper->textStorage();
+            $description = $textStorage->getText($factory['text_id']);
+        }
+
         $this->view->assign(array(
             'factory'     => $factory,
+            'description' => $description,
             'pictures'    => $pictures,
             'carPictures' => $carPictures,
-            'point'       => $point
+            'point'       => $point,
+            'canEdit'     => $this->_helper->user()->isAllowed('factory', 'edit')
         ));
     }
 

@@ -50,8 +50,7 @@ class MapController extends Zend_Controller_Action
 
         $pictureTable = new Picture();
 
-        $imageStorage = $this->getInvokeArg('bootstrap')
-            ->getResource('imagestorage');
+        $imageStorage = $this->_helper->imageStorage();
 
         $factoryTable = new Factory();
 

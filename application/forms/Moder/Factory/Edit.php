@@ -8,7 +8,7 @@ class Application_Form_Moder_Factory_Edit extends Project_Form
 
         $this->setOptions(array(
             'method'     => 'post',
-            'legend'     => 'Двигатель',
+            'legend'     => 'Завод',
             'decorators' => array(
                 'PrepareElements',
                 array('viewScript', array(
@@ -32,15 +32,6 @@ class Application_Form_Moder_Factory_Edit extends Project_Form
                     'label'       => 'Год по',
                     'placeholder' => 'по',
                     'decorators'  => array('ViewHelper')
-                )),
-                array('textarea', 'description', array(
-                    'required'    => false,
-                    'label'       => 'Описание',
-                    'cols'        => 80,
-                    'rows'        => 8,
-                    'filters'     => array('StringTrim'),
-                    'decorators'  => array('ViewHelper'),
-                    'class'       => 'span6'
                 )),
                 array('text', 'lat', array(
                     'required'    => false,

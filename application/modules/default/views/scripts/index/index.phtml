@@ -146,6 +146,14 @@
                     <p>Хотите знать, какой автомобиль был самым быстрым? Хотите знать, сколько весит самый могучий карьерный самосвал? Заходите и узнаете!</p>
                 <?php } ?>
             </div>
+
+            <div class="col-md-6">
+                <h4><?=$this->escape($this->translate('index/factories'))?> <small><?=$this->htmlA('/map/', $this->translate('all-link'))?></small></h4>
+                <?php foreach ($this->factories as $factory) {
+                    echo $this->htmlA($factory['url'], $factory['name']) .
+                        '&#xa0;<span class="count">(' . $factory['count'] . ')</span> ';
+                } ?>
+            </div>
         </div>
     </div>
 </div>

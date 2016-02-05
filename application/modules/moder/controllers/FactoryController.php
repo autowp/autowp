@@ -38,6 +38,29 @@ class Moder_FactoryController extends Zend_Controller_Action
         geoPHP::version(); // for autoload classes
     }
 
+    private function _getDescriptionForm()
+    {
+        return new Project_Form(array(
+            'method' => Zend_Form::METHOD_POST,
+            'action' => $this->_helper->url->url(array(
+                'action' => 'save-description'
+            )),
+            'decorators' => array(
+                'PrepareElements',
+                ['viewScript', array(
+                    'viewScript' => 'forms/markdown.phtml'
+                )],
+                'Form'
+            ),
+            'elements' => [
+                ['Brand_Description', 'markdown', array(
+                    'required'   => false,
+                    'decorators' => ['ViewHelper'],
+                )],
+            ]
+        ));
+    }
+
     public function factoryAction()
     {
         $factoryTable = $this->_getFactoryTable();
@@ -65,7 +88,6 @@ class Moder_FactoryController extends Zend_Controller_Action
                 'lng'         => $point ? $point->x() : null,
                 'year_from'   => $factory->year_from,
                 'year_to'     => $factory->year_to,
-                'description' => $factory['description'],
             ));
             $request = $this->getRequest();
 
@@ -86,7 +108,6 @@ class Moder_FactoryController extends Zend_Controller_Action
                     'year_from'   => strlen($values['year_from']) ? $values['year_from'] : null,
                     'year_to'     => strlen($values['year_to']) ? $values['year_to'] : null,
                     'point'       => $point,
-                    'description' => $values['description']
                 ));
                 $factory->save();
 
@@ -104,6 +125,23 @@ class Moder_FactoryController extends Zend_Controller_Action
             $this->view->formModerFactoryEdit = $form;
         }
 
+        $descriptionForm = null;
+        if ($canEdit) {
+            $descriptionForm = $this->_getDescriptionForm();
+        }
+
+        if ($factory->text_id) {
+            $textStorage = $this->_helper->textStorage();
+            $description = $textStorage->getText($factory->text_id);
+            if ($canEdit) {
+                $descriptionForm->populate(array(
+                    'markdown' => $description
+                ));
+            }
+        } else {
+            $description = '';
+        }
+
         $carTable = new Cars();
 
         $cars = $carTable->fetchAll(
@@ -113,9 +151,11 @@ class Moder_FactoryController extends Zend_Controller_Action
         );
 
         $this->view->assign(array(
-            'factory' => $factory,
-            'canEdit' => $canEdit,
-            'cars'    => $cars
+            'factory'         => $factory,
+            'canEdit'         => $canEdit,
+            'cars'            => $cars,
+            'description'     => $description,
+            'descriptionForm' => $descriptionForm
         ));
     }
 
@@ -283,5 +323,73 @@ class Moder_FactoryController extends Zend_Controller_Action
         $this->view->assign(array(
             'form' => $form,
         ));
+    }
+
+    public function saveDescriptionAction()
+    {
+        $canEdit = $this->_helper->user()->isAllowed('factory', 'edit');
+        if (!$canEdit) {
+            return $this->_forward('forbidden', 'error', 'default');
+        }
+
+        $user = $this->_helper->user()->get();
+
+        $request = $this->getRequest();
+        if (!$request->isPost()) {
+            return $this->_forward('forbidden', 'error', 'default');
+        }
+
+        $factoryTable = $this->_getFactoryTable();
+
+        $factory = $factoryTable->find($this->_getParam('factory_id'))->current();
+        if (!$factory) {
+            return $this->_forward('notfound', 'error', 'default');
+        }
+
+        $form = $this->_getDescriptionForm();
+
+        if ($form->isValid($request->getPost())) {
+
+            $values = $form->getValues();
+
+            $text = $values['markdown'];
+
+            $textStorage = $this->_helper->textStorage();
+
+            if ($factory->text_id) {
+                $textStorage->setText($factory->text_id, $text, $user->id);
+            } elseif ($text) {
+                $textId = $textStorage->createText($text, $user->id);
+                $factory->text_id = $textId;
+                $factory->save();
+            }
+
+
+            $this->_helper->log(sprintf(
+                'Редактирование описания завода %s',
+                $this->view->htmlA($this->_factoryModerUrl($factory->id), $factory->name)
+            ), $factory);
+
+            if ($factory->text_id) {
+                $userIds = $textStorage->getTextUserIds($factory->text_id);
+                $message = sprintf(
+                    'Пользователь %s редактировал описание группы близнецов %s ( %s )',
+                    $this->view->serverUrl($user->getAboutUrl()),
+                    $factory->name,
+                    $this->view->serverUrl($this->_factoryModerUrl($factory->id))
+                );
+
+                $userTable = new Users();
+                foreach ($userIds as $userId) {
+                    if ($userId != $user->id) {
+                        foreach ($userTable->find($userId) as $userRow) {
+                            $userRow->sendPersonalMessage(null, $message);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $this->_redirect($this->_factoryModerUrl($factory->id));
     }
 }
