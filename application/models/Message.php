@@ -207,7 +207,7 @@ class Message
         
         $markReaden = [];
         foreach ($rows as $message) {
-            if (!$message->readen && $message->to_user_id == $user->id) {
+            if (!$message->readen && $message->to_user_id == $userId) {
                 $markReaden[] = $message->id;
             }
         }
@@ -248,7 +248,7 @@ class Message
         
         $markReaden = [];
         foreach ($rows as $message) {
-            if (!$message->readen && $message->to_user_id == $user->id) {
+            if (!$message->readen && $message->to_user_id == $userId) {
                 $markReaden[] = $message->id;
             }
         }
@@ -273,7 +273,7 @@ class Message
     
         $markReaden = [];
         foreach ($rows as $message) {
-            if (!$message->readen && $message->to_user_id == $user->id) {
+            if (!$message->readen && $message->to_user_id == $userId) {
                 $markReaden[] = $message->id;
             }
         }
