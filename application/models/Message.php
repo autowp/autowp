@@ -13,7 +13,10 @@ class Message
     
     public function __construct()
     {
-        $this->_table = new \Personal_Messages();
+        $this->_table = new \Project_Db_Table(array(
+            'name'    => 'personal_messages',
+            'primary' => 'id'
+        ));
     }
     
     public function send($fromId = null, $toId, $message)
@@ -295,10 +298,12 @@ class Message
         $db = $this->_table->getAdapter();
     
         $cache = [];
+        
+        $userTable = new \Users();
     
         $messages = [];
         foreach ($rows as $message) {
-            $author = $message->findParentUsersByFrom();
+            $author = $userTable->find($message->from_user_id)->current();
     
             $isNew = $message->to_user_id == $userId && !$message->readen;
             $canDelete = $message->from_user_id == $userId || $message->to_user_id == $userId;
