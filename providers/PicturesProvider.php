@@ -64,7 +64,4 @@ class PicturesProvider extends Zend_Tool_Project_Provider_Abstract
             $progressBar->finish();
         }
     }
-
-
 }
-

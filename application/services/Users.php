@@ -104,9 +104,9 @@ class Application_Service_Users
         $service = new Application_Service_Specifications();
         $service->refreshUserConflicts($user->id);
 
-        $user->updateVotesLimit();
-
         $this->sendRegistrationConfirmEmail($user, $host['hostname']);
+
+        $this->updateUserVoteLimit($user->id);
 
         return $user;
     }
@@ -241,5 +241,80 @@ class Application_Service_Users
             $login,
             $this->_passwordHashExpr($password)
         );
+    }
+
+    public function updateUsersVoteLimits()
+    {
+        $userTable = $this->_getTable();
+        $db = $userTable->getAdapter();
+
+        $ids = $db->fetchCol(
+            $db->select()
+                ->from($userTable->info('name'), 'id')
+                ->where('not deleted')
+                ->where('last_online > DATE_SUB(NOW(), INTERVAL 3 MONTH)')
+        );
+
+        $affected = 0;
+        foreach ($ids as $id) {
+            $this->updateUserVoteLimit($id);
+            $affected++;
+        }
+
+        return $affected;
+    }
+
+    public function updateUserVoteLimit($userId)
+    {
+        $userRow = $this->_getTable()->find($userId)->current();
+        if (!$userRow) {
+            return false;
+        }
+
+        $default = 10;
+
+        $commentTable = new Comment_Message();
+        $db = $commentTable->getAdapter();
+
+        $avgVote = $db->fetchOne(
+            $db->select()
+                ->from($commentTable->info('name'), new Zend_Db_Expr('avg(vote)'))
+                ->where('author_id = ?', $userRow->id)
+                ->where('vote <> 0')
+        );
+
+        $age = 0;
+        $regDate = $userRow->getDate('reg_date');
+        if ($regDate) {
+            $diff = Zend_Date::now()->sub($regDate)->toValue();
+            $age = ((($diff / 60) / 60) / 24) / 365;
+        }
+
+        $pictureTable = new Picture();
+        $db = $pictureTable->getAdapter();
+        $picturesExists = $db->fetchOne(
+            $db->select()
+                ->from($pictureTable->info('name'), array(new Zend_Db_Expr('COUNT(1)')))
+                ->where('owner_id = ?', $userRow->id)
+                ->where('status = ?', Picture::STATUS_ACCEPTED)
+        );
+
+        $value = round($default + $avgVote + $age + $picturesExists / 100);
+        if ($value < 0) {
+            $value = 0;
+        }
+
+        $userRow->votes_per_day = $value;
+        $userRow->save();
+    }
+
+    public function restoreVotes()
+    {
+        $this->_getTable()->update(array(
+            'votes_left' => new Zend_Db_Expr('votes_per_day')
+        ), array(
+            'votes_left < votes_per_day',
+            'not deleted'
+        ));
     }
 }
