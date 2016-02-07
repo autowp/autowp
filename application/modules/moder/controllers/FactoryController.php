@@ -1,5 +1,7 @@
 <?php
 
+use Application\Model\Message;
+
 class Moder_FactoryController extends Zend_Controller_Action
 {
     /**
@@ -379,11 +381,12 @@ class Moder_FactoryController extends Zend_Controller_Action
                     $this->view->serverUrl($this->_factoryModerUrl($factory->id))
                 );
 
+                $mModel = new Message();
                 $userTable = new Users();
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {
                         foreach ($userTable->find($userId) as $userRow) {
-                            $userRow->sendPersonalMessage(null, $message);
+                            $mModel->send(null, $userRow->id, $message);
                         }
                     }
                 }

@@ -130,8 +130,12 @@ class Comments
      * @param int $page
      * @return array
      */
-    private function _get($type, $item, $parentId, $user, $perPage = 0, $page = 0)
+    private function _get($type, $item, $parentId, $userId, $perPage = 0, $page = 0)
     {
+        if ($userId instanceof Users_Row) {
+            $userId = $userId->id;
+        }
+        
         if ($perPage) {
 
             $paginator = $this->getPaginator($type, $item, $perPage, $page);
@@ -156,10 +160,10 @@ class Comments
             $author = $row->findParentUsersByAuthor();
 
             $vote = null;
-            if ($user) {
+            if ($userId) {
                 $voteRow = $this->_getVoteTable()->fetchRow(array(
                     'comment_id = ?' => $row->id,
-                    'user_id = ?'    => $user->id
+                    'user_id = ?'    => (int)$userId
                 ));
                 $vote = $voteRow ? $voteRow->vote : null;
             }
@@ -170,7 +174,7 @@ class Comments
             }
 
             if ($row->replies_count > 0) {
-                $submessages = $this->_get($type, $item, $row->id, $user);
+                $submessages = $this->_get($type, $item, $row->id, $userId);
             } else {
                 $submessages = array();
             }
@@ -198,9 +202,9 @@ class Comments
      * @param int $item
      * @return array
      */
-    public function get($type, $item, $user, $perPage = 0, $page = 0)
+    public function get($type, $item, $userId, $perPage = 0, $page = 0)
     {
-        return $this->_get($type, $item, null, $user, $perPage, $page);
+        return $this->_get($type, $item, null, $userId, $perPage, $page);
     }
 
     /**

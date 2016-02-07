@@ -1,4 +1,7 @@
 <?php
+
+use Application\Model\Message;
+
 class Moder_TwinsController extends Zend_Controller_Action
 {
     public function preDispatch()
@@ -158,10 +161,11 @@ class Moder_TwinsController extends Zend_Controller_Action
                 );
 
                 $userTable = new Users();
+                $mModel = new Message();
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {
                         foreach ($userTable->find($userId) as $userRow) {
-                            $userRow->sendPersonalMessage(null, $message);
+                            $mModel->send(null, $userRow->id, $message);
                         }
                     }
                 }

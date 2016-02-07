@@ -1,5 +1,4 @@
 define(
-    'forums/topic',
     ['jquery', 'bootstrap', 'brand-popover'],
     function($, Bootstrap, BrandPopover) {
         return {

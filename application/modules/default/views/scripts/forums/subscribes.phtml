@@ -1,0 +1,52 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Топики</th>
+            <th><?=$this->escape($this->translate('forums/theme/author'))?></th>
+            <th><?=$this->escape($this->translate('forums/theme/last-message'))?></th>
+            <th>Подписка</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->topics as $topic) { ?>
+            <tr>
+                <td>
+                    <?php if ($topic['theme']) { ?>
+                        <?=$this->htmlA($topic['theme']['url'], $this->translate($topic['theme']['name'])) ?> →<br />
+                    <?php } ?>
+                    <?=$this->htmlA($topic['url'], $topic['name']) ?>
+                    <span class="badge"><?=$topic['oldMessages'] ?><?php if ($topic['newMessages'] > 0) { ?>+<?=$topic['newMessages']?><?php } ?></span>
+                </td>
+                <td>
+                    <?php if ($topic['author']) { ?>
+                        <?=$this->user($topic['author']) ?>
+                    <?php } ?>
+                </td>
+                <td>
+                    <?php if ($topic['messages'] > 0) { ?>
+                        <?php if ($topic['lastMessage']) { ?>
+                            <?=$this->pastTimeIndicator($topic['lastMessage']['date'])?><br />
+                            <?php if ($topic['lastMessage']['author']) { ?>
+                                <?=$this->user($topic['lastMessage']['author']) ?>
+                                <?=$this->htmlA(array(
+                                    'href'  => $topic['lastMessage']['url'],
+                                    'title' => $this->translate('forums/go-to-last-message')
+                                ), '<i class="fa fa-share"></i>', false) ?>
+                            <?php } ?>
+                        <?php } else { ?>
+                            &#x2014;
+                        <?php } ?>
+                    <?php } else { ?>
+                        &#x2014;
+                    <?php } ?>
+                </td>
+                <td>
+                    <?=$this->htmlA(array(
+                        'class' => 'btn btn-xs btn-warning',
+                        'href'  => $topic['unsubscribeUrl'],
+                    ), 'отписаться') ?>
+                </td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>

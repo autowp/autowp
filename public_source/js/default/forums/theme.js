@@ -1,5 +1,4 @@
 define(
-    'forums/theme/theme',
     ['jquery'],
     function($) {
         return {
