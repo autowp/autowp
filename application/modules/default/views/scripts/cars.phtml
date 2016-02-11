@@ -58,7 +58,7 @@
 
 
         <?php if (!$this->disableDescription && strlen($item['description'])) { ?>
-            <div class="text"><?=$item['description']?></div>
+            <div class="text"><?=$this->markdown($item['description'])?></div>
         <?php } ?>
 
         <ul class="list-inline">

@@ -7,7 +7,6 @@
         "phpmyadmin/phpmyadmin": "4.5.0.1",
         "fortawesome/font-awesome": "^4.5",
         "components/jquery": "^2.1",
-        "tinymce/tinymce": "^4.3",
         "irazasyed/telegram-bot-sdk": "dev-master",
         "components/jquery-cookie": "1.4.1.2",
         "zendframework/zend-mail": "^2.5",
@@ -42,7 +41,8 @@
         "psr-4": {
             "Autowp\\OAuth2\\Client\\": "vendor/autowp/oauth2-vk/src/",
             "Autowp\\": "vendor/autowp/textstorage/src/",
-            "Application\\Model\\": "application/models"
+            "Application\\Model\\": "application/models",
+            "Application\\Service\\": "application/services"
         }
     },
     "repositories":[

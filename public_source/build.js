@@ -5,7 +5,6 @@
         async: 'lib/require/async',
         domReady: 'lib/requirejs-plugins/domReady',
         jquery: 'lib/jquery',
-        tinymce: '/tiny_mce/jquery.tinymce.min',
         'jquery.cookie': 'lib/jquery.cookie',
         raphael: 'lib/raphael',
         css: 'lib/requirejs-plugins/css'

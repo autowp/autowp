@@ -248,17 +248,6 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
                     'decorators'   => array('ViewHelper'),
                     'disabled'     => $this->_isGroupDisabled ? true : null
                 )),
-                array('description', 'description', array(
-                    'required'     => false,
-                    'label'        => 'Краткое описание',
-                    'order'        => 12,
-                    'cols'         => 60,
-                    'rows'         => 6,
-                    'filters'      => array('StringTrim'),
-                    'class'        => 'html',
-                    'style'        => 'width:380px;height:200px;',
-                    'decorators'   => array('ViewHelper')
-                )),
             ),
             'displayGroups'=> array(
                 'model_years' =>    array(

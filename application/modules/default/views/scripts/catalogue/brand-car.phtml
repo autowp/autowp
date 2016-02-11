@@ -108,11 +108,11 @@
 
 <?php if ($this->hasHtml) { ?>
     <div class="text">
-        <?=$this->car['html'] ?>
+        <?=$this->markdown($this->car['text']) ?>
     </div>
 <?php } elseif ($this->car['description']) { ?>
     <div class="text">
-        <?=$this->car['description'] ?>
+        <?=$this->markdown($this->car['description']) ?>
     </div>
 <?php } ?>
 

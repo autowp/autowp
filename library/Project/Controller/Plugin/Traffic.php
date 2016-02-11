@@ -1,7 +1,6 @@
 <?php
 
-/** Zend_Controller_Plugin_Abstract */
-require_once 'Zend/Controller/Plugin/Abstract.php';
+use Application\Service\TrafficControl;
 
 class Project_Controller_Plugin_Traffic extends Zend_Controller_Plugin_Abstract
 {
@@ -12,7 +11,7 @@ class Project_Controller_Plugin_Traffic extends Zend_Controller_Plugin_Abstract
 
         $ip = $request->getServer('REMOTE_ADDR');
 
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
 
         $banInfo = $service->getBanInfo($ip);
         if ($banInfo) {

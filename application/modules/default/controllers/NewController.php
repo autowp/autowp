@@ -1,5 +1,7 @@
 <?php
 
+use Application\Service\DayPictures;
+
 class NewController extends Zend_Controller_Action
 {
     private $_perPage = 18;
@@ -8,7 +10,7 @@ class NewController extends Zend_Controller_Action
     {
         $pictureTable = $this->_helper->catalogue()->getPictureTable();
 
-        $service = new Application_Service_DayPictures(array(
+        $service = new DayPictures(array(
             'timezone'     => $this->_helper->user()->timezone(),
             'dbTimezone'   => MYSQL_TIMEZONE,
             'select'       => $pictureTable->select(true)

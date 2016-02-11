@@ -1,8 +1,16 @@
 <?php
 
-use Telegram\Bot\Api;
+namespace Application\Service;
 
-class Application_Service_Telegram
+use Picture;
+use Project\Telegram\Command\InboxCommand;
+use Project\Telegram\Command\MeCommand;
+use Project\Telegram\Command\StartCommand;
+use Telegram\Bot\Api;
+use Telegram_Brand;
+use Zend_Controller_Front;
+
+class Telegram
 {
     private $_accessToken;
 
@@ -25,9 +33,9 @@ class Application_Service_Telegram
         $api = new Api($this->_accessToken);
 
         $api->addCommands([
-            Project\Telegram\Command\StartCommand::class,
-            Project\Telegram\Command\MeCommand::class,
-            Project\Telegram\Command\InboxCommand::class,
+            StartCommand::class,
+            MeCommand::class,
+            InboxCommand::class,
         ]);
 
         return $api;

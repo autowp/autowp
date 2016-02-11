@@ -1,7 +1,6 @@
 <?php
 
-require_once 'Zend/Tool/Project/Provider/Abstract.php';
-require_once 'Zend/Tool/Project/Provider/Exception.php';
+use Application\Service\TrafficControl;
 
 class TrafficProvider extends Zend_Tool_Project_Provider_Abstract
 {
@@ -21,7 +20,7 @@ class TrafficProvider extends Zend_Tool_Project_Provider_Abstract
             ->bootstrap('db')
             ->bootstrap('backCompatibility');
 
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
         $service->autoBan();
     }
 
@@ -39,7 +38,7 @@ class TrafficProvider extends Zend_Tool_Project_Provider_Abstract
             ->bootstrap('autoloader')
             ->bootstrap('db');
 
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
 
         $service->autoWhitelist();
     }

@@ -1,6 +1,14 @@
 <?php
 
-class Application_Service_TrafficControl
+namespace Application\Service;
+
+use DateInterval;
+use DateTime;
+use DateTimeZone;
+use Project_Db_Table;
+use Zend_Db_Expr;
+
+class TrafficControl
 {
     /**
      * @var Project_Db_Table

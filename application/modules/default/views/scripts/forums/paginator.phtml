@@ -2,8 +2,7 @@
     <br />
     <?php foreach ($this->pagesInRange as $page) { ?>
         <?=$this->htmlA($this->url(array(
-            'module'     => 'forums',
-            'controller' => 'topic',
+            'controller' => 'forums',
             'action'     => 'topic',
             'topic_id'   => $this->topic_id,
             'page'       => $page

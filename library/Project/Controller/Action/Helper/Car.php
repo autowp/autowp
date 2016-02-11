@@ -116,6 +116,7 @@ class Project_Controller_Action_Helper_Car
         $userHelper = $controller->getHelper('User')->direct();
         $aclHelper = $controller->getHelper('Acl')->direct();
         $imageStorage = $controller->getHelper('imageStorage')->direct();
+        $textStorage = $controller->getHelper('textStorage')->direct();
 
         $user = $userHelper->get();
         $specEditor = $userHelper->isAllowed('specifications', 'edit');
@@ -317,7 +318,7 @@ class Project_Controller_Action_Helper_Car
                 }
             }
 
-            $hasHtml = (bool)$car->html;
+            $hasHtml = (bool)$car->full_text_id;
 
             $specsLinks = array();
             if (!$disableSpecs) {
@@ -426,7 +427,11 @@ class Project_Controller_Action_Helper_Car
             }
 
             if (!$disableDescription) {
-                $item['description'] = $car->description;
+                $description = null;
+                if ($car->text_id) {
+                    $description = $textStorage->getText($car->text_id);
+                }
+                $item['description'] = $description;
             }
 
             if ($specEditor) {

@@ -1,5 +1,7 @@
 <?php
 
+use Application\Service\DayPictures;
+
 class InboxController extends Zend_Controller_Action
 {
     private $_perPage = 18;
@@ -69,7 +71,7 @@ class InboxController extends Zend_Controller_Action
                 ->group('pictures.id');
         }
 
-        $service = new Application_Service_DayPictures(array(
+        $service = new DayPictures(array(
             'timezone'     => $this->_helper->user()->timezone(),
             'dbTimezone'   => MYSQL_TIMEZONE,
             'select'       => $select,

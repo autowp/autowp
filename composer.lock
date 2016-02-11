@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3fd761b882aac9bef6e8b2a976552af8",
-    "content-hash": "2c09c9d5d7b810fdc888516e5c7bcb69",
+    "hash": "ddda7f907e25a5422ed763a10d7c160f",
+    "content-hash": "48cd9ec91b78cbc9c6b9d319ae4cf7e6",
     "packages": [
         {
             "name": "autowp/oauth2-vk",
@@ -1491,52 +1491,6 @@
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
             "time": "2016-02-02 13:44:19"
-        },
-        {
-            "name": "tinymce/tinymce",
-            "version": "4.3.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "ea98451a2b7b7d64b5aa3c33509bd07406a6ab90"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/ea98451a2b7b7d64b5aa3c33509bd07406a6ab90",
-                "reference": "ea98451a2b7b7d64b5aa3c33509bd07406a6ab90",
-                "shasum": ""
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "tinymce.js",
-                        "plugins/*/plugin.js",
-                        "themes/*/theme.js"
-                    ],
-                    "files": [
-                        "tinymce.min.js",
-                        "plugins/*/plugin.min.js",
-                        "themes/*/theme.min.js",
-                        "skins/**"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-2.1"
-            ],
-            "description": "Web based JavaScript HTML WYSIWYG editor control.",
-            "homepage": "http://www.tinymce.com",
-            "keywords": [
-                "editor",
-                "html",
-                "javascript",
-                "richtext",
-                "tinymce",
-                "wysiwyg"
-            ],
-            "time": "2016-01-13 15:10:44"
         },
         {
             "name": "twbs/bootstrap",

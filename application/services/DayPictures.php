@@ -1,6 +1,15 @@
 <?php
 
-class Application_Service_DayPictures
+namespace Application\Service;
+
+use DateTime;
+use DateTimeZone;
+use Exception;
+use Zend_Db_Table_Select;
+use Zend_Paginator;
+
+
+class DayPictures
 {
     const DEFAULT_TIMEZONE = 'UTC';
 
@@ -55,7 +64,7 @@ class Application_Service_DayPictures
     private $_minDate = null;
 
     /**
-     * @var Zend_Paginaotr
+     * @var Zend_Paginator
      */
     private $_paginator = null;
 

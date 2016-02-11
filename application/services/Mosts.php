@@ -1,6 +1,17 @@
 <?php
 
-class Application_Service_Mosts
+namespace Application\Service;
+
+use Car_Types;
+use Car_Type_Language;
+use Cars;
+use Exception;
+use Perspectives_Groups;
+use Picture;
+use Project_Most;
+use Zend_Db_Expr;
+
+class Mosts
 {
     private $_ratings = array (
         array(
@@ -578,7 +589,7 @@ class Application_Service_Mosts
                     ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
                     ->order(array(
                         'mp.position',
-                        new Zend_Db_expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
+                        new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
                         'pictures.width DESC', 'pictures.height DESC'
                     ))
                     ->limit(1)

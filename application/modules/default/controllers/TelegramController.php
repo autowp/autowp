@@ -8,21 +8,13 @@ class TelegramController extends Zend_Controller_Action
             return $this->forward('forbidden', 'error');
         }
 
-        try {
+        $telegram = $this->getInvokeArg('bootstrap')->getResource('telegram');
 
-            $telegram = $this->getInvokeArg('bootstrap')->getResource('telegram');
-
-            if (!$telegram->checkTokenMatch($this->getParam('token'))) {
-                return $this->_forward('forbidden', 'error', 'default');
-            }
-
-            $updates = $telegram->commandsHandler(true);
-
-        } catch (Exception $e) {
-            $text = $e->getMessage() . PHP_EOL . $e->getTraceAsString();
-            $filepath = APPLICATION_PATH . '/data/telegram.txt';
-            file_put_contents($filepath, $text);
+        if (!$telegram->checkTokenMatch($this->getParam('token'))) {
+            return $this->_forward('forbidden', 'error', 'default');
         }
+
+        $updates = $telegram->commandsHandler(true);
 
         return $this->_helper->json(true);
     }

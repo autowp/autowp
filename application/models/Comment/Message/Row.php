@@ -26,7 +26,7 @@ class Comment_Message_Row extends Project_Db_Table_Row
                 return $article->getUrl($absolute);
 
             case Comment_Message::FORUMS_TYPE_ID:
-                return ($absolute ? HOST : '/').'forums/topic/topic-message/message_id/'.(int)$this->id;
+                return ($absolute ? HOST : '/').'forums/topic-message/message_id/'.(int)$this->id;
 
             case Comment_Message::MUSEUMS_TYPE_ID:
                 return ($absolute ? HOST : '/').'museums/museum/id/'.(int)$this->item_id;

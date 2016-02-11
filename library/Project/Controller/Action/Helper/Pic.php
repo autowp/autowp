@@ -428,6 +428,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         $carDetailsUrl = null;
 
         $language = $controller->getHelper('language')->direct();
+        $textStorage = $controller->getHelper('textStorage')->direct();
 
         switch ($picture->type) {
             case Picture::ENGINE_TYPE_ID:
@@ -627,7 +628,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                         );
                     }
 
-                    if ($car->html) {
+                    if ($car->full_text_id) {
                         foreach ($catalogue->cataloguePaths($car) as $path) {
                             $carDetailsUrl = $urlHelper->url(array(
                                 'module'        => 'default',
@@ -892,6 +893,16 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                 'url'  => $url
             );
         }
+        
+        $carDescription = null;
+        if ($car && $car->text_id) {
+            $carDescription = $textStorage->getText($car->text_id);
+        }
+        
+        $carText = null;
+        if ($car && $car->full_text_id) {
+            $carText = $textStorage->getText($car->full_text_id);
+        }
 
         $data = array(
             'id'                => $picture['id'],
@@ -923,8 +934,8 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
             'designProject'     => $designProject,
             'categories'        => $categories,
             'carDetailsUrl'     => $carDetailsUrl,
-            'carHtml'           => $car ? $car->html : null,
-            'carDescription'    => $car ? $car->description : null,
+            'carHtml'           => $carText,
+            'carDescription'    => $carDescription,
             'modifications'     => $modifications
         );
 

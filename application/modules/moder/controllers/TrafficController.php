@@ -1,5 +1,7 @@
 <?php
 
+use Application\Service\TrafficControl;
+
 class Moder_TrafficController extends Zend_Controller_Action
 {
     public function preDispatch()
@@ -13,7 +15,7 @@ class Moder_TrafficController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
 
         if ($this->getRequest()->isPost()) {
             $user = $this->_helper->user()->get();
@@ -83,7 +85,7 @@ class Moder_TrafficController extends Zend_Controller_Action
             return $this->_forward('forbidden', 'error', 'default');
         }
 
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
         $service->unban($this->getParam('ip'));
 
         return $this->_redirect($this->_helper->url->url(array(
@@ -94,7 +96,7 @@ class Moder_TrafficController extends Zend_Controller_Action
 
     public function whitelistAction()
     {
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
 
         $data = $service->getWhitelistData();
 
@@ -116,7 +118,7 @@ class Moder_TrafficController extends Zend_Controller_Action
 
     public function whitelistRemoveAction()
     {
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
         $service->deleteFromWhitelist($this->getParam('ip'));
 
         return $this->_redirect($this->_helper->url->url(array(
@@ -130,7 +132,7 @@ class Moder_TrafficController extends Zend_Controller_Action
         $ip = trim($this->getParam('ip'));
 
         if ($ip) {
-            $service = new Application_Service_TrafficControl();
+            $service = new TrafficControl();
             $service->addToWhitelist($ip, 'manual click');
         }
 

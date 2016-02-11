@@ -317,4 +317,13 @@ class Application_Service_Users
             'not deleted'
         ));
     }
+    
+    public function setPassword(Users_Row $user, $password)
+    {
+        $uTable = $this->_getTable();
+        $passwordExpr = $this->_passwordHashExpr($password);
+        
+        $user->password = new Zend_Db_Expr($passwordExpr);
+        $user->save();
+    }
 }

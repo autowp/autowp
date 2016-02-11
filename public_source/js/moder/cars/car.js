@@ -1,5 +1,5 @@
 define(
-    ['jquery', 'tinymce', 'bootstrap', 'typeahead'],
+    ['jquery', 'bootstrap', 'typeahead'],
     function($) {
         return {
             init: function(options) {
@@ -28,60 +28,6 @@ define(
                             $subscribed.show();
                         });
                     });
-                });
-                
-                $('textarea#description').tinymce({
-                    // Location of TinyMCE script
-                    script_url : '/tiny_mce/tinymce.min.js',
-
-                    plugins: [
-                        "link"
-                    ],
-
-                    // General options
-                    theme: "modern",
-
-                    menubar: false,
-                    toolbar: "undo redo link unlink",
-                    resize: true,
-
-                    // Example content CSS (should be your site CSS)
-                    //content_css : "/css/styles.css",
-
-                    object_resizing : false,
-                    convert_fonts_to_spans : true,
-                    force_p_newlines : true,
-                    //remove_trailing_nbsp : true,
-                    //trim_span_elements : true,
-                    valid_elements : "a[href|title],p,br",
-                    language: "en"
-                });
-
-                $('textarea#html').tinymce({
-                    // Location of TinyMCE script
-                    script_url : '/tiny_mce/tinymce.min.js',
-
-                    plugins: [
-                        "link advlist lists"
-                    ],
-
-                    // General options
-                    theme: "modern",
-
-                    menubar: false,
-                    toolbar: "undo redo link unlink bullist numlist",
-                    resize: true,
-
-                    // Example content CSS (should be your site CSS)
-                    //content_css : "/css/styles.css",
-
-                    object_resizing : false,
-                    convert_fonts_to_spans : true,
-                    force_p_newlines : true,
-                    //remove_trailing_nbsp : true,
-                    //trim_span_elements : true,
-                    valid_elements : "a[href|title],p,ul,li,ol",
-                    language: "en"
                 });
                 
                 $('a[data-toggle="tab"][data-load]').on('show.bs.tab', function (e) {
