@@ -405,6 +405,9 @@ return array (
         "Если сообщение попало к вам по ошибке - просто удалите его\n\n" .
         "С Уважением, Робот %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'E-mail with a confirmation code was sent',
+    
+    'user/add-to-contacts' => 'Добавить в контакты',
+    'user/remove-from-contacts' => 'Удалить из контактов',
 
     'donate/text' => 'Несмотря на то, что мы позиционируем нашу энциклопедию как некоммерческую, совсем обходиться без денег невозможно.
 

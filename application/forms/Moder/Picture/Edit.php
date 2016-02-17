@@ -25,14 +25,6 @@ class Application_Form_Moder_Picture_Edit extends Project_Form
                     'placeholder' => 'Для исключительных ситуаций!',
                     'decorators'  => array('ViewHelper')
                 )),
-                array('textarea', 'copyrights', array(
-                    'required'    => false,
-                    'label'       => 'Копирайты',
-                    'cols'        => 55,
-                    'rows'        => 10,
-                    'filters'     => array('StringTrim'),
-                    'decorators'  => array('ViewHelper')
-                )),
             )
         ));
     }

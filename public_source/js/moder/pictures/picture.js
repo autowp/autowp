@@ -1,36 +1,8 @@
 define(
-    'moder/pictures/picture',
-    ['jquery', 'bootstrap', 'tinymce', 'crop-dialog'],
-    function($, Bootstrap, Tinymce, CropDialog) {
+    ['jquery', 'bootstrap', 'crop-dialog'],
+    function($, Bootstrap, CropDialog) {
         return {
             init: function(options) {
-                
-                $('textarea#copyrights').tinymce({
-                    // Location of TinyMCE script
-                    script_url : '/tiny_mce/tinymce.min.js',
-
-                    plugins: [
-                        "link"
-                    ],
-
-                    // General options
-                    theme: "modern",
-
-                    menubar: false,
-                    toolbar: "undo redo link unlink",
-                    resize: true,
-
-                    // Example content CSS (should be your site CSS)
-                    //content_css : "/css/styles.css",
-
-                    object_resizing : false,
-                    convert_fonts_to_spans : true,
-                    force_p_newlines : true,
-                    //remove_trailing_nbsp : true,
-                    //trim_span_elements : true,
-                    valid_elements : "a[href|title],p",
-                    language: "en"
-                });
                 
                 $('.normalize').on('click', function() {
                     var $btn = $(this),

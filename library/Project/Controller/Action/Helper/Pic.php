@@ -903,9 +903,15 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         if ($car && $car->full_text_id) {
             $carText = $textStorage->getText($car->full_text_id);
         }
+        
+        $copyrights = null;
+        if ($car && $picture->copyrights_text_id) {
+            $copyrights = $textStorage->getText($picture->copyrights_text_id);
+        }
 
         $data = array(
             'id'                => $picture['id'],
+            'copyrights'        => $copyrights,
             'identity'          => $picture['identity'],
             'name'              => $name,
             'picture'           => $picture,

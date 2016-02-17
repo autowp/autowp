@@ -101,7 +101,27 @@
         </div>
 
         <h3>Настройки</h3>
-        <div class="well"><?=$this->editPictureForm->render($this) ?></div>
+        <div class="well">
+        	<?=$this->editPictureForm->render($this) ?>
+    	</div>
+    	
+    	<h3>Копирайты</h3>
+        <div class="well">
+            <?=$this->copyrightsForm->render($this)?>
+            <?php if ($this->picture->copyrights_text_id) { ?>
+                <p>
+                    <?=$this->htmlA(array(
+                        'class' => 'pull-right',
+                        'href'  => $this->url(array(
+                            'module'     => 'default',
+                            'controller' => 'info',
+                            'action'     => 'text',
+                            'id'         => $this->picture->copyrights_text_id
+                        ), null, true)
+                    ), 'History')?>
+                </p>
+            <?php } ?>
+        </div>
 
         <?php if ($this->iptc) { ?>
             <h3>IPTC</h3>

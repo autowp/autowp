@@ -391,6 +391,9 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
         "If the message has got to you by mistake - just delete it\n\n" .
         "Sincerely, Robot %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'E-mail with confirmation code was sent',
+    
+    'user/add-to-contacts' => 'Add to contacts',
+    'user/remove-from-contacts' => 'Remove from contacts',
 
     'donate/text' => 'Despite the fact that we always try to work as non-comercial project, it is absolutely impossible to support encyclopedia without money.
 

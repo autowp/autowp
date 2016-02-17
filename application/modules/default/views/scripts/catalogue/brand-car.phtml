@@ -52,13 +52,13 @@
             'car_id'     => $this->car['id']
         ), 'default', true), 'управление')?>
 
-        <?php if ($this->user()->isAllowed('car', 'add')) { ?>
+        <?php if ($this->user()->isAllowed('car', 'add') && $this->car['is_group']) { ?>
             <i class="fa fa-plus"></i>
             <?=$this->htmlA($this->url(array(
                 'module'     => 'moder',
                 'controller' => 'cars',
                 'action'     => 'new',
-                'parent_id'     => $this->car['id']
+                'parent_id'  => $this->car['id']
             ), 'default', true), 'добавить автомобиль')?>
         <?php } ?>
 

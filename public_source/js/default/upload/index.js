@@ -1,5 +1,4 @@
 define(
-    'default/upload/index',
     ['jquery', 'bootstrap', 'crop-dialog'],
     function($, Bootstrap, CropDialog) {
         return {

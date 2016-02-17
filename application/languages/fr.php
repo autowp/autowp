@@ -392,6 +392,9 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
         "Si le message a eu à vous par erreur - il suffit de le supprimer\n\n" .
         "Sincèrement, le Robot de %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'Vous avez envoyé un e-mail avec un code de confirmation',
+    
+    'user/add-to-contacts' => 'Ajouter aux contacts',
+    'user/remove-from-contacts' => 'Enlever des contacts',
 
     'donate/text' => 'Malgré le fait que nous positionnons notre Encyclopédie comme un but non lucratif, tout à fait se passer de l\'argent est impossible.
 
