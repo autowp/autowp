@@ -1,5 +1,4 @@
 define(
-    'moder/pictures/picture-select-car',
     ['jquery'],
     function($) {
         return {

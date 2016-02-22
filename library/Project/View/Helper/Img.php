@@ -11,8 +11,13 @@ class Project_View_Helper_Img extends Zend_View_Helper_HtmlElement
     protected function _getImageStorage()
     {
         if (null === $this->_imageStorage) {
-            $this->_imageStorage = Zend_Controller_Front::getInstance()
+            
+            $front = Zend_Controller_Front::getInstance();
+            
+            $this->_imageStorage = $front
                 ->getParam('bootstrap')->getResource('imagestorage');
+            
+            $this->_imageStorage->setForceHttps($front->getRequest()->isSecure());
         }
 
         return $this->_imageStorage;

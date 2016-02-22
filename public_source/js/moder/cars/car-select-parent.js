@@ -1,6 +1,5 @@
 define(
-    'moder/cars/car-select-parent',
-    ['jquery', 'tinymce', 'bootstrap', 'typeahead'],
+    ['jquery', 'bootstrap'],
     function($) {
         return {
             init: function(options) {

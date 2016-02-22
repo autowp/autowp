@@ -1,5 +1,4 @@
 define(
-    'moder/pictures/index',
     ['jquery', 'bootstrap'],
     function($, Bootstrap) {
         

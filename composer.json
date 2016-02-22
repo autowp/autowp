@@ -29,18 +29,18 @@
         "autowp/oauth2-vk": "^1.0",
         "league/oauth2-linkedin": "^0.4.0",
         "michelf/php-markdown": "^1.6",
-        "league/html-to-markdown": "^4.1"
+        "league/html-to-markdown": "^4.1",
+        "autowp/textstorage": "^1.0"
     },
     "authors": [
         {
-            "name": "autowp",
+            "name": "Dmitry Pereslegin",
             "email": "dmitry@pereslegin.ru"
         }
     ],
     "autoload": {
         "psr-4": {
             "Autowp\\OAuth2\\Client\\": "vendor/autowp/oauth2-vk/src/",
-            "Autowp\\": "vendor/autowp/textstorage/src/",
             "Application\\Model\\": "application/models",
             "Application\\Service\\": "application/services"
         }

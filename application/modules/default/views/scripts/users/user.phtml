@@ -136,20 +136,20 @@
     </div>
     <div class="col-md-6">
     
-    	<?php if ($this->canBeInContacts) { ?>
-    		<div class="well">
-        		<button type="submit" class="btn btn-lg btn-contact<?=$this->inContacts ? ' in-contacts' : ''?>">
-        			<span class="not-in-contacts">
-            			<span class="fa fa-plus-circle"></span>
-            			<?=$this->escape($this->translate('user/add-to-contacts'))?>
-        			</span>
-        			<span class="in-contacts">
-        				<span class="fa fa-minus-circle"></span>
-        				<?=$this->escape($this->translate('user/remove-from-contacts'))?>
-        			</span>
-        		</button>
-    		</div>
-    	<?php } ?>
+        <?php if ($this->canBeInContacts) { ?>
+            <div class="well">
+                <button type="submit" class="btn btn-lg btn-contact<?=$this->inContacts ? ' in-contacts' : ''?>">
+                    <span class="not-in-contacts">
+                        <span class="fa fa-plus-circle"></span>
+                        <?=$this->escape($this->translate('user/add-to-contacts'))?>
+                    </span>
+                    <span class="in-contacts">
+                        <span class="fa fa-minus-circle"></span>
+                        <?=$this->escape($this->translate('user/remove-from-contacts'))?>
+                    </span>
+                </button>
+            </div>
+        <?php } ?>
 
         <?php /* if ($this->current_user->own_car || $this->current_user->dream_car) { ?>
             <h2>Автомобиль</h2>

@@ -1,5 +1,7 @@
 <?php
 
+use Application\Service\TrafficControl;
+
 class BanController extends Zend_Controller_Action
 {
     public function unbanIpAction()
@@ -12,7 +14,7 @@ class BanController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
         }
 
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
         $service->unban($ip);
 
         return $this->_redirect($this->getRequest()->getServer('HTTP_REFERER'));
@@ -28,7 +30,7 @@ class BanController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
         }
 
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
 
         $service->ban(
             $ip,
@@ -56,7 +58,7 @@ class BanController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
         }
 
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
 
         $service->ban(
             inet_ntop($user->last_ip),
@@ -89,7 +91,7 @@ class BanController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
         }
 
-        $service = new Application_Service_TrafficControl();
+        $service = new TrafficControl();
         $service->unban(inet_ntop($user->last_ip));
 
         return $this->_redirect($this->_helper->url->url(array(

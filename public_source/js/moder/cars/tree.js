@@ -1,5 +1,4 @@
 define(
-    'moder/cars/tree',
     ['jquery', 'bootstrap', 'typeahead', 'dracula'],
     function($) {
         return {

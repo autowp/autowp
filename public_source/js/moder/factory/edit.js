@@ -1,5 +1,4 @@
 define(
-    'moder/factory/edit',
     ['jquery', 'googlemaps'],
     function($, googlemaps) {
         return {
