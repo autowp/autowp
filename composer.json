@@ -2,9 +2,10 @@
     "name": "autowp/autowp.ru",
     "description": "AutoWP.ru, the website",
     "require": {
+    	"php": "^5.6.0",
         "zendframework/zendframework1": "1.*",
         "twbs/bootstrap": "3.*",
-        "phpmyadmin/phpmyadmin": "4.5.0.1",
+        "phpmyadmin/phpmyadmin": "4.*",
         "fortawesome/font-awesome": "^4.5",
         "components/jquery": "^2.1",
         "irazasyed/telegram-bot-sdk": "dev-master",
@@ -20,17 +21,12 @@
         "ext-intl": "*",
         "ext-geos": "*",
         "ext-gd": "*",
-        "ext-apc": "*",
-        "league/oauth2-client": "^1.1",
-        "league/oauth2-facebook": "^1.1",
-        "league/oauth2-github": "^0.2.0",
-        "league/oauth2-google": "^1.0",
-        "league/oauth2-instagram": "^0.2.1",
-        "autowp/oauth2-vk": "^1.0",
-        "league/oauth2-linkedin": "^0.4.0",
         "michelf/php-markdown": "^1.6",
         "league/html-to-markdown": "^4.1",
-        "autowp/textstorage": "^1.0"
+        "autowp/textstorage": "^1.0",
+        "autowp/image": "^1.0",
+        "autowp/filters": "^1.0",
+        "autowp/external-login-service": "^1.0"
     },
     "authors": [
         {
@@ -40,7 +36,6 @@
     ],
     "autoload": {
         "psr-4": {
-            "Autowp\\OAuth2\\Client\\": "vendor/autowp/oauth2-vk/src/",
             "Application\\Model\\": "application/models",
             "Application\\Service\\": "application/services"
         }

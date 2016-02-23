@@ -1,14 +1,17 @@
 <?php
+
+use Autowp\Image\Storage;
+
 class Project_View_Helper_Img extends Zend_View_Helper_HtmlElement
 {
     private $_attribs;
 
     /**
-     * @var Autowp_Service_ImageStorage
+     * @var Storage
      */
-    protected $_imageStorage = null;
+    private $_imageStorage = null;
 
-    protected function _getImageStorage()
+    private function _getImageStorage()
     {
         if (null === $this->_imageStorage) {
             
