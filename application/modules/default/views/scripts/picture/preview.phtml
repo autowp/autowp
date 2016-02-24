@@ -1,0 +1,8 @@
+<?php $this->layout()->disableLayout() ?>
+<?=$this->partial('picture.phtml', array_replace(
+    $this->picturesData['items'][0],
+    array(
+        'disableBehaviour' => $this->picturesData['disableBehaviour'],
+        'isModer'          => $this->picturesData['isModer']
+    )
+))?>

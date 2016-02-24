@@ -25,7 +25,7 @@
         "league/html-to-markdown": "^4.1",
         "autowp/textstorage": "^1.0",
         "autowp/image": "^1.0",
-        "autowp/filters": "^1.0",
+        "autowp/filters": "^1.1",
         "autowp/external-login-service": "^1.0"
     },
     "authors": [
@@ -37,6 +37,7 @@
     "autoload": {
         "psr-4": {
             "Application\\Model\\": "application/models",
+            "Application\\Model\\DbTable\\": "application/models/DbTable",
             "Application\\Service\\": "application/services"
         }
     },

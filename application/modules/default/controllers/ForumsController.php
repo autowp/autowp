@@ -93,7 +93,7 @@ class ForumsController extends Zend_Controller_Action
         $isModearator = $this->_helper->user()->inheritsRole('moder');
     
         $topic = $model->getTopic((int)$this->getParam('topic_id'), [
-            'status'      => [Forums_Topics::STATUS_NORMAL, Forums_Topics::STATUS_CLOSED],
+            'status'      => [Forums::STATUS_NORMAL, Forums::STATUS_CLOSED],
             'isModerator' => $isModearator
         ]);
     
@@ -103,7 +103,7 @@ class ForumsController extends Zend_Controller_Action
     
         $user = $this->_helper->user()->get();
     
-        $canAddComments = $user && ($topic['status'] == Forums_Topics::STATUS_NORMAL) || $forumAdmin;
+        $canAddComments = $user && ($topic['status'] == Forums::STATUS_NORMAL) || $forumAdmin;
     
         $needWait = $this->_needWait();
     

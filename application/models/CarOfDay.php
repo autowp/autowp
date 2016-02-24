@@ -2,16 +2,21 @@
 
 namespace Application\Model;
 
+use Project_Db_Table;
+use Picture;
+
+use Zend_Db_Expr;
+
 class CarOfDay
 {
     /**
-     * @var \Project_Db_Table
+     * @var Project_Db_Table
      */
     private $_table;
     
     public function __construct()
     {
-        $this->_table = new \Project_Db_Table([
+        $this->_table = new Project_Db_Table([
             'name'    => 'of_day',
             'primary' => 'day_date'
         ]);
@@ -25,7 +30,7 @@ class CarOfDay
         
         if (!$dayRow) {
             $dayRow = $this->_table->createRow([
-                'day_date' => new \Zend_Db_Expr('CURDATE()')
+                'day_date' => new Zend_Db_Expr('CURDATE()')
             ]);
         }
         
@@ -44,7 +49,7 @@ class CarOfDay
                 ORDER BY RAND()
                 LIMIT 1
             ';
-            $row = $db->fetchRow($sql, [\Picture::CAR_TYPE_ID, \Picture::STATUS_ACCEPTED]);
+            $row = $db->fetchRow($sql, [Picture::CAR_TYPE_ID, Picture::STATUS_ACCEPTED]);
             if ($row) {
                 print $row['id']  ."\n";
                 

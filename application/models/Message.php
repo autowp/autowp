@@ -2,10 +2,16 @@
 
 namespace Application\Model;
 
+use Project_Db_Table;
+use Users;
+
+use Zend_Db_Expr;
+use Zend_Paginator;
+
 class Message
 {
     /**
-     * @var \Project_Db_Table
+     * @var Project_Db_Table
      */
     private $_table;
     
@@ -13,7 +19,7 @@ class Message
     
     public function __construct()
     {
-        $this->_table = new \Project_Db_Table(array(
+        $this->_table = new Project_Db_Table(array(
             'name'    => 'personal_messages',
             'primary' => 'id'
         ));
@@ -36,7 +42,7 @@ class Message
             'from_user_id' => $fromId ? (int)$fromId : null,
             'to_user_id'   => (int)$toId,
             'contents'     => $message,
-            'add_datetime' => new \Zend_Db_Expr('NOW()'),
+            'add_datetime' => new Zend_Db_Expr('NOW()'),
             'readen'       => 0
         ));
     }
@@ -144,7 +150,7 @@ class Message
     {
         $select = $this->_getSystemSelect($userId);
         
-        return \Zend_Paginator::factory($select)->getTotalItemCount();
+        return Zend_Paginator::factory($select)->getTotalItemCount();
     }
     
     public function getNewSystemCount($userId)
@@ -152,14 +158,14 @@ class Message
         $select = $this->_getSystemSelect($userId)
             ->where('NOT readen');
         
-        return \Zend_Paginator::factory($select)->getTotalItemCount();
+        return Zend_Paginator::factory($select)->getTotalItemCount();
     }
     
     public function getInboxCount($userId)
     {
         $select = $this->_getInboxSelect($userId);
         
-        return \Zend_Paginator::factory($select)->getTotalItemCount();
+        return Zend_Paginator::factory($select)->getTotalItemCount();
     }
     
     public function getInboxNewCount($userId)
@@ -167,21 +173,21 @@ class Message
         $select = $this->_getInboxSelect($userId)
             ->where('NOT readen');
         
-        return \Zend_Paginator::factory($select)->getTotalItemCount();
+        return Zend_Paginator::factory($select)->getTotalItemCount();
     }
     
     public function getDialogCount($userId, $withUserId)
     {
         $select = $this->_getDialogSelect($userId, $withUserId);
     
-        return \Zend_Paginator::factory($select)->getTotalItemCount();
+        return Zend_Paginator::factory($select)->getTotalItemCount();
     }
     
     public function getSentCount($userId)
     {
         $select = $this->_getSentSelect($userId);
         
-        return \Zend_Paginator::factory($select)->getTotalItemCount();
+        return Zend_Paginator::factory($select)->getTotalItemCount();
     }
     
     public function markReaden($ids)
@@ -199,7 +205,7 @@ class Message
     {   
         $select = $this->_getInboxSelect($userId);
         
-        $paginator = \Zend_Paginator::factory($select)
+        $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
             ->setCurrentPageNumber($page);
         
@@ -224,7 +230,7 @@ class Message
     {
         $select = $this->_getSentSelect($userId);
     
-        $paginator = \Zend_Paginator::factory($select)
+        $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
             ->setCurrentPageNumber($page);
     
@@ -240,7 +246,7 @@ class Message
     {
         $select = $this->_getSystemSelect($userId);
     
-        $paginator = \Zend_Paginator::factory($select)
+        $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
             ->setCurrentPageNumber($page);
     
@@ -265,7 +271,7 @@ class Message
     {
         $select = $this->_getDialogSelect($userId, $withUserId);
     
-        $paginator = \Zend_Paginator::factory($select)
+        $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
             ->setCurrentPageNumber($page);
     
@@ -299,7 +305,7 @@ class Message
     
         $cache = [];
         
-        $userTable = new \Users();
+        $userTable = new Users();
     
         $messages = [];
         foreach ($rows as $message) {

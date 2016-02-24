@@ -1,10 +1,12 @@
 <?php
 
+use Application\Model\DbTable\Museum;
+
 class Moder_MuseumController extends Zend_Controller_Action
 {
     private $_table;
 
-    protected $_googleClient;
+    private $_googleClient;
     const GOOGLE_URL = 'http://maps.googleapis.com/maps/api/geocode/json';
 
     public function init()

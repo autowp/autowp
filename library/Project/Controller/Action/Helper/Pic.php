@@ -1,5 +1,7 @@
 <?php
 
+use Application\Model\DbTable\BrandLink;
+
 class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper_Abstract
 {
     /**
@@ -649,7 +651,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
 
         // ссылки на офсайты
         $ofLinks = array();
-        $linksTable = new Links();
+        $linksTable = new BrandLink();
         if (count($brandIds)) {
             $links = $linksTable->fetchAll(
                 $linksTable->select(true)

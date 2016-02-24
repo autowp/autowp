@@ -1,5 +1,7 @@
 <?php
 
+use Application\Model\DbTable\Museum;
+
 class MapController extends Zend_Controller_Action
 {
     protected $_googleClient;

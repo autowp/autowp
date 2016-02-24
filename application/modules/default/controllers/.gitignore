@@ -9,8 +9,6 @@
 /IndexController.php
 /LoginController.php
 /MostController.php
-/MuseumsController.php
-/PagesController.php
 /PictureController.php
 /PictureFileController.php
 /RestorepasswordController.php
@@ -18,4 +16,3 @@
 /TestController.php
 /UsersController.php
 /VotingController.php
-/WidgetController.php

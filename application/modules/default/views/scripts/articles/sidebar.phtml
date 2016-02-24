@@ -1,0 +1,15 @@
+<div class="well">
+    <ul class="nav nav-list">
+        <?php foreach ($this->brandList as $brand) { ?>
+            <?php
+                $selected = in_array($brand->id, $this->selected_brand_ids) ? ' class="selected"' : '';
+            ?>
+            <li<?=$selected ? ' class="selected"' : ''?>>
+                <?=$this->htmlA($this->url(array(
+                    'action'        => 'index',
+                    'brand_catname' => $brand->folder
+                ), 'articles', true, true), $brand->caption) ?>
+            </li>
+        <?php } ?>
+    </ul>
+</div>

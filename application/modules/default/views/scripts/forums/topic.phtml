@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <?php if ($this->topic['status'] == Forums_Topics::STATUS_NORMAL) { ?>
+    <?php if ($this->topic['status'] == \Application\Model\Forums::STATUS_NORMAL) { ?>
         <?php if (!$this->user()->logedIn()) { ?>
             <div class="well">
                 <p>Чтобы иметь возможность создавать топики и отвечать в них, Вам необходимо <a href="/registration/">зарегистрироваться</a>.</p>

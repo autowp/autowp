@@ -143,7 +143,7 @@
                     <?php if ($this->forumAdmin) { ?>
                         <td>
                             <div class="btn-group">
-                                <?php if ($topic['status'] == Forums_Topics::STATUS_CLOSED) { ?>
+                                <?php if ($topic['status'] == \Application\Model\Forums::STATUS_CLOSED) { ?>
                                     <button title="открыть" class="btn btn-xs btn-warning open" id="open-topic-<?=$topic['id'] ?>">
                                         <i class="fa fa-check-circle"></i>
                                     </button>
