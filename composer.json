@@ -19,7 +19,6 @@
         "ext-mbstring": "*",
         "ext-json": "*",
         "ext-intl": "*",
-        "ext-geos": "*",
         "ext-gd": "*",
         "michelf/php-markdown": "^1.6",
         "league/html-to-markdown": "^4.1",
@@ -37,7 +36,7 @@
     ],
     "autoload": {
         "psr-4": {
-        	"Autowp\\": "library/Autowp",
+            "Autowp\\": "library/Autowp",
             "Application\\Model\\": "application/models",
             "Application\\Model\\DbTable\\": "application/models/DbTable",
             "Application\\Service\\": "application/services"
@@ -56,5 +55,8 @@
             "type": "git",
             "url": "https://github.com/irazasyed/telegram-bot-sdk"
         }
-    ]
+    ],
+    "suggest": {
+        "ext-geos": "Allows map module"
+    }
 }
