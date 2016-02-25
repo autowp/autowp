@@ -17,3 +17,7 @@
 [submodule "vendor/kpdecker/jsdiff"]
 	path = vendor/kpdecker/jsdiff
 	url = git://github.com/kpdecker/jsdiff.git
+
+[submodule "vendor/millermedeiros/requirejs-plugins"]
+	path = vendor/millermedeiros/requirejs-plugins
+	url = git://github.com/millermedeiros/requirejs-plugins.git
