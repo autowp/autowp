@@ -1,2 +1,4 @@
-<a href="http://www.autowp.ru">www.autowp.ru</a> partial sources
+[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
+
+<http://www.autowp.ru> partial sources
 ======
