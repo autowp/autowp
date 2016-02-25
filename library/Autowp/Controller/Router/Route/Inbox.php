@@ -1,6 +1,14 @@
 <?php
 
-class Project_Controller_Router_Route_Inbox extends Project_Controller_Router_Route_Abstract
+namespace Autowp\Controller\Router\Route;
+
+use Exception;
+
+use Brands;
+
+use Zend_Config;
+
+class Inbox extends AbstractRoute
 {
     protected $_defaults = array(
         'module'     => 'default',

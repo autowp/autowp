@@ -58,7 +58,7 @@ class NewController extends Zend_Controller_Action
                 'count' => $service->getPrevDateCount(),
                 'url'   => $this->_helper->url->url(array(
                     'date' => $service->getPrevDateStr()
-                ), 'new', true)
+                ), 'new-pictures', true)
             ),
             'current'   => array(
                 'date'  => $service->getCurrentDate(),
@@ -69,7 +69,7 @@ class NewController extends Zend_Controller_Action
                 'count' => $service->getNextDateCount(),
                 'url'   => $this->_helper->url->url(array(
                     'date' => $service->getNextDateStr()
-                ), 'new', true)
+                ), 'new-pictures', true)
             ),
         ));
     }

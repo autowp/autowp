@@ -1,8 +1,11 @@
 <?php
-/** Zend_Controller_Router_Route_Abstract */
-require_once 'Zend/Controller/Router/Route/Interface.php';
 
-abstract class Project_Controller_Router_Route_Abstract
+namespace Autowp\Controller\Router\Route;
+
+use Zend_Config;
+use Zend_Controller_Router_Route_Interface;
+
+abstract class AbstractRoute
     implements Zend_Controller_Router_Route_Interface
 {
     const DELIMETER = '/';

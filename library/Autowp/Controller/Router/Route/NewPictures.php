@@ -1,6 +1,10 @@
 <?php
 
-class Project_Controller_Router_Route_New extends Project_Controller_Router_Route_Abstract
+namespace Autowp\Controller\Router\Route;
+
+use Zend_Config;
+
+class NewPictures extends AbstractRoute
 {
     protected $_defaults = array(
         'module'     => 'default',

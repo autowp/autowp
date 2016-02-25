@@ -1,6 +1,12 @@
 <?php
 
-class Project_Controller_Router_Route_Most extends Project_Controller_Router_Route_Abstract
+namespace Autowp\Controller\Router\Route;
+
+use Exception;
+
+use Zend_Config;
+
+class Most extends AbstractRoute
 {
     protected $_defaults = array(
         'module'     => 'default',

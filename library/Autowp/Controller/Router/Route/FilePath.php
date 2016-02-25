@@ -1,7 +1,13 @@
 <?php
 
-class Project_Controller_Router_Route_FilePath
-    extends Zend_Controller_Router_Route_Abstract
+namespace Autowp\Controller\Router\Route;
+
+use Exception;
+
+use Zend_Config;
+use Zend_Controller_Router_Route_Abstract;
+
+class FilePath extends Zend_Controller_Router_Route_Abstract
 {
     protected $_defaults = array();
 

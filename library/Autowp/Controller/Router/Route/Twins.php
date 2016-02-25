@@ -1,6 +1,12 @@
 <?php
 
-class Project_Controller_Router_Route_Twins extends Project_Controller_Router_Route_Abstract
+namespace Autowp\Controller\Router\Route;
+
+use Brands;
+
+use Zend_Config;
+
+class Twins extends AbstractRoute
 {
     protected $_defaults = array(
         'module'     => 'default',
