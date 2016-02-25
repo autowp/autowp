@@ -1,0 +1,22 @@
+<?php
+    $this->layout()->disableLayout();
+?>
+<form action="<?=$this->escape($this->url(array(
+    'action' => 'save-name'
+)))?>" method="post" class="form-horizontal">
+    <?php foreach ($this->languages as $code => $name) { ?>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label"><?=$this->escape($name)?></label>
+            <div class="col-lg-10 col-md-10">
+                <?=$this->formText($code, $this->langValues[$code], array(
+                    'class' => 'form-control'
+                ))?>
+            </div>
+        </div>
+    <?php } ?>
+    <div class="row">
+        <div class="col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2">
+            <input type="submit" class="btn btn-primary" value="Сохранить" />
+        </div>
+    </div>
+</form>

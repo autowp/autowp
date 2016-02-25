@@ -1,0 +1,38 @@
+<p>
+    Синтаксис Markdown.
+    Несколько описаний языка:
+    <a href="https://ru.wikipedia.org/wiki/Markdown">1</a>,
+    <a href="https://en.wikipedia.org/wiki/Markdown">2</a>,
+    <a href="https://guides.github.com/features/mastering-markdown/">3</a>,
+    <a href="https://daringfireball.net/projects/markdown/basics">4</a>,
+    <a href="http://rukeba.com/by-the-way/markdown-sintaksis-po-russki/">5</a>
+</p>
+<p>Ссылки на внутрисайтовые страницы следует писать не полностью: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins></p>
+<?php foreach ($this->element->getElements() as $element) { ?>
+	<div data-module="markdown-edit-tabbar">
+        <ul id="myTabs-<?=$element->getId()?>" class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#<?=$element->getId()?>-edit" id="<?=$element->getId()?>-tab" role="tab" data-toggle="tab" aria-expanded="true" aria-controls="edit">Edit</a>
+            </li>
+            <li role="presentation">
+                <a href="#<?=$element->getId()?>-preview" class="tab-preview" id="<?=$element->getId()?>-tab" role="tab" data-toggle="tab" aria-expanded="false" aria-controls="preview">Preview</a>
+            </li>
+        </ul>
+        <div id="myTabContent" class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="<?=$element->getId()?>-edit" aria-labelledby="edit-tab">
+                <div class="form-group<?=$element->hasErrors() ? ' has-error' : ''?>">
+                    <?=$element->setAttrib('class', $element->getAttrib('class') . ' form-control')?>
+                    <?php foreach ($element->getMessages() as $error) { ?>
+                        <p class="help-block"><?=$this->escape($error)?></p>
+                    <?php } ?>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane tab-pane-preview fade" id="<?=$element->getId()?>-preview" aria-labelledby="preview-tab" style="padding:7px 13px">
+    
+            </div>
+        </div>
+    </div>
+<?php } ?>
+<?=$this->formSubmit('submit', $this->translate('sumbit'), array(
+    'class' => 'btn btn-primary'
+))?>

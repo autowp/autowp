@@ -1,0 +1,32 @@
+<fieldset class="form-inline">
+    <?php foreach ($this->element->getElements() as $element) { ?>
+        <?php if ($element instanceof Zend_Form_Element) { ?>
+            <?php if ($element instanceof Zend_Form_Element_File) { ?>
+                <?=$element?>
+                <?php foreach ($element->getMessages() as $error) { ?>
+                    <p class="help-block"><?=$this->escape($error)?></p>
+                <?php } ?>
+            <?php } elseif ($element instanceof Zend_Form_Element_Checkbox) { ?>
+                <label class="checkbox">
+                    <?=$element?>
+                    <?=$this->escape($element->getLabel())?>
+                </label>
+            <?php } elseif (!$element instanceof Zend_Form_Element_Submit) { ?>
+                <?=$element->setAttrib('class', $element->getAttrib('class') . ' form-control')?>
+                <?php foreach ($element->getMessages() as $error) { ?>
+                    <p class="help-block"><?=$this->escape($error)?></p>
+                <?php } ?>
+            <?php } ?>
+        <?php } elseif ($element instanceof Zend_Form) { ?>
+            <?=$element->render($this)?>
+        <?php } elseif ($element instanceof Zend_Form_DisplayGroup) { ?>
+            <div class="form-group">
+                <label class="control-label"><?=$this->escape($element->getLegend())?></label>
+                <?=$element->render($this)?>
+            </div>
+        <?php } ?>
+    <?php } ?>
+    <?php if ($desc = $this->element->getDescription()) { ?>
+        <p><?=$this->escape($desc)?></p>
+    <?php } ?>
+</fieldset>

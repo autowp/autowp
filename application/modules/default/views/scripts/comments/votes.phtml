@@ -1,0 +1,24 @@
+<?php
+    $this->layout()->assign(array(
+        'blankPage' => false,
+        'needLeft'  => false,
+        'needRight' => false
+    ));
+?>
+<?php if (count($this->positiveVotes)) { ?>
+    <p>
+        <strong>+1</strong>:
+        <?php foreach ($this->positiveVotes as $user) { ?>
+            <?=$this->user($user) . ' ' ?>
+        <?php } ?>
+    </p>
+<?php } ?>
+
+<?php if (count($this->negativeVotes)) { ?>
+    <p>
+        <strong>-1</strong>:
+        <?php foreach ($this->negativeVotes as $user) { ?>
+            <?=$this->user($user) . ' ' ?>
+        <?php } ?>
+    </p>
+<?php } ?>

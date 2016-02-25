@@ -1,0 +1,29 @@
+<?php
+    $text = $this->element->getFullyQualifiedName();
+    $select = $this->element->getFullyQualifiedName().'_select';
+?>
+<?php
+    $options = array(
+        'плохое качество',
+        'дубль',
+        'любительское фото',
+        'не по теме сайта',
+        'другая',
+        'своя'
+    );
+    $options = array_combine($options, $options);
+    if (isset($_COOKIE['customReason'])) {
+        foreach ((array)unserialize($_COOKIE['customReason']) as $reason)
+            if (strlen($reason) && !in_array($reason, $options))
+                $options[$reason] = $reason;
+    }
+?>
+<div data-module="moder-vote-reason">
+    <?=$this->formSelect($select, '', array(
+        'class' => 'form-control'
+    ), $options) ?>
+    <?=$this->formText($text, 'плохое качество', array(
+        'style' => 'display: none',
+        'class' => 'form-control'
+    )) ?>
+</div>

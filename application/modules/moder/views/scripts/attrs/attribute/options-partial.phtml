@@ -1,0 +1,18 @@
+<?php if (count($this->options)) { ?>
+    <ul>
+        <?php foreach ($this->options as $option) { ?>
+            <li>
+                <?=$this->htmlA($this->url(array(
+                    'option_id' =>  $option->id
+                )), $option->name) ?>
+                <?=$this->partial('attrs/attribute/options-partial.phtml', array(
+                    'options'    =>  $option->getTable()->fetchAll(
+                        $option->getTable()->select()
+                            ->where('parent_id = ?', $option->id)
+                            ->where('attribute_id = ?', $option->attribute_id)
+                    )
+                )) ?>
+            </li>
+        <?php } ?>
+    </ul>
+<?php } ?>

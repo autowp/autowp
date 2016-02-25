@@ -1,0 +1,15 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ),
+        'pageId' => 105,
+    ));
+?>
+
+<?=$this->markup(sprintf($this->translate('comments/need-wait-text'), $this->nextMessageTime))?>
+
+<h2><?=$this->escape($this->translate('comments/form-title'))?></h2>
+<?=$this->form->render($this) ?>

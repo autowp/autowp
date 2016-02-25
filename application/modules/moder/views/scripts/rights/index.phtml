@@ -1,0 +1,99 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 71,
+    ));
+
+    $roles = new Acl_Roles();
+
+    function printRolesRecuirsive($roles, $role) {
+        $select = $roles->select()
+                        ->from($roles)
+                        ->joinLeft('acl_roles_parents', 'acl_roles.id=acl_roles_parents.role_id', null)
+                        ->where('acl_roles_parents.parent_role_id=?', $role->id);
+
+        ?>
+        <?=sprintf('%02d', $role->id) ?>. <?=$role->name ?>
+        <div style="margin-left:16px">
+            <?php foreach ($roles->fetchAll($select) as $role) { ?>
+                <?php printRolesRecuirsive($roles, $role) ?>
+            <?php } ?>
+        </div>
+        <?php
+    }
+
+
+    $select = $roles->select()
+        ->from($roles)
+        ->joinLeft('acl_roles_parents', 'acl_roles.id=acl_roles_parents.role_id', null)
+        ->where('acl_roles_parents.role_id IS NULL');
+?>
+
+<?php foreach ($roles->fetchAll($select) as $role) { ?>
+    <div>
+        <?php printRolesRecuirsive($roles, $role) ?>
+    </div>
+<?php } ?>
+
+<table class="table table-border table-striped">
+    <tr>
+        <td></td>
+        <?php foreach ($this->roles as $role) { ?>
+            <td><?=$role->name ?></td>
+        <?php } ?>
+    </tr>
+    <?php foreach ($this->resources as $resource) { ?>
+        <tr>
+            <td><?=$resource->name ?></td>
+        </tr>
+        <?php foreach ($resource->findAcl_Resources_Privileges() as $privilege) { ?>
+            <tr>
+                <td><?=$resource->name ?> / <?=$privilege->name ?></td>
+                <?php foreach ($this->roles as $role) { ?>
+                    <td style="text-align:center">
+                        <?php if ($this->acl()->isAllowed($role->name, $resource->name, $privilege->name)) { ?>
+                            <i class="fa fa-check"></i>
+                        <?php } else { ?>
+                        <?php } ?>
+                    </td>
+                <?php } ?>
+            </tr>
+        <?php } ?>
+    <?php } ?>
+</table>
+
+<table>
+    <thead>
+        <tr>
+            <th>role</th>
+            <th>resource</th>
+            <th>privilege</th>
+            <th>allowed</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->rules as $rule) { ?>
+            <tr>
+                <td><?=$this->escape($rule['role'])?></td>
+                <td><?=$this->escape($rule['resource'])?></td>
+                <td><?=$this->escape($rule['privilege'])?></td>
+                <td>
+                    <?php if ($rule['allowed']) { ?>
+                        <i class="fa fa-check-circle"></i>
+                    <?php } else { ?>
+                        <i class="fa fa-times-circle"></i>
+                    <?php } ?>
+                </td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>
+
+<?=$this->addRoleForm->render($this) ?>
+<?=$this->addRuleForm->render($this) ?>
+<?=$this->addRoleParentForm->render($this) ?>

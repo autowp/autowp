@@ -1,0 +1,43 @@
+<?php
+    $this->layout()->disableLayout();
+?>
+<h3>Модификации</h3>
+<p>
+    <?=$this->htmlA(array(
+        'class' => 'btn btn-primary',
+        'href'  => $this->url(array(
+            'action' => 'car-modification-pictures'
+        ))
+    ), 'Распределить изображения')?>
+    <?=$this->htmlA(array(
+        'class' => 'btn btn-success',
+        'href'  => $this->url(array(
+            'module'     => 'moder',
+            'controller' => 'modification',
+            'action'     => 'add',
+            'car_id'     => $this->car['id'],
+        ))
+    ), '<i class="fa fa-plus"></i> добавить модификацию', false)?>
+</p>
+<?php foreach ($this->groups as $group) { ?>
+    <?php if (count($group['modifications']) > 0) { ?>
+        <div class="row">
+            <div class="col-md-2">
+                <h4><?=$this->escape($group['name'] ? $group['name'] : 'Без группы')?></h4>
+            </div>
+            <div class="col-md-10">
+                <?php foreach ($group['modifications'] as $modification) { ?>
+                    <p>
+                        <?=$this->htmlA($modification['url'], $modification['name'])?>
+                        <?php if ($modification['count']) { ?>
+                            <span class="badge"><?=(int)$modification['count']?></span>
+                        <?php } ?>
+                        <?php if ($modification['inherited']) { ?>
+                            <small><em>Inherited from XXX</em></small>
+                        <?php } ?>
+                    </p>
+                <?php } ?>
+            </div>
+        </div>
+    <?php } ?>
+<?php } ?>

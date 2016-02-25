@@ -1,0 +1,14 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 69,
+    ));
+?>
+<div class="well">
+    <?=$this->newPageForm->render($this)?>
+</div>

@@ -1,0 +1,41 @@
+<?php
+    $this->layout()->disableLayout();
+?>
+<?php if (count($this->twinsGroups)) { ?>
+    <table class="table"><tbody>
+        <?php foreach ($this->twinsGroups as $twinsGroup) { ?>
+            <tr>
+                <td>
+                    <?=$this->htmlA($twinsGroup['url'], $twinsGroup['name']) ?>
+                    <?php if ($twinsGroup['inherited'] && count($twinsGroup['inheritedFrom'])) { ?>
+                        <h6><em>
+                            Inherited from
+                            <?php foreach ($twinsGroup['inheritedFrom'] as $car) { ?>
+                                <?=$this->htmlA($car['url'], $car['name'])?>
+                            <?php } ?>
+                        </em></h6>
+                    <?php } ?>
+                </td>
+                <?php if ($this->canEditTwins && !$twinsGroup['inherited']) { ?>
+                    <td>
+                        <form action="<?=$this->escape($twinsGroup['removeUrl']) ?>" method="post">
+                            <button type="submit" class="btn btn-danger btn-xs">
+                                <i class="fa fa-times"></i> Удалить
+                            </button>
+                        </form>
+                    </td>
+                <?php } ?>
+            </tr>
+        <?php } ?>
+    </tbody></table>
+<?php } else { ?>
+    <p>Группа не задана</p>
+<?php } ?>
+<?php if ($this->canEditTwins) { ?>
+    <p><?=$this->htmlA($this->url(array(
+        'module'     => 'moder',
+        'controller' => 'cars',
+        'action'     => 'car-select-twins-group',
+        'car_id'     => $this->car->id
+    ), 'default', true), 'Выбрать или создать группу ...') ?></p>
+<?php } ?>

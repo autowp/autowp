@@ -1,0 +1,15 @@
+<?php
+    $this->element->setAttrib('data-module', 'perspective-selector');
+
+    $class = 'form-control';
+
+    $tiny = $this->element->getAttrib('class') == 'tiny';
+    if ($tiny) {
+        $class .= ' input-sm';
+    }
+    $this->element->perspective_id->setAttrib('class', $class);
+?>
+<?php if (!$tiny) { ?>
+    <label for="perspective_id"><?=$this->escape($this->element->perspective_id->getLabel())?></label>
+<?php } ?>
+<?=$this->element->perspective_id ?>

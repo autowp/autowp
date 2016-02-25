@@ -1,0 +1,45 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 171,
+        'args'   => array(
+            'ENGINE_NAME' => $this->engine->caption,
+            'ENGINE_ID'   => $this->engine->id
+        )
+    ));
+?>
+<form action="<?=$this->escape($this->url(array(
+    'module'     => 'moder',
+    'controller' => 'engines',
+    'action'     => 'select-parent',
+    'engine_id'  => $this->engine->id
+), 'default', true))?>" method="post">
+    <?php if (!$this->brand) { ?>
+        <?php
+            $columns = 6;
+            $rows = ceil(count($this->brands) / $columns);
+        ?>
+        <div class="row">
+            <div class="col-lg-2 col-md-2">
+                <?php foreach ($this->brands as $idx => $brand) { ?>
+                    <?=$this->formButton('brand_id', $brand->id, array(
+                        'type'    => 'submit',
+                        'class'   => 'btn btn-link',
+                        'value'   => $brand->id,
+                        'content' => $brand->caption
+                    ))?><br />
+                    <?php if ($idx && ($idx % $rows == 0)) { ?></div><div class="col-lg-2 col-md-2"><?php } ?>
+                <?php } ?>
+            </div>
+        </div>
+    <?php } else { ?>
+        <?=$this->formHidden('brand_id', $this->brand->id)?>
+        <?=$this->partial('engines/select-parent-walk-tree.phtml', array(
+            'engines' => $this->engines
+        ))?>
+    <?php } ?>
+</form>

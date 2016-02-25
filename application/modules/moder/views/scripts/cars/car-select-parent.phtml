@@ -1,0 +1,45 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 145,
+        'args'   => array(
+            'CAR_ID'   => $this->car->id,
+            'CAR_NAME' => $this->car->getFullName()
+        )
+    ));
+
+    $this->layout()->moduleName = 'moder/cars/car-select-parent';
+?>
+<div class="well">
+    <?php if (!$this->brand) { ?>
+        <?php
+            $columns = 6;
+            $count = count($this->brands);
+            $perOne = ceil($count / $columns);
+            $width = round(100*$perOne/$count);
+            $idx = 0;
+        ?>
+        <table class="table" class="brand-selector"><tbody><tr>
+            <td style="width:<?=(100-$width*($columns-1)) ?>%">
+                <?php foreach ($this->brands as $brand) { ?>
+                    <?php if ($idx && ($idx%$perOne == 0)) { ?>
+                        </td><td style="width:<?=$width ?>%">
+                    <?php } ?>
+                    <?=$this->htmlA($this->url(array('brand_id' => $brand->id)), $brand->caption) ?><br />
+                    <?php $idx++ ?>
+                <?php } ?>
+            </td>
+        </tr></tbody></table>
+    <?php } else { ?>
+        <ul>
+            <?=$this->partial('cars/partial/car-select-parent.phtml', array(
+                'cars' => $this->cars
+            ))?>
+        </ul>
+    <?php } ?>
+</div>

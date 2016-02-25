@@ -1,0 +1,23 @@
+<div data-module="comments" data-comments-item-id="<?=$this->itemId?>" data-comments-type="<?=$this->type?>" class="comments">
+    <?php if (count($this->comments)) { ?>
+        <h2><?=$this->escape($this->translate('comments/title'))?></h2>
+        <?=$this->partial('comments/messages.phtml', array(
+            'messages'          => $this->comments,
+            'canRemoveComments' => $this->canRemoveComments,
+            'canAddComments'    => $this->canAddComments,
+            'canViewIp'         => $this->user()->isAllowed('user', 'ip'),
+            'canMoveMessage'    => false,
+            'moveMessageUrl'    => null
+        ))?>
+    <?php } ?>
+
+    <?php if ($this->canAddComments) { ?>
+        <div class="form-holder">
+            <?=$this->form->render($this) ?>
+        </div>
+    <?php } else { ?>
+        <p class="alert alert-block alert-info">
+            <?=$this->translate('comments/what-to-do-for-write-comments')?>
+        </p>
+    <?php } ?>
+</div>

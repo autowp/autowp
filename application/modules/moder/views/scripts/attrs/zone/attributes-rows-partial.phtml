@@ -1,0 +1,42 @@
+<?php foreach ($this->attributes as $idx => $attribute) { ?>
+    <tr>
+        <td>
+            <?php if ($idx > 0) { ?>
+                <form action="<?=$this->url(array(
+                    'module'        =>  'moder',
+                    'controller'    =>  'attrs',
+                    'action'        =>  'move-up-attribute',
+                    'attribute_id'  =>  $attribute->id,
+                    'zone_id'       =>  $this->zone->id
+                )) ?>">
+                    <div><input type="submit" value="↑" /></div>
+                </form>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if ($idx < count($this->attributes)-1) { ?>
+                <form action="<?=$this->url(array(
+                    'module'        =>  'moder',
+                    'controller'    =>  'attrs',
+                    'action'        =>  'move-down-attribute',
+                    'attribute_id'  =>  $attribute->id,
+                    'zone_id'       =>  $this->zone->id
+                )) ?>">
+                    <div><input type="submit" value="↓" /></div>
+                </form>
+            <?php } ?>
+        </td>
+        <td>
+            <?=str_repeat('——', $this->deep) ?>
+            <?=$this->htmlA($this->url(array(
+                'action'        =>  'attribute',
+                'attribute_id'  =>  $attribute->id
+            )), $attribute->name) ?>
+        </td>
+    </tr>
+    <?=$this->partial('attrs/zone/attributes-rows-partial.phtml', array(
+        'attributes'    =>  $this->zone->findAttributes($attribute),
+        'zone'          =>  $this->zone,
+        'deep'          =>  $this->deep + 1
+    )) ?>
+<?php } ?>

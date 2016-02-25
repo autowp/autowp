@@ -1,0 +1,74 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 82,
+    ));
+?>
+<div class="row">
+    <div class="col-lg-4 col-md-4">
+        <h2>Фильтр</h2>
+        <div class="well">
+            <?=$this->form->render($this)?>
+        </div>
+
+        <ul class="list-unstyled">
+            <?php if ($this->user()->isAllowed('engine', 'add')) { ?>
+                <li>
+                    <i class="fa fa-plus"></i>
+                    <?=$this->htmlA($this->url(array(
+                        'module'     => 'moder',
+                        'controller' => 'engines',
+                        'action'     => 'add',
+                    ), 'default', true), 'добавить двигатель')?>
+                </li>
+            <?php } ?>
+        </ul>
+    </div>
+    <div class="col-lg-8 col-md-8">
+        <h2>
+            Двигатели
+            <?php if ($count = $this->paginator->getTotalItemCount()) {?>
+                <small><?=$this->translate(array('%1$s engines', null, $count), $count)?></small>
+            <?php } ?>
+        </h2>
+        <?php foreach ($this->engines as $engine) { ?>
+            <div class="car">
+                <h3><?=$this->escape($engine['name'])?></h3>
+                <div class="row thumbnails">
+                    <?php foreach ($engine['pictures'] as $picture) { ?>
+                        <div class="col-lg-3 col-md-3 col-sm-6">
+                            <?php if ($picture->image_id) { ?>
+                                <?=$this->htmlA(
+                                    array(
+                                        'href'  => $this->pic($picture)->url(),
+                                        'class' =>'thumbnail'
+                                    ),
+                                    $this->img($picture->getFormatRequest(), array(
+                                        'format' => 'picture-thumb',
+                                    )),
+                                    false
+                                )?>
+                            <?php } ?>
+                        </div>
+                    <?php } ?>
+                </div>
+                <ul class="list-inline">
+                    <li>
+                        <i class="fa fa-cog"></i>
+                        <?=$this->htmlA($engine['moderUrl'], 'управление')?>
+                    </li>
+                    <li>
+                        <i class="fa fa-pencil"></i>
+                        <?=$this->htmlA($engine['specsUrl'], 'ввод ттх')?>
+                    </li>
+                </ul>
+            </div>
+        <?php } ?>
+        <?=$this->paginationControl($this->paginator) ?>
+    </div>
+</div>

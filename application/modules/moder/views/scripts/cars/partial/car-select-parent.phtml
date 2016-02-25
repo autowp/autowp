@@ -1,0 +1,18 @@
+<?php foreach ($this->cars as $car) { ?>
+    <li class="car-node">
+        <?php if (count($car['childs'])) { ?>
+            <a href="#" class="toggle">
+                <i class="fa fa-folder-o"></i><i class="fa fa-folder-open-o"></i>
+                <?=$this->escape($car['name']) ?>
+            </a>
+            <ul>
+                <li><?=$this->htmlA($car['url'], 'сюда') ?></li>
+                <?=$this->partial('cars/partial/car-select-parent.phtml', array(
+                    'cars' => $car['childs']
+                ))?>
+            </ul>
+        <?php } else { ?>
+            <?=$this->htmlA($car['url'], $car['name']) ?>
+        <?php } ?>
+    </li>
+<?php } ?>

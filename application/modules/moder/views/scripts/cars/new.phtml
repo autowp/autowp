@@ -1,0 +1,15 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 163,
+    ));
+?>
+<?php if ($this->parentCar) { ?>
+    <p>В автомобиль <?=$this->car($this->parentCar)->title()?></p>
+<?php } ?>
+<?=$this->form->render($this)?>

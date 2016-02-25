@@ -1,0 +1,15 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 170,
+    ));
+?>
+<?php if ($this->parentEngine) { ?>
+    <p>В двигатель <?=$this->escape($this->parentEngine->caption)?></p>
+<?php } ?>
+<?=$this->form->render($this) ?>

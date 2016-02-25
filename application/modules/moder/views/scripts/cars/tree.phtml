@@ -1,0 +1,101 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 78,
+        'args'   => array(
+            'CAR_ID'   => $this->car->id,
+            'CAR_NAME' => $this->car->getFullName()
+        )
+    ));
+
+    $this->layout()->moduleName = 'moder/cars/tree';
+    $this->layout()->moduleOptions = array(
+        'addParentUrl' => $this->url(array(
+            'action' => 'add-parent'
+        )),
+        'removeParentUrl' => $this->url(array(
+            'action' => 'remove-parent'
+        )),
+        'graphItems' => $this->graphItems,
+        'graphLinks' => $this->graphLinks
+    );
+?>
+
+<div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="well">
+            <ul>
+                <?php foreach ($this->parents as $car) { ?>
+                    <li class="parent">
+                        <?=$this->htmlA($this->url(array(
+                            'car_id' => $car->id
+                        )), $car->getFullName())?>
+                        <?=$this->htmlA($this->url(array(
+                            'action' => 'car',
+                            'car_id' => $car->id
+                        )), '<i class="fa fa-cog"></i>', false)?>
+                        <?=$this->htmlA(array(
+                            'href'    => '#',
+                            'data-id' => $car->id,
+                            'class'   => 'remove-parent'
+                        ), '<i class="fa fa-times"></i>', false)?>
+                    </li>
+                <?php } ?>
+                <li>
+                    <ul><li>
+                        <strong><?=$this->htmlA($this->url(array(
+                            'car_id' => $this->car->id
+                        )), $this->car->getFullName())?></strong>
+                        <?=$this->htmlA($this->url(array(
+                            'action' => 'car',
+                            'car_id' => $this->car->id
+                        )), '<i class="fa fa-cog"></i>', false)?>
+                        <ul>
+                            <?php foreach ($this->childs as $car) { ?>
+                                <li>
+                                    <form action="<?=$this->escape($car['setIsPrimaryUrl'])?>" method="post" class="form-inline">
+                                        <?php if ($car['isPrimary']) { ?>
+                                            <button type="submit" class="btn btn-success btn-xs">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                        <?php } else { ?>
+                                            <button type="submit" class="btn btn-default btn-xs">
+                                                <i class="fa fa-eye-slash"></i>
+                                            </button>
+                                        <?php } ?>
+
+                                        <?=$this->htmlA($car['treeUrl'], $car['name'])?>
+                                        <?=$this->htmlA($car['moderUrl'], '<i class="fa fa-cog"></i>', false)?>
+                                    </form>
+                                </li>
+                            <?php } ?>
+                        </ul>
+                    </li></ul>
+                </li>
+            </ul>
+            <form action="<?=$this->escape($this->url(array(
+                'action' => 'rebuild-tree'
+            )))?>" method="post">
+                <button type="submit" class="btn btn-default">Refresh cache</button>
+            </form>
+            <div>
+                <p>Добавить <?=$this->escape($this->car->getFullName())?> в</p>
+                <?=$this->formText('name', '', array(
+                    'id'           => 'add-parent-search',
+                    'class'        => 'form-control',
+                    'placeholder'  => 'Type to search ...',
+                    'autocomplete' => "off"
+                ))?>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6">
+
+    </div>
+</div>
+<div id="graph" style="height:800px"></div>

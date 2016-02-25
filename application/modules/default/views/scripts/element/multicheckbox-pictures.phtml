@@ -1,0 +1,8 @@
+<div class="multicheckbox-pictures" data-toggle="buttons">
+    <?php foreach ($this->element->getMultioptions() as $value => $label) { ?>
+        <label class="btn btn-default">
+            <input type="checkbox" name="<?=$this->escape($this->element->getName().'[]')?>" value="<?=$this->escape($value)?>">
+            <?=$this->htmlImg($label)?>
+        </label>
+    <?php } ?>
+</div>

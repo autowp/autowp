@@ -1,0 +1,252 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 85,
+        'args'   => array(
+            'BRAND_ID'   => $this->brand->id,
+            'BRAND_NAME' => $this->brand->caption
+        )
+    ));
+    $this->layout()->moduleName = 'moder/brands/brand';
+?>
+
+<?php
+    $brand_url = $this->url(array(
+        'module'     => 'default',
+        'controller' => 'catalogue',
+        'action'     => 'brand',
+        'brand_catname' => $this->brand->folder
+    ), 'catalogue', true);
+?>
+<div class="row">
+    <div class="col-md-6">
+        <?php if ($this->picture) { ?>
+            <?=$this->img($this->picture->getFormatRequest(), array(
+                'format' => 'picture-thumb',
+            ))?>
+        <?php } ?>
+        <div class="well">
+            <p>В базе данных чиcлится под номером <strong><?=$this->brand->id ?></strong></p>
+            <p>
+                Автомобилей: <strong><?=$this->brand->cars_count ?></strong><br />
+                Двигателей: <strong><?=$this->brand->engines_count ?></strong><br />
+                Картинок автомобилей: <strong><?=$this->brand->carpictures_count ?></strong><br />
+                Картинок двигателей: <strong><?=$this->brand->enginepictures_count ?></strong><br />
+                Картинок логотипов: <strong><?=$this->brand->logopictures_count ?></strong><br />
+                Смешанных картинок: <strong><?=$this->brand->mixedpictures_count ?></strong><br />
+                Несортированных картинок: <strong><?=$this->brand->unsortedpictures_count ?></strong><br />
+                Всего картинок: <strong><?=$this->brand->getTotalPicturesCount() ?></strong><br />
+                На сайте: <?=$this->htmlA($brand_url, $brand_url) ?><br />
+            </p>
+            <p><?=$this->htmlA($this->url(array(
+                'module' => 'default',
+                'controller' => 'log',
+                'action' => 'index',
+                'brand_id' => $this->brand->id
+            ), 'default', true), 'Журнал событий по бренду') ?></p>
+        </div>
+
+        <h3>Мета-информация</h3>
+        <div class="well">
+
+            <?php if ($this->canEdit) { ?>
+                <?=$this->formBrandEdit->render($this) ?>
+            <?php } else { ?>
+                <table><tbody>
+                    <tr>
+                        <td>Название</td>
+                        <td><?=$this->escape($this->brand->caption) ?></td>
+                    </tr>
+                    <tr>
+                        <td>Полное название</td>
+                        <td><?=$this->escape($this->brand->full_caption) ?></td>
+                    </tr>
+                    <tr>
+                        <td>Краткое описание</td>
+                        <td><?=$this->brand->description ?></td>
+                    </tr>
+                </tbody></table>
+            <?php } ?>
+        </div>
+
+        <h3>Краткое описание</h3>
+        <div class="well">
+            <?php if ($this->canEdit) { ?>
+                <?=$this->descriptionForm->render($this)?>
+            <?php } else { ?>
+                <?=$this->markup($this->description)?>
+            <?php } ?>
+            <?php if ($this->brand->text_id) { ?>
+                <p>
+                    <?=$this->htmlA(array(
+                        'class' => 'pull-right',
+                        'href'  => $this->url(array(
+                            'module'     => 'default',
+                            'controller' => 'info',
+                            'action'     => 'text',
+                            'id'         => $this->brand->text_id
+                        ), null, true)
+                    ), 'History')?>
+                </p>
+            <?php } ?>
+        </div>
+
+        <h3>Логотип</h3>
+        <div class="well">
+            <?php if ($this->canLogo) { ?>
+                <ul>
+                    <li>Логотип должен быть строго в формате PNG.</li>
+                    <li>Все прозрачныме области должны быть прозрачными, а не белыми!</li>
+                    <li>Логотип должен касаться краев изображения. Никаких полей не не надо</li>
+                    <li>Закачивайте в максимальном доступном разрешении - это обеспечит качество и возможность в будущем где-то воспользоваться этим крупным фото.<br />На сайте все размеры будут подогнанны</li>
+                </ul>
+            <?php } ?>
+            <?=$this->img($this->brand->img, array('style' => 'max-width:100%')) ?>
+            <?php if ($this->canLogo) { ?>
+                <?=$this->formLogo->render($this) ?>
+            <?php } ?>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#brand-tab-bar-1">Модели и автомобили</a></li>
+                <li><a data-toggle="tab" href="#brand-tab-bar-2">Ссылки</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="brand-tab-bar-1" class="tab-pane active">
+                    <div class="well">
+                        <table class="table table-condensed table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Папка</th>
+                                    <th colspan="2">Года выпуска</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($this->designProjects as $designProject) { ?>
+                                    <tr>
+                                        <td>
+                                            <?=$this->htmlA($this->url(array(
+                                                'module'           => 'moder',
+                                                'controller'        => 'design-projects',
+                                                'action'            => 'design-project',
+                                                'design_project_id' => $designProject->id
+                                            )), $designProject->name) ?>
+                                        </td>
+                                        <td><?=$this->escape($designProject->catname) ?></td>
+                                        <td colspan="2"><?=$this->escape($designProject->year) ?></td>
+                                        <td>
+                                            <?php if ($this->canDeleteModel) { ?>
+                                                <?=$this->form('delete-design-project', array(
+                                                    'style'     => 'margin-bottom:0',
+                                                    'method' => 'post',
+                                                    'action' => $this->url(array(
+                                                        'module'         => 'moder',
+                                                        'controller'     => 'brands',
+                                                        'action'         => 'delete-design-project',
+                                                        'design_project_id' => $designProject->id
+                                                    ))
+                                                ), '<button type="submit" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></button>')?>
+                                            <?php } ?>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+
+                                <?php foreach ($this->cars as $car) { ?>
+                                    <tr>
+                                        <td>
+                                            <?=$this->htmlA($this->url(array(
+                                                'module' => 'moder',
+                                                'controller' => 'cars',
+                                                'action' => 'car',
+                                                'car_id' => $car->id
+                                            )), $car->getFullName()) ?>
+                                        </td>
+                                        <td></td>
+                                        <td colspan="2"></td>
+                                        <td></td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+
+                        <?php if ($this->canEditDesignProjects) { ?>
+                            <?=$this->formBrandAddDesignProject->render($this)?>
+                        <?php } ?>
+                    </div>
+                </div>
+                <div id="brand-tab-bar-2" class="tab-pane">
+                    <div class="well">
+                        <?php if ($this->canEdit) { ?>
+                            <form action="<?=$this->escape($this->url(array(
+                                'action' => 'save-links'
+                            ))) ?>" method="post">
+                                <table class="table table-condensed table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Текст</th>
+                                            <th>Адрес</th>
+                                            <th>Тип</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($this->links as $link) { ?>
+                                            <tr>
+                                                <td><?=$this->formText('link['.$link['id'].'][caption]', $link['caption']) ?></td>
+                                                <td><?=$this->formText('link['.$link['id'].'][url]', $link['url']) ?></td>
+                                                <td>
+                                                    <?=$this->formSelect('link['.$link['id'].'][type]', $link['type'], null, array(
+                                                        'default'  => 'просто полезная ссылка',
+                                                        'official' => 'официальный сайт',
+                                                        'club'     => 'клуб'
+                                                    )) ?>
+                                                </td>
+                                            </tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><?=$this->formText('new[caption]', '') ?></td>
+                                            <td><?=$this->formText('new[url]', '') ?></td>
+                                            <td>
+                                                <?=$this->formSelect('new[type]', '', null, array(
+                                                    'default'  => 'просто полезная ссылка',
+                                                    'official' => 'официальный сайт',
+                                                    'club'     => 'клуб'
+                                                )) ?>
+                                            </td>
+                                        </tr>
+                                        <tr><td colspan="3"><input class="btn btn-primary" type="submit" value="Сохранить" /></td></tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        <?php } else { ?>
+                            <table class="table table-condensed table-stripped"><tbody>
+                                <tr>
+                                    <th>Текст</th>
+                                    <th>Адрес</th>
+                                    <th>Тип</th>
+                                </tr>
+                                <?php foreach ($this->brand->findLinks() as $link) { ?>
+                                    <tr>
+                                        <td><?=$this->escape($link->caption)?></td>
+                                        <td><?=$this->escape($link->url)?></td>
+                                        <td><?=$this->escape($link->type)?></td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody></table>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

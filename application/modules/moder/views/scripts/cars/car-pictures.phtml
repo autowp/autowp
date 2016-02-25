@@ -1,0 +1,12 @@
+<?php
+    $this->layout()->disableLayout();
+?>
+<div class="btn-group">
+    <?=$this->htmlA(array(
+        'href'  => $this->url(array(
+            'action'    => 'organize-pictures',
+        )),
+        'class' => 'btn btn-default',
+    ), 'Турбо объединятор картинок в группы')?>
+</div>
+<?=$this->partial('pictures.phtml', $this->picturesData)?>

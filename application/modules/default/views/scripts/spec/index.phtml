@@ -1,0 +1,71 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 122
+    ));
+?>
+<?php $this->headStyle()->captureStart() ?>
+.car-specs-log td { vertical-align: top }
+.car-specs-log h2.carCaption { margin-top: 0}
+.specs {
+    font-size: 11px;
+}
+.specs dt, .specs dd {float: left; margin: 0; padding: 0 }
+.specs dt { clear: both}
+<?php $this->headStyle()->captureEnd() ?>
+<table style="width:100%;margin-bottom:10px"><tr>
+    <td style="width:33%;text-align:center;">
+        <h2><?php if ($this->prev) { ?>
+            &#x2190;
+            <?=$this->htmlA($this->prev['url'], $this->humanDate($this->prev['date'])) ?>
+            <span class="count">(<?=$this->prev['count'] ?>)</span>
+        <?php } ?></h2>
+    </td>
+    <td style="width:34%;text-align:center">
+        <h2>
+            <?=$this->humanDate($this->current['date'])?> <span class="count">(<?=$this->current['count'] ?>)</span>
+        </h2>
+    </td>
+    <td style="width:33%;text-align:center;">
+        <h2><?php if ($this->next) { ?>
+            <?=$this->htmlA($this->next['url'], $this->humanDate($this->next['date'])) ?>
+            <span class="count">(<?=$this->next['count'] ?>)</span>
+            &#x2192;
+        <?php } ?></h2>
+    </td>
+</tr></table>
+<table cellspacing="0" summary="Автомобили" class="car-specs-log">
+    <?php $idx = 0 ?>
+    <?php foreach ($this->items as $item) { ?>
+        <tr>
+            <td>
+                <h2 class="carCaption"><?=$item['car']->getCaptionHtml() ?></h2>
+                <?=$this->pictureListHorizontal($item['car']->getOrientedPictureList($this->groupIds)) ?>
+                <?php if ($item['car']->description) { ?>
+                    <div class="text" style="width: 494px"><?=$item['car']->description ?></div>
+                <?php } ?>
+                <?php if ($item['users']) { ?>
+                    By: <?php
+                        foreach ($item['users'] as $i => $user) {
+                            print $this->user($user). ' ';
+                        }
+                    ?>
+                <?php } ?>
+            </td>
+            <td>
+                <dl class="specs">
+                    <?php foreach ($item['attrs'] as $attr) { ?>
+                        <dt><?=$this->escape($attr['attr']['name'])?></dt>
+                        <?php foreach ($attr['values'] as $value) { ?>
+                            <dd><?=$this->escape($value)?></dd>
+                        <?php } ?>
+                    <?php } ?>
+                </dl>
+            </td>
+        </tr>
+    <?php } ?>
+</table>

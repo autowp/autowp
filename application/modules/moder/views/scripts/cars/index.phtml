@@ -1,0 +1,29 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 131,
+    ));
+?>
+<div class="row">
+    <div class="col-lg-4 col-md-4">
+        <h2>Фильтр</h2>
+        <div class="well">
+            <?=$this->form->render($this)?>
+        </div>
+    </div>
+    <div class="col-lg-8 col-md-8">
+        <h2>
+            Автомобили
+            <?php if ($count = $this->paginator->getTotalItemCount()) {?>
+                <small><?=$this->translate(array('%1$s vehicles', null, $count), $count)?></small>
+            <?php } ?>
+        </h2>
+        <?=$this->partial('cars.phtml', $this->listData)?>
+        <?=$this->paginationControl($this->paginator) ?>
+    </div>
+</div>

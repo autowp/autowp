@@ -1,0 +1,30 @@
+<div class="well">
+    <?php if (!$this->brand) { ?>
+        <?php
+            $columns = 6;
+            $count = count($this->brands);
+            $perOne = ceil($count / $columns);
+            $width = round(100*$perOne/$count);
+            $idx = 0;
+        ?>
+        <table width="100%" class="brand-selector"><tbody><tr>
+            <td valign="top" style="width:<?=(100-$width*($columns-1)) ?>%">
+                <?php foreach ($this->brands as $brand) { ?>
+                    <?php if ($idx && ($idx%$perOne == 0)) { ?>
+                        </td><td valign="top" style="width:<?=$width ?>%">
+                    <?php } ?>
+                    <?=$this->htmlA($this->url(array('brand_id' => $brand->id)), $brand->caption) ?><br />
+                    <?php $idx++ ?>
+                <?php } ?>
+            </td>
+        </tr></tbody></table>
+    <?php } else { ?>
+        <?php foreach ($this->engines as $engine) { ?>
+            <div class="model">
+                <?=$this->htmlA($this->url(array(
+                    'engine_id' => $engine->id
+                )), $engine->getMetaCaption()) ?><br />
+            </div>
+        <?php } ?>
+    <?php } ?>
+</div>

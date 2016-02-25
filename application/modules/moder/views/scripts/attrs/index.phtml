@@ -1,0 +1,41 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 100,
+    ));
+?>
+<div class="row">
+    <div class="col-md-6">
+        <h2>Зоны</h2>
+        <div class="well">
+            <ul>
+                <?php foreach ($this->itemTypes as $itemType) { ?>
+                    <li>
+                        <?=$this->htmlA($this->url(), $itemType->name) ?>
+                        <ul>
+                            <?php foreach ($itemType->findAttrs_Zones() as $zone) { ?>
+                                <li><?=$this->htmlA($this->url(array(
+                                    'action'    =>  'zone',
+                                    'zone_id'   =>  $zone->id
+                                )), $zone->name) ?></li>
+                            <?php } ?>
+                        </ul>
+                    </li>
+                <?php } ?>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h2>Характеристики</h2>
+        <div class="well">
+            <?=$this->partial('attrs/attribute/attributes-partial.phtml', array(
+                'attributes' => $this->attributes
+            )) ?>
+        </div>
+    </div>
+</div>

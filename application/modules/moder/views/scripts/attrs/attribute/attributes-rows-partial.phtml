@@ -1,0 +1,31 @@
+<?php foreach ($this->attributes as $attribute) { ?>
+    <tr>
+        <td>
+            <?=str_repeat('—', $this->deep) ?>
+            <?=$this->htmlA($this->url(array(
+                'attribute_id' => $attribute->id
+            )), $attribute->name) ?>
+        </td>
+        <td>
+            <?php if ($type = $attribute->findParentAttrs_Types()) { ?>
+                <?=$this->escape($type->name) ?>
+            <?php } else { ?>
+                —
+            <?php } ?>
+        </td>
+        <td>
+            <?php if ($unit = $attribute->findParentAttrs_Units()) { ?>
+                <?=$this->escape($unit->name) ?>
+            <?php } else { ?>
+                —
+            <?php } ?>
+        </td>
+    </tr>
+    <?=$this->partial('attrs/attribute/attributes-rows-partial.phtml', array(
+        'attributes'    =>  $attribute->getTable()->fetchAll(
+            $attribute->getTable()->select()
+                ->where('parent_id = ?', $attribute->id)
+        ),
+        'deep'          =>  $this->deep + 1
+    )) ?>
+<?php } ?>

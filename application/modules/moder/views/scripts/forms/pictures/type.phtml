@@ -1,0 +1,15 @@
+<fieldset>
+    <?php if ($element = $this->element->getElement('type')) { ?>
+        <div class="form-group<?=$element->hasErrors() ? ' has-error' : ''?>">
+            <label class="control-label" for="<?=$element->getId()?>"><?=$this->escape($element->getLabel())?></label>
+            <div class="input-group">
+                <?=$element->setAttrib('class', $element->getAttrib('class') . ' form-control')?>
+                <span class="input-group-btn">
+                    <?=$this->formSubmit('submit', 'Ok', array(
+                        'class' => 'btn btn-primary'
+                    ))?>
+                </span>
+            </div>
+        </div>
+    <?php } ?>
+</fieldset>

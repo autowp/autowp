@@ -1,0 +1,41 @@
+<?php
+    $this->layout()->disableLayout();
+?>
+<?php if (count($this->factories)) { ?>
+    <table class="table"><tbody>
+        <?php foreach ($this->factories as $factory) { ?>
+            <tr>
+                <td>
+                    <?=$this->htmlA($factory['url'], $factory['name']) ?>
+                    <?php if ($factory['inherited'] && count($factory['inheritedFrom'])) { ?>
+                        <h6><em>
+                            Inherited from
+                            <?php foreach ($factory['inheritedFrom'] as $car) { ?>
+                                <?=$this->htmlA($car['url'], $car['name'])?>
+                            <?php } ?>
+                        </em></h6>
+                    <?php } ?>
+                </td>
+                <?php if ($this->canEditFactory && !$factory['inherited']) { ?>
+                    <td>
+                        <form action="<?=$this->escape($factory['removeUrl']) ?>" method="post">
+                            <button type="submit" class="btn btn-danger btn-xs">
+                                <i class="fa fa-times"></i> Удалить
+                            </button>
+                        </form>
+                    </td>
+                <?php } ?>
+            </tr>
+        <?php } ?>
+    </tbody></table>
+<?php } else { ?>
+    <p>Завод не задан</p>
+<?php } ?>
+<?php if ($this->canEditFactory) { ?>
+    <p><?=$this->htmlA($this->url(array(
+        'module'     => 'moder',
+        'controller' => 'cars',
+        'action'     => 'car-select-factory',
+        'car_id'     => $this->car->id
+    ), 'default', true), 'Выбрать завод ...') ?></p>
+<?php } ?>

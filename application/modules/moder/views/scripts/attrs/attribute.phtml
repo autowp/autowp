@@ -1,0 +1,58 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 101,
+        'args'   => array(
+            'ATTR_NAME' => $this->attribute->name
+        )
+    ));
+?>
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Парметры аттрибута</h2>
+        <div class="well">
+            <?=$this->formAttributeEdit->render($this) ?>
+        </div>
+
+        <h2>Список значений (для списковых типов)</h2>
+        <div class="well">
+            <?=$this->partial('attrs/attribute/options-partial.phtml', array(
+                'options' => $this->options
+            )) ?>
+        </div>
+
+        <h2>Добавить значение</h2>
+        <div class="well">
+            <?=$this->formListOption->render($this) ?>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <?php if (count($this->attributes)) { ?>
+            <h2>Аттрибуты</h2>
+            <div class="well">
+                <table class="table">
+                    <tr>
+                        <th>Название</th>
+                        <th>Тип</th>
+                        <th>Единица измерения</th>
+                    </tr>
+                    <?=$this->partial('attrs/attribute/attributes-rows-partial.phtml', array(
+                        'attributes'    =>  $this->attributes,
+                        'deep'          =>  0
+                    )) ?>
+                </table>
+            </div>
+        <?php } ?>
+
+        <h2>Добавить податтрибут</h2>
+        <div class="well">
+            <?=$this->formAttributeNew->render($this) ?>
+        </div>
+    </div>
+</div>
