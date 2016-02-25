@@ -26,7 +26,8 @@
         "autowp/textstorage": "^1.0",
         "autowp/image": "^1.0",
         "autowp/filters": "^1.1",
-        "autowp/external-login-service": "^1.0"
+        "autowp/external-login-service": "^1.0",
+        "zendframework/zend-uri": "^2.5"
     },
     "authors": [
         {
@@ -36,9 +37,18 @@
     ],
     "autoload": {
         "psr-4": {
+        	"Autowp\\": "library/Autowp",
             "Application\\Model\\": "application/models",
             "Application\\Model\\DbTable\\": "application/models/DbTable",
             "Application\\Service\\": "application/services"
+        }
+    },
+    "require-dev": {
+        "phpunit/PHPUnit": "~4.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AutowpTest\\": "test/"
         }
     },
     "repositories":[

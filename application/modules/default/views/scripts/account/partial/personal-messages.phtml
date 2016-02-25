@@ -15,7 +15,7 @@
             </div>
             <div class="content">
                 <div class="text">
-                    <p><?=$message['contents']?></p>
+                    <p><?=$this->userText($message['contents'])?></p>
                 </div>
                 <div>
                     <?php if ($message['isNew']) { ?>

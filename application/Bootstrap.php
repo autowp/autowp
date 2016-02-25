@@ -34,21 +34,21 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
      */
     protected function _initBackCompatibility()
     {
-        define('PUBLIC_DIR', realpath(APPLICATION_PATH . '/../public_html'));
-        define('PROJECT_DIR', '/home/autowp/autowp.ru');
-        define('RESOURCES_DIR', APPLICATION_PATH . '/resources');
-        define('IMAGES_DIR', PUBLIC_DIR . '/img');
-        define('IMAGES_URL', '/img');
-        define('DOMAIN', 'autowp.ru');
-        define('DOMAIN_WWW', 'www.autowp.ru');
+        defined('PUBLIC_DIR') || define('PUBLIC_DIR', realpath(APPLICATION_PATH . '/../public_html'));
+        defined('PROJECT_DIR') || define('PROJECT_DIR', '/home/autowp/autowp.ru');
+        defined('RESOURCES_DIR') || define('RESOURCES_DIR', APPLICATION_PATH . '/resources');
+        defined('IMAGES_DIR') || define('IMAGES_DIR', PUBLIC_DIR . '/img');
+        defined('IMAGES_URL') || define('IMAGES_URL', '/img');
+        defined('DOMAIN') || define('DOMAIN', 'autowp.ru');
+        defined('DOMAIN_WWW') || define('DOMAIN_WWW', 'www.autowp.ru');
 
-        define('MYSQL_DATE', 'yyyy-MM-dd');
-        define('MYSQL_TIME', 'HH:mm:ss');
-        define('MYSQL_DATETIME', MYSQL_DATE . ' ' . MYSQL_TIME);
-        define('MYSQL_TIMEZONE', 'UTC');
-        define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
+        defined('MYSQL_DATE') || define('MYSQL_DATE', 'yyyy-MM-dd');
+        defined('MYSQL_TIME') || define('MYSQL_TIME', 'HH:mm:ss');
+        defined('MYSQL_DATETIME') || define('MYSQL_DATETIME', MYSQL_DATE . ' ' . MYSQL_TIME);
+        defined('MYSQL_TIMEZONE') || define('MYSQL_TIMEZONE', 'UTC');
+        defined('MYSQL_DATETIME_FORMAT') || define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
 
-        require_once 'BBDocument.php';
+        //require_once 'BBDocument.php';
     }
 
     protected function _initAutoloader()

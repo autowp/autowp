@@ -9,8 +9,13 @@ class Engines_Row extends Project_Db_Table_Row
         return $this->caption;
     }
 
-    public function getRelatedCarGroupId()
+    public function getRelatedCarGroupId(array $options = [])
     {
+        $defaults = [
+            'groupJoinLimit' => null
+        ];
+        $options = array_merge($defaults, $options);
+        
         $carTable = new Cars();
 
         $db = $this->getTable()->getAdapter();
@@ -46,6 +51,11 @@ class Engines_Row extends Project_Db_Table_Row
             $vectors[] = $vector;
         }
 
+        if ($options['groupJoinLimit'] && count($carIds) <= $options['groupJoinLimit']) {
+            return $carIds;
+        }
+        
+        
         do {
             // look for same root
 
