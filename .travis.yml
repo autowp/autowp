@@ -7,4 +7,7 @@ php:
   - nightly
 services:
   - mysql
-before_script: composer install --dev
+before_script: 
+  - composer install --dev
+  - mysql -u root -e 'create database autowp_test;'
+  - mysql -u root < test/_files/dump.sql

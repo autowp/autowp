@@ -1,3 +1,7 @@
 [submodule "vendor/tapmodo/Jcrop"]
 	path = vendor/tapmodo/Jcrop
 	url = git://github.com/tapmodo/Jcrop.git
+	
+[submodule "vendor/DmitryBaranovskiy/raphael"]
+	path = vendor/DmitryBaranovskiy/raphael
+	url = git://github.com/DmitryBaranovskiy/raphael.git
