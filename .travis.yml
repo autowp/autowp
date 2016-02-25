@@ -7,9 +7,8 @@ php:
   - nightly
 services:
   - mysql
-before_install:
-  - sudo apt-get install php5-imagick
 before_script: 
+  - phpenv config-add test/_files/travis.php.ini
   - composer install --dev
   - mysql -u root -e 'create database autowp_test;'
   - mysql -u root < test/_files/dump.sql
