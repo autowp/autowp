@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Autowp\UserText;
 
@@ -21,20 +21,20 @@ class Renderer
      * @var Zend_View
      */
     private $_view;
-    
+
     /**
      * @var array
      */
     private $_parseUrlHosts = [
-        'www.autowp.ru', 
-        'en.autowp.ru', 
-        'ru.autowp.ru', 
+        'www.autowp.ru',
+        'en.autowp.ru',
+        'ru.autowp.ru',
         'autowp.ru',
-        'fr.wheelsage.org', 
-        'en.wheelsage.org', 
+        'fr.wheelsage.org',
+        'en.wheelsage.org',
         'wheelsage.org'
     ];
-    
+
     /**
      * @param Zend_View $view
      */
@@ -42,7 +42,7 @@ class Renderer
     {
         $this->_view = $view;
     }
-    
+
     private static function _getRouter()
     {
         static $router = null;
@@ -53,10 +53,10 @@ class Renderer
                 $router->addConfig(new Zend_Config($options['router']['routes']));
             }
         }
-    
+
         return $router;
     }
-    
+
     /**
      * @param string $text
      * @throws Exception
@@ -65,7 +65,7 @@ class Renderer
     public function render($text)
     {
         $out = [];
-        
+
         $regexp = '@(https?://[[:alnum:]:\.,/?&_=~+%#\'!|\(\)-]{3,})|(www\.[[:alnum:]\.,/?&_=~+%#\'!|\(\)-]{3,})@isu';
         while ($text && preg_match($regexp, $text, $regs)) {
             if ($regs[1]) {
@@ -75,26 +75,26 @@ class Renderer
                 $umatch = $regs[2];
                 $url = 'http://' . $umatch;
             }
-        
+
             $linkPos = mb_strpos($text, $umatch);
             $matchLength = mb_strlen($umatch);
             if ($linkPos === false) {
                 throw new Exception("Error during parse urls");
             }
-            
+
             $out[] = $this->_view->escape(mb_substr($text, 0, $linkPos));
-            
+
             $out[] = $this->processHref($url);
-            
+
             $text = mb_substr($text, $linkPos + $matchLength);
         }
         if ($text) {
             $out[] = $this->_view->escape($text);
         }
-        
+
         return implode($out);
     }
-    
+
     private function processHref($url)
     {
         try {
@@ -102,35 +102,35 @@ class Renderer
         } catch (Uri\Exception\InvalidArgumentException $e) {
             $uri = null;
         }
-        
+
         $hostAllowed = false;
         if ($uri instanceof Uri\Uri) {
             $hostAllowed = in_array($uri->getHost(), $this->_parseUrlHosts);
         }
-        
+
         if ($hostAllowed) {
-        
+
             $request = new Zend_Controller_Request_Http($url);
-            
+
             $result = self::_getRouter()->route($request);
-            
+
             $params = $result->getParams();
-            
+
             $result = $this->_tryUserLinkParams($params);
             if ($result !== false) {
                 return $result;
             }
-            
+
             $result = $this->_tryPictureLinkParams($params);
             if ($result !== false) {
                 return $result;
             }
-            
+
         }
-        
+
         return '<a href="'.$this->_view->escape($url).'">' . $this->_view->escape($url) . '</a>';
     }
-    
+
     /**
      * @param array $params
      * @return boolean
@@ -143,7 +143,7 @@ class Renderer
                 'action'     => 'user'
             )
         ];
-        
+
         $userId = null;
         $userIdentity = null;
         foreach ($map as $pattern) {
@@ -154,41 +154,41 @@ class Renderer
                     break;
                 }
             }
-        
+
             if ($match && isset($params['user_id'])) {
                 $userId = $params['user_id'];
                 break;
             }
-            
+
             if ($match && isset($params['identity'])) {
                 $userIdentity = $params['identity'];
                 break;
             }
         }
-        
+
         if ($userId) {
             $userTable = new Users();
             $user = $userTable->find($userId)->current();
-            
+
             if ($user) {
-                return $this->_view->user($user);
+                return $this->_view->user($user)->__toString();
             }
         }
-        
+
         if ($userIdentity) {
             $userTable = new Users();
             $user = $userTable->fetchRow([
                 'identity = ?' => $userIdentity
             ]);
-        
+
             if ($user) {
-                return $this->_view->user($user);
+                return $this->_view->user($user)->__toString();
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * @param array $params
      * @return boolean
@@ -205,7 +205,7 @@ class Renderer
                 'action'     => 'brand-car-picture'
             )
         ];
-    
+
         $pictureId = null;
         foreach ($map as $pattern) {
             $match = true;
@@ -215,30 +215,30 @@ class Renderer
                     break;
                 }
             }
-    
+
             if ($match && isset($params['picture_id'])) {
                 $pictureId = $params['picture_id'];
             }
         }
-    
+
         if ($pictureId) {
             $pictureTable = new Picture();
             $picture = $pictureTable->fetchRow(array(
                 'id = ?' => $pictureId,
                 'identity IS NULL'
             ));
-    
+
             if (!$picture) {
                 $picture = $pictureTable->fetchRow(array(
                     'identity = ?' => $pictureId
                 ));
             }
-    
+
             if ($picture) {
                 return $this->_view->inlinePicture($picture);
             }
         }
-    
+
         return false;
     }
 }
