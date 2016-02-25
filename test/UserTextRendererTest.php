@@ -4,9 +4,7 @@ namespace AutowpTest;
 
 use Autowp\UserText\Renderer;
 
-use Zend_Application;
-use Zend_Controller_Request_Http;
-use Zend_Session;
+use Zend_Controller_Front;
 
 /**
  * @group Autowp_UserText
@@ -14,43 +12,11 @@ use Zend_Session;
 class UserTextRendererTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return Zend_Application
-     */
-    private function _bootstrap()
-    {
-        defined('APPLICATION_PATH')
-            || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));
-        
-        defined('APPLICATION_ENV')
-            || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'testing'));
-        
-        Zend_Session::$_unitTestEnabled = true;
-        
-        $application = new Zend_Application(
-                APPLICATION_ENV,
-                dirname(__FILE__) . '/_files/application.ini'
-        );
-        $application->bootstrap();
-        
-        $bootstrap = $application->getBootstrap();
-        
-        $front = $bootstrap->getResource('FrontController');
-        
-        $front->setParam('bootstrap', $bootstrap);
-        
-        $request = new Zend_Controller_Request_Http('http://www.autowp.ru');
-        $front->setRequest($request);
-
-        return $application;
-    }
-    
-    /**
      * @dataProvider hyperlinksProvider
      */
     public function testHyperlinks($text, $expected)
     {
-        $application = $this->_bootstrap();
-        $bootstrap = $application->getBootstrap();
+        $bootstrap = Zend_Controller_Front::getInstance()->getParam('bootstrap');
         $view = $bootstrap->getResource('View');
         
         $renderer = new Renderer($view);
@@ -63,8 +29,7 @@ class UserTextRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testUsers($text, $expected)
     {
-        $application = $this->_bootstrap();
-        $bootstrap = $application->getBootstrap();
+        $bootstrap = Zend_Controller_Front::getInstance()->getParam('bootstrap');
         $view = $bootstrap->getResource('View');
         
         $renderer = new Renderer($view);
@@ -74,8 +39,7 @@ class UserTextRendererTest extends \PHPUnit_Framework_TestCase
     
     /*public function testPictures()
     {
-        $application = $this->_bootstrap();
-        $bootstrap = $application->getBootstrap();
+        $bootstrap = Zend_Controller_Front::getInstance()->getParam('bootstrap');
         $view = $bootstrap->getResource('View');
         
         $text = 'https://fr.wheelsage.org/subaru/impreza/ii/16899/pictures/225671/';
