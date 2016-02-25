@@ -25,3 +25,8 @@
 [submodule "vendor/requirejs/domReady"]
 	path = vendor/requirejs/domReady
 	url = git://github.com/requirejs/domReady.git
+	
+[submodule "vendor/scottjehl/Respond"]
+	path = vendor/scottjehl/Respond
+	url = git://github.com/scottjehl/Respond.git
+
