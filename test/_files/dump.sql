@@ -39,6 +39,27 @@ CREATE TABLE IF NOT EXISTS `acl_roles` (
   UNIQUE KEY `role` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8;
 
+INSERT INTO `acl_roles` (`id`, `name`) VALUES
+(1, 'abstract-user'),
+(5, 'admin'),
+(12, 'articles-moder'),
+(11, 'brands-moder'),
+(10, 'cars-moder'),
+(8, 'comments-writer'),
+(15, 'engines-moder'),
+(23, 'expert'),
+(58, 'factory-moder'),
+(16, 'forums-moder'),
+(49, 'green-user'),
+(7, 'guest'),
+(17, 'models-moder'),
+(14, 'moder'),
+(50, 'museum-moder'),
+(13, 'pages-moder'),
+(9, 'pictures-moder'),
+(47, 'specifications-editor'),
+(6, 'user');
+
 -- --------------------------------------------------------
 
 --
