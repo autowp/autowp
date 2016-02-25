@@ -9,6 +9,8 @@ services:
   - mysql
 install:
   - printf "\n" | pecl install imagick
+  - printf "\n" | pecl install memcache
+  - printf "\n" | pecl install geos
 before_script: 
   - composer install --dev
   - mysql -u root -e 'create database autowp_test;'
