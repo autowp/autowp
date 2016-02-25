@@ -9,3 +9,7 @@
 [submodule "vendor/artpolikarpov/Flags"]
 	path = vendor/artpolikarpov/Flags
 	url = git://github.com/artpolikarpov/Flags.git
+	
+[submodule "vendor/jrburke/requirejs"]
+	path = vendor/jrburke/requirejs
+	url = git://github.com/jrburke/requirejs.git
