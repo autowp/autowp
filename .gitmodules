@@ -13,3 +13,7 @@
 [submodule "vendor/jrburke/requirejs"]
 	path = vendor/jrburke/requirejs
 	url = git://github.com/jrburke/requirejs.git
+	
+[submodule "vendor/kpdecker/jsdiff"]
+	path = vendor/kpdecker/jsdiff
+	url = git://github.com/kpdecker/jsdiff.git
