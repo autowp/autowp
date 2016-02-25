@@ -35,8 +35,10 @@
         }
     ],
     "autoload": {
+        "psr-0": {
+            "Project_": "library/Project/"
+        },
         "psr-4": {
-            "Project\\": "library/Project",
             "Autowp\\": "library/Autowp",
             "Application\\Model\\": "application/models",
             "Application\\Model\\DbTable\\": "application/models/DbTable",
