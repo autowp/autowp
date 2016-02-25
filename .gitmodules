@@ -21,3 +21,7 @@
 [submodule "vendor/millermedeiros/requirejs-plugins"]
 	path = vendor/millermedeiros/requirejs-plugins
 	url = git://github.com/millermedeiros/requirejs-plugins.git
+
+[submodule "vendor/requirejs/domReady"]
+	path = vendor/requirejs/domReady
+	url = git://github.com/requirejs/domReady.git
