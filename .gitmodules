@@ -5,3 +5,7 @@
 [submodule "vendor/DmitryBaranovskiy/raphael"]
 	path = vendor/DmitryBaranovskiy/raphael
 	url = git://github.com/DmitryBaranovskiy/raphael.git
+
+[submodule "vendor/artpolikarpov/Flags"]
+	path = vendor/artpolikarpov/Flags
+	url = git://github.com/artpolikarpov/Flags.git
