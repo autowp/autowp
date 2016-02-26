@@ -44,6 +44,28 @@ $application->bootstrap();
 
 Zend_Session::$_unitTestEnabled = true;
 
+// Locale
+$locale = new Zend_Locale('en_GB');
+
+// Translation
+$translate = new Zend_Translate('Array', APPLICATION_PATH . '/languages', null, array(
+    'scan'            => Zend_Translate::LOCALE_FILENAME,
+    'disableNotices'  => true,
+    'logUntranslated' => false,
+    'locale'          => $locale,
+));
+
+$translate->addTranslation(array(
+    'content' => PROJECT_DIR . '/vendor/zendframework/zendframework1/resources/languages/',
+    'scan'    => Zend_Translate::LOCALE_DIRECTORY,
+    'locale'  => $locale,
+));
+$translate->setLocale($locale);
+
+// populate for wide-engine
+Zend_Registry::set('Zend_Translate', $translate);
+Zend_Registry::set('Zend_Locale', $locale);
+
 $bootstrap = $application->getBootstrap();
 
 $front = $bootstrap->getResource('FrontController');
