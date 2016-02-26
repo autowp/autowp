@@ -35,7 +35,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     protected function _initBackCompatibility()
     {
         defined('PUBLIC_DIR') || define('PUBLIC_DIR', realpath(APPLICATION_PATH . '/../public_html'));
-        defined('PROJECT_DIR') || define('PROJECT_DIR', '/home/autowp/autowp.ru');
+        //defined('PROJECT_DIR') || define('PROJECT_DIR', '/home/autowp/autowp.ru');
         defined('RESOURCES_DIR') || define('RESOURCES_DIR', APPLICATION_PATH . '/resources');
         defined('IMAGES_DIR') || define('IMAGES_DIR', PUBLIC_DIR . '/img');
         defined('IMAGES_URL') || define('IMAGES_URL', '/img');

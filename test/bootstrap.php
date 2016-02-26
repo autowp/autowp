@@ -56,7 +56,7 @@ $translate = new Zend_Translate('Array', APPLICATION_PATH . '/languages', null, 
 ));
 
 $translate->addTranslation(array(
-    'content' => PROJECT_DIR . '/vendor/zendframework/zendframework1/resources/languages/',
+    'content' => APPLICATION_PATH . '/../vendor/zendframework/zendframework1/resources/languages/',
     'scan'    => Zend_Translate::LOCALE_DIRECTORY,
     'locale'  => $locale,
 ));

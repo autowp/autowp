@@ -31,7 +31,7 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
         'en.autowp.ru'  => 'en.wheelsage.org',
         'ru.autowp.ru'  => 'www.autowp.ru'
     );
-    
+
     /**
      * @var array
      */
@@ -92,17 +92,17 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
                 }
             }
         }
-        
+
         if (in_array($hostname, $this->_userDetectable)) {
             $userLanguage = $this->_detectUserLanguage();
-            
+
             $hosts = Zend_Controller_Front::getInstance()
                 ->getParam('bootstrap')->getOption('hosts');
-            
+
             if (isset($hosts[$userLanguage])) {
                 $redirectUrl = $request->getScheme() . '://' .
                     $hosts[$userLanguage]['hostname'] . $request->getRequestUri();
-            
+
                 $this->getResponse()->setRedirect($redirectUrl);
                 return;
             }
@@ -163,18 +163,18 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
 
         $this->_initLocaleAndTranslate($language);
     }
-    
+
     private function _detectUserLanguage()
     {
         $result = null;
-        
+
         $auth = Zend_Auth::getInstance();
         if ($auth->hasIdentity()) {
-        
+
             $userTable = new Users();
-        
+
             $user = $userTable->find($auth->getIdentity())->current();
-        
+
             if ($user) {
                 $isAllowed = in_array($user->language, $this->_languageWhitelist);
                 if ($isAllowed) {
@@ -182,7 +182,7 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
                 }
             }
         }
-        
+
         return $result;
     }
 
@@ -204,7 +204,7 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
         ));
 
         $translate->addTranslation(array(
-            'content' => PROJECT_DIR . '/vendor/zendframework/zendframework1/resources/languages/',
+            'content' => APPLICATION_PATH . '/../vendor/zendframework/zendframework1/resources/languages/',
             'scan'    => Zend_Translate::LOCALE_DIRECTORY,
             'locale'  => $locale,
         ));
