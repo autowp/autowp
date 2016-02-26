@@ -25,3 +25,6 @@ ratings:
 exclude_paths:
 - test/
 - vendor/
+- public_source/js/lib/
+- public_html/js/
+- public_html/css/
