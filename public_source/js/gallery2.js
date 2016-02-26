@@ -518,10 +518,13 @@ define(
                     var crop = $item.data('crop');
                     var cropMode = $item.data('cropMode');
                     
+                    var bounds;
+                    var offsetBounds;
+                    
                     if (crop) {
                         
                         if (cropMode) {
-                            var bounds = self.maxBounds(self.bound(cSize, {
+                            bounds = self.maxBounds(self.bound(cSize, {
                                 width: crop.width,
                                 height: crop.height
                             }), {
@@ -529,7 +532,7 @@ define(
                                 height: crop.height
                             });
                             
-                            var offsetBounds = self.boundCenter(cSize, bounds);
+                            offsetBounds = self.boundCenter(cSize, bounds);
                             $imgCrop.css(offsetBounds);
                             var fullWidth = bounds.width / crop.crop.width;
                             var fullHeight = bounds.height / crop.crop.height;
@@ -540,14 +543,14 @@ define(
                                 height: fullHeight
                             });
                         } else {
-                            var bounds = self.maxBounds(self.bound(cSize, {
+                            bounds = self.maxBounds(self.bound(cSize, {
                                 width: full.width,
                                 height: full.height
                             }), {
                                 width: full.width,
                                 height: full.height
                             });
-                            var offsetBounds = self.boundCenter(cSize, bounds);
+                            offsetBounds = self.boundCenter(cSize, bounds);
                             $imgFull.css(offsetBounds);
                             $imgCrop.css({
                                 left: offsetBounds.left + crop.crop.left * bounds.width,
@@ -558,14 +561,14 @@ define(
                         }
                         
                     } else {
-                        var bounds = self.maxBounds(self.bound(cSize, {
+                        bounds = self.maxBounds(self.bound(cSize, {
                             width: full.width,
                             height: full.height
                         }), {
                             width: full.width,
                             height: full.height
                         });
-                        var offsetBounds = self.boundCenter(cSize, bounds);
+                        offsetBounds = self.boundCenter(cSize, bounds);
                         $imgFull.css(offsetBounds);
                     }
                 });
