@@ -13,13 +13,13 @@ class Message
     /**
      * @var Project_Db_Table
      */
-    private $_table;
+    private $table;
     
     const MESSAGES_PER_PAGE = 20;
     
     public function __construct()
     {
-        $this->_table = new Project_Db_Table(array(
+        $this->table = new Project_Db_Table(array(
             'name'    => 'personal_messages',
             'primary' => 'id'
         ));
@@ -38,7 +38,7 @@ class Message
             throw new \Exception('Сообщение слишком длинное');
         }
         
-        $this->_table->insert(array(
+        $this->table->insert(array(
             'from_user_id' => $fromId ? (int)$fromId : null,
             'to_user_id'   => (int)$toId,
             'contents'     => $message,
@@ -49,10 +49,10 @@ class Message
     
     public function getNewCount($userId)
     {
-        $db = $this->_table->getAdapter();
+        $db = $this->table->getAdapter();
         return $db->fetchOne(
             $db->select()
-                ->from($this->_table->info('name'), array('COUNT(1)'))
+                ->from($this->table->info('name'), array('COUNT(1)'))
                 ->where('to_user_id = ?', (int)$userId)
                 ->where('NOT readen')
         );
@@ -60,14 +60,14 @@ class Message
     
     public function delete($userId, $messageId)
     {
-        $this->_table->update(array(
+        $this->table->update(array(
             'deleted_by_from'  => 1
         ), array(
             'from_user_id = ?' => (int)$userId,
             'id = ?'           => (int)$messageId
         ));
         
-        $this->_table->update(array(
+        $this->table->update(array(
             'deleted_by_to'  => 1
         ), array(
             'to_user_id = ?' => (int)$userId,
@@ -77,7 +77,7 @@ class Message
     
     public function deleteAllSystem($userId)
     {
-        $this->_table->delete(array(
+        $this->table->delete(array(
             'to_user_id = ?' => (int)$userId,
             'from_user_id IS NULL'
         ));
@@ -85,7 +85,7 @@ class Message
     
     public function deleteAllSent($userId)
     {
-        $this->_table->update(array(
+        $this->table->update(array(
             'deleted_by_from' => 1
         ), array(
             'from_user_id = ?' => (int)$userId,
@@ -94,7 +94,7 @@ class Message
     
     public function recycle()
     {
-        return $this->_table->delete(array(
+        return $this->table->delete(array(
             'deleted_by_to',
             'deleted_by_from OR from_user_id IS NULL'
         ));
@@ -102,41 +102,41 @@ class Message
     
     public function recycleSystem()
     {
-        return $this->_table->delete(array(
+        return $this->table->delete(array(
             'from_user_id is null',
             'add_datetime < date_sub(now(), interval 6 month)'
         ));
     }
     
-    private function _getSystemSelect($userId)
+    private function getSystemSelect($userId)
     {
-        return $this->_table->select(true)
+        return $this->table->select(true)
             ->where('to_user_id = ?', (int)$userId)
             ->where('from_user_id IS NULL')
             ->where('NOT deleted_by_to')
             ->order('add_datetime DESC');
     }
     
-    private function _getInboxSelect($userId)
+    private function getInboxSelect($userId)
     {
-        return $this->_table->select(true)
+        return $this->table->select(true)
             ->where('to_user_id = ?', (int)$userId)
             ->where('from_user_id')
             ->where('NOT deleted_by_to')
             ->order('add_datetime DESC');
     }
     
-    private function _getSentSelect($userId)
+    private function getSentSelect($userId)
     {
-        return $this->_table->select(true)
+        return $this->table->select(true)
             ->where('from_user_id = ?', (int)$userId)
             ->where('NOT deleted_by_from')
             ->order('add_datetime DESC');
     }
     
-    private function _getDialogSelect($userId, $withUserId)
+    private function getDialogSelect($userId, $withUserId)
     {
-        return $this->_table->select(true)
+        return $this->table->select(true)
             ->where('from_user_id = :user_id and to_user_id = :with_user_id and NOT deleted_by_from')
             ->orWhere('from_user_id = :with_user_id and to_user_id = :user_id and NOT deleted_by_to')
             ->order('add_datetime DESC')
@@ -148,14 +148,14 @@ class Message
     
     public function getSystemCount($userId)
     {
-        $select = $this->_getSystemSelect($userId);
+        $select = $this->getSystemSelect($userId);
         
         return Zend_Paginator::factory($select)->getTotalItemCount();
     }
     
     public function getNewSystemCount($userId)
     {
-        $select = $this->_getSystemSelect($userId)
+        $select = $this->getSystemSelect($userId)
             ->where('NOT readen');
         
         return Zend_Paginator::factory($select)->getTotalItemCount();
@@ -163,14 +163,14 @@ class Message
     
     public function getInboxCount($userId)
     {
-        $select = $this->_getInboxSelect($userId);
+        $select = $this->getInboxSelect($userId);
         
         return Zend_Paginator::factory($select)->getTotalItemCount();
     }
     
     public function getInboxNewCount($userId)
     {
-        $select = $this->_getInboxSelect($userId)
+        $select = $this->getInboxSelect($userId)
             ->where('NOT readen');
         
         return Zend_Paginator::factory($select)->getTotalItemCount();
@@ -178,14 +178,14 @@ class Message
     
     public function getDialogCount($userId, $withUserId)
     {
-        $select = $this->_getDialogSelect($userId, $withUserId);
+        $select = $this->getDialogSelect($userId, $withUserId);
     
         return Zend_Paginator::factory($select)->getTotalItemCount();
     }
     
     public function getSentCount($userId)
     {
-        $select = $this->_getSentSelect($userId);
+        $select = $this->getSentSelect($userId);
         
         return Zend_Paginator::factory($select)->getTotalItemCount();
     }
@@ -193,7 +193,7 @@ class Message
     public function markReaden($ids)
     {
         if (count($ids)) {
-            $this->_table->update(array(
+            $this->table->update(array(
                 'readen' => 1
             ), array(
                 'id IN (?)' => $ids
@@ -203,7 +203,7 @@ class Message
     
     public function getInbox($userId, $page)
     {   
-        $select = $this->_getInboxSelect($userId);
+        $select = $this->getInboxSelect($userId);
         
         $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
@@ -221,14 +221,14 @@ class Message
         $this->markReaden($markReaden);
         
         return [
-            'messages'  => $this->_prepareList($userId, $rows),
+            'messages'  => $this->prepareList($userId, $rows),
             'paginator' => $paginator
         ];
     }
     
     public function getSentbox($userId, $page)
     {
-        $select = $this->_getSentSelect($userId);
+        $select = $this->getSentSelect($userId);
     
         $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
@@ -237,14 +237,14 @@ class Message
         $rows = $paginator->getCurrentItems();
     
         return [
-            'messages'  => $this->_prepareList($userId, $rows),
+            'messages'  => $this->prepareList($userId, $rows),
             'paginator' => $paginator
         ];
     }
     
     public function getSystembox($userId, $page)
     {
-        $select = $this->_getSystemSelect($userId);
+        $select = $this->getSystemSelect($userId);
     
         $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
@@ -262,14 +262,14 @@ class Message
         $this->markReaden($markReaden);
     
         return [
-            'messages'  => $this->_prepareList($userId, $rows),
+            'messages'  => $this->prepareList($userId, $rows),
             'paginator' => $paginator
         ];
     }
     
     public function getDialogbox($userId, $withUserId, $page)
     {
-        $select = $this->_getDialogSelect($userId, $withUserId);
+        $select = $this->getDialogSelect($userId, $withUserId);
     
         $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
@@ -287,21 +287,21 @@ class Message
         $this->markReaden($markReaden);
     
         return [
-            'messages'  => $this->_prepareList($userId, $rows, array(
+            'messages'  => $this->prepareList($userId, $rows, array(
                 'allMessagesLink' => false
             )),
             'paginator' => $paginator
         ];
     }
     
-    private function _prepareList($userId, $rows, array $options = [])
+    private function prepareList($userId, $rows, array $options = [])
     {
         $defaults = array(
             'allMessagesLink' => true
         );
         $options = array_replace($defaults, $options);
     
-        $db = $this->_table->getAdapter();
+        $db = $this->table->getAdapter();
     
         $cache = [];
         

@@ -1,22 +1,23 @@
 <?php
+
 class Cars_Row extends Project_Db_Table_Row
 {
     /**
      * @var Spec
      */
-    private $_specTable;
+    private $specTable;
 
     /**
      * @return Spec
      */
-    private function _getSpecTable()
+    private function getSpecTable()
     {
-        return $this->_specTable
-            ? $this->_specTable
-            : $this->_specTable = new Spec();
+        return $this->specTable
+            ? $this->specTable
+            : $this->specTable = new Spec();
     }
 
-    private static function _buildYearsString(array $options)
+    private static function buildYearsString(array $options)
     {
         $defaults = array(
             'begin_year' => null,
@@ -103,7 +104,7 @@ class Cars_Row extends Project_Db_Table_Row
             $result .= ' ('.$options['body'].')';
         }
 
-        $years = self::_buildYearsString(array(
+        $years = self::buildYearsString(array(
             'begin_year' => $options['begin_year'],
             'end_year'   => $options['end_year'],
             'today'      => $options['today']
@@ -128,7 +129,7 @@ class Cars_Row extends Project_Db_Table_Row
         $spec = null;
         $specFull = null;
         if ($this->spec_id) {
-            $specRow = $this->_getSpecTable()->find($this->spec_id)->current();
+            $specRow = $this->getSpecTable()->find($this->spec_id)->current();
             if ($specRow) {
                 $spec = $specRow->short_name;
                 $specFull = $specRow->name;
@@ -155,7 +156,7 @@ class Cars_Row extends Project_Db_Table_Row
 
     public function getYearsString()
     {
-        return self::_buildYearsString(array(
+        return self::buildYearsString(array(
             'begin_year' => $this->begin_year,
             'end_year'   => $this->end_year,
             'today'      => $this->today
@@ -255,15 +256,15 @@ class Cars_Row extends Project_Db_Table_Row
         return parent::findParentRow($parentTable, $ruleKey, $select);
     }
 
-    public function getOrientedPictureList(array $perspective_group_ids, &$interiors = 0)
+    public function getOrientedPictureList(array $perspectiveGroupIds, &$interiors = 0)
     {
-        $_pictures = new Picture();
+        $pictureTable = new Picture();
         $pictures = array();
         $db = $this->getTable()->getAdapter();
 
-        foreach ($perspective_group_ids as $groupId) {
-            $picture = $_pictures->fetchRow(
-                $_pictures->select(true)
+        foreach ($perspectiveGroupIds as $groupId) {
+            $picture = $pictureTable->fetchRow(
+                $pictureTable->select(true)
                     ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->join(array('mp' => 'perspectives_groups_perspectives'), 'pictures.perspective_id=mp.perspective_id', null)
@@ -295,7 +296,7 @@ class Cars_Row extends Project_Db_Table_Row
         {
             if (!$picture)
             {
-                $select = $_pictures->select(true)
+                $select = $pictureTable->select(true)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->where('pictures.type=?', Picture::CAR_TYPE_ID)
                     ->where('car_parent_cache.parent_id = ?', $this->id)
@@ -303,20 +304,18 @@ class Cars_Row extends Project_Db_Table_Row
                     ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
                     ->limit(1);
 
-                if (count($ids) > 0)
-                {
+                if (count($ids) > 0) {
                     $select->where('id NOT IN (?)', $ids);
                 }
 
-                $pic = $_pictures->fetchAll($select)->current();
+                $pic = $pictureTable->fetchAll($select)->current();
 
-                if ($pic)
-                {
+                if ($pic) {
                     $pictures[$key] = $pic;
                     $ids[] = $pic->id;
-                }
-                else
+                } else {
                     break;
+                }
             }
         }
 

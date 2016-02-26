@@ -3,43 +3,8 @@
 class Car_Parent extends Project_Db_Table
 {
     protected $_name = 'car_parent';
-    protected $_primary = array('car_id', 'parent_id');
-
-    const
-        TYPE_DEFAULT = 0,
-        TYPE_TUNING = 1,
-        TYPE_SPORT = 2;
-
-    /**
-     * @var Brand_Car
-     */
-    private $_brandCarTable;
-
-    /**
-     * @var Brands
-     */
-    private $_brandTable;
-
-    /**
-     * @return Brand_Car
-     */
-    private function _getBrandCarTable()
-    {
-        return $this->_brandCarTable
-            ? $this->_brandCarTable
-            : $this->_brandCarTable = new Brand_Car();
-    }
-
-    /**
-     * @return Brands
-     */
-    private function _getBrandTable()
-    {
-        return $this->_brandTable
-            ? $this->_brandTable
-            : $this->_brandTable = new Brands();
-    }
-
+    protected $_primary = ['car_id', 'parent_id'];
+    
     protected $_referenceMap = array(
         'Car' => array(
             'columns'       => array('car_id'),
@@ -52,6 +17,42 @@ class Car_Parent extends Project_Db_Table
             'refColumns'    => array('id')
         ),
     );
+
+    const
+        TYPE_DEFAULT = 0,
+        TYPE_TUNING = 1,
+        TYPE_SPORT = 2,
+        TYPE_DESIGN = 3;
+
+    /**
+     * @var Brand_Car
+     */
+    private $brandCarTable;
+
+    /**
+     * @var Brands
+     */
+    private $brandTable;
+
+    /**
+     * @return Brand_Car
+     */
+    private function getBrandCarTable()
+    {
+        return $this->brandCarTable
+            ? $this->brandCarTable
+            : $this->brandCarTable = new Brand_Car();
+    }
+
+    /**
+     * @return Brands
+     */
+    private function getBrandTable()
+    {
+        return $this->brandTable
+            ? $this->brandTable
+            : $this->brandTable = new Brands();
+    }
 
     public function collectChildIds($id)
     {
@@ -165,7 +166,7 @@ class Car_Parent extends Project_Db_Table
         $result = array();
 
         $limit = $breakOnFirst ? 1 : null;
-        $brandCarRows = $this->_getBrandCarTable()->fetchAll(array(
+        $brandCarRows = $this->getBrandCarTable()->fetchAll(array(
             'car_id = ?'   => $carId,
             'brand_id = ?' => $brand->id
         ), null, $limit);
@@ -213,7 +214,7 @@ class Car_Parent extends Project_Db_Table
 
         $result = array();
 
-        $db = $this->_getBrandCarTable()->getAdapter();
+        $db = $this->getBrandCarTable()->getAdapter();
 
         $select = $db->select()
             ->from('brands_cars', 'catname')

@@ -2,28 +2,28 @@
 
 class Application_Form_Attrs_Zone_Attributes extends Project_Form
 {
-    protected $_zone = null;
+    private $_zone = null;
 
-    protected $_itemType = null;
+    private $_itemType = null;
 
-    protected $_itemId = null;
+    private $_itemId = null;
 
     /**
      * @var Application_Service_Specifications
      */
-    protected $_service = null;
+    private $_service = null;
 
-    protected $_allValues = null;
-
-    /**
-     * @var array
-     */
-    protected $_actualValues = array();
+    private $_allValues = null;
 
     /**
      * @var array
      */
-    protected $_multioptions = array();
+    private $_actualValues = array();
+
+    /**
+     * @var array
+     */
+    private $_multioptions = array();
 
     public function setZone($zone)
     {
@@ -111,7 +111,7 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
         return $this;
     }
 
-    private function _buildElements($form, $attributes, $deep, $parents = array())
+    private function buildElements($form, $attributes, $deep, $parents = array())
     {
         if (!$this->_itemId) {
             throw new Exception('item_id not set');
@@ -146,11 +146,11 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
                     )
                 ));
                 $form->addSubForm($subform, $nodeName);
-                $this->_buildElements($subform, $subAttributes, $deep + 1,
+                $this->buildElements($subform, $subAttributes, $deep + 1,
                     array_merge($parents, array('subform-' . $attribute['id'])));
             } else {
 
-                $options = $this->_getFormElementOptions($attribute, $deep, $parents);
+                $options = $this->getFormElementOptions($attribute, $deep, $parents);
 
                 $type = null;
                 if ($attribute['typeId']) {
@@ -167,7 +167,7 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
         }
     }
 
-    private function _getFormElementOptions($attribute, $deep, $parents)
+    private function getFormElementOptions($attribute, $deep, $parents)
     {
         if (!$this->_itemId) {
             throw new Exception('item_id not set');
@@ -184,10 +184,7 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
             $value = null;
         }
 
-        $unit = null;
-        if (!is_null($value)) {
-            $unit = $this->_service->getUnit($attribute['unitId']);
-        }
+        $unit = $this->_service->getUnit($attribute['unitId']);
 
         $allValues = array();
         if (isset($this->_allValues[$attribute['id']])) {
@@ -288,6 +285,6 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
             'parent' => 0,
             'zone'   => $this->_zone->id
         ));
-        $this->_buildElements($this, $attributes, 0);
+        $this->buildElements($this, $attributes, 0);
     }
 }

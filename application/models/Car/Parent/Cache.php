@@ -21,21 +21,21 @@ class Car_Parent_Cache extends Project_Db_Table
     /**
      * @var Car_Parent
      */
-    protected $_carParentTable;
+    private $carParentTable;
 
     /**
      * @return Car_Parent
      */
-    protected function _getCarParentTable()
+    private function getCarParentTable()
     {
-        return $this->_carParentTable
-            ? $this->_carParentTable
-            : $this->_carParentTable = new Car_Parent();
+        return $this->carParentTable
+            ? $this->carParentTable
+            : $this->carParentTable = new Car_Parent();
     }
 
-    protected function _collectParentInfo($id, $diff = 1)
+    private function collectParentInfo($id, $diff = 1)
     {
-        $cpTable = $this->_getCarParentTable();
+        $cpTable = $this->getCarParentTable();
 
         $cpTableName = $cpTable->info('name');
         $adapter = $cpTable->getAdapter();
@@ -51,17 +51,20 @@ class Car_Parent_Cache extends Project_Db_Table
             $parentId = $row['parent_id'];
             $isTuning = $row['type'] == Car_Parent::TYPE_TUNING;
             $isSport  = $row['type'] == Car_Parent::TYPE_SPORT;
+            $isDesign = $row['type'] == Car_Parent::TYPE_DESIGN;
             $result[$parentId] = array(
                 'diff'   => $diff,
                 'tuning' => $isTuning,
                 'sport'  => $isSport,
+                'design' => $isDesign
             );
 
-            foreach ($this->_collectParentInfo($parentId, $diff+1) as $pid => $info) {
+            foreach ($this->collectParentInfo($parentId, $diff+1) as $pid => $info) {
                 if (!isset($result[$pid]) || $info['diff'] < $result[$pid]['diff']) {
                     $result[$pid] = $info;
                     $result[$pid]['tuning'] = $result[$pid]['tuning'] || $isTuning;
                     $result[$pid]['sport']  = $result[$pid]['sport']  || $isSport;
+                    $result[$pid]['design'] = $result[$pid]['design'] || $isDesign;
                 }
             }
         }
@@ -151,11 +154,12 @@ class Car_Parent_Cache extends Project_Db_Table
     {
         $id = (int)$car->id;
 
-        $parentInfo = $this->_collectParentInfo($id);
+        $parentInfo = $this->collectParentInfo($id);
         $parentInfo[$id] = array(
             'diff'  => 0,
             'tuning' => false,
-            'sport'  => false
+            'sport'  => false,
+            'design' => false
         );
 
         $updates = 0;
@@ -171,7 +175,8 @@ class Car_Parent_Cache extends Project_Db_Table
                     'parent_id' => $parentId,
                     'diff'      => $info['diff'],
                     'tuning'    => $info['tuning'] ? 1 : 0,
-                    'sport'     => $info['sport'] ? 1 : 0
+                    'sport'     => $info['sport']  ? 1 : 0,
+                    'design'    => $info['design'] ? 1 : 0
                 ));
                 $updates++;
                 $row->save();
@@ -189,6 +194,11 @@ class Car_Parent_Cache extends Project_Db_Table
 
             if ($row->sport xor $info['sport']) {
                 $row->sport = $info['sport'] ? 1 : 0;
+                $changes = true;
+            }
+            
+            if ($row->design xor $info['design']) {
+                $row->design = $info['design'] ? 1 : 0;
                 $changes = true;
             }
 

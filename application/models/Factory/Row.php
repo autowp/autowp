@@ -3,8 +3,6 @@ class Factory_Row extends Project_Db_Table_Row
 {
     public function getRelatedCarGroupId()
     {
-        $carTable = new Cars();
-
         $db = $this->getTable()->getAdapter();
 
         $carIds = $db->fetchCol(
@@ -69,8 +67,6 @@ class Factory_Row extends Project_Db_Table_Row
 
     public function getRelatedCarGroups()
     {
-        $carTable = new Cars();
-
         $db = $this->getTable()->getAdapter();
 
         $carIds = $db->fetchCol(
