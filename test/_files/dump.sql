@@ -12,6 +12,28 @@ CREATE TABLE IF NOT EXISTS `acl_resources` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
 
+INSERT INTO `acl_resources` (`id`, `name`) VALUES
+(12, 'attrs'),
+(1, 'brand'),
+(4, 'car'),
+(14, 'category'),
+(6, 'comment'),
+(3, 'design_project'),
+(8, 'engine'),
+(21, 'factory'),
+(10, 'forums'),
+(15, 'hotlinks'),
+(2, 'model'),
+(19, 'museums'),
+(7, 'page'),
+(5, 'picture'),
+(9, 'rights'),
+(17, 'specifications'),
+(18, 'status'),
+(11, 'twins'),
+(13, 'user'),
+(20, 'website');
+
 -- --------------------------------------------------------
 
 --
