@@ -2,11 +2,11 @@
 
 class Application_Form_Moder_Brand_Edit extends Project_Form
 {
-    private $_languages = array();
+    private $languages = array();
 
     public function setLanguages(array $languages)
     {
-        $this->_languages = $languages;
+        $this->languages = $languages;
     }
 
     public function init()
@@ -22,7 +22,7 @@ class Application_Form_Moder_Brand_Edit extends Project_Form
             )),
         );
 
-        foreach ($this->_languages as $language) {
+        foreach ($this->languages as $language) {
             $elements[] = array('Brand_Name', 'name'.$language, array (
                 'label'      => 'Name ('.$language.')',
                 'required'   => false,

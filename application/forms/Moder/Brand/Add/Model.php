@@ -18,7 +18,7 @@ class Application_Form_Moder_Brand_Add_Model extends Project_Form
             ),
             'elements'  => array(
                 array('Model_Name', 'name', array(
-                    'required'   =>  true,
+                    'required'   => true,
                     'decorators' => array('ViewHelper')
                 )),
             )

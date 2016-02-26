@@ -2,43 +2,43 @@
 
 class Application_Form_Moder_Car_New extends Project_Form
 {
-    protected $_inheritedCarType = null;
+    protected $inheritedCarType = null;
 
-    protected $_inheritedIsConcept = null;
+    protected $inheritedIsConcept = null;
 
-    protected $_inheritedSpec = null;
+    protected $inheritedSpec = null;
 
-    protected $_specOptions = array();
+    protected $specOptions = array();
 
     /**
      * @var Car_Types
      */
-    protected $_carTypeTable = null;
+    protected $carTypeTable = null;
 
     public function setInheritedCarType($value)
     {
-        $this->_inheritedCarType = $value;
+        $this->inheritedCarType = $value;
 
         return $this;
     }
 
     public function setInheritedSpec($value)
     {
-        $this->_inheritedSpec = $value;
+        $this->inheritedSpec = $value;
 
         return $this;
     }
 
     public function setInheritedIsConcept($value)
     {
-        $this->_inheritedIsConcept = $value === null ? null : (bool)$value;
+        $this->inheritedIsConcept = $value === null ? null : (bool)$value;
 
         return $this;
     }
 
     public function setSpecOptions(array $options)
     {
-        $this->_specOptions = $options;
+        $this->specOptions = $options;
 
         return $this;
     }
@@ -46,14 +46,14 @@ class Application_Form_Moder_Car_New extends Project_Form
     /**
      * @return Car_Types
      */
-    protected function _getCarTypeTable()
+    protected function getCarTypeTable()
     {
-        return $this->_carTypeTable
-            ? $this->_carTypeTable
-            : $this->_carTypeTable = new Car_Types();
+        return $this->carTypeTable
+            ? $this->carTypeTable
+            : $this->carTypeTable = new Car_Types();
     }
 
-    protected function _getCarTypeOptions($parentId = null)
+    protected function getCarTypeOptions($parentId = null)
     {
         if ($parentId) {
             $filter = array(
@@ -63,12 +63,12 @@ class Application_Form_Moder_Car_New extends Project_Form
             $filter = 'parent_id is null';
         }
 
-        $rows = $this->_getCarTypeTable()->fetchAll($filter, 'position');
+        $rows = $this->getCarTypeTable()->fetchAll($filter, 'position');
         $result = array();
         foreach ($rows as $row) {
             $result[$row->id] = $row->name;
 
-            foreach ($this->_getCarTypeOptions($row->id) as $key => $value) {
+            foreach ($this->getCarTypeOptions($row->id) as $key => $value) {
                 $result[$key] = '...' . $value;
             }
         }
@@ -80,13 +80,13 @@ class Application_Form_Moder_Car_New extends Project_Form
     {
         parent::init();
 
-        $carTypeOptions = $this->_getCarTypeOptions();
+        $carTypeOptions = $this->getCarTypeOptions();
 
         $carTypeOptions = array('' => '-') + $carTypeOptions;
 
-        if (!is_null($this->_inheritedCarType)) {
+        if (!is_null($this->inheritedCarType)) {
 
-            $carType = $this->_getCarTypeTable()->find($this->_inheritedCarType)->current();
+            $carType = $this->getCarTypeTable()->find($this->inheritedCarType)->current();
             $carTypeName = $carType ? $carType->name : '-';
 
             $carTypeOptions = array(
@@ -102,9 +102,9 @@ class Application_Form_Moder_Car_New extends Project_Form
             '0' => 'нет',
             '1' => 'да',
         );
-        if (!is_null($this->_inheritedIsConcept)) {
+        if (!is_null($this->inheritedIsConcept)) {
             $isConceptOptions = array_merge(array(
-                'inherited' => 'inherited (' . ($this->_inheritedIsConcept ? 'да' : 'нет') . ')'
+                'inherited' => 'inherited (' . ($this->inheritedIsConcept ? 'да' : 'нет') . ')'
             ), $isConceptOptions);
         } else {
             $isConceptOptions = array_merge(array(
@@ -113,10 +113,10 @@ class Application_Form_Moder_Car_New extends Project_Form
         }
 
 
-        if (!is_null($this->_inheritedSpec)) {
-            $specOptions = array('inherited' => 'inherited (' . $this->_inheritedSpec . ')') + $this->_specOptions;
+        if (!is_null($this->inheritedSpec)) {
+            $specOptions = array('inherited' => 'inherited (' . $this->inheritedSpec . ')') + $this->specOptions;
         } else {
-            $specOptions = array('inherited' => 'inherited') + $this->_specOptions;
+            $specOptions = array('inherited' => 'inherited') + $this->specOptions;
         }
 
         $this->setOptions(array(

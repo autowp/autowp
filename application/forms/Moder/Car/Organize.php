@@ -2,11 +2,11 @@
 
 class Application_Form_Moder_Car_Organize extends Application_Form_Moder_Car_New
 {
-    protected $_childOptions = array();
+    protected $childOptions = array();
 
     public function setChildOptions(array $options)
     {
-        $this->_childOptions = $options;
+        $this->childOptions = $options;
 
         return $this;
     }
@@ -28,7 +28,7 @@ class Application_Form_Moder_Car_Organize extends Application_Form_Moder_Car_New
                 'required'     => true,
                 'id'           => 'car_caption',
                 'decorators'   => array('ViewHelper'),
-                'multioptions' => $this->_childOptions,
+                'multioptions' => $this->childOptions,
                 'label_class'  => 'checkbox',
                 'separator'    => '',
                 'order'        => 12,

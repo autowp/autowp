@@ -2,11 +2,11 @@
 
 class Application_Form_Moder_Category_Edit extends Project_Form
 {
-    protected $_languages = array();
+    private $languages = array();
 
     public function setLanguages(array $languages)
     {
-        $this->_languages = $languages;
+        $this->languages = $languages;
     }
 
     public function init()
@@ -15,7 +15,7 @@ class Application_Form_Moder_Category_Edit extends Project_Form
 
         $subForms = array();
 
-        foreach ($this->_languages as $i => $language) {
+        foreach ($this->languages as $i => $language) {
             $subForms[] = array(
                 array(
                     'description' => 'Fields for ' . $language,
@@ -50,7 +50,7 @@ class Application_Form_Moder_Category_Edit extends Project_Form
             );
         }
 
-        $lskip = count($this->_languages) + 6;
+        $lskip = count($this->languages) + 6;
 
         $this->setOptions(array(
             'method'            => 'post',
@@ -61,7 +61,7 @@ class Application_Form_Moder_Category_Edit extends Project_Form
                 )),
                 'Form'
             ),
-            //'action'        => $this->_helper->url->url(),
+            //'action'        => $this->helper->url->url(),
             'subForms'          => $subForms,
             'elements'          => array(
                 array('Select_Db_Table_Tree', 'parent_id', array(

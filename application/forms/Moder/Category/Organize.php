@@ -2,11 +2,11 @@
 
 class Application_Form_Moder_Category_Organize extends Project_Form
 {
-    protected $_childOptions = array();
+    private $childOptions = [];
 
     public function setChildOptions(array $options)
     {
-        $this->_childOptions = $options;
+        $this->childOptions = $options;
 
         return $this;
     }
@@ -31,7 +31,7 @@ class Application_Form_Moder_Category_Organize extends Project_Form
                     'required'   => true,
                     'id'         => 'car_caption',
                     'decorators' => array('ViewHelper'),
-                    'multioptions' => $this->_childOptions,
+                    'multioptions' => $this->childOptions,
                     'label_class'  => 'checkbox',
                     'separator'    => ''
                 )),

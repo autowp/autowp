@@ -2,7 +2,7 @@
 
 class Application_Form_Moder_Brand_Logo extends Project_Form
 {
-    protected $_maxFileSize = 4194304; //1024*1024*4;
+    private $maxFileSize = 4194304; //1024*1024*4;
 
     public function init()
     {
@@ -24,7 +24,7 @@ class Application_Form_Moder_Brand_Logo extends Project_Form
                     'required'    => true,
                     'validators'  => array(
                         array('Count',     true, 1),
-                        array('Size',      true, $this->_maxFileSize),
+                        array('Size',      true, $this->maxFileSize),
                         //array('IsImage',   true),
                         array('Extension', false, 'png'),
                         array('ImageSize', false, array(
@@ -32,7 +32,7 @@ class Application_Form_Moder_Brand_Logo extends Project_Form
                             'minwidth'  => 50
                         )),
                     ),
-                    'MaxFileSize' => $this->_maxFileSize,
+                    'MaxFileSize' => $this->maxFileSize,
                     'decorators'  => array('File')
                 )),
             )

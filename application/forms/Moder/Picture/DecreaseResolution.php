@@ -2,7 +2,7 @@
 
 class Application_Form_Moder_Picture_DecreaseResolution extends Project_Form
 {
-    private $_resolutions = array();
+    private $resolutions = array();
 
     /**
      * Set form state from options array
@@ -12,7 +12,7 @@ class Application_Form_Moder_Picture_DecreaseResolution extends Project_Form
      */
     public function setResolutions(array $resolutions)
     {
-        $this->_resolutions = $resolutions;
+        $this->resolutions = $resolutions;
 
         return $this;
     }
@@ -26,7 +26,7 @@ class Application_Form_Moder_Picture_DecreaseResolution extends Project_Form
         $options = array(
             '' => '--'
         );
-        foreach ($this->_resolutions as $resolution)
+        foreach ($this->resolutions as $resolution)
         {
             $id = $resolution['width'] . 'x' . $resolution['height'];
             $size = ($resolution['width'] * $resolution['height'] / 1024 / 1024);
