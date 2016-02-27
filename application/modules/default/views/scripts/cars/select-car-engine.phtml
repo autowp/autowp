@@ -1,0 +1,39 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 102,
+        'args'   => array(
+            'CAR_NAME' => $this->car->getFullName()
+        )
+    ));
+?>
+<form action="" method="post">
+    <?php if (!$this->brand) { ?>
+        <?php
+            $columns = 6;
+            $rows = ceil(count($this->brands) / $columns);
+        ?>
+        <div class="row">
+            <div class="col-lg-2 col-md-2">
+                <?php foreach ($this->brands as $idx => $brand) { ?>
+                    <?=$this->formButton('brand', $brand->id, array(
+                        'type'    => 'submit',
+                        'class'   => 'btn btn-link',
+                        'value'   => $brand->id,
+                        'content' => $brand->caption
+                    ))?><br />
+                    <?php if ($idx && ($idx % $rows == 0)) { ?></div><div class="col-lg-2 col-md-2"><?php } ?>
+                <?php } ?>
+            </div>
+        </div>
+    <?php } else { ?>
+        <?=$this->formHidden('brand', $this->brand->id)?>
+        <?=$this->partial('cars/select-car-engine-walk-tree.phtml', array(
+            'engines' => $this->engines
+        ))?>
+    <?php } ?>
+</form>

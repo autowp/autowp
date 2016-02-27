@@ -38,7 +38,7 @@ class Moder_AttrsController extends Zend_Controller_Action
     {
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->_getParam('attribute_id'))->current();
+        $attribute = $attributes->find($this->getParam('attribute_id'))->current();
         if (!$attribute)
             return $this->_forward('notfound', 'error');
 
@@ -69,7 +69,7 @@ class Moder_AttrsController extends Zend_Controller_Action
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            switch ($this->_getParam('form')) {
+            switch ($this->getParam('form')) {
                 case 'new':
                     if ($formAttributeNew->isValid($request->getPost('new'))) {
                         $values = $formAttributeNew->getValues();
@@ -171,7 +171,7 @@ class Moder_AttrsController extends Zend_Controller_Action
     {
         $zones = new Attrs_Zones();
 
-        $zone = $zones->find($this->_getParam('zone_id'))->current();
+        $zone = $zones->find($this->getParam('zone_id'))->current();
         if (!$zone)
             return $this->_forward('notfound', 'error');
 
@@ -181,7 +181,7 @@ class Moder_AttrsController extends Zend_Controller_Action
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            switch($this->_getParam('form')) {
+            switch($this->getParam('form')) {
                 case 'attributes':
 
                     $zoneAttributes = new Attrs_Zone_Attributes();
@@ -236,7 +236,7 @@ class Moder_AttrsController extends Zend_Controller_Action
     {
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->_getParam('attribute_id'))->current();
+        $attribute = $attributes->find($this->getParam('attribute_id'))->current();
         if (!$attribute)
             return $this->_forward('notfound', 'error');
 
@@ -274,7 +274,7 @@ class Moder_AttrsController extends Zend_Controller_Action
     {
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->_getParam('attribute_id'))->current();
+        $attribute = $attributes->find($this->getParam('attribute_id'))->current();
         if (!$attribute)
             return $this->_forward('notfound', 'error');
 
@@ -312,13 +312,13 @@ class Moder_AttrsController extends Zend_Controller_Action
     {
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->_getParam('attribute_id'))->current();
+        $attribute = $attributes->find($this->getParam('attribute_id'))->current();
         if (!$attribute)
             return $this->_forward('notfound', 'error');
 
         $zones = new Attrs_Zones();
 
-        $zone = $zones->find($this->_getParam('zone_id'))->current();
+        $zone = $zones->find($this->getParam('zone_id'))->current();
         if (!$zone)
             return $this->_forward('notfound', 'error');
 
@@ -367,13 +367,13 @@ class Moder_AttrsController extends Zend_Controller_Action
     {
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->_getParam('attribute_id'))->current();
+        $attribute = $attributes->find($this->getParam('attribute_id'))->current();
         if (!$attribute)
             return $this->_forward('notfound', 'error');
 
         $zones = new Attrs_Zones();
 
-        $zone = $zones->find($this->_getParam('zone_id'))->current();
+        $zone = $zones->find($this->getParam('zone_id'))->current();
         if (!$zone)
             return $this->_forward('notfound', 'error');
 

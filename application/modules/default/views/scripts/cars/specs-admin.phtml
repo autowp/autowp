@@ -1,0 +1,54 @@
+<table class="table table-stripped">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Пользователь</th>
+            <th>Характеристика</th>
+            <th>Значение</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->values as $value) { ?>
+            <tr>
+                <td><?=$this->escape($this->humanTime($value['date']))?></td>
+                <td>
+                    <?php if ($value['user']) { ?>
+                        <?=$this->user($value['user'])?>
+                    <?php } ?>
+                </td>
+                <td>
+                    <?php if ($value['attribute']) {
+                        echo $this->escape($value['attribute']->name);
+                        if ($value['unit']) {
+                            echo ', ' . $this->escape($value['unit']->name);
+                        }
+                    } ?>
+                </td>
+                <td>
+                    <?=$this->escape($value['userValue'])?>
+                    /
+                    <?=$this->escape($value['value'])?>
+                </td>
+                <td>
+                    <form action="<?=$this->escape($value['deleteUrl'])?>" method="post">
+                        <button type="submit" class="btn btn-danger btn-xs">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>
+<form action="<?=$this->escape($this->url(array(
+    'action' => 'move'
+)))?>" method="post">
+    <?=$this->formText('to_item_id', null, array(
+        'placeholder' => 'id'
+    ))?>
+    <?=$this->formText('to_item_type_id', null, array(
+        'placeholder' => 'type'
+    ))?>
+    <button type="submit">Перенести</button>
+</form>

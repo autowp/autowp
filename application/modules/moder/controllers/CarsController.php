@@ -275,15 +275,18 @@ class Moder_CarsController extends Zend_Controller_Action
      */
     private function carModerUrl(Cars_Row $car, $full = false, $tab = null)
     {
-        return
-            ($full ? 'http://'.$_SERVER['HTTP_HOST'] : '') .
-            $this->_helper->url->url(array(
-                'module'        => 'moder',
-                'controller'    => 'cars',
-                'action'        => 'car',
-                'car_id'        => $car->id,
-                'tab'            => $tab
-            ), 'default', true);
+        $url = $this->_helper->url->url(array(
+            'module'     => 'moder',
+            'controller' => 'cars',
+            'action'     => 'car',
+            'car_id'     => $car->id,
+            'tab'        => $tab
+        ), 'default', true);
+        
+        if ($full) {
+            $url = $this->view->serverUrl($url);
+        }
+        return $url;
     }
 
     /**
@@ -512,8 +515,6 @@ class Moder_CarsController extends Zend_Controller_Action
         }
 
         $pictures = $this->_helper->catalogue()->getPictureTable();
-        $brandTable = $this->getBrandTable();
-        $brandCarTable = new Brand_Car();
 
 
         $canEditMeta = $this->canEditMeta($car);
@@ -619,7 +620,7 @@ class Moder_CarsController extends Zend_Controller_Action
 
                 $newData = $car->toArray();
 
-                $a = array(
+                $fields = array(
                     'caption'          => array('str', 'название автомобиля с "%s" на "%s"'),
                     'body'             => array('str', 'номер кузова с "%s" на "%s"'),
                     'begin_year'       => array('int', 'год начала выпуска c "%s" на "%s"'),
@@ -638,7 +639,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 );
 
                 $changes = array();
-                foreach ($a as $field => $info) {
+                foreach ($fields as $field => $info) {
                     switch ($info[0]) {
                         case 'int':
                             $old = is_null($oldData[$field]) ? null : (int)$oldData[$field];
@@ -1279,9 +1280,6 @@ class Moder_CarsController extends Zend_Controller_Action
             $brandCarRow->save();
 
             $ok = true;
-        } else {
-            var_dump($form->getMessages());
-            exit;
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
@@ -1642,11 +1640,11 @@ class Moder_CarsController extends Zend_Controller_Action
 
             $categoryNames = array();
             foreach ($categories as $category) {
-                $categoryNames[] = $category->name . ' (http://'.$_SERVER['HTTP_HOST'] . $this->_helper->url->url(array(
+                $categoryNames[] = $category->name . ' (' . $this->view->serverUrl($this->_helper->url->url(array(
                     'controller'       => 'category',
                     'action'           => 'category',
                     'category_catname' => $category->catname
-                ), 'category', true) .')';
+                ), 'category', true)) .')';
             }
 
             if ($notifyUser && count($categoryNames)) {
@@ -2154,15 +2152,15 @@ class Moder_CarsController extends Zend_Controller_Action
 
     public function carAutocompleteAction()
     {
-        $q = trim($this->getParam('q'));
+        $query = trim($this->getParam('q'));
         $beginYear = false;
         $endYear = false;
         $today = false;
         $body = false;
 
-        if (preg_match("|^(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?$|isu", $q, $match)) {
+        if (preg_match("|^(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?$|isu", $query, $match)) {
 
-            $q = trim($match[5]);
+            $query = trim($match[5]);
             $body = isset($match[7]) ? trim($match[7]) : null;
             $beginYear = isset($match[9]) ? (int)$match[9] : null;
             $endYear = isset($match[11]) ? $match[11] : null;
@@ -2204,20 +2202,20 @@ class Moder_CarsController extends Zend_Controller_Action
 
         $specTable = new Spec();
         $specRow = $specTable->fetchRow(array(
-            'INSTR(?, short_name)' => $q
+            'INSTR(?, short_name)' => $query
         ));
 
         $specId = null;
         if ($specRow) {
             $specId = $specRow->id;
-            $q = trim(str_replace($specRow->short_name, '', $q));
+            $query = trim(str_replace($specRow->short_name, '', $query));
         }
 
         $carTable = $this->_helper->catalogue()->getCarTable();
 
         $select = $carTable->select(true)
             ->where('cars.is_group')
-            ->where('cars.caption like ?', $q . '%')
+            ->where('cars.caption like ?', $query . '%')
             ->order(array('length(cars.caption)', 'cars.is_group desc', 'cars.caption'))
             ->limit(15);
 
@@ -2611,9 +2609,6 @@ class Moder_CarsController extends Zend_Controller_Action
             }
         }
 
-        $canEditMeta = $this->canEditMeta($car);
-
-
 
         $relevantBrands = array();
 
@@ -2830,8 +2825,6 @@ class Moder_CarsController extends Zend_Controller_Action
                 'path'          => $path
             ), 'catalogue', true);
         }
-
-        $carParentTable = $this->getCarParentTable();
 
         $parentRows = $this->getCarParentTable()->fetchAll(array(
             'car_id = ?' => $id
@@ -3092,8 +3085,6 @@ class Moder_CarsController extends Zend_Controller_Action
             }
         }
 
-        //var_dump($data); exit;
-
         if ($form->isValid($data)) {
 
             $values = $form->getValues();
@@ -3266,7 +3257,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 ->join('cars', 'car_parent.car_id = cars.id', null)
                 ->where('car_parent.parent_id = ?', $car->id)
                 ->where('car_parent.type = ?', Car_Parent::TYPE_DEFAULT)
-                ->order(array_merge(array('car_parent.type'), $this->_helper->catalogue()->carsOrdering()))
+                ->order($order)
         );
 
         $childs = array();
@@ -3923,7 +3914,7 @@ class Moder_CarsController extends Zend_Controller_Action
 
             $pictures[] = array(
                 'id'              => $pictureRow->id,
-                'name'            => $name = $pictureRow->getCaption(array(
+                'name'            => $pictureRow->getCaption(array(
                     'language' => $language
                 )),
                 'url'             => $this->_helper->pic->href($pictureRow),

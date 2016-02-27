@@ -1,6 +1,4 @@
-/AboutController.php
 /AccountController.php
-/ArticlesController.php
 /BrandsController.php
 /CarsController.php
 /CatalogueController.php
@@ -8,7 +6,6 @@
 /CommentsController.php
 /IndexController.php
 /LoginController.php
-/MostController.php
 /PictureController.php
 /PictureFileController.php
 /RestorepasswordController.php

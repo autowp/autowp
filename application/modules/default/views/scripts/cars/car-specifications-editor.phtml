@@ -1,0 +1,222 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 102,
+        'args'   => array(
+            'CAR_NAME' => $this->car->getFullName()
+        )
+    ));
+
+    $this->layout()->moduleName = 'default/cars/car-specifications-editor';
+?>
+
+<?php $this->headStyle()->captureStart() ?>
+.spec-editor-form table tr th {
+    text-align: left;
+}
+.spec-editor-form table thead tr th {
+    text-align: center;
+    font-weight: bold;
+}
+.spec-editor-form table tr th {
+    font-weight: normal;
+}
+.spec-editor-form h2 {
+    margin-bottom: 2px;
+}
+.spec-editor-form .unit {
+    cursor: help;
+}
+.spec-editor-form .subform-header.hover,
+.spec-editor-form tr.element-row.hover {
+    background-color: #eeeeee;
+}
+
+.spec-editor-form .date {
+    font-size: 10px;
+    color: #999999;
+    white-space: nowrap
+}
+.spec-editor-form .actual {
+    text-align: center;
+    background-color: #F0F0F0;
+    vertical-align: middle;
+    padding: 1px 2px;
+}
+
+<?php $this->headStyle()->captureEnd() ?>
+
+<ul class="nav nav-pills" style="margin-bottom: 20px">
+    <?php if ($this->user()->inheritsRole('cars-moder')) { ?>
+        <li>
+            <a href="<?=$this->escape($this->url(array(
+                'module'     => 'moder',
+                'controller' => 'cars',
+                'action'     => 'car',
+                'car_id'     => $this->car->id
+            ), 'default', true))?>">
+                <i class="fa fa-cog"></i>
+                Управление <?=$this->escape($this->car->getFullName($this->language()->get()))?>
+            </a>
+        </li>
+    <?php } ?>
+    <li>
+        <a href="/forums/topic/topic/topic_id/2988"><i class="fa fa-comment"></i> Обсуждение на форуме</a>
+    </li>
+    <li>
+        <a href="/cars/attrs-change-log"><i class="fa fa-list"></i> Журнал ТТХ</a>
+    </li>
+</ul>
+
+
+<?php if ($this->user()->get()->specs_weight < 1) { ?>
+    <div class="alert alert-danger">
+        <strong>Внимание!</strong> Вроятно, у вас накопилось существенное количество ошибок.
+        Некоторые из них, обнаруженные другими посетителями, вы можете найти <a href="/account/specs-conflicts/">здесь</a>
+    </div>
+<?php } ?>
+
+
+
+<ul class="nav nav-tabs" id="myTab">
+    <?php foreach ($this->tabs as $id => $tab) { ?>
+        <li<?=$tab['active'] ? ' class="active"' : ''?>>
+            <?=$this->htmlA(
+                array(
+                    'href'          => '#'.$id,
+                    'data-toggle'   => 'tab',
+                    'data-load'     => isset($tab['data-load']) ? $tab['data-load'] : null,
+                    'data-activate' => $tab['active'] ? '1' : null
+                ),
+                ($tab['icon'] ? '<span class="'.$tab['icon'].'"></span> ' : '') .
+                $this->escape($tab['title']) .
+                ($tab['count'] ? ' <span class="badge">'.$tab['count'].'</span>' : ''),
+                false
+            )?>
+        </li>
+    <?php } ?>
+</ul>
+
+<div class="tab-content well">
+    <div class="tab-pane<?=$this->tabs['info']['active'] ? ' active' : ''?>" id="info">
+        <p>Просьба отнестить со всей ответственностью ко всем выполняемым действиям, т.к. они станут достоянием общественности.</p>
+
+        <p>Теперь подробнее о структуре самих характеристик.</p>
+        <p>Все характеристики организованы в виде дерева элементов "параметр - значение". Значения могут быть числовыми и текстовыми.</p>
+        <p>Важной особенностью является тот факт, что каждая характеристика может быть задана одновременно несколькими пользователями. В этом случае актуальным (используемым) значением является то, которое система сочтет приоритетным по ряду признаков.</p>
+        <p>Если вы столкнулись с ситуацией, когда вам не удаётся перекрыть введенное кем-то ранее значение, то вы можете просто написать об этом автору. Впрочем в процессе реализации система автоматического уведомления автором о том, что с его значением кто-то не согласен.</p>
+        <p>&#xa0;</p>
+        <p>Все значения, которые здесь вводятся - отображаются на сайте, в характеристиках, используются в построении разделы "самые-самые", а также отображаются в некоторых других местах сайта.</p>
+    </div>
+    <div class="tab-pane<?=$this->tabs['engine']['active'] ? ' active' : ''?>" id="engine">
+        <h2>Двигатель из каталога</h2>
+
+        <?php if ($this->user()->isAllowed('specifications', 'edit-engine')) { ?>
+            <?php if ($this->engine) { ?>
+                <p><?=$this->htmlA($this->url(array(
+                    'module'     => 'moder',
+                    'controller' => 'engines',
+                    'action'     => 'engine',
+                    'engine_id'  => $this->engine->id
+                ), 'default', true), $this->engine->getMETACaption())?></p>
+                <?php if ($this->engineInherited) { ?>
+                    <?php foreach ($this->engineInheritedFrom as $car) { ?>
+                        <h6><em>Inherited from <?=$this->htmlA($car['url'], $car['name'])?></em></h6>
+                    <?php } ?>
+                <?php } ?>
+                <?=$this->form('select-engine', array(
+                    'action' => $this->url(array(
+                        'action' => 'select-car-engine',
+                        'car_id' => $this->car->id
+                    )),
+                    'method' => 'post'
+                ), $this->formSubmit('submit', 'Выбрать другой двигатель', array(
+                    'class' => 'btn btn-primary'
+                )))?>
+                <?=$this->form('select-engine', array(
+                    'action' => $this->url(array(
+                        'action' => 'cancel-car-engine',
+                        'car_id' => $this->car->id
+                    )),
+                    'method' => 'post'
+                ), $this->formSubmit('submit', 'Отменить двигатель', array(
+                    'class' => 'btn btn-warning'
+                )))?>
+                <?php if (!$this->engineInherited) { ?>
+                    <?=$this->form('inherit-car-engine', array(
+                        'action' => $this->url(array(
+                            'action' => 'inherit-car-engine',
+                            'car_id' => $this->car->id
+                        )),
+                        'method' => 'post'
+                    ), $this->formSubmit('submit', 'Наследовать двигатель', array(
+                        'class' => 'btn btn-warning'
+                    )))?>
+                <?php } ?>
+            <?php } else { ?>
+                <p>[не выбран]</p>
+                <?=$this->form('select-engine', array(
+                    'action' => $this->url(array(
+                        'action' => 'select-car-engine',
+                        'car_id' => $this->car->id
+                    )),
+                    'method' => 'post'
+                ), $this->formSubmit('submit', 'Выбрать двигатель', array(
+                    'class' => 'btn btn-primary'
+                )))?>
+                <?php if (!$this->engineInherited) { ?>
+                    <?=$this->form('inherit-car-engine', array(
+                        'action' => $this->url(array(
+                            'action' => 'inherit-car-engine',
+                            'car_id' => $this->car->id
+                        )),
+                        'method' => 'post'
+                    ), $this->formSubmit('submit', 'Наследовать двигатель', array(
+                        'class' => 'btn btn-warning'
+                    )))?>
+                <?php } else { ?>
+                    <?=$this->form('inherit-car-engine', array(
+                        'action' => $this->url(array(
+                            'action' => 'cancel-car-engine',
+                            'car_id' => $this->car->id
+                        )),
+                        'method' => 'post'
+                    ), $this->formSubmit('submit', 'Не наследовать двигатель', array(
+                        'class' => 'btn btn-warning'
+                    )))?>
+                <?php } ?>
+            <?php } ?>
+        <?php } else { ?>
+            <?php if ($this->engine) { ?>
+                <p><?=$this->escape($this->engine->getMETACaption())?></p>
+                <?php if ($this->engineInherited) { ?>
+                    <?php foreach ($this->engineInheritedFrom as $car) { ?>
+                        <h6><em>Inherited from <?=$this->escape($car['name'])?></em></h6>
+                    <?php } ?>
+                <?php } ?>
+            <?php } ?>
+        <?php } ?>
+    </div>
+    <div class="tab-pane<?=$this->tabs['spec']['active'] ? ' active' : ''?>" id="spec">
+        <?=$this->form->render($this) ?>
+    </div>
+    <div class="tab-pane<?=$this->tabs['result']['active'] ? ' active' : ''?>" id="result"></div>
+    <?php if ($this->isSpecsAdmin) { ?>
+        <div class="tab-pane<?=$this->tabs['admin']['active'] ? ' active' : ''?>" id="admin">
+            <p><?=$this->htmlA($this->url(array(
+                'action'       => 'specs-admin',
+                'item_type_id' => 1,
+                'item_id'      => $this->car->id
+            )), 'Admin')?></p>
+            <form action="<?=$this->escape($this->url(array(
+                'action' => 'refresh-inheritance'
+            )))?>" method="post">
+                <button type="submit" class="btn btn-default">Refresh inheritance</button>
+            </form>
+        </div>
+    <?php } ?>
+</div>

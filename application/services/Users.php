@@ -326,4 +326,24 @@ class Application_Service_Users
         $user->password = new Zend_Db_Expr($passwordExpr);
         $user->save();
     }
+    
+    public function createRememberToken($userId)
+    {
+        $table = new User_Remember();
+        
+        do {
+            $token = md5($this->_salt . microtime());
+            $row = $table->fetchRow(array(
+                'token = ?' => $token
+            ));
+        } while ($row);
+        
+        $table->insert(array(
+            'user_id' => $userId,
+            'token'   => $token,
+            'date'    => new Zend_Db_Expr('NOW()')
+        ));
+        
+        return $token;
+    }
 }
