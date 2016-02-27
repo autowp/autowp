@@ -129,6 +129,8 @@
                         <i class="fa fa-arrow-down"></i>
                         <?php if ($car['parent']['type'] == Car_Parent::TYPE_TUNING) { ?>
                             <?=$this->escape($this->translate('catalogue/related'))?>:
+                        <?php } elseif ($car['parent']['type'] == Car_Parent::TYPE_DESIGN) { ?>
+                            Дизайн:
                         <?php } elseif ($car['parent']['type'] == Car_Parent::TYPE_SPORT) { ?>
                             Спорт:
                         <?php } ?>
@@ -227,9 +229,9 @@
                     <td>
                         <?php if ($this->canMove) { ?>
                             <form action="<?=$this->escape($brand['setBrandCarTypeUrl']) ?>" method="post" class="inline brand-car-type">
-                                <?=$this->formSelect('type', $brand['type'], array(
+                                <?=$this->formSelect('type', $brand['type'], [
                                     'class' => 'form-control'
-                                ), $this->brandCarTypeOptions)?>
+                                ], $this->brandCarTypeOptions)?>
                             </form>
                         <?php } else { ?>
                             <?=$this->escape($this->brandCarTypeOptions[$brand['type']])?>
@@ -365,16 +367,4 @@
             <?php } ?>
         </tbody>
     </table>
-<?php } ?>
-
-<?php if ($this->canMove) { ?>
-    <form action="<?=$this->escape($this->url(array(
-        'module'     => 'moder',
-        'controller' => 'cars',
-        'action'     => 'car-select-design-project',
-        'car_id'     => $this->car->id,
-        'brand_id'   => null
-    ))) ?>" method="post">
-        <button type="submit" class="btn btn-xs btn-success"><i class="fa fa-plus"></i> Добавить к проекту дизайна ...</button>
-    </form>
 <?php } ?>

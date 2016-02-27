@@ -140,8 +140,8 @@
                                                 'module'           => 'moder',
                                                 'controller'        => 'design-projects',
                                                 'action'            => 'design-project',
-                                                'design_project_id' => $designProject->id
-                                            )), $designProject->name) ?>
+                                                'design_project_id' => $designProject->id,
+                                            ), 'default', true), $designProject->name) ?>
                                         </td>
                                         <td><?=$this->escape($designProject->catname) ?></td>
                                         <td colspan="2"><?=$this->escape($designProject->year) ?></td>

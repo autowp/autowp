@@ -20,5 +20,6 @@ class Brands_Cars extends Zend_Db_Table
     const
         TYPE_DEFAULT = 0,
         TYPE_TUNING = 1,
-        TYPE_SPORT = 2;
+        TYPE_SPORT = 2,
+        TYPE_DESIGN = 3;
 }

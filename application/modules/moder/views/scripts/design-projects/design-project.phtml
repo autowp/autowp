@@ -1,0 +1,19 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ),
+        'pageId' => 67,
+    ));
+?>
+<h2><?=$this->project->name?> <?=$this->project->year?></h2>
+<ul>
+    <?php foreach ($this->cars as $car) { ?>
+    	<li>
+    		<?=$this->htmlA($car['url'], $car['name'])?>
+    	</li>
+    <?php } ?>
+</ul>
