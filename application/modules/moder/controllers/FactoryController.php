@@ -7,19 +7,19 @@ class Moder_FactoryController extends Zend_Controller_Action
     /**
      * @var Factory
      */
-    private $_factoryTable = null;
+    private $factoryTable = null;
 
     /**
      * @return Factory
      */
-    private function _getFactoryTable()
+    private function getFactoryTable()
     {
-        return $this->_factoryTable
-            ? $this->_factoryTable
-            : $this->_factoryTable = new Factory();
+        return $this->factoryTable
+            ? $this->factoryTable
+            : $this->factoryTable = new Factory();
     }
 
-    private function _factoryModerUrl($id)
+    private function factoryModerUrl($id)
     {
         return $this->_helper->url->url(array(
             'action'     => 'factory',
@@ -40,7 +40,7 @@ class Moder_FactoryController extends Zend_Controller_Action
         geoPHP::version(); // for autoload classes
     }
 
-    private function _getDescriptionForm()
+    private function getDescriptionForm()
     {
         return new Project_Form(array(
             'method' => Zend_Form::METHOD_POST,
@@ -65,7 +65,7 @@ class Moder_FactoryController extends Zend_Controller_Action
 
     public function factoryAction()
     {
-        $factoryTable = $this->_getFactoryTable();
+        $factoryTable = $this->getFactoryTable();
 
         $factory = $factoryTable->find($this->_getParam('factory_id'))->current();
         if (!$factory) {
@@ -113,7 +113,7 @@ class Moder_FactoryController extends Zend_Controller_Action
                 ));
                 $factory->save();
 
-                $factoryUrl = $this->_factoryModerUrl($factory->id);
+                $factoryUrl = $this->factoryModerUrl($factory->id);
 
                 $message = sprintf(
                     'Редактирование завода %s',
@@ -129,7 +129,7 @@ class Moder_FactoryController extends Zend_Controller_Action
 
         $descriptionForm = null;
         if ($canEdit) {
-            $descriptionForm = $this->_getDescriptionForm();
+            $descriptionForm = $this->getDescriptionForm();
         }
 
         if ($factory->text_id) {
@@ -222,7 +222,7 @@ class Moder_FactoryController extends Zend_Controller_Action
             return $this->_redirect($this->_helper->url->url($params));
         }
 
-        $factoryTable = $this->_getFactoryTable();
+        $factoryTable = $this->getFactoryTable();
 
         $select = $factoryTable->select(true);
 
@@ -276,7 +276,7 @@ class Moder_FactoryController extends Zend_Controller_Action
             $factories[] = array(
                 'name'     => $factory->name,
                 'pictures' => $pictures,
-                'moderUrl' => $this->_factoryModerUrl($factory->id),
+                'moderUrl' => $this->factoryModerUrl($factory->id),
             );
         }
 
@@ -293,7 +293,7 @@ class Moder_FactoryController extends Zend_Controller_Action
             return $this->_forward('forbidden', 'error');
         }
 
-        $factoryTable = $this->_getFactoryTable();
+        $factoryTable = $this->getFactoryTable();
 
         $form = new Application_Form_Moder_Factory_Add(array(
             'description' => 'Новый завод',
@@ -312,7 +312,7 @@ class Moder_FactoryController extends Zend_Controller_Action
             ));
             $factory->save();
 
-            $url = $this->_factoryModerUrl($factory->id);
+            $url = $this->factoryModerUrl($factory->id);
 
             $this->_helper->log(sprintf(
                 'Создан новый завод %s',
@@ -341,14 +341,14 @@ class Moder_FactoryController extends Zend_Controller_Action
             return $this->_forward('forbidden', 'error', 'default');
         }
 
-        $factoryTable = $this->_getFactoryTable();
+        $factoryTable = $this->getFactoryTable();
 
         $factory = $factoryTable->find($this->_getParam('factory_id'))->current();
         if (!$factory) {
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $form = $this->_getDescriptionForm();
+        $form = $this->getDescriptionForm();
 
         if ($form->isValid($request->getPost())) {
 
@@ -369,7 +369,7 @@ class Moder_FactoryController extends Zend_Controller_Action
 
             $this->_helper->log(sprintf(
                 'Редактирование описания завода %s',
-                $this->view->htmlA($this->_factoryModerUrl($factory->id), $factory->name)
+                $this->view->htmlA($this->factoryModerUrl($factory->id), $factory->name)
             ), $factory);
 
             if ($factory->text_id) {
@@ -378,7 +378,7 @@ class Moder_FactoryController extends Zend_Controller_Action
                     'Пользователь %s редактировал описание группы близнецов %s ( %s )',
                     $this->view->serverUrl($user->getAboutUrl()),
                     $factory->name,
-                    $this->view->serverUrl($this->_factoryModerUrl($factory->id))
+                    $this->view->serverUrl($this->factoryModerUrl($factory->id))
                 );
 
                 $mModel = new Message();
@@ -393,6 +393,6 @@ class Moder_FactoryController extends Zend_Controller_Action
             }
         }
 
-        return $this->_redirect($this->_factoryModerUrl($factory->id));
+        return $this->redirect($this->factoryModerUrl($factory->id));
     }
 }
