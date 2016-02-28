@@ -78,7 +78,7 @@ class UserTextRendererTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['just.test', 'just.test'],
-            ["Multiline\ntest", "Multiline\ntest"],
+            ["Multiline\ntest", "Multiline<br />test"],
             ["Test with &ampersand", "Test with &amp;ampersand"],
             ["Test with \"quote", "Test with &quot;quote"],
             [

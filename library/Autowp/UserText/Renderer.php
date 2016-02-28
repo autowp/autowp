@@ -91,8 +91,13 @@ class Renderer
         if ($text) {
             $out[] = $this->_view->escape($text);
         }
+        
+        $out = implode($out);
+        
+        $out = str_replace("\r", '', $out);
+        $out = str_replace("\n", '<br />', $out);
 
-        return implode($out);
+        return $out;
     }
 
     private function processHref($url)
