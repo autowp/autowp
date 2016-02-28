@@ -44,16 +44,6 @@ class Car_Parent extends Project_Db_Table
             : $this->brandCarTable = new Brand_Car();
     }
 
-    /**
-     * @return Brands
-     */
-    private function getBrandTable()
-    {
-        return $this->brandTable
-            ? $this->brandTable
-            : $this->brandTable = new Brands();
-    }
-
     public function collectChildIds($id)
     {
         $cpTableName = $this->info('name');

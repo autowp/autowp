@@ -14,7 +14,7 @@ class TelegramController extends Zend_Controller_Action
             return $this->_forward('forbidden', 'error', 'default');
         }
 
-        $updates = $telegram->commandsHandler(true);
+        $telegram->commandsHandler(true);
 
         return $this->_helper->json(true);
     }

@@ -185,7 +185,6 @@ class Cars_Row extends Project_Db_Table_Row
         $ey = $this->end_year;
         $em = $this->end_month;
         $cy = (int)date('Y');
-        $cm = (int)date('m');
 
         $bs = (int)($by/100);
         $es = (int)($ey/100);

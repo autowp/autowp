@@ -112,15 +112,6 @@ class Pictures_Row extends Project_Db_Table_Row
         return ($absolute ? HOST : '/').'moder/car/?car_id='.$this->id;
     }
 
-    private function createDir($dir)
-    {
-        if (!is_dir($dir)) {
-            if (mkdir($dir, 0755, true) !== true) {
-                throw new Exception('Error creating directory "'.$dir.'"');
-            }
-        }
-    }
-
     private static function between($a, $min, $max)
     {
         return ($min <= $a) && ($a <= $max);
@@ -156,7 +147,6 @@ class Pictures_Row extends Project_Db_Table_Row
             $brandId = null;
             $carId = null;
             $engineId = null;
-            $factoryId = null;
 
             // вычисляем старые значения
             switch ($typeID)

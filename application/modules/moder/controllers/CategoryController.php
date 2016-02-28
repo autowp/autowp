@@ -49,8 +49,6 @@ class Moder_CategoryController extends Zend_Controller_Action
             'action'    => $this->_helper->url->url(),
             'languages' => $this->getLanguages()
         ));
-
-        return $form;
     }
 
     public function newAction()

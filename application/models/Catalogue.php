@@ -4,54 +4,55 @@ use Autowp\Image\Storage\Request;
 
 class Catalogue
 {
-    protected $_picturesPerPage = 20;
-    protected $_carsPerPage = 7;
+    private $_picturesPerPage = 20;
+    
+    private $carsPerPage = 7;
 
     /**
      * @var Brands
      */
-    protected $_brandTable;
+    private $brandTable;
 
     /**
      * @var Brands_Cars
      */
-    protected $_brandCarTable;
+    private $brandCarTable;
 
     /**
      * @var Cars
      */
-    protected $_carTable;
+    private $carTable;
 
     /**
      * @var Car_Parent
      */
-    protected $_carParentTable;
+    private $carParentTable;
 
     /**
      * @var Car_Types
      */
-    protected $_carTypeTable;
+    private $carTypeTable;
 
     /**
      * @var Picture
      */
-    protected $_pictureTable;
+    private $pictureTable;
 
     /**
      * @var Engines
      */
-    protected $_engineTable;
+    private $engineTable;
 
     /**
      * @var Brand_Engine
      */
-    protected $_brandEngineTable;
+    private $brandEngineTable;
 
-    protected $_perspectiveLangTable;
+    private $perspectiveLangTable;
 
-    protected $_perspectivePrefix = array();
+    private $perspectivePrefix = array();
 
-    protected $_prefixedPerspectives = array(5, 6, 17, 20, 21);
+    private $prefixedPerspectives = array(5, 6, 17, 20, 21);
 
     /**
      * @return array
@@ -93,7 +94,7 @@ class Catalogue
 
     public function getCarsPerPage()
     {
-        return $this->_carsPerPage;
+        return $this->carsPerPage;
     }
 
     public function getPicturesPerPage()
@@ -106,9 +107,9 @@ class Catalogue
      */
     public function getBrandTable()
     {
-        return $this->_brandTable
-            ? $this->_brandTable
-            : $this->_brandTable = new Brands();
+        return $this->brandTable
+            ? $this->brandTable
+            : $this->brandTable = new Brands();
     }
 
     /**
@@ -116,9 +117,9 @@ class Catalogue
      */
     public function getBrandCarTable()
     {
-        return $this->_brandCarTable
-            ? $this->_brandCarTable
-            : $this->_brandCarTable = new Brands_Cars();
+        return $this->brandCarTable
+            ? $this->brandCarTable
+            : $this->brandCarTable = new Brands_Cars();
     }
 
     /**
@@ -126,9 +127,9 @@ class Catalogue
      */
     public function getCarTable()
     {
-        return $this->_carTable
-            ? $this->_carTable
-            : $this->_carTable = new Cars();
+        return $this->carTable
+            ? $this->carTable
+            : $this->carTable = new Cars();
     }
 
     /**
@@ -136,9 +137,9 @@ class Catalogue
      */
     public function getCarParentTable()
     {
-        return $this->_carParentTable
-            ? $this->_carParentTable
-            : $this->_carParentTable = new Car_Parent();
+        return $this->carParentTable
+            ? $this->carParentTable
+            : $this->carParentTable = new Car_Parent();
     }
 
     /**
@@ -146,9 +147,9 @@ class Catalogue
      */
     public function getCarTypeTable()
     {
-        return $this->_carTypeTable
-        ? $this->_carTypeTable
-        : $this->_carTypeTable = new Car_Types();
+        return $this->carTypeTable
+        ? $this->carTypeTable
+        : $this->carTypeTable = new Car_Types();
     }
 
     /**
@@ -156,9 +157,9 @@ class Catalogue
      */
     public function getPictureTable()
     {
-        return $this->_pictureTable
-            ? $this->_pictureTable
-            : $this->_pictureTable = new Picture();
+        return $this->pictureTable
+            ? $this->pictureTable
+            : $this->pictureTable = new Picture();
     }
 
     /**
@@ -166,9 +167,9 @@ class Catalogue
      */
     public function getEngineTable()
     {
-        return $this->_engineTable
-            ? $this->_engineTable
-            : $this->_engineTable = new Engines();
+        return $this->engineTable
+            ? $this->engineTable
+            : $this->engineTable = new Engines();
     }
 
     /**
@@ -176,9 +177,9 @@ class Catalogue
      */
     public function getBrandEngineTable()
     {
-        return $this->_brandEngineTable
-            ? $this->_brandEngineTable
-            : $this->_brandEngineTable = new Brand_Engine();
+        return $this->brandEngineTable
+            ? $this->brandEngineTable
+            : $this->brandEngineTable = new Brand_Engine();
     }
 
     /**
@@ -187,7 +188,7 @@ class Catalogue
      */
     public function cataloguePaths(Cars_Row $car)
     {
-        return $this->_walkUpUntilBrand($car->id, array());
+        return $this->walkUpUntilBrand($car->id, array());
     }
 
     /**
@@ -196,7 +197,7 @@ class Catalogue
      * @throws Exception
      * @return array
      */
-    protected function _walkUpUntilBrand($id, array $path)
+    private function walkUpUntilBrand($id, array $path)
     {
         $urls = array();
 
@@ -224,7 +225,7 @@ class Catalogue
         foreach ($parentRows as $parentRow) {
             $urls = array_merge(
                 $urls,
-                $this->_walkUpUntilBrand($parentRow->parent_id, array_merge(array($parentRow->catname), $path))
+                $this->walkUpUntilBrand($parentRow->parent_id, array_merge(array($parentRow->catname), $path))
             );
         }
 
@@ -239,7 +240,7 @@ class Catalogue
         );
         $options = array_merge($defaults, $options);
 
-        return $this->_engineWalkUpUntilBrand($engine->id, $options);
+        return $this->engineWalkUpUntilBrand($engine->id, $options);
     }
 
     /**
@@ -248,7 +249,7 @@ class Catalogue
      * @throws Exception
      * @return array
      */
-    protected function _engineWalkUpUntilBrand($id, $options)
+    private function engineWalkUpUntilBrand($id, $options)
     {
         $urls = array();
 
@@ -313,9 +314,9 @@ class Catalogue
         return $urls;
     }
 
-    protected function _getPerspectiveLangTable()
+    private function getPerspectiveLangTable()
     {
-        return $this->_perspectiveLangTable ?: $this->_perspectiveLangTable = new Perspective_Language();
+        return $this->perspectiveLangTable ?: $this->perspectiveLangTable = new Perspective_Language();
     }
 
     private static function mbUcfirst($str)
@@ -323,22 +324,22 @@ class Catalogue
         return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
     }
 
-    protected function _getPerspectivePrefix($id, $language)
+    private function getPerspectivePrefix($id, $language)
     {
-        if (in_array($id, $this->_prefixedPerspectives)) {
-            if (!isset($this->_perspectivePrefix[$id][$language])) {
-                $row = $this->_getPerspectiveLangTable()->fetchRow(array(
+        if (in_array($id, $this->prefixedPerspectives)) {
+            if (!isset($this->perspectivePrefix[$id][$language])) {
+                $row = $this->getPerspectiveLangTable()->fetchRow(array(
                     'perspective_id = ?' => $id,
                     'language = ?'       => $language
                 ));
                 if ($row) {
-                    $this->_perspectivePrefix[$id][$language] = self::mbUcfirst($row->name) . ' ';
+                    $this->perspectivePrefix[$id][$language] = self::mbUcfirst($row->name) . ' ';
                 } else {
-                    $this->_perspectivePrefix[$id][$language] = '';
+                    $this->perspectivePrefix[$id][$language] = '';
                 }
             }
 
-            return $this->_perspectivePrefix[$id][$language];
+            return $this->perspectivePrefix[$id][$language];
         }
 
         return '';
@@ -382,7 +383,7 @@ class Catalogue
             case Picture::CAR_TYPE_ID:
                 $car = $this->getCarTable()->find($picture['car_id'])->current();
                 if ($car) {
-                    $caption = $this->_getPerspectivePrefix($picture['perspective_id'], $language) .
+                    $caption = $this->getPerspectivePrefix($picture['perspective_id'], $language) .
                     $car->getFullName($language);
                 }
                 break;
@@ -415,7 +416,7 @@ class Catalogue
         return $caption;
     }
 
-    private static function _between($a, $min, $max)
+    private static function between($a, $min, $max)
     {
         return ($min <= $a) && ($a <= $max);
     }
@@ -426,10 +427,10 @@ class Catalogue
         // проверяем верные ли значения границ обрезания
         $canCrop =  !is_null($picture['crop_left']) && !is_null($picture['crop_top']) &&
             !is_null($picture['crop_width']) && !is_null($picture['crop_height']) &&
-            self::_between($picture['crop_left'], 0, $picture['width']) &&
-            self::_between($picture['crop_width'], 1, $picture['width']) &&
-            self::_between($picture['crop_top'], 0, $picture['height']) &&
-            self::_between($picture['crop_height'], 1, $picture['height']);
+            self::between($picture['crop_left'], 0, $picture['width']) &&
+            self::between($picture['crop_width'], 1, $picture['width']) &&
+            self::between($picture['crop_top'], 0, $picture['height']) &&
+            self::between($picture['crop_height'], 1, $picture['height']);
 
         return $canCrop;
     }

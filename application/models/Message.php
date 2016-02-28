@@ -301,8 +301,6 @@ class Message
         );
         $options = array_replace($defaults, $options);
     
-        $db = $this->table->getAdapter();
-    
         $cache = [];
         
         $userTable = new Users();

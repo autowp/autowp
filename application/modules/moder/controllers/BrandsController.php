@@ -70,7 +70,6 @@ class Moder_BrandsController extends Zend_Controller_Action
 
         $designProjects = new Design_Projects();
 
-        $pictures = $this->_helper->catalogue()->getPictureTable();
         $this->view->picture = null;
 
         $request = $this->getRequest();

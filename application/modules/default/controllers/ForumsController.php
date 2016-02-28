@@ -46,7 +46,6 @@ class ForumsController extends Zend_Controller_Action
         }
         
         $userTable = new Users();
-        $commentTopicTable = new Comment_Topic();
         
         foreach ($data['topics'] as &$topic) {
             $topic['author'] = $userTable->find($topic['authorId'])->current();

@@ -104,7 +104,7 @@ class Moder_FactoryController extends Zend_Controller_Action
                     $point = null;
                 }
 
-                $user = $this->_helper->user()->get();
+
                 $factory->setFromArray(array(
                     'name'        => $values['name'],
                     'year_from'   => strlen($values['year_from']) ? $values['year_from'] : null,

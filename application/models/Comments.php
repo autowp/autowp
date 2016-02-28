@@ -503,6 +503,8 @@ class Comments
                 using(type_id, item_id, id)
             set comments_messages.replies_count = __cms.count
         ');
+        
+        return $affected;
     }
 
     private function _moveMessageRecursive($parentId, $newTypeId, $newItemId)

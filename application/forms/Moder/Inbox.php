@@ -8,8 +8,6 @@ class Application_Form_Moder_Inbox extends Project_Form
 
     private $_resolutionMultioptions = array();
 
-    private $_userMultioptions = array();
-
     public function setPerspectiveMultioptions($options)
     {
         $this->_perspectiveMultioptions = $options;
