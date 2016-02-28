@@ -1526,7 +1526,7 @@ class Moder_PicturesController extends Zend_Controller_Action
         $acceptPictureForm = null;
         if ($canAccept) {
 
-            $acceptPictureForm = new Application_Form_Moder_Picture_Aaccept(array(
+            $acceptPictureForm = new Application_Form_Moder_Picture_Accept(array(
                 'action'  => $this->_helper->url->url(array(
                     'form' => 'picture-accept'
                 ))

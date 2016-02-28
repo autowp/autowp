@@ -5,13 +5,13 @@ class UploadController extends Zend_Controller_Action
     /**
      * @var Car_Parent
      */
-    private $_carParentTable;
+    private $carParentTable;
 
-    private function _getCarParentTable()
+    private function getCarParentTable()
     {
-        return $this->_carParentTable
-            ? $this->_carParentTable
-            : $this->_carParentTable = new Car_Parent();
+        return $this->carParentTable
+            ? $this->carParentTable
+            : $this->carParentTable = new Car_Parent();
     }
 
     public function onlyRegisteredAction()
@@ -119,7 +119,7 @@ class UploadController extends Zend_Controller_Action
             if ($request->isPost()) {
                 if ($form->isValid($request->getPost())) {
 
-                    $pictures = $this->_saveUpload($form, $type, $brandId, $engineId, $carId, $replacePicture);
+                    $pictures = $this->saveUpload($form, $type, $brandId, $engineId, $carId, $replacePicture);
 
                     if ($request->isXmlHttpRequest()) {
                         /*$urls = array();
@@ -181,7 +181,7 @@ class UploadController extends Zend_Controller_Action
         }
     }
 
-    private function _saveUpload($form, $type, $brandId, $engineId, $carId, $replacePicture)
+    private function saveUpload($form, $type, $brandId, $engineId, $carId, $replacePicture)
     {
         $user = $this->_helper->user()->get();
 
@@ -377,8 +377,7 @@ class UploadController extends Zend_Controller_Action
         $this->view->brand = $brand;
 
         $carTable = new Cars();
-        $carParentTable = $this->_getCarParentTable();
-        $carParentAdapter = $carParentTable->getAdapter();
+        $carParentTable = $this->getCarParentTable();
 
         $haveConcepts = (bool)$carTable->fetchRow(
             $carTable->select(true)
@@ -395,7 +394,7 @@ class UploadController extends Zend_Controller_Action
                 ->where('NOT cars.is_concept')
                 ->order(array('cars.caption', 'cars.begin_year', 'cars.end_year'))
         );
-        $cars = $this->_prepareCars($rows);
+        $cars = $this->prepareCars($rows);
 
         $engineTable = new Engines();
         $haveEngines = (bool)$engineTable->fetchRow(
@@ -426,9 +425,9 @@ class UploadController extends Zend_Controller_Action
         ));
     }
 
-    private function _prepareCars(Cars_Rowset $rows)
+    private function prepareCars(Cars_Rowset $rows)
     {
-        $carParentTable = $this->_getCarParentTable();
+        $carParentTable = $this->getCarParentTable();
         $carParentAdapter = $carParentTable->getAdapter();
 
         $cars = array();
@@ -458,9 +457,9 @@ class UploadController extends Zend_Controller_Action
         return $cars;
     }
 
-    private function _prepareCarParentRows($rows)
+    private function prepareCarParentRows($rows)
     {
-        $carParentTable = $this->_getCarParentTable();
+        $carParentTable = $this->getCarParentTable();
         $carParentAdapter = $carParentTable->getAdapter();
         $carTable = new Cars();
 
@@ -502,7 +501,7 @@ class UploadController extends Zend_Controller_Action
         }
 
         $carTable = new Cars();
-        $carParentTable = $this->_getCarParentTable();
+        $carParentTable = $this->getCarParentTable();
 
         $car = $carTable->find($this->getParam('car_id'))->current();
         if (!$car) {
@@ -517,7 +516,7 @@ class UploadController extends Zend_Controller_Action
         );
 
         $this->view->assign(array(
-            'cars' => $this->_prepareCarParentRows($rows)
+            'cars' => $this->prepareCarParentRows($rows)
         ));
     }
 
@@ -585,7 +584,7 @@ class UploadController extends Zend_Controller_Action
                 ->order(array('cars.caption', 'cars.begin_year', 'cars.end_year'))
                 ->group('cars.id')
         );
-        $concepts = $this->_prepareCars($rows);
+        $concepts = $this->prepareCars($rows);
 
         $this->view->assign(array(
             'concepts' => $concepts,

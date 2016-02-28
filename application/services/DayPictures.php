@@ -16,47 +16,47 @@ class DayPictures
     /**
      * @var DateTimeZone
      */
-    private $_timezone = 'UTC';
+    private $timezone = 'UTC';
 
     /**
      * @var DateTimeZone
      */
-    private $_dbTimezone = 'UTC';
+    private $dbTimezone = 'UTC';
 
     /**
      * @var Zend_Db_Table_Select
      */
-    private $_select = null;
+    private $select = null;
 
     /**
      * @var string
      */
-    private $_orderColumn = null;
+    private $orderColumn = null;
 
     /**
      * @var string
      */
-    private $_externalDateFormat = 'Y-m-d';
+    private $externalDateFormat = 'Y-m-d';
 
     /**
      * @var string
      */
-    private $_dbDateTimeFormat = MYSQL_DATETIME_FORMAT;
+    private $dbDateTimeFormat = MYSQL_DATETIME_FORMAT;
 
     /**
      * @var DateTime
      */
-    private $_currentDate = null;
+    private $currentDate = null;
 
     /**
      * @var DateTime
      */
-    private $_prevDate = null;
+    private $prevDate = null;
 
     /**
      * @var DateTime
      */
-    private $_nextDate = null;
+    private $nextDate = null;
 
     /**
      * @var DateTime
@@ -66,15 +66,15 @@ class DayPictures
     /**
      * @var Zend_Paginator
      */
-    private $_paginator = null;
+    private $paginator = null;
 
     /**
      * @param array $options
      */
     public function __construct(array $options = array())
     {
-        $this->_timezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
-        $this->_dbTimezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
+        $this->timezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
+        $this->dbTimezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
 
         $this->setOptions($options);
     }
@@ -104,9 +104,9 @@ class DayPictures
      */
     public function setTimeZone($timezone)
     {
-        $this->_timezone = new DateTimeZone($timezone);
+        $this->timezone = new DateTimeZone($timezone);
 
-        return $this->_reset();
+        return $this->reset();
     }
 
     /**
@@ -115,9 +115,9 @@ class DayPictures
      */
     public function setDbTimeZone($timezone)
     {
-        $this->_dbTimezone = new DateTimeZone($timezone);
+        $this->dbTimezone = new DateTimeZone($timezone);
 
-        return $this->_reset();
+        return $this->reset();
     }
 
     /**
@@ -126,9 +126,9 @@ class DayPictures
      */
     public function setSelect(Zend_Db_Table_Select $select)
     {
-        $this->_select = $select;
+        $this->select = $select;
 
-        return $this->_reset();
+        return $this->reset();
     }
 
     /**
@@ -148,9 +148,9 @@ class DayPictures
      */
     public function setOrderColumn($column)
     {
-        $this->_orderColumn = $column;
+        $this->orderColumn = $column;
 
-        return $this->_reset();
+        return $this->reset();
     }
 
     /**
@@ -158,7 +158,7 @@ class DayPictures
      */
     public function haveCurrentDate()
     {
-        return (bool)$this->_currentDate;
+        return (bool)$this->currentDate;
     }
 
     /**
@@ -166,7 +166,7 @@ class DayPictures
      */
     public function getCurrentDate()
     {
-        return $this->_currentDate;
+        return $this->currentDate;
     }
 
     /**
@@ -174,8 +174,8 @@ class DayPictures
      */
     public function getCurrentDateStr()
     {
-        return $this->_currentDate
-            ? $this->_currentDate->format($this->_externalDateFormat)
+        return $this->currentDate
+            ? $this->currentDate->format($this->externalDateFormat)
             : false;
     }
 
@@ -184,7 +184,7 @@ class DayPictures
      */
     public function getCurrentDateCount()
     {
-        return $this->_currentDate ? $this->_dateCount($this->_currentDate) : 0;
+        return $this->currentDate ? $this->dateCount($this->currentDate) : 0;
     }
 
     /**
@@ -198,18 +198,18 @@ class DayPictures
 
         if (!empty($date)) {
             if (is_string($date)) {
-                $dateObj = DateTime::createFromFormat($this->_externalDateFormat, $date, $this->_timezone);
+                $dateObj = DateTime::createFromFormat($this->externalDateFormat, $date, $this->timezone);
             } elseif ($date instanceof DateTime) {
                 $dateObj = $date;
-                $dateObj->setTimeZone($this->_timezone);
+                $dateObj->setTimeZone($this->timezone);
             } else {
                 throw new Exception("Unexpected type of date");
             }
         }
 
-        $this->_currentDate = $dateObj;
+        $this->currentDate = $dateObj;
 
-        return $this->_reset();
+        return $this->reset();
     }
 
     /**
@@ -217,7 +217,7 @@ class DayPictures
      */
     public function haveCurrentDayPictures()
     {
-        if (!$this->_currentDate) {
+        if (!$this->currentDate) {
             return false;
         }
 
@@ -232,59 +232,59 @@ class DayPictures
      */
     public function getLastDateStr()
     {
-        $select = $this->_selectClone()
-            ->order($this->_orderColumn . ' desc');
+        $select = $this->selectClone()
+            ->order($this->orderColumn . ' desc');
 
         $lastPicture = $select->getTable()->fetchRow($select);
         if (!$lastPicture) {
             return null;
         }
 
-        $lastDate = $lastPicture->getDateTime($this->_orderColumn);
+        $lastDate = $lastPicture->getDateTime($this->orderColumn);
         if (!$lastDate) {
             return null;
         }
 
         return $lastDate
-            ->setTimeZone($this->_timezone)
-            ->format($this->_externalDateFormat);
+            ->setTimeZone($this->timezone)
+            ->format($this->externalDateFormat);
     }
 
     /**
      * @return Application_Service_DayPictures
      */
-    private function _calcPrevDate()
+    private function calcPrevDate()
     {
-        if (!$this->_currentDate) {
+        if (!$this->currentDate) {
             return $this;
         }
 
-        if ($this->_prevDate === null) {
+        if ($this->prevDate === null) {
 
-            $column = $this->_quotedOrderColumn();
+            $column = $this->quotedOrderColumn();
 
-            $select = $this->_selectClone()
-                ->where($column . ' < ?', $this->_startOfDayDbValue($this->_currentDate))
-                ->order($this->_orderColumn . ' DESC');
+            $select = $this->selectClone()
+                ->where($column . ' < ?', $this->startOfDayDbValue($this->currentDate))
+                ->order($this->orderColumn . ' DESC');
 
             if ($this->_minDate) {
-                $select->where($column . ' >= ?', $this->_startOfDayDbValue($this->_minDate));
+                $select->where($column . ' >= ?', $this->startOfDayDbValue($this->_minDate));
             }
 
             $prevDatePicture = $select->getTable()->fetchRow($select);
 
             $prevDate = false;
             if ($prevDatePicture) {
-                $date = $prevDatePicture->getDateTime($this->_orderColumn);
+                $date = $prevDatePicture->getDateTime($this->orderColumn);
                 if ($date) {
                     $prevDate = $date;
                 }
             }
 
             if ($prevDate) {
-                $this->_prevDate = $prevDate->setTimezone($this->_timezone);
+                $this->prevDate = $prevDate->setTimezone($this->timezone);
             } else {
-                $this->_prevDate = false;
+                $this->prevDate = false;
             }
         }
 
@@ -296,9 +296,9 @@ class DayPictures
      */
     public function getPrevDate()
     {
-        $this->_calcPrevDate();
+        $this->calcPrevDate();
 
-        return $this->_prevDate;
+        return $this->prevDate;
     }
 
     /**
@@ -306,10 +306,10 @@ class DayPictures
      */
     public function getPrevDateStr()
     {
-        $this->_calcPrevDate();
+        $this->calcPrevDate();
 
-        return $this->_prevDate
-            ? $this->_prevDate->format($this->_externalDateFormat)
+        return $this->prevDate
+            ? $this->prevDate->format($this->externalDateFormat)
             : false;
     }
 
@@ -318,42 +318,42 @@ class DayPictures
      */
     public function getPrevDateCount()
     {
-        $this->_calcPrevDate();
+        $this->calcPrevDate();
 
-        return $this->_prevDate ? $this->_dateCount($this->_prevDate) : 0;
+        return $this->prevDate ? $this->dateCount($this->prevDate) : 0;
     }
 
     /**
      * @return Application_Service_DayPictures
      */
-    private function _calcNextDate()
+    private function calcNextDate()
     {
-        if (!$this->_currentDate) {
+        if (!$this->currentDate) {
             return $this;
         }
 
-        if ($this->_nextDate === null) {
+        if ($this->nextDate === null) {
 
-            $column = $this->_quotedOrderColumn();
+            $column = $this->quotedOrderColumn();
 
-            $select = $this->_selectClone()
-                ->where($column . ' > ?', $this->_endOfDayDbValue($this->_currentDate))
-                ->order($this->_orderColumn);
+            $select = $this->selectClone()
+                ->where($column . ' > ?', $this->endOfDayDbValue($this->currentDate))
+                ->order($this->orderColumn);
 
             $nextDatePicture = $select->getTable()->fetchRow($select);
 
             $nextDate = false;
             if ($nextDatePicture) {
-                $date = $nextDatePicture->getDateTime($this->_orderColumn);
+                $date = $nextDatePicture->getDateTime($this->orderColumn);
                 if ($date) {
                     $nextDate = $date;
                 }
             }
 
             if ($nextDate) {
-                $this->_nextDate = $nextDate->setTimezone($this->_timezone);
+                $this->nextDate = $nextDate->setTimezone($this->timezone);
             } else {
-                $this->_nextDate = false;
+                $this->nextDate = false;
             }
         }
 
@@ -365,9 +365,9 @@ class DayPictures
      */
     public function getNextDate()
     {
-        $this->_calcNextDate();
+        $this->calcNextDate();
 
-        return $this->_nextDate;
+        return $this->nextDate;
     }
 
     /**
@@ -375,10 +375,10 @@ class DayPictures
      */
     public function getNextDateStr()
     {
-        $this->_calcNextDate();
+        $this->calcNextDate();
 
-        return $this->_nextDate
-            ? $this->_nextDate->format($this->_externalDateFormat)
+        return $this->nextDate
+            ? $this->nextDate->format($this->externalDateFormat)
             : false;
     }
 
@@ -387,9 +387,9 @@ class DayPictures
      */
     public function getNextDateCount()
     {
-        $this->_calcNextDate();
+        $this->calcNextDate();
 
-        return $this->_nextDate ? $this->_dateCount($this->_nextDate) : 0;
+        return $this->nextDate ? $this->dateCount($this->nextDate) : 0;
     }
 
     /**
@@ -397,31 +397,31 @@ class DayPictures
      */
     public function getPaginator()
     {
-        if (!$this->_currentDate) {
+        if (!$this->currentDate) {
             return false;
         }
 
-        if ($this->_paginator === null) {
+        if ($this->paginator === null) {
 
             $select = $this->getCurrentDateSelect();
 
-            $this->_paginator = Zend_Paginator::factory($select);
+            $this->paginator = Zend_Paginator::factory($select);
         }
 
-        return $this->_paginator;
+        return $this->paginator;
     }
 
     /**
      * @param DateTime $date
      * @return int
      */
-    private function _dateCount(DateTime $date)
+    private function dateCount(DateTime $date)
     {
-        $column = $this->_quotedOrderColumn();
+        $column = $this->quotedOrderColumn();
 
-        $select = $this->_selectClone()
-            ->where($column . ' >= ?', $this->_startOfDayDbValue($date))
-            ->where($column . ' <= ?', $this->_endOfDayDbValue($date));
+        $select = $this->selectClone()
+            ->where($column . ' >= ?', $this->startOfDayDbValue($date))
+            ->where($column . ' <= ?', $this->endOfDayDbValue($date));
 
         return Zend_Paginator::factory($select)
             ->getTotalItemCount();
@@ -430,11 +430,11 @@ class DayPictures
     /**
      * @return Application_Service_DayPictures
      */
-    private function _reset()
+    private function reset()
     {
-        $this->_nextDate = null;
-        $this->_prevDate = null;
-        $this->_paginator = null;
+        $this->nextDate = null;
+        $this->prevDate = null;
+        $this->paginator = null;
 
         return $this;
     }
@@ -443,7 +443,7 @@ class DayPictures
      * @param DateTime $date
      * @return DateTime
      */
-    private function _endOfDay(DateTime $date)
+    private function endOfDay(DateTime $date)
     {
         $d = clone $date;
         return $d->setTime(23, 59, 59);
@@ -453,7 +453,7 @@ class DayPictures
      * @param DateTime $date
      * @return DateTime
      */
-    private function _startOfDay(DateTime $date)
+    private function startOfDay(DateTime $date)
     {
         $d = clone $date;
         return $d->setTime(0, 0, 0);
@@ -463,28 +463,28 @@ class DayPictures
      * @param DateTime $date
      * @return string
      */
-    private function _startOfDayDbValue(DateTime $date)
+    private function startOfDayDbValue(DateTime $date)
     {
-        $d = $this->_startOfDay($date)->setTimezone($this->_dbTimezone);
-        return $d->format($this->_dbDateTimeFormat);
+        $d = $this->startOfDay($date)->setTimezone($this->dbTimezone);
+        return $d->format($this->dbDateTimeFormat);
     }
 
     /**
      * @param DateTime $date
      * @return string
      */
-    private function _endOfDayDbValue(DateTime $date)
+    private function endOfDayDbValue(DateTime $date)
     {
-        $d = $this->_endOfDay($date)->setTimezone($this->_dbTimezone);
-        return $d->format($this->_dbDateTimeFormat);
+        $d = $this->endOfDay($date)->setTimezone($this->dbTimezone);
+        return $d->format($this->dbDateTimeFormat);
     }
 
     /**
      * @return Zend_Db_Table_Select
      */
-    private function _selectClone()
+    private function selectClone()
     {
-        return clone $this->_select;
+        return clone $this->select;
     }
 
     /**
@@ -492,15 +492,15 @@ class DayPictures
      */
     public function getCurrentDateSelect()
     {
-        $column = $this->_quotedOrderColumn();
+        $column = $this->quotedOrderColumn();
 
-        $select = $this->_selectClone()
-            ->where($column . ' >= ?', $this->_startOfDayDbValue($this->_currentDate))
-            ->where($column . ' <= ?', $this->_endOfDayDbValue($this->_currentDate))
-            ->order($this->_orderColumn . ' DESC');
+        $select = $this->selectClone()
+            ->where($column . ' >= ?', $this->startOfDayDbValue($this->currentDate))
+            ->where($column . ' <= ?', $this->endOfDayDbValue($this->currentDate))
+            ->order($this->orderColumn . ' DESC');
 
         if ($this->_minDate) {
-            $select->where($column . ' >= ?', $this->_startOfDayDbValue($this->_minDate));
+            $select->where($column . ' >= ?', $this->startOfDayDbValue($this->_minDate));
         }
 
         return $select;
@@ -510,16 +510,16 @@ class DayPictures
      * @return string
      * @throws Exception
      */
-    private function _quotedOrderColumn()
+    private function quotedOrderColumn()
     {
-        if (!$this->_orderColumn) {
+        if (!$this->orderColumn) {
             throw new Exception('Order column not configured');
         }
 
-        $db = $this->_select->getAdapter();
+        $db = $this->select->getAdapter();
 
-        $tableName = $this->_select->getTable()->info('name');
+        $tableName = $this->select->getTable()->info('name');
 
-        return $db->quoteIdentifier($tableName . '.' . $this->_orderColumn);
+        return $db->quoteIdentifier($tableName . '.' . $this->orderColumn);
     }
 }
