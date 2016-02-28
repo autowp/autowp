@@ -65,7 +65,7 @@ class Picture extends Project_Db_Table
         ),
     );
 
-    protected $_prefixedPerspectives = array(5, 6, 17, 20, 21);
+    private $prefixedPerspectives = array(5, 6, 17, 20, 21, 22);
 
     public static function getResolutions()
     {
@@ -107,7 +107,7 @@ class Picture extends Project_Db_Table
         return $result;
     }
 
-    protected static function mbUcfirst($str)
+    private static function mbUcfirst($str)
     {
         return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
     }
@@ -128,7 +128,7 @@ class Picture extends Project_Db_Table
             switch ($row['type']) {
                 case Picture::CAR_TYPE_ID:
                     $carIds[$row['car_id']] = true;
-                    if (in_array($row['perspective_id'], $this->_prefixedPerspectives)) {
+                    if (in_array($row['perspective_id'], $this->prefixedPerspectives)) {
                         $perspectiveIds[$row['perspective_id']] = true;
                     }
                     break;
@@ -292,7 +292,7 @@ class Picture extends Project_Db_Table
             switch ($row['type']) {
                 case Picture::CAR_TYPE_ID:
                     $carIds[$row['car_id']] = true;
-                    if (in_array($row['perspective_id'], $this->_prefixedPerspectives)) {
+                    if (in_array($row['perspective_id'], $this->prefixedPerspectives)) {
                         $perspectiveIds[$row['perspective_id']] = true;
                     }
                     break;

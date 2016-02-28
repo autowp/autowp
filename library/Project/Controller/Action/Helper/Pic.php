@@ -7,28 +7,28 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
     /**
      * @var Picture_View
      */
-    protected $_pictureViewTable = null;
+    private $pictureViewTable = null;
 
-    protected $_moderVoteTable = null;
+    private $moderVoteTable = null;
 
     /**
      * @return Pictures_Moder_Votes
      */
-    protected function getModerVoteTable()
+    private function getModerVoteTable()
     {
-        return $this->_moderVoteTable
-            ? $this->_moderVoteTable
-            : $this->_moderVoteTable = new Pictures_Moder_Votes();
+        return $this->moderVoteTable
+            ? $this->moderVoteTable
+            : $this->moderVoteTable = new Pictures_Moder_Votes();
     }
 
     /**
      * @return Picture_View
      */
-    protected function getPictureViewTable()
+    private function getPictureViewTable()
     {
-        return $this->_pictureViewTable
-            ? $this->_pictureViewTable
-            : $this->_pictureViewTable = new Picture_View();
+        return $this->pictureViewTable
+            ? $this->pictureViewTable
+            : $this->pictureViewTable = new Picture_View();
     }
 
     public function href($row, array $options = array())

@@ -281,6 +281,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'perspective/bottom'         => 'bottom',
     'perspective/dashboard'      => 'dashboard',
     'perspective/boot'           => 'boot',
+    'perspective/logo'           => 'logo',
 
     'login/sign-in' => 'Sign in',
     'login/sign-out' => 'Sign out',

@@ -281,6 +281,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'perspective/bottom'         => 'bas',
     'perspective/dashboard'      => 'tableau de bord',
     'perspective/boot'           => 'coffre',
+    'perspective/logo'           => 'logo',
 
     'login/sign-in' => 'Entrée',
     'login/sign-out' => 'Sortie',

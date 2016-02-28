@@ -295,6 +295,7 @@ return array (
     'perspective/bottom'         => 'снизу',
     'perspective/dashboard'      => 'комбинация приборов',
     'perspective/boot'           => 'багажник',
+    'perspective/logo'           => 'логотип',
 
     'login/sign-in' => 'Вход',
     'login/sign-out' => 'Выход',

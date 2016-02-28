@@ -7,15 +7,15 @@ class Pictures_Row extends Project_Db_Table_Row
 {
     private $_caption_cache = array();
 
-    private $_perspectiveTable;
-    private $_perspectivePrefix = array();
-    private $_prefixedPerspectives = array(5, 6, 17, 20, 21);
+    private $perspectiveTable;
+    private $perspectivePrefix = array();
+    private $prefixedPerspectives = array(5, 6, 17, 20, 21, 22);
 
-    private function _getPerspectiveTable()
+    private function getPerspectiveTable()
     {
-        return $this->_perspectiveTable
-            ? $this->_perspectiveTable
-            : $this->_perspectiveTable = new Perspectives();
+        return $this->perspectiveTable
+            ? $this->perspectiveTable
+            : $this->perspectiveTable = new Perspectives();
     }
 
     private static function mbUcfirst($str)
@@ -23,21 +23,21 @@ class Pictures_Row extends Project_Db_Table_Row
         return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
     }
 
-    private function _getPerspectivePrefix($id, $language)
+    private function getPerspectivePrefix($id, $language)
     {
-        if (in_array($id, $this->_prefixedPerspectives)) {
-            if (!isset($this->_perspectivePrefix[$id][$language])) {
-                $row = $this->_getPerspectiveTable()->find($id)->current();
+        if (in_array($id, $this->prefixedPerspectives)) {
+            if (!isset($this->perspectivePrefix[$id][$language])) {
+                $row = $this->getPerspectiveTable()->find($id)->current();
                 if ($row) {
                     $translate = Zend_Registry::get('Zend_Translate');
                     $name = $translate->translate($row->name, $language);
-                    $this->_perspectivePrefix[$id][$language] = self::mbUcfirst($name) . ' ';
+                    $this->perspectivePrefix[$id][$language] = self::mbUcfirst($name) . ' ';
                 } else {
-                    $this->_perspectivePrefix[$id][$language] = '';
+                    $this->perspectivePrefix[$id][$language] = '';
                 }
             }
 
-            return $this->_perspectivePrefix[$id][$language];
+            return $this->perspectivePrefix[$id][$language];
         }
 
         return '';
@@ -61,7 +61,7 @@ class Pictures_Row extends Project_Db_Table_Row
             case Picture::CAR_TYPE_ID:
                 $car = $this->findParentCars();
                 if ($car) {
-                    $caption = $this->_getPerspectivePrefix($this->perspective_id, $language) .
+                    $caption = $this->getPerspectivePrefix($this->perspective_id, $language) .
                                $car->getFullName($language);
                 }
                 break;
@@ -114,16 +114,14 @@ class Pictures_Row extends Project_Db_Table_Row
 
     private function createDir($dir)
     {
-        if (!is_dir($dir))
-        {
-            if (mkdir($dir, 0755, true) !== true)
-            {
-                throw new Exception ('Error creating directory "'.$dir.'"');
+        if (!is_dir($dir)) {
+            if (mkdir($dir, 0755, true) !== true) {
+                throw new Exception('Error creating directory "'.$dir.'"');
             }
         }
     }
 
-    protected static function _between($a, $min, $max)
+    private static function between($a, $min, $max)
     {
         return ($min <= $a) && ($a <= $max);
     }
@@ -134,10 +132,10 @@ class Pictures_Row extends Project_Db_Table_Row
         // проверяем верные ли значения границ обрезания
         return  !is_null($options['crop_left']) && !is_null($options['crop_top']) &&
                 !is_null($options['crop_width']) && !is_null($options['crop_height']) &&
-                self::_between($options['crop_left'], 0, $options['width']) &&
-                self::_between($options['crop_width'], 1, $options['width']) &&
-                self::_between($options['crop_top'], 0, $options['height']) &&
-                self::_between($options['crop_height'], 1, $options['height']);
+                self::between($options['crop_left'], 0, $options['width']) &&
+                self::between($options['crop_width'], 1, $options['width']) &&
+                self::between($options['crop_top'], 0, $options['height']) &&
+                self::between($options['crop_height'], 1, $options['height']);
     }
 
     public function cropParametersExists()
@@ -498,7 +496,7 @@ class Pictures_Row extends Project_Db_Table_Row
         return $this->getFileNamePattern() . '_%d.' . $ext;
     }
 
-    public function _delete()
+    protected function _delete()
     {
         $comments = new Comment_Message();
         $comments->delete(array(
@@ -533,7 +531,7 @@ class Pictures_Row extends Project_Db_Table_Row
         return $options;
     }
 
-    protected function _postImageFormat($imageRow, $format)
+    protected function postImageFormat($imageRow, $format)
     {
         if ($format->id == 8) {
 
