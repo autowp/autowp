@@ -7,6 +7,11 @@ class Application_Form_Moder_Inbox extends Project_Form
     private $_brandMultioptions = array();
 
     private $_resolutionMultioptions = array();
+    
+    /**
+     * @var Car_Types
+     */
+    private $carTypeTable = null;
 
     public function setPerspectiveMultioptions($options)
     {
@@ -26,6 +31,10 @@ class Application_Form_Moder_Inbox extends Project_Form
     public function init()
     {
         parent::init();
+        
+        $carTypeOptions = $this->getCarTypeOptions();
+        
+        $carTypeOptions = array('' => '-') + $carTypeOptions;
 
         $this->setOptions(array(
             'decorators' => array(
@@ -51,10 +60,11 @@ class Application_Form_Moder_Inbox extends Project_Form
                     ),
                     'decorators'   => array('ViewHelper')
                 )),
-                new Project_Form_Element_Car_Type('car_type_id', array(
-                    'required'     => false,
+                array('select', 'car_type_id', array(
                     'label'        => 'Тип кузова',
-                    'decorators'   => array('ViewHelper')
+                    'required'     => false,
+                    'decorators'   => array('ViewHelper'),
+                    'multioptions' => $carTypeOptions,
                 )),
                 array('select', 'perspective_id', array(
                     'required'     => false,
@@ -161,5 +171,40 @@ class Application_Form_Moder_Inbox extends Project_Form
                 )),
             )
         ));
+    }
+    
+    /**
+     * @return Car_Types
+     */
+    private function getCarTypeTable()
+    {
+        return $this->carTypeTable
+            ? $this->carTypeTable
+            : $this->carTypeTable = new Car_Types();
+    }
+    
+    private function getCarTypeOptions($parentId = null)
+    {
+        if ($parentId) {
+            $filter = array(
+                'parent_id = ?' => $parentId
+            );
+        } else {
+            $filter = 'parent_id is null';
+        }
+    
+        $translate = Zend_Registry::get('Zend_Translate');
+    
+        $rows = $this->getCarTypeTable()->fetchAll($filter, 'position');
+        $result = array();
+        foreach ($rows as $row) {
+            $result[$row->id] = $row->name;
+    
+            foreach ($this->getCarTypeOptions($row->id) as $key => $value) {
+                $result[$key] = '...' . $translate->translate($value);
+            }
+        }
+    
+        return $result;
     }
 }

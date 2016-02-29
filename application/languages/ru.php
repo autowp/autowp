@@ -234,6 +234,23 @@ return array (
     'most/bigclearance/param' => 'дорожный просвет',
     'most/smallclearance' => 'маленький клиренс',
     'most/smallclearance/param' => 'дорожный просвет',
+    
+    'mosts/sidebar/mostly…' => 'Самые …',
+    'mosts/sidebar/between…' => 'Среди …',
+    
+    'mosts/period/before1920' => 'до 1920го',
+    'mosts/period/1920-29'    => '1920-29ых',
+    'mosts/period/1930-39'    => '1930-39ых',
+    'mosts/period/1940-49'    => '1940-49ых',
+    'mosts/period/1950-59'    => '1950-59ых',
+    'mosts/period/1960-69'    => '1960-69ых',
+    'mosts/period/1970-79'    => '1970-79ых',
+    'mosts/period/1980-89'    => '1980-89ых',
+    'mosts/period/1990-99'    => '1990-99ых',
+    'mosts/period/2000-09'    => '2000-09ых',
+    'mosts/period/2010-15'    => '2010-15ых',
+    'mosts/period/present'    => 'нашего времени',
+    'mosts/period/all-time'   => 'за всю историю',
 
     /* upload */
     'upload/picture/crop' => 'кадрировать',

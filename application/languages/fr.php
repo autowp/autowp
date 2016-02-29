@@ -220,6 +220,23 @@ return array (
     'most/bigclearance/param' => 'garde au sol',
     'most/smallclearance' => 'petite garde au sol',
     'most/smallclearance/param' => 'garde au sol',
+    
+    'mosts/sidebar/mostly…' => 'Le plus …',
+    'mosts/sidebar/between…' => 'Parmi …',
+    
+    'mosts/period/before1920' => 'jusqu\'à 1920го',
+    'mosts/period/1920-29'    => '1920-29th',
+    'mosts/period/1930-39'    => '1930-39th',
+    'mosts/period/1940-49'    => '1940-49th',
+    'mosts/period/1950-59'    => '1950-59th',
+    'mosts/period/1960-69'    => '1960-69th',
+    'mosts/period/1970-79'    => '1970-79th',
+    'mosts/period/1980-89'    => '1980-89th',
+    'mosts/period/1990-99'    => '1990-99th',
+    'mosts/period/2000-09'    => '2000-09th',
+    'mosts/period/2010-15'    => '2010-15th',
+    'mosts/period/present'    => 'au présent',
+    'mosts/period/all-time'   => 'dans l\'histoire',
 
     /* upload */
     'upload/picture/crop' => 'recadrer',

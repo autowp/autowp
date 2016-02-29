@@ -71,6 +71,8 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
         } else {
             $filter = 'parent_id is null';
         }
+        
+        $translate = Zend_Registry::get('Zend_Translate');
 
         $rows = $this->getCarTypeTable()->fetchAll($filter, 'position');
         $result = array();
@@ -78,7 +80,7 @@ class Application_Form_Moder_Car_Edit_Meta extends Project_Form
             $result[$row->id] = $row->name;
 
             foreach ($this->getCarTypeOptions($row->id) as $key => $value) {
-                $result[$key] = '...' . $value;
+                $result[$key] = '...' . $translate->translate($value);
             }
         }
 

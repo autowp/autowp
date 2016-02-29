@@ -3,7 +3,6 @@
 namespace Application\Service;
 
 use Car_Types;
-use Car_Type_Language;
 use Cars;
 use Exception;
 use Perspectives_Groups;
@@ -351,11 +350,6 @@ class Mosts
 
     private $_years = null;
 
-    /**
-     * @var Car_Type_Language
-     */
-    private $_carTypeLangTable = null;
-
     private $_perspectiveGroups = null;
 
     /**
@@ -366,16 +360,6 @@ class Mosts
     public function __construct(array $options = array())
     {
         $this->_specs = $options['specs'];
-    }
-
-    /**
-     * @return Car_Type_Language
-     */
-    private function _getCarTypeLangTable()
-    {
-        return $this->_carTypeLangTable
-            ? $this->_carTypeLangTable
-            : $this->_carTypeLangTable = new Car_Type_Language();
     }
 
     private function _betweenYearsExpr($from, $to)
@@ -394,63 +378,63 @@ class Mosts
 
             $this->_years = array(
                 array(
-                    'name'   => 'до 1920го',
+                    'name'   => 'mosts/period/before1920',
                     'folder' => 'before1920',
                     'where'  => 'cars.begin_order_cache <= "1919-12-31" or ' .
                                 'cars.end_order_cache <= "1919-12-31"'
                 ),
                 array(
-                    'name'   => '1920-29ых',
+                    'name'   => 'mosts/period/1920-29',
                     'folder' => '1920-29',
                     'where'  => $this->_betweenYearsExpr(1920, 1929)
                 ),
                 array(
-                    'name'   => '1930-39ых',
+                    'name'   => 'mosts/period/1930-39',
                     'folder' => '1930-39',
                     'where'  => $this->_betweenYearsExpr(1930, 1939)
                 ),
                 array(
-                    'name'   => '1940-49ых',
+                    'name'   => 'mosts/period/1940-49',
                     'folder' => '1940-49',
                     'where'  => $this->_betweenYearsExpr(1940, 1949)
                 ),
                 array(
-                    'name'   => '1950-59ых',
+                    'name'   => 'mosts/period/1950-59',
                     'folder' => '1950-59',
                     'where'  => $this->_betweenYearsExpr(1950, 1959)
                 ),
                 array(
-                    'name'   => '1960-69ых',
+                    'name'   => 'mosts/period/1960-69',
                     'folder' => '1960-69',
                     'where'  => $this->_betweenYearsExpr(1960, 1969)
                 ),
                 array(
-                    'name'   => '1970-79ых',
+                    'name'   => 'mosts/period/1970-79',
                     'folder' => '1970-79',
                     'where'  => $this->_betweenYearsExpr(1970, 1979)
                 ),
                 array(
-                    'name'   => '1980-89ых',
+                    'name'   => 'mosts/period/1980-89',
                     'folder' => '1980-89',
                     'where'  => $this->_betweenYearsExpr(1980, 1989)
                 ),
                 array(
-                    'name'   => '1990-99ых',
+                    'name'   => 'mosts/period/1990-99',
                     'folder' => '1990-99',
                     'where'  => $this->_betweenYearsExpr(1990, 1999)
                 ),
                 array(
-                    'name'   => '2000-09ых',
+                    'name'   => 'mosts/period/2000-09',
                     'folder' => '2000-09',
                     'where'  => $this->_betweenYearsExpr(2000, 2009)
                 ),
                 array(
-                    'name'   => '2010-'.($prevYear%100),
+                    'name'   => 'mosts/period/2010-'.($prevYear%100),
                     'folder' => '2010-'.($prevYear%100),
                     'where'  => $this->_betweenYearsExpr(2010, $prevYear)
                 ),
                 array(
-                    'name'   => 'нашего времени',
+                    'name'   => 'mosts/period/present',
                     'folder' => 'today',
                     'where'  => 'cars.end_order_cache >="'.$cy.'-01-01" and cars.end_order_cache<"2100-01-01" or cars.end_order_cache is null and cars.today'
                 )
@@ -489,7 +473,6 @@ class Mosts
     public function getCarTypes($language, $brandId)
     {
         $carTypesTable = new Car_Types();
-        $carTypeLangTable = $this->_getCarTypeLangTable();
         $carTypes = array();
         $select = $carTypesTable->select(true)
             ->where('car_types.parent_id IS NULL')
@@ -507,11 +490,6 @@ class Mosts
 
 
         foreach ($carTypesTable->fetchAll($select) as $row) {
-
-            $lang = $carTypeLangTable->fetchRow(array(
-                'language = ?'    => $language,
-                'car_type_id = ?' => $row->id
-            ));
 
             $childs = array();
 
@@ -531,22 +509,17 @@ class Mosts
 
             foreach ($carTypesTable->fetchAll($select) as $srow) {
 
-                $slang = $carTypeLangTable->fetchRow(array(
-                    'language = ?'    => $language,
-                    'car_type_id = ?' => $srow->id
-                ));
-
                 $childs[] = array(
                     'id'      => $srow->id,
                     'catname' => $srow->catname,
-                    'name'    => $slang ? $slang->name_rp : $srow->name_rp
+                    'name'    => $srow->name_rp
                 );
             }
 
             $carTypes[] = array(
                 'id'      => $row->id,
                 'catname' => $row->catname,
-                'name'    => $lang ? $lang->name_rp : $row->name_rp,
+                'name'    => $row->name_rp,
                 'childs'  => $childs
             );
         }
@@ -556,18 +529,11 @@ class Mosts
 
     public function getCarTypeData($carType, $language)
     {
-        $carTypeLangTable = $this->_getCarTypeLangTable();
-
-        $carTypeLang = $carTypeLangTable->fetchRow(array(
-            'language = ?'    => $language,
-            'car_type_id = ?' => $carType->id
-        ));
-
         return array(
             'id'      => $carType->id,
             'catname' => $carType->catname,
-            'name'    => $carTypeLang ? $carTypeLang->name : $carType->name,
-            'name_rp' => $carTypeLang ? $carTypeLang->name_rp : $carType->name_rp,
+            'name'    => $carType->name,
+            'name_rp' => $carType->name_rp,
         );
     }
 
@@ -846,7 +812,7 @@ class Mosts
         }
         $yearsMenu[] = array(
             'active' => is_null($yearId),
-            'name'   => 'за всю историю',
+            'name'   => 'mosts/period/all-time',
             'params' => array(
                 'most_catname'  => $cMost['catName'],
                 'shape_catname' => $carTypeCatname ? $carTypeCatname : null,

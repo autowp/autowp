@@ -220,6 +220,23 @@ return array (
     'most/bigclearance/param' => 'clearance',
     'most/smallclearance' => 'small clearance',
     'most/smallclearance/param' => 'clearance',
+    
+    'mosts/sidebar/mostly…' => 'Most …',
+    'mosts/sidebar/between…' => 'Between …',
+    
+    'mosts/period/before1920' => 'before 1920го',
+    'mosts/period/1920-29'    => '1920-29th',
+    'mosts/period/1930-39'    => '1930-39th',
+    'mosts/period/1940-49'    => '1940-49th',
+    'mosts/period/1950-59'    => '1950-59th',
+    'mosts/period/1960-69'    => '1960-69th',
+    'mosts/period/1970-79'    => '1970-79th',
+    'mosts/period/1980-89'    => '1980-89th',
+    'mosts/period/1990-99'    => '1990-99th',
+    'mosts/period/2000-09'    => '2000-09th',
+    'mosts/period/2010-15'    => '2010-15th',
+    'mosts/period/present'    => 'present time',
+    'mosts/period/all-time'   => 'all time',
 
     /* upload */
     'upload/picture/crop' => 'crop',
