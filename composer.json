@@ -26,7 +26,8 @@
         "autowp/image": "^1.0",
         "autowp/filters": "^1.1",
         "autowp/external-login-service": "^1.0",
-        "zendframework/zend-uri": "^2.5"
+        "zendframework/zend-uri": "^2.5",
+        "zendframework/zend-db": "^2.7"
     },
     "authors": [
         {

@@ -346,4 +346,22 @@ class Application_Service_Users
         
         return $token;
     }
+    
+    public function createRestorePasswordToken($userId)
+    {
+        $uprTable = new User_Password_Remind();
+        
+        do {
+            $code = md5($this->_salt . uniqid());
+            $exists = (bool)$uprTable->find($code)->current();
+        } while ($exists);
+        
+        $uprTable->insert(array(
+            'user_id' => $userId,
+            'hash'    => $code,
+            'created' => new Zend_Db_Expr('NOW()')
+        ));
+        
+        return $code;
+    }
 }

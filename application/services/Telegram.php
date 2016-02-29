@@ -98,7 +98,7 @@ class Telegram
                 $brandIds = $db->fetchCol(
                     $db->select()
                         ->from('brand_engine', 'brand_id')
-                        ->where('engine_id = ?', $engine->id)
+                        ->where('engine_id = ?', $picture->engine_id)
                 );
                 break;
         }

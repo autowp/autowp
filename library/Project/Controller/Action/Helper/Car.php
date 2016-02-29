@@ -279,7 +279,7 @@ class Project_Controller_Action_Helper_Car
                 ])
                 ->where('brands_cars.type = ?', Brands_Cars::TYPE_DESIGN)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
-                ->where('car_parent_cache.car_id IN (?)', $carIds)
+                ->where('car_parent_cache.car_id IN (?)', $carIds ? $carIds : 0)
                 ->group('car_parent_cache.car_id')
         );
         foreach ($designCarsRows as $designCarsRow) {
