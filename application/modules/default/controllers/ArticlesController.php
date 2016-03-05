@@ -73,12 +73,6 @@ class ArticlesController extends Zend_Controller_Action
                 'name' => $brand->caption
             );
 
-        foreach ($article->findDesign_ProjectsViaArticles_Design_Projects() as $dp)
-            $links[] = array(
-                'url' => $dp->getUrl(),
-                'name' => $dp->findParentBrands()->caption.' '.$dp->name
-            );
-
         foreach ($article->findCarsViaArticles_Cars() as $car)
         {
             $brands = $car->findBrandsViaBrands_Cars();

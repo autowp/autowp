@@ -7,11 +7,6 @@ class Cars extends Project_Db_Table
     protected $_rowClass = 'Cars_Row';
     protected $_rowsetClass = 'Cars_Rowset';
     protected $_referenceMap = array(
-        'Design_Project' => array(
-            'columns'       => array('design_project_id'),
-            'refTableClass' => 'Design_Projects',
-            'refColumns'    => array('id')
-        ),
         'Type' => array(
             'columns'       => array('car_type_id'),
             'refTableClass' => 'Car_Types',

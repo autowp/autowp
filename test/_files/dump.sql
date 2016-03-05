@@ -18,7 +18,6 @@ INSERT INTO `acl_resources` (`id`, `name`) VALUES
 (4, 'car'),
 (14, 'category'),
 (6, 'comment'),
-(3, 'design_project'),
 (8, 'engine'),
 (21, 'factory'),
 (10, 'forums'),
@@ -220,18 +219,6 @@ CREATE TABLE IF NOT EXISTS `articles_criterias_votes_ips` (
   KEY `criteria_id` (`criteria_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `articles_design_projects`
---
-
-CREATE TABLE IF NOT EXISTS `articles_design_projects` (
-  `article_id` int(11) UNSIGNED NOT NULL,
-  `design_project_id` int(10) UNSIGNED NOT NULL,
-  PRIMARY KEY (`article_id`,`design_project_id`),
-  KEY `design_project_id` (`design_project_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 122880 kB; (`article_id`)';
 
 -- --------------------------------------------------------
 
@@ -906,7 +893,6 @@ CREATE TABLE IF NOT EXISTS `cars` (
   `pictures_count` int(10) UNSIGNED NOT NULL DEFAULT '0',
   `description` mediumtext NOT NULL COMMENT 'РљСЂР°С‚РєРѕРµ РѕРїРёСЃР°РЅРёРµ',
   `today` tinyint(3) UNSIGNED DEFAULT NULL,
-  `design_project_id` int(11) UNSIGNED DEFAULT NULL,
   `add_datetime` timestamp NULL DEFAULT NULL COMMENT 'Р”Р°С‚Р° СЃРѕР·РґР°РЅРёСЏ Р·Р°РїРёСЃРё',
   `begin_month` tinyint(3) UNSIGNED DEFAULT NULL,
   `end_month` tinyint(3) UNSIGNED DEFAULT NULL,
@@ -925,14 +911,13 @@ CREATE TABLE IF NOT EXISTS `cars` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `caption` (`caption`,`begin_year`,`body`,`end_year`,`begin_model_year`,`end_model_year`,`is_group`),
   KEY `fullCaptionOrder` (`caption`,`body`,`begin_year`,`end_year`),
-  KEY `design_project_id` (`design_project_id`),
   KEY `car_type_id` (`car_type_id`),
   KEY `primary_and_sorting` (`id`,`begin_order_cache`),
   KEY `engine_id` (`engine_id`),
   KEY `spec_id` (`spec_id`),
   KEY `text_id` (`text_id`),
   KEY `full_text_id` (`full_text_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=99781 AVG_ROW_LENGTH=152 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB; (`design_project_id`)';
+) ENGINE=InnoDB AUTO_INCREMENT=99781 AVG_ROW_LENGTH=152 DEFAULT CHARSET=utf8;
 
 insert into cars (id, caption, body, produced_exactly, description)
 values (1, 'test car', '', 0, '');
@@ -1157,26 +1142,6 @@ CREATE TABLE IF NOT EXISTS `day_stat` (
   `hits` mediumint(10) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`day_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `design_projects`
---
-
-CREATE TABLE IF NOT EXISTS `design_projects` (
-  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `brand_id` int(11) UNSIGNED NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `catname` varchar(50) NOT NULL,
-  `year` smallint(6) UNSIGNED DEFAULT NULL,
-  `last_editor_id` int(11) UNSIGNED DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `brand_id` (`brand_id`,`name`),
-  UNIQUE KEY `uniqueCatName` (`brand_id`,`catname`),
-  KEY `brand_id_2` (`brand_id`),
-  KEY `last_editor_id` (`last_editor_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1042 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -2744,13 +2709,6 @@ ALTER TABLE `articles_criterias_votes_ips`
   ADD CONSTRAINT `articles_criterias_votes_ips_fk1` FOREIGN KEY (`criteria_id`) REFERENCES `articles_votings_criterias` (`id`);
 
 --
--- Constraints for table `articles_design_projects`
---
-ALTER TABLE `articles_design_projects`
-  ADD CONSTRAINT `articles_design_projects_fk` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`),
-  ADD CONSTRAINT `articles_design_projects_fk1` FOREIGN KEY (`design_project_id`) REFERENCES `design_projects` (`id`);
-
---
 -- Constraints for table `articles_engines`
 --
 ALTER TABLE `articles_engines`
@@ -2980,7 +2938,6 @@ ALTER TABLE `car_types_parents`
 --
 ALTER TABLE `cars`
   ADD CONSTRAINT `cars_fk` FOREIGN KEY (`car_type_id`) REFERENCES `car_types` (`id`),
-  ADD CONSTRAINT `cars_ibfk_1` FOREIGN KEY (`design_project_id`) REFERENCES `design_projects` (`id`),
   ADD CONSTRAINT `cars_ibfk_2` FOREIGN KEY (`engine_id`) REFERENCES `engines` (`id`),
   ADD CONSTRAINT `cars_ibfk_3` FOREIGN KEY (`spec_id`) REFERENCES `spec` (`id`),
   ADD CONSTRAINT `cars_ibfk_4` FOREIGN KEY (`text_id`) REFERENCES `textstorage_text` (`id`),
@@ -3033,13 +2990,6 @@ ALTER TABLE `comments_messages`
 ALTER TABLE `contact`
   ADD CONSTRAINT `contact_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `contact_ibfk_2` FOREIGN KEY (`contact_user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `design_projects`
---
-ALTER TABLE `design_projects`
-  ADD CONSTRAINT `design_projects_ibfk_1` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`),
-  ADD CONSTRAINT `design_projects_ibfk_2` FOREIGN KEY (`last_editor_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `engine_parent_cache`
