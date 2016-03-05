@@ -34,35 +34,6 @@ class SidebarController extends Zend_Controller_Action
         return $aliases;
     }
 
-    private function _designProjectBrandGroups($brand)
-    {
-        $brandTable = $this->_helper->catalogue()->getBrandTable();
-
-        $select = $brandTable->select(true)
-            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-            ->join('cars', 'car_parent_cache.car_id = cars.id', null)
-            ->join('design_projects', 'cars.design_project_id = design_projects.id', null)
-            ->where('design_projects.brand_id = ?', $brand->id)
-            ->where('brands.id <> ?', $brand->id)
-            ->where('brands.type_id IN (?)', array(1, 3))
-            ->group('brands.id');
-
-        $groups = array();
-        foreach ($brandTable->fetchAll($select) as $ibrand) {
-            $groups[] = array(
-                'url'     => $this->_helper->url->url(array(
-                    'action'          => 'design-project-brand',
-                    'brand_catname'   => $brand->folder,
-                    'dpbrand_catname' => $ibrand->folder
-                ), 'catalogue', true),
-                'caption' => $ibrand->caption,
-            );
-        }
-
-        return $groups;
-    }
-
     private function _subBrandGroups($brand)
     {
         $brandTable = $this->_helper->catalogue()->getBrandTable();
@@ -338,8 +309,7 @@ class SidebarController extends Zend_Controller_Action
         // создаем массив групп
         $groups = array_merge(
             $this->_carGroups($brand, $conceptsSeparatly, $carId),
-            $this->_subBrandGroups($brand),
-            $this->_designProjectBrandGroups($brand)
+            $this->_subBrandGroups($brand)
         );
 
         // сортируем группы

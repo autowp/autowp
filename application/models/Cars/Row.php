@@ -244,17 +244,6 @@ class Cars_Row extends Project_Db_Table_Row
         return $result;
     }
 
-    public function findParentRow($parentTable, $ruleKey = null, Zend_Db_Table_Select $select = null)
-    {
-        if ($select === null && $ruleKey === null && $parentTable === 'Design_Projects')
-        {
-            $designProjects = new Design_Projects();
-            return $designProjects->find($this->design_project_id)->current();
-        }
-
-        return parent::findParentRow($parentTable, $ruleKey, $select);
-    }
-
     public function getOrientedPictureList(array $perspectiveGroupIds, &$interiors = 0)
     {
         $pictureTable = new Picture();
@@ -351,10 +340,6 @@ class Cars_Row extends Project_Db_Table_Row
     {
         foreach ($this->findBrandsViaBrands_Cars() as $brand) {
             $brand->updateTwinsGroupsCount();
-        }
-
-        if ($dp = $this->findParentDesign_Projects()) {
-            $dp->findParentBrands()->updateTwinsGroupsCount();
         }
     }
 

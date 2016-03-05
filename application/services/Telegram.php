@@ -12,25 +12,25 @@ use Zend_Controller_Front;
 
 class Telegram
 {
-    private $_accessToken;
+    private $accessToken;
 
-    private $_webhook;
+    private $webhook;
 
-    private $_token;
+    private $token;
 
     public function __construct(array $options = array())
     {
-        $this->_accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
-        $this->_webhook = isset($options['webhook']) ? $options['webhook'] : null;
-        $this->_token = isset($options['token']) ? $options['token'] : null;
+        $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
+        $this->webhook = isset($options['webhook']) ? $options['webhook'] : null;
+        $this->token = isset($options['token']) ? $options['token'] : null;
     }
 
     /**
      * @return Telegram\Bot\Api
      */
-    private function _getApi()
+    private function getApi()
     {
-        $api = new Api($this->_accessToken);
+        $api = new Api($this->accessToken);
 
         $api->addCommands([
             StartCommand::class,
@@ -43,30 +43,30 @@ class Telegram
 
     public function checkTokenMatch($token)
     {
-        return $this->_token == (string)$token;
+        return $this->token == (string)$token;
     }
 
     public function registerWebhook()
     {
-        $message = $this->_getApi()->setWebhook(array(
-            'url'         => $this->_webhook,
+        $message = $this->getApi()->setWebhook(array(
+            'url'         => $this->webhook,
             'certificate' => ''
         ));
     }
 
     public function getWebhookUpdates()
     {
-        return $this->_getApi()->getWebhookUpdates();
+        return $this->getApi()->getWebhookUpdates();
     }
 
     public function sendMessage(array $params)
     {
-        return $this->_getApi()->sendMessage($params);
+        return $this->getApi()->sendMessage($params);
     }
 
     public function commandsHandler($webhook = false)
     {
-        return $this->_getApi()->commandsHandler($webhook);
+        return $this->getApi()->commandsHandler($webhook);
     }
 
     public function notifyInbox($pictureId)

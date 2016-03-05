@@ -65,10 +65,7 @@ class Moder_BrandsController extends Zend_Controller_Action
 
         $canEdit = $this->_helper->user()->isAllowed('brand', 'edit');
         $canLogo = $this->_helper->user()->isAllowed('brand', 'logo');
-        $canEditDesignProjects = $this->_helper->user()->isAllowed('design_project', 'edit');
         $canDeleteModel = $this->_helper->user()->isAllowed('model', 'delete');
-
-        $designProjects = new Design_Projects();
 
         $this->view->picture = null;
 
@@ -181,56 +178,6 @@ class Moder_BrandsController extends Zend_Controller_Action
             $this->view->formLogo = $form;
         }
 
-        if ($canEditDesignProjects) {
-            $form = new Application_Form_Moder_Brand_Add_DesignProject(array(
-                'action' => $this->_helper->url->url(array(
-                    'form' => 'add-design-project'
-                ))
-            ));
-
-
-            if ($request->isPost() && $this->_getParam('form') == 'add-design-project' && $form->isValid($request->getPost())) {
-                $values = $form->getValues();
-
-                $filenameFilter = new Safe();
-
-                $user = $this->_helper->user()->get();
-                $data = array(
-                    'name'           => $values['name'],
-                    'year'           => $values['year'],
-                    'catname'        => $filenameFilter->filter($values['name']),
-                    'brand_id'       => $brand->id,
-                    'last_editor_id' => $user->id
-                );
-
-                $designProjectId = $designProjects->insert($data);
-                $designProject = $designProjects->find($designProjectId)->current();
-
-                $this->_helper->log(sprintf(
-                    'Создание нового прокета дизайна %s',
-                    $this->view->htmlA($this->_helper->url->url(array(
-                        'module'            => 'moder',
-                        'controller'        => 'design-project',
-                        'action'            => 'design-project',
-                        'design_project_id' => $designProject->id
-                    )), $brand->caption . ' ' . $designProject->name)
-                ), array($brand));
-
-                return $this->_redirect($this->_helper->url->url(array(
-                    'form' => null
-                )));
-            }
-
-            $this->view->formBrandAddDesignProject = $form;
-        }
-
-        $this->view->designProjects = $designProjects->fetchAll(
-            $designProjects
-                ->select()
-                ->where('brand_id = ?', $brand->id)
-                ->order('name')
-        );
-
         $cars = new Cars();
         $this->view->cars = $cars->fetchAll(
             $cars
@@ -277,40 +224,12 @@ class Moder_BrandsController extends Zend_Controller_Action
             'brand'                 => $brand,
             'canEdit'               => $canEdit,
             'canDeleteModel'        => $canDeleteModel,
-            'canEditDesignProjects' => $canEditDesignProjects,
             'canLogo'               => $canLogo,
             'description'           => $description,
             'descriptionForm'       => $descriptionForm,
             'links'                 => $links
         ));
     }
-
-    public function deleteDesignProjectAction()
-    {
-        $canDelete = $this->_helper->user()->isAllowed('design_project', 'edit');
-
-        if (!$canDelete) {
-            return $this->_forward('forbidden', 'error');
-        }
-
-        $designProjects = new Design_Projects();
-        $designProject = $designProjects->find($this->_getParam('design_project_id'))->current();
-
-        if (!$designProject)
-            return $this->_forward('notfound', 'error');
-
-        $brand = $designProject->findParentBrands();
-
-        $designProject->delete();
-
-        $this->_helper->log(sprintf(
-            'Удаление проекта дизайна для бренда %s',
-            $this->view->htmlA($this->brandModerUrl($brand), $brand->caption)
-        ), array($brand));
-
-        return $this->_redirect($this->brandModerUrl($brand));
-    }
-
 
     public function saveLinksAction()
     {

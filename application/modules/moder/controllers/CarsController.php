@@ -833,9 +833,6 @@ class Moder_CarsController extends Zend_Controller_Action
                 ->from('brands_cars', 'count(1)')
                 ->where('car_id = ?', $car->id)
         );
-        if ($car->design_project_id) {
-            $catalogueLinksCount++;
-        }
 
         $factoriesCount = $db->fetchOne(
             $db->select()
@@ -942,46 +939,6 @@ class Moder_CarsController extends Zend_Controller_Action
         ));
     }
 
-    public function deleteCarFromDesignProjectAction()
-    {
-        $cars = $this->_helper->catalogue()->getCarTable();
-
-        $car = $cars->find($this->getParam('car_id'))->current();
-        if (!$car)
-            return $this->_forward('notfound', 'error');
-
-        $canMove = $this->canMove($car);
-        if (!$canMove)
-            return $this->_forward('forbidden', 'error');
-
-        $designProjects = new Design_Projects();
-
-        $designProject = $designProjects->find($this->getParam('design_project_id'))->current();
-        if (!$designProject)
-            return $this->_forward('notfound', 'error');
-
-        $brand = $designProject->findParentBrands();
-
-        // удаляем связь атомобиля и семейства
-        $car->design_project_id = null;
-        $car->save();
-
-        $brand->updatePicturesCache();
-        $brand->refreshPicturesCount();
-
-        // обновляем кэши близнецов
-        $car->updateRelatedTwinsGroupsCount();
-
-        $message = sprintf(
-            'Удаление связи между автомобилем %s и проектом дизайна %s',
-            $this->view->htmlA($this->carModerUrl($car), $car->getFullName()),
-            $brand->caption . ' ' . $designProject->name
-        );
-        $this->_helper->log($message, array($car));
-
-        return $this->redirectToCar($car, 'catalogue');
-    }
-
     public function deleteCarFromBrandAction()
     {
         $cars = $this->_helper->catalogue()->getCarTable();
@@ -1050,55 +1007,6 @@ class Moder_CarsController extends Zend_Controller_Action
                        ->order(array('brands.position', 'brands.caption'))
             );
         }
-    }
-
-    public function addCarToDesignProjectAction()
-    {
-        $cars = $this->_helper->catalogue()->getCarTable();
-
-        $car = $cars->find($this->getParam('car_id'))->current();
-        if (!$car)
-            return $this->_forward('notfound', 'error');
-
-        $canMove = $this->canMove($car);
-        if (!$canMove)
-            return $this->_forward('forbidden', 'error');
-
-        $designProjects = new Design_Projects();
-
-        $designProject = $designProjects->find($this->getParam('design_project_id'))->current();
-        if (!$designProject)
-            return $this->_forward('notfound', 'error');
-
-        $brand = $designProject->findParentBrands();
-
-        // удаляем связь автомобиля и бренда модели
-        foreach ($car->findBrandsViaBrands_Cars() as $iBrand)
-            if ($brand->id == $iBrand->id) {
-                $car->deleteFromBrand($iBrand);
-                break;
-            }
-
-        $car->design_project_id = $designProject->id;
-        $car->save();
-
-        $brand->updatePicturesCache();
-
-        // обновляем кэши близнецов
-        $car->updateRelatedTwinsGroupsCount();
-
-        $user = $this->_helper->user()->get();
-        $ucsTable = new User_Car_Subscribe();
-        $ucsTable->subscribe($user, $car);
-
-        $message = sprintf(
-            'Связывание автомобиля %s и проекта дизайна %s',
-            $this->view->htmlA($this->carModerUrl($car), $car->getFullName()),
-            $brand->caption . ' ' . $designProject->name
-        );
-        $this->_helper->log($message, array($car));
-
-        return $this->redirectToCar($car, 'catalogue');
     }
 
     public function addCarToBrandAction()
@@ -2661,57 +2569,6 @@ class Moder_CarsController extends Zend_Controller_Action
             $childs = $this->perepareCatalogueCars($carParentRows, false);
         }
 
-        $designProjectRow = $car->findParentDesign_Projects();
-        $designProject = false;
-        if ($designProjectRow) {
-            $designProject = $this->prepareCatalogueDesignProject($designProjectRow);
-            if ($designProject) {
-                $designProject['removeUrl'] = $this->_helper->url->url(array(
-                    'module'            => 'moder',
-                    'controller'        => 'cars',
-                    'action'            => 'delete-car-from-design-project',
-                    'design_project_id' => $designProjectRow->id
-                ));
-            }
-        }
-
-        $desginProjectTable = new Design_Projects();
-        $designProjectRows = $desginProjectTable->fetchAll(
-            $desginProjectTable->select(true)
-                ->join('cars', 'design_projects.id = cars.design_project_id', null)
-                ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
-                ->where('car_parent_cache.diff <> 0')
-                ->where('car_parent_cache.car_id = ?', $car->id)
-                ->group('design_projects.id')
-        );
-
-        $inheritDesignProjects = array();
-        foreach ($designProjectRows as $designProjectRow) {
-            $data = $this->prepareCatalogueDesignProject($designProjectRow);
-            if ($data) {
-
-                $inheritFromCars = $carTable->fetchAll(
-                    $carTable->select(true)
-                        ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
-                        ->where('car_parent_cache.car_id = ?', $car->id)
-                        ->where('car_parent_cache.diff <> 0')
-                        ->where('cars.design_project_id = ?', $designProjectRow->id)
-                );
-
-                $cars = array();
-                foreach ($inheritFromCars as $inheritFromCar) {
-                    $cars[] = array(
-                        'name' => $inheritFromCar->getFullName(),
-                        'url'  => $this->carModerUrl($inheritFromCar)
-                    );
-                }
-
-                $data['cars'] = $cars;
-
-                $inheritDesignProjects[] = $data;
-            }
-        }
-
         $this->view->assign(array(
             'car'                 => $car,
             'canMove'             => $this->canMove($car),
@@ -2732,43 +2589,8 @@ class Moder_CarsController extends Zend_Controller_Action
                 Car_Parent::TYPE_DEFAULT => 'подвид',
                 Car_Parent::TYPE_TUNING  => $this->view->translate('catalogue/related'),
                 Car_Parent::TYPE_SPORT   => 'спорт'
-            ),
-            'designProject'         => $designProject,
-            'inheritDesignProjects' => $inheritDesignProjects
+            )
         ));
-    }
-
-    private function prepareCatalogueDesignProject($designProjectRow)
-    {
-        $designProject = false;
-        $brand = $designProjectRow->findParentBrands();
-        if ($brand) {
-            $designProject = array(
-                'brand' => array(
-                    'name'     => $brand->caption,
-                    'moderUrl' => $this->_helper->url->url(array(
-                        'module'     => 'moder',
-                        'controller' => 'brands',
-                        'action'     => 'brand',
-                        'brand_id'   => $brand->id
-                    ))
-                ),
-                'name'     => $designProjectRow->name,
-                'url'      => $this->_helper->url->url(array(
-                    'controller'             => 'catalogue',
-                    'action'                 => 'design-project',
-                    'brand_catname'          => $brand->folder,
-                    'design_project_catname' => $designProjectRow->catname
-                ), 'catalogue', true),
-                'moderUrl' => $this->_helper->url->url(array(
-                    'controller'        => 'moder',
-                    'action'            => 'design-project',
-                    'design_project_id' => $designProjectRow->id
-                )),
-            );
-        }
-
-        return $designProject;
     }
 
     /**

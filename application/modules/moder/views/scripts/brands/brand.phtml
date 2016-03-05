@@ -123,65 +123,15 @@
             <div class="tab-content">
                 <div id="brand-tab-bar-1" class="tab-pane active">
                     <div class="well">
-                        <table class="table table-condensed table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Название</th>
-                                    <th>Папка</th>
-                                    <th colspan="2">Года выпуска</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($this->designProjects as $designProject) { ?>
-                                    <tr>
-                                        <td>
-                                            <?=$this->htmlA($this->url(array(
-                                                'module'           => 'moder',
-                                                'controller'        => 'design-projects',
-                                                'action'            => 'design-project',
-                                                'design_project_id' => $designProject->id,
-                                            ), 'default', true), $designProject->name) ?>
-                                        </td>
-                                        <td><?=$this->escape($designProject->catname) ?></td>
-                                        <td colspan="2"><?=$this->escape($designProject->year) ?></td>
-                                        <td>
-                                            <?php if ($this->canDeleteModel) { ?>
-                                                <?=$this->form('delete-design-project', array(
-                                                    'style'     => 'margin-bottom:0',
-                                                    'method' => 'post',
-                                                    'action' => $this->url(array(
-                                                        'module'         => 'moder',
-                                                        'controller'     => 'brands',
-                                                        'action'         => 'delete-design-project',
-                                                        'design_project_id' => $designProject->id
-                                                    ))
-                                                ), '<button type="submit" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></button>')?>
-                                            <?php } ?>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-
-                                <?php foreach ($this->cars as $car) { ?>
-                                    <tr>
-                                        <td>
-                                            <?=$this->htmlA($this->url(array(
-                                                'module' => 'moder',
-                                                'controller' => 'cars',
-                                                'action' => 'car',
-                                                'car_id' => $car->id
-                                            )), $car->getFullName()) ?>
-                                        </td>
-                                        <td></td>
-                                        <td colspan="2"></td>
-                                        <td></td>
-                                    </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
-
-                        <?php if ($this->canEditDesignProjects) { ?>
-                            <?=$this->formBrandAddDesignProject->render($this)?>
+                        <?php foreach ($this->cars as $car) { ?>
+                            <p>
+                                <?=$this->htmlA($this->url(array(
+                                    'module' => 'moder',
+                                    'controller' => 'cars',
+                                    'action' => 'car',
+                                    'car_id' => $car->id
+                                )), $car->getFullName()) ?>
+                            </p>
                         <?php } ?>
                     </div>
                 </div>

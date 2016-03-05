@@ -2,12 +2,10 @@
 /BrandsController.php
 /CarsController.php
 /CatalogueController.php
-/CategoryController.php
 /CommentsController.php
 /IndexController.php
 /LoginController.php
 /PictureController.php
-/RestorepasswordController.php
 /SpecController.php
 /TestController.php
 /UsersController.php

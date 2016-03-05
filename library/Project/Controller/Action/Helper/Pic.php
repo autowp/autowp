@@ -583,27 +583,33 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                     if ($currentLangName) {
                         unset($altNames2[$currentLangName]);
                     }
-
-                    $designProjectTable = new Design_Projects();
-                    $designProjectRow = $designProjectTable->fetchRow(
-                        $designProjectTable->select(true)
-                            ->join('cars', 'design_projects.id = cars.design_project_id', null)
-                            ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
+                    
+                    
+                    $designCarsRow = $db->fetchRow(
+                        $db->select()
+                            ->from('brands', [
+                                'brand_name'    => 'caption',
+                                'brand_catname' => 'folder'
+                            ])
+                            ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
+                                'brand_car_catname' => 'catname'
+                            ])
+                            ->where('brands_cars.type = ?', Brands_Cars::TYPE_DESIGN)
+                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
                             ->where('car_parent_cache.car_id = ?', $car->id)
-                            ->limit(1)
                     );
-
-                    if ($designProjectRow) {
-                        $dbBrand = $designProjectRow->findParentBrands();
+                    if ($designCarsRow) {
                         $designProject = array(
+                            'brand' => $designCarsRow['brand_name'],
                             'url'   => $urlHelper->url(array(
-                                'action'                 => 'design-project',
-                                'brand_catname'          => $dbBrand->folder,
-                                'design_project_catname' => $designProjectRow->catname
-                            ), 'catalogue', true),
-                            'brand' => $dbBrand->caption
+                                'controller'    => 'catalogue',
+                                'action'        => 'brand-car',
+                                'brand_catname' => $designCarsRow['brand_catname'],
+                                'car_catname'   => $designCarsRow['brand_car_catname']
+                            ), 'catalogue', true)
                         );
                     }
+                    
 
                     $cdTable = new Category();
                     $cdlTable = new Category_Language();
@@ -718,17 +724,6 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                             $links[$url] = 'Управление брендом ' . $brand->caption;
                         }
 
-                        if ($dp = $car->findParentDesign_Projects()) {
-                            if ($brand = $dp->findParentBrands()) {
-                                $url = $urlHelper->url(array(
-                                    'module'     => 'moder',
-                                    'controller' => 'brands',
-                                    'action'     => 'brand',
-                                    'brand_id'   => $brand->id
-                                ), 'default', true);
-                                $links[$url] = 'Управление брендом ' . $brand->caption;
-                            }
-                        }
                     }
 
                     break;

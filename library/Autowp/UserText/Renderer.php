@@ -56,6 +56,18 @@ class Renderer
 
         return $router;
     }
+    
+    /**
+     * @param string $text
+     * @return string
+     */
+    private function preparePlainText($text)
+    {
+        $out = $this->_view->escape($text);
+        $out = str_replace("\r", '', $out);
+        $out = str_replace("\n", '<br />', $out);
+        return $out;
+    }
 
     /**
      * @param string $text
@@ -82,20 +94,17 @@ class Renderer
                 throw new Exception("Error during parse urls");
             }
 
-            $out[] = $this->_view->escape(mb_substr($text, 0, $linkPos));
+            $out[] = $this->preparePlainText(mb_substr($text, 0, $linkPos));
 
             $out[] = $this->processHref($url);
 
             $text = mb_substr($text, $linkPos + $matchLength);
         }
         if ($text) {
-            $out[] = $this->_view->escape($text);
+            $out[] = $this->preparePlainText($text);
         }
         
         $out = implode($out);
-        
-        $out = str_replace("\r", '', $out);
-        $out = str_replace("\n", '<br />', $out);
 
         return $out;
     }

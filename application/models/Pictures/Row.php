@@ -408,40 +408,27 @@ class Pictures_Row extends Project_Db_Table_Row
 
                         $result = $firstChar . '/' . $brandsFolder .'/'.$carFolder.'/'.$carCatname;
                     } else {
-                        $dp = $car->findParentDesign_Projects();
-                        if ((count($sBrands) == 0) && $dp) {
-                            $brand = $dp->findParentBrands();
+
+                        if (count($sBrands) == 1) {
+                            $sBrandsA = array_values($sBrands);
+                            $brand = $sBrandsA[0];
+
                             $brandFolder = $filenameFilter->filter($brand->folder);
                             $firstChar = mb_substr($brandFolder, 0, 1);
+
+                            $carFolder = $carCatname;
+                            $carFolder = trim(str_replace($brandFolder, '', $carFolder), '_-');
+
                             $result = implode('/', array(
                                 $firstChar,
                                 $brandFolder,
-                                $carCatname,
+                                $carFolder,
                                 $carCatname
                             ));
                         } else {
-
-                            if (count($sBrands) == 1) {
-                                $sBrandsA = array_values($sBrands);
-                                $brand = $sBrandsA[0];
-
-                                $brandFolder = $filenameFilter->filter($brand->folder);
-                                $firstChar = mb_substr($brandFolder, 0, 1);
-
-                                $carFolder = $carCatname;
-                                $carFolder = trim(str_replace($brandFolder, '', $carFolder), '_-');
-
-                                $result = implode('/', array(
-                                    $firstChar,
-                                    $brandFolder,
-                                    $carFolder,
-                                    $carCatname
-                                ));
-                            } else {
-                                $carFolder = $filenameFilter->filter($car->caption);
-                                $firstChar = mb_substr($carFolder, 0, 1);
-                                $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
-                            }
+                            $carFolder = $filenameFilter->filter($car->caption);
+                            $firstChar = mb_substr($carFolder, 0, 1);
+                            $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
                         }
                     }
                 }

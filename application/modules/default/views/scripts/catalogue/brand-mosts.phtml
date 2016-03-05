@@ -12,8 +12,8 @@
                 'args'   => array(
                     'MOST_CATNAME'     => $this->cMost['catName'],
                     'MOST_NAME'        => $this->translate('most/'.$this->cMost['catName']),
-                    'CAR_TYPE_NAME'    => $this->carType['name_rp'],
-                    'CAR_TYPE_CARNAME' => $this->carType['catname'],
+                    'CAR_TYPE_NAME'    => $this->translate($this->carType['name_rp']),
+                    'CAR_TYPE_CATNAME' => $this->carType['catname'],
                     'YEAR_NAME'        => $this->cYear['name'],
                     'YEAR_CATNAME'     => $this->cYear['folder'],
                     'BRAND_CATNAME'    => $this->brand->folder,
@@ -27,8 +27,8 @@
                 'args'   => array(
                     'MOST_CATNAME'     => $this->cMost['catName'],
                     'MOST_NAME'        => $this->translate('most/'.$this->cMost['catName']),
-                    'CAR_TYPE_NAME'    => $this->carType['name_rp'],
-                    'CAR_TYPE_CARNAME' => $this->carType['catname'],
+                    'CAR_TYPE_NAME'    => $this->translate($this->carType['name_rp']),
+                    'CAR_TYPE_CATNAME' => $this->carType['catname'],
                     'BRAND_CATNAME'    => $this->brand->folder,
                     'BRAND_NAME'       => $this->brandName,
                 )
@@ -52,7 +52,7 @@
 <ul class="nav nav-pills">
     <?php foreach ($this->years as $year) { ?>
         <li<?=$year['active'] ? ' class="active"' : '' ?>>
-            <?=$this->htmlA($year['url'], $year['name']) ?>
+            <?=$this->htmlA($year['url'], $this->translate($year['name'])) ?>
         </li>
     <?php } ?>
 </ul>

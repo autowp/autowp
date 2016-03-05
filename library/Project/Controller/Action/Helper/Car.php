@@ -243,31 +243,6 @@ class Project_Controller_Action_Helper_Car
 
         // design projects
         $carsDesignProject = array();
-        $designProjectTable = new Design_Projects();
-        $db = $designProjectTable->getAdapter();
-        if ($carIds) {
-            $designProjectRows = $db->fetchAll(
-                $db->select()
-                    ->from($designProjectTable->info('name'), array('catname', 'brand_id'))
-                    ->join('cars', 'design_projects.id = cars.design_project_id', null)
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', 'car_id')
-                    ->join('brands', 'design_projects.brand_id = brands.id', array('brand_name' => 'caption', 'brand_catname' => 'folder'))
-                    ->where('car_parent_cache.car_id IN (?)', $carIds)
-                    ->group('car_parent_cache.car_id')
-            );
-            foreach ($designProjectRows as $row) {
-                $carsDesignProject[$row['car_id']] = array(
-                    'brandName' => $row['brand_name'],
-                    'url'       => $urlHelper->url(array(
-                        'action'                 => 'design-project',
-                        'brand_catname'          => $row['brand_catname'],
-                        'design_project_catname' => $row['catname']
-                    ), 'catalogue', true)
-                );
-            }
-        }
-        
-        // new design projects
         $designCarsRows = $carParentAdapter->fetchAll(
             $carParentAdapter->select()
                 ->from('brands', [
