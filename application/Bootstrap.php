@@ -44,8 +44,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         defined('MYSQL_DATETIME') || define('MYSQL_DATETIME', MYSQL_DATE . ' ' . MYSQL_TIME);
         defined('MYSQL_TIMEZONE') || define('MYSQL_TIMEZONE', 'UTC');
         defined('MYSQL_DATETIME_FORMAT') || define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
-
-        //require_once 'BBDocument.php';
     }
 
     protected function _initAutoloader()

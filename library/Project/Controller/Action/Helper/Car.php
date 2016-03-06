@@ -1,5 +1,7 @@
 <?php
 
+use Application\Model\Twins;
+
 class Project_Controller_Action_Helper_Car
     extends Zend_Controller_Action_Helper_Abstract
 {

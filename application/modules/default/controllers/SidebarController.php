@@ -1,13 +1,16 @@
 <?php
+
+use Application\Model\Brand;
+
 class SidebarController extends Zend_Controller_Action
 {
-    private function _getBrandAliases(Brands_Row $brand)
+    private function getBrandAliases(array $brand)
     {
-        $aliases = array($brand->caption);
+        $aliases = [$brand['name']];
 
         $brandAliasTable = new Brand_Alias();
         $brandAliasRows = $brandAliasTable->fetchAll(array(
-            'brand_id = ?' => $brand->id
+            'brand_id = ?' => $brand['id']
         ));
         foreach ($brandAliasRows as $brandAliasRow) {
             $aliases[] = $brandAliasRow->name;
@@ -15,7 +18,7 @@ class SidebarController extends Zend_Controller_Action
 
         $brandLangTable = new Brand_Language();
         $brandLangRows = $brandLangTable->fetchAll(array(
-            'brand_id = ?'    => $brand->id
+            'brand_id = ?' => $brand['id']
         ));
         foreach ($brandLangRows as $brandLangRow) {
             $aliases[] = $brandLangRow->name;
@@ -34,36 +37,38 @@ class SidebarController extends Zend_Controller_Action
         return $aliases;
     }
 
-    private function _subBrandGroups($brand)
+    private function subBrandGroups(array $brand)
     {
-        $brandTable = $this->_helper->catalogue()->getBrandTable();
-
-        $rows = $brandTable->fetchAll(array(
-            'parent_brand_id = ?' => $brand->id
-        ));
+        $brandModel = new Brand();
+        
+        $language = $this->_helper->language();
+        
+        $rows = $brandModel->getList($language, function($select) use ($brand) {
+            $select->where('parent_brand_id = ?', $brand['id']);
+        });
 
         $groups = array();
         foreach ($rows as $subBrand) {
             $groups[] = array(
                 'url'     => $this->_helper->url->url(array(
                     'action'        => 'brand',
-                    'brand_catname' => $subBrand->folder
+                    'brand_catname' => $subBrand['catname']
                 ), 'catalogue', true),
-                'caption' => $subBrand->caption,
+                'caption' => $subBrand['name'],
             );
         }
 
         return $groups;
     }
 
-    private function _carGroups($brand, $conceptsSeparatly, $carId)
+    private function carGroups(array $brand, $conceptsSeparatly, $carId)
     {
         $cache = $this->getInvokeArg('bootstrap')
             ->getResource('cachemanager')->getCache('long');
 
         $language = $this->_helper->language();
 
-        $cacheKey = 'SIDEBAR_' . $brand->id . '_' . $language . '_1';
+        $cacheKey = 'SIDEBAR_' . $brand['id'] . '_' . $language . '_1';
 
         if (!($groups = $cache->load($cacheKey))) {
 
@@ -78,12 +83,12 @@ class SidebarController extends Zend_Controller_Action
                     'car_id'   => 'id',
                     'car_name' => 'cars.caption'
                 ))
-                ->where('brands_cars.brand_id = ?', $brand->id);
+                ->where('brands_cars.brand_id = ?', $brand['id']);
             if ($conceptsSeparatly) {
                 $select->where('NOT cars.is_concept');
             }
 
-            $aliases = $this->_getBrandAliases($brand);
+            $aliases = $this->getBrandAliases($brand);
 
             $carLanguageTable = new Car_Language();
 
@@ -93,13 +98,13 @@ class SidebarController extends Zend_Controller_Action
                 if ($brandCarRow['brand_car_catname']) {
                     $url = $this->_helper->url->url(array(
                         'action'        => 'brand-car',
-                        'brand_catname' => $brand->folder,
+                        'brand_catname' => $brand['catname'],
                         'car_catname'   => $brandCarRow['brand_car_catname']
                     ), 'catalogue', true);
                 } else {
                     $url = $this->_helper->url->url(array(
                         'action'        => 'car',
-                        'brand_catname' => $brand->folder,
+                        'brand_catname' => $brand['catname'],
                         'car_id'        => $brandCarRow['car_id']
                     ), 'catalogue', true);
                 }
@@ -156,14 +161,14 @@ class SidebarController extends Zend_Controller_Action
         return $groups;
     }
 
-    private function _otherGroups($brand, $conceptsSeparatly, $type, $isConcepts, $isEngines)
+    private function otherGroups($brand, $conceptsSeparatly, $type, $isConcepts, $isEngines)
     {
         $cache = $this->getInvokeArg('bootstrap')
             ->getResource('cachemanager')->getCache('long');
 
         $language = $this->_helper->language();
 
-        $cacheKey = 'SIDEBAR_OTHER_' . $brand->id . '_' . $language . '_' . ($conceptsSeparatly ? '1' : '0');
+        $cacheKey = 'SIDEBAR_OTHER_' . $brand['id'] . '_' . $language . '_' . ($conceptsSeparatly ? '1' : '0');
 
         if (!($groups = $cache->load($cacheKey))) {
             $groups = array();
@@ -177,14 +182,14 @@ class SidebarController extends Zend_Controller_Action
                     ->from('cars', array(new Zend_Db_Expr('1')))
                     ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                     ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                    ->where('brands_cars.brand_id = ?', $brand->id)
+                    ->where('brands_cars.brand_id = ?', $brand['id'])
                     ->where('cars.is_concept')
                     ->limit(1);
                 if ($db->fetchOne($select) > 0) {
                     $groups['concepts'] = array(
                         'url' => $this->_helper->url->url(array(
                             'action'        => 'concepts',
-                            'brand_catname' => $brand->folder
+                            'brand_catname' => $brand['catname']
                         ), 'catalogue', true),
                         'caption' => $this->view->translate('concepts and prototypes'),
                     );
@@ -198,13 +203,13 @@ class SidebarController extends Zend_Controller_Action
                 $db->select()
                     ->from($engineTable->info('name'), new Zend_Db_Expr('count(1)'))
                     ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
-                    ->where('brand_engine.brand_id = ?', $brand->id)
+                    ->where('brand_engine.brand_id = ?', $brand['id'])
             );
             if ($enginesCount > 0)
                 $groups['engines'] = array(
                     'url' => $this->_helper->url->url(array(
                         'action'        => 'engines',
-                        'brand_catname' => $brand->folder
+                        'brand_catname' => $brand['catname']
                     ), 'catalogue', true),
                     'caption' => $this->view->translate('engines'),
                     'count'   => $enginesCount
@@ -220,13 +225,13 @@ class SidebarController extends Zend_Controller_Action
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
                     ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
                     ->where('type = ?', Picture::LOGO_TYPE_ID)
-                    ->where('brand_id = ?', $brand->id)
+                    ->where('brand_id = ?', $brand['id'])
             );
             if ($logoPicturesCount > 0)
                 $groups['logo'] = array(
                     'url' => $this->_helper->url->url(array(
                         'action'        => 'logotypes',
-                        'brand_catname' => $brand->folder
+                        'brand_catname' => $brand['catname']
                     ), 'catalogue', true),
                     'caption' => $this->view->translate('logotypes'),
                     'count'   => $logoPicturesCount
@@ -238,13 +243,13 @@ class SidebarController extends Zend_Controller_Action
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
                     ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
                     ->where('type = ?', Picture::MIXED_TYPE_ID)
-                    ->where('brand_id = ?', $brand->id)
+                    ->where('brand_id = ?', $brand['id'])
             );
             if ($mixedPicturesCount > 0)
                 $groups['mixed'] = array(
                     'url' => $this->_helper->url->url(array(
                         'action' => 'mixed',
-                        'brand_catname' => $brand->folder
+                        'brand_catname' => $brand['catname']
                     ), 'catalogue', true),
                     'caption' => $this->view->translate('mixed'),
                     'count'   => $mixedPicturesCount
@@ -256,14 +261,14 @@ class SidebarController extends Zend_Controller_Action
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
                     ->where('status in (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
                     ->where('type = ?', Picture::UNSORTED_TYPE_ID)
-                    ->where('brand_id = ?', $brand->id)
+                    ->where('brand_id = ?', $brand['id'])
             );
 
             if ($unsortedPicturesCount > 0) {
                 $groups['unsorted'] = array(
                     'url'     => $this->_helper->url->url(array(
                         'action'        => 'other',
-                        'brand_catname' => $brand->folder
+                        'brand_catname' => $brand['catname']
                     ), 'catalogue', true),
                     'caption' => $this->view->translate('unsorted'),
                     'count'   => $unsortedPicturesCount
@@ -296,20 +301,19 @@ class SidebarController extends Zend_Controller_Action
         return array_values($groups);
     }
 
-
-    private function _getNamespace()
+    private function getNamespace()
     {
         return new Zend_Session_Namespace(__CLASS__);
     }
 
-    private function _brandGroups($brand, $type, $carId, $isConcepts, $isEngines)
+    private function brandGroups($brand, $type, $carId, $isConcepts, $isEngines)
     {
-        $conceptsSeparatly = !in_array($brand->type_id, array(3, 4));
+        $conceptsSeparatly = !in_array($brand['type_id'], array(3, 4));
 
         // создаем массив групп
         $groups = array_merge(
-            $this->_carGroups($brand, $conceptsSeparatly, $carId),
-            $this->_subBrandGroups($brand)
+            $this->carGroups($brand, $conceptsSeparatly, $carId),
+            $this->subBrandGroups($brand)
         );
 
         // сортируем группы
@@ -324,7 +328,7 @@ class SidebarController extends Zend_Controller_Action
 
         $groups = array_merge(
             $groups,
-            $this->_otherGroups($brand, $conceptsSeparatly, $type, $isConcepts, $isEngines)
+            $this->otherGroups($brand, $conceptsSeparatly, $type, $isConcepts, $isEngines)
         );
 
         return $groups;
@@ -332,39 +336,41 @@ class SidebarController extends Zend_Controller_Action
 
     public function brandAction()
     {
-        $brandTable = $this->_helper->catalogue()->getBrandTable();
-        $brand = $brandTable->find($this->_getParam('brand_id'))->current();
+        $language = $this->_helper->language();
+        
+        $brandModel = new Brand();
+        $brand = $brandModel->getBrandById($this->getParam('brand_id'), $language);
         if (!$brand) {
             return $this->_forward('notfound', 'error');
         }
 
-        $carId = (int)$this->_getParam('car_id');
-        $type = $this->_getParam('type');
+        $carId = (int)$this->getParam('car_id');
+        $type = $this->getParam('type');
         $type = strlen($type) ? (int)$type : null;
         $isConcepts = (bool)$this->getParam('is_concepts');
         $isEngines = (bool)$this->getParam('is_engines');
 
-        $namespace = $this->_getNamespace();
-        $namespace->selected = $brand->id;
+        $namespace = $this->getNamespace();
+        $namespace->selected = $brand['id'];
 
-        $this->view->groups = $this->_brandGroups($brand, $type, $carId, $isConcepts, $isEngines);
+        $this->view->groups = $this->brandGroups($brand, $type, $carId, $isConcepts, $isEngines);
         $this->_helper->viewRenderer->setResponseSegment('sidebar');
     }
 
     public function brandsAction()
     {
-        $brandTable = $this->_helper->catalogue()->getBrandTable();
+        $brandModel = new Brand();
 
-        $namespace = $this->_getNamespace();
+        $namespace = $this->getNamespace();
         $selected = null;
         if (isset($namespace->selected)) {
             $selected = (int)$namespace->selected;
         }
 
-        $ids = (array)$this->_getParam('brand_id');
+        $ids = (array)$this->getParam('brand_id');
 
-        $carId = (int)$this->_getParam('car_id');
-        $type = $this->_getParam('type');
+        $carId = (int)$this->getParam('car_id');
+        $type = $this->getParam('type');
         $type = strlen($type) ? (int)$type : null;
         $isConcepts = (bool)$this->getParam('is_concepts');
         $isEngines = (bool)$this->getParam('is_engines');
@@ -372,14 +378,15 @@ class SidebarController extends Zend_Controller_Action
         $result = array();
 
         if ($ids) {
-            $brands = $brandTable->fetchAll(array(
-                'id in (?)' => $ids
-            ), 'caption');
+            $language = $this->_helper->language();
+            $brands = $brandModel->getList($language, function($select) use ($ids) {
+                $select->where('id in (?)', $ids);
+            });
 
             foreach ($brands as $brand) {
                 $result[] = array(
                     'brand'  => $brand,
-                    'groups' => $this->_brandGroups($brand, $type, $carId, $isConcepts, $isEngines),
+                    'groups' => $this->brandGroups($brand, $type, $carId, $isConcepts, $isEngines),
                     'active' => false
                 );
             }
@@ -387,7 +394,7 @@ class SidebarController extends Zend_Controller_Action
 
         $found = false;
         foreach ($result as &$brand) {
-            if ($brand['brand']->id == $selected) {
+            if ($brand['brand']['id'] == $selected) {
                 $brand['active'] = true;
                 $found = true;
                 break;

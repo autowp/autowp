@@ -96,7 +96,8 @@ class Brand
         return $items;
     }
     
-    private function _utfCharToNumber($char) {
+    private function _utfCharToNumber($char) 
+    {
         $i = 0;
         $number = '';
         while (isset($char{$i})) {
@@ -164,5 +165,105 @@ class Brand
         }
         
         return $result;
+    }
+    
+    public function getBrandIdByCatname($catname)
+    {
+        $db = $this->table->getAdapter();
+        
+        return $db->fetchOne(
+            $db->select()
+                ->from('brands', 'id')
+                ->where('folder = ?', (string)$catname)
+        );
+    }
+    
+    private function fetchBrand($language, $callback)
+    {
+        $db = $this->table->getAdapter();
+        
+        $select = $db->select()
+            ->from('brands', [
+                'id', 'folder', 'type_id',
+                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.caption)',
+                'full_caption', 'img', 'text_id'
+            ])
+            ->joinLeft('brand_language', 'brands.id = brand_language.brand_id and brand_language.language = :language', null)
+            ->bind([
+                'language' => (string)$language
+            ]);
+            
+        $callback($select);
+        
+        $brand = $db->fetchRow($select);
+        
+        if (!$brand) {
+            return null;
+        }
+        
+        return [
+            'id'        => $brand['id'],
+            'name'      => $brand['name'],
+            'catname'   => $brand['folder'],
+            'full_name' => $brand['full_caption'],
+            'img'       => $brand['img'],
+            'text_id'   => $brand['text_id'],
+            'type_id'   => $brand['type_id']
+        ];
+    }
+    
+    public function getBrandById($id, $language)
+    {
+        return $this->fetchBrand($language, function($select) use ($id) {
+            $select->where('brands.id = ?', (int)$id);
+        });
+    }
+    
+    public function getBrandByCatname($catname, $language)
+    {
+        return $this->fetchBrand($language, function($select) use ($catname) {
+            $select->where('brands.folder = ?', (string)$catname);
+        });
+    }
+    
+    public function getFactoryBrandId($factoryId)
+    {
+        $brand = $this->table->fetchRow(
+            $this->table->select(true)
+                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                ->join('factory_car', 'car_parent_cache.car_id = factory_car.car_id', null)
+                ->where('factory_car.factory_id = ?', (int)$factoryId)
+                ->group('brands.id')
+                ->order(new Zend_Db_Expr('count(1) desc'))
+        );
+        if (!$brand) {
+            return null;
+        }
+        
+        return $brand->id;
+    }
+    
+    public function getList($language, callable $callback)
+    {
+        $db = $this->table->getAdapter();
+        
+        $select = $db->select()
+            ->from('brands', [
+                'id', 'type_id',
+                'catname' => 'folder',
+                'name'    => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.caption)'
+            ])
+            ->joinLeft('brand_language', 'brands.id = brand_language.brand_id and brand_language.language = :language', null)
+            ->order(['brands.position', 'name'])
+            ->bind([
+                'language' => (string)$language
+            ]);
+        
+        $callback($select);
+        
+        $items = $db->fetchAll($select);
+        
+        return $items;
     }
 }

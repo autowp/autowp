@@ -18,20 +18,20 @@
             $rows = ceil(count($this->brands) / $columns);
         ?>
         <div class="row">
-            <div class="col-lg-2 col-md-2">
+            <div class="col-md-2">
                 <?php foreach ($this->brands as $idx => $brand) { ?>
-                    <?=$this->formButton('brand', $brand->id, array(
+                    <?=$this->formButton('brand', $brand['catname'], array(
                         'type'    => 'submit',
                         'class'   => 'btn btn-link',
-                        'value'   => $brand->id,
-                        'content' => $brand->caption
+                        'value'   => $brand['catname'],
+                        'content' => $brand['name']
                     ))?><br />
-                    <?php if ($idx && ($idx % $rows == 0)) { ?></div><div class="col-lg-2 col-md-2"><?php } ?>
+                    <?php if ($idx && ($idx % $rows == 0)) { ?></div><div class="col-md-2"><?php } ?>
                 <?php } ?>
             </div>
         </div>
     <?php } else { ?>
-        <?=$this->formHidden('brand', $this->brand->id)?>
+        <?=$this->formHidden('brand', $this->brand['catname'])?>
         <?=$this->partial('cars/select-car-engine-walk-tree.phtml', array(
             'engines' => $this->engines
         ))?>

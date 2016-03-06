@@ -8,8 +8,8 @@
             ),
             'pageId' => 138,
             'args'   => array(
-                'BRAND_CATNAME'    => $this->brand->folder,
-                'BRAND_NAME'       => $this->brandName,
+                'BRAND_CATNAME'    => $this->brand['catname'],
+                'BRAND_NAME'       => $this->brand['name'],
                 'CAR_TYPE_NAME'    => $this->translate($this->cartype->name),
                 'CAR_TYPE_CATNAME' => $this->cartype->catname
             )
@@ -23,8 +23,8 @@
             ),
             'pageId'    => 14,
             'args'      => array(
-                'BRAND_CATNAME'  => $this->brand->folder,
-                'BRAND_NAME'     => $this->brandName,
+                'BRAND_CATNAME'  => $this->brand['catname'],
+                'BRAND_NAME'     => $this->brand['name'],
             )
         ));
     }

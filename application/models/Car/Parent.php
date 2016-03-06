@@ -144,12 +144,18 @@ class Car_Parent extends Project_Db_Table
         $cpcTable->rebuildCache($car);
     }
 
-    public function getPathsToBrand($carId, Brands_Row $brand, array $options = array())
+    public function getPathsToBrand($carId, $brand, array $options = array())
     {
         $carId = (int)$carId;
         if (!$carId) {
             throw new Exception("carId not provided");
         }
+        
+        $brandId = $brand;
+        if ($brandId instanceof Brands_Row) {
+            $brandId = $brandId->id;
+        }
+        
 
         $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
 
@@ -158,7 +164,7 @@ class Car_Parent extends Project_Db_Table
         $limit = $breakOnFirst ? 1 : null;
         $brandCarRows = $this->getBrandCarTable()->fetchAll(array(
             'car_id = ?'   => $carId,
-            'brand_id = ?' => $brand->id
+            'brand_id = ?' => $brandId
         ), null, $limit);
         foreach ($brandCarRows as $brandCarRow) {
             $result[] = array(
@@ -176,7 +182,7 @@ class Car_Parent extends Project_Db_Table
         ));
 
         foreach ($parents as $parent) {
-            $paths = $this->getPathsToBrand($parent->parent_id, $brand, $options);
+            $paths = $this->getPathsToBrand($parent->parent_id, $brandId, $options);
 
             foreach ($paths as $path) {
                 $result[] = array(

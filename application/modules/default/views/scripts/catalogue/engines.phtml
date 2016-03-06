@@ -7,8 +7,8 @@
         ),
         'pageId' => $this->engine ? 168 : 38,
         'args'   => array(
-            'BRAND_NAME'    => $this->brandName,
-            'BRAND_CATNAME' => $this->brand->folder,
+            'BRAND_NAME'    => $this->brand['name'],
+            'BRAND_CATNAME' => $this->brand['catname'],
             'ENGINE_NAME'   => $this->engine ? $this->engine->caption : null
         )
     ));
@@ -38,7 +38,7 @@
                     'module'     => 'moder',
                     'controller' => 'engines',
                     'action'     => 'add',
-                    'brand_id'   => $this->brand->id
+                    'brand_id'   => $this->brand['id']
                 ), 'default', true), 'добавить двигатель')?>
             <?php } ?>
         <?php } ?>

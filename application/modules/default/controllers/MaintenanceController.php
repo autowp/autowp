@@ -1,7 +1,7 @@
 <?php
 class MaintenanceController extends Zend_Controller_Action
 {
-    protected function _getProgress()
+    private function getProgress()
     {
         exec('cat /proc/mdstat', $out);
 
@@ -28,14 +28,14 @@ class MaintenanceController extends Zend_Controller_Action
         $this->getResponse()->setHttpResponseCode(503);
 
         $this->view->assign(array(
-            'progress' => $this->_getProgress()
+            'progress' => $this->getProgress()
         ));
     }
 
     public function progressAction()
     {
         return $this->_helper->json(array(
-            'progress' => $this->_getProgress()
+            'progress' => $this->getProgress()
         ));
     }
 }

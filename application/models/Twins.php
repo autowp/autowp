@@ -1,65 +1,75 @@
 <?php
 
+namespace Application\Model;
+
+use Twins_Groups;
+use Brands;
+use Picture;
+use Cars;
+
+use Zend_Db_Expr;
+use Zend_Paginator;
+
 class Twins
 {
     /**
      * @var Twins_Groups
      */
-    protected $_groupsTable;
+    private $groupsTable;
 
     /**
      * @var Brands
      */
-    protected $_brandTable;
+    private $brandTable;
 
     /**
      * @var Picture
      */
-    protected $_pictureTable;
+    private $pictureTable;
 
     /**
      * @var Cars
      */
-    protected $_carTable;
+    private $carTable;
 
     /**
      * @return Twins_Groups
      */
-    protected function _getGroupsTable()
+    private function getGroupsTable()
     {
-        return $this->_groupsTable
-            ? $this->_groupsTable
-            : $this->_groupsTable = new Twins_Groups();
+        return $this->groupsTable
+            ? $this->groupsTable
+            : $this->groupsTable = new Twins_Groups();
     }
 
     /**
      * @return Brands
      */
-    protected function _getBrandTable()
+    private function getBrandTable()
     {
-        return $this->_brandTable
-            ? $this->_brandTable
-            : $this->_brandTable = new Brands();
+        return $this->brandTable
+            ? $this->brandTable
+            : $this->brandTable = new Brands();
     }
 
     /**
      * @return Picture
      */
-    protected function _getPictureTable()
+    private function getPictureTable()
     {
-        return $this->_pictureTable
-            ? $this->_pictureTable
-            : $this->_pictureTable = new Picture();
+        return $this->pictureTable
+            ? $this->pictureTable
+            : $this->pictureTable = new Picture();
     }
 
     /**
      * @return Cars
      */
-    protected function _getCarTable()
+    private function getCarTable()
     {
-        return $this->_carTable
-            ? $this->_carTable
-            : $this->_carTable = new Cars();
+        return $this->carTable
+            ? $this->carTable
+            : $this->carTable = new Cars();
     }
 
     /**
@@ -77,7 +87,7 @@ class Twins
         $language = $options['language'];
         $limit = $options['limit'];
 
-        $brandTable = $this->_getBrandTable();
+        $brandTable = $this->getBrandTable();
         $db = $brandTable->getAdapter();
 
         $langExpr = $db->quoteInto('brands.id = brand_language.brand_id and brand_language.language = ?', $language);
@@ -126,7 +136,7 @@ class Twins
      */
     public function getGroupPicturesCount($groupId)
     {
-        $pictureTable = $this->_getPictureTable();
+        $pictureTable = $this->getPictureTable();
 
         $db = $pictureTable->getAdapter();
 
@@ -135,7 +145,7 @@ class Twins
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
             ->join(array('tgc' => 'twins_groups_cars'), 'tgc.car_id = car_parent_cache.parent_id', null)
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-            ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW));
+            ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW]);
 
         if (is_array($groupId)) {
 
@@ -170,7 +180,7 @@ class Twins
      */
     public function getGroupBrandIds($groupId)
     {
-        $brandTable = $this->_getBrandTable();
+        $brandTable = $this->getBrandTable();
         $brandAdapter = $brandTable->getAdapter();
         return $brandAdapter->fetchCol(
             $brandAdapter->select()
@@ -187,7 +197,7 @@ class Twins
      */
     public function getTotalBrandsCount()
     {
-        $brandTable = $this->_getBrandTable();
+        $brandTable = $this->getBrandTable();
         $db = $brandTable->getAdapter();
 
         return (int)$db->fetchOne(
@@ -216,7 +226,7 @@ class Twins
 
         $brandId = (int)$options['brandId'];
 
-        $select = $this->_getGroupsTable()->select(true)
+        $select = $this->getGroupsTable()->select(true)
             ->order('twins_groups.add_datetime desc');
 
         if ($options['brandId']) {
@@ -237,7 +247,7 @@ class Twins
      */
     public function getGroupCars($groupId)
     {
-        $carTable = $this->_getCarTable();
+        $carTable = $this->getCarTable();
         return $carTable->fetchAll(
             $carTable->select(true)
                 ->join('twins_groups_cars', 'cars.id = twins_groups_cars.car_id', null)
@@ -260,7 +270,7 @@ class Twins
 
         $ordering = $options['ordering'];
 
-        $select = $this->_getPictureTable()->select(true)
+        $select = $this->getPictureTable()->select(true)
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
             ->join(array('tgc' => 'twins_groups_cars'), 'tgc.car_id = car_parent_cache.parent_id', null)
@@ -280,7 +290,7 @@ class Twins
      */
     public function getGroup($groupId)
     {
-        $row = $this->_getGroupsTable()->find($groupId)->current();
+        $row = $this->getGroupsTable()->find($groupId)->current();
         if (!$row) {
             return null;
         }
@@ -298,7 +308,7 @@ class Twins
      */
     public function getCarGroups($carId)
     {
-        $groupTable = $this->_getGroupsTable();
+        $groupTable = $this->getGroupsTable();
 
         $rows = $groupTable->fetchAll(
             $groupTable->select(true)
@@ -325,7 +335,7 @@ class Twins
      */
     public function getCarsGroups(array $carIds)
     {
-        $groupTable = $this->_getGroupsTable();
+        $groupTable = $this->getGroupsTable();
 
         $db = $groupTable->getAdapter();
 

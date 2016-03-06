@@ -1,4 +1,7 @@
 <?php
+
+use Application\Model\Twins;
+
 class TwinsController extends Zend_Controller_Action
 {
     const GROUPS_PER_PAGE = 20;
@@ -6,16 +9,16 @@ class TwinsController extends Zend_Controller_Action
     /**
      * @var Twins
      */
-    private $_twins;
+    private $twins;
 
     /**
      * @return Twins
      */
-    protected function _getTwins()
+    private function _getTwins()
     {
-        return $this->_twins
-            ? $this->_twins
-            : $this->_twins = new Twins();
+        return $this->twins
+            ? $this->twins
+            : $this->twins = new Twins();
     }
 
     private function _loadBrands(array $selectedIds)

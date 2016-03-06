@@ -1,4 +1,7 @@
 <?php
+
+use Application\Model\Brand;
+
 class ArticlesController extends Zend_Controller_Action
 {
     const ARTICLES_PER_PAGE = 10;
@@ -7,37 +10,42 @@ class ArticlesController extends Zend_Controller_Action
     {
         parent::init();
 
-        $this->view->selected_brand_ids = array();
+        $this->view->selected_brand_ids = [];
     }
 
     public function loadBrands()
     {
-        $brands = new Brands();
-        $this->view->brandList = $brands->fetchAll(
-            $brands->select(true)
-                ->join(array('abc' => 'articles_brands_cache'), 'brands.id=abc.brand_id', null)
-                ->join('articles', 'abc.article_id=articles.id', null)
+        $brandModel = new Brand();
+        
+        $language = $this->_helper->language();
+        
+        $this->view->brandList = $brandModel->getList($language, function($select) {
+            $select
+                ->join(['abc' => 'articles_brands_cache'], 'brands.id = abc.brand_id', null)
+                ->join('articles', 'abc.article_id = articles.id', null)
                 ->where('articles.enabled')
-                ->group('brands.id')
-                ->order(array('brands.position', 'brands.caption'))
-        );
+                ->group('brands.id');
+        });
     }
 
     public function indexAction()
     {
-        $brands = new Brands();
-        $brand = $brands->findRowByCatname($this->_getParam('brand_catname'));
+        $language = $this->_helper->language();
+        
+        $brandModel = new Brand();
+        
+        $brand = $brandModel->getBrandByCatname($this->getParam('brand_catname'), $language);
 
         $articles = new Articles();
 
-        $select = $articles->select()
-            ->from($articles)
+        $select = $articles->select(true)
             ->where('articles.enabled')
-            ->order(array('articles.ratio DESC', 'articles.add_date DESC'));
+            ->order(['articles.ratio DESC', 'articles.add_date DESC']);
 
         if ($brand) {
-            $select->join(array('abc' => 'articles_brands_cache'), 'articles.id=abc.article_id', null)
-                   ->where('abc.brand_id = ?', $brand->id);
+            $select
+                ->join(['abc' => 'articles_brands_cache'], 'articles.id=abc.article_id', null)
+                ->where('abc.brand_id = ?', $brand['id']);
         }
 
         $paginator = Zend_Paginator::factory($select)
@@ -48,7 +56,7 @@ class ArticlesController extends Zend_Controller_Action
         $this->view->paginator = $paginator;
 
         // сайд бар
-        $this->view->selected_brand_ids = $brand ? array($brand->id) : array();
+        $this->view->selected_brand_ids = $brand ? [$brand['id']] : [];
         $this->loadBrands();
         $this->getResponse()->insert('sidebar', $this->view->render('articles/sidebar.phtml'));
     }
@@ -57,12 +65,14 @@ class ArticlesController extends Zend_Controller_Action
     {
         $articles = new Articles();
 
-        $article = $articles->findRowByCatname($this->_getParam('article_catname'));
-        if (!$article)
+        $article = $articles->findRowByCatname($this->getParam('article_catname'));
+        if (!$article) {
             return $this->_forward('notfound', 'error');
+        }
 
-        if (!$article->enabled)
+        if (!$article->enabled) {
             return $this->_forward('notfound', 'error');
+        }
 
         $this->view->article = $article;
 
@@ -73,27 +83,24 @@ class ArticlesController extends Zend_Controller_Action
                 'name' => $brand->caption
             );
 
-        foreach ($article->findCarsViaArticles_Cars() as $car)
-        {
+        foreach ($article->findCarsViaArticles_Cars() as $car) {
             $brands = $car->findBrandsViaBrands_Cars();
-            if (count($brands) > 0)
-            {
-                foreach ($brands as $brand)
-                    $links[] = array(
+            if (count($brands) > 0) {
+                foreach ($brands as $brand) {
+                    $links[] = [
                         'url' => $brand->getUrl().'car'.$car->id.'/',
                         'name' => $car->getFullName()
-                    );
+                    ];
+                }
             }
         }
 
         $this->view->links = $links;
 
-
-
-
         // сайдбар
-        foreach ($article->findBrandsViaArticles_Brands_Cache() as $brand)
-            $this->view->selected_brand_ids[] = $brand->id;
+        foreach ($article->findArticles_Brands_Cache() as $abc) {
+            $this->view->selected_brand_ids[] = $abc->brand_id;
+        }
 
         $this->loadBrands();
         $this->getResponse()->insert('sidebar', $this->view->render('articles/sidebar.phtml'));

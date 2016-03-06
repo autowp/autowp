@@ -1,5 +1,7 @@
 <?php
 
+use Application\Model\Brand;
+
 class UploadController extends Zend_Controller_Action
 {
     /**
@@ -343,32 +345,27 @@ class UploadController extends Zend_Controller_Action
 
     public function selectBrandAction()
     {
-        $brandTable = new Brands();
-        $brand = $brandTable->find($this->getParam('brand_id'))->current();
-
+        $brandModel = new Brand();
+        
+        $language = $this->_helper->language();
+        
+        $brand = $brandModel->getBrandById($this->getParam('brand_id'), $language);
         if ($brand) {
             return $this->_forward('select-in-brand');
         }
-
-        $db = $brandTable->getAdapter();
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from('brands', ['id', 'name' => 'IFNULL(brand_language.name, brands.caption)'])
-                ->joinLeft('brand_language', 'brands.id = brand_language.brand_id and brand_language.language = :language', null)
-                ->order(['brands.position', 'name'])
-                ->bind(array(
-                    'language' => $this->_helper->language()
-                ))
-        );
+        
+        $rows = $brandModel->getList($language, function($select) { });
 
         $this->view->brands = $rows;
     }
 
     public function selectInBrandAction()
     {
-        $brands = new Brands();
-        $brand = $brands->find($this->getParam('brand_id'))->current();
+        $brandModel = new Brand();
+        
+        $language = $this->_helper->language();
+        
+        $brand = $brandModel->getBrandById($this->getParam('brand_id'), $language);
 
         if (!$brand) {
             return $this->_forward('select-brand');
@@ -383,16 +380,33 @@ class UploadController extends Zend_Controller_Action
             $carTable->select(true)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand->id)
+                ->where('brands_cars.brand_id = ?', $brand['id'])
                 ->where('cars.is_concept')
         );
 
-        $rows = $carTable->fetchAll(
-            $carTable->select(true)
-                ->join('brands_cars', 'cars.id=brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand->id)
+        $db = $carTable->getAdapter();
+        
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from('cars', array(
+                    'cars.id',
+                    'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                    'cars.begin_model_year', 'cars.end_model_year',
+                    'spec' => 'spec.short_name',
+                    'spec_full' => 'spec.name',
+                    'cars.body', 'cars.today',
+                    'cars.begin_year', 'cars.end_year',
+                    'cars.is_group'
+                ))
+                ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
+                ->joinLeft('spec', 'cars.spec_id = spec.id', null)
+                ->join('brands_cars', 'cars.id = brands_cars.car_id', null)
+                ->where('brands_cars.brand_id = ?', $brand['id'])
                 ->where('NOT cars.is_concept')
                 ->order(array('cars.caption', 'cars.begin_year', 'cars.end_year'))
+                ->bind([
+                    'lang' => $this->_helper->language()
+                ])
         );
         $cars = $this->prepareCars($rows);
 
@@ -401,7 +415,7 @@ class UploadController extends Zend_Controller_Action
             $engineTable->select(true)
                 ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
                 ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
-                ->where('brand_engine.brand_id = ?', $brand->id)
+                ->where('brand_engine.brand_id = ?', $brand['id'])
         );
 
         $this->view->assign(array(
@@ -425,7 +439,7 @@ class UploadController extends Zend_Controller_Action
         ));
     }
 
-    private function prepareCars(Cars_Rowset $rows)
+    private function prepareCars($rows)
     {
         $carParentTable = $this->getCarParentTable();
         $carParentAdapter = $carParentTable->getAdapter();
@@ -435,17 +449,25 @@ class UploadController extends Zend_Controller_Action
             $haveChilds = (bool)$carParentAdapter->fetchOne(
                 $carParentAdapter->select()
                     ->from($carParentTable->info('name'), new Zend_Db_Expr('1'))
-                    ->where('parent_id = ?', $row->id)
+                    ->where('parent_id = ?', $row['id'])
             );
             $cars[] = array(
-                'name' => $row->getFullName(),
+                'begin_model_year' => $row['begin_model_year'],
+                'end_model_year'   => $row['end_model_year'],
+                'spec'             => $row['spec'],
+                'spec_full'        => $row['spec_full'],
+                'body'             => $row['body'],
+                'name'             => $row['name'],
+                'begin_year'       => $row['begin_year'],
+                'end_year'         => $row['end_year'],
+                'today'            => $row['today'],
                 'url'  => $this->_helper->url->url(array(
                     'action' => 'index',
                     'type'   => Picture::CAR_TYPE_ID,
                     'car_id' => $row['id']
                 )),
                 'haveChilds' => $haveChilds,
-                'isGroup'    => $row->is_group,
+                'isGroup'    => $row['is_group'],
                 'type'       => null,
                 'loadUrl'    => $this->_helper->url->url(array(
                     'action' => 'car-childs',
@@ -464,30 +486,35 @@ class UploadController extends Zend_Controller_Action
         $carTable = new Cars();
 
         $items = array();
-        foreach ($rows as $carParentRow) {
-            $car = $carTable->find($carParentRow->car_id)->current();
-            if ($car) {
-                $haveChilds = (bool)$carParentAdapter->fetchOne(
-                    $carParentAdapter->select()
-                        ->from($carParentTable->info('name'), new Zend_Db_Expr('1'))
-                        ->where('parent_id = ?', $car->id)
-                );
-                $items[] = array(
-                    'name' => $car->getFullName(),
-                    'url'  => $this->_helper->url->url(array(
-                        'action' => 'index',
-                        'type'   => Picture::CAR_TYPE_ID,
-                        'car_id' => $car['id']
-                    )),
-                    'haveChilds' => $haveChilds,
-                    'isGroup'    => $car['is_group'],
-                    'type'       => $carParentRow->type,
-                    'loadUrl'    => $this->_helper->url->url(array(
-                        'action' => 'car-childs',
-                        'car_id' => $car['id']
-                    )),
-                );
-            }
+        foreach ($rows as $row) {
+            $haveChilds = (bool)$carParentAdapter->fetchOne(
+                $carParentAdapter->select()
+                    ->from($carParentTable->info('name'), new Zend_Db_Expr('1'))
+                    ->where('parent_id = ?', $row['id'])
+            );
+            $items[] = array(
+                'begin_model_year' => $row['begin_model_year'],
+                'end_model_year'   => $row['end_model_year'],
+                'spec'             => $row['spec'],
+                'spec_full'        => $row['spec_full'],
+                'body'             => $row['body'],
+                'name'             => $row['name'],
+                'begin_year'       => $row['begin_year'],
+                'end_year'         => $row['end_year'],
+                'today'            => $row['today'],
+                'url'  => $this->_helper->url->url(array(
+                    'action' => 'index',
+                    'type'   => Picture::CAR_TYPE_ID,
+                    'car_id' => $row['id']
+                )),
+                'haveChilds' => $haveChilds,
+                'isGroup'    => $row['is_group'],
+                'type'       => $row['type'],
+                'loadUrl'    => $this->_helper->url->url(array(
+                    'action' => 'car-childs',
+                    'car_id' => $row['id']
+                )),
+            );
         }
 
         return $items;
@@ -507,12 +534,29 @@ class UploadController extends Zend_Controller_Action
         if (!$car) {
             return $this->_forward('notfound', 'error');
         }
-
-        $rows = $carParentTable->fetchAll(
-            $carParentTable->select(true)
-                ->join('cars', 'cars.id = car_parent.car_id', null)
+        
+        $db = $carTable->getAdapter();
+        
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from('cars', array(
+                    'cars.id',
+                    'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                    'cars.begin_model_year', 'cars.end_model_year',
+                    'spec' => 'spec.short_name',
+                    'spec_full' => 'spec.name',
+                    'cars.body', 'cars.today',
+                    'cars.begin_year', 'cars.end_year',
+                    'cars.is_group'
+                ))
+                ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
+                ->joinLeft('spec', 'cars.spec_id = spec.id', null)
+                ->join('car_parent', 'cars.id = car_parent.car_id', 'type')
                 ->where('car_parent.parent_id = ?', $car->id)
                 ->order(array('car_parent.type', 'cars.caption', 'cars.begin_year', 'cars.end_year'))
+                ->bind([
+                    'lang' => $this->_helper->language()
+                ])
         );
 
         $this->view->assign(array(
@@ -574,16 +618,34 @@ class UploadController extends Zend_Controller_Action
         }
 
         $carTable = new Cars();
-
-        $rows = $carTable->fetchAll(
-            $carTable->select(true)
+        
+        $db = $carTable->getAdapter();
+        
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from('cars', array(
+                    'cars.id',
+                    'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                    'cars.begin_model_year', 'cars.end_model_year',
+                    'spec' => 'spec.short_name',
+                    'spec_full' => 'spec.name',
+                    'cars.body', 'cars.today',
+                    'cars.begin_year', 'cars.end_year',
+                    'cars.is_group'
+                ))
+                ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
+                ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brand->id)
                 ->where('cars.is_concept')
                 ->order(array('cars.caption', 'cars.begin_year', 'cars.end_year'))
                 ->group('cars.id')
+                ->bind([
+                    'language' => $this->_helper->language()
+                ])
         );
+
         $concepts = $this->prepareCars($rows);
 
         $this->view->assign(array(

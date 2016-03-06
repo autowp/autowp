@@ -21,10 +21,10 @@
                 'href'      => '#',
                 'class'     => 'arrow',
                 'data-load' => $car['loadUrl']
-            ), '<i class="fa fa-plus-circle"></i> ' . $this->escape($car['name']), false) ?>
+            ), '<i class="fa fa-plus-circle"></i> ' . $this->car()->htmlTitle($car), false) ?>
             <div style="margin:0 0 4px 18px;display:none">
                 <?php if (!$car['isGroup']) { ?>
-                    <?=$this->htmlA($car['url'], $car['name']) ?><br />
+                    <?=$this->htmlA($car['url'], $this->car()->htmlTitle($car), false) ?><br />
                 <?php } ?>
                 <div class="loading"><em>Loading ...</em></div>
                 <?php if ($car['isGroup']) { ?>
@@ -33,6 +33,6 @@
             </div>
         </div>
     <?php } else { ?>
-        <?=$this->htmlA($car['url'], $car['name']) ?><br />
+        <?=$this->htmlA($car['url'], $this->car()->htmlTitle($car), false) ?><br />
     <?php } ?>
 <?php } ?>
