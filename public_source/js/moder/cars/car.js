@@ -1,5 +1,5 @@
 define(
-    ['jquery', 'bootstrap', 'typeahead'],
+    ['jquery', 'bootstrap', 'lib/typeahead'],
     function($) {
         return {
             init: function(options) {

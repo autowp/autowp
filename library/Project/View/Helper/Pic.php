@@ -5,19 +5,19 @@ class Project_View_Helper_Pic extends Zend_View_Helper_HtmlElement
     /**
      * @var Pictures_Row
      */
-    protected $_picture = null;
+    private $picture = null;
 
     public function pic(Pictures_Row $picture = null)
     {
-        $this->_picture = $picture;
+        $this->picture = $picture;
 
         return $this;
     }
 
     public function url()
     {
-        if ($this->_picture) {
-            $identity = $this->_picture->identity ? $this->_picture->identity : $this->_picture->id;
+        if ($this->picture) {
+            $identity = $this->picture->identity ? $this->picture->identity : $this->picture->id;
 
             return $this->view->url(array(
                 'controller' => 'picture',

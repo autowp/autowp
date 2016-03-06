@@ -847,7 +847,8 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         }
 
         $names = $pictureTable->getNameData([$picture->toArray()], array(
-            'language' => $language
+            'language' => $language,
+            'large'    => true
         ));
         $name = $names[$picture->id];
 

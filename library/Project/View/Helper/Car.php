@@ -5,24 +5,24 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
     /**
      * @var Cars_Row
      */
-    protected $_car = null;
+    private $_car = null;
 
-    protected $_monthFormat = '<small class="month">%02d.</small>';
+    private $_monthFormat = '<small class="month">%02d.</small>';
 
     /**
      * @var Brands_Cars
      */
-    protected $_brandCarTable;
+    private $_brandCarTable;
 
     /**
      * @var Car_Parent
      */
-    protected $_carParentTable;
+    private $_carParentTable;
 
     /**
      * @var Brands
      */
-    protected $_brandTable;
+    private $_brandTable;
 
     /**
      * @var Spec
@@ -422,7 +422,7 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
     /**
      * @return Brands_Cars
      */
-    protected function _getBrandCarTable()
+    private function _getBrandCarTable()
     {
         return $this->_brandCarTable
             ? $this->_brandCarTable
@@ -432,7 +432,7 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
     /**
      * @return Brands
      */
-    protected function _getBrandTable()
+    private function _getBrandTable()
     {
         return $this->_brandTable
             ? $this->_brandTable
@@ -442,19 +442,19 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
     /**
      * @return Car_Parent
      */
-    protected function _getCarParentTable()
+    private function _getCarParentTable()
     {
         return $this->_carParentTable
             ? $this->_carParentTable
             : $this->_carParentTable = new Car_Parent();
     }
 
-    protected function _carPublicUrls(Cars_Row $car)
+    private function _carPublicUrls(Cars_Row $car)
     {
         return $this->_walkUpUntilBrand($car->id, array());
     }
 
-    protected function _walkUpUntilBrand($id, array $path)
+    private function _walkUpUntilBrand($id, array $path)
     {
         $urls = array();
 

@@ -7,7 +7,6 @@ require.config({
         jquery: 'lib/jquery',
         tinymce: '/tiny_mce/jquery.tinymce.min',
         'jquery.cookie': '/js/lib/jquery.cookie',
-        typeahead: 'lib/bootstrap3-typeahead',
         raphael: 'lib/raphael',
         css: 'lib/requirejs-plugins/css',
         markdown: 'lib/markdown.min',
@@ -20,9 +19,6 @@ require.config({
         },
         'jquery.cookie': {
             deps: ['jquery']
-        },
-        'typeahead': {
-            deps: ['bootstrap']
         },
         markdown: {
             exports: 'markdown'

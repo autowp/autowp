@@ -281,6 +281,7 @@ class Picture extends Project_Db_Table
         $result = array();
 
         $language = isset($options['language']) ? $options['language'] : 'en';
+        $large = isset($options['large']) && $options['large'];
 
         // prefetch
         $carIds = array();
@@ -318,23 +319,29 @@ class Picture extends Project_Db_Table
             $table = new Cars();
 
             $db = $table->getAdapter();
+            
+            $columns = [
+                'id',
+                'begin_model_year', 'end_model_year',
+                'spec' => 'spec.short_name',
+                'spec_full' => 'spec.name',
+                'body',
+                'name' => 'if(length(car_language.name) > 0, car_language.name, cars.caption)',
+                'begin_year', 'end_year', 'today',
+            ];
+            if ($large) {
+                $columns[] = 'begin_month';
+                $columns[] = 'end_month';
+            }
 
             $select = $db->select()
-                ->from('cars', array(
-                    'id',
-                    'begin_model_year', 'end_model_year',
-                    'spec' => 'spec.short_name',
-                    'spec_full' => 'spec.name',
-                    'body',
-                    'name' => 'if(length(car_language.name) > 0, car_language.name, cars.caption)',
-                    'begin_year', 'end_year', 'today',
-                ))
+                ->from('cars', $columns)
                 ->where('cars.id in (?)', array_keys($carIds))
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :language', null);
 
             foreach ($db->fetchAll($select, array('language' => $language)) as $row) {
-                $cars[$row['id']] = array(
+                $data = [
                     'begin_model_year' => $row['begin_model_year'],
                     'end_model_year'   => $row['end_model_year'],
                     'spec'             => $row['spec'],
@@ -344,7 +351,12 @@ class Picture extends Project_Db_Table
                     'begin_year'       => $row['begin_year'],
                     'end_year'         => $row['end_year'],
                     'today'            => $row['today']
-                );
+                ];
+                if ($large) {
+                    $data['begin_month'] = $row['begin_month'];
+                    $data['end_month'] = $row['end_month'];
+                }
+                $cars[$row['id']] = $data;
             }
         }
 

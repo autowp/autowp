@@ -1,6 +1,7 @@
 {
     "name": "autowp/autowp.ru",
     "description": "AutoWP.ru, the website",
+    "license": "MIT",
     "require": {
     	"php": "^5.6.0",
         "zendframework/zendframework1": "1.*",
@@ -27,7 +28,8 @@
         "autowp/filters": "^1.1",
         "autowp/external-login-service": "^1.0",
         "zendframework/zend-uri": "^2.5",
-        "zendframework/zend-db": "^2.7"
+        "zendframework/zend-db": "^2.7",
+        "twitter/typeahead.js": "^0.11.1"
     },
     "authors": [
         {
