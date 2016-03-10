@@ -2167,8 +2167,9 @@ class Moder_CarsController extends Zend_Controller_Action
         $result = array();
         foreach ($carRows as $carRow) {
             $result[] = array(
-                'id'   => (int)$carRow->id,
-                'name' => ($carRow->is_group ? 'Group: ' : '') . $carRow->getFullName()
+                'id'       => (int)$carRow->id,
+                'is_group' => (boolean)$carRow->is_group,
+                'name'     => $carRow->getFullName()
             );
         }
 

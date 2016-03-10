@@ -2,10 +2,8 @@
 /CarsController.php
 /CatalogueController.php
 /CommentsController.php
-/IndexController.php
 /LoginController.php
 /PictureController.php
 /SpecController.php
 /TestController.php
-/UsersController.php
 /VotingController.php

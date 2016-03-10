@@ -11,7 +11,8 @@ require.config({
         css: 'lib/requirejs-plugins/css',
         markdown: 'lib/markdown.min',
         moment: 'lib/moment',
-        Chart: 'lib/Chart'
+        Chart: 'lib/Chart',
+        typeahead: 'lib/typeahead'
     },
     shim: {
         'bootstrap': {

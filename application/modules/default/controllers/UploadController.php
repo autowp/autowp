@@ -374,7 +374,6 @@ class UploadController extends Zend_Controller_Action
         $this->view->brand = $brand;
 
         $carTable = new Cars();
-        $carParentTable = $this->getCarParentTable();
 
         $haveConcepts = (bool)$carTable->fetchRow(
             $carTable->select(true)
@@ -483,7 +482,6 @@ class UploadController extends Zend_Controller_Action
     {
         $carParentTable = $this->getCarParentTable();
         $carParentAdapter = $carParentTable->getAdapter();
-        $carTable = new Cars();
 
         $items = array();
         foreach ($rows as $row) {
@@ -528,7 +526,6 @@ class UploadController extends Zend_Controller_Action
         }
 
         $carTable = new Cars();
-        $carParentTable = $this->getCarParentTable();
 
         $car = $carTable->find($this->getParam('car_id'))->current();
         if (!$car) {

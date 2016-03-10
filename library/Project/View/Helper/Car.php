@@ -8,6 +8,8 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
     private $_car = null;
 
     private $_monthFormat = '<small class="month">%02d.</small>';
+    
+    private $_textMonthFormat = '%02d.';
 
     /**
      * @var Brands_Cars
@@ -289,7 +291,7 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
                 $result .= ' \'';
 
                 if ($equalM) {
-                    $result .= sprintf($this->_monthFormat, $bm).$by;
+                    $result .= sprintf($this->_textMonthFormat, $bm).$by;
                 } else {
                     if ($equalY) {
                         if ($bm && $em)
@@ -298,14 +300,14 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
                                 $result .= $by;
                     } else {
                         if ($equalS) {
-                            $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').$by).
+                            $result .=  (($bm ? sprintf($this->_textMonthFormat, $bm) : '').$by).
                             '–'.
-                            ($em ? sprintf($this->_monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
+                            ($em ? sprintf($this->_textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
                         } else {
-                            $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').($by ? $by : '????')).
+                            $result .=  (($bm ? sprintf($this->_textMonthFormat, $bm) : '').($by ? $by : '????')).
                             (
                                     $ey
-                                    ? '–'.($em ? sprintf($this->_monthFormat, $em) : '').$ey
+                                    ? '–'.($em ? sprintf($this->_textMonthFormat, $em) : '').$ey
                                     : (
                                             $car['today']
                                             ? ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
@@ -322,7 +324,7 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
                 $result .= " '";
 
                 if ($equalM) {
-                    $result .= sprintf($this->_monthFormat, $bm).$by;
+                    $result .= sprintf($this->_textMonthFormat, $bm).$by;
                 } else {
                     if ($equalY) {
                         if ($bm && $em) {
@@ -334,14 +336,14 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
                         }
                     } else {
                         if ($equalS) {
-                            $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').$by).
+                            $result .=  (($bm ? sprintf($this->_textMonthFormat, $bm) : '').$by).
                             '–'.
-                            ($em ? sprintf($this->_monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
+                            ($em ? sprintf($this->_textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
                         } else {
-                            $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').($by ? $by : '????')).
+                            $result .=  (($bm ? sprintf($this->_textMonthFormat, $bm) : '').($by ? $by : '????')).
                             (
                                 $ey
-                                    ? '–'.($em ? sprintf($this->_monthFormat, $em) : '').$ey
+                                    ? '–'.($em ? sprintf($this->_textMonthFormat, $em) : '').$ey
                                     : (
                                         $car['today']
                                             ? ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')

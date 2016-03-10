@@ -1,5 +1,5 @@
 define(
-    ['jquery', 'bootstrap', 'lib/typeahead'],
+    ['jquery', 'bootstrap', 'typeahead'],
     function($) {
         return {
             init: function(options) {
@@ -147,69 +147,28 @@ define(
                     var self = this;
                     
                     $catalogueTab.find('form.car-add-parent').each(function() {
-                        var map = {},
-                            $form = $(this),
+                        var $form = $(this),
                             $input = $form.find(':text');
                         
                         $form.on('submit', function(e) {
                             e.preventDefault();
-                        })
+                        });
                     
                         $input
-                            .typeahead({
-                                minLength: 1,
-                                items: 20,
-                                showHintOnFocus: true,
-                                source: function(query, process) {
+                            .typeahead({ }, {
+                                display: function(car) {
+                                    return car.name;
+                                },
+                                source: function(query, syncResults, asyncResults) {
                                     $.getJSON($input.data('autocomplete'), {q: query}, function(cars) {
-                                        var lines = [];
-                                        map = {};
-                                        $.map(cars, function(car) {
-                                            lines.push(car.name);
-                                            map[car.name] = car.id;
-                                        });
-                                        process(lines);
+                                        asyncResults(cars);
                                     });
-                                },
-                                matcher: function(item) {
-                                    return true;
-                                },
-                                updater: function(item) {
-                                    if (map[item]) {
-                                        var id = map[item];
-                                        
-                                        $.post($form.attr('action'), {parent_id: id}, function(json) {
-                                            window.location = json.url;
-                                        });
-                                    }
-                                    
-                                    return item;
-                                },
-                                highlighter: function (item) {
-                                    var groupPattern = 'Group: ',
-                                        isGroup = false;
-                                    if (item.substring(0, groupPattern.length) == groupPattern) {
-                                        item = item.substring(groupPattern.length);
-                                        isGroup = true;
-                                    }
-                                    var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
-                                    return (isGroup ? '<i class="fa fa-folder-o"></i> ' : '') + item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-                                        return '<strong>' + match + '</strong>';
-                                    });
-                                },
-                                sorter: function(items) {
-                                    return items;
                                 }
                             })
-                            .on('keyup', function(e) {
-                                if (e.which == 13) {
-                                    var value = $(this).val();
-                                    if (map[value]) {
-                                        var id = map[value];
-                                        
-                                        self.postAddParent(id);
-                                    }
-                                }
+                            .on('typeahead:select', function(ev, car) {
+                                $.post($form.attr('action'), {parent_id: car.id}, function(json) {
+                                    window.location = json.url;
+                                });
                             });
                     });
                 });

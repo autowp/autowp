@@ -10,6 +10,7 @@ use Zend_Config;
 use Zend_Controller_Front;
 use Zend_Controller_Request_Http;
 use Zend_Controller_Router_Rewrite;
+use Zend_Uri_Exception;
 
 use Zend\Uri;
 
@@ -56,7 +57,7 @@ class Renderer
 
         return $router;
     }
-    
+
     /**
      * @param string $text
      * @return string
@@ -103,7 +104,7 @@ class Renderer
         if ($text) {
             $out[] = $this->preparePlainText($text);
         }
-        
+
         $out = implode($out);
 
         return $out;
@@ -124,20 +125,25 @@ class Renderer
 
         if ($hostAllowed) {
 
-            $request = new Zend_Controller_Request_Http($url);
+            try {
+                $request = new Zend_Controller_Request_Http($url);
 
-            $result = self::_getRouter()->route($request);
+                $result = self::_getRouter()->route($request);
 
-            $params = $result->getParams();
+                $params = $result->getParams();
 
-            $result = $this->_tryUserLinkParams($params);
-            if ($result !== false) {
-                return $result;
-            }
+                $result = $this->_tryUserLinkParams($params);
+                if ($result !== false) {
+                    return $result;
+                }
 
-            $result = $this->_tryPictureLinkParams($params);
-            if ($result !== false) {
-                return $result;
+                $result = $this->_tryPictureLinkParams($params);
+                if ($result !== false) {
+                    return $result;
+                }
+
+            } catch (Zend_Uri_Exception $e) {
+
             }
 
         }

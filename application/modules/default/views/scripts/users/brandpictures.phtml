@@ -7,11 +7,11 @@
         ),
         'pageId' => 141,
         'args'   => array(
-            'BRAND_NAME'    => $this->brand->caption,
+            'BRAND_NAME'    => $this->brand['name'],
             'USER_NAME'     => $this->user->getCompoundName(),
             'USER_IDENTITY' => $this->user->identity ? $this->user->identity : 'user' . $this->user->id,
-            'BRAND_NAME'    => $this->brand->caption,
-            'BRAND_CATNAME' => $this->brand->folder,
+            'BRAND_NAME'    => $this->brand['name'],
+            'BRAND_CATNAME' => $this->brand['catname']
         )
     ));
 ?>

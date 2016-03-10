@@ -80,6 +80,23 @@
     </section>
 <?php } ?>
 
+<?php if (count($this->factories)) { ?>
+	<section>
+		<h2>Factories</h2>
+		<div class="row">
+        	<?php foreach ($this->factories as $factory) { ?>
+        		<div class="col-sm-3">
+        			<?=$this->htmlA([
+        			    'class' => 'thumbnail',
+        			    'href'  => $factory['url']
+        			], $this->htmlImg($factory['src']), false)?>
+        			<p><?=$this->htmlA($factory['url'], $factory['name'])?></p>
+        		</div>
+        	<?php } ?>
+    	</div>
+	</section>
+<?php } ?>
+
 <?php if (count($this->link_types)) { ?>
     <section>
         <h2><?=$this->escape($this->translate('catalogue/brand/links')) ?></h2>
