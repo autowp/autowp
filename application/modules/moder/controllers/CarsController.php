@@ -1,6 +1,9 @@
 <?php
 
+use Application\Model\Brand;
 use Application\Model\Message;
+use Application\Model\Modification;
+use Application\Model\DbTable\Modification as ModificationTable;
 use Autowp\Filter\Filename\Safe;
 
 class Moder_CarsController extends Zend_Controller_Action
@@ -69,7 +72,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 array('text', 'from_year', array(
                     'label'      => 'From year',
                     'validators' => array(
-                        'Number'
+                        'Int'
                     ),
                     'decorators' => array(
                         'ViewHelper'
@@ -78,7 +81,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 array('text', 'to_year', array(
                     'label'      => 'To year',
                     'validators' => array(
-                        'Number'
+                        'Int'
                     ),
                     'decorators' => array(
                         'ViewHelper'
@@ -127,9 +130,9 @@ class Moder_CarsController extends Zend_Controller_Action
             $params = $this->getRequest()->getPost();
             unset($params['submit']);
             foreach ($params as $key => $value) {
-                if (strlen($value) <= 0) {
+                /*if (strlen($value) <= 0) {
                     unset($params[$key]);
-                }
+                }*/
             }
             return $this->_redirect($this->_helper->url->url($params));
         }
@@ -282,7 +285,7 @@ class Moder_CarsController extends Zend_Controller_Action
             'car_id'     => $car->id,
             'tab'        => $tab
         ), 'default', true);
-        
+
         if ($full) {
             $url = $this->view->serverUrl($url);
         }
@@ -395,9 +398,9 @@ class Moder_CarsController extends Zend_Controller_Action
         }
 
         $canEditMeta = $this->canEditMeta($car);
-        
+
         $textForm = $this->getTextForm();
-        
+
         if ($car->full_text_id) {
             $textStorage = $this->_helper->textStorage();
             $text = $textStorage->getText($car->full_text_id);
@@ -407,18 +410,18 @@ class Moder_CarsController extends Zend_Controller_Action
         }
 
         if ($canEditMeta) {
-            
+
             $request = $this->getRequest();
-            
+
             if ($request->isPost() && $textForm->isValid($request->getPost())) {
                 $values = $textForm->getValues();
-            
+
                 $text = $values['text'];
-            
+
                 $textStorage = $this->_helper->textStorage();
-            
+
                 $user = $this->_helper->user()->get();
-            
+
                 if ($car->full_text_id) {
                     $textStorage->setText($car->full_text_id, $text, $user->id);
                 } elseif ($text) {
@@ -426,13 +429,13 @@ class Moder_CarsController extends Zend_Controller_Action
                     $car->full_text_id = $textId;
                     $car->save();
                 }
-            
-            
+
+
                 $this->_helper->log(sprintf(
                     'Редактирование полного описания автомобиля %s',
                     $this->view->htmlA($this->carModerUrl($car), $car->getFullName())
                 ), $car);
-            
+
                 if ($car->full_text_id) {
                     $userIds = $textStorage->getTextUserIds($car->full_text_id);
                     $message = sprintf(
@@ -441,7 +444,7 @@ class Moder_CarsController extends Zend_Controller_Action
                         $car->getFullName(),
                         $this->view->serverUrl($this->carModerUrl($car))
                     );
-            
+
                     $mModel = new Message();
                     $userTable = new Users();
                     foreach ($userIds as $userId) {
@@ -458,13 +461,13 @@ class Moder_CarsController extends Zend_Controller_Action
 
         return $this->redirectToCar($car, 'desc');
     }
-    
+
     private function getDescriptionForm()
     {
         return new Project_Form(array(
             'method' => Zend_Form::METHOD_POST,
             'action' => $this->_helper->url->url(array(
-                'form' => 'car-edit-description' 
+                'form' => 'car-edit-description'
             )),
             'decorators' => array(
                 'PrepareElements',
@@ -481,7 +484,7 @@ class Moder_CarsController extends Zend_Controller_Action
             ]
         ));
     }
-    
+
     private function getTextForm()
     {
         return new Project_Form(array(
@@ -691,7 +694,7 @@ class Moder_CarsController extends Zend_Controller_Action
                     ( count($changes) ? '<p>'.implode('<br />', $changes).'</p>' : '')
                 );
                 $this->_helper->log($message, $car);
-                
+
                 $mModel = new Message();
 
                 $user = $this->_helper->user()->get();
@@ -705,10 +708,10 @@ class Moder_CarsController extends Zend_Controller_Action
 
                 return $this->redirectToCar($car, 'meta');
             }
-            
-            
+
+
             $descriptionForm = $this->getDescriptionForm();
-            
+
             if ($car->text_id) {
                 $textStorage = $this->_helper->textStorage();
                 $description = $textStorage->getText($car->text_id);
@@ -716,16 +719,16 @@ class Moder_CarsController extends Zend_Controller_Action
                     'markdown' => $description
                 ));
             }
-            
+
             if ($request->isPost() && $this->getParam('form') == 'car-edit-description' && $descriptionForm->isValid($request->getPost())) {
                 $values = $descriptionForm->getValues();
-                
+
                 $text = $values['markdown'];
-                
+
                 $textStorage = $this->_helper->textStorage();
-                
+
                 $user = $this->_helper->user()->get();
-                
+
                 if ($car->text_id) {
                     $textStorage->setText($car->text_id, $text, $user->id);
                 } elseif ($text) {
@@ -733,13 +736,13 @@ class Moder_CarsController extends Zend_Controller_Action
                     $car->text_id = $textId;
                     $car->save();
                 }
-                
-                
+
+
                 $this->_helper->log(sprintf(
                     'Редактирование описания автомобиля %s',
                     $this->view->htmlA($this->carModerUrl($car), $car->getFullName())
                 ), $car);
-                
+
                 if ($car->text_id) {
                     $userIds = $textStorage->getTextUserIds($car->text_id);
                     $message = sprintf(
@@ -748,7 +751,7 @@ class Moder_CarsController extends Zend_Controller_Action
                         $car->getFullName(),
                         $this->view->serverUrl($this->carModerUrl($car))
                     );
-                
+
                     $mModel = new Message();
                     $userTable = new Users();
                     foreach ($userIds as $userId) {
@@ -759,12 +762,12 @@ class Moder_CarsController extends Zend_Controller_Action
                         }
                     }
                 }
-                
+
                 return $this->redirectToCar($car, 'meta');
             }
-            
+
             $textForm = $this->getTextForm();
-            
+
             if ($car->full_text_id) {
                 $textStorage = $this->_helper->textStorage();
                 $text = $textStorage->getText($car->full_text_id);
@@ -772,7 +775,7 @@ class Moder_CarsController extends Zend_Controller_Action
                     'text' => $text
                 ));
             }
-            
+
             $this->view->assign([
                 'textForm'             => $textForm,
                 'descriptionForm'      => $descriptionForm,
@@ -985,12 +988,14 @@ class Moder_CarsController extends Zend_Controller_Action
     {
         $cars = $this->_helper->catalogue()->getCarTable();
         $car = $cars->find($this->getParam('car_id'))->current();
-        if (!$car)
-            return $this->_forward('notfound', 'error');
+        if (!$car) {
+            return $this->_forward('notfound', 'error', 'default');
+        }
 
         $canMove = $this->canMove($car);
-        if (!$canMove)
-            throw new Exception('Access denied');
+        if (!$canMove) {
+            return $this->_forward('forbidden', 'error', 'default');
+        }
 
         $this->view->car = $car;
 
@@ -1015,19 +1020,19 @@ class Moder_CarsController extends Zend_Controller_Action
 
         $car = $cars->find($this->getParam('car_id'))->current();
         if (!$car) {
-            return $this->_forward('notfound', 'error');
+            return $this->_forward('notfound', 'error', 'default');
         }
 
         $canMove = $this->canMove($car);
         if (!$canMove) {
-            return $this->_forward('forbidden', 'error');
+            return $this->_forward('forbidden', 'error', 'default');
         }
 
         $brands = $this->getBrandTable();
 
         $brand = $brands->find($this->getParam('brand_id'))->current();
         if (!$brand) {
-            return $this->_forward('notfound', 'error');
+            return $this->_forward('notfound', 'error', 'default');
         }
 
         foreach ($car->findBrandsViaBrands_Cars() as $iBrand) {
@@ -1081,7 +1086,15 @@ class Moder_CarsController extends Zend_Controller_Action
         );
         $this->_helper->log($message, array($brand, $car));
 
-        return $this->redirectToCar($car, 'catalogue');
+        $url = $this->carModerUrl($car, true, 'catalogue');
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            return $this->_helper->json(array(
+                'ok'  => true,
+                'url' => $url
+            ));
+        } else {
+            return $this->_redirect($url);
+        }
     }
 
     public function setBrandCarTypeAction()
@@ -1539,7 +1552,7 @@ class Moder_CarsController extends Zend_Controller_Action
                         ($insertedNames ? 'Добавлено: ' . implode(', ', $insertedNames) . '. ' : '');
             $this->_helper->log($this->view->escape($logText), $car);
         }
-        
+
         $mModel = new Message();
 
         $users = new Users();
@@ -2061,6 +2074,41 @@ class Moder_CarsController extends Zend_Controller_Action
     public function carAutocompleteAction()
     {
         $query = trim($this->getParam('q'));
+
+        $result = [];
+
+        $language = $this->_helper->language();
+        $imageStorage = $this->_helper->imageStorage();
+
+        $brandModel = new Brand();
+        $brandRows = $brandModel->getList([
+            'language' => $language,
+            'columns'  => ['id', 'name', 'img']
+        ], function($select) use ($query) {
+            $select->where('caption like ?', $query . '%');
+        });
+
+        foreach ($brandRows as $brandRow) {
+            $img = false;
+            if ($brandRow['img']) {
+                $imageInfo = $imageStorage->getFormatedImage($brandRow['img'], 'brandicon2');
+                if ($imageInfo) {
+                    $img = $imageInfo->getSrc();
+                }
+            }
+
+            $result[] = array(
+                'url'   => $this->_helper->url->url([
+                    'action'     => 'add-car-to-brand',
+                    'brand_id'   => $brandRow['id']
+                ]),
+                'name'  => $brandRow['name'],
+                'image' => $img,
+                'type'  => 'brand'
+            );
+        }
+
+
         $beginYear = false;
         $endYear = false;
         $today = false;
@@ -2162,14 +2210,19 @@ class Moder_CarsController extends Zend_Controller_Action
                 ->where('car_parent_cache.car_id is null');
         }
 
+
+
         $carRows = $carTable->fetchAll($select);
 
-        $result = array();
         foreach ($carRows as $carRow) {
             $result[] = array(
-                'id'       => (int)$carRow->id,
+                'url'      => $this->_helper->url->url([
+                    'action'    => 'add-parent',
+                    'parent_id' => $carRow->id
+                ]),
                 'is_group' => (boolean)$carRow->is_group,
-                'name'     => $carRow->getFullName()
+                'name'     => $carRow->getFullName($language),
+                'type'     => 'car'
             );
         }
 
@@ -2530,7 +2583,7 @@ class Moder_CarsController extends Zend_Controller_Action
             foreach ($rows as $row) {
                 $relevantBrands[$row->id] = $row;
             }
-            
+
             $brandRows = $brandTable->fetchAll(
                 $brandTable->select(true)
                     ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
@@ -2543,7 +2596,7 @@ class Moder_CarsController extends Zend_Controller_Action
             }
 
         }
-        $canUseTree = in_array($this->_helper->user()->get()->id, array(1, 15603, 1565, 11022, 10713, 14892, 11668, 14360, 216, 3282, 14175, 7715, 1826, 266, 9373, 3755));
+        $canUseTree = true;
 
         $parents = array();
         $childs = array();
@@ -3567,8 +3620,12 @@ class Moder_CarsController extends Zend_Controller_Action
 
     private function carMofificationsGroupModifications(Cars_Row $car, $groupId)
     {
-        $mTable = new Modification();
+        $modModel = new Modification();
+        $mTable = new ModificationTable();
         $db = $mTable->getAdapter();
+        $carTable = $this->_helper->catalogue()->getCarTable();
+
+        $language = $this->_helper->language();
 
         $select = $mTable->select(true)
             ->join('car_parent_cache', 'modification.car_id = car_parent_cache.parent_id', null)
@@ -3583,8 +3640,39 @@ class Moder_CarsController extends Zend_Controller_Action
 
         $modifications = [];
         foreach ($mTable->fetchAll($select) as $mRow) {
+
+            $picturesCount = $db->fetchOne(
+                $db->select()
+                    ->from('modification_picture', 'count(1)')
+                    ->where('modification_picture.modification_id = ?', $mRow->id)
+                    ->join('pictures', 'modification_picture.picture_id = pictures.id', null)
+                    ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->where('car_parent_cache.parent_id = ?', $car->id)
+            );
+
+            $isInherited = $mRow->car_id != $car->id;
+            $inheritedFrom = null;
+
+            if ($isInherited) {
+                $carRow = $carTable->fetchRow(
+                    $carTable->select(true)
+                        ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
+                        ->join('modification', 'cars.id = modification.car_id', null)
+                        ->where('modification.id = ?', $mRow['id'])
+                );
+
+                if ($carRow) {
+                    $inheritedFrom = [
+                        'name' => $carRow->getFullName($language),
+                        'url'  => $this->carModerUrl($carRow)
+                    ];
+                }
+            }
+
             $modifications[] = array(
-                'inherited' => $mRow->car_id != $car->id,
+                'inherited'     => $isInherited,
+                'inheritedFrom' => $inheritedFrom,
                 'name'      => $mRow->name,
                 'url'       => $this->_helper->url->url(array(
                     'module'          => 'moder',
@@ -3593,15 +3681,13 @@ class Moder_CarsController extends Zend_Controller_Action
                     'car_id'          => $car['id'],
                     'modification_id' => $mRow->id
                 ), 'default', true),
-                'count'     => $db->fetchOne(
-                    $db->select()
-                        ->from('modification_picture', 'count(1)')
-                        ->where('modification_picture.modification_id = ?', $mRow->id)
-                        ->join('pictures', 'modification_picture.picture_id = pictures.id', null)
-                        ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-                        ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                        ->where('car_parent_cache.parent_id = ?', $car->id)
-                )
+                'count'     => $picturesCount,
+                'canDelete' => !$isInherited && $modModel->canDelete($mRow->id),
+                'deleteUrl' => $this->_helper->url->url([
+                    'controller' => 'modification',
+                    'action'     => 'delete',
+                    'id'         => $mRow->id
+                ])
             );
         }
 
@@ -3631,10 +3717,10 @@ class Moder_CarsController extends Zend_Controller_Action
             );
         }
 
-        $groups[] = array(
+        $groups[] = [
             'name'          => null,
-            'modifications' => $this->carMofificationsGroupModifications($car, null)
-        );
+            'modifications' => $this->carMofificationsGroupModifications($car, null),
+        ];
 
         $this->view->assign(array(
             'car'    => $car,
@@ -3651,7 +3737,7 @@ class Moder_CarsController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $mTable = new Modification();
+        $mTable = new ModificationTable();
         $mpTable = new Modification_Picture();
         $mgTable = new Modification_Group();
         $pictureTable = new Picture();

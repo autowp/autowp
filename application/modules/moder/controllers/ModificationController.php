@@ -1,5 +1,10 @@
 <?php
 
+use Application\Form\Modification as ModificationForm;
+use Application\Model\DbTable\CombinationModification;
+use Application\Model\DbTable\Modification as ModificationTable;
+use Application\Model\Modification;
+
 class Moder_ModificationController extends Zend_Controller_Action
 {
     public function preDispatch()
@@ -15,16 +20,16 @@ class Moder_ModificationController extends Zend_Controller_Action
      * @param Cars_Row $car
      * @return string
      */
-    private function carModerUrl(Cars_Row $car, $full = false, $tab = null)
+    private function carModerUrl($carId, $full = false, $tab = null)
     {
         return $this->view->serverUrl(
-            $this->_helper->url->url(array(
+            $this->_helper->url->url([
                 'module'     => 'moder',
                 'controller' => 'cars',
                 'action'     => 'car',
-                'car_id'     => $car->id,
+                'car_id'     => $carId,
                 'tab'        => $tab
-            ), 'default', true)
+            ], 'default', true)
         );
     }
 
@@ -32,9 +37,9 @@ class Moder_ModificationController extends Zend_Controller_Action
      * @param Cars_Row $car
      * @return void
      */
-    private function redirectToCar(Cars_Row $car, $tab = null)
+    private function redirectToCar($carId, $tab = null)
     {
-        return $this->redirect($this->carModerUrl($car, true, $tab));
+        return $this->redirect($this->carModerUrl($carId, true, $tab));
     }
 
     public function addAction()
@@ -46,41 +51,75 @@ class Moder_ModificationController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $mTable = new Modification();
+        $mTable = new ModificationTable();
         $mgTable = new Modification_Group();
 
-        $groupOptions = array(
+        $groupOptions = [
             '' => 'без группы'
-        );
+        ];
 
         foreach ($mgTable->fetchAll() as $mgRow) {
             $groupOptions[$mgRow->id] = $mgRow->name;
         }
 
-        $form = new Application_Form_Modification(array(
+        $form = new ModificationForm([
             'groupOptions' => $groupOptions,
             'action'       => $this->_helper->url->url()
-        ));
+        ]);
 
         $request = $this->getRequest();
         if ($request->isPost() && $form->isValid($request->getPost())) {
 
             $values = $form->getValues();
 
-            $mRow = $mTable->createRow(array(
-                'car_id'   => $car->id,
-                'name'     => $values['name'],
-                'group_id' => $values['group_id'] ? $values['group_id'] : null
-            ));
+            $endYear = (int)$values['end_year'];
+
+            $today = null;
+            if ($endYear) {
+                if ($endYear < date('Y')) {
+                    $today = 0;
+                } else {
+                    $today = null;
+                }
+            } else {
+                switch ($values['today']) {
+                    case 0:
+                        $today = null;
+                        break;
+
+                    case 1:
+                        $today = 0;
+                        break;
+
+                    case 2:
+                        $today = 1;
+                        break;
+                }
+            }
+
+            $mRow = $mTable->createRow([
+                'car_id'           => $car->id,
+                'name'             => $values['name'],
+                'group_id'         => $values['group_id'] ? $values['group_id'] : null,
+                'begin_year'       => $values['begin_year'] ? $values['begin_year'] : null,
+                'end_year'         => $endYear ? $endYear : null,
+                'begin_month'      => $values['begin_month'] ? $values['begin_month'] : null,
+                'end_month'        => $values['end_month'] ? $values['end_month'] : null,
+                'begin_model_year' => $values['begin_model_year'] ? $values['begin_model_year'] : null,
+                'end_model_year'   => $values['end_model_year'] ? $values['end_model_year'] : null,
+                'today'            => $today,
+                'produced'         => $values['produced'],
+                'produced_exactly' => $values['produced_exactly'] ? 1 : 0,
+            ]);
             $mRow->save();
 
-            return $this->redirectToCar($car, 'modifications');
+            return $this->redirectToCar($car->id, 'modifications');
         }
 
-        $this->view->assign(array(
+        $this->view->assign([
             'form'   => $form,
-            'carUrl' => $this->carModerUrl($car, false, 'modifications')
-        ));
+            'carUrl' => $this->carModerUrl($car->id, false, 'modifications')
+        ]);
     }
 
     public function editAction()
@@ -92,7 +131,7 @@ class Moder_ModificationController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $mTable = new Modification();
+        $mTable = new ModificationTable();
 
         $mRow = $mTable->find($this->getParam('modification_id'))->current();
         if (!$mRow) {
@@ -100,57 +139,86 @@ class Moder_ModificationController extends Zend_Controller_Action
         }
 
         $mgTable = new Modification_Group();
-        $mvTable = new Modification_Value();
 
-        $groupOptions = array(
+        $groupOptions = [
             '' => 'без группы'
-        );
+        ];
 
         foreach ($mgTable->fetchAll() as $mgRow) {
             $groupOptions[$mgRow->id] = $mgRow->name;
         }
 
-        $form = new Application_Form_Modification(array(
+        $form = new ModificationForm([
             'groupOptions' => $groupOptions,
             'action'       => $this->_helper->url->url()
-        ));
+        ]);
 
-        $form->populate(array(
-            'name'     => $mRow->name,
-            'group_id' => $mRow->group_id
-        ));
+        $form->populate([
+            'name'             => $mRow->name,
+            'group_id'         => $mRow->group_id,
+            'begin_year'       => $mRow->begin_year,
+            'end_year'         => $mRow->end_year,
+            'begin_month'      => $mRow->begin_month,
+            'end_month'        => $mRow->end_month,
+            'begin_model_year' => $mRow->begin_model_year,
+            'end_model_year'   => $mRow->end_model_year,
+            'today'            => $mRow->today ? 1 : 0,
+            'produced'         => $mRow->produced,
+            'produced_exactly' => $mRow->produced_exactly,
+        ]);
 
         $request = $this->getRequest();
         if ($request->isPost() && $form->isValid($request->getPost())) {
 
             $values = $form->getValues();
 
-            $mRow->setFromArray(array(
-                'name'     => $values['name'],
-                'group_id' => $values['group_id'] ? $values['group_id'] : null
-            ));
+            $endYear = (int)$values['end_year'];
+
+            $today = null;
+            if ($endYear) {
+                if ($endYear < date('Y')) {
+                    $today = 0;
+                } else {
+                    $today = null;
+                }
+            } else {
+                switch ($values['today']) {
+                    case 0:
+                        $today = null;
+                        break;
+
+                    case 1:
+                        $today = 0;
+                        break;
+
+                    case 2:
+                        $today = 1;
+                        break;
+                }
+            }
+
+            $mRow->setFromArray([
+                'name'             => $values['name'],
+                'group_id'         => $values['group_id'] ? $values['group_id'] : null,
+                'begin_year'       => $values['begin_year'] ? $values['begin_year'] : null,
+                'end_year'         => $endYear ? $endYear : null,
+                'begin_month'      => $values['begin_month'] ? $values['begin_month'] : null,
+                'end_month'        => $values['end_month'] ? $values['end_month'] : null,
+                'begin_model_year' => $values['begin_model_year'] ? $values['begin_model_year'] : null,
+                'end_model_year'   => $values['end_model_year'] ? $values['end_model_year'] : null,
+                'today'            => $today,
+                'produced'         => $values['produced'],
+                'produced_exactly' => $values['produced_exactly'] ? 1 : 0,
+            ]);
             $mRow->save();
 
-            return $this->redirectToCar($car, 'modifications');
+            return $this->redirectToCar($car->id, 'modifications');
         }
 
-        $modValues = [];
-        $mvRows = $mvTable->fetchAll(array(
-            'modification_id' => $mRow->id
-        ), 'position');
-
-        foreach ($mvRows as $mvRow) {
-            $modValues[] = array(
-                'name' => $mvRow>value,
-                'id'   => $mvRow->id
-            );
-        }
-
-        $this->view->assign(array(
+        $this->view->assign([
             'form'   => $form,
-            'carUrl' => $this->carModerUrl($car, false, 'modifications'),
-            'values' => $modValues
-        ));
+            'carUrl' => $this->carModerUrl($car->id, false, 'modifications'),
+        ]);
     }
 
     public function mapAction()
@@ -162,27 +230,112 @@ class Moder_ModificationController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $mTable = new Modification();
+        $mgTable = new Modification_Group();
 
-        $mRows = $mTable->fetchAll(
-            $mTable->select(true)
-                ->join('car_parent_cache', 'modification.car_id = car_parent_cache.car_id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id)
+        $mgRows = $mgTable->fetchAll(
+            $mgTable->select(true)
+                ->join('modification', 'modification_group.id = modification.group_id', null)
+                ->join('car_parent_cache', 'modification.car_id = car_parent_cache.parent_id', null)
+                ->where('car_parent_cache.car_id = ?', $car->id)
+                ->group('modification_group.id')
+        );
+
+        $mTable = new ModificationTable();
+        $db = $mTable->getAdapter();
+
+        $names = $db->fetchPairs(
+            $db->select()
+                ->from($mTable->info('name'), ['id', 'name'])
+                ->join('car_parent_cache', 'modification.car_id = car_parent_cache.parent_id', null)
+                ->where('car_parent_cache.car_id = ?', $car->id)
                 ->order(['modification.group_id', 'modification.name'])
         );
 
-        /*$map = [];
-        foreach ($mRows as $mRow1) {
-            foreach ($mRows as $mRow2) {
-                $map[] = array(
-                    'first'  => $mRow1->toArray(),
-                    'second' => $mRow2->toArray()
-                );
+        $map = [];
+
+        foreach ($mgRows as $mgRow) {
+
+            $map[] = $db->fetchCol(
+                $db->select()
+                    ->from($mTable->info('name'), 'id')
+                    ->join('car_parent_cache', 'modification.car_id = car_parent_cache.parent_id', null)
+                    ->where('car_parent_cache.car_id = ?', $car->id)
+                    ->where('modification.group_id = ?', $mgRow->id)
+                    ->order(['modification.group_id', 'modification.name'])
+            );
+        }
+
+        $combinations = $this->groupCombinations($map);
+        //var_dump(count($combinations)); exit;
+
+        // get selected combinations
+        $combModTable = new CombinationModification();
+        $db = $combModTable->getAdapter();
+        $combModRows = $db->fetchAll(
+            $db->select(true)
+                ->from($combModTable->info('name'), ['combination_id', 'modification_id'])
+                ->join('combination', 'combination_modification.combination_id = combination.id', null)
+                ->where('combination.car_id = ?', $car->id)
+        );
+        $values = [];
+        foreach ($combModRows as $combModRow) {
+            $values[$combModRow->combination_id][] = $combModRow['modification_id'];
+        }
+
+        // check combinations active
+        /*foreach ($combinations as &$combination) {
+            $combination['active'] = false;
+            foreach ($values as $value) {
+                if ($combination == $value) {
+                    $combination['active'] = true;
+                    break;
+                }
             }
         }*/
 
-        $this->view->assign(array(
-            'rows' => $mRows->toArray()
-        ));
+        //print_r($combinations); exit;
+
+        $this->view->assign([
+            'combinations' => $combinations,
+            'values'       => $values,
+            'names'        => $names
+        ]);
+    }
+
+    private function groupCombinations($groups)
+    {
+        $firstGroup = $groups[0];
+        $otherGroups = array_slice($groups, 1);
+        $combinations = [];
+
+        if (count($otherGroups)) {
+            $ogCombinations = $this->groupCombinations($otherGroups);
+            foreach ($firstGroup as $id) {
+                foreach ($ogCombinations as $combination) {
+                    $combinations[] = array_merge([$id], $combination);
+                }
+            }
+        } else {
+            foreach ($firstGroup as $id) {
+                $combinations[] = [$id];
+            }
+        }
+
+        return $combinations;
+    }
+
+    public function deleteAction()
+    {
+        $id = (int)$this->getParam('id');
+
+        $modModel = new Modification();
+
+        if (!$modModel->canDelete($id)) {
+            return $this->forward('forbidden', 'error');
+        }
+
+        $modModel->delete($id);
+
+        return $this->redirectToCar($this->getParam('car_id'), 'modifications');
     }
 }

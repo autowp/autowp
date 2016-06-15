@@ -1,6 +1,7 @@
 <?php
 
 use Application\Model\DbTable\BrandLink;
+use Application\Model\DbTable\Modification as ModificationTable;
 
 class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper_Abstract
 {
@@ -583,8 +584,8 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                     if ($currentLangName) {
                         unset($altNames2[$currentLangName]);
                     }
-                    
-                    
+
+
                     $designCarsRow = $db->fetchRow(
                         $db->select()
                             ->from('brands', [
@@ -609,7 +610,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                             ), 'catalogue', true)
                         );
                     }
-                    
+
 
                     $cdTable = new Category();
                     $cdlTable = new Category_Language();
@@ -852,7 +853,7 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
         ));
         $name = $names[$picture->id];
 
-        $mTable = new Modification();
+        $mTable = new ModificationTable();
         $mRows = $mTable->fetchAll(
             $mTable->select(true)
                 ->join('modification_picture', 'modification.id = modification_picture.modification_id', null)
@@ -891,19 +892,19 @@ class Project_Controller_Action_Helper_Pic extends Zend_Controller_Action_Helper
                 'url'  => $url
             );
         }
-        
+
         $carDescription = null;
         if ($car && $car->text_id) {
             $carDescription = $textStorage->getText($car->text_id);
         }
-        
+
         $carText = null;
         if ($car && $car->full_text_id) {
             $carText = $textStorage->getText($car->full_text_id);
         }
-        
+
         $copyrights = null;
-        if ($car && $picture->copyrights_text_id) {
+        if ($picture->copyrights_text_id) {
             $copyrights = $textStorage->getText($picture->copyrights_text_id);
         }
 

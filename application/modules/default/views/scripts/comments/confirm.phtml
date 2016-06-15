@@ -9,7 +9,7 @@
     ));
 ?>
 
-<?=$this->markup(sprintf($this->translate('comments/need-wait-text'), $this->nextMessageTime))?>
+<?=$this->markdown(sprintf($this->translate('comments/need-wait-text'), $this->nextMessageTime))?>
 
 <h2><?=$this->escape($this->translate('comments/form-title'))?></h2>
 <?=$this->form->render($this) ?>

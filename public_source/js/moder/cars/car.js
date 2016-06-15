@@ -159,6 +159,22 @@ define(
                                 display: function(car) {
                                     return car.name;
                                 },
+                                templates: {
+                                    suggestion: function(item) {
+                                        var $div = $('<div class="tt-suggestion tt-selectable"></div>')
+                                            .text(item.name);
+                                        
+                                        $div.addClass(item.type);
+                                        
+                                        if (item.image) {
+                                            $div.prepend($('<img />', {
+                                                src: item.image
+                                            }))
+                                        }
+                                        
+                                        return $div[0];
+                                    }
+                                },
                                 source: function(query, syncResults, asyncResults) {
                                     $.getJSON($input.data('autocomplete'), {q: query}, function(cars) {
                                         asyncResults(cars);
@@ -166,7 +182,7 @@ define(
                                 }
                             })
                             .on('typeahead:select', function(ev, car) {
-                                $.post($form.attr('action'), {parent_id: car.id}, function(json) {
+                                $.post(car.url, {}, function(json) {
                                     window.location = json.url;
                                 });
                             });

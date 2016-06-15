@@ -12,7 +12,7 @@ class LogController extends Zend_Controller_Action
         $logTable = new Log_Events();
 
         $select = $logTable->select(true)
-            ->order('add_datetime DESC');
+            ->order(['add_datetime DESC', 'id DESC']);
 
         $articleId = (int)$this->getParam('article_id');
         if ($articleId) {

@@ -664,6 +664,43 @@ class Catalogue extends AbstractRoute
                     return $this->_matchCarPictures($path, $brand, $brandCarRow, $treePath, false);
                     break;
 
+                case 'mod':
+                    array_shift($path);
+                    
+                    if (!$path) {
+                        return false;
+                    }
+                    
+                    $mod = array_shift($path);
+                    
+                    // :brand/:car_catname/:path[]/mod/:mod
+                    return $this->_assembleMatch(array(
+                        'action'        => 'brand-car',
+                        'brand_catname' => $brand->folder,
+                        'car_catname'   => $brandCarRow->catname,
+                        'path'          => $treePath,
+                        'mod'           => $mod
+                    ));
+                    break;
+                    
+                case 'modgroup':
+                    array_shift($path);
+                    
+                    if (!$path) {
+                        return false;
+                    }
+                    
+                    $modgroup = array_shift($path);
+                    
+                    // :brand/:car_catname/:path[]/modgroup/:modgroup
+                    return $this->_assembleMatch([
+                        'action'        => 'brand-car',
+                        'brand_catname' => $brand->folder,
+                        'car_catname'   => $brandCarRow->catname,
+                        'path'          => $treePath,
+                        'modgroup'      => $modgroup
+                    ]);
+                    break;
 
             }
 
@@ -941,6 +978,14 @@ class Catalogue extends AbstractRoute
                     foreach ($data['path'] as $node) {
                         $url[] = $node;
                     }
+                }
+                if (isset($data['modgroup']) && $data['modgroup']) {
+                    $url[] = 'modgroup';
+                    $url[] = $data['modgroup'];
+                }
+                if (isset($data['mod']) && $data['mod']) {
+                    $url[] = 'mod';
+                    $url[] = $data['mod'];
                 }
                 if (isset($data['type']) && $data['type']) {
                     $url[] = $data['type'];

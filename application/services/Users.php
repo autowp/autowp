@@ -364,4 +364,14 @@ class Application_Service_Users
         
         return $code;
     }
+    
+    public function checkPassword($userId, $password)
+    {
+        $passwordExpr = $this->_passwordHashExpr($password);
+        
+        return (bool)$this->_getTable()->fetchRow(array(
+            'id = ?'       => (int)$userId,
+            'password = ?' => new Zend_Db_Expr($passwordExpr)
+        ));
+    }
 }

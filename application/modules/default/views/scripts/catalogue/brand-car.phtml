@@ -86,25 +86,27 @@
     </p>
 <?php } ?>
 
-<?=$this->partial('catalogue/partial/brand-car-menu.phtml', array(
-    'title' => $this->carFullName,
-    'stock' => array(
-        'count'  => $this->stockCount,
-        'active' => $this->type == Car_Parent::TYPE_DEFAULT
-    ),
-    'tuning' => array(
-        'count'  => $this->tuningCount,
-        'active' => $this->type == Car_Parent::TYPE_TUNING
-    ),
-    'sport' => array(
-        'count'  => $this->sportCount,
-        'active' => $this->type == Car_Parent::TYPE_SPORT
-    ),
-    'pictures' => array(
-        'count'  => $this->picturesCount,
-        'active' => false
-    ),
-)) ?>
+<?php if (!isset($this->modgroup)) { ?>
+    <?=$this->partial('catalogue/partial/brand-car-menu.phtml', array(
+        'title' => $this->carFullName,
+        'stock' => array(
+            'count'  => $this->stockCount,
+            'active' => $this->type == Car_Parent::TYPE_DEFAULT
+        ),
+        'tuning' => array(
+            'count'  => $this->tuningCount,
+            'active' => $this->type == Car_Parent::TYPE_TUNING
+        ),
+        'sport' => array(
+            'count'  => $this->sportCount,
+            'active' => $this->type == Car_Parent::TYPE_SPORT
+        ),
+        'pictures' => array(
+            'count'  => $this->picturesCount,
+            'active' => false
+        ),
+    )) ?>
+<?php } ?>
 
 <?php if ($this->hasHtml) { ?>
     <div class="text">
@@ -118,33 +120,82 @@
 
 <?=$this->render('catalogue/partial/modification-filter.phtml')?>
 
-<?=$this->partial('cars.phtml', $this->childListData)?>
-
-<?php if ($this->currentPicturesCount) { ?>
-    <h3><?=$this->escape($this->translate('catalogue/other-pictures-of-%1$s', $this->carFullName)) ?></h3>
-
-    <div class="row thumbnails">
-        <?php foreach ($this->currentPictures as $picture) { ?>
-            <div class="col-md-3">
-                <?=$this->htmlA(array(
-                    'href'  => $picture['url'],
-                    'class' => 'thumbnail'
-                ), $this->htmlImg($picture['src'], array(
-                    'format'  => 'picture-thumb',
-                    'alt'     => $picture['name'],
-                    'title'   => $picture['name'],
-                    'shuffle' => true
-                )), false)?>
-            </div>
+<?php if (!isset($this->modgroup)) { ?>
+    <?=$this->partial('cars.phtml', $this->childListData)?>
+    
+    <?php if ($this->currentPicturesCount) { ?>
+        <h3><?=$this->escape($this->translate('catalogue/other-pictures-of-%1$s', $this->carFullName)) ?></h3>
+    
+        <div class="row thumbnails">
+            <?php foreach ($this->currentPictures as $picture) { ?>
+                <div class="col-md-3">
+                    <?=$this->htmlA(array(
+                        'href'  => $picture['url'],
+                        'class' => 'thumbnail'
+                    ), $this->htmlImg($picture['src'], array(
+                        'format'  => 'picture-thumb',
+                        'alt'     => $picture['name'],
+                        'title'   => $picture['name'],
+                        'shuffle' => true
+                    )), false)?>
+                </div>
+            <?php } ?>
+        </div>
+    
+        <?php if ($this->currentPicturesCount > 4) { ?>
+            <i class="fa fa-th"></i>
+            <?=$this->htmlA($this->currentPicturesUrl, $this->translate('carlist/all pictures').' ('.$this->currentPicturesCount.')')?>
         <?php } ?>
-    </div>
-
-    <?php if ($this->currentPicturesCount > 4) { ?>
-        <i class="fa fa-th"></i>
-        <?=$this->htmlA($this->currentPicturesUrl, $this->translate('carlist/all pictures').' ('.$this->currentPicturesCount.')')?>
     <?php } ?>
-<?php } ?>
+    
+    <?php if (isset($this->paginator)) { ?>
+        <?=$this->paginationControl($this->paginator) ?>
+    <?php } ?>
+    
+<?php } else { ?>
 
-<?php if (isset($this->paginator)) { ?>
-    <?=$this->paginationControl($this->paginator) ?>
+    <?php foreach ($this->modifications as $modification) { ?>
+        <?php /* if (!$modification['totalPictures']) { continue; } */ ?>
+        <h3>
+            <?=$this->car()->htmlTitle(array_replace($this->car, $modification['nameParams']))?>
+        </h3>
+        
+        <div class="row thumbnails">
+            <?php foreach ($modification['pictures'] as $picture) { ?>
+                <div class="col-md-3">
+                    <?php if ($picture) { ?>
+                        <?=$this->htmlA(array(
+                            'href'  => $picture['url'],
+                            'class' => 'thumbnail'
+                        ), $this->htmlImg($picture['src'], array(
+                            'format'  => 'picture-thumb',
+                            /*'alt'     => $picture['name'],
+                            'title'   => $picture['name'],*/
+                            'shuffle' => true
+                        )), false)?>
+                    <?php } else { ?>
+                        &nbsp;
+                    <?php } ?>
+                </div>
+            <?php } ?>
+        </div>
+        
+        <ul class="list-inline">
+
+            <?php if (isset($modification['url']) && $modification['url']) { ?>
+                <li>
+                    <span class="fa fa-th"></span>
+                    <?=$this->htmlA($modification['url'], $this->translate('carlist/all pictures').' ('.$modification['totalPictures'].')')?>
+                </li>
+            <?php } ?>
+
+            <?php if ($this->isCarModer) { ?>
+                <li>
+                    <i class="fa fa-cog"></i>
+                    <?=$this->htmlA('#' /*$item['moderUrl']*/, 'управление') ?>
+                </li>
+            <?php } ?>
+
+        </ul>
+    <?php } ?>
 <?php } ?>

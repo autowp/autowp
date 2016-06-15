@@ -639,7 +639,7 @@ class UploadController extends Zend_Controller_Action
                 ->order(array('cars.caption', 'cars.begin_year', 'cars.end_year'))
                 ->group('cars.id')
                 ->bind([
-                    'language' => $this->_helper->language()
+                    'lang' => $this->_helper->language()
                 ])
         );
 

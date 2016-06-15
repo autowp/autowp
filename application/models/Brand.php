@@ -1,36 +1,36 @@
-<?php 
+<?php
 
 namespace Application\Model;
 
 use Application\Model\DbTable\Brand as Table;
 use Zend_Db_Expr;
 
-class Brand 
+class Brand
 {
     const TOP_COUNT = 150;
-    
+
     const NEW_DAYS = 7;
-    
+
     /**
      * @var Table
      */
     private $table;
-    
+
     public function __construct()
     {
         $this->table = new Table();
     }
-    
+
     public function getTotalCount()
     {
         $sql = 'SELECT COUNT(1) FROM brands';
         return $this->table->getAdapter()->fetchOne($sql);
     }
-    
+
     private function countExpr()
     {
         $db = $this->table->getAdapter();
-        
+
         return new Zend_Db_Expr('(' .
             '(' .
                 $db->select()
@@ -48,13 +48,13 @@ class Brand
             ')' .
         ')');
     }
-    
+
     public function getTopBrandsList($language)
     {
         $db = $this->table->getAdapter();
-        
+
         $items = array();
-        
+
         $select = $db->select(true)
             ->from('brands', [
                 'id', 'folder',
@@ -69,7 +69,7 @@ class Brand
             ->bind([
                 'language' => $language
             ]);
-        
+
         foreach ($db->fetchAll($select) as $brandRow) {
             $newCarsCount = $db->fetchOne(
                 $db->select()
@@ -79,7 +79,7 @@ class Brand
                     ->where('brands_cars.brand_id = ?', $brandRow['id'])
                     ->where('cars.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)', self::NEW_DAYS)
             );
-        
+
             $items[] = array(
                 'id'             => $brandRow['id'],
                 'catname'        => $brandRow['folder'],
@@ -88,15 +88,15 @@ class Brand
                 'new_cars_count' => $newCarsCount
             );
         }
-        
+
         usort($items, function($a, $b) {
             return strcoll($a['name'], $b['name']);
         });
-        
+
         return $items;
     }
-    
-    private function utfCharToNumber($char) 
+
+    private function utfCharToNumber($char)
     {
         $i = 0;
         $number = '';
@@ -106,7 +106,7 @@ class Brand
         }
         return $number;
     }
-    
+
     public function getFullBrandsList($language)
     {
         $rows = $this->getList([
@@ -130,57 +130,57 @@ class Brand
                     'new_days' => self::NEW_DAYS
                 ]);
         });
-        
+
         $result = [];
-        
+
         foreach ($rows as $row) {
-       
+
             $name = $row['name'];
-        
+
             $char = str_replace('Š', 'S', mb_strtoupper(mb_substr($name, 0, 1)));
             $char = str_replace('Ö', 'O', $char);
             $char = str_replace('Ẽ', 'E', $char);
-        
+
             if (!isset($result[$char])) {
                 $result[$char] = [
                     'id'     => $this->utfCharToNumber($char),
                     'brands' => []
                 ];
             }
-            
-            $picturesCount = $row['carpictures_count'] + $row['enginepictures_count'] + 
-                $row['logopictures_count'] + $row['mixedpictures_count'] + 
+
+            $picturesCount = $row['carpictures_count'] + $row['enginepictures_count'] +
+                $row['logopictures_count'] + $row['mixedpictures_count'] +
                 $row['unsortedpictures_count'];
-        
+
             $result[$char]['brands'][] = [
                 'id'             => $row['id'],
                 'name'           => $name,
-                'catname'        => $row['folder'],
+                'catname'        => $row['catname'],
                 'img'            => $row['img'],
                 'totalPictures'  => $picturesCount,
                 'newCars'        => $row['new_cars_count'],
                 'totalCars'      => $row['cars_count']
             ];
         }
-        
+
         return $result;
     }
-    
+
     public function getBrandIdByCatname($catname)
     {
         $db = $this->table->getAdapter();
-        
+
         return $db->fetchOne(
             $db->select()
                 ->from('brands', 'id')
                 ->where('folder = ?', (string)$catname)
         );
     }
-    
+
     private function fetchBrand($language, $callback)
     {
         $db = $this->table->getAdapter();
-        
+
         $select = $db->select()
             ->from('brands', [
                 'id', 'folder', 'type_id',
@@ -191,15 +191,15 @@ class Brand
             ->bind([
                 'language' => (string)$language
             ]);
-            
+
         $callback($select);
-        
+
         $brand = $db->fetchRow($select);
-        
+
         if (!$brand) {
             return null;
         }
-        
+
         return [
             'id'        => $brand['id'],
             'name'      => $brand['name'],
@@ -210,21 +210,21 @@ class Brand
             'type_id'   => $brand['type_id']
         ];
     }
-    
+
     public function getBrandById($id, $language)
     {
         return $this->fetchBrand($language, function($select) use ($id) {
             $select->where('brands.id = ?', (int)$id);
         });
     }
-    
+
     public function getBrandByCatname($catname, $language)
     {
         return $this->fetchBrand($language, function($select) use ($catname) {
             $select->where('brands.folder = ?', (string)$catname);
         });
     }
-    
+
     public function getFactoryBrandId($factoryId)
     {
         $brand = $this->table->fetchRow(
@@ -239,10 +239,10 @@ class Brand
         if (!$brand) {
             return null;
         }
-        
+
         return $brand->id;
     }
-    
+
     public function getList($options, callable $callback)
     {
         if (is_string($options)) {
@@ -250,17 +250,17 @@ class Brand
                 'language' => $options
             ];
         }
-        
+
         $defaults = [
             'language' => 'en',
             'columns'  => []
         ];
         $options = array_replace($defaults, $options);
-        
+
         $db = $this->table->getAdapter();
-        
+
         $columns = [
-            'id', 
+            'id',
             'type_id',
             'catname' => 'folder',
             'name'    => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.caption)'
@@ -269,6 +269,7 @@ class Brand
             switch ($expr) {
                 case 'id':
                 case 'type_id':
+                case 'name':
                     break;
                 case 'img':
                     $columns[] = 'img';
@@ -282,7 +283,7 @@ class Brand
             }
         }
         //var_dump($columns);
-        
+
         $select = $db->select()
             ->from('brands', $columns)
             ->joinLeft('brand_language', 'brands.id = brand_language.brand_id and brand_language.language = :language', null)
@@ -290,11 +291,11 @@ class Brand
             ->bind([
                 'language' => (string)$options['language']
             ]);
-        
+
         $callback($select);
-        
+
         $items = $db->fetchAll($select);
-        
+
         return $items;
     }
 }

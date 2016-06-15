@@ -179,6 +179,7 @@ a {
             padding: 10px;
             min-height: 70px;
             margin-bottom: 10px;
+            word-wrap: break-word;
         }
         
         .vote {
@@ -822,10 +823,11 @@ footer .links {
         background-color: #f5f5f5;
         padding: 3px 20px;
         white-space: nowrap;
+        .clearfix();
         
         &:hover {
-            color: @dropdown-link-hover-color;
-            background-color: @dropdown-link-hover-bg;
+            color: @dropdown-link-active-color;
+            background-color: @dropdown-link-active-bg;
         }
         
         &.tt-cursor {
@@ -834,5 +836,22 @@ footer .links {
             outline: 0;
             background-color: @dropdown-link-active-bg;
         }
+        
+        img {
+            display: inline-block;
+            margin: 0 15px 0 0;
+        }
+        
+        &.brand {
+            line-height: 40px;
+            vertical-align: middle;
+            img {
+                max-width: 40px;
+                max-height: 40px;
+            }
+        }
     }
+}
+
+.tt-hint:extend(.text-muted) {
 }

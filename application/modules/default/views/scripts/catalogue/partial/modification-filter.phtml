@@ -4,8 +4,14 @@
         <?php foreach ($this->modificationGroups as $group) { ?>
             <?php if (count($group['modifications'])) { ?>
                 <div>
-                    <small><?=$this->escape($group['name'] ? $group['name'] : 'Другие')?></small>
-                    <div class="btn-group" role="group">
+                    <small>
+                        <?php if (isset($group['url'])) { ?>
+                            By <?=$this->htmlA($group['url'], $group['name'])?>
+                        <?php }/* else { ?>
+                            <?=$this->escape($group['name'] ? $group['name'] : 'Другие')?>
+                        <?php }*/ ?>
+                    </small>
+                    <?php /*<div class="btn-group" role="group">
                         <?php foreach ($group['modifications'] as $modification) { ?>
                             <?php if ($modification['count'] > 0) { ?>
                                 <a href="<?=$this->escape($modification['url'])?>" class="btn btn-sm <?=$modification['active'] ? 'btn-primary active' : 'btn-default'?>">
@@ -14,7 +20,7 @@
                                 </a>
                             <?php } ?>
                         <?php } ?>
-                    </div>
+                    </div>*/?>
                 </div>
             <?php } ?>
         <?php } ?>

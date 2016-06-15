@@ -8,7 +8,7 @@ class BrandsController extends Zend_Controller_Action
     {
         $language = $this->_helper->language();
 
-        $cache_key = 'brands_list_4_' . $language;
+        $cache_key = 'brands_list_5_' . $language;
 
         $cache = $this->getInvokeArg('bootstrap')
             ->getResource('cachemanager')->getCache('long');
@@ -16,13 +16,13 @@ class BrandsController extends Zend_Controller_Action
         if (!($items = $cache->load($cache_key))) {
 
             $imageStorage = $this->_helper->imageStorage();
-            
+
             $brandModel = new Brand();
-            
+
             $items = $brandModel->getFullBrandsList($language);
-            
+
             foreach ($items as &$char) {
-                foreach ($char['brands'] as &$item) { 
+                foreach ($char['brands'] as &$item) {
                     $item['url'] = $this->_helper->url->url(array(
                         'module'        => 'default',
                         'controller'    => 'catalogue',
@@ -32,7 +32,7 @@ class BrandsController extends Zend_Controller_Action
                     $item['newCarsUrl'] = $this->_helper->url->url(array(
                         'brand_id' => $item['id'],
                     ), 'brand_new_cars', true);
-                    
+
                     $img = false;
                     if ($item['img']) {
                         $imageInfo = $imageStorage->getFormatedImage($item['img'], 'brandicon');
@@ -40,7 +40,7 @@ class BrandsController extends Zend_Controller_Action
                             $img = $imageInfo->getSrc();
                         }
                     }
-                    
+
                     $item['logo'] = $img;
                 }
             }

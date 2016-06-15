@@ -43,6 +43,7 @@
         },
         "psr-4": {
             "Autowp\\": "library/Autowp",
+            "Application\\Form\\": "application/forms/",
             "Application\\Model\\": "application/models",
             "Application\\Model\\DbTable\\": "application/models/DbTable",
             "Application\\Service\\": "application/services"
