@@ -4,6 +4,8 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
+use Application\Acl;
+
 use Zend_Auth;
 use Zend_Acl_Role_Interface;
 use Zend_View_Exception;
@@ -15,6 +17,8 @@ use DateTimeZone;
 use Users;
 use Users_Row;
 
+use Exception;
+
 class User extends AbstractHelper
 {
     private $_userModel;
@@ -22,6 +26,13 @@ class User extends AbstractHelper
     private $_users = array();
 
     private $_user = null;
+
+    private $acl;
+
+    public function __construct(Acl $acl)
+    {
+        $this->acl = $acl;
+    }
 
     private function _user($id)
     {
@@ -100,15 +111,11 @@ class User extends AbstractHelper
                            '</span>';
                 }
 
-                $url = $this->view->url(array(
-                    'module'     => 'default',
-                    'controller' => 'users',
-                    'action'     => 'user',
-                    'identity'   => $user->identity,
-                    'user_id'    => $user->id
-                ), 'users', true);
+                $url = $this->view->url('users/user', [
+                    'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                ]);
 
-                $classes = array('user');
+                $classes = ['user'];
                 if ($lastOnline = $user->getDate('last_online')) {
                     if (Zend_Date::now()->subMonth(6)->isLater($lastOnline)) {
                         $classes[] = 'long-away';
@@ -131,6 +138,8 @@ class User extends AbstractHelper
         } catch (Exception $e) {
 
             $result = $e->getMessage();
+
+            print $e->getTraceAsString();
 
         }
 
@@ -173,8 +182,7 @@ class User extends AbstractHelper
     {
         return $this->_user
             && $this->_user->role
-            && $this->view->acl()
-                ->isAllowed($this->_user->role, $resource, $privilege);
+            && $this->acl->isAllowed($this->_user->role, $resource, $privilege);
     }
 
     /**
@@ -185,8 +193,7 @@ class User extends AbstractHelper
     {
         return $this->_user
             && $this->_user->role
-            && $this->view->acl()
-                ->inheritsRole($this->_user->role, $inherit);
+            && $this->acl->inheritsRole($this->_user->role, $inherit);
     }
 
     public function timezone()

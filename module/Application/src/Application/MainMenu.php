@@ -1,27 +1,47 @@
 <?php
 
-use Application\Model\Message;
+namespace Application;
 
-class LayoutController extends Zend_Controller_Action
+use Application\Model\Message;
+use Application\Language;
+use Zend_Cache_Manager;
+
+use Zend\Router\Http\TreeRouteStack;
+
+use Category;
+use Category_Language;
+use Pages;
+
+class MainMenu
 {
     /**
      * @var Page
      */
-    private $_pageTable;
+    private $pageTable;
 
-    public function flashMessagesAction()
+    private $request;
+
+    /**
+     * @var TreeRouteStack
+     */
+    private $router;
+
+    /**
+     * @var Language
+     */
+    private $language;
+
+    /**
+     * @var Zend_Cache_Manager
+     */
+    private $cacheManager;
+
+    public function __construct($request, TreeRouteStack $router, Language $language, Zend_Cache_Manager $cacheManager)
     {
-        $this->view->flashMessages = $this->_helper->flashMessenger->getMessages();
-    }
-
-    public function sidebarRightAction()
-    {
-        if ($this->_helper->user()->logedIn()) {
-            $mModel = new Message();
-            $count = $mModel->getNewCount($this->_helper->user()->get()->id);
-
-            $this->view->newPersonalMessages = $count;
-        }
+        $this->request = $request;
+        $this->router = $router;
+        $this->language = $language;
+        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -29,9 +49,9 @@ class LayoutController extends Zend_Controller_Action
      */
     private function _getPageTable()
     {
-        return $this->_pageTable
-            ? $this->_pageTable
-            : $this->_pageTable = new Pages();
+        return $this->pageTable
+            ? $this->pageTable
+            : $this->pageTable = new Pages();
     }
 
     private function getMenuData($id, $logedIn, $language)
@@ -56,7 +76,7 @@ class LayoutController extends Zend_Controller_Action
             $select->where('NOT pages.registered_only');
         }
 
-        $result = array();
+        $result = [];
         foreach ($db->fetchAll($select) as $row) {
             $result[] = array(
                 'id'    => $row['id'],
@@ -69,23 +89,9 @@ class LayoutController extends Zend_Controller_Action
         return $result;
     }
 
-    private function getMenu($id, $logedIn)
+    public function getMenu()
     {
-        $select = $this->_getPageTable()->select(true)
-            ->where('parent_id = ?', $id)
-            ->order('position');
-        if ($logedIn) {
-            $select->where('NOT guest_only');
-        } else {
-            $select->where('NOT registered_only');
-        }
-
-        return $this->_getPageTable()->fetchAll($select);
-    }
-
-    public function mainMenuAction()
-    {
-        $user = $this->_helper->user()->get();
+        $user = false;//$this->_helper->user()->get();
 
         $pm = 0;
         if ($user) {
@@ -93,16 +99,15 @@ class LayoutController extends Zend_Controller_Action
             $pm = $mModel->getNewCount($user->id);
         }
 
-        $language = $this->_helper->language();
+        $language = $this->language->getLanguage();
 
-        $cache = $this->getInvokeArg('bootstrap')
-            ->getResource('cachemanager')->getCache('long');
+        $cache = $this->cacheManager->getCache('long');
 
-        $key = 'CATEGORY_MENU_2_' . $language;
+        $key = 'ZF2_CATEGORY_MENU_2_' . $language;
 
         if (!($categories = $cache->load($key))) {
 
-            $categories = array();
+            $categories = [];
 
             $categoryTable = new Category();
             $categoryLanguageTable = new Category_Language();
@@ -118,48 +123,48 @@ class LayoutController extends Zend_Controller_Action
                     'category_id = ?' => $row->id
                 ));
 
-                $categories[] = array(
+                $categories[] = [
                     'id'             => $row->id,
-                    'url'            => $this->_helper->url->url(array(
-                        'controller'       => 'category',
-                        'action'           => 'category',
-                        'category_catname' => $row->catname,
-                        'other'            => null
-                    ), 'category', true),
+                    'url'            => $this->router->assemble([
+                        'category_catname' => $row->catname
+                    ], [
+                        'name' => 'categories/category'
+                    ]),
                     'name'           => $langRow ? $langRow->name : $row->name,
                     'short_name'     => $langRow ? $langRow->short_name : $row->short_name,
                     'cars_count'     => $row->getCarsCount(),
                     'new_cars_count' => $row->getWeekCarsCount(),
-                );
+                ];
             }
 
-            $cache->save($categories, null, array(), 1800);
+            $cache->save($categories, null, [], 1800);
         }
 
         $searchHostname = 'www.autowp.ru';
 
-        $languages = array(
-            array(
+        $languages = [
+            [
                 'name'     => 'Русский',
                 'language' => 'ru',
                 'hostname' => 'www.autowp.ru',
                 'flag'     => 'flag-RU',
-            ),
-            array(
+            ],
+            [
                 'name'     => 'English (beta)',
                 'language' => 'en',
                 'hostname' => 'en.wheelsage.org',
                 'flag'     => 'flag-GB'
-            ),
-            array(
+            ],
+            [
                 'name'     => 'Français (beta)',
                 'language' => 'fr',
                 'hostname' => 'fr.wheelsage.org',
                 'flag'     => 'flag-FR'
-            ),
-        );
+            ]
+        ];
 
-        $scheme = $this->getRequest()->getScheme();
+        $uri = $this->request->getUri();
+        $scheme = $uri->getScheme();
         foreach ($languages as &$item) {
             $active = $item['language'] == $language;
             $item['active'] = $active;
@@ -167,21 +172,25 @@ class LayoutController extends Zend_Controller_Action
                 $searchHostname = $item['hostname'];
             }
 
-            $item['url'] = $scheme . '://' . $item['hostname'] . $this->_helper->url->url();
+            $clone = clone $uri;
+
+            $clone->setHost($item['hostname']);
+
+            $item['url'] = $clone->__toString();
         }
         unset($item); // prevent future bugs
 
-        $logedIn = $this->_helper->user()->logedIn();
+        $logedIn = false; //$this->_helper->user()->logedIn();
 
 
-        $key = 'MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '3_' . $language;
+        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '2_' . $language;
         if (!($pages = $cache->load($key))) {
             $pages = $this->getMenuData(2, $logedIn, $language);
 
-            $cache->save($pages, null, array(), 1800);
+            $cache->save($pages, null, [], 1800);
         }
 
-        $key = 'SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '10_' . $language;
+        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '7_' . $language;
         if (!($secondMenu = $cache->load($key))) {
             $secondMenu = $this->getMenuData(87, $logedIn, $language);
 
@@ -198,10 +207,10 @@ class LayoutController extends Zend_Controller_Action
             }
             unset($item);
 
-            $cache->save($secondMenu, null, array(), 1800);
+            $cache->save($secondMenu, null, [], 1800);
         }
 
-        $this->view->assign(array(
+        return [
             'pages'          => $pages,
             'secondMenu'     => $secondMenu,
             'pm'             => $pm,
@@ -209,6 +218,6 @@ class LayoutController extends Zend_Controller_Action
             'languages'      => $languages,
             'language'       => $language,
             'searchHostname' => $searchHostname
-        ));
+        ];
     }
 }

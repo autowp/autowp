@@ -10,13 +10,13 @@
     }
 
     $mainMenu = '';
-    if (false && !$blankPage) {
-        $mainMenu = $this->action('main-menu', 'layout', 'default');
+    if (!$blankPage) {
+        $mainMenu = $this->mainMenu();
     }
 
 ?>
 <?=$this->doctype() . PHP_EOL ?>
-<html dir="ltr" lang="<? /*=$this->language()->get() */?>">
+<html dir="ltr" lang="<?=$this->language()?>">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -72,9 +72,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
             <div class="row">
                 <div class="col-sm-<?=$spanCenter?> col-sm-push-<?=$spanLeft?>">
-                    <?/*=$this->action('flash-messages', 'layout', 'default') */?>
-                    <?/*=$this->breadcrumbs()*/ ?>
-                    <?/*=$this->pageTitle()*/ ?>
+                    <?php /*=$this->action('flash-messages', 'layout', 'default') */?>
+                    <?=$this->breadcrumbs() ?>
+                    <?=$this->pageTitle() ?>
                     <?=$this->layout()->content ?>
                 </div>
                 <?php if ($needLeft) { ?>
@@ -84,7 +84,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 <?php } ?>
                 <?php if ($needRight) { ?>
                     <div class="col-sm-<?=$spanRight?>">
-                        <?=$this->action('sidebar-right', 'layout', 'default') ?>
+                        <?=$this->sidebar()?>
                     </div>
                 <?php } ?>
             </div>
@@ -100,11 +100,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                                 <a href="https://www.facebook.com/AutoWP/" title="Facebook" data-toggle="tooltip" data-placement="top"><i class="fa fa-facebook"></i></a>
                                 <a href="https://github.com/autowp/autowp" title="GitHub" data-toggle="tooltip" data-placement="top"><i class="fa fa-github"></i></a>
                                 <a href="https://play.google.com/store/apps/details?id=com.autowp.wallpaper" title="Android wallpaper" data-toggle="tooltip" data-placement="top"><i class="fa fa-android"></i></a>
-                                <a href="/feedback/" title="<?=$this->escapeHtml($this->translate('feedback/title'))?>" data-toggle="tooltip" data-placement="top"><i class="fa fa-comment"></i></a>
+                                <a href="/feedback/" title="<?=$this->escapeHtmlAttr($this->translate('feedback/title'))?>" data-toggle="tooltip" data-placement="top"><i class="fa fa-comment"></i></a>
                             </p>
                             <p>
                                 <?=$this->htmlA('/about', $this->page(136)->name)?>
-                                •
+                                â€¢
                                 <?=$this->htmlA('/donate', $this->page(196)->name)?>
                             </p>
                         </div>

@@ -1,10 +1,17 @@
 <?php
 
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
+
 use Application\Service\TrafficControl;
 use Application\Model\Brand;
 use Application\Model\Contact;
 
-class UsersController extends Zend_Controller_Action
+use Users;
+
+class UsersController extends AbstractActionController
 {
     public function indexAction()
     {
@@ -239,6 +246,23 @@ class UsersController extends Zend_Controller_Action
             'paginator'    => $paginator,
             'picturesData' => $picturesData,
         ));
+    }
+
+    public function onlineAction()
+    {
+        $userTable = new Users();
+
+        $viewModel = new ViewModel([
+            'users' => $userTable->fetchAll(
+                $userTable->select(true)
+                    ->join('session', 'users.id = session.user_id', null)
+                    ->where('session.modified >= ?', time() - 5*60)
+                    ->group('users.id')
+            )
+        ]);
+        $viewModel->setTerminal($this->getRequest()->isXmlHttpRequest());
+
+        return $viewModel;
     }
 
     public function ratingAction()

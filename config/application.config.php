@@ -15,6 +15,8 @@ return [
         'Zend\Form',
         'Zend\Mvc\Console',
         'Application',
+        'ZF\ContentNegotiation',
+        'ZF\OAuth2'
     ],
 
     // These are various options for the listeners attached to the ModuleManager

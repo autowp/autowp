@@ -8,6 +8,7 @@ use Pages;
 use Page_Language;
 
 use Zend_Db_Table;
+use Zend_Db_Table_Row;
 use Zend_Locale;
 use Zend_Registry;
 
@@ -47,7 +48,7 @@ class Page extends AbstractHelper
         }
     }
 
-    public function page($value)
+    public function __invoke($value)
     {
         if ($value) {
             $doc = null;

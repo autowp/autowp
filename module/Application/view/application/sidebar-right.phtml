@@ -1,0 +1,44 @@
+<?php if ($this->user()->logedIn()) { ?>
+    <div class="well">
+        <div>
+            <?=$this->user() ?><br />
+            <?=$this->htmlA('/account/profile/', $this->page(48)->name)?><br />
+            <i class="fa fa-sign-out"></i> <?=$this->htmlA('/login/logout/', $this->translate('login/sign-out'))?>
+        </div>
+        <p>
+            <i class="fa fa-comment"></i>
+            <?php if ($this->newPersonalMessages > 0) { ?>
+                <?=$this->htmlA(array(
+                    'href'  => '/account/pm/',
+                    'class' => 'label label-danger'
+                ), $this->translate(array('layout/you-have-%1$s-new-messages', null, $this->newPersonalMessages), $this->newPersonalMessages))?>
+            <?php } else { ?>
+                <?=$this->htmlA('/account/pm/', $this->translate('layout/personal-messages'))?>
+            <?php } ?>
+        </p>
+    </div>
+<?php } else { ?>
+    <h3><?=$this->escapeHtml($this->translate('login/sign-in'))?></h3>
+    <div class="well">
+        <form action="/login/" method="post" class="login"><div>
+            <p><input type="text" name="login" placeholder="<?=$this->escapeHtmlAttr($this->translate('login/login-or-email'))?>" class="form-control" /></p>
+            <p><input type="password" name="password" placeholder="<?=$this->escapeHtmlAttr($this->translate('login/password'))?>" class="form-control" /></p>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" value="1" name="remember" />
+                    <?=$this->escapeHtml($this->translate('login/remember'))?>
+                </label>
+            </div>
+            <div>
+                <div class="pull-right text-right">
+                    <?=$this->htmlA('/registration/', $this->translate('login/registration'))?><br />
+                    <?=$this->htmlA('/restorepassword/', $this->translate('login/forgot-password?'))?>
+                </div>
+                <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('login/sign-in'))?>" class="btn btn-primary" />
+            </div>
+        </div></form>
+    </div>
+<?php } ?>
+
+<a class="twitter-timeline"  href="https://twitter.com/autowp_ru"  data-widget-id="323907714319253505" data-chrome="nofooter" width="370" height="730">Твиты пользователя @autowp_ru</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>

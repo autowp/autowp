@@ -1,9 +1,9 @@
 <?php
-    $this->layout()->assign(array(
+    $this->layout()->setVariables([
         'blankPage' => false,
         'needLeft'  => false,
         'needRight' => false
-    ));
+    ]);
 ?>
 <?php foreach ($this->users as $user) { ?>
     <?=$this->user($user) . ' ' ?>

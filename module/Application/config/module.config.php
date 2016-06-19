@@ -73,6 +73,69 @@ return [
                     ]
                 ]
             ],
+            'categories' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/category',
+                    'defaults' => [
+                        'controller' => Controller\CategoryController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'category' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/:category_catname',
+                            'defaults' => [
+                                'action' => 'category',
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            'users' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/users',
+                    'defaults' => [
+                        'controller' => Controller\UsersController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'user' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/:user_id',
+                            'defaults' => [
+                                'action' => 'user',
+                            ],
+                        ]
+                    ],
+                    'online' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/online',
+                            'defaults' => [
+                                'action' => 'online',
+                            ],
+                        ]
+                    ],
+                ]
+            ],
+            'rules' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/rules',
+                    'defaults' => [
+                        'controller' => Controller\RulesController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
             'api' => [
                 'type' => Literal::class,
                 'options' => [
@@ -274,6 +337,8 @@ return [
             Controller\IndexController::class        => InvokableFactory::class,
             Controller\MapController::class          => InvokableFactory::class,
             Controller\LoginController::class        => InvokableFactory::class,
+            Controller\RulesController::class        => InvokableFactory::class,
+            Controller\UsersController::class        => InvokableFactory::class,
             Controller\Api\ContactsController::class => InvokableFactory::class,
             Controller\Api\PictureController::class => function($sm) {
                 $imageStorage = $sm->get(Image\Storage::class);
@@ -337,11 +402,25 @@ return [
         ],
     ],
     'view_helpers' => [
-        'invokables'=> [
-            'pageEnv' => View\Helper\PageEnv::class,
-            'page'    => View\Helper\Page::class,
-            'user'    => View\Helper\User::class,
-            'htmlA'   => View\Helper\HtmlA::class
+        'invokables' => [
+            'pageEnv'     => View\Helper\PageEnv::class,
+            'page'        => View\Helper\Page::class,
+            'htmlA'       => View\Helper\HtmlA::class,
+            'sidebar'     => View\Helper\Sidebar::class,
+            'pageTitle'   => View\Helper\PageTitle::class,
+            'breadcrumbs' => View\Helper\Breadcrumbs::class,
+        ],
+        'factories' => [
+            'mainMenu' => function($sm) {
+                return new View\Helper\MainMenu($sm->get(MainMenu::class));
+            },
+            'language' => function($sm) {
+                return new View\Helper\Language($sm->get(Language::class));
+            },
+            'user' => function($sm) {
+                $acl = $sm->get(Acl::class);
+                return new View\Helper\User($acl);
+            }
         ]
     ],
     'translator' => [
@@ -420,6 +499,21 @@ return [
                 $config = $sm->get('Config');
                 $resource = new Zend_Application_Resource_Cachemanager($config['cachemanager']);
                 return $resource->init();
+            },
+            MainMenu::class => function($sm) {
+
+                $router = $sm->get('HttpRouter');
+                $language = $sm->get(Language::class);
+                $cacheManager = $sm->get(Zend_Cache_Manager::class);
+                $request = $sm->get('Request');
+
+                return new MainMenu($request, $router, $language, $cacheManager);
+            },
+            Language::class => function($sm) {
+
+                $request = $sm->get('Request');
+
+                return new Language($request);
             }
         ],
         /*'services' => [),

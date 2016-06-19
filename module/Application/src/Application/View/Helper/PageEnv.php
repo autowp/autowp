@@ -26,7 +26,7 @@ class PageEnv extends AbstractHelper
     /**
      * @var array
      */
-    protected $_onPath = array();
+    protected $_onPath = [];
 
     /**
      * @var int
@@ -44,17 +44,17 @@ class PageEnv extends AbstractHelper
         }
     }
 
-    public function pageEnv(array $options = array())
+    public function __invoke(array $options = [])
     {
-        if ($options === array()) {
+        if ($options === []) {
             return $this;
         }
 
         $defaults = array(
-            'layout'             => array(),
+            'layout'             => [],
             'pageId'             => null,
             'pageTitle'          => null,
-            'args'               => array(),
+            'args'               => [],
             'breadcrumbsReplace' => null
         );
 
@@ -62,16 +62,16 @@ class PageEnv extends AbstractHelper
 
         $view = $this->view;
 
-        $args = is_array($options['args']) ? $options['args'] : array();
-        $preparedUrlArgs = array();
-        $preparedNameArgs = array();
+        $args = is_array($options['args']) ? $options['args'] : [];
+        $preparedUrlArgs = [];
+        $preparedNameArgs = [];
         foreach ($args as $key => $value) {
             $preparedUrlArgs['%' . $key . '%'] = urlencode($value);
             $preparedNameArgs['%' . $key . '%'] = $value;
         }
 
         if (is_array($options['layout'])) {
-            $view->layout()->assign($options['layout']);
+            $view->layout()->setVariables($options['layout']);
         }
 
         $pageTitle = null;

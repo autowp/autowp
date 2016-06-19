@@ -1,0 +1,131 @@
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <?=$this->htmlA(array(
+                'class' => 'navbar-brand',
+                'href'  => '/'
+            ), $this->translate('layout/brand'))?>
+        </div>
+        <div class="collapse navbar-collapse navbar-responsive-collapse">
+            <ul class="nav navbar-nav">
+                <?php foreach ($this->pages as $page) { ?>
+                    <?php if ($page['id'] == 22) { ?>
+                        <li class="dropdown<?=$this->pageEnv()->isOnPath($page['id']) ? ' active' : ''?>">
+                            <?=$this->htmlA(array(
+                                'href'        => '#',
+                                'class'       => 'dropdown-toggle',
+                                'data-toggle' => 'dropdown'
+                            ), $this->escapeHtml($page['name']) . ' <b class="caret"></b>', false) ?>
+                            <ul class="dropdown-menu">
+                                <?php foreach ($this->categories as $category) { ?>
+                                    <li><?=$this->htmlA($category['url'], $category['short_name'] . '&#xa0;<span class="count">('.($category['cars_count'] - $category['new_cars_count']) . ($category['new_cars_count'] > 0 ? '<span>+'.$category['new_cars_count'].'</span>' : '') .')</span>', false)?></li>
+                                <?php } ?>
+                            </ul>
+                        </li>
+                    <?php } else { ?>
+                        <?php
+                            $classes = array();
+                            if ($this->pageEnv()->isOnPath($page['id'])) {
+                                $classes[] = 'active';
+                            }
+                            if (in_array($page['id'], array(25, 117))) {
+                                $classes[] = 'hidden-sm';
+                            }
+                            if (in_array($page['id'], array(42))) {
+                                $classes[] = 'hidden-md hidden-sm';
+                            }
+                        ?>
+                        <li<?=$classes ? ' class="'.implode(' ', $classes).'"' : ''?>><?=$this->htmlA($page['url'], $page['name']) ?></li>
+                    <?php } ?>
+                <?php } ?>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <?php if ($this->user()->logedIn()) { ?>
+                    <li<?=$this->pageEnv()->isOnPath(49) ? ' class="active"' : ''?>>
+                        <?=$this->htmlA('/account/pm/', '<i class="fa fa-comment"></i>' . ($this->pm ? ' <span class="badge">'.$this->pm.'</span>' : ''), false)?>
+                    </li>
+                <?php } else { ?>
+                    <li<?=$this->page(79)->onPath ? ' class="active"' : ''?>>
+                        <?=$this->htmlA('/login/', '<i class="fa fa-sign-in"></i> ' . $this->escapeHtml($this->translate('login/sign-in')), false)?>
+                    </li>
+                <?php } ?>
+                <li class="dropdown">
+                    <?=$this->htmlA(array(
+                        'href'        => '#',
+                        'class'       => 'dropdown-toggle',
+                        'data-toggle' => 'dropdown'
+                    ), $this->escapeHtml($this->page(87)->name) . ' <b class="caret"></b>', false)?>
+                    <ul class="dropdown-menu">
+                        <?php foreach ($this->pages as $page) { ?>
+                            <?php if (in_array($page['id'], array(25, 117, 42))) { ?>
+                                <?php
+                                    $classes = array();
+                                    if ($this->pageEnv()->isOnPath($page['id'])) {
+                                        $classes[] = 'active';
+                                    }
+                                    if (in_array($page['id'], array(25, 117))) {
+                                        $classes[] = 'visible-sm';
+                                    }
+                                    if (in_array($page['id'], array(42))) {
+                                        $classes[] = 'visible-md visible-sm';
+                                    }
+                                ?>
+                                <li<?=$classes ? ' class="'.implode(' ', $classes).'"' : ''?>>
+                                    <?=$this->htmlA($page['url'], $page['name']) ?>
+                                </li>
+                            <?php } ?>
+                        <?php } ?>
+                        <li class="divider visible-sm visible-md"></li>
+                        <?php foreach ($this->secondMenu as $page) { ?>
+                            <?php if ($page['id'] == 90) {?>
+                                <li class="divider"></li>
+                            <?php } ?>
+                            <li class="<?=$page['class'] ? $this->escapeHtmlAttr($page['class']) : ''?> <?=$this->pageEnv()->isOnPath($page['id']) ? 'active' : ''?>">
+                                <?php if (isset($page['icon'])) { ?>
+                                    <?=$this->htmlA($page['url'], '<i class="'.$this->escapeHtmlAttr($page['icon']).'"></i> ' . $page['name'], false) ?>
+                                <?php } else { ?>
+                                    <?=$this->htmlA($page['url'], $page['name']) ?>
+                                <?php } ?>
+                            </li>
+                        <?php } ?>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <?php foreach ($this->languages as $item) { ?>
+                            <?php if ($item['active']) { ?>
+                                <i class="<?=$this->escapeHtmlAttr($item['flag'])?>"></i>
+                            <?php } ?>
+                        <?php } ?>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <?php foreach ($this->languages as $item) { ?>
+                            <?php
+                                $this->headLink(array('rel' => 'alternate', 'href' => $item['url'], 'hreflang' => $item['language']));
+                            ?>
+                            <li<?=$item['active'] ? ' class="active"' : ''?>>
+                                <a href="<?=$this->escapeHtmlAttr($item['url'])?>">
+                                    <i class="<?=$this->escapeHtmlAttr($item['flag'])?>"></i>
+                                    <?=$this->escapeHtml($item['name'])?>
+                                </a>
+                            </li>
+                        <?php } ?>
+                    </ul>
+                </li>
+            </ul>
+
+            <form action="//www.google.com/search" method="get" class="navbar-form navbar-right">
+                <input type="hidden" name="ie" value="utf-8" />
+                <input type="hidden" name="domains" value="<?=$this->escapeHtmlAttr($this->searchHostname)?>" />
+                <input type="hidden" name="sitesearch" value="<?=$this->escapeHtmlAttr($this->searchHostname)?>" />
+                <input type="text" class="form-control" placeholder="<?=$this->escapeHtmlAttr($this->translate('layout/search'))?>" name="q" />
+            </form>
+        </div>
+    </div>
+</div>

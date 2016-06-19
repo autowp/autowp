@@ -52,24 +52,11 @@ class Users extends AbstractRoute
         }
 
         switch ($path[0]) {
-            case 'on-line':
-                array_shift($path);
-
-                if (!$path) {
-                    // users/on-line
-                    return $this->_assembleMatch(array(
-                        'action' => 'on-line',
-                    ));
-                }
-
-                return false;
-                break;
-
             case 'rating':
                 array_shift($path);
 
                 if (!$path) {
-                    // users/on-line
+                    // users/rating
                     return $this->_assembleMatch(array(
                         'action' => 'rating',
                     ));
@@ -216,10 +203,6 @@ class Users extends AbstractRoute
 
         switch ($data['action'])
         {
-            case 'on-line':
-                $url[] = 'on-line';
-                break;
-
             case 'user':
                 if (isset($data['identity'])) {
                     $url[] = $data['identity'];

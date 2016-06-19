@@ -38,7 +38,8 @@
         "zendframework/zend-view": "^2.7",
         "zendframework/zend-mvc-console": "^1.1",
         "zendframework/zend-form": "^2.9",
-        "zendframework/zend-captcha": "^2.5"
+        "zendframework/zend-captcha": "^2.5",
+        "bshaffer/oauth2-server-php": "^1.8"
     },
     "authors": [
         {
@@ -55,14 +56,20 @@
             "Application\\Form\\": "application/forms/",
             "Application\\Model\\": "application/models",
             "Application\\Model\\DbTable\\": "application/models/DbTable",
-            "Application\\Service\\": "application/services"
+            "Application\\Service\\": "application/services",
+            "ZF\\OAuth2\\": "vendor/autowp/zf-oauth2/src/",
+            "ZF\\ContentNegotiation\\": "vendor/autowp/zf-content-negotiation/src/",
+            "ZF\\ApiProblem\\": "vendor/autowp/zf-api-problem/src/"
         },
         "classmap": [
             "application/models/",
             "application/forms/",
             "application/services/",
             "library/Project/Form/Element/",
-            "library/Project/Telegram"
+            "library/Project/Telegram",
+            "vendor/autowp/zf-oauth2/Module.php",
+            "vendor/autowp/zf-content-negotiation/Module.php",
+            "vendor/autowp/zf-api-problem/Module.php"
         ]
     },
     "require-dev": {
