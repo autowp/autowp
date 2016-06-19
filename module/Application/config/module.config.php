@@ -41,6 +41,16 @@ return [
                     ],
                 ],
             ],*/
+            'about' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/about',
+                    'defaults' => [
+                        'controller' => Controller\AboutController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
             'map' => [
                 'type' => Literal::class,
                 'options' => [
@@ -334,6 +344,10 @@ return [
     ],
     'controllers' => [
         'factories' => [
+            Controller\AboutController::class => function($sm) {
+                $acl = $sm->get(Acl::class);
+                return new Controller\AboutController($acl);
+            },
             Controller\IndexController::class        => InvokableFactory::class,
             Controller\MapController::class          => InvokableFactory::class,
             Controller\LoginController::class        => InvokableFactory::class,
@@ -420,7 +434,10 @@ return [
             'user' => function($sm) {
                 $acl = $sm->get(Acl::class);
                 return new View\Helper\User($acl);
-            }
+            },
+            'fileSize' => function($sm) {
+                return new View\Helper\FileSize($sm->get(Language::class));
+            },
         ]
     ],
     'translator' => [

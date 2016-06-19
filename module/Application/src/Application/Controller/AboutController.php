@@ -1,33 +1,53 @@
 <?php
 
-class AboutController extends Zend_Controller_Action
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+
+use Application\Acl;
+
+use Cars;
+use Comment_Message;
+use Picture;
+use Users;
+
+class AboutController extends AbstractActionController
 {
+    /**
+     * @var Acl
+     */
+    private $acl;
+
+    public function __construct(Acl $acl)
+    {
+        $this->acl = $acl;
+    }
+
     public function indexAction()
     {
         $userTable = new Users();
         $userTableAdapter = $userTable->getAdapter();
         $totalUsers = $userTableAdapter->fetchOne(
             $userTableAdapter->select()
-            ->from($userTable->info('name'), 'count(1)')
+                ->from($userTable->info('name'), 'count(1)')
         );
         $totalUsers = round($totalUsers, -3);
 
-        $contributors = array();
+        $contributors = [];
 
-        $greenUserRoles = array();
-        $acl = $this->getInvokeArg('bootstrap')->getResource('acl');
-        foreach ($acl->getRoles() as $role) {
-            if ($acl->isAllowed($role, 'status', 'be-green')) {
+        $greenUserRoles = [];
+        foreach ($this->acl->getRoles() as $role) {
+            if ($this->acl->isAllowed($role, 'status', 'be-green')) {
                 $greenUserRoles[] = $role;
             }
         }
 
-        $greenUsers = $userTable->fetchAll(array(
+        $greenUsers = $userTable->fetchAll([
             'not deleted',
             'role in (?)' => $greenUserRoles,
             'identity is null or identity <> "autowp"',
             'last_online > DATE_SUB(CURDATE(), INTERVAL 6 MONTH)'
-        ));
+        ]);
 
         foreach ($greenUsers as $greenUser) {
             $contributors[$greenUser->id] = $greenUser;
@@ -43,7 +63,7 @@ class AboutController extends Zend_Controller_Action
 
         ksort($contributors, SORT_NUMERIC);
 
-        $pictureTable = $this->_helper->catalogue()->getPictureTable();
+        $pictureTable = new Picture();
         $pictureTableAdapter = $pictureTable->getAdapter();
         $pictureTableName = $pictureTable->info('name');
 
@@ -69,7 +89,7 @@ class AboutController extends Zend_Controller_Action
         );
         $totalComments = round($totalComments, -3);
 
-        $this->view->assign(array(
+        return [
             'developer'     => $userTable->find(1)->current(),
             'contributors'  => $contributors,
             'totalPictures' => $totalPictures,
@@ -80,6 +100,6 @@ class AboutController extends Zend_Controller_Action
             'totalUsers'    => $totalUsers,
             'totalCars'     => $totalCars,
             'totalComments' =>  $totalComments
-        ));
+        ];
     }
 }
