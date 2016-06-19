@@ -3,16 +3,26 @@ define(
     function($, Bootstrap) {
         return {
             init: function(options) {
-                
-                var self = this;
-                
                 $('.btn-contact').on('click', function() {
                     var $btn = $(this);
                     var value = $btn.hasClass('in-contacts');
                     
-                    $.post(options.contactApiUrl, {value: value ? 0 : 1}, function(json) {
-                        $btn.toggleClass('in-contacts');
-                    })
+                    console.log(value ? 'DELETE' : 'PUT');
+                    
+                    $.ajax({
+                        url: options.contactApiUrl,
+                        method: value ? 'DELETE' : 'PUT',
+                        success: function(data, textStatus, jqXHR) {
+                            switch (jqXHR.status) {
+                                case 204:
+                                    $btn.removeClass('in-contacts');
+                                    break;
+                                case 200:
+                                    $btn.addClass('in-contacts');
+                                    break;
+                            }
+                        }
+                    });
                 });
             }
         }

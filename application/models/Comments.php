@@ -135,7 +135,7 @@ class Comments
         if ($userId instanceof Users_Row) {
             $userId = $userId->id;
         }
-        
+
         if ($perPage) {
 
             $paginator = $this->getPaginator($type, $item, $perPage, $page);
@@ -503,8 +503,8 @@ class Comments
                 using(type_id, item_id, id)
             set comments_messages.replies_count = __cms.count
         ');
-        
-        return $affected;
+
+        return $affected->rowCount();
     }
 
     private function _moveMessageRecursive($parentId, $newTypeId, $newItemId)

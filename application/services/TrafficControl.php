@@ -443,4 +443,17 @@ class TrafficControl
             print PHP_EOL;
         }
     }
+
+    public function gc()
+    {
+        $count = $this->_getMonitoringTable()->delete([
+            'day_date < CURDATE()'
+        ]);
+
+        $count += $this->_getBannedTable()->delete(
+            'up_to < NOW()'
+        );
+
+        return $count;
+    }
 }

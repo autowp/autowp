@@ -1,29 +1,38 @@
 <?php
 
-// Define path to application directory
-defined('APPLICATION_PATH')
-    || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));
+$useZF2 = isset($_SERVER['QUERY_STRING']) && substr($_SERVER['REQUEST_URI'], 0, 5) == '/api/'
+       || php_sapi_name() === 'cli';
+       //|| isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] == '46.188.125.123';
 
-// Define application environment
-defined('APPLICATION_ENV')
-    || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'development'));
+if ($useZF2) {
+    require_once 'index.zf2.php';
+} else {
 
-// Ensure library/ is on include_path
-set_include_path(implode(PATH_SEPARATOR, array(
-    realpath(APPLICATION_PATH . '/../library'),
-    //APPLICATION_PATH . '/models',
-    //get_include_path(),
-)));
+    // Define path to application directory
+    defined('APPLICATION_PATH')
+        || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));
 
-require_once realpath(APPLICATION_PATH . '/../vendor/autoload.php');
+    // Define application environment
+    defined('APPLICATION_ENV')
+        || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'development'));
 
-/** Zend_Application */
-require_once 'Zend/Application.php';
+    // Ensure library/ is on include_path
+    set_include_path(implode(PATH_SEPARATOR, array(
+        realpath(APPLICATION_PATH . '/../library'),
+        //APPLICATION_PATH . '/models',
+        //get_include_path(),
+    )));
 
-// Create application, bootstrap, and run
-$application = new Zend_Application(
-    APPLICATION_ENV,
-    APPLICATION_PATH . '/configs/application.ini'
-);
-$application->bootstrap()
-    ->run();
+    require_once realpath(APPLICATION_PATH . '/../vendor/autoload.php');
+
+    /** Zend_Application */
+    require_once 'Zend/Application.php';
+
+    // Create application, bootstrap, and run
+    $application = new Zend_Application(
+        APPLICATION_ENV,
+        APPLICATION_PATH . '/configs/application.ini'
+    );
+    $application->bootstrap()
+        ->run();
+}

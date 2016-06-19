@@ -8,9 +8,10 @@ use Project\Telegram\Command\MeCommand;
 use Project\Telegram\Command\StartCommand;
 use Telegram\Bot\Api;
 use Telegram_Brand;
-use Zend_Controller_Front;
 
-class Telegram
+use Zend\Router\Http\TreeRouteStack;
+
+class TelegramService
 {
     private $accessToken;
 
@@ -18,11 +19,18 @@ class Telegram
 
     private $token;
 
-    public function __construct(array $options = array())
+    /**
+     * @var TreeRouteStack
+     */
+    private $router;
+
+    public function __construct(array $options = [], TreeRouteStack $router)
     {
         $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
         $this->webhook = isset($options['webhook']) ? $options['webhook'] : null;
         $this->token = isset($options['token']) ? $options['token'] : null;
+
+        $this->router = $router;
     }
 
     /**
@@ -106,14 +114,14 @@ class Telegram
         if (count($brandIds)) {
             $telegramBrandTable = new Telegram_Brand();
 
-            $filter = array(
+            $filter = [
                 'brand_id in (?)' => $brandIds
-            );
+            ];
 
             $authorChatId = $db->fetchOne(
                 $db->select()
                     ->from('telegram_chat', 'chat_id')
-                    ->where('user_id = ?', $picture->owner_id)
+                    ->where('user_id = ?', (int)$picture->owner_id)
             );
 
             if ($authorChatId) {
@@ -122,15 +130,16 @@ class Telegram
 
             $rows = $telegramBrandTable->fetchAll($filter);
 
-            $router = Zend_Controller_Front::getInstance()->getRouter();
-
             foreach ($rows as $row) {
-                $url = $router->assemble([
+                $url = $this->router->assemble([
                     'picture_id' => $picture->identity ? $picture->identity : $picture->id,
-                ], 'picture', true);
+                ], [
+                    'name' => 'picture',
+                    'force_canonical' => true
+                ]);
 
                 $this->sendMessage([
-                    'text'    => 'http://autowp.ru' . $url,
+                    'text'    => $url,
                     'chat_id' => $row['chat_id']
                 ]);
             }

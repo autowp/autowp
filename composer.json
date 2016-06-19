@@ -29,7 +29,16 @@
         "autowp/external-login-service": "^1.0",
         "zendframework/zend-uri": "^2.5",
         "zendframework/zend-db": "^2.7",
-        "twitter/typeahead.js": "^0.11.1"
+        "twitter/typeahead.js": "^0.11.1",
+        "zendframework/zend-mvc": "^3.0",
+        "zendframework/zend-mvc-i18n": "^1.0",
+        "zendframework/zend-mvc-plugin-flashmessenger": "^1.0",
+        "zendframework/zend-i18n": "^2.7",
+        "zendframework/zend-paginator": "^2.7",
+        "zendframework/zend-view": "^2.7",
+        "zendframework/zend-mvc-console": "^1.1",
+        "zendframework/zend-form": "^2.9",
+        "zendframework/zend-captcha": "^2.5"
     },
     "authors": [
         {
@@ -47,7 +56,14 @@
             "Application\\Model\\": "application/models",
             "Application\\Model\\DbTable\\": "application/models/DbTable",
             "Application\\Service\\": "application/services"
-        }
+        },
+        "classmap": [
+            "application/models/",
+            "application/forms/",
+            "application/services/",
+            "library/Project/Form/Element/",
+            "library/Project/Telegram"
+        ]
     },
     "require-dev": {
         "phpunit/PHPUnit": "~4.0"

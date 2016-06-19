@@ -1,0 +1,48 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ),
+        'pageId' => 79,
+    ));
+?>
+<div class="row"><div class="col-md-8 col-md-offset-2 login-page">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="/login/">
+                <i class="fa fa-sign-in"></i>
+                <?=$this->escapeHtml($this->translate('login/sign-in'))?>
+            </a>
+        </li>
+        <li>
+            <a href="/registration">
+                <i class="fa fa-pencil"></i>
+                <?=$this->escapeHtml($this->translate('login/registration'))?>
+            </a>
+        </li>
+    </ul>
+    <div class="well">
+        <?=$this->form($this->form) ?>
+    </div>
+
+    <?php if ($this->errorMessage) { ?>
+        <p class="alert alert-danger"><?=$this->escapeHtml($this->errorMessage) ?></p>
+    <?php } ?>
+
+    <div class="row" style="margin-top:50px;margin-bottom:50px"><div class="col-md-9 col-md-offset-3">
+        <p><?=$this->escapeHtml($this->translate('login/sign-in-using-account'))?></p>
+        <?php foreach ($this->services as $service) { ?>
+            <?=$this->htmlA([
+                'href'  => $service['url'],
+                'class' => 'btn btn-default btn-lg',
+                'title' => $service['name']
+            ], '<i class="fa fa-fw fa-2x '.$service['icon'].'"></i>', false)?>
+        <?php } ?>
+    </div></div>
+
+    <p><?=$this->translate('login/if-you-lose-password')?></p>
+    <p><?=$this->translate('login/if-you-not-registered')?></p>
+
+</div></div>

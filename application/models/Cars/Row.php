@@ -19,11 +19,11 @@ class Cars_Row extends Project_Db_Table_Row
 
     private static function buildYearsString(array $options)
     {
-        $defaults = array(
+        $defaults = [
             'begin_year' => null,
             'end_year'   => null,
             'today'      => null
-        );
+        ];
         $options = array_replace($defaults, $options);
 
         $result = '';

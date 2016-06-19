@@ -94,9 +94,9 @@ class UsersController extends Zend_Controller_Action
         $uaRows = $uaTable->fetchAll(array(
             'user_id = ?' => $user->id
         ));
-        
+
         $contact = new Contact();
-        
+
         $currentUser = $this->_helper->user()->get();
         $isMe = $currentUser && ($currentUser->id == $user->id);
         $inContacts = $currentUser && !$isMe && $contact->exists($currentUser->id, $user->id);
@@ -112,12 +112,7 @@ class UsersController extends Zend_Controller_Action
             'accounts'        => $uaRows,
             'inContacts'      => $inContacts,
             'canBeInContacts' => $canBeInContacts,
-            'contactApiUrl'   => $this->_helper->url->url([
-                'module'     => 'api',
-                'controller' => 'contact',
-                'action'     => 'user',
-                'user_id'    => $user->id
-            ], 'default', true)
+            'contactApiUrl'   => sprintf('/api/contacts/%d', $user->id)
         ));
 
     }
@@ -147,7 +142,7 @@ class UsersController extends Zend_Controller_Action
 
         // СПИСОК БРЕНДОВ
         $brandModel = new Brand();
-        
+
         $options = [
             'language' => $this->_helper->language(),
             'columns'  => [
@@ -155,7 +150,7 @@ class UsersController extends Zend_Controller_Action
                 'pictures_count' => new Zend_Db_Expr('COUNT(distinct pictures.id)')
             ]
         ];
-        
+
         $rows = $brandModel->getList($options, function($select) use ($user) {
             $select
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
@@ -207,7 +202,7 @@ class UsersController extends Zend_Controller_Action
         if (!$user) {
             return $this->_forward('notfound', 'error');
         }
-        
+
         $language = $this->_helper->language();
 
         $brandModel = new Brand();

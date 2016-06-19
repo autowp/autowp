@@ -1,0 +1,87 @@
+<?php
+
+namespace Application\Controller\Api;
+
+use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\View\Model\JsonModel;
+
+use Application\Model\Contact;
+
+use Users;
+
+class ContactsController extends AbstractRestfulController
+{
+    /**
+     * Update an existing resource
+     *
+     * @param  mixed $id
+     * @param  mixed $data
+     * @return mixed
+     */
+    public function update($id, $data)
+    {
+        $currentUser = $this->user()->get();
+        if (!$currentUser) {
+            return $this->notFoundAction();
+        }
+
+        if ($currentUser->id == $id) {
+            return $this->notFoundAction();
+        }
+
+        $contact = new Contact();
+
+        $userTable = new Users();
+        $user = $userTable->fetchRow([
+            'id = ?' => (int)$id,
+            'not deleted'
+        ]);
+
+        if (!$user) {
+            $this->getResponse()->setStatusCode(403);
+            return;
+        }
+
+        $contact->create($currentUser->id, $user->id);
+
+        $this->getResponse()->setStatusCode(200);
+        return new JsonModel([
+            'status' => true
+        ]);
+    }
+
+    /**
+     * Delete an existing resource
+     *
+     * @param  mixed $id
+     * @return mixed
+     */
+    public function delete($id)
+    {
+        $currentUser = $this->user()->get();
+        if (!$currentUser) {
+            return $this->notFoundAction();
+        }
+
+        if ($currentUser->id == $id) {
+            return $this->notFoundAction();
+        }
+
+        $contact = new Contact();
+
+        $userTable = new Users();
+        $user = $userTable->fetchRow([
+            'id = ?' => (int)$id,
+            'not deleted'
+        ]);
+
+        if (!$user) {
+            $this->getResponse()->setStatusCode(403);
+            return;
+        }
+
+        $contact->delete($currentUser->id, $user->id);
+
+        $this->getResponse()->setStatusCode(204);
+    }
+}
