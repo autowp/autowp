@@ -39,7 +39,9 @@
         "zendframework/zend-mvc-console": "^1.1",
         "zendframework/zend-form": "^2.9",
         "zendframework/zend-captcha": "^2.5",
-        "bshaffer/oauth2-server-php": "^1.8"
+        "bshaffer/oauth2-server-php": "^1.8",
+        "zfcampus/zf-content-negotiation": "dev-master",
+        "zfcampus/zf-oauth2": "dev-master"
     },
     "authors": [
         {
@@ -66,10 +68,7 @@
             "application/forms/",
             "application/services/",
             "library/Project/Form/Element/",
-            "library/Project/Telegram",
-            "vendor/autowp/zf-oauth2/Module.php",
-            "vendor/autowp/zf-content-negotiation/Module.php",
-            "vendor/autowp/zf-api-problem/Module.php"
+            "library/Project/Telegram"
         ]
     },
     "require-dev": {
@@ -84,6 +83,18 @@
         {
             "type": "git",
             "url": "https://github.com/irazasyed/telegram-bot-sdk"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/autowp/zf-oauth2"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/autowp/zf-api-problem/"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/autowp/zf-content-negotiation/"
         }
     ],
     "suggest": {

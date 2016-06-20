@@ -11,6 +11,16 @@
  * file.
  */
 
+use Application\Provider\UserId\OAuth2UserIdProvider;
+use Application\Provider\UserId\OAuth2UserIdProviderFactory;
+
 return [
-    // ...
+    'service_manager' => [
+        'aliases' => [
+            'ZF\OAuth2\Provider\UserId' => OAuth2UserIdProvider::class
+        ],
+        'factories' => [
+            OAuth2UserIdProvider::class => OAuth2UserIdProviderFactory::class,
+        ]
+    ]
 ];

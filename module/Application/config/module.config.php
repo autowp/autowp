@@ -255,6 +255,24 @@ return [
                                 ]
                             ]
                         ]
+                    ],
+                    'users' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/users',
+                            'defaults' => [
+                                'controller' => Controller\Api\UsersController::class
+                            ]
+                        ],
+                        'may_terminate' => true,
+                        'child_routes' => [
+                            'user' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/:id'
+                                ]
+                            ]
+                        ]
                     ]
                 ]
             ],
@@ -412,6 +430,7 @@ return [
                 $imageStorage = $sm->get(Image\Storage::class);
                 return new Controller\Api\PictureController($imageStorage);
             },
+            Controller\Api\UsersController::class => InvokableFactory::class,
             Controller\Console\BuildController::class => InvokableFactory::class,
             Controller\Console\ImageStorageController::class => InvokableFactory::class,
             Controller\Console\MaintenanceController::class => function($sm) {
@@ -447,7 +466,8 @@ return [
             'imageStorage' => function($sm) {
                 $storage = $sm->get(Image\Storage::class);
                 return new Controller\Plugin\ImageStorage($storage);
-            }
+            },
+            'oauth2' => Factory\OAuth2PluginFactory::class,
         ]
     ],
     'view_manager' => [
@@ -592,13 +612,15 @@ return [
                 return new TextStorage\Service($options);
             }
         ],
+        'aliases' => [
+            'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
+        ],
         /*'services' => [),
         'factories' => [),
         'abstract_factories' => [),
         'initializators' => [),
         'delegators' => [),
-        'shared' => [),
-        'aliases' => [)*/
+        'shared' => [)*/
     ],
     'imageStorage' => [
         'imageTableName' => 'image',

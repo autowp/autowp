@@ -4,7 +4,11 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+use Zend_Acl_Resource_Interface;
+use Zend_Acl_Role_Interface;
 use Zend_Auth;
+use Zend_Controller_Action_HelperBroker;
+use Zend_Registry;
 
 use Users;
 use Users_Row;
@@ -14,43 +18,43 @@ class User extends AbstractPlugin
     /**
      * @var Users
      */
-    protected $_userTable = null;
+    private $userTable = null;
 
     /**
      * @var array
      */
-    protected $_users = array();
+    private $users = [];
 
     /**
      * @var Users_Row
      */
-    protected $_user = null;
+    private $user = null;
 
     /**
      * @return Users
      */
-    protected function _getUserTable()
+    private function getUserTable()
     {
-        return $this->_userTable
-            ? $this->_userTable
-            : $this->_userTable = new Users();
+        return $this->userTable
+            ? $this->userTable
+            : $this->userTable = new Users();
     }
 
     /**
      * @param int $id
      * @return Users_Row
      */
-    protected function _user($id)
+    private function user($id)
     {
         if (!$id) {
             return null;
         }
 
-        if (!array_key_exists($id, $this->_users)) {
-            $this->_users[$id] = $this->_getUserTable()->find($id)->current();
+        if (!array_key_exists($id, $this->users)) {
+            $this->users[$id] = $this->getUserTable()->find($id)->current();
         }
 
-        return $this->_users[$id];
+        return $this->users[$id];
     }
 
     /**
@@ -60,14 +64,14 @@ class User extends AbstractPlugin
     public function __invoke($user = null)
     {
         if ($user === null) {
-            $user = $this->_getLogedInUser();
+            $user = $this->getLogedInUser();
         }
 
         if (!$user instanceof Users_Row) {
-            $user = $this->_user($user);
+            $user = $this->user($user);
         }
 
-        $this->_user = $user;
+        $this->user = $user;
 
         return $this;
     }
@@ -75,7 +79,7 @@ class User extends AbstractPlugin
     /**
      * @return Users_Row
      */
-    protected function _getLogedInUser()
+    private function getLogedInUser()
     {
         $auth = Zend_Auth::getInstance();
 
@@ -83,7 +87,7 @@ class User extends AbstractPlugin
             return false;
         }
 
-        return $this->_user($auth->getIdentity());
+        return $this->user($auth->getIdentity());
     }
 
     /**
@@ -91,7 +95,7 @@ class User extends AbstractPlugin
      */
     public function logedIn()
     {
-        return (bool)$this->_getLogedInUser();
+        return (bool)$this->getLogedInUser();
     }
 
     /**
@@ -99,7 +103,7 @@ class User extends AbstractPlugin
      */
     public function get()
     {
-        return $this->_user;
+        return $this->user;
     }
 
     /**
@@ -109,11 +113,11 @@ class User extends AbstractPlugin
      */
     public function isAllowed($resource = null, $privilege = null)
     {
-        return $this->_user
-            && $this->_user->role
+        return $this->user
+            && $this->user->role
             && Zend_Controller_Action_HelperBroker::getStaticHelper('acl')
                 ->direct()
-                ->isAllowed($this->_user->role, $resource, $privilege);
+                ->isAllowed($this->user->role, $resource, $privilege);
     }
 
     /**
@@ -122,11 +126,11 @@ class User extends AbstractPlugin
      */
     public function inheritsRole($inherit)
     {
-        return $this->_user
-            && $this->_user->role
+        return $this->user
+            && $this->user->role
             && Zend_Controller_Action_HelperBroker::getStaticHelper('acl')
                 ->direct()
-                ->inheritsRole($this->_user->role, $inherit);
+                ->inheritsRole($this->user->role, $inherit);
     }
 
     public function clearRememberCookie()
@@ -143,8 +147,8 @@ class User extends AbstractPlugin
 
     public function timezone()
     {
-        return $this->_user && $this->_user->timezone
-            ? $this->_user->timezone
+        return $this->user && $this->user->timezone
+            ? $this->user->timezone
             : 'UTC';
     }
 }

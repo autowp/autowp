@@ -1,6 +1,6 @@
 <?php
 
-$zf2uri = ['/api/', '/oauth/', '/users/online', '/rules', '/about', '/info',
+$zf2uri = ['/api/', '/oauth', '/users/online', '/rules', '/about', '/info',
     '/pulse'];
 
 $useZF2 = php_sapi_name() === 'cli';
