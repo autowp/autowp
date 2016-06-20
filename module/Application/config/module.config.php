@@ -12,6 +12,7 @@ use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Autowp\Image;
+use Autowp\TextStorage;
 
 use Zend_Application_Resource_Db;
 use Zend_Application_Resource_Cachemanager;
@@ -50,6 +51,44 @@ return [
                         'action'     => 'index',
                     ],
                 ],
+            ],
+            'info' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route' => '/info',
+                    'defaults' => [
+                        'controller' => Controller\InfoController::class,
+                    ]
+                ],
+                'child_routes'  => [
+                    'spec' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/spec',
+                            'defaults' => [
+                                'action' => 'spec',
+                            ],
+                        ]
+                    ],
+                    'text' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/text/id/:id',
+                            'defaults' => [
+                                'action' => 'text',
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'revision' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/revision/:revision',
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ],
             'map' => [
                 'type' => Literal::class,
@@ -349,6 +388,10 @@ return [
                 return new Controller\AboutController($acl);
             },
             Controller\IndexController::class        => InvokableFactory::class,
+            Controller\InfoController::class => function($sm) {
+                $textStorage = $sm->get(TextStorage\Service::class);
+                return new Controller\InfoController($textStorage);
+            },
             Controller\MapController::class          => InvokableFactory::class,
             Controller\LoginController::class        => InvokableFactory::class,
             Controller\RulesController::class        => InvokableFactory::class,
@@ -531,6 +574,11 @@ return [
                 $request = $sm->get('Request');
 
                 return new Language($request);
+            },
+            TextStorage\Service::class => function($sm) {
+                $options = $sm->get('Config')['textstorage'];
+                $options['dbAdapter'] = $sm->get(Zend_Db_Adapter_Abstract::class);
+                return new TextStorage\Service($options);
             }
         ],
         /*'services' => [),
@@ -800,5 +848,10 @@ return [
     'acl' => [
         'cache'         => 'long',
         'cacheLifetime' => 3600
+    ],
+
+    'textstorage' => [
+        'textTableName'     => 'textstorage_text',
+        'revisionTableName' => 'textstorage_revision'
     ]
 ];

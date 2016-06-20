@@ -1,16 +1,16 @@
 <?php
-    $this->pageEnv(array(
-        'layout'    => array(
+    $this->pageEnv([
+        'layout'    => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => true
-        ),
+        ],
         'pageId'    => 174
-    ));
+    ]);
 ?>
 <table class="table"><tbody>
-    <?=$this->partial('info/spec-row.phtml', array(
+    <?=$this->partial('application/info/spec-row', [
         'items' => $this->items,
         'deep'  => 0
-    ))?>
+    ])?>
 </tbody></table>

@@ -1,6 +1,6 @@
 <?php
 
-$zf2uri = ['/api/', '/oauth/', '/users/online', '/rules', '/about'];
+$zf2uri = ['/api/', '/oauth/', '/users/online', '/rules', '/about', '/info'];
 
 $useZF2 = php_sapi_name() === 'cli';
        //|| isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] == '46.188.125.123';
