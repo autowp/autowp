@@ -18,7 +18,7 @@ class InfoController extends AbstractActionController
         $this->textStorage = $textStorage;
     }
 
-    private function _loadSpecs($table, $parentId)
+    private function loadSpecs($table, $parentId)
     {
         if ($parentId) {
             $filter = ['parent_id = ?' => $parentId];
@@ -32,7 +32,7 @@ class InfoController extends AbstractActionController
                 'id'         => $row->id,
                 'short_name' => $row->short_name,
                 'name'       => $row->name,
-                'childs'     => $this->_loadSpecs($table, $row->id)
+                'childs'     => $this->loadSpecs($table, $row->id)
             ];
         }
 
@@ -44,7 +44,7 @@ class InfoController extends AbstractActionController
         $table = new Spec();
 
         return [
-            'items' => $this->_loadSpecs($table, null)
+            'items' => $this->loadSpecs($table, null)
         ];
     }
 
@@ -55,7 +55,8 @@ class InfoController extends AbstractActionController
 
         $text = $this->textStorage->getTextInfo($textId);
         if ($text === null) {
-            return $this->forward('notfound', 'error');
+            $this->getResponse()->setStatusCode(404);
+            return;
         }
 
         if ($revision) {
@@ -64,7 +65,8 @@ class InfoController extends AbstractActionController
             $current = $this->textStorage->getRevisionInfo($textId, $text['revision']);
         }
         if ($current === null) {
-            return $this->forward('notfound', 'error');
+            $this->getResponse()->setStatusCode(404);
+            return;
         }
 
         $prevText = $this->textStorage->getRevisionInfo($textId, $current['revision']-1);
