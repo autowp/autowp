@@ -1,8 +1,19 @@
 <?php
-class PulseController extends Zend_Controller_Action
+
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+
+use Zend_Date;
+
+use Log_Events;
+use Users;
+
+class PulseController extends AbstractActionController
 {
-    protected $_lastColor = 0;
-    protected $_colors = array(
+    private $lastColor = 0;
+
+    private $colors = [
         '#FF0000',
         '#00FF00',
         '#0000FF',
@@ -15,11 +26,11 @@ class PulseController extends Zend_Controller_Action
         '#888800',
         '#880088',
         '#008888',
-    );
+    ];
 
-    protected function randomColor()
+    private function randomColor()
     {
-        return $this->_colors[$this->_lastColor++ % count($this->_colors)];
+        return $this->colors[$this->lastColor++ % count($this->colors)];
     }
 
     public function indexAction()
@@ -33,30 +44,30 @@ class PulseController extends Zend_Controller_Action
 
         $rows = $logAdapter->fetchAll(
             $logAdapter->select()
-                ->from($logTable->info('name'), array(
+                ->from($logTable->info('name'), [
                     'user_id',
                     'date' => 'date(add_datetime)',
                     'hour' => 'hour(add_datetime)',
                     'value' => 'count(1)'
-                ))
+                ])
                 ->where('add_datetime >= ?', $from->get(MYSQL_DATETIME))
                 ->where('add_datetime <= ?', $now->get(MYSQL_DATETIME))
-                ->group(array('user_id', 'date', 'hour'))
+                ->group(['user_id', 'date', 'hour'])
         );
 
-        $data = array();
+        $data = [];
         foreach ($rows as $row) {
             $uid = $row['user_id'];
             $date = $row['date'] . ' ' . $row['hour'];
             $data[$uid][$date] = (int)$row['value'];
         }
 
-        $grid = array();
-        $legend = array();
+        $grid = [];
+        $legend = [];
 
         foreach ($data as $uid => $dates) {
 
-            $line = array();
+            $line = [];
 
             $cDate = clone $from;
             while ($now->isLater($cDate)) {
@@ -69,20 +80,20 @@ class PulseController extends Zend_Controller_Action
 
             $color = $this->randomColor();
 
-            $grid[$uid] = array(
+            $grid[$uid] = [
                 'line'  => $line,
                 'color' => $color
-            );
+            ];
 
-            $legend[$uid] = array(
+            $legend[$uid] = [
                 'user'  => $userTable->find($uid)->current(),
                 'color' => $color
-            );
+            ];
         }
 
-        $this->view->assign(array(
+        return [
             'grid'   => $grid,
             'legend' => $legend
-        ));
+        ];
     }
 }

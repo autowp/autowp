@@ -28,3 +28,7 @@ exclude_paths:
 - public_source/js/lib/
 - public_html/js/
 - public_html/css/
+- application/language
+- config
+- module/Application/language
+- module/Application/config

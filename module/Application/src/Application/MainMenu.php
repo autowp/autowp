@@ -63,10 +63,10 @@ class MainMenu
                 $db->quoteInto('page_language.language = ?', $language);
 
         $select = $db->select()
-            ->from($table->info('name'), array(
+            ->from($table->info('name'), [
                 'id', 'url', 'class',
                 'name' => 'if(length(page_language.name) > 0, page_language.name, pages.name)'
-            ))
+            ])
             ->joinLeft('page_language', $expr, null)
             ->where('pages.parent_id = ?', $id)
             ->order('pages.position');
@@ -78,29 +78,23 @@ class MainMenu
 
         $result = [];
         foreach ($db->fetchAll($select) as $row) {
-            $result[] = array(
+            $result[] = [
                 'id'    => $row['id'],
                 'url'   => $row['url'],
                 'name'  => $row['name'],
                 'class' => $row['class']
-            );
+            ];
         }
 
         return $result;
     }
 
-    public function getMenu()
+    /**
+     * @return array
+     */
+    private function getCategoriesItems()
     {
-        $user = false;//$this->_helper->user()->get();
-
-        $pm = 0;
-        if ($user) {
-            $mModel = new Message();
-            $pm = $mModel->getNewCount($user->id);
-        }
-
         $language = $this->language->getLanguage();
-
         $cache = $this->cacheManager->getCache('long');
 
         $key = 'ZF2_CATEGORY_MENU_2_' . $language;
@@ -112,16 +106,16 @@ class MainMenu
             $categoryTable = new Category();
             $categoryLanguageTable = new Category_Language();
 
-            $rows = $categoryTable->fetchAll(array(
+            $rows = $categoryTable->fetchAll([
                 'parent_id is null',
-            ), 'short_name');
+            ], 'short_name');
 
             foreach ($rows as $row) {
 
-                $langRow = $categoryLanguageTable->fetchRow(array(
+                $langRow = $categoryLanguageTable->fetchRow([
                     'language = ?'    => $language,
                     'category_id = ?' => $row->id
-                ));
+                ]);
 
                 $categories[] = [
                     'id'             => $row->id,
@@ -139,6 +133,68 @@ class MainMenu
 
             $cache->save($categories, null, [], 1800);
         }
+
+        return $categories;
+    }
+
+    /**
+     * @param boolean $logedIn
+     * @return array
+     */
+    private function getSecondaryMenu($logedIn)
+    {
+        $language = $this->language->getLanguage();
+        $cache = $this->cacheManager->getCache('long');
+
+        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '7_' . $language;
+        if (!($secondMenu = $cache->load($key))) {
+            $secondMenu = $this->getMenuData(87, $logedIn, $language);
+
+            foreach ($secondMenu as &$item) {
+                switch($item['id']) {
+                    case  29: $item['icon'] = 'fa fa-fw fa-upload'; break;
+                    case  89: $item['icon'] = 'fa fa-fw fa-comment'; break;
+                    case 136: $item['icon'] = 'fa fa-fw fa-info'; break;
+                    case  48: $item['icon'] = 'fa fa-fw fa-user'; break;
+                    case  90: $item['icon'] = 'fa fa-fw fa-sign-out'; break;
+                    case 124: $item['icon'] = 'fa fa-fw fa fa-users'; break;
+                    case  91: $item['icon'] = 'fa fa-fw fa fa-pencil'; break;
+                }
+            }
+            unset($item);
+
+            $cache->save($secondMenu, null, [], 1800);
+        }
+
+        return $secondMenu;
+    }
+
+    private function getPrimaryMenu($logedIn)
+    {
+        $language = $this->language->getLanguage();
+        $cache = $this->cacheManager->getCache('long');
+
+        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '2_' . $language;
+        if (!($pages = $cache->load($key))) {
+            $pages = $this->getMenuData(2, $logedIn, $language);
+
+            $cache->save($pages, null, [], 1800);
+        }
+
+        return $pages;
+    }
+
+    public function getMenu()
+    {
+        $user = false;//$this->_helper->user()->get();
+
+        $newMessages = 0;
+        if ($user) {
+            $mModel = new Message();
+            $newMessages = $mModel->getNewCount($user->id);
+        }
+
+        $language = $this->language->getLanguage();
 
         $searchHostname = 'www.autowp.ru';
 
@@ -164,7 +220,6 @@ class MainMenu
         ];
 
         $uri = $this->request->getUri();
-        $scheme = $uri->getScheme();
         foreach ($languages as &$item) {
             $active = $item['language'] == $language;
             $item['active'] = $active;
@@ -183,38 +238,12 @@ class MainMenu
         $logedIn = false; //$this->_helper->user()->logedIn();
 
 
-        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '2_' . $language;
-        if (!($pages = $cache->load($key))) {
-            $pages = $this->getMenuData(2, $logedIn, $language);
-
-            $cache->save($pages, null, [], 1800);
-        }
-
-        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '7_' . $language;
-        if (!($secondMenu = $cache->load($key))) {
-            $secondMenu = $this->getMenuData(87, $logedIn, $language);
-
-            foreach ($secondMenu as &$item) {
-                switch($item['id']) {
-                    case  29: $item['icon'] = 'fa fa-fw fa-upload'; break;
-                    case  89: $item['icon'] = 'fa fa-fw fa-comment'; break;
-                    case 136: $item['icon'] = 'fa fa-fw fa-info'; break;
-                    case  48: $item['icon'] = 'fa fa-fw fa-user'; break;
-                    case  90: $item['icon'] = 'fa fa-fw fa-sign-out'; break;
-                    case 124: $item['icon'] = 'fa fa-fw fa fa-users'; break;
-                    case  91: $item['icon'] = 'fa fa-fw fa fa-pencil'; break;
-                }
-            }
-            unset($item);
-
-            $cache->save($secondMenu, null, [], 1800);
-        }
 
         return [
-            'pages'          => $pages,
-            'secondMenu'     => $secondMenu,
-            'pm'             => $pm,
-            'categories'     => $categories,
+            'pages'          => $this->getPrimaryMenu($logedIn),
+            'secondMenu'     => $this->getSecondaryMenu($logedIn),
+            'pm'             => $newMessages,
+            'categories'     => $this->getCategoriesItems(),
             'languages'      => $languages,
             'language'       => $language,
             'searchHostname' => $searchHostname

@@ -144,6 +144,26 @@ return [
                     ]
                 ]
             ],
+            'pulse' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/pulse',
+                    'defaults' => [
+                        'controller' => Controller\PulseController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+            'rules' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/rules',
+                    'defaults' => [
+                        'controller' => Controller\RulesController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
             'users' => [
                 'type' => Literal::class,
                 'options' => [
@@ -174,16 +194,6 @@ return [
                         ]
                     ],
                 ]
-            ],
-            'rules' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route'    => '/rules',
-                    'defaults' => [
-                        'controller' => Controller\RulesController::class,
-                        'action'     => 'index',
-                    ],
-                ],
             ],
             'api' => [
                 'type' => Literal::class,
@@ -394,6 +404,7 @@ return [
             },
             Controller\MapController::class          => InvokableFactory::class,
             Controller\LoginController::class        => InvokableFactory::class,
+            Controller\PulseController::class        => InvokableFactory::class,
             Controller\RulesController::class        => InvokableFactory::class,
             Controller\UsersController::class        => InvokableFactory::class,
             Controller\Api\ContactsController::class => InvokableFactory::class,

@@ -4,13 +4,17 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
+use Exception;
+
+use Zend_View_Abstract;
+
 class Breadcrumbs extends AbstractHelper
 {
-    protected $_data = [];
+    private $data = [];
 
     public function reset()
     {
-        $this->_data = $this->_params = array();
+        $this->data = [];
     }
 
     public function __invoke($url = null, $name = null, $placement = 'append')
@@ -19,10 +23,10 @@ class Breadcrumbs extends AbstractHelper
             $node = array('url' => $url, 'name' => $name);
             switch ($placement) {
                 case 'append':
-                    $this->_data[] = $node;
+                    $this->data[] = $node;
                     break;
                 case 'prepend':
-                    array_unshift($this->_data, $node);
+                    array_unshift($this->data, $node);
                     break;
             }
         }
@@ -33,21 +37,21 @@ class Breadcrumbs extends AbstractHelper
     public function __toString()
     {
         try {
-            $a = array();
-            foreach ($this->_data as $node) {
+            $items = array();
+            foreach ($this->data as $node) {
 
                 $name = $node['name'];
                 $url = $node['url'];
 
                 if ($url)
-                    $a[] = '<li>'.$this->view->htmlA(array('href' => $url), $name).'</li>';
+                    $items[] = '<li>'.$this->view->htmlA(array('href' => $url), $name).'</li>';
                 else
-                    $a[] = '<li>'.$this->view->escape($name).'</li>';
+                    $items[] = '<li>'.$this->view->escape($name).'</li>';
             }
 
-            array_pop($a);
+            array_pop($items);
 
-            if (!$a) {
+            if (!$items) {
                 return '';
             }
 
@@ -60,7 +64,7 @@ class Breadcrumbs extends AbstractHelper
                         /*'<strong style="margin-right:8px">'.
                             $this->view->escape($this->view->translate('breadcrumbs/title')) .
                         ':</strong>'.*/
-                        implode($a).
+                        implode($items).
                     '</ul>';
         } catch (Exception $e) {
             print $e->getMessage();
