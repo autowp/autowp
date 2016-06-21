@@ -1,40 +1,40 @@
 <?php
 
-return array (
+return [
     /* Common words */
     'and' => 'and',
-    '%1$s picures'       => array(
+    '%1$s picures'       => [
         '%1$s picture',
         '%1$s pictures',
-    ),
-    '%1$s vehicles'      => array(
+    ],
+    '%1$s vehicles'      => [
         '%1$s vehicle',
         '%1$s vehicles',
-    ),
-    '%1$s comments'      => array(
+    ],
+    '%1$s comments'      => [
         '%1$s comment',
         '%1$s comments',
-    ),
-    '%1$s messages'      => array(
+    ],
+    '%1$s messages'      => [
         '%1$s message',
         '%1$s messages',
-    ),
-    '%1$s topics'      => array(
+    ],
+    '%1$s topics'      => [
         '%1$s topic',
         '%1$s topics',
-    ),
+    ],
 
     'few seconds ago'    => 'few seconds ago',
     'a minute ago'       => 'a minute ago',
-    '%1$s minutes ago'   => array(
+    '%1$s minutes ago'   => [
         '%1$s minute ago',
         '%1$s minutes ago'
-    ),
+    ],
     'an hour ago'        => 'an hour ago',
-    '%1$s hours ago'     => array(
+    '%1$s hours ago'     => [
         '%1$s hour ago',
         '%1$s hours ago'
-    ),
+    ],
     'yesterday'          => 'yesterday',
     'today'              => 'today',
 
@@ -50,10 +50,10 @@ return array (
     'layout/meta/keywords' => 'car, vehicle, auto, avto',
     'layout/brand' => 'WheelsAge.org',
     'layout/personal-messages' => 'Personal messages',
-    'layout/you-have-%1$s-new-messages' => array(
+    'layout/you-have-%1$s-new-messages' => [
         'You have %1$s new message',
         'You have %1$s new messages',
-    ),
+    ],
 
     'layout/search' => 'Search',
     'layout/footer' => 'Please note that all material on this server autowp.ru, added visitors.<br />' .
@@ -75,10 +75,10 @@ return array (
     'Nm'  => 'Nm',
     'kW'  => 'kW',
     'hp'  => 'hp',
-    'spec/%1$s-gear' => array(
+    'spec/%1$s-gear' => [
         '%1$s gear',
         '%1$s gears'
-    ),
+    ],
 
     /* PAGINATOR */
     'next'                     => 'next',
@@ -106,10 +106,10 @@ return array (
 
     'brands/new-cars-of-brand' => 'New %s cars',
 
-    'brands/more-companies'    => array(
+    'brands/more-companies'    => [
         'more %s company',
         'more %s companies'
-    ),
+    ],
 
     /* Layout */
     'breadcrumbs/title'       => 'Way',
@@ -128,14 +128,14 @@ return array (
     'carlist/details'         => 'details',
     'carlist/twins'           => 'twins',
     'carlist/produced/one'    => 'Produced in a single copy',
-    'carlist/produced/%1$s'   => array(
+    'carlist/produced/%1$s'   => [
         'Produced in %1$s copy',
         'Produced in %1$s copies'
-    ),
-    'carlist/produced-about/%1$s' => array(
+    ],
+    'carlist/produced-about/%1$s' => [
         'Produced in about %1$s copy',
         'Produced in about %1$s copies'
-    ),
+    ],
     'carlist/specifications'  => 'specifications',
     'carlist/designed by %s'  => 'designed by %s',
     'carlist/edit-specs' => 'edit specs',
@@ -152,14 +152,14 @@ return array (
     'present-time-abbr'       => 'pr.',
 
     /* Categories */
-    'category/%s cars'        => array(
+    'category/%s cars'        => [
         '%s car',
         '%s cars'
-    ),
-    'category/%s new cars'    => array(
+    ],
+    'category/%s new cars'    => [
         '%s new',
         '%s new'
-    ),
+    ],
 
     /* most */
     'most/fastest' => 'fastest',
@@ -220,10 +220,10 @@ return array (
     'most/bigclearance/param' => 'clearance',
     'most/smallclearance' => 'small clearance',
     'most/smallclearance/param' => 'clearance',
-    
+
     'mosts/sidebar/mostly…' => 'Most …',
     'mosts/sidebar/between…' => 'Between …',
-    
+
     'mosts/period/before1920' => 'before 1920го',
     'mosts/period/1920-29'    => '1920-29th',
     'mosts/period/1930-39'    => '1930-39th',
@@ -286,15 +286,15 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'perspective/3/4-left'       => '¾ left',
     'perspective/3/4-right'      => '¾ right',
     'perspective/cutaway'        => 'cutaway',
-    'perspective/front-strict'   => 'front (strict)',
-    'perspective/left-strict'    => 'left (strict)',
-    'perspective/right-strict'   => 'right (strict)',
-    'perspective/back-strict'    => 'back (strict)',
+    'perspective/front-strict'   => 'front (strict]',
+    'perspective/left-strict'    => 'left (strict]',
+    'perspective/right-strict'   => 'right (strict]',
+    'perspective/back-strict'    => 'back (strict]',
     'perspective/n/a'            => 'n/a',
     'perspective/label'          => 'label',
     'perspective/upper'          => 'upper',
     'perspective/under-the-hood' => 'under the hood',
-    'perspective/upper-strict'   => 'upper (strict)',
+    'perspective/upper-strict'   => 'upper (strict]',
     'perspective/bottom'         => 'bottom',
     'perspective/dashboard'      => 'dashboard',
     'perspective/boot'           => 'boot',
@@ -305,7 +305,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'login/name' => 'name',
     'login/login-or-email' => 'login or e-mail',
     'login/password' => 'password',
-    'login/password-confirm' => 'password (again)',
+    'login/password-confirm' => 'password (again]',
     'login/captcha' => 'enter security code',
     'login/registration' => 'Sign up',
     'login/forgot-password?' => 'Forgot your password?',
@@ -367,7 +367,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'feedback/title' => 'Feedback',
     'feedback/name'  => 'Your name',
     'feedback/message' => 'Message',
-    'feedback/donate-text' => 'If you have come here to express words of support, it is possible to [express it in hard currency](/donate)',
+    'feedback/donate-text' => 'If you have come here to express words of support, it is possible to [express it in hard currency](/donate]',
 
     'map/museums-and-factories' => 'Museums and factories',
 
@@ -409,7 +409,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
         "If the message has got to you by mistake - just delete it\n\n" .
         "Sincerely, Robot %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'E-mail with confirmation code was sent',
-    
+
     'user/add-to-contacts' => 'Add to contacts',
     'user/remove-from-contacts' => 'Remove from contacts',
 
@@ -428,9 +428,9 @@ We do not collect information about our donators, however if you wish, we can ma
     'donate/success-text' => 'Thank you for your support.
         
 We will try not to disappoint you.',
-    
-    'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s )',
-    
+
+    'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s ]',
+
     'car-type/roadster'       => 'Roadster',
     'car-type/spyder'         => 'Spyder',
     'car-type/cabriolet'      => 'Cabriolet',
@@ -471,7 +471,7 @@ We will try not to disappoint you.',
     'car-type/2-floor-bus'    => '2-floor bus',
     'car-type/town-car'       => 'Town car',
     'car-type/barchetta'      => 'Barchetta',
-    
+
     'car-type-rp/roadster'       => 'Roadster',
     'car-type-rp/spyder'         => 'Spyder',
     'car-type-rp/cabriolet'      => 'Cabriolet',
@@ -512,4 +512,4 @@ We will try not to disappoint you.',
     'car-type-rp/2-floor-bus'    => '2-floor bus',
     'car-type-rp/town-car'       => 'Town car',
     'car-type-rp/barchetta'      => 'Barchetta',
-);
+];

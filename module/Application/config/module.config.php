@@ -9,6 +9,7 @@ namespace Application;
 
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
+use Zend\Router\Http\Wildcard;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Autowp\Image;
@@ -52,6 +53,28 @@ return [
                     ],
                 ],
             ],
+            'categories' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/category',
+                    'defaults' => [
+                        'controller' => Controller\CategoryController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'category' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/:category_catname',
+                            'defaults' => [
+                                'action' => 'category',
+                            ],
+                        ]
+                    ]
+                ]
+            ],
             'info' => [
                 'type'    => Literal::class,
                 'options' => [
@@ -90,15 +113,21 @@ return [
                     ]
                 ]
             ],
-            'map' => [
+            'log' => [
                 'type' => Literal::class,
                 'options' => [
-                    'route'    => '/map',
+                    'route'    => '/log',
                     'defaults' => [
-                        'controller' => Controller\MapController::class,
+                        'controller' => Controller\LogController::class,
                         'action'     => 'index',
                     ],
                 ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'params' => [
+                        'type' => Wildcard::class
+                    ]
+                ]
             ],
             'login' => [
                 'type' => Literal::class,
@@ -122,27 +151,15 @@ return [
                     ]
                 ]
             ],
-            'categories' => [
+            'map' => [
                 'type' => Literal::class,
                 'options' => [
-                    'route'    => '/category',
+                    'route'    => '/map',
                     'defaults' => [
-                        'controller' => Controller\CategoryController::class,
+                        'controller' => Controller\MapController::class,
                         'action'     => 'index',
                     ],
                 ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'category' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/:category_catname',
-                            'defaults' => [
-                                'action' => 'category',
-                            ],
-                        ]
-                    ]
-                ]
             ],
             'pulse' => [
                 'type' => Literal::class,
@@ -421,6 +438,7 @@ return [
                 return new Controller\InfoController($textStorage);
             },
             Controller\MapController::class          => InvokableFactory::class,
+            Controller\LogController::class          => InvokableFactory::class,
             Controller\LoginController::class        => InvokableFactory::class,
             Controller\PulseController::class        => InvokableFactory::class,
             Controller\RulesController::class        => InvokableFactory::class,
@@ -459,8 +477,7 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
-            'pic'          => Controller\Plugin\Pic::class,
-            'user'         => Controller\Plugin\User::class,
+            'pic'  => Controller\Plugin\Pic::class,
         ],
         'factories' => [
             'imageStorage' => function($sm) {
@@ -468,6 +485,10 @@ return [
                 return new Controller\Plugin\ImageStorage($storage);
             },
             'oauth2' => Factory\OAuth2PluginFactory::class,
+            'user' => function($sm) {
+                $acl = $sm->get(Acl::class);
+                return new Controller\Plugin\User($acl);
+            },
         ]
     ],
     'view_manager' => [
@@ -497,6 +518,8 @@ return [
             'sidebar'     => View\Helper\Sidebar::class,
             'pageTitle'   => View\Helper\PageTitle::class,
             'breadcrumbs' => View\Helper\Breadcrumbs::class,
+            'humanDate'   => View\Helper\HumanDate::class,
+            'humanTime'   => View\Helper\HumanTime::class,
         ],
         'factories' => [
             'mainMenu' => function($sm) {

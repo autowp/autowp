@@ -6,8 +6,6 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Museum;
 
-use Zend_Auth;
-
 class MapController extends AbstractActionController
 {
     private $googleClient;

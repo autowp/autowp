@@ -1,47 +1,50 @@
 <?php
 
-return array (
+return [
+    '' => [
+        'plural_forms' => 'nplurals=3; plural=((n%10==1)&&(n%100!=11))?0:(((n%10>=2)&&(n%10<=4)&&((n%100<10)||(n%100>=20)))?1:2)'
+    ],
     /* Common words */
     'and' => 'и',
-    '%1$s picures'       => array(
+    '%1$s picures'       => [
         '%1$s изображение',
         '%1$s изображения',
         '%1$s изображений'
-    ),
-    '%1$s vehicles'      => array(
+    ],
+    '%1$s vehicles'      => [
         '%1$s автомобиль',
         '%1$s автомобиля',
         '%1$s автомобилей',
-    ),
-    '%1$s comments'      => array(
+    ],
+    '%1$s comments'      => [
         '%1$s комментарий',
         '%1$s комментария',
         '%1$s комментариев',
-    ),
-    '%1$s messages'      => array(
+    ],
+    '%1$s messages'      => [
         '%1$s сообщение',
         '%1$s сообщения',
         '%1$s сообщений',
-    ),
-    '%1$s topics'      => array(
+    ],
+    '%1$s topics'      => [
         '%1$s тема',
         '%1$s темы',
         '%1$s тем',
-    ),
+    ],
 
     'few seconds ago'    => 'несколько секунд назад',
     'a minute ago'       => 'минуту назад',
-    '%1$s minutes ago'   => array(
+    '%1$s minutes ago'   => [
         '%1$s минуту назад',
         '%1$s минуты назад',
         '%1$s минут назад'
-    ),
+    ],
     'an hour ago'        => 'час назад',
-    '%1$s hours ago'     => array(
+    '%1$s hours ago'     => [
         '%1$s час назад',
         '%1$s часа назад',
         '%1$s часов назад'
-    ),
+    ],
     'yesterday'          => 'вчера',
     'today'              => 'сегодня',
 
@@ -57,11 +60,11 @@ return array (
     'layout/meta/keywords' => 'car, vehicle, auto, avto, автомобиль',
     'layout/brand' => 'AutoWP.ru',
     'layout/personal-messages' => 'Личные сообщения',
-    'layout/you-have-%1$s-new-messages' => array(
+    'layout/you-have-%1$s-new-messages' => [
         'У вас %1$s новое сообщение',
         'У вас %1$s новое сообщения',
         'У вас %1$s новое сообщений',
-    ),
+    ],
 
     'layout/search' => 'Поиск',
     'layout/footer' => 'Обращаем ваше внимание на то, что все материалы, размещенные на сервере autowp.ru, добавлены посетителями сайта.<br />' .
@@ -83,11 +86,11 @@ return array (
     'Nm'  => 'Нм',
     'kW'  => 'КВт',
     'hp'  => 'л.с.',
-    'spec/%1$s-gear' => array(
+    'spec/%1$s-gear' => [
         '%1$s передача',
         '%1$s передачи',
         '%1$s передач',
-    ),
+    ],
 
     /* PAGINATOR */
     'next'     => 'следующая',
@@ -115,11 +118,11 @@ return array (
 
     'brands/new-cars-of-brand' => 'Новые автомобили %s',
 
-    'brands/more-companies'    => array(
+    'brands/more-companies'    => [
         'ещё %s компания',
         'ещё %s компании',
         'ещё %s компаний'
-    ),
+    ],
 
     /* Layout */
     'breadcrumbs/title'       => 'Путь - дорога',
@@ -138,16 +141,16 @@ return array (
     'carlist/details'        => 'подробнее',
     'carlist/twins'          => 'автомобили-близнецы',
     'carlist/produced/one'   => 'Произведен в единственном экземпляре',
-    'carlist/produced/%1$s'  => array(
+    'carlist/produced/%1$s'  => [
         'Произведена %1$s единица',
         'Произведены %1$s единицы',
         'Произведено %1$s единиц'
-    ),
-    'carlist/produced-about/%1$s' => array(
+    ],
+    'carlist/produced-about/%1$s' => [
         'Произведена примерно %1$s единица',
         'Произведены примерно %1$s единицы',
         'Произведено примерно %1$s единиц'
-    ),
+    ],
     'carlist/specifications' => 'технические характеристики',
     'carlist/designed by %s'  => 'дизайн %s',
     'carlist/edit-specs' => 'ввод ттх',
@@ -164,16 +167,16 @@ return array (
     'present-time-abbr'      => 'н.в.',
 
     /* Categories */
-    'category/%s cars'       => array(
+    'category/%s cars'       => [
         '%s автомобиль',
         '%s автомобиля',
         '%s автомобилей'
-    ),
-    'category/%s new cars'   => array(
+    ],
+    'category/%s new cars'   => [
         '%s новый',
         '%s новых',
         '%s новых'
-    ),
+    ],
 
     /* most */
     'most/fastest' => 'быстрые',
@@ -234,10 +237,10 @@ return array (
     'most/bigclearance/param' => 'дорожный просвет',
     'most/smallclearance' => 'маленький клиренс',
     'most/smallclearance/param' => 'дорожный просвет',
-    
+
     'mosts/sidebar/mostly…' => 'Самые …',
     'mosts/sidebar/between…' => 'Среди …',
-    
+
     'mosts/period/before1920' => 'до 1920го',
     'mosts/period/1920-29'    => '1920-29ых',
     'mosts/period/1930-39'    => '1930-39ых',
@@ -285,9 +288,9 @@ return array (
     'comments/send' => 'Отправить',
     'comments/cancel' => 'Отменить',
 	'comments/need-wait-text' => 'К сожалению вам нужно немного подождать, чтобы получить возможность оставить комментарий.
-		
+
 Это связано с наличием порога "сообщений в час", необходимого для борьбы со спамом и некоторыми другими негативными моментами.
-		
+
 Следующий комментарий вы сможете оставить в "%s", а пока у вас есть время уточнить ту мысль, которую вы хотели донести до общественности:',
 
     /*perspectives*/
@@ -300,15 +303,15 @@ return array (
     'perspective/3/4-left'       => '¾ левый бок',
     'perspective/3/4-right'      => '¾ правый бок',
     'perspective/cutaway'        => 'cutaway',
-    'perspective/front-strict'   => 'спереди (строго)',
-    'perspective/left-strict'    => 'левый бок (строго)',
-    'perspective/right-strict'   => 'правый бок (строго)',
-    'perspective/back-strict'    => 'сзади (строго)',
+    'perspective/front-strict'   => 'спереди (строго]',
+    'perspective/left-strict'    => 'левый бок (строго]',
+    'perspective/right-strict'   => 'правый бок (строго]',
+    'perspective/back-strict'    => 'сзади (строго]',
     'perspective/n/a'            => 'n/a',
     'perspective/label'          => 'шильдик',
     'perspective/upper'          => 'сверху',
     'perspective/under-the-hood' => 'под капотом',
-    'perspective/upper-strict'   => 'сверху (строго)',
+    'perspective/upper-strict'   => 'сверху (строго]',
     'perspective/bottom'         => 'снизу',
     'perspective/dashboard'      => 'комбинация приборов',
     'perspective/boot'           => 'багажник',
@@ -319,7 +322,7 @@ return array (
     'login/name' => 'имя',
     'login/login-or-email' => 'логин или e-mail',
     'login/password' => 'пароль',
-    'login/password-confirm' => 'пароль (ещё раз)',
+    'login/password-confirm' => 'пароль (ещё раз]',
     'login/captcha' => 'введите код защиты',
     'login/registration' => 'Регистрация',
     'login/forgot-password?' => 'Забыли пароль?',
@@ -381,7 +384,7 @@ return array (
     'feedback/title' => 'Обратная связь',
     'feedback/name'  => 'Ваше имя',
     'feedback/message' => 'Сообщение',
-    'feedback/donate-text' => 'Если вы пришли сюда, чтобы высказать слова поддержки, есть возможность [выразить её в твердой валюте](/donate)',
+    'feedback/donate-text' => 'Если вы пришли сюда, чтобы высказать слова поддержки, есть возможность [выразить её в твердой валюте](/donate]',
 
     'map/museums-and-factories' => 'музеи и заводы',
 
@@ -423,7 +426,7 @@ return array (
         "Если сообщение попало к вам по ошибке - просто удалите его\n\n" .
         "С Уважением, Робот %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'E-mail with a confirmation code was sent',
-    
+
     'user/add-to-contacts' => 'Добавить в контакты',
     'user/remove-from-contacts' => 'Удалить из контактов',
 
@@ -442,8 +445,8 @@ return array (
     'donate/success-text' => 'Благодарим вас за оказанную поддержку.
 
 Постараемся вас не разочаровать.',
-    
-    'message/user-cancel-car-engine' => '%1$s отменил двигатель %2$s для автомобиля %3$s ( %4$s )',
+
+    'message/user-cancel-car-engine' => '%1$s отменил двигатель %2$s для автомобиля %3$s ( %4$s ]',
 
     'car-type/roadster'       => 'Родстер',
     'car-type/spyder'         => 'Спайдер',
@@ -526,4 +529,4 @@ return array (
     'car-type-rp/2-floor-bus'    => '2-х этажных автобусов',
     'car-type-rp/town-car'       => 'Таун каров',
     'car-type-rp/barchetta'      => 'Баркетта',
-);
+];

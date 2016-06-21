@@ -27,6 +27,9 @@ class User extends AbstractHelper
 
     private $_user = null;
 
+    /**
+     * @var Acl
+     */
     private $acl;
 
     public function __construct(Acl $acl)

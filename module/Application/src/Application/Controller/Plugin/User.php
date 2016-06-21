@@ -4,10 +4,11 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+use Application\Acl;
+
 use Zend_Acl_Resource_Interface;
 use Zend_Acl_Role_Interface;
 use Zend_Auth;
-use Zend_Controller_Action_HelperBroker;
 use Zend_Registry;
 
 use Users;
@@ -15,6 +16,11 @@ use Users_Row;
 
 class User extends AbstractPlugin
 {
+    /**
+     * @var Acl
+     */
+    private $acl;
+
     /**
      * @var Users
      */
@@ -29,6 +35,11 @@ class User extends AbstractPlugin
      * @var Users_Row
      */
     private $user = null;
+
+    public function __construct(Acl $acl)
+    {
+        $this->acl = $acl;
+    }
 
     /**
      * @return Users
@@ -115,9 +126,7 @@ class User extends AbstractPlugin
     {
         return $this->user
             && $this->user->role
-            && Zend_Controller_Action_HelperBroker::getStaticHelper('acl')
-                ->direct()
-                ->isAllowed($this->user->role, $resource, $privilege);
+            && $this->acl->isAllowed($this->user->role, $resource, $privilege);
     }
 
     /**
@@ -128,9 +137,7 @@ class User extends AbstractPlugin
     {
         return $this->user
             && $this->user->role
-            && Zend_Controller_Action_HelperBroker::getStaticHelper('acl')
-                ->direct()
-                ->inheritsRole($this->user->role, $inherit);
+            && $this->acl->inheritsRole($this->user->role, $inherit);
     }
 
     public function clearRememberCookie()

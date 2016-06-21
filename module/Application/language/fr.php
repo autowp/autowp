@@ -1,40 +1,43 @@
 <?php
 
-return array (
+return [
+    '' => [
+        'nplurals=2; plural=((n==0)||(n==1))?0:1'
+    ],
     /* Common words */
     'and' => 'et',
-    '%1$s picures'       => array(
+    '%1$s picures'       => [
         '%1$s image',
         '%1$s images',
-    ),
-    '%1$s vehicles'      => array(
+    ],
+    '%1$s vehicles'      => [
         '%1$s véhicule',
         '%1$s véhicules',
-    ),
-    '%1$s comments'      => array(
+    ],
+    '%1$s comments'      => [
         '%1$s commentaire',
         '%1$s commentaires',
-    ),
-    '%1$s messages'      => array(
+    ],
+    '%1$s messages'      => [
         '%1$s message',
         '%1$s messages',
-    ),
-    '%1$s topics'      => array(
+    ],
+    '%1$s topics'      => [
         '%1$s sujet',
         '%1$s sujets',
-    ),
+    ],
 
     'few seconds ago'    => 'il ya quelques secondes',
     'a minute ago'       => 'il y\'a une minute',
-    '%1$s minutes ago'   => array(
+    '%1$s minutes ago'   => [
         'il y\'a %1$s minute',
         'il y\'a %1$s minutes'
-    ),
+    ],
     'an hour ago'        => 'il ya une heure',
-    '%1$s hours ago'     => array(
+    '%1$s hours ago'     => [
         'il ya %1$s heure',
         'il ya %1$s heures'
-    ),
+    ],
     'yesterday'          => 'hier',
     'today'              => 'aujourd\'hui',
 
@@ -50,10 +53,10 @@ return array (
     'layout/meta/keywords' => 'car, vehicle, auto, avto, voiture',
     'layout/brand' => 'WheelsAge.org',
     'layout/personal-messages' => 'Messages personnels',
-    'layout/you-have-%1$s-new-messages' => array(
+    'layout/you-have-%1$s-new-messages' => [
         'Vous avez %1$s nouveau message',
         'Vous avez %1$s nouveaux messages',
-    ),
+    ],
 
     'layout/search' => 'Recherche',
     'layout/footer' => 'S\'il vous plaît noter que tous les documents sur ce autowp.ru, sont ajouté par  les visiteurs.<br />' .
@@ -75,10 +78,10 @@ return array (
     'Nm'  => 'Nm',
     'kW'  => 'kW',
     'hp'  => 'cv',
-    'spec/%1$s-gear' => array(
+    'spec/%1$s-gear' => [
         '%1$s vitesse',
         '%1$s vitesses'
-    ),
+    ],
 
     /* PAGINATOR */
     'next'                     => 'prochaine',
@@ -106,10 +109,10 @@ return array (
 
     'brands/new-cars-of-brand' => 'Nouveaux modèles %s',
 
-    'brands/more-companies'    => array(
+    'brands/more-companies'    => [
         'plus d\'%s marque',
         'plus de %s marques'
-    ),
+    ],
 
     /* Layout */
     'breadcrumbs/title'       => 'Chemin',
@@ -128,14 +131,14 @@ return array (
     'carlist/details'         => 'détails',
     'carlist/twins'           => 'des jumeaux',
     'carlist/produced/one'    => 'Produit en un seul exemplaire',
-    'carlist/produced/%1$s'   => array(
+    'carlist/produced/%1$s'   => [
         'Produit en %1$s exemplaire',
         'Produit à %1$s exemplaires'
-    ),
-    'carlist/produced-about/%1$s' => array(
+    ],
+    'carlist/produced-about/%1$s' => [
         'Produit dans environ %1$s exemplaire',
         'Produit dans environ %1$s exemplaires'
-    ),
+    ],
     'carlist/specifications'  => 'caractéristiques',
     'carlist/designed by %s'  => 'dessinée par %s',
     'carlist/edit-specs' => 'modifier spécifications',
@@ -152,14 +155,14 @@ return array (
     'present-time-abbr'       => 'pr.',
 
     /* Categories */
-    'category/%s cars'        => array(
+    'category/%s cars'        => [
         '%s voiture',
         '%s voitures'
-    ),
-    'category/%s new cars'    => array(
+    ],
+    'category/%s new cars'    => [
         '%s nouvelle',
         '%s nouvelle'
-    ),
+    ],
 
     /* most */
     'most/fastest' => 'le plus rapide',
@@ -220,10 +223,10 @@ return array (
     'most/bigclearance/param' => 'garde au sol',
     'most/smallclearance' => 'petite garde au sol',
     'most/smallclearance/param' => 'garde au sol',
-    
+
     'mosts/sidebar/mostly…' => 'Le plus …',
     'mosts/sidebar/between…' => 'Parmi …',
-    
+
     'mosts/period/before1920' => 'jusqu\'à 1920го',
     'mosts/period/1920-29'    => '1920-29th',
     'mosts/period/1930-39'    => '1930-39th',
@@ -271,9 +274,9 @@ return array (
     'comments/send' => 'Envoyer',
     'comments/cancel' => 'Annuler',
 	'comments/need-wait-text' => 'Malheureusement, il faut attendre un peu pour obtenir la possibilité de laisser un commentaire.
-		
+
 Cela est dû à la présence d\'un seuil "messages par heure" nécessaire pour lutter contre le spam et autres moments négatifs.
-		
+
 Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le temps de clarifier l\'idée que vous voulez transmettre au public:',
 
     /*perspectives*/
@@ -286,15 +289,15 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'perspective/3/4-left'       => '¾ gauche',
     'perspective/3/4-right'      => '¾ droit',
     'perspective/cutaway'        => 'cutaway',
-    'perspective/front-strict'   => 'avant (strictement)',
-    'perspective/left-strict'    => 'gauche (strictement)',
-    'perspective/right-strict'   => 'droit (strictement)',
-    'perspective/back-strict'    => 'derrière (strictement)',
+    'perspective/front-strict'   => 'avant (strictement]',
+    'perspective/left-strict'    => 'gauche (strictement]',
+    'perspective/right-strict'   => 'droit (strictement]',
+    'perspective/back-strict'    => 'derrière (strictement]',
     'perspective/n/a'            => 'n/a',
     'perspective/label'          => 'label',
     'perspective/upper'          => 'haut',
     'perspective/under-the-hood' => 'sous la capuche',
-    'perspective/upper-strict'   => 'haut (strictement)',
+    'perspective/upper-strict'   => 'haut (strictement]',
     'perspective/bottom'         => 'bas',
     'perspective/dashboard'      => 'tableau de bord',
     'perspective/boot'           => 'coffre',
@@ -305,7 +308,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'login/name' => 'nom',
     'login/login-or-email' => 'login ou e-mail',
     'login/password' => 'mot de passe',
-    'login/password-confirm' => 'mot de passe (bis)',
+    'login/password-confirm' => 'mot de passe (bis]',
     'login/captcha' => 'entrez le code de sécurité',
     'login/registration' => 'Enregistrement',
     'login/forgot-password?' => 'Récupérer mot de passe',
@@ -367,7 +370,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'feedback/title' => 'Retour d\'information',
     'feedback/name'  => 'Votre nom',
     'feedback/message' => 'Message',
-    'feedback/donate-text' => 'Si vous êtes venu ici pour exprimer des mots de soutien, il est possible [de l\'exprimer en devises](/donate)',
+    'feedback/donate-text' => 'Si vous êtes venu ici pour exprimer des mots de soutien, il est possible [de l\'exprimer en devises](/donate]',
 
     'map/museums-and-factories' => 'Les musées et les usines',
 
@@ -410,7 +413,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
         "Si le message a eu à vous par erreur - il suffit de le supprimer\n\n" .
         "Sincèrement, le Robot de %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'Vous avez envoyé un e-mail avec un code de confirmation',
-    
+
     'user/add-to-contacts' => 'Ajouter aux contacts',
     'user/remove-from-contacts' => 'Enlever des contacts',
 
@@ -429,9 +432,9 @@ Nous ne recueillons pas d\'informations sur les donateurs, mais, si vous insiste
     'donate/success-text' => 'Merci pour votre soutien.
 
 Allons essayer de ne pas vous décevoir.',
-    
-    'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s )',
-    
+
+    'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s ]',
+
     'car-type/roadster'       => 'Roadster',
     'car-type/spyder'         => 'Spider',
     'car-type/cabriolet'      => 'Cabriolet',
@@ -472,7 +475,7 @@ Allons essayer de ne pas vous décevoir.',
     'car-type/2-floor-bus'    => 'Autobus de 2 étages',
     'car-type/town-car'       => 'Coupé de Ville',
     'car-type/barchetta'      => 'Barquette',
-    
+
     'car-type-rp/roadster'       => 'Roadster',
     'car-type-rp/spyder'         => 'Spider',
     'car-type-rp/cabriolet'      => 'Cabriolet',
@@ -513,4 +516,4 @@ Allons essayer de ne pas vous décevoir.',
     'car-type-rp/2-floor-bus'    => 'Autobus de 2 étages',
     'car-type-rp/town-car'       => 'Coupé de Ville',
     'car-type-rp/barchetta'      => 'Barquette',
-);
+];

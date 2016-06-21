@@ -145,6 +145,8 @@ class Module implements ConsoleUsageProviderInterface,
 
         $eventManager = $e->getApplication()->getEventManager();
         $eventManager->attach( \Zend\Mvc\MvcEvent::EVENT_DISPATCH, array($this, 'preDispatch'), 100 );
+
+        \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
     }
 
 

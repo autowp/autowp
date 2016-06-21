@@ -1,12 +1,12 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 75,
-    ));
+    ]);
 ?>
 
 <table class="table table-condensed table-striped">
@@ -14,7 +14,7 @@
         <tr>
             <td>
                 <?php if ($event['date']) { ?>
-                    <?=$this->escape($this->humanTime($event['date']))?>
+                    <?=$this->escapeHtml($this->humanTime($event['date']))?>
                 <?php } ?>
             </td>
             <td>

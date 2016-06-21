@@ -1,7 +1,9 @@
 <?php
 
 $zf2uri = ['/api/', '/oauth', '/users/online', '/rules', '/about', '/info',
-    '/pulse'];
+    '/pulse', '/log/'];
+
+$zf2ExactUri = ['/log'];
 
 $useZF2 = php_sapi_name() === 'cli';
        //|| isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] == '46.188.125.123';
@@ -12,6 +14,15 @@ if (!$useZF2) {
             if (0 === strpos($_SERVER['REQUEST_URI'], $uri)) {
                 $useZF2 = true;
                 break;
+            }
+        }
+
+        if (!$useZF2) {
+            foreach ($zf2ExactUri as $uri) {
+                if ($_SERVER['REQUEST_URI'] === $uri) {
+                    $useZF2 = true;
+                    break;
+                }
             }
         }
     }
