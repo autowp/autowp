@@ -10,14 +10,26 @@ use DateTimeZone;
 use IntlDateFormatter;
 
 use Zend_Date;
-use Zend_Registry;
 
 class HumanDate extends AbstractHelper
 {
     /**
+     * @var string
+     */
+    private $language;
+
+    /**
+     * @param string $language
+     */
+    public function __construct($language)
+    {
+        $this->language = $language;
+    }
+
+    /**
      * Converts time to fuzzy time strings
      *
-     * @param string|integer|Zend_Date|array $time
+     * @param string|integer|Zend_Date|DateTime|array $time
      */
     public function __invoke($time = null)
     {
@@ -29,37 +41,28 @@ class HumanDate extends AbstractHelper
             if (!$time instanceof Zend_Date) {
                 $time = new Zend_Date($time);
             }
-            $dt = new DateTime();
-            $dt->setTimestamp($time->getTimestamp());
-            $tz = new DateTimeZone($time->getTimezone());
-            $dt->setTimezone($tz);
-            $time = $dt;
+            $dateTime = new DateTime();
+            $dateTime->setTimestamp($time->getTimestamp());
+            $timezone = new DateTimeZone($time->getTimezone());
+            $dateTime->setTimezone($timezone);
+            $time = $dateTime;
         }
 
         $now = new DateTime('now');
         $now->setTimezone($time->getTimezone());
         $ymd = $time->format('Ymd');
-        $isToday = $ymd == $now->format('Ymd');
 
-        if ($isToday) {
-            $s = $this->view->translate('today');
-        } else {
-
-            $now->sub(new DateInterval('P1D'));
-            $isYesterday = $ymd == $now->format('Ymd');
-
-            if ($isYesterday) {
-                $s = $this->view->translate('yesterday');
-            } else {
-                $locale = Zend_Registry::get('Zend_Locale');
-                $df = new IntlDateFormatter($locale->toString(), IntlDateFormatter::LONG, IntlDateFormatter::NONE);
-                $df->setTimezone($time->getTimezone());
-                $s = $df->format($time);
-                //$s = $time->format(MYSQL_DATETIME_FORMAT);
-                //$s = $time->get(Zend_Date::DATE_MEDIUM);
-            }
+        if ($ymd == $now->format('Ymd')) {
+            return $this->view->translate('today');
         }
 
-        return $s;
+        $now->sub(new DateInterval('P1D'));
+        if ($ymd == $now->format('Ymd')) {
+            return $this->view->translate('yesterday');
+        }
+
+        $dateFormatter = new IntlDateFormatter($this->language, IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+        $dateFormatter->setTimezone($time->getTimezone());
+        return $dateFormatter->format($time);
     }
 }

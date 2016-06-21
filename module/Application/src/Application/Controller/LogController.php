@@ -17,7 +17,7 @@ class LogController extends AbstractActionController
     public function indexAction()
     {
         if (!$this->user()->inheritsRole('moder') ) {
-            $this->getResponse()->setResponseCode(403);
+            return $this->getResponse()->setStatusCode(403);
         }
 
         $logTable = new Log_Events();

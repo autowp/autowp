@@ -13,7 +13,7 @@ class HumanTime extends AbstractHelper
     /**
      * Converts time to fuzzy time strings
      *
-     * @param string|integer|Zend_Date|array $time
+     * @param string|integer|Zend_Date|DateTime|array $time
      */
     public function __invoke($time = null)
     {
@@ -25,9 +25,9 @@ class HumanTime extends AbstractHelper
             if (!$time instanceof Zend_Date) {
                 $time = new Zend_Date($time);
             }
-            $dt = new DateTime();
-            $dt->setTimestamp($time->getTimestamp());
-            $time = $dt;
+            $dateTime = new DateTime();
+            $dateTime->setTimestamp($time->getTimestamp());
+            $time = $dateTime;
         }
 
         $now = new DateTime('now');
@@ -36,32 +36,37 @@ class HumanTime extends AbstractHelper
 
         if ($diff > 0 && $diff <= 50) {
             //less than 50 seconds
-            $s = $this->view->translate('few seconds ago');
+            return $this->view->translate('few seconds ago');
+        }
 
-        } elseif ($diff > 50 && $diff < (60+30)) {
+        if ($diff > 50 && $diff < (60+30)) {
             //more than 50 seconds
             //less than minute and 30 seconds
-            $s = $this->view->translate('a minute ago');
-        } elseif ($diff >= (60+30) && $diff < (60*55)) {
+            return $this->view->translate('a minute ago');
+        }
+
+        if ($diff >= (60+30) && $diff < (60*55)) {
             //more than minute and 30 seconds
             //less than 55 minutes
             $minutes = $diff / 60;
             $minutes = round($minutes, 0);
-            $s = sprintf($this->view->translatePlural('%1$s minutes ago', null, $minutes), $minutes);
-        } elseif ($diff >= (60*55) && $diff < (60*60+60*30)) {
+            return sprintf($this->view->translatePlural('%1$s minutes ago', null, $minutes), $minutes);
+        }
+
+        if ($diff >= (60*55) && $diff < (60*60+60*30)) {
             //more than 55 minutes
             //less than hour and 30 minutes
-            $s = $this->view->translate('an hour ago');
-        } elseif ($diff >= (60*60+60*30) && $diff < (60 * 60 * 23.5)) {
+            return $this->view->translate('an hour ago');
+        }
+
+        if ($diff >= (60*60+60*30) && $diff < (60 * 60 * 23.5)) {
             //more than hour and 30 minutes
             //less than 23 and half hour
             $hours = $diff / (60*60);
             $hours = round($hours, 0);
-            $s = sprintf($this->view->translatePlural('%1$s hours ago', null, $hours), $hours);
-        } else {
-            $s = $this->view->humanDate($time);
+            return sprintf($this->view->translatePlural('%1$s hours ago', null, $hours), $hours);
         }
 
-        return $s;
+        return $this->view->humanDate($time);
     }
 }

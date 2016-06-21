@@ -18,8 +18,6 @@ class WildcardSafe extends Wildcard
 {
     private $exclude = ['controller', 'action'];
 
-
-
     /**
      * match(): defined by RouteInterface interface.
      *

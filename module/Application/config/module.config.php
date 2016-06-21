@@ -519,7 +519,6 @@ return [
             'sidebar'     => View\Helper\Sidebar::class,
             'pageTitle'   => View\Helper\PageTitle::class,
             'breadcrumbs' => View\Helper\Breadcrumbs::class,
-            'humanDate'   => View\Helper\HumanDate::class,
             'humanTime'   => View\Helper\HumanTime::class,
         ],
         'factories' => [
@@ -535,6 +534,10 @@ return [
             },
             'fileSize' => function($sm) {
                 return new View\Helper\FileSize($sm->get(Language::class));
+            },
+            'humanDate' => function($sm) {
+                $language = $sm->get(Language::class);
+                return new View\Helper\HumanDate($language->getLanguage());
             },
         ]
     ],
