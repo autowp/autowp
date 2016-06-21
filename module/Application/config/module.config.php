@@ -9,8 +9,9 @@ namespace Application;
 
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
-use Zend\Router\Http\Wildcard;
 use Zend\ServiceManager\Factory\InvokableFactory;
+
+use Application\Router\Http\WildcardSafe;
 
 use Autowp\Image;
 use Autowp\TextStorage;
@@ -125,7 +126,7 @@ return [
                 'may_terminate' => true,
                 'child_routes'  => [
                     'params' => [
-                        'type' => Wildcard::class
+                        'type' => WildcardSafe::class
                     ]
                 ]
             ],
