@@ -32,7 +32,7 @@ class HtmlA extends AbstractHtmlElement
     public function url($attribs)
     {
         if (!is_array($attribs)) {
-            $attribs = array('href' => $attribs);
+            $attribs = ['href' => $attribs];
         }
 
         $href = isset($attribs['href']) ? $attribs['href'] : '';

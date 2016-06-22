@@ -2,6 +2,8 @@
 
 use Application\Model\Message;
 
+use Application\Model\DbTable\Museum;
+
 class CommentsController extends Zend_Controller_Action
 {
     private $_comments = null;

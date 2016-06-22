@@ -22,6 +22,7 @@ use Zend_Application_Resource_Session;
 use Zend_Cache_Core;
 use Zend_Cache_Manager;
 use Zend_Db_Adapter_Abstract;
+use Zend_View;
 
 use Exception;
 
@@ -54,6 +55,15 @@ return [
                     ],
                 ],
             ],
+            'catalogue' => [
+                'type' => \Application\Router\Http\Catalogue::class,
+                'options' => [
+                    'defaults' => [
+                        'controller' => Controller\CatalogueController::class,
+                        'action'     => 'brand'
+                    ]
+                ]
+            ],
             'categories' => [
                 'type' => Literal::class,
                 'options' => [
@@ -71,6 +81,28 @@ return [
                             'route' => '/:category_catname',
                             'defaults' => [
                                 'action' => 'category',
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            'comments' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/comments',
+                    'defaults' => [
+                        'controller' => Controller\CommentsController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'add' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/add/type_id/:type_id/item_id/:item_id',
+                            'defaults' => [
+                                'action' => 'add',
                             ],
                         ]
                     ]
@@ -511,6 +543,7 @@ return [
                 $acl = $sm->get(Acl::class);
                 return new Controller\AboutController($acl);
             },
+            Controller\CommentsController::class     => InvokableFactory::class,
             Controller\DonateController::class       => InvokableFactory::class,
             Controller\IndexController::class        => InvokableFactory::class,
             Controller\InfoController::class => function($sm) {
@@ -520,6 +553,7 @@ return [
             Controller\LogController::class          => InvokableFactory::class,
             Controller\LoginController::class        => InvokableFactory::class,
             Controller\MapController::class          => InvokableFactory::class,
+            Controller\MuseumsController::class      => InvokableFactory::class,
             Controller\PulseController::class        => InvokableFactory::class,
             Controller\RulesController::class        => InvokableFactory::class,
             Controller\UsersController::class        => InvokableFactory::class,
@@ -595,11 +629,17 @@ return [
             'pageEnv'     => View\Helper\PageEnv::class,
             'page'        => View\Helper\Page::class,
             'htmlA'       => View\Helper\HtmlA::class,
+            'htmlImg'     => View\Helper\HtmlImg::class,
             'sidebar'     => View\Helper\Sidebar::class,
             'pageTitle'   => View\Helper\PageTitle::class,
             'breadcrumbs' => View\Helper\Breadcrumbs::class,
             'humanTime'   => View\Helper\HumanTime::class,
             'markdown'    => View\Helper\Markdown::class,
+            'pastTimeIndicator' => View\Helper\PastTimeIndicator::class,
+            'inlinePicture' => View\Helper\InlinePicture::class,
+            'pic'         => View\Helper\Pic::class,
+            'img'         => View\Helper\Img::class,
+            'pictures'    => View\Helper\Pictures::class,
         ],
         'factories' => [
             'mainMenu' => function($sm) {
@@ -618,6 +658,22 @@ return [
             'humanDate' => function($sm) {
                 $language = $sm->get(Language::class);
                 return new View\Helper\HumanDate($language->getLanguage());
+            },
+            'comments' => function($sm) {
+                $view = $sm->get(Zend_View::class);
+                return new View\Helper\Comments($view);
+            },
+            'userText' => function($sm) {
+                $router = $sm->get('Router');
+                return new View\Helper\UserText($router);
+            },
+            'acl' => function($sm) {
+                $acl = $sm->get(Acl::class);
+                return new View\Helper\Acl($acl);
+            },
+            'imageStorage' => function($sm) {
+                $imageStorage = $sm->get(Image\Storage::class);
+                return new View\Helper\ImageStorage($imageStorage);
             },
         ]
     ],
@@ -717,7 +773,12 @@ return [
                 $options = $sm->get('Config')['textstorage'];
                 $options['dbAdapter'] = $sm->get(Zend_Db_Adapter_Abstract::class);
                 return new TextStorage\Service($options);
-            }
+            },
+            Zend_View::class => function($sm) {
+                return new Zend_View([
+                    'scriptPath' => APPLICATION_PATH . '/modules/default/views/scripts/'
+                ]);
+            },
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class

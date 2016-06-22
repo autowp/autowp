@@ -1,6 +1,18 @@
 <?php
 
-class Project_View_Helper_Pictures extends Zend_View_Helper_Abstract
+namespace Application\View\Helper;
+
+use Zend\View\Helper\AbstractHelper;
+
+use Comment_Message;
+use Comment_Topic;
+use Picture_View;
+use Pictures_Moder_Votes;
+use Pictures_Row;
+
+use Zend_Db_Expr;
+
+class Pictures extends AbstractHelper
 {
     const
         SCHEME_631 = '631',
@@ -74,7 +86,7 @@ class Project_View_Helper_Pictures extends Zend_View_Helper_Abstract
      */
     private function _renderBehaviour(array $picture, $isModer)
     {
-        return $this->view->partial('picture-behaviour.phtml', array(
+        return $this->view->partial('application/picture-behaviour', array(
             'isModer'        => $isModer,
             'resolution'     => $picture['width'].'×'.$picture['height'],
             'status'         => $picture['status'],
@@ -177,7 +189,7 @@ class Project_View_Helper_Pictures extends Zend_View_Helper_Abstract
             $newMsgCount = 0;
         }
 
-        $data = array(
+        $data = [
             'url'         => $this->view->pic($picture)->url(),
             'cropped'     => $picture->cropParametersExists(),
             'width'       => $picture['width'],
@@ -188,7 +200,7 @@ class Project_View_Helper_Pictures extends Zend_View_Helper_Abstract
             'newMsgCount' => $newMsgCount,
             'views'       => $this->getPictureViewTable()->get($picture),
             'status'      => $picture->status,
-        );
+        ];
 
         return $this->_renderBehaviour($data, $isModer);
     }
@@ -302,10 +314,5 @@ class Project_View_Helper_Pictures extends Zend_View_Helper_Abstract
             $html[] = '</div>';
         }
         return implode($html);
-    }
-
-    public function __invoke()
-    {
-        return $this;
     }
 }

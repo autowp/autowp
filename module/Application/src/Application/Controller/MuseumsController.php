@@ -1,19 +1,25 @@
 <?php
 
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+
 use Application\Model\DbTable\Museum;
 
-class MuseumsController extends Zend_Controller_Action
+use geoPHP;
+
+class MuseumsController extends AbstractActionController
 {
     public function indexAction()
     {
-        $this->_redirect('/map/');
+        return $this->redirect()->toUrl('/map');
     }
 
     public function museumAction()
     {
         $table = new Museum();
 
-        $museum = $table->find($this->getParam('id'))->current();
+        $museum = $table->find($this->params()->fromRoute('id'))->current();
         if (!$museum) {
             return $this->_forward('notfound', 'error');
         }
@@ -23,9 +29,9 @@ class MuseumsController extends Zend_Controller_Action
             $point = geoPHP::load(substr($museum->point, 4), 'wkb');
         }
 
-        $this->view->assign(array(
+        return [
             'museum' => $museum,
             'point'  => $point
-        ));
+        ];
     }
 }

@@ -1,23 +1,23 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => true
-        ),
+        ],
         'pageId' => 159,
-        'args'   => array(
+        'args'   => [
             'MUSEUM_ID'   => $this->museum->id,
             'MUSEUM_NAME' => $this->museum->name
-        )
-    ));
+        ]
+    ]);
 
     $this->layout()->moduleName = 'default/museums/museum';
     if ($this->point) {
-        $this->layout()->moduleOptions = array(
+        $this->layout()->moduleOptions = [
             'lat' => $this->point->y(),
             'lng' => $this->point->x(),
-        );
+        ];
     }
 ?>
 
@@ -25,7 +25,7 @@
 
 <div class="well">
     <?php if ($this->museum->address) { ?>
-        <p>Адрес: <?=$this->escape($this->museum->address)?></p>
+        <p>Адрес: <?=$this->escapeHtml($this->museum->address)?></p>
     <?php } ?>
 
     <?php if ($this->museum->url) { ?>
@@ -36,8 +36,8 @@
 </div>
 
 <div id="comments">
-    <?=$this->action('comments', 'comments', 'default', array(
+    <?=$this->comments([
         'type'    => Comment_Message::MUSEUMS_TYPE_ID,
         'item_id' => $this->museum->id
-    )) ?>
+    ]) ?>
 </div>
