@@ -17,6 +17,9 @@ engines:
     enabled: true
   phan:
     enabled: true
+    config:
+      ignore-undeclared: true
+      dead-code-detection: true
 ratings:
   paths:
   - "**.inc"
