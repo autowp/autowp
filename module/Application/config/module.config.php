@@ -117,7 +117,7 @@ return [
             'log' => [
                 'type' => Literal::class,
                 'options' => [
-                    'route'    => '/log',
+                    'route'    => '/log/index',
                     'defaults' => [
                         'controller' => Controller\LogController::class,
                         'action'     => 'index',

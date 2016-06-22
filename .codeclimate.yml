@@ -13,6 +13,10 @@ engines:
     enabled: true
   phpmd:
     enabled: true
+  phpcodesniffer:
+    enabled: true
+  phan:
+    enabled: true
 ratings:
   paths:
   - "**.inc"

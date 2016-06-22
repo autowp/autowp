@@ -75,11 +75,11 @@ class LogController extends AbstractActionController
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)
         );
-
+        
         $paginator
             ->setItemCountPerPage(self::EVENTS_PER_PAGE)
             ->setCurrentPageNumber($this->params()->fromRoute('page'));
-
+        
         $events = [];
         foreach ($paginator->getCurrentItems() as $event) {
             $events[] = [
