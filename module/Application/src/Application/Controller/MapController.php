@@ -3,8 +3,17 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
 
 use Application\Model\DbTable\Museum;
+
+use geoPHP;
+use LineString;
+use Point;
+use Polygon;
+
+use Factory;
+use Picture;
 
 class MapController extends AbstractActionController
 {
@@ -29,7 +38,7 @@ class MapController extends AbstractActionController
     {
         geoPHP::version(); // for autoload classes
 
-        $bounds = $this->_getParam('bounds');
+        $bounds = $this->params()->fromQuery('bounds');
         $bounds = explode(',', $bounds);
 
         if (count($bounds) < 4) {
@@ -41,28 +50,28 @@ class MapController extends AbstractActionController
         $latHi = (float)$bounds[2];
         $lngHi = (float)$bounds[3];
 
-        $line = new LineString(array(
+        $line = new LineString([
             new Point($lngLo, $latLo),
             new Point($lngLo, $latHi),
             new Point($lngHi, $latHi),
             new Point($lngHi, $latLo),
             new Point($lngLo, $latLo),
-        ));
-        $polygon = new Polygon(array($line));
+        ]);
+        $polygon = new Polygon([$line]);
 
-        $coordsFilter = array(
+        $coordsFilter = [
             'ST_Contains(GeomFromText(?), point)' => $polygon->out('wkt'),
-        );
+        ];
 
         $pictureTable = new Picture();
 
-        $imageStorage = $this->_helper->imageStorage();
+        $imageStorage = $this->imageStorage();
 
         $factoryTable = new Factory();
 
         $factories = $factoryTable->fetchAll($coordsFilter, 'name');
 
-        $data = array();
+        $data = [];
         foreach ($factories as $factory) {
 
             $point = null;
@@ -70,26 +79,22 @@ class MapController extends AbstractActionController
                 $point = geoPHP::load(substr($factory->point, 4), 'wkb');
             }
 
-            $row = array(
+            $row = [
                 'id'   => 'factory' . $factory->id,
                 'name' => $factory->name,
-                'location' => array(
+                'location' => [
                     'lat'  => $point ? $point->y() : null,
                     'lng'  => $point ? $point->x() : null,
-                ),
-                'url'  => $this->_helper->url->url(array(
-                    'controller' => 'factory',
-                    'action'     => 'factory',
-                    'id'         => $factory->id
-                ))
-            );
+                ],
+                'url'  => $this->url()->fromRoute('factories/factory', [
+                    'id' => $factory->id
+                ])
+            ];
 
-
-
-            $picture = $pictureTable->fetchRow(array(
+            $picture = $pictureTable->fetchRow([
                 'type = ?'       => Picture::FACTORY_TYPE_ID,
                 'factory_id = ?' => $factory->id
-            ));
+            ]);
 
             if ($picture) {
                 $image = $imageStorage->getFormatedImage($picture->getFormatRequest(), 'format9');
@@ -112,19 +117,17 @@ class MapController extends AbstractActionController
                 $point = geoPHP::load(substr($museum->point, 4), 'wkb');
             }
 
-            $row = array(
+            $row = [
                 'id'   => 'museum' . $museum->id,
                 'name' => $museum->name,
-                'location' => array(
+                'location' => [
                     'lat'  => $point ? $point->y() : null,
                     'lng'  => $point ? $point->x() : null,
-                ),
-                'url'  => $this->_helper->url->url(array(
-                    'controller' => 'museums',
-                    'action'     => 'museum',
-                    'id'         => $museum->id
-                ))
-            );
+                ],
+                'url'  => $this->url()->fromRoute('museums/museum', [
+                    'id' => $museum->id
+                ])
+            ];
 
             /*if ($museum->url) {
                 $row['url'] = $museum->url;
@@ -146,6 +149,6 @@ class MapController extends AbstractActionController
             $data[] = $row;
         }
 
-        $this->_helper->json($data);
+        return new JsonModel($data);
     }
 }

@@ -76,6 +76,28 @@ return [
                     ]
                 ]
             ],
+            'factories' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/factory',
+                    'defaults' => [
+                        'controller' => Controller\FactoriesController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'factory' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/factory/id/:id',
+                            'defaults' => [
+                                'action' => 'factory',
+                            ],
+                        ]
+                    ]
+                ]
+            ],
             'info' => [
                 'type'    => Literal::class,
                 'options' => [
@@ -161,6 +183,40 @@ return [
                         'action'     => 'index',
                     ],
                 ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'data' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/data',
+                            'defaults' => [
+                                'action' => 'data',
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            'museums' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/museums',
+                    'defaults' => [
+                        'controller' => Controller\MuseumsController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'museum' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/museum/id/:id',
+                            'defaults' => [
+                                'action' => 'museum',
+                            ],
+                        ]
+                    ]
+                ]
             ],
             'pulse' => [
                 'type' => Literal::class,

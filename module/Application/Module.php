@@ -82,11 +82,6 @@ class Module implements ConsoleUsageProviderInterface,
     private $_skipHostname = ['i.wheelsage.org'];
 
     /**
-     * @var array
-     */
-    private $_skipUri = '/picture-file';
-
-    /**
      * @var string
      */
     private $_defaultLanguage = 'en';

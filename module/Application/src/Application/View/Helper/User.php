@@ -3,12 +3,12 @@
 namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
+use Zend\View\Exception\InvalidArgumentException;
 
 use Application\Acl;
 
 use Zend_Auth;
 use Zend_Acl_Role_Interface;
-use Zend_View_Exception;
 use Zend_Date;
 
 use DateTime;
@@ -21,11 +21,11 @@ use Exception;
 
 class User extends AbstractHelper
 {
-    private $_userModel;
+    private $userModel;
 
-    private $_users = array();
+    private $users = [];
 
-    private $_user = null;
+    private $user = null;
 
     /**
      * @var Acl
@@ -37,41 +37,41 @@ class User extends AbstractHelper
         $this->acl = $acl;
     }
 
-    private function _user($id)
+    private function user($id)
     {
         if (!$id) {
             return null;
         }
 
-        if (!isset($this->_users[$id])) {
-            if (!$this->_userModel) {
-                $this->_userModel = new Users();
+        if (!isset($this->users[$id])) {
+            if (!$this->userModel) {
+                $this->userModel = new Users();
             }
-            $this->_users[$id] = $this->_userModel->find($id)->current();
+            $this->users[$id] = $this->userModel->find($id)->current();
         }
 
-        return $this->_users[$id];
+        return $this->users[$id];
     }
 
     public function __invoke($user = null, array $options = [])
     {
         if ($user === null) {
-            $user = $this->_getLogedInUser();
+            $user = $this->getLogedInUser();
         }
 
         if (!$user instanceof Users_Row) {
-            $user = $this->_user($user);
+            $user = $this->user($user);
         }
 
-        $this->_user = $user;
+        $this->user = $user;
 
         return $this;
     }
 
     /**
-     * @return Users_Row
+     * @return Users_Row|bool
      */
-    private function _getLogedInUser()
+    private function getLogedInUser()
     {
         $auth = Zend_Auth::getInstance();
 
@@ -79,7 +79,7 @@ class User extends AbstractHelper
             return false;
         }
 
-        return $this->_user($auth->getIdentity());
+        return $this->user($auth->getIdentity());
     }
 
     /**
@@ -87,7 +87,7 @@ class User extends AbstractHelper
      */
     public function logedIn()
     {
-        return (bool)$this->_getLogedInUser();
+        return (bool)$this->getLogedInUser();
     }
 
     /**
@@ -95,7 +95,7 @@ class User extends AbstractHelper
      */
     public function get()
     {
-        return $this->_user;
+        return $this->user;
     }
 
     public function __toString()
@@ -104,7 +104,7 @@ class User extends AbstractHelper
 
         try {
 
-            $user = $this->_user;
+            $user = $this->user;
 
             if ($user) {
 
@@ -151,7 +151,7 @@ class User extends AbstractHelper
 
     public function avatar()
     {
-        $user = $this->_user;
+        $user = $this->user;
 
         if ($user) {
             if ($user->img) {
@@ -183,9 +183,9 @@ class User extends AbstractHelper
      */
     public function isAllowed($resource = null, $privilege = null)
     {
-        return $this->_user
-            && $this->_user->role
-            && $this->acl->isAllowed($this->_user->role, $resource, $privilege);
+        return $this->user
+            && $this->user->role
+            && $this->acl->isAllowed($this->user->role, $resource, $privilege);
     }
 
     /**
@@ -194,22 +194,22 @@ class User extends AbstractHelper
      */
     public function inheritsRole($inherit)
     {
-        return $this->_user
-            && $this->_user->role
-            && $this->acl->inheritsRole($this->_user->role, $inherit);
+        return $this->user
+            && $this->user->role
+            && $this->acl->inheritsRole($this->user->role, $inherit);
     }
 
     public function timezone()
     {
-        return $this->_user && $this->_user->timezone
-            ? $this->_user->timezone
+        return $this->user && $this->user->timezone
+            ? $this->user->timezone
             : 'UTC';
     }
 
     public function humanTime($time = null)
     {
         if ($time === null) {
-            throw new Zend_View_Exception('Expected parameter $time was not provided.');
+            throw new InvalidArgumentException('Expected parameter $time was not provided.');
         }
 
         $tz = $this->timezone();
@@ -217,7 +217,6 @@ class User extends AbstractHelper
         if ($time instanceof DateTime) {
             $time->setTimezone(new DateTimeZone($tz));
         } else {
-            require_once 'Zend/Date.php';
             if (!($time instanceof Zend_Date)) {
                 $time = new Zend_Date($time);
             }
@@ -230,7 +229,7 @@ class User extends AbstractHelper
     public function humanDate($time = null)
     {
         if ($time === null) {
-            throw new Zend_View_Exception('Expected parameter $time was not provided.');
+            throw new InvalidArgumentException('Expected parameter $time was not provided.');
         }
 
         $tz = $this->timezone();
