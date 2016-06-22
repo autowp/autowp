@@ -76,6 +76,28 @@ return [
                     ]
                 ]
             ],
+            'donate' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/donate',
+                    'defaults' => [
+                        'controller' => Controller\DonateController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'success' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/success',
+                            'defaults' => [
+                                'action' => 'success',
+                            ],
+                        ]
+                    ]
+                ]
+            ],
             'factories' => [
                 'type' => Literal::class,
                 'options' => [
@@ -489,14 +511,15 @@ return [
                 $acl = $sm->get(Acl::class);
                 return new Controller\AboutController($acl);
             },
+            Controller\DonateController::class       => InvokableFactory::class,
             Controller\IndexController::class        => InvokableFactory::class,
             Controller\InfoController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
                 return new Controller\InfoController($textStorage);
             },
-            Controller\MapController::class          => InvokableFactory::class,
             Controller\LogController::class          => InvokableFactory::class,
             Controller\LoginController::class        => InvokableFactory::class,
+            Controller\MapController::class          => InvokableFactory::class,
             Controller\PulseController::class        => InvokableFactory::class,
             Controller\RulesController::class        => InvokableFactory::class,
             Controller\UsersController::class        => InvokableFactory::class,
@@ -576,6 +599,7 @@ return [
             'pageTitle'   => View\Helper\PageTitle::class,
             'breadcrumbs' => View\Helper\Breadcrumbs::class,
             'humanTime'   => View\Helper\HumanTime::class,
+            'markdown'    => View\Helper\Markdown::class,
         ],
         'factories' => [
             'mainMenu' => function($sm) {

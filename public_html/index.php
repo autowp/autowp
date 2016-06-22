@@ -1,7 +1,7 @@
 <?php
 
 $zf2uri = ['/api/', '/oauth', '/users/online', '/rules', '/about', '/info',
-    '/pulse', '/log/', '/map'];
+    '/pulse', '/log/', '/map', '/donate'];
 
 $zf2ExactUri = ['/log'];
 
