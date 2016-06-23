@@ -696,7 +696,8 @@ class Pic extends AbstractPlugin
             switch ($picture->type) {
                 case Picture::CAR_TYPE_ID:
                     if ($car) {
-                        $url = $controller->url()->fromRoute('moder/cars/car', [
+                        $url = $controller->url()->fromRoute('moder/cars/action/params', [
+                            'action' => 'car',
                             'car_id' => $car->id
                         ]);
                         $links[$url] = 'Управление автомобилем ' . $car->getFullName();

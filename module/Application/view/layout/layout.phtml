@@ -4,11 +4,6 @@
     $needRight = isset($this->layout()->needRight) ? $this->layout()->needRight : $this->needRight;
     $isAdminPage = isset($this->layout()->isAdminPage) ? $this->layout()->isAdminPage : $this->isAdminPage;
 
-    $moderMenu = '';
-    if (false && !$blankPage && $this->user()->logedIn() && $this->acl()->inheritsRole($this->user()->get()->role, 'moder')) {
-        $moderMenu = $this->action('moder-menu', 'index', 'moder');
-    }
-
     $mainMenu = '';
     if (!$blankPage) {
         $mainMenu = $this->mainMenu();
@@ -56,7 +51,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-KGMHT4');</script>
 
-        <?=$moderMenu ?>
+        <?php if (!$blankPage && $this->user()->inheritsRole('moder')) { ?>
+            <?=$this->moderMenu()?>
+        <?php } ?>
 
         <?php
             $spanLeft = $needLeft ? 4 : 0;

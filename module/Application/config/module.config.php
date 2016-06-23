@@ -389,16 +389,44 @@ return [
                                 'action'     => 'index'
                             ],
                         ],
-                        'may_terminate' => false,
+                        'may_terminate' => true,
                         'child_routes' => [
-                            'car' => [
+                            'action' => [
                                 'type' => Segment::class,
                                 'options' => [
-                                    'route' => '/car/car_id/:car_id',
-                                    'defaults' => [
-                                        'action' => 'car'
-                                    ],
+                                    'route' => '/:action',
                                 ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'params' => [
+                                        'type' => WildcardSafe::class
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'comments' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/comments',
+                            'defaults' => [
+                                'controller' => Controller\Moder\CommentsController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes' => [
+                            'action' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/:action',
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'params' => [
+                                        'type' => WildcardSafe::class
+                                    ]
+                                ]
                             ]
                         ]
                     ],
@@ -421,6 +449,31 @@ return [
                                         'action' => 'factory'
                                     ],
                                 ],
+                            ]
+                        ]
+                    ],
+                    'pages' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/pages',
+                            'defaults' => [
+                                'controller' => Controller\Moder\PagesController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes' => [
+                            'action' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/:action',
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'params' => [
+                                        'type' => WildcardSafe::class
+                                    ]
+                                ]
                             ]
                         ]
                     ],
@@ -754,6 +807,7 @@ return [
             'pic'         => View\Helper\Pic::class,
             'img'         => View\Helper\Img::class,
             'pictures'    => View\Helper\Pictures::class,
+            'moderMenu'   => View\Helper\ModerMenu::class,
         ],
         'factories' => [
             'mainMenu' => function($sm) {
