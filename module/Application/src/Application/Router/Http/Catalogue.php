@@ -872,19 +872,14 @@ class Catalogue implements RouteInterface
         $data = $params;
 
         $def = $this->_defaults;
-        if (!$reset) {
-            $def = array_merge($def, $this->_variables);
-        }
         $data = array_merge($def, $data);
 
-        if ($encode) {
-            foreach ($data as &$value) {
-                if (is_string($value)) {
-                    $value = urlencode($value);
-                } elseif (is_array($value)) {
-                    foreach ($value as &$sValue) {
-                        $sValue = urlencode($sValue);
-                    }
+        foreach ($data as &$value) {
+            if (is_string($value)) {
+                $value = urlencode($value);
+            } elseif (is_array($value)) {
+                foreach ($value as &$sValue) {
+                    $sValue = urlencode($sValue);
                 }
             }
         }
@@ -1118,7 +1113,7 @@ class Catalogue implements RouteInterface
                 break;
         }
 
-        return implode(self::DELIMETER, $url) . self::DELIMETER;
+        return self::DELIMETER . implode(self::DELIMETER, $url) . self::DELIMETER;
     }
 
     /**

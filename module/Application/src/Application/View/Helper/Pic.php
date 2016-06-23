@@ -4,6 +4,7 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
 
+use Picture;
 use Pictures_Row;
 
 class Pic extends AbstractHtmlElement

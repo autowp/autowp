@@ -7,6 +7,27 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Modification as ModificationTable;
 
+use Exception;
+
+use Application_Service_Specifications;
+use Brands;
+use Car_Parent;
+use Car_Language;
+use Cars;
+use Category;
+use Category_Language;
+use Comment_Message;
+use Comment_Topic;
+use Engines;
+use Picture;
+use Picture_View;
+use Pictures_Moder_Votes;
+use Users;
+
+use Zend_Db_Expr;
+use Zend_Db_Select;
+use Zend_Db_Table_Select;
+
 class Pic extends AbstractPlugin
 {
     /**
@@ -36,11 +57,11 @@ class Pic extends AbstractPlugin
             : $this->pictureViewTable = new Picture_View();
     }
 
-    public function href($row, array $options = array())
+    public function href($row, array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'fallback' => true
-        );
+        ];
         $options = array_replace($defaults, $options);
 
         $controller = $this->getController();
@@ -52,39 +73,33 @@ class Pic extends AbstractPlugin
             case Picture::LOGO_TYPE_ID:
                 $brandRow = $brandTable->find($row['brand_id'])->current();
                 if ($brandRow) {
-                    $url = $controller->url(array(
-                        'module'        => 'default',
-                        'controller'    => 'catalogue',
+                    $url = $controller->url()->fromRoute('catalogue', [
                         'action'        => 'logotypes-picture',
                         'brand_catname' => $brandRow->folder,
                         'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
-                    ), 'catalogue', true);
+                    ]);
                 }
                 break;
 
             case Picture::MIXED_TYPE_ID:
                 $brandRow = $brandTable->find($row['brand_id'])->current();
                 if ($brandRow) {
-                    $url = $controller->url(array(
-                        'module'        => 'default',
-                        'controller'    => 'catalogue',
+                    $url = $controller->url()->fromRoute('catalogue', [
                         'action'        => 'mixed-picture',
                         'brand_catname' => $brandRow->folder,
                         'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
-                    ), 'catalogue', true);
+                    ]);
                 }
                 break;
 
             case Picture::UNSORTED_TYPE_ID:
                 $brandRow = $brandTable->find($row['brand_id'])->current();
                 if ($brandRow) {
-                    $url = $controller->url(array(
-                        'module'        => 'default',
-                        'controller'    => 'catalogue',
+                    $url = $controller->url()->fromRoute('catalogue', [
                         'action'        => 'other-picture',
                         'brand_catname' => $brandRow->folder,
                         'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
-                    ), 'catalogue', true);
+                    ]);
                 }
                 break;
 
@@ -98,15 +113,13 @@ class Pic extends AbstractPlugin
                     if (count($paths) > 0) {
                         $path = $paths[0];
 
-                        $url = $controller->url(array(
-                            'module'        => 'default',
-                            'controller'    => 'catalogue',
+                        $url = $controller->url()->fromRoute('catalogue', [
                             'action'        => 'brand-car-picture',
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
                             'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
-                        ), 'catalogue', true);
+                        ]);
                     }
                 }
                 break;
@@ -130,14 +143,12 @@ class Pic extends AbstractPlugin
                     } while ($parentId && !$brandRow);
 
                     if ($brandRow && $path) {
-                        $url = $controller->url(array(
-                            'module'        => 'default',
-                            'controller'    => 'catalogue',
+                        $url = $controller->url()->fromRoute('catalogue', [
                             'action'        => 'engine-picture',
                             'brand_catname' => $brandRow['folder'],
                             'path'          => array_reverse($path),
                             'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
-                        ), 'catalogue', true);
+                        ]);
                     }
                 }
                 break;
@@ -161,7 +172,7 @@ class Pic extends AbstractPlugin
         ], true);
     }
 
-    public function listData($pictures, array $options = array())
+    public function listData($pictures, array $options = [])
     {
         $defaults = array(
             'width'            => null,
@@ -184,30 +195,28 @@ class Pic extends AbstractPlugin
         }
 
         $controller = $this->getController();
-        $userHelper = $controller->getHelper('user');
-        $urlHelper = $controller->getHelper('url');
-        $imageStorage = $controller->getHelper('imageStorage')->direct();
-        $isModer = $userHelper->inheritsRole('pictures-moder');
+        $imageStorage = $controller->imageStorage();
+        $isModer = $controller->user()->inheritsRole('pictures-moder');
         $userId = null;
-        if ($userHelper->logedIn()) {
-            $user = $userHelper->get();
+        if ($controller->user()->logedIn()) {
+            $user = $controller->user()->get();
             $userId = $user ? $user->id : null;
         }
 
-        $language = $controller->getHelper('language')->direct();
+        $language = $controller->language();
 
-        $ids = array();
+        $ids = [];
 
         if (is_array($pictures)) {
 
-            $rows = array();
+            $rows = [];
             foreach ($pictures as $picture) {
                 $ids[] = $picture['id'];
                 $rows[] = $picture->toArray();
             }
 
             // moder votes
-            $moderVotes = array();
+            $moderVotes = [];
             if (count($ids)) {
                 $moderVoteTable = $this->getModerVoteTable();
                 $db = $moderVoteTable->getAdapter();
@@ -232,13 +241,13 @@ class Pic extends AbstractPlugin
             }
 
             // views
-            $views = array();
+            $views = [];
             if (!$options['disableBehaviour']) {
                 $views = $this->getPictureViewTable()->getValues($ids);
             }
 
             // messages
-            $messages = array();
+            $messages = [];
             if (!$options['disableBehaviour'] && count($ids)) {
                 $ctTable = new Comment_Topic();
                 $db = $ctTable->getAdapter();
@@ -281,7 +290,7 @@ class Pic extends AbstractPlugin
             $db = $table->getAdapter();
 
             $select = clone $pictures;
-            $bind = array();
+            $bind = [];
 
             $select
                 ->reset(Zend_Db_Select::COLUMNS)
@@ -326,7 +335,7 @@ class Pic extends AbstractPlugin
         //print $select;
 
         // prefetch
-        $requests = array();
+        $requests = [];
         foreach ($rows as $idx => $picture) {
             $requests[$idx] = Pictures_Row::buildFormatRequest($picture);
         }
@@ -354,7 +363,7 @@ class Pic extends AbstractPlugin
         $brandTable = new Brands();
         $carParentTable = new Car_Parent();
 
-        $items = array();
+        $items = [];
         foreach ($rows as $idx => $row) {
 
             $id = (int)$row['id'];
@@ -408,30 +417,28 @@ class Pic extends AbstractPlugin
         );
     }
 
-    public function picPageData($picture, $picSelect, $brandIds = array())
+    public function picPageData($picture, $picSelect, $brandIds = [])
     {
         $controller = $this->getController();
-        $userHelper = $controller->getHelper('user');
-        $catalogue = $controller->getHelper('catalogue')->getCatalogue();
-        $urlHelper = $controller->getHelper('url');
-        $imageStorage = $controller->getHelper('imageStorage')->direct();
+        $catalogue = $controller->catalogue();
+        $imageStorage = $controller->imageStorage();
 
-        $isModer = $userHelper->direct()->inheritsRole('moder');
+        $isModer = $controller->user()->inheritsRole('moder');
 
         $pictureTable = $catalogue->getPictureTable();
         $db = $pictureTable->getAdapter();
 
         $engine = null;
-        $engineCars = array();
+        $engineCars = [];
         $engineHasSpecs = false;
         $engineSpecsUrl = false;
         $factory = null;
-        $factoryCars = array();
+        $factoryCars = [];
         $factoryCarsMore = false;
-        $altNames2 = array();
+        $altNames2 = [];
         $currentLangName = null;
         $designProject = null;
-        $categories = array();
+        $categories = [];
 
         $car = null;
         $carDetailsUrl = null;
@@ -463,14 +470,12 @@ class Pic extends AbstractPlugin
                             foreach ($cataloguePaths as $cPath) {
                                 $engineCars[] = array(
                                     'name' => $carRow->getFullName($language),
-                                    'url'  => $urlHelper->url(array(
-                                        'module'        => 'default',
-                                        'controller'    => 'catalogue',
+                                    'url'  => $controller->url()->fromRoute('catalogue', [
                                         'action'        => 'brand-car',
                                         'brand_catname' => $cPath['brand_catname'],
                                         'car_catname'   => $cPath['car_catname'],
                                         'path'          => $cPath['path']
-                                    ), 'catalogue', true)
+                                    ])
                                 );
                                 break;
                             }
@@ -487,13 +492,11 @@ class Pic extends AbstractPlugin
                         ));
 
                         foreach ($cataloguePaths as $cataloguePath) {
-                            $engineSpecsUrl = $urlHelper->url(array(
-                                'module'        => 'default',
-                                'controller'    => 'catalogue',
+                            $engineSpecsUrl = $controller->url()->fromRoute('catalogue', [
                                 'action'        => 'engine-specs',
                                 'brand_catname' => $cataloguePath['brand_catname'],
                                 'path'          => $cataloguePath['path']
-                            ), 'catalogue', true);
+                            ]);
                         }
                     }
 
@@ -520,7 +523,7 @@ class Pic extends AbstractPlugin
                         $limit = 10;
 
                         if (count($carRows) > $limit) {
-                            $a = array();
+                            $a = [];
                             foreach ($carRows as $carRow) {
                                 $a[] = $carRow;
                             }
@@ -534,14 +537,12 @@ class Pic extends AbstractPlugin
                             foreach ($cataloguePaths as $cPath) {
                                 $factoryCars[] = array(
                                     'name' => $carRow->getFullName($language),
-                                    'url'  => $urlHelper->url(array(
-                                        'module'        => 'default',
-                                        'controller'    => 'catalogue',
+                                    'url'  => $controller->url()->fromRoute('catalogue', [
                                         'action'        => 'brand-car',
                                         'brand_catname' => $cPath['brand_catname'],
                                         'car_catname'   => $cPath['car_catname'],
                                         'path'          => $cPath['path']
-                                    ), 'catalogue', true)
+                                    ])
                                 );
                                 break;
                             }
@@ -561,7 +562,7 @@ class Pic extends AbstractPlugin
                     );
 
                     // alt names
-                    $altNames = array();
+                    $altNames = [];
 
                     $carLangTable = new Car_Language();
                     $carLangRows = $carLangTable->fetchAll(array(
@@ -572,7 +573,7 @@ class Pic extends AbstractPlugin
                     foreach ($carLangRows as $carLangRow) {
                         $name = $carLangRow->name;
                         if (!isset($altNames[$name])) {
-                            $altNames[$carLangRow->name] = array();
+                            $altNames[$carLangRow->name] = [];
                         }
                         $altNames[$name][] = $carLangRow->language;
 
@@ -608,12 +609,11 @@ class Pic extends AbstractPlugin
                     if ($designCarsRow) {
                         $designProject = array(
                             'brand' => $designCarsRow['brand_name'],
-                            'url'   => $urlHelper->url(array(
-                                'controller'    => 'catalogue',
+                            'url'   => $controller->url()->fromRoute('catalogue', [
                                 'action'        => 'brand-car',
                                 'brand_catname' => $designCarsRow['brand_catname'],
                                 'car_catname'   => $designCarsRow['brand_car_catname']
-                            ), 'catalogue', true)
+                            ])
                         );
                     }
 
@@ -635,24 +635,20 @@ class Pic extends AbstractPlugin
                         ));
                         $categories[$row->id] = array(
                             'name' => $lRow ? $lRow->name : $row->name,
-                            'url'  => $urlHelper->url(array(
-                                'controller'       => 'category',
-                                'action'           => 'category',
+                            'url'  => $controller->url()->fromRoute('categories/category', [
                                 'category_catname' => $row['catname'],
-                            ), 'category', true)
+                            ])
                         );
                     }
 
                     if ($car->full_text_id) {
                         foreach ($catalogue->cataloguePaths($car) as $path) {
-                            $carDetailsUrl = $urlHelper->url(array(
-                                'module'        => 'default',
-                                'controller'    => 'catalogue',
+                            $carDetailsUrl = $controller->url()->fromRoute('catalogue', [
                                 'action'        => 'brand-car',
                                 'brand_catname' => $path['brand_catname'],
                                 'car_catname'   => $path['car_catname'],
                                 'path'          => $path['path']
-                            ), 'catalogue', true);
+                            ]);
                             break;
                         }
                     }
@@ -663,7 +659,7 @@ class Pic extends AbstractPlugin
 
 
         // ссылки на офсайты
-        $ofLinks = array();
+        $ofLinks = [];
         $linksTable = new BrandLink();
         if (count($brandIds)) {
             $links = $linksTable->fetchAll(
@@ -684,31 +680,25 @@ class Pic extends AbstractPlugin
             $replacePicture = $picHelper->href($replacePictureRow->toArray());
 
             if ($replacePictureRow->status == Picture::STATUS_REMOVING) {
-                if (!$userHelper->direct()->inheritsRole('moder')) {
+                if (!$controller->user()->inheritsRole('moder')) {
                     $replacePicture = null;
                 }
             }
         }
 
-        $moderLinks = array();
+        $moderLinks = [];
         if ($isModer) {
-            $links = array();
-            $links[$urlHelper->url(array(
-                'module'     => 'moder',
-                'controller' => 'pictures',
-                'action'     => 'picture',
+            $links = [];
+            $links[$controller->url()->fromRoute('moder/pictures/picture', [
                 'picture_id' => $picture->id
-            ), 'default', true)] = 'Управление изображением №'.$picture->id;
+            ])] = 'Управление изображением №'.$picture->id;
 
             switch ($picture->type) {
                 case Picture::CAR_TYPE_ID:
                     if ($car) {
-                        $url = $urlHelper->url(array(
-                            'module'     => 'moder',
-                            'controller' => 'cars',
-                            'action'     => 'car',
-                            'car_id'     => $car->id
-                        ), 'default', true);
+                        $url = $controller->url()->fromRoute('moder/cars/car', [
+                            'car_id' => $car->id
+                        ]);
                         $links[$url] = 'Управление автомобилем ' . $car->getFullName();
 
                         $brandTable = new Brands();
@@ -722,12 +712,9 @@ class Pic extends AbstractPlugin
                         );
 
                         foreach ($brandRows as $brand) {
-                            $url = $urlHelper->url(array(
-                                'module'     => 'moder',
-                                'controller' => 'brands',
-                                'action'     => 'brand',
+                            $url = $controller->url()->fromRoute('moder/brands/brand', [
                                 'brand_id'   => $brand->id
-                            ), 'default', true);
+                            ]);
                             $links[$url] = 'Управление брендом ' . $brand->caption;
                         }
 
@@ -737,24 +724,18 @@ class Pic extends AbstractPlugin
 
                 case Picture::ENGINE_TYPE_ID:
                     if ($engine = $picture->findParentEngines()) {
-                        $url = $urlHelper->url(array(
-                            'module'     => 'moder',
-                            'controller' => 'engines',
-                            'action'     => 'engine',
+                        $url = $controller->url()->fromRoute('moder/engines/engine', [
                             'engine_id'  => $engine->id
-                        ), 'default', true);
+                        ]);
                         $links[$url] = 'Управление двигателем ' . $engine->caption;
                     }
                     break;
 
                 case Picture::FACTORY_TYPE_ID:
                     if ($factory = $picture->findParentFactory()) {
-                        $links[$urlHelper->url(array(
-                            'module'     => 'moder',
-                            'controller' => 'factory',
-                            'action'     => 'factory',
+                        $links[$controller->url()->fromRoute('moder/factories/factory', [
                             'factory_id' => $factory->id
-                        ), 'default', true)] = 'Управление заводом ' . $factory->name;
+                        ])] = 'Управление заводом ' . $factory->name;
                     }
                     break;
 
@@ -762,12 +743,9 @@ class Pic extends AbstractPlugin
                 case Picture::LOGO_TYPE_ID:
                 case Picture::UNSORTED_TYPE_ID:
                     if ($brand = $picture->findParentBrands()) {
-                        $url = $urlHelper->url(array(
-                            'module'     => 'moder',
-                            'controller' => 'brands',
-                            'action'     => 'brand',
+                        $url = $controller->url()->fromRoute('moder/brands/brand', [
                             'brand_id'   => $brand->id
-                        ), 'default', true);
+                        ]);
                         $links[$url] = 'Управление брендом ' . $brand->caption;
                     }
                     break;
@@ -778,7 +756,7 @@ class Pic extends AbstractPlugin
 
         $userTable = new Users();
 
-        $moderVotes = array();
+        $moderVotes = [];
         foreach ($picture->findPictures_Moder_Votes() as $moderVote) {
             $moderVotes[] = array(
                 'vote'   => $moderVote->vote,
@@ -842,9 +820,9 @@ class Pic extends AbstractPlugin
 
                 foreach($pageNumbers as $page => &$val) {
                     $pic = $paginatorPictures[$page - 1];
-                    $val = $urlHelper->url(array(
+                    $val = $controller->url()->fromRoute('picture', [
                         'picture_id' => $pic['identity'] ? $pic['identity'] : $pic['id']
-                    ));
+                    ]);
                 }
                 unset($val);
 
@@ -881,15 +859,13 @@ class Pic extends AbstractPlugin
                 if (count($paths) > 0) {
                     $path = $paths[0];
 
-                    $url = $urlHelper->url(array(
-                        'module'        => 'default',
-                        'controller'    => 'catalogue',
+                    $url = $controller->url()->fromRoute('catalogue', [
                         'action'        => 'brand-car-pictures',
                         'brand_catname' => $path['brand_catname'],
                         'car_catname'   => $path['car_catname'],
                         'path'          => $path['path'],
                         'mod'           => $mRow->id
-                    ), 'catalogue', true);
+                    ]);
                 }
             }
 
@@ -961,17 +937,15 @@ class Pic extends AbstractPlugin
     {
         $galleryStatuses = array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW);
 
-        $gallery = array();
+        $gallery = [];
 
         $controller = $this->getController();
-        $userHelper = $controller->getHelper('user');
-        $catalogue = $controller->getHelper('catalogue')->getCatalogue();
-        $urlHelper = $controller->getHelper('Url');
-        $imageStorage = $controller->getHelper('imageStorage')->direct();
+        $catalogue = $controller->catalogue();
+        $imageStorage = $controller->getHelper('imageStorage');
 
         $view = $controller->view;
 
-        $language = $controller->getHelper('language')->direct();
+        $language = $controller->language();
 
         $select = clone $picSelect;
 
@@ -995,9 +969,9 @@ class Pic extends AbstractPlugin
 
 
         // prefetch
-        $fullRequests = array();
-        $cropRequests = array();
-        $imageIds = array();
+        $fullRequests = [];
+        $cropRequests = [];
+        $imageIds = [];
         foreach ($rows as $idx => $picture) {
             $request = Pictures_Row::buildFormatRequest($picture);
             $fullRequests[$idx] = $request;
@@ -1022,8 +996,8 @@ class Pic extends AbstractPlugin
 
         // comments
         $userId = null;
-        if ($userHelper->direct()->logedIn()) {
-            $userId = $userHelper->direct()->get()->id;
+        if ($controller->user()->logedIn()) {
+            $userId = $controller->user()->get()->id;
         }
 
         if ($userId) {
@@ -1072,10 +1046,10 @@ class Pic extends AbstractPlugin
 
                     $name = isset($names[$id]) ? $names[$id] : null;
 
-                    $url = $urlHelper->url(array(
+                    $url = $catalogue->url()->fromRoute('picture', [
                         'picture_id' => $row['identity'] ? $row['identity'] : $id,
                         'gallery'    => null
-                    ));
+                    ]);
 
                     $gallery[] = array(
                         'id'          => $id,
@@ -1095,7 +1069,7 @@ class Pic extends AbstractPlugin
         return $gallery;
     }
 
-    public function gallery2(Zend_Db_Table_Select $picSelect, array $options = array())
+    public function gallery2(Zend_Db_Table_Select $picSelect, array $options = [])
     {
         $defaults = array(
             'page'      => 1,
@@ -1109,12 +1083,11 @@ class Pic extends AbstractPlugin
 
         $galleryStatuses = array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW);
 
-        $gallery = array();
+        $gallery = [];
 
         $controller = $this->getController();
         $userHelper = $controller->getHelper('user');
         $catalogue = $controller->getHelper('catalogue')->getCatalogue();
-        $urlHelper = $controller->getHelper('Url');
         $imageStorage = $controller->getHelper('imageStorage')->direct();
 
         $view = $controller->view;
@@ -1180,9 +1153,9 @@ class Pic extends AbstractPlugin
 
         // prefetch
         $ids = [];
-        $fullRequests = array();
-        $cropRequests = array();
-        $imageIds = array();
+        $fullRequests = [];
+        $cropRequests = [];
+        $imageIds = [];
         foreach ($rows as $idx => $picture) {
             $request = Pictures_Row::buildFormatRequest($picture);
             $fullRequests[$idx] = $request;
@@ -1207,8 +1180,8 @@ class Pic extends AbstractPlugin
 
         // comments
         $userId = null;
-        if ($userHelper->direct()->logedIn()) {
-            $userId = $userHelper->direct()->get()->id;
+        if ($controller->user()->logedIn()) {
+            $userId = $controller->user()->get()->id;
         }
 
         if ($userId) {
@@ -1264,10 +1237,10 @@ class Pic extends AbstractPlugin
                         $name = $view->escape($name);
                     }
 
-                    $url = $urlHelper->url(array_replace($options['urlParams'], array(
+                    $url = $controller->url()->fromRoute($route, array_replace($options['urlParams'], array(
                         'picture_id' => $row['identity'] ? $row['identity'] : $id,
                         'gallery'    => null,
-                    )), $route);
+                    )));
 
                     $gallery[] = array(
                         'id'          => $id,

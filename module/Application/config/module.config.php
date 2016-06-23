@@ -55,6 +55,21 @@ return [
                     ],
                 ],
             ],
+            'cars' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/cars/:action',
+                    'defaults' => [
+                        'controller' => Controller\CarsController::class,
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'params' => [
+                        'type' => WildcardSafe::class
+                    ]
+                ]
+            ],
             'catalogue' => [
                 'type' => \Application\Router\Http\Catalogue::class,
                 'options' => [
@@ -147,6 +162,15 @@ return [
                             'route' => '/factory/id/:id',
                             'defaults' => [
                                 'action' => 'factory',
+                            ],
+                        ]
+                    ],
+                    'factory-cars' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/factory-cars/id/:id',
+                            'defaults' => [
+                                'action' => 'factory-cars',
                             ],
                         ]
                     ]
@@ -292,6 +316,28 @@ return [
                     ],
                 ],
             ],
+            'twins' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/twins',
+                    'defaults' => [
+                        'controller' => Controller\TwinsController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'group' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/group:id',
+                            'defaults' => [
+                                'action' => 'group',
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'users' => [
                 'type' => Literal::class,
                 'options' => [
@@ -319,6 +365,63 @@ return [
                             'defaults' => [
                                 'action' => 'online',
                             ],
+                        ]
+                    ],
+                ]
+            ],
+            'moder' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/moder',
+                    'defaults' => [
+                        'controller' => Controller\Moder\IndexController::class,
+                        'action'     => 'index'
+                    ],
+                ],
+                'may_terminate' => false,
+                'child_routes' => [
+                    'cars' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/cars',
+                            'defaults' => [
+                                'controller' => Controller\Moder\CarController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'car' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/car/car_id/:car_id',
+                                    'defaults' => [
+                                        'action' => 'car'
+                                    ],
+                                ],
+                            ]
+                        ]
+                    ],
+                    'factories' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/factory',
+                            'defaults' => [
+                                'controller' => Controller\Moder\FactoryController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => false,
+                        'child_routes' => [
+                            'factory' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/factory/factory_id/:factory_id',
+                                    'defaults' => [
+                                        'action' => 'factory'
+                                    ],
+                                ],
+                            ]
                         ]
                     ],
                 ]
@@ -545,6 +648,7 @@ return [
             },
             Controller\CommentsController::class     => InvokableFactory::class,
             Controller\DonateController::class       => InvokableFactory::class,
+            Controller\FactoriesController::class    => InvokableFactory::class,
             Controller\IndexController::class        => InvokableFactory::class,
             Controller\InfoController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
@@ -591,9 +695,14 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
-            'pic'  => Controller\Plugin\Pic::class,
+            'pic'       => Controller\Plugin\Pic::class,
+            'catalogue' => Controller\Plugin\Catalogue::class,
         ],
         'factories' => [
+            'car' => function ($sm) {
+                $textStorage = $sm->get(TextStorage\Service::class);
+                return new Controller\Plugin\Car($textStorage);
+            },
             'imageStorage' => function($sm) {
                 $storage = $sm->get(Image\Storage::class);
                 return new Controller\Plugin\ImageStorage($storage);
@@ -602,6 +711,10 @@ return [
             'user' => function($sm) {
                 $acl = $sm->get(Acl::class);
                 return new Controller\Plugin\User($acl);
+            },
+            'language' => function($sm) {
+                $language = $sm->get(Language::class);
+                return new Controller\Plugin\Language($language);
             },
         ]
     ],
@@ -626,6 +739,7 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            'car'         => View\Helper\Car::class,
             'pageEnv'     => View\Helper\PageEnv::class,
             'page'        => View\Helper\Page::class,
             'htmlA'       => View\Helper\HtmlA::class,
