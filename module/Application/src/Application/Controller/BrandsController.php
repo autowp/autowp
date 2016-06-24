@@ -22,9 +22,11 @@ class BrandsController extends AbstractActionController
 
     public function indexAction()
     {
+        $isHttps = (bool)$this->getRequest()->getServer('HTTPS');
+
         $language = $this->language();
 
-        $cacheKey = 'brands_list_5_' . $language;
+        $cacheKey = 'brands_list_6_' . $language . '_' . ($isHttps ? 'HTTPS' : 'HTTP');
 
         $items = $this->cache->getItem($cacheKey, $success);
         if (!$success) {

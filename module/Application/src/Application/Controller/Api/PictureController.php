@@ -12,20 +12,10 @@ use Picture;
 
 class PictureController extends AbstractActionController
 {
-    /**
-     * @var Image\Storage
-     */
-    private $imageStorage;
-
     private function serverUrl($url)
     {
         $helper = new \Zend\View\Helper\ServerUrl();
         return $helper->__invoke($url);
-    }
-
-    public function __construct(Image\Storage $imageStorage)
-    {
-        $this->imageStorage = $imageStorage;
     }
 
     public function randomPictureAction()
@@ -44,7 +34,7 @@ class PictureController extends AbstractActionController
         ];
 
         if ($pictureRow) {
-            $imageInfo = $this->imageStorage->getImage($pictureRow->image_id);
+            $imageInfo = $this->imageStorage()->getImage($pictureRow->image_id);
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
@@ -72,7 +62,7 @@ class PictureController extends AbstractActionController
         ];
 
         if ($pictureRow) {
-            $imageInfo = $this->imageStorage->getImage($pictureRow->image_id);
+            $imageInfo = $this->imageStorage()->getImage($pictureRow->image_id);
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
@@ -135,7 +125,7 @@ class PictureController extends AbstractActionController
         ];
 
         if ($pictureRow) {
-            $imageInfo = $this->imageStorage->getImage($pictureRow->image_id);
+            $imageInfo = $this->imageStorage()->getImage($pictureRow->image_id);
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),

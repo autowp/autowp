@@ -13,8 +13,6 @@ class ImageStorage extends AbstractPlugin
     public function __construct(Image\Storage $imageStorage)
     {
         $this->imageStorage = $imageStorage;
-
-        //$this->imageStorage->setForceHttps($this->getController()->getRequest()->isSecure());
     }
 
     public function __invoke()

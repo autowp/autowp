@@ -752,10 +752,7 @@ return [
             Controller\RulesController::class        => InvokableFactory::class,
             Controller\UsersController::class        => InvokableFactory::class,
             Controller\Api\ContactsController::class => InvokableFactory::class,
-            Controller\Api\PictureController::class => function($sm) {
-                $imageStorage = $sm->get(Image\Storage::class);
-                return new Controller\Api\PictureController($imageStorage);
-            },
+            Controller\Api\PictureController::class  => InvokableFactory::class,
             Controller\Api\UsersController::class => InvokableFactory::class,
             Controller\Console\BuildController::class => InvokableFactory::class,
             Controller\Console\ImageStorageController::class => InvokableFactory::class,
@@ -910,8 +907,17 @@ return [
         'factories' => [
             Image\Storage::class => function($sm) {
                 $config = $sm->get('Config')['imageStorage'];
+                $storage = new Image\Storage($config);
 
-                return new Image\Storage($config);
+                $request = $sm->get('Request');
+                //var_dump(get_class($request)); exit;
+                if ($request instanceof \Zend\Http\Request) {
+                    if ($request->getUri()->getScheme() == 'https') {
+                        $storage->setForceHttps(true);
+                    }
+                }
+
+                return $storage;
             },
             Service\UsersService::class => function($sm) {
                 $config = $sm->get('Config')['users'];
