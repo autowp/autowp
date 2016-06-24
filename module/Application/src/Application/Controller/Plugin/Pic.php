@@ -22,6 +22,7 @@ use Engines;
 use Picture;
 use Picture_View;
 use Pictures_Moder_Votes;
+use Pictures_Row;
 use Users;
 
 use Zend_Db_Expr;

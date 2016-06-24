@@ -110,7 +110,7 @@ class User extends AbstractHelper
 
                 if ($user->deleted) {
                     return '<span class="muted"><i class="fa fa-user"></i> ' .
-                               $this->view->escape($this->view->translate('deleted-user')).
+                               $this->view->escapeHtml($this->view->translate('deleted-user')).
                            '</span>';
                 }
 

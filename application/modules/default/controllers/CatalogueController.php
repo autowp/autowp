@@ -33,7 +33,7 @@ class CatalogueController extends Zend_Controller_Action
      * @param string $pictureId
      * @return Picture_Row
      */
-    private function _fetchSelectPicture(Zend_Db_Table_Select $select, $pictureId)
+    private function fetchSelectPicture(Zend_Db_Table_Select $select, $pictureId)
     {
         $selectRow = clone $select;
 
@@ -58,9 +58,9 @@ class CatalogueController extends Zend_Controller_Action
      *
      * @return Zend_Db_Table_Select
      */
-    private function _selectOrderFromPictures($onlyAccepted = true)
+    private function selectOrderFromPictures($onlyAccepted = true)
     {
-        return $this->_selectFromPictures($onlyAccepted)
+        return $this->selectFromPictures($onlyAccepted)
             ->order($this->_helper->catalogue()->picturesOrdering());
     }
 
@@ -68,7 +68,7 @@ class CatalogueController extends Zend_Controller_Action
      *
      * @return Zend_Db_Table_Select
      */
-    private function _selectFromPictures($onlyAccepted = true)
+    private function selectFromPictures($onlyAccepted = true)
     {
         $select = $this->_helper->catalogue()->getPictureTable()->select(true);
 
@@ -86,38 +86,26 @@ class CatalogueController extends Zend_Controller_Action
      * @param int $page
      * @return Zend_Paginator
      */
-    private function _carsPaginator(Zend_Db_Table_Select $select, $page)
+    private function carsPaginator(Zend_Db_Table_Select $select, $page)
     {
         return Zend_Paginator::factory($select)
             ->setItemCountPerPage($this->_helper->catalogue()->getCarsPerPage())
             ->setCurrentPageNumber($page);
     }
 
-    private function _perspectivesGroupsIds($pageId)
-    {
-        $pgTable = new Perspectives_Groups();
-
-        return $pgTable->getAdapter()->fetchCol(
-            $pgTable->getAdapter()->select()
-                ->from($pgTable->info('name'), 'id')
-                ->where('page_id = ?', $pageId)
-                ->order('position')
-        );
-    }
-
-    private function _carsOrder()
+    private function carsOrder()
     {
         return $this->_helper->catalogue()->carsOrdering();
     }
 
-    private function _picturesPaginator(Zend_Db_Table_Select $select, $page)
+    private function picturesPaginator(Zend_Db_Table_Select $select, $page)
     {
         return Zend_Paginator::factory($select)
             ->setItemCountPerPage($this->_helper->catalogue()->getPicturesPerPage())
             ->setCurrentPageNumber($page);
     }
 
-    private function _getCarShortName($brand, $carName)
+    private function getCarShortName($brand, $carName)
     {
         $shortCaption = $carName;
         $patterns = array(
@@ -138,7 +126,7 @@ class CatalogueController extends Zend_Controller_Action
     {
         $this->_brandAction(function($brand) {
 
-            $select = $this->_selectFromPictures()
+            $select = $this->selectFromPictures()
                 ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
@@ -152,7 +140,7 @@ class CatalogueController extends Zend_Controller_Action
                     'pictures.id DESC'
                 ));
 
-            $paginator = $this->_picturesPaginator($select, $this->getParam('page'));
+            $paginator = $this->picturesPaginator($select, $this->getParam('page'));
 
             if ($paginator->getTotalItemCount() <= 0) {
                 return $this->forward('notfound', 'error');
@@ -186,9 +174,9 @@ class CatalogueController extends Zend_Controller_Action
                 ->where('cars.is_concept')
                 ->where('not cars.is_concept_inherit')
                 ->group('cars.id')
-                ->order($this->_carsOrder());
+                ->order($this->carsOrder());
 
-            $paginator = $this->_carsPaginator($select, $this->getParam('page'));
+            $paginator = $this->carsPaginator($select, $this->getParam('page'));
 
             if ($paginator->getTotalItemCount() <= 0) {
                 return $this->forward('notfound', 'error');
@@ -360,12 +348,12 @@ class CatalogueController extends Zend_Controller_Action
                 ->where('cars.begin_year or cars.begin_model_year')
                 ->where('not cars.is_group')
                 ->group('cars.id')
-                ->order($this->_carsOrder());
+                ->order($this->carsOrder());
             if ($cartype) {
                 $select->where('cars.car_type_id = ?', $cartype->id);
             }
 
-            $paginator = $this->_carsPaginator($select, $this->getParam('page'));
+            $paginator = $this->carsPaginator($select, $this->getParam('page'));
 
             if (!$paginator->getTotalItemCount()) {
                 return $this->forward('notfound', 'error');
@@ -552,7 +540,7 @@ class CatalogueController extends Zend_Controller_Action
             $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_5_' . $language;
             if (!($topPictures = $cache->load($key))) {
 
-                $select = $this->_selectOrderFromPictures()
+                $select = $this->selectOrderFromPictures()
                     ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
@@ -657,9 +645,9 @@ class CatalogueController extends Zend_Controller_Action
      * @param int $type
      * @return Zend_Db_Table_Select
      */
-    private function _typePicturesSelect($brandId, $type, $onlyAccepted = true)
+    private function typePicturesSelect($brandId, $type, $onlyAccepted = true)
     {
-        return $this->_selectOrderFromPictures($onlyAccepted)
+        return $this->selectOrderFromPictures($onlyAccepted)
             ->where('pictures.brand_id = ?', $brandId)
             ->where('pictures.type = ?', $type);
     }
@@ -668,9 +656,9 @@ class CatalogueController extends Zend_Controller_Action
     {
         $this->_brandAction(function($brand) use ($type) {
 
-            $select = $this->_typePicturesSelect($brand['id'], $type);
+            $select = $this->typePicturesSelect($brand['id'], $type);
 
-            $paginator = $this->_picturesPaginator($select, $this->getParam('page'));
+            $paginator = $this->picturesPaginator($select, $this->getParam('page'));
 
             if ($paginator->getTotalItemCount() <= 0) {
                 return $this->forward('notfound', 'error');
@@ -721,7 +709,7 @@ class CatalogueController extends Zend_Controller_Action
     {
         $this->_brandAction(function($brand) use ($type) {
 
-            $select = $this->_typePicturesSelect($brand['id'], $type, false);
+            $select = $this->typePicturesSelect($brand['id'], $type, false);
 
             $this->_pictureAction($select, function($select, $picture) use ($brand, $type) {
 
@@ -732,7 +720,7 @@ class CatalogueController extends Zend_Controller_Action
                             'gallery2'   => true,
                             'galleryUrl' => $this->_helper->url->url([
                                 'action'  => str_replace('-picture', '-gallery', $this->getParam('action')),
-                                'gallery' => $this->_galleryType($picture)
+                                'gallery' => $this->galleryType($picture)
                             ])
                         ]
                     )
@@ -767,7 +755,7 @@ class CatalogueController extends Zend_Controller_Action
     {
         $this->_brandAction(function($brand) use ($type) {
 
-            $select = $this->_typePicturesSelect($brand['id'], $type, false);
+            $select = $this->typePicturesSelect($brand['id'], $type, false);
 
             switch ($this->getParam('gallery')) {
                 case 'inbox':
@@ -889,7 +877,7 @@ class CatalogueController extends Zend_Controller_Action
             $engines = array();
             foreach ($paginator->getCurrentItems() as $engine) {
                 $pictureRows = $pictureTable->fetchAll(
-                    $this->_selectFromPictures()
+                    $this->selectFromPictures()
                         ->join('engine_parent_cache', 'pictures.engine_id = engine_parent_cache.engine_id', null)
                         ->where('engine_parent_cache.parent_id = ?', $engine->id)
                         ->where('pictures.type = ?', Picture::ENGINE_TYPE_ID)
@@ -921,7 +909,7 @@ class CatalogueController extends Zend_Controller_Action
                 $morePictures = $picturesLimit - count($pictures);
                 if ($morePictures > 0) {
                     $pictureRows = $pictureTable->fetchAll(
-                        $this->_selectFromPictures()
+                        $this->selectFromPictures()
                             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
                             ->where('pictures.perspective_id = ?', 17) // under the hood
                             ->join('cars', 'pictures.car_id = cars.id', null)
@@ -1152,7 +1140,7 @@ class CatalogueController extends Zend_Controller_Action
 
     private function _enginePicturesSelect($engine, $onlyAccepted = true)
     {
-        return $this->_selectOrderFromPictures($onlyAccepted)
+        return $this->selectOrderFromPictures($onlyAccepted)
             ->where('pictures.type = ?', Picture::ENGINE_TYPE_ID)
             ->join('engine_parent_cache', 'pictures.engine_id = engine_parent_cache.engine_id', null)
             ->where('engine_parent_cache.parent_id = ?', $engine->id);
@@ -1199,7 +1187,7 @@ class CatalogueController extends Zend_Controller_Action
                             'gallery2'   => true,
                             'galleryUrl' => $this->_helper->url->url(array(
                                 'action'  => 'engine-gallery',
-                                'gallery' => $this->_galleryType($picture)
+                                'gallery' => $this->galleryType($picture)
                             ))
                         )
                     )
@@ -1219,7 +1207,7 @@ class CatalogueController extends Zend_Controller_Action
         $this->_engineAction(function($brand, $engineRow, $path) {
             $select = $this->_enginePicturesSelect($engineRow);
 
-            $paginator = $this->_picturesPaginator($select, $this->getParam('page'));
+            $paginator = $this->picturesPaginator($select, $this->getParam('page'));
 
             if ($paginator->getTotalItemCount() <= 0) {
                 return $this->forward('notfound', 'error');
@@ -1317,7 +1305,7 @@ class CatalogueController extends Zend_Controller_Action
         return implode(' ', $name);
     }
 
-    private function _getCarNames(array $ids)
+    private function getCarNames(array $ids)
     {
         $result = array();
 
@@ -1433,7 +1421,7 @@ class CatalogueController extends Zend_Controller_Action
                     $ids[] = $currentCar[$idKey];
                 }
             }
-            $carNames = $this->_getCarNames($ids);
+            $carNames = $this->getCarNames($ids);
 
 
             // breadcrumbs
@@ -1521,7 +1509,7 @@ class CatalogueController extends Zend_Controller_Action
             $this->view->assign(array(
                 'design'       => $design,
                 'carFullName'  => $carFullName,
-                'carShortName' => $this->_getCarShortName($brand, $carFullName),
+                'carShortName' => $this->getCarShortName($brand, $carFullName),
                 'carCatname'   => $currentCar['brand_car_catname'],
             ));
 
@@ -1535,7 +1523,7 @@ class CatalogueController extends Zend_Controller_Action
         });
     }
 
-    private function _childsTypeCount($carId)
+    private function childsTypeCount($carId)
     {
         $carTable = $this->_helper->catalogue()->getCarTable();
         $db = $carTable->getAdapter();
@@ -1579,11 +1567,11 @@ class CatalogueController extends Zend_Controller_Action
             }
 
             if ($modgroupId) {
-                return $this->_brandCarModgroup($brand, $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs);
+                return $this->brandCarModgroup($brand, $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs);
             }
 
             if ($currentCar['is_group']) {
-                return $this->_brandCarGroup($brand, $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs);
+                return $this->brandCarGroup($brand, $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs);
             }
 
             $type = $this->getParam('type');
@@ -1613,16 +1601,16 @@ class CatalogueController extends Zend_Controller_Action
 
             $inboxCount = 0;
             if ($canAcceptPicture) {
-                $inboxCount = $this->_getCarInboxCount($currentCarId);
+                $inboxCount = $this->getCarInboxCount($currentCarId);
             }
 
             $requireAttention = 0;
             $isModerator = $this->_helper->user()->inheritsRole('moder');
             if ($isModerator) {
-                $requireAttention = $this->_getCarModerAttentionCount($currentCarId);
+                $requireAttention = $this->getCarModerAttentionCount($currentCarId);
             }
 
-            $counts = $this->_childsTypeCount($currentCarId);
+            $counts = $this->childsTypeCount($currentCarId);
 
             $modificationGroups = [];
 
@@ -1748,7 +1736,7 @@ class CatalogueController extends Zend_Controller_Action
         });
     }
 
-    private function _brandCarGroupModifications($carId, $groupId, $modificationId)
+    private function brandCarGroupModifications($carId, $groupId, $modificationId)
     {
         $mTable = new ModificationTable();
         $db = $mTable->getAdapter();
@@ -1807,7 +1795,7 @@ class CatalogueController extends Zend_Controller_Action
 
         $groups = [];
         foreach ($mgRows as $mgRow) {
-            $modifications = $this->_brandCarGroupModifications($carId, $mgRow->id, $modificationId);
+            $modifications = $this->brandCarGroupModifications($carId, $mgRow->id, $modificationId);
 
             if ($modifications) {
                 $modificationGroups[] = [
@@ -1821,7 +1809,7 @@ class CatalogueController extends Zend_Controller_Action
             }
         }
 
-        $modifications = $this->_brandCarGroupModifications($carId, null, $modificationId);
+        $modifications = $this->brandCarGroupModifications($carId, null, $modificationId);
         if ($modifications) {
             $modificationGroups[] = [
                 'name'          => null,
@@ -1969,7 +1957,7 @@ class CatalogueController extends Zend_Controller_Action
         );
     }
 
-    private function _brandCarModgroup($brand, array $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs)
+    private function brandCarModgroup($brand, array $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs)
     {
         $currentCarId = $currentCar['id'];
 
@@ -2053,13 +2041,13 @@ class CatalogueController extends Zend_Controller_Action
 
         $inboxCount = 0;
         if ($canAcceptPicture) {
-            $inboxCount = $this->_getCarInboxCount($currentCarId);
+            $inboxCount = $this->getCarInboxCount($currentCarId);
         }
 
         $requireAttention = 0;
         $isModerator = $this->_helper->user()->inheritsRole('moder');
         if ($isModerator) {
-            $requireAttention = $this->_getCarModerAttentionCount($currentCarId);
+            $requireAttention = $this->getCarModerAttentionCount($currentCarId);
         }
 
         $description = null;
@@ -2091,7 +2079,7 @@ class CatalogueController extends Zend_Controller_Action
         ]);
     }
 
-    private function _brandCarGroup($brand, array $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs)
+    private function brandCarGroup($brand, array $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs)
     {
         $currentCarId = $currentCar['id'];
 
@@ -2118,7 +2106,7 @@ class CatalogueController extends Zend_Controller_Action
             ->join('car_parent', 'cars.id = car_parent.car_id', null)
             ->where('car_parent.parent_id = ?', $currentCarId)
             ->where('car_parent.type = ?', $type)
-            ->order($this->_carsOrder());
+            ->order($this->carsOrder());
 
         $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(20)
@@ -2134,7 +2122,7 @@ class CatalogueController extends Zend_Controller_Action
         $currentPicturesCount = 0;
         if ($isLastPage && $type == Car_Parent::TYPE_DEFAULT) {
             $pictureTable = $this->_helper->catalogue()->getPictureTable();
-            $select = $this->_selectOrderFromPictures()
+            $select = $this->selectOrderFromPictures()
                 ->where('pictures.car_id = ?', $currentCarId)
                 ->where('pictures.type = ?', Picture::CAR_TYPE_ID);
             $pPaginator = Zend_Paginator::factory($select)
@@ -2171,13 +2159,13 @@ class CatalogueController extends Zend_Controller_Action
 
         $inboxCount = 0;
         if ($canAcceptPicture) {
-            $inboxCount = $this->_getCarInboxCount($currentCarId);
+            $inboxCount = $this->getCarInboxCount($currentCarId);
         }
 
         $requireAttention = 0;
         $isModerator = $this->_helper->user()->inheritsRole('moder');
         if ($isModerator) {
-            $requireAttention = $this->_getCarModerAttentionCount($currentCarId);
+            $requireAttention = $this->getCarModerAttentionCount($currentCarId);
         }
 
         $ids = array();
@@ -2188,12 +2176,12 @@ class CatalogueController extends Zend_Controller_Action
         $specService = new Application_Service_Specifications();
         $hasChildSpecs = $specService->hasChildSpecs(1, $ids);
 
-        $picturesSelect = $this->_selectFromPictures()
+        $picturesSelect = $this->selectFromPictures()
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
             ->where('car_parent_cache.parent_id = ?', $currentCarId);
 
-        $counts = $this->_childsTypeCount($currentCarId);
+        $counts = $this->childsTypeCount($currentCarId);
 
 
         $description = null;
@@ -2220,7 +2208,7 @@ class CatalogueController extends Zend_Controller_Action
             'stockCount'    => $counts['stock'],
             'tuningCount'   => $counts['tuning'],
             'sportCount'    => $counts['sport'],
-            'picturesCount' => $this->_picturesPaginator($picturesSelect, 1)->getTotalItemCount(),
+            'picturesCount' => $this->picturesPaginator($picturesSelect, 1)->getTotalItemCount(),
             'hasHtml'       => $hasHtml,
             'currentPictures'      => $currentPictures,
             'currentPicturesCount' => $currentPicturesCount,
@@ -2413,7 +2401,7 @@ class CatalogueController extends Zend_Controller_Action
         ));
     }
 
-    private function _getCarModerAttentionCount($carId)
+    private function getCarModerAttentionCount($carId)
     {
         $commentTable = new Comment_Message();
 
@@ -2428,7 +2416,7 @@ class CatalogueController extends Zend_Controller_Action
         return Zend_Paginator::factory($select)->getTotalItemCount();
     }
 
-    private function _getCarInboxCount($carId)
+    private function getCarInboxCount($carId)
     {
         $pictureTable = $this->_helper->catalogue()->getPictureTable();
         $select = $pictureTable->select(true)
@@ -2445,9 +2433,9 @@ class CatalogueController extends Zend_Controller_Action
      * @param bool $exact
      * @return Zend_Db_Table_Select
      */
-    private function _getBrandCarPicturesSelect($carId, $exact, $onlyAccepted = true)
+    private function getBrandCarPicturesSelect($carId, $exact, $onlyAccepted = true)
     {
-        $select = $this->_selectOrderFromPictures($onlyAccepted)
+        $select = $this->selectOrderFromPictures($onlyAccepted)
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID);
 
         if ($exact) {
@@ -2468,7 +2456,7 @@ class CatalogueController extends Zend_Controller_Action
 
             $exact = (bool)$this->getParam('exact');
 
-            $select = $this->_getBrandCarPicturesSelect($currentCar['id'], $exact);
+            $select = $this->getBrandCarPicturesSelect($currentCar['id'], $exact);
 
             $modification = null;
             $modId = (int)$this->getParam('mod');
@@ -2485,7 +2473,7 @@ class CatalogueController extends Zend_Controller_Action
                     ->where('modification_picture.modification_id = ?', $modId);
             }
 
-            $paginator = $this->_picturesPaginator($select, $this->getParam('page'));
+            $paginator = $this->picturesPaginator($select, $this->getParam('page'));
 
             if ($paginator->getTotalItemCount() <= 0) {
                 return $this->forward('notfound', 'error');
@@ -2507,7 +2495,7 @@ class CatalogueController extends Zend_Controller_Action
                 }
             ));
 
-            $counts = $this->_childsTypeCount($currentCar['id']);
+            $counts = $this->childsTypeCount($currentCar['id']);
 
             $this->view->assign(array(
                 'breadcrumbs'   => $breadcrumbs,
@@ -2528,7 +2516,7 @@ class CatalogueController extends Zend_Controller_Action
     {
         $pictureId = (string)$this->getParam('picture_id');
 
-        $picture = $this->_fetchSelectPicture($select, $pictureId);
+        $picture = $this->fetchSelectPicture($select, $pictureId);
         if (!$picture) {
             return $this->forward('notfound', 'error');
         }
@@ -2564,7 +2552,7 @@ class CatalogueController extends Zend_Controller_Action
         $callback($select, $picture);
     }
 
-    private function _galleryType($picture)
+    private function galleryType($picture)
     {
         if ($picture->status == Picture::STATUS_REMOVING) {
             $gallery = 'removing';
@@ -2583,7 +2571,7 @@ class CatalogueController extends Zend_Controller_Action
 
             $exact = (bool)$this->getParam('exact');
 
-            $select = $this->_getBrandCarPicturesSelect($currentCar['id'], $exact, false);
+            $select = $this->getBrandCarPicturesSelect($currentCar['id'], $exact, false);
 
             $this->_pictureAction($select, function($select, $picture) use ($breadcrumbs) {
                 $this->view->assign(array(
@@ -2594,7 +2582,7 @@ class CatalogueController extends Zend_Controller_Action
                             'gallery2'   => true,
                             'galleryUrl' => $this->_helper->url->url(array(
                                 'action'  => 'brand-car-gallery',
-                                'gallery' => $this->_galleryType($picture)
+                                'gallery' => $this->galleryType($picture)
                             ))
                         )
                     )
@@ -2608,7 +2596,7 @@ class CatalogueController extends Zend_Controller_Action
         return $this->_brandCarAction(function($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
 
             $exact = (bool)$this->getParam('exact');
-            $select = $this->_getBrandCarPicturesSelect($currentCar['id'], $exact, false);
+            $select = $this->getBrandCarPicturesSelect($currentCar['id'], $exact, false);
 
             switch ($this->getParam('gallery')) {
                 case 'inbox':
@@ -2656,7 +2644,7 @@ class CatalogueController extends Zend_Controller_Action
             $carTable = $this->_helper->catalogue()->getCarTable();
 
             $select = $carTable->select(true)
-                ->order($this->_carsOrder());
+                ->order($this->carsOrder());
             if ($currentCar['is_group']) {
                 $select
                     ->where('car_parent.type = ?', $type)
@@ -2673,7 +2661,7 @@ class CatalogueController extends Zend_Controller_Action
 
             if (count($childCars) <= 0) {
                 $select = $carTable->select(true)
-                    ->order($this->_carsOrder());
+                    ->order($this->carsOrder());
                 if ($currentCar['is_group']) {
                     $select
                         ->where('car_parent.type = ?', $type)

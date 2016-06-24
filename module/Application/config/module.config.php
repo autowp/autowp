@@ -123,6 +123,16 @@ return [
                     ]
                 ]
             ],
+            'cutaway' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/cutaway[/page:page]',
+                    'defaults' => [
+                        'controller' => Controller\CutawayController::class,
+                        'action'     => 'index',
+                    ],
+                ]
+            ],
             'donate' => [
                 'type' => Literal::class,
                 'options' => [
@@ -700,6 +710,7 @@ return [
                 return new Controller\AboutController($acl);
             },
             Controller\CommentsController::class     => InvokableFactory::class,
+            Controller\CutawayController::class      => InvokableFactory::class,
             Controller\DonateController::class       => InvokableFactory::class,
             Controller\FactoriesController::class    => InvokableFactory::class,
             Controller\IndexController::class        => InvokableFactory::class,

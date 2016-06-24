@@ -77,7 +77,7 @@ class User extends AbstractPlugin
         if ($user === null) {
             $user = $this->getLogedInUser();
         }
-
+        
         if (!$user instanceof Users_Row) {
             $user = $this->user($user);
         }

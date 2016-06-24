@@ -104,7 +104,7 @@ class AccountController extends Zend_Controller_Action
      * @param string $serviceId
      * @return Autowp_ExternalLoginService_Abstract
      */
-    private function _getExternalLoginService($serviceId)
+    private function getExternalLoginService($serviceId)
     {
         $factory = $this->getInvokeArg('bootstrap')->getResource('externalloginservice');
         $service = $factory->getService($serviceId, $serviceId, array(
@@ -139,7 +139,7 @@ class AccountController extends Zend_Controller_Action
                 'name'      => $uaRow->name,
                 'link'      => $uaRow->link,
                 'icon'      => 'fa fa-' . $uaRow->service_id,
-                'canRemove' => $this->_canRemoveAccount($uaRow->service_id),
+                'canRemove' => $this->canRemoveAccount($uaRow->service_id),
                 'removeUrl' => $this->_helper->url->url(array(
                     'action'  => 'remove-account',
                     'service' => $uaRow->service_id
@@ -164,7 +164,7 @@ class AccountController extends Zend_Controller_Action
         if ($request->isPost() && $addAccountForm->isValid($request->getPost())) {
             $values = $addAccountForm->getValues();
             $serviceId = $values['type'];
-            $service = $this->_getExternalLoginService($values['type']);
+            $service = $this->getExternalLoginService($values['type']);
 
             $loginUrl = $service->getLoginUrl();
 
@@ -194,7 +194,7 @@ class AccountController extends Zend_Controller_Action
         ));
     }
 
-    private function _canRemoveAccount($serviceId)
+    private function canRemoveAccount($serviceId)
     {
         if (!$this->_helper->user()->logedIn()) {
             return false;
@@ -235,7 +235,7 @@ class AccountController extends Zend_Controller_Action
             return $this->forward('notfound', 'error');
         }
 
-        if (!$this->_canRemoveAccount($serviceId)) {
+        if (!$this->canRemoveAccount($serviceId)) {
             return $this->forward('remove-account-failed');
         }
 
@@ -466,7 +466,7 @@ class AccountController extends Zend_Controller_Action
         return $this->render($template);
     }
 
-    private function _preparePersonalMessages($messages)
+    private function preparePersonalMessages($messages)
     {
         //TODO: remove
         return $messages;
@@ -487,7 +487,7 @@ class AccountController extends Zend_Controller_Action
 
         $this->view->assign(array(
             'paginator' => $inbox['paginator'],
-            'messages'  => $this->_preparePersonalMessages($inbox['messages'])
+            'messages'  => $this->preparePersonalMessages($inbox['messages'])
         ));
     }
 
@@ -507,7 +507,7 @@ class AccountController extends Zend_Controller_Action
 
         $this->view->assign(array(
             'paginator' => $sentbox['paginator'],
-            'messages'  => $this->_preparePersonalMessages($sentbox['messages'])
+            'messages'  => $this->preparePersonalMessages($sentbox['messages'])
         ));
     }
 
@@ -526,7 +526,7 @@ class AccountController extends Zend_Controller_Action
 
         $this->view->assign(array(
             'paginator' => $systembox['paginator'],
-            'messages'  => $this->_preparePersonalMessages($systembox['messages'])
+            'messages'  => $this->preparePersonalMessages($systembox['messages'])
         ));
     }
 
@@ -552,7 +552,7 @@ class AccountController extends Zend_Controller_Action
 
         $this->view->assign(array(
             'paginator' => $dialogbox['paginator'],
-            'messages'  => $this->_preparePersonalMessages($dialogbox['messages'])
+            'messages'  => $this->preparePersonalMessages($dialogbox['messages'])
         ));
     }
 

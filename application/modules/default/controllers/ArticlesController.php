@@ -16,9 +16,9 @@ class ArticlesController extends Zend_Controller_Action
     public function loadBrands()
     {
         $brandModel = new Brand();
-        
+
         $language = $this->_helper->language();
-        
+
         $this->view->brandList = $brandModel->getList($language, function($select) {
             $select
                 ->join(['abc' => 'articles_brands_cache'], 'brands.id = abc.brand_id', null)
@@ -31,9 +31,9 @@ class ArticlesController extends Zend_Controller_Action
     public function indexAction()
     {
         $language = $this->_helper->language();
-        
+
         $brandModel = new Brand();
-        
+
         $brand = $brandModel->getBrandByCatname($this->getParam('brand_catname'), $language);
 
         $articles = new Articles();
@@ -50,7 +50,7 @@ class ArticlesController extends Zend_Controller_Action
 
         $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(self::ARTICLES_PER_PAGE)
-            ->setCurrentPageNumber($this->_getParam('page'));
+            ->setCurrentPageNumber($this->getParam('page'));
 
         $this->view->brand = $brand;
         $this->view->paginator = $paginator;
@@ -67,11 +67,11 @@ class ArticlesController extends Zend_Controller_Action
 
         $article = $articles->findRowByCatname($this->getParam('article_catname'));
         if (!$article) {
-            return $this->_forward('notfound', 'error');
+            return $this->forward('notfound', 'error');
         }
 
         if (!$article->enabled) {
-            return $this->_forward('notfound', 'error');
+            return $this->forward('notfound', 'error');
         }
 
         $this->view->article = $article;

@@ -11,13 +11,13 @@ class BanController extends Zend_Controller_Action
         $ip = $this->_getParam('ip');
 
         if (!$canBan || $ip === null) {
-            return $this->_forward('notfound', 'error');
+            return $this->forward('notfound', 'error');
         }
 
         $service = new TrafficControl();
         $service->unban($ip);
 
-        return $this->_redirect($this->getRequest()->getServer('HTTP_REFERER'));
+        return $this->redirect($this->getRequest()->getServer('HTTP_REFERER'));
     }
 
     public function banIpAction()
@@ -27,7 +27,7 @@ class BanController extends Zend_Controller_Action
         $ip = $this->_getParam('ip');
 
         if (!$canBan || $ip === null) {
-            return $this->_forward('notfound', 'error');
+            return $this->forward('notfound', 'error');
         }
 
         $service = new TrafficControl();
@@ -39,7 +39,7 @@ class BanController extends Zend_Controller_Action
             $this->getParam('reason')
         );
 
-        return $this->_redirect($this->getRequest()->getServer('HTTP_REFERER'));
+        return $this->redirect($this->getRequest()->getServer('HTTP_REFERER'));
     }
 
     public function banUserAction()
@@ -48,14 +48,14 @@ class BanController extends Zend_Controller_Action
         $user = $users->find($this->_getParam('user_id'))->current();
 
         if (!$user) {
-            return $this->_forward('notfound', 'error');
+            return $this->forward('notfound', 'error');
         }
 
         $canBan = $this->_helper->user()->isAllowed('user', 'ban')
               && ($this->_helper->user()->get()->id != $user->id);
 
         if (!$canBan || $user->last_ip === null) {
-            return $this->_forward('notfound', 'error');
+            return $this->forward('notfound', 'error');
         }
 
         $service = new TrafficControl();
@@ -67,7 +67,7 @@ class BanController extends Zend_Controller_Action
             $this->getParam('reason')
         );
 
-        return $this->_redirect($this->_helper->url->url(array(
+        return $this->redirect($this->_helper->url->url(array(
             'action'   => 'user',
             'user_id'  => $user->id,
             'identity' => $user->identity
@@ -80,7 +80,7 @@ class BanController extends Zend_Controller_Action
         $user = $users->find($this->_getParam('user_id'))->current();
 
         if (!$user) {
-            return $this->_forward('notfound', 'error');
+            return $this->forward('notfound', 'error');
         }
 
 
@@ -88,13 +88,13 @@ class BanController extends Zend_Controller_Action
               && ($this->_helper->user()->get()->id != $user->id);
 
         if (!$canBan || $user->last_ip === null) {
-            return $this->_forward('notfound', 'error');
+            return $this->forward('notfound', 'error');
         }
 
         $service = new TrafficControl();
         $service->unban(inet_ntop($user->last_ip));
 
-        return $this->_redirect($this->_helper->url->url(array(
+        return $this->redirect($this->_helper->url->url(array(
             'action'   => 'user',
             'user_id'  => $user->id,
             'identity' => $user->identity
