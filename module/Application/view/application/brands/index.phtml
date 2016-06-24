@@ -33,7 +33,7 @@
 
 
 <?php foreach ($this->brandList as $char => $info) { ?>
-    <h2 id="char<?=urlencode($info['id'])?>">→ <?=$this->escape($char)?></h2>
+    <h2 id="char<?=urlencode($info['id'])?>">→ <?=$this->escapeHtml($char)?></h2>
     <div class="brand-icons">
         <?php foreach ($info['brands'] as $idx => $brand) {
             $newCars = $brand['newCars'];
@@ -60,7 +60,7 @@
                     <h4>
                         <?=$this->htmlA($brand['url'], $brand['name'])?>
                         <small>(<?=$oldCars ?><?php if ($newCars > 0) {
-                            echo '<span data-href="'.$this->escape($brand['newCarsUrl']).'" data-toggle="popover" data-container="body" class="popover-handler" title="'.$this->escape(sprintf($this->translate('brands/new-cars-of-brand'), $brand['name'])).'">+'.$newCars.'</span>';
+                            echo '<span data-href="'.$this->escapeHtmlAttr($brand['newCarsUrl']).'" data-toggle="popover" data-container="body" class="popover-handler" title="'.$this->escapeHtmlAttr(sprintf($this->translate('brands/new-cars-of-brand'), $brand['name'])).'">+'.$newCars.'</span>';
                         } ?>)</small>
                     </h4>
                     <p><small>картинок: (<?=$brand['totalPictures'] ?>)</small></p>

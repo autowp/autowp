@@ -41,7 +41,8 @@
         "zendframework/zend-captcha": "^2.5",
         "bshaffer/oauth2-server-php": "^1.8",
         "zfcampus/zf-content-negotiation": "dev-master",
-        "zfcampus/zf-oauth2": "dev-master"
+        "zfcampus/zf-oauth2": "dev-master",
+        "zendframework/zend-cache": "^2.7"
     },
     "authors": [
         {

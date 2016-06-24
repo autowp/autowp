@@ -1,21 +1,35 @@
 <?php
 
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
+
 use Application\Model\Brand;
 
-class BrandsController extends Zend_Controller_Action
+use Cars;
+use Brands;
+use Brand_Language;
+
+class BrandsController extends AbstractActionController
 {
+    private $cache;
+
+    public function __construct($cache)
+    {
+        $this->cache = $cache;
+    }
+
     public function indexAction()
     {
-        $language = $this->_helper->language();
+        $language = $this->language();
 
-        $cache_key = 'brands_list_5_' . $language;
+        $cacheKey = 'brands_list_5_' . $language;
 
-        $cache = $this->getInvokeArg('bootstrap')
-            ->getResource('cachemanager')->getCache('long');
+        $items = $this->cache->getItem($cacheKey, $success);
+        if (!$success) {
 
-        if (!($items = $cache->load($cache_key))) {
-
-            $imageStorage = $this->_helper->imageStorage();
+            $imageStorage = $this->imageStorage();
 
             $brandModel = new Brand();
 
@@ -23,15 +37,13 @@ class BrandsController extends Zend_Controller_Action
 
             foreach ($items as &$char) {
                 foreach ($char['brands'] as &$item) {
-                    $item['url'] = $this->_helper->url->url(array(
-                        'module'        => 'default',
-                        'controller'    => 'catalogue',
+                    $item['url'] = $this->url()->fromRoute('catalogue', [
                         'action'        => 'brand',
                         'brand_catname' => $item['catname']
-                    ), 'catalogue', true);
-                    $item['newCarsUrl'] = $this->_helper->url->url(array(
+                    ]);
+                    $item['newCarsUrl'] = $this->url()->fromRoute('brands/newcars', [
                         'brand_id' => $item['id'],
-                    ), 'brand_new_cars', true);
+                    ]);
 
                     $img = false;
                     if ($item['img']) {
@@ -46,51 +58,54 @@ class BrandsController extends Zend_Controller_Action
             }
             unset($char, $item);
 
-            $cache->save($items);
+            $this->cache->setItem($cacheKey, $items);
         }
 
-        $this->view->assign(array(
+        return [
             'brandList' => $items
-        ));
+        ];
     }
 
     public function newcarsAction()
     {
-        if (!$this->getRequest()->isXmlHttpRequest()) {
-            $this->_forward('notfound', 'error');
-        }
+        /*if (!$this->getRequest()->isXmlHttpRequest()) {
+            return $this->getResponse()->setStatusCode(404);
+        }*/
 
-        $brand_id = $this->getRequest()->getParam('brand_id');
         $brands = new Brands();
 
-        $brand = $brands->find($brand_id)->current();
+        $brand = $brands->find($this->params('brand_id'))->current();
         if (!$brand) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
-        $language = $this->_helper->language();
+        $language = $this->language();
         $brandLangTable = new Brand_Language();
-        $brandLang = $brandLangTable->fetchRow(array(
+        $brandLang = $brandLangTable->fetchRow([
             'brand_id = ?' => $brand->id,
             'language = ?' => $language
-        ));
+        ]);
 
         $cars = new Cars();
         $carList = $cars->fetchAll(
             $cars->select(true)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand_id)
+                ->where('brands_cars.brand_id = ?', $brand->id)
                 ->where('cars.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY)')
                 ->group('cars.id')
-                ->order(array('cars.add_datetime DESC'))
+                ->order(['cars.add_datetime DESC'])
                 ->limit(30)
         );
-        $this->view->assign(array(
+
+        $viewModel = new ViewModel([
             'brand'     => $brand,
             'brandLang' => $brandLang,
             'carList'   => $carList
-        ));
+        ]);
+        $viewModel->setTerminal(true);
+
+        return $viewModel;
     }
 
 }

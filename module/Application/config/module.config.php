@@ -55,6 +55,28 @@ return [
                     ],
                 ],
             ],
+            'brands' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/brands',
+                    'defaults' => [
+                        'controller' => Controller\BrandsController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'newcars' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route'  => '/newcars/:brand_id',
+                            'defaults' => [
+                                'action' => 'newcars',
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'cars' => [
                 'type' => Segment::class,
                 'options' => [
@@ -709,6 +731,10 @@ return [
                 $acl = $sm->get(Acl::class);
                 return new Controller\AboutController($acl);
             },
+            Controller\BrandsController::class => function($sm) {
+                $cache = $sm->get('longCache');
+                return new Controller\BrandsController($cache);
+            },
             Controller\CommentsController::class     => InvokableFactory::class,
             Controller\CutawayController::class      => InvokableFactory::class,
             Controller\DonateController::class       => InvokableFactory::class,
@@ -962,12 +988,15 @@ return [
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
         ],
+        'abstract_factories' => [
+            'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
+        ],
         /*'services' => [),
         'factories' => [),
-        'abstract_factories' => [),
         'initializators' => [),
         'delegators' => [),
         'shared' => [)*/
+
     ],
     'imageStorage' => [
         'imageTableName' => 'image',
@@ -1233,5 +1262,77 @@ return [
     'textstorage' => [
         'textTableName'     => 'textstorage_text',
         'revisionTableName' => 'textstorage_revision'
-    ]
+    ],
+
+    'caches' => [
+        'fastCache' => [
+            'adapter' => [
+                'name'     =>'memcached',
+                'lifetime' => 180,
+                'options'  => [
+                    'servers'   => [
+                        ['localhost', 11211]
+                    ],
+                    'namespace'  => 'FAST',
+                    'liboptions' => [
+                        'COMPRESSION'     => false,
+                        'binary_protocol' => true,
+                        'no_block'        => true,
+                        'connect_timeout' => 100
+                    ]
+                ]
+            ],
+            /*'plugins' => [
+                'exception_handler' => [
+                    'throw_exceptions' => false
+                ],
+            ],*/
+        ],
+        'longCache' => [
+            'adapter' => [
+                'name'     =>'memcached',
+                'lifetime' => 600,
+                'options'  => [
+                    'servers'   => [
+                        ['localhost', 11211]
+                    ],
+                    'namespace'  => 'LONG',
+                    'liboptions' => [
+                        'COMPRESSION'     => false,
+                        'binary_protocol' => true,
+                        'no_block'        => true,
+                        'connect_timeout' => 100
+                    ]
+                ]
+            ],
+            /*'plugins' => [
+             'exception_handler' => [
+                 'throw_exceptions' => false
+             ],
+            ],*/
+        ],
+        'localeCache' => [
+            'adapter' => [
+                'name'     =>'memcached',
+                'lifetime' => 600,
+                'options'  => [
+                    'servers'   => [
+                        ['localhost', 11211]
+                    ],
+                    'namespace'  => 'LOCALE',
+                    'liboptions' => [
+                        'COMPRESSION'     => false,
+                        'binary_protocol' => true,
+                        'no_block'        => true,
+                        'connect_timeout' => 100
+                    ]
+                ]
+            ],
+            /*'plugins' => [
+             'exception_handler' => [
+                 'throw_exceptions' => false
+             ],
+            ],*/
+        ],
+    ],
 ];

@@ -1,21 +1,17 @@
-<?php
-    $this->layout()->disableLayout();
-?>
 <?php if (count($this->carList)) { ?>
     <?php if ($this->brand->img) { ?>
-        <?=$this->htmlA($this->url(array(
-            'controller'    => 'catalogue',
+        <?=$this->htmlA($this->url('catalogue', [
             'action'        => 'brand',
             'brand_catname' => $this->brand->folder
-        ), 'catalogue', true), $this->img($this->brand->img, array(
+        ]), $this->img($this->brand->img, [
             'alt'    => '',
             'title'  => 'логотип '. ($this->brandLang ? $this->brandLang->name : $this->brand->caption),
             'style'  => "float:right;margin:0 0 5px 5px",
             'format' => 'brandicon2'
-        )), false)?>
+        ]), false)?>
     <?php } ?>
     <?php foreach ($this->carList as $car) {?>
-        <p><?=$this->escape($car->getFullName())?></p>
+        <p><?=$this->escapeHtml($car->getFullName())?></p>
     <?php } ?>
     <br style="clear:both" />
 <?php } ?>
