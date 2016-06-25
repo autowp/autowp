@@ -113,11 +113,13 @@ class Articles implements RouteInterface
                 break;
 
             case 'index':
-                if (isset($data['brand_catname']))
+                if (isset($data['brand_catname'])) {
                     $url[] = $data['brand_catname'];
+                }
 
-                if (isset($data['page']) && $data['page'] > 1)
+                if (isset($data['page']) && $data['page'] > 1) {
                     $url[] = 'page'.$data['page'];
+                }
             default:
                 break;
         }

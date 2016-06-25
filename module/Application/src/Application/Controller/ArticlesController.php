@@ -74,7 +74,11 @@ class ArticlesController extends AbstractActionController
             'brand'            => $brand,
             'paginator'        => $paginator,
             'articles'         => $articles,
-            'selectedBrandIds' => $brand ? [$brand['id']] : []
+            'selectedBrandIds' => $brand ? [$brand['id']] : [],
+            'urlParams'        => [
+                'action'        => 'index',
+                'brand_catname' => $brand ? $brand['catname'] : null
+            ]
         ];
     }
 
