@@ -199,7 +199,7 @@ class IndexController extends Zend_Controller_Action
 
             // промах кэша
             $brandModel = new Brand();
-            
+
             $items = $brandModel->getTopBrandsList($language);
             foreach ($items as &$item) {
                 $item['url'] = $this->_helper->url->url(array(
@@ -547,31 +547,31 @@ class IndexController extends Zend_Controller_Action
         $this->view->specsCars = $specsCars;
 
 
-        $cacheKey = 'INDEX_PAGE_DATA_' . $language;
+        $cacheKey = 'INDEX_PAGE_DATA_6_' . $language;
         if (!($pageData = $cache->load($cacheKey))) {
 
-            $pageData = array(
-                'statistics' => array(
+            $pageData = [
+                'statistics' => [
                     'name' => $this->view->page(173)->name,
                     'url'  => '/users/rating'
-                ),
-                'mosts' => array(
+                ],
+                'mosts' => [
                     'name' => $this->view->page(21)->name,
                     'url'  => '/mosts/'
-                ),
-                'category' => array(
+                ],
+                'category' => [
                     'name' => $this->view->page(22)->name,
                     'url'  => '/category/'
-                ),
-                'twins' => array(
+                ],
+                'twins' => [
                     'name' => $this->view->page(25)->name,
                     'url'  => '/twins/'
-                ),
-                'new' => array(
+                ],
+                'new' => [
                     'name' => $this->view->page(51)->name,
-                    'url'  => '/new/'
-                ),
-            );
+                    'url'  => '/new'
+                ],
+            ];
 
             $cache->save($pageData, $cacheKey, array(), 300);
         }

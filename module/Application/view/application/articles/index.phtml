@@ -1,0 +1,56 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ],
+        'pageId' => 31,
+    ]);
+?>
+<div class="row">
+    <div class="col-sm-4">
+        <?=$this->partial('application/articles/sidebar', [
+            'brands'   => $this->menu,
+            'selected' => $this->selectedBrandIds
+        ])?>
+    </div>
+    <div class="col-sm-8">
+        <div class="well">
+            <ul class="articleList">
+                <?php foreach ($this->articles as $article) { ?>
+                    <li>
+                        <?php if ($article['previewUrl']) { ?>
+                            <?=$this->htmlA(
+                                $article['url'],
+                                $this->htmlImg([
+                                    'src'   => $article['previewUrl'],
+                                    'style' => 'float:left;margin:0 10px 4px 0'
+                                ]),
+                                false
+                            )?>
+                        <?php } ?>
+
+                        <p><?=$this->htmlA($article['url'], $article['name'])?></p>
+                        <p>
+                            <?=$this->escapeHtml($article['description'])?>
+                            <?=$this->htmlA($article['url'], $this->translate('carlist/details'))?>
+                        </p>
+                        <p>
+                            <?php if ($article['author']) { ?>
+                                <?=$this->user($article['author']) . ', ' ?>
+                            <?php } ?>
+                            <?php if ($article['date']) { ?>
+                                <span class="date"><?=$this->humanDate($article['date'])?></span>
+                            <?php } ?>
+                        </p>
+                    </li>
+                <?php } ?>
+            </ul>
+
+            <?=$this->paginationControl($this->paginator, null, null, [
+                'urlParams' => $this->urlParams
+            ]) ?>
+        </div>
+    </div>
+</div>

@@ -18,9 +18,9 @@ class Catalogue implements RouteInterface
     /**
      * @var Car_Types
      */
-    private $_carTypeTable;
+    private $carTypeTable;
 
-    private $_defaults = [];
+    private $defaults = [];
 
     /**
      * Create a new route with given options.
@@ -35,7 +35,7 @@ class Catalogue implements RouteInterface
 
     public function __construct($options = [])
     {
-        $this->_defaults = $options['defaults'];
+        $this->defaults = $options['defaults'];
     }
 
     /**
@@ -43,15 +43,14 @@ class Catalogue implements RouteInterface
      */
     private function _getCarTypeTable()
     {
-        return $this->_carTypeTable
-            ? $this->_carTypeTable
-            : $this->_carTypeTable = new Car_Types();
+        return $this->carTypeTable
+            ? $this->carTypeTable
+            : $this->carTypeTable = new Car_Types();
     }
 
     private function assembleMatch(array $data, $length)
     {
-        $result = array_replace($this->_defaults, $data);
-        $this->_variables = $result;
+        $result = array_replace($this->defaults, $data);
         return new RouteMatch($result, $length);
     }
 
@@ -71,7 +70,7 @@ class Catalogue implements RouteInterface
 
         $length = strlen($path);
 
-        $data = $this->_defaults;
+        $data = $this->defaults;
 
         $path = trim($path, self::DELIMETER);
         $path = explode(self::DELIMETER, $path);
@@ -871,7 +870,7 @@ class Catalogue implements RouteInterface
     {
         $data = $params;
 
-        $def = $this->_defaults;
+        $def = $this->defaults;
         $data = array_merge($def, $data);
 
         foreach ($data as &$value) {

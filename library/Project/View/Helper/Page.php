@@ -63,6 +63,10 @@ class Project_View_Helper_Page extends Zend_View_Helper_Abstract
                     'language' => $this->_language
                 ));*/
 
+            case 'url':
+                $this->_doc['url'];
+                break;
+
             case 'name':
             case 'title':
             case 'breadcrumbs':

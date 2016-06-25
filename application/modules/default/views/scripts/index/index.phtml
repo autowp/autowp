@@ -87,11 +87,7 @@
         <?=$this->partial('pictures.phtml', $this->newPictures)?>
         <p>
             <span class="fa fa-th"></span>
-            <?=$this->htmlA($this->url(array(
-                'module'     => 'default',
-                'controller' => 'new',
-                'action'     => 'index'
-            ), 'new-pictures', true), $this->translate('All new pictures') . ' …') ?>
+            <?=$this->htmlA($this->pageData['new']['url'], $this->translate('All new pictures') . ' …') ?>
         </p>
     </div>
     <div class="col-md-6">

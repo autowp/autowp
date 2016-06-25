@@ -55,6 +55,16 @@ return [
                     ],
                 ],
             ],
+            'articles' => [
+                'type' => \Application\Router\Http\Articles::class,
+                'options' => [
+                    'route'    => '/articles',
+                    'defaults' => [
+                        'controller' => Controller\ArticlesController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
             'brands' => [
                 'type' => Literal::class,
                 'options' => [
@@ -751,6 +761,7 @@ return [
                 $acl = $sm->get(Acl::class);
                 return new Controller\AboutController($acl);
             },
+            Controller\ArticlesController::class     => InvokableFactory::class,
             Controller\BrandsController::class => function($sm) {
                 $cache = $sm->get('longCache');
                 return new Controller\BrandsController($cache);

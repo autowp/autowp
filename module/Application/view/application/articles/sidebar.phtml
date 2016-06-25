@@ -1,14 +1,14 @@
 <div class="well">
     <ul class="nav nav-pills nav-stacked">
-        <?php foreach ($this->brandList as $brand) { ?>
+        <?php foreach ($this->brands as $brand) { ?>
             <?php
-                $selected = in_array($brand['id'], $this->selected_brand_ids) ? ' class="selected"' : '';
+                $selected = in_array($brand['id'], $this->selected) ? ' class="selected"' : '';
             ?>
             <li<?=$selected ? ' class="active"' : ''?>>
-                <?=$this->htmlA($this->url(array(
+                <?=$this->htmlA($this->url('articles', [
                     'action'        => 'index',
                     'brand_catname' => $brand['catname']
-                ), 'articles', true), $brand['name']) ?>
+                ]), $brand['name']) ?>
             </li>
         <?php } ?>
     </ul>
