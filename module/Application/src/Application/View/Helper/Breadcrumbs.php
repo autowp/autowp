@@ -44,9 +44,9 @@ class Breadcrumbs extends AbstractHelper
                 $url = $node['url'];
 
                 if ($url)
-                    $items[] = '<li>'.$this->view->htmlA(array('href' => $url), $name).'</li>';
+                    $items[] = '<li>'.$this->view->htmlA(['href' => $url], $name).'</li>';
                 else
-                    $items[] = '<li>'.$this->view->escape($name).'</li>';
+                    $items[] = '<li>'.$this->view->escapeHtml($name).'</li>';
             }
 
             array_pop($items);

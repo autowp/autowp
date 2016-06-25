@@ -43,13 +43,13 @@ class Pic extends AbstractHtmlElement
         $view = $this->view;
 
         if (isset($picture['name']) && $picture['name']) {
-            return $view->escape($picture['name']);
+            return $view->escapeHtml($picture['name']);
         }
 
         switch ($picture['type']) {
             case Picture::CAR_TYPE_ID:
                 return
-                    ($picture['perspective'] ? $view->escape(self::mbUcfirst($view->translate($picture['perspective']))) . ' ' : '') .
+                    ($picture['perspective'] ? $view->escapeHtml(self::mbUcfirst($view->translate($picture['perspective']))) . ' ' : '') .
                     $view->car()->htmlTitle($picture['car']);
                 break;
 
@@ -58,7 +58,7 @@ class Pic extends AbstractHtmlElement
             case Picture::MIXED_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:
             case Picture::FACTORY_TYPE_ID:
-                return $view->escape($this->textTitle($picture));
+                return $view->escapeHtml($this->textTitle($picture));
                 break;
         }
 

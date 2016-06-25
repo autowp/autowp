@@ -208,6 +208,16 @@ return [
                     ]
                 ]
             ],
+            'inbox' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route' => '/inbox[/:brand][/:date][/page:page]',
+                    'defaults' => [
+                        'controller' => Controller\InboxController::class,
+                        'action'     => 'index'
+                    ]
+                ]
+            ],
             'info' => [
                 'type'    => Literal::class,
                 'options' => [
@@ -740,6 +750,7 @@ return [
             Controller\DonateController::class       => InvokableFactory::class,
             Controller\FactoriesController::class    => InvokableFactory::class,
             Controller\IndexController::class        => InvokableFactory::class,
+            Controller\InboxController::class        => InvokableFactory::class,
             Controller\InfoController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
                 return new Controller\InfoController($textStorage);
@@ -910,9 +921,8 @@ return [
                 $storage = new Image\Storage($config);
 
                 $request = $sm->get('Request');
-                //var_dump(get_class($request)); exit;
                 if ($request instanceof \Zend\Http\Request) {
-                    if ($request->getUri()->getScheme() == 'https') {
+                    if ($request->getServer('HTTPS')) {
                         $storage->setForceHttps(true);
                     }
                 }

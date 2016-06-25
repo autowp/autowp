@@ -8,6 +8,7 @@ use Exception;
 use Zend_Db_Table_Select;
 use Zend_Paginator;
 
+use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class DayPictures
 {
@@ -67,6 +68,11 @@ class DayPictures
      * @var Zend_Paginator
      */
     private $paginator = null;
+
+    /**
+     * @var \Zend\Paginator\Paginator
+     */
+    private $paginator2;
 
     /**
      * @param array $options
@@ -409,6 +415,27 @@ class DayPictures
         }
 
         return $this->paginator;
+    }
+
+    /**
+     * @return \Zend\Paginator|false
+     */
+    public function getPaginator2()
+    {
+        if (!$this->currentDate) {
+            return false;
+        }
+
+        if ($this->paginator2 === null) {
+
+            $select = $this->getCurrentDateSelect();
+
+            $this->paginator2 = new \Zend\Paginator\Paginator(
+                    new Zend1DbTableSelect($select)
+            );
+        }
+
+        return $this->paginator2;
     }
 
     /**

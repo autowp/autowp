@@ -27,4 +27,7 @@
     <?php } ?>
 </table>
 
-<?=$this->paginationControl($this->paginator) ?>
+<?=$this->paginationControl($this->paginator, null, null, [
+    'route'     => 'log/params',
+    'urlParams' => $this->urlParams
+]) ?>

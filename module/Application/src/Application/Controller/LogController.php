@@ -89,7 +89,8 @@ class LogController extends AbstractActionController
 
         return [
             'paginator' => $paginator,
-            'events'    => $events
+            'events'    => $events,
+            'urlParams' => $this->params()->fromRoute()
         ];
     }
 }

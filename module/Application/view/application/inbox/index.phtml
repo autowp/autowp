@@ -1,0 +1,45 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ],
+        'pageId' => 76,
+    ]);
+?>
+<div>
+    <?=$this->formSelect((new Zend\Form\Element\Select('brand'))
+        ->setValueOptions($this->brands)
+        ->setValue($this->brand)
+        ->setAttributes([
+            'onchange' => 'window.location = $(this).val()'
+        ])
+    )?>
+</div>
+<div class="row">
+    <div class="col-lg-4 col-md-4">
+        <h3 class="text-left"><?php if ($this->prev['date']) { ?>
+            &#x2190;
+            <?=$this->htmlA($this->prev['url'], $this->user()->humanDate($this->prev['date'])) ?>
+            <small>(<?=$this->escapeHtml(sprintf($this->translatePlural('%1$s picures', null, $this->prev['count']), $this->prev['count']))?>)</small>
+        <?php } ?></h3>
+    </div>
+    <div class="col-lg-4 col-md-4">
+        <h3 class="text-center">
+            <?=$this->user()->humanDate($this->current['date'])?>
+            <small>(<?=$this->escapeHtml(sprintf($this->translatePlural('%1$s picures', null, $this->current['count']), $this->current['count']))?>)</small>
+        </h3>
+    </div>
+    <div class="col-lg-4 col-md-4">
+        <h3 class="text-right"><?php if ($this->next['date']) { ?>
+            <?=$this->htmlA($this->next['url'], $this->user()->humanDate($this->next['date'])) ?>
+            <small>(<?=$this->escapeHtml(sprintf($this->translatePlural('%1$s picures', null, $this->next['count']), $this->next['count']))?>)</small>
+            &#x2192;
+        <?php } ?></h3>
+    </div>
+</div>
+<?=$this->partial('application/pictures', $this->picturesData)?>
+<?=$this->paginationControl($this->paginator, null, null, [
+    'urlParams' => $this->urlParams
+]) ?>

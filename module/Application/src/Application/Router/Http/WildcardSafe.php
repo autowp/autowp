@@ -76,4 +76,35 @@ class WildcardSafe extends Wildcard
 
         return new RouteMatch(array_merge($this->defaults, $matches), strlen($path));
     }
+
+    /**
+     * assemble(): Defined by RouteInterface interface.
+     *
+     * @see    \Zend\Router\RouteInterface::assemble()
+     * @param  array $params
+     * @param  array $options
+     * @return mixed
+     */
+    public function assemble(array $params = [], array $options = [])
+    {
+        $elements              = [];
+        $mergedParams          = array_replace($this->defaults, $params);
+        $this->assembledParams = [];
+
+        foreach ($this->exclude as $key) {
+            unset($mergedParams[$key]);
+        }
+
+        if ($mergedParams) {
+            foreach ($mergedParams as $key => $value) {
+                $elements[] = rawurlencode($key) . $this->keyValueDelimiter . rawurlencode($value);
+
+                $this->assembledParams[] = $key;
+            }
+
+            return $this->paramDelimiter . implode($this->paramDelimiter, $elements);
+        }
+
+        return '';
+    }
 }
