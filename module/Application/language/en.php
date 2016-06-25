@@ -367,7 +367,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'feedback/title' => 'Feedback',
     'feedback/name'  => 'Your name',
     'feedback/message' => 'Message',
-    'feedback/donate-text' => 'If you have come here to express words of support, it is possible to [express it in hard currency](/donate]',
+    'feedback/donate-text' => 'If you have come here to express words of support, it is possible to [express it in hard currency][/donate]',
 
     'map/museums-and-factories' => 'Museums and factories',
 

@@ -1,0 +1,123 @@
+<?php
+    $this->form->setAttribute(
+        'class',
+        $this->form->getAttribute('class') . ' form-horizontal'
+    );
+?>
+<?=$this->form()->openTag($this->form)?>
+<fieldset>
+    <?php if ($legend = $this->form->getAttribute('legend')) { ?>
+        <legend><?=$this->escapeHtml($this->translate($legend))?></legend>
+    <?php } ?>
+    <?php foreach ($this->form->getElements() as $element) { ?>
+        <?php if ($element instanceof Zend\Form\Element) { ?>
+            <?php if ($element instanceof Zend\Form\Element\File) { ?>
+                <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
+                    <label class="col-md-2 control-label" for="<?=$element->getId()?>">
+                        <?=$this->escapeHtml($this->translate($element->getLabel()))?>
+                    </label>
+                    <div class="col-md-10">
+                        <?=$element?>
+                        <?php foreach ($element->getMessages() as $error) { ?>
+                            <p class="help-block"><?=$this->escapeHtml($error)?></p>
+                        <?php } ?>
+                    </div>
+                </div>
+            <?php } elseif ($element instanceof Zend\Form\Element\Multicheckbox) { ?>
+                <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
+                    <label class="col-md-2 control-label" for="<?=$element->getId()?>">
+                        <?=$this->escapeHtml($this->translate($element->getLabel()))?>
+                    </label>
+                    <div class="col-md-10">
+                        <?=$element ?>
+                        <?php foreach ($element->getMessages() as $error) { ?>
+                            <p class="help-block"><?=$this->escapeHtml($error)?></p>
+                        <?php } ?>
+                    </div>
+                </div>
+            <?php } elseif ($element instanceof Zend\Form\Element\Checkbox) { ?>
+                <div class="form-group">
+                    <div class="col-md-2">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="checkbox<?=$element->getMessages() ? ' has-error' : ''?>">
+                            <label>
+                                <?=$element?>
+                                <?=$this->escapeHtml($this->translate($element->getLabel()))?>
+                            </label>
+                            <?php foreach ($element->getMessages() as $error) { ?>
+                                <p class="help-block"><?=$this->escapeHtml($error)?></p>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
+            <?php } elseif (!$element instanceof Zend\Form\Element\Submit) { ?>
+                <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
+                    <label class="col-md-2 control-label">
+                        <?=$this->escapeHtml($this->translate($element->getLabel()))?>
+                    </label>
+                    <div class="col-md-10">
+                        <?=$this->formElement(
+                            $element
+                                ->setAttribute('class', $element->getAttribute('class') . ' form-control')
+                        )?>
+                        <?php foreach ($element->getMessages() as $error) { ?>
+                            <p class="help-block"><?=$this->escapeHtml($error)?></p>
+                        <?php } ?>
+                    </div>
+                </div>
+            <?php } ?>
+        <?php } elseif ($element instanceof Zend\Form) { ?>
+            <?=$element->render($this)?>
+        <?php } elseif ($element instanceof Zend\Form\DisplayGroup) { ?>
+            <div class="form-group">
+                <label class="col-md-2 control-label">
+                    <?=$this->escapeHtml($this->translate($element->getLegend()))?>
+                </label>
+                <div class="col-md-10">
+                    <?=$element->render($this)?>
+                </div>
+            </div>
+        <?php } ?>
+    <?php } ?>
+    <?php
+        $submitFound = false;
+    ?>
+    <?php foreach ($this->form->getElements() as $element) { ?>
+        <?php if ($element instanceof Zend\Form\Element\Submit) { ?>
+            <?php
+                $element->setAttribute(
+                    'class',
+                    $element->getAttribute('class') . ($element->getAttribute('class') ? ' ' : '') . 'btn'
+                );
+                if (!$submitFound) {
+                    $element->setAttribute(
+                        'class',
+                        $element->getAttribute('class') . ' btn-primary'
+                    );
+                    $submitFound = true;
+                }
+            ?>
+            <div class="form-group">
+                <div class="col-md-2"></div>
+                <div class="col-md-10">
+                    <?=$this->formElement($element)?>
+                </div>
+            </div>
+        <?php } ?>
+    <?php } ?>
+    <?php /* if ($desc = $this->element->getDescription()) { ?>
+        <p><?=$this->escapeHtml($desc)?></p>
+    <?php } */ ?>
+    <?php if (!$submitFound && !$this->element instanceof Zend\Form\SubForm) { ?>
+        <div class="row">
+            <div class="col-md-10 col-md-offset-2">
+                <?=$this->formSubmit('submit', $this->translate('sumbit'), array(
+                    'class' => 'btn btn-primary'
+                ))?>
+            </div>
+        </div>
+    <?php } ?>
+
+</fieldset>
+<?=$this->form()->closeTag($this->form)?>

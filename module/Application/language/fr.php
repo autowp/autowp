@@ -370,7 +370,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'feedback/title' => 'Retour d\'information',
     'feedback/name'  => 'Votre nom',
     'feedback/message' => 'Message',
-    'feedback/donate-text' => 'Si vous êtes venu ici pour exprimer des mots de soutien, il est possible [de l\'exprimer en devises](/donate]',
+    'feedback/donate-text' => 'Si vous êtes venu ici pour exprimer des mots de soutien, il est possible [de l\'exprimer en devises](/donate)',
 
     'map/museums-and-factories' => 'Les musées et les usines',
 

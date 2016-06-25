@@ -47,7 +47,7 @@ class MainMenu
     /**
      * @return Page
      */
-    private function _getPageTable()
+    private function getPageTable()
     {
         return $this->pageTable
             ? $this->pageTable
@@ -56,8 +56,8 @@ class MainMenu
 
     private function getMenuData($id, $logedIn, $language)
     {
-        $table = $this->_getPageTable();
-        $db = $this->_getPageTable()->getAdapter();
+        $table = $this->getPageTable();
+        $db = $table->getAdapter();
 
         $expr = 'pages.id = page_language.page_id and ' .
                 $db->quoteInto('page_language.language = ?', $language);

@@ -8,10 +8,10 @@
         <p>
             <i class="fa fa-comment"></i>
             <?php if ($this->newPersonalMessages > 0) { ?>
-                <?=$this->htmlA(array(
+                <?=$this->htmlA([
                     'href'  => '/account/pm/',
                     'class' => 'label label-danger'
-                ), $this->translate(array('layout/you-have-%1$s-new-messages', null, $this->newPersonalMessages), $this->newPersonalMessages))?>
+                ], sprintf($this->translatePlural('layout/you-have-%1$s-new-messages', null, $this->newPersonalMessages), $this->newPersonalMessages))?>
             <?php } else { ?>
                 <?=$this->htmlA('/account/pm/', $this->translate('layout/personal-messages'))?>
             <?php } ?>

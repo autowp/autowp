@@ -218,6 +218,28 @@ return [
                     ]
                 ]
             ],
+            'feedback' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/feedback',
+                    'defaults' => [
+                        'controller' => Controller\FeedbackController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'sent' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/sent',
+                            'defaults' => [
+                                'action' => 'sent',
+                            ],
+                        ]
+                    ]
+                ]
+            ],
             'inbox' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -770,6 +792,12 @@ return [
             Controller\CutawayController::class      => InvokableFactory::class,
             Controller\DonateController::class       => InvokableFactory::class,
             Controller\FactoriesController::class    => InvokableFactory::class,
+            Controller\FeedbackController::class     => function($sm) {
+                $form = $sm->get('FeedbackForm');
+                $transport = $sm->get('MailTransport');
+                $options = $sm->get('Config')['feedback'];
+                return new Controller\FeedbackController($form, $transport, $options);
+            },
             Controller\IndexController::class        => InvokableFactory::class,
             Controller\InboxController::class        => InvokableFactory::class,
             Controller\InfoController::class => function($sm) {
@@ -1022,12 +1050,24 @@ return [
                     'scriptPath' => APPLICATION_PATH . '/modules/default/views/scripts/'
                 ]);
             },
+            'MailTransport' => function($sm) {
+                $config = $sm->get('Config');
+                $transport = new \Zend\Mail\Transport\Smtp();
+                $transport->setOptions(
+                    new \Zend\Mail\Transport\SmtpOptions(
+                        $config['mail']['transport']['options']
+                    )
+                );
+
+                return $transport;
+            }
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
         ],
         'abstract_factories' => [
             'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
+            //'Zend\Form\FormAbstractServiceFactory',
         ],
         /*'services' => [),
         'factories' => [),
@@ -1373,4 +1413,119 @@ return [
             ],*/
         ],
     ],
+
+    'forms' => [
+        'FeedbackForm' => [
+            //'hydrator' => 'ObjectProperty',
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'feedback/title',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'name',
+                        'options' => [
+                            'label'        => 'feedback/name',
+                            'maxlength'    => 255,
+                            'size'         => 80,
+                            'autocomplete' => 'name',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'email',
+                        'options' => [
+                            'label'        => 'E-mail',
+                            'maxlength'    => 255,
+                            'size'         => 80,
+                            'autocomplete' => 'email',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Textarea',
+                        'name' => 'message',
+                        'options' => [
+                            'label' => 'feedback/message',
+                            'cols'  => 80,
+                            'rows'  => 8,
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Captcha',
+                        'name' => 'captcha',
+                        'options' => [
+                            'label' => 'login/captcha',
+                            'captcha' => [
+                                'class'   => 'Image',
+                                'font'    => APPLICATION_PATH . '/resources/fonts/arial.ttf',
+                                'imgDir'  => APPLICATION_PATH . '/../public_html/img/captcha/',
+                                'imgUrl'  => '/img/captcha/',
+                                'wordLen' => 4,
+                                'timeout' => 300,
+                            ]
+                        ],
+                    ],
+                ],
+                /*array('captcha', 'captcha', array(
+                    'required'   => true,
+                    'label'      => 'login/captcha',
+                    'captcha'    => array(
+                        'captcha' => 'Image',
+
+
+
+                    ),
+                    'decorators' => array('Captcha'),
+                )),*/
+                [
+                    'spec' => [
+                        'type' => 'Submit',
+                        'name' => 'submit',
+                        'attributes' => [
+                            'value' => 'Send',
+                        ]
+                    ],
+                ],
+            ],
+            'input_filter' => [
+                'name' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'email' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'EmailAddress']
+                    ]
+                ],
+                'message' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ]
+            ],
+        ],
+    ],
+
+    'feedback' => [
+        'from'     => 'no-reply@autowp.ru',
+        'fromname' => 'robot autowp.ru',
+        'to'       => 'autowp@gmail.com',
+        'subject'  => 'AutoWP Feedback'
+    ]
 ];
