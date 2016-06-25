@@ -8,19 +8,15 @@ use Pictures_Row;
 
 class InlinePicture extends AbstractHelper
 {
-    private $_blockNumber = 0;
-
     public function __invoke(Pictures_Row $picture)
     {
-        $this->_blockNumber++;
-
         $view = $this->view;
 
         $url = $view->pic($picture)->url();
 
         $caption = $picture->getCaption();
 
-        $imageHtml = $this->view->img($picture->getFormatRequest(), [
+        $imageHtml = $view->img($picture->getFormatRequest(), [
             'format'  => 'picture-thumb',
             'alt'     => $caption,
             'title'   => $caption,

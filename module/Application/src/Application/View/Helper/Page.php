@@ -17,34 +17,34 @@ class Page extends AbstractHelper
     /**
      * @var Zend_Db_Table
      */
-    protected $_pageTable;
+    private $pageTable;
     /**
      * @var Zend_Db_Table
      */
-    protected $_pageLanguageTable;
+    private $pageLanguageTable;
     /**
      * @var Page_Row
      */
-    protected $_doc;
+    private $doc;
     /**
      * @var int
      */
-    protected $_language = 'en';
+    private $language = 'en';
 
-    protected $_parentsCache = array();
+    private $parentsCache = [];
 
-    protected $_pages = array();
+    private $pages = [];
 
-    protected $_langPages = array();
+    private $langPages = [];
 
     public function __construct()
     {
-        $this->_pageTable = new Pages();
-        $this->_pageLanguageTable = new Page_Language();
+        $this->pageTable = new Pages();
+        $this->pageLanguageTable = new Page_Language();
 
         if (Zend_Registry::isRegistered('Zend_Locale')) {
             $locale = new Zend_Locale(Zend_Registry::get('Zend_Locale'));
-            $this->_language = $locale->getLanguage();
+            $this->language = $locale->getLanguage();
         }
     }
 
@@ -56,10 +56,10 @@ class Page extends AbstractHelper
             if ($value instanceof Zend_Db_Table_Row)
                 $doc = $value;
             elseif (is_numeric($value)) {
-                $doc = $this->_getPageById($value);
+                $doc = $this->getPageById($value);
             }
 
-            $this->_doc = $doc;
+            $this->doc = $doc;
         }
 
         return $this;
@@ -67,13 +67,13 @@ class Page extends AbstractHelper
 
     public function __get($name)
     {
-        if (!$this->_doc) {
+        if (!$this->doc) {
             return '';
         }
         switch ($name) {
             /*case 'html':
-                return $this->_doc->getHtml(array(
-                    'language' => $this->_language
+                return $this->doc->getHtml(array(
+                    'language' => $this->language
                 ));*/
 
             case 'name':
@@ -81,41 +81,41 @@ class Page extends AbstractHelper
             case 'breadcrumbs':
                 $field = $name;
 
-                $id = $this->_doc->id;
-                $lang = $this->_language;
+                $id = $this->doc->id;
+                $lang = $this->language;
 
-                if (!isset($this->_langPages[$id][$lang])) {
-                    $this->_langPages[$id][$lang] = $this->_pageLanguageTable->fetchRow(array(
+                if (!isset($this->langPages[$id][$lang])) {
+                    $this->langPages[$id][$lang] = $this->pageLanguageTable->fetchRow(array(
                         'page_id = ?'  => $id,
                         'language = ?' => $lang
                     ));
                 }
 
-                $langDoc = $this->_langPages[$id][$lang];
+                $langDoc = $this->langPages[$id][$lang];
 
                 if ($langDoc && $langDoc[$field]) {
                     return $langDoc[$field];
                 }
-                return $this->_doc[$field];
+                return $this->doc[$field];
 
             case 'onPath':
-                return $this->_isParentOrSelf($this->_currentPage, $this->_doc);
+                return $this->isParentOrSelf($this->_currentPage, $this->doc);
                 break;
         }
 
         return '';
     }
 
-    protected function _getPageById($id)
+    private function getPageById($id)
     {
-        if (isset($this->_pages[$id])) {
-            return $this->_pages[$id];
+        if (isset($this->pages[$id])) {
+            return $this->pages[$id];
         }
 
-        return $this->_pages[$id] = $this->_pageTable->find($id)->current();
+        return $this->pages[$id] = $this->pageTable->find($id)->current();
     }
 
-    protected function _isParentOrSelf($child, $parent)
+    private function isParentOrSelf($child, $parent)
     {
         if (!$parent || !$child) {
             return false;
@@ -129,14 +129,14 @@ class Page extends AbstractHelper
             return true;
         }
 
-        if (isset($this->_parentsCache[$child->id][$parent->id])) {
-            return $this->_parentsCache[$child->id][$parent->id];
+        if (isset($this->parentsCache[$child->id][$parent->id])) {
+            return $this->parentsCache[$child->id][$parent->id];
         }
 
-        $cParent = $child->parent_id ? $this->_getPageById($child->parent_id) : false;
-        $result = $this->_isParentOrSelf($cParent, $parent);
+        $cParent = $child->parent_id ? $this->getPageById($child->parent_id) : false;
+        $result = $this->isParentOrSelf($cParent, $parent);
 
-        $this->_parentsCache[$child->id][$parent->id] = $result;
+        $this->parentsCache[$child->id][$parent->id] = $result;
 
         return $result;
     }

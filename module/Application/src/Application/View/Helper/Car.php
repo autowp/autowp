@@ -41,16 +41,16 @@ class Car extends AbstractHelper
     /**
      * @var Spec
      */
-    private $_specTable;
+    private $specTable;
 
     /**
      * @return Spec
      */
-    private function _getSpecTable()
+    private function getSpecTable()
     {
-        return $this->_specTable
-            ? $this->_specTable
-            : $this->_specTable = new Spec();
+        return $this->specTable
+            ? $this->specTable
+            : $this->specTable = new Spec();
         }
 
     public function __invoke(Cars_Row $car = null)
@@ -382,7 +382,7 @@ class Car extends AbstractHelper
         $spec = null;
         $specFull = null;
         if ($car->spec_id) {
-            $specRow = $this->_getSpecTable()->find($car->spec_id)->current();
+            $specRow = $this->getSpecTable()->find($car->spec_id)->current();
             if ($specRow) {
                 $spec = $specRow->short_name;
                 $specFull = $specRow->name;

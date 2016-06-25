@@ -16,31 +16,31 @@ class PageEnv extends AbstractHelper
     /**
      * @var Zend_Db_Table
      */
-    protected $_pageTable;
+    private $pageTable;
 
     /**
      * @var Zend_Db_Table
      */
-    protected $_pageLanguageTable;
+    private $pageLanguageTable;
 
     /**
      * @var array
      */
-    protected $_onPath = [];
+    private $onPath = [];
 
     /**
      * @var int
      */
-    protected $_language = 'en';
+    private $language = 'en';
 
     public function __construct()
     {
-        $this->_pageTable = new Pages();
-        $this->_pageLanguageTable = new Page_Language();
+        $this->pageTable = new Pages();
+        $this->pageLanguageTable = new Page_Language();
 
         if (Zend_Registry::isRegistered('Zend_Locale')) {
             $locale = new Zend_Locale(Zend_Registry::get('Zend_Locale'));
-            $this->_language = $locale->getLanguage();
+            $this->language = $locale->getLanguage();
         }
     }
 
@@ -50,13 +50,13 @@ class PageEnv extends AbstractHelper
             return $this;
         }
 
-        $defaults = array(
+        $defaults = [
             'layout'             => [],
             'pageId'             => null,
             'pageTitle'          => null,
             'args'               => [],
             'breadcrumbsReplace' => null
-        );
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -81,12 +81,12 @@ class PageEnv extends AbstractHelper
 
         $page = null;
         if (isset($options['pageId'])) {
-            $page = $this->_pageTable->find($options['pageId'])->current();
+            $page = $this->pageTable->find($options['pageId'])->current();
         }
 
         if ($page) {
-            $name = $this->_replaceArgs($view->page($page)->name, $preparedNameArgs);
-            $title = $this->_replaceArgs($view->page($page)->title, $preparedNameArgs);
+            $name = $this->replaceArgs($view->page($page)->name, $preparedNameArgs);
+            $title = $this->replaceArgs($view->page($page)->title, $preparedNameArgs);
             $title = $title ? $title : $name;
 
             $view->headTitle($title, 'SET');
@@ -105,7 +105,7 @@ class PageEnv extends AbstractHelper
             $currentDoc = $page;
             do {
 
-                $this->_onPath[] = $currentDoc->id;
+                $this->onPath[] = $currentDoc->id;
 
                 if (!$currentDoc->is_group_node) {
                     if ($replace && ($replace['pageId'] == $currentDoc->id)) {
@@ -114,12 +114,12 @@ class PageEnv extends AbstractHelper
                         }
                     } else {
 
-                        $currentUrl = $this->_replaceArgs(
+                        $currentUrl = $this->replaceArgs(
                             $currentDoc->url,
                             $preparedUrlArgs
                         );
 
-                        $currentName = $this->_replaceArgs(
+                        $currentName = $this->replaceArgs(
                             $currentDoc->breadcrumbs
                                 ? $view->page($currentDoc)->breadcrumbs
                                 : $view->page($currentDoc)->name,
@@ -129,7 +129,7 @@ class PageEnv extends AbstractHelper
                         $view->breadcrumbs($currentUrl, $currentName, 'prepend');
                     }
                 }
-                $currentDoc = $this->_pageTable->find($currentDoc->parent_id)->current();
+                $currentDoc = $this->pageTable->find($currentDoc->parent_id)->current();
             } while($currentDoc);
         }
 
@@ -138,7 +138,7 @@ class PageEnv extends AbstractHelper
         }
     }
 
-    protected function _replaceArgs($str, $args)
+    private function replaceArgs($str, $args)
     {
         foreach ($args as $key => $value) {
             $str = str_replace($key, $value, $str);
@@ -148,7 +148,7 @@ class PageEnv extends AbstractHelper
 
     public function isOnPath($id)
     {
-        return in_array($id, $this->_onPath);
+        return in_array($id, $this->onPath);
     }
 
 }

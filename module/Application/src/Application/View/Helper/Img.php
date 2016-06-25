@@ -8,7 +8,7 @@ use Autowp\Image\Storage;
 
 class Img extends AbstractHtmlElement
 {
-    private $_attribs;
+    private $attribs;
 
     /**
      * @param int $imageId
@@ -17,7 +17,7 @@ class Img extends AbstractHtmlElement
      */
     public function __invoke($imageId, array $attribs = [])
     {
-        $this->_attribs = array();
+        $this->attribs = [];
         $format = null;
         if (array_key_exists('format', $attribs)) {
             $format = $attribs['format'];
@@ -38,7 +38,7 @@ class Img extends AbstractHtmlElement
 
         if ($imageInfo) {
             $attribs['src'] = $imageInfo->getSrc();
-            $this->_attribs = $attribs;
+            $this->attribs = $attribs;
         }
 
         return $this;
@@ -46,15 +46,15 @@ class Img extends AbstractHtmlElement
 
     public function src()
     {
-        return isset($this->_attribs['src']) ? $this->_attribs['src'] : '';
+        return isset($this->attribs['src']) ? $this->attribs['src'] : '';
     }
 
     public function __toString()
     {
         try {
 
-            if (isset($this->_attribs['src'])) {
-                return $this->view->htmlImg($this->_attribs);
+            if (isset($this->attribs['src'])) {
+                return $this->view->htmlImg($this->attribs);
             }
 
         } catch (\Exception $e) {
@@ -68,7 +68,7 @@ class Img extends AbstractHtmlElement
 
     public function exists()
     {
-        return isset($this->_attribs['src']) && $this->_attribs['src'];
+        return isset($this->attribs['src']) && $this->attribs['src'];
     }
 }
 

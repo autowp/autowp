@@ -21,46 +21,46 @@ class Pictures extends AbstractHelper
     /**
      * @var Picture_View
      */
-    protected $_pictureViewTable = null;
+    private $pictureViewTable = null;
 
     /**
      * @var Comment_Topic
      */
-    protected $_commentTopicTable = null;
+    private $commentTopicTable = null;
 
-    protected $_moderVoteTable = null;
+    private $moderVoteTable = null;
 
     /**
      * @return Pictures_Moder_Votes
      */
-    protected function getModerVoteTable()
+    private function getModerVoteTable()
     {
-        return $this->_moderVoteTable
-        ? $this->_moderVoteTable
-        : $this->_moderVoteTable = new Pictures_Moder_Votes();
+        return $this->moderVoteTable
+            ? $this->moderVoteTable
+            : $this->moderVoteTable = new Pictures_Moder_Votes();
     }
 
     /**
      * @return Picture_View
      */
-    protected function getPictureViewTable()
+    private function getPictureViewTable()
     {
-        return $this->_pictureViewTable
-            ? $this->_pictureViewTable
-            : $this->_pictureViewTable = new Picture_View();
+        return $this->pictureViewTable
+            ? $this->pictureViewTable
+            : $this->pictureViewTable = new Picture_View();
     }
 
     /**
      * @return Comment_Topic
      */
-    protected function getCommentTopicTable()
+    private function getCommentTopicTable()
     {
-        return $this->_commentTopicTable
-            ? $this->_commentTopicTable
-            : $this->_commentTopicTable = new Comment_Topic();
+        return $this->commentTopicTable
+            ? $this->commentTopicTable
+            : $this->commentTopicTable = new Comment_Topic();
     }
 
-    protected function _isPictureModer()
+    private function isPictureModer()
     {
         $view = $this->view;
 
@@ -73,9 +73,10 @@ class Pictures extends AbstractHelper
         return $isModer;
     }
 
+
     public function behaviour(Pictures_Row $picture)
     {
-        return $this->_behaviour($picture, $this->_isPictureModer());
+        return $this->_behaviour($picture, $this->isPictureModer());
     }
 
     /**
@@ -84,7 +85,7 @@ class Pictures extends AbstractHelper
      * @param bool $logedIn
      * @return string
      */
-    private function _renderBehaviour(array $picture, $isModer)
+    private function renderBehaviour(array $picture, $isModer)
     {
         return $this->view->partial('application/picture-behaviour', array(
             'isModer'        => $isModer,
@@ -169,7 +170,8 @@ class Pictures extends AbstractHelper
         return '<dl class="picture-behaviour">' . implode($behaviourHtml) . '</dl>';*/
     }
 
-    protected function _behaviour(Pictures_Row $picture, $isModer)
+
+    private function _behaviour(Pictures_Row $picture, $isModer)
     {
         $ctTable = $this->getCommentTopicTable();
         if ($this->view->user()->logedIn()) {
@@ -202,10 +204,11 @@ class Pictures extends AbstractHelper
             'status'      => $picture->status,
         ];
 
-        return $this->_renderBehaviour($data, $isModer);
+        return $this->renderBehaviour($data, $isModer);
     }
 
-    protected function _getModerVote(Pictures_Row $picture)
+
+    private function getModerVote(Pictures_Row $picture)
     {
         $moderVoteTable = $this->getModerVoteTable();
         $db = $moderVoteTable->getAdapter();
@@ -228,11 +231,12 @@ class Pictures extends AbstractHelper
         return $moderVote;
     }
 
+
     public function picture(Pictures_Row $picture)
     {
         $view = $this->view;
 
-        $isModer = $this->_isPictureModer();
+        $isModer = $this->isPictureModer();
 
         $caption = $picture->getCaption(array(
             'language' => $view->language()->get()
@@ -252,7 +256,7 @@ class Pictures extends AbstractHelper
             $escCaption = '<span style="color:darkgreen" title="Картинке задано особое название">'.$escCaption.'</span>';
         }
 
-        $moderVote = $this->_getModerVote($picture);
+        $moderVote = $this->getModerVote($picture);
 
         $classes = array('picture-preview');
         if ($moderVote !== null) {
@@ -274,15 +278,16 @@ class Pictures extends AbstractHelper
                 '</div>';
     }
 
-    protected function _splitByScheme(array $items, $scheme)
+
+    private function splitByScheme(array $items, $scheme)
     {
         switch ($scheme) {
             case self::SCHEME_422:
-                return $this->_splitBy3Level($items, 4, 2);
+                return $this->splitBy3Level($items, 4, 2);
                 break;
 
             case self::SCHEME_631:
-                return $this->_splitBy3Level($items, 6, 3);
+                return $this->splitBy3Level($items, 6, 3);
                 break;
 
             default:
@@ -290,7 +295,8 @@ class Pictures extends AbstractHelper
         }
     }
 
-    protected function _splitBy3Level(array $items, $perLine, $perSuperCol)
+
+    private function splitBy3Level(array $items, $perLine, $perSuperCol)
     {
         $html = array();
 
