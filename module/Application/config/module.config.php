@@ -338,6 +338,16 @@ return [
                     ]
                 ]
             ],
+            'new' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route' => '/new[/:date][/page:page]',
+                    'defaults' => [
+                        'controller' => Controller\NewController::class,
+                        'action'     => 'index'
+                    ]
+                ]
+            ],
             'pulse' => [
                 'type' => Literal::class,
                 'options' => [
@@ -758,6 +768,7 @@ return [
             Controller\LogController::class          => InvokableFactory::class,
             Controller\LoginController::class        => InvokableFactory::class,
             Controller\MapController::class          => InvokableFactory::class,
+            Controller\NewController::class          => InvokableFactory::class,
             Controller\MuseumsController::class      => InvokableFactory::class,
             Controller\PulseController::class        => InvokableFactory::class,
             Controller\RulesController::class        => InvokableFactory::class,

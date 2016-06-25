@@ -106,8 +106,15 @@ class InboxController extends AbstractActionController
             return $this->redirect()->toUrl($url);
         }
 
-        // for date formatting fix
-        //$this->setParam('date', $service->getCurrentDateStr());
+        $currentDateStr = $service->getCurrentDateStr();
+        if ($this->params('date') != $currentDateStr) {
+            $url = $this->url()->fromRoute('inbox', [
+                'brand' => $brandCatname,
+                'date'  => $currentDateStr,
+                'page'  => null
+            ]);
+            return $this->redirect()->toUrl($url);
+        }
 
         $paginator = $service->getPaginator2()
             ->setItemCountPerPage(self::PER_PAGE)
