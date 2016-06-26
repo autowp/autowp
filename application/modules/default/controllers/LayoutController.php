@@ -174,7 +174,7 @@ class LayoutController extends Zend_Controller_Action
         $logedIn = $this->_helper->user()->logedIn();
 
 
-        $key = 'MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '3_' . $language;
+        $key = 'MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '4_' . $language;
         if (!($pages = $cache->load($key))) {
             $pages = $this->getMenuData(2, $logedIn, $language);
 

@@ -348,6 +348,16 @@ return [
                     ]
                 ]
             ],
+            'mosts' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/mosts[/:most_catname][/:shape_catname][/:years_catname]',
+                    'defaults' => [
+                        'controller' => Controller\MostsController::class,
+                        'action'     => 'index'
+                    ]
+                ]
+            ],
             'museums' => [
                 'type' => Literal::class,
                 'options' => [
@@ -807,6 +817,10 @@ return [
             Controller\LogController::class          => InvokableFactory::class,
             Controller\LoginController::class        => InvokableFactory::class,
             Controller\MapController::class          => InvokableFactory::class,
+            Controller\MostsController::class => function($sm) {
+                $textStorage = $sm->get(TextStorage\Service::class);
+                return new Controller\MostsController($textStorage);
+            },
             Controller\NewController::class          => InvokableFactory::class,
             Controller\MuseumsController::class      => InvokableFactory::class,
             Controller\PulseController::class        => InvokableFactory::class,

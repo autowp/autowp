@@ -16,7 +16,7 @@ use Users_Row;
 class MainMenu
 {
     /**
-     * @var Page
+     * @var Pages
      */
     private $pageTable;
 
@@ -113,7 +113,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_CATEGORY_MENU_2_' . $language;
+        $key = 'ZF2_CATEGORY_MENU_3_' . $language;
 
         $categories = $this->cache->getItem($key, $success);
         if (!$success) {
@@ -121,7 +121,7 @@ class MainMenu
             $categories = [];
 
             $categoryTable = new Category();
-            $categoryLanguageTable = new Category_Language();
+            $categoryLangTable = new Category_Language();
 
             $rows = $categoryTable->fetchAll([
                 'parent_id is null',
@@ -129,7 +129,7 @@ class MainMenu
 
             foreach ($rows as $row) {
 
-                $langRow = $categoryLanguageTable->fetchRow([
+                $langRow = $categoryLangTable->fetchRow([
                     'language = ?'    => $language,
                     'category_id = ?' => $row->id
                 ]);
@@ -189,7 +189,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '2_' . $language;
+        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '_3_' . $language;
 
         $pages = $this->cache->getItem($key, $success);
         if (!$success) {

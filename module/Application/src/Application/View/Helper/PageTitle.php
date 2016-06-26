@@ -15,7 +15,7 @@ class PageTitle extends AbstractStandalone
      *
      * @var string
      */
-    protected $regKey = 'Application_View_Helper_PageTitle';
+    protected $regKey = 'Application_View_Helper_PageTitle2';
 
     /**
      * Default title rendering order (i.e. order in which each title attached)
@@ -67,7 +67,7 @@ class PageTitle extends AbstractStandalone
 
         $output = $this->renderTitle();
 
-        return $indent . '<title>' . $output . '</title>';
+        return $indent . '<div class="page-header"><h1>' . $output . '</h1></div>';
     }
 
     /**

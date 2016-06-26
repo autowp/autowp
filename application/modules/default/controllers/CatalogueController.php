@@ -2836,11 +2836,11 @@ class CatalogueController extends Zend_Controller_Action
                             ), 'catalogue', true);
                         }
 
-                        $pictures[] = array(
+                        $pictures[] = [
                             'name' => isset($names[$id]) ? $names[$id] : null,
                             'src'  => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
                             'url'  => $url
-                        );
+                        ];
                         $idx++;
                     } else {
                         $pictures[] = null;

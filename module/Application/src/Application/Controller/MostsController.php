@@ -1,45 +1,62 @@
 <?php
 
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+
 use Application\Service\Mosts;
 
-class MostController extends Zend_Controller_Action
+use Autowp\TextStorage;
+
+use Application_Service_Specifications;
+use Car_Parent;
+use Picture;
+
+class MostsController extends AbstractActionController
 {
+    private $textStorage;
+
+    public function __construct(TextStorage\Service $textStorage)
+    {
+        $this->textStorage = $textStorage;
+    }
+
     public function indexAction()
     {
         $specService = new Application_Service_Specifications();
-        $service = new Mosts(array(
+        $service = new Mosts([
             'specs' => $specService
-        ));
+        ]);
 
-        $language = $this->_helper->language();
-        $yearsCatname = $this->_getParam('years_catname');
-        $carTypeCatname = $this->_getParam('shape_catname');
-        $mostCatname = $this->_getParam('most_catname');
+        $language = $this->language();
+        $yearsCatname = $this->params('years_catname');
+        $carTypeCatname = $this->params('shape_catname');
+        $mostCatname = $this->params('most_catname');
 
-        $data = $service->getData(array(
+        $data = $service->getData([
             'language' => $language,
             'most'     => $mostCatname,
             'years'    => $yearsCatname,
             'carType'  => $carTypeCatname
-        ));
+        ]);
 
         foreach ($data['sidebar']['mosts'] as &$most) {
-            $most['url'] = $this->_helper->url->url($most['params'], 'most');
+            $most['url'] = $this->url()->fromRoute('mosts', $most['params']);
         }
         foreach ($data['sidebar']['carTypes'] as &$carType) {
-            $carType['url'] = $this->_helper->url->url($carType['params'], 'most');
+            $carType['url'] = $this->url()->fromRoute('mosts', $carType['params']);
             foreach ($carType['childs'] as &$child) {
-                $child['url'] = $this->_helper->url->url($child['params'], 'most');
+                $child['url'] = $this->url()->fromRoute('mosts', $child['params']);
             }
         }
         foreach ($data['years'] as &$year) {
-            $year['url'] = $this->_helper->url->url($year['params'], 'most');
+            $year['url'] = $this->url()->fromRoute('mosts', $year['params']);
         }
 
 
         // images
-        $formatRequests = array();
-        $allPictures = array();
+        $formatRequests = [];
+        $allPictures = [];
         $idx = 0;
         foreach ($data['carList']['cars'] as $car) {
             foreach ($car['pictures'] as $picture) {
@@ -50,31 +67,30 @@ class MostController extends Zend_Controller_Action
             }
         }
 
-        $imageStorage = $this->_helper->imageStorage();
+        $imageStorage = $this->imageStorage();
         $imagesInfo = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb');
 
         $pictureTable = new Picture();
-        $names = $pictureTable->getNameData($allPictures, array(
+        $names = $pictureTable->getNameData($allPictures, [
             'language' => $language
-        ));
+        ]);
 
         $carParentTable = new Car_Parent();
-        $textStorage = $this->_helper->textStorage();
 
         $idx = 0;
         foreach ($data['carList']['cars'] as &$car) {
-            
+
             $description = null;
             if ($car['car']['text_id']) {
-                $description = $textStorage->getText($car['car']['text_id']);
+                $description = $this->textStorage->getText($car['car']['text_id']);
             }
             $car['description'] = $description;
-            
+
             $pictures = [];
 
-            $paths = $carParentTable->getPaths($car['car']['id'], array(
+            $paths = $carParentTable->getPaths($car['car']['id'], [
                 'breakOnFirst' => true
-            ));
+            ]);
 
             foreach ($car['pictures'] as $picture) {
                 if ($picture) {
@@ -82,20 +98,20 @@ class MostController extends Zend_Controller_Action
 
                     $url = null;
                     foreach ($paths as $path) {
-                        $url = $this->_helper->url->url(array(
+                        $url = $this->url()->fromRoute('catalogue', [
                             'action'        => 'brand-car-picture',
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
                             'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ), 'catalogue', true);
+                        ]);
                     }
 
-                    $pictures[] = array(
+                    $pictures[] = [
                         'name' => isset($names[$id]) ? $names[$id] : null,
                         'src'  => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
                         'url'  => $url
-                    );
+                    ];
                     $idx++;
                 } else {
                     $pictures[] = null;
@@ -107,10 +123,6 @@ class MostController extends Zend_Controller_Action
         }
         unset($car);
 
-        $this->view->assign(
-            $data
-        );
-
-        $this->getResponse()->insert('sidebar', $this->view->render('most/sidebar.phtml'));
+        return $data;
     }
 }
