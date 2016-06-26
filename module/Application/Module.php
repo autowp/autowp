@@ -341,7 +341,6 @@ class Module implements ConsoleUsageProviderInterface,
                 if ($token) {
                     $adapter = new Project_Auth_Adapter_Remember();
                     $adapter->setCredential($token);
-                    $auth = Zend_Auth::getInstance();
                     $result = $auth->authenticate($adapter);
                 }
             }

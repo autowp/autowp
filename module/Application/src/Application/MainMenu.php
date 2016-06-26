@@ -4,13 +4,14 @@ namespace Application;
 
 use Application\Model\Message;
 use Application\Language;
-use Zend_Cache_Manager;
 
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Router\Http\TreeRouteStack;
 
 use Category;
 use Category_Language;
 use Pages;
+use Users_Row;
 
 class MainMenu
 {
@@ -32,38 +33,54 @@ class MainMenu
     private $language;
 
     /**
-     * @var Zend_Cache_Manager
+     * @var StorageInterface
      */
-    private $cacheManager;
+    private $cache;
 
-    public function __construct($request, TreeRouteStack $router, Language $language, Zend_Cache_Manager $cacheManager)
+    /**
+     * @var array
+     */
+    private $icons = [
+        29  => 'fa fa-fw fa-upload',
+        89  => 'fa fa-fw fa-comment',
+        136 => 'fa fa-fw fa-info',
+        48  => 'fa fa-fw fa-user',
+        90  => 'fa fa-fw fa-sign-out',
+        124 => 'fa fa-fw fa fa-users',
+        91  => 'fa fa-fw fa fa-pencil'
+    ];
+
+    /**
+     * @var array
+     */
+    private $hosts = [];
+
+    public function __construct($request, TreeRouteStack $router, Language $language, StorageInterface $cache, $hosts)
     {
         $this->request = $request;
         $this->router = $router;
         $this->language = $language;
-        $this->cacheManager = $cacheManager;
+        $this->hosts = $hosts;
+        $this->cache = $cache;
+
+        $this->pageTable = new Pages();
     }
 
     /**
-     * @return Page
+     * @param int $id
+     * @param boolean $logedIn
+     * @param string $language
+     * @return array
      */
-    private function getPageTable()
-    {
-        return $this->pageTable
-            ? $this->pageTable
-            : $this->pageTable = new Pages();
-    }
-
     private function getMenuData($id, $logedIn, $language)
     {
-        $table = $this->getPageTable();
-        $db = $table->getAdapter();
+        $db = $this->pageTable->getAdapter();
 
         $expr = 'pages.id = page_language.page_id and ' .
                 $db->quoteInto('page_language.language = ?', $language);
 
         $select = $db->select()
-            ->from($table->info('name'), [
+            ->from($this->pageTable->info('name'), [
                 'id', 'url', 'class',
                 'name' => 'if(length(page_language.name) > 0, page_language.name, pages.name)'
             ])
@@ -95,11 +112,11 @@ class MainMenu
     private function getCategoriesItems()
     {
         $language = $this->language->getLanguage();
-        $cache = $this->cacheManager->getCache('long');
 
         $key = 'ZF2_CATEGORY_MENU_2_' . $language;
 
-        if (!($categories = $cache->load($key))) {
+        $categories = $this->cache->getItem($key, $success);
+        if (!$success) {
 
             $categories = [];
 
@@ -131,7 +148,7 @@ class MainMenu
                 ];
             }
 
-            $cache->save($categories, null, [], 1800);
+            $this->cache->setItem($key, $categories);
         }
 
         return $categories;
@@ -144,50 +161,52 @@ class MainMenu
     private function getSecondaryMenu($logedIn)
     {
         $language = $this->language->getLanguage();
-        $cache = $this->cacheManager->getCache('long');
 
-        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '7_' . $language;
-        if (!($secondMenu = $cache->load($key))) {
+        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '8_' . $language;
+
+        $secondMenu = $this->cache->getItem($key, $success);
+        if (!$success) {
             $secondMenu = $this->getMenuData(87, $logedIn, $language);
 
             foreach ($secondMenu as &$item) {
-                switch($item['id']) {
-                    case  29: $item['icon'] = 'fa fa-fw fa-upload'; break;
-                    case  89: $item['icon'] = 'fa fa-fw fa-comment'; break;
-                    case 136: $item['icon'] = 'fa fa-fw fa-info'; break;
-                    case  48: $item['icon'] = 'fa fa-fw fa-user'; break;
-                    case  90: $item['icon'] = 'fa fa-fw fa-sign-out'; break;
-                    case 124: $item['icon'] = 'fa fa-fw fa fa-users'; break;
-                    case  91: $item['icon'] = 'fa fa-fw fa fa-pencil'; break;
+                if (isset($this->icons[$item['id']])) {
+                    $item['icon'] = $this->icons[$item['id']];
                 }
             }
             unset($item);
 
-            $cache->save($secondMenu, null, [], 1800);
+            $this->cache->setItem($key, $secondMenu);
         }
 
         return $secondMenu;
     }
 
+    /**
+     * @param boolean $logedIn
+     * @return array
+     */
     private function getPrimaryMenu($logedIn)
     {
         $language = $this->language->getLanguage();
-        $cache = $this->cacheManager->getCache('long');
 
         $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '2_' . $language;
-        if (!($pages = $cache->load($key))) {
+
+        $pages = $this->cache->getItem($key, $success);
+        if (!$success) {
             $pages = $this->getMenuData(2, $logedIn, $language);
 
-            $cache->save($pages, null, [], 1800);
+            $this->cache->setItem($key, $pages);
         }
 
         return $pages;
     }
 
-    public function getMenu()
+    /**
+     * @param Users_Row $user
+     * @return array
+     */
+    public function getMenu(Users_Row $user = null)
     {
-        $user = false;//$this->_helper->user()->get();
-
         $newMessages = 0;
         if ($user) {
             $mModel = new Message();
@@ -198,46 +217,29 @@ class MainMenu
 
         $searchHostname = 'www.autowp.ru';
 
-        $languages = [
-            [
-                'name'     => 'Русский',
-                'language' => 'ru',
-                'hostname' => 'www.autowp.ru',
-                'flag'     => 'flag-RU',
-            ],
-            [
-                'name'     => 'English (beta)',
-                'language' => 'en',
-                'hostname' => 'en.wheelsage.org',
-                'flag'     => 'flag-GB'
-            ],
-            [
-                'name'     => 'Français (beta)',
-                'language' => 'fr',
-                'hostname' => 'fr.wheelsage.org',
-                'flag'     => 'flag-FR'
-            ]
-        ];
+        $languages = [];
 
         $uri = $this->request->getUri();
-        foreach ($languages as &$item) {
-            $active = $item['language'] == $language;
-            $item['active'] = $active;
+        foreach ($this->hosts as $itemLanguage => $item) {
+            $active = $itemLanguage == $language;
             if ($active) {
                 $searchHostname = $item['hostname'];
             }
 
             $clone = clone $uri;
-
             $clone->setHost($item['hostname']);
 
-            $item['url'] = $clone->__toString();
+            $languages[] = [
+                'name'     => $item['name'],
+                'language' => $itemLanguage,
+                'hostname' => $item['hostname'],
+                'flag'     => $item['flag'],
+                'url'      => $clone->__toString(),
+                'active'   => $active
+            ];
         }
-        unset($item); // prevent future bugs
 
-        $logedIn = false; //$this->_helper->user()->logedIn();
-
-
+        $logedIn = (bool)$user;
 
         return [
             'pages'          => $this->getPrimaryMenu($logedIn),

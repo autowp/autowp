@@ -9,8 +9,6 @@ use Page_Language;
 
 use Zend_Db_Table;
 use Zend_Db_Table_Row;
-use Zend_Locale;
-use Zend_Registry;
 
 class Page extends AbstractHelper
 {
@@ -26,26 +24,26 @@ class Page extends AbstractHelper
      * @var Page_Row
      */
     private $doc;
-    /**
-     * @var int
-     */
-    private $language = 'en';
 
+    /**
+     * @var array
+     */
     private $parentsCache = [];
 
+    /**
+     * @var array
+     */
     private $pages = [];
 
+    /**
+     * @var array
+     */
     private $langPages = [];
 
     public function __construct()
     {
         $this->pageTable = new Pages();
         $this->pageLanguageTable = new Page_Language();
-
-        if (Zend_Registry::isRegistered('Zend_Locale')) {
-            $locale = new Zend_Locale(Zend_Registry::get('Zend_Locale'));
-            $this->language = $locale->getLanguage();
-        }
     }
 
     public function __invoke($value)
@@ -73,7 +71,7 @@ class Page extends AbstractHelper
         switch ($name) {
             /*case 'html':
                 return $this->doc->getHtml(array(
-                    'language' => $this->language
+                    'language' => $this->view->language()
                 ));*/
 
             case 'name':
@@ -82,7 +80,7 @@ class Page extends AbstractHelper
                 $field = $name;
 
                 $id = $this->doc->id;
-                $lang = $this->language;
+                $lang = $this->view->language();
 
                 if (!isset($this->langPages[$id][$lang])) {
                     $this->langPages[$id][$lang] = $this->pageLanguageTable->fetchRow(array(

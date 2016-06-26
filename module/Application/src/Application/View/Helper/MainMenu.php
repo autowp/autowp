@@ -19,6 +19,9 @@ class MainMenu extends AbstractHtmlElement
 
     public function __invoke()
     {
-        return $this->view->partial('application/main-menu', $this->mainMenu->getMenu());
+        $user = $this->view->user()->get();
+        $menu = $this->mainMenu->getMenu($user ? $user : null);
+
+        return $this->view->partial('application/main-menu', $menu);
     }
 }

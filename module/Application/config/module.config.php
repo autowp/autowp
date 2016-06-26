@@ -1029,10 +1029,11 @@ return [
 
                 $router = $sm->get('HttpRouter');
                 $language = $sm->get(Language::class);
-                $cacheManager = $sm->get(Zend_Cache_Manager::class);
+                $cache = $sm->get('longCache');
                 $request = $sm->get('Request');
+                $config = $sm->get('Config');
 
-                return new MainMenu($request, $router, $language, $cacheManager);
+                return new MainMenu($request, $router, $language, $cache, $config['hosts']);
             },
             Language::class => function($sm) {
 
@@ -1320,15 +1321,21 @@ return [
     'hosts' => [
         'ru' => [
             'hostname' => 'www.autowp.ru',
-            'timezone' => 'Europe/Moscow'
+            'timezone' => 'Europe/Moscow',
+            'name'     => 'Русский',
+            'flag'     => 'flag-RU'
         ],
         'en' => [
             'hostname' => 'en.wheelsage.org',
-            'timezone' => 'Europe/London'
+            'timezone' => 'Europe/London',
+            'name'     => 'English (beta)',
+            'flag'     => 'flag-GB'
         ],
         'fr' => [
             'hostname' => 'fr.wheelsage.org',
-            'timezone' => 'Europe/Paris'
+            'timezone' => 'Europe/Paris',
+            'name'     => 'Français (beta)',
+            'flag'     => 'flag-FR'
         ]
     ],
 
