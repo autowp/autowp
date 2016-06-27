@@ -9,6 +9,8 @@ use Application\Service\TrafficControl;
 use Application\Model\Brand;
 use Application\Model\Contact;
 
+use Application\Paginator\Adapter\Zend1DbTableSelect;
+
 use Application_Service_Specifications;
 use Brands;
 use Comment_Message;
@@ -28,42 +30,49 @@ class UsersController extends AbstractActionController
         $this->cache = $cache;
     }
 
-    public function userAction()
+    private function getUser()
     {
         $users = new Users();
 
-        $identity = trim($this->params('identity'));
+        $identity = $this->params('user_id');
 
-        if ($identity) {
+        if (preg_match('|^user([0-9]+)&|isu', $identity, $match)) {
             $user = $users->fetchRow([
-                'identity = ?' => $identity,
+                'id = ?' => (int)$match[1],
+                'identity is null',
                 'not deleted'
             ]);
         } else {
             $user = $users->fetchRow([
-                'id = ?' => (int)$this->params('user_id'),
-                'identity is null',
+                'identity = ?' => $identity,
                 'not deleted'
             ]);
         }
 
+        return $user;
+    }
+
+    public function userAction()
+    {
+        $users = new Users();
+
+        $user = $this->getUser();
+
         if (!$user) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
-        $pictureTable = $this->_helper->catalogue()->getPictureTable();
+        $pictureTable = $this->catalogue()->getPictureTable();
         $pictureAdapter = $pictureTable->getAdapter();
-        $this->view->picturesExists = $pictureAdapter->fetchOne(
+        $picturesExists = $pictureAdapter->fetchOne(
             $pictureAdapter->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
                 ->where('owner_id = ?', $user->id)
                 ->where('status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
         );
 
-        $this->view->current_user = $user;
-
-        $pictures = $this->_helper->catalogue()->getPictureTable();
-        $this->view->last_pictures = $pictures->fetchAll(
+        $pictures = $this->catalogue()->getPictureTable();
+        $lastPictures = $pictures->fetchAll(
             $pictures->select()
                 ->from('pictures')
                 ->where('owner_id = ?', $user->id)
@@ -73,7 +82,7 @@ class UsersController extends AbstractActionController
 
 
         $comments = new Comment_Message();
-        $this->view->last_comments = $comments->fetchAll(
+        $lastComments = $comments->fetchAll(
             $comments->select()
                 ->where('author_id = ?', $user->id)
                 ->where('type_id <> ?', Comment_Message::FORUMS_TYPE_ID)
@@ -83,19 +92,19 @@ class UsersController extends AbstractActionController
         );
 
         $userRenames = new User_Renames();
-        $this->view->renames = $userRenames->fetchAll(
+        $renames = $userRenames->fetchAll(
             $userRenames->select(true)
                 ->where('user_id = ?', $user->id)
                 ->order('date DESC')
         );
 
         $ban = $canBan = $canViewIp = $canDeleteUser = false;
-        if ($this->_helper->user()->logedIn()) {
-            if ($this->_helper->user()->get()->id != $user->id) {
-                $canBan = $this->_helper->user()->isAllowed('user', 'ban');
-                $canDeleteUser = $this->_helper->user()->isAllowed('user', 'delete');
+        if ($this->user()->logedIn()) {
+            if ($this->user()->get()->id != $user->id) {
+                $canBan = $this->user()->isAllowed('user', 'ban');
+                $canDeleteUser = $this->user()->isAllowed('user', 'delete');
             }
-            $canViewIp = $this->_helper->user()->isAllowed('user', 'ip');
+            $canViewIp = $this->user()->isAllowed('user', 'ip');
         }
 
         if ($canBan && $user->last_ip !== null) {
@@ -114,12 +123,13 @@ class UsersController extends AbstractActionController
 
         $contact = new Contact();
 
-        $currentUser = $this->_helper->user()->get();
+        $currentUser = $this->user()->get();
         $isMe = $currentUser && ($currentUser->id == $user->id);
         $inContacts = $currentUser && !$isMe && $contact->exists($currentUser->id, $user->id);
         $canBeInContacts = $currentUser && !$currentUser->deleted && !$isMe ;
 
         return [
+            'currentUser'     => $user,
             'ban'             => $ban,
             'canBan'          => $canBan,
             'canRemovePhoto'  => $canBan,
@@ -128,30 +138,20 @@ class UsersController extends AbstractActionController
             'accounts'        => $uaRows,
             'inContacts'      => $inContacts,
             'canBeInContacts' => $canBeInContacts,
-            'contactApiUrl'   => sprintf('/api/contacts/%d', $user->id)
+            'contactApiUrl'   => sprintf('/api/contacts/%d', $user->id),
+            'picturesExists'  => $picturesExists,
+            'last_pictures'   => $lastPictures,
+            'last_comments'   => $lastComments,
+            'renames'         => $renames
         ];
     }
 
     public function picturesAction()
     {
-        $users = new Users();
-        $identity = trim($this->params('identity'));
-        if ($identity) {
-            $user = $users->fetchRow(
-                $users->select()
-                    ->where('identity = ?', $identity)
-                    ->where('not deleted')
-            );
-        } else {
-            $user = $users->fetchRow(
-                $users->select()
-                    ->where('id = ?', (int)$this->params('user_id'))
-                    ->where('not deleted')
-            );
-        }
+        $user = $this->getUser();
 
         if (!$user) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
 
@@ -159,7 +159,7 @@ class UsersController extends AbstractActionController
         $brandModel = new Brand();
 
         $options = [
-            'language' => $this->_helper->language(),
+            'language' => $this->language(),
             'columns'  => [
                 'img',
                 'pictures_count' => new Zend_Db_Expr('COUNT(distinct pictures.id)')
@@ -183,10 +183,10 @@ class UsersController extends AbstractActionController
                 'img'           => $row['img'],
                 'name'          => $row['name'],
                 'picturesCount' => $row['pictures_count'],
-                'url'           => $this->_helper->url->url([
-                    'action'        => 'brandpictures',
+                'url'           => $this->url()->fromRoute('users/user/pictures/brand', [
+                    'user_id'       => $user->identity ? $user->identity : 'user' . $user->user_id,
                     'brand_catname' => $row['catname']
-                ], 'users')
+                ])
             ];
         }
 
@@ -198,36 +198,22 @@ class UsersController extends AbstractActionController
 
     public function brandpicturesAction()
     {
-        $users = new Users();
-        $identity = trim($this->params('identity'));
-        if ($identity) {
-            $user = $users->fetchRow(
-                $users->select()
-                    ->where('identity = ?', $identity)
-                    ->where('not deleted')
-            );
-        } else {
-            $user = $users->fetchRow(
-                $users->select()
-                    ->where('id = ?', (int)$this->params('user_id'))
-                    ->where('not deleted')
-            );
-        }
+        $user = $this->getUser();
 
         if (!$user) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
-        $language = $this->_helper->language();
+        $language = $this->language();
 
         $brandModel = new Brand();
         $brand = $brandModel->getBrandByCatname($this->params('brand_catname'), $language);
 
         if (!$brand) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
-        $pictures = $this->_helper->catalogue()->getPictureTable();
+        $pictures = $this->catalogue()->getPictureTable();
         $select = $pictures->select(true)
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
@@ -238,13 +224,17 @@ class UsersController extends AbstractActionController
             ->group('pictures.id')
             ->order(['pictures.add_date DESC', 'pictures.id DESC']);
 
-        $paginator = Zend_Paginator::factory($select)
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+
+        $paginator
             ->setItemCountPerPage(18)
             ->setCurrentPageNumber($this->params('page'));
 
         $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
-        $picturesData = $this->_helper->pic->listData($select, [
+        $picturesData = $this->pic()->listData($select, [
             'width' => 6
         ]);
 
@@ -253,6 +243,10 @@ class UsersController extends AbstractActionController
             'brand'        => $brand,
             'paginator'    => $paginator,
             'picturesData' => $picturesData,
+            'urlParams'    => [
+                'user_id'       => $user->identity ? $user->identity : 'user' . $user->user_id,
+                'brand_catname' => $brand['catname']
+            ]
         ];
     }
 

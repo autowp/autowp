@@ -1,19 +1,22 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 141,
-        'args'   => array(
+        'args'   => [
             'BRAND_NAME'    => $this->brand['name'],
             'USER_NAME'     => $this->user->getCompoundName(),
             'USER_IDENTITY' => $this->user->identity ? $this->user->identity : 'user' . $this->user->id,
             'BRAND_NAME'    => $this->brand['name'],
             'BRAND_CATNAME' => $this->brand['catname']
-        )
-    ));
+        ]
+    ]);
 ?>
-<?=$this->partial('pictures.phtml', $this->picturesData)?>
-<?=$this->paginationControl($this->paginator) ?>
+<?=$this->partial('application/pictures', $this->picturesData)?>
+<?=$this->paginationControl($this->paginator, null, null, [
+    'route'     => 'users/user/pictures/brand',
+    'urlParams' => $this->urlParams
+]) ?>

@@ -1,16 +1,16 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 63,
-        'args'   => array(
-            'USER_NAME'     => $this->user->getCompoundName(),
+        'args'   => [
+            'USER_NAME'     => $this->user->name,
             'USER_IDENTITY' => $this->user->identity ? $this->user->identity : 'user' . $this->user->id,
-        )
-    ));
+        ]
+    ]);
 
     $cols = 4;
     $count = count($this->brands);
@@ -27,11 +27,11 @@
                 ?>
                 <?php if ($brand) { ?>
                     <?php
-                        $image = $this->img($brand['img'], array(
+                        $image = $this->img($brand['img'], [
                             'alt'    => 'логотип '. $brand['name'],
                             'title'  => 'логотип '. $brand['name'],
                             'format' => 'brandicon'
-                        ));
+                        ]);
                     ?>
                     <div class="col-md-4">
                         <?php if ($image->exists()) { ?>

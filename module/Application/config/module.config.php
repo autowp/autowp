@@ -65,6 +65,37 @@ return [
                     ],
                 ],
             ],
+            'ban' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/ban',
+                    'defaults' => [
+                        'controller' => Controller\BanController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'ban-user' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'  => '/ban-user',
+                            'defaults' => [
+                                'action' => 'ban-user',
+                            ]
+                        ]
+                    ],
+                    'unban-user' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'  => '/unban-user',
+                            'defaults' => [
+                                'action' => 'unban-user',
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'brands' => [
                 'type' => Literal::class,
                 'options' => [
@@ -481,6 +512,30 @@ return [
                             'defaults' => [
                                 'action' => 'user',
                             ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'pictures' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/pictures',
+                                    'defaults' => [
+                                        'action' => 'pictures',
+                                    ],
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'brand' => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route' => '/:brand_catname[/page:page]',
+                                            'defaults' => [
+                                                'action' => 'brandpictures',
+                                            ],
+                                        ],
+                                    ]
+                                ]
+                            ],
                         ]
                     ],
                     'online' => [
@@ -622,6 +677,22 @@ return [
                                         'type' => WildcardSafe::class
                                     ]
                                 ]
+                            ]
+                        ]
+                    ],
+                    'users' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/users[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\UsersController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
                             ]
                         ]
                     ],
