@@ -492,6 +492,29 @@ return [
                             ],
                         ]
                     ],
+                    'rating' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/rating',
+                            'defaults' => [
+                                'action' => 'rating',
+                                'rating' =>  'specs'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'pictures' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/pictures',
+                                    'defaults' => [
+                                        'action' => 'rating',
+                                        'rating' =>  'pictures'
+                                    ],
+                                ],
+                            ]
+                        ]
+                    ]
                 ]
             ],
             'moder' => [
@@ -863,7 +886,10 @@ return [
                 return new Controller\RestorePasswordController($service, $restoreForm, $newPasswordForm, $transport);
             },
             Controller\RulesController::class        => InvokableFactory::class,
-            Controller\UsersController::class        => InvokableFactory::class,
+            Controller\UsersController::class => function($sm) {
+                $cache = $sm->get('longCache');
+                return new Controller\UsersController($cache);
+            },
             Controller\Api\ContactsController::class => InvokableFactory::class,
             Controller\Api\PictureController::class  => InvokableFactory::class,
             Controller\Api\UsersController::class => InvokableFactory::class,

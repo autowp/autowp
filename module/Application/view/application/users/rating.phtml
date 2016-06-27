@@ -1,23 +1,19 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => true
-        ),
+        ],
         'pageId' => 173,
-    ));
+    ]);
 ?>
 <ul class="nav nav-pills" style="margin-bottom:10px">
     <li<?=$this->rating == 'specs' ? ' class="active"' : ''?>>
-        <?=$this->htmlA($this->url(array(
-            'rating' => null
-        )), $this->translate('users/rating/specifications'))?>
+        <?=$this->htmlA($this->url('users/rating'), $this->translate('users/rating/specifications'))?>
     </li>
     <li<?=$this->rating == 'pictures' ? ' class="active"' : ''?>>
-        <?=$this->htmlA($this->url(array(
-            'rating' => 'pictures'
-        )), $this->translate('users/rating/pictures'))?>
+        <?=$this->htmlA($this->url('users/rating/pictures'), $this->translate('users/rating/pictures'))?>
     </li>
 </ul>
 <table class="table">
@@ -26,9 +22,9 @@
             <th>#</th>
             <th></th>
             <th></th>
-            <th class="text-right"><?=$this->escape($this->translate($this->valueTitle))?></th>
+            <th class="text-right"><?=$this->escapeHtml($this->translate($this->valueTitle))?></th>
             <?php if ($this->rating == 'specs') { ?>
-                <th class="text-right"><?=$this->escape($this->translate('users/rating/specs-volume'))?></th>
+                <th class="text-right"><?=$this->escapeHtml($this->translate('users/rating/specs-volume'))?></th>
             <?php } ?>
         </tr>
     </thead>

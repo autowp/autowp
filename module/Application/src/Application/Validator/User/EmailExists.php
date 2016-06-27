@@ -8,11 +8,16 @@ use Users;
 
 class EmailExists extends AbstractValidator
 {
-    const EXISTS = 'userEmailExists';
+    const NOT_EXISTS = 'userEmailNotExists';
 
-    public function isValid($value, $context = null)
+    protected $messageTemplates = [
+        self::EXISTS => "E-mail '%value%' не зарегистрирован на сайте"
+
+    ];
+
+    public function isValid($value)
     {
-        $this->_messages = [];
+        $this->setValue($value);
 
         $table = new Users();
         $db = $table->getAdapter();
@@ -23,7 +28,7 @@ class EmailExists extends AbstractValidator
                 ->where('e_mail = ?', $value)
         );
         if (!$exists) {
-            $this->_messages[self::EXISTS] = sprintf("E-mail '%s' не зарегистрирован на сайте", $value);
+            $this->error(self::NOT_EXISTS);
             return false;
         }
         return true;
