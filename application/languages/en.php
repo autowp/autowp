@@ -220,10 +220,10 @@ return array (
     'most/bigclearance/param' => 'clearance',
     'most/smallclearance' => 'small clearance',
     'most/smallclearance/param' => 'clearance',
-    
+
     'mosts/sidebar/mostly…' => 'Most …',
     'mosts/sidebar/between…' => 'Between …',
-    
+
     'mosts/period/before1920' => 'before 1920го',
     'mosts/period/1920-29'    => '1920-29th',
     'mosts/period/1930-39'    => '1930-39th',
@@ -311,8 +311,8 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'login/forgot-password?' => 'Forgot your password?',
     'login/success-text' => 'We are glad to welcome you to our website',
     'login/remember' => 'remember',
-    'login/if-you-lose-password' => 'If you have forgotten your username or password, you can use the <a href="/restorepassword/">form of recovery by e-mail</a>',
-    'login/if-you-not-registered' => 'If you are not registered on the website, you can <a href="/registration/">do it now</a>!',
+    'login/if-you-lose-password' => 'If you have forgotten your username or password, you can use the <a href="/restorepassword">form of recovery by e-mail</a>',
+    'login/if-you-not-registered' => 'If you are not registered on the website, you can <a href="/registration">do it now</a>!',
     'login/sign-in-using-account' => 'Sign in using existing account',
     'login/login-or-password-is-incorrect' => 'Login or password is incorrect',
     'login/user-%s-not-found' => 'User with login or e-mail "%s" not found',
@@ -409,7 +409,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
         "If the message has got to you by mistake - just delete it\n\n" .
         "Sincerely, Robot %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'E-mail with confirmation code was sent',
-    
+
     'user/add-to-contacts' => 'Add to contacts',
     'user/remove-from-contacts' => 'Remove from contacts',
 
@@ -428,9 +428,9 @@ We do not collect information about our donators, however if you wish, we can ma
     'donate/success-text' => 'Thank you for your support.
         
 We will try not to disappoint you.',
-    
+
     'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s )',
-    
+
     'car-type/roadster'       => 'Roadster',
     'car-type/spyder'         => 'Spyder',
     'car-type/cabriolet'      => 'Cabriolet',
@@ -471,7 +471,7 @@ We will try not to disappoint you.',
     'car-type/2-floor-bus'    => '2-floor bus',
     'car-type/town-car'       => 'Town car',
     'car-type/barchetta'      => 'Barchetta',
-    
+
     'car-type-rp/roadster'       => 'Roadster',
     'car-type-rp/spyder'         => 'Spyder',
     'car-type-rp/cabriolet'      => 'Cabriolet',

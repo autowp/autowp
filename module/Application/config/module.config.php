@@ -243,7 +243,7 @@ return [
             'inbox' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route' => '/inbox[/:brand][/:date][/page:page]',
+                    'route' => '/inbox[/:brand][/:date][/page:page][/]',
                     'defaults' => [
                         'controller' => Controller\InboxController::class,
                         'action'     => 'index'
@@ -399,6 +399,37 @@ return [
                         'action'     => 'index',
                     ],
                 ],
+            ],
+            'restorepassword' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/restorepassword',
+                    'defaults' => [
+                        'controller' => Controller\RestorePasswordController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'new' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/new/:code',
+                            'defaults' => [
+                                'action' => 'new',
+                            ]
+                        ]
+                    ],
+                    'saved' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/saved',
+                            'defaults' => [
+                                'action' => 'saved',
+                            ]
+                        ]
+                    ]
+                ]
             ],
             'rules' => [
                 'type' => Literal::class,
@@ -824,6 +855,13 @@ return [
             Controller\NewController::class          => InvokableFactory::class,
             Controller\MuseumsController::class      => InvokableFactory::class,
             Controller\PulseController::class        => InvokableFactory::class,
+            Controller\RestorePasswordController::class => function($sm) {
+                $service = $sm->get(Service\UsersService::class);
+                $restoreForm = $sm->get('RestorePasswordForm');
+                $newPasswordForm = $sm->get('NewPasswordForm');
+                $transport = $sm->get('MailTransport');
+                return new Controller\RestorePasswordController($service, $restoreForm, $newPasswordForm, $transport);
+            },
             Controller\RulesController::class        => InvokableFactory::class,
             Controller\UsersController::class        => InvokableFactory::class,
             Controller\Api\ContactsController::class => InvokableFactory::class,
@@ -1496,17 +1534,6 @@ return [
                         ],
                     ],
                 ],
-                /*array('captcha', 'captcha', array(
-                    'required'   => true,
-                    'label'      => 'login/captcha',
-                    'captcha'    => array(
-                        'captcha' => 'Image',
-
-
-
-                    ),
-                    'decorators' => array('Captcha'),
-                )),*/
                 [
                     'spec' => [
                         'type' => 'Submit',
@@ -1539,6 +1566,127 @@ return [
                         ['name' => 'StringTrim']
                     ]
                 ]
+            ],
+        ],
+        'RestorePasswordForm' => [
+            //'hydrator' => 'ObjectProperty',
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'email',
+                        'options' => [
+                            'label'        => 'E-mail',
+                            'maxlength'    => 255,
+                            'size'         => 80,
+                            'autocomplete' => 'email',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Submit',
+                        'name' => 'submit',
+                        'attributes' => [
+                            'value' => 'Send',
+                        ]
+                    ],
+                ],
+            ],
+            'input_filter' => [
+                'email' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'EmailAddress']
+                    ]
+                ],
+            ],
+        ],
+        'NewPasswordForm' => [
+            //'hydrator' => 'ObjectProperty',
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Password',
+                        'name' => 'password',
+                        'options' => [
+                            'label'        => 'Пароль',
+                            'size'         => 20,
+                            'maxlength'    => 50,
+                            'autocomplete' => 'email',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Password',
+                        'name' => 'password_confirm',
+                        'options' => [
+                            'label'        => 'Пароль (еще раз)',
+                            'size'         => 20,
+                            'maxlength'    => 50,
+                            'autocomplete' => 'email',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Submit',
+                        'name' => 'submit',
+                        'attributes' => [
+                            'value' => 'Send',
+                        ]
+                    ],
+                ],
+            ],
+            'input_filter' => [
+                'password' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'min' => 6,
+                                'max' => 50
+                            ]
+                        ]
+                    ]
+                ],
+                'password_confirm' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'min' => 6,
+                                'max' => 50
+                            ]
+                        ],
+                        [
+                            'name' => 'Identical',
+                            'options' => [
+                                'token' => 'password',
+                            ],
+                        ]
+                    ]
+                ],
             ],
         ],
     ],

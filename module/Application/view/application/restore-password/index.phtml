@@ -1,17 +1,19 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 60,
-    ));
+    ]);
 ?>
 <div class="row">
     <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2">
         <p>Если вы забыли свой пароль - введите ваш e-mail (который вы указали при регистрации) и на него будет выслан пароль.</p>
-        <?=$this->form->render($this) ?>
+        <?=$this->partial('application/forms/bootstrap-horizontal', [
+            'form' => $this->form
+        ])?>
         <?php if ($this->message) { ?>
             <?php if ($this->success) { ?>
                 <p class="alert alert-block alert-success"><?=$this->message ?></p>

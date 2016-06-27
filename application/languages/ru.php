@@ -234,10 +234,10 @@ return array (
     'most/bigclearance/param' => 'дорожный просвет',
     'most/smallclearance' => 'маленький клиренс',
     'most/smallclearance/param' => 'дорожный просвет',
-    
+
     'mosts/sidebar/mostly…' => 'Самые …',
     'mosts/sidebar/between…' => 'Среди …',
-    
+
     'mosts/period/before1920' => 'до 1920го',
     'mosts/period/1920-29'    => '1920-29ых',
     'mosts/period/1930-39'    => '1930-39ых',
@@ -285,9 +285,9 @@ return array (
     'comments/send' => 'Отправить',
     'comments/cancel' => 'Отменить',
 	'comments/need-wait-text' => 'К сожалению вам нужно немного подождать, чтобы получить возможность оставить комментарий.
-		
+
 Это связано с наличием порога "сообщений в час", необходимого для борьбы со спамом и некоторыми другими негативными моментами.
-		
+
 Следующий комментарий вы сможете оставить в "%s", а пока у вас есть время уточнить ту мысль, которую вы хотели донести до общественности:',
 
     /*perspectives*/
@@ -325,8 +325,8 @@ return array (
     'login/forgot-password?' => 'Забыли пароль?',
     'login/success-text' => 'Рады снова приветствовать вас на нашем сайте',
     'login/remember' => 'запомнить',
-    'login/if-you-lose-password' => 'Если вы забыли свой логин или пароль, вы можете воспользоваться <a href="/restorepassword/">формой восстановления по e-mail</a>',
-    'login/if-you-not-registered' => 'Если вы ещё не зарегистрированы на сайте, то можете <a href="/registration/">сделать это сейчас</a>',
+    'login/if-you-lose-password' => 'Если вы забыли свой логин или пароль, вы можете воспользоваться <a href="/restorepassword">формой восстановления по e-mail</a>',
+    'login/if-you-not-registered' => 'Если вы ещё не зарегистрированы на сайте, то можете <a href="/registration">сделать это сейчас</a>',
     'login/sign-in-using-account' => 'Войти, используя учётную запись',
     'login/login-or-password-is-incorrect' => 'Логин или пароль неверен',
     'login/user-%s-not-found' => 'Пользователь с именем или e-mail "%s" не найден',
@@ -423,7 +423,7 @@ return array (
         "Если сообщение попало к вам по ошибке - просто удалите его\n\n" .
         "С Уважением, Робот %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'E-mail with a confirmation code was sent',
-    
+
     'user/add-to-contacts' => 'Добавить в контакты',
     'user/remove-from-contacts' => 'Удалить из контактов',
 
@@ -442,7 +442,7 @@ return array (
     'donate/success-text' => 'Благодарим вас за оказанную поддержку.
 
 Постараемся вас не разочаровать.',
-    
+
     'message/user-cancel-car-engine' => '%1$s отменил двигатель %2$s для автомобиля %3$s ( %4$s )',
 
     'car-type/roadster'       => 'Родстер',

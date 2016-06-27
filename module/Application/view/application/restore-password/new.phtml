@@ -1,18 +1,20 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 134,
-    ));
+    ]);
 ?>
 <div class="row">
     <div class="col-md-8 col-md-offset-2">
         <div class="well">
             <p>Введите новый пароль</p>
-            <?=$this->form->render($this) ?>
+            <?=$this->partial('application/forms/bootstrap-horizontal', [
+                'form' => $this->form
+            ])?>
         </div>
     </div>
 </div>

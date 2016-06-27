@@ -9,6 +9,7 @@ use Project_Auth_Adapter_Login;
 use User_Password_Remind;
 use User_Remember;
 use Users;
+use Users_Row;
 
 use Exception;
 

@@ -220,10 +220,10 @@ return array (
     'most/bigclearance/param' => 'garde au sol',
     'most/smallclearance' => 'petite garde au sol',
     'most/smallclearance/param' => 'garde au sol',
-    
+
     'mosts/sidebar/mostly…' => 'Le plus …',
     'mosts/sidebar/between…' => 'Parmi …',
-    
+
     'mosts/period/before1920' => 'jusqu\'à 1920го',
     'mosts/period/1920-29'    => '1920-29th',
     'mosts/period/1930-39'    => '1930-39th',
@@ -271,9 +271,9 @@ return array (
     'comments/send' => 'Envoyer',
     'comments/cancel' => 'Annuler',
 	'comments/need-wait-text' => 'Malheureusement, il faut attendre un peu pour obtenir la possibilité de laisser un commentaire.
-		
+
 Cela est dû à la présence d\'un seuil "messages par heure" nécessaire pour lutter contre le spam et autres moments négatifs.
-		
+
 Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le temps de clarifier l\'idée que vous voulez transmettre au public:',
 
     /*perspectives*/
@@ -311,8 +311,8 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'login/forgot-password?' => 'Récupérer mot de passe',
     'login/success-text' => 'Nous sommes heureux de vous revoir sur notre site',
     'login/remember' => 'rappeller',
-    'login/if-you-lose-password' => 'Si vous avez oublié votre login ou mot de passe, vous pouvez utiliser <a href="/restorepassword/">le formulaire de récupération par e-mail</a>',
-    'login/if-you-not-registered' => 'Si vous n\'êtes pas enregistré sur le site, vous <a href="/registration/">pouvez le faire maintenant</a>!',
+    'login/if-you-lose-password' => 'Si vous avez oublié votre login ou mot de passe, vous pouvez utiliser <a href="/restorepassword">le formulaire de récupération par e-mail</a>',
+    'login/if-you-not-registered' => 'Si vous n\'êtes pas enregistré sur le site, vous <a href="/registration">pouvez le faire maintenant</a>!',
     'login/sign-in-using-account' => 'Connectez-vous en utilisant un compte existant',
     'login/login-or-password-is-incorrect' => 'Login ou mot de passe est incorrect',
     'login/user-%s-not-found' => 'Utilisateur avec login ou e-mail "%s" non trouvé',
@@ -410,7 +410,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
         "Si le message a eu à vous par erreur - il suffit de le supprimer\n\n" .
         "Sincèrement, le Robot de %1\$s\n",
     'users/change-email/confirmation-message-sent' => 'Vous avez envoyé un e-mail avec un code de confirmation',
-    
+
     'user/add-to-contacts' => 'Ajouter aux contacts',
     'user/remove-from-contacts' => 'Enlever des contacts',
 
@@ -429,9 +429,9 @@ Nous ne recueillons pas d\'informations sur les donateurs, mais, si vous insiste
     'donate/success-text' => 'Merci pour votre soutien.
 
 Allons essayer de ne pas vous décevoir.',
-    
+
     'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s )',
-    
+
     'car-type/roadster'       => 'Roadster',
     'car-type/spyder'         => 'Spider',
     'car-type/cabriolet'      => 'Cabriolet',
@@ -472,7 +472,7 @@ Allons essayer de ne pas vous décevoir.',
     'car-type/2-floor-bus'    => 'Autobus de 2 étages',
     'car-type/town-car'       => 'Coupé de Ville',
     'car-type/barchetta'      => 'Barquette',
-    
+
     'car-type-rp/roadster'       => 'Roadster',
     'car-type-rp/spyder'         => 'Spider',
     'car-type-rp/cabriolet'      => 'Cabriolet',
