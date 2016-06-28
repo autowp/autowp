@@ -61,7 +61,7 @@ class UserTextRendererTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'http://www.autowp.ru/users/user1/', 
-                '<span class="user"><i class="fa fa-user"></i>&#xa0;<a href="/users/user1/">tester</a></span>'
+                '<span class="user"><i class="fa fa-user"></i>&#xa0;<a href="/users/user1">tester</a></span>'
             ],
             [
                 'http://www.autowp.ru/users/user9999999999/',
@@ -69,7 +69,7 @@ class UserTextRendererTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'http://www.autowp.ru/users/identity/',
-                '<span class="user"><i class="fa fa-user"></i>&#xa0;<a href="/users/identity/">tester2</a></span>'
+                '<span class="user"><i class="fa fa-user"></i>&#xa0;<a href="/users/identity">tester2</a></span>'
             ],
         ];
     }

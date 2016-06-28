@@ -2,7 +2,8 @@
 
 $zf2uri = ['/api/', '/oauth', '/users', '/rules', '/about', '/info', '/pulse',
     '/log/', '/map', '/donate', '/museum', '/factory', '/cutaway', '/brands',
-    '/inbox', '/new', '/articles', '/feedback', '/mosts', '/restorepassword'];
+    '/inbox', '/new', '/articles', '/feedback', '/mosts', '/restorepassword',
+    '/voting'];
 
 $zf2ExactUri = ['/log'];
 

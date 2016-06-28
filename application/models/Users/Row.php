@@ -9,7 +9,7 @@ class Users_Row extends Project_Db_Table_Row
      */
     public function getAboutUrl($absolute = false)
     {
-        return ($absolute ? HOST : '/').'users/' . ($this->identity ? $this->identity : 'user'.$this->id) . '/';
+        return ($absolute ? HOST : '/').'users/' . ($this->identity ? $this->identity : 'user'.$this->id);
     }
 
     public function getCompoundName()

@@ -572,6 +572,66 @@ return [
                     ]
                 ]
             ],
+            'votings' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/voting',
+                    'defaults' => [
+                        'controller' => Controller\VotingController::class,
+                    ],
+                ],
+                'may_terminate' => false,
+                'child_routes'  => [
+                    'voting' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route'    => '/voting/id/:id[/filter/:filter]',
+                            'defaults' => [
+                                'action' => 'voting'
+                            ],
+                        ]
+                    ],
+                    'voting-variant-votes' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route'    => '/voting-variant-votes/id/:id',
+                            'defaults' => [
+                                'action' => 'voting-variant-votes'
+                            ],
+                        ]
+                    ],
+                    'vote' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route'    => '/vote/id/:id',
+                            'defaults' => [
+                                'action' => 'vote'
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            /*'widget' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/widget',
+                    'defaults' => [
+                        'controller' => Controller\WidgetController::class,
+                    ],
+                ],
+                'may_terminate' => false,
+                'child_routes'  => [
+                    'picture-preview' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/picture-preview/picture_id/:picture_id',
+                            'defaults' => [
+                                'action' => 'picture-preview',
+                            ]
+                        ]
+                    ]
+                ]
+            ],*/
             'moder' => [
                 'type' => Literal::class,
                 'options' => [
@@ -961,6 +1021,7 @@ return [
                 $cache = $sm->get('longCache');
                 return new Controller\UsersController($cache);
             },
+            Controller\VotingController::class       => InvokableFactory::class,
             Controller\Api\ContactsController::class => InvokableFactory::class,
             Controller\Api\PictureController::class  => InvokableFactory::class,
             Controller\Api\UsersController::class => InvokableFactory::class,

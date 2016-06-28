@@ -1,67 +1,63 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => true
-        ),
+        ],
         'pageId' => 157,
-        'args'   => array(
+        'args'   => [
             'VOTING_NAME' => $this->voting->name,
             'VOTING_ID'   => $this->voting->id
-        )
-    ));
+        ]
+    ]);
 
     $this->layout()->moduleName = 'default/voting/voting';
 ?>
 <div class="well">
-    <p><?=nl2br($this->escape($this->voting->text))?></p>
+    <p><?=nl2br($this->escapeHtml($this->voting->text))?></p>
     <hr />
 
     <?php if ($this->canVote) { ?>
-        <form action="<?=$this->escape($this->url(array(
-            'action' => 'vote',
-            'id'     => $this->voting->id
-        )))?>" method="post">
+        <form action="<?=$this->escapeHtmlAttr($this->url('votings/vote', [
+            'id' => $this->voting->id
+        ]))?>" method="post">
             <ul class="unstyled">
                 <?php foreach ($this->variants as $variant) { ?>
                     <li>
                         <?php if ($this->voting->multivariant) { ?>
                             <label class="checkbox inline">
                                 <input type="checkbox" name="variant[]" value="<?=$variant['id']?>" />
-                                <?=$this->escape($variant['name'])?>
+                                <?=$this->escapeHtml($variant['name'])?>
                             </label>
                         <?php } else { ?>
                             <label class="radio inline">
                                 <input type="radio" name="variant[]" value="<?=$variant['id']?>" />
-                                <?=$this->escape($variant['name'])?>
+                                <?=$this->escapeHtml($variant['name'])?>
                             </label>
                         <?php } ?>
 
                         <?php if ($variant['text']) { ?>
-                            <p class="text-info"><?=nl2br($this->escape($variant['text']))?></p>
+                            <p class="text-info"><?=nl2br($this->escapeHtml($variant['text']))?></p>
                         <?php } ?>
                     </li>
                 <?php } ?>
             </ul>
-            <?=$this->formSubmit('submit', 'Голосовать', array(
-                'class' => 'btn btn-primary'
-            ))?>
+            <input type="submit" class="btn btn-primary" value="Голосовать" />
         </form>
     <?php } else { ?>
         <?php foreach ($this->variants as $variant) { ?>
             <?php if ($variant['votes']) { ?>
-                <p class="pull-right"><?=$this->htmlA(array(
+                <p class="pull-right"><?=$this->htmlA([
                     'class' => 'who-vote',
-                    'href'  => $this->url(array(
-                        'action' => 'voting-variant-votes',
-                        'id'     => $variant['id']
-                    ))
-                ), 'Кто проголосовал?')?></p>
+                    'href'  => $this->url('votings/voting-variant-votes', [
+                        'id' => $variant['id']
+                    ])
+                ], 'Кто проголосовал?')?></p>
             <?php } ?>
-            <?=$this->escape($variant['name'])?>
+            <?=$this->escapeHtml($variant['name'])?>
             <?php if ($variant['text']) { ?>
-                <p class="text-info"><?=nl2br($this->escape($variant['text']))?></p>
+                <p class="text-info"><?=nl2br($this->escapeHtml($variant['text']))?></p>
             <?php } ?>
             <div style="clear:both" class="progress">
                 <div class="progress-bar<?=$variant['isMax'] ? ' progress-bar-success' : ''?><?=$variant['isMin'] ? ' progress-bar-danger' : ''?>" style="width:<?=$variant['percent']?>%"><?=$variant['votes'] > 0 ? $variant['votes'] : ''?></div>
@@ -72,21 +68,23 @@
 <?php if (!$this->canVote && $this->user()->inheritsRole('moder')) { ?>
     <p class="pull-right">
         <?php if ($this->filter) { ?>
-            <?=$this->htmlA($this->url(array(
+            <?=$this->htmlA($this->url('votings/voting', [
+                'id'     => $this->voting->id,
                 'filter' => null
-            )), 'показать всех')?>
+            ]), 'показать всех')?>
         <?php } else { ?>
-            <?=$this->htmlA($this->url(array(
+            <?=$this->htmlA($this->url('votings/voting', [
+                'id'     => $this->voting->id,
                 'filter' => 1
-            )), 'показать только от 100 закаченных картинок')?>
+            ]), 'показать только от 100 закаченных картинок')?>
         <?php } ?>
     </p>
 <?php } ?>
 <p>Опрос проводится с <?=$this->voting->getDate('begin_date')->get(Zend_Date::DATES)?> по <?=$this->voting->getDate('end_date')->get(Zend_Date::DATES)?></p>
 
 <div id="comments">
-    <?=$this->action('comments', 'comments', 'default', array(
+    <?=$this->comments([
         'type'    => Comment_Message::VOTINGS_TYPE_ID,
         'item_id' => $this->voting->id
-    )) ?>
+    ]) ?>
 </div>

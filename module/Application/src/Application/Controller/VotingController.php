@@ -1,15 +1,28 @@
 <?php
 
-class VotingController extends Zend_Controller_Action
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
+
+use Zend_Date;
+use Zend_Db_Expr;
+
+use Voting;
+use Voting_Variant;
+use Voting_Variant_Vote;
+use Users;
+
+class VotingController extends AbstractActionController
 {
-    private function _canVote($voting)
+    private function canVote($voting)
     {
         $canVote = false;
 
         if ($voting->getDate('begin_date')->isEarlier(Zend_Date::now())) {
             if ($voting->getDate('end_date')->isLater(Zend_Date::now())) {
 
-                $user = $this->_helper->user()->get();
+                $user = $this->user()->get();
                 if ($user) {
                     $vvvTable = new Voting_Variant_Vote();
                     $voted = (bool)$vvvTable->fetchRow(
@@ -34,19 +47,19 @@ class VotingController extends Zend_Controller_Action
         $vTable = new Voting();
         $vvTable = new Voting_Variant();
 
-        $voting = $vTable->find($this->_getParam('id'))->current();
+        $voting = $vTable->find($this->params('id'))->current();
 
         if (!$voting) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
-        $filter = (int)$this->_getParam('filter');
+        $filter = (int)$this->params('filter');
         $vvvTable = new Voting_Variant_Vote();
 
-        $variants = array();
-        $vvRows = $vvTable->fetchAll(array(
+        $variants = [];
+        $vvRows = $vvTable->fetchAll([
             'voting_id = ?' => $voting->id
-        ), 'position');
+        ], 'position');
         $maxVotes = $minVotes = null;
         foreach ($vvRows as $vvRow) {
 
@@ -66,12 +79,12 @@ class VotingController extends Zend_Controller_Action
                     break;
             }
 
-            $variants[] = array(
+            $variants[] = [
                 'id'    => $vvRow->id,
                 'name'  => $vvRow->name,
                 'text'  => $vvRow->text,
                 'votes' => $votes,
-            );
+            ];
 
             if (is_null($maxVotes) || $votes > $maxVotes) {
                 $maxVotes = $votes;
@@ -100,22 +113,22 @@ class VotingController extends Zend_Controller_Action
         }
 
 
-        $this->view->assign(array(
-            'canVote'  => $this->_canVote($voting),
+        return [
+            'canVote'  => $this->canVote($voting),
             'voting'   => $voting,
             'variants' => $variants,
             'maxVotes' => $maxVotes,
             'filter'   => $filter
-        ));
+        ];
     }
 
     public function votingVariantVotesAction()
     {
         $vvTable = new Voting_Variant();
-        $variant = $vvTable->find($this->_getParam('id'))->current();
+        $variant = $vvTable->find($this->params('id'))->current();
 
         if (!$variant) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
         $vvvTable = new Voting_Variant_Vote();
@@ -127,58 +140,62 @@ class VotingController extends Zend_Controller_Action
                 ->where('voting_variant_vote.voting_variant_id = ?', $variant->id)
         );
 
-        $this->view->assign(array(
+        $viewModel = new ViewModel([
             'users' => $users
-        ));
+        ]);
+
+        $viewModel->setTerminal($this->getRequest()->isXmlHttpRequest());
+
+        return $viewModel;
     }
 
     public function voteAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
         $vTable = new Voting();
 
-        $voting = $vTable->find($this->_getParam('id'))->current();
+        $voting = $vTable->find($this->params('id'))->current();
 
         if (!$voting) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
-        if (!$this->_canVote($voting)) {
-            return $this->_forward('forbidden', 'error');
+        if (!$this->canVote($voting)) {
+            return $this->getResponse()->setStatusCode(403);
         }
 
         $vvTable = new Voting_Variant();
-        $vvRows = $vvTable->find($this->_getParam('variant'));
+        $vvRows = $vvTable->find($this->params()->fromPost('variant'));
 
         if (!$voting->multivariant) {
             if (count($vvRows) > 1) {
-                return $this->_forward('forbidden', 'error');
+                return $this->getResponse()->setStatusCode(403);
             }
         }
 
         $vvvTable = new Voting_Variant_Vote();
         $vvvAdapter = $vvvTable->getAdapter();
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
         foreach ($vvRows as $vvRow) {
             if ($vvRow->voting_id != $voting->id) {
                 continue;
             }
 
-            $vvvRow = $vvvTable->fetchRow(array(
+            $vvvRow = $vvvTable->fetchRow([
                 'voting_variant_id = ?' => $vvRow->id,
                 'user_id = ?'           => $user->id
-            ));
+            ]);
             if (!$vvvRow) {
-                $vvvTable->insert(array(
+                $vvvTable->insert([
                     'voting_variant_id' => $vvRow->id,
                     'user_id'           => $user->id,
                     'timestamp'         => new Zend_Db_Expr('now()')
-                ));
+                ]);
             }
 
             $vvRow->votes = $vvvAdapter->fetchOne(
@@ -197,9 +214,9 @@ class VotingController extends Zend_Controller_Action
         );
         $voting->save();
 
-        return $this->_redirect($this->_helper->url->url(array(
+        return $this->redirect()->toUrl($this->url()->fromRoute('votings/voting', [
             'action' => 'voting',
             'id'     => $voting->id
-        )));
+        ]));
     }
 }
