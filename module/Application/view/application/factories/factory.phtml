@@ -51,7 +51,7 @@
 
 <?php if ($this->pictures && count($this->pictures['items']) > 0) { ?>
     <h3>Фотографии</h3>
-    <?=$this->partial('pictures.phtml', $this->pictures)?>
+    <?=$this->partial('application/pictures', $this->pictures)?>
 <?php } ?>
 
 <?php if (count($this->carPictures) > 0) { ?>

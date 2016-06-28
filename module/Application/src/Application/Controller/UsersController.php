@@ -11,7 +11,6 @@ use Application\Model\Contact;
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Application_Service_Specifications;
 use Brands;
 use Comment_Message;
 use Picture;
@@ -36,20 +35,18 @@ class UsersController extends AbstractActionController
 
         $identity = $this->params('user_id');
 
-        if (preg_match('|^user([0-9]+)&|isu', $identity, $match)) {
-            $user = $users->fetchRow([
+        if (preg_match('|^user([0-9]+)$|isu', $identity, $match)) {
+            return $users->fetchRow([
                 'id = ?' => (int)$match[1],
                 'identity is null',
                 'not deleted'
             ]);
-        } else {
-            $user = $users->fetchRow([
-                'identity = ?' => $identity,
-                'not deleted'
-            ]);
         }
-
-        return $user;
+        
+        return $users->fetchRow([
+            'identity = ?' => $identity,
+            'not deleted'
+        ]);
     }
 
     public function userAction()
@@ -267,154 +264,172 @@ class UsersController extends AbstractActionController
         return $viewModel;
     }
 
-
-    public function ratingAction()
+    private function specsRating()
     {
         $userTable = new Users();
         $brandTable = new Brands();
-
+        
         $select = $userTable->select(true)
             ->where('not deleted')
-            ->limit(30);
+            ->limit(30)
+            ->where('specs_volume > 0')
+            ->order('specs_volume desc');
+        
+        $valueTitle = 'users/rating/specs-volume';
+        
+        $db = $brandTable->getAdapter();
+        
+        $precisionLimit = 50;
+        
+        $users = [];
+        foreach ($userTable->fetchAll($select) as $idx => $user) {
+            $brands = [];
+            if ($idx < 5) {
+        
+                $cacheKey = 'RATING_USER_BRAND_5_'.$precisionLimit.'_' . $user->id;
+                $brands = $this->cache->getItem($cacheKey, $success);
+                if (!$success) {
+        
+                    $carSelect = $db->select()
+                        ->from('brands_cars', ['brand_id', 'count(1)'])
+                        ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                        ->join('attrs_user_values', 'car_parent_cache.car_id = attrs_user_values.item_id', null)
+                        ->where('attrs_user_values.item_type_id = 1')
+                        ->where('attrs_user_values.user_id = ?', $user->id)
+                        ->group('brands_cars.brand_id')
+                        ->order('count(1) desc')
+                        ->limit($precisionLimit);
+        
+                    $engineSelect = $db->select()
+                        ->join('brand_engine', ['brand_id', 'count(1)'])
+                        ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
+                        ->join('attrs_user_values', 'engine_parent_cache.engine_id = attrs_user_values.item_id', null)
+                        ->where('attrs_user_values.item_type_id = 3')
+                        ->where('attrs_user_values.user_id = ?', $user->id)
+                        ->group('brand_engine.brand_id')
+                        ->order('count(1) desc')
+                        ->limit($precisionLimit);
+        
+                    $data = [];
+                    foreach ([$carSelect, $engineSelect] as $select) {
+                        $pairs = $db->fetchPairs($select);
+                        foreach ($pairs as $brandId => $value) {
+                            if (!isset($data[$brandId])) {
+                                $data[$brandId] = $value;
+                            } else {
+                                $data[$brandId] += $value;
+                            }
+                        }
+                    }
+        
+                    arsort($data, SORT_NUMERIC);
+                    $data = array_slice($data, 0, 3, true);
+        
+                    foreach ($data as $brandId => $value) {
+                        $row = $brandTable->find($brandId)->current();
+                        $brands[] = [
+                            'name' => $row->caption,
+                            'url'  => $this->url()->fromRoute('catalogue', [
+                                'action'        => 'brand',
+                                'brand_catname' => $row->folder
+                            ]),
+                            'value' => $value
+                        ];
+                    }
+                }
+        
+                $this->cache->setItem($cacheKey, $brands);
+            }
+        
+            $users[] = [
+                'row'    => $user,
+                'volume' => $user->specs_volume,
+                'brands' => $brands,
+                'weight' => $user->specs_weight
+            ];
+        }
+        
+        return [
+            'users'      => $users,
+            'rating'     => 'specs',
+            'valueTitle' => $valueTitle
+        ];
+    }
+    
+    private function picturesRating()
+    {
+        $userTable = new Users();
+        $brandTable = new Brands();
+        
+        $select = $userTable->select(true)
+            ->where('not deleted')
+            ->limit(30)
+            ->where('pictures_added > 0')
+            ->order('pictures_added desc');
+        
+        $valueTitle = 'users/rating/pictures';
+        
+        $users = [];
+        foreach ($userTable->fetchAll($select) as $idx => $user) {
+            $brands = [];
+            if ($idx < 5) {
+        
+                $cacheKey = 'RATING_USER_PICTURES_BRAND_4_' . $user->id;
+                $brands = $this->cache->getItem($cacheKey, $success);
+                if (!$success) {
+        
+                    $select = $brandTable->select(true)
+                        ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+                        ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                        ->join('pictures', 'car_parent_cache.car_id = pictures.car_id', null)
+                        ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                        ->group('brands_cars.brand_id')
+                        ->where('pictures.owner_id = ?', $user->id)
+                        ->order('count(1) desc')
+                        ->limit(3);
+        
+                    foreach ($brandTable->fetchAll($select) as $brand) {
+                        $brands[] = [
+                            'name' => $brand->caption,
+                            'url'  => $this->url()->fromRoute('catalogue', [
+                                'action'        => 'brand',
+                                'brand_catname' => $brand->folder
+                            ]),
+                        ];
+                    }
+                }
+        
+                $this->cache->setItem($cacheKey, $brands);
+            }
+        
+            $users[] = [
+                'row'    => $user,
+                'volume' => $user->pictures_added,
+                'brands' => $brands
+            ];
+        }
+        
+        return [
+            'users'      => $users,
+            'rating'     => 'pictures',
+            'valueTitle' => $valueTitle
+        ];
+    }
 
+    public function ratingAction()
+    {
         $rating = $this->params('rating', 'specs');
-
-        $valueTitle = '';
 
         switch ($rating) {
             case 'specs':
-                $valueTitle = 'users/rating/specs-volume';
-
-                $db = $brandTable->getAdapter();
-
-                $select->where('specs_volume > 0')
-                    ->order('specs_volume desc');
-
-                $precisionLimit = 50;
-
-                $service = new Application_Service_Specifications();
-
-                $users = [];
-                foreach ($userTable->fetchAll($select) as $idx => $user) {
-                    $brands = [];
-                    if ($idx < 5) {
-
-                        $cacheKey = 'RATING_USER_BRAND_4_'.$precisionLimit.'_' . $user->id;
-                        $brands = $this->cache->getItem($cacheKey, $success);
-                        if (!$success) {
-
-                            $carSelect = $db->select()
-                                ->from('brands_cars', ['brand_id', 'count(1)'])
-                                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                                ->join('attrs_user_values', 'car_parent_cache.car_id = attrs_user_values.item_id', null)
-                                ->where('attrs_user_values.item_type_id = 1')
-                                ->where('attrs_user_values.user_id = ?', $user->id)
-                                ->group('brands_cars.brand_id')
-                                ->order('count(1) desc')
-                                ->limit($precisionLimit);
-
-                            $engineSelect = $db->select()
-                                ->join('brand_engine', ['brand_id', 'count(1)'])
-                                ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
-                                ->join('attrs_user_values', 'engine_parent_cache.engine_id = attrs_user_values.item_id', null)
-                                ->where('attrs_user_values.item_type_id = 3')
-                                ->where('attrs_user_values.user_id = ?', $user->id)
-                                ->group('brand_engine.brand_id')
-                                ->order('count(1) desc')
-                                ->limit($precisionLimit);
-
-                            $data = [];
-                            foreach ([$carSelect, $engineSelect] as $select) {
-                                $pairs = $db->fetchPairs($select);
-                                foreach ($pairs as $brandId => $value) {
-                                    if (!isset($data[$brandId])) {
-                                        $data[$brandId] = $value;
-                                    } else {
-                                        $data[$brandId] += $value;
-                                    }
-                                }
-                            }
-
-                            arsort($data, SORT_NUMERIC);
-                            $data = array_slice($data, 0, 3, true);
-
-                            foreach ($data as $brandId => $value) {
-                                $row = $brandTable->find($brandId)->current();
-                                $brands[] = [
-                                    'name' => $row->caption,
-                                    'url'  => $this->url()->fromRoute('catalogue', [
-                                        'action'        => 'brand',
-                                        'brand_catname' => $row->folder
-                                    ]),
-                                    'value' => $value
-                                ];
-                            }
-                        }
-
-                        $this->cache->setItem($cacheKey, $brands);
-                    }
-
-                    $users[] = [
-                        'row'    => $user,
-                        'volume' => $user->specs_volume,
-                        'brands' => $brands,
-                        'weight' => $user->specs_weight
-                    ];
-                }
+                return $this->specsRating();
                 break;
 
             case 'pictures':
-                $valueTitle = 'users/rating/pictures';
-
-                $select->where('pictures_added > 0')
-                    ->order('pictures_added desc');
-
-                $users = [];
-                foreach ($userTable->fetchAll($select) as $idx => $user) {
-                    $brands = [];
-                    if ($idx < 5) {
-
-                        $cacheKey = 'RATING_USER_PICTURES_BRAND_3_' . $user->id;
-                        $brands = $this->cache->getItem($cacheKey, $success);
-                        if (!$success) {
-
-                            $select = $brandTable->select(true)
-                                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                                ->join('pictures', 'car_parent_cache.car_id = pictures.car_id', null)
-                                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-                                ->group('brands_cars.brand_id')
-                                ->where('pictures.owner_id = ?', $user->id)
-                                ->order('count(1) desc')
-                                ->limit(3);
-
-                            foreach ($brandTable->fetchAll($select) as $brand) {
-                                $brands[] = [
-                                    'name' => $brand->caption,
-                                    'url'  => $this->url()->fromRoute('catalogue', [
-                                        'action'        => 'brand',
-                                        'brand_catname' => $brand->folder
-                                    ]),
-                                ];
-                            }
-                        }
-
-                        $this->cache->setItem($cacheKey, $brands);
-                    }
-
-                    $users[] = [
-                        'row'    => $user,
-                        'volume' => $user->pictures_added,
-                        'brands' => $brands
-                    ];
-                }
+                return $this->picturesRating();
                 break;
         }
 
-        return [
-            'users'      => $users,
-            'rating'     => $rating,
-            'valueTitle' => $valueTitle
-        ];
+        return $this->getResponse()->setStatusCode(404);
     }
 }

@@ -244,6 +244,6 @@ class Users extends AbstractRoute
                 break;
         }
 
-        return implode(self::DELIMETER, $url) . self::DELIMETER;
+        return implode(self::DELIMETER, $url);
     }
 }
