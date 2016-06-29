@@ -74,26 +74,44 @@ return [
                         'action'     => 'index',
                     ],
                 ],
-                'may_terminate' => true,
+                'may_terminate' => false,
                 'child_routes'  => [
                     'ban-user' => [
-                        'type' => Literal::class,
+                        'type' => Segment::class,
                         'options' => [
-                            'route'  => '/ban-user',
+                            'route'  => '/ban-user/user_id/:user_id',
                             'defaults' => [
                                 'action' => 'ban-user',
                             ]
                         ]
                     ],
                     'unban-user' => [
-                        'type' => Literal::class,
+                        'type' => Segment::class,
                         'options' => [
-                            'route'  => '/unban-user',
+                            'route'  => '/unban-user/user_id/:user_id',
                             'defaults' => [
                                 'action' => 'unban-user',
                             ]
                         ]
-                    ]
+                    ],
+                    'ban-ip' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route'  => '/ban-ip/ip/:ip',
+                            'defaults' => [
+                                'action' => 'ban-ip',
+                            ]
+                        ]
+                    ],
+                    'unban-ip' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route'  => '/unban-ip/ip/:ip',
+                            'defaults' => [
+                                'action' => 'unban-ip',
+                            ]
+                        ]
+                    ],
                 ]
             ],
             'brands' => [
@@ -1146,6 +1164,7 @@ return [
                 return new Controller\AboutController($acl);
             },
             Controller\ArticlesController::class     => InvokableFactory::class,
+            Controller\BanController::class          => InvokableFactory::class,
             Controller\BrandsController::class => function($sm) {
                 $cache = $sm->get('longCache');
                 return new Controller\BrandsController($cache);

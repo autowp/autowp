@@ -181,7 +181,7 @@ class UsersController extends AbstractActionController
                 'name'          => $row['name'],
                 'picturesCount' => $row['pictures_count'],
                 'url'           => $this->url()->fromRoute('users/user/pictures/brand', [
-                    'user_id'       => $user->identity ? $user->identity : 'user' . $user->user_id,
+                    'user_id'       => $user->identity ? $user->identity : 'user' . $user->id,
                     'brand_catname' => $row['catname']
                 ])
             ];
@@ -241,7 +241,7 @@ class UsersController extends AbstractActionController
             'paginator'    => $paginator,
             'picturesData' => $picturesData,
             'urlParams'    => [
-                'user_id'       => $user->identity ? $user->identity : 'user' . $user->user_id,
+                'user_id'       => $user->identity ? $user->identity : 'user' . $user->id,
                 'brand_catname' => $brand['catname']
             ]
         ];
