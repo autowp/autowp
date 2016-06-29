@@ -284,7 +284,7 @@ class Car extends AbstractPlugin
         foreach ($designCarsRows as $designCarsRow) {
             $carsDesignProject[$designCarsRow['car_id']] = array(
                 'brandName' => $designCarsRow['brand_name'],
-                'url'       => $controller->url()->fromRoute('catalogue/', [
+                'url'       => $controller->url()->fromRoute('catalogue', [
                     'action'        => 'brand-car',
                     'brand_catname' => $designCarsRow['brand_catname'],
                     'car_catname'   => $designCarsRow['brand_car_catname']

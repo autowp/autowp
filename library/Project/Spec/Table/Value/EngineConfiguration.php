@@ -1,5 +1,7 @@
 <?php
 
+use Zend\View\Renderer\PhpRenderer;
+
 class Project_Spec_Table_Value_EngineConfiguration
 {
     protected $_cylindersCount;
@@ -25,6 +27,31 @@ class Project_Spec_Table_Value_EngineConfiguration
                 $result = $layout.$cylinders;
             else
                 $result = $layout.'?';
+        } else {
+            if ($cylinders) {
+                $result = $cylinders;
+            } else {
+                $result = '';
+            }
+        }
+        if ($valves) {
+            $result .= '/' . $valves;
+        }
+
+        return $result;
+    }
+
+    public function render2(PhpRenderer $view, $attribute, $value, $values)
+    {
+        $cylinders = isset($values[$this->_cylindersCount]) ? $values[$this->_cylindersCount] : null;
+        $layout = isset($values[$this->_cylindersLayout]) ? $values[$this->_cylindersLayout] : null;
+        $valves = isset($values[$this->_valvesCount]) ? $values[$this->_valvesCount] : null;
+
+        if ($layout) {
+            if ($cylinders)
+                $result = $layout.$cylinders;
+                else
+                    $result = $layout.'?';
         } else {
             if ($cylinders) {
                 $result = $cylinders;

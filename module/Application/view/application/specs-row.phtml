@@ -1,0 +1,42 @@
+<tr>
+    <td style="padding-left:<?=5 + $this->deep*16?>px">
+        <?=$this->escapeHtml($this->attribute['name'])?>
+    </td>
+    <?php
+        $cells = [];
+
+        foreach ($this->table->getCars() as $car) {
+            $value = $this->table->renderValue2($this, $this->attribute, $car['values'], 1, $car['id']);
+            $lastColIdx = count($cells)-1;
+            if ($lastColIdx >= 0) {
+                $lastCol = $cells[$lastColIdx];
+                $isSame = $lastCol['value'] === $value;
+            } else {
+                $isSame = false;
+            }
+            if ($isSame) {
+                $cells[$lastColIdx]['colspan']++;
+            } else {
+                $cells[] = [
+                    'carId'   => $car['id'],
+                    'value'   => $value,
+                    'colspan' => 1
+                ];
+            }
+        }
+    ?>
+    <?php foreach ($cells as $cell) { ?>
+        <td data-specs-attr="<?=$this->attribute['id']?>" data-specs-item="<?=$cell['carId']?>" class="text-center" <?=$cell['colspan'] > 1 ? ' colspan="'.$cell['colspan'].'"' : ''?>>
+            <?=$cell['value'] ?>
+        </td>
+    <?php } ?>
+</tr>
+<?php if (!$this->table->preventedRenderSubAttributes($this->attribute['id'])) { ?>
+    <?php foreach ($this->attribute['childs'] as $child) { ?>
+        <?=$this->partial('application/specs-row', [
+            'attribute' => $child,
+            'table'     => $this->table,
+            'deep'      => $this->deep + 1
+        ])?>
+    <?php } ?>
+<?php } ?>

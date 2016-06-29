@@ -1,5 +1,5 @@
 <?php foreach ($this->groups as $twinsGroup) { ?>
-    <h3><?=$this->escape($twinsGroup['name'])?></h3>
+    <h3><?=$this->escapeHtml($twinsGroup['name'])?></h3>
 
     <?php while ($items = array_splice($twinsGroup['cars'], 0, 4)) { ?>
         <div class="thumbnails twins row">
@@ -9,17 +9,17 @@
                         <?php if ($car['picture']) { ?>
                             <?=$this->htmlA(
                                 $car['picture']['url'],
-                                $this->htmlImg(array(
+                                $this->htmlImg([
                                     'src'   => $car['picture']['src'],
                                     'alt'   => $car['name'],
                                     'title' => $car['name'],
-                                )),
+                                ]),
                                 false
                             )?>
                         <?php } else { ?>
                             &#xa0;
                         <?php } ?>
-                        <p><?=$this->escape($car['name'])?></p>
+                        <p><?=$this->escapeHtml($car['name'])?></p>
                     </div>
                 </div>
             <?php } ?>
@@ -30,7 +30,10 @@
         <li>
             <i class="fa fa-file"></i>
             <?php if ($twinsGroup['msgCount'] > 0) { ?>
-                <?=$this->htmlA($twinsGroup['detailsUrl'], $this->translate('carlist/details') . ' … (' . $this->translate(array('%1$s comments', null, $twinsGroup['msgCount']), $twinsGroup['msgCount']) . ')')?>
+                <?=$this->htmlA(
+                    $twinsGroup['detailsUrl'],
+                    $this->translate('carlist/details') . ' … (' . sprintf($this->translate('%1$s comments', null, $twinsGroup['msgCount']), $twinsGroup['msgCount']) . ')'
+                )?>
             <?php } else { ?>
                 <?=$this->htmlA($twinsGroup['detailsUrl'], $this->translate('carlist/details') . ' …')?>
             <?php } ?>

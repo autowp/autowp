@@ -478,11 +478,20 @@ return [
                     'route'    => '/twins',
                     'defaults' => [
                         'controller' => Controller\TwinsController::class,
-                        'action'     => 'index',
+                        'action'     => 'index'
                     ],
                 ],
                 'may_terminate' => true,
                 'child_routes'  => [
+                    'brand' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/:brand_catname[/page:page]',
+                            'defaults' => [
+                                'action' => 'brand',
+                            ]
+                        ]
+                    ],
                     'group' => [
                         'type' => Segment::class,
                         'options' => [
@@ -490,8 +499,65 @@ return [
                             'defaults' => [
                                 'action' => 'group',
                             ]
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'specifications' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/specifications',
+                                    'defaults' => [
+                                        'action' => 'specifications',
+                                    ]
+                                ],
+                            ],
+                            'pictures' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/pictures',
+                                    'defaults' => [
+                                        'action' => 'pictures',
+                                    ]
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'picture' => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route' => '/:picture_id',
+                                            'defaults' => [
+                                                'action' => 'picture',
+                                            ]
+                                        ],
+                                        'may_terminate' => true,
+                                        'child_routes' => [
+                                            'gallery' => [
+                                                'type' => Literal::class,
+                                                'options' => [
+                                                    'route' => '/gallery',
+                                                    'defaults' => [
+                                                        'action' => 'picture-gallery',
+                                                    ]
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                    'page'    => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route' => '/page:page',
+                                        ]
+                                    ],
+                                ]
+                            ],
                         ]
-                    ]
+                    ],
+                    'page'    => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/page:page',
+                        ]
+                    ],
                 ]
             ],
             'users' => [
@@ -611,6 +677,31 @@ return [
                     ]
                 ]
             ],
+            'upload' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/upload',
+                    'defaults' => [
+                        'controller' => Controller\UploadController::class,
+                        'action'     => 'index'
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes' => [
+                    'action' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/:action',
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             /*'widget' => [
                 'type' => Literal::class,
                 'options' => [
@@ -643,6 +734,31 @@ return [
                 ],
                 'may_terminate' => false,
                 'child_routes' => [
+                    'brands' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/brands',
+                            'defaults' => [
+                                'controller' => Controller\Moder\BrandsController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes' => [
+                            'action' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/:action',
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'params' => [
+                                        'type' => WildcardSafe::class
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
                     'cars' => [
                         'type' => Literal::class,
                         'options' => [
@@ -715,6 +831,16 @@ return [
                             ]
                         ]
                     ],
+                    'index' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/index',
+                            'defaults' => [
+                                'controller' => Controller\Moder\IndexController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                    ],
                     'pages' => [
                         'type' => Literal::class,
                         'options' => [
@@ -737,6 +863,47 @@ return [
                                         'type' => WildcardSafe::class
                                     ]
                                 ]
+                            ]
+                        ]
+                    ],
+                    'pictures' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/pictures',
+                            'defaults' => [
+                                'controller' => Controller\Moder\PicturesController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes' => [
+                            'action' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => '/:action',
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'params' => [
+                                        'type' => WildcardSafe::class
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'twins' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/twins[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\TwinsController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
                             ]
                         ]
                     ],
@@ -1017,6 +1184,11 @@ return [
                 return new Controller\RestorePasswordController($service, $restoreForm, $newPasswordForm, $transport);
             },
             Controller\RulesController::class        => InvokableFactory::class,
+            Controller\TwinsController::class => function($sm) {
+                $textStorage = $sm->get(TextStorage\Service::class);
+                $cache = $sm->get('longCache');
+                return new Controller\TwinsController($textStorage, $cache);
+            },
             Controller\UsersController::class => function($sm) {
                 $cache = $sm->get('longCache');
                 return new Controller\UsersController($cache);
@@ -1053,7 +1225,6 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
-            'pic'       => Controller\Plugin\Pic::class,
             'catalogue' => Controller\Plugin\Catalogue::class,
         ],
         'factories' => [
@@ -1073,6 +1244,12 @@ return [
             'language' => function($sm) {
                 $language = $sm->get(Language::class);
                 return new Controller\Plugin\Language($language);
+            },
+            'pic' => function($sm) {
+                $viewHelperManager = $sm->get('ViewHelperManager');
+                $carHelper = $viewHelperManager->get('car');
+                $textStorage = $sm->get(TextStorage\Service::class);
+                return new Controller\Plugin\Pic($textStorage, $carHelper);
             },
         ]
     ],
@@ -1113,6 +1290,7 @@ return [
             'img'         => View\Helper\Img::class,
             'pictures'    => View\Helper\Pictures::class,
             'moderMenu'   => View\Helper\ModerMenu::class,
+            'count'       => View\Helper\Count::class,
         ],
         'factories' => [
             'mainMenu' => function($sm) {

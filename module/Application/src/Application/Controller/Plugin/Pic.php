@@ -7,10 +7,13 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Modification as ModificationTable;
 
+use Application\Paginator\Adapter\Zend1DbTableSelect;
+
 use Exception;
 
 use Application_Service_Specifications;
 use Brands;
+use Brands_Cars;
 use Car_Parent;
 use Car_Language;
 use Cars;
@@ -28,6 +31,7 @@ use Users;
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;
+use Zend_Paginator;
 
 class Pic extends AbstractPlugin
 {
@@ -37,6 +41,16 @@ class Pic extends AbstractPlugin
     private $pictureViewTable = null;
 
     private $moderVoteTable = null;
+
+    private $textStorage;
+    
+    private $carHelper;
+
+    public function __construct($textStorage, $carHelper)
+    {
+        $this->textStorage = $textStorage;
+        $this->carHelper = $carHelper;
+    }
 
     /**
      * @return Pictures_Moder_Votes
@@ -107,9 +121,9 @@ class Pic extends AbstractPlugin
             case Picture::CAR_TYPE_ID:
                 if ($row['car_id']) {
                     $carParentTable = new Car_Parent();
-                    $paths = $carParentTable->getPaths($row['car_id'], array(
+                    $paths = $carParentTable->getPaths($row['car_id'], [
                         'breakOnFirst' => true
-                    ));
+                    ]);
 
                     if (count($paths) > 0) {
                         $path = $paths[0];
@@ -175,11 +189,11 @@ class Pic extends AbstractPlugin
 
     public function listData($pictures, array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'width'            => null,
             'disableBehaviour' => false,
             'url'              => null
-        );
+        ];
 
         $options = array_replace($defaults, $options);
 
@@ -224,20 +238,20 @@ class Pic extends AbstractPlugin
 
                 $voteRows = $db->fetchAll(
                     $db->select()
-                        ->from($moderVoteTable->info('name'), array(
+                        ->from($moderVoteTable->info('name'), [
                             'picture_id',
                             'vote'  => new Zend_Db_Expr('sum(if(vote, 1, -1))'),
                             'count' => 'count(1)'
-                        ))
+                        ])
                         ->where('picture_id in (?)', $ids)
                         ->group('picture_id')
                 );
 
                 foreach ($voteRows as $row) {
-                    $moderVotes[$row['picture_id']] = array(
+                    $moderVotes[$row['picture_id']] = [
                         'moder_votes'       => (int)$row['vote'],
                         'moder_votes_count' => (int)$row['count']
-                    );
+                    ];
                 }
             }
 
@@ -254,7 +268,7 @@ class Pic extends AbstractPlugin
                 $db = $ctTable->getAdapter();
                 $messages = $db->fetchPairs(
                     $ctTable->select()
-                        ->from($ctTable->info('name'), array('item_id', 'messages'))
+                        ->from($ctTable->info('name'), ['item_id', 'messages'])
                         ->where('item_id in (?)', $ids)
                         ->where('type_id = ?', Comment_Message::PICTURES_TYPE_ID)
                 );
@@ -296,28 +310,28 @@ class Pic extends AbstractPlugin
             $select
                 ->reset(Zend_Db_Select::COLUMNS)
                 ->setIntegrityCheck(false)
-                ->columns(array(
+                ->columns([
                     'pictures.id', 'pictures.identity', 'pictures.name',
                     'pictures.width', 'pictures.height',
                     'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                     'pictures.status', 'pictures.image_id',
                     'pictures.brand_id', 'pictures.car_id', 'pictures.engine_id',
                     'pictures.perspective_id', 'pictures.type', 'pictures.factory_id'
-                ));
+                ]);
 
             $select
                 ->group('pictures.id')
-                ->joinLeft('pictures_moder_votes', 'pictures.id = pictures_moder_votes.picture_id', array(
+                ->joinLeft('pictures_moder_votes', 'pictures.id = pictures_moder_votes.picture_id', [
                     'moder_votes'       => 'sum(if(pictures_moder_votes.vote, 1, -1))',
                     'moder_votes_count' => 'count(pictures_moder_votes.picture_id)'
-                ));
+                ]);
 
 
 
             if (!$options['disableBehaviour']) {
                 $select
-                    ->joinLeft(array('pv' => 'picture_view'), 'pictures.id = pv.picture_id', 'views')
-                    ->joinLeft(array('ct' => 'comment_topic'), 'ct.type_id = :type_id and ct.item_id = pictures.id', 'messages');
+                    ->joinLeft(['pv' => 'picture_view'], 'pictures.id = pv.picture_id', 'views')
+                    ->joinLeft(['ct' => 'comment_topic'], 'ct.type_id = :type_id and ct.item_id = pictures.id', 'messages');
 
                 $bind['type_id'] = Comment_Message::PICTURES_TYPE_ID;
             }
@@ -345,9 +359,9 @@ class Pic extends AbstractPlugin
 
         // names
         $pictureTable = new Picture();
-        $names = $pictureTable->getNameData($rows, array(
+        $names = $pictureTable->getNameData($rows, [
             'language' => $language
-        ));
+        ]);
 
         // comments
         if (!$options['disableBehaviour']) {
@@ -377,14 +391,14 @@ class Pic extends AbstractPlugin
                 $url = $this->href($row);
             }
 
-            $item = array(
+            $item = [
                 'id'        => $id,
                 'type'      => $row['type'],
                 'name'      => $name,
                 'url'       => $url,
                 'src'       => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
                 'moderVote' => $row['moder_votes_count'] > 0 ? $row['moder_votes'] : null,
-            );
+            ];
 
             if (!$options['disableBehaviour']) {
                 $msgCount = $row['messages'];
@@ -393,7 +407,7 @@ class Pic extends AbstractPlugin
                     $newMsgCount = isset($newMessages[$id]) ? $newMessages[$id] : $msgCount;
                 }
 
-                $item = array_replace($item, array(
+                $item = array_replace($item, [
                     'resolution'     => (int)$row['width'] . '×' . (int)$row['height'],
                     'cropped'        => Pictures_Row::checkCropParameters($row),
                     'cropResolution' => $row['crop_width'] . '×' . $row['crop_height'],
@@ -401,7 +415,7 @@ class Pic extends AbstractPlugin
                     'views'          => (int)$row['views'],
                     'msgCount'       => $msgCount,
                     'newMsgCount'    => $newMsgCount,
-                ));
+                ]);
             }
 
 
@@ -409,17 +423,24 @@ class Pic extends AbstractPlugin
             $items[] = $item;
         }
 
-        return array(
+        return [
             'items'            => $items,
             'colClass'         => $colClass,
             'disableBehaviour' => $options['disableBehaviour'],
             'isModer'          => $isModer,
             'width'            => $width
-        );
+        ];
     }
 
-    public function picPageData($picture, $picSelect, $brandIds = [])
+    public function picPageData($picture, $picSelect, $brandIds = [], array $options = [])
     {
+        $options = array_replace([
+            'paginator' => [
+                'route'     => 'picture',
+                'urlParams' => []
+            ]
+        ], $options);
+        
         $controller = $this->getController();
         $catalogue = $controller->catalogue();
         $imageStorage = $controller->imageStorage();
@@ -444,8 +465,7 @@ class Pic extends AbstractPlugin
         $car = null;
         $carDetailsUrl = null;
 
-        $language = $controller->getHelper('language')->direct();
-        $textStorage = $controller->getHelper('textStorage')->direct();
+        $language = $controller->language();
 
         switch ($picture->type) {
             case Picture::ENGINE_TYPE_ID:
@@ -461,15 +481,15 @@ class Pic extends AbstractPlugin
                     if ($carIds) {
                         $carTable = $catalogue->getCarTable();
 
-                        $carRows = $carTable->fetchAll(array(
+                        $carRows = $carTable->fetchAll([
                             'id in (?)' => $carIds
-                        ), $catalogue->carsOrdering());
+                        ], $catalogue->carsOrdering());
 
                         foreach ($carRows as $carRow) {
                             $cataloguePaths = $catalogue->cataloguePaths($carRow);
 
                             foreach ($cataloguePaths as $cPath) {
-                                $engineCars[] = array(
+                                $engineCars[] = [
                                     'name' => $carRow->getFullName($language),
                                     'url'  => $controller->url()->fromRoute('catalogue', [
                                         'action'        => 'brand-car',
@@ -477,7 +497,7 @@ class Pic extends AbstractPlugin
                                         'car_catname'   => $cPath['car_catname'],
                                         'path'          => $cPath['path']
                                     ])
-                                );
+                                ];
                                 break;
                             }
                         }
@@ -488,9 +508,9 @@ class Pic extends AbstractPlugin
 
                     if ($engineHasSpecs) {
 
-                        $cataloguePaths = $catalogue->engineCataloguePaths($engine, array(
+                        $cataloguePaths = $catalogue->engineCataloguePaths($engine, [
                             'limit' => 1
-                        ));
+                        ]);
 
                         foreach ($cataloguePaths as $cataloguePath) {
                             $engineSpecsUrl = $controller->url()->fromRoute('catalogue', [
@@ -517,9 +537,9 @@ class Pic extends AbstractPlugin
                     if ($carIds) {
                         $carTable = $catalogue->getCarTable();
 
-                        $carRows = $carTable->fetchAll(array(
+                        $carRows = $carTable->fetchAll([
                             'id in (?)' => $carIds
-                        ), $catalogue->carsOrdering());
+                        ], $catalogue->carsOrdering());
 
                         $limit = 10;
 
@@ -536,7 +556,7 @@ class Pic extends AbstractPlugin
                             $cataloguePaths = $catalogue->cataloguePaths($carRow);
 
                             foreach ($cataloguePaths as $cPath) {
-                                $factoryCars[] = array(
+                                $factoryCars[] = [
                                     'name' => $carRow->getFullName($language),
                                     'url'  => $controller->url()->fromRoute('catalogue', [
                                         'action'        => 'brand-car',
@@ -544,7 +564,7 @@ class Pic extends AbstractPlugin
                                         'car_catname'   => $cPath['car_catname'],
                                         'path'          => $cPath['path']
                                     ])
-                                );
+                                ];
                                 break;
                             }
                         }
@@ -566,9 +586,9 @@ class Pic extends AbstractPlugin
                     $altNames = [];
 
                     $carLangTable = new Car_Language();
-                    $carLangRows = $carLangTable->fetchAll(array(
+                    $carLangRows = $carLangTable->fetchAll([
                         'car_id = ?' => $car->id
-                    ));
+                    ]);
 
                     $defaultName = $car->caption;
                     foreach ($carLangRows as $carLangRow) {
@@ -608,14 +628,14 @@ class Pic extends AbstractPlugin
                             ->where('car_parent_cache.car_id = ?', $car->id)
                     );
                     if ($designCarsRow) {
-                        $designProject = array(
+                        $designProject = [
                             'brand' => $designCarsRow['brand_name'],
                             'url'   => $controller->url()->fromRoute('catalogue', [
                                 'action'        => 'brand-car',
                                 'brand_catname' => $designCarsRow['brand_catname'],
                                 'car_catname'   => $designCarsRow['brand_car_catname']
                             ])
-                        );
+                        ];
                     }
 
 
@@ -630,16 +650,16 @@ class Pic extends AbstractPlugin
                     );
 
                     foreach ($categoryRows as $row) {
-                        $lRow = $cdlTable->fetchRow(array(
+                        $lRow = $cdlTable->fetchRow([
                             'language = ?'    => $language,
                             'category_id = ?' => $row->id
-                        ));
-                        $categories[$row->id] = array(
+                        ]);
+                        $categories[$row->id] = [
                             'name' => $lRow ? $lRow->name : $row->name,
                             'url'  => $controller->url()->fromRoute('categories/category', [
                                 'category_catname' => $row['catname'],
                             ])
-                        );
+                        ];
                     }
 
                     if ($car->full_text_id) {
@@ -690,7 +710,8 @@ class Pic extends AbstractPlugin
         $moderLinks = [];
         if ($isModer) {
             $links = [];
-            $links[$controller->url()->fromRoute('moder/pictures/picture', [
+            $links[$controller->url()->fromRoute('moder/pictures', [
+                'action'     => 'picture',
                 'picture_id' => $picture->id
             ])] = 'Управление изображением №'.$picture->id;
 
@@ -714,8 +735,9 @@ class Pic extends AbstractPlugin
                         );
 
                         foreach ($brandRows as $brand) {
-                            $url = $controller->url()->fromRoute('moder/brands/brand', [
-                                'brand_id'   => $brand->id
+                            $url = $controller->url()->fromRoute('moder/brands', [
+                                'action'   => 'brand',
+                                'brand_id' => $brand->id
                             ]);
                             $links[$url] = 'Управление брендом ' . $brand->caption;
                         }
@@ -760,11 +782,11 @@ class Pic extends AbstractPlugin
 
         $moderVotes = [];
         foreach ($picture->findPictures_Moder_Votes() as $moderVote) {
-            $moderVotes[] = array(
+            $moderVotes[] = [
                 'vote'   => $moderVote->vote,
                 'reason' => $moderVote->reason,
                 'user'   => $userTable->find($moderVote->user_id)->current()
-            );
+            ];
         }
 
         $image = $imageStorage->getImage($picture->image_id);
@@ -778,8 +800,10 @@ class Pic extends AbstractPlugin
         $pageNumbers = false;
 
         if ($picSelect) {
-
-            $paginator = Zend_Paginator::factory($picSelect);
+            
+            $paginator = new \Zend\Paginator\Paginator(
+                new Zend1DbTableSelect($picSelect)
+            );
 
             $total = $paginator->getTotalItemCount();
 
@@ -789,7 +813,7 @@ class Pic extends AbstractPlugin
 
                 $paginatorPictures = $db->fetchAll(
                     $db->select()
-                        ->from(array('_pic' => new Zend_Db_Expr('('.$picSelect->assemble() .')')), array('id', 'identity'))
+                        ->from(['_pic' => new Zend_Db_Expr('('.$picSelect->assemble() .')')], ['id', 'identity'])
                 );
 
                 //$paginatorPictures = $pictureTable->fetchAll($picSelect);
@@ -822,9 +846,9 @@ class Pic extends AbstractPlugin
 
                 foreach($pageNumbers as $page => &$val) {
                     $pic = $paginatorPictures[$page - 1];
-                    $val = $controller->url()->fromRoute('picture', [
+                    $val = $controller->url()->fromRoute($options['paginator']['route'], array_replace($options['paginator']['urlParams'], [
                         'picture_id' => $pic['identity'] ? $pic['identity'] : $pic['id']
-                    ]);
+                    ]));
                 }
                 unset($val);
 
@@ -833,10 +857,10 @@ class Pic extends AbstractPlugin
             }
         }
 
-        $names = $pictureTable->getNameData([$picture->toArray()], array(
+        $names = $pictureTable->getNameData([$picture->toArray()], [
             'language' => $language,
             'large'    => true
-        ));
+        ]);
         $name = $names[$picture->id];
 
         $mTable = new ModificationTable();
@@ -855,9 +879,9 @@ class Pic extends AbstractPlugin
             $carRow = $carTable->find($mRow->car_id)->current();
             if ($carRow) {
                 $carParentTable = new Car_Parent();
-                $paths = $carParentTable->getPaths($carRow->id, array(
+                $paths = $carParentTable->getPaths($carRow->id, [
                     'breakOnFirst' => true
-                ));
+                ]);
                 if (count($paths) > 0) {
                     $path = $paths[0];
 
@@ -871,28 +895,28 @@ class Pic extends AbstractPlugin
                 }
             }
 
-            $modifications[] = array(
+            $modifications[] = [
                 'name' => $mRow->name,
                 'url'  => $url
-            );
+            ];
         }
 
         $carDescription = null;
         if ($car && $car->text_id) {
-            $carDescription = $textStorage->getText($car->text_id);
+            $carDescription = $this->textStorage->getText($car->text_id);
         }
 
         $carText = null;
         if ($car && $car->full_text_id) {
-            $carText = $textStorage->getText($car->full_text_id);
+            $carText = $this->textStorage->getText($car->full_text_id);
         }
 
         $copyrights = null;
         if ($picture->copyrights_text_id) {
-            $copyrights = $textStorage->getText($picture->copyrights_text_id);
+            $copyrights = $this->textStorage->getText($picture->copyrights_text_id);
         }
 
-        $data = array(
+        $data = [
             'id'                => $picture['id'],
             'copyrights'        => $copyrights,
             'identity'          => $picture['identity'],
@@ -905,9 +929,9 @@ class Pic extends AbstractPlugin
             'sourceUrl'         => $sourceUrl,
             'previewUrl'        => $previewUrl,
             'replacePicture'    => $replacePicture,
-            'gallery'           => array(
+            'gallery'           => [
                 'current' => $picture->id
-            ),
+            ],
             'paginator'         => $paginator,
             'paginatorPictures' => $pageNumbers,
             'engine'            => $engine,
@@ -926,7 +950,7 @@ class Pic extends AbstractPlugin
             'carHtml'           => $carText,
             'carDescription'    => $carDescription,
             'modifications'     => $modifications
-        );
+        ];
 
         // Обвновляем количество просмотров
         $views = new Picture_View();
@@ -937,13 +961,13 @@ class Pic extends AbstractPlugin
 
     public function gallery(Zend_Db_Table_Select $picSelect)
     {
-        $galleryStatuses = array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW);
+        $galleryStatuses = [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW];
 
         $gallery = [];
 
         $controller = $this->getController();
         $catalogue = $controller->catalogue();
-        $imageStorage = $controller->getHelper('imageStorage');
+        $imageStorage = $controller->imageStorage();
 
         $view = $controller->view;
 
@@ -954,19 +978,19 @@ class Pic extends AbstractPlugin
         $select
             ->reset(Zend_Db_Select::COLUMNS)
             ->setIntegrityCheck(false)
-            ->columns(array(
+            ->columns([
                 'pictures.id', 'pictures.identity', 'pictures.name',
                 'pictures.width', 'pictures.height',
                 'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                 'pictures.image_id', 'pictures.filesize',
                 'pictures.brand_id', 'pictures.car_id', 'pictures.engine_id',
                 'pictures.perspective_id', 'pictures.type', 'pictures.factory_id'
-            ))
-            ->joinLeft(array('ct' => 'comment_topic'), 'ct.type_id = :type_id and ct.item_id = pictures.id', 'messages');
+            ])
+            ->joinLeft(['ct' => 'comment_topic'], 'ct.type_id = :type_id and ct.item_id = pictures.id', 'messages');
 
-        $rows = $select->getAdapter()->fetchAll($select, array(
+        $rows = $select->getAdapter()->fetchAll($select, [
             'type_id' => Comment_Message::PICTURES_TYPE_ID
-        ));
+        ]);
 
 
 
@@ -992,9 +1016,9 @@ class Pic extends AbstractPlugin
 
         // names
         $pictureTable = new Picture();
-        $names = $pictureTable->getNames($rows, array(
+        $names = $pictureTable->getNames($rows, [
             'language' => $language
-        ));
+        ]);
 
         // comments
         $userId = null;
@@ -1027,12 +1051,12 @@ class Pic extends AbstractPlugin
                     if (Pictures_Row::checkCropParameters($row)) {
                         $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
 
-                        $crop['crop'] = array(
+                        $crop['crop'] = [
                             'left'   => $row['crop_left'] / $image->getWidth(),
                             'top'    => $row['crop_top'] / $image->getHeight(),
                             'width'  => $row['crop_width'] / $image->getWidth(),
                             'height' => $row['crop_height'] / $image->getHeight(),
-                        );
+                        ];
 
                     } else {
                         $crop = null;
@@ -1053,7 +1077,7 @@ class Pic extends AbstractPlugin
                         'gallery'    => null
                     ]);
 
-                    $gallery[] = array(
+                    $gallery[] = [
                         'id'          => $id,
                         'url'         => $url,
                         'sourceUrl'   => $sUrl,
@@ -1063,7 +1087,7 @@ class Pic extends AbstractPlugin
                         'newMessages' => $newMsgCount,
                         'name'        => $name,
                         'filesize'    => $view->fileSize($row['filesize'])
-                    );
+                    ];
                 }
             }
         }
@@ -1073,28 +1097,25 @@ class Pic extends AbstractPlugin
 
     public function gallery2(Zend_Db_Table_Select $picSelect, array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'page'      => 1,
             'pictureId' => null,
             'route'     => null,
             'urlParams' => []
-        );
+        ];
         $options = array_replace($defaults, $options);
 
         $itemsPerPage = 10;
 
-        $galleryStatuses = array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW);
+        $galleryStatuses = [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW];
 
         $gallery = [];
 
         $controller = $this->getController();
-        $userHelper = $controller->getHelper('user');
-        $catalogue = $controller->getHelper('catalogue')->getCatalogue();
-        $imageStorage = $controller->getHelper('imageStorage')->direct();
+        $catalogue = $controller->catalogue();
+        $imageStorage = $controller->imageStorage();
 
-        $view = $controller->view;
-
-        $language = $controller->getHelper('language')->direct();
+        $language = $controller->language();
 
         if ($options['pictureId']) {
             // look for page of that picture
@@ -1103,9 +1124,9 @@ class Pic extends AbstractPlugin
             $select
                 ->setIntegrityCheck(false)
                 ->reset(Zend_Db_Select::COLUMNS)
-                ->columns(array(
+                ->columns([
                     'pictures.id'
-                ));
+                ]);
 
             $col = $select->getAdapter()->fetchCol($select);
             foreach ($col as $index => $id) {
@@ -1121,7 +1142,7 @@ class Pic extends AbstractPlugin
         $select
             ->setIntegrityCheck(false)
             ->reset(Zend_Db_Select::COLUMNS)
-            ->columns(array(
+            ->columns([
                 'pictures.id', 'pictures.identity', 'pictures.name',
                 'pictures.width', 'pictures.height',
                 'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
@@ -1129,15 +1150,15 @@ class Pic extends AbstractPlugin
                 'pictures.brand_id', 'pictures.car_id', 'pictures.engine_id',
                 'pictures.perspective_id', 'pictures.type', 'pictures.factory_id',
                 'pictures.type'
-            ))
+            ])
             ->joinLeft(
-                array('ct' => 'comment_topic'),
+                ['ct' => 'comment_topic'],
                 'ct.type_id = :type_id and ct.item_id = pictures.id',
                 'messages'
             )
-            ->bind(array(
+            ->bind([
                 'type_id' => Comment_Message::PICTURES_TYPE_ID
-            ));
+            ]);
 
         $count = Zend_Paginator::factory($select)->getTotalItemCount();
 
@@ -1176,9 +1197,9 @@ class Pic extends AbstractPlugin
 
         // names
         $pictureTable = new Picture();
-        $names = $pictureTable->getNames($rows, array(
+        $names = $pictureTable->getNames($rows, [
             'language' => $language
-        ));
+        ]);
 
         // comments
         $userId = null;
@@ -1213,12 +1234,12 @@ class Pic extends AbstractPlugin
                     if (Pictures_Row::checkCropParameters($row)) {
                         $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
 
-                        $crop['crop'] = array(
+                        $crop['crop'] = [
                             'left'   => $row['crop_left'] / $image->getWidth(),
                             'top'    => $row['crop_top'] / $image->getHeight(),
                             'width'  => $row['crop_width'] / $image->getWidth(),
                             'height' => $row['crop_height'] / $image->getHeight(),
-                        );
+                        ];
 
                     } else {
                         $crop = null;
@@ -1233,19 +1254,21 @@ class Pic extends AbstractPlugin
                     }
 
                     $name = isset($names[$id]) ? $names[$id] : null;
+                    // TODO: extract HTML to view script
                     if (($row['type'] == Picture::CAR_TYPE_ID) && is_array($name)) {
-                        $name = $view->car()->htmlTitle($name);
+                        $name = $this->carHelper->htmlTitle($name);
                     } else {
-                        $name = $view->escape($name);
+                        $name = htmlspecialchars($name);
                     }
 
-                    $url = $controller->url()->fromRoute($route, array_replace($options['urlParams'], array(
+                    $url = $controller->url()->fromRoute($route, array_replace($options['urlParams'], [
                         'picture_id' => $row['identity'] ? $row['identity'] : $id,
                         'gallery'    => null,
-                    )));
+                    ]));
 
-                    $gallery[] = array(
+                    $gallery[] = [
                         'id'          => $id,
+                        'type'        => $row['type'],
                         'url'         => $url,
                         'sourceUrl'   => $sUrl,
                         'crop'        => $crop,
@@ -1253,17 +1276,17 @@ class Pic extends AbstractPlugin
                         'messages'    => $msgCount,
                         'newMessages' => $newMsgCount,
                         'name'        => $name,
-                        'filesize'    => $view->fileSize($row['filesize'])
-                    );
+                        'filesize'    => $row['filesize'] //$view->fileSize($row['filesize'])
+                    ];
                 }
             }
         }
 
-        return array(
+        return [
             'page'  => $paginator->getCurrentPageNumber(),
             'pages' => $paginator->count(),
             'count' => $paginator->getTotalItemCount(),
             'items' => $gallery
-        );
+        ];
     }
 }

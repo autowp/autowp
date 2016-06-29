@@ -1,0 +1,25 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ],
+        'pageId' => 183,
+        'args'   => [
+            'PICTURE_NAME'     => $this->pic()->textTitle($this->name ? $this->name : []),
+            'TWINS_GROUP_NAME' => $this->group['name'],
+            'TWINS_GROUP_ID'   => $this->group['id']
+        ]
+    ]);
+?>
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <?=$this->render('application/picture/picture')?>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <?=$this->partial('application/twins/partial/sidebar', [
+            'brands'  => $this->brands
+        ])?>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ],
+        'pageId' => 26,
+        'args'   => [
+            'TWINS_GROUP_NAME' => $this->group['name'],
+            'TWINS_GROUP_ID'   => $this->group['id']
+        ]
+    ]);
+?>
+
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <?=$this->partial('application/cars', $this->cars)?>
+
+        <ul class="carLinks">
+            <?php if ($this->hasSpecs) {?>
+                <li>
+                    <i class="fa fa-list-alt"></i>
+                    <?=$this->htmlA($this->specsUrl, 'технические характеристики')?>
+                </li>
+            <?php } ?>
+
+            <?php if ($this->picturesCount) { ?>
+                <li>
+                    <i class="fa fa-th"></i>
+                    <?=$this->htmlA($this->picturesUrl, 'все картинки ('.$this->picturesCount.')')?>
+                </li>
+            <?php } ?>
+        </ul>
+
+        <?php if (strlen($this->description)){ ?>
+            <h3>Описание</h3>
+            <div class="well"><?=$this->markdown($this->description) ?></div>
+        <?php } ?>
+
+        <?=$this->comments([
+            'type'    => Comment_Message::TWINS_TYPE_ID,
+            'item_id' => $this->group['id']
+        ]) ?>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <?=$this->partial('application/twins/partial/sidebar', [
+            'brands'  => $this->brands
+        ])?>
+    </div>
+</div>

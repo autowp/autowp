@@ -1,5 +1,7 @@
 <?php
 
+use Zend\View\Renderer\PhpRenderer;
+
 abstract class Project_Spec_Table_Abstract
 {
     protected $_attributes = array();
@@ -90,11 +92,30 @@ abstract class Project_Spec_Table_Abstract
             $rendererOptions = $map['options'];
         } else {
             $rendererName = 'default';
-            $rendererOptions = array();
+            $rendererOptions = [];
         }
 
         $renderer = $this->_getRenderer($rendererName, $rendererOptions);
         return $renderer->render($view, $attribute, $value, $values, $itemTypeId, $itemId);
+    }
+
+    public function renderValue2(PhpRenderer $view, $attribute, $values, $itemTypeId, $itemId)
+    {
+        $attrId = $attribute['id'];
+
+        $value = isset($values[$attrId]) ? $values[$attrId] : null;
+
+        if (isset($this->_renderMap[$attrId])) {
+            $map = $this->_renderMap[$attrId];
+            $rendererName = $map['name'];
+            $rendererOptions = $map['options'];
+        } else {
+            $rendererName = 'default';
+            $rendererOptions = [];
+        }
+
+        $renderer = $this->_getRenderer($rendererName, $rendererOptions);
+        return $renderer->render2($view, $attribute, $value, $values, $itemTypeId, $itemId);
     }
 
     abstract public function render(Zend_View_Abstract $view);

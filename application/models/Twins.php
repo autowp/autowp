@@ -2,6 +2,8 @@
 
 namespace Application\Model;
 
+use Application\Paginator\Adapter\Zend1DbTableSelect;
+
 use Twins_Groups;
 use Brands;
 use Picture;
@@ -210,6 +212,36 @@ class Twins
                     'car_parent_cache.car_id = tgc.car_id',
                     null
                 )
+        );
+    }
+
+    /**
+     * @param array $options
+     * @return Zend_Paginator
+     */
+    public function getGroupsPaginator2(array $options = array())
+    {
+        $defaults = array(
+            'brandId' => null
+        );
+        $options = array_merge($defaults, $options);
+
+        $brandId = (int)$options['brandId'];
+
+        $select = $this->getGroupsTable()->select(true)
+            ->order('twins_groups.add_datetime desc');
+
+        if ($options['brandId']) {
+            $select
+                ->join(array('tgc' => 'twins_groups_cars'), 'twins_groups.id = tgc.twins_group_id', null)
+                ->join('car_parent_cache', 'tgc.car_id = car_parent_cache.car_id', null)
+                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                ->where('brands_cars.brand_id = ?', $brandId)
+                ->group('twins_groups.id');
+        }
+
+        return new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
         );
     }
 
