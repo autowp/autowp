@@ -1,35 +1,35 @@
 <?php
 
     if (!$this->theme) {
-        $this->pageEnv(array(
-            'layout' => array(
+        $this->pageEnv([
+            'layout' => [
                 'blankPage' => false,
                 'needLeft'  => false,
                 'needRight' => true
-            ),
+            ],
             'pageId' => 42,
-        ));
+        ]);
     } else {
-        $this->pageEnv(array(
-            'layout' => array(
+        $this->pageEnv([
+            'layout' => [
                 'blankPage' => false,
                 'needLeft'  => false,
                 'needRight' => true
-            ),
+            ],
             'pageId' => 43,
-            'args'   => array(
+            'args'   => [
                 'THEME_NAME' => $this->translate($this->theme['name']),
                 'THEME_ID'   => $this->theme['id']
-            )
-        ));
-        
+            ]
+        ]);
+
         if ($this->forumAdmin) {
             $this->layout()->moduleName = 'default/forums/theme';
-            $this->layout()->moduleOptions = array(
+            $this->layout()->moduleOptions = [
                 'openUrl'   => $this->openUrl,
                 'closeUrl'  => $this->closeUrl,
                 'deleteUrl' => $this->deleteUrl
-            );
+            ];
         }
     }
 ?>
@@ -38,19 +38,19 @@
     <div class="row">
         <div class="col-md-6">
             <div class="well">
-                <p><i class="fa fa-th-list"></i> <strong><?=$this->htmlA(array(
+                <p><i class="fa fa-th-list"></i> <strong><?=$this->htmlA([
                     'href'  => $theme['url'],
                     'title' => $this->translate('forums/go-to-theme-%1$s', $this->translate($theme['name']))
-                ), $this->translate($theme['name'])) ?></strong></p>
+                ], $this->translate($theme['name'])) ?></strong></p>
                 <?php if ($theme['description']) { ?>
-                    <p><?=$this->escape($theme['description']) ?></p>
+                    <p><?=$this->escapeHtml($theme['description']) ?></p>
                 <?php } ?>
                 <p>
-                    <?=$this->escape($this->translate(['%1$s topics', null, $theme['topics']], $theme['topics']))?>,
-                    <?=$this->escape($this->translate(['%1$s messages', null, $theme['messages']], $theme['messages']))?>
+                    <?=$this->escapeHtml(sprintf($this->translate('%1$s topics', null, $theme['topics']), $theme['topics']))?>,
+                    <?=$this->escapeHtml(sprintf($this->translate('%1$s messages', null, $theme['messages']), $theme['messages']))?>
                 </p>
                 <?php if (count($theme['subthemes'])) { ?>
-                    <?=$this->escape($this->translate('forums/subforums'))?>:
+                    <?=$this->escapeHtml($this->translate('forums/subforums'))?>:
                     <?php foreach ($theme['subthemes'] as $idx => $subtheme) {
                         if ($idx) {
                             print ', ';
@@ -68,7 +68,7 @@
                     <?php if ($lastMessage = $theme['lastMessage']) { ?>
                         <p>
                             <i class="fa fa-comment"></i>
-                            <?=$this->translate('forums/last-message-in-topic-%1$s', $this->htmlA($lastMessage['url'], $theme['lastTopic']['name']))?>
+                            <?=sprintf($this->translate('forums/last-message-in-topic-%1$s'), $this->htmlA($lastMessage['url'], $theme['lastTopic']['name']))?>
                         </p>
                         <p>
                             <?php if ($lastMessage['date']) { ?>
@@ -77,10 +77,10 @@
                             <?php if ($lastMessage['author']) { ?>
                                 <?=$this->user($lastMessage['author']) ?>
                             <?php } ?>
-                            <?=$this->htmlA(array(
+                            <?=$this->htmlA([
                                 'href'  => $lastMessage['message-url'],
                                 'title' => $this->translate('forums/go-to-last-message')
-                            ), '<i class="fa fa-share"></i>', false) ?>
+                            ], '<i class="fa fa-share"></i>', false) ?>
                         </p>
                     <?php } ?>
                 </div>
@@ -90,17 +90,17 @@
 <?php } ?>
 
 <?php if ($this->theme && !$this->theme['disable_topics']) { ?>
-    <?=$this->htmlA(array(
+    <?=$this->htmlA([
         'class' => 'btn btn-info',
         'href'  => $this->newTopicUrl,
-    ), '<i class="fa fa-comment"></i> ' . $this->escape($this->translate('forums/create-new-topic')), false) ?>
+    ], '<i class="fa fa-comment"></i> ' . $this->escapeHtml($this->translate('forums/create-new-topic')), false) ?>
 
     <table class="table table-striped">
         <thead>
             <tr>
-                <th><?=$this->escape($this->translate('forums/theme/topics'))?></th>
-                <th><?=$this->escape($this->translate('forums/theme/author'))?></th>
-                <th><?=$this->escape($this->translate('forums/theme/last-message'))?></th>
+                <th><?=$this->escapeHtml($this->translate('forums/theme/topics'))?></th>
+                <th><?=$this->escapeHtml($this->translate('forums/theme/author'))?></th>
+                <th><?=$this->escapeHtml($this->translate('forums/theme/last-message'))?></th>
                 <?php if ($this->forumAdmin) { ?>
                     <th></th>
                 <?php } ?>
@@ -112,9 +112,9 @@
                     <td>
                         <?=$this->htmlA($topic['url'], $topic['name']) ?>
                         <span class="badge"><?=$topic['oldMessages'] ?><?php if ($topic['newMessages'] > 0) { ?>+<?=$topic['newMessages']?><?php } ?></span>
-                        <?=$this->paginationControl($topic['paginator'], 'Sliding', 'forums/paginator.phtml', array(
+                        <?=$this->paginationControl($topic['paginator'], 'Sliding', 'application/forums/paginator', [
                             'topic_id' => $topic['id']
-                        )) ?>
+                        ]) ?>
                     </td>
                     <td>
                         <?php if ($topic['addDatetime']) { ?>
@@ -131,10 +131,10 @@
                             <?php } ?>
                             <?php if ($topic['lastMessage']['author']) { ?>
                                 <?=$this->user($topic['lastMessage']['author']) ?>
-                                <?=$this->htmlA(array(
+                                <?=$this->htmlA([
                                     'href'  => $topic['lastMessage']['url'],
                                     'title' => $this->translate('forums/go-to-last-message')
-                                ), '<i class="fa fa-share"></i>', false) ?>
+                                ], '<i class="fa fa-share"></i>', false) ?>
                             <?php } ?>
                         <?php } else { ?>
                             &#x2014;
@@ -152,17 +152,13 @@
                                         <i class="fa fa-times-circle"></i>
                                     </button>
                                 <?php } ?>
-                                <?=$this->htmlA(array(
-                                    'href'  => $this->url(array(
-                                        'module'     => 'forums',
-                                        'controller' => 'topic',
-                                        'action'     => 'move',
-                                        'topic_id'   => $topic['id'],
-                                        'theme_id'   => null
-                                    )),
+                                <?=$this->htmlA([
+                                    'href'  => $this->url('forums/move', [
+                                        'topic_id' => $topic['id'],
+                                    ]),
                                     'class' => 'btn btn-default btn-xs',
                                     'title' => 'переместить'
-                                ), '<i class="fa fa-share"></i>', false) ?>
+                                ], '<i class="fa fa-share"></i>', false) ?>
                                 <button title="удалить" class="btn btn-xs btn-danger delete" id="delete-topic-<?=$topic['id'] ?>">
                                     <i class="fa fa-ban"></i>
                                 </button>
@@ -174,14 +170,19 @@
         </tbody>
     </table>
     <?php if ($this->paginator) { ?>
-    	<?=$this->paginationControl($this->paginator) ?>
-	<?php } ?>
+        <?=$this->paginationControl($this->paginator, null, null, [
+            'route'     => 'forums/index',
+            'urlParams' => [
+                'theme_id' => $this->theme ? $this->theme['id'] : null
+            ]
+        ]) ?>
+    <?php } ?>
 <?php } ?>
 
 <?php if ($this->theme) { ?>
     <p class="text-right small">
-        <?=$this->escape($this->translate('forums/theme/total:'))?>
-        <?=$this->escape($this->translate(['%1$s topics', null, $this->theme['topics']], $this->theme['topics']))?>,
-        <?=$this->escape($this->translate(['%1$s messages', null, $this->theme['messages']], $this->theme['messages']))?>
+        <?=$this->escapeHtml($this->translate('forums/theme/total:'))?>
+        <?=$this->escapeHtml(sprintf($this->translate('%1$s topics', null, $this->theme['topics']), $this->theme['topics']))?>,
+        <?=$this->escapeHtml(sprintf($this->translate('%1$s messages', null, $this->theme['messages']), $this->theme['messages']))?>
     </p>
 <?php } ?>

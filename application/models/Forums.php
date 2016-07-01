@@ -2,8 +2,9 @@
 
 namespace Application\Model;
 
+use Application\Paginator\Adapter\Zend1DbTableSelect;
+
 use Zend_Db_Expr;
-use Zend_Paginator;
 
 use Comments;
 use Comment_Message;
@@ -14,7 +15,7 @@ class Forums
 {
     const TOPICS_PER_PAGE = 20;
     const MESSAGES_PER_PAGE = 20;
-    
+
     const STATUS_NORMAL = 'normal';
     const STATUS_CLOSED = 'closed';
     const STATUS_DELETED = 'deleted';
@@ -263,7 +264,11 @@ class Forums
             $select->where('forums_topics.theme_id IS NULL');
         }
 
-        $paginator = Zend_Paginator::factory($select)
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+
+        $paginator
             ->setItemCountPerPage(self::TOPICS_PER_PAGE)
             ->setCurrentPageNumber($page);
 
@@ -273,7 +278,7 @@ class Forums
         $topics = [];
 
         foreach ($paginator->getCurrentItems() as $topicRow) {
-            $topicPaginator = $comments->getMessagePaginator(Comment_Message::FORUMS_TYPE_ID, $topicRow->id)
+            $topicPaginator = $comments->getMessagePaginator2(Comment_Message::FORUMS_TYPE_ID, $topicRow->id)
                 ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
                 ->setPageRange(10);
 
@@ -621,7 +626,7 @@ class Forums
                 $page
         );
 
-        $paginator = $comments->getPaginator(
+        $paginator = $comments->getPaginator2(
                 Comment_Message::FORUMS_TYPE_ID,
                 $topic['id'],
                 self::TOPICS_PER_PAGE,

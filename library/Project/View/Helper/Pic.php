@@ -40,12 +40,20 @@ class Project_View_Helper_Pic extends Zend_View_Helper_HtmlElement
         if (isset($picture['name']) && $picture['name']) {
             return $view->escape($picture['name']);
         }
+        
+        if (!isset($picture['type'])) {
+            throw new Exception('Type not set');
+        }
 
         switch ($picture['type']) {
             case Picture::CAR_TYPE_ID:
-                return
-                    ($picture['perspective'] ? $view->escape(self::mbUcfirst($view->translate($picture['perspective']))) . ' ' : '') .
-                    $view->car()->htmlTitle($picture['car']);
+                if ($picture['car']) {
+                    return
+                        ($picture['perspective'] ? $view->escape(self::mbUcfirst($view->translate($picture['perspective']))) . ' ' : '') .
+                        $view->car()->htmlTitle($picture['car']);
+                } else {
+                    return 'Unsorted car';
+                }
                 break;
 
             case Picture::ENGINE_TYPE_ID:
@@ -72,7 +80,7 @@ class Project_View_Helper_Pic extends Zend_View_Helper_HtmlElement
             case Picture::CAR_TYPE_ID:
                 return
                     ($picture['perspective'] ? self::mbUcfirst($view->translate($picture['perspective'])) . ' ' : '') .
-                    $view->car()->textTitle($picture['car']);
+                    ($picture['car'] ? $view->car()->textTitle($picture['car']) : 'Unsorted car');
                 break;
 
             case Picture::ENGINE_TYPE_ID:

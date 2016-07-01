@@ -1,22 +1,24 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => true
-        ),
+        ],
         'pageId' => 45,
-        'args'   => array(
+        'args'   => [
             'THEME_NAME' => $this->translate($this->theme['name']),
             'THEME_ID'   => $this->theme['id'],
-        )
-    ));
+        ]
+    ]);
 ?>
 <?php if ($this->user()->logedIn()) { ?>
     <?php if ($this->needWait) { ?>
         <p class="alert alert-block alert-warning">Для добавления нового сообщения вам необходимо подождать некоторое время</p>
     <?php } ?>
-    <?=$this->formTopicNew->render($this) ?>
+    <?=$this->partial('application/forms/bootstrap-horizontal', [
+        'form' => $this->formTopicNew
+    ])?>
 <?php } else { ?>
     <div class="alert alert-block alert-error">
         <p>Добавлять топики могут только зарегистрированные пользователи.</p>

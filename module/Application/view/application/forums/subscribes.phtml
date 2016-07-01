@@ -2,8 +2,8 @@
     <thead>
         <tr>
             <th>Топики</th>
-            <th><?=$this->escape($this->translate('forums/theme/author'))?></th>
-            <th><?=$this->escape($this->translate('forums/theme/last-message'))?></th>
+            <th><?=$this->escapeHtml($this->translate('forums/theme/author'))?></th>
+            <th><?=$this->escapeHtml($this->translate('forums/theme/last-message'))?></th>
             <th>Подписка</th>
         </tr>
     </thead>
@@ -28,10 +28,10 @@
                             <?=$this->pastTimeIndicator($topic['lastMessage']['date'])?><br />
                             <?php if ($topic['lastMessage']['author']) { ?>
                                 <?=$this->user($topic['lastMessage']['author']) ?>
-                                <?=$this->htmlA(array(
+                                <?=$this->htmlA([
                                     'href'  => $topic['lastMessage']['url'],
                                     'title' => $this->translate('forums/go-to-last-message')
-                                ), '<i class="fa fa-share"></i>', false) ?>
+                                ], '<i class="fa fa-share"></i>', false) ?>
                             <?php } ?>
                         <?php } else { ?>
                             &#x2014;
@@ -41,10 +41,10 @@
                     <?php } ?>
                 </td>
                 <td>
-                    <?=$this->htmlA(array(
+                    <?=$this->htmlA([
                         'class' => 'btn btn-xs btn-warning',
                         'href'  => $topic['unsubscribeUrl'],
-                    ), 'отписаться') ?>
+                    ], 'отписаться') ?>
                 </td>
             </tr>
         <?php } ?>

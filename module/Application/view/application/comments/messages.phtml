@@ -92,9 +92,9 @@
 
                 <?php if ($this->canMoveMessage) { ?>
                     <?=$this->htmlA([
-                        'href'  => $this->url(array_merge($this->moveMessageUrl, array(
+                        'href'  => $this->url($this->moveMessageRoute, array_replace($this->moveMessageUrl, [
                             'id' => $comment['id']
-                        ))),
+                        ])),
                         'class' => 'btn btn-default btn-xs pull-right',
                     ], '<i class="fa fa-arrows"></i> Переместить', false) ?>
                 <?php } ?>
@@ -121,6 +121,7 @@
                     'canViewIp'         => $this->canViewIp,
                     'canMoveMessage'    => $this->canMoveMessage,
                     'moveMessageUrl'    => $this->moveMessageUrl,
+                    'moveMessageRoute'  => $this->moveMessageRoute,
                     'deep'              => $deep + 1
                 ])?>
             </div>

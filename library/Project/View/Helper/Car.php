@@ -207,7 +207,7 @@ class Project_View_Helper_Car extends Zend_View_Helper_HtmlElement
         return $result;
     }
 
-    public function textTitle($car)
+    public function textTitle(array $car)
     {
         $defaults = array(
             'begin_model_year' => null,

@@ -1,5 +1,4 @@
 define(
-    'default/picture',
     ['jquery', 'bootstrap', 'gallery', 'gallery2'],
     function($, Bootstrap, Gallery, Gallery2) {
         return {

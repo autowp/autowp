@@ -1,0 +1,26 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ],
+        'pageId' => 83
+    ]);
+?>
+
+<form action="<?=$this->escapeHtmlAttr($this->url('forums/move', [
+    'topic_id' => $this->topic['id']
+]))?>" method="post">
+    <?php foreach ($this->themes as $theme) { ?>
+        <div>
+            <?php if ($theme['id'] == $this->topic['theme_id']) { ?>
+                <button class="btn btn-default" deisabled><?=$this->escapeHtml($this->translate($theme['name']))?></button>
+            <?php } else { ?>
+                <button class="btn btn-default" type="submit" name="theme_id" value="<?=$theme['id']?>">
+                    <?=$this->escapeHtml($this->translate($theme['name'])) ?>
+                </button>
+            <?php } ?>
+        </div>
+    <?php } ?>
+</form>

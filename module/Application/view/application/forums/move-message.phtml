@@ -1,0 +1,37 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ],
+        'pageId' => 83
+    ]);
+?>
+
+<?php if (!$this->theme) { ?>
+    <ul>
+        <?php foreach ($this->themes as $theme) { ?>
+            <li><?=$this->htmlA($this->url('forums/move-message', [
+                'id' => $this->id
+            ], [
+                'query' => [
+                    'theme_id' => $theme['id']
+                ]
+            ]), $this->translate($theme['name'])) ?></li>
+        <?php } ?>
+    </ul>
+<?php } else { ?>
+    <?php foreach ($this->topics as $topic) { ?>
+        <p>
+            <?=$this->htmlA($this->url('forums/move-message', [
+                'id' => $this->id
+            ], [
+                'query' => [
+                    'theme_id' => $this->theme['id'],
+                    'topic_id' => $topic['id']
+                ]
+            ]), $topic['name']) ?>
+        </p>
+    <?php } ?>
+<?php } ?>

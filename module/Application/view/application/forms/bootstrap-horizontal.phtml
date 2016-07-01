@@ -42,7 +42,7 @@
                     <div class="col-md-10">
                         <div class="checkbox<?=$element->getMessages() ? ' has-error' : ''?>">
                             <label>
-                                <?=$element?>
+                                <?=$this->formElement($element)?>
                                 <?=$this->escapeHtml($this->translate($element->getLabel()))?>
                             </label>
                             <?php foreach ($element->getMessages() as $error) { ?>
@@ -51,6 +51,8 @@
                         </div>
                     </div>
                 </div>
+            <?php } elseif ($element instanceof Zend\Form\Element\Hidden) { ?>
+                <?=$this->formElement($element)?>
             <?php } elseif (!$element instanceof Zend\Form\Element\Submit) { ?>
                 <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
                     <label class="col-md-2 control-label">
@@ -112,9 +114,11 @@
     <?php if (!$submitFound && !$this->element instanceof Zend\Form\SubForm) { ?>
         <div class="row">
             <div class="col-md-10 col-md-offset-2">
-                <?=$this->formSubmit('submit', $this->translate('sumbit'), array(
-                    'class' => 'btn btn-primary'
-                ))?>
+                <?=$this->formElement(
+                    (new Zend\Form\Element\Submit('submit'))
+                        ->setAttribute('class', 'btn btn-primary')
+                        ->setValue($this->translate('sumbit'))
+                )?>
             </div>
         </div>
     <?php } ?>

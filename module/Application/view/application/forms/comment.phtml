@@ -1,0 +1,48 @@
+<?php
+    $this->form->setAttribute(
+        'class',
+        $this->form->getAttribute('class') . ' add-message'
+    );
+?>
+<?=$this->form()->openTag($this->form)?>
+<fieldset>
+    <?php if ($legend = $this->form->getAttribute('legend')) { ?>
+        <legend><?=$this->escapeHtml($this->translate($legend))?></legend>
+    <?php } ?>
+    <?php if ($element = $this->form->get('message')) { ?>
+        <div class="form-group <?=$element->getMessages() ? ' has-error' : ''?>">
+            <div class="controls">
+                <?=$this->formElement(
+                    $element
+                        ->setAttribute('class', $element->getAttribute('class') . ' form-control')
+                )?>
+                <?php foreach ($element->getMessages() as $error) { ?>
+                    <div class="alert alert-danger" role="alert"><?=$this->escapeHtml($error)?></div>
+                <?php } ?>
+            </div>
+        </div>
+    <?php } ?>
+    <?php if ($element = $this->form->get('moderator_attention')) { ?>
+        <div class="form-group <?=$element->getMessages() ? ' has-error' : ''?>">
+            <div class="controls checkbox">
+                <div class="pull-right cancel">
+                    <button class="btn btn-xs btn-warning">
+                        <?=$this->escapeHtml($this->translate('comments/cancel'))?>
+                    </button>
+                </div>
+                <label for="moderator_attention">
+                    <?=$this->formElement($element)?>
+                    <?=$this->escapeHtml($this->translate($element->getLabel()))?>
+                </label>
+            </div>
+        </div>
+    <?php } ?>
+    <?=$this->formElement($this->form->get('parent_id'))?>
+    <?=$this->formElement($this->form->get('resolve'))?>
+    <div>
+        <button type="submit" class="btn btn-primary">
+            <?=$this->escapeHtml($this->translate('comments/send'))?>
+        </button>
+    </div>
+</fieldset>
+<?=$this->form()->closeTag($this->form)?>

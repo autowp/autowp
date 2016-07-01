@@ -1,5 +1,7 @@
 <?php
 
+use Application\Paginator\Adapter\Zend1DbTableSelect;
+
 class Comments
 {
     /**
@@ -112,6 +114,13 @@ class Comments
         $commentTopicTable->updateTopicView($typeId, $itemId, $authorId);
 
         return $messageId;
+    }
+
+    public function getPaginator2($type, $item, $perPage = 0, $page = 0)
+    {
+        return $this->getMessagePaginator2($type, $item)
+            ->setItemCountPerPage($perPage)
+            ->setCurrentPageNumber($page);
     }
 
     public function getPaginator($type, $item, $perPage = 0, $page = 0)
@@ -399,6 +408,24 @@ class Comments
                 ->where('type_id = ?', (int)$type)
                 ->where('parent_id is null')
                 ->order('datetime')
+        );
+    }
+
+/**
+     * @param int $type
+     * @param int $item
+     * @return \Zend\Paginator\Paginator
+     */
+    public function getMessagePaginator2($type, $item)
+    {
+        $select = $this->_getMessageTable()->select(true)
+            ->where('item_id = ?', (int)$item)
+            ->where('type_id = ?', (int)$type)
+            ->where('parent_id is null')
+            ->order('datetime');
+
+        return new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
         );
     }
 

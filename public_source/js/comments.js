@@ -1,5 +1,4 @@
 define(
-    'comments',
     ['jquery'],
     function($) {
         

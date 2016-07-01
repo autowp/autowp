@@ -7,7 +7,8 @@
             'canAddComments'    => $this->canAddComments,
             'canViewIp'         => $this->user()->isAllowed('user', 'ip'),
             'canMoveMessage'    => false,
-            'moveMessageUrl'    => null
+            'moveMessageUrl'    => $this->moveMessageUrl,
+            'moveMessageRoute'  => $this->moveMessageRoute
         ])?>
     <?php } ?>
 

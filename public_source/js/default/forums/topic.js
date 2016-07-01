@@ -14,6 +14,7 @@ define(
                          </div>'
                     );
 
+                    //TODO: extract url to options
                     $('input', div).val(
                         'http://www.autowp.ru' + $(this).attr('href')
                     );

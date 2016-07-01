@@ -1,10 +1,10 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => true
-        ),
+        ],
         'pageId' => 44,
         'args'   => [
             'THEME_NAME' => $this->translate($this->theme['name']),
@@ -12,32 +12,40 @@
             'TOPIC_NAME' => $this->topic['name'],
             'TOPIC_ID'   => $this->topic['id']
         ]
-    ));
+    ]);
 
     $this->layout()->moduleName = 'default/forums/topic';
 ?>
 
 <section class="forum-topic-page comments" data-module="comments" data-comments-item-id="<?=$this->topic['id']?>" data-comments-type="<?=Comment_Message::FORUMS_TYPE_ID?>">
-    <?=$this->partial('comments/messages.phtml', array(
+    <?=$this->partial('application/comments/messages', [
         'messages'          => $this->messages,
         'canRemoveComments' => $this->canRemoveComments,
         'canAddComments'    => $this->canAddComments,
         'canViewIp'         => $this->canViewIp,
         'canMoveMessage'    => $this->canMoveMessage,
+        'moveMessageRoute'  => $this->moveMessageRoute,
         'moveMessageUrl'    => $this->moveMessageUrl
-    ))?>
+    ])?>
 
     <div class="row" style="margin-bottom:10px">
-        <div class="col-sm-6"><?=$this->paginationControl($this->paginator) ?></div>
+        <div class="col-sm-6">
+            <?=$this->paginationControl($this->paginator, null, null, [
+                'route'     => 'forums/topic',
+                'urlParams' => [
+                    'topic_id' => $this->topic['id']
+                ]
+            ]) ?>
+        </div>
         <div class="col-sm-6 text-right">
             <?php if ($this->canSubscribe) { ?>
-                <form action="<?=$this->escape($this->subscribeUrl) ?>" method="post"><div>
+                <form action="<?=$this->escapeHtml($this->subscribeUrl) ?>" method="post"><div>
                     <i class="fa fa-envelope"></i>
                     <a href="#" onclick="this.parentNode.parentNode.submit();return false;">Подписаться на получение уведомлений<br />о новых сообщениях в этом топике</a>
                 </div></form>
             <?php } ?>
             <?php if ($this->canUnsubscribe) { ?>
-                <form action="<?=$this->escape($this->unsubscribeUrl) ?>" method="post"><div>
+                <form action="<?=$this->escapeHtml($this->unsubscribeUrl) ?>" method="post"><div>
                     <i class="fa fa-envelope"></i>
                     Вы подписаны на получение уведомлений<br />о новых сообщения в этом топике. <a href="#" onclick="this.parentNode.parentNode.submit();return false;">Отписаться</a>
                 </div></form>
@@ -45,7 +53,7 @@
         </div>
     </div>
 
-    <?php if ($this->topic['status'] == \Application\Model\Forums::STATUS_NORMAL) { ?>
+    <?php if ($this->topic['status'] == Application\Model\Forums::STATUS_NORMAL) { ?>
         <?php if (!$this->user()->logedIn()) { ?>
             <div class="well">
                 <p>Чтобы иметь возможность создавать топики и отвечать в них, Вам необходимо <a href="/registration/">зарегистрироваться</a>.</p>
@@ -56,7 +64,9 @@
                 <p class="alert alert-block alert-warning">Для добавления нового сообщения вам необходимо подождать некоторое время</p>
             <?php } ?>
             <div class="form-holder">
-                <?=$this->formMessageNew->render($this) ?>
+                <?=$this->partial('application/forms/comment', [
+                    'form' => $this->formMessageNew
+                ])?>
             </div>
         <?php } ?>
     <?php } else { ?>

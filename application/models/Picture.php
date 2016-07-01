@@ -403,7 +403,9 @@ class Picture extends Project_Db_Table
                 continue;
             }
 
-            $caption = array();
+            $caption = array(
+                'type' => $row['type'],
+            );
 
             switch ($row['type']) {
                 case Picture::CAR_TYPE_ID:
@@ -412,6 +414,12 @@ class Picture extends Project_Db_Table
                         $caption = array(
                             'type' => $row['type'],
                             'car' => $car,
+                            'perspective' => isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : null
+                        );
+                    } else {
+                        $caption = array(
+                            'type' => $row['type'],
+                            'car' => null,
                             'perspective' => isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : null
                         );
                     }

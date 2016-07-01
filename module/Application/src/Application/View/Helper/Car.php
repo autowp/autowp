@@ -219,7 +219,7 @@ class Car extends AbstractHelper
         return $result;
     }
 
-    public function textTitle($car)
+    public function textTitle(array $car)
     {
         $defaults = array(
             'begin_model_year' => null,

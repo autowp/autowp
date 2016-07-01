@@ -289,6 +289,115 @@ return [
                     ]
                 ]
             ],
+            'forums' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/forums',
+                    'defaults' => [
+                        'controller' => Controller\ForumsController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'index' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/index[/theme_id/:theme_id][/page/page:page]',
+                        ]
+                    ],
+                    'topic' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/topic/topic_id/:topic_id[/page:page]',
+                            'defaults' => [
+                                'action' => 'topic',
+                            ],
+                        ]
+                    ],
+                    'subscribe' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/subscribe/topic_id/:topic_id',
+                            'defaults' => [
+                                'action' => 'subscribe',
+                            ],
+                        ]
+                    ],
+                    'unsubscribe' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/unsubscribe/topic_id/:topic_id',
+                            'defaults' => [
+                                'action' => 'unsubscribe',
+                            ],
+                        ]
+                    ],
+                    'new' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/new/theme_id/:theme_id',
+                            'defaults' => [
+                                'action' => 'new',
+                            ],
+                        ]
+                    ],
+                    'topic-message' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/topic-message/message_id/:message_id',
+                            'defaults' => [
+                                'action' => 'topic-message',
+                            ],
+                        ]
+                    ],
+                    'open' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/open',
+                            'defaults' => [
+                                'action' => 'open',
+                            ]
+                        ]
+                    ],
+                    'close' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/close',
+                            'defaults' => [
+                                'action' => 'close',
+                            ]
+                        ]
+                    ],
+                    'delete' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/delete',
+                            'defaults' => [
+                                'action' => 'delete',
+                            ]
+                        ]
+                    ],
+                    'move' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/move/:topic_id',
+                            'defaults' => [
+                                'action' => 'move',
+                            ]
+                        ]
+                    ],
+                    'move-message' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/move-message/:id',
+                            'defaults' => [
+                                'action' => 'move-message',
+                            ]
+                        ]
+                    ],
+                ]
+            ],
             'inbox' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -1179,6 +1288,12 @@ return [
                 $options = $sm->get('Config')['feedback'];
                 return new Controller\FeedbackController($form, $transport, $options);
             },
+            Controller\ForumsController::class => function($sm) {
+                $newTopicForm = $sm->get('ForumsTopicNewForm');
+                $commentForm = $sm->get('CommentForm');
+                $transport = $sm->get('MailTransport');
+                return new Controller\ForumsController($newTopicForm, $commentForm, $transport);
+            },
             Controller\IndexController::class        => InvokableFactory::class,
             Controller\InboxController::class        => InvokableFactory::class,
             Controller\InfoController::class => function($sm) {
@@ -2039,6 +2154,155 @@ return [
                             'options' => [
                                 'token' => 'password',
                             ],
+                        ]
+                    ]
+                ],
+            ],
+        ],
+        'ForumsTopicNewForm' => [
+            //'hydrator' => 'ObjectProperty',
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'name',
+                        'options' => [
+                            'label'     => 'forums/topic/name',
+                        ],
+                        'attributes' => [
+                            'size'      => 80,
+                            'maxlength' => 100,
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Textarea',
+                        'name' => 'text',
+                        'options' => [
+                            'label'     => 'forums/topic/text',
+                        ],
+                        'attributes' => [
+                            'cols'      => 140,
+                            'rows'      => 15,
+                            'maxlength' => 1024*4
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Checkbox',
+                        'name' => 'moderator_attention',
+                        'options' => [
+                            'label' => 'comments/it-requires-attention-of-moderators',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Checkbox',
+                        'name' => 'subscribe',
+                        'options' => [
+                            'label' => 'forums/topic/subscribe-to-new-messages',
+                        ]
+                    ],
+                ],
+            ],
+            'input_filter' => [
+                'name' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'min' => 0,
+                                'max' => 100
+                            ]
+                        ]
+                    ]
+                ],
+                'text' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'min' => 0,
+                                'max' => 1024*4
+                            ]
+                        ]
+                    ]
+                ],
+            ],
+        ],
+        'CommentForm' => [
+            //'hydrator' => 'ObjectProperty',
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'comments/form-title',
+                'id'     => 'form-add-comment'
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Textarea',
+                        'name' => 'message',
+                        'options' => [
+                            'label'     => 'forums/topic/text',
+                        ],
+                        'attributes' => [
+                            'cols'      => 80,
+                            'rows'      => 5,
+                            'maxlength' => 1024*4
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Checkbox',
+                        'name' => 'moderator_attention',
+                        'options' => [
+                            'label' => 'comments/it-requires-attention-of-moderators',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Hidden',
+                        'name' => 'parent_id',
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Hidden',
+                        'name' => 'resolve',
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'message' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'min' => 0,
+                                'max' => 1024*4
+                            ]
                         ]
                     ]
                 ],
