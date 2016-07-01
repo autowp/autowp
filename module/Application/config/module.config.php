@@ -303,13 +303,13 @@ return [
                     'index' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => '/index[/theme_id/:theme_id][/page/page:page]',
+                            'route' => '/index[/:theme_id][/page:page]',
                         ]
                     ],
                     'topic' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => '/topic/topic_id/:topic_id[/page:page]',
+                            'route' => '/topic/:topic_id[/page:page]',
                             'defaults' => [
                                 'action' => 'topic',
                             ],
@@ -396,6 +396,15 @@ return [
                             ]
                         ]
                     ],
+                    'subscribes' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/subscribes',
+                            'defaults' => [
+                                'action' => 'subscribes',
+                            ]
+                        ]
+                    ]
                 ]
             ],
             'inbox' => [

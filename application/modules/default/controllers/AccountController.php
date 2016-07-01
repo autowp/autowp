@@ -556,35 +556,6 @@ class AccountController extends Zend_Controller_Action
         ));
     }
 
-    public function forumsAction()
-    {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
-        }
-
-        $this->sidebar();
-    }
-
-    public function forumsUnsubscribeAction()
-    {
-        $user = $this->_helper->user()->get();
-
-        if (!$user) {
-            return $this->forward('index', 'login');
-        }
-
-        $topicId = (int)$this->getParam('topic_id');
-
-        $model = new Forums();
-        $model->unsubscribe($topicId, $user->id);
-
-        return $this->redirect($this->_helper->url->url(array(
-            'module'     => 'default',
-            'controller' => 'account',
-            'action'     => 'forums',
-        ), 'account', true));
-    }
-
     public function notTakenPicturesAction()
     {
         if (!$this->_helper->user()->logedIn()) {

@@ -299,7 +299,11 @@ class ForumsController extends AbstractActionController
         $model = new Forums();
         $model->subscribe($topicId, $user->id);
 
-        return $this->redirect()->toUrl($this->topicUrl($topicId));
+        $referer = $this->getRequest()->getServer('HTTP_REFERER');
+
+        return $this->redirect()->toUrl(
+            $referer ? $referer : $this->topicUrl($topicId)
+        );
     }
 
     public function unsubscribeAction()
@@ -314,7 +318,11 @@ class ForumsController extends AbstractActionController
         $model = new Forums();
         $model->unsubscribe($topicId, $user->id);
 
-        return $this->redirect()->toUrl($this->topicUrl($topicId));
+        $referer = $this->getRequest()->getServer('HTTP_REFERER');
+
+        return $this->redirect()->toUrl(
+            $referer ? $referer : $this->topicUrl($topicId)
+        );
     }
 
     private function needWait()
