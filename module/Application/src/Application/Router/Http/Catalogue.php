@@ -26,7 +26,7 @@ class Catalogue implements RouteInterface
      * Create a new route with given options.
      *
      * @param  array|\Traversable $options
-     * @return void
+     * @return Catalogue
      */
     public static function factory($options = [])
     {

@@ -11,15 +11,15 @@
     <tbody>
         <?php foreach ($this->rows as $row) { ?>
             <tr>
-                <td><?=$this->escape($row['id'])?></td>
-                <td><?=$this->htmlA($this->url(array(
+                <td><?=$this->escapeHtml($row['id'])?></td>
+                <td><?=$this->htmlA($this->url([
                     'controller' => 'cars',
                     'action'     => 'car',
                     'car_id'     => $row['id']
-                )), $row['caption'])?></td>
-                <td><?=$this->escape($row['body'])?></td>
-                <td><?=$this->escape($row['t'])?></td>
-                <td><?=$this->escape($row['c'])?></td>
+                ]), $row['caption'])?></td>
+                <td><?=$this->escapeHtml($row['body'])?></td>
+                <td><?=$this->escapeHtml($row['t'])?></td>
+                <td><?=$this->escapeHtml($row['c'])?></td>
             </tr>
         <?php } ?>
     </tbody>

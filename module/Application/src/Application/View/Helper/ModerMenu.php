@@ -37,7 +37,7 @@ class ModerMenu extends AbstractHtmlElement
             );
 
             $items[] = [
-                'href'  => $this->view->url('moder/comments/action/params', [
+                'href'  => $this->view->url('moder/comments/params', [
                     'action'              => 'index',
                     'moderator_attention' => Comment_Message::MODERATOR_ATTENTION_REQUIRED
                 ]),
@@ -48,18 +48,14 @@ class ModerMenu extends AbstractHtmlElement
 
             if ($this->view->user()->inheritsRole('pages-moder')) {
                 $items[] = [
-                    'href'  => $this->view->url('moder/pages/action', [
-                        'action'     => 'index'
-                    ]),
+                    'href'  => $this->view->url('moder/pages'),
                     'label' => 'Страницы сайта',
                     'icon'  => 'fa fa-book'
                 ];
             }
 
             $items[] = [
-                'href'  => $this->view->url('moder/cars/action', [
-                    'action' => 'index'
-                ]),
+                'href'  => $this->view->url('moder/cars'),
                 'label' => 'Автомобили',
                 'icon'  => 'fa fa-car'
             ];

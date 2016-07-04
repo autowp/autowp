@@ -11,7 +11,7 @@ class EmailExists extends AbstractValidator
     const NOT_EXISTS = 'userEmailNotExists';
 
     protected $messageTemplates = [
-        self::EXISTS => "E-mail '%value%' не зарегистрирован на сайте"
+        self::NOT_EXISTS => "E-mail '%value%' не зарегистрирован на сайте"
 
     ];
 

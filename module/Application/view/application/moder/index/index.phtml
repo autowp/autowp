@@ -1,13 +1,13 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'isAdminPage' => true,
             'blankPage'   => false,
             'needLeft'    => false,
             'needRight'   => false
-        ),
+        ],
         'pageId' => 67,
-    ));
+    ]);
 ?>
 <div class="row">
     <div class="col-md-6">
@@ -17,30 +17,22 @@
                 <ul class="list-unstyled">
                     <li>
                         <i class="fa fa-align-left"></i>
-                        <?=$this->htmlA($this->url(array(
-                            'module'     => 'moder',
-                            'controller' => 'cars',
-                            'action'     => 'index',
-                        ), 'default', true), 'Автомобили')?>
+                        <?=$this->htmlA($this->url('moder/cars'), 'Автомобили')?>
                     </li>
 
                     <li>
                         <i class="fa fa-sort-alpha-asc"></i>
-                        <?=$this->htmlA($this->url(array(
-                            'module'     => 'moder',
-                            'controller' => 'cars',
-                            'action'     => 'alpha',
-                        ), 'default', true), 'Алфавитный список автомобилей')?>
+                        <?=$this->htmlA($this->url('moder/cars', [
+                            'action' => 'alpha'
+                        ]), 'Алфавитный список автомобилей')?>
                     </li>
 
                     <?php if ($this->user()->isAllowed('car', 'add')) { ?>
                         <li>
                             <i class="fa fa-plus"></i>
-                            <?=$this->htmlA($this->url(array(
-                                'module'     => 'moder',
-                                'controller' => 'cars',
-                                'action'     => 'new',
-                            ), 'default', true), 'добавить')?>
+                            <?=$this->htmlA($this->url('moder/cars', [
+                                'action' => 'new',
+                            ]), 'добавить')?>
                         </li>
                     <?php } ?>
                 </ul>
@@ -51,20 +43,14 @@
             <ul class="list-unstyled">
                 <li>
                     <i class="fa fa-align-left"></i>
-                    <?=$this->htmlA($this->url(array(
-                        'module'     => 'moder',
-                        'controller' => 'engines',
-                        'action'     => 'index',
-                    ), 'default', true), 'Двигатели')?>
+                    <?=$this->htmlA($this->url('moder/engines'), 'Двигатели')?>
                 </li>
                 <?php if ($this->user()->isAllowed('engine', 'add')) { ?>
                     <li>
                         <i class="fa fa-plus"></i>
-                        <?=$this->htmlA($this->url(array(
-                            'module'     => 'moder',
-                            'controller' => 'engines',
-                            'action'     => 'add',
-                        ), 'default', true), 'добавить')?>
+                        <?=$this->htmlA($this->url('moder/engines', [
+                            'action' => 'add',
+                        ]), 'добавить')?>
                     </li>
                 <?php } ?>
             </ul>
@@ -74,20 +60,14 @@
             <ul class="list-unstyled">
                 <li>
                     <i class="fa fa-align-left"></i>
-                    <?=$this->htmlA($this->url(array(
-                        'module'     => 'moder',
-                        'controller' => 'factory',
-                        'action'     => 'index',
-                    ), 'default', true), 'Заводы')?>
+                    <?=$this->htmlA($this->url('moder/factories'), 'Заводы')?>
                 </li>
                 <?php if ($this->user()->isAllowed('factory', 'add')) { ?>
                     <li>
                         <i class="fa fa-plus"></i>
-                        <?=$this->htmlA($this->url(array(
-                            'module'     => 'moder',
-                            'controller' => 'factory',
-                            'action'     => 'add',
-                        ), 'default', true), 'добавить')?>
+                        <?=$this->htmlA($this->url('moder/factories', [
+                            'action' => 'add',
+                        ]), 'добавить')?>
                     </li>
                 <?php } ?>
             </ul>
@@ -95,7 +75,11 @@
     </div>
     <div class="col-md-6">
         <?php if ($this->addBrandForm) { ?>
-            <div class="well"><?=$this->addBrandForm->render($this) ?></div>
+            <div class="well">
+                <?=$this->partial('application/forms/bootstrap-horizontal', [
+                    'form' => $this->addBrandForm
+                ])?>
+            </div>
         <?php } ?>
         <h2>Другие инструменты</h2>
         <div class="well">

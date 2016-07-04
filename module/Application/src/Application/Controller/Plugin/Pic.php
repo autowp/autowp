@@ -711,7 +711,7 @@ class Pic extends AbstractPlugin
         $moderLinks = [];
         if ($isModer) {
             $links = [];
-            $links[$controller->url()->fromRoute('moder/pictures', [
+            $links[$controller->url()->fromRoute('moder/pictures/params', [
                 'action'     => 'picture',
                 'picture_id' => $picture->id
             ])] = 'Управление изображением №'.$picture->id;
@@ -719,7 +719,7 @@ class Pic extends AbstractPlugin
             switch ($picture->type) {
                 case Picture::CAR_TYPE_ID:
                     if ($car) {
-                        $url = $controller->url()->fromRoute('moder/cars/action/params', [
+                        $url = $controller->url()->fromRoute('moder/cars/params', [
                             'action' => 'car',
                             'car_id' => $car->id
                         ]);
@@ -736,7 +736,7 @@ class Pic extends AbstractPlugin
                         );
 
                         foreach ($brandRows as $brand) {
-                            $url = $controller->url()->fromRoute('moder/brands', [
+                            $url = $controller->url()->fromRoute('moder/brands/params', [
                                 'action'   => 'brand',
                                 'brand_id' => $brand->id
                             ]);
@@ -749,8 +749,9 @@ class Pic extends AbstractPlugin
 
                 case Picture::ENGINE_TYPE_ID:
                     if ($engine = $picture->findParentEngines()) {
-                        $url = $controller->url()->fromRoute('moder/engines/engine', [
-                            'engine_id'  => $engine->id
+                        $url = $controller->url()->fromRoute('moder/engines/params', [
+                            'action'    => 'engine',
+                            'engine_id' => $engine->id
                         ]);
                         $links[$url] = 'Управление двигателем ' . $engine->caption;
                     }
@@ -758,7 +759,8 @@ class Pic extends AbstractPlugin
 
                 case Picture::FACTORY_TYPE_ID:
                     if ($factory = $picture->findParentFactory()) {
-                        $links[$controller->url()->fromRoute('moder/factories/factory', [
+                        $links[$controller->url()->fromRoute('moder/factories/params', [
+                            'action'     => 'factory',
                             'factory_id' => $factory->id
                         ])] = 'Управление заводом ' . $factory->name;
                     }
@@ -768,8 +770,9 @@ class Pic extends AbstractPlugin
                 case Picture::LOGO_TYPE_ID:
                 case Picture::UNSORTED_TYPE_ID:
                     if ($brand = $picture->findParentBrands()) {
-                        $url = $controller->url()->fromRoute('moder/brands/brand', [
-                            'brand_id'   => $brand->id
+                        $url = $controller->url()->fromRoute('moder/brands/params', [
+                            'action'   => 'brand',
+                            'brand_id' => $brand->id
                         ]);
                         $links[$url] = 'Управление брендом ' . $brand->caption;
                     }

@@ -16,7 +16,7 @@ class Category implements RouteInterface
      * Create a new route with given options.
      *
      * @param  array|\Traversable $options
-     * @return void
+     * @return Category
      */
     public static function factory($options = [])
     {
@@ -43,8 +43,6 @@ class Category implements RouteInterface
         $path = $request->getUri()->getPath();
 
         $length = strlen($path);
-
-        $data = $this->defaults;
 
         $path = trim($path, self::DELIMETER);
         $path = explode(self::DELIMETER, $path);

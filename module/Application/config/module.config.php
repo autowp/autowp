@@ -857,162 +857,149 @@ return [
                         'action'     => 'index'
                     ],
                 ],
-                'may_terminate' => false,
+                'may_terminate' => true,
                 'child_routes' => [
                     'brands' => [
-                        'type' => Literal::class,
+                        'type' => Segment::class,
                         'options' => [
-                            'route' => '/brands',
+                            'route' => '/brands[/:action]',
                             'defaults' => [
                                 'controller' => Controller\Moder\BrandsController::class,
                                 'action'     => 'index'
                             ],
                         ],
                         'may_terminate' => true,
-                        'child_routes' => [
-                            'action' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route' => '/:action',
-                                ],
-                                'may_terminate' => true,
-                                'child_routes'  => [
-                                    'params' => [
-                                        'type' => WildcardSafe::class
-                                    ]
-                                ]
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
                             ]
                         ]
                     ],
                     'cars' => [
-                        'type' => Literal::class,
+                        'type' => Segment::class,
                         'options' => [
-                            'route' => '/cars',
+                            'route' => '/cars[/:action]',
                             'defaults' => [
                                 'controller' => Controller\Moder\CarController::class,
                                 'action'     => 'index'
                             ],
                         ],
                         'may_terminate' => true,
-                        'child_routes' => [
-                            'action' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route' => '/:action',
-                                ],
-                                'may_terminate' => true,
-                                'child_routes'  => [
-                                    'params' => [
-                                        'type' => WildcardSafe::class
-                                    ]
-                                ]
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
                             ]
                         ]
                     ],
                     'comments' => [
-                        'type' => Literal::class,
+                        'type' => Segment::class,
                         'options' => [
-                            'route' => '/comments',
+                            'route' => '/comments[/:action]',
                             'defaults' => [
                                 'controller' => Controller\Moder\CommentsController::class,
                                 'action'     => 'index'
                             ],
                         ],
                         'may_terminate' => true,
-                        'child_routes' => [
-                            'action' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route' => '/:action',
-                                ],
-                                'may_terminate' => true,
-                                'child_routes'  => [
-                                    'params' => [
-                                        'type' => WildcardSafe::class
-                                    ]
-                                ]
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
+                            ]
+                        ]
+                    ],
+                    'engines' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/engines[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\EnginesController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
                             ]
                         ]
                     ],
                     'factories' => [
-                        'type' => Literal::class,
+                        'type' => Segment::class,
                         'options' => [
-                            'route' => '/factory',
+                            'route' => '/factory[/:action]',
                             'defaults' => [
                                 'controller' => Controller\Moder\FactoryController::class,
                                 'action'     => 'index'
                             ],
                         ],
-                        'may_terminate' => false,
-                        'child_routes' => [
-                            'factory' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route' => '/factory/factory_id/:factory_id',
-                                    'defaults' => [
-                                        'action' => 'factory'
-                                    ],
-                                ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
                             ]
                         ]
                     ],
                     'index' => [
-                        'type' => Literal::class,
+                        'type' => Segment::class,
                         'options' => [
-                            'route' => '/index',
+                            'route' => '/index[/:action]',
                             'defaults' => [
                                 'controller' => Controller\Moder\IndexController::class,
                                 'action'     => 'index'
                             ],
                         ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
+                            ]
+                        ]
                     ],
                     'pages' => [
-                        'type' => Literal::class,
+                        'type' => Segment::class,
                         'options' => [
-                            'route' => '/pages',
+                            'route' => '/pages[/:action]',
                             'defaults' => [
                                 'controller' => Controller\Moder\PagesController::class,
                                 'action'     => 'index'
                             ],
                         ],
                         'may_terminate' => true,
-                        'child_routes' => [
-                            'action' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route' => '/:action',
-                                ],
-                                'may_terminate' => true,
-                                'child_routes'  => [
-                                    'params' => [
-                                        'type' => WildcardSafe::class
-                                    ]
-                                ]
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
                             ]
                         ]
                     ],
                     'pictures' => [
-                        'type' => Literal::class,
+                        'type' => Segment::class,
                         'options' => [
-                            'route' => '/pictures',
+                            'route' => '/pictures[/:action]',
                             'defaults' => [
                                 'controller' => Controller\Moder\PicturesController::class,
                                 'action'     => 'index'
                             ],
                         ],
                         'may_terminate' => true,
-                        'child_routes' => [
-                            'action' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route' => '/:action',
-                                ],
-                                'may_terminate' => true,
-                                'child_routes'  => [
-                                    'params' => [
-                                        'type' => WildcardSafe::class
-                                    ]
-                                ]
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
+                            ]
+                        ]
+                    ],
+                    'rights' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/rights[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\RightsController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => WildcardSafe::class
                             ]
                         ]
                     ],
@@ -1358,11 +1345,16 @@ return [
                 $service = $sm->get(Service\UsersService::class);
                 return new Controller\Console\UsersController($service);
             },
+            Controller\Moder\IndexController::class => function($sm) {
+                $form = $sm->get('AddBrandForm');
+                return new Controller\Moder\IndexController($form);
+            },
         ],
     ],
     'controller_plugins' => [
         'invokables' => [
             'catalogue' => Controller\Plugin\Catalogue::class,
+            'log'       => Controller\Plugin\Log::class,
         ],
         'factories' => [
             'car' => function ($sm) {
@@ -2077,7 +2069,8 @@ return [
                         ['name' => 'StringTrim']
                     ],
                     'validators' => [
-                        ['name' => 'EmailAddress']
+                        ['name' => 'EmailAddress'],
+                        ['name' => Validator\User\EmailExists::class]
                     ]
                 ],
             ],
@@ -2311,6 +2304,38 @@ return [
                 ],
             ],
         ],
+        'AddBrandForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'Новый Бренд',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'name',
+                        'options' => [
+                            'label'     => 'Название',
+                        ],
+                        'attributes' => [
+                            'size'      => 60
+                        ]
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'name' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => Validator\Brand\NameNotExists::class]
+                    ]
+                ],
+            ],
+        ],
     ],
 
     'feedback' => [
@@ -2318,5 +2343,12 @@ return [
         'fromname' => 'robot autowp.ru',
         'to'       => 'autowp@gmail.com',
         'subject'  => 'AutoWP Feedback'
-    ]
+    ],
+
+    'validators' => [
+        'factories' => [
+            Validator\Brand\NameNotExists::class => InvokableFactory::class,
+            Validator\User\EmailExists::class => InvokableFactory::class,
+        ],
+    ],
 ];
