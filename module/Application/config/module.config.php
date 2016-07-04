@@ -12,6 +12,7 @@ use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Application\Router\Http\WildcardSafe;
+use Application\Router\Http\Category;
 
 use Autowp\Image;
 use Autowp\TextStorage;
@@ -161,25 +162,13 @@ return [
                 ]
             ],
             'categories' => [
-                'type' => Literal::class,
+                'type' => Category::class,
                 'options' => [
                     'route'    => '/category',
                     'defaults' => [
                         'controller' => Controller\CategoryController::class,
                         'action'     => 'index',
                     ],
-                ],
-                'may_terminate' => true,
-                'child_routes'  => [
-                    'category' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/:category_catname',
-                            'defaults' => [
-                                'action' => 'category',
-                            ],
-                        ]
-                    ]
                 ]
             ],
             'comments' => [
@@ -1287,6 +1276,10 @@ return [
                 $cache = $sm->get('longCache');
                 return new Controller\BrandsController($cache);
             },
+            Controller\CategoryController::class => function($sm) {
+                $cache = $sm->get('longCache');
+                return new Controller\CategoryController($cache);
+            },
             Controller\CommentsController::class     => InvokableFactory::class,
             Controller\CutawayController::class      => InvokableFactory::class,
             Controller\DonateController::class       => InvokableFactory::class,
@@ -1301,7 +1294,8 @@ return [
                 $newTopicForm = $sm->get('ForumsTopicNewForm');
                 $commentForm = $sm->get('CommentForm');
                 $transport = $sm->get('MailTransport');
-                return new Controller\ForumsController($newTopicForm, $commentForm, $transport);
+                $translator = $sm->get('translator');
+                return new Controller\ForumsController($newTopicForm, $commentForm, $transport, $translator);
             },
             Controller\IndexController::class        => InvokableFactory::class,
             Controller\InboxController::class        => InvokableFactory::class,

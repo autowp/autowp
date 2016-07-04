@@ -2,7 +2,7 @@
 
 return [
     '' => [
-        'nplurals=2; plural=((n==0)||(n==1))?0:1'
+        'plural_forms' => 'nplurals=2; plural=((n==0)||(n==1))?0:1'
     ],
     /* Common words */
     'and' => 'et',
@@ -350,6 +350,14 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'forums/topic/name' => 'Titre',
     'forums/topic/text' => 'Message',
     'forums/topic/subscribe-to-new-messages' => 'Abonnez-vous à de nouveaux messages',
+    'forums/notification-mail/from' => 'Robot wheelsage.org',
+    'forums/notification-mail/subject' => 'New forum message',
+    'forums/notification-mail/body' =>
+        "Hello.\n\n" .
+        "New message in topic `%1\$s`\n" .
+        "To go to the viewing messages, use the link %2\$s\n\n" .
+        "Unsubscribe from the receipt of the notification, you can in account settings\n\n" .
+        "Sincerely, robot www.wheelsage.org\n",
 
     'account/personal-message/reply' => 'répondre',
     'account/personal-message/delete' => 'effacer',

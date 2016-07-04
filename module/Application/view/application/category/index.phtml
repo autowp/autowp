@@ -1,12 +1,12 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 22,
-    ));
+    ]);
 ?>
 <div class="row destinations thumbnails">
     <?php foreach ($this->categories as $idx => $category) { ?>
@@ -18,27 +18,27 @@
                         $caption = $picture->getCaption();
                     ?>
                     <?=$this->htmlA(
-                        array(
+                        [
                             'href'   => $category['url'],
                             //'class'    =>    'thumbnail'
-                        ),
-                        $this->img($picture->getFormatRequest(), array(
+                        ],
+                        $this->img($picture->getFormatRequest(), [
                             'format' => 'picture-thumb',
                             'alt'    => $caption,
                             'title'  => $caption
-                        )),
+                        ]),
                         false
                     ) ?>
                 <?php } ?>
                 <div class="caption">
-                    <h4><?=$this->htmlA(array(
+                    <h4><?=$this->htmlA([
                         'href'  => $category['url'],
                         'title' => $category['name']
-                    ), $category['short_name']) ?></h4>
+                    ], $category['short_name']) ?></h4>
                     <p>
-                        <?=$this->escape($this->translate(array('category/%s cars', null, $category['cars_count']), $category['cars_count']))?>
+                        <?=$this->escapeHtml(sprintf($this->translatePlural('category/%s cars', null, $category['cars_count']), $category['cars_count']))?>
                         <?php if ($category['new_cars_count'] > 0) { ?>
-                            <small>(<?=$this->escape($this->translate(array('category/%s new cars', null, $category['new_cars_count']), $category['new_cars_count']))?>)</small>
+                            <small>(<?=$this->escapeHtml(sprintf($this->translatePlural('category/%s new cars', null, $category['new_cars_count']), $category['new_cars_count']))?>)</small>
                         <?php } ?>
                     </p>
                 </div>

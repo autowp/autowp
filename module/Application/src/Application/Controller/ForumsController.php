@@ -22,12 +22,15 @@ class ForumsController extends AbstractActionController
     private $newTopicForm;
 
     private $commentForm;
+    
+    private $translator;
 
-    public function __construct($newTopicForm, $commentForm, $transport)
+    public function __construct($newTopicForm, $commentForm, $transport, $translator)
     {
         $this->newTopicForm = $newTopicForm;
         $this->commentForm = $commentForm;
         $this->transport = $transport;
+        $this->translator = $translator;
     }
 
     private function prepareThemeList(&$themes)
@@ -106,6 +109,27 @@ class ForumsController extends AbstractActionController
                 'action' => 'delete'
             ]),
         ]);
+    }
+    
+    private function sendMessageEmailNotification($email, $topicName, $url)
+    {
+        $subject = $this->translator->translate('forums/notification-mail/subject');
+        
+        $message = sprintf(
+            $this->translator->translate('forums/notification-mail/body'),
+            $topicName,
+            $url
+        );
+        
+        $mail = new Mail\Message();
+        $mail
+            ->setEncoding('utf-8')
+            ->setBody($message)
+            ->setFrom('no-reply@autowp.ru', $this->translator->translate('forums/notification-mail/from'))
+            ->addTo($email)
+            ->setSubject($subject);
+
+        $this->transport->send($mail);
     }
 
     public function topicAction()
@@ -188,36 +212,12 @@ class ForumsController extends AbstractActionController
                         $ids = $model->getSubscribersIds($topic['id']);
                         $subscribers = $userTable->find($ids);
 
-                        if (count($subscribers)) {
+                        foreach ($subscribers as $subscriber) {
+                            if ($subscriber->id == $user->id)
+                                continue;
 
-                            $subject = 'Уведомление о новом сообщении на форуме';
-                            $message = sprintf(
-                                "Здравствуйте.\n\n" .
-                                "На форуме сайта http://www.autowp.ru/ в топике \"%s\" добавлено новое сообщение\n" .
-                                "Для перехода к просмотру сообщения воспользуйтесь ссылкой %s\n\n" .
-                                "Отписаться от получений уведомлений вы можете в личном кабинете\n\n" .
-                                "С Уважением, робот www.autowp.ru\n",
-                                $topic['name'],
-                                $messageUrl
-                            );
-
-
-                            foreach ($subscribers as $subscriber) {
-                                if ($subscriber->id == $user->id)
-                                    continue;
-
-                                    if ($subscriber->e_mail) {
-
-                                        $mail = new Mail\Message();
-                                        $mail
-                                            ->setEncoding('utf-8')
-                                            ->setBody($message)
-                                            ->setFrom('no-reply@autowp.ru', 'Робот autowp.ru')
-                                            ->addTo($subscriber->e_mail)
-                                            ->setSubject($subject);
-
-                                        $this->transport->send($mail);
-                                    }
+                            if ($subscriber->e_mail) {
+                                $this->sendMessageEmailNotification($subscriber->e_mail, $topic['name'], $messageUrl);
                             }
                         }
 

@@ -43,7 +43,7 @@ class Pic extends AbstractPlugin
     private $moderVoteTable = null;
 
     private $textStorage;
-    
+
     private $carHelper;
 
     public function __construct($textStorage, $carHelper)
@@ -440,7 +440,7 @@ class Pic extends AbstractPlugin
                 'urlParams' => []
             ]
         ], $options);
-        
+
         $controller = $this->getController();
         $catalogue = $controller->catalogue();
         $imageStorage = $controller->imageStorage();
@@ -656,7 +656,8 @@ class Pic extends AbstractPlugin
                         ]);
                         $categories[$row->id] = [
                             'name' => $lRow ? $lRow->name : $row->name,
-                            'url'  => $controller->url()->fromRoute('categories/category', [
+                            'url'  => $controller->url()->fromRoute('categories', [
+                                'action'           => 'category',
                                 'category_catname' => $row['catname'],
                             ])
                         ];
@@ -800,7 +801,7 @@ class Pic extends AbstractPlugin
         $pageNumbers = false;
 
         if ($picSelect) {
-            
+
             $paginator = new \Zend\Paginator\Paginator(
                 new Zend1DbTableSelect($picSelect)
             );

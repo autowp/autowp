@@ -11,12 +11,15 @@
                     <small>
                         <?php if ($item['produced'] > 1) { ?>
                             <?=$this->escapeHtml(
-                                $this->translate(array(
-                                    $item['produced_exactly'] ? 'carlist/produced/%1$s' : 'carlist/produced-about/%1$s',
-                                    null,
-                                    $item['produced']
-                                ), Zend_Locale_Format::toNumber($item['produced']))
-                            )?>
+                                sprintf(
+                                    $this->translatePlural(
+                                        $item['produced_exactly'] ? 'carlist/produced/%1$s' : 'carlist/produced-about/%1$s',
+                                        null,
+                                        $item['produced']
+                                    ),
+                                    Zend_Locale_Format::toNumber($item['produced'])
+                                )
+                            ) ?>
                         <?php } else {?>
                             <?=$this->escapeHtml($this->translate('carlist/produced/one'))?>
                         <?php } ?>

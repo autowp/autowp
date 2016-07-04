@@ -364,6 +364,14 @@ return [
     'forums/topic/name' => 'Тема топика',
     'forums/topic/text' => 'Сообщение',
     'forums/topic/subscribe-to-new-messages' => 'Подписаться на новые сообщения',
+    'forums/notification-mail/from' => 'Робот autowp.ru',
+    'forums/notification-mail/subject' => 'Уведомление о новом сообщении на форуме',
+    'forums/notification-mail/body' => 
+        "Здравствуйте.\n\n" .
+        "На форуме сайта http://www.autowp.ru/ в топике `%1\$s` добавлено новое сообщение\n" .
+        "Для перехода к просмотру сообщения воспользуйтесь ссылкой %2\$s\n\n" .
+        "Отписаться от получений уведомлений вы можете в личном кабинете\n\n" .
+        "С Уважением, робот www.autowp.ru\n",
 
     'account/personal-message/reply' => 'ответить',
     'account/personal-message/delete' => 'удалить',

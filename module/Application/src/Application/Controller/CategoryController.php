@@ -1,6 +1,21 @@
 <?php
 
-class CategoryController extends Zend_Controller_Action
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
+
+use Application\Paginator\Adapter\Zend1DbTableSelect;
+
+use Car_Parent;
+use Category;
+use Category_Language;
+use Picture;
+use Users;
+
+use Zend_Db_Expr;
+
+class CategoryController extends AbstractActionController
 {
     private $otherCategoryName = 'Other';
 
@@ -14,9 +29,11 @@ class CategoryController extends Zend_Controller_Action
      */
     private $categoryLanguageTable;
 
-    function init()
+    private $cache;
+
+    public function __construct($cache)
     {
-        parent::init();
+        $this->cache = $cache;
 
         $this->categoryTable = new Category();
         $this->categoryLanguageTable = new Category_Language();
@@ -24,69 +41,66 @@ class CategoryController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        $language = $this->_helper->language();
+        $language = $this->language();
 
-        $cache = $this->getInvokeArg('bootstrap')
-            ->getResource('cachemanager')->getCache('long');
+        $key = 'CATEGORY_INDEX46_' . $language;
 
-        $key = 'CATEGORY_INDEX45_' . $language;
+        $categories = $this->cache->getItem($key, $success);
+        if (!$success) {
 
-        if (!($categories = $cache->load($key))) {
+            $categories = [];
 
-            $categories = array();
-
-            $rows = $this->categoryTable->fetchAll(array(
+            $rows = $this->categoryTable->fetchAll([
                 'parent_id is null',
-            ), 'short_name');
+            ], 'short_name');
 
             foreach ($rows as $row) {
 
-                $langRow = $this->categoryLanguageTable->fetchRow(array(
+                $langRow = $this->categoryLanguageTable->fetchRow([
                     'language = ?'    => $language,
                     'category_id = ?' => $row->id
-                ));
+                ]);
 
-                $categories[] = array(
+                $categories[] = [
                     'id'             => $row->id,
-                    'url'            => $this->_helper->url->url(array(
-                        'controller'       => 'category',
+                    'url'            => $this->url()->fromRoute('categories', [
                         'action'           => 'category',
                         'category_catname' => $row->catname,
-                    ), 'category', true),
+                    ]),
                     'name'           => $langRow ? $langRow->name : $row->name,
                     'short_name'     => $langRow ? $langRow->short_name : $row->short_name,
                     'cars_count'     => $row->getCarsCount(),
                     'new_cars_count' => $row->getWeekCarsCount(),
-                );
+                ];
             }
 
-            $cache->save($categories, null, array(), 1800);
+            $this->cache->setItem($key, $categories);
         }
 
-        $pictures = $this->_helper->catalogue()->getPictureTable();
+        $pictures = $this->catalogue()->getPictureTable();
         foreach ($categories as &$category) {
             $category['top_picture'] = $pictures->fetchRow(
                 $pictures->select(true)
                     ->join('category_car', 'pictures.car_id=category_car.car_id', null)
                     ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
                     ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-                    ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->where('category_parent.parent_id = ?', $category['id'])
-                    ->order(array(
+                    ->order([
                         new Zend_Db_Expr('pictures.perspective_id = 7 DESC'),
                         new Zend_Db_Expr('pictures.perspective_id = 8 DESC'),
                         new Zend_Db_Expr('pictures.perspective_id = 1 DESC')
-                    ))
+                    ])
                     ->limit(1)
             );
         }
 
-        $this->view->assign(array(
-            'categories'    => $categories
-        ));
+        return [
+            'categories' => $categories
+        ];
     }
 
-    private function _categoriesMenuActive(&$menu, $currentCategory, $isOther)
+    private function categoriesMenuActive(&$menu, $currentCategory, $isOther)
     {
         $activeFound = false;
         foreach ($menu as &$item) {
@@ -96,7 +110,7 @@ class CategoryController extends Zend_Controller_Action
                 $activeFound = true;
                 $item['active'] = true;
             }
-            if ($this->_categoriesMenuActive($item['categories'], $currentCategory, $isOther)) {
+            if ($this->categoriesMenuActive($item['categories'], $currentCategory, $isOther)) {
                 $activeFound = true;
                 $item['active'] = true;
             }
@@ -105,40 +119,39 @@ class CategoryController extends Zend_Controller_Action
         return $activeFound;
     }
 
-    private function _categoriesMenu($parent, $language, $maxDeep)
+    private function categoriesMenu($parent, $language, $maxDeep)
     {
-        $categories = array();
+        $categories = [];
 
         if ($maxDeep > 0) {
-            $filter = $parent ? array(
+            $filter = $parent ? [
                 'parent_id = ?' => $parent->id
-            ) : array(
+            ] : [
                 'parent_id is null'
-            );
+            ];
             $rows = $this->categoryTable->fetchAll($filter, 'short_name');
             foreach ($rows as $row) {
-                $langRow = $this->categoryLanguageTable->fetchRow(array(
+                $langRow = $this->categoryLanguageTable->fetchRow([
                     'language = ?'    => $language,
                     'category_id = ?' => $row['id']
-                ));
+                ]);
 
-                $category = array(
+                $category = [
                     'id'             => $row->id,
-                    'url'            => $this->_helper->url->url(array(
-                        'controller'       => 'category',
+                    'url'            => $this->url()->fromRoute('categories', [
                         'action'           => 'category',
                         'category_catname' => $row->catname,
                         'other'            => false,
                         'car_id'           => null,
                         'page'             => null
-                    ), 'category', true),
+                    ]),
                     'name'           => $langRow ? $langRow->name : $row->name,
                     'short_name'     => $langRow ? $langRow->short_name : $row->short_name,
                     'cars_count'     => $row->getCarsCount(),
                     'new_cars_count' => $row->getWeekCarsCount(),
-                    'categories'     => $this->_categoriesMenu($row, $language, $maxDeep-1),
+                    'categories'     => $this->categoriesMenu($row, $language, $maxDeep-1),
                     'isOther'        => false
-                );
+                ];
 
                 $categories[] = $category;
             }
@@ -146,22 +159,21 @@ class CategoryController extends Zend_Controller_Action
             if ($parent && count($categories)) {
                 $ownCarsCount = $parent->getOwnCarsCount();
                 if ($ownCarsCount > 0) {
-                    $categories[] = array(
+                    $categories[] = [
                         'id'             => $parent->id,
-                        'url'            => $this->_helper->url->url(array(
-                            'controller'       => 'category',
+                        'url'            => $this->url()->fromRoute('categories', [
                             'action'           => 'category',
                             'category_catname' => $parent->catname,
                             'other'            => true,
                             'car_id'           => null,
                             'page'             => null
-                        ), 'category', true),
+                        ]),
                         'short_name'     => $this->otherCategoryName,
                         'cars_count'     => $ownCarsCount,
                         'new_cars_count' => $parent->getWeekOwnCarsCount(),
                         'isOther'        => true,
-                        'categories'     => array()
-                    );
+                        'categories'     => []
+                    ];
                 }
             }
         }
@@ -181,70 +193,66 @@ class CategoryController extends Zend_Controller_Action
 
     private function _categoryAction($callback)
     {
-        $language = $this->_helper->language();
+        $language = $this->language();
 
-        $currentCategory = $this->categoryTable->fetchRow(array(
-            'catname = ?' => (string)$this->_getParam('category_catname')
-        ));
-        $isOther = (bool)$this->_getParam('other');
+        $currentCategory = $this->categoryTable->fetchRow([
+            'catname = ?' => (string)$this->params('category_catname')
+        ]);
+        $isOther = (bool)$this->params('other');
 
         if (!$currentCategory) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
-        $categoryLang = $this->categoryLanguageTable->fetchRow(array(
+        $categoryLang = $this->categoryLanguageTable->fetchRow([
             'language = ?'    => $language,
             'category_id = ?' => $currentCategory->id
-        ));
+        ]);
 
-        $breadcrumbs = array(array(
+        $breadcrumbs = [[
             'name' => $categoryLang && $categoryLang->short_name ? $categoryLang->short_name : $currentCategory->name,
-            'url'  => $this->_helper->url->url(array(
-                'module'           => 'default',
-                'controller'       => 'category',
+            'url'  => $this->url()->fromRoute('categories', [
                 'action'           => 'category',
                 'category_catname' => $currentCategory->catname,
                 'other'            => false,
                 'car_id'           => null,
-                'path'             => array(),
+                'path'             => [],
                 'page'             => 1
-            ), 'category', true)
-        ));
+            ])
+        ]];
 
         $topCategory = $currentCategory;
 
         while ($parentCategory = $topCategory->findParentCategory()) {
             $topCategory = $parentCategory;
 
-            $categoryLang = $this->categoryLanguageTable->fetchRow(array(
+            $categoryLang = $this->categoryLanguageTable->fetchRow([
                 'language = ?'    => $language,
                 'category_id = ?' => $parentCategory->id
-            ));
+            ]);
 
-            array_unshift($breadcrumbs, array(
+            array_unshift($breadcrumbs, [
                 'name' => $categoryLang && $categoryLang->short_name ? $categoryLang->short_name : $parentCategory->short_name,
-                'url'  => $this->_helper->url->url(array(
-                    'module'           => 'default',
-                    'controller'       => 'category',
+                'url'  => $this->url()->fromRoute('categories', [
                     'action'           => 'category',
                     'category_catname' => $parentCategory->catname,
                     'other'            => false,
                     'car_id'           => null,
-                    'path'             => array(),
+                    'path'             => [],
                     'page'             => 1
-                ), 'category', true)
-            ));
+                ])
+            ]);
         }
 
-        $categoryLang = $this->categoryLanguageTable->fetchRow(array(
+        $categoryLang = $this->categoryLanguageTable->fetchRow([
             'language = ?'    => $language,
             'category_id = ?' => $currentCategory->id
-        ));
+        ]);
 
-        $carTable = $this->_helper->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
         $carParentTable = new Car_Parent();
 
-        $carId = $this->_getParam('car_id');
+        $carId = $this->params('car_id');
         $topCar = false;
         $currentCar = false;
         if ($carId) {
@@ -258,29 +266,27 @@ class CategoryController extends Zend_Controller_Action
             );
         }
 
-        $path = array();
+        $path = [];
 
         if ($topCar) {
-            $path = $this->_getParam('path');
-            $path = $path ? (array)$path : array();
+            $path = $this->params('path');
+            $path = $path ? (array)$path : [];
 
-            $breadcrumbs[] = array(
+            $breadcrumbs[] = [
                 'name' => $topCar->getFullName($language),
-                'url'  => $this->_helper->url->url(array(
-                    'module'           => 'default',
-                    'controller'       => 'category',
+                'url'  => $this->url()->fromRoute('categories', [
                     'action'           => 'category',
                     'category_catname' => $currentCategory->catname,
                     'other'            => false,
                     'car_id'           => $topCar->id,
-                    'path'             => array(),
+                    'path'             => [],
                     'page'             => 1
-                ), 'category', true)
-            );
+                ])
+            ];
 
             $currentCar = $topCar;
 
-            $breadcrumbsPath = array();
+            $breadcrumbsPath = [];
 
             foreach ($path as $pathNode) {
                 $childCar = $carTable->fetchRow(
@@ -291,52 +297,54 @@ class CategoryController extends Zend_Controller_Action
                 );
 
                 if (!$childCar) {
-                    return $this->_forward('notfound', 'error');
+                    return $this->getResponse()->setStatusCode(404);
                 }
 
                 $breadcrumbsPath[] = $pathNode;
 
-                $breadcrumbs[] = array(
+                $breadcrumbs[] = [
                     'name' => $childCar->getFullName($language),
-                    'url'  => $this->_helper->url->url(array(
-                        'module'           => 'default',
-                        'controller'       => 'category',
+                    'url'  => $this->url()->fromRoute('categories', [
                         'action'           => 'category',
                         'category_catname' => $currentCategory->catname,
                         'other'            => false,
                         'car_id'           => $topCar->id,
                         'path'             => $breadcrumbsPath,
                         'page'             => 1
-                    ), 'category', true)
-                );
+                    ])
+                ];
 
                 $currentCar = $childCar;
             }
         }
 
-        $cache = $this->getInvokeArg('bootstrap')
-            ->getResource('cachemanager')->getCache('long');
+        $key = 'CATEGORY_MENU324_' . $topCategory->id . '_' . $language;
 
-        $key = 'CATEGORY_MENU322_' . $topCategory->id . '_' . $language;
+        $menu = $this->cache->getItem($key, $success);
+        if (!$success) {
 
-        if (!($menu = $cache->load($key))) {
+            $menu = $this->categoriesMenu($topCategory, $language, 3);
 
-            $menu = $this->_categoriesMenu($topCategory, $language, 3);
-
-            $cache->save($menu, null, array(), 600);
+            $this->cache->setItem($key, $menu);
         }
 
-        $this->_categoriesMenuActive($menu, $currentCategory, $isOther);
+        $this->categoriesMenuActive($menu, $currentCategory, $isOther);
 
-        $this->view->assign(array(
+        $data = [
             'category'     => $currentCategory,
             'categoryLang' => $categoryLang,
             'isOther'      => $isOther,
             'categories'   => $menu,
-        ));
+        ];
 
-        return $callback($language, $topCategory, $currentCategory,
+        $result =  $callback($language, $topCategory, $currentCategory,
             $categoryLang, $isOther, $topCar, $path, $currentCar, $breadcrumbs);
+
+        if (is_array($result)) {
+            return array_replace($data, $result);
+        }
+
+        return $result;
     }
 
     public function categoryAction()
@@ -345,19 +353,19 @@ class CategoryController extends Zend_Controller_Action
                 $currentCategory, $categoryLang, $isOther, $topCar, $path,
                 $currentCar, $breadcrumbs) {
 
-            $carTable = $this->_helper->catalogue()->getCarTable();
+            $carTable = $this->catalogue()->getCarTable();
 
             if ($topCar) {
                 $select = $carTable->select(true)
                     ->join('car_parent', 'cars.id = car_parent.car_id', null)
                     ->where('car_parent.parent_id = ?', $currentCar->id)
-                    ->order($this->_helper->catalogue()->carsOrdering());
+                    ->order($this->catalogue()->carsOrdering());
 
             } else {
 
                 $select = $carTable->select(true)
                     ->join('category_car', 'cars.id = category_car.car_id', null)
-                    ->order($this->_helper->catalogue()->carsOrdering());
+                    ->order($this->catalogue()->carsOrdering());
 
                 if ($isOther) {
                     $select->where('category_car.category_id=?', $currentCategory->id);
@@ -369,9 +377,13 @@ class CategoryController extends Zend_Controller_Action
                 }
             }
 
-            $paginator = Zend_Paginator::factory($select)
-                ->setItemCountPerPage($this->_helper->catalogue()->getCarsPerPage())
-                ->setCurrentPageNumber($this->_getParam('page'));
+            $paginator = new \Zend\Paginator\Paginator(
+                new Zend1DbTableSelect($select)
+            );
+
+            $paginator
+                ->setItemCountPerPage($this->catalogue()->getCarsPerPage())
+                ->setCurrentPageNumber($this->params('page'));
 
             $users = new Users();
             $contributors = $users->fetchAll(
@@ -398,174 +410,177 @@ class CategoryController extends Zend_Controller_Action
 
             $carParentTable = new Car_Parent();
 
-            $this->view->assign(array(
+            $listData = $this->car()->listData($paginator->getCurrentItems(), [
+                'picturesDateSort' => true,
+                'detailsUrl' => function($listCar) use ($topCar, $currentCar, $carParentTable, $currentCategory, $isOther, $path) {
+
+                    $carParentAdapter = $carParentTable->getAdapter();
+                    $hasChilds = (bool)$carParentAdapter->fetchOne(
+                        $carParentAdapter->select()
+                            ->from($carParentTable->info('name'), new Zend_Db_Expr('1'))
+                            ->where('parent_id = ?', $listCar->id)
+                    );
+
+                    if (!$hasChilds) {
+                        return false;
+                    }
+
+                    // found parent row
+                    if ($currentCar) {
+                        if (count($path)) {
+                            $carParentRow = $carParentTable->fetchRow([
+                                'car_id = ?'    => $listCar->id,
+                                'parent_id = ?' => $currentCar->id
+                            ]);
+                            if ($carParentRow) {
+                                $currentPath = array_merge($path, [
+                                    $carParentRow->catname
+                                ]);
+                            } else {
+                                $currentPath = false;
+                            }
+                        } else {
+                            $carParentRow = $carParentTable->fetchRow([
+                                'car_id = ?'    => $listCar->id,
+                                'parent_id = ?' => $currentCar->id
+                            ]);
+                            if ($carParentRow) {
+                                $currentPath = array_merge($path, [
+                                    $carParentRow->catname
+                                ]);
+                            } else {
+                                $currentPath = false;
+                            }
+                        }
+
+                        if (!$currentPath) {
+                            return false;
+                        }
+                    } else {
+                        $currentPath = [];
+                    }
+
+                    $url = $this->url()->fromRoute('categories', [
+                        'action'           => 'category',
+                        'category_catname' => $currentCategory->catname,
+                        'other'            => $isOther,
+                        'car_id'           => $topCar ? $topCar->id : $listCar->id,
+                        'path'             => $currentPath,
+                        'page'             => 1
+                    ]);
+
+                    return $url;
+                },
+                'allPicturesUrl' => function($listCar) use ($topCar, $currentCar, $carParentTable, $currentCategory, $isOther, $path) {
+
+                    // found parent row
+                    if ($currentCar) {
+                        if (count($path)) {
+                            $carParentRow = $carParentTable->fetchRow([
+                                'car_id = ?'    => $listCar->id,
+                                'parent_id = ?' => $currentCar->id
+                            ]);
+                            if ($carParentRow) {
+                                $currentPath = array_merge($path, [
+                                    $carParentRow->catname
+                                ]);
+                            } else {
+                                $currentPath = false;
+                            }
+                        } else {
+                            $carParentRow = $carParentTable->fetchRow([
+                                'car_id = ?'    => $listCar->id,
+                                'parent_id = ?' => $currentCar->id
+                            ]);
+                            if ($carParentRow) {
+                                $currentPath = array_merge($path, [
+                                    $carParentRow->catname
+                                ]);
+                            } else {
+                                $currentPath = false;
+                            }
+                        }
+
+                        if (!$currentPath) {
+                            return false;
+                        }
+                    } else {
+                        $currentPath = [];
+                    }
+
+                    $url = $this->url()->fromRoute('categories', [
+                        'action'           => 'category-pictures',
+                        'category_catname' => $currentCategory->catname,
+                        'other'            => $isOther,
+                        'car_id'           => $topCar ? $topCar->id : $listCar->id,
+                        'path'             => $currentPath,
+                        'page'             => 1
+                    ]);
+
+                    return $url;
+                },
+                'pictureUrl'           => function($listCar, $picture) use ($currentCategory, $isOther, $topCar, $currentCar, $carParentTable, $path) {
+
+                    // found parent row
+                    if ($currentCar) {
+                        if (count($path)) {
+                            $carParentRow = $carParentTable->fetchRow([
+                                'car_id = ?'    => $listCar->id,
+                                'parent_id = ?' => $currentCar->id
+                            ]);
+                            if ($carParentRow) {
+                                $currentPath = array_merge($path, [
+                                    $carParentRow->catname
+                                ]);
+                            } else {
+                                $currentPath = false;
+                            }
+                        } else {
+                            $carParentRow = $carParentTable->fetchRow([
+                                'car_id = ?'    => $listCar->id,
+                                'parent_id = ?' => $currentCar->id
+                            ]);
+                            if ($carParentRow) {
+                                $currentPath = array_merge($path, [
+                                    $carParentRow->catname
+                                ]);
+                            } else {
+                                $currentPath = false;
+                            }
+                        }
+
+                        if (!$currentPath) {
+                            return false;
+                        }
+                    } else {
+                        $currentPath = [];
+                    }
+
+                    return $this->url()->fromRoute('categories', [
+                        'action'           => 'category-picture',
+                        'category_catname' => $currentCategory->catname,
+                        'other'            => $isOther,
+                        'car_id'           => $topCar ? $topCar->id : $listCar->id,
+                        'path'             => $currentPath,
+                        'picture_id'       => $picture['identity'] ? $picture['identity'] : $picture['id']
+                    ]);
+                }
+            ]);
+
+            return [
                 'title'            => $title,
                 'breadcrumbs'      => $breadcrumbs,
                 'paginator'        => $paginator,
                 'contributors'     => $contributors,
-                'listData'         => $this->_helper->car->listData($paginator->getCurrentItems(), array(
-                    'picturesDateSort' => true,
-                    'detailsUrl' => function($listCar) use ($topCar, $currentCar, $carParentTable, $currentCategory, $isOther, $path) {
-
-                        $carParentAdapter = $carParentTable->getAdapter();
-                        $hasChilds = (bool)$carParentAdapter->fetchOne(
-                            $carParentAdapter->select()
-                                ->from($carParentTable->info('name'), new Zend_Db_Expr('1'))
-                                ->where('parent_id = ?', $listCar->id)
-                        );
-
-                        if (!$hasChilds) {
-                            return false;
-                        }
-
-                        // found parent row
-                        if ($currentCar) {
-                            if (count($path)) {
-                                $carParentRow = $carParentTable->fetchRow(array(
-                                    'car_id = ?'    => $listCar->id,
-                                    'parent_id = ?' => $currentCar->id
-                                ));
-                                if ($carParentRow) {
-                                    $currentPath = array_merge($path, array(
-                                        $carParentRow->catname
-                                    ));
-                                } else {
-                                    $currentPath = false;
-                                }
-                            } else {
-                                $carParentRow = $carParentTable->fetchRow(array(
-                                    'car_id = ?'    => $listCar->id,
-                                    'parent_id = ?' => $currentCar->id
-                                ));
-                                if ($carParentRow) {
-                                    $currentPath = array_merge($path, array(
-                                        $carParentRow->catname
-                                    ));
-                                } else {
-                                    $currentPath = false;
-                                }
-                            }
-
-                            if (!$currentPath) {
-                                return false;
-                            }
-                        } else {
-                            $currentPath = array();
-                        }
-
-                        $url = $this->_helper->url->url(array(
-                            'module'           => 'default',
-                            'controller'       => 'category',
-                            'action'           => 'category',
-                            'category_catname' => $currentCategory->catname,
-                            'other'            => $isOther,
-                            'car_id'           => $topCar ? $topCar->id : $listCar->id,
-                            'path'             => $currentPath,
-                            'page'             => 1
-                        ), 'category', true);
-
-                        return $url;
-                    },
-                    'allPicturesUrl' => function($listCar) use ($topCar, $currentCar, $carParentTable, $currentCategory, $isOther, $path) {
-
-                        // found parent row
-                        if ($currentCar) {
-                            if (count($path)) {
-                                $carParentRow = $carParentTable->fetchRow(array(
-                                    'car_id = ?'    => $listCar->id,
-                                    'parent_id = ?' => $currentCar->id
-                                ));
-                                if ($carParentRow) {
-                                    $currentPath = array_merge($path, array(
-                                        $carParentRow->catname
-                                    ));
-                                } else {
-                                    $currentPath = false;
-                                }
-                            } else {
-                                $carParentRow = $carParentTable->fetchRow(array(
-                                    'car_id = ?'    => $listCar->id,
-                                    'parent_id = ?' => $currentCar->id
-                                ));
-                                if ($carParentRow) {
-                                    $currentPath = array_merge($path, array(
-                                        $carParentRow->catname
-                                    ));
-                                } else {
-                                    $currentPath = false;
-                                }
-                            }
-
-                            if (!$currentPath) {
-                                return false;
-                            }
-                        } else {
-                            $currentPath = array();
-                        }
-
-                        $url = $this->_helper->url->url(array(
-                            'module'           => 'default',
-                            'controller'       => 'category',
-                            'action'           => 'category-pictures',
-                            'category_catname' => $currentCategory->catname,
-                            'other'            => $isOther,
-                            'car_id'           => $topCar ? $topCar->id : $listCar->id,
-                            'path'             => $currentPath,
-                            'page'             => 1
-                        ), 'category', true);
-
-                        return $url;
-                    },
-                    'pictureUrl'           => function($listCar, $picture) use ($currentCategory, $isOther, $topCar, $currentCar, $carParentTable, $path) {
-
-                        // found parent row
-                        if ($currentCar) {
-                            if (count($path)) {
-                                $carParentRow = $carParentTable->fetchRow(array(
-                                    'car_id = ?'    => $listCar->id,
-                                    'parent_id = ?' => $currentCar->id
-                                ));
-                                if ($carParentRow) {
-                                    $currentPath = array_merge($path, array(
-                                        $carParentRow->catname
-                                    ));
-                                } else {
-                                    $currentPath = false;
-                                }
-                            } else {
-                                $carParentRow = $carParentTable->fetchRow(array(
-                                    'car_id = ?'    => $listCar->id,
-                                    'parent_id = ?' => $currentCar->id
-                                ));
-                                if ($carParentRow) {
-                                    $currentPath = array_merge($path, array(
-                                        $carParentRow->catname
-                                    ));
-                                } else {
-                                    $currentPath = false;
-                                }
-                            }
-
-                            if (!$currentPath) {
-                                return false;
-                            }
-                        } else {
-                            $currentPath = array();
-                        }
-
-                        return $this->_helper->url->url(array(
-                            'module'           => 'default',
-                            'controller'       => 'category',
-                            'action'           => 'category-picture',
-                            'category_catname' => $currentCategory->catname,
-                            'other'            => $isOther,
-                            'car_id'           => $topCar ? $topCar->id : $listCar->id,
-                            'path'             => $currentPath,
-                            'picture_id'       => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ));
-                    }
-                ))
-            ));
+                'listData'         => $listData,
+                'urlParams'        => [
+                    'action'           => 'category',
+                    'category_catname' => $currentCategory->catname,
+                    'other'            => $isOther,
+                    'car_id'           => $topCar ? $topCar->id : null,
+                    'path'             => $path
+                ]
+            ];
         });
     }
 
@@ -575,14 +590,14 @@ class CategoryController extends Zend_Controller_Action
                 $currentCategory, $categoryLang, $isOther, $topCar, $path,
                 $currentCar, $breadcrumbs) {
 
-            $pictureTable = $this->_helper->catalogue()->getPictureTable();
+            $pictureTable = $this->catalogue()->getPictureTable();
 
             $select = $pictureTable->select(true)
                 ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-                ->where('pictures.status IN (?)', array(
+                ->where('pictures.status IN (?)', [
                     Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
-                ))
-                ->order($this->_helper->catalogue()->picturesOrdering());
+                ])
+                ->order($this->catalogue()->picturesOrdering());
 
             if ($topCar) {
                 $select
@@ -605,33 +620,35 @@ class CategoryController extends Zend_Controller_Action
                 }
             }
 
-            $paginator = Zend_Paginator::factory($select)
-                ->setItemCountPerPage($this->_helper->catalogue()->getPicturesPerPage())
-                ->setCurrentPageNumber($this->_getParam('page'));
+            $paginator = new \Zend\Paginator\Paginator(
+                    new Zend1DbTableSelect($select)
+            );
+
+            $paginator
+                ->setItemCountPerPage($this->catalogue()->getPicturesPerPage())
+                ->setCurrentPageNumber($this->params('page'));
 
             $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
-            $picturesData = $this->_helper->pic->listData($select, array(
+            $picturesData = $this->pic()->listData($select, [
                 'width' => 4,
                 'url'   => function($picture) use ($currentCategory, $isOther, $topCar, $path) {
-                    return $this->_helper->url->url(array(
-                        'module'           => 'default',
-                        'controller'       => 'category',
+                    return $this->url()->fromRoute('categories', [
                         'action'           => 'category-picture',
                         'category_catname' => $currentCategory->catname,
                         'other'            => $isOther,
                         'car_id'           => $topCar ? $topCar->id : null,
                         'path'             => $path,
                         'picture_id'       => $picture['identity'] ? $picture['identity'] : $picture['id']
-                    ));
+                    ]);
                 }
-            ));
+            ]);
 
-            $this->view->assign(array(
+            return [
                 'breadcrumbs'  => $breadcrumbs,
                 'paginator'    => $paginator,
                 'picturesData' => $picturesData,
-            ));
+            ];
         });
     }
 
@@ -641,14 +658,14 @@ class CategoryController extends Zend_Controller_Action
                 $currentCategory, $categoryLang, $isOther, $topCar, $path,
                 $currentCar, $breadcrumbs) {
 
-            $pictureTable = $this->_helper->catalogue()->getPictureTable();
+            $pictureTable = $this->catalogue()->getPictureTable();
 
             $select = $pictureTable->select(true)
                 ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-                ->where('pictures.status IN (?)', array(
+                ->where('pictures.status IN (?)', [
                     Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
-                ))
-                ->order($this->_helper->catalogue()->picturesOrdering());
+                ])
+                ->order($this->catalogue()->picturesOrdering());
 
             if ($topCar) {
                 $select
@@ -673,7 +690,7 @@ class CategoryController extends Zend_Controller_Action
 
             $selectRow = clone $select;
 
-            $pictureId = (string)$this->_getParam('picture_id');
+            $pictureId = (string)$this->params('picture_id');
 
             $selectRow
                 ->where('pictures.id = ?', $pictureId)
@@ -690,21 +707,21 @@ class CategoryController extends Zend_Controller_Action
             }
 
             if (!$picture) {
-                return $this->_forward('notfound', 'error');
+                return $this->getResponse()->setStatusCode(404);
             }
 
-            $this->view->assign(array(
+            return [
                 'breadcrumbs' => $breadcrumbs,
                 'picture'     => array_replace(
-                    $this->_helper->pic->picPageData($picture, $select, array()),
-                    array(
+                    $this->pic()->picPageData($picture, $select, []),
+                    [
                         'gallery2'   => true,
-                        'galleryUrl' => $this->_helper->url->url(array(
+                        'galleryUrl' => $this->url()->fromRoute('categories', [
                             'action' => 'category-picture-gallery'
-                        ))
-                    )
+                        ])
+                    ]
                 )
-            ));
+            ];
         });
     }
 
@@ -714,14 +731,14 @@ class CategoryController extends Zend_Controller_Action
                 $currentCategory, $categoryLang, $isOther, $topCar, $path,
                 $currentCar, $breadcrumbs) {
 
-            $pictureTable = $this->_helper->catalogue()->getPictureTable();
+            $pictureTable = $this->catalogue()->getPictureTable();
 
             $select = $pictureTable->select(true)
                 ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-                ->where('pictures.status IN (?)', array(
+                ->where('pictures.status IN (?)', [
                     Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
-                ))
-                ->order($this->_helper->catalogue()->picturesOrdering());
+                ])
+                ->order($this->catalogue()->picturesOrdering());
 
             if ($topCar) {
                 $select
@@ -746,7 +763,7 @@ class CategoryController extends Zend_Controller_Action
 
             $selectRow = clone $select;
 
-            $pictureId = (string)$this->_getParam('picture_id');
+            $pictureId = (string)$this->params('picture_id');
 
             $selectRow
                 ->where('pictures.id = ?', $pictureId)
@@ -763,16 +780,16 @@ class CategoryController extends Zend_Controller_Action
             }
 
             if (!$picture) {
-                return $this->_forward('notfound', 'error');
+                return $this->getResponse()->setStatusCode(404);
             }
 
-            return $this->_helper->json($this->_helper->pic->gallery2($select, array(
-                'page'      => $this->getParam('page'),
-                'pictureId' => $this->getParam('pictureId'),
-                'urlParams' => array(
+            return new JsonModel($this->pic()->gallery2($select, [
+                'page'      => $this->params('page'),
+                'pictureId' => $this->params('pictureId'),
+                'urlParams' => [
                     'action' => 'category-picture'
-                )
-            )));
+                ]
+            ]));
         });
     }
 }

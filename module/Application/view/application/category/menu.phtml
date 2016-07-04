@@ -3,16 +3,16 @@
         <li<?=$category['active'] ? ' class="active"' : '' ?>>
             <?=$this->htmlA(
                 $category['url'],
-                $this->escape($category['short_name']) .
+                $this->escapeHtml($category['short_name']) .
                     '&#xa0;<span class="count">('.($category['cars_count'] - $category['new_cars_count']) . ($category['new_cars_count'] > 0 ? '<span>+'.$category['new_cars_count'].'</span>' : '') .')</span>',
                 false
             )?>
             <?php if (isset($category['categories']) && $category['categories'] && $category['active']) { ?>
-                <?=$this->partial('category/menu.phtml', array(
+                <?=$this->partial('application/category/menu', [
                     'categories' => $category['categories'],
                     'category'   => $this->category,
                     'isOther'    => $this->isOther
-                ))?>
+                ])?>
             <?php } ?>
         </li>
     <?php } ?>

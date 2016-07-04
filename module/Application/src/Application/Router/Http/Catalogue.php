@@ -88,9 +88,9 @@ class Catalogue implements RouteInterface
         }
 
         $brands = new Brands();
-        $brand = $brands->fetchRow(array(
+        $brand = $brands->fetchRow([
            'folder = ?' => $path[0]
-        ));
+        ]);
 
         if (!$brand) {
             return false;
@@ -380,7 +380,7 @@ class Catalogue implements RouteInterface
                     return false;
                 }
 
-                $enginePath = array();
+                $enginePath = [];
                 while ($path) {
                     if (!preg_match('|^[0-9]+$|', $path[0], $match)) {
                         break;
@@ -494,15 +494,15 @@ class Catalogue implements RouteInterface
         }
 
         $brandCarTable = new Brand_Car();
-        $brandCarRow = $brandCarTable->fetchRow(array(
+        $brandCarRow = $brandCarTable->fetchRow([
             'brand_id = ?' => $brand->id,
             'catname = ?'  => $path[0]
-        ));
+        ]);
 
         if ($brandCarRow) {
             array_shift($path);
 
-            $treePath = array();
+            $treePath = [];
 
             if (!$path) {
                 // :brand/:car_catname
@@ -518,10 +518,10 @@ class Catalogue implements RouteInterface
 
             $currentCarId = $brandCarRow->car_id;
             while($path) {
-                $carParentRow = $carParentTable->fetchRow(array(
+                $carParentRow = $carParentTable->fetchRow([
                     'parent_id = ?' => $currentCarId,
                     'catname = ?'   => $path[0]
-                ));
+                ]);
 
                 if (!$carParentRow) {
                     break;
@@ -883,7 +883,7 @@ class Catalogue implements RouteInterface
             }
         }
 
-        $url = array($data['brand_catname']);
+        $url = [$data['brand_catname']];
 
         switch ($data['action'])
         {

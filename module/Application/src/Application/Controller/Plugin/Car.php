@@ -206,7 +206,8 @@ class Car extends AbstractPlugin
                 }
                 $carsCategories[$carId][] = [
                     'name' => $category['lang_name'] ? $category['lang_name'] : $category['name'],
-                    'url'  => $controller->url()->fromRoute('categories/category', [
+                    'url'  => $controller->url()->fromRoute('categories', [
+                        'action'           => 'category',
                         'category_catname' => $category['catname'],
                     ]),
                 ];
