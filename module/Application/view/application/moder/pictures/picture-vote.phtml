@@ -1,0 +1,52 @@
+<?php if ($this->canVote) { ?>
+    <form action="<?=$this->escapeHtmlAttr($this->pictureVoteUrl)?>" class="form-inline" method="post">
+        <div data-module="moder-vote-reason">
+            <?=$this->formElement(
+                (new Zend\Form\Element\Select('reason_select'))
+                    ->setAttributes([
+                        'id'    => 'reason_select',
+                        'class' => 'form-control'
+                    ])
+                    ->setValueOptions($this->voteOptions)
+            )?>
+            <?php foreach ($this->voteOptions as $value) { ?>
+                <input type="text" name="reason" id="reason" value="<?=$this->escapeHtmlAttr($value)?>" style="display: none" class="form-control">
+            <?php break; } ?>
+        </div>
+
+        <div class="btn-group btn-group-sm">
+            <input type="submit" name="vote" value="Хочу принять" class="btn btn-success">
+            <input type="submit" name="vote" value="Хочу удалить" class="btn btn-danger">
+        </div>
+    </form>
+<?php } ?>
+
+<?php if ($this->voteExists) { ?>
+    <form action="<?=$this->escapeHtmlAttr($this->pictureUnvoteUrl)?>" method="post">
+        <input type="submit" name="send" id="send" value="Отменить мою заявку" class="btn btn-default">
+    </form>
+<?php } ?>
+
+<?php if (isset($this->moderVotes) && count($this->moderVotes) > 0) { ?>
+    Уже подали:
+    <?php $idx = 0 ?>
+    <?php foreach ($this->moderVotes as $vote) { ?>
+        <?php if ($idx++ > 0) { ?>, <?php } ?>
+        <?php if ($user = $vote->findParentUsers()) { ?>
+            <?=$this->user($user) ?>
+        <?php } ?>
+        <span style="color:<?=$vote->vote ? 'green' : 'red' ?>">&#xa0;(<?=$this->escapeHtml($vote->reason) ?>)</span>
+    <?php } ?>
+<?php } ?>
+
+<?php if ($this->canDelete) { ?>
+    <form action="<?=$this->escapeHtmlAttr($this->pictureDeleteUrl)?>" method="post">
+        <input type="submit" name="send" id="send" value="Удалить" class="btn btn-danger">
+    </form>
+<?php } ?>
+
+<?php if ($this->isLastPicture) { ?>
+    <p><span class="label label-warning">Это единственная принятая картинка этого автомобиля</span></p>
+<?php } elseif ($this->acceptedCount !== null && $this->acceptedCount <= 4) { ?>
+    <p><span class="label label-warning">Принятых картинок этого автомобиля всего <?=$this->acceptedCount ?></span></p>
+<?php } ?>

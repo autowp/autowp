@@ -14,7 +14,7 @@ class NameNotExists extends AbstractValidator
         self::EXISTS => "Бренд с названием '%value%' уже существует"
     ];
 
-    public function isValid($value, $context = null)
+    public function isValid($value)
     {
         $this->setValue($value);
 

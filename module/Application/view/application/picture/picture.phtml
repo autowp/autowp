@@ -190,7 +190,7 @@
                         }
 
                         if ($this->user()->logedIn()) {
-                            $list[] = $this->htmlA($this->url('upload/action', [
+                            $list[] = $this->htmlA($this->url('upload/params', [
                                 'action'     => 'index',
                                 'type'       => '1',
                                 'car_id'     => $car->id
@@ -202,7 +202,7 @@
                 case Picture::MIXED_TYPE_ID:
                     if ($this->user()->logedIn()) {
                         if ($brand = $this->picture->findParentBrands()) {
-                            $list[] = $this->htmlA($this->url('upload/action', [
+                            $list[] = $this->htmlA($this->url('upload/params', [
                                 'action'     => 'index',
                                 'type'       => Picture::MIXED_TYPE_ID,
                                 'brand_id'   => $brand->id
@@ -273,9 +273,9 @@
 
             if ($this->user()->logedIn()) {
                 if ($this->picture->car_id || $this->picture->brand_id || $this->picture->engine_id) {
-                    $list[] = $this->htmlA($this->url('upload/action', [
-                        'action'     => 'index',
-                        'replace'    => $this->picture->identity ? $this->picture->identity : $this->picture->id
+                    $list[] = $this->htmlA($this->url('upload/params', [
+                        'action'  => 'index',
+                        'replace' => $this->picture->identity ? $this->picture->identity : $this->picture->id
                     ]), '<i class="fa fa-exchange"></i> ' . $this->escapeHtml($this->translate('picture/propose-image-replacement')), false);
                 }
             }
@@ -327,10 +327,7 @@
         <div class="row">
             <div class="col-md-6">
                 Удаление<br/>
-                <?php /*=$this->action('picture-vote', 'pictures', 'moder', [
-                    'picture_id' => $this->picture->id,
-                    'hide-vote'  => true
-                ])*/ ?>
+                <?=$this->partial('application/moder/pictures/picture-vote', $this->pictureVote)?>
             </div>
             <div class="col-md-6">
                 <?php foreach ($this->moderLinks as $url => $name) { ?>
@@ -339,9 +336,7 @@
             </div>
             <?php if ($this->picture->type == Picture::CAR_TYPE_ID) { ?>
                 <div class="col-md-6">
-                    <?php /*=$this->action('picture-perspective', 'pictures', 'moder', [
-                        'picture_id' => $this->picture->id
-                    ])*/ ?>
+                    <?=$this->partial('application/moder/pictures/picture-perspective', $this->picturePerspective)?>
                 </div>
             <?php } ?>
         </div>

@@ -1,0 +1,16 @@
+<form method="post" action="<?=$this->escapeHtmlAttr($this->url)?>" class="tiny" data-module="perspective-selector">
+    <label for="perspective_id">Ракурс</label>
+
+    <?=$this->formElement(
+        (new Zend\Form\Element\Select('perspective_id'))
+            ->setAttributes([
+                'id'    => 'perspective_id',
+                'class' => 'form-control'
+            ])
+            ->setValueOptions($this->options)
+            ->setValue($this->value)
+    )?>
+</form>
+<?php if ($this->user) { ?>
+    <p>Установил: <?=$this->user($this->user) ?></p>
+<?php } ?>

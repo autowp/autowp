@@ -27,8 +27,8 @@ class IndexController extends AbstractActionController
 
         if ($this->user()->isAllowed('brand', 'add')) {
             $this->addBrandForm->setAttribute(
-                    'action',
-                    $this->url()->fromRoute('moder/index/params', ['form' => 'add-brand'])
+                'action',
+                $this->url()->fromRoute('moder/index/params', ['form' => 'add-brand'])
             );
 
             if ($request->isPost() && $this->params('form') == 'add-brand') {
@@ -74,11 +74,6 @@ class IndexController extends AbstractActionController
 
         $menu['/moder/pictures/'] = 'Картинки';
 
-        /*if ($this->user()->inheritsRole('cars-moder')) {
-            $menu[$this->_helper->url('alpha', 'cars')] = 'Алфавитный список автомобилей';
-            //$menu[$this->_helper->url('by_types', 'cars')] = 'Список автомобилей по типам кузова';
-        }*/
-
         $menu['/moder/perspectives/'] = 'Справка по ракурсам';
 
         $menu['/moder/index/stat'] = 'Статистика';
@@ -96,7 +91,6 @@ class IndexController extends AbstractActionController
             return $this->getResponse()->setStatusCode(403);
         }
 
-        $pictures = $this->catalogue()->getPictureTable();
         $cars = new Cars();
 
         $db = $cars->getAdapter();
@@ -111,10 +105,6 @@ class IndexController extends AbstractActionController
 
         $totalCars = $db->fetchOne('
             select count(1) from cars
-        ');
-
-        $totalAttrs = $db->fetchOne('
-            select count(1) from attrs_attributes
         ');
 
         $totalCarAttrs = $db->fetchOne('

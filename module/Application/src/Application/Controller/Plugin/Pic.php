@@ -22,6 +22,7 @@ use Category_Language;
 use Comment_Message;
 use Comment_Topic;
 use Engines;
+use Perspectives;
 use Picture;
 use Picture_View;
 use Pictures_Moder_Votes;
@@ -698,8 +699,7 @@ class Pic extends AbstractPlugin
         if ($picture->replace_picture_id) {
             $replacePictureRow = $pictureTable->find($picture->replace_picture_id)->current();
 
-            $picHelper = $controller->getHelper('pic');
-            $replacePicture = $picHelper->href($replacePictureRow->toArray());
+            $replacePicture = $controller->pic()->href($replacePictureRow->toArray());
 
             if ($replacePictureRow->status == Picture::STATUS_REMOVING) {
                 if (!$controller->user()->inheritsRole('moder')) {
@@ -920,6 +920,35 @@ class Pic extends AbstractPlugin
             $copyrights = $this->textStorage->getText($picture->copyrights_text_id);
         }
 
+        $picturePerspective = null;
+        if ($this->getController()->user()->inheritsRole('moder')) {
+            if ($picture->type == Picture::CAR_TYPE_ID) {
+                $perspectives = new Perspectives();
+
+                $multioptions = $perspectives->getAdapter()->fetchPairs(
+                    $perspectives->getAdapter()->select()
+                        ->from($perspectives->info('name'), ['id', 'name'])
+                        ->order('position')
+                );
+
+                $multioptions = array_replace([
+                    '' => '--'
+                ], $multioptions);
+
+                $user = $picture->findParentUsersByChange_Perspective_User();
+
+                $picturePerspective = [
+                    'options' => $multioptions,
+                    'url'     => $this->getController()->url()->fromRoute('moder/pictures/params', [
+                        'action'     => 'picture-perspective',
+                        'picture_id' => $picture->id
+                    ]),
+                    'user'    => $user,
+                    'value'   => $picture->perspective_id
+                ];
+            }
+        }
+
         $data = [
             'id'                => $picture['id'],
             'copyrights'        => $copyrights,
@@ -953,7 +982,11 @@ class Pic extends AbstractPlugin
             'carDetailsUrl'     => $carDetailsUrl,
             'carHtml'           => $carText,
             'carDescription'    => $carDescription,
-            'modifications'     => $modifications
+            'modifications'     => $modifications,
+            'pictureVote'       => $this->getController()->pictureVote($picture->id, [
+                'hideVote' => true
+            ]),
+            'picturePerspective' => $picturePerspective
         ];
 
         // Обвновляем количество просмотров

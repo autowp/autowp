@@ -803,27 +803,18 @@ return [
                 ]
             ],
             'upload' => [
-                'type' => Literal::class,
+                'type' => Segment::class,
                 'options' => [
-                    'route' => '/upload',
+                    'route' => '/upload[/:action]',
                     'defaults' => [
                         'controller' => Controller\UploadController::class,
                         'action'     => 'index'
                     ],
                 ],
                 'may_terminate' => true,
-                'child_routes' => [
-                    'action' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/:action',
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => WildcardSafe::class
-                            ]
-                        ]
+                'child_routes'  => [
+                    'params' => [
+                        'type' => WildcardSafe::class
                     ]
                 ]
             ],
@@ -1353,8 +1344,9 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
-            'catalogue' => Controller\Plugin\Catalogue::class,
-            'log'       => Controller\Plugin\Log::class,
+            'catalogue'   => Controller\Plugin\Catalogue::class,
+            'log'         => Controller\Plugin\Log::class,
+            'pictureVote' => Controller\Plugin\PictureVote::class,
         ],
         'factories' => [
             'car' => function ($sm) {
