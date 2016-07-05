@@ -20,31 +20,14 @@ class PictureVote extends AbstractPlugin
         $this->table = new Picture();
     }
 
-    public function __invoke($pictureId, $options)
+    private function isLastPicture($picture)
     {
-        $options = array_replace([
-            'hideVote' => false
-        ], $options);
-
-        $picture = $this->table->find($pictureId)->current();
-        if (!$picture) {
-            return false;
-        }
-
-        if (!$this->getController()->user()->inheritsRole('moder')) {
-            return false;
-        }
-
-        $hideVote = (bool)$options['hideVote'];
-
-        $canDelete = $this->pictureCanDelete($picture);
-
-        $isLastPicture = null;
+        $result = null;
         if ($picture->type == Picture::CAR_TYPE_ID && $picture->status == Picture::STATUS_ACCEPTED) {
             $car = $picture->findParentCars();
             if ($car) {
                 $db = $this->table->getAdapter();
-                $isLastPicture = !$db->fetchOne(
+                $result = !$db->fetchOne(
                     $db->select()
                         ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
                         ->where('car_id = ?', $car->id)
@@ -54,12 +37,17 @@ class PictureVote extends AbstractPlugin
             }
         }
 
-        $acceptedCount = null;
+        return $result;
+    }
+
+    private function getAcceptedCount($picture)
+    {
+        $result = null;
         if ($picture->type == Picture::CAR_TYPE_ID) {
             $car = $picture->findParentCars();
             if ($car) {
                 $db = $this->table->getAdapter();
-                $acceptedCount = $db->fetchOne(
+                $result = $db->fetchOne(
                     $db->select()
                         ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
                         ->where('car_id = ?', $car->id)
@@ -67,10 +55,11 @@ class PictureVote extends AbstractPlugin
                 );
             }
         }
+        return $result;
+    }
 
-        $user = $this->getController()->user()->get();
-        $voteExists = $this->pictureVoteExists($picture, $user);
-
+    private function getVoteOptions()
+    {
         $voteOptions = [
             'плохое качество',
             'дубль',
@@ -91,28 +80,51 @@ class PictureVote extends AbstractPlugin
             }
         }
 
+        return array_combine($voteOptions, $voteOptions);
+    }
+
+    public function __invoke($pictureId, $options)
+    {
+        $options = array_replace([
+            'hideVote' => false
+        ], $options);
+
+        $picture = $this->table->find($pictureId)->current();
+        if (!$picture) {
+            return false;
+        }
+
+        $controller = $this->getController();
+
+        if (!$controller->user()->inheritsRole('moder')) {
+            return false;
+        }
+
+        $user = $controller->user()->get();
+        $voteExists = $this->pictureVoteExists($picture, $user);
+
         return [
-            'isLastPicture'     => $isLastPicture,
-            'acceptedCount'     => $acceptedCount,
-            'canDelete'         => $canDelete,
-            'canVote'           => !$voteExists && $this->getController()->user()->isAllowed('picture', 'moder_vote'),
+            'isLastPicture'     => $this->isLastPicture($picture),
+            'acceptedCount'     => $this->getAcceptedCount($picture),
+            'canDelete'         => $this->pictureCanDelete($picture),
+            'canVote'           => !$voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
             'voteExists'        => $voteExists,
-            'moderVotes'        => $hideVote ? null : $picture->findPictures_Moder_Votes(),
-            'pictureDeleteUrl'  => $this->getController()->url()->fromRoute('moder/pictures/params', [
+            'moderVotes'        => $options['hideVote'] ? null : $picture->findPictures_Moder_Votes(),
+            'pictureDeleteUrl'  => $controller->url()->fromRoute('moder/pictures/params', [
                 'action'     => 'delete-picture',
                 'picture_id' => $picture->id
             ]),
-            'pictureUnvoteUrl'  => $this->getController()->url()->fromRoute('moder/pictures/params', [
+            'pictureUnvoteUrl'  => $controller->url()->fromRoute('moder/pictures/params', [
                 'action'     => 'picture-vote',
                 'form'       => 'picture-unvote',
                 'picture_id' => $picture->id
             ]),
-            'pictureVoteUrl'    => $this->getController()->url()->fromRoute('moder/pictures/params', [
+            'pictureVoteUrl'    => $controller->url()->fromRoute('moder/pictures/params', [
                 'action'     => 'picture-vote',
                 'form'       => 'picture-vote',
                 'picture_id' => $picture->id
             ]),
-            'voteOptions' => array_combine($voteOptions, $voteOptions)
+            'voteOptions' => $this->getVoteOptions()
         ];
     }
 
