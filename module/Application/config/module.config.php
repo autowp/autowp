@@ -1628,7 +1628,7 @@ return [
                 ]
             ],
             'picture' => [
-                'path' => $imageDir . "pictures",
+                'path' => APPLICATION_PATH . "/../public_html/pictures/",
                 'url'  => 'http://i.wheelsage.org/pictures/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'

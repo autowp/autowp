@@ -1,59 +1,18 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 111,
-        'args'   => array(
+        'args'   => [
             'ENGINE_NAME' => $this->engine->caption
-        )
-    ));
+        ]
+    ]);
 
     $this->layout()->moduleName = 'default/cars/engine-spec-editor';
 ?>
-
-<?php $this->headStyle()->captureStart() ?>
-.spec-editor-form table tr th {
-    text-align: left;
-}
-.spec-editor-form table thead tr th {
-    text-align: center;
-    font-weight: bold;
-}
-.spec-editor-form table tr th {
-    font-weight: normal;
-}
-.spec-editor-form h2 {
-    margin-bottom: 2px;
-}
-.spec-editor-form .unit {
-    cursor: help;
-}
-.spec-editor-form .subform-header.hover,
-.spec-editor-form tr.element-row.hover {
-    background-color: #eeeeee;
-}
-
-.spec-editor-form .date {
-    font-size: 10px;
-    color: #999999;
-    white-space: nowrap
-}
-.spec-editor-form .actual {
-    text-align: center;
-    background-color: #F0F0F0;
-    vertical-align: middle;
-    padding: 1px 2px;
-}
-
-.faq blockquote {
-    margin-top: 30px;
-    font-style: italic;
-}
-<?php $this->headStyle()->captureEnd() ?>
-
 <div class="well">
     <?=$this->form->render($this) ?>
 </div>

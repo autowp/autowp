@@ -34,7 +34,8 @@
     </li>
     <?php if ($this->canEdit) { ?>
         <li>
-            <?=$this->htmlA($this->url('moder/factories/factory', [
+            <?=$this->htmlA($this->url('moder/factories/params', [
+                'action'     => 'factory',
                 'factory_id' => $this->factory->id
             ]), '<i class="fa fa-cog"></i> Управление', false) ?>
         </li>

@@ -18,12 +18,16 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
     /**
      * @var array
      */
-    private $_actualValues = array();
+    private $_actualValues = [];
 
     /**
      * @var array
      */
-    private $_multioptions = array();
+    private $_multioptions = [];
+
+    private $_editableAttributes = [];
+
+    private $_editOnlyMode = false;
 
     public function setZone($zone)
     {
@@ -35,6 +39,20 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
     public function getZone()
     {
         return $this->_zone;
+    }
+
+    public function setEditOnlyMode($editOnlyMode)
+    {
+        $this->_editOnlyMode = (bool)$editOnlyMode;
+
+        return $this;
+    }
+
+    public function setEditableAttributes(array $editableAttributes)
+    {
+        $this->_editableAttributes = (array)$editableAttributes;
+
+        return $this;
     }
 
     /**
@@ -111,7 +129,7 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
         return $this;
     }
 
-    private function buildElements($form, $attributes, $deep, $parents = array())
+    private function buildElements($form, $attributes, $deep, $parents = [])
     {
         if (!$this->_itemId) {
             throw new Exception('item_id not set');
@@ -122,32 +140,32 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
         }
 
         foreach ($attributes as $attribute) {
-            $subAttributes = $this->_service->getAttributes(array(
+            $subAttributes = $this->_service->getAttributes([
                 'parent' => $attribute['id'],
                 'zone'   => $this->_zone->id
-            ));
+            ]);
 
             $nodeName = 'attr_' . $attribute['id'];
             if (count($subAttributes)) {
-                $subform = new Zend_Form_SubForm(array(
+                $subform = new Zend_Form_SubForm([
                     'legend'                       => $attribute['name'],
                     'description'                  => $attribute['description'],
                     'disableLoadDefaultDecorators' => true,
-                    //'elementsBelongTo'             => null,
-                    'decorators'                   => array(
+                    'elementsBelongTo'             => null,
+                    'decorators'                   => [
                         'FormElements',
-                        array('viewScript', array(
+                        ['viewScript', [
                             'viewScript' => 'forms/specs-sub.phtml',
                             'placement'  => false,
                             'attribute'  => $attribute,
                             'deep'       => $deep,
                             'classes'    => $parents
-                        )),
-                    )
-                ));
+                        ]],
+                    ]
+                ]);
                 $form->addSubForm($subform, $nodeName);
                 $this->buildElements($subform, $subAttributes, $deep + 1,
-                    array_merge($parents, array('subform-' . $attribute['id'])));
+                    array_merge($parents, ['subform-' . $attribute['id']]));
             } else {
 
                 $options = $this->getFormElementOptions($attribute, $deep, $parents);
@@ -191,15 +209,21 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
             $allValues = $this->_allValues[$attribute['id']];
         }
 
-        $options = array(
+        $readonly = false;
+        if ($this->_editOnlyMode) {
+            $readonly = !in_array($attribute['id'], $this->_editableAttributes);
+        }
+
+        $options = [
             'required'                     => false,
             'label'                        => $attribute['name'],
             'disableLoadDefaultDecorators' => true,
             'description'                  => $attribute['description'],
             'class'                        => 'input-sm form-control',
-            'decorators'                   => array(
+            'disabled'                     => $readonly ? 'disabled' : null,
+            'decorators'                   => [
                 'ViewHelper',
-                array('viewScript', array(
+                ['viewScript', [
                     'viewScript'   => 'forms/specs-element.phtml',
                     'placement'    => false,
                     'deep'         => $deep,
@@ -208,9 +232,9 @@ class Application_Form_Attrs_Zone_Attributes extends Project_Form
                     'actual'       => $value,
                     'unit'         => $unit,
                     'allValues'    => $allValues
-                ))
-            )
-        );
+                ]]
+            ]
+        ];
 
         $type = null;
         if ($attribute['typeId']) {

@@ -30,18 +30,18 @@ class Application_Service_Specifications
     /**
      * @var array
      */
-    private $_listOptions = array();
+    private $_listOptions = [];
 
-    private $_listOptionsChilds = array();
+    private $_listOptionsChilds = [];
 
     /**
      * @var Attrs_Units
      */
     protected $_unitTable = null;
 
-    protected $_valueTables = array();
+    protected $_valueTables = [];
 
-    protected $_userValueDataTables = array();
+    protected $_userValueDataTables = [];
 
     protected $_units = null;
 
@@ -63,7 +63,7 @@ class Application_Service_Specifications
 
     protected $_attributeChilds = null;
 
-    protected $_zoneAttrs = array();
+    protected $_zoneAttrs = [];
 
     /**
      * @var Cars
@@ -78,12 +78,12 @@ class Application_Service_Specifications
     /**
      * @var array
      */
-    protected $_carChildsCache = array();
+    protected $_carChildsCache = [];
 
     /**
      * @var array
      */
-    protected $_engineChildsCache = array();
+    protected $_engineChildsCache = [];
 
     /**
      * @var Attrs_Values
@@ -93,7 +93,7 @@ class Application_Service_Specifications
     /**
      * @var array
      */
-    protected $_actualValueCache = array();
+    protected $_actualValueCache = [];
 
     /**
      * @var array
@@ -123,7 +123,7 @@ class Application_Service_Specifications
     /**
      * @var array
      */
-    protected $_users = array();
+    protected $_users = [];
 
     protected $_valueWeights = [];
 
@@ -233,7 +233,7 @@ class Application_Service_Specifications
     {
         if ($this->_zones === null) {
             $zoneTable = new Attrs_Zones();
-            $this->_zones = array();
+            $this->_zones = [];
             foreach ($zoneTable->fetchAll() as $zone) {
                 $this->_zones[$zone->id] = $zone;
             }
@@ -249,7 +249,7 @@ class Application_Service_Specifications
     public function getUnit($id)
     {
         if ($this->_units === null) {
-            $units = array();
+            $units = [];
             foreach ($this->_getUnitTable()->fetchAll() as $unit) {
                 $units[$unit->id] = array(
                     'id'   => (int)$unit->id,
@@ -286,7 +286,7 @@ class Application_Service_Specifications
     private function _walkTree($zoneId, Callable $callback)
     {
         $this->_loadAttributes();
-        $this->_loadZone($zoneId);
+        $this->loadZone($zoneId);
 
         return $this->_walkTreeStep($zoneId, 0, $callback);
     }
@@ -298,13 +298,13 @@ class Application_Service_Specifications
             'zone'   => $zoneId
         ));
 
-        $result = array();
+        $result = [];
 
         foreach ($attributes as $attribute) {
             $key = 'attr_' . $attribute['id'];
             $haveChilds = isset($this->_childs[$attribute['id']]);
             if ($haveChilds) {
-                $result[$key] = $this->_walkTreeStep($zoneId, $attribute['id'], $callback);
+                $result = array_replace($result, $this->_walkTreeStep($zoneId, $attribute['id'], $callback));
             } else {
                 $result[$key] = $callback($attribute);
             }
@@ -327,7 +327,7 @@ class Application_Service_Specifications
                 $id = (int)$row->id;
                 $pid = (int)$row->parent_id;
                 if (!isset($this->_listOptions[$aid])) {
-                    $this->_listOptions[$aid] = array();
+                    $this->_listOptions[$aid] = [];
                 }
                 $this->_listOptions[$aid][$id] = $row->name;
                 if (!isset($this->_listOptionsChilds[$aid][$pid])) {
@@ -343,7 +343,7 @@ class Application_Service_Specifications
     {
         $this->_loadListOptions($attributeIds);
 
-        $result = array();
+        $result = [];
         foreach ($attributeIds as $aid) {
             if (isset($this->_listOptions[$aid])) {
                 $result[$aid] = $this->_getListOptions($aid, 0);
@@ -357,7 +357,7 @@ class Application_Service_Specifications
     {
         $parentId = (int)$parentId;
 
-        $result = array();
+        $result = [];
         if (isset($this->_listOptionsChilds[$aid][$parentId])) {
             foreach ($this->_listOptionsChilds[$aid][$parentId] as $childId) {
                 $result[$childId] = $this->_listOptions[$aid][$childId];
@@ -390,9 +390,9 @@ class Application_Service_Specifications
      * @param array $options
      * @return Application_Form_Attrs_Zone_Attributes
      */
-    protected function _getForm($itemId, $zoneId, Users_Row $user, array $options)
+    private function getForm($itemId, $zoneId, Users_Row $user, array $options)
     {
-        $multioptions = $this->_getListsOptions($this->_loadZone($zoneId));
+        $multioptions = $this->_getListsOptions($this->loadZone($zoneId));
 
         $zoneUserValues = $this->getZoneUsersValues($zoneId, $itemId);
 
@@ -402,7 +402,7 @@ class Application_Service_Specifications
         $userValueTable = $this->_getUserValueTable();
 
         // fetch values dates
-        $dates = array();
+        $dates = [];
         if (count($zoneUserValues)) {
             $valueDescRows = $userValueTable->fetchAll(array(
                 'attribute_id IN (?)' => array_keys($zoneUserValues),
@@ -414,8 +414,8 @@ class Application_Service_Specifications
             }
         }
 
-        $currentUserValues = array();
-        $allValues = array();
+        $currentUserValues = [];
+        $allValues = [];
         foreach ($zoneUserValues as $attributeId => $users) {
             foreach ($users as $userId => $value) {
                 $date = null;
@@ -428,11 +428,11 @@ class Application_Service_Specifications
                     throw new Exception("Attribute `$attributeId` not found");
                 }
 
-                $allValues[$attributeId][] = array(
+                $allValues[$attributeId][] = [
                     'user'  => $this->_getUser($userId),
                     'value' => $this->_valueToText($attribute, $value),
                     'date'  => $date
-                );
+                ];
 
                 if ($userId == $user->id) {
                     $currentUserValues[$attributeId] = $value;
@@ -441,7 +441,7 @@ class Application_Service_Specifications
         }
 
         $zoneActualValues = $this->getZoneActualValues($zoneId, $itemId);
-        $actualValues = array();
+        $actualValues = [];
         foreach ($zoneActualValues as $attributeId => $value) {
             $attribute = $this->_getAttribute($attributeId);
             if (!$attribute) {
@@ -451,14 +451,15 @@ class Application_Service_Specifications
             $actualValues[$attributeId] = $this->_valueToText($attribute, $value);
         }
 
-        $options = array_merge($options, array(
+        $options = array_replace($options, [
             'service'      => $this,
             'zone'         => $this->_getZone($zoneId),
             'itemId'       => $itemId,
             'allValues'    => $allValues,
             'actualValues' => $actualValues,
-            'multioptions' => $multioptions
-        ));
+            'multioptions' => $multioptions,
+            'editableAttributes' => array_keys($currentUserValues)
+        ]);
 
         //$currentUserValues = $this->getZoneUserValues($zoneId, $itemId, $user->id);
 
@@ -469,7 +470,7 @@ class Application_Service_Specifications
                 if (is_array($value)) {
                     foreach ($value as $oneValue) {
                         if ($oneValue === null) {
-                            return array(self::NULL_VALUE_STR);
+                            return [self::NULL_VALUE_STR];
                         }
                     }
                     return $value;
@@ -493,7 +494,7 @@ class Application_Service_Specifications
     public function getCarForm(Cars_Row $car, Users_Row $user, array $options)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
-        return $this->_getForm($car->id, $zoneId, $user, $options);
+        return $this->getForm($car->id, $zoneId, $user, $options);
     }
 
     /**
@@ -505,23 +506,23 @@ class Application_Service_Specifications
     public function getEngineForm(Engines_Row $engine, Users_Row $user, array $options)
     {
         $zoneId = 5;
-        return $this->_getForm($engine->id, $zoneId, $user, $options);
+        return $this->getForm($engine->id, $zoneId, $user, $options);
     }
 
-    protected function _collectFormData($zoneId, $attributes, $values)
+    private function collectFormData($zoneId, $attributes, $values)
     {
-        $result = array();
+        $result = [];
         foreach ($attributes as $attribute) {
             $id = (int)$attribute['id'];
             $value = $values['attr_' . $id];
 
-            $subAttributes = $this->getAttributes(array(
+            $subAttributes = $this->getAttributes([
                 'zone'   => $zoneId,
                 'parent' => $id
-            ));
+            ]);
 
             if (count($subAttributes)) {
-                $subvalues = $this->_collectFormData($zoneId, $subAttributes, $value);
+                $subvalues = $this->collectFormData($zoneId, $subAttributes, $value);
                 $result = array_replace($result, $subvalues);
             } else {
                 $result[$id] = $value;
@@ -531,7 +532,7 @@ class Application_Service_Specifications
         return $result;
     }
 
-    protected function _loadZone($id)
+    private function loadZone($id)
     {
         $id = (int)$id;
         if (!isset($this->_zoneAttrs[$id])) {
@@ -553,8 +554,8 @@ class Application_Service_Specifications
     protected function _loadAttributes()
     {
         if ($this->_attributes === null) {
-            $array = array();
-            $childs = array();
+            $array = [];
+            $childs = [];
             foreach ($this->_getAttributeTable()->fetchAll(null, 'position') as $row) {
                 $id = (int)$row->id;
                 $pid = (int)$row->parent_id;
@@ -789,7 +790,7 @@ class Application_Service_Specifications
             'parent' => 0
         ));
 
-        $values = $this->_collectFormData($zone->id, $attributes, $form->getValues());
+        $values = $this->collectFormData($zone->id, $attributes, $form->getValues());
 
         foreach ($values as $attributeId => $value) {
             $this->setUserValue(
@@ -959,7 +960,7 @@ class Application_Service_Specifications
         $pictureTable = new Picture();
         $pictureTableAdapter = $pictureTable->getAdapter();
 
-        $order = array();
+        $order = [];
         if ($perspectives) {
             foreach ($perspectives as $pid) {
                 $order[] = new Zend_Db_Expr($pictureTableAdapter->quoteInto('pictures.perspective_id = ? DESC', $pid));
@@ -994,12 +995,12 @@ class Application_Service_Specifications
         $this->_loadAttributes();
 
         if ($zone) {
-            $this->_loadZone($zone);
+            $this->loadZone($zone);
         }
 
         if ($recursive) {
-            $attributes = array();
-            $ids = array();
+            $attributes = [];
+            $ids = [];
             if ($zone) {
                 if (isset($this->_childs[$parent])) {
                     $ids = array_intersect($this->_zoneAttrs[$zone], $this->_childs[$parent]);
@@ -1014,9 +1015,9 @@ class Application_Service_Specifications
             }
         } else {
             if ($zone) {
-                $attributes = array();
+                $attributes = [];
                 if ($parent !== null) {
-                    $ids = array();
+                    $ids = [];
                     if (isset($this->_childs[$parent])) {
                         $ids = array_intersect($this->_zoneAttrs[$zone], $this->_childs[$parent]);
                     }
@@ -1140,7 +1141,7 @@ class Application_Service_Specifications
 
             $rows = $valuesTable->fetchAll($select);
 
-            $values = array();
+            $values = [];
             foreach ($rows as $row) {
                 $values[] = $row->value;
             }
@@ -1209,7 +1210,7 @@ class Application_Service_Specifications
 
     protected function _loadValues($attributes, $itemId, $itemTypeId)
     {
-        $values = array();
+        $values = [];
         foreach ($attributes as $attribute) {
             $value = $this->getActualValue($attribute, $itemId, $itemTypeId);
             $valueText = $this->_valueToText($attribute, $value);
@@ -1243,15 +1244,15 @@ class Application_Service_Specifications
         $attributeTable = $this->_getAttributeTable();
         $carParentTable = new Car_Parent();
 
-        $ids = array();
+        $ids = [];
         foreach ($cars as $car) {
             $ids[] = $car->id;
         }
 
-        $result = array();
-        $attributes = array();
+        $result = [];
+        $attributes = [];
 
-        $zoneIds = array();
+        $zoneIds = [];
         foreach ($cars as $car) {
             $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
 
@@ -1276,7 +1277,7 @@ class Application_Service_Specifications
         $engineTable = $this->_getEngineTable();
         $engineNameAttr = 100;
 
-        $carIds = array();
+        $carIds = [];
         foreach ($cars as $car) {
             $carIds[] = $car->id;
         }
@@ -1307,7 +1308,7 @@ class Application_Service_Specifications
             $carType = $carTypeTable->find($car->car_type_id)->current();
 
             //$values = $this->_loadValues($attributes, $itemId, self::ITEM_TYPE_CAR);
-            $values = isset($actualValues[$itemId]) ? $actualValues[$itemId] : array();
+            $values = isset($actualValues[$itemId]) ? $actualValues[$itemId] : [];
 
             // append engine name
             if (!(isset($values[$engineNameAttr]) && $values[$engineNameAttr]) && $car->engine_id) {
@@ -1361,8 +1362,8 @@ class Application_Service_Specifications
 
         $attributeTable = $this->_getAttributeTable();
 
-        $result = array();
-        $attributes = array();
+        $result = [];
+        $attributes = [];
 
         $attributes = $this->getAttributes(array(
             'zone'      => self::ENGINE_ZONE_ID,
@@ -1516,7 +1517,7 @@ class Application_Service_Specifications
                 return Zend_Locale_Format::toNumber($value);
 
             case 3: // float
-                $options = array();
+                $options = [];
                 if ($attribute['precision']) {
                     $options['precision'] = $attribute['precision'];
                 }
@@ -1533,7 +1534,7 @@ class Application_Service_Specifications
             case 7: // select
                 if ($value) {
                     if (is_array($value)) {
-                        $text = array();
+                        $text = [];
                         $nullText = false;
                         foreach ($value as $v) {
                             if ($v === null) {
@@ -1566,17 +1567,17 @@ class Application_Service_Specifications
         if (count($userValueDataRows)) {
 
             // группируем по пользователям
-            $data = array();
+            $data = [];
             foreach ($userValueDataRows as $userValueDataRow) {
                 $uid = $userValueDataRow->user_id;
                 if (!isset($data[$uid])) {
-                    $data[$uid] = array();
+                    $data[$uid] = [];
                 }
                 $data[$uid][] = $userValueDataRow;
             }
 
             $idx = 0;
-            $registry = $freshness = $ratios = array();
+            $registry = $freshness = $ratios = [];
             foreach ($data as $uid => $valueRows) {
                 /*$user = $uTable->find($uid)->current();
                 if (!$user) {
@@ -1584,7 +1585,7 @@ class Application_Service_Specifications
                 }*/
 
                 if ($attribute['isMultiple']) {
-                    $value = array();
+                    $value = [];
                     foreach ($valueRows as $valueRow) {
                         $value[$valueRow->ordering] = $valueRow->value;
                     }
@@ -1741,7 +1742,7 @@ class Application_Service_Specifications
             ));
 
             if (count($valueDataRows)) {
-                $value = array();
+                $value = [];
                 foreach ($valueDataRows as $valueDataRow) {
                     $value[] = $valueDataRow->value;
                 }
@@ -1781,8 +1782,8 @@ class Application_Service_Specifications
 
                 if (!$attribute['isMultiple']) {
                     $idx = 0;
-                    $registry = array();
-                    $ratios = array();
+                    $registry = [];
+                    $ratios = [];
 
                     $valueDataRows = $valueDataTable->fetchAll(array(
                         'attribute_id = ?' => $attribute['id'],
@@ -1871,7 +1872,7 @@ class Application_Service_Specifications
                         ));
 
                         if (count($valueDataRows)) {
-                            $a = array();
+                            $a = [];
                             foreach ($valueDataRows as $valueDataRow) {
                                 $a[] = $valueDataRow->value;
                             }
@@ -2044,7 +2045,7 @@ class Application_Service_Specifications
                     ->distinct()
                     ->where('item_id in (?)', $itemId)
             );
-            $result = array();
+            $result = [];
             foreach ($itemId as $id) {
                 $result[(int)$id] = false;
             }
@@ -2068,7 +2069,7 @@ class Application_Service_Specifications
     public function twinsGroupsHasSpecs(array $groupIds)
     {
         if (count($groupIds) <= 0) {
-            return array();
+            return [];
         }
 
         $valueTable = $this->_getValueTable();
@@ -2117,14 +2118,14 @@ class Application_Service_Specifications
                 ->join('car_parent', 'attrs_values.item_id = car_parent.car_id', null);
             if (is_array($itemId)) {
                 if (count($itemId) <= 0) {
-                    return array();
+                    return [];
                 }
                 $ids = $db->fetchCol(
                     $select
                         ->distinct()
                         ->where('car_parent.parent_id IN (?)', $itemId)
                 );
-                $result = array();
+                $result = [];
                 foreach ($itemId as $id) {
                     $result[(int)$id] = false;
                 }
@@ -2173,7 +2174,7 @@ class Application_Service_Specifications
     public function getContributors($itemTypeId, $itemId)
     {
         if (!$itemId) {
-            return array();
+            return [];
         }
 
         $uvTable = $this->_getUserValueTable();
@@ -2233,27 +2234,27 @@ class Application_Service_Specifications
         $zone = $this->_getZone($zoneId);
         $itemTypeId = $zone->item_type_id;
 
-        $this->_loadZone($zoneId);
+        $this->loadZone($zoneId);
 
         $attributes = $this->getAttributes(array(
             'zone'   => $zoneId,
             'parent' => null
         ));
 
-        $requests = array();
+        $requests = [];
 
         foreach ($attributes as $attribute) {
             $typeId = $attribute['typeId'];
             $isMultiple = $attribute['isMultiple'] ? 1 : 0;
             if ($typeId) {
                 if (!isset($requests[$typeId][$isMultiple])) {
-                    $requests[$typeId][$isMultiple] = array();
+                    $requests[$typeId][$isMultiple] = [];
                 }
                 $requests[$typeId][$isMultiple][] = $attribute['id'];
             }
         }
 
-        $values = array();
+        $values = [];
         foreach ($requests as $typeId => $multiples) {
             foreach ($multiples as $isMultiple => $ids) {
                 $valuesTable = $this->getUserValueDataTable($typeId);
@@ -2276,7 +2277,7 @@ class Application_Service_Specifications
                     $value = $this->_prepareValue($typeId, $row->value);
                     if ($isMultiple) {
                         if (!isset($values[$aid])) {
-                            $values[$aid] = array();
+                            $values[$aid] = [];
                         }
                         $values[$aid][] = $value;
                     } else {
@@ -2305,27 +2306,27 @@ class Application_Service_Specifications
         $zone = $this->_getZone($zoneId);
         $itemTypeId = $zone->item_type_id;
 
-        $this->_loadZone($zoneId);
+        $this->loadZone($zoneId);
 
-        $attributes = $this->getAttributes(array(
+        $attributes = $this->getAttributes([
             'zone'   => $zoneId,
             'parent' => null
-        ));
+        ]);
 
-        $requests = array();
+        $requests = [];
 
         foreach ($attributes as $attribute) {
             $typeId = $attribute['typeId'];
             $isMultiple = $attribute['isMultiple'] ? 1 : 0;
             if ($typeId) {
                 if (!isset($requests[$typeId][$isMultiple])) {
-                    $requests[$typeId][$isMultiple] = array();
+                    $requests[$typeId][$isMultiple] = [];
                 }
                 $requests[$typeId][$isMultiple][] = $attribute['id'];
             }
         }
 
-        $values = array();
+        $values = [];
         foreach ($requests as $typeId => $multiples) {
             foreach ($multiples as $isMultiple => $ids) {
                 $valuesTable = $this->getUserValueDataTable($typeId);
@@ -2347,11 +2348,11 @@ class Application_Service_Specifications
                     $uid = (int)$row->user_id;
                     $value = $this->_prepareValue($typeId, $row->value);
                     if (!isset($values[$aid])) {
-                        $values[$aid] = array();
+                        $values[$aid] = [];
                     }
                     if ($isMultiple) {
                         if (!isset($values[$aid][$uid])) {
-                            $values[$aid][$uid] = array();
+                            $values[$aid][$uid] = [];
                         }
                         $values[$aid][$uid][] = $value;
                     } else {
@@ -2390,7 +2391,7 @@ class Application_Service_Specifications
             $select->order('ordering');
         }
 
-        $values = array();
+        $values = [];
         foreach ($valuesTable->fetchAll($select) as $row) {
             $values[] = $this->_prepareValue($attribute['typeId'], $row->value);
         }
@@ -2428,7 +2429,7 @@ class Application_Service_Specifications
             $select->order('ordering');
         }
 
-        $values = array();
+        $values = [];
         foreach ($valuesTable->fetchAll($select) as $row) {
             $values[] = $this->_valueToText($attribute, $row->value);
         }
@@ -2461,7 +2462,7 @@ class Application_Service_Specifications
 
         if ($attribute['isMultiple'] && is_array($value)) {
 
-            $text = array();
+            $text = [];
             foreach ($value as $v) {
                 $text[] = $this->_valueToText($attribute, $v);
             }
@@ -2481,7 +2482,7 @@ class Application_Service_Specifications
     private function _getItemsActualValues($itemIds, $itemTypeId)
     {
         if (count($itemIds) <= 0) {
-            return array();
+            return [];
         }
 
         $requests = array(
@@ -2492,7 +2493,7 @@ class Application_Service_Specifications
             6 => true, /* , 7 */
         );
 
-        $values = array();
+        $values = [];
         foreach ($requests as $typeId => $isMultiple) {
             $valuesTable = $this->getValueDataTable($typeId);
             if (!$valuesTable) {
@@ -2512,14 +2513,14 @@ class Application_Service_Specifications
                 $id = (int)$row->item_id;
                 $value = $this->_prepareValue($typeId, $row->value);
                 if (!isset($values[$id])) {
-                    $values[$id] = array();
+                    $values[$id] = [];
                 }
 
                 $attribute = $this->_getAttribute($aid);
 
                 if ($attribute['isMultiple']) {
                     if (!isset($values[$id][$aid])) {
-                        $values[$id][$aid] = array();
+                        $values[$id][$aid] = [];
                     }
                     $values[$id][$aid][] = $value;
                 } else {
@@ -2540,33 +2541,33 @@ class Application_Service_Specifications
     private function _getZoneItemsActualValues($zoneId, array $itemIds)
     {
         if (count($itemIds) <= 0) {
-            return array();
+            return [];
         }
 
         $zone = $this->_getZone($zoneId);
         $itemTypeId = $zone->item_type_id;
 
-        $this->_loadZone($zoneId);
+        $this->loadZone($zoneId);
 
         $attributes = $this->getAttributes(array(
             'zone'   => $zoneId,
             'parent' => null
         ));
 
-        $requests = array();
+        $requests = [];
 
         foreach ($attributes as $attribute) {
             $typeId = $attribute['typeId'];
             $isMultiple = $attribute['isMultiple'] ? 1 : 0;
             if ($typeId) {
                 if (!isset($requests[$typeId][$isMultiple])) {
-                    $requests[$typeId][$isMultiple] = array();
+                    $requests[$typeId][$isMultiple] = [];
                 }
                 $requests[$typeId][$isMultiple][] = $attribute['id'];
             }
         }
 
-        $values = array();
+        $values = [];
         foreach ($requests as $typeId => $multiples) {
             foreach ($multiples as $isMultiple => $ids) {
                 $valuesTable = $this->getValueDataTable($typeId);
@@ -2588,11 +2589,11 @@ class Application_Service_Specifications
                     $id = (int)$row->item_id;
                     $value = $this->_prepareValue($typeId, $row->value);
                     if (!isset($values[$id])) {
-                        $values[$id] = array();
+                        $values[$id] = [];
                     }
                     if ($isMultiple) {
                         if (!isset($values[$id][$aid])) {
-                            $values[$id][$aid] = array();
+                            $values[$id][$aid] = [];
                         }
                         $values[$id][$aid][] = $value;
                     } else {
@@ -2621,27 +2622,27 @@ class Application_Service_Specifications
         $zone = $this->_getZone($zoneId);
         $itemTypeId = $zone->item_type_id;
 
-        $this->_loadZone($zoneId);
+        $this->loadZone($zoneId);
 
         $attributes = $this->getAttributes(array(
             'zone'   => $zoneId,
             'parent' => null
         ));
 
-        $requests = array();
+        $requests = [];
 
         foreach ($attributes as $attribute) {
             $typeId = $attribute['typeId'];
             $isMultiple = $attribute['isMultiple'] ? 1 : 0;
             if ($typeId) {
                 if (!isset($requests[$typeId][$isMultiple])) {
-                    $requests[$typeId][$isMultiple] = array();
+                    $requests[$typeId][$isMultiple] = [];
                 }
                 $requests[$typeId][$isMultiple][] = $attribute['id'];
             }
         }
 
-        $values = array();
+        $values = [];
         foreach ($requests as $typeId => $multiples) {
             foreach ($multiples as $isMultiple => $ids) {
                 $valuesTable = $this->getValueDataTable($typeId);
@@ -2663,7 +2664,7 @@ class Application_Service_Specifications
                     $value = $this->_prepareValue($typeId, $row->value);
                     if ($isMultiple) {
                         if (!isset($values[$aid])) {
-                            $values[$aid] = array();
+                            $values[$aid] = [];
                         }
                         $values[$aid][] = $value;
                     } else {
@@ -2683,15 +2684,15 @@ class Application_Service_Specifications
     public function getType($typeId)
     {
         if ($this->_types === null) {
-            $this->_types = array();
+            $this->_types = [];
             foreach ($this->_getTypeTable()->fetchAll() as $row) {
-                $this->_types[(int)$row->id] = array(
+                $this->_types[(int)$row->id] = [
                     'id'        => (int)$row->id,
                     'name'      => $row->name,
                     'element'   => $row->element,
                     'maxlength' => $row->maxlength,
                     'size'      => $row->size
-                );
+                ];
             }
         }
 
