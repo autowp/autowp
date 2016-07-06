@@ -403,9 +403,7 @@ class CarsController extends Zend_Controller_Action
 
     public function engineSpecEditorAction()
     {
-        if ($this->_helper->user()->get()->specs_weight < 0.10) {
-            return $this->forward('low-weight');
-        }
+        $editOnlyMode = $this->_helper->user()->get()->specs_weight < 0.10;
 
         $engines = $this->getEngineTable();
 
@@ -419,7 +417,8 @@ class CarsController extends Zend_Controller_Action
         $user = $this->_helper->user()->get();
 
         $form = $service->getEngineForm($engine, $user, [
-            'action'  => $this->_helper->url->url()
+            'editOnlyMode' => $editOnlyMode,
+            'action'       => $this->_helper->url->url()
         ]);
 
         $request = $this->getRequest();

@@ -1340,6 +1340,7 @@ return [
                 $form = $sm->get('AddBrandForm');
                 return new Controller\Moder\IndexController($form);
             },
+            Controller\Moder\UsersController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
