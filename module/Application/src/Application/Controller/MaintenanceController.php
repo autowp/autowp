@@ -1,5 +1,11 @@
 <?php
-class MaintenanceController extends Zend_Controller_Action
+
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\View\Model\JsonModel;
+
+class MaintenanceController extends AbstractRestfulController
 {
     private function getProgress()
     {
@@ -25,17 +31,17 @@ class MaintenanceController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        $this->getResponse()->setHttpResponseCode(503);
+        $this->getResponse()->setStatusCode(503);
 
-        $this->view->assign(array(
+        return [
             'progress' => $this->getProgress()
-        ));
+        ];
     }
 
     public function progressAction()
     {
-        return $this->_helper->json(array(
+        return new JsonModel([
             'progress' => $this->getProgress()
-        ));
+        ]);
     }
 }
