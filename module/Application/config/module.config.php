@@ -171,6 +171,36 @@ return [
                     ],
                 ]
             ],
+            'chart' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/chart',
+                    'defaults' => [
+                        'controller' => Controller\ChartController::class,
+                    ],
+                ],
+                'may_terminate' => false,
+                'child_routes'  => [
+                    'years' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/years',
+                            'defaults' => [
+                                'action' => 'years',
+                            ],
+                        ],
+                    ],
+                    'years-data' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/years-data',
+                            'defaults' => [
+                                'action' => 'years-data',
+                            ],
+                        ],
+                    ]
+                ]
+            ],
             'comments' => [
                 'type' => Literal::class,
                 'options' => [
@@ -1258,6 +1288,7 @@ return [
                 $cache = $sm->get('longCache');
                 return new Controller\CategoryController($cache);
             },
+            Controller\ChartController::class        => InvokableFactory::class,
             Controller\CommentsController::class     => InvokableFactory::class,
             Controller\CutawayController::class      => InvokableFactory::class,
             Controller\DonateController::class       => InvokableFactory::class,

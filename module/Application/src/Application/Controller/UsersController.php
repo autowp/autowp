@@ -372,9 +372,9 @@ class UsersController extends AbstractActionController
         $users = [];
         foreach ($userTable->fetchAll($select) as $idx => $user) {
             $brands = [];
-            if ($idx < 5) {
+            if ($idx < 10) {
         
-                $cacheKey = 'RATING_USER_PICTURES_BRAND_4_' . $user->id;
+                $cacheKey = 'RATING_USER_PICTURES_BRAND_6_' . $user->id;
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (!$success) {
         
@@ -385,7 +385,7 @@ class UsersController extends AbstractActionController
                         ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
                         ->group('brands_cars.brand_id')
                         ->where('pictures.owner_id = ?', $user->id)
-                        ->order('count(1) desc')
+                        ->order('count(distinct pictures.id) desc')
                         ->limit(3);
         
                     foreach ($brandTable->fetchAll($select) as $brand) {

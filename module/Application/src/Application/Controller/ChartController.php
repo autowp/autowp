@@ -1,33 +1,43 @@
 <?php
 
-class ChartController extends Zend_Controller_Action
-{
-    private $_parameters = array(
-        1, 2, 3, 47
-    );
+namespace Application\Controller;
 
-    private $_specs = array(
+use Zend\Mvc\Controller\AbstractRestfulController;
+use Zend\View\Model\JsonModel;
+
+use Application_Service_Specifications;
+use Attrs_Attributes;
+use Cars;
+use Spec;
+
+class ChartController extends AbstractRestfulController
+{
+    private $parameters = [
+        1, 2, 3, 47
+    ];
+
+    private $specs = [
         1, 29
-    );
+    ];
 
     public function yearsAction()
     {
         $attrTable = new Attrs_Attributes();
 
         $params = [];
-        foreach ($attrTable->find($this->_parameters) as $row) {
-            $params[] = array(
+        foreach ($attrTable->find($this->parameters) as $row) {
+            $params[] = [
                 'name' => $row->name,
                 'id'   => $row->id
-            );
+            ];
         }
 
-        $this->view->assign(array(
+        return [
             'parameters' => $params
-        ));
+        ];
     }
 
-    private function _specIds($db, $id)
+    private function specIds($db, $id)
     {
         $ids = $db->fetchCol(
             $db->select()
@@ -36,7 +46,7 @@ class ChartController extends Zend_Controller_Action
         );
         $result = [$id];
         foreach ($ids as $pid) {
-            $result = array_merge($result, $this->_specIds($db, $pid));
+            $result = array_merge($result, $this->specIds($db, $pid));
         }
 
         return array_merge($ids, $result);
@@ -44,16 +54,16 @@ class ChartController extends Zend_Controller_Action
 
     public function yearsDataAction()
     {
-        $id = $this->getParam('id');
+        $id = $this->params()->fromQuery('id');
 
-        if (!in_array($id, $this->_parameters)) {
-            return $this->_forward('notfound', 'error');
+        if (!in_array($id, $this->parameters)) {
+            return $this->getResponse()->setStatusCode(404);
         }
 
         $attrTable = new Attrs_Attributes();
         $attrRow = $attrTable->find($id)->current();
         if (!$attrRow) {
-            return $this->_forward('notfound', 'error');
+            return $this->getResponse()->setStatusCode(404);
         }
 
         $specService = new Application_Service_Specifications();
@@ -66,10 +76,10 @@ class ChartController extends Zend_Controller_Action
         $specTable = new Spec();
 
         $datasets = [];
-        foreach ($this->_specs as $specId) {
+        foreach ($this->specs as $specId) {
 
             $specRow = $specTable->find($specId)->current();
-            $specIds = $this->_specIds($specTable->getAdapter(), $specId);
+            $specIds = $this->specIds($specTable->getAdapter(), $specId);
 
             $pairs = $db->fetchPairs(
                 $db->select()
@@ -86,10 +96,10 @@ class ChartController extends Zend_Controller_Action
                     ->order('year')
             );
 
-            $datasets[] = array(
+            $datasets[] = [
                 'title'  => $specRow->name,
                 'pairs'  => $pairs,
-            );
+            ];
         }
 
         $years = [];
@@ -112,15 +122,15 @@ class ChartController extends Zend_Controller_Action
 
         $result = [];
         foreach ($datasets as $dataset) {
-            $result[] = array(
+            $result[] = [
                 'name'   => $dataset['title'],
                 'values' => array_values($dataset['pairs'])
-            );
+            ];
         }
 
-        return $this->_helper->json(array(
+        return new JsonModel([
             'years'    => $years,
             'datasets' => $result
-        ));
+        ]);
     }
 }

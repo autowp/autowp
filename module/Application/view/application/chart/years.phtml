@@ -1,21 +1,21 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 1,
-    ));
+    ]);
     $this->layout()->moduleName = 'default/chart/years';
 ?>
 <div>
     <ul class="nav nav-pills">
         <?php foreach ($this->parameters as $param) { ?>
-            <li><?=$this->htmlA(array(
+            <li><?=$this->htmlA([
                 'href'    => '#',
                 'data-id' => $param['id']
-            ), $param['name'])?></li>
+            ], $param['name'])?></li>
         <?php } ?>
     </ul>
     <canvas class="chart" width="400" height="250"></canvas>
