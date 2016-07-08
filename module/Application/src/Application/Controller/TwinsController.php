@@ -82,7 +82,7 @@ class TwinsController extends AbstractActionController
     {
         $group = $this->getTwins()->getGroup($this->params('id'));
         if (!$group) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $service = new Application_Service_Specifications();
@@ -102,7 +102,7 @@ class TwinsController extends AbstractActionController
 
         $group = $twins->getGroup($this->params('id'));
         if (!$group) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $select = $twins->getGroupPicturesSelect($group['id'], [
@@ -143,7 +143,7 @@ class TwinsController extends AbstractActionController
 
         $group = $twins->getGroup($this->params('id'));
         if (!$group) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $carList = $twins->getGroupCars($group['id']);
@@ -358,7 +358,7 @@ class TwinsController extends AbstractActionController
         $brand = $this->catalogue()->getBrandTable()->findRowByCatname($this->params('brand_catname'));
 
         if (!$brand) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $canEdit = $this->user()->isAllowed('twins', 'edit');
@@ -404,7 +404,7 @@ class TwinsController extends AbstractActionController
 
         $group = $twins->getGroup($this->params('id'));
         if (!$group) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $pictureId = (string)$this->params('picture_id');
@@ -423,7 +423,7 @@ class TwinsController extends AbstractActionController
         }
 
         if (!$picture) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         return $callback($group, $picture);

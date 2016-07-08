@@ -56,7 +56,7 @@ class UsersController extends AbstractActionController
         $user = $this->getUser();
 
         if (!$user) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $pictureTable = $this->catalogue()->getPictureTable();
@@ -148,7 +148,7 @@ class UsersController extends AbstractActionController
         $user = $this->getUser();
 
         if (!$user) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
 
@@ -198,7 +198,7 @@ class UsersController extends AbstractActionController
         $user = $this->getUser();
 
         if (!$user) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $language = $this->language();
@@ -207,7 +207,7 @@ class UsersController extends AbstractActionController
         $brand = $brandModel->getBrandByCatname($this->params('brand_catname'), $language);
 
         if (!$brand) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $pictures = $this->catalogue()->getPictureTable();
@@ -430,6 +430,6 @@ class UsersController extends AbstractActionController
                 break;
         }
 
-        return $this->getResponse()->setStatusCode(404);
+        return $this->notFoundAction();
     }
 }

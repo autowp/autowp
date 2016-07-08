@@ -29,7 +29,7 @@ class NewController extends AbstractActionController
         if (!$service->haveCurrentDate()) {
             $lastDate = $service->getLastDateStr();
             if (!$lastDate) {
-                return $this->getResponse()->setStatusCode(404);
+                return $this->notFoundAction();
             }
 
             return $this->redirect()->toUrl($this->url()->fromRoute('new', [
@@ -47,7 +47,7 @@ class NewController extends AbstractActionController
         }
 
         if (!$service->haveCurrentDayPictures()) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         // for date formatting fix

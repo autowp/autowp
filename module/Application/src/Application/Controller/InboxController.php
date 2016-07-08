@@ -95,7 +95,7 @@ class InboxController extends AbstractActionController
             $lastDate = $service->getLastDateStr();
 
             if (!$lastDate) {
-                return $this->getResponse()->setStatusCode(404);
+                return $this->notFoundAction();
             }
 
             $url = $this->url()->fromRoute('inbox', [

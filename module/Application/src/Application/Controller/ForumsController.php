@@ -70,7 +70,7 @@ class ForumsController extends AbstractActionController
         );
 
         if (!$data) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $userTable = new Users();
@@ -145,7 +145,7 @@ class ForumsController extends AbstractActionController
         ]);
 
         if (!$topic) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $user = $this->user()->get();
@@ -237,7 +237,7 @@ class ForumsController extends AbstractActionController
         );
 
         if (!$data) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $canRemoveComments = $this->user()->isAllowed('comment', 'remove');
@@ -291,7 +291,7 @@ class ForumsController extends AbstractActionController
     {
         $user = $this->user()->get();
         if (!$user) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $topicId = (int)$this->params('topic_id');
@@ -310,7 +310,7 @@ class ForumsController extends AbstractActionController
     {
         $user = $this->user()->get();
         if (!$user) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $topicId = (int)$this->params('topic_id');
@@ -340,14 +340,14 @@ class ForumsController extends AbstractActionController
     public function newAction()
     {
         if (!$this->user()->logedIn()) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $model = new Forums();
         $theme = $model->getTheme($this->params('theme_id'));
 
         if (!$theme || $theme['disable_topics']) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $needWait = $this->needWait();
@@ -400,7 +400,7 @@ class ForumsController extends AbstractActionController
         $messageId = $this->params('message_id');
         $page = $model->getMessagePage($messageId);
         if (!$page) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         return $this->redirect()->toUrl($this->topicUrl($page['topic_id'], $page['page']) . '#msg' . $messageId);
@@ -410,7 +410,7 @@ class ForumsController extends AbstractActionController
     {
         $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
         if (!$forumAdmin) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         return $callback();
@@ -463,7 +463,7 @@ class ForumsController extends AbstractActionController
 
             $topic = $model->getTopic($this->params('topic_id'));
             if (!$topic) {
-                return $this->getResponse()->setStatusCode(404);
+                return $this->notFoundAction();
             }
 
             $theme = $model->getTheme($this->params()->fromPost('theme_id'));
@@ -485,7 +485,7 @@ class ForumsController extends AbstractActionController
     {
         $user = $this->user()->get();
         if (!$user) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $moder = new Forums();
@@ -525,7 +525,7 @@ class ForumsController extends AbstractActionController
             $messageId = $this->params('id');
 
             if (!$messageId) {
-                return $this->getResponse()->setStatusCode(404);
+                return $this->notFoundAction();
             }
 
             $themes = [];

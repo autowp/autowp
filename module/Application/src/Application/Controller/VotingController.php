@@ -50,7 +50,7 @@ class VotingController extends AbstractActionController
         $voting = $vTable->find($this->params('id'))->current();
 
         if (!$voting) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $filter = (int)$this->params('filter');
@@ -128,7 +128,7 @@ class VotingController extends AbstractActionController
         $variant = $vvTable->find($this->params('id'))->current();
 
         if (!$variant) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $vvvTable = new Voting_Variant_Vote();
@@ -152,7 +152,7 @@ class VotingController extends AbstractActionController
     public function voteAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $vTable = new Voting();
@@ -160,11 +160,11 @@ class VotingController extends AbstractActionController
         $voting = $vTable->find($this->params('id'))->current();
 
         if (!$voting) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         if (!$this->canVote($voting)) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $vvTable = new Voting_Variant();
@@ -172,7 +172,7 @@ class VotingController extends AbstractActionController
 
         if (!$voting->multivariant) {
             if (count($vvRows) > 1) {
-                return $this->getResponse()->setStatusCode(403);
+                return $this->forbiddenAction();
             }
         }
 

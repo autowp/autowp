@@ -71,14 +71,14 @@ class BrandsController extends AbstractActionController
     public function newcarsAction()
     {
         /*if (!$this->getRequest()->isXmlHttpRequest()) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }*/
 
         $brands = new Brands();
 
         $brand = $brands->find($this->params('brand_id'))->current();
         if (!$brand) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $language = $this->language();

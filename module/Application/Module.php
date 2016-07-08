@@ -122,8 +122,6 @@ class Module implements ConsoleUsageProviderInterface,
 
         set_include_path(APPLICATION_PATH . '/../library' . PATH_SEPARATOR . get_include_path());
 
-        $config = $this->getConfig();
-
         $serviceManager = $e->getApplication()->getServiceManager();
 
         $cacheManager = $serviceManager->get(Zend_Cache_Manager::class);
@@ -142,6 +140,13 @@ class Module implements ConsoleUsageProviderInterface,
         $eventManager->attach( \Zend\Mvc\MvcEvent::EVENT_DISPATCH, array($this, 'preDispatch'), 100 );
 
         \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
+
+        // forbidden handle
+        /*$sharedEvents = $eventManager->getSharedManager();
+
+        $forbiddenStrategy = $serviceManager->get('HttpForbiddenStrategy');
+        $forbiddenStrategy->attach($eventManager);
+        $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', MvcEvent::EVENT_DISPATCH, [$forbiddenStrategy, 'prepareForbiddenViewModel'], -90);*/
     }
 
 

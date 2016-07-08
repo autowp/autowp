@@ -24,7 +24,7 @@ class UsersController extends AbstractActionController
     public function indexAction()
     {
         if (!$this->user()->inheritsRole('moder')) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $select = $this->table->select(true)
@@ -46,18 +46,18 @@ class UsersController extends AbstractActionController
     public function removeUserPhotoAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $can = $this->user()->isAllowed('user', 'ban');
         if (!$can) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $row = $this->table->find($this->params('id'))->current();
 
         if (!$row) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $oldImageId = $row->img;
@@ -80,17 +80,17 @@ class UsersController extends AbstractActionController
     public function deleteUserAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $can = $this->user()->isAllowed('user', 'delete');
         if (!$can) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $row = $this->table->find($this->params('id'))->current();
         if (!$row) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $oldImageId = $row->img;

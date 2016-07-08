@@ -28,7 +28,7 @@ class FactoriesController extends AbstractActionController
 
         $factory = $table->find($this->params()->fromRoute('id'))->current();
         if (!$factory) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         $pictureTable = new Picture();

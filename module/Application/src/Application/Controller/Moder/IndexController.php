@@ -20,7 +20,7 @@ class IndexController extends AbstractActionController
     public function indexAction()
     {
         if (!$this->user()->inheritsRole('moder') ) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $request = $this->getRequest();
@@ -88,7 +88,7 @@ class IndexController extends AbstractActionController
     public function statAction()
     {
         if (!$this->user()->inheritsRole('moder') ) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $cars = new Cars();
@@ -193,7 +193,7 @@ class IndexController extends AbstractActionController
     public function tooBigCarsAction()
     {
         if (!$this->user()->inheritsRole('moder') ) {
-            return $this->getResponse()->setStatusCode(403);
+            return $this->forbiddenAction();
         }
 
         $carTable = new Cars();

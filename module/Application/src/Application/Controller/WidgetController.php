@@ -13,7 +13,7 @@ class WidgetController extends AbstractActionController
         $picture = $pictures->find($this->params('picture_id'))->current();
 
         if (!$picture) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         return new JsonModel([

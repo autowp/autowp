@@ -12,12 +12,16 @@ class BanController extends AbstractActionController
 {
     public function unbanIpAction()
     {
+        if (!$this->getRequest()->isPost()) {
+            return $this->forbiddenAction();
+        }
+
         $canBan = $this->user()->isAllowed('user', 'ban');
 
         $ip = $this->params('ip');
 
         if (!$canBan || $ip === null) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $service = new TrafficControl();
@@ -30,12 +34,16 @@ class BanController extends AbstractActionController
 
     public function banIpAction()
     {
+        if (!$this->getRequest()->isPost()) {
+            return $this->forbiddenAction();
+        }
+
         $canBan = $this->user()->isAllowed('user', 'ban');
 
         $ip = $this->params('ip');
 
         if (!$canBan || $ip === null) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $service = new TrafficControl();
@@ -52,18 +60,22 @@ class BanController extends AbstractActionController
 
     public function banUserAction()
     {
+        if (!$this->getRequest()->isPost()) {
+            return $this->forbiddenAction();
+        }
+
         $users = new Users();
         $user = $users->find($this->params('user_id'))->current();
 
         if (!$user) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $canBan = $this->user()->isAllowed('user', 'ban')
               && ($this->user()->get()->id != $user->id);
 
         if (!$canBan || $user->last_ip === null) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $service = new TrafficControl();
@@ -82,18 +94,22 @@ class BanController extends AbstractActionController
 
     public function unbanUserAction()
     {
+        if (!$this->getRequest()->isPost()) {
+            return $this->forbiddenAction();
+        }
+
         $users = new Users();
         $user = $users->find($this->params('user_id'))->current();
 
         if (!$user) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $canBan = $this->user()->isAllowed('user', 'ban')
               && ($this->user()->get()->id != $user->id);
 
         if (!$canBan || $user->last_ip === null) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $service = new TrafficControl();

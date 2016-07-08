@@ -153,7 +153,7 @@ class PictureController extends AbstractActionController
             if ($isModer || ($user->id == $picture->owner_id)) {
                 $this->getResponse()->setHttpResponseCode(404);
             } else {
-                return $this->_forward('notfound', 'error');
+                return $this->notFoundAction();
             }
         }
 
@@ -252,7 +252,7 @@ class PictureController extends AbstractActionController
             if ($isModer || ($user->id == $picture->owner_id)) {
                 //$this->getResponse()->setHttpResponseCode(404);
             } else {
-                return $this->_forward('notfound', 'error');
+                return $this->notFoundAction();
             }
         }
 

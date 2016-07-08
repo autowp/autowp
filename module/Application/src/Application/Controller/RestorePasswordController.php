@@ -110,13 +110,13 @@ class RestorePasswordController extends AbstractActionController
         ]);
 
         if (!$uprRow) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $user = $uprRow->findParentUsers();
 
         if (!$user) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         if ($this->getRequest()->isPost()) {

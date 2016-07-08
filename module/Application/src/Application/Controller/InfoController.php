@@ -55,7 +55,7 @@ class InfoController extends AbstractActionController
 
         $text = $this->textStorage->getTextInfo($textId);
         if ($text === null) {
-            $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
             return;
         }
 
@@ -65,7 +65,7 @@ class InfoController extends AbstractActionController
             $current = $this->textStorage->getRevisionInfo($textId, $text['revision']);
         }
         if ($current === null) {
-            $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
             return;
         }
 

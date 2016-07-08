@@ -57,13 +57,13 @@ class ChartController extends AbstractRestfulController
         $id = $this->params()->fromQuery('id');
 
         if (!in_array($id, $this->parameters)) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $attrTable = new Attrs_Attributes();
         $attrRow = $attrTable->find($id)->current();
         if (!$attrRow) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $specService = new Application_Service_Specifications();

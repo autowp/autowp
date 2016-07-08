@@ -201,7 +201,7 @@ class CategoryController extends AbstractActionController
         $isOther = (bool)$this->params('other');
 
         if (!$currentCategory) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $categoryLang = $this->categoryLanguageTable->fetchRow([
@@ -297,7 +297,7 @@ class CategoryController extends AbstractActionController
                 );
 
                 if (!$childCar) {
-                    return $this->getResponse()->setStatusCode(404);
+                    return $this->notFoundAction();
                 }
 
                 $breadcrumbsPath[] = $pathNode;
@@ -707,7 +707,7 @@ class CategoryController extends AbstractActionController
             }
 
             if (!$picture) {
-                return $this->getResponse()->setStatusCode(404);
+                return $this->notFoundAction();
             }
 
             return [
@@ -780,7 +780,7 @@ class CategoryController extends AbstractActionController
             }
 
             if (!$picture) {
-                return $this->getResponse()->setStatusCode(404);
+                return $this->notFoundAction();
             }
 
             return new JsonModel($this->pic()->gallery2($select, [

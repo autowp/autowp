@@ -88,11 +88,11 @@ class ArticlesController extends AbstractActionController
 
         $article = $articles->findRowByCatname($this->params('article_catname'));
         if (!$article) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         if (!$article->enabled) {
-            return $this->getResponse()->setStatusCode(404);
+            return $this->notFoundAction();
         }
 
         $links = array();

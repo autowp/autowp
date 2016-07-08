@@ -38,8 +38,7 @@ class ContactsController extends AbstractRestfulController
         ]);
 
         if (!$user) {
-            $this->getResponse()->setStatusCode(403);
-            return;
+            return $this->forbiddenAction();
         }
 
         $contact->create($currentUser->id, $user->id);
@@ -76,8 +75,7 @@ class ContactsController extends AbstractRestfulController
         ]);
 
         if (!$user) {
-            $this->getResponse()->setStatusCode(403);
-            return;
+            return $this->forbiddenAction();
         }
 
         $contact->delete($currentUser->id, $user->id);

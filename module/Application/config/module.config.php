@@ -1376,9 +1376,10 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
-            'catalogue'   => Controller\Plugin\Catalogue::class,
-            'log'         => Controller\Plugin\Log::class,
-            'pictureVote' => Controller\Plugin\PictureVote::class,
+            'catalogue'       => Controller\Plugin\Catalogue::class,
+            'log'             => Controller\Plugin\Log::class,
+            'pictureVote'     => Controller\Plugin\PictureVote::class,
+            'forbiddenAction' => Controller\Plugin\ForbiddenAction::class,
         ],
         'factories' => [
             'car' => function ($sm) {
@@ -1411,10 +1412,12 @@ return [
         'display_exceptions'       => true,
         'doctype'                  => 'HTML5',
         'not_found_template'       => 'error/404',
+        'forbidden_template'       => 'error/403',
         'exception_template'       => 'error/index',
         'template_map' => [
             'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
             'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
+            'error/403'               => __DIR__ . '/../view/error/403.phtml',
             'error/404'               => __DIR__ . '/../view/error/404.phtml',
             'error/index'             => __DIR__ . '/../view/error/index.phtml',
         ],
@@ -1602,7 +1605,7 @@ return [
                 );
 
                 return $transport;
-            }
+            },
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
