@@ -62,15 +62,7 @@ class Pictures extends AbstractHelper
 
     private function isPictureModer()
     {
-        $view = $this->view;
-
-        $isModer = false;
-        if ($view->user()->logedIn()) {
-            $role = $view->user()->get()->role;
-            $isModer = $role && $view->acl()->inheritsRole($role, 'pictures-moder');
-        }
-
-        return $isModer;
+        return $this->view->user()->inheritsRole('pictures-moder');
     }
 
 

@@ -4,7 +4,7 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
-use Application\Acl;
+use Zend\Permissions\Acl\Acl;
 
 use Zend_Acl_Resource_Interface;
 use Zend_Acl_Role_Interface;
@@ -77,7 +77,7 @@ class User extends AbstractPlugin
         if ($user === null) {
             $user = $this->getLogedInUser();
         }
-        
+
         if (!$user instanceof Users_Row) {
             $user = $this->user($user);
         }

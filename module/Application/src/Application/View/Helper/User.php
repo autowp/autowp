@@ -4,8 +4,7 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 use Zend\View\Exception\InvalidArgumentException;
-
-use Application\Acl;
+use Zend\Permissions\Acl\Acl;
 
 use Zend_Auth;
 use Zend_Acl_Role_Interface;

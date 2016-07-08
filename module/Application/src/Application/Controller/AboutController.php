@@ -4,7 +4,7 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Application\Acl;
+use Zend\Permissions\Acl\Acl;
 
 use Cars;
 use Comment_Message;

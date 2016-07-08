@@ -42,7 +42,8 @@
         "bshaffer/oauth2-server-php": "^1.8",
         "zfcampus/zf-content-negotiation": "dev-master",
         "zfcampus/zf-oauth2": "dev-master",
-        "zendframework/zend-cache": "^2.7"
+        "zendframework/zend-cache": "^2.7",
+        "zendframework/zend-permissions-acl": "^2.6"
     },
     "authors": [
         {

@@ -7,6 +7,7 @@
 
 namespace Application;
 
+use Zend\Permissions\Acl\Acl;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
@@ -20,12 +21,9 @@ use Autowp\TextStorage;
 use Zend_Application_Resource_Db;
 use Zend_Application_Resource_Cachemanager;
 use Zend_Application_Resource_Session;
-use Zend_Cache_Core;
 use Zend_Cache_Manager;
 use Zend_Db_Adapter_Abstract;
 use Zend_View;
-
-use Exception;
 
 $imageDir = APPLICATION_PATH . "/../public_html/image/";
 
@@ -1474,10 +1472,6 @@ return [
                 $router = $sm->get('Router');
                 return new View\Helper\UserText($router);
             },
-            'acl' => function($sm) {
-                $acl = $sm->get(Acl::class);
-                return new View\Helper\Acl($acl);
-            },
             'imageStorage' => function($sm) {
                 $imageStorage = $sm->get(Image\Storage::class);
                 return new View\Helper\ImageStorage($imageStorage);
@@ -1544,26 +1538,6 @@ return [
                 return new Service\TelegramService($config['telegram'], $router);
             },
             'translator' => \Zend\Mvc\I18n\TranslatorFactory::class,
-            Acl::class => function($sm) {
-
-                $config = $sm->get('Config')['acl'];
-
-                $cacheManager = $sm->get(Zend_Cache_Manager::class);
-
-                $cacheCore = $cacheManager->getCache($config['cache']);
-
-                if (!$cacheCore instanceof Zend_Cache_Core) {
-                    throw new Exception('Cache not initialized');
-                }
-
-                $acl = $cacheCore->load('__ACL__');
-                if (!$acl instanceof Acl) {
-                    $acl = new Acl();
-                    $cacheCore->save($acl, null, [], $config['cacheLifetime']);
-                }
-
-                return $acl;
-            },
             Zend_Cache_Manager::class => function($sm) {
                 $config = $sm->get('Config');
                 $resource = new Zend_Application_Resource_Cachemanager($config['cachemanager']);
@@ -1606,6 +1580,7 @@ return [
 
                 return $transport;
             },
+            Acl::class => Permissions\AclFactory::class
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
@@ -1883,10 +1858,10 @@ return [
         ]
     ],
 
-    'acl' => [
+    /*'acl' => [
         'cache'         => 'long',
         'cacheLifetime' => 3600
-    ],
+    ],*/
 
     'textstorage' => [
         'textTableName'     => 'textstorage_text',

@@ -407,7 +407,7 @@ class Module implements ConsoleUsageProviderInterface,
                 $user = $userTable->find($userId)->current();
 
                 if ($user) {
-                    $acl = $serviceManager->get(Acl::class);
+                    $acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
                     $unlimitedTraffic = $acl->isAllowed($user->role, 'website', 'unlimited-traffic');
                 }
             }
