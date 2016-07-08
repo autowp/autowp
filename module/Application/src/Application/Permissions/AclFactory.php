@@ -24,7 +24,7 @@ class AclFactory implements FactoryInterface
 
         $cache = $services->get('longCache');
 
-        /*$key = 'acl22';
+        $key = 'acl_cache_key';
 
         $acl = $cache->getItem($key, $success);
 
@@ -35,10 +35,10 @@ class AclFactory implements FactoryInterface
             $this->load($acl);
 
             $cache->setItem($key, $acl);
-        }*/
+        }
 
-        $acl = new Acl();
-        $this->load($acl);
+        /*$acl = new Acl();
+        $this->load($acl);*/
 
         if (!$acl) {
             throw new Exception('NULL');
