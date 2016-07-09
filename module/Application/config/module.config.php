@@ -8,12 +8,14 @@
 namespace Application;
 
 use Zend\Permissions\Acl\Acl;
+use Zend\Router\Http\Hostname;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
-use Application\Router\Http\WildcardSafe;
 use Application\Router\Http\Category;
+use Application\Router\Http\FilePath;
+use Application\Router\Http\WildcardSafe;
 
 use Autowp\Image;
 use Autowp\TextStorage;
@@ -28,12 +30,26 @@ use Zend_View;
 $imageDir = APPLICATION_PATH . "/../public_html/image/";
 
 return [
-    'modules' => [
-        'Zend\I18n',
-        'Zend\Mvc\I18n',
-    ],
     'router' => [
         'routes' => [
+            'i-wheelsage' => [
+                'type'          => Hostname::class,
+                'options' => [
+                    'route' => 'i.wheelsage.org',
+                ],
+                'may_terminate' => false,
+                'child_routes'  => [
+                    'picture-source' => [
+                        'type' => FilePath::class,
+                        'options' => [
+                            'defaults' => [
+                                'controller' => Controller\PictureFileController::class,
+                                'action'     => 'index'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             /*'home' => [
                 'type' => Literal::class,
                 'options' => [
@@ -1319,6 +1335,7 @@ return [
             },
             Controller\NewController::class          => InvokableFactory::class,
             Controller\MuseumsController::class      => InvokableFactory::class,
+            Controller\PictureFileController::class  => InvokableFactory::class,
             Controller\PulseController::class        => InvokableFactory::class,
             Controller\RestorePasswordController::class => function($sm) {
                 $service = $sm->get(Service\UsersService::class);

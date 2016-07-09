@@ -91,7 +91,7 @@
             <?php } ?>
 
 
-            <?php if ($this->user()->logedIn() && $this->acl()->inheritsRole($this->user()->get()->role, 'moder')) { ?>
+            <?php if ($this->user()->inheritsRole('moder')) { ?>
                 <p><?=$this->htmlA($this->url('log/params', [
                     'user_id' => $this->currentUser->id
                 ]), 'Журнал событий пользователя') ?></p>

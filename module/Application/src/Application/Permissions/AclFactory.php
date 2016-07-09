@@ -37,9 +37,6 @@ class AclFactory implements FactoryInterface
             $cache->setItem($key, $acl);
         }
 
-        /*$acl = new Acl();
-        $this->load($acl);*/
-
         if (!$acl) {
             throw new Exception('NULL');
         }

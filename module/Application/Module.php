@@ -137,16 +137,9 @@ class Module implements ConsoleUsageProviderInterface,
         ini_set('display_errors', true);
 
         $eventManager = $e->getApplication()->getEventManager();
-        $eventManager->attach( \Zend\Mvc\MvcEvent::EVENT_DISPATCH, array($this, 'preDispatch'), 100 );
+        $eventManager->attach( \Zend\Mvc\MvcEvent::EVENT_DISPATCH, [$this, 'preDispatch'], 100 );
 
         \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
-
-        // forbidden handle
-        /*$sharedEvents = $eventManager->getSharedManager();
-
-        $forbiddenStrategy = $serviceManager->get('HttpForbiddenStrategy');
-        $forbiddenStrategy->attach($eventManager);
-        $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', MvcEvent::EVENT_DISPATCH, [$forbiddenStrategy, 'prepareForbiddenViewModel'], -90);*/
     }
 
 
@@ -200,9 +193,9 @@ class Module implements ConsoleUsageProviderInterface,
 
             if (in_array($hostname, $this->_skipHostname)) {
                 $uri = $request->getUriString();
-                if (substr($uri, 0, strlen($this->_skipUrl)) == $this->_skipUrl) {
+                //if (substr($uri, 0, strlen($this->_skipUrl)) == $this->_skipUrl) {
                     return;
-                }
+                //}
             }
 
             if (in_array($hostname, $this->_userDetectable)) {
@@ -379,7 +372,7 @@ class Module implements ConsoleUsageProviderInterface,
             $pattern = '/pictures/';
             $host = 'i.wheelsage.org';
             if (strncmp($uri, $pattern, strlen($pattern)) == 0) {
-                if ($request->getHttpHost() != $host) {
+                if ($request->getUri()->getHost() != $host) {
                     $redirectUrl = $request->getUri()->getScheme() . '://' .
                             $host . $uri;
 
