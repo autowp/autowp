@@ -13,11 +13,16 @@ class Language
      * @var array
      */
     private $whitelist = [
-        'fr.wheelsage.org' => 'fr',
-        'en.wheelsage.org' => 'en',
-        'autowp.ru'        => 'ru',
-        'www.autowp.ru'    => 'ru',
-        'ru.autowp.ru'     => 'ru'
+        'fr.wheelsage.org'  => 'fr',
+        'en.wheelsage.org'  => 'en',
+        'wheelsage.org'     => 'en',
+        'www.wheelsage.org' => 'en',
+        'autowp.ru'         => 'ru',
+        'www.autowp.ru'     => 'ru',
+        'ru.autowp.ru'      => 'ru',
+        'en.autowp.ru'      => 'ru',
+        'fr.autowp.ru'      => 'fr',
+        'i.wheelsage.org'   => 'en'
     ];
 
     /**
@@ -31,7 +36,9 @@ class Language
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
             $hostname = $request->getServer('HTTP_HOST');
-            $this->language = $this->whitelist[$hostname];
+            if (isset($this->whitelist[$hostname])) {
+                $this->language = $this->whitelist[$hostname];
+            }
         }
     }
 

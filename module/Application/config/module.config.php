@@ -14,7 +14,7 @@ use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Application\Router\Http\Category;
-use Application\Router\Http\FilePath;
+use Application\Router\Http\PictureFile;
 use Application\Router\Http\WildcardSafe;
 
 use Autowp\Image;
@@ -32,21 +32,13 @@ $imageDir = APPLICATION_PATH . "/../public_html/image/";
 return [
     'router' => [
         'routes' => [
-            'i-wheelsage' => [
-                'type'          => Hostname::class,
+            'picture-file' => [
+                'type' => PictureFile::class,
                 'options' => [
-                    'route' => 'i.wheelsage.org',
-                ],
-                'may_terminate' => false,
-                'child_routes'  => [
-                    'picture-source' => [
-                        'type' => FilePath::class,
-                        'options' => [
-                            'defaults' => [
-                                'controller' => Controller\PictureFileController::class,
-                                'action'     => 'index'
-                            ]
-                        ]
+                    'defaults' => [
+                        'hostname'   => 'i.wheelsage.org',
+                        'controller' => Controller\PictureFileController::class,
+                        'action'     => 'index'
                     ]
                 ]
             ],
@@ -233,6 +225,42 @@ return [
                             'defaults' => [
                                 'action' => 'add',
                             ],
+                        ]
+                    ],
+                    'delete' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/delete',
+                            'defaults' => [
+                                'action' => 'delete',
+                            ]
+                        ]
+                    ],
+                    'restore' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/restore',
+                            'defaults' => [
+                                'action' => 'restore',
+                            ]
+                        ]
+                    ],
+                    'vote' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/vote',
+                            'defaults' => [
+                                'action' => 'vote',
+                            ]
+                        ]
+                    ],
+                    'votes' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/votes',
+                            'defaults' => [
+                                'action' => 'votes',
+                            ]
                         ]
                     ]
                 ]
@@ -1303,7 +1331,10 @@ return [
                 return new Controller\CategoryController($cache);
             },
             Controller\ChartController::class        => InvokableFactory::class,
-            Controller\CommentsController::class     => InvokableFactory::class,
+            Controller\CommentsController::class => function($sm) {
+                $commentForm = $sm->get('CommentForm');
+                return new Controller\CommentsController($commentForm);
+            },
             Controller\CutawayController::class      => InvokableFactory::class,
             Controller\DonateController::class       => InvokableFactory::class,
             Controller\FactoriesController::class    => InvokableFactory::class,
@@ -1483,7 +1514,8 @@ return [
             },
             'comments' => function($sm) {
                 $view = $sm->get(Zend_View::class);
-                return new View\Helper\Comments($view);
+                $commentForm = $sm->get('CommentForm');
+                return new View\Helper\Comments($view, $commentForm);
             },
             'userText' => function($sm) {
                 $router = $sm->get('Router');

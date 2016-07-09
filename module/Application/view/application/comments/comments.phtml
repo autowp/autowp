@@ -14,7 +14,9 @@
 
     <?php if ($this->canAddComments) { ?>
         <div class="form-holder">
-            <?=$this->form->render($this->view) ?>
+            <?=$this->partial('application/forms/comment', [
+                'form' => $this->form
+            ])?>
         </div>
     <?php } else { ?>
         <p class="alert alert-block alert-info">

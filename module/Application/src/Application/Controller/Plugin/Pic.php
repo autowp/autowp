@@ -76,7 +76,8 @@ class Pic extends AbstractPlugin
     public function href($row, array $options = [])
     {
         $defaults = [
-            'fallback' => true
+            'fallback'  => true,
+            'canonical' => false
         ];
         $options = array_replace($defaults, $options);
 
@@ -93,6 +94,8 @@ class Pic extends AbstractPlugin
                         'action'        => 'logotypes-picture',
                         'brand_catname' => $brandRow->folder,
                         'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                    ], [
+                        'force_canonical' => $options['canonical']
                     ]);
                 }
                 break;
@@ -104,6 +107,8 @@ class Pic extends AbstractPlugin
                         'action'        => 'mixed-picture',
                         'brand_catname' => $brandRow->folder,
                         'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                    ], [
+                        'force_canonical' => $options['canonical']
                     ]);
                 }
                 break;
@@ -115,6 +120,8 @@ class Pic extends AbstractPlugin
                         'action'        => 'other-picture',
                         'brand_catname' => $brandRow->folder,
                         'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                    ], [
+                        'force_canonical' => $options['canonical']
                     ]);
                 }
                 break;
@@ -135,7 +142,9 @@ class Pic extends AbstractPlugin
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
                             'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
-                        ]);
+                        ], [
+                        'force_canonical' => $options['canonical']
+                    ]);
                     }
                 }
                 break;
@@ -164,14 +173,16 @@ class Pic extends AbstractPlugin
                             'brand_catname' => $brandRow['folder'],
                             'path'          => array_reverse($path),
                             'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
-                        ]);
+                        ], [
+                        'force_canonical' => $options['canonical']
+                    ]);
                     }
                 }
                 break;
         }
 
         if ($options['fallback'] && !$url) {
-            $url = $this->url($row['id'], $row['identity']);
+            $url = $this->url($row['id'], $row['identity'], $options['canonical']);
         }
 
         return $url;

@@ -13,12 +13,13 @@ class PictureFileController extends AbstractActionController
     {
         $request = $this->getRequest();
 
-        $hostname = $request->getUri()->getHost();
+        $hostname = $this->params('hostname');
         $file = $this->params('file');
 
         if ($hostname != 'i.wheelsage.org') {
-            $sourceUrl = $this->url()->fromRoute('i-wheelsage/picture-source', [
-                'file' => 'pictures/' . $file
+            $sourceUrl = $this->url()->fromRoute('picture-file', [
+                'hostname' => 'i.wheelsage.org',
+                'file'     => $file
             ]);
 
             return $this->redirect()->toUrl($sourceUrl);
@@ -89,5 +90,4 @@ class PictureFileController extends AbstractActionController
 
         return $this->getResponse();
     }
-
 }

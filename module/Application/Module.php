@@ -22,6 +22,7 @@ use Zend_Db_Adapter_Abstract;
 use Zend_Db_Expr;
 use Zend_Locale;
 use Zend_Locale_Data;
+use Zend_Locale_Exception;
 use Zend_Registry;
 use Zend_Translate;
 
@@ -33,7 +34,7 @@ class Module implements ConsoleUsageProviderInterface,
     /**
      * @var array
      */
-    protected $_hostnameWhitelist = [
+    private $hostnameWhitelist = [
         'www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
         'i.wheelsage.org', 'en.wheelsage.org', 'fr.wheelsage.org',
         'www.wheelsage.org', 'wheelsage.org'
@@ -42,54 +43,50 @@ class Module implements ConsoleUsageProviderInterface,
     /**
      * @var string
      */
-    protected $_defaultHostname = 'www.autowp.ru';
+    private $defaultHostname = 'www.autowp.ru';
 
     /**
      * @var array
      */
-    private $_languageWhitelist = ['ru', 'en', 'fr'];
+    private $languageWhitelist = ['ru', 'en', 'fr'];
 
     /**
      * @var array
      */
-    private $_whitelist = array(
+    private $whitelist = [
         'fr.wheelsage.org' => 'fr',
         'en.wheelsage.org' => 'en',
         'autowp.ru'        => 'ru',
         'www.autowp.ru'    => 'ru',
         'ru.autowp.ru'     => 'ru'
-    );
+    ];
 
     /**
      * @var array
      */
-    private $_redirects = array(
-        'wheelsage.org' => 'en.wheelsage.org',
-        'en.autowp.ru'  => 'en.wheelsage.org',
-        'ru.autowp.ru'  => 'www.autowp.ru'
-    );
+    private $redirects = [
+        'www.wheelsage.org' => 'en.wheelsage.org',
+        'wheelsage.org'     => 'en.wheelsage.org',
+        'en.autowp.ru'      => 'en.wheelsage.org',
+        'ru.autowp.ru'      => 'www.autowp.ru'
+    ];
 
     /**
      * @var array
      */
-    private $_userDetectable = [
+    private $userDetectable = [
         'wheelsage.org'
     ];
 
     /**
      * @var array
      */
-    private $_skipHostname = ['i.wheelsage.org'];
+    private $skipHostname = ['i.wheelsage.org'];
 
     /**
      * @var string
      */
-    private $_defaultLanguage = 'en';
-
-    /**
-     * @var string
-     */
-    private $_hostname = '.autowp.ru';
+    private $defaultLanguage = 'en';
 
     public function getConfig()
     {
@@ -131,7 +128,7 @@ class Module implements ConsoleUsageProviderInterface,
         $serviceManager->get(Zend_Db_Adapter_Abstract::class);
         $serviceManager->get('session');
 
-        $this->initLocaleAndTranslate();
+        $this->initLocaleAndTranslate($cacheManager);
 
         error_reporting(E_ALL);
         ini_set('display_errors', true);
@@ -143,12 +140,10 @@ class Module implements ConsoleUsageProviderInterface,
     }
 
 
-    private function initLocaleAndTranslate()
+    private function initLocaleAndTranslate($cacheManager)
     {
-        $cachemanager = Zend_Registry::get('Cachemanager');
-
-        $longCache = $cachemanager->getCache('long');
-        $localeCache = $cachemanager->getCache('locale');
+        $longCache = $cacheManager->getCache('long');
+        $localeCache = $cacheManager->getCache('locale');
 
         Zend_Locale_Data::setCache($localeCache);
         Zend_Date::setOptions(['cache' => $localeCache]);
@@ -187,19 +182,19 @@ class Module implements ConsoleUsageProviderInterface,
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
 
-            $language = $this->_defaultLanguage;
+            $language = $this->defaultLanguage;
 
             $hostname = $request->getServer('HTTP_HOST');
 
-            if (in_array($hostname, $this->_skipHostname)) {
+            if (in_array($hostname, $this->skipHostname)) {
                 $uri = $request->getUriString();
                 //if (substr($uri, 0, strlen($this->_skipUrl)) == $this->_skipUrl) {
                     return;
                 //}
             }
 
-            if (in_array($hostname, $this->_userDetectable)) {
-                $userLanguage = $this->_detectUserLanguage();
+            if (in_array($hostname, $this->userDetectable)) {
+                $userLanguage = $this->detectUserLanguage();
 
                 $hosts = $this->getConfig()['hosts'];
 
@@ -212,35 +207,35 @@ class Module implements ConsoleUsageProviderInterface,
                 }
             }
 
-            if (isset($this->_redirects[$hostname])) {
+            if (isset($this->redirects[$hostname])) {
 
                 $redirectUrl = $request->getUri()->getScheme() . '://' .
-                        $this->_redirects[$hostname] . $request->getRequestUri();
+                        $this->redirects[$hostname] . $request->getRequestUri();
 
                 $this->redirect($app, $redirectUrl);
                 return;
             }
 
-            if (isset($this->_whitelist[$hostname])) {
-                $language = $this->_whitelist[$hostname];
+            if (isset($this->whitelist[$hostname])) {
+                $language = $this->whitelist[$hostname];
             } else {
 
                 try {
                     $locale = new Zend_Locale(Zend_Locale::BROWSER);
                     $localeLanguage = $locale->getLanguage();
-                    $isAllowed = in_array($localeLanguage, $this->_languageWhitelist);
+                    $isAllowed = in_array($localeLanguage, $this->languageWhitelist);
                     if ($isAllowed) {
                         $language = $localeLanguage;
                     }
-                } catch (Exception $e) {
+                } catch (Zend_Locale_Exception $e) {
                 }
             }
 
-            $this->_initLocaleAndTranslate($serviceManager, $language);
+            $this->initLocaleAndTranslate2($serviceManager, $language);
         }
     }
 
-    private function _detectUserLanguage()
+    private function detectUserLanguage()
     {
         $result = null;
 
@@ -252,7 +247,7 @@ class Module implements ConsoleUsageProviderInterface,
             $user = $userTable->find($auth->getIdentity())->current();
 
             if ($user) {
-                $isAllowed = in_array($user->language, $this->_languageWhitelist);
+                $isAllowed = in_array($user->language, $this->languageWhitelist);
                 if ($isAllowed) {
                     $result = $user->language;
                 }
@@ -265,24 +260,24 @@ class Module implements ConsoleUsageProviderInterface,
     /**
      * @param string $language
      */
-    private function _initLocaleAndTranslate($serviceManager, $language)
+    private function initLocaleAndTranslate2($serviceManager, $language)
     {
         // Locale
         $locale = new Zend_Locale($language);
 
         // Translation
-        $translate = new Zend_Translate('Array', APPLICATION_PATH . '/languages', null, array(
+        $translate = new Zend_Translate('Array', APPLICATION_PATH . '/languages', null, [
             'scan'            => Zend_Translate::LOCALE_FILENAME,
             'disableNotices'  => true,
             'logUntranslated' => false,
             'locale'          => $locale,
-        ));
+        ]);
 
-        $translate->addTranslation(array(
+        $translate->addTranslation([
             'content' => APPLICATION_PATH . '/../vendor/zendframework/zendframework1/resources/languages/',
             'scan'    => Zend_Translate::LOCALE_DIRECTORY,
             'locale'  => $locale,
-        ));
+        ]);
         $translate->setLocale($locale);
 
         // populate for wide-engine
@@ -303,13 +298,13 @@ class Module implements ConsoleUsageProviderInterface,
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
             $hostname = $request->getServer('HTTP_HOST');
 
-            $isAllowed = in_array($hostname, $this->_hostnameWhitelist);
+            $isAllowed = in_array($hostname, $this->hostnameWhitelist);
 
             if (!$isAllowed) {
-                $request->setDispatched(true);
+                //$request->setDispatched(true);
 
                 $redirectUrl = $request->getUri()->getScheme() . '://' .
-                        $this->_defaultHostname . $request->getRequestUri();
+                        $this->defaultHostname . $request->getRequestUri();
 
                 $this->redirect($app, $redirectUrl);
             }

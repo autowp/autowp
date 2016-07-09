@@ -13,9 +13,10 @@ class Comments extends AbstractHelper
      */
     private $oldView;
 
-    public function __construct($view)
+    public function __construct($view, $form)
     {
         $this->oldView = $view;
+        $this->form = $form;
     }
 
     public function __invoke(array $options)
@@ -44,13 +45,13 @@ class Comments extends AbstractHelper
 
         $form = null;
         if ($canAddComments) {
-            $form = $model->getAddForm([
-                'canModeratorAttention' => $this->view->user()->isAllowed('comment', 'moderator-attention'),
-                'action' => $this->view->url('comments/add', [
-                    'type_id'    => $type,
-                    'item_id'    => $item
-                ])
-            ]);
+            $form = $this->form;
+
+            $form->setAttribute('action', $this->view->url('comments/add', [
+                'type_id'    => $type,
+                'item_id'    => $item
+            ]));
+            // TODO: 'canModeratorAttention' => $this->view->user()->isAllowed('comment', 'moderator-attention'),
         }
 
         return $this->view->partial('application/comments/comments', [

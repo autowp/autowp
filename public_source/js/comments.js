@@ -153,7 +153,7 @@ define(
                     var $btnClose = $modal.find('.btn-default')
                     
                     $btnClose.button('loading');
-                    $.get('/comments/votes/', {id: $vote.data('id')}, function(html) {
+                    $.get('/comments/votes', {id: $vote.data('id')}, function(html) {
                         $body.html(html);
                         $btnClose.button('reset');
                     });

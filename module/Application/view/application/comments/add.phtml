@@ -1,0 +1,10 @@
+<?php
+    $this->layout()->setVariables([
+        'blankPage' => false,
+        'needLeft'  => false,
+        'needRight' => true
+    ]);
+?>
+<?=$this->partial('application/forms/comment', [
+    'form' => $this->form
+])?>
