@@ -90,7 +90,25 @@ class Module implements ConsoleUsageProviderInterface,
 
     public function getConfig()
     {
-        return include __DIR__ . '/config/module.config.php';
+        //return include __DIR__ . '/config/module.config.php';
+
+        $config = [];
+
+        $configFiles = [
+            __DIR__ . '/config/module.config.php',
+            __DIR__ . '/config/module.config.cache.php',
+            __DIR__ . '/config/module.config.console.php',
+            __DIR__ . '/config/module.config.forms.php',
+            __DIR__ . '/config/module.config.imagestorage.php',
+            __DIR__ . '/config/module.config.routes.php',
+        ];
+
+        // Merge all module config options
+        foreach($configFiles as $configFile) {
+            $config = \Zend\Stdlib\ArrayUtils::merge($config, include $configFile);
+        }
+
+        return $config;
     }
 
     public function getAutoloaderConfig()
