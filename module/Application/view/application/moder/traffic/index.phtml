@@ -1,50 +1,55 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'isAdminPage' => true,
             'blankPage'   => false,
             'needLeft'    => false,
             'needRight'   => false
-        ),
+        ],
         'pageId' => 77,
-    ));
+    ]);
 
     $this->layout()->moduleName = 'moder/traffic/index';
-    $this->layout()->moduleOptions = array(
-        'hostByAddrUrl' => $this->url(array(
-            'action' => 'host-by-addr'
-        ))
-    );
+    $this->layout()->moduleOptions = [
+        'hostByAddrUrl' => $this->url('moder/traffic/host-by-addr')
+    ];
 ?>
 <ul class="nav nav-pills">
-    <li class="active"><a href="/moder/traffic/">Traffic</a></li>
-    <li><a href="/moder/traffic/whitelist">Whitelist</a></li>
+    <li class="active">
+        <?=$this->htmlA($this->url('moder/traffic'), 'Traffic')?>
+    </li>
+    <li>
+        <?=$this->htmlA($this->url('moder/traffic/whitelist'), 'Whitelist')?>
+    </li>
 </ul>
 <table class="table table-striped table-condensed">
     <tbody>
         <?php foreach ($this->rows as $row) { ?>
             <tr>
-                <td><?=$this->escape($row['ip']) ?></td>
+                <td><?=$this->escapeHtml($row['ip']) ?></td>
                 <td><?=$row['count'] ?></td>
                 <td>
                     <?php foreach ($row['users'] as $user) { ?>
                         <?=$this->user($user) ?>
                     <?php } ?>
                 </td>
-                <td class="host-name"><?=$this->escape($row['ip'])?></td>
+                <td class="host-name"><?=$this->escapeHtml($row['ip'])?></td>
                 <td>
                     <?php if ($row['ban']) { ?>
-                        <form action="<?=$this->escape($row['unban_url'])?>" method="post" style="margin:0">
+                        <form action="<?=$this->escapeHtmlAttr($row['unbanUrl'])?>" method="post" style="margin:0">
                             <input type="submit" value="Разбанить" class="btn btn-xs btn-info" />
                         </form>
                     <?php } ?>
-                    <form action="<?=$this->escape($row['ban_url'])?>" method="post" style="margin:0">
+                    <form action="<?=$this->escapeHtmlAttr($row['banUrl'])?>" method="post" style="margin:0">
+                        <input type="hidden" name="period" value="240" />
+                        <input type="hidden" name="reason" value="" />
                         <input type="submit" value="Забанить" class="btn btn-xs btn-danger" />
                     </form>
                 </td>
                 <td>
                     <?php if (!$row['whitelist']) { ?>
-                        <form action="<?=$this->escape($row['whitelist_url'])?>" method="post" style="margin:0">
+                        <form action="<?=$this->escapeHtmlAttr($this->whitelistUrl)?>" method="post" style="margin:0">
+                            <input type="hidden" name="ip" value="<?=$this->escapeHtmlAttr($row['ip'])?>" />
                             <input type="submit" value="Whitelist" class="btn btn-xs btn-success" />
                         </form>
                     <?php } ?>
@@ -55,12 +60,12 @@
                         <?php if ($row['ban']['user']) { ?>
                             by <?=$this->user($row['ban']['user'])?>
                             <?php if ($row['ban']['reason']) { ?>
-                                because <?=$this->escape($row['ban']['reason']) ?>
+                                because <?=$this->escapeHtml($row['ban']['reason']) ?>
                             <?php } ?>
                         <?php } ?>
                     <?php } ?>
                 </td>
-                <td><?=$this->htmlA($row['whois_url'], 'whois') ?></td>
+                <td><?=$this->htmlA($row['whoisUrl'], 'whois') ?></td>
             </tr>
         <?php } ?>
     </tbody>

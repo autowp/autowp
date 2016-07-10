@@ -123,6 +123,7 @@ return [
                 return new Controller\Moder\IndexController($form);
             },
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
+            Controller\Moder\TrafficController::class => InvokableFactory::class,
             Controller\Moder\UsersController::class => InvokableFactory::class,
         ],
     ],
