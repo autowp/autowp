@@ -38,14 +38,14 @@ class CommentsController extends AbstractRestfulController
         return $this->user()->logedIn();
     }
 
-    private function _nextMessageTime()
+    private function nextMessageTime()
     {
         return $this->user()->get()->nextMessageTime();
     }
 
     private function needWait()
     {
-        if ($nextMessageTime = $this->_nextMessageTime()) {
+        if ($nextMessageTime = $this->nextMessageTime()) {
             return $nextMessageTime->isLater(Zend_Date::now());
         }
 
@@ -58,14 +58,13 @@ class CommentsController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $request = $this->getRequest();
-        $item_id = (int)$this->params('item_id');
-        $type_id = (int)$this->params('type_id');
+        $itemId = (int)$this->params('item_id');
+        $typeId = (int)$this->params('type_id');
 
         $form = $this->getAddForm([
             'action' => $this->url()->fromRoute('comments/add', [
-                'type_id' => $type_id,
-                'item_id' => $item_id
+                'type_id' => $typeId,
+                'item_id' => $itemId
             ])
         ]);
         $form->setData($this->params()->fromPost());
@@ -73,7 +72,7 @@ class CommentsController extends AbstractRestfulController
 
         return [
             'form'            => $form,
-            'nextMessageTime' => $this->_nextMessageTime()
+            'nextMessageTime' => $this->nextMessageTime()
         ];
     }
 
@@ -133,8 +132,8 @@ class CommentsController extends AbstractRestfulController
         }
 
         $request = $this->getRequest();
-        $item_id = (int)$this->params('item_id');
-        $type_id = (int)$this->params('type_id');
+        $itemId = (int)$this->params('item_id');
+        $typeId = (int)$this->params('type_id');
 
         if ($this->needWait()) {
             return $this->forward('confirm');
@@ -142,8 +141,8 @@ class CommentsController extends AbstractRestfulController
 
         $form = $this->getAddForm([
             'action' => $this->url()->fromRoute('comments/add', [
-                'type_id' => $type_id,
-                'item_id' => $item_id
+                'type_id' => $typeId,
+                'item_id' => $itemId
             ])
         ]);
 
@@ -153,30 +152,30 @@ class CommentsController extends AbstractRestfulController
             $values = $form->getData();
 
             $object = null;
-            switch ($type_id) {
+            switch ($typeId) {
                 case Comment_Message::PICTURES_TYPE_ID:
                     $pictures = $this->catalogue()->getPictureTable();
-                    $object = $pictures->find($item_id)->current();
+                    $object = $pictures->find($itemId)->current();
                     break;
 
                 case Comment_Message::TWINS_TYPE_ID:
                     $twinsGroups = new Twins_Groups();
-                    $object = $twinsGroups->find($item_id)->current();
+                    $object = $twinsGroups->find($itemId)->current();
                     break;
 
                 case Comment_Message::VOTINGS_TYPE_ID:
                     $vTable = new Voting();
-                    $object = $vTable->find($item_id)->current();
+                    $object = $vTable->find($itemId)->current();
                     break;
 
                 case Comment_Message::ARTICLES_TYPE_ID:
                     $articles = new Articles();
-                    $object = $articles->find($item_id)->current();
+                    $object = $articles->find($itemId)->current();
                     break;
 
                 case Comment_Message::MUSEUMS_TYPE_ID:
                     $museums = new Museum();
-                    $object = $museums->find($item_id)->current();
+                    $object = $museums->find($itemId)->current();
                     break;
 
                 default:
@@ -195,8 +194,8 @@ class CommentsController extends AbstractRestfulController
             }
 
             $messageId = $this->comments->add([
-                'typeId'             => $type_id,
-                'itemId'             => $item_id,
+                'typeId'             => $typeId,
+                'itemId'             => $itemId,
                 'parentId'           => $values['parent_id'] ? $values['parent_id'] : null,
                 'authorId'           => $user->id,
                 'message'            => $values['message'],
@@ -223,7 +222,7 @@ class CommentsController extends AbstractRestfulController
                     $userTable = new Users();
                     $parentMessageAuthor = $userTable->find($authorId)->current();
                     if ($parentMessageAuthor && !$parentMessageAuthor->deleted) {
-                        $url = $this->messageUrl($type_id, $object, true) . '#msg' . $messageId;
+                        $url = $this->messageUrl($typeId, $object, true) . '#msg' . $messageId;
                         $moderUrl = $this->url()->fromRoute('users/user', [
                             'user_id' => $user->identity ? $user->identity : 'user' . $user->id,
                         ], [
@@ -239,7 +238,7 @@ class CommentsController extends AbstractRestfulController
                 }
             }
 
-            $backUrl = $this->messageUrl($type_id, $object, false);
+            $backUrl = $this->messageUrl($typeId, $object, false);
 
             return $this->redirect()->toUrl($backUrl);
         }

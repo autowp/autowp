@@ -1,28 +1,28 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'isAdminPage' => true,
             'blankPage'   => false,
             'needLeft'    => false,
             'needRight'   => false
-        ),
-    ));
+        ]
+    ]);
 ?>
 <ul>
     <?php foreach ($this->pages as $page) { ?>
         <li>
-            [<?=$this->escape($page['id'])?>]
-            <?=$this->escape($page['name'])?>
+            [<?=$this->escapeHtml($page['id'])?>]
+            <?=$this->escapeHtml($page['name'])?>
             <table style="margin-bottom:20px"><tr>
                 <?php foreach ($page['groups'] as $group) { ?>
                     <td>
-                        [<?=$this->escape($group['id'])?>]
-                        <?=$this->escape($group['name'])?>
+                        [<?=$this->escapeHtml($group['id'])?>]
+                        <?=$this->escapeHtml($group['name'])?>
                         <ul>
                             <?php foreach ($group['perspectives'] as $perspective) { ?>
                                 <li>
-                                    [<?=$this->escape($perspective['id'])?>]
-                                    <?=$this->escape($perspective['name'])?>
+                                    [<?=$this->escapeHtml($perspective['id'])?>]
+                                    <?=$this->escapeHtml($perspective['name'])?>
                                 </li>
                             <?php } ?>
                         </ul>

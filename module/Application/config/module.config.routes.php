@@ -1011,6 +1011,16 @@ return [
                             ]
                         ]
                     ],
+                    'perspectives' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/perspectives',
+                            'defaults' => [
+                                'controller' => Controller\Moder\PerspectivesController::class,
+                                'action'     => 'index'
+                            ]
+                        ]
+                    ],
                     'pictures' => [
                         'type' => Segment::class,
                         'options' => [

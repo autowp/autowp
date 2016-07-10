@@ -1,31 +1,36 @@
 <?php
-class Moder_PerspectivesController extends Zend_Controller_Action
+
+namespace Application\Controller\Moder;
+
+use Zend\Mvc\Controller\AbstractActionController;
+
+use Perspectives;
+use Perspectives_Groups;
+use Perspectives_Groups_Perspectives;
+use Perspectives_Pages;
+
+class PerspectivesController extends AbstractActionController
 {
-    public function preDispatch()
-    {
-        parent::preDispatch();
-
-        if (!$this->_helper->user()->inheritsRole('moder') ) {
-            return $this->_forward('forbidden', 'error', 'default');
-        }
-    }
-
     public function indexAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $prspModel = new Perspectives();
         $prspGroupsModel = new Perspectives_Groups();
         $prspGroupsPrspModel = new Perspectives_Groups_Perspectives();
         $prspPagesModel = new Perspectives_Pages();
 
-        $data = array();
+        $data = [];
         foreach ($prspPagesModel->fetchAll(null, 'id') as $page) {
-            $groups = array();
+            $groups = [];
 
-            $groupRows = $prspGroupsModel->fetchAll(array(
+            $groupRows = $prspGroupsModel->fetchAll([
                 'page_id = ?' => $page->id
-            ), 'position');
+            ], 'position');
             foreach ($groupRows as $groupRow) {
-                $perspectives = array();
+                $perspectives = [];
 
                 $perspectiveRows = $prspModel->fetchAll(
                     $prspModel->select(true)
@@ -34,27 +39,29 @@ class Moder_PerspectivesController extends Zend_Controller_Action
                         ->order('perspectives_groups_perspectives.position')
                 );
                 foreach ($perspectiveRows as $perspectiveRow) {
-                    $perspectives[] = array(
+                    $perspectives[] = [
                         'id'   => $perspectiveRow->id,
                         'name' => $perspectiveRow->name
-                    );
+                    ];
                 }
 
-                $groups[] = array(
+                $groups[] = [
                     'id'           => $groupRow->id,
                     'name'         => $groupRow->name,
                     'perspectives' => $perspectives
-                );
+                ];
             }
 
-            $data[] = array(
+            $data[] = [
                 'id'    => $page->id,
                 'name'  => $page->name,
                 'groups'=> $groups
-            );
+            ];
         }
 
-        $this->view->pages = $data;
+        return [
+            'pages' => $data
+        ];
     }
 
 }
