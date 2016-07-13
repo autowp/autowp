@@ -77,7 +77,7 @@ class IndexController extends AbstractActionController
         $menu[$this->url()->fromRoute('moder/perspectives')] = 'Справка по ракурсам';
 
         $menu['/moder/index/stat'] = 'Статистика';
-        $menu['/moder/hotlink'] = 'Hotlinks';
+        $menu[$this->url()->fromRoute('moder/hotlink')] = 'Hotlinks';
 
         return [
             'menu'          => $menu,

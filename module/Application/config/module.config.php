@@ -118,6 +118,7 @@ return [
                 $service = $sm->get(Service\UsersService::class);
                 return new Controller\Console\UsersController($service);
             },
+            Controller\Moder\HotlinkController::class => InvokableFactory::class,
             Controller\Moder\IndexController::class => function($sm) {
                 $form = $sm->get('AddBrandForm');
                 return new Controller\Moder\IndexController($form);

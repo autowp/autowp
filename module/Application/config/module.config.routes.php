@@ -979,6 +979,64 @@ return [
                             ]
                         ]
                     ],
+                    'hotlink' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/hotlink',
+                            'defaults' => [
+                                'controller' => Controller\Moder\HotlinkController::class,
+                                'action'     => 'index'
+                            ]
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'clear-all' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/clear-all',
+                                    'defaults' => [
+                                        'action' => 'clear-all'
+                                    ]
+                                ]
+                            ],
+                            'clear-host' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/clear-host',
+                                    'defaults' => [
+                                        'action' => 'clear-host'
+                                    ]
+                                ]
+                            ],
+                            'whitelist-host' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/whitelist-host',
+                                    'defaults' => [
+                                        'action' => 'whitelist-host'
+                                    ]
+                                ]
+                            ],
+                            'whitelist-and-clear-host' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/whitelist-and-clear-host',
+                                    'defaults' => [
+                                        'action' => 'whitelist-and-clear-host'
+                                    ]
+                                ]
+                            ],
+                            'blacklist-host' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/blacklist-host',
+                                    'defaults' => [
+                                        'action' => 'blacklist-host'
+                                    ]
+                                ]
+                            ],
+                        ]
+                    ],
                     'index' => [
                         'type' => Segment::class,
                         'options' => [

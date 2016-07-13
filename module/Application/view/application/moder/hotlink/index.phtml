@@ -1,0 +1,62 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ],
+    ]);
+?>
+<?php if ($this->canManage) { ?>
+    <form action="<?=$this->escapeHtml($this->url('moder/hotlink/clear-all'))?>" method="post" class="form-inline">
+        <input type="submit" class="btn btn-danger" value="Clear all" />
+    </form>
+<?php } ?>
+<table class="table table-border">
+    <thead>
+        <tr>
+            <th>Host</th>
+            <th>URL</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->hosts as $host) { ?>
+            <tr>
+                <td>
+                    <?=$this->escapeHtml($host['host'])?>
+                    <?php if ($this->canManage) { ?>
+                        <form action="<?=$this->escapeHtml($this->url('moder/hotlink/clear-host'))?>" method="post" class="form-inline">
+                            <input type="hidden" name="host" value="<?=$this->escapeHtmlAttr($host['host'])?>" />
+                            <input type="submit" class="btn btn-warning btn-xs" value="Clear" />
+                        </form>
+                        <?php if (!$host['whitelisted']) { ?>
+                            <form action="<?=$this->escapeHtml($this->url('moder/hotlink/whitelist-host'))?>" method="post" class="form-inline">
+                                <input type="hidden" name="host" value="<?=$this->escapeHtmlAttr($host['host'])?>" />
+                                <input type="submit" class="btn btn-success btn-xs" value="Whitelist" />
+                            </form>
+                            <form action="<?=$this->escapeHtml($this->url('moder/hotlink/whitelist-and-clear-host'))?>" method="post" class="form-inline">
+                                <input type="hidden" name="host" value="<?=$this->escapeHtmlAttr($host['host'])?>" />
+                                <input type="submit" class="btn btn-success btn-xs" value="Whitelist&amp;Clear" />
+                            </form>
+                        <?php } ?>
+                        <?php if (!$host['blacklisted']) { ?>
+                            <form action="<?=$this->escapeHtml($this->url('moder/hotlink/blacklist-host'))?>" method="post" class="form-inline">
+                                <input type="hidden" name="host" value="<?=$this->escapeHtmlAttr($host['host'])?>" />
+                                <input type="submit" class="btn btn-danger btn-xs" value="Blacklist" />
+                            </form>
+                        <?php } ?>
+                    <?php } ?>
+                </td>
+                <td>
+                    <?php foreach ($host['links'] as $link) { ?>
+                        <?=$link['last_date']?> <?=$this->htmlA($link['url'], mb_strlen($link['url']) > 70 ? mb_substr($link['url'], 0, 70) . ' ...' : $link['url'])?> <small>(<?=$link['count']?>)</small><br />
+                        <?=$this->escapeHtml($link['accept'])?><br />
+                    <?php } ?>
+                </td>
+                <td><?=$host['c']?></td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>
