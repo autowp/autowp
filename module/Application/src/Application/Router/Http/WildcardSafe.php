@@ -46,7 +46,7 @@ class WildcardSafe extends Wildcard
         $matches = [];
         $params  = explode($this->paramDelimiter, $path);
 
-        if (count($params) > 1 && ($params[0] !== '' || end($params) === '')) {
+        if (count($params) > 1 && ($params[0] !== '')) {
             return;
         }
 

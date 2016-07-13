@@ -1,18 +1,34 @@
 <?php
 
-class Moder_CommentsController extends Zend_Controller_Action
-{
-    public function preDispatch()
-    {
-        parent::preDispatch();
+namespace Application\Controller\Moder;
 
-        if (!$this->_helper->user()->inheritsRole('moder') ) {
-            return $this->_forward('forbidden', 'error', 'default');
-        }
+use Zend\Form\Form;
+use Zend\Mvc\Controller\AbstractActionController;
+
+use Application\Paginator\Adapter\Zend1DbTableSelect;
+
+use Brands;
+use Comment_Message;
+use Picture;
+use Users;
+
+class CommentsController extends AbstractActionController
+{
+    /**
+     * @var Form
+     */
+    private $form;
+
+    public function __construct(Form $form)
+    {
+        $this->form = $form;
     }
 
     public function indexAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
 
         $brandTable = new Brands();
 
@@ -25,83 +41,43 @@ class Moder_CommentsController extends Zend_Controller_Action
                 ->join('comments_messages', 'comments_messages.item_id = pictures.id', null)
                 ->where('comments_messages.type_id = ?', Comment_Message::PICTURES_TYPE_ID)
                 ->group('brands.id')*/
-                ->order(array('brands.position', 'brands.caption'))
+                ->order(['brands.position', 'brands.caption'])
         );
-        $brandOptions = array(
+        $brandOptions = [
             '' => '--'
-        );
+        ];
         foreach ($brandRows as $brandRow) {
             $brandOptions[$brandRow->id] = $brandRow->caption;
         }
 
-        $form = new Project_Form(array(
-            'decorators' => array(
-                'PrepareElements',
-                array('viewScript', array('viewScript' => 'forms/bootstrap-vertical.phtml')),
-                'Form'
-            ),
-            'action'   => $this->_helper->url->url(),
-            'method'   => 'post',
-            'elements' => array(
-                array('text', 'user', array(
-                    'label'      => 'Пользователь №',
-                    'decorators' => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('select', 'brand_id', array(
-                    'label'        => 'Бренд',
-                    'multioptions' => $brandOptions,
-                    'decorators' => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('select', 'moderator_attention', array(
-                    'label'        => 'Внимание модераторов',
-                    'multioptions' => array(
-                        ''                                             => 'Не важно',
-                        Comment_Message::MODERATOR_ATTENTION_NONE      => 'Не требуется',
-                        Comment_Message::MODERATOR_ATTENTION_REQUIRED  => 'Требуется',
-                        Comment_Message::MODERATOR_ATTENTION_COMPLETED => 'Выполнено',
-                    ),
-                    'decorators' => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('text', 'car_id', array(
-                    'required'     => false,
-                    'label'        => 'Автомобиль (id)',
-                    'decorators'   => array('ViewHelper')
-                )),
-            )
-        ));
-
         if ($this->getRequest()->isPost()) {
-            $params = $this->getRequest()->getPost();
+            $params = $this->params()->fromPost();
             unset($params['submit']);
             foreach ($params as $key => $value) {
                 if (strlen($value) <= 0) {
                     $params[$key] = null;
                 }
             }
-            return $this->_redirect($this->_helper->url->url($params));
+            return $this->redirect()->toUrl($this->url()->fromRoute('moder/comments/params', $params));
         }
 
         $commentTable = new Comment_Message();
 
         $select = $commentTable->select(true)
-            ->order(array('comments_messages.datetime DESC'));
+            ->order(['comments_messages.datetime DESC']);
 
-        if ($form->isValid($this->_getAllParams())) {
-            $values = $form->getValues();
+        $this->form->setData($this->params()->fromRoute());
+
+        if ($this->form->isValid()) {
+            $values = $this->form->getData();
 
             if ($values['user']) {
 
                 if (!is_numeric($values['user'])) {
                     $userTable = new Users();
-                    $userRow = $userTable->fetchRow(array(
+                    $userRow = $userTable->fetchRow([
                         'identity = ?' => $values['user']
-                    ));
+                    ]);
                     if ($userRow) {
                         $values['user'] = $userRow->id;
                     }
@@ -140,19 +116,21 @@ class Moder_CommentsController extends Zend_Controller_Action
             }
         }
 
-        //print $select; exit;
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
 
-        $paginator = Zend_Paginator::factory($select)
+        $paginator
             ->setItemCountPerPage(50)
-            ->setCurrentPageNumber($this->_getParam('page'));
+            ->setCurrentPageNumber($this->params('page'));
 
 
 
-        $comments = array();
+        $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $status = '';
             if ($commentRow->type_id == Comment_Message::PICTURES_TYPE_ID) {
-                $pictures = $this->_helper->catalogue()->getPictureTable();
+                $pictures = $this->catalogue()->getPictureTable();
                 $picture = $pictures->find($commentRow->item_id)->current();
                 if ($picture) {
                     switch ($picture->status) {
@@ -165,19 +143,19 @@ class Moder_CommentsController extends Zend_Controller_Action
                 }
             }
 
-            $comments[] = array(
+            $comments[] = [
                 'url'     => $commentRow->getUrl(),
                 'message' => $commentRow->getMessagePreview(),
                 'user'    => $commentRow->findParentUsers(),
                 'status'  => $status,
-                'new'     => $commentRow->isNew($this->_helper->user()->get()->id)
-            );
+                'new'     => $commentRow->isNew($this->user()->get()->id)
+            ];
         }
 
-        $this->view->assign(array(
-            'form'      => $form,
+        return [
+            'form'      => $this->form,
             'paginator' => $paginator,
             'comments'  => $comments
-        ));
+        ];
     }
 }

@@ -118,6 +118,10 @@ return [
                 $service = $sm->get(Service\UsersService::class);
                 return new Controller\Console\UsersController($service);
             },
+            Controller\Moder\CommentsController::class => function($sm) {
+                $form = $sm->get('ModerCommentsFilterForm');
+                return new Controller\Moder\CommentsController($form);
+            },
             Controller\Moder\HotlinkController::class => InvokableFactory::class,
             Controller\Moder\IndexController::class => function($sm) {
                 $form = $sm->get('AddBrandForm');

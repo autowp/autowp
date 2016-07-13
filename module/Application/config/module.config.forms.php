@@ -2,6 +2,8 @@
 
 namespace Application;
 
+use Comment_Message;
+
 return [
     'forms' => [
         'FeedbackForm' => [
@@ -397,6 +399,80 @@ return [
                     ],
                     'validators' => [
                         ['name' => Validator\Brand\NameNotExists::class]
+                    ]
+                ]
+            ]
+        ],
+        'ModerCommentsFilterForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'Новый Бренд',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'user',
+                        'options' => [
+                            'label'     => 'Пользователь №',
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'brand_id',
+                        'options' => [
+                            'label'     => 'Бренд',
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'moderator_attention',
+                        'options' => [
+                            'label'        => 'Внимание модераторов',
+                            'options' => [
+                                ''                                             => 'Не важно',
+                                Comment_Message::MODERATOR_ATTENTION_NONE      => 'Не требуется',
+                                Comment_Message::MODERATOR_ATTENTION_REQUIRED  => 'Требуется',
+                                Comment_Message::MODERATOR_ATTENTION_COMPLETED => 'Выполнено',
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'car_id',
+                        'options' => [
+                            'label'     => 'Автомобиль (id)',
+                        ]
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'user' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'moderator_attention' => [
+                    'required' => false,
+                ],
+                'brand_id' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'car_id' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
                     ]
                 ]
             ]
