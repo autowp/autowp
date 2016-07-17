@@ -476,6 +476,82 @@ return [
                     ]
                 ]
             ]
+        ],
+        'ModerTwinsEditForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post'
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'name',
+                        'options' => [
+                            'label'     => 'Название',
+                            'maxlength' => 255,
+                            'size'      => 80,
+                        ]
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'name' => [
+                    'required' => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim'],
+                        ['name' => Filter\SingleSpaces::class]
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'min' => 1,
+                                'max' => 255
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ],
+        'ModerTwinsDescriptionForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post'
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Textarea',
+                        'name' => 'markdown',
+                        'options' => [
+                            'label'     => 'Описание',
+                        ],
+                        'attributes' => [
+                            'maxlength' => 4096,
+                            'cols'      => 60,
+                            'rows'      => 10
+                        ]
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'markdown' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'min' => 0,
+                                'max' => 4096
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ]
     ]
 ];

@@ -129,6 +129,12 @@ return [
             },
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
             Controller\Moder\TrafficController::class => InvokableFactory::class,
+            Controller\Moder\TwinsController::class => function($sm) {
+                $textStorage = $sm->get(TextStorage\Service::class);
+                $editForm = $sm->get('ModerTwinsEditForm');
+                $descForm = $sm->get('ModerTwinsDescriptionForm');
+                return new Controller\Moder\TwinsController($textStorage, $editForm, $descForm);
+            },
             Controller\Moder\UsersController::class => InvokableFactory::class,
         ],
     ],
@@ -436,6 +442,11 @@ return [
         'factories' => [
             Validator\Brand\NameNotExists::class => InvokableFactory::class,
             Validator\User\EmailExists::class => InvokableFactory::class,
+        ],
+    ],
+    'filters' => [
+        'factories' => [
+            Filter\SingleSpaces::class => InvokableFactory::class
         ],
     ],
 ];

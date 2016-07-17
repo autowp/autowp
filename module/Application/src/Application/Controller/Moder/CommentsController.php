@@ -26,7 +26,7 @@ class CommentsController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (!$this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -134,11 +134,21 @@ class CommentsController extends AbstractActionController
                 $picture = $pictures->find($commentRow->item_id)->current();
                 if ($picture) {
                     switch ($picture->status) {
-                        case Picture::STATUS_ACCEPTED: $status = '<span class="label label-success">принято</span>'; break;
-                        case Picture::STATUS_NEW:      $status = '<span class="label label-warning">новое</span>'; break;
-                        case Picture::STATUS_INBOX:    $status = '<span class="label label-warning">входящее</span>'; break;
-                        case Picture::STATUS_REMOVED:  $status = '<span class="label label-danger">удалено</span>'; break;
-                        case Picture::STATUS_REMOVING: $status = '<span class="label label-danger">удаляется</span>'; break;
+                        case Picture::STATUS_ACCEPTED:
+                            $status = '<span class="label label-success">принято</span>';
+                            break;
+                        case Picture::STATUS_NEW:
+                            $status = '<span class="label label-warning">новое</span>';
+                            break;
+                        case Picture::STATUS_INBOX:
+                            $status = '<span class="label label-warning">входящее</span>';
+                            break;
+                        case Picture::STATUS_REMOVED:
+                            $status = '<span class="label label-danger">удалено</span>';
+                            break;
+                        case Picture::STATUS_REMOVING:
+                            $status = '<span class="label label-danger">удаляется</span>';
+                            break;
                     }
                 }
             }

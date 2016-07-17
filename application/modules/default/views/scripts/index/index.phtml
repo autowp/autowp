@@ -10,6 +10,15 @@
     ));
     $this->layout()->moduleName = 'default/index';
 ?>
+<?php if (date('Y-m-d') == '2016-07-15') { ?>
+<?php $this->headStyle()->captureStart()?>
+html {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    filter: grayscale(100%);
+}
+<?php $this->headStyle()->captureEnd()?>
+<?php } ?>
 <div class="row">
     <div class="col-md-6">
         <?php if ($this->carOfDay['name']) { ?>
@@ -112,7 +121,7 @@
                     <?php } ?>
                 </p>
                 <?php if ($this->language()->is('ru')) { ?>
-                    <p>Вы знаете, что Daewoo Matiz имеет аж целых <a href="/twins/group87/">шесть клонов</a>? А знаете, что <a href="http://www.autowp.ru/twins/group5/">общего у Lotus и Kia</a>? Уверены, что вам покажется интересным этот раздел.</p>
+                    <p>Вы знаете, что Daewoo Matiz имеет аж целых <a href="/twins/group87">шесть клонов</a>? А знаете, что <a href="/twins/group5">общего у Lotus и Kia</a>? Уверены, что вам покажется интересным этот раздел.</p>
                 <?php } ?>
             </div>
 

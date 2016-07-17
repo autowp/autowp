@@ -1,25 +1,23 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'isAdminPage' => true,
             'blankPage'   => false,
             'needLeft'    => false,
             'needRight'   => false
-        ),
+        ],
         'pageId' => 143,
-        'args'   => array(
+        'args'   => [
             'TWINS_GROUP_NAME' => $this->group->name,
             'TWINS_GROUP_ID'   => $this->group->id
-        )
-    ));
+        ]
+    ]);
 ?>
 <?php
-    $url = $this->url(array(
-        'module' => 'default',
-        'controller' => 'twins',
-        'action' => 'group',
+    $url = $this->url('moder/twins/params', [
+        'action'         => 'twins-group',
         'twins_group_id' => $this->group->id
-    ), 'twins', true);
+    ]);
 ?>
 <div class="row">
     <div class="col-md-6">
@@ -27,12 +25,9 @@
             <p>
                 В базе данных чиcлится под номером <strong><?=$this->group->id ?></strong><br />
                 На сайте: <?=$this->htmlA($url, $url) ?><br />
-                <?=$this->htmlA($this->url(array(
-                    'module' => 'default',
-                    'controller' => 'log',
-                    'action' => 'index',
+                <?=$this->htmlA($this->url('log/params', [
                     'twins_group_id' => $this->group->id
-                ), 'default', true), 'Журнал событий по группе') ?>
+                ]), 'Журнал событий по группе') ?>
             </p>
         </div>
 
@@ -40,16 +35,14 @@
         <div class="well">
 
             <?php if ($this->canEdit) { ?>
-                <?=$this->formEdit->render($this) ?>
+                <?=$this->partial('application/forms/bootstrap-horizontal', [
+                    'form' => $this->editForm
+                ])?>
             <?php } else { ?>
                 <table><tbody>
                     <tr>
                         <td>Название</td>
-                        <td><?=$this->escape($this->group->name) ?></td>
-                    </tr>
-                    <tr>
-                        <td>Описание</td>
-                        <td><?=$this->group->description ?></td>
+                        <td><?=$this->escapeHtml($this->group->name) ?></td>
                     </tr>
                 </tbody></table>
             <?php } ?>
@@ -58,21 +51,20 @@
         <h3>Краткое описание</h3>
         <div class="well">
             <?php if ($this->canEdit) { ?>
-                <?=$this->descriptionForm->render($this)?>
+                <?=$this->partial('application/forms/markdown', [
+                    'form' => $this->descForm
+                ])?>
             <?php } else { ?>
-                <?=$this->markup($this->description)?>
+                <?=$this->markdown($this->description)?>
             <?php } ?>
             <?php if ($this->group->text_id) { ?>
                 <p>
-                    <?=$this->htmlA(array(
+                    <?=$this->htmlA([
                         'class' => 'pull-right',
-                        'href'  => $this->url(array(
-                            'module'     => 'default',
-                            'controller' => 'info',
-                            'action'     => 'text',
-                            'id'         => $this->group->text_id
-                        ), null, true)
-                    ), 'History')?>
+                        'href'  => $this->url('info/text', [
+                            'id' => $this->group->text_id
+                        ])
+                    ], 'History')?>
                 </p>
             <?php } ?>
         </div>
@@ -81,14 +73,12 @@
         <h2>Автомобили</h2>
         <div class="well">
             <ul>
-                <?php foreach ($this->group->findCarsViaTwins_Groups_Cars() as $car) { ?>
+                <?php foreach ($this->cars as $car) { ?>
                     <li>
-                        <?=$this->htmlA($this->url(array(
-                            'module' => 'moder',
-                            'controller' => 'cars',
+                        <?=$this->htmlA($this->url('moder/cars/params', [
                             'action' => 'car',
                             'car_id' => $car->id
-                        ), 'default', true), $car->getFullName()) ?>
+                        ]), $car->getFullName()) ?>
                     </li>
                 <?php } ?>
             </ul>
