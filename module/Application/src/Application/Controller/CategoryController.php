@@ -717,7 +717,12 @@ class CategoryController extends AbstractActionController
                     [
                         'gallery2'   => true,
                         'galleryUrl' => $this->url()->fromRoute('categories', [
-                            'action' => 'category-picture-gallery'
+                            'action'           => 'category-picture-gallery',
+                            'category_catname' => $currentCategory->catname,
+                            'other'            => $isOther,
+                            'car_id'           => $topCar ? $topCar->id : null,
+                            'path'             => $path,
+                            'picture_id'       => $picture['identity'] ? $picture['identity'] : $picture['id']
                         ])
                     ]
                 )

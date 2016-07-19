@@ -492,12 +492,12 @@ class IndexController extends Zend_Controller_Action
         ));
 
         // САМЫЕ-САМЫЕ
-        $this->view->mosts = array(
-            '/mosts/fastest/roadster/'          => 'mosts/fastest/roadster',
-            '/mosts/mighty/sedan/today/'        => 'mosts/mighty/sedan/today',
-            '/mosts/dynamic/universal/2000-09/' => 'mosts/dynamic/universal/2000-09',
-            '/mosts/heavy/truck/'               => 'mosts/heavy/truck'
-        );
+        $this->view->mosts = [
+            '/mosts/fastest/roadster'          => 'mosts/fastest/roadster',
+            '/mosts/mighty/sedan/today'        => 'mosts/mighty/sedan/today',
+            '/mosts/dynamic/universal/2000-09' => 'mosts/dynamic/universal/2000-09',
+            '/mosts/heavy/truck'               => 'mosts/heavy/truck'
+        ];
 
         $userTable = new Users();
 
@@ -557,15 +557,15 @@ class IndexController extends Zend_Controller_Action
                 ],
                 'mosts' => [
                     'name' => $this->view->page(21)->name,
-                    'url'  => '/mosts/'
+                    'url'  => '/mosts'
                 ],
                 'category' => [
                     'name' => $this->view->page(22)->name,
-                    'url'  => '/category/'
+                    'url'  => '/category'
                 ],
                 'twins' => [
                     'name' => $this->view->page(25)->name,
-                    'url'  => '/twins/'
+                    'url'  => '/twins'
                 ],
                 'new' => [
                     'name' => $this->view->page(51)->name,

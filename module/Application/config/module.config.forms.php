@@ -552,6 +552,133 @@ return [
                     ]
                 ]
             ]
+        ],
+        'ModerAclRoleForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'Добавить роль',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'role',
+                        'options' => [
+                            'label'     => 'Роль',
+                        ],
+                        'attributes' => [
+                            'maxlength' => 80
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'parent_role_id',
+                        'options' => [
+                            'label'     => 'Родительская роль',
+                        ]
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'role' => [
+                    'required' => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'parent_role_id' => [
+                    'required' => true
+                ]
+            ]
+        ],
+        'ModerAclRuleForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'Добавить правило',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'role_id',
+                        'options' => [
+                            'label'     => 'Роль',
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'privilege_id',
+                        'options' => [
+                            'label'     => 'Привелегия',
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'what',
+                        'options' => [
+                            'label'     => 'Действие',
+                            'options' => [
+                                '0' => 'запретить',
+                                '1' => 'разрешить'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'role_id' => [
+                    'required' => true
+                ],
+                'privilege_id' => [
+                    'required' => true
+                ],
+                'what' => [
+                    'required' => true
+                ]
+            ]
+        ],
+        'ModerAclRoleParentForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'Добавить родителя',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'role_id',
+                        'options' => [
+                            'label'     => 'Роль',
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'parent_role_id',
+                        'options' => [
+                            'label'     => 'Родительская роль',
+                        ]
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'role_id' => [
+                    'required' => true
+                ],
+                'parent_role_id' => [
+                    'required' => true
+                ]
+            ]
         ]
     ]
 ];

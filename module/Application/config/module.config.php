@@ -128,6 +128,14 @@ return [
                 return new Controller\Moder\IndexController($form);
             },
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
+            Controller\Moder\RightsController::class => function($sm) {
+                $acl = $sm->get(Acl::class);
+                $cache = $sm->get('longCache');
+                $roleForm = $sm->get('ModerAclRoleForm');
+                $ruleForm = $sm->get('ModerAclRuleForm');
+                $roleParentForm = $sm->get('ModerAclRoleParentForm');
+                return new Controller\Moder\RightsController($acl, $cache, $roleForm, $ruleForm, $roleParentForm);
+            },
             Controller\Moder\TrafficController::class => InvokableFactory::class,
             Controller\Moder\TwinsController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);

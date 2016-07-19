@@ -1,21 +1,21 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'isAdminPage' => true,
             'blankPage'   => false,
             'needLeft'    => false,
             'needRight'   => false
-        ),
+        ],
         'pageId' => 71,
-    ));
+    ]);
 
     $roles = new Acl_Roles();
 
     function printRolesRecuirsive($roles, $role) {
         $select = $roles->select()
-                        ->from($roles)
-                        ->joinLeft('acl_roles_parents', 'acl_roles.id=acl_roles_parents.role_id', null)
-                        ->where('acl_roles_parents.parent_role_id=?', $role->id);
+            ->from($roles)
+            ->joinLeft('acl_roles_parents', 'acl_roles.id=acl_roles_parents.role_id', null)
+            ->where('acl_roles_parents.parent_role_id=?', $role->id);
 
         ?>
         <?=sprintf('%02d', $role->id) ?>. <?=$role->name ?>
@@ -55,8 +55,8 @@
             <tr>
                 <td><?=$resource->name ?> / <?=$privilege->name ?></td>
                 <?php foreach ($this->roles as $role) { ?>
-                    <td style="text-align:center">
-                        <?php if ($this->acl()->isAllowed($role->name, $resource->name, $privilege->name)) { ?>
+                    <td class="text-center">
+                        <?php if ($this->acl->isAllowed($role->name, $resource->name, $privilege->name)) { ?>
                             <i class="fa fa-check"></i>
                         <?php } else { ?>
                         <?php } ?>
@@ -79,9 +79,9 @@
     <tbody>
         <?php foreach ($this->rules as $rule) { ?>
             <tr>
-                <td><?=$this->escape($rule['role'])?></td>
-                <td><?=$this->escape($rule['resource'])?></td>
-                <td><?=$this->escape($rule['privilege'])?></td>
+                <td><?=$this->escapeHtml($rule['role'])?></td>
+                <td><?=$this->escapeHtml($rule['resource'])?></td>
+                <td><?=$this->escapeHtml($rule['privilege'])?></td>
                 <td>
                     <?php if ($rule['allowed']) { ?>
                         <i class="fa fa-check-circle"></i>
@@ -94,6 +94,18 @@
     </tbody>
 </table>
 
-<?=$this->addRoleForm->render($this) ?>
-<?=$this->addRuleForm->render($this) ?>
-<?=$this->addRoleParentForm->render($this) ?>
+<div class="well">
+    <?=$this->partial('application/forms/bootstrap-horizontal', [
+        'form' => $this->addRoleForm
+    ])?>
+</div>
+<div class="well">
+    <?=$this->partial('application/forms/bootstrap-horizontal', [
+        'form' => $this->addRuleForm
+    ])?>
+</div>
+<div class="well">
+    <?=$this->partial('application/forms/bootstrap-horizontal', [
+        'form' => $this->addRoleParentForm
+    ])?>
+</div>
