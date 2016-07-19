@@ -1,0 +1,16 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => true
+        ],
+        'pageId' => 52,
+    ]);
+?>
+<div class="well">
+    <p><?=$this->escapeHtml($this->translate('registration/if-you-registered'))?></p>
+    <?=$this->partial('application/forms/bootstrap-horizontal', [
+        'form' => $this->form
+    ])?>
+</div>

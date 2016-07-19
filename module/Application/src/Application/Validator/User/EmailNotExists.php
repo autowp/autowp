@@ -6,12 +6,12 @@ use Zend\Validator\AbstractValidator;
 
 use Users;
 
-class EmailExists extends AbstractValidator
+class EmailNotExists extends AbstractValidator
 {
-    const NOT_EXISTS = 'userEmailNotExists';
+    const EXISTS = 'userEmailExists';
 
     protected $messageTemplates = [
-        self::NOT_EXISTS => "E-mail '%value%' не зарегистрирован на сайте"
+        self::EXISTS => "E-mail '%value%' уже зарегистрирован на сайте"
     ];
 
     public function isValid($value)
@@ -24,10 +24,11 @@ class EmailExists extends AbstractValidator
         $exists = $db->fetchOne(
             $db->select()
                 ->from($table->info('name'), 'id')
-                ->where('e_mail = ?', $value)
+                ->where('e_mail = ?', (string)$value)
         );
-        if (!$exists) {
-            $this->error(self::NOT_EXISTS);
+
+        if ($exists) {
+            $this->error(self::EXISTS);
             return false;
         }
         return true;

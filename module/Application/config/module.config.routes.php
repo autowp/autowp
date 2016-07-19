@@ -605,6 +605,28 @@ return [
                     ],
                 ],
             ],
+            'registration' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/registration',
+                    'defaults' => [
+                        'controller' => Controller\RegistrationController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'ok' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/ok',
+                            'defaults' => [
+                                'action' => 'ok',
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'restorepassword' => [
                 'type' => Literal::class,
                 'options' => [

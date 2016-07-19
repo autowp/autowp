@@ -73,6 +73,11 @@ return [
             Controller\MuseumsController::class      => InvokableFactory::class,
             Controller\PictureFileController::class  => InvokableFactory::class,
             Controller\PulseController::class        => InvokableFactory::class,
+            Controller\RegistrationController::class => function($sm) {
+                $service = $sm->get(Service\UsersService::class);
+                $form = $sm->get('RegistrationForm');
+                return new Controller\RegistrationController($service, $form);
+            },
             Controller\RestorePasswordController::class => function($sm) {
                 $service = $sm->get(Service\UsersService::class);
                 $restoreForm = $sm->get('RestorePasswordForm');
@@ -293,9 +298,10 @@ return [
                 return $storage;
             },
             Service\UsersService::class => function($sm) {
-                $config = $sm->get('Config')['users'];
-
-                return new Service\UsersService($config);
+                $config = $sm->get('Config');
+                $translator = $sm->get('translator');
+                $transport = $sm->get('MailTransport');
+                return new Service\UsersService($config['users'], $config['hosts'], $translator, $transport);
             },
             Zend_Db_Adapter_Abstract::class => function($sm) {
                 $config = $sm->get('Config');
@@ -450,6 +456,7 @@ return [
         'factories' => [
             Validator\Brand\NameNotExists::class => InvokableFactory::class,
             Validator\User\EmailExists::class => InvokableFactory::class,
+            Validator\User\EmailNotExists::class => InvokableFactory::class,
         ],
     ],
     'filters' => [

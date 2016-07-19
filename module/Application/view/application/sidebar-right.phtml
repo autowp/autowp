@@ -2,18 +2,18 @@
     <div class="well">
         <div>
             <?=$this->user() ?><br />
-            <?=$this->htmlA('/account/profile/', $this->page(48)->name)?><br />
-            <i class="fa fa-sign-out"></i> <?=$this->htmlA('/login/logout/', $this->translate('login/sign-out'))?>
+            <?=$this->htmlA('/account/profile', $this->page(48)->name)?><br />
+            <i class="fa fa-sign-out"></i> <?=$this->htmlA('/login/logout', $this->translate('login/sign-out'))?>
         </div>
         <p>
             <i class="fa fa-comment"></i>
             <?php if ($this->newPersonalMessages > 0) { ?>
                 <?=$this->htmlA([
-                    'href'  => '/account/pm/',
+                    'href'  => '/account/pm',
                     'class' => 'label label-danger'
                 ], sprintf($this->translatePlural('layout/you-have-%1$s-new-messages', null, $this->newPersonalMessages), $this->newPersonalMessages))?>
             <?php } else { ?>
-                <?=$this->htmlA('/account/pm/', $this->translate('layout/personal-messages'))?>
+                <?=$this->htmlA('/account/pm', $this->translate('layout/personal-messages'))?>
             <?php } ?>
         </p>
     </div>
@@ -31,8 +31,8 @@
             </div>
             <div>
                 <div class="pull-right text-right">
-                    <?=$this->htmlA('/registration/', $this->translate('login/registration'))?><br />
-                    <?=$this->htmlA('/restorepassword/', $this->translate('login/forgot-password?'))?>
+                    <?=$this->htmlA('/registration', $this->translate('login/registration'))?><br />
+                    <?=$this->htmlA('/restorepassword', $this->translate('login/forgot-password?'))?>
                 </div>
                 <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('login/sign-in'))?>" class="btn btn-primary" />
             </div>

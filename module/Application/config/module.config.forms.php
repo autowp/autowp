@@ -136,7 +136,10 @@ return [
                         ['name' => 'StringTrim']
                     ],
                     'validators' => [
-                        ['name' => 'EmailAddress'],
+                        [
+                            'name'                   => 'EmailAddress',
+                            'break_chain_on_failure' => true
+                        ],
                         ['name' => Validator\User\EmailExists::class]
                     ]
                 ],
@@ -679,6 +682,148 @@ return [
                     'required' => true
                 ]
             ]
-        ]
+        ],
+        'RegistrationForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post'
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'email',
+                        'options' => [
+                            'label'     => 'E-mail',
+                            'size'      => 20,
+                            'maxlength' => 50,
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'name',
+                        'options' => [
+                            'label'     => 'login/name',
+                            'size'       => 20,
+                            'maxlength'  => 30,
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Password',
+                        'name' => 'password',
+                        'options' => [
+                            'label'     => 'login/password',
+                            'size'      => 20,
+                            'maxlength' => 50,
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Password',
+                        'name' => 'password_confirm',
+                        'options' => [
+                            'label'     => 'login/password-confirm',
+                            'size'      => 20,
+                            'maxlength' => 50,
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Captcha',
+                        'name' => 'captcha',
+                        'options' => [
+                            'label' => 'login/captcha',
+                            'captcha' => [
+                                'class'   => 'Image',
+                                'font'    => APPLICATION_PATH . '/resources/fonts/arial.ttf',
+                                'imgDir'  => APPLICATION_PATH . '/../public_html/img/captcha/',
+                                'imgUrl'  => '/img/captcha/',
+                                'wordLen' => 4,
+                                'timeout' => 300,
+                            ]
+                        ],
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'email' => [
+                    'required' => true,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name'    => 'StringLength',
+                            'options' => [
+                                'min' => null,
+                                'max' => 50
+                            ]
+                        ],
+                        [
+                            'name'                   => 'EmailAddress',
+                            'break_chain_on_failure' => true
+                        ],
+                        ['name' => Validator\User\EmailNotExists::class]
+                    ]
+                ],
+                'name' => [
+                    'required' => true,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name'    => 'StringLength',
+                            'options' => [
+                                'min' => 1,
+                                'max' => 50
+                            ]
+                        ]
+                    ]
+                ],
+                'password' => [
+                    'required' => true,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name'    => 'StringLength',
+                            'options' => [
+                                'min' => 6,
+                                'max' => 50
+                            ]
+                        ]
+                    ]
+                ],
+                'password_confirm' => [
+                    'required' => true,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name'    => 'StringLength',
+                            'options' => [
+                                'min' => 6,
+                                'max' => 50
+                            ]
+                        ],
+                        [
+                            'name' => 'Identical',
+                            'options' => [
+                                'token' => 'password',
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ],
     ]
 ];

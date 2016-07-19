@@ -2,6 +2,8 @@
 
 namespace Application\Service;
 
+use Zend\Mail;
+
 use Application_Service_Specifications;
 use Comment_Message;
 use Picture;
@@ -13,63 +15,76 @@ use Users_Row;
 
 use Exception;
 
-use Zend_Controller_Front;
 use Zend_Date;
 use Zend_Db_Expr;
-use Zend_Mail;
 
 class UsersService
 {
     /**
      * @var Users
      */
-    private $_table;
+    private $table;
 
     /**
      * @var string
      */
-    private $_salt = null;
+    private $salt = null;
 
-    private $_emailSalt = null;
+    private $emailSalt = null;
+
+    /**
+     * @var array
+     */
+    private $hosts = [];
+
+    private $translator;
+
+    private $transport;
 
     /**
      * @return Users
      */
-    private function _getTable()
+    private function getTable()
     {
-        return $this->_table
-            ? $this->_table
-            : $this->_table = new Users();
+        return $this->table
+            ? $this->table
+            : $this->table = new Users();
     }
 
-    public function __construct(array $options)
+    public function __construct(array $options, array $hosts, $translator, $transport)
     {
-        $this->_salt = $options['salt'];
-        $this->_emailSalt = $options['emailSalt'];
+        $this->salt = $options['salt'];
+        $this->emailSalt = $options['emailSalt'];
+
+        $this->hosts = $hosts;
+
+        $this->translator = $translator;
+
+        $this->transport = $transport;
     }
 
     /**
      * @param string $password
      * @return string
      */
-    private function _passwordHashExpr($password)
+    private function passwordHashExpr($password)
     {
         if (strlen($password) <= 0) {
             throw new Exception("Password cannot be empty");
         }
 
-        $db = $this->_getTable()->getAdapter();
+        $db = $this->getTable()->getAdapter();
 
-        return 'MD5(CONCAT(' . $db->quote($this->_salt) . ', ' . $db->quote($password) . '))';
+        return 'MD5(CONCAT(' . $db->quote($this->salt) . ', ' . $db->quote($password) . '))';
     }
 
     /**
      * @param string $email
      * @return string
      */
-    private function _emailCheckCode($email)
+    private function emailCheckCode($email)
     {
-        return md5($this->_emailSalt. $email . microtime());
+        return md5($this->emailSalt. $email . microtime());
     }
 
     /**
@@ -77,14 +92,13 @@ class UsersService
      * @throws Exception
      * @return array
      */
-    private function _getHostOptions($language)
+    private function getHostOptions($language)
     {
-        $hosts = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOption('hosts');
-        if (!isset($hosts[$language])) {
+        if (!isset($this->hosts[$language])) {
             throw new Exception("Host with language `$language` is not supported");
         }
 
-        return $hosts[$language];
+        return $this->hosts[$language];
     }
 
     /**
@@ -93,17 +107,17 @@ class UsersService
      */
     public function addUser(array $values, $language)
     {
-        $host = $this->_getHostOptions($language);
+        $host = $this->getHostOptions($language);
 
-        $emailCheckCode = $this->_emailCheckCode($values['email']);
+        $emailCheckCode = $this->emailCheckCode($values['email']);
 
-        $table = $this->_getTable();
+        $table = $this->getTable();
         $db = $table->getAdapter();
 
-        $passwordExpr = $this->_passwordHashExpr($values['password']);
+        $passwordExpr = $this->passwordHashExpr($values['password']);
         $ipExpr = $db->quoteInto('INET6_ATON(?)', $values['ip']);
 
-        $user = $table->createRow(array(
+        $user = $table->createRow([
             'login'            => null,
             'e_mail'           => null,
             'password'         => new Zend_Db_Expr($passwordExpr),
@@ -116,7 +130,7 @@ class UsersService
             'timezone'         => $host['timezone'],
             'last_ip'          => new Zend_Db_Expr($ipExpr),
             'language'         => $language
-        ));
+        ]);
         $user->save();
 
         $service = new Application_Service_Specifications();
@@ -136,9 +150,9 @@ class UsersService
      */
     public function changeEmailStart(Users_Row $user, $email, $language)
     {
-        $host = $this->_getHostOptions($language);
+        $host = $this->getHostOptions($language);
 
-        $emailCheckCode = $this->_emailCheckCode($email);
+        $emailCheckCode = $this->emailCheckCode($email);
 
         $user->email_to_check = $email;
         $user->email_check_code = $emailCheckCode;
@@ -153,7 +167,7 @@ class UsersService
      */
     public function emailChangeFinish($code)
     {
-        $userTable = $this->_getTable();
+        $userTable = $this->getTable();
         $user = $userTable->fetchRow(
             $userTable->select(true)
                 ->where('not deleted')
@@ -166,11 +180,11 @@ class UsersService
             return false;
         }
 
-        $user->setFromArray(array(
+        $user->setFromArray([
             'e_mail'           => $user->email_to_check,
             'email_check_code' => null,
             'email_to_check'   => null
-        ));
+        ]);
         $user->save();
 
         return $user;
@@ -184,16 +198,14 @@ class UsersService
     {
         if ($user->email_to_check && $user->email_check_code) {
 
-            $values = array(
+            $values = [
                 'email' => $user->email_to_check,
                 'name'  => $user->name,
                 'url'   => 'http://'.$hostname.'/account/emailcheck/' . $user->email_check_code
-            );
+            ];
 
-            $translate = Zend_Registry::get('Zend_Translate');
-
-            $subject = $translate->translate('users/registration/email-confirm-subject');
-            $message = $translate->translate('users/registration/email-confirm-message');
+            $subject = $this->translator->translate('users/registration/email-confirm-subject');
+            $message = $this->translator->translate('users/registration/email-confirm-message');
 
             $subject = sprintf($subject, $hostname);
             $message = sprintf(
@@ -204,11 +216,15 @@ class UsersService
                 $hostname
             );
 
-            $mail = new Zend_Mail('utf-8');
-            $mail->setBodyText($message, 'utf-8')
+            $mail = new Mail\Message();
+            $mail
+                ->setEncoding('utf-8')
+                ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
+                ->setBody($message)
                 ->addTo($values['email'], $values['name'])
-                ->setSubject($subject)
-                ->send();
+                ->setSubject($subject);
+
+            $this->transport->send($mail);
         }
     }
 
@@ -220,16 +236,14 @@ class UsersService
     {
         if ($user->email_to_check && $user->email_check_code) {
 
-            $values = array(
+            $values = [
                 'email' => $user->email_to_check,
                 'name'  => $user->name,
                 'url'   => 'http://'.$hostname.'/account/emailcheck/' . $user->email_check_code
-            );
+            ];
 
-            $translate = Zend_Registry::get('Zend_Translate');
-
-            $subject = $translate->translate('users/change-email/confirm-subject');
-            $message = $translate->translate('users/change-email/confirm-message');
+            $subject = $this->translator->translate('users/change-email/confirm-subject');
+            $message = $this->translator->translate('users/change-email/confirm-message');
 
             $subject = sprintf($subject, $hostname);
             $message = sprintf(
@@ -239,12 +253,15 @@ class UsersService
                 $values['url']
             );
 
-            $mail = new Zend_Mail('utf-8');
-            $mail->setBodyText($message)
-                 ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
-                 ->addTo($values['email'], $values['name'])
-                 ->setSubject($subject)
-                 ->send();
+            $mail = new Mail\Message();
+            $mail
+                ->setEncoding('utf-8')
+                ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
+                ->setBody($message)
+                ->addTo($values['email'], $values['name'])
+                ->setSubject($subject);
+
+            $this->transport->send($mail);
         }
     }
 
@@ -257,13 +274,13 @@ class UsersService
     {
         return new Project_Auth_Adapter_Login(
             $login,
-            $this->_passwordHashExpr($password)
+            $this->passwordHashExpr($password)
         );
     }
 
     public function updateUsersVoteLimits()
     {
-        $userTable = $this->_getTable();
+        $userTable = $this->getTable();
         $db = $userTable->getAdapter();
 
         $ids = $db->fetchCol(
@@ -284,7 +301,7 @@ class UsersService
 
     public function updateUserVoteLimit($userId)
     {
-        $userRow = $this->_getTable()->find($userId)->current();
+        $userRow = $this->getTable()->find($userId)->current();
         if (!$userRow) {
             return false;
         }
@@ -312,7 +329,7 @@ class UsersService
         $db = $pictureTable->getAdapter();
         $picturesExists = $db->fetchOne(
             $db->select()
-                ->from($pictureTable->info('name'), array(new Zend_Db_Expr('COUNT(1)')))
+                ->from($pictureTable->info('name'), [new Zend_Db_Expr('COUNT(1)')])
                 ->where('owner_id = ?', $userRow->id)
                 ->where('status = ?', Picture::STATUS_ACCEPTED)
         );
@@ -328,18 +345,18 @@ class UsersService
 
     public function restoreVotes()
     {
-        $this->_getTable()->update(array(
+        $this->getTable()->update([
             'votes_left' => new Zend_Db_Expr('votes_per_day')
-        ), array(
+        ], [
             'votes_left < votes_per_day',
             'not deleted'
-        ));
+        ]);
     }
 
     public function setPassword(Users_Row $user, $password)
     {
-        $uTable = $this->_getTable();
-        $passwordExpr = $this->_passwordHashExpr($password);
+        $uTable = $this->getTable();
+        $passwordExpr = $this->passwordHashExpr($password);
 
         $user->password = new Zend_Db_Expr($passwordExpr);
         $user->save();
@@ -350,17 +367,17 @@ class UsersService
         $table = new User_Remember();
 
         do {
-            $token = md5($this->_salt . microtime());
-            $row = $table->fetchRow(array(
+            $token = md5($this->salt . microtime());
+            $row = $table->fetchRow([
                 'token = ?' => $token
-            ));
+            ]);
         } while ($row);
 
-        $table->insert(array(
+        $table->insert([
             'user_id' => $userId,
             'token'   => $token,
             'date'    => new Zend_Db_Expr('NOW()')
-        ));
+        ]);
 
         return $token;
     }
@@ -370,26 +387,26 @@ class UsersService
         $uprTable = new User_Password_Remind();
 
         do {
-            $code = md5($this->_salt . uniqid());
+            $code = md5($this->salt . uniqid());
             $exists = (bool)$uprTable->find($code)->current();
         } while ($exists);
 
-        $uprTable->insert(array(
+        $uprTable->insert([
             'user_id' => $userId,
             'hash'    => $code,
             'created' => new Zend_Db_Expr('NOW()')
-        ));
+        ]);
 
         return $code;
     }
 
     public function checkPassword($userId, $password)
     {
-        $passwordExpr = $this->_passwordHashExpr($password);
+        $passwordExpr = $this->passwordHashExpr($password);
 
-        return (bool)$this->_getTable()->fetchRow(array(
+        return (bool)$this->getTable()->fetchRow([
             'id = ?'       => (int)$userId,
             'password = ?' => new Zend_Db_Expr($passwordExpr)
-        ));
+        ]);
     }
 }

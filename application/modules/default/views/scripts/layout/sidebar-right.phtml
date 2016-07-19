@@ -20,7 +20,7 @@
 <?php } else { ?>
     <h3><?=$this->escape($this->translate('login/sign-in'))?></h3>
     <div class="well">
-        <form action="/login/" method="post" class="login"><div>
+        <form action="/login" method="post" class="login"><div>
             <p><input type="text" name="login" placeholder="<?=$this->escape($this->translate('login/login-or-email'))?>" class="form-control" /></p>
             <p><input type="password" name="password" placeholder="<?=$this->escape($this->translate('login/password'))?>" class="form-control" /></p>
             <div class="checkbox">
@@ -31,8 +31,8 @@
             </div>
             <div>
                 <div class="pull-right text-right">
-                    <?=$this->htmlA('/registration/', $this->translate('login/registration'))?><br />
-                    <?=$this->htmlA('/restorepassword/', $this->translate('login/forgot-password?'))?>
+                    <?=$this->htmlA('/registration', $this->translate('login/registration'))?><br />
+                    <?=$this->htmlA('/restorepassword', $this->translate('login/forgot-password?'))?>
                 </div>
                 <input type="submit" value="<?=$this->escape($this->translate('login/sign-in'))?>" class="btn btn-primary" />
             </div>

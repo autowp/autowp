@@ -322,7 +322,7 @@ return [
     'login/name' => 'имя',
     'login/login-or-email' => 'логин или e-mail',
     'login/password' => 'пароль',
-    'login/password-confirm' => 'пароль (ещё раз]',
+    'login/password-confirm' => 'пароль (ещё раз)',
     'login/captcha' => 'введите код защиты',
     'login/registration' => 'Регистрация',
     'login/forgot-password?' => 'Забыли пароль?',
@@ -366,7 +366,7 @@ return [
     'forums/topic/subscribe-to-new-messages' => 'Подписаться на новые сообщения',
     'forums/notification-mail/from' => 'Робот autowp.ru',
     'forums/notification-mail/subject' => 'Уведомление о новом сообщении на форуме',
-    'forums/notification-mail/body' => 
+    'forums/notification-mail/body' =>
         "Здравствуйте.\n\n" .
         "На форуме сайта http://www.autowp.ru/ в топике `%1\$s` добавлено новое сообщение\n" .
         "Для перехода к просмотру сообщения воспользуйтесь ссылкой %2\$s\n\n" .
