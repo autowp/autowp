@@ -1,12 +1,12 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 79,
-    ));
+    ]);
 ?>
 <div class="row"><div class="col-md-8 col-md-offset-2 login-page">
     <ul class="nav nav-tabs">
@@ -24,7 +24,9 @@
         </li>
     </ul>
     <div class="well">
-        <?=$this->form($this->form) ?>
+        <?=$this->partial('application/forms/login', [
+            'form' => $this->form
+        ])?>
     </div>
 
     <?php if ($this->errorMessage) { ?>

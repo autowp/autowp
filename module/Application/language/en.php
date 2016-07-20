@@ -318,7 +318,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'login/if-you-not-registered' => 'If you are not registered on the website, you can <a href="/registration">do it now</a>!',
     'login/sign-in-using-account' => 'Sign in using existing account',
     'login/login-or-password-is-incorrect' => 'Login or password is incorrect',
-    'login/user-%s-not-found' => 'User with login or e-mail "%s" not found',
+    'login/user-%value%-not-found' => 'User with login or e-mail "%value%" not found',
 
     'registration/if-you-registered' => 'If you are already registered, then you should not do it again, but only need to enter your username and password in the form on the right.',
 

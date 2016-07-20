@@ -98,7 +98,7 @@ class LayoutController extends Zend_Controller_Action
         $cache = $this->getInvokeArg('bootstrap')
             ->getResource('cachemanager')->getCache('long');
 
-        $key = 'CATEGORY_MENU_2_' . $language;
+        $key = 'CATEGORY_MENU_3_' . $language;
 
         if (!($categories = $cache->load($key))) {
 
@@ -174,14 +174,14 @@ class LayoutController extends Zend_Controller_Action
         $logedIn = $this->_helper->user()->logedIn();
 
 
-        $key = 'MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '4_' . $language;
+        $key = 'MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '5_' . $language;
         if (!($pages = $cache->load($key))) {
             $pages = $this->getMenuData(2, $logedIn, $language);
 
             $cache->save($pages, null, array(), 1800);
         }
 
-        $key = 'SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '10_' . $language;
+        $key = 'SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '11_' . $language;
         if (!($secondMenu = $cache->load($key))) {
             $secondMenu = $this->getMenuData(87, $logedIn, $language);
 

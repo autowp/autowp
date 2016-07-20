@@ -46,7 +46,7 @@ class Moder_PicturesController extends Zend_Controller_Action
         parent::preDispatch();
 
         if (!$this->_helper->user()->inheritsRole('moder') ) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
     }
 
@@ -409,7 +409,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     {
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if ($picture->type != Picture::CAR_TYPE_ID)
@@ -516,7 +516,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     {
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if ($picture->type != Picture::ENGINE_TYPE_ID)
@@ -524,7 +524,7 @@ class Moder_PicturesController extends Zend_Controller_Action
 
         $canMove = $this->_helper->user()->isAllowed('picture', 'move');
         if (!$canMove) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $this->view->picture = $picture;
@@ -619,7 +619,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     {
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if ($picture->type != Picture::FACTORY_TYPE_ID) {
@@ -628,7 +628,7 @@ class Moder_PicturesController extends Zend_Controller_Action
 
         $canMove = $this->_helper->user()->isAllowed('picture', 'move');
         if (!$canMove) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $this->view->picture = $picture;
@@ -667,7 +667,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     {
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if ($picture->type != Picture::CAR_TYPE_ID)
@@ -675,7 +675,7 @@ class Moder_PicturesController extends Zend_Controller_Action
 
         $canMove = $this->_helper->user()->isAllowed('picture', 'move');
         if (!$canMove) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $this->view->picture = $picture;
@@ -858,7 +858,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     {
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if (!in_array($picture->type, array(Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID, Picture::MIXED_TYPE_ID)))
@@ -866,7 +866,7 @@ class Moder_PicturesController extends Zend_Controller_Action
 
         $canMove = $this->_helper->user()->isAllowed('picture', 'move');
         if (!$canMove) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $this->view->picture = $picture;
@@ -955,7 +955,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     {
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $canDelete = $this->pictureCanDelete($picture);
@@ -1007,7 +1007,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     {
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $hideVote = (bool)$this->_getParam('hide-vote');
@@ -1197,7 +1197,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     {
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $prevPicture = $this->table->fetchRow(
@@ -1592,7 +1592,7 @@ class Moder_PicturesController extends Zend_Controller_Action
         $image = $imageStorage->getImage($picture->image_id);
 
         if (!$image) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $sourceUrl = $image->getSrc();
@@ -1678,17 +1678,17 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function restoreAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
 
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if (!$this->canRestore($picture)) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $user = $this->_helper->user()->get();
@@ -1714,16 +1714,16 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function flopAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if (!$this->canFlop($picture)) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         if ($picture->image_id) {
@@ -1746,23 +1746,27 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function normalizeAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if (!$this->canNormalize($picture)) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
-        throw new Exception("Deprecated");
-        $picture->normalize();
+        if ($picture->image_id) {
+            $imageStorage = $this->getInvokeArg('bootstrap')
+                ->getResource('imagestorage');
+        
+            $imageStorage->normalize($picture->image_id);
+        }
 
         $this->_helper->log(sprintf(
-            'К картинке %s применён автоконтраст',
+            'К картинке %s применён normalize',
             $this->view->htmlA($this->view->pic($picture)->url(), $picture->getCaption())
         ), $picture);
 
@@ -1774,12 +1778,12 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function filesRepairAction()
     {
         /*if (!$this->getRequest()->isPost()) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }*/
 
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if ($picture->image_id) {
@@ -1799,12 +1803,12 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function filesCorrectNamesAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $imageStorage = $this->getInvokeArg('bootstrap')
@@ -1823,7 +1827,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     {
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture || !$this->canCrop()) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $left = round($this->_getParam('x'));
@@ -1945,7 +1949,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     {
         $user = $this->_helper->user()->get();
         if (!$user) {
-            return $this->_forward('only-registered');
+            return $this->forward('only-registered');
         }
 
         $carTable = new Cars();
@@ -1953,7 +1957,7 @@ class Moder_PicturesController extends Zend_Controller_Action
 
         $car = $carTable->find($this->_getParam('car_id'))->current();
         if (!$car) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $rows = $carParentTable->fetchAll(
@@ -1974,7 +1978,7 @@ class Moder_PicturesController extends Zend_Controller_Action
         $brandTable = new Brands();
         $brand = $brandTable->find($this->_getParam('brand_id'))->current();
         if (!$brand) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $carTable = new Cars();
@@ -2033,25 +2037,25 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function cancelReplaceAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if (!$picture->replace_picture_id) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $replacePicture = $this->table->find($picture->replace_picture_id)->current();
         if (!$replacePicture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if (!$this->_helper->user()->isAllowed('picture', 'move')) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $picture->replace_picture_id = null;
@@ -2072,25 +2076,25 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function acceptReplaceAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $picture = $this->table->find($this->_getParam('picture_id'))->current();
         if (!$picture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if (!$picture->replace_picture_id) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         $replacePicture = $this->table->find($picture->replace_picture_id)->current();
         if (!$replacePicture) {
-            return $this->_forward('notfound', 'error', 'default');
+            return $this->forward('notfound', 'error', 'default');
         }
 
         if (!$this->canReplace($picture, $replacePicture)) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $user = $this->_helper->user()->get();
@@ -2225,7 +2229,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function acceptAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         foreach ($this->table->find($this->getParam('id')) as $picture) {
@@ -2238,7 +2242,7 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function voteAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->_forward('forbidden', 'error', 'default');
+            return $this->forward('forbidden', 'error', 'default');
         }
 
         $pictureRows = $this->table->find($this->_getParam('id'));

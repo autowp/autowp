@@ -9,7 +9,6 @@ use Zend\Permissions\Acl\Acl;
 use Zend_Acl_Resource_Interface;
 use Zend_Acl_Role_Interface;
 use Zend_Auth;
-use Zend_Registry;
 
 use Users;
 use Users_Row;
@@ -36,9 +35,15 @@ class User extends AbstractPlugin
      */
     private $user = null;
 
-    public function __construct(Acl $acl)
+    /**
+     * @var array
+     */
+    private $hosts = [];
+
+    public function __construct(Acl $acl, array $hosts)
     {
         $this->acl = $acl;
+        $this->hosts = $hosts;
     }
 
     /**
@@ -142,13 +147,23 @@ class User extends AbstractPlugin
 
     public function clearRememberCookie()
     {
-        $domain = Zend_Registry::get('cookie_domain');
+        $language = $this->getController()->language();
+
+        if (!isset($this->hosts[$language])) {
+            throw new Exception("Host `$language` not found");
+        }
+        $domain = $this->hosts[$language]['cookie'];
         setcookie('remember', '', time() - 3600*24*30, '/', $domain);
     }
 
     public function setRememberCookie($hash)
     {
-        $domain = Zend_Registry::get('cookie_domain');
+        $language = $this->getController()->language();
+
+        if (!isset($this->hosts[$language])) {
+            throw new Exception("Host `$language` not found");
+        }
+        $domain = $this->hosts[$language]['cookie'];
         setcookie('remember', $hash, time() + 3600*24*30, '/', $domain);
     }
 

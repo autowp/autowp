@@ -2,7 +2,14 @@
 
 namespace Application\Controller;
 
+use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Uri\Http as HttpUri;
+use Zend\View\Model\ViewModel;
+
+use Application\Service\UsersService;
+
+use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
 use Zend_Auth;
 use Zend_Db_Expr;
@@ -17,33 +24,64 @@ use Users;
 
 class LoginController extends AbstractActionController
 {
+    /**
+     * @var UsersService
+     */
+    private $service;
+
+    /**
+     * @var Form
+     */
+    private $form;
+
+    private $translator;
+
+    /**
+     * @var ExternalLoginServiceFactory
+     */
+    private $externalLoginFactory;
+
+    /**
+     * @var array
+     */
+    private $hosts = [];
+
+    public function __construct(UsersService $service, Form $form, $translator,
+            ExternalLoginServiceFactory $externalLoginFactory, array $hosts)
+    {
+        $this->service = $service;
+        $this->form = $form;
+        $this->translator = $translator;
+        $this->externalLoginFactory = $externalLoginFactory;
+        $this->hosts = $hosts;
+    }
+
     public function indexAction()
     {
         if ($this->user()->logedIn()) {
-            return $this->render('loginsuccess');
+            $viewModel = new ViewModel();
+            return $viewModel->setTemplate('application/login/loginsuccess');
         }
 
         $errorMessage = '';
 
-        $form = new \Application\Form\LoginForm(array(
-            'action' => $this->url()->fromRoute(),
-        ));
+        $this->form->setAttribute('action', $this->url()->fromRoute('login'));
 
         $request = $this->getRequest();
 
         if ($request->isPost()) {
-            if ($form->isValid($request->getPost())) {
-                $values = $form->getValues();
+            $this->form->setData($this->params()->fromPost());
+            if ($this->form->isValid()) {
+                $values = $this->form->getData();
 
-                $usersService = $this->getInvokeArg('bootstrap')->getResource('users');
-                $adapter = $usersService->getAuthAdapterLogin($values['login'], $values['password']);
+                $adapter = $this->service->getAuthAdapterLogin($values['login'], $values['password']);
 
                 $result = Zend_Auth::getInstance()->authenticate($adapter);
 
                 if ($result->isValid()) {
                     if ($values['remember']) {
 
-                        $token = $usersService->createRememberToken($this->user()->get()->id);
+                        $token = $this->service->createRememberToken($this->user()->get()->id);
 
                         $this->user()->setRememberCookie($token);
                     } else {
@@ -51,55 +89,56 @@ class LoginController extends AbstractActionController
                     }
 
                     if ($url = $request->getServer('REQUEST_URI')) {
-                        return $this->_redirect($url);
+                        return $this->redirect()->toUrl($url);
                     }
 
-                    return $this->render('loginsuccess');
+                    $viewModel = new ViewModel();
+                    return $viewModel->setTemplate('application/login/loginsuccess');
                 } else {
                     // Invalid credentials
-                    $errorMessage = $this->view->translate('login/login-or-password-is-incorrect');
+                    $errorMessage = $this->translator->translate('login/login-or-password-is-incorrect');
                 }
             }
         }
 
-        $services = array(
-            'facebook'    => array(
+        $services = [
+            'facebook'    => [
                 'name' => 'Facebook',
                 'icon' => 'fa-facebook'
-            ),
-            'vk'          => array(
+            ],
+            'vk'          => [
                 'name' => 'VK',
                 'icon' => 'fa-vk'
-            ),
-            'google-plus' => array(
+            ],
+            'google-plus' => [
                 'name' => 'Google+',
                 'icon' => 'fa-google-plus'
-            ),
-            'twitter'     => array(
+            ],
+            'twitter'     => [
                 'name' => 'Twitter',
                 'icon' => 'fa-twitter'
-            ),
-            'github'     => array(
+            ],
+            'github'     => [
                 'name' => 'Github',
                 'icon' => 'fa-github'
-            ),
-            'linkedin'     => array(
+            ],
+            'linkedin'     => [
                 'name' => 'LinkedIn',
                 'icon' => 'fa-linkedin'
-            ),
-        );
+            ],
+        ];
 
         foreach ($services as $serviceId => &$service) {
-            $service['url'] = $this->url()->fromRoute('login/start', array(
+            $service['url'] = $this->url()->fromRoute('login/start', [
                 'type' => $serviceId
-            ));
+            ]);
         }
         unset($service);
 
 
         return [
             'errorMessage' => $errorMessage,
-            'form'         => $form,
+            'form'         => $this->form,
             'services'     => $services
         ];
     }
@@ -108,21 +147,22 @@ class LoginController extends AbstractActionController
     {
         Zend_Auth::getInstance()->clearIdentity();
         $this->user()->clearRememberCookie();
-        $this->_helper->redirector('index');
+        return $this->redirect()->toUrl(
+            $this->url()->fromRoute('login')
+        );
     }
 
     /**
      * @param string $serviceId
      * @return Autowp_ExternalLoginService_Abstract
      */
-    private function _getExternalLoginService($serviceId)
+    private function getExternalLoginService($serviceId)
     {
         $serviceOptionsKey = $serviceId;
 
-        $factory = $this->getInvokeArg('bootstrap')->getResource('externalloginservice');
-        $service = $factory->getService($serviceId, $serviceOptionsKey, array(
+        $service = $this->externalLoginFactory->getService($serviceId, $serviceOptionsKey, [
             'redirect_uri' => 'http://en.wheelsage.org/login/callback'
-        ));
+        ]);
 
         if (!$service) {
             throw new Exception("Service `$serviceId` not found");
@@ -133,77 +173,72 @@ class LoginController extends AbstractActionController
     public function startAction()
     {
         if ($this->user()->logedIn()) {
-            return $this->_redirect($this->_helper->url->url(array(
-                'action' => 'index'
-            )));
+            return $this->redirect()->toUrl($this->url()->fromRoute('login'));
         }
 
-        $serviceId = trim($this->getParam('type'));
+        $serviceId = trim($this->params('type'));
 
-        $service = $this->_getExternalLoginService($serviceId);
+        $service = $this->getExternalLoginService($serviceId);
 
         $loginUrl = $service->getLoginUrl();
 
         $table = new LoginState();
-        $row = $table->createRow(array(
+        $row = $table->createRow([
             'state'    => $service->getState(),
             'time'     => new Zend_Db_Expr('now()'),
             'user_id'  => null,
-            'language' => $this->_helper->language(),
+            'language' => $this->language(),
             'service'  => $serviceId,
-            'url'      => $this->_helper->url->url(array(
-                'controller' => 'login',
-                'action'     => 'index'
-            ), 'default', true)
-        ));
+            'url'      => $this->url()->fromRoute('login')
+        ]);
 
         $row->save();
 
-        return $this->_redirect($loginUrl);
+        return $this->redirect()->toUrl($loginUrl);
     }
 
     public function callbackAction()
     {
         $table = new LoginState();
 
-        $state = (string)$this->getParam('state');
+        $state = (string)$this->params()->fromQuery('state');
         if (!$state) { // twitter workaround
-            $state = (string)$this->getParam('oauth_token');
+            $state = (string)$this->params()->fromQuery('oauth_token');
         }
 
-        $stateRow = $table->fetchRow(array(
+        $stateRow = $table->fetchRow([
             'state = ?' => $state
-        ));
+        ]);
 
         if (!$stateRow) {
-            return $this->_forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
-        $params = $this->getRequest()->getQuery();
+        $params = $this->params()->fromQuery();
 
-        if ($stateRow->language != $this->_helper->language()) {
+        if ($stateRow->language != $this->language()) {
 
-            $hosts = $this->getInvokeArg('bootstrap')->getOption('hosts');
-
-            if (!isset($hosts[$stateRow->language])) {
+            if (!isset($this->hosts[$stateRow->language])) {
                 throw new Exception("Host {$stateRow->language} not found");
             }
 
-            return $this->_redirect(
-                'http://' . $hosts[$stateRow->language]['hostname'] .
-                    $this->_helper->url->url() . '?' . http_build_query($params)
-            );
+            $url = $this->url()->fromRoute('login/callback', [], [
+                'force_canonical' => true,
+                'query'           => $params,
+                'uri'             => new HttpUri('http://' . $this->hosts[$stateRow->language]['hostname'])
+            ]);
+            return $this->redirect()->toUrl($url);
         }
 
-        $service = $this->_getExternalLoginService($stateRow->service);
+        $service = $this->getExternalLoginService($stateRow->service);
         $success = $service->callback($params);
         if (!$success) {
             throw new Exception("Error processing callback");
         }
 
-        $data = $service->getData(array(
+        $data = $service->getData([
             'language' => $stateRow->language
-        ));
+        ]);
 
         if (!$data) {
             throw new Exception("Error requesting data");
@@ -218,14 +253,12 @@ class LoginController extends AbstractActionController
 
         $uaTable = new User_Account();
 
-        $uaRow = $uaTable->fetchRow(array(
+        $uaRow = $uaTable->fetchRow([
             'service_id = ?'  => $stateRow->service,
             'external_id = ?' => $data->getExternalId(),
-        ));
+        ]);
 
         if (!$uaRow) {
-
-            $usersService = $this->getInvokeArg('bootstrap')->getResource('users');
 
             $uTable = new Users();
 
@@ -235,34 +268,32 @@ class LoginController extends AbstractActionController
                     throw new Exception("Account `{$stateRow->user_id}` not found");
                 }
             } else {
-                $uRow = $usersService->addUser(array(
+                $uRow = $this->service->addUser([
                     'email'    => null,
                     'password' => uniqid(),
                     'name'     => $data->getName(),
                     'ip'       => $this->getRequest()->getServer('REMOTE_ADDR')
-                ), $this->_helper->language());
+                ], $this->language());
             }
 
             if (!$uRow) {
-                return $this->_forward('notfound', 'error');
+                return $this->notFoundAction();
             }
 
             $uaRow = $uaTable->fetchNew();
-            $uaRow->setFromArray(array(
+            $uaRow->setFromArray([
                 'service_id'   => $stateRow->service,
                 'external_id'  => $data->getExternalId(),
                 'user_id'      => $uRow->id,
                 'used_for_reg' => $stateRow->user_id ? 0 : 1
-            ));
+            ]);
 
             if (!$stateRow->user_id) { // first login
                 if ($photoUrl = $data->getPhotoUrl()) {
                     $photo = file_get_contents($photoUrl);
 
                     if ($photo) {
-
-                        $imageStorage = $this->getInvokeArg('bootstrap')->getResource('imagestorage');
-                        $imageSampler = $imageStorage->getImageSampler();
+                        $imageSampler = $this->imageStorage()->getImageSampler();
 
                         $imagick = new Imagick();
                         if (!$imagick->readImageBlob($photo)) {
@@ -294,10 +325,10 @@ class LoginController extends AbstractActionController
 
         }
 
-        $uaRow->setFromArray(array(
+        $uaRow->setFromArray([
             'name' => $data->getName(),
             'link' => $data->getProfileUrl(),
-        ));
+        ]);
         $uaRow->save();
 
         $url = $stateRow->url;
@@ -308,7 +339,7 @@ class LoginController extends AbstractActionController
         $adapter->setIdentity($uRow->id);
         $authResult = Zend_Auth::getInstance()->authenticate($adapter);
         if ($authResult->isValid()) {
-            return $this->_redirect($url);
+            return $this->redirect()->toUrl($url);
         } else {
             // Invalid credentials
             throw new Exception('Error during login');

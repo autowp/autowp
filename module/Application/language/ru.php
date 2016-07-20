@@ -332,7 +332,7 @@ return [
     'login/if-you-not-registered' => 'Если вы ещё не зарегистрированы на сайте, то можете <a href="/registration">сделать это сейчас</a>',
     'login/sign-in-using-account' => 'Войти, используя учётную запись',
     'login/login-or-password-is-incorrect' => 'Логин или пароль неверен',
-    'login/user-%s-not-found' => 'Пользователь с именем или e-mail "%s" не найден',
+    'login/user-%value%-not-found' => 'Пользователь с именем или e-mail "%value%" не найден',
 
     'registration/if-you-registered' => 'Если вы уже зарегистрированы, то вам не следует делать этого снова, а нужно лишь ввести свой логин и пароль в форме справа.',
 

@@ -3,10 +3,9 @@
 namespace Application;
 
 use Zend\Permissions\Acl\Acl;
-
-
 use Zend\ServiceManager\Factory\InvokableFactory;
 
+use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 use Autowp\Image;
 use Autowp\TextStorage;
 
@@ -63,7 +62,15 @@ return [
                 return new Controller\InfoController($textStorage);
             },
             Controller\LogController::class          => InvokableFactory::class,
-            Controller\LoginController::class        => InvokableFactory::class,
+            Controller\LoginController::class => function($sm) {
+                $service = $sm->get(Service\UsersService::class);
+                $form = $sm->get('LoginForm');
+                $translator = $sm->get('translator');
+                $externalLoginFactory = $sm->get(ExternalLoginServiceFactory::class);
+                $config = $sm->get('Config');
+
+                return new Controller\LoginController($service, $form, $translator, $externalLoginFactory, $config['hosts']);
+            },
             Controller\MapController::class          => InvokableFactory::class,
             Controller\MostsController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
@@ -170,7 +177,8 @@ return [
             'oauth2' => Factory\OAuth2PluginFactory::class,
             'user' => function($sm) {
                 $acl = $sm->get(Acl::class);
-                return new Controller\Plugin\User($acl);
+                $config = $sm->get('Config');
+                return new Controller\Plugin\User($acl, $config['hosts']);
             },
             'language' => function($sm) {
                 $language = $sm->get(Language::class);
@@ -361,7 +369,11 @@ return [
 
                 return $transport;
             },
-            Acl::class => Permissions\AclFactory::class
+            Acl::class => Permissions\AclFactory::class,
+            ExternalLoginServiceFactory::class => function($sm) {
+                $config = $sm->get('Config');
+                return new ExternalLoginServiceFactory($config['externalloginservice']);
+            }
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
@@ -419,19 +431,22 @@ return [
             'hostname' => 'www.autowp.ru',
             'timezone' => 'Europe/Moscow',
             'name'     => 'Русский',
-            'flag'     => 'flag-RU'
+            'flag'     => 'flag-RU',
+            'cookie'   => '.autowp.ru'
         ],
         'en' => [
             'hostname' => 'en.wheelsage.org',
             'timezone' => 'Europe/London',
             'name'     => 'English (beta)',
-            'flag'     => 'flag-GB'
+            'flag'     => 'flag-GB',
+            'cookie'   => '.wheelsage.org'
         ],
         'fr' => [
             'hostname' => 'fr.wheelsage.org',
             'timezone' => 'Europe/Paris',
             'name'     => 'Français (beta)',
-            'flag'     => 'flag-FR'
+            'flag'     => 'flag-FR',
+            'cookie'   => '.wheelsage.org'
         ]
     ],
 
@@ -457,6 +472,7 @@ return [
             Validator\Brand\NameNotExists::class => InvokableFactory::class,
             Validator\User\EmailExists::class => InvokableFactory::class,
             Validator\User\EmailNotExists::class => InvokableFactory::class,
+            Validator\User\Login::class => InvokableFactory::class,
         ],
     ],
     'filters' => [
@@ -464,4 +480,32 @@ return [
             Filter\SingleSpaces::class => InvokableFactory::class
         ],
     ],
+
+    'externalloginservice' => [
+        'vk' => [
+            'clientId'     => '',
+            'clientSecret' => ''
+        ],
+        'google-plus' => [
+            'clientId'     => '',
+            'clientSecret' => ''
+        ],
+        'twitter' => [
+            'consumerKey'    => '',
+            'consumerSecret' => ''
+        ],
+        'facebook' => [
+            'clientId'     => '',
+            'clientSecret' => '',
+            'scope'        => ['public_profile', 'user_friends']
+        ],
+        'github' => [
+            'clientId'     => '',
+            'clientSecret' => ''
+        ],
+        'linkedin' => [
+            'clientId'     => '',
+            'clientSecret' => ''
+        ]
+    ]
 ];

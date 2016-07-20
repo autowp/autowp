@@ -20,7 +20,7 @@
 <?php } else { ?>
     <h3><?=$this->escapeHtml($this->translate('login/sign-in'))?></h3>
     <div class="well">
-        <form action="/login/" method="post" class="login"><div>
+        <form action="/login" method="post" class="login"><div>
             <p><input type="text" name="login" placeholder="<?=$this->escapeHtmlAttr($this->translate('login/login-or-email'))?>" class="form-control" /></p>
             <p><input type="password" name="password" placeholder="<?=$this->escapeHtmlAttr($this->translate('login/password'))?>" class="form-control" /></p>
             <div class="checkbox">

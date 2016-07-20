@@ -528,6 +528,24 @@ return [
                                 'action' => 'start',
                             ],
                         ]
+                    ],
+                    'callback' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/callback',
+                            'defaults' => [
+                                'action' => 'callback',
+                            ],
+                        ]
+                    ],
+                    'logout' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/logout',
+                            'defaults' => [
+                                'action' => 'logout',
+                            ],
+                        ]
                     ]
                 ]
             ],

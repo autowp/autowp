@@ -318,7 +318,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'login/if-you-not-registered' => 'Si vous n\'êtes pas enregistré sur le site, vous <a href="/registration">pouvez le faire maintenant</a>!',
     'login/sign-in-using-account' => 'Connectez-vous en utilisant un compte existant',
     'login/login-or-password-is-incorrect' => 'Login ou mot de passe est incorrect',
-    'login/user-%s-not-found' => 'Utilisateur avec login ou e-mail "%s" non trouvé',
+    'login/user-%value%-not-found' => 'Utilisateur avec login ou e-mail "%value%" non trouvé',
 
     'registration/if-you-registered' => 'Si vous êtes déjà enregistré, vous ne devriez pas le faire à nouveau, mais seulement besoin de saisir votre login et mot de passe dans le formulaire à droite.',
 
