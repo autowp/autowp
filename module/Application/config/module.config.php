@@ -78,6 +78,7 @@ return [
             },
             Controller\NewController::class          => InvokableFactory::class,
             Controller\MuseumsController::class      => InvokableFactory::class,
+            Controller\PictureController::class      => InvokableFactory::class,
             Controller\PictureFileController::class  => InvokableFactory::class,
             Controller\PulseController::class        => InvokableFactory::class,
             Controller\RegistrationController::class => function($sm) {

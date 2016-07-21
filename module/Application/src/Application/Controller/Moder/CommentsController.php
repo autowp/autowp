@@ -165,7 +165,8 @@ class CommentsController extends AbstractActionController
         return [
             'form'      => $this->form,
             'paginator' => $paginator,
-            'comments'  => $comments
+            'comments'  => $comments,
+            'urlParams' => $this->params()->fromRoute()
         ];
     }
 }

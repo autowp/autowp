@@ -3,26 +3,30 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
 
 use Application\Model\Brand;
+use Brands;
+use Picture;
+use Pictures_Row;
 
 class PictureController extends AbstractActionController
 {
-    private function _picture()
+    private function picture()
     {
-        $identity = (string)$this->_getParam('picture_id');
+        $identity = (string)$this->params('picture_id');
 
-        $pTable = $this->_helper->catalogue()->getPictureTable();
+        $pTable = $this->catalogue()->getPictureTable();
 
-        $picture = $pTable->fetchRow(array(
+        $picture = $pTable->fetchRow([
             'id = ?'    => $identity,
             'identity IS NULL'
-        ));
+        ]);
 
         if (!$picture) {
-            $picture = $pTable->fetchRow(array(
+            $picture = $pTable->fetchRow([
                 'identity = ?' => $identity
-            ));
+            ]);
         }
 
         return $picture;
@@ -30,31 +34,31 @@ class PictureController extends AbstractActionController
 
     public function previewAction()
     {
-        $picture = $this->_picture();
+        $picture = $this->picture();
 
         if (!$picture) {
-            return $this->_forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
-        $picturesData = $this->_helper->pic->listData(array($picture));
+        $picturesData = $this->pic()->listData([$picture]);
 
-        $this->view->assign(array(
+        return [
             'picturesData' => $picturesData,
-        ));
+        ];
     }
 
-    private function _getPicturesSelect(Pictures_Row $picture)
+    private function getPicturesSelect(Pictures_Row $picture)
     {
-        $pictureTable = $this->_helper->catalogue()->getPictureTable();
+        $pictureTable = $this->catalogue()->getPictureTable();
 
-        $galleryStatuses = array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW);
+        $galleryStatuses = [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW];
 
         if (in_array($picture->status, $galleryStatuses)) {
 
 
             $picSelect = $pictureTable->select(true)
                 ->where('pictures.status IN (?)', $galleryStatuses)
-                ->order($this->_helper->catalogue()->picturesOrdering());
+                ->order($this->catalogue()->picturesOrdering());
 
             $galleryEnabled = false;
             switch ($picture->type)
@@ -115,49 +119,47 @@ class PictureController extends AbstractActionController
 
     public function indexAction()
     {
-        if ($this->_getParam('preview')) {
-            return $this->_forward('preview');
+        if ($this->params('preview')) {
+            return $this->previewAction();
         }
 
-        if ($this->_getParam('gallery')) {
-            return $this->_forward('gallery');
+        if ($this->params('gallery')) {
+            return $this->galleryAction();
         }
 
-        $picture = $this->_picture();
+        $picture = $this->picture();
 
         if (!$picture) {
-            return $this->_forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         $brandTable = new Brands();
         $brandModel = new Brand();
 
-        $url = $this->_helper->pic->href($picture->toArray(), array(
+        $url = $this->pic()->href($picture->toArray(), [
             'fallback' => false
-        ));
+        ]);
 
         if ($url) {
-            return $this->redirect($url, array(
-                'code' => 301
-            ));
+            return $this->redirect()->toUrl($url);
         }
 
-        $isModer = $this->_helper->user()->inheritsRole('moder');
+        $isModer = $this->user()->inheritsRole('moder');
 
         if ($picture->status == Picture::STATUS_REMOVING) {
-            $user = $this->_helper->user()->get();
+            $user = $this->user()->get();
             if (!$user) {
-                return $this->_forward('notfound', 'error');
+                return $this->notFoundAction();
             }
 
             if ($isModer || ($user->id == $picture->owner_id)) {
-                $this->getResponse()->setHttpResponseCode(404);
+                $this->getResponse()->setStatusCode(404);
             } else {
                 return $this->notFoundAction();
             }
         }
 
-        $picSelect = $this->_getPicturesSelect($picture);
+        $picSelect = $this->getPicturesSelect($picture);
 
         $brands = [];
         $car = null;
@@ -166,9 +168,9 @@ class PictureController extends AbstractActionController
         switch ($picture->type) {
             case Picture::ENGINE_TYPE_ID:
                 if ($engine = $picture->findParentEngines()) {
-                    $cataloguePaths = $this->_helper->catalogue()->engineCataloguePaths($engine, array(
+                    $cataloguePaths = $this->catalogue()->engineCataloguePaths($engine, [
                         'limit' => 1
-                    ));
+                    ]);
 
                     foreach ($cataloguePaths as $cataloguePath) {
                         $brandId = $brandModel->getBrandIdByCatname($cataloguePath['brand_catname']);
@@ -199,7 +201,7 @@ class PictureController extends AbstractActionController
                 break;
             case Picture::CAR_TYPE_ID:
                 if ($car = $picture->findParentCars()) {
-                    $language = $this->_helper->language();
+                    $language = $this->language();
                     $brandList = $brandModel->getList($language, function($select) use ($car) {
                         $select
                             ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
@@ -215,38 +217,45 @@ class PictureController extends AbstractActionController
                 break;
         }
 
-        $this->_helper->actionStack('brands', 'sidebar', 'default', array(
+        /*$this->_helper->actionStack('brands', 'sidebar', 'default', [
             'brand_id'   => $brands,
             'car_id'     => $car ? $car->id : null,
             'type'       => (int)$picture->type,
             'is_engines' => $isEngines
-        ));
+        ]);*/
 
-        $data = $this->_helper->pic->picPageData($picture, $picSelect, $brands);
+        $data = $this->pic()->picPageData($picture, $picSelect, $brands, [
+            'paginator' => [
+                'route'     => 'picture/picture',
+                'urlParams' => []
+            ]
+        ]);
 
-        $this->view->assign($data);
-
-        $this->view->assign(array(
-            'galleryUrl' => $this->_helper->url->url(array(
-                'gallery' => '1'
-            ))
-        ));
+        return array_replace($data, [
+            'galleryUrl' => $this->url()->fromRoute('picture/picture', [
+                'picture_id' => $picture->identity ? $picture->identity : $picture->id
+            ], [
+                'query' => [
+                    'gallery' => '1'
+                ]
+            ])
+        ]);
     }
 
     public function galleryAction()
     {
-        $picture = $this->_picture();
+        $picture = $this->picture();
 
         if (!$picture) {
-            return $this->_forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
-        $isModer = $this->_helper->user()->inheritsRole('moder');
+        $isModer = $this->user()->inheritsRole('moder');
 
         if ($picture->status == Picture::STATUS_REMOVING) {
-            $user = $this->_helper->user()->get();
+            $user = $this->user()->get();
             if (!$user) {
-                return $this->_forward('notfound', 'error');
+                return $this->notFoundAction();
             }
 
             if ($isModer || ($user->id == $picture->owner_id)) {
@@ -256,8 +265,8 @@ class PictureController extends AbstractActionController
             }
         }
 
-        $select = $this->_getPicturesSelect($picture);
+        $select = $this->getPicturesSelect($picture);
 
-        return $this->_helper->json($this->_helper->pic->gallery($select));
+        return new JsonModel($this->pic()->gallery($select));
     }
 }

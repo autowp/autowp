@@ -613,6 +613,27 @@ return [
                     ]
                 ]
             ],
+            'picture' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/picture',
+                    'defaults' => [
+                        'controller' => Controller\PictureController::class,
+                    ],
+                ],
+                'may_terminate' => false,
+                'child_routes'  => [
+                    'picture' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route'    => '/[:picture_id]',
+                            'defaults' => [
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+                ]
+            ],
             'pulse' => [
                 'type' => Literal::class,
                 'options' => [
@@ -1313,16 +1334,6 @@ return [
                             ]
                         ]
                     ]
-                ]
-            ],
-            'picture' => [
-                'type' => Segment::class,
-                'options' => [
-                    'route' => '/picture/:picture_id'
-                ],
-                'defaults' => [
-                    'controller' => Controller\PictureController::class,
-                    'action'     => 'index',
                 ]
             ]
         ]

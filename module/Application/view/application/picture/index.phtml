@@ -1,0 +1,14 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ],
+        'pageId' => 18,
+        'args'   => [
+            'PICTURE_NAME' => $this->pic()->textTitle($this->name),
+        ]
+    ]);
+?>
+<?=$this->render('application/picture/picture')?>

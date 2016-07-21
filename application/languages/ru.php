@@ -278,7 +278,7 @@ return array (
     /* comments */
     'comments/title' => 'Комментарии',
     'comments/reply' => 'ответить',
-    'comments/what-to-do-for-write-comments' => 'Чтобы иметь возможность оставлять комментарии, необходимо <a href="/login/">зарегистрироваться или войти на сайт с помощью учётной записи в одной из социальных сетей</a>',
+    'comments/what-to-do-for-write-comments' => 'Чтобы иметь возможность оставлять комментарии, необходимо <a href="/login">зарегистрироваться или войти на сайт с помощью учётной записи в одной из социальных сетей</a>',
     'comments/it-requires-attention-of-moderators' => 'Требуется внимание модераторов',
     'comments/form-title' => 'Добавить комментарий',
     'comments/message' => 'Сообщение',

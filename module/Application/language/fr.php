@@ -267,7 +267,7 @@ return [
     /* comments */
     'comments/title' => 'Commentaires',
     'comments/reply' => 'répondre',
-    'comments/what-to-do-for-write-comments' => 'Pour pouvoir poster un commentaire, vous devez <a href="/login/">créer un compte ou de vous connecter en utilisant le compte des réseaux sociaux</a>',
+    'comments/what-to-do-for-write-comments' => 'Pour pouvoir poster un commentaire, vous devez <a href="/login">créer un compte ou de vous connecter en utilisant le compte des réseaux sociaux</a>',
     'comments/it-requires-attention-of-moderators' => 'Il nécessite une attention des modérateurs',
     'comments/form-title' => 'Ajouter un commentaire',
     'comments/message' => 'Message',
