@@ -707,6 +707,16 @@ return [
                     ],
                 ],
             ],
+            'telegram-webhook' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/telegram/webhook/token/:token',
+                    'defaults' => [
+                        'controller' => Controller\TelegramController::class,
+                        'action'     => 'webhook',
+                    ],
+                ],
+            ],
             'twins' => [
                 'type' => Literal::class,
                 'options' => [

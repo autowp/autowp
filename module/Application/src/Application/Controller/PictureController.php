@@ -4,9 +4,9 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand;
-use Brands;
 use Picture;
 use Pictures_Row;
 
@@ -41,10 +41,12 @@ class PictureController extends AbstractActionController
         }
 
         $picturesData = $this->pic()->listData([$picture]);
-
-        return [
+        $viewModel = new ViewModel([
             'picturesData' => $picturesData,
-        ];
+        ]);
+        $viewModel->setTerminal(true);
+
+        return $viewModel;
     }
 
     private function getPicturesSelect(Pictures_Row $picture)
@@ -61,8 +63,7 @@ class PictureController extends AbstractActionController
                 ->order($this->catalogue()->picturesOrdering());
 
             $galleryEnabled = false;
-            switch ($picture->type)
-            {
+            switch ($picture->type) {
                 case Picture::CAR_TYPE_ID:
                     if ($picture->car_id) {
                         $galleryEnabled = true;
@@ -119,12 +120,18 @@ class PictureController extends AbstractActionController
 
     public function indexAction()
     {
-        if ($this->params('preview')) {
-            return $this->previewAction();
+        if ($this->params()->fromQuery('preview')) {
+            return $this->forward()->dispatch(self::class, [
+                'action'     => 'preview',
+                'picture_id' => $this->params('picture_id')
+            ]);
         }
 
         if ($this->params('gallery')) {
-            return $this->galleryAction();
+            return $this->forward()->dispatch(self::class, [
+                'action'     => 'gallery',
+                'picture_id' => $this->params('picture_id')
+            ]);
         }
 
         $picture = $this->picture();
@@ -133,7 +140,6 @@ class PictureController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandTable = new Brands();
         $brandModel = new Brand();
 
         $url = $this->pic()->href($picture->toArray(), [
@@ -152,11 +158,11 @@ class PictureController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            if ($isModer || ($user->id == $picture->owner_id)) {
-                $this->getResponse()->setStatusCode(404);
-            } else {
+            if (!$isModer && ($user->id != $picture->owner_id)) {
                 return $this->notFoundAction();
             }
+
+            $this->getResponse()->setStatusCode(404);
         }
 
         $picSelect = $this->getPicturesSelect($picture);
@@ -258,9 +264,7 @@ class PictureController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            if ($isModer || ($user->id == $picture->owner_id)) {
-                //$this->getResponse()->setHttpResponseCode(404);
-            } else {
+            if (!$isModer && ($user->id != $picture->owner_id)) {
                 return $this->notFoundAction();
             }
         }

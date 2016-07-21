@@ -94,6 +94,10 @@ return [
                 return new Controller\RestorePasswordController($service, $restoreForm, $newPasswordForm, $transport);
             },
             Controller\RulesController::class        => InvokableFactory::class,
+            Controller\TelegramController::class => function($sm) {
+                $service = $sm->get(Service\TelegramService::class);
+                return new Controller\TelegramController($service);
+            },
             Controller\TwinsController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
                 $cache = $sm->get('longCache');

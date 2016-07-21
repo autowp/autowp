@@ -26,7 +26,7 @@ class Pic extends AbstractHtmlElement
         if ($this->picture) {
             $identity = $this->picture->identity ? $this->picture->identity : $this->picture->id;
 
-            return $this->view->url('picture', [
+            return $this->view->url('picture/picture', [
                 'picture_id' => $identity
             ]);
         }
