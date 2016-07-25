@@ -48,7 +48,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <?php if ($this->user()->logedIn()) { ?>
                     <li<?=$this->pageEnv()->isOnPath(49) ? ' class="active"' : ''?>>
-                        <?=$this->htmlA('/account/pm/', '<i class="fa fa-comment"></i>' . ($this->pm ? ' <span class="badge">'.$this->pm.'</span>' : ''), false)?>
+                        <?=$this->htmlA('/account/pm', '<i class="fa fa-comment"></i>' . ($this->pm ? ' <span class="badge">'.$this->pm.'</span>' : ''), false)?>
                     </li>
                 <?php } else { ?>
                     <li<?=$this->page(79)->onPath ? ' class="active"' : ''?>>
@@ -108,8 +108,8 @@
                         <?php foreach ($this->languages as $item) { ?>
                             <?php
                                 $this->headLink([
-                                    'rel'      => 'alternate', 
-                                    'href'     => $item['url'], 
+                                    'rel'      => 'alternate',
+                                    'href'     => $item['url'],
                                     'hreflang' => $item['language']
                                 ]);
                             ?>

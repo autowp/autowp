@@ -1,0 +1,26 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ],
+        'pageId' => 49,
+    ]);
+
+    $this->layout()->moduleName = 'default/account/pm';
+?>
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <?=$this->partial('application/account/partial/personal-messages', [
+            'messages' => $this->messages
+        ])?>
+        <?=$this->paginationControl($this->paginator, null, null, [
+            'route'     => 'account/personal-messages/user/page',
+            'urlParams' => $this->urlParams
+        ]) ?>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <?=$this->partial('application/account/sidebar', $this->sidebar)?>
+    </div>
+</div>

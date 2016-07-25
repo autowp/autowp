@@ -1,0 +1,39 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 129,
+    ));
+?>
+
+<h2><?=$this->escape($this->translate('account/profile/personal'))?></h2>
+<div class="well">
+    <?=$this->form->render($this) ?>
+</div>
+
+<h2><?=$this->escape($this->translate('account/profile/photo'))?></h2>
+<div class="well">
+    <p><?=$this->translate('account/profile/use-gravatar')?></p>
+    <?php if ($this->user()->get()->img) { ?>
+        <?=$this->img($this->user()->get()->img) ?>
+        <form action="<?=$this->escape($this->url(array(
+            'form' => 'reset-photo'
+         )))?>" method="post">
+            <button type="submit" class="btn btn-danger">
+                <i class="fa fa-times"></i>
+                <?=$this->escape($this->translate('account/profile/photo/delete'))?>
+            </button>
+        </form>
+    <?php } ?>
+    <?=$this->formPhoto->render($this) ?>
+</div>
+
+<h2><?=$this->escape($this->translate('account/profile/other'))?></h2>
+<div class="well">
+    <p><?=$this->escape($this->translate('account/profile/votes-per-day'))?>: <?=$this->user()->get()->votes_per_day?></p>
+    <p><?=$this->escape($this->translate('account/profile/votes-left'))?>: <?=$this->user()->get()->votes_left?></p>
+    <?=$this->settingsForm->render($this)?>
+</div>

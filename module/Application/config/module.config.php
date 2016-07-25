@@ -24,6 +24,9 @@ return [
                 $acl = $sm->get(Acl::class);
                 return new Controller\AboutController($acl);
             },
+            Controller\AccountController::class => function($sm) {
+                return new Controller\AccountController();
+            },
             Controller\ArticlesController::class     => InvokableFactory::class,
             Controller\BanController::class          => InvokableFactory::class,
             Controller\BrandsController::class => function($sm) {

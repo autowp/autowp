@@ -1,112 +1,94 @@
 <?php
-    $items = array(
-        array(
+    $items = [
+        [
             'active' => $this->page(129)->onPath,
-            'url'    => $this->url(array(
-                'action' => 'profile',
-            )),
+            'url'    => $this->url('account/profile'),
             'icon'   => 'user',
             'name'   => $this->page(129)->name,
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(198)->onPath,
-            'url'    => $this->url(array(
-                'action' => 'contacts',
-            )),
+            'url'    => $this->url('account/contacts'),
             'icon'   => 'users',
             'name'   => $this->page(198)->name,
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(55)->onPath,
-            'url'    => $this->url(array(
-                'action' => 'email'
-            )),
+            'url'    => $this->url('account/email'),
             'icon'   => 'envelope-o',
             'name'   => $this->page(55)->name,
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(133)->onPath,
-            'url'    => $this->url(array(
-                'action' => 'access'
-            )),
+            'url'    => $this->url('account/access'),
             'icon'   => 'lock',
             'name'   => $this->page(133)->name,
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(123)->onPath,
-            'url'    => $this->url(array(
-                'action' => 'accounts'
-            )),
+            'url'    => $this->url('account/accounts'),
             'icon'   => 'asterisk',
             'name'   => $this->page(123)->name,
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(130)->onPath,
-            'url'    => $this->url(array(
-                'action'   => 'pictures',
-                'user_id'  => $this->user()->get()->id,
-                'identity' => $this->user()->get()->identity
-            ), 'users'),
+            'url'    => $this->url('users/user/pictures', [
+                'user_id'  => $this->user()->get()->identity ? $this->user()->get()->identity : 'user' . $this->user()->get()->id
+            ]),
             'icon'   => 'th',
             'name'   => $this->page(130)->name,
             'count'    => $this->picsCount,
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(94)->onPath,
-            'url'    => $this->url(array(
-                'action' => 'not-taken-pictures'
-            )),
+            'url'    => $this->url('account/not-taken-pictures'),
             'icon'   => 'th',
             'name'   => $this->page(94)->name,
             'count'    => $this->notTakenPicturesCount,
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(57)->onPath,
             'url'    => '/forums/subscribes',
             'icon'   => 'bookmark',
             'name'   => $this->page(57)->name,
             'count'    => $this->subscribesCount,
-        ),
-        array(
+        ],
+        [
             'name'   => $this->translate('catalogue/specifications'),
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(188)->onPath,
-            'url'    => $this->url(array(
-                'controller' => 'account',
-                'action'     => 'specs-conflicts'
-            ), 'account', true),
+            'url'    => $this->url('account/specs-conflicts'),
             'icon'   => 'exclamation-triangle',
             'name'   => $this->page(188)->name
-        ),
-        array(
+        ],
+        [
             'name'   => $this->page(49)->name,
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(128)->onPath,
-            'url'    => '/account/pm',
+            'url'    => $this->url('account/personal-messages'),
             'icon'   => 'comments-o',
             'name'   => $this->page(128)->name,
             'count'    => $this->pmCount,
             'newCount' => $this->newPmCount
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(80)->onPath,
-            'url'    => '/account/pm/sent',
+            'url'    => $this->url('account/personal-messages/sent'),
             'icon'   => 'comments-o',
             'name'   => $this->page(80)->name,
             'count'    => $this->omCount,
-        ),
-        array(
+        ],
+        [
             'active' => $this->page(81)->onPath,
-            'url'    => '/account/pm/system',
+            'url'    => $this->url('account/personal-messages/system'),
             'icon'   => 'comments',
             'name'   => $this->page(81)->name,
             'count'    => $this->smCount,
             'newCount' => $this->newSmCount
-        ),
-
-    );
+        ],
+    ];
 ?>
 <div class="well">
     <ul class="nav nav-pills nav-stacked">
@@ -114,7 +96,7 @@
             <?php
                 $badge = '';
                 if (isset($item['count'])) {
-                    $classes = array('badge', 'pull-right');
+                    $classes = ['badge', 'pull-right'];
                     if ($item['count'] == 0) {
                         $text = $this->translate('count 0');
                     } else {
@@ -139,11 +121,11 @@
                 <?php if (isset($item['url'])) { ?>
                     <?=$this->htmlA(
                         $item['url'],
-                        $badge . $icon . $this->escape($item['name']),
+                        $badge . $icon . $this->escapeHtml($item['name']),
                         false
                     )?>
                 <?php } else { ?>
-                    <?=$badge . $icon . $this->escape($item['name'])?>
+                    <?=$badge . $icon . $this->escapeHtml($item['name'])?>
                 <?php } ?>
             </li>
         <?php } ?>

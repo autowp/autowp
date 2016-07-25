@@ -48,11 +48,11 @@
             <ul class="nav navbar-nav navbar-right">
                 <?php if ($this->user()->logedIn()) { ?>
                     <li<?=$this->pageEnv()->isOnPath(49) ? ' class="active"' : ''?>>
-                        <?=$this->htmlA('/account/pm/', '<i class="fa fa-comment"></i>' . ($this->pm ? ' <span class="badge">'.$this->pm.'</span>' : ''), false)?>
+                        <?=$this->htmlA('/account/pm', '<i class="fa fa-comment"></i>' . ($this->pm ? ' <span class="badge">'.$this->pm.'</span>' : ''), false)?>
                     </li>
                 <?php } else { ?>
                     <li<?=$this->page(79)->onPath ? ' class="active"' : ''?>>
-                        <?=$this->htmlA('/login/', '<i class="fa fa-sign-in"></i> ' . $this->escape($this->translate('login/sign-in')), false)?>
+                        <?=$this->htmlA('/login', '<i class="fa fa-sign-in"></i> ' . $this->escape($this->translate('login/sign-in')), false)?>
                     </li>
                 <?php } ?>
                 <li class="dropdown">

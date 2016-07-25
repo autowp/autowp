@@ -39,6 +39,181 @@ return [
                     ],
                 ],
             ],
+            'account' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/account',
+                    'defaults' => [
+                        'controller' => Controller\AccountController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes'  => [
+                    'access' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/access',
+                            'defaults' => [
+                                'action' => 'access',
+                            ],
+                        ],
+                    ],
+                    'accounts' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/accounts',
+                            'defaults' => [
+                                'action' => 'accounts',
+                            ],
+                        ],
+                    ],
+                    'clear-sent-messages' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/clear-sent-messages',
+                            'defaults' => [
+                                'action' => 'clear-sent-messages',
+                            ],
+                        ],
+                    ],
+                    'clear-system-messages' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/clear-system-messages',
+                            'defaults' => [
+                                'action' => 'clear-system-messages',
+                            ],
+                        ],
+                    ],
+                    'contacts' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/contacts',
+                            'defaults' => [
+                                'action' => 'contacts',
+                            ],
+                        ],
+                    ],
+                    'email' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/email',
+                            'defaults' => [
+                                'action' => 'email',
+                            ],
+                        ],
+                    ],
+                    'not-taken-pictures' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/not-taken-pictures',
+                            'defaults' => [
+                                'action' => 'not-taken-pictures',
+                            ],
+                        ],
+                    ],
+                    'personal-messages' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/pm',
+                            'defaults' => [
+                                'action' => 'personal-messages-inbox',
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'page' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route'    => '/page:page'
+                                ]
+                            ],
+                            'sent' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/sent',
+                                    'defaults' => [
+                                        'action' => 'personal-messages-sent',
+                                    ],
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'page' => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route'    => '/page:page'
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'system' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route'    => '/system',
+                                    'defaults' => [
+                                        'action' => 'personal-messages-system',
+                                    ],
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'page' => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route'    => '/page:page'
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            'user' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route'    => '/user:user_id',
+                                    'defaults' => [
+                                        'action' => 'personal-messages-user',
+                                    ]
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'page' => [
+                                        'type' => Segment::class,
+                                        'options' => [
+                                            'route'    => '/page:page'
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'pictures' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/pictures',
+                            'defaults' => [
+                                'action' => 'pictures',
+                            ],
+                        ],
+                    ],
+                    'profile' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/profile',
+                            'defaults' => [
+                                'action' => 'profile',
+                            ],
+                        ],
+                    ],
+                    'specs-conflicts' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/specs-conflicts',
+                            'defaults' => [
+                                'action' => 'specs-conflicts',
+                            ],
+                        ],
+                    ],
+                ]
+            ],
             'articles' => [
                 'type' => \Application\Router\Http\Articles::class,
                 'options' => [

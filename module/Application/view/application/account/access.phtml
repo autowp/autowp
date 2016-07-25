@@ -1,0 +1,18 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 133,
+    ));
+?>
+<h2>Изменить пароль</h2>
+<div class="well">
+    <?=$this->formPassword->render($this) ?>
+</div>
+
+<p><?=$this->htmlA($this->url(array(
+    'action' => 'delete'
+)), '<i class="fa fa-times"></i> Удалить учётную запись', false)?></p>

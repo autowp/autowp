@@ -1,0 +1,40 @@
+<?php
+    $this->pageEnv(array(
+        'layout' => array(
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ),
+        'pageId' => 198,
+    ));
+    
+    $cols = 2;
+    $rows = ceil(count($this->users) / $cols);
+?>
+
+<div class="row">
+	<?php for ($i=0; $i<$cols; $i++) { ?>
+		<div class="col-md-6">
+			<ul class="media-list">
+    			<?php foreach (array_slice($this->users, $i*$rows, $rows) as $user) { ?>
+                	<li class="media">
+                		<div class="media-left media-middle">
+                    		<?php if (!$user->deleted) { ?>
+                                <?=$this->htmlA(array(
+                                    'href'  => $user->getAboutUrl(),
+                                    'class' => 'photo'
+                                ), $this->user($user)->avatar(), false) ?>
+                            <?php } ?>
+                        </div>
+                        <div class="media-body">
+                			<h4 class="media-heading"><?=$this->user($user)?></h4>
+                			<?php if ($lastOnline = $user->getDateTime('last_online')) { ?>
+                				<p><?=$this->escape($this->humanTime($lastOnline))?></p>
+                			<?php } ?>
+                		</div>
+                	</li>
+        		<?php } ?>
+    		</ul>
+    	</div>
+	<?php } ?>
+</div>

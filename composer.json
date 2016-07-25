@@ -70,7 +70,8 @@
             "application/forms/",
             "application/services/",
             "library/Project/Form/Element/",
-            "library/Project/Telegram"
+            "library/Project/Telegram",
+            "module/Application/src/Application/Paginator/Adapter/"
         ]
     },
     "require-dev": {

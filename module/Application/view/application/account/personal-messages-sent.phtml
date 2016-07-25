@@ -1,0 +1,31 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => false,
+            'needRight' => false
+        ],
+        'pageId' => 80,
+    ]);
+
+    $this->layout()->moduleName = 'default/account/pm';
+?>
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <?php if ($this->paginator->count()) { ?>
+            <form action="<?=$this->escapeHtmlAttr($this->url('account/clear-sent-messages'))?>" method="post">
+                <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('account/personal-message/delete-all-sent'))?>" class="btn btn-danger" />
+            </form>
+        <?php } ?>
+        <?=$this->partial('application/account/partial/personal-messages', [
+            'messages' => $this->messages
+        ])?>
+        <?=$this->paginationControl($this->paginator, null, null, [
+            'route'     => 'account/personal-messages/sent/page',
+            'urlParams' => []
+        ]) ?>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <?=$this->partial('application/account/sidebar', $this->sidebar)?>
+    </div>
+</div>

@@ -1,100 +1,128 @@
 <?php
 
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+
+use Application\Controller\LoginController;
 use Application\Model\Forums;
 use Application\Model\Message;
 
-class AccountController extends Zend_Controller_Action
+use Application_Service_Specifications;
+use Cars;
+use Engines;
+use LoginState;
+use Picture;
+use Project_Auth_Adapter_Id;
+use User_Account;
+use User_Renames;
+use Users;
+
+use Zend_Auth;
+use Zend_Db_Expr;
+use Zend_Locale;
+
+use Exception;
+use Imagick;
+
+class AccountController extends AbstractActionController
 {
+    private function forwadToLogin()
+    {
+        return $this->forward()->dispatch(LoginController::class, [
+            'action' => 'index'
+        ]);
+    }
+
     public function sidebar()
     {
         $mModel = new Message();
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
-        $this->view->assign([
-            'smCount'    => $mModel->getSystemCount($user->id),
-            'newSmCount' => $mModel->getNewSystemCount($user->id),
-            'pmCount'    => $mModel->getInboxCount($user->id),
-            'newPmCount' => $mModel->getInboxNewCount($user->id),
-            'omCount'    => $mModel->getSentCount($user->id)
-        ]);
-
-        $pictures = $this->_helper->catalogue()->getPictureTable();
+        $pictures = $this->catalogue()->getPictureTable();
 
         $db = $pictures->getAdapter();
 
-        $this->view->picsCount = $db->fetchOne(
+        $picsCount = $db->fetchOne(
             $db->select()
-                 ->from('pictures', array(new Zend_Db_Expr('COUNT(1)')))
+                 ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
                  ->where('owner_id=?', $user->id)
-                 ->where('status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+                 ->where('status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
         );
 
-        $this->view->subscribesCount = $db->fetchOne(
+        $subscribesCount = $db->fetchOne(
             $db->select()
                  ->from('forums_topics', new Zend_Db_Expr('COUNT(*)'))
                  ->join('forums_topics_subscribers', 'forums_topics.id=forums_topics_subscribers.topic_id', null)
                  ->where('forums_topics_subscribers.user_id = ?', $user->id)
-                 ->where('forums_topics.status IN (?)', array(Forums::STATUS_CLOSED, Forums::STATUS_NORMAL))
+                 ->where('forums_topics.status IN (?)', [Forums::STATUS_CLOSED, Forums::STATUS_NORMAL])
         );
 
-
-
-        $this->view->notTakenPicturesCount = $pictures->getAdapter()->fetchOne(
+        $notTakenPicturesCount = $pictures->getAdapter()->fetchOne(
             $pictures->select()
                 ->from($pictures, new Zend_Db_Expr('COUNT(1)'))
                 ->where('owner_id = ?', $user->id)
-                ->where('status IN (?)', array(Picture::STATUS_NEW, Picture::STATUS_INBOX))
+                ->where('status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_INBOX])
         );
 
-        $this->getResponse()->insert('sidebar', $this->view->render('account/sidebar.phtml'));
+        return [
+            'smCount'    => $mModel->getSystemCount($user->id),
+            'newSmCount' => $mModel->getNewSystemCount($user->id),
+            'pmCount'    => $mModel->getInboxCount($user->id),
+            'newPmCount' => $mModel->getInboxNewCount($user->id),
+            'omCount'    => $mModel->getSentCount($user->id),
+            'notTakenPicturesCount' => $notTakenPicturesCount,
+            'subscribesCount'       => $subscribesCount,
+            'picsCount'             => $picsCount
+        ];
     }
 
     public function sendPersonalMessageAction()
     {
-        $currentUser = $this->_helper->user()->get();
+        $currentUser = $this->user()->get();
         if (!$currentUser) {
-            return $this->forward('index', 'login');
+            return $this->forwadToLogin();
         }
 
         $users = new Users();
 
-        $user = $users->find($this->getParam('user_id'))->current();
+        $user = $users->find($this->params('user_id'))->current();
         if (!$user) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
-        $message = $this->getParam('message');
+        $message = $this->params('message');
 
         $mModel = new Message();
         $mModel->send($currentUser->id, $user->id, $message);
 
-        return $this->_helper->json(array(
+        return $this->_helper->json([
             'ok'      => true,
             'message' => 'Сообщение отправлено'
-        ));
+        ]);
     }
 
     public function deletePersonalMessageAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
         $mModel = new Message();
-        $mModel->delete($user->id, $this->getParam('id'));
+        $mModel->delete($user->id, $this->params('id'));
 
-        return $this->_helper->json(array(
+        return $this->_helper->json([
             'ok' => true
-        ));
+        ]);
     }
 
     public function addAccountFailedAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
         $this->sidebar();
@@ -107,9 +135,9 @@ class AccountController extends Zend_Controller_Action
     private function getExternalLoginService($serviceId)
     {
         $factory = $this->getInvokeArg('bootstrap')->getResource('externalloginservice');
-        $service = $factory->getService($serviceId, $serviceId, array(
+        $service = $factory->getService($serviceId, $serviceId, [
             'redirect_uri' => 'http://en.wheelsage.org/login/callback'
-        ));
+        ]);
 
         if (!$service) {
             throw new Exception("Service `$serviceId` not found");
@@ -119,45 +147,45 @@ class AccountController extends Zend_Controller_Action
 
     public function accountsAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
         $this->sidebar();
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
         $uaTable = new User_Account();
 
-        $uaRows = $uaTable->fetchAll(array(
+        $uaRows = $uaTable->fetchAll([
             'user_id = ?' => $user->id
-        ));
+        ]);
 
-        $accounts = array();
+        $accounts = [];
         foreach ($uaRows as $uaRow) {
-            $accounts[] = array(
+            $accounts[] = [
                 'name'      => $uaRow->name,
                 'link'      => $uaRow->link,
                 'icon'      => 'fa fa-' . $uaRow->service_id,
                 'canRemove' => $this->canRemoveAccount($uaRow->service_id),
-                'removeUrl' => $this->_helper->url->url(array(
+                'removeUrl' => $this->_helper->url->url([
                     'action'  => 'remove-account',
                     'service' => $uaRow->service_id
-                ))
-            );
+                ])
+            ];
         }
 
-        $addAccountForm = new Application_Form_Account_AddAccount(array(
+        $addAccountForm = new Application_Form_Account_AddAccount([
             'action'           => $this->_helper->url->url(),
-            'typeMultioptions' => array(
+            'typeMultioptions' => [
                 'facebook'    => 'Facebook',
                 'vk'          => 'VK',
                 'google-plus' => 'Google+',
                 'twitter'     => 'Twitter',
                 'github'      => 'Github',
                 'linkedin'    => 'Linkedin'
-            )
-        ));
+            ]
+        ]);
 
         $request = $this->getRequest();
 
@@ -171,44 +199,44 @@ class AccountController extends Zend_Controller_Action
             //print $loginUrl; exit;
 
             $table = new LoginState();
-            $row = $table->createRow(array(
+            $row = $table->createRow([
                 'state'    => $service->getState(),
                 'time'     => new Zend_Db_Expr('now()'),
                 'user_id'  => $user->id,
-                'language' => $this->_helper->language(),
+                'language' => $this->language(),
                 'service'  => $serviceId,
-                'url'      => $this->_helper->url->url(array(
+                'url'      => $this->_helper->url->url([
                     'controller' => 'account',
                     'action'     => 'accounts'
-                ), 'account', true)
-            ));
+                ], 'account', true)
+            ]);
 
             $row->save();
 
-            return $this->redirect($loginUrl);
+            return $this->redirect()->toUrl($loginUrl);
         }
 
-        $this->view->assign(array(
+        return [
             'accounts'       => $accounts,
             'addAccountForm' => $addAccountForm
-        ));
+        ];
     }
 
     private function canRemoveAccount($serviceId)
     {
-        if (!$this->_helper->user()->logedIn()) {
+        if (!$this->user()->logedIn()) {
             return false;
         }
 
-        if ($this->_helper->user()->get()->e_mail) {
+        if ($this->user()->get()->e_mail) {
             return true;
         }
 
         $uaTable = new User_Account();
-        $uaRow = $uaTable->fetchRow(array(
-            'user_id = ?'     => $this->_helper->user()->get()->id,
+        $uaRow = $uaTable->fetchRow([
+            'user_id = ?'     => $this->user()->get()->id,
             'service_id <> ?' => $serviceId
-        ));
+        ]);
 
         if ($uaRow) {
             return true;
@@ -219,34 +247,33 @@ class AccountController extends Zend_Controller_Action
 
     public function removeAccountAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
-        $serviceId = (string)$this->_getParam('service');
+        $serviceId = (string)$this->params('service');
 
         $uaTable = new User_Account();
-        $uaRow = $uaTable->fetchRow(array(
-            'user_id = ?'    => $this->_helper->user()->get()->id,
+        $uaRow = $uaTable->fetchRow([
+            'user_id = ?'    => $this->user()->get()->id,
             'service_id = ?' => $serviceId
-        ));
+        ]);
 
         if (!$uaRow) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         if (!$this->canRemoveAccount($serviceId)) {
-            return $this->forward('remove-account-failed');
+            return $this->forward()->dispatch(self::class, [
+                'action' => 'remove-account-failed'
+            ]);
         }
 
         $uaRow->delete();
 
         $this->_helper->flashMessenger->addMessage('Учётная запись удалена');
 
-        return $this->redirect($this->_helper->url->url(array(
-            'action'     => 'accounts',
-            'service_id' => null
-        )));
+        return $this->redirect()->toRoute('account/accounts');
     }
 
     public function removeAccountFailedAction()
@@ -256,79 +283,73 @@ class AccountController extends Zend_Controller_Action
 
     public function profileAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
         $this->sidebar();
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
         $request = $this->getRequest();
 
-        $form = new Application_Form_Account_Profile(array(
-            'action' => $this->_helper->url->url(array(
+        $formProfile = new Application_Form_Account_Profile([
+            'action' => $this->_helper->url->url([
                 'form' => 'profile'
-            ))
-        ));
-        $form->populate($user->toArray());
-        if ($request->isPost() && $this->_getParam('form') == 'profile' && $form->isValid($request->getPost())) {
-            $values = $form->getValues();
+            ])
+        ]);
+        $formProfile->populate($user->toArray());
+        if ($request->isPost() && $this->params('form') == 'profile' && $formProfile->isValid($request->getPost())) {
+            $values = $formProfile->getValues();
 
             $old_name = $user->getCompoundName();
 
-            $user->setFromArray(array(
+            $user->setFromArray([
                 'name' => $values['name']
-            ))->save();
+            ])->save();
 
             $new_name = $user->getCompoundName();
 
             if ($old_name != $new_name) {
                 $user_renames = new User_Renames();
-                $user_renames->insert(array(
+                $user_renames->insert([
                     'user_id'  => $user->id,
                     'old_name' => $old_name,
                     'new_name' => $new_name,
                     'date'     => new Zend_Db_Expr('NOW()')
-                ));
+                ]);
             }
 
             $this->_helper->flashMessenger->addMessage('Данные сохранены');
 
-            return $this->redirect($this->_helper->url->url(array()));
+            return $this->redirect()->toRoute();
         }
 
-        $this->view->form = $form;
-
-
-        if ($request->isPost() && $this->_getParam('form') == 'reset-photo') {
+        if ($request->isPost() && $this->params('form') == 'reset-photo') {
 
             $oldImageId = $user->img;
             if ($oldImageId) {
                 $user->img = null;
                 $user->save();
-                $imageStorage = $this->getInvokeArg('bootstrap')->getResource('imagestorage');
-                $imageStorage->removeImage($oldImageId);
+                $this->imageStorage()->removeImage($oldImageId);
             }
 
             $this->_helper->flashMessenger->addMessage('Фотография удалена');
 
-            return $this->redirect($this->_helper->url->url(array(
-                'form' => null
-            )));
+            return $this->redirect()->toRoute();
         }
 
-        $form = new Application_Form_Account_Photo(array(
-            'action' => $this->_helper->url->url(array(
+        $formPhoto = new Application_Form_Account_Photo([
+            'action' => $this->_helper->url->url([
                 'form' => 'photo'
-            ))
-        ));
-        if ($request->isPost() && $this->_getParam('form') == 'photo' && $form->isValid($request->getPost())) {
+            ])
+        ]);
+        if ($request->isPost() && $this->params('form') == 'photo' && $formPhoto->isValid($request->getPost())) {
 
-            $form->photo->receive();
-            $filepath = $form->photo->getFileName();
+            $formPhoto->photo->receive();
+            $filepath = $formPhoto->photo->getFileName();
 
-            $imageStorage = $this->getInvokeArg('bootstrap')->getResource('imagestorage');
+            $imageStorage = $this->imageStorage();
             $imageSampler = $imageStorage->getImageSampler();
 
             $imagick = new Imagick();
@@ -351,12 +372,10 @@ class AccountController extends Zend_Controller_Action
 
             $this->_helper->flashMessenger->addMessage('Фотография сохранена');
 
-            return $this->redirect($this->_helper->url->url(array()));
+            return $this->redirect()->toRoute();
         }
 
-        $this->view->formPhoto = $form;
-
-        $language = $this->_helper->language();
+        $language = $this->language();
         $list = Zend_Locale::getTranslationList("timezonetowindows", $language);
         $list = array_values($list);
         $list[] = 'UTC';
@@ -378,9 +397,9 @@ class AccountController extends Zend_Controller_Action
         $settingsForm = new Application_Form_Account_Settings([
             'timezoneList' => $list,
             'languages'    => $languages,
-            'action' => $this->_helper->url->url(array(
+            'action' => $this->_helper->url->url([
                 'form' => 'settings'
-            ))
+            ])
         ]);
 
         $settingsForm->populate([
@@ -388,7 +407,7 @@ class AccountController extends Zend_Controller_Action
             'language' => $user->language
         ]);
 
-        if ($request->isPost() && $this->_getParam('form') == 'settings' && $settingsForm->isValid($request->getPost())) {
+        if ($request->isPost() && $this->params('form') == 'settings' && $settingsForm->isValid($request->getPost())) {
 
             $values = $settingsForm->getValues();
 
@@ -396,57 +415,61 @@ class AccountController extends Zend_Controller_Action
             $user->language = $values['language'];
             $user->save();
 
-            return $this->redirect($this->_helper->url->url());
+            return $this->redirect()->toRoute();
         }
 
-        $this->view->assign(array(
-            'settingsForm' => $settingsForm
-        ));
+        return [
+            'settingsForm' => $settingsForm,
+            'formProfile'  => $formProfile,
+            'formPhoto'    => $formPhoto,
+        ];
     }
 
     public function emailAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
         $this->sidebar();
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
         $request = $this->getRequest();
 
-        $form = new Application_Form_Account_Email(array(
+        $form = new Application_Form_Account_Email([
             'action' => $this->_helper->url->url()
-        ));
-        $form->populate(array(
+        ]);
+        $form->populate([
             'e_mail' => $user->e_mail
-        ));
+        ]);
         if ($request->isPost() && $form->isValid($request->getPost())) {
             $values = $form->getValues();
 
             $usersService = $this->getInvokeArg('bootstrap')->getResource('users');
-            $usersService->changeEmailStart($user, $values['e_mail'], $this->_helper->language());
+            $usersService->changeEmailStart($user, $values['e_mail'], $this->language());
 
             $this->_helper->flashMessenger->addMessage($this->view->translate('users/change-email/confirmation-message-sent'));
 
-            return $this->redirect($this->_helper->url->url(array()));
+            return $this->redirect()->toRoute();
         }
 
-        $this->view->form = $form;
+        return [
+            'form' => $form
+        ];
     }
 
     public function emailcheckAction()
     {
         $usersService = $this->getInvokeArg('bootstrap')->getResource('users');
 
-        $code = $this->getParam('email_check_code');
+        $code = $this->params('email_check_code');
         $user = $usersService->emailChangeFinish($code);
 
         $template = 'emailcheck-fail';
 
         if ($user) {
-            if (!$this->_helper->user()->logedIn()) {
+            if (!$this->user()->logedIn()) {
                 $adapter = new Project_Auth_Adapter_Id();
                 $adapter->setIdentity($user->id);
                 $result = Zend_Auth::getInstance()->authenticate($adapter);
@@ -459,69 +482,183 @@ class AccountController extends Zend_Controller_Action
             $template = 'emailcheck-ok';
         }
 
-        if ($this->_helper->user()->logedIn()) {
+        if ($this->user()->logedIn()) {
             $this->sidebar();
         }
 
         return $this->render($template);
     }
 
+    private function preparePersonalMessages($messages)
+    {
+        //TODO: remove
+        return $messages;
+    }
+
+    public function personalMessagesInboxAction()
+    {
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
+        }
+
+        $user = $this->user()->get();
+
+        $mModel = new Message();
+        $inbox = $mModel->getInbox($user->id, $this->params('page'));
+
+        return [
+            'paginator' => $inbox['paginator'],
+            'messages'  => $this->preparePersonalMessages($inbox['messages']),
+            'sidebar'   => $this->sidebar()
+        ];
+    }
+
+
+    public function personalMessagesSentAction()
+    {
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
+        }
+
+        $user = $this->user()->get();
+
+        $mModel = new Message();
+        $sentbox = $mModel->getSentbox($user->id, $this->params('page'));
+
+        return [
+            'paginator' => $sentbox['paginator'],
+            'messages'  => $this->preparePersonalMessages($sentbox['messages']),
+            'sidebar'   => $this->sidebar()
+        ];
+    }
+
+    public function personalMessagesSystemAction()
+    {
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
+        }
+
+        $user = $this->user()->get();
+
+        $mModel = new Message();
+        $systembox = $mModel->getSystembox($user->id, $this->params('page'));
+
+        return [
+            'paginator' => $systembox['paginator'],
+            'messages'  => $this->preparePersonalMessages($systembox['messages']),
+            'sidebar'   => $this->sidebar()
+        ];
+    }
+
+    public function personalMessagesUserAction()
+    {
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
+        }
+
+        $users = new Users();
+
+        $user = $users->find($this->params('user_id'))->current();
+        if (!$user) {
+            return $this->notFoundAction();
+        }
+
+        $logedInUser = $this->user()->get();
+
+        $mModel = new Message();
+        $dialogbox = $mModel->getDialogbox($logedInUser->id, $user->id, $this->params('page'));
+
+        return [
+            'paginator' => $dialogbox['paginator'],
+            'messages'  => $this->preparePersonalMessages($dialogbox['messages']),
+            'sidebar'   => $this->sidebar(),
+            'urlParams' => [
+                'user_id' => $user->id
+            ]
+        ];
+    }
+
     public function notTakenPicturesAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
         $this->sidebar();
 
-        $pictures = $this->_helper->catalogue()->getPictureTable();
+        $pictures = $this->catalogue()->getPictureTable();
 
         $select = $pictures->select(true)
-            ->where('owner_id = ?', $this->_helper->user()->get()->id)
-            ->where('status IN (?)', array(Picture::STATUS_NEW, Picture::STATUS_INBOX))
-            ->order(array('add_date DESC'));
+            ->where('owner_id = ?', $this->user()->get()->id)
+            ->where('status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_INBOX])
+            ->order(['add_date DESC']);
 
         $paginator = Zend_Paginator::factory($select)
             ->setItemCountPerPage(16)
-            ->setCurrentPageNumber($this->_getParam('page'));
+            ->setCurrentPageNumber($this->params('page'));
 
         $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
-        $picturesData = $this->_helper->pic->listData($select, array(
+        $picturesData = $this->pic()->listData($select, [
             'width' => 4
-        ));
+        ]);
 
-        $this->view->assign(array(
+        return [
             'paginator'    => $paginator,
             'picturesData' => $picturesData,
-        ));
+        ];
+    }
+
+
+    public function clearSystemMessagesAction()
+    {
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
+        }
+
+        $mModel = new Message();
+        $mModel->deleteAllSystem($this->user()->get()->id);
+
+        return $this->redirect()->toRoute('account/personal-messages-system');
+    }
+
+    public function clearSentMessagesAction()
+    {
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
+        }
+
+        $mModel = new Message();
+        $mModel->deleteAllSent($this->user()->get()->id);
+
+        return $this->redirect()->toRoute('account/personal-messages-sent');
     }
 
     public function accessAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
         $this->sidebar();
 
-        $form = new Application_Form_Account_Password(array(
-            'action' => $this->_helper->url->url(array()),
-        ));
+        $form = new Application_Form_Account_Password([
+            'action' => $this->_helper->url->url([]),
+        ]);
 
         $request = $this->getRequest();
 
         if ($request->isPost() && $form->isValid($request->getPost())) {
             $values = $form->getValues();
 
-            $user = $this->_helper->user()->get();
+            $user = $this->user()->get();
 
             $uTable = new Users();
 
-            $uRow = $uTable->fetchRow(array(
+            $uRow = $uTable->fetchRow([
                 'id = ?'                                  => $user->id,
                 'password = ' . Users::passwordHashExpr() => $values['password_old']
-            ));
+            ]);
 
             if (!$uRow) {
 
@@ -536,31 +673,31 @@ class AccountController extends Zend_Controller_Action
 
                 $this->_helper->flashMessenger->addMessage('Пароль успешно изменён');
 
-                return $this->redirect($this->_helper->url->url(array(
-                    'form' => null
-                )));
+                return $this->redirect()->toRoute('account/access');
             }
         }
 
-        $this->view->formPassword = $form;
+        return [
+            'formPassword' => $form
+        ];
     }
 
     public function deleteAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
         $request = $this->getRequest();
 
-        $form = new Application_Form_Account_Delete(array(
-            'action' => $this->_helper->url->url(array()),
-        ));
+        $form = new Application_Form_Account_Delete([
+            'action' => $this->_helper->url->url([]),
+        ]);
 
         if ($request->isPost() && $form->isValid($request->getPost())) {
             $values = $form->getValues();
 
-            $user = $this->_helper->user()->get();
+            $user = $this->user()->get();
 
             $usersService = $this->getInvokeArg('bootstrap')->getResource('users');
 
@@ -576,28 +713,30 @@ class AccountController extends Zend_Controller_Action
                 $user->save();
 
                 Zend_Auth::getInstance()->clearIdentity();
-                $this->_helper->user()->clearRememberCookie();
+                $this->user()->clearRememberCookie();
 
                 return $this->render('deleted');
             }
         }
 
         $this->sidebar();
-        $this->view->form = $form;
+        return [
+            'form' => $form
+        ];
     }
 
     public function specsConflictsAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
         $service = new Application_Service_Specifications();
 
-        $filter = $this->getParam('conflict');
-        $page = (int)$this->getParam('page');
+        $filter = $this->params('conflict');
+        $page = (int)$this->params('page');
 
-        $userId = $this->_helper->user()->get()->id;
+        $userId = $this->user()->get()->id;
 
         $data = $service->getConflicts($userId, $filter, $page, 50);
         $conflicts = $data['conflicts'];
@@ -618,46 +757,46 @@ class AccountController extends Zend_Controller_Action
                 case Application_Service_Specifications::ITEM_TYPE_CAR:
                     $car = $carTable->find($conflict['itemId'])->current();
                     $conflict['object'] = $car ? $car->getFullName($language) : null;
-                    $conflict['url'] = $this->_helper->url->url(array(
+                    $conflict['url'] = $this->_helper->url->url([
                         'controller' => 'cars',
                         'action'     => 'car-specifications-editor',
                         'car_id'     => $conflict['itemId'],
                         'tab'        => 'spec'
-                    ), 'default', true);
+                    ], 'default', true);
                     break;
                 case Application_Service_Specifications::ITEM_TYPE_ENGINE:
                     $engine = $engineTable->find($conflict['itemId'])->current();
                     $conflict['object'] = $engine ? 'Двигатель ' . $engine->caption : null;
-                    $conflict['url'] = $this->_helper->url->url(array(
+                    $conflict['url'] = $this->_helper->url->url([
                         'controller' => 'cars',
                         'action'     => 'engine-spec-editor',
                         'engine_id'  => $conflict['itemId'],
                         'tab'        => 'engine'
-                    ), 'default', true);
+                    ], 'default', true);
                     break;
             }
         }
         unset($conflict);
 
-        $this->view->assign(array(
+        $this->sidebar();
+
+        return [
             'filter'    => (string)$filter,
             'conflicts' => $conflicts,
             'paginator' => $paginator,
-            'weight'    => $this->_helper->user()->get()->specs_weight
-        ));
-
-        $this->sidebar();
+            'weight'    => $this->user()->get()->specs_weight
+        ];
     }
 
     public function contactsAction()
     {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
+        if (!$this->user()->logedIn()) {
+            return $this->forwadToLogin();
         }
 
         $this->sidebar();
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
         $userTable = new Users();
 
@@ -672,8 +811,8 @@ class AccountController extends Zend_Controller_Action
             $users[] = $row;
         }
 
-        $this->view->assign(array(
+        return [
             'users' => $users
-        ));
+        ];
     }
 }

@@ -21,9 +21,9 @@ class CatalogueController extends Zend_Controller_Action
             return $this->forward('notfound', 'error');
         }
 
-        $this->view->assign(array(
+        $this->view->assign([
             'brand' => $brand
-        ));
+        ]);
 
         $callback($brand);
     }
@@ -73,9 +73,9 @@ class CatalogueController extends Zend_Controller_Action
         $select = $this->_helper->catalogue()->getPictureTable()->select(true);
 
         if ($onlyAccepted) {
-            $select->where('pictures.status IN (?)', array(
+            $select->where('pictures.status IN (?)', [
                 Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
-            ));
+            ]);
         }
 
         return $select;
@@ -108,11 +108,11 @@ class CatalogueController extends Zend_Controller_Action
     private function getCarShortName($brand, $carName)
     {
         $shortCaption = $carName;
-        $patterns = array(
+        $patterns = [
             preg_quote($brand['name'].'-', '|') => '',
             preg_quote($brand['name'], '|') => '',
             '[[:space:]]+' => ' '
-        );
+        ];
         foreach ($patterns as $pattern => $replacement) {
             $shortCaption = preg_replace('|'.$pattern.'|isu', $replacement, $shortCaption);
         }
@@ -134,11 +134,11 @@ class CatalogueController extends Zend_Controller_Action
                 /*->join('brands_pictures_cache', 'pictures.id=brands_pictures_cache.picture_id', null)
                 ->where('brands_pictures_cache.brand_id = ?', $brand['id'])*/
                 ->group('pictures.id')
-                ->order(array(
+                ->order([
                     'pictures.accept_datetime DESC',
                     'pictures.add_date DESC',
                     'pictures.id DESC'
-                ));
+                ]);
 
             $paginator = $this->picturesPaginator($select, $this->getParam('page'));
 
@@ -148,18 +148,18 @@ class CatalogueController extends Zend_Controller_Action
 
             $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
-            $picturesData = $this->_helper->pic->listData($select, array(
+            $picturesData = $this->_helper->pic->listData($select, [
                 'width' => 4
-            ));
+            ]);
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'paginator'    => $paginator,
                 'picturesData' => $picturesData,
-            ));
+            ]);
 
-            $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+            $this->_helper->actionStack('brand', 'sidebar', 'default', [
                 'brand_id' => $brand['id'],
-            ));
+            ]);
         });
     }
 
@@ -186,14 +186,14 @@ class CatalogueController extends Zend_Controller_Action
 
             $specService = new Application_Service_Specifications();
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'paginator' => $paginator,
-                'listData'  => $this->_helper->car->listData($paginator->getCurrentItems(), array(
+                'listData'  => $this->_helper->car->listData($paginator->getCurrentItems(), [
                     'detailsUrl' => function($listCar) use ($brand, $carParentTable) {
 
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], array(
+                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
                             'breakOnFirst' => true
-                        ));
+                        ]);
 
                         if (count($paths) <= 0) {
                             return false;
@@ -201,20 +201,20 @@ class CatalogueController extends Zend_Controller_Action
 
                         $path = $paths[0];
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path']
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     },
                     'allPicturesUrl' => function($listCar) use ($brand, $carParentTable) {
 
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], array(
+                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
                             'breakOnFirst' => true
-                        ));
+                        ]);
 
                         if (count($paths) <= 0) {
                             return false;
@@ -222,7 +222,7 @@ class CatalogueController extends Zend_Controller_Action
 
                         $path = $paths[0];
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-pictures',
@@ -230,7 +230,7 @@ class CatalogueController extends Zend_Controller_Action
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
                             'exact'         => false
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     },
                     'specificationsUrl' => function($listCar) use ($brand, $carParentTable, $specService) {
 
@@ -240,9 +240,9 @@ class CatalogueController extends Zend_Controller_Action
                             return false;
                         }
 
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], array(
+                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
                             'breakOnFirst' => true
-                        ));
+                        ]);
 
                         if (count($paths) <= 0) {
                             return false;
@@ -250,20 +250,20 @@ class CatalogueController extends Zend_Controller_Action
 
                         $path = $paths[0];
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-specifications',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     },
                     'pictureUrl' => function($listCar, $picture) use ($brand, $carParentTable) {
 
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], array(
+                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
                             'breakOnFirst' => true
-                        ));
+                        ]);
 
                         if (count($paths) <= 0) {
                             return $this->_helper->pic->url($picture['id'], $picture['identity']);
@@ -271,7 +271,7 @@ class CatalogueController extends Zend_Controller_Action
 
                         $path = $paths[0];
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-picture',
@@ -279,15 +279,15 @@ class CatalogueController extends Zend_Controller_Action
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
                             'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     }
-                ))
-            ));
+                ])
+            ]);
 
-            $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+            $this->_helper->actionStack('brand', 'sidebar', 'default', [
                 'brand_id'    => $brand['id'],
                 'is_concepts' => true
-            ));
+            ]);
         });
     }
 
@@ -301,7 +301,7 @@ class CatalogueController extends Zend_Controller_Action
             if ($this->getParam('cartype_catname')) {
                 $cartype = $carTypeTable->fetchRow(
                     $carTypeTable->select()
-                        ->from($carTypeTable, array('id', 'name', 'catname'))
+                        ->from($carTypeTable, ['id', 'name', 'catname'])
                         ->where('catname = ?', $this->getParam('cartype_catname'))
                 );
 
@@ -312,10 +312,10 @@ class CatalogueController extends Zend_Controller_Action
 
             $carTypeAdapter = $carTypeTable->getAdapter();
             $select = $carTypeAdapter->select()
-                ->from($carTypeTable->info('name'), array(
+                ->from($carTypeTable->info('name'), [
                     'id',
                     'cars_count' => new Zend_db_Expr('COUNT(1)')
-                ))
+                ])
                 ->join('cars', 'car_types.id = cars.car_type_id', null)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
@@ -325,19 +325,19 @@ class CatalogueController extends Zend_Controller_Action
                 ->group('car_types.id')
                 ->order('car_types.position');
 
-            $list = array();
+            $list = [];
             foreach ($carTypeAdapter->fetchAll($select) as $row) {
                 $carType = $carTypeTable->find($row['id'])->current();
                 if ($carType) {
-                    $list[] = array(
+                    $list[] = [
                         'id'        => $carType->id,
                         'name'      => $carType->name,
                         'carsCount' => $row['cars_count'],
-                        'url'       => $this->_helper->url->url(array(
+                        'url'       => $this->_helper->url->url([
                             'cartype_catname' => $carType->catname,
                             'page'            => 1
-                        ), 'catalogue')
-                    );
+                        ], 'catalogue')
+                    ];
                 }
             }
 
@@ -367,16 +367,16 @@ class CatalogueController extends Zend_Controller_Action
 
             $specService = new Application_Service_Specifications();
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'cartypes'  => $list,
                 'cartype'   => $cartype,
                 'paginator' => $paginator,
-                'listData'  => $this->_helper->car->listData($paginator->getCurrentItems(), array(
+                'listData'  => $this->_helper->car->listData($paginator->getCurrentItems(), [
                     'detailsUrl' => function($listCar) use ($brand, $carParentTable) {
 
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], array(
+                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
                             'breakOnFirst' => true
-                        ));
+                        ]);
 
                         if (count($paths) <= 0) {
                             return false;
@@ -384,20 +384,20 @@ class CatalogueController extends Zend_Controller_Action
 
                         $path = $paths[0];
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path']
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     },
                     'allPicturesUrl' => function($listCar) use ($brand, $carParentTable) {
 
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], array(
+                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
                             'breakOnFirst' => true
-                        ));
+                        ]);
 
                         if (count($paths) <= 0) {
                             return false;
@@ -405,7 +405,7 @@ class CatalogueController extends Zend_Controller_Action
 
                         $path = $paths[0];
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-pictures',
@@ -413,7 +413,7 @@ class CatalogueController extends Zend_Controller_Action
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
                             'exact'         => false
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     },
                     'specificationsUrl' => function($listCar) use ($brand, $specService, $carParentTable) {
 
@@ -423,9 +423,9 @@ class CatalogueController extends Zend_Controller_Action
                             return false;
                         }
 
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], array(
+                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
                             'breakOnFirst' => true
-                        ));
+                        ]);
 
                         if (count($paths) <= 0) {
                             return false;
@@ -433,20 +433,20 @@ class CatalogueController extends Zend_Controller_Action
 
                         $path = $paths[0];
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-specifications',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     },
                     'pictureUrl' => function($listCar, $picture) use ($brand, $carParentTable) {
 
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], array(
+                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
                             'breakOnFirst' => true
-                        ));
+                        ]);
 
                         if (count($paths) <= 0) {
                             return $this->_helper->pic->url($picture['id'], $picture['identity']);
@@ -454,7 +454,7 @@ class CatalogueController extends Zend_Controller_Action
 
                         $path = $paths[0];
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-picture',
@@ -462,14 +462,14 @@ class CatalogueController extends Zend_Controller_Action
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
                             'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     }
-                ))
-            ));
+                ])
+            ]);
 
-            $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+            $this->_helper->actionStack('brand', 'sidebar', 'default', [
                 'brand_id' => $brand['id']
-            ));
+            ]);
         });
     }
 
@@ -499,7 +499,7 @@ class CatalogueController extends Zend_Controller_Action
         );
 
         // prefetch
-        $requests = array();
+        $requests = [];
         foreach ($rows as $idx => $picture) {
             $requests[$idx] = Pictures_Row::buildFormatRequest($picture);
         }
@@ -545,13 +545,13 @@ class CatalogueController extends Zend_Controller_Action
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                     ->where('brands_cars.brand_id = ?', $brand['id'])
-                    ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->group('pictures.id')
                     ->limit(12);
 
                 $carParentTable = new Car_Parent();
 
-                $topPictures = $this->_helper->pic->listData($select, array(
+                $topPictures = $this->_helper->pic->listData($select, [
                     'width' => 4,
                     'url'   => function($picture) use ($carParentTable, $brand) {
 
@@ -559,9 +559,9 @@ class CatalogueController extends Zend_Controller_Action
                             return $this->_helper->pic->url($picture['id'], $picture['identity']);
                         }
 
-                        $paths = $carParentTable->getPathsToBrand($picture['car_id'], $brand['id'], array(
+                        $paths = $carParentTable->getPathsToBrand($picture['car_id'], $brand['id'], [
                             'breakOnFirst' => true
-                        ));
+                        ]);
 
                         if (count($paths) <= 0) {
                             return $this->_helper->pic->url($picture['id'], $picture['identity']);
@@ -569,7 +569,7 @@ class CatalogueController extends Zend_Controller_Action
 
                         $path = $paths[0];
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-picture',
@@ -577,19 +577,19 @@ class CatalogueController extends Zend_Controller_Action
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
                             'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     }
-                ));
+                ]);
 
-                $cache->save($topPictures, $key, array(), 60 * 10);
+                $cache->save($topPictures, $key, [], 60 * 10);
             }
 
-            $types = array(
-                'official' => array(),
-                'helper'   => array(),
-                'club'     => array(),
-                'default'  => array()
-            );
+            $types = [
+                'official' => [],
+                'helper'   => [],
+                'club'     => [],
+                'default'  => []
+            ];
 
             $links = new BrandLink();
             foreach ($types as $key => &$type) {
@@ -625,18 +625,18 @@ class CatalogueController extends Zend_Controller_Action
 
 
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'topPictures' => $topPictures,
                 'link_types'  => $types,
                 'haveTwins'   => $haveTwins,
                 'mostsActive' => $this->mostsActive($brand['id']),
                 'description' => $description,
                 'factories'   => $this->getBrandFactories($brand['id'])
-            ));
+            ]);
 
-            $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+            $this->_helper->actionStack('brand', 'sidebar', 'default', [
                 'brand_id' => $brand['id']
-            ));
+            ]);
         });
     }
 
@@ -666,26 +666,26 @@ class CatalogueController extends Zend_Controller_Action
 
             $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
-            $picturesData = $this->_helper->pic->listData($select, array(
+            $picturesData = $this->_helper->pic->listData($select, [
                 'width' => 4,
                 'url'   => function($row) {
-                    return $this->_helper->url->url(array(
+                    return $this->_helper->url->url([
                         'action'     => $this->getParam('action') . '-picture',
                         'picture_id' => $row['identity'] ? $row['identity'] : $row['id']
-                    ));
+                    ]);
                 }
-            ));
+            ]);
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'brand'        => $brand,
                 'paginator'    => $paginator,
                 'picturesData' => $picturesData
-            ));
+            ]);
 
-            $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+            $this->_helper->actionStack('brand', 'sidebar', 'default', [
                 'brand_id' => $brand['id'],
                 'type'     => $type
-            ));
+            ]);
 
         });
     }
@@ -713,7 +713,7 @@ class CatalogueController extends Zend_Controller_Action
 
             $this->_pictureAction($select, function($select, $picture) use ($brand, $type) {
 
-                $this->view->assign(array(
+                $this->view->assign([
                     'picture'     => array_replace(
                         $this->_helper->pic->picPageData($picture, $select),
                         [
@@ -724,12 +724,12 @@ class CatalogueController extends Zend_Controller_Action
                             ])
                         ]
                     )
-                ));
+                ]);
 
-                $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+                $this->_helper->actionStack('brand', 'sidebar', 'default', [
                     'brand_id' => $brand['id'],
                     'type'     => $type
-                ));
+                ]);
 
             });
 
@@ -769,13 +769,13 @@ class CatalogueController extends Zend_Controller_Action
                     break;
             }
 
-            return $this->_helper->json($this->_helper->pic->gallery2($select, array(
+            return $this->_helper->json($this->_helper->pic->gallery2($select, [
                 'page'      => $this->getParam('page'),
                 'pictureId' => $this->getParam('pictureId'),
-                'urlParams' => array(
+                'urlParams' => [
                     'action' => str_replace('-gallery', '-picture', $this->getParam('action'))
-                )
-            )));
+                ]
+            ]));
 
         });
     }
@@ -802,13 +802,13 @@ class CatalogueController extends Zend_Controller_Action
             $engineTable = new Engines();
 
             $path = $this->getParam('path');
-            $path = $path ? (array)$path : array();
+            $path = $path ? (array)$path : [];
 
             $prevEngine = null;
             foreach ($path as $node) {
-                $filter = array(
+                $filter = [
                     'id = ?' => (int)$node,
-                );
+                ];
                 if (!$prevEngine) {
 
                     $currentEngine = $engineTable->fetchRow(
@@ -818,10 +818,10 @@ class CatalogueController extends Zend_Controller_Action
                             ->where('brand_engine.brand_id = ?', $brand['id'])
                     );
                 } else {
-                    $currentEngine = $engineTable->fetchRow(array(
+                    $currentEngine = $engineTable->fetchRow([
                         'id = ?'        => (int)$node,
                         'parent_id = ?' => $prevEngine->id
-                    ));
+                    ]);
                 }
 
                 if (!$currentEngine) {
@@ -874,7 +874,7 @@ class CatalogueController extends Zend_Controller_Action
 
             $picturesLimit = 4;
 
-            $engines = array();
+            $engines = [];
             foreach ($paginator->getCurrentItems() as $engine) {
                 $pictureRows = $pictureTable->fetchAll(
                     $this->selectFromPictures()
@@ -885,25 +885,25 @@ class CatalogueController extends Zend_Controller_Action
                         ->limit(4)
                 );
 
-                $pictures = array();
+                $pictures = [];
                 foreach ($pictureRows as $pictureRow) {
                     //$pictures[] = $pictureRow;
 
-                    $caption = $pictureRow->getCaption(array(
+                    $caption = $pictureRow->getCaption([
                         'language' => $language
-                    ));
+                    ]);
 
-                    $url = $this->_helper->url->url(array(
+                    $url = $this->_helper->url->url([
                         'action'     => 'engine-picture',
                         'path'       => array_merge($path, [$engine->id]),
                         'picture_id' => $pictureRow['identity'] ? $pictureRow['identity'] : $pictureRow['id']
-                    ));
+                    ]);
 
-                    $pictures[] = array(
+                    $pictures[] = [
                         'name' => $caption,
                         'url'  => $url,
                         'img'  => $pictureRow->getFormatRequest()
-                    );
+                    ];
                 }
 
                 $morePictures = $picturesLimit - count($pictures);
@@ -920,17 +920,17 @@ class CatalogueController extends Zend_Controller_Action
                     );
                     foreach ($pictureRows as $pictureRow) {
                         //$pictures[] = $pictureRow;
-                        $caption = $pictureRow->getCaption(array(
+                        $caption = $pictureRow->getCaption([
                             'language' => $language
-                        ));
+                        ]);
 
                         $url = $this->_helper->pic->href($pictureRow->toArray());
 
-                        $pictures[] = array(
+                        $pictures[] = [
                             'name' => $caption,
                             'url'  => $url,
                             'img'  => $pictureRow->getFormatRequest()
-                        );
+                        ];
                     }
                 }
 
@@ -941,33 +941,33 @@ class CatalogueController extends Zend_Controller_Action
                 $detailsUrl = null;
 
                 if ($isModer) {
-                    $moderUrl = $this->_helper->url->url(array(
+                    $moderUrl = $this->_helper->url->url([
                         'module'     => 'moder',
                         'controller' => 'engines',
                         'action'     => 'engine',
                         'engine_id'  => $engine->id
-                    ), 'default', true);
+                    ], 'default', true);
                 }
 
                 if ($logedIn) {
-                    $specsEditUrl = $this->_helper->url->url(array(
+                    $specsEditUrl = $this->_helper->url->url([
                         'module'     => 'default',
                         'controller' => 'cars',
                         'action'     => 'engine-spec-editor',
                         'engine_id'  => $engine->id
-                    ), 'default', true);
+                    ], 'default', true);
                 }
 
                 $hasSpecs = $specService->hasSpecs(3, $engine->id);
 
                 if ($hasSpecs) {
-                    $specsUrl = $this->_helper->url->url(array(
+                    $specsUrl = $this->_helper->url->url([
                         'module'        => 'default',
                         'controller'    => 'catalogue',
                         'action'        => 'engine-specs',
                         'brand_catname' => $brand['catname'],
-                        'path'          => array_merge($path, array($engine->id))
-                    ), 'catalogue', true);
+                        'path'          => array_merge($path, [$engine->id])
+                    ], 'catalogue', true);
                 }
 
                 $childsCount = $engineTable->getAdapter()->fetchOne(
@@ -977,45 +977,45 @@ class CatalogueController extends Zend_Controller_Action
                 );
 
                 if ($childsCount) {
-                    $detailsUrl = $this->_helper->url->url(array(
+                    $detailsUrl = $this->_helper->url->url([
                         'module'        => 'default',
                         'controller'    => 'catalogue',
                         'action'        => 'engines',
                         'brand_catname' => $brand['catname'],
-                        'path'          => array_merge($path, array($engine->id))
-                    ), 'catalogue', true);
+                        'path'          => array_merge($path, [$engine->id])
+                    ], 'catalogue', true);
                 }
 
                 $carIds = $engine->getRelatedCarGroupId([
                     'groupJoinLimit' => 3
                 ]);
-                $cars = array();
+                $cars = [];
                 if ($carIds) {
-                    $carRows = $carTable->fetchAll(array(
+                    $carRows = $carTable->fetchAll([
                         'id in (?)' => $carIds
-                    ), $this->_helper->catalogue()->carsOrdering());
+                    ], $this->_helper->catalogue()->carsOrdering());
 
                     foreach ($carRows as $carRow) {
                         $cataloguePaths = $this->_helper->catalogue()->cataloguePaths($carRow);
 
                         foreach ($cataloguePaths as $cPath) {
-                            $cars[] = array(
+                            $cars[] = [
                                 'name' => $carRow->getNameData($language),
-                                'url'  => $this->_helper->url->url(array(
+                                'url'  => $this->_helper->url->url([
                                     'module'        => 'default',
                                     'controller'    => 'catalogue',
                                     'action'        => 'brand-car',
                                     'brand_catname' => $cPath['brand_catname'],
                                     'car_catname'   => $cPath['car_catname'],
                                     'path'          => $cPath['path']
-                                ), 'catalogue', true)
-                            );
+                                ], 'catalogue', true)
+                            ];
                             break;
                         }
                     }
                 }
 
-                $engines[] = array(
+                $engines[] = [
                     'name'         => $engine->caption,
                     'pictures'     => $pictures,
                     'moderUrl'     => $moderUrl,
@@ -1024,7 +1024,7 @@ class CatalogueController extends Zend_Controller_Action
                     'detailsUrl'   => $detailsUrl,
                     'childsCount'  => $childsCount,
                     'cars'         => $cars
-                );
+                ];
             }
 
             $carsCount = null;
@@ -1046,11 +1046,11 @@ class CatalogueController extends Zend_Controller_Action
 
                 $specsCount = $specService->getSpecsCount(3, $engineRow->id);
 
-                $picturesSelect = $this->_enginePicturesSelect($engineRow, true);
+                $picturesSelect = $this->enginePicturesSelect($engineRow, true);
                 $picturesCount = Zend_Paginator::factory($picturesSelect)->getTotalItemCount();
             }
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'engine'      => $engineRow,
                 'brand'       => $brand,
                 'paginator'   => $paginator,
@@ -1059,12 +1059,12 @@ class CatalogueController extends Zend_Controller_Action
                 'childsCount' => $childsCount,
                 'specsCount'  => $specsCount,
                 'picturesCount' => $picturesCount
-            ));
+            ]);
 
-            $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+            $this->_helper->actionStack('brand', 'sidebar', 'default', [
                 'brand_id'   => $brand['id'],
                 'is_engines' => true
-            ));
+            ]);
         });
     }
 
@@ -1072,26 +1072,26 @@ class CatalogueController extends Zend_Controller_Action
     {
         $this->_engineAction(function($brand, $engineRow, $path) {
 
-            $engine = array(
+            $engine = [
                 'id'   => $engineRow->id,
                 'name' => $engineRow->caption
-            );
+            ];
 
             $specService = new Application_Service_Specifications();
 
-            $specs = $specService->engineSpecifications(array($engine), array(
+            $specs = $specService->engineSpecifications([$engine], [
                 'language' => 'en'
-            ));
+            ]);
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'engine'      => $engine,
                 'specs'       => $specs,
-            ));
+            ]);
 
-            $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+            $this->_helper->actionStack('brand', 'sidebar', 'default', [
                 'brand_id'   => $brand['id'],
                 'is_engines' => true
-            ));
+            ]);
 
         });
     }
@@ -1119,26 +1119,26 @@ class CatalogueController extends Zend_Controller_Action
             $specService = new Application_Service_Specifications();
             $specsCount = $specService->getSpecsCount(3, $engineRow->id);
 
-            $picturesSelect = $this->_enginePicturesSelect($engineRow, true);
+            $picturesSelect = $this->enginePicturesSelect($engineRow, true);
             $picturesCount = Zend_Paginator::factory($picturesSelect)->getTotalItemCount();
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'brand'        => $brand,
-                'engine'       => array(
+                'engine'       => [
                     'id'   => $engineRow->id,
                     'name' => $engineRow->caption
-                ),
+                ],
                 'carsCount'    => $carsCount,
                 'childsCount'  => $childsCount,
                 'specsCount'   => $specsCount,
                 'picturesCount' => $picturesCount
-            ));
+            ]);
 
             $callback($brand, $engineRow, $path);
         });
     }
 
-    private function _enginePicturesSelect($engine, $onlyAccepted = true)
+    private function enginePicturesSelect($engine, $onlyAccepted = true)
     {
         return $this->selectOrderFromPictures($onlyAccepted)
             ->where('pictures.type = ?', Picture::ENGINE_TYPE_ID)
@@ -1149,7 +1149,7 @@ class CatalogueController extends Zend_Controller_Action
     public function engineGalleryAction()
     {
         $this->_engineAction(function($brand, $engineRow, $path) {
-            $select = $this->_enginePicturesSelect($engineRow, false);
+            $select = $this->enginePicturesSelect($engineRow, false);
 
             switch ($this->getParam('gallery')) {
                 case 'inbox':
@@ -1163,40 +1163,40 @@ class CatalogueController extends Zend_Controller_Action
                     break;
             }
 
-            return $this->_helper->json($this->_helper->pic->gallery2($select, array(
+            return $this->_helper->json($this->_helper->pic->gallery2($select, [
                 'page'      => $this->getParam('page'),
                 'pictureId' => $this->getParam('pictureId'),
-                'urlParams' => array(
+                'urlParams' => [
                     'action' => 'engine-picture'
-                )
-            )));
+                ]
+            ]));
         });
     }
 
     public function enginePictureAction()
     {
         $this->_engineAction(function($brand, $engineRow, $path) {
-            $select = $this->_enginePicturesSelect($engineRow, false);
+            $select = $this->enginePicturesSelect($engineRow, false);
 
             $this->_pictureAction($select, function($select, $picture) use ($brand, $engineRow) {
 
-                $this->view->assign(array(
+                $this->view->assign([
                     'picture'     => array_replace(
                         $this->_helper->pic->picPageData($picture, $select),
-                        array(
+                        [
                             'gallery2'   => true,
-                            'galleryUrl' => $this->_helper->url->url(array(
+                            'galleryUrl' => $this->_helper->url->url([
                                 'action'  => 'engine-gallery',
                                 'gallery' => $this->galleryType($picture)
-                            ))
-                        )
+                            ])
+                        ]
                     )
-                ));
+                ]);
 
-                $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+                $this->_helper->actionStack('brand', 'sidebar', 'default', [
                     'brand_id'   => $brand['id'],
                     'is_engines' => true
-                ));
+                ]);
 
             });
         });
@@ -1205,7 +1205,7 @@ class CatalogueController extends Zend_Controller_Action
     public function enginePicturesAction()
     {
         $this->_engineAction(function($brand, $engineRow, $path) {
-            $select = $this->_enginePicturesSelect($engineRow);
+            $select = $this->enginePicturesSelect($engineRow);
 
             $paginator = $this->picturesPaginator($select, $this->getParam('page'));
 
@@ -1215,25 +1215,25 @@ class CatalogueController extends Zend_Controller_Action
 
             $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
-            $picturesData = $this->_helper->pic->listData($select, array(
+            $picturesData = $this->_helper->pic->listData($select, [
                 'width' => 4,
                 'url'   => function($row) {
-                    return $this->_helper->url->url(array(
+                    return $this->_helper->url->url([
                         'action'     => 'engine-picture',
                         'picture_id' => $row['identity'] ? $row['identity'] : $row['id']
-                    ));
+                    ]);
                 }
-            ));
+            ]);
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'paginator'    => $paginator,
                 'picturesData' => $picturesData
-            ));
+            ]);
 
-            $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+            $this->_helper->actionStack('brand', 'sidebar', 'default', [
                 'brand_id'   => $brand['id'],
                 'is_engines' => true
-            ));
+            ]);
         });
     }
 
@@ -1241,30 +1241,30 @@ class CatalogueController extends Zend_Controller_Action
     {
         $this->_engineAction(function($brand, $engineRow, $path) {
 
-            $engine = array(
+            $engine = [
                 'id'   => $engineRow->id,
                 'name' => $engineRow->caption
-            );
+            ];
 
             $carIds = $engineRow->getRelatedCarGroupId();
-            $carRows = array();
+            $carRows = [];
             if ($carIds) {
                 $carTable = $this->_helper->catalogue()->getCarTable();
 
-                $carRows = $carTable->fetchAll(array(
+                $carRows = $carTable->fetchAll([
                     'id in (?)' => $carIds
-                ), $this->_helper->catalogue()->carsOrdering());
+                ], $this->_helper->catalogue()->carsOrdering());
             }
 
             $carParentTable = new Car_Parent();
 
-            $this->view->assign(array(
-                'cars'        => $this->_helper->car->listData($carRows, array(
+            $this->view->assign([
+                'cars'        => $this->_helper->car->listData($carRows, [
                     'pictureUrl' => function($listCar, $picture) use ($brand, $carParentTable) {
 
-                        $paths = $carParentTable->getPaths($listCar->id, array(
+                        $paths = $carParentTable->getPaths($listCar->id, [
                             'breakOnFirst' => true
-                        ));
+                        ]);
 
                         if (count($paths) <= 0) {
                             return $this->_helper->pic->url($picture['id'], $picture['identity']);
@@ -1272,7 +1272,7 @@ class CatalogueController extends Zend_Controller_Action
 
                         $path = $paths[0];
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-picture',
@@ -1280,15 +1280,15 @@ class CatalogueController extends Zend_Controller_Action
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
                             'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     }
-                )),
-            ));
+                ]),
+            ]);
 
-            $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+            $this->_helper->actionStack('brand', 'sidebar', 'default', [
                 'brand_id'   => $brand['id'],
                 'is_engines' => true
-            ));
+            ]);
 
         });
     }
@@ -1307,7 +1307,7 @@ class CatalogueController extends Zend_Controller_Action
 
     private function getCarNames(array $ids)
     {
-        $result = array();
+        $result = [];
 
         if (count($ids)) {
             $carTable = $this->_helper->catalogue()->getCarTable();
@@ -1317,7 +1317,7 @@ class CatalogueController extends Zend_Controller_Action
 
             $rows = $db->fetchAll(
                 $db->select()
-                    ->from('cars', array(
+                    ->from('cars', [
                         'cars.id',
                         'name' => 'if(car_language.name, car_language.name, cars.caption)',
                         'cars.begin_model_year', 'cars.end_model_year',
@@ -1325,13 +1325,13 @@ class CatalogueController extends Zend_Controller_Action
                         'spec_full' => 'spec.name',
                         'cars.body', 'cars.today',
                         'cars.begin_year', 'cars.end_year'
-                    ))
+                    ])
                     ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
                     ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                     ->where('cars.id in (?)', $ids),
-                array(
+                [
                     'lang' => $language
-                )
+                ]
             );
 
             foreach ($rows as $row) {
@@ -1351,16 +1351,16 @@ class CatalogueController extends Zend_Controller_Action
             $language = $this->_helper->language();
 
             $path = $this->getParam('path');
-            $path = $path ? (array)$path : array();
+            $path = $path ? (array)$path : [];
             $path = array_values($path);
 
             $db = $carTable->getAdapter();
             $select = $db->select()
-                ->from('cars', array())
+                ->from('cars', [])
                 ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null);
 
-            $columns = array(
+            $columns = [
                 'cars.id',
                 'cars.is_concept',
                 'name' => 'if(car_language.name, car_language.name, cars.caption)',
@@ -1370,14 +1370,14 @@ class CatalogueController extends Zend_Controller_Action
                 'cars.begin_year', 'cars.end_year', 'cars.begin_month', 'cars.end_month',
                 'cars.is_group', 'cars.full_text_id', 'cars.text_id',
                 'brand_car_catname' => 'brands_cars.catname'
-            );
+            ];
 
             $field = 'cars.id';
             foreach (array_reverse($path) as $idx => $pathNode) {
                 $cpAlias = 'cp'. $idx;
                 $select
                     ->join(
-                        array($cpAlias => 'car_parent'),
+                        [$cpAlias => 'car_parent'],
                         $field . ' = ' . $cpAlias . '.car_id',
                         null
                     )
@@ -1395,11 +1395,11 @@ class CatalogueController extends Zend_Controller_Action
                 ->where('brands_cars.brand_id = :brand_id')
                 ->where('brands_cars.catname = :brand_car_catname');
 
-            $currentCar = $db->fetchRow($select, array(
+            $currentCar = $db->fetchRow($select, [
                 'lang'              => $language,
                 'brand_id'          => (int)$brand['id'],
                 'brand_car_catname' => (string)$this->getParam('car_catname')
-            ));
+            ]);
 
             if (!$currentCar) {
                 return $this->forward('notfound', 'error');
@@ -1408,7 +1408,7 @@ class CatalogueController extends Zend_Controller_Action
             $carFullName = Cars_Row::buildFullName($currentCar);
 
             // prefetch car names
-            $ids = array();
+            $ids = [];
             if (count($path)) {
                 $ids[] = $currentCar['top_car_id'];
             }
@@ -1425,8 +1425,8 @@ class CatalogueController extends Zend_Controller_Action
 
 
             // breadcrumbs
-            $breadcrumbs = array();
-            $breadcrumbsPath = array();
+            $breadcrumbs = [];
+            $breadcrumbsPath = [];
 
             $topCarName = null;
             if (count($path)) {
@@ -1438,17 +1438,17 @@ class CatalogueController extends Zend_Controller_Action
             }
 
 
-            $breadcrumbs[] = array(
+            $breadcrumbs[] = [
                 'name' => $this->stripName($brand, $topCarName),
-                'url'  => $this->_helper->url->url(array(
+                'url'  => $this->_helper->url->url([
                     'module'        => 'default',
                     'controller'    => 'catalogue',
                     'action'        => 'brand-car',
                     'brand_catname' => $brand['catname'],
                     'car_catname'   => $currentCar['brand_car_catname'],
                     'path'          => $breadcrumbsPath
-                ), 'catalogue', true)
-            );
+                ], 'catalogue', true)
+            ];
 
             foreach ($path as $idx => $pathNode) {
                 $ridx = count($path) - $idx - 1;
@@ -1465,17 +1465,17 @@ class CatalogueController extends Zend_Controller_Action
 
                 $breadcrumbsPath[] = $pathNode;
 
-                $breadcrumbs[] = array(
+                $breadcrumbs[] = [
                     'name' => $breadcrumbName,
-                    'url'  => $this->_helper->url->url(array(
+                    'url'  => $this->_helper->url->url([
                         'module'        => 'default',
                         'controller'    => 'catalogue',
                         'action'        => 'brand-car',
                         'brand_catname' => $brand['catname'],
                         'car_catname'   => $currentCar['brand_car_catname'],
                         'path'          => $breadcrumbsPath
-                    ), 'catalogue', true)
-                );
+                    ], 'catalogue', true)
+                ];
             }
 
             $design = false;
@@ -1506,18 +1506,18 @@ class CatalogueController extends Zend_Controller_Action
                 ];
             }
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'design'       => $design,
                 'carFullName'  => $carFullName,
                 'carShortName' => $this->getCarShortName($brand, $carFullName),
                 'carCatname'   => $currentCar['brand_car_catname'],
-            ));
+            ]);
 
-            $this->_helper->actionStack('brand', 'sidebar', 'default', array(
+            $this->_helper->actionStack('brand', 'sidebar', 'default', [
                 'brand_id'    => $brand['id'],
                 'car_id'      => $currentCar['top_car_id'],
                 'is_concepts' => $currentCar['is_concept']
-            ));
+            ]);
 
             return $callback($brand, $currentCar, $currentCar['brand_car_catname'], $path, $breadcrumbs);
         });
@@ -1528,17 +1528,17 @@ class CatalogueController extends Zend_Controller_Action
         $carTable = $this->_helper->catalogue()->getCarTable();
         $db = $carTable->getAdapter();
         $select = $db->select()
-            ->from('car_parent', array('type', 'count(1)'))
+            ->from('car_parent', ['type', 'count(1)'])
             ->where('parent_id = ?', $carId)
             ->group('type');
 
         $pairs = $db->fetchPairs($select);
 
-        return array(
+        return [
             'stock'  => isset($pairs[Car_Parent::TYPE_DEFAULT]) ? $pairs[Car_Parent::TYPE_DEFAULT] : 0,
             'tuning' => isset($pairs[Car_Parent::TYPE_TUNING]) ? $pairs[Car_Parent::TYPE_TUNING] : 0,
             'sport'  => isset($pairs[Car_Parent::TYPE_SPORT]) ? $pairs[Car_Parent::TYPE_SPORT] : 0
-        );
+        ];
     }
 
     public function brandCarAction()
@@ -1594,7 +1594,7 @@ class CatalogueController extends Zend_Controller_Action
 
             $listCars = $carTable->find($currentCarId);
 
-            $currentPictures = array();
+            $currentPictures = [];
             $currentPicturesCount = 0;
 
             $canAcceptPicture = $this->_helper->user()->isAllowed('picture', 'accept');
@@ -1629,7 +1629,7 @@ class CatalogueController extends Zend_Controller_Action
             $currentCar['text'] = $text;
             $hasHtml = (bool)$currentCar['text'];
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'car'           => $currentCar,
                 'modificationGroups' => $this->_brandCarModifications($currentCar['id'], $modId),
                 'breadcrumbs'   => $breadcrumbs,
@@ -1641,7 +1641,7 @@ class CatalogueController extends Zend_Controller_Action
                 'hasHtml'       => $hasHtml,
                 'currentPictures'      => $currentPictures,
                 'currentPicturesCount' => $currentPicturesCount,
-                'currentPicturesUrl'   => $this->_helper->url->url(array(
+                'currentPicturesUrl'   => $this->_helper->url->url([
                     'module'        => 'default',
                     'controller'    => 'catalogue',
                     'action'        => 'brand-car-pictures',
@@ -1649,13 +1649,13 @@ class CatalogueController extends Zend_Controller_Action
                     'car_catname'   => $brandCarCatname,
                     'path'          => $path,
                     'exact'         => true
-                )),
-                'childListData' => $this->_helper->car->listData($listCars, array(
+                ]),
+                'childListData' => $this->_helper->car->listData($listCars, [
                     'disableDescription' => true,
                     'type'       => $type == Car_Parent::TYPE_DEFAULT ? $type : null,
                     'detailsUrl' => false,
                     'allPicturesUrl' => function($listCar) use ($brand, $brandCarCatname, $path) {
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-pictures',
@@ -1663,7 +1663,7 @@ class CatalogueController extends Zend_Controller_Action
                             'car_catname'   => $brandCarCatname,
                             'path'          => $path,
                             'exact'         => true
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     },
                     'onlyExactlyPictures' => true,
                     'specificationsUrl' => function($listCar) use ($brand, $brandCarCatname, $path) {
@@ -1675,14 +1675,14 @@ class CatalogueController extends Zend_Controller_Action
                             return false;
                         }
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-specifications',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $brandCarCatname,
                             'path'          => $path
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     },
                     'typeUrl' => function($listCar, $type) use($carParentTable, $currentCarId, $path) {
 
@@ -1698,27 +1698,27 @@ class CatalogueController extends Zend_Controller_Action
                                 break;
                         }
 
-                        $carParentRow = $carParentTable->fetchRow(array(
+                        $carParentRow = $carParentTable->fetchRow([
                             'car_id = ?'    => $listCar->id,
                             'parent_id = ?' => $currentCarId
-                        ));
+                        ]);
                         if ($carParentRow) {
-                            $currentPath = array_merge($path, array(
+                            $currentPath = array_merge($path, [
                                 $carParentRow->catname
-                            ));
+                            ]);
                         } else {
                             $currentPath = $path;
                         }
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'path' => $currentPath,
                             'type' => $catname,
                             'page' => null,
-                        ));
+                        ]);
                     },
                     'pictureUrl' => function($listCar, $picture) use ($brand, $currentCarId, $brandCarCatname, $path, $carParentTable) {
 
-                        return $this->_helper->url->url(array(
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-picture',
@@ -1726,13 +1726,13 @@ class CatalogueController extends Zend_Controller_Action
                             'car_catname'   => $brandCarCatname,
                             'path'          => $path,
                             'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     }
-                )),
+                ]),
                 'canAcceptPicture' => $canAcceptPicture,
                 'inboxCount'       => $inboxCount,
                 'requireAttention' => $requireAttention
-            ));
+            ]);
         });
     }
 
@@ -1754,12 +1754,12 @@ class CatalogueController extends Zend_Controller_Action
 
         $modifications = [];
         foreach ($mTable->fetchAll($select) as $mRow) {
-            $modifications[] = array(
+            $modifications[] = [
                 'name'      => $mRow->name,
-                'url'       => $this->_helper->url->url(array(
+                'url'       => $this->_helper->url->url([
                     'action' => 'brand-car', // -pictures
                     'mod'    => $mRow->id,
-                )),
+                ]),
                 'count'     => $db->fetchOne(
                     $db->select()
                         ->from('modification_picture', 'count(1)')
@@ -1770,7 +1770,7 @@ class CatalogueController extends Zend_Controller_Action
                         ->where('car_parent_cache.parent_id = ?', $carId)
                 ),
                 'active' => $mRow->id == $modificationId
-            );
+            ];
         }
 
         return $modifications;
@@ -1917,7 +1917,7 @@ class CatalogueController extends Zend_Controller_Action
 
         $needMore = count($perspectiveGroupIds) - count($usedIds);
 
-        $result = array();
+        $result = [];
         foreach ($pictures as $idx => $picture) {
             if ($picture) {
                 $pictureId = $picture['id'];
@@ -2136,7 +2136,7 @@ class CatalogueController extends Zend_Controller_Action
             foreach ($pPaginator->getCurrentItems() as $pictureRow) {
                 $imageInfo = $imageStorage->getFormatedImage($pictureRow->getFormatRequest(), 'picture-thumb');
 
-                $currentPictures[] = array(
+                $currentPictures[] = [
                     'name' => $pictureRow->getCaption([
                         'language' => $language
                     ]),
@@ -2149,7 +2149,7 @@ class CatalogueController extends Zend_Controller_Action
                         'exact'         => true,
                         'picture_id'    => $pictureRow['identity'] ? $pictureRow['identity'] : $pictureRow['id']
                     ])
-                );
+                ];
             }
 
             $currentPicturesCount = $pPaginator->getTotalItemCount();
@@ -2168,7 +2168,7 @@ class CatalogueController extends Zend_Controller_Action
             $requireAttention = $this->getCarModerAttentionCount($currentCarId);
         }
 
-        $ids = array();
+        $ids = [];
         foreach ($listCars as $car) {
             $ids[] = $car->id;
         }
@@ -2199,7 +2199,7 @@ class CatalogueController extends Zend_Controller_Action
         $currentCar['text'] = $text;
         $hasHtml = (bool)$currentCar['text'];
 
-        $this->view->assign(array(
+        $this->view->assign([
             'car'           => $currentCar,
             'modificationGroups' => $this->_brandCarModifications($currentCar['id'], $modId),
             'paginator'     => $paginator,
@@ -2212,7 +2212,7 @@ class CatalogueController extends Zend_Controller_Action
             'hasHtml'       => $hasHtml,
             'currentPictures'      => $currentPictures,
             'currentPicturesCount' => $currentPicturesCount,
-            'currentPicturesUrl'   => $this->_helper->url->url(array(
+            'currentPicturesUrl'   => $this->_helper->url->url([
                 'module'        => 'default',
                 'controller'    => 'catalogue',
                 'action'        => 'brand-car-pictures',
@@ -2221,8 +2221,8 @@ class CatalogueController extends Zend_Controller_Action
                 'path'          => $path,
                 'exact'         => true,
                 'page'          => null
-            )),
-            'childListData' => $this->_helper->car->listData($listCars, array(
+            ]),
+            'childListData' => $this->_helper->car->listData($listCars, [
                 'disableDescription' => false,
                 'type'       => $type == Car_Parent::TYPE_DEFAULT ? $type : null,
                 'detailsUrl' => function($listCar) use ($brand, $currentCarId, $brandCarCatname, $path, $carParentTable) {
@@ -2241,39 +2241,39 @@ class CatalogueController extends Zend_Controller_Action
                     }
 
                     // found parent row
-                    $carParentRow = $carParentTable->fetchRow(array(
+                    $carParentRow = $carParentTable->fetchRow([
                         'car_id = ?'    => $listCar->id,
                         'parent_id = ?' => $currentCarId
-                    ));
+                    ]);
                     if (!$carParentRow) {
                         return false;
                     }
 
-                    $currentPath = array_merge($path, array(
+                    $currentPath = array_merge($path, [
                         $carParentRow->catname
-                    ));
+                    ]);
 
-                    return $this->_helper->url->url(array(
+                    return $this->_helper->url->url([
                         'module'        => 'default',
                         'controller'    => 'catalogue',
                         'action'        => 'brand-car',
                         'brand_catname' => $brand['catname'],
                         'car_catname'   => $brandCarCatname,
                         'path'          => $currentPath
-                    ), 'catalogue', true);
+                    ], 'catalogue', true);
                 },
                 'allPicturesUrl' => function($listCar) use ($brand, $brandCarCatname, $path, $currentCarId, $carParentTable) {
 
                     //TODO: more than 1 levels diff fails here
-                    $carParentRow = $carParentTable->fetchRow(array(
+                    $carParentRow = $carParentTable->fetchRow([
                         'car_id = ?'    => $listCar->id,
                         'parent_id = ?' => $currentCarId
-                    ));
+                    ]);
                     if ($carParentRow) {
-                        $currentPath = array_merge($path, array(
+                        $currentPath = array_merge($path, [
                             $carParentRow->catname
-                        ));
-                        return $this->_helper->url->url(array(
+                        ]);
+                        return $this->_helper->url->url([
                             'module'        => 'default',
                             'controller'    => 'catalogue',
                             'action'        => 'brand-car-pictures',
@@ -2281,7 +2281,7 @@ class CatalogueController extends Zend_Controller_Action
                             'car_catname'   => $brandCarCatname,
                             'path'          => $currentPath,
                             'exact'         => false
-                        ), 'catalogue', true);
+                        ], 'catalogue', true);
                     }
 
                     return false;
@@ -2289,23 +2289,23 @@ class CatalogueController extends Zend_Controller_Action
                 'onlyExactlyPictures' => false,
                 'specificationsUrl' => function($listCar) use ($brand, $specService, $hasChildSpecs, $carParentTable, $brandCarCatname, $path, $currentCarId, $type) {
                     if ($hasChildSpecs[$listCar->id]) {
-                        $carParentRow = $carParentTable->fetchRow(array(
+                        $carParentRow = $carParentTable->fetchRow([
                             'car_id = ?'    => $listCar->id,
                             'parent_id = ?' => $currentCarId
-                        ));
+                        ]);
                         if ($carParentRow) {
-                            $currentPath = array_merge($path, array(
+                            $currentPath = array_merge($path, [
                                 $carParentRow->catname
-                            ));
+                            ]);
 
-                            return $this->_helper->url->url(array(
+                            return $this->_helper->url->url([
                                 'module'        => 'default',
                                 'controller'    => 'catalogue',
                                 'action'        => 'brand-car-specifications',
                                 'brand_catname' => $brand['catname'],
                                 'car_catname'   => $brandCarCatname,
                                 'path'          => $currentPath,
-                            ), 'catalogue', true);
+                            ], 'catalogue', true);
                         }
                     }
 
@@ -2327,7 +2327,7 @@ class CatalogueController extends Zend_Controller_Action
                             break;
                     }
 
-                    return $this->_helper->url->url(array(
+                    return $this->_helper->url->url([
                         'module'        => 'default',
                         'controller'    => 'catalogue',
                         'action'        => 'brand-car-specifications',
@@ -2335,7 +2335,7 @@ class CatalogueController extends Zend_Controller_Action
                         'car_catname'   => $brandCarCatname,
                         'path'          => $path,
                         'type'          => $typeStr
-                    ), 'catalogue', true);
+                    ], 'catalogue', true);
                 },
                 'typeUrl' => function($listCar, $type) use($carParentTable, $currentCarId, $path) {
 
@@ -2351,40 +2351,40 @@ class CatalogueController extends Zend_Controller_Action
                             break;
                     }
 
-                    $carParentRow = $carParentTable->fetchRow(array(
+                    $carParentRow = $carParentTable->fetchRow([
                         'car_id = ?'    => $listCar->id,
                         'parent_id = ?' => $currentCarId
-                    ));
+                    ]);
                     if ($carParentRow) {
-                        $currentPath = array_merge($path, array(
+                        $currentPath = array_merge($path, [
                             $carParentRow->catname
-                        ));
+                        ]);
                     } else {
                         $currentPath = $path;
                     }
 
-                    return $this->_helper->url->url(array(
+                    return $this->_helper->url->url([
                         'path' => $currentPath,
                         'type' => $catname,
                         'page' => null,
-                    ));
+                    ]);
                 },
                 'pictureUrl' => function($listCar, $picture) use ($brand, $currentCarId, $brandCarCatname, $path, $carParentTable) {
 
                     // found parent row
-                    $carParentRow = $carParentTable->fetchRow(array(
+                    $carParentRow = $carParentTable->fetchRow([
                         'car_id = ?'    => $listCar->id,
                         'parent_id = ?' => $currentCarId
-                    ));
+                    ]);
                     if (!$carParentRow) {
                         return $this->_helper->pic->url($picture['id'], $picture['identity']);
                     }
 
-                    $currentPath = array_merge($path, array(
+                    $currentPath = array_merge($path, [
                         $carParentRow->catname
-                    ));
+                    ]);
 
-                    return $this->_helper->url->url(array(
+                    return $this->_helper->url->url([
                         'module'        => 'default',
                         'controller'    => 'catalogue',
                         'action'        => 'brand-car-picture',
@@ -2392,13 +2392,13 @@ class CatalogueController extends Zend_Controller_Action
                         'car_catname'   => $brandCarCatname,
                         'path'          => $currentPath,
                         'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                    ), 'catalogue', true);
+                    ], 'catalogue', true);
                 }
-            )),
+            ]),
             'canAcceptPicture' => $canAcceptPicture,
             'inboxCount'       => $inboxCount,
             'requireAttention' => $requireAttention
-        ));
+        ]);
     }
 
     private function getCarModerAttentionCount($carId)
@@ -2481,23 +2481,23 @@ class CatalogueController extends Zend_Controller_Action
 
             $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
-            $picturesData = $this->_helper->pic->listData($select, array(
+            $picturesData = $this->_helper->pic->listData($select, [
                 'width' => 4,
                 'url'   => function($row) use($brand, $brandCarCatname, $path, $exact) {
-                    return $this->_helper->url->url(array(
+                    return $this->_helper->url->url([
                         'action'        => 'brand-car-picture',
                         'brand_catname' => $brand['catname'],
                         'car_catname'   => $brandCarCatname,
                         'path'          => $path,
                         'exact'         => $exact,
                         'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
-                    ));
+                    ]);
                 }
-            ));
+            ]);
 
             $counts = $this->childsTypeCount($currentCar['id']);
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'breadcrumbs'   => $breadcrumbs,
                 'picturesData'  => $picturesData,
                 'paginator'     => $paginator,
@@ -2508,7 +2508,7 @@ class CatalogueController extends Zend_Controller_Action
                 'type'          => null,
                 'modification'  => $modification,
                 'modificationGroups' => $this->_brandCarModifications($currentCar['id'], $modId),
-            ));
+            ]);
         });
     }
 
@@ -2543,9 +2543,9 @@ class CatalogueController extends Zend_Controller_Action
 
         } else {
 
-            $select->where('pictures.status IN (?)', array(
+            $select->where('pictures.status IN (?)', [
                 Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
-            ));
+            ]);
 
         }
 
@@ -2574,19 +2574,19 @@ class CatalogueController extends Zend_Controller_Action
             $select = $this->getBrandCarPicturesSelect($currentCar['id'], $exact, false);
 
             $this->_pictureAction($select, function($select, $picture) use ($breadcrumbs) {
-                $this->view->assign(array(
+                $this->view->assign([
                     'breadcrumbs' => $breadcrumbs,
                     'picture'     => array_replace(
                         $this->_helper->pic->picPageData($picture, $select),
-                        array(
+                        [
                             'gallery2'   => true,
-                            'galleryUrl' => $this->_helper->url->url(array(
+                            'galleryUrl' => $this->_helper->url->url([
                                 'action'  => 'brand-car-gallery',
                                 'gallery' => $this->galleryType($picture)
-                            ))
-                        )
+                            ])
+                        ]
                     )
-                ));
+                ]);
             });
         });
     }
@@ -2610,13 +2610,13 @@ class CatalogueController extends Zend_Controller_Action
                     break;
             }
 
-            return $this->_helper->json($this->_helper->pic->gallery2($select, array(
+            return $this->_helper->json($this->_helper->pic->gallery2($select, [
                 'page'      => $this->getParam('page'),
                 'pictureId' => $this->getParam('pictureId'),
-                'urlParams' => array(
+                'urlParams' => [
                     'action' => 'brand-car-picture'
-                )
-            )));
+                ]
+            ]));
         });
     }
 
@@ -2679,7 +2679,7 @@ class CatalogueController extends Zend_Controller_Action
 
             $service = new Application_Service_Specifications();
 
-            $cars = array();
+            $cars = [];
             foreach ($childCars as $childCar) {
                 if ($service->hasSpecs(1, $childCar->id)) {
                     $cars[] = $childCar;
@@ -2689,12 +2689,12 @@ class CatalogueController extends Zend_Controller_Action
             $user = $this->_helper->user()->get();
 
 
-            $specs = $service->specifications($cars, array(
+            $specs = $service->specifications($cars, [
                 'language'     => 'en',
                 'contextCarId' => $currentCarId
-            ));
+            ]);
 
-            $ids = array();
+            $ids = [];
             foreach ($cars as $car) {
                 $ids[] = $car->id;
             }
@@ -2704,11 +2704,11 @@ class CatalogueController extends Zend_Controller_Action
             $userTable = new Users();
             $contributors = $userTable->find(array_keys($contribPairs));
 
-            $this->view->assign(array(
+            $this->view->assign([
                 'breadcrumbs'  => $breadcrumbs,
                 'specs'        => $specs,
                 'contributors' => $contributors
-            ));
+            ]);
         });
     }
 
@@ -2736,22 +2736,22 @@ class CatalogueController extends Zend_Controller_Action
             }
 
             $specService = new Application_Service_Specifications();
-            $service = new Mosts(array(
+            $service = new Mosts([
                 'specs' => $specService
-            ));
+            ]);
 
             $language = $this->_helper->language();
             $yearsCatname = $this->getParam('years_catname');
             $carTypeCatname = $this->getParam('shape_catname');
             $mostCatname = $this->getParam('most_catname');
 
-            $data = $service->getData(array(
+            $data = $service->getData([
                 'language' => $language,
                 'most'     => $mostCatname,
                 'years'    => $yearsCatname,
                 'carType'  => $carTypeCatname,
                 'brandId'  => $brand['id']
-            ));
+            ]);
 
             foreach ($data['sidebar']['mosts'] as &$most) {
                 $most['url'] = $this->_helper->url->url(
@@ -2791,8 +2791,8 @@ class CatalogueController extends Zend_Controller_Action
             }
 
             // images
-            $formatRequests = array();
-            $allPictures = array();
+            $formatRequests = [];
+            $allPictures = [];
             $idx = 0;
             foreach ($data['carList']['cars'] as $car) {
                 foreach ($car['pictures'] as $picture) {
@@ -2807,9 +2807,9 @@ class CatalogueController extends Zend_Controller_Action
             $imagesInfo = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb');
 
             $pictureTable = new Picture();
-            $names = $pictureTable->getNameData($allPictures, array(
+            $names = $pictureTable->getNameData($allPictures, [
                 'language' => $language
-            ));
+            ]);
 
             $carParentTable = new Car_Parent();
 
@@ -2817,9 +2817,9 @@ class CatalogueController extends Zend_Controller_Action
             foreach ($data['carList']['cars'] as &$car) {
                 $pictures = [];
 
-                $paths = $carParentTable->getPaths($car['car']['id'], array(
+                $paths = $carParentTable->getPaths($car['car']['id'], [
                     'breakOnFirst' => true
-                ));
+                ]);
 
                 foreach ($car['pictures'] as $picture) {
                     if ($picture) {
@@ -2827,13 +2827,13 @@ class CatalogueController extends Zend_Controller_Action
 
                         $url = null;
                         foreach ($paths as $path) {
-                            $url = $this->_helper->url->url(array(
+                            $url = $this->_helper->url->url([
                                 'action'        => 'brand-car-picture',
                                 'brand_catname' => $path['brand_catname'],
                                 'car_catname'   => $path['car_catname'],
                                 'path'          => $path['path'],
                                 'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                            ), 'catalogue', true);
+                            ], 'catalogue', true);
                         }
 
                         $pictures[] = [

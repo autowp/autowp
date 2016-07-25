@@ -5,12 +5,8 @@
             'needLeft'  => true,
             'needRight' => false
         ),
-        'pageId' => 128,
+        'pageId' => 94,
     ));
-
-    $this->layout()->moduleName = 'default/account/pm';
 ?>
-<?=$this->partial('account/partial/personal-messages.phtml', array(
-    'messages' => $this->messages
-))?>
+<?=$this->partial('pictures.phtml', $this->picturesData)?>
 <?=$this->paginationControl($this->paginator) ?>

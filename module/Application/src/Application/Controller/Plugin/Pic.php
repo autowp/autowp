@@ -192,7 +192,7 @@ class Pic extends AbstractPlugin
     {
         $controller = $this->getController();
 
-        return $controller->url()->fromRoute('picture', [
+        return $controller->url()->fromRoute('picture/picture', [
             'picture_id' => $identity ? $identity : $id,
         ], [
             'force_canonical' => $absolute
