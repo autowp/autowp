@@ -112,6 +112,15 @@ return [
                                 'action' => 'not-taken-pictures',
                             ],
                         ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'page' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route'    => '/page:page'
+                                ]
+                            ]
+                        ]
                     ],
                     'personal-messages' => [
                         'type' => Literal::class,

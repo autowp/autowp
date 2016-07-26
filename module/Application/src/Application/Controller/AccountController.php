@@ -8,6 +8,7 @@ use Zend\View\Model\JsonModel;
 use Application\Controller\LoginController;
 use Application\Model\Forums;
 use Application\Model\Message;
+use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Application_Service_Specifications;
 use Cars;
@@ -593,7 +594,11 @@ class AccountController extends AbstractActionController
             ->where('status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_INBOX])
             ->order(['add_date DESC']);
 
-        $paginator = Zend_Paginator::factory($select)
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+
+        $paginator
             ->setItemCountPerPage(16)
             ->setCurrentPageNumber($this->params('page'));
 

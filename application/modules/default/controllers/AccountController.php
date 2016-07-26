@@ -466,37 +466,6 @@ class AccountController extends Zend_Controller_Action
         return $this->render($template);
     }
 
-    public function notTakenPicturesAction()
-    {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
-        }
-
-        $this->sidebar();
-
-        $pictures = $this->_helper->catalogue()->getPictureTable();
-
-        $select = $pictures->select(true)
-            ->where('owner_id = ?', $this->_helper->user()->get()->id)
-            ->where('status IN (?)', array(Picture::STATUS_NEW, Picture::STATUS_INBOX))
-            ->order(array('add_date DESC'));
-
-        $paginator = Zend_Paginator::factory($select)
-            ->setItemCountPerPage(16)
-            ->setCurrentPageNumber($this->_getParam('page'));
-
-        $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-        $picturesData = $this->_helper->pic->listData($select, array(
-            'width' => 4
-        ));
-
-        $this->view->assign(array(
-            'paginator'    => $paginator,
-            'picturesData' => $picturesData,
-        ));
-    }
-
     public function accessAction()
     {
         if (!$this->_helper->user()->logedIn()) {
