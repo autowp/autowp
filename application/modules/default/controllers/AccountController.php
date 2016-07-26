@@ -586,31 +586,4 @@ class AccountController extends Zend_Controller_Action
         $this->view->form = $form;
     }
 
-    public function contactsAction()
-    {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
-        }
-
-        $this->sidebar();
-
-        $user = $this->_helper->user()->get();
-
-        $userTable = new Users();
-
-        $userRows = $userTable->fetchAll(
-            $userTable->select(true)
-                ->join('contact', 'users.id = contact.contact_user_id', null)
-                ->where('contact.user_id = ?', $user->id)
-                ->order(['users.deleted', 'users.name'])
-        );
-        $users = [];
-        foreach ($userRows as $row) {
-            $users[] = $row;
-        }
-
-        $this->view->assign(array(
-            'users' => $users
-        ));
-    }
 }
