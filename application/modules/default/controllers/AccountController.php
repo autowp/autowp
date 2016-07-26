@@ -404,67 +404,6 @@ class AccountController extends Zend_Controller_Action
         ));
     }
 
-    public function emailAction()
-    {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
-        }
-
-        $this->sidebar();
-
-        $user = $this->_helper->user()->get();
-
-        $request = $this->getRequest();
-
-        $form = new Application_Form_Account_Email(array(
-            'action' => $this->_helper->url->url()
-        ));
-        $form->populate(array(
-            'e_mail' => $user->e_mail
-        ));
-        if ($request->isPost() && $form->isValid($request->getPost())) {
-            $values = $form->getValues();
-
-            $usersService = $this->getInvokeArg('bootstrap')->getResource('users');
-            $usersService->changeEmailStart($user, $values['e_mail'], $this->_helper->language());
-
-            $this->_helper->flashMessenger->addMessage($this->view->translate('users/change-email/confirmation-message-sent'));
-
-            return $this->redirect($this->_helper->url->url(array()));
-        }
-
-        $this->view->form = $form;
-    }
-
-    public function emailcheckAction()
-    {
-        $usersService = $this->getInvokeArg('bootstrap')->getResource('users');
-
-        $code = $this->getParam('email_check_code');
-        $user = $usersService->emailChangeFinish($code);
-
-        $template = 'emailcheck-fail';
-
-        if ($user) {
-            if (!$this->_helper->user()->logedIn()) {
-                $adapter = new Project_Auth_Adapter_Id();
-                $adapter->setIdentity($user->id);
-                $result = Zend_Auth::getInstance()->authenticate($adapter);
-
-                if ($result->isValid()) {
-                    // hmmm...
-                }
-            }
-
-            $template = 'emailcheck-ok';
-        }
-
-        if ($this->_helper->user()->logedIn()) {
-            $this->sidebar();
-        }
-
-        return $this->render($template);
-    }
 
     public function accessAction()
     {

@@ -104,6 +104,15 @@ return [
                             ],
                         ],
                     ],
+                    'emailcheck' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route'    => '/emailcheck/:email_check_code',
+                            'defaults' => [
+                                'action' => 'emailcheck',
+                            ],
+                        ],
+                    ],
                     'not-taken-pictures' => [
                         'type' => Literal::class,
                         'options' => [

@@ -1,13 +1,13 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => true
-        ),
+        ],
         'pageId' => 54,
-    ));
+    ]);
 ?>
 <div class="well">
-    <p><?=$this->escape($this->translate('users/registration/email-confirm/success-text'))?></p>
+    <p><?=$this->escapeHtml($this->translate('users/registration/email-confirm/success-text'))?></p>
 </div>

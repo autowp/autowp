@@ -25,7 +25,10 @@ return [
                 return new Controller\AboutController($acl);
             },
             Controller\AccountController::class => function($sm) {
-                return new Controller\AccountController();
+                $service = $sm->get(Service\UsersService::class);
+                $emailForm = $sm->get('AccountEmailForm');
+                $translator = $sm->get('translator');
+                return new Controller\AccountController($service, $translator, $emailForm);
             },
             Controller\ArticlesController::class     => InvokableFactory::class,
             Controller\BanController::class          => InvokableFactory::class,
@@ -514,6 +517,14 @@ return [
         'linkedin' => [
             'clientId'     => '',
             'clientSecret' => ''
+        ]
+    ],
+
+    'view_helper_config' => [
+        'flashmessenger' => [
+            'message_open_format'      => '<div%s><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><ul><li>',
+            'message_close_string'     => '</li></ul></div>',
+            'message_separator_string' => '</li><li>'
         ]
     ]
 ];

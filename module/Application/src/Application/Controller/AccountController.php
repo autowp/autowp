@@ -2,13 +2,16 @@
 
 namespace Application\Controller;
 
+use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 
 use Application\Controller\LoginController;
 use Application\Model\Forums;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Service\UsersService;
 
 use Application_Service_Specifications;
 use Cars;
@@ -29,6 +32,25 @@ use Imagick;
 
 class AccountController extends AbstractActionController
 {
+    /**
+     * @var UsersService
+     */
+    private $service;
+
+    private $translator;
+
+    /**
+     * @var Form
+     */
+    private $emailForm;
+
+    public function __construct(UsersService $service, $translator, Form $emailForm)
+    {
+        $this->service = $service;
+        $this->translator = $translator;
+        $this->emailForm = $emailForm;
+    }
+
     private function forwadToLogin()
     {
         return $this->forward()->dispatch(LoginController::class, [
@@ -439,36 +461,35 @@ class AccountController extends AbstractActionController
 
         $request = $this->getRequest();
 
-        $form = new Application_Form_Account_Email([
-            'action' => $this->_helper->url->url()
+        $this->emailForm->setAttribute('action', $this->url()->fromRoute('account/email'));
+        $this->emailForm->setData([
+            'email' => $user->e_mail
         ]);
-        $form->populate([
-            'e_mail' => $user->e_mail
-        ]);
-        if ($request->isPost() && $form->isValid($request->getPost())) {
-            $values = $form->getValues();
+        if ($request->isPost()) {
+            $this->emailForm->setData($this->params()->fromPost());
+            if ($this->emailForm->isValid()) {
+                $values = $this->emailForm->getData();
 
-            $usersService = $this->getInvokeArg('bootstrap')->getResource('users');
-            $usersService->changeEmailStart($user, $values['e_mail'], $this->language());
+                $this->service->changeEmailStart($user, $values['email'], $this->language());
 
-            $this->_helper->flashMessenger->addMessage($this->view->translate('users/change-email/confirmation-message-sent'));
+                $this->flashMessenger()->addSuccessMessage($this->translator->translate('users/change-email/confirmation-message-sent'));
 
-            return $this->redirect()->toRoute();
+                return $this->redirect()->toRoute();
+            }
         }
 
         return [
-            'form' => $form
+            'sidebar' => $this->sidebar(),
+            'form'    => $this->emailForm
         ];
     }
 
     public function emailcheckAction()
     {
-        $usersService = $this->getInvokeArg('bootstrap')->getResource('users');
-
         $code = $this->params('email_check_code');
-        $user = $usersService->emailChangeFinish($code);
+        $user = $this->service->emailChangeFinish($code);
 
-        $template = 'emailcheck-fail';
+        $template = 'application/account/emailcheck-fail';
 
         if ($user) {
             if (!$this->user()->logedIn()) {
@@ -481,14 +502,20 @@ class AccountController extends AbstractActionController
                 }
             }
 
-            $template = 'emailcheck-ok';
+            $template = 'application/account/emailcheck-ok';
         }
+
+        $viewModel = new ViewModel();
+
+        $viewModel->setTemplate($template);
 
         if ($this->user()->logedIn()) {
-            $this->sidebar();
+            $viewModel->setVariables([
+                'sidebar' => $this->sidebar()
+            ]);
         }
 
-        return $this->render($template);
+        return $viewModel;
     }
 
     private function preparePersonalMessages($messages)

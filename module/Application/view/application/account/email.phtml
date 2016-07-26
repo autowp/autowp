@@ -1,20 +1,29 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
-            'needLeft'  => true,
+            'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 55,
-    ));
+    ]);
 ?>
-<div class="well">
-    <?php if ($email = $this->user()->get()->e_mail) { ?>
-        <p>Ваш текущий адрес e-mail: <?=$this->htmlA('mailto:' . $email, $email) ?></p>
-    <?php } else { ?>
-        <p>Вы не указали адрес e-mail</p>
-    <?php } ?>
-    <p>На этой странице вы можете изменить свой адрес электронной почты (e-mail)</p>
-    <p>На новый адрес будет выслано письмо с инструкциями по его подтверждению</p>
-    <?=$this->form->render($this) ?>
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <div class="well">
+            <?php if ($email = $this->user()->get()->e_mail) { ?>
+                <p>Ваш текущий адрес e-mail: <?=$this->htmlA('mailto:' . $email, $email) ?></p>
+            <?php } else { ?>
+                <p>Вы не указали адрес e-mail</p>
+            <?php } ?>
+            <p>На этой странице вы можете изменить свой адрес электронной почты (e-mail)</p>
+            <p>На новый адрес будет выслано письмо с инструкциями по его подтверждению</p>
+            <?=$this->partial('application/forms/bootstrap-horizontal', [
+                'form' => $this->form
+            ])?>
+        </div>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <?=$this->partial('application/account/sidebar', $this->sidebar)?>
+    </div>
 </div>

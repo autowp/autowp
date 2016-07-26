@@ -9,6 +9,15 @@
         $mainMenu = $this->mainMenu();
     }
 
+    $flash = $this->flashMessenger();
+
+    $flash->setMessageOpenFormat('<div%s>
+ <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+     &times;
+ </button>
+ <ul><li>')
+     ->setMessageSeparatorString('</li><li>')
+     ->setMessageCloseString('</li></ul></div>');
 ?>
 <?=$this->doctype() . PHP_EOL ?>
 <html dir="ltr" lang="<?=$this->language()?>">
@@ -69,9 +78,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
             <div class="row">
                 <div class="col-sm-<?=$spanCenter?> col-sm-push-<?=$spanLeft?>">
-                    <?php /*=$this->action('flash-messages', 'layout', 'default') */?>
                     <?=$this->breadcrumbs() ?>
                     <?=$this->pageTitle() ?>
+                    <?=$flash->render('error',   ['alert', 'alert-dismissible', 'alert-danger']) ?>
+                    <?=$flash->render('info',    ['alert', 'alert-dismissible', 'alert-info']) ?>
+                    <?=$flash->render('default', ['alert', 'alert-dismissible', 'alert-warning']) ?>
+                    <?=$flash->render('success', ['alert', 'alert-dismissible', 'alert-success']) ?>
+
                     <?=$this->layout()->content ?>
                 </div>
                 <?php if ($needLeft) { ?>

@@ -19,7 +19,8 @@ return [
         'Zend\Mvc\Console',
         'Application',
         'ZF\ContentNegotiation',
-        'ZF\OAuth2'
+        'ZF\OAuth2',
+        'Zend\Mvc\Plugin\FlashMessenger'
     ],
 
     // These are various options for the listeners attached to the ModuleManager
