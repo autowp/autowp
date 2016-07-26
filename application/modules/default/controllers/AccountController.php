@@ -586,69 +586,6 @@ class AccountController extends Zend_Controller_Action
         $this->view->form = $form;
     }
 
-    public function specsConflictsAction()
-    {
-        if (!$this->_helper->user()->logedIn()) {
-            return $this->forward('index', 'login');
-        }
-
-        $service = new Application_Service_Specifications();
-
-        $filter = $this->getParam('conflict');
-        $page = (int)$this->getParam('page');
-
-        $userId = $this->_helper->user()->get()->id;
-
-        $data = $service->getConflicts($userId, $filter, $page, 50);
-        $conflicts = $data['conflicts'];
-        $paginator = $data['paginator'];
-
-        $userTable = new Users();
-        $carTable = new Cars();
-        $engineTable = new Engines();
-
-        $language = $this->_helper->language();
-
-        foreach ($conflicts as &$conflict) {
-            foreach ($conflict['values'] as &$value) {
-                $value['user'] = $userTable->find($value['userId'])->current();
-            }
-
-            switch ($conflict['itemTypeId']) {
-                case Application_Service_Specifications::ITEM_TYPE_CAR:
-                    $car = $carTable->find($conflict['itemId'])->current();
-                    $conflict['object'] = $car ? $car->getFullName($language) : null;
-                    $conflict['url'] = $this->_helper->url->url(array(
-                        'controller' => 'cars',
-                        'action'     => 'car-specifications-editor',
-                        'car_id'     => $conflict['itemId'],
-                        'tab'        => 'spec'
-                    ), 'default', true);
-                    break;
-                case Application_Service_Specifications::ITEM_TYPE_ENGINE:
-                    $engine = $engineTable->find($conflict['itemId'])->current();
-                    $conflict['object'] = $engine ? 'Двигатель ' . $engine->caption : null;
-                    $conflict['url'] = $this->_helper->url->url(array(
-                        'controller' => 'cars',
-                        'action'     => 'engine-spec-editor',
-                        'engine_id'  => $conflict['itemId'],
-                        'tab'        => 'engine'
-                    ), 'default', true);
-                    break;
-            }
-        }
-        unset($conflict);
-
-        $this->view->assign(array(
-            'filter'    => (string)$filter,
-            'conflicts' => $conflicts,
-            'paginator' => $paginator,
-            'weight'    => $this->_helper->user()->get()->specs_weight
-        ));
-
-        $this->sidebar();
-    }
-
     public function contactsAction()
     {
         if (!$this->_helper->user()->logedIn()) {

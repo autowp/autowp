@@ -211,6 +211,12 @@ return [
                                 'action' => 'specs-conflicts',
                             ],
                         ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => Router\Http\WildcardSafe::class
+                            ]
+                        ]
                     ],
                 ]
             ],

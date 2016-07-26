@@ -1,5 +1,7 @@
 <?php
 
+use Application\Paginator\Adapter\Zend1DbTableSelect;
+
 class Application_Service_Specifications
 {
     const ITEM_TYPE_CAR = 1;
@@ -2917,7 +2919,11 @@ class Application_Service_Specifications
 
         $userValueTable = $this->_getUserValueTable();
 
-        $paginator = Zend_Paginator::factory($select)
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+
+        $paginator
             ->setItemCountPerPage($perPage)
             ->setCurrentPageNumber($page);
 

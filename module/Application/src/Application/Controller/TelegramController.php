@@ -29,7 +29,7 @@ class TelegramController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $telegram->commandsHandler(true);
+        $this->service->commandsHandler(true);
 
         return new JsonModel([
             'status' => true

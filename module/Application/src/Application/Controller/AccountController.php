@@ -3,6 +3,7 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
 
 use Application\Controller\LoginController;
 use Application\Model\Forums;
@@ -97,7 +98,7 @@ class AccountController extends AbstractActionController
         $mModel = new Message();
         $mModel->send($currentUser->id, $user->id, $message);
 
-        return $this->_helper->json([
+        return new JsonModel([
             'ok'      => true,
             'message' => 'Сообщение отправлено'
         ]);
@@ -114,7 +115,7 @@ class AccountController extends AbstractActionController
         $mModel = new Message();
         $mModel->delete($user->id, $this->params('id'));
 
-        return $this->_helper->json([
+        return new JsonModel([
             'ok' => true
         ]);
     }
@@ -513,7 +514,6 @@ class AccountController extends AbstractActionController
         ];
     }
 
-
     public function personalMessagesSentAction()
     {
         if (!$this->user()->logedIn()) {
@@ -609,7 +609,6 @@ class AccountController extends AbstractActionController
         ];
     }
 
-
     public function clearSystemMessagesAction()
     {
         if (!$this->user()->logedIn()) {
@@ -619,7 +618,7 @@ class AccountController extends AbstractActionController
         $mModel = new Message();
         $mModel->deleteAllSystem($this->user()->get()->id);
 
-        return $this->redirect()->toRoute('account/personal-messages-system');
+        return $this->redirect()->toRoute('account/personal-messages/system');
     }
 
     public function clearSentMessagesAction()
@@ -631,7 +630,7 @@ class AccountController extends AbstractActionController
         $mModel = new Message();
         $mModel->deleteAllSent($this->user()->get()->id);
 
-        return $this->redirect()->toRoute('account/personal-messages-sent');
+        return $this->redirect()->toRoute('account/personal-messages/sent');
     }
 
     public function accessAction()
@@ -733,7 +732,7 @@ class AccountController extends AbstractActionController
 
         $service = new Application_Service_Specifications();
 
-        $filter = $this->params('conflict');
+        $filter = $this->params('conflict', '0');
         $page = (int)$this->params('page');
 
         $userId = $this->user()->get()->id;
@@ -746,7 +745,7 @@ class AccountController extends AbstractActionController
         $carTable = new Cars();
         $engineTable = new Engines();
 
-        $language = $this->_helper->language();
+        $language = $this->language();
 
         foreach ($conflicts as &$conflict) {
             foreach ($conflict['values'] as &$value) {
@@ -757,22 +756,20 @@ class AccountController extends AbstractActionController
                 case Application_Service_Specifications::ITEM_TYPE_CAR:
                     $car = $carTable->find($conflict['itemId'])->current();
                     $conflict['object'] = $car ? $car->getFullName($language) : null;
-                    $conflict['url'] = $this->_helper->url->url([
-                        'controller' => 'cars',
-                        'action'     => 'car-specifications-editor',
-                        'car_id'     => $conflict['itemId'],
-                        'tab'        => 'spec'
-                    ], 'default', true);
+                    $conflict['url'] = $this->url()->fromRoute('cars', [
+                        'action' => 'car-specifications-editor',
+                        'car_id' => $conflict['itemId'],
+                        'tab'    => 'spec'
+                    ]);
                     break;
                 case Application_Service_Specifications::ITEM_TYPE_ENGINE:
                     $engine = $engineTable->find($conflict['itemId'])->current();
                     $conflict['object'] = $engine ? 'Двигатель ' . $engine->caption : null;
-                    $conflict['url'] = $this->_helper->url->url([
-                        'controller' => 'cars',
-                        'action'     => 'engine-spec-editor',
-                        'engine_id'  => $conflict['itemId'],
-                        'tab'        => 'engine'
-                    ], 'default', true);
+                    $conflict['url'] = $this->url()->fromRoute('cars', [
+                        'action'    => 'engine-spec-editor',
+                        'engine_id' => $conflict['itemId'],
+                        'tab'       => 'engine'
+                    ]);
                     break;
             }
         }

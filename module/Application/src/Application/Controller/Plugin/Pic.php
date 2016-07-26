@@ -448,7 +448,7 @@ class Pic extends AbstractPlugin
     {
         $options = array_replace([
             'paginator' => [
-                'route'     => 'picture',
+                'route'     => 'picture/picture',
                 'urlParams' => []
             ]
         ], $options);
@@ -1120,7 +1120,7 @@ class Pic extends AbstractPlugin
 
                     $name = isset($names[$id]) ? $names[$id] : null;
 
-                    $url = $catalogue->url()->fromRoute('picture', [
+                    $url = $catalogue->url()->fromRoute('picture/picture', [
                         'picture_id' => $row['identity'] ? $row['identity'] : $id,
                         'gallery'    => null
                     ]);

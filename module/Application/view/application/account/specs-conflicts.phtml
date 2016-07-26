@@ -1,12 +1,12 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
-            'needLeft'  => true,
+            'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 188,
-    ));
+    ]);
 
     //$this->layout()->moduleName = 'default/account/specs-conflicts';
 ?>
@@ -17,28 +17,22 @@
 
 <ul class="nav nav-pills" style="margin-bottom:10px">
     <li<?=$this->filter == '0' ? ' class="active"' : ''?>>
-        <?=$this->htmlA($this->url(array(
-            'conflict' => null,
-            'page'     => null
-        )), 'Все')?>
+        <?=$this->htmlA($this->url('account/specs-conflicts'), 'Все')?>
     </li>
     <li<?=$this->filter == '-1' ? ' class="active"' : ''?>>
-        <?=$this->htmlA($this->url(array(
+        <?=$this->htmlA($this->url('account/specs-conflicts/params', [
             'conflict' => -1,
-            'page'     => null
-        )), 'Я не согласен')?>
+        ]), 'Я не согласен')?>
     </li>
     <li<?=$this->filter == '1' ? ' class="active"' : ''?>>
-        <?=$this->htmlA($this->url(array(
+        <?=$this->htmlA($this->url('account/specs-conflicts/params', [
             'conflict' => 1,
-            'page'     => null
-        )), 'Не согласны со мной')?>
+        ]), 'Не согласны со мной')?>
     </li>
     <li<?=$this->filter == 'minus-weight' ? ' class="active"' : ''?>>
-        <?=$this->htmlA($this->url(array(
+        <?=$this->htmlA($this->url('account/specs-conflicts/params', [
             'conflict' => 'minus-weight',
-            'page'     => null
-        )), 'Ошибки')?>
+        ]), 'Ошибки')?>
     </li>
 </ul>
 
@@ -55,16 +49,16 @@
         <?php foreach ($this->conflicts as $conflict) { ?>
             <tr>
                 <td>
-                    <?=$this->escape($conflict['object'])?>
+                    <?=$this->escapeHtml($conflict['object'])?>
                 </td>
-                <td><?=$this->escape($conflict['attribute'])?></td>
+                <td><?=$this->escapeHtml($conflict['attribute'])?></td>
                 <td>
                     <?php if ($conflict['value'] === null) { ?>
                         <em>нет</em>
                     <?php } else { ?>
-                        <?=$this->escape($conflict['value'])?>
+                        <?=$this->escapeHtml($conflict['value'])?>
                         <?php if ($conflict['unit']) { ?>
-                            <?=$this->escape($conflict['unit']['abbr'])?>
+                            <?=$this->escapeHtml($conflict['unit']['abbr'])?>
                         <?php } ?>
                     <?php } ?>
 
@@ -75,8 +69,8 @@
                         <?php if ($value['value'] === null) { ?>
                             <em>нет</em>
                         <?php } else { ?>
-                            <?=$this->escape($value['value'])?>
-                            <?=$this->escape($conflict['unit']['abbr'])?>
+                            <?=$this->escapeHtml($value['value'])?>
+                            <?=$this->escapeHtml($conflict['unit']['abbr'])?>
                         <?php } ?>
                         <?=$this->user($value['user'])?>
                         <br />
@@ -86,4 +80,6 @@
         <?php } ?>
     </tbody>
 </table>
-<?=$this->paginationControl($this->paginator) ?>
+<?=$this->paginationControl($this->paginator, null, null, [
+    'route' => 'account/specs-conflicts/params'
+]) ?>
