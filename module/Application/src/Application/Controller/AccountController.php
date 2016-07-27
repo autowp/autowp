@@ -44,11 +44,37 @@ class AccountController extends AbstractActionController
      */
     private $emailForm;
 
-    public function __construct(UsersService $service, $translator, Form $emailForm)
+    /**
+     * @var Form
+     */
+    private $profileForm;
+
+    /**
+     * @var Form
+     */
+    private $settingsForm;
+
+    /**
+     * @var Form
+     */
+    private $photoForm;
+
+    /**
+     * @var array
+     */
+    private $hosts = [];
+
+    public function __construct(UsersService $service, $translator,
+            Form $emailForm, Form $profileForm, Form $settingsForm,
+            Form $photoForm, array $hosts)
     {
         $this->service = $service;
         $this->translator = $translator;
         $this->emailForm = $emailForm;
+        $this->profileForm = $profileForm;
+        $this->settingsForm = $settingsForm;
+        $this->photoForm = $photoForm;
+        $this->hosts = $hosts;
     }
 
     private function forwadToLogin()
@@ -307,46 +333,48 @@ class AccountController extends AbstractActionController
 
     public function profileAction()
     {
-        if (!$this->user()->logedIn()) {
+        $user = $this->user()->get();
+
+        if (!$user) {
             return $this->forwadToLogin();
         }
 
-        $this->sidebar();
-
-        $user = $this->user()->get();
-
         $request = $this->getRequest();
 
-        $formProfile = new Application_Form_Account_Profile([
-            'action' => $this->_helper->url->url([
-                'form' => 'profile'
-            ])
+        $this->profileForm->setAttribute('action', $this->url()->fromRoute('account/profile', [
+            'form' => 'profile'
+        ]));
+
+        $this->profileForm->setData([
+            'name' => $user->name
         ]);
-        $formProfile->populate($user->toArray());
-        if ($request->isPost() && $this->params('form') == 'profile' && $formProfile->isValid($request->getPost())) {
-            $values = $formProfile->getValues();
+        if ($request->isPost() && $this->params('form') == 'profile') {
+            $this->profileForm->setData($this->params()->fromPost());
+            if ($this->profileForm->isValid()) {
+                $values = $this->profileForm->getData();
 
-            $old_name = $user->getCompoundName();
+                $oldName = $user->getCompoundName();
 
-            $user->setFromArray([
-                'name' => $values['name']
-            ])->save();
+                $user->setFromArray([
+                    'name' => $values['name']
+                ])->save();
 
-            $new_name = $user->getCompoundName();
+                $newName = $user->getCompoundName();
 
-            if ($old_name != $new_name) {
-                $user_renames = new User_Renames();
-                $user_renames->insert([
-                    'user_id'  => $user->id,
-                    'old_name' => $old_name,
-                    'new_name' => $new_name,
-                    'date'     => new Zend_Db_Expr('NOW()')
-                ]);
+                if ($oldName != $newName) {
+                    $user_renames = new User_Renames();
+                    $user_renames->insert([
+                        'user_id'  => $user->id,
+                        'old_name' => $oldName,
+                        'new_name' => $newName,
+                        'date'     => new Zend_Db_Expr('NOW()')
+                    ]);
+                }
+
+                $this->flashMessenger()->addSuccessMessage('Данные сохранены');
+
+                return $this->redirect()->toRoute();
             }
-
-            $this->_helper->flashMessenger->addMessage('Данные сохранены');
-
-            return $this->redirect()->toRoute();
         }
 
         if ($request->isPost() && $this->params('form') == 'reset-photo') {
@@ -358,45 +386,58 @@ class AccountController extends AbstractActionController
                 $this->imageStorage()->removeImage($oldImageId);
             }
 
-            $this->_helper->flashMessenger->addMessage('Фотография удалена');
+            $this->flashMessenger()->addSuccessMessage('Фотография удалена');
 
             return $this->redirect()->toRoute();
         }
 
-        $formPhoto = new Application_Form_Account_Photo([
-            'action' => $this->_helper->url->url([
-                'form' => 'photo'
-            ])
-        ]);
-        if ($request->isPost() && $this->params('form') == 'photo' && $formPhoto->isValid($request->getPost())) {
+        $this->photoForm->setAttribute('action', $this->url()->fromRoute('account/profile', [
+            'form' => 'photo'
+        ]));
 
-            $formPhoto->photo->receive();
-            $filepath = $formPhoto->photo->getFileName();
+        if ($request->isPost() && $this->params('form') == 'photo') {
+            $data = array_merge_recursive(
+                $this->getRequest()->getPost()->toArray(),
+                $this->getRequest()->getFiles()->toArray()
+            );
+            $this->photoForm->setData($data);
+            if ($this->photoForm->isValid()) {
 
-            $imageStorage = $this->imageStorage();
-            $imageSampler = $imageStorage->getImageSampler();
+                $adapter = new \Zend\File\Transfer\Adapter\Http();
+                /*var_dump(); exit;
+                if (!$adapter->receive($data['photo']['name'])) {
+                    throw new Exception("Failed to receive file");
+                }
 
-            $imagick = new Imagick();
-            if (!$imagick->readImage($filepath)) {
-                throw new Exception("Error loading image");
+                $filepath = $adapter->getFileName();*/
+
+                $filepath = $data['photo']['tmp_name'];
+
+                $imageStorage = $this->imageStorage();
+                $imageSampler = $imageStorage->getImageSampler();
+
+                $imagick = new Imagick();
+                if (!$imagick->readImage($filepath)) {
+                    throw new Exception("Error loading image");
+                }
+                $format = $imageStorage->getFormat('photo');
+                $imageSampler->convertImagick($imagick, $format);
+
+                $newImageId = $imageStorage->addImageFromImagick($imagick, 'user');
+
+                $imagick->clear();
+
+                $oldImageId = $user->img;
+                $user->img = $newImageId;
+                $user->save();
+                if ($oldImageId) {
+                    $imageStorage->removeImage($oldImageId);
+                }
+
+                $this->flashMessenger()->addSuccessMessage('Фотография сохранена');
+
+                return $this->redirect()->toRoute('account/profile');
             }
-            $format = $imageStorage->getFormat('photo');
-            $imageSampler->convertImagick($imagick, $format);
-
-            $newImageId = $imageStorage->addImageFromImagick($imagick, 'user');
-
-            $imagick->clear();
-
-            $oldImageId = $user->img;
-            $user->img = $newImageId;
-            $user->save();
-            if ($oldImageId) {
-                $imageStorage->removeImage($oldImageId);
-            }
-
-            $this->_helper->flashMessenger->addMessage('Фотография сохранена');
-
-            return $this->redirect()->toRoute();
         }
 
         $language = $this->language();
@@ -409,43 +450,45 @@ class AccountController extends AbstractActionController
             }
         }
         sort($list, SORT_STRING);
+        $list = array_combine($list, $list);
 
-        $hosts = Zend_Controller_Front::getInstance()
-                ->getParam('bootstrap')->getOption('hosts');
-
-        foreach ($hosts as $language => $options) {
+        foreach ($this->hosts as $language => $options) {
             $name = Zend_Locale::getTranslation($language, 'language', $language);
             $languages[$language] = $name;
         }
 
-        $settingsForm = new Application_Form_Account_Settings([
-            'timezoneList' => $list,
-            'languages'    => $languages,
-            'action' => $this->_helper->url->url([
-                'form' => 'settings'
-            ])
-        ]);
+        $this->settingsForm->setAttribute('action', $this->url()->fromRoute('account/profile', [
+            'form' => 'settings'
+        ]));
+        $this->settingsForm->get('language')->setValueOptions($languages);
+        $this->settingsForm->get('timezone')->setValueOptions($list);
 
-        $settingsForm->populate([
+        $this->settingsForm->setData([
             'timezone' => $user->timezone,
             'language' => $user->language
         ]);
 
-        if ($request->isPost() && $this->params('form') == 'settings' && $settingsForm->isValid($request->getPost())) {
+        if ($request->isPost() && $this->params('form') == 'settings') {
+            $this->settingsForm->setData($this->params()->fromPost());
+            if ($this->settingsForm->isValid()) {
 
-            $values = $settingsForm->getValues();
+                $values = $this->settingsForm->getData();
 
-            $user->timezone = $values['timezone'];
-            $user->language = $values['language'];
-            $user->save();
+                $user->timezone = $values['timezone'];
+                $user->language = $values['language'];
+                $user->save();
 
-            return $this->redirect()->toRoute();
+                $this->flashMessenger()->addSuccessMessage('Данные сохранены');
+
+                return $this->redirect()->toRoute();
+            }
         }
 
         return [
-            'settingsForm' => $settingsForm,
-            'formProfile'  => $formProfile,
-            'formPhoto'    => $formPhoto,
+            'settingsForm' => $this->settingsForm,
+            'profileForm'  => $this->profileForm,
+            'photoForm'    => $this->photoForm,
+            'sidebar'      => $this->sidebar()
         ];
     }
 
@@ -612,8 +655,6 @@ class AccountController extends AbstractActionController
             return $this->forwadToLogin();
         }
 
-        $this->sidebar();
-
         $pictures = $this->catalogue()->getPictureTable();
 
         $select = $pictures->select(true)
@@ -638,6 +679,7 @@ class AccountController extends AbstractActionController
         return [
             'paginator'    => $paginator,
             'picturesData' => $picturesData,
+            'sidebar'      => $this->sidebar()
         ];
     }
 

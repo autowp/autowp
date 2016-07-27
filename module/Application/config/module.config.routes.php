@@ -45,7 +45,7 @@ return [
                     'route'    => '/account',
                     'defaults' => [
                         'controller' => Controller\AccountController::class,
-                        'action'     => 'index',
+                        'action'     => 'profile',
                     ],
                 ],
                 'may_terminate' => true,
@@ -213,9 +213,9 @@ return [
                         ],
                     ],
                     'profile' => [
-                        'type' => Literal::class,
+                        'type' => Segment::class,
                         'options' => [
-                            'route'    => '/profile',
+                            'route'    => '/profile[/:form]',
                             'defaults' => [
                                 'action' => 'profile',
                             ],

@@ -5,6 +5,8 @@ class Users extends Project_Db_Table
     protected $_name = 'users';
     protected $_rowClass = 'Users_Row';
 
+    const MAX_NAME = 50;
+
     public function updateSpecsVolumes()
     {
         $db = $this->getAdapter();

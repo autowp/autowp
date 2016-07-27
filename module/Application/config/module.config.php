@@ -27,8 +27,12 @@ return [
             Controller\AccountController::class => function($sm) {
                 $service = $sm->get(Service\UsersService::class);
                 $emailForm = $sm->get('AccountEmailForm');
+                $profileForm = $sm->get('AccountProfileForm');
+                $settingsForm = $sm->get('AccountSettingsForm');
+                $photoForm = $sm->get('AccountPhotoForm');
                 $translator = $sm->get('translator');
-                return new Controller\AccountController($service, $translator, $emailForm);
+                $config = $sm->get('Config');
+                return new Controller\AccountController($service, $translator, $emailForm, $profileForm, $settingsForm, $photoForm, $config['hosts']);
             },
             Controller\ArticlesController::class     => InvokableFactory::class,
             Controller\BanController::class          => InvokableFactory::class,

@@ -13,11 +13,14 @@
         <?php if ($element instanceof Zend\Form\Element) { ?>
             <?php if ($element instanceof Zend\Form\Element\File) { ?>
                 <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
-                    <label class="col-md-2 control-label" for="<?=$element->getId()?>">
+                    <label class="col-md-2 control-label">
                         <?=$this->escapeHtml($this->translate($element->getLabel()))?>
                     </label>
                     <div class="col-md-10">
-                        <?=$element?>
+                        <?=$this->formElement(
+                            $element
+                                ->setAttribute('class', $element->getAttribute('class') . ' form-control')
+                        )?>
                         <?php foreach ($element->getMessages() as $error) { ?>
                             <p class="help-block"><?=$this->escapeHtml($error)?></p>
                         <?php } ?>

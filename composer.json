@@ -43,7 +43,8 @@
         "zfcampus/zf-content-negotiation": "dev-master",
         "zfcampus/zf-oauth2": "dev-master",
         "zendframework/zend-cache": "^2.7",
-        "zendframework/zend-permissions-acl": "^2.6"
+        "zendframework/zend-permissions-acl": "^2.6",
+        "zendframework/zend-file": "^2.7"
     },
     "authors": [
         {

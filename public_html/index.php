@@ -8,9 +8,10 @@ $zf2uri = ['/api/', '/oauth', '/users', '/rules', '/about', '/info', '/pulse',
     '/moder/traffic', '/moder/hotlink', '/moder/comments', '/moder/twins',
     '/moder/rights', '/registration', '/login', '/picture/', '/telegram',
     '/account/pm', '/account/clear', '/account/specs-conflicts',
-    '/account/contacts', '/account/not-taken-pictures', '/account/email'];
+    '/account/contacts', '/account/not-taken-pictures', '/account/email',
+    '/account/profile'];
 
-$zf2ExactUri = ['/log', '/moder'];
+$zf2ExactUri = ['/log', '/moder', '/account'];
 
 $useZF2 = php_sapi_name() === 'cli';
        //|| isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] == '46.188.125.123';

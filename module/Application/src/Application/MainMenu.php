@@ -162,7 +162,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '9_' . $language;
+        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '10_' . $language;
 
         $secondMenu = $this->cache->getItem($key, $success);
         if (!$success) {
@@ -189,7 +189,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '_4_' . $language;
+        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '_5_' . $language;
 
         $pages = $this->cache->getItem($key, $success);
         if (!$success) {
