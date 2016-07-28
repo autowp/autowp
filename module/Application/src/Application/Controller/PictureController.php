@@ -127,7 +127,7 @@ class PictureController extends AbstractActionController
             ]);
         }
 
-        if ($this->params('gallery')) {
+        if ($this->params()->fromQuery('gallery')) {
             return $this->forward()->dispatch(self::class, [
                 'action'     => 'gallery',
                 'picture_id' => $this->params('picture_id')

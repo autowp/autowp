@@ -161,9 +161,8 @@ return [
                         'name' => 'password',
                         'options' => [
                             'label'        => 'Пароль',
-                            'size'         => 20,
-                            'maxlength'    => 50,
-                            'autocomplete' => 'email',
+                            'size'         => Users::MAX_PASSWORD,
+                            'maxlength'    => Users::MAX_PASSWORD
                         ]
                     ],
                 ],
@@ -173,9 +172,8 @@ return [
                         'name' => 'password_confirm',
                         'options' => [
                             'label'        => 'Пароль (еще раз)',
-                            'size'         => 20,
-                            'maxlength'    => 50,
-                            'autocomplete' => 'email',
+                            'size'         => Users::MAX_PASSWORD,
+                            'maxlength'    => Users::MAX_PASSWORD
                         ]
                     ],
                 ],
@@ -199,8 +197,8 @@ return [
                         [
                             'name' => 'StringLength',
                             'options' => [
-                                'min' => 6,
-                                'max' => 50
+                                'min' => Users::MIN_PASSWORD,
+                                'max' => Users::MAX_PASSWORD
                             ]
                         ]
                     ]
@@ -214,8 +212,8 @@ return [
                         [
                             'name' => 'StringLength',
                             'options' => [
-                                'min' => 6,
-                                'max' => 50
+                                'min' => Users::MIN_PASSWORD,
+                                'max' => Users::MAX_PASSWORD
                             ]
                         ],
                         [
@@ -720,8 +718,8 @@ return [
                         'name' => 'password',
                         'options' => [
                             'label'     => 'login/password',
-                            'size'      => 20,
-                            'maxlength' => 50,
+                            'size'      => Users::MAX_PASSWORD,
+                            'maxlength' => Users::MAX_PASSWORD,
                         ]
                     ]
                 ],
@@ -731,8 +729,8 @@ return [
                         'name' => 'password_confirm',
                         'options' => [
                             'label'     => 'login/password-confirm',
-                            'size'      => 20,
-                            'maxlength' => 50,
+                            'size'      => Users::MAX_PASSWORD,
+                            'maxlength' => Users::MAX_PASSWORD,
                         ]
                     ]
                 ],
@@ -799,8 +797,8 @@ return [
                         [
                             'name'    => 'StringLength',
                             'options' => [
-                                'min' => 6,
-                                'max' => 50
+                                'min' => Users::MIN_PASSWORD,
+                                'max' => Users::MAX_PASSWORD
                             ]
                         ]
                     ]
@@ -814,8 +812,8 @@ return [
                         [
                             'name'    => 'StringLength',
                             'options' => [
-                                'min' => 6,
-                                'max' => 50
+                                'min' => Users::MIN_PASSWORD,
+                                'max' => Users::MAX_PASSWORD
                             ]
                         ],
                         [
@@ -1057,6 +1055,134 @@ return [
                     ]
                 ]
             ]
+        ],
+        'ChangePasswordForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Password',
+                        'name' => 'password_old',
+                        'options' => [
+                            'label'        => 'Текущий',
+                            'size'         => Users::MAX_PASSWORD,
+                            'maxlength'    => Users::MAX_PASSWORD
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Password',
+                        'name' => 'password',
+                        'options' => [
+                            'label'        => 'Новый',
+                            'size'         => Users::MAX_PASSWORD,
+                            'maxlength'    => Users::MAX_PASSWORD
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Password',
+                        'name' => 'password_confirm',
+                        'options' => [
+                            'label'        => 'Новый (ещё раз)',
+                            'size'         => Users::MAX_PASSWORD,
+                            'maxlength'    => Users::MAX_PASSWORD
+                        ]
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'password_old' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'max' => Users::MAX_PASSWORD
+                            ]
+                        ]
+                    ]
+                ],
+                'password' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'min' => Users::MIN_PASSWORD,
+                                'max' => Users::MAX_PASSWORD
+                            ]
+                        ]
+                    ]
+                ],
+                'password_confirm' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'min' => Users::MIN_PASSWORD,
+                                'max' => Users::MAX_PASSWORD
+                            ]
+                        ],
+                        [
+                            'name' => 'Identical',
+                            'options' => [
+                                'token' => 'password',
+                            ],
+                        ]
+                    ]
+                ],
+            ],
+        ],
+        'DeleteUserForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Password',
+                        'name' => 'password',
+                        'options' => [
+                            'label'        => 'login/password',
+                            'size'         => Users::MAX_PASSWORD,
+                            'maxlength'    => Users::MAX_PASSWORD
+                        ]
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'password' => [
+                    'required'   => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'max' => Users::MAX_PASSWORD
+                            ]
+                        ]
+                    ]
+                ]
+            ],
         ],
     ]
 ];

@@ -143,8 +143,8 @@ class Pic extends AbstractPlugin
                             'path'          => $path['path'],
                             'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
                         ], [
-                        'force_canonical' => $options['canonical']
-                    ]);
+                            'force_canonical' => $options['canonical']
+                        ]);
                     }
                 }
                 break;
@@ -1017,8 +1017,6 @@ class Pic extends AbstractPlugin
         $catalogue = $controller->catalogue();
         $imageStorage = $controller->imageStorage();
 
-        $view = $controller->view;
-
         $language = $controller->language();
 
         $select = clone $picSelect;
@@ -1120,7 +1118,7 @@ class Pic extends AbstractPlugin
 
                     $name = isset($names[$id]) ? $names[$id] : null;
 
-                    $url = $catalogue->url()->fromRoute('picture/picture', [
+                    $url = $controller->url('picture/picture', [
                         'picture_id' => $row['identity'] ? $row['identity'] : $id,
                         'gallery'    => null
                     ]);
@@ -1134,7 +1132,7 @@ class Pic extends AbstractPlugin
                         'messages'    => $msgCount,
                         'newMessages' => $newMsgCount,
                         'name'        => $name,
-                        'filesize'    => $view->fileSize($row['filesize'])
+                        'filesize'    => $controller->fileSize($row['filesize'])
                     ];
                 }
             }

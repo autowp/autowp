@@ -95,6 +95,33 @@ return [
                             ],
                         ],
                     ],
+                    'delete' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/delete',
+                            'defaults' => [
+                                'action' => 'delete',
+                            ],
+                        ],
+                    ],
+                    'delete-personal-message' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/delete-personal-message',
+                            'defaults' => [
+                                'action' => 'delete-personal-message',
+                            ],
+                        ],
+                    ],
+                    'send-personal-message' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route'    => '/send-personal-message',
+                            'defaults' => [
+                                'action' => 'send-personal-message',
+                            ],
+                        ],
+                    ],
                     'email' => [
                         'type' => Literal::class,
                         'options' => [
@@ -218,6 +245,15 @@ return [
                             'route'    => '/profile[/:form]',
                             'defaults' => [
                                 'action' => 'profile',
+                            ],
+                        ],
+                    ],
+                    'remove-account' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route'    => '/remove-account/:service',
+                            'defaults' => [
+                                'action' => 'remove-account',
                             ],
                         ],
                     ],

@@ -1,40 +1,57 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
-            'needLeft'  => true,
+            'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 123,
-    ));
+    ]);
 ?>
-<?php if (count($this->accounts)) { ?>
-    <div class="well">
-        <?php foreach ($this->accounts as $account) { ?>
-            <p>
-                <?php if ($account['canRemove']) { ?>
-                    <form action="<?=$this->escape($account['removeUrl'])?>" method="post">
-                        <button type="submit" class="btn btn-xs btn-danger" title="Удалить">
-                            <i class="fa fa-times"></i>
-                        </button>
-                        &#xa0;
-                        <i class="fa-fw <?=$account['icon']?>"></i>
-                        <?php if ($account['link']) { ?>
-                            <?=$this->htmlA($account['link'], $account['name'])?>
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <?php if (count($this->accounts)) { ?>
+            <div class="well">
+                <?php foreach ($this->accounts as $account) { ?>
+                    <p>
+                        <?php if ($account['canRemove']) { ?>
+                            <form action="<?=$this->escapeHtmlAttr($account['removeUrl'])?>" method="post">
+                                <button type="submit" class="btn btn-xs btn-danger" title="Удалить">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                                &#xa0;
+                                <i class="fa-fw <?=$account['icon']?>"></i>
+                                <?php if ($account['link']) { ?>
+                                    <?=$this->htmlA($account['link'], $account['name'])?>
+                                <?php } else { ?>
+                                    <?=$this->escapeHtml($account['name'])?>
+                                <?php } ?>
+                            </form>
                         <?php } else { ?>
-                            <?=$this->escape($account['name'])?>
+                            <i class="fa-fw <?=$account['icon']?>"></i>
+                            <?php if ($account['link']) { ?>
+                                <?=$this->htmlA($account['link'], $account['name'])?>
+                            <?php } else { ?>
+                                <?=$this->escapeHtml($account['name'])?>
+                            <?php } ?>
                         <?php } ?>
-                    </form>
-                <?php } else { ?>
-                    <i class="fa-fw <?=$account['icon']?>"></i>
-                    <?php if ($account['link']) { ?>
-                        <?=$this->htmlA($account['link'], $account['name'])?>
-                    <?php } else { ?>
-                        <?=$this->escape($account['name'])?>
-                    <?php } ?>
+                    </p>
                 <?php } ?>
-            </p>
+            </div>
         <?php } ?>
+        <form action="<?=$this->escapeHtmlAttr($this->url())?>" method="post" class="well">
+            <h3>Добавить учётную запись</h3>
+            <div class="form-group">
+                <select name="type" class="form-control">
+                    <?php foreach ($this->types as $value => $name) { ?>
+                        <option value="<?=$this->escapeHtmlAttr($value)?>"><?=$this->escapeHtml($name)?></option>
+                    <?php } ?>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><?=$this->escapeHtml($this->translate('sumbit'))?></button>
+        </form>
     </div>
-<?php } ?>
-<?=$this->addAccountForm->render($this)?>
+    <div class="col-sm-4 col-sm-pull-8">
+        <?=$this->partial('application/account/sidebar', $this->sidebar)?>
+    </div>
+</div>

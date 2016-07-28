@@ -1,17 +1,26 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
-            'needLeft'  => true,
+            'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 137,
-    ));
+    ]);
 ?>
-<div class="well">
-    <p>Мы сожалем, что вам пришлось оказаться на этой странице, и вы планируете покинуть наш сайт навсегда, но не можем вам в этом отказать.</p>
-    <p>Нажав на красную кнопку, все данные, касающиеся вас, будут обезличены или удалены.</p>
-    <p>Этот процесс необратим, поэтому хорошенько подумайте и не принимайте поспешных решений.</p>
-    <hr />
-    <?=$this->form->render($this) ?>
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <div class="well">
+            <p>Мы сожалем, что вам пришлось оказаться на этой странице, и вы планируете покинуть наш сайт навсегда, но не можем вам в этом отказать.</p>
+            <p>Нажав на красную кнопку, все данные, касающиеся вас, будут обезличены или удалены.</p>
+            <p>Этот процесс необратим, поэтому хорошенько подумайте и не принимайте поспешных решений.</p>
+            <hr />
+            <?=$this->partial('application/forms/bootstrap-horizontal', [
+                'form' => $this->form
+            ])?>
+        </div>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <?=$this->partial('application/account/sidebar', $this->sidebar)?>
+    </div>
 </div>

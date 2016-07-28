@@ -1,13 +1,20 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
-            'needLeft'  => true,
+            'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 123,
-    ));
+    ]);
 ?>
-<div class="well">
-    <p>Не удалось привязать учетную запись. Возможно произошла ошибка или доступ к приложению запрещен пользователем.</p>
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <div class="well">
+            <p>Не удалось привязать учетную запись. Возможно произошла ошибка или доступ к приложению запрещен пользователем.</p>
+        </div>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <?=$this->partial('application/account/sidebar', $this->sidebar)?>
+    </div>
 </div>

@@ -1,13 +1,13 @@
 <?php
 
-namespace Application\View\Helper;
+namespace Application\Controller\Plugin;
 
-use Zend\View\Helper\AbstractHelper;
+use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Language;
 use Application\FileSize as AppFileSize;
 
-class FileSize extends AbstractHelper
+class FileSize extends AbstractPlugin
 {
     /**
      * @var AppFileSize

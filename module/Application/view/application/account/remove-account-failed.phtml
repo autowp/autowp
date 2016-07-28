@@ -1,14 +1,21 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
             'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 123,
-    ));
+    ]);
 ?>
-<div class="well">
-    <p>Не удалось удалить учетную запись.</p>
-    <p>Такое бывает, если привязанная учётная запись является единственным способом авторизации, т.е. не задан e-mail или другие учётный записи.</p>
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <div class="well">
+            <p>Не удалось удалить учетную запись.</p>
+            <p>Такое бывает, если привязанная учётная запись является единственным способом авторизации, т.е. не задан e-mail или другие учётный записи.</p>
+        </div>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <?=$this->partial('application/account/sidebar', $this->sidebar)?>
+    </div>
 </div>

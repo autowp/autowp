@@ -30,9 +30,12 @@ return [
                 $profileForm = $sm->get('AccountProfileForm');
                 $settingsForm = $sm->get('AccountSettingsForm');
                 $photoForm = $sm->get('AccountPhotoForm');
+                $changePasswordForm = $sm->get('ChangePasswordForm');
+                $deleteUserForm = $sm->get('DeleteUserForm');
                 $translator = $sm->get('translator');
                 $config = $sm->get('Config');
-                return new Controller\AccountController($service, $translator, $emailForm, $profileForm, $settingsForm, $photoForm, $config['hosts']);
+                $externalLoginFactory = $sm->get(ExternalLoginServiceFactory::class);
+                return new Controller\AccountController($service, $translator, $emailForm, $profileForm, $settingsForm, $photoForm, $changePasswordForm, $deleteUserForm, $externalLoginFactory, $config['hosts']);
             },
             Controller\ArticlesController::class     => InvokableFactory::class,
             Controller\BanController::class          => InvokableFactory::class,
@@ -178,7 +181,7 @@ return [
             'catalogue'       => Controller\Plugin\Catalogue::class,
             'log'             => Controller\Plugin\Log::class,
             'pictureVote'     => Controller\Plugin\PictureVote::class,
-            'forbiddenAction' => Controller\Plugin\ForbiddenAction::class,
+            'forbiddenAction' => Controller\Plugin\ForbiddenAction::class
         ],
         'factories' => [
             'car' => function ($sm) {
@@ -204,6 +207,12 @@ return [
                 $carHelper = $viewHelperManager->get('car');
                 $textStorage = $sm->get(TextStorage\Service::class);
                 return new Controller\Plugin\Pic($textStorage, $carHelper);
+            },
+            'fileSize' => function($sm) {
+                return new Controller\Plugin\FileSize(
+                    $sm->get(Language::class),
+                    $sm->get(FileSize::class)
+                );
             },
         ]
     ],
@@ -260,7 +269,10 @@ return [
                 return new View\Helper\User($acl);
             },
             'fileSize' => function($sm) {
-                return new View\Helper\FileSize($sm->get(Language::class));
+                return new View\Helper\FileSize(
+                    $sm->get(Language::class),
+                    $sm->get(FileSize::class)
+                );
             },
             'humanDate' => function($sm) {
                 $language = $sm->get(Language::class);
@@ -388,6 +400,9 @@ return [
             ExternalLoginServiceFactory::class => function($sm) {
                 $config = $sm->get('Config');
                 return new ExternalLoginServiceFactory($config['externalloginservice']);
+            },
+            FileSize::class => function($sm) {
+                return new FileSize();
             }
         ],
         'aliases' => [

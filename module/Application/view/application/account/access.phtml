@@ -1,18 +1,28 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
-            'needLeft'  => true,
+            'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 133,
-    ));
+    ]);
 ?>
-<h2>Изменить пароль</h2>
-<div class="well">
-    <?=$this->formPassword->render($this) ?>
-</div>
+<div class="row">
+    <div class="col-sm-8 col-sm-push-4">
+        <h2>Изменить пароль</h2>
+        <div class="well">
+            <?=$this->partial('application/forms/bootstrap-horizontal', [
+                'form' => $this->formPassword
+            ])?>
+        </div>
 
-<p><?=$this->htmlA($this->url(array(
-    'action' => 'delete'
-)), '<i class="fa fa-times"></i> Удалить учётную запись', false)?></p>
+        <p><?=$this->htmlA([
+            'href'  => $this->url('account/delete'),
+            'class' => "btn btn-danger btn-lg"
+        ], '<i class="fa fa-times"></i> Удалить учётную запись', false)?></p>
+    </div>
+    <div class="col-sm-4 col-sm-pull-8">
+        <?=$this->partial('application/account/sidebar', $this->sidebar)?>
+    </div>
+</div>

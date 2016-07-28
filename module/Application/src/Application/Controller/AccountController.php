@@ -8,6 +8,7 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Application\Controller\LoginController;
+use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 use Application\Model\Forums;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -60,13 +61,29 @@ class AccountController extends AbstractActionController
     private $photoForm;
 
     /**
+     * @var Form
+     */
+    private $changePasswordForm;
+
+    /**
+     * @var Form
+     */
+    private $deleteUserForm;
+
+    /**
+     * @var ExternalLoginServiceFactory
+     */
+    private $externalLoginFactory;
+
+    /**
      * @var array
      */
     private $hosts = [];
 
     public function __construct(UsersService $service, $translator,
             Form $emailForm, Form $profileForm, Form $settingsForm,
-            Form $photoForm, array $hosts)
+            Form $photoForm, Form $changePasswordForm, Form $deleteUserForm,
+            ExternalLoginServiceFactory $externalLoginFactory, array $hosts)
     {
         $this->service = $service;
         $this->translator = $translator;
@@ -74,6 +91,9 @@ class AccountController extends AbstractActionController
         $this->profileForm = $profileForm;
         $this->settingsForm = $settingsForm;
         $this->photoForm = $photoForm;
+        $this->changePasswordForm = $changePasswordForm;
+        $this->deleteUserForm = $deleteUserForm;
+        $this->externalLoginFactory = $externalLoginFactory;
         $this->hosts = $hosts;
     }
 
@@ -137,12 +157,12 @@ class AccountController extends AbstractActionController
 
         $users = new Users();
 
-        $user = $users->find($this->params('user_id'))->current();
+        $user = $users->find($this->params()->fromPost('user_id'))->current();
         if (!$user) {
             return $this->notFoundAction();
         }
 
-        $message = $this->params('message');
+        $message = $this->params()->fromPost('message');
 
         $mModel = new Message();
         $mModel->send($currentUser->id, $user->id, $message);
@@ -162,7 +182,7 @@ class AccountController extends AbstractActionController
         $user = $this->user()->get();
 
         $mModel = new Message();
-        $mModel->delete($user->id, $this->params('id'));
+        $mModel->delete($user->id, $this->params()->fromPost('id'));
 
         return new JsonModel([
             'ok' => true
@@ -175,7 +195,9 @@ class AccountController extends AbstractActionController
             return $this->forwadToLogin();
         }
 
-        $this->sidebar();
+        return [
+            'sidebar' => $this->sidebar()
+        ];
     }
 
     /**
@@ -184,8 +206,7 @@ class AccountController extends AbstractActionController
      */
     private function getExternalLoginService($serviceId)
     {
-        $factory = $this->getInvokeArg('bootstrap')->getResource('externalloginservice');
-        $service = $factory->getService($serviceId, $serviceId, [
+        $service = $this->externalLoginFactory->getService($serviceId, $serviceId, [
             'redirect_uri' => 'http://en.wheelsage.org/login/callback'
         ]);
 
@@ -197,13 +218,11 @@ class AccountController extends AbstractActionController
 
     public function accountsAction()
     {
-        if (!$this->user()->logedIn()) {
+        $user = $this->user()->get();
+
+        if (!$user) {
             return $this->forwadToLogin();
         }
-
-        $this->sidebar();
-
-        $user = $this->user()->get();
 
         $uaTable = new User_Account();
 
@@ -218,31 +237,17 @@ class AccountController extends AbstractActionController
                 'link'      => $uaRow->link,
                 'icon'      => 'fa fa-' . $uaRow->service_id,
                 'canRemove' => $this->canRemoveAccount($uaRow->service_id),
-                'removeUrl' => $this->_helper->url->url([
-                    'action'  => 'remove-account',
+                'removeUrl' => $this->url()->fromRoute('account/remove-account', [
                     'service' => $uaRow->service_id
                 ])
             ];
         }
 
-        $addAccountForm = new Application_Form_Account_AddAccount([
-            'action'           => $this->_helper->url->url(),
-            'typeMultioptions' => [
-                'facebook'    => 'Facebook',
-                'vk'          => 'VK',
-                'google-plus' => 'Google+',
-                'twitter'     => 'Twitter',
-                'github'      => 'Github',
-                'linkedin'    => 'Linkedin'
-            ]
-        ]);
-
         $request = $this->getRequest();
 
-        if ($request->isPost() && $addAccountForm->isValid($request->getPost())) {
-            $values = $addAccountForm->getValues();
-            $serviceId = $values['type'];
-            $service = $this->getExternalLoginService($values['type']);
+        if ($request->isPost()) {
+            $serviceId = $this->params()->fromPost('type');
+            $service = $this->getExternalLoginService($serviceId);
 
             $loginUrl = $service->getLoginUrl();
 
@@ -255,10 +260,7 @@ class AccountController extends AbstractActionController
                 'user_id'  => $user->id,
                 'language' => $this->language(),
                 'service'  => $serviceId,
-                'url'      => $this->_helper->url->url([
-                    'controller' => 'account',
-                    'action'     => 'accounts'
-                ], 'account', true)
+                'url'      => $this->url()->fromRoute('account/accounts')
             ]);
 
             $row->save();
@@ -267,8 +269,16 @@ class AccountController extends AbstractActionController
         }
 
         return [
-            'accounts'       => $accounts,
-            'addAccountForm' => $addAccountForm
+            'sidebar'  => $this->sidebar(),
+            'accounts' => $accounts,
+            'types'    => [
+                'facebook'    => 'Facebook',
+                'vk'          => 'VK',
+                'google-plus' => 'Google+',
+                'twitter'     => 'Twitter',
+                'github'      => 'Github',
+                'linkedin'    => 'Linkedin'
+            ]
         ];
     }
 
@@ -297,7 +307,8 @@ class AccountController extends AbstractActionController
 
     public function removeAccountAction()
     {
-        if (!$this->user()->logedIn()) {
+        $user = $this->user()->get();
+        if (!$user) {
             return $this->forwadToLogin();
         }
 
@@ -305,7 +316,7 @@ class AccountController extends AbstractActionController
 
         $uaTable = new User_Account();
         $uaRow = $uaTable->fetchRow([
-            'user_id = ?'    => $this->user()->get()->id,
+            'user_id = ?'    => $user->id,
             'service_id = ?' => $serviceId
         ]);
 
@@ -321,7 +332,7 @@ class AccountController extends AbstractActionController
 
         $uaRow->delete();
 
-        $this->_helper->flashMessenger->addMessage('Учётная запись удалена');
+        $this->flashMessenger()->addSuccessMessage('Учётная запись удалена');
 
         return $this->redirect()->toRoute('account/accounts');
     }
@@ -403,21 +414,11 @@ class AccountController extends AbstractActionController
             $this->photoForm->setData($data);
             if ($this->photoForm->isValid()) {
 
-                $adapter = new \Zend\File\Transfer\Adapter\Http();
-                /*var_dump(); exit;
-                if (!$adapter->receive($data['photo']['name'])) {
-                    throw new Exception("Failed to receive file");
-                }
-
-                $filepath = $adapter->getFileName();*/
-
-                $filepath = $data['photo']['tmp_name'];
-
                 $imageStorage = $this->imageStorage();
                 $imageSampler = $imageStorage->getImageSampler();
 
                 $imagick = new Imagick();
-                if (!$imagick->readImage($filepath)) {
+                if (!$imagick->readImage($data['photo']['tmp_name'])) {
                     throw new Exception("Error loading image");
                 }
                 $format = $imageStorage->getFormat('photo');
@@ -494,13 +495,10 @@ class AccountController extends AbstractActionController
 
     public function emailAction()
     {
-        if (!$this->user()->logedIn()) {
+        $user = $this->user()->get();
+        if (!$user) {
             return $this->forwadToLogin();
         }
-
-        $this->sidebar();
-
-        $user = $this->user()->get();
 
         $request = $this->getRequest();
 
@@ -709,49 +707,40 @@ class AccountController extends AbstractActionController
 
     public function accessAction()
     {
-        if (!$this->user()->logedIn()) {
+        $user = $this->user()->get();
+        if (!$user) {
             return $this->forwadToLogin();
         }
 
-        $this->sidebar();
-
-        $form = new Application_Form_Account_Password([
-            'action' => $this->_helper->url->url([]),
-        ]);
-
         $request = $this->getRequest();
 
-        if ($request->isPost() && $form->isValid($request->getPost())) {
-            $values = $form->getValues();
+        if ($request->isPost()) {
+            $this->changePasswordForm->setData($this->params()->fromPost());
+            if ($this->changePasswordForm->isValid()) {
+                $values = $this->changePasswordForm->getData();
 
-            $user = $this->user()->get();
+                $uTable = new Users();
 
-            $uTable = new Users();
+                $correct = $this->service->checkPassword($user->id, $values['password_old']);
 
-            $uRow = $uTable->fetchRow([
-                'id = ?'                                  => $user->id,
-                'password = ' . Users::passwordHashExpr() => $values['password_old']
-            ]);
+                if (!$correct) {
 
-            if (!$uRow) {
+                    $this->changePasswordForm->get('password_old')->setMessages(['Текущий пароль введен неверно']);
 
-                $form->password_old->addError('Текущий пароль введен неверно');
+                } else {
 
-            } else {
+                    $this->service->setPassword($user, $values['password']);
 
-                $passwordExpr = $uTable->getAdapter()->quoteInto(Users::passwordHashExpr(), $values['password']);
+                    $this->flashMessenger()->addSuccessMessage('Пароль успешно изменён');
 
-                $user->password = new Zend_Db_Expr($passwordExpr);
-                $user->save();
-
-                $this->_helper->flashMessenger->addMessage('Пароль успешно изменён');
-
-                return $this->redirect()->toRoute('account/access');
+                    return $this->redirect()->toRoute('account/access');
+                }
             }
         }
 
         return [
-            'formPassword' => $form
+            'sidebar'      => $this->sidebar(),
+            'formPassword' => $this->changePasswordForm
         ];
     }
 
@@ -763,38 +752,41 @@ class AccountController extends AbstractActionController
 
         $request = $this->getRequest();
 
-        $form = new Application_Form_Account_Delete([
-            'action' => $this->_helper->url->url([]),
-        ]);
+        $this->deleteUserForm->setAttribute('action', $this->url()->fromRoute('account/delete'));
 
-        if ($request->isPost() && $form->isValid($request->getPost())) {
-            $values = $form->getValues();
+        if ($request->isPost()) {
+            $this->deleteUserForm->setData($this->params()->fromPost());
+            if ($this->deleteUserForm->isValid()) {
+                $values = $this->deleteUserForm->getData();
 
-            $user = $this->user()->get();
+                $user = $this->user()->get();
 
-            $usersService = $this->getInvokeArg('bootstrap')->getResource('users');
+                $valid = $this->service->checkPassword($user->id, $values['password']);
 
-            $valid = $usersService->checkPassword($user->id, $values['password']);
+                if (!$valid) {
 
-            if (!$valid) {
+                    $this->deleteUserForm->get('password')->setMessages(['Пароль введён неверно']);
 
-                $form->password->addError('Пароль введен неверно');
+                } else {
 
-            } else {
+                    $user->deleted = true;
+                    $user->save();
 
-                $user->deleted = true;
-                $user->save();
+                    Zend_Auth::getInstance()->clearIdentity();
+                    $this->user()->clearRememberCookie();
 
-                Zend_Auth::getInstance()->clearIdentity();
-                $this->user()->clearRememberCookie();
+                    $viewModel = new ViewModel();
 
-                return $this->render('deleted');
+                    $viewModel->setTemplate('application/account/deleted');
+
+                    return $viewModel;
+                }
             }
         }
 
-        $this->sidebar();
         return [
-            'form' => $form
+            'sidebar' => $this->sidebar(),
+            'form'    => $this->deleteUserForm
         ];
     }
 
@@ -849,9 +841,8 @@ class AccountController extends AbstractActionController
         }
         unset($conflict);
 
-        $this->sidebar();
-
         return [
+            'sidebar'   => $this->sidebar(),
             'filter'    => (string)$filter,
             'conflicts' => $conflicts,
             'paginator' => $paginator,
@@ -864,8 +855,6 @@ class AccountController extends AbstractActionController
         if (!$this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
-
-        $this->sidebar();
 
         $user = $this->user()->get();
 
@@ -883,7 +872,8 @@ class AccountController extends AbstractActionController
         }
 
         return [
-            'users' => $users
+            'sidebar' => $this->sidebar(),
+            'users'   => $users
         ];
     }
 }
