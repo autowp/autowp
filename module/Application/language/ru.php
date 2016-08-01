@@ -408,6 +408,16 @@ return [
     'picture/all-images-have-owners' => 'Все изображения являются чьей-либо собственностью.',
     'picture/if-you-found-error' => 'Если вы считаете, что пользователи сайта ошиблись, разместив данную картинку в этом разделе, то было бы здорово, если бы вы написали об этом в комментариях и указали на ошибку.',
     'picture/where-to-talk' => 'Поделиться своей радостью, обсудить наболевшее и просто поболтать об автомобилях и не только вы можете на нашем <a href="/forums/" title="Перейти в форум">форуме</a>',
+    
+    'users/user/recent-activity' => 'Активность на сайте',
+    'users/user/recent-uploads' => 'Последние добавленные изображения',
+    'users/user/recent-comments' => 'Последние комментарии',
+    'users/user/registration-date' => 'Зарегистрирован',
+    'users/user/last-visited' => 'Последний раз был на сайте',
+    'users/user/send-personal-message' => 'Отправить личное сообщение',
+    'users/user/log' => 'Журнал событий пользователя',
+    'users/user/uploaded-pictures' => 'Добавленные изображения',
+    'users/user/not-upload-pictures' => 'Не добавлял изображений',
 
     'users/rating/specifications' => 'Технические х-ки',
     'users/rating/pictures' => 'Изображения',

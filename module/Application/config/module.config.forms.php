@@ -8,6 +8,12 @@ use Users;
 use Zend\Validator as ZendValidator;
 
 return [
+    'form_elements' => [
+        'invokables' => [
+            Form\Element\BrandName::class => Form\Element\BrandName::class,
+            Form\Element\BrandFullName::class => Form\Element\BrandFullName::class
+        ]
+    ],
     'forms' => [
         'FeedbackForm' => [
             //'hydrator' => 'ObjectProperty',
@@ -518,7 +524,7 @@ return [
                 ]
             ]
         ],
-        'ModerTwinsDescriptionForm' => [
+        'DescriptionForm' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post'
@@ -1183,6 +1189,58 @@ return [
                     ]
                 ]
             ],
+        ],
+        'BrandLogoForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method'  => 'post',
+                'enctype' => 'multipart/form-data',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'File',
+                        'name' => 'logo',
+                        'options' => [
+                            'label' => 'Логотип'
+                        ]
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'logo' => [
+                    'required' => true,
+                    'validators' => [
+                        [
+                            'name' => ZendValidator\File\Size::class,
+                            'break_chain_on_failure' => true,
+                            'options' => [
+                                'max' => 4194304
+                            ]
+                        ],
+                        [
+                            'name' => ZendValidator\File\IsImage::class,
+                            'break_chain_on_failure' => true,
+                        ],
+                        [
+                            'name' => ZendValidator\File\Extension::class,
+                            'break_chain_on_failure' => true,
+                            'options' => [
+                                'extension' => 'png'
+                            ]
+                        ],
+                        [
+                            'name' => ZendValidator\File\ImageSize::class,
+                            'break_chain_on_failure' => true,
+                            'options' => [
+                                'minWidth'  => 50,
+                                'minHeight' => 50
+                            ]
+                        ],
+
+                    ]
+                ]
+            ]
         ],
     ]
 ];

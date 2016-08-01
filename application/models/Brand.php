@@ -11,6 +11,10 @@ class Brand
 
     const NEW_DAYS = 7;
 
+    const MAX_NAME = 80;
+
+    const MAX_FULLNAME = 255;
+
     /**
      * @var Table
      */

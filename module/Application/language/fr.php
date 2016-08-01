@@ -394,6 +394,16 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'picture/all-images-have-owners' => 'Toutes les images ont propriétaires.',
     'picture/if-you-found-error' => 'Si vous pensez que utilisateurs du site s\'est trompé en affichant cette image dans cette section, ce serait bien si vous avez écrit à ce sujet dans les commentaires et ont indiqué à l\'erreur.',
     'picture/where-to-talk' => 'Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur <a href="/forums/">notre forum</a>',
+    
+    'users/user/recent-activity' => 'Recent activity',
+    'users/user/recent-uploads' => 'Recent uploads',
+    'users/user/recent-comments' => 'Recent comments',
+    'users/user/registration-date' => 'Registration date',
+    'users/user/last-visited' => 'Last visited',
+    'users/user/send-personal-message' => 'Send personal message',
+    'users/user/log' => 'User\'s log',
+    'users/user/uploaded-pictures' => 'Uploaded pictures',
+    'users/user/not-upload-pictures' => 'Not upload pictures',
 
     'users/rating/specifications' => 'Caractéristiques',
     'users/rating/pictures' => 'Images',

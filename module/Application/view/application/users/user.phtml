@@ -49,8 +49,8 @@
         <?php } ?>
         </strong></p>
 
-        <p>Зарегистрирован: <strong><?=$this->escapeHtml($this->humanDate($this->currentUser->getDate('reg_date')))?></strong></p>
-        <p>Последний раз был на сайте: <strong><?=$this->escapeHtml($this->humanTime($this->currentUser->getDate('last_online')))?></strong></p>
+        <p><?=$this->escapeHtml($this->translate('users/user/registration-date'))?>: <strong><?=$this->escapeHtml($this->humanDate($this->currentUser->getDate('reg_date')))?></strong></p>
+        <p><?=$this->escapeHtml($this->translate('users/user/last-visited'))?>: <strong><?=$this->escapeHtml($this->humanTime($this->currentUser->getDate('last_online')))?></strong></p>
         <?php if ($this->user()->logedIn()) { ?>
             <p>
                 <i class="fa fa-reply"></i>
@@ -58,14 +58,14 @@
                     'href'         => '#',
                     'data-trigger' => 'show-pm-dialog',
                     'data-user-id' => $this->currentUser->id
-                ], 'Отправить личное сообщение')?>
+                ], $this->translate('users/user/send-personal-message'))?>
             </p>
         <?php } ?>
 
         <?php if (count($this->accounts)) { ?>
             <?php foreach ($this->accounts as $account) { ?>
                 <p>
-                    <i class="fa fa-fw fa-<?=$this->escapeHtmlAttr($account->service_id)?>"></i>
+                    <i class="fa fa-fw fa-<?=$this->escapeHtmlAttr(str_replace('googleplus', 'google-plus', $account->service_id))?>"></i>
                     <?php if ($account->link) { ?>
                         <?=$this->htmlA($account->link, $account->name)?>
                     <?php } else { ?>
@@ -75,7 +75,7 @@
             <?php } ?>
         <?php } ?>
 
-        <h2>Активность на сайте</h2>
+        <h2><?=$this->escapeHtml($this->translate('users/user/recent-activity'))?></h2>
         <div class="well">
             <?php if ($this->currentUser->pictures_added > 0) { ?>
                 <p>Добавил изображений: <strong><?=$this->currentUser->pictures_added ?></strong></p>
@@ -85,22 +85,22 @@
 
                 <p><a href="<?=$this->escapeHtmlAttr($this->url('users/user/pictures', [
                     'user_id'  => $this->currentUser->identity ? $this->currentUser->identity : 'user' . $this->currentUser->id,
-                ])) ?>">Добавленные изображения</a></p>
+                ])) ?>"><?=$this->escapeHtml($this->translate('users/user/uploaded-pictures'))?></a></p>
             <?php } else { ?>
-                <p>Не добавлял изображений</p>
+                <p><?=$this->escapeHtml($this->translate('users/user/not-upload-pictures'))?></p>
             <?php } ?>
 
 
             <?php if ($this->user()->inheritsRole('moder')) { ?>
                 <p><?=$this->htmlA($this->url('log/params', [
                     'user_id' => $this->currentUser->id
-                ]), 'Журнал событий пользователя') ?></p>
+                ]), $this->translate('users/user/log')) ?></p>
             <?php } ?>
         </div>
 
 
         <?php if (count($this->last_pictures)) { ?>
-            <h2>Последние добавленные изображения</h2>
+            <h2><?=$this->escapeHtml($this->translate('users/user/recent-uploads'))?></h2>
             <div class="well">
                 <ul>
                     <?php foreach ($this->last_pictures as $picture) { ?>
@@ -114,7 +114,7 @@
         <?php } ?>
 
         <?php if (count($this->last_comments)) { ?>
-            <h2>Последние комментарии</h2>
+            <h2><?=$this->escapeHtml($this->translate('users/user/recent-comments'))?></h2>
             <div class="well">
                 <ul class="comments">
                     <?php foreach ($this->last_comments as $comment) { ?>

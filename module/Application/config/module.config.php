@@ -148,6 +148,12 @@ return [
                 $service = $sm->get(Service\UsersService::class);
                 return new Controller\Console\UsersController($service);
             },
+            Controller\Moder\BrandsController::class => function($sm) {
+                $textStorage = $sm->get(TextStorage\Service::class);
+                $logoForm = $sm->get('BrandLogoForm');
+                $descForm = $sm->get('DescriptionForm');
+                return new Controller\Moder\BrandsController($textStorage, $logoForm, $descForm);
+            },
             Controller\Moder\CommentsController::class => function($sm) {
                 $form = $sm->get('ModerCommentsFilterForm');
                 return new Controller\Moder\CommentsController($form);
@@ -170,7 +176,7 @@ return [
             Controller\Moder\TwinsController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
                 $editForm = $sm->get('ModerTwinsEditForm');
-                $descForm = $sm->get('ModerTwinsDescriptionForm');
+                $descForm = $sm->get('DescriptionForm');
                 return new Controller\Moder\TwinsController($textStorage, $editForm, $descForm);
             },
             Controller\Moder\UsersController::class => InvokableFactory::class,

@@ -394,6 +394,16 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'picture/all-images-have-owners' => 'All images have owners.',
     'picture/if-you-found-error' => 'If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.',
     'picture/where-to-talk' => 'Discuss anything and just talk about cars and not only can you on <a href="/forums/">the forum</a>',
+    
+    'users/user/recent-activity' => 'Recent activity',
+    'users/user/recent-uploads' => 'Recent uploads',
+    'users/user/recent-comments' => 'Recent comments',
+    'users/user/registration-date' => 'Registration date',
+    'users/user/last-visited' => 'Last visited',
+    'users/user/send-personal-message' => 'Send personal message',
+    'users/user/log' => 'User\'s log',
+    'users/user/uploaded-pictures' => 'Uploaded pictures',
+    'users/user/not-upload-pictures' => 'Not upload pictures',
 
     'users/rating/specifications' => 'Specifications',
     'users/rating/pictures' => 'Pictures',
