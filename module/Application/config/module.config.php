@@ -163,6 +163,10 @@ return [
                 $form = $sm->get('AddBrandForm');
                 return new Controller\Moder\IndexController($form);
             },
+            Controller\Moder\MuseumController::class => function($sm) {
+                $form = $sm->get('MuseumForm');
+                return new Controller\Moder\MuseumController($form);
+            },
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
             Controller\Moder\RightsController::class => function($sm) {
                 $acl = $sm->get(Acl::class);

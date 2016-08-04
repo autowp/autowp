@@ -1242,5 +1242,166 @@ return [
                 ]
             ]
         ],
+        'MuseumForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method'  => 'post',
+                'enctype' => 'multipart/form-data',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'name',
+                        'options' => [
+                            'label'     => 'Название',
+                            'maxlength' => 255,
+                            'size'      => 80,
+                            'class'      => 'span6'
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'url',
+                        'options' => [
+                            'label'     => 'URL',
+                            'maxlength' => 255,
+                            'size'      => 80,
+                            'class'      => 'span6'
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'address',
+                        'options' => [
+                            'label'     => 'Адрес',
+                            'maxlength' => 255,
+                            'size'      => 80,
+                            'class'      => 'span6'
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'lat',
+                        'options' => [
+                            'label'     => 'Latitude',
+                            'maxlength' => 20,
+                            'size'      => 20
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'lng',
+                        'options' => [
+                            'label'     => 'Longtitude',
+                            'maxlength' => 20,
+                            'size'      => 20
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Textarea',
+                        'name' => 'description',
+                        'options' => [
+                            'label' => 'Описание',
+                            'cols'  => 80,
+                            'rows'  => 8,
+                            'class' => 'span6'
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type' => 'File',
+                        'name' => 'photo',
+                        'options' => [
+                            'label' => 'Фотография'
+                        ]
+                    ]
+                ],
+            ],
+            'input_filter' => [
+                'logo' => [
+                    'required' => false,
+                    'validators' => [
+                        [
+                            'name' => ZendValidator\File\Size::class,
+                            'break_chain_on_failure' => true,
+                            'options' => [
+                                'max' => 4194304
+                            ]
+                        ],
+                        [
+                            'name' => ZendValidator\File\IsImage::class,
+                            'break_chain_on_failure' => true,
+                        ],
+                        [
+                            'name' => ZendValidator\File\Extension::class,
+                            'break_chain_on_failure' => true,
+                            'options' => [
+                                'extension' => 'jpg,jpeg,jpe,png,gif,bmp'
+                            ]
+                        ],
+                        [
+                            'name' => ZendValidator\File\ImageSize::class,
+                            'break_chain_on_failure' => true,
+                            'options' => [
+                                'minWidth'  => 50,
+                                'minHeight' => 50
+                            ]
+                        ],
+
+                    ]
+                ],
+                'name' => [
+                    'required' => true,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'url' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        ['name' => 'Uri']
+                    ]
+                ],
+                'address' => [
+                    'required' => true,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'lat' => [
+                    'required' => true,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'lng' => [
+                    'required' => true,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'description' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ]
+                ]
+            ]
+        ],
     ]
 ];

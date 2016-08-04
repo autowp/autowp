@@ -4,13 +4,15 @@ define(
         return {
             init: function(options) {
                 var startPosition = new googlemaps.LatLng(55.7423627, 37.6786422);
-                var lat = parseFloat($('#lat').val());
-                var lng = parseFloat($('#lng').val());
+                var $lat = $(':input[name=lat]');
+                var $lng = $(':input[name=lng]');
+                var lat = parseFloat($lat.val());
+                var lng = parseFloat($lng.val());
                 if (lng && lat) {
                     startPosition = new googlemaps.LatLng(lat, lng);
                 }
 
-                var node = $('<div style="width:100%; height: 300px" />').insertAfter($('#lng'))[0];
+                var node = $('<div style="width:100%; height: 300px" />').insertAfter($lng)[0];
                 var marker = null;
 
                 var map = new googlemaps.Map(node, {
@@ -41,9 +43,9 @@ define(
                     }
                 }
 
-                $('#lng, #lat').change(function() {
-                    var lat = parseFloat($('#lat').val());
-                    var lng = parseFloat($('#lng').val());
+                $(':input[name=lat], :input[name=lng]').change(function() {
+                    var lat = parseFloat($lat.val());
+                    var lng = parseFloat($lng.val());
                     if (lng && lat) {
                         var point = new googlemaps.LatLng(lat, lng);
                         setMarkerPoint(point);
@@ -54,8 +56,8 @@ define(
 
                 googlemaps.event.addListener(map, 'click', function(event) {
                     setMarkerPoint(event.latLng);
-                    $('#lng').val(event.latLng.lng());
-                    $('#lat').val(event.latLng.lat());
+                    $lng.val(event.latLng.lng());
+                    $lat.val(event.latLng.lat());
                 });
 
                 $('#address').change(function() {
@@ -63,8 +65,8 @@ define(
                         if (point) {
                             var latLng = new googlemaps.LatLng(point.lat, point.lng);
                             setMarkerPoint(latLng);
-                            $('#lat').val(point.lat);
-                            $('#lng').val(point.lng);
+                            $lat.val(point.lat);
+                            $lng.val(point.lng);
                         }
                     });
                 });

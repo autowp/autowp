@@ -69,10 +69,10 @@ class IndexController extends AbstractActionController
 
         $menu['/moder/users'] = 'Пользователи';
         if ($this->user()->isAllowed('museums', 'manage')) {
-            $menu['/moder/museum/'] = 'Музеи';
+            $menu[$this->url()->fromRoute('moder/museum')] = 'Музеи';
         }
 
-        $menu['/moder/pictures/'] = 'Картинки';
+        $menu['/moder/pictures'] = 'Картинки';
 
         $menu[$this->url()->fromRoute('moder/perspectives')] = 'Справка по ракурсам';
 

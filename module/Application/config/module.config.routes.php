@@ -1359,6 +1359,22 @@ return [
                             ]
                         ]
                     ],
+                    'museum' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/museum[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\MuseumController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => Router\Http\WildcardSafe::class
+                            ]
+                        ]
+                    ],
                     'pages' => [
                         'type' => Segment::class,
                         'options' => [
