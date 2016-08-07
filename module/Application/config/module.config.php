@@ -167,6 +167,7 @@ return [
                 $form = $sm->get('MuseumForm');
                 return new Controller\Moder\MuseumController($form);
             },
+            Controller\Moder\PagesController::class => InvokableFactory::class,
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
             Controller\Moder\RightsController::class => function($sm) {
                 $acl = $sm->get(Acl::class);

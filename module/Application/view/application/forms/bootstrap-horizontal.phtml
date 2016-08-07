@@ -9,82 +9,9 @@
     <?php if ($legend = $this->form->getAttribute('legend')) { ?>
         <legend><?=$this->escapeHtml($this->translate($legend))?></legend>
     <?php } ?>
-    <?php foreach ($this->form->getElements() as $element) { ?>
-        <?php if ($element instanceof Zend\Form\Element) { ?>
-            <?php if ($element instanceof Zend\Form\Element\File) { ?>
-                <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
-                    <label class="col-md-2 control-label">
-                        <?=$this->escapeHtml($this->translate($element->getLabel()))?>
-                    </label>
-                    <div class="col-md-10">
-                        <?=$this->formElement(
-                            $element
-                                ->setAttribute('class', $element->getAttribute('class') . ' form-control')
-                        )?>
-                        <?php foreach ($element->getMessages() as $error) { ?>
-                            <p class="help-block"><?=$this->escapeHtml($error)?></p>
-                        <?php } ?>
-                    </div>
-                </div>
-            <?php } elseif ($element instanceof Zend\Form\Element\Multicheckbox) { ?>
-                <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
-                    <label class="col-md-2 control-label" for="<?=$element->getId()?>">
-                        <?=$this->escapeHtml($this->translate($element->getLabel()))?>
-                    </label>
-                    <div class="col-md-10">
-                        <?=$element ?>
-                        <?php foreach ($element->getMessages() as $error) { ?>
-                            <p class="help-block"><?=$this->escapeHtml($error)?></p>
-                        <?php } ?>
-                    </div>
-                </div>
-            <?php } elseif ($element instanceof Zend\Form\Element\Checkbox) { ?>
-                <div class="form-group">
-                    <div class="col-md-2">
-                    </div>
-                    <div class="col-md-10">
-                        <div class="checkbox<?=$element->getMessages() ? ' has-error' : ''?>">
-                            <label>
-                                <?=$this->formElement($element)?>
-                                <?=$this->escapeHtml($this->translate($element->getLabel()))?>
-                            </label>
-                            <?php foreach ($element->getMessages() as $error) { ?>
-                                <p class="help-block"><?=$this->escapeHtml($error)?></p>
-                            <?php } ?>
-                        </div>
-                    </div>
-                </div>
-            <?php } elseif ($element instanceof Zend\Form\Element\Hidden) { ?>
-                <?=$this->formElement($element)?>
-            <?php } elseif (!$element instanceof Zend\Form\Element\Submit) { ?>
-                <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
-                    <label class="col-md-2 control-label">
-                        <?=$this->escapeHtml($this->translate($element->getLabel()))?>
-                    </label>
-                    <div class="col-md-10">
-                        <?=$this->formElement(
-                            $element
-                                ->setAttribute('class', $element->getAttribute('class') . ' form-control')
-                        )?>
-                        <?php foreach ($element->getMessages() as $error) { ?>
-                            <p class="help-block"><?=$this->escapeHtml($error)?></p>
-                        <?php } ?>
-                    </div>
-                </div>
-            <?php } ?>
-        <?php } elseif ($element instanceof Zend\Form) { ?>
-            <?=$element->render($this)?>
-        <?php } elseif ($element instanceof Zend\Form\DisplayGroup) { ?>
-            <div class="form-group">
-                <label class="col-md-2 control-label">
-                    <?=$this->escapeHtml($this->translate($element->getLegend()))?>
-                </label>
-                <div class="col-md-10">
-                    <?=$element->render($this)?>
-                </div>
-            </div>
-        <?php } ?>
-    <?php } ?>
+    <?=$this->partial('application/forms/bootstrap-horizontal-elements', [
+        'form' => $this->form
+    ])?>
     <?php
         $submitFound = false;
     ?>
@@ -125,6 +52,5 @@
             </div>
         </div>
     <?php } ?>
-
 </fieldset>
 <?=$this->form()->closeTag($this->form)?>

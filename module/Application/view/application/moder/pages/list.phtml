@@ -1,0 +1,41 @@
+<?php foreach ($this->items as $idx => $page) { ?>
+    <tr class="data-row">
+        <td>
+            <?php if ($idx > 0) { ?>
+                <form action="<?=$this->escapeHtmlAttr($page['moveUpUrl']) ?>" style="margin:0">
+                    <div><button type="submit" class="btn btn-default btn-xs">↑</button></div>
+                </form>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if ($idx < count($this->items)-1) { ?>
+                <form action="<?=$this->escapeHtmlAttr($page['moveDownUrl']) ?>" style="margin:0">
+                    <div><button type="submit" class="btn btn-default btn-xs">↓</button></div>
+                </form>
+            <?php } ?>
+        </td>
+        <td><?=$page['id'] ?></td>
+        <td style="padding-left:<?=$this->level * 20?>px"><?=$this->escapeHtml($page['name']) ?></td>
+        <td><?=$this->escapeHtml($page['breadcrumbs']) ?></td>
+        <td><?=$this->escapeHtml($page['isGroupNode'] ? 'да' : 'нет') ?></td>
+        <td>
+            <form class="btn-group" action="<?=$this->escapeHtmlAttr($page['deleteUrl'])?>" style="white-space:nowrap">
+                <?=$this->htmlA([
+                    'class' => "btn btn-xs btn-success",
+                    'href'  => $page['addChildUrl']
+                ], '<i class="fa fa-plus"></i>', false) ?>
+                <?=$this->htmlA([
+                    'class' => "btn btn-default btn-xs",
+                    'href'  => $page['itemUrl']
+                ], '<i class="fa fa-pencil"></i>', false) ?>
+                <button class="btn btn-xs btn-danger" type="submit">
+                    <i class="fa fa-times"></i>
+                </button>
+            </form>
+        </td>
+    </tr>
+    <?=$this->partial('application/moder/pages/list', [
+        'items' => $page['childs'],
+        'level' => $this->level + 1
+    ])?>
+<?php } ?>
