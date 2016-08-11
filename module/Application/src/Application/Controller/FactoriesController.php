@@ -11,12 +11,18 @@ use geoPHP;
 use Picture;
 
 use Zend_Db_Expr;
-use Zend_Paginator;
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class FactoriesController extends AbstractActionController
 {
+    private $textStorage;
+
+    public function __construct($textStorage)
+    {
+        $this->textStorage = $textStorage;
+    }
+
     public function indexAction()
     {
         return $this->redirect()->toUrl('/map/');
@@ -128,8 +134,7 @@ class FactoriesController extends AbstractActionController
 
         $description = null;
         if ($factory['text_id']) {
-            $textStorage = $this->textStorage();
-            $description = $textStorage->getText($factory['text_id']);
+            $description = $this->textStorage->getText($factory['text_id']);
         }
 
         return [

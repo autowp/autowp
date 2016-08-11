@@ -281,9 +281,11 @@
             }
         ?>
 
-        <?=$this->htmlList($list, false, [
-            'class' => 'unstyled'
-        ], false) ?>
+        <?php if (count($list)) { ?>
+            <?=$this->htmlList($list, false, [
+                'class' => 'unstyled'
+            ], false) ?>
+        <?php } ?>
 
         <?php if ($this->paginator && $this->paginator->count() > 1) { ?>
             <h4 class="text-right"><?=$this->escapeHtml($this->translate('catalogue/other-photos'))?></h4>

@@ -1,12 +1,14 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'isAdminPage' => true,
             'blankPage'   => false,
             'needLeft'    => false,
             'needRight'   => false
-        ),
+        ],
         'pageId' => 176,
-    ));
+    ]);
 ?>
-<?=$this->form->render($this) ?>
+<?=$this->partial('application/forms/bootstrap-horizontal', [
+    'form' => $this->form
+])?>

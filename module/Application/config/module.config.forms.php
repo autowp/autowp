@@ -11,7 +11,9 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\Element\BrandName::class => Form\Element\BrandName::class,
-            Form\Element\BrandFullName::class => Form\Element\BrandFullName::class
+            Form\Element\BrandFullName::class => Form\Element\BrandFullName::class,
+            Form\Element\FactoryName::class => Form\Element\FactoryName::class,
+            Form\Element\Year::class => Form\Element\Year::class,
         ]
     ],
     'forms' => [
@@ -1402,6 +1404,199 @@ return [
                     ]
                 ]
             ]
+        ],
+        'ModerFactoryAddForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'Завод',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => Form\Element\FactoryName::class,
+                        'name' => 'name'
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => Form\Element\Year::class,
+                        'name' => 'year_from',
+                        'options' => [
+                            'label' => 'Год с'
+                        ],
+                        'attributes'  => [
+                            'placeholder' => 'с'
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => Form\Element\Year::class,
+                        'name' => 'year_to',
+                        'options' => [
+                            'label' => 'Год по'
+                        ],
+                        'attributes'  => [
+                            'placeholder' => 'по'
+                        ]
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'name' => [
+                    'required' => true
+                ],
+                'year_from' => [
+                    'required' => false
+                ],
+                'year_to' => [
+                    'required' => false
+                ],
+            ],
+        ],
+        'ModerFactoryEditForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'Завод',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => Form\Element\FactoryName::class,
+                        'name' => 'name'
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => Form\Element\Year::class,
+                        'name' => 'year_from',
+                        'options' => [
+                            'label' => 'Год с'
+                        ],
+                        'attributes'  => [
+                            'placeholder' => 'с'
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => Form\Element\Year::class,
+                        'name' => 'year_to',
+                        'options' => [
+                            'label' => 'Год по'
+                        ],
+                        'attributes'  => [
+                            'placeholder' => 'по'
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'lat',
+                        'options' => [
+                            'label' => 'Latitude'
+                        ],
+                        'attributes' => [
+                            'id'        => 'lat',
+                            'maxlength' => 20,
+                            'size'      => 20,
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'lng',
+                        'options' => [
+                            'label' => 'Longtitude'
+                        ],
+                        'attributes' => [
+                            'id'        => 'lng',
+                            'maxlength' => 20,
+                            'size'      => 20,
+                        ]
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'name' => [
+                    'required' => true
+                ],
+                'year_from' => [
+                    'required' => false
+                ],
+                'year_to' => [
+                    'required' => false
+                ],
+                'lat' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'lng' => [
+                    'required' => false,
+                    'filters' => [
+                        ['name' => 'StringTrim']
+                    ]
+                ]
+            ],
+        ],
+        'ModerFactoryFilterForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'Завод',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type'    => 'Text',
+                        'name'    => 'name',
+                        'options' => [
+                            'label' => 'Name',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'brand_id',
+                        'options' => [
+                            'label'        => 'Бренд',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'order',
+                        'options' => [
+                            'label'   => 'Сортировка',
+                            'options' => [
+                                0 => 'id asc',
+                                1 => 'id desc',
+                                2 => 'Название asc',
+                                3 => 'Название desc',
+                            ]
+                        ]
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'name' => [
+                    'required' => false
+                ],
+                'brand_id' => [
+                    'required' => false
+                ],
+                'order' => [
+                    'required' => false
+                ],
+            ],
         ],
     ]
 ];

@@ -54,7 +54,10 @@ return [
             },
             Controller\CutawayController::class      => InvokableFactory::class,
             Controller\DonateController::class       => InvokableFactory::class,
-            Controller\FactoriesController::class    => InvokableFactory::class,
+            Controller\FactoriesController::class => function($sm) {
+                $textStorage = $sm->get(TextStorage\Service::class);
+                return new Controller\FactoriesController($textStorage);
+            },
             Controller\FeedbackController::class     => function($sm) {
                 $form = $sm->get('FeedbackForm');
                 $transport = $sm->get('MailTransport');
@@ -157,6 +160,14 @@ return [
             Controller\Moder\CommentsController::class => function($sm) {
                 $form = $sm->get('ModerCommentsFilterForm');
                 return new Controller\Moder\CommentsController($form);
+            },
+            Controller\Moder\FactoryController::class => function($sm) {
+                $textStorage = $sm->get(TextStorage\Service::class);
+                $addForm = $sm->get('ModerFactoryAddForm');
+                $editForm = $sm->get('ModerFactoryEditForm');
+                $descForm = $sm->get('DescriptionForm');
+                $filterForm = $sm->get('ModerFactoryFilterForm');
+                return new Controller\Moder\FactoryController($textStorage, $addForm, $editForm, $descForm, $filterForm);
             },
             Controller\Moder\HotlinkController::class => InvokableFactory::class,
             Controller\Moder\IndexController::class => function($sm) {
