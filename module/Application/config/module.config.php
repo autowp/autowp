@@ -157,6 +157,9 @@ return [
                 $descForm = $sm->get('DescriptionForm');
                 return new Controller\Moder\BrandsController($textStorage, $logoForm, $descForm);
             },
+            Controller\Moder\CategoryController::class => function($sm) {
+                return new Controller\Moder\CategoryController();
+            },
             Controller\Moder\CommentsController::class => function($sm) {
                 $form = $sm->get('ModerCommentsFilterForm');
                 return new Controller\Moder\CommentsController($form);
