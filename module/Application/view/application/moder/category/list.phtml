@@ -1,0 +1,28 @@
+<?php foreach ($this->items as $page) { ?>
+    <tr class="data-row">
+        <td><?=$page['id'] ?></td>
+        <td style="padding-left:<?=$this->level*20?>px"><?=$this->escapeHtmlAttr($page['name']) ?></td>
+        <td>
+            <div class="btn-group">
+                <?=$this->htmlA([
+                    'class' => "btn btn-xs btn-success",
+                    'href'  => $this->url('moder/category/params', [
+                        'action'    => 'item',
+                        'parent_id' => $page['id']
+                    ])
+                ], 'Добавить') ?>
+                <?=$this->htmlA([
+                    'class' => "btn btn-xs btn-default",
+                    'href'  => $this->url('moder/category/params', [
+                        'action' => 'item',
+                        'id'     => $page['id']
+                    ])
+                ], 'Изменить') ?>
+            </div>
+        </td>
+    </tr>
+    <?=$this->partial('application/moder/category/list', [
+        'items' => $page['childs'],
+        'level' => $this->level + 1
+    ])?>
+<?php } ?>

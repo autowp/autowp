@@ -164,6 +164,11 @@ return [
                 $form = $sm->get('ModerCommentsFilterForm');
                 return new Controller\Moder\CommentsController($form);
             },
+            Controller\Moder\EnginesController::class => function($sm) {
+                $filterForm = $sm->get('ModerFactoryFilterForm');
+                $editForm = $sm->get('ModerEngineForm');
+                return new Controller\Moder\EnginesController($filterForm, $editForm);
+            },
             Controller\Moder\FactoryController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
                 $addForm = $sm->get('ModerFactoryAddForm');

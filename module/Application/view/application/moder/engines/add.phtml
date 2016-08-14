@@ -1,0 +1,17 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ],
+        'pageId' => 170,
+    ]);
+?>
+<?php if ($this->parentEngine) { ?>
+    <p>В двигатель <?=$this->escapeHtml($this->parentEngine->caption)?></p>
+<?php } ?>
+<?=$this->partial('application/forms/bootstrap-horizontal', [
+    'form' => $this->form
+])?>

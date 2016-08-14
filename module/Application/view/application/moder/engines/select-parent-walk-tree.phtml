@@ -1,0 +1,12 @@
+<?php foreach ($this->engines as $engine) { ?>
+    <button type="submit" name="parent_id" class="btn btn-link" value="<?=$this->escapeHtmlAttr($engine['id'])?>">
+        <?=$this->escapeHtml($engine['name'])?>
+    </button><br />
+    <?php if (count($engine['childs'])) { ?>
+        <div style="margin-left:2em">
+            <?=$this->partial('application/moder/engines/select-parent-walk-tree.phtml', [
+                'engines' => $engine['childs']
+            ])?>
+        </div>
+    <?php } ?>
+<?php } ?>

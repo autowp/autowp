@@ -12,6 +12,7 @@ return [
         'invokables' => [
             Form\Element\BrandName::class => Form\Element\BrandName::class,
             Form\Element\BrandFullName::class => Form\Element\BrandFullName::class,
+            Form\Element\EngineName::class => Form\Element\EngineName::class,
             Form\Element\FactoryName::class => Form\Element\FactoryName::class,
             Form\Element\Year::class => Form\Element\Year::class,
         ]
@@ -1596,6 +1597,82 @@ return [
                 'order' => [
                     'required' => false
                 ],
+            ],
+        ],
+        'ModerEnginesFilterForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post'
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type'    => 'Text',
+                        'name'    => 'name',
+                        'options' => [
+                            'label' => 'Name',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'brand_id',
+                        'options' => [
+                            'label' => 'Бренд',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'order',
+                        'options' => [
+                            'label'   => 'Сортировка',
+                            'options' => [
+                                0 => 'id asc',
+                                1 => 'id desc',
+                                2 => 'Название asc',
+                                3 => 'Название desc',
+                            ]
+                        ]
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'name' => [
+                    'required' => false
+                ],
+                'brand_id' => [
+                    'required' => false
+                ],
+                'order' => [
+                    'required' => false
+                ],
+            ],
+        ],
+        'ModerEngineForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+                'legend' => 'Двигатель',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => Form\Element\EngineName::class,
+                        'name' => 'caption'
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'caption' => [
+                    'required' => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim'],
+                        ['name' => Filter\SingleSpaces::class]
+                    ]
+                ]
             ],
         ],
     ]
