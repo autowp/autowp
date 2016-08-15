@@ -168,11 +168,13 @@ class Module implements ConsoleUsageProviderInterface,
         Zend_Translate::setCache($longCache);
     }
 
-    public function getConsoleBanner(Console $console) {
+    public function getConsoleBanner(Console $console) 
+    {
         return 'WheelsAge Module';
     }
 
-    public function getConsoleUsage(Console $console) {
+    public function getConsoleUsage(Console $console) 
+    {
         //description command
         return [
             'db_migrations_version'             => 'Get current migration version',
@@ -348,10 +350,10 @@ class Module implements ConsoleUsageProviderInterface,
 
             $auth = Zend_Auth::getInstance();
             if (!$auth->hasIdentity()) {
-                $token = $request->getCookie('remember');
-                if ($token) {
+                $cookies = $request->getCookie();
+                if ($cookies && isset($cookies['remember'])) {
                     $adapter = new Project_Auth_Adapter_Remember();
-                    $adapter->setCredential($token);
+                    $adapter->setCredential($cookies['remember']);
                     $result = $auth->authenticate($adapter);
                 }
             }

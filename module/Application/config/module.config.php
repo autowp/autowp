@@ -151,6 +151,7 @@ return [
                 $service = $sm->get(Service\UsersService::class);
                 return new Controller\Console\UsersController($service);
             },
+            Controller\Moder\AttrsController::class => InvokableFactory::class,
             Controller\Moder\BrandsController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
                 $logoForm = $sm->get('BrandLogoForm');

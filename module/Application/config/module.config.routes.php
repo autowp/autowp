@@ -1205,6 +1205,22 @@ return [
                 ],
                 'may_terminate' => true,
                 'child_routes' => [
+                    'attrs' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/attrs[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\AttrsController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => Router\Http\WildcardSafe::class
+                            ]
+                        ]
+                    ],
                     'brands' => [
                         'type' => Segment::class,
                         'options' => [

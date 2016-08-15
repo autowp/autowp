@@ -2,30 +2,30 @@
     <tr>
         <td>
             <?=str_repeat('—', $this->deep) ?>
-            <?=$this->htmlA($this->url(array(
+            <?=$this->htmlA($this->url('moder/attrs/params', [
                 'attribute_id' => $attribute->id
-            )), $attribute->name) ?>
+            ], [], true), $attribute->name) ?>
         </td>
         <td>
             <?php if ($type = $attribute->findParentAttrs_Types()) { ?>
-                <?=$this->escape($type->name) ?>
+                <?=$this->escapeHtml($type->name) ?>
             <?php } else { ?>
                 —
             <?php } ?>
         </td>
         <td>
             <?php if ($unit = $attribute->findParentAttrs_Units()) { ?>
-                <?=$this->escape($unit->name) ?>
+                <?=$this->escapeHtml($unit->name) ?>
             <?php } else { ?>
                 —
             <?php } ?>
         </td>
     </tr>
-    <?=$this->partial('attrs/attribute/attributes-rows-partial.phtml', array(
-        'attributes'    =>  $attribute->getTable()->fetchAll(
+    <?=$this->partial('application/moder/attrs/attribute/attributes-rows-partial', [
+        'attributes' =>  $attribute->getTable()->fetchAll(
             $attribute->getTable()->select()
                 ->where('parent_id = ?', $attribute->id)
         ),
-        'deep'          =>  $this->deep + 1
-    )) ?>
+        'deep'       =>  $this->deep + 1
+    ]) ?>
 <?php } ?>

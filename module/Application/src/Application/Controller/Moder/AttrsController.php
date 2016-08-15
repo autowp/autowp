@@ -1,79 +1,84 @@
 <?php
 
-class Moder_AttrsController extends Zend_Controller_Action
+namespace Application\Controller\Moder;
+
+use Zend\Form\Form;
+use Zend\Mvc\Controller\AbstractActionController;
+
+use Application\Form\Moder\Attribute as AttributeForm;
+use Application\Form\Moder\AttributeListOption as AttributeListOptionForm;
+
+use Attrs_Attributes;
+use Attrs_Item_Types;
+use Attrs_List_Options;
+use Attrs_Zone_Attributes;
+use Attrs_Zones;
+
+class AttrsController extends AbstractActionController
 {
-    public function preDispatch()
-    {
-        parent::preDispatch();
-
-        if (!$this->_helper->user()->isAllowed('attrs', 'edit')) {
-            return $this->_forward('forbidden', 'error', 'default');
-        }
-    }
-
     public function indexAction()
     {
+        if (!$this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+        
         $itemTypes = new Attrs_Item_Types();
         $attributes = new Attrs_Attributes();
 
-        $this->view->assign(array(
-            'itemTypes'     => $itemTypes->fetchAll(),
-            'attributes'    => $attributes->fetchAll(
-                $attributes->select()->where('parent_id IS NULL')->order('position')
-            )
-        ));
+        return [
+            'itemTypes'  => $itemTypes->fetchAll(),
+            'attributes' => $attributes->fetchAll('parent_id IS NULL', 'position')
+        ];
     }
 
     private function attributeUrl($attribute)
     {
-        return $this->_helper->url->url(array(
-            'module'        => 'moder',
-            'controller'    => 'attrs',
-            'action'        => 'attribute',
-            'attribute_id'  => $attribute->id
-        ), 'default', true);
+        return $this->url()->fromRoute('moder/attrs/params', [
+            'action'       => 'attribute',
+            'attribute_id' => $attribute->id
+        ]);
     }
 
     public function attributeAction()
     {
+        if (!$this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+        
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->getParam('attribute_id'))->current();
-        if (!$attribute)
-            return $this->_forward('notfound', 'error');
+        $attribute = $attributes->find($this->params('attribute_id'))->current();
+        if (!$attribute) {
+            return $this->notFoundAction();
+        }
 
-        $formAttributeEdit = new Application_Form_Moder_Attrs_Attribute(array(
-            'elementsBelongTo' => 'edit',
-            'action'           => $this->_helper->url->url(array(
-                'form' => 'edit'
-            ))
-        ));
-        $formAttributeEdit->populate($attribute->toArray());
+        $formAttributeEdit = new AttributeForm();
+        $formAttributeEdit->setAttribute('action', $this->url()->fromRoute(null, [
+            'form' => 'edit'
+        ], [], true));
+        $formAttributeEdit->populateValues($attribute->toArray());
 
-        $formAttributeNew = new Application_Form_Moder_Attrs_Attribute(array(
-            'elementsBelongTo' => 'new',
-            'action'           => $this->_helper->url->url(array(
-                'form' => 'new'
-            ))
-        ));
+        $formAttributeNew = new AttributeForm();
+        $formAttributeNew->setAttribute('action', $this->url()->fromRoute(null, [
+            'form' => 'new'
+        ], [], true));
 
-        $formListOption = new Application_Form_Moder_Attrs_List_Option(array(
-            'elementsBelongTo' => 'option',
-            'attribute'        => $attribute,
-            'action'           => $this->_helper->url->url(array(
-                'form' => 'option'
-            )),
-        ));
+        $formListOption = new AttributeListOptionForm(null, [
+            'attribute' => $attribute
+        ]);
+        $formListOption->setAttribute('action', $this->url()->fromRoute(null, [
+            'form' => 'option'
+        ], [], true));
 
         $options = new Attrs_List_Options();
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            switch ($this->getParam('form')) {
+            switch ($this->params('form')) {
                 case 'new':
-                    if ($formAttributeNew->isValid($request->getPost('new'))) {
-                        $values = $formAttributeNew->getValues();
-                        $values = $values['new'];
+                    $formAttributeNew->setData($this->params()->fromPost());
+                    if ($formAttributeNew->isValid()) {
+                        $values = $formAttributeNew->getData();
 
                         $position = $attributes->getAdapter()->fetchOne(
                             $attributes->getAdapter()->select()
@@ -81,7 +86,7 @@ class Moder_AttrsController extends Zend_Controller_Action
                                 ->where('parent_id = ?', $attribute->id)
                         ) + 1;
 
-                        $new = $attributes->createRow(array(
+                        $new = $attributes->createRow([
                             'name'        => $values['name'],
                             'description' => $values['description'],
                             'type_id'     => $values['type_id'] ? $values['type_id'] : null,
@@ -89,64 +94,64 @@ class Moder_AttrsController extends Zend_Controller_Action
                             'parent_id'   => $attribute->id,
                             'precision'   => $values['precision'] ? $values['precision'] : null,
                             'position'    => $position
-                        ));
+                        ]);
                         $new->save();
 
-                        return $this->_redirect($this->attributeUrl($attribute));
+                        return $this->redirect()->toUrl($this->attributeUrl($attribute));
                     }
                     break;
 
                 case 'edit':
-                    if ($formAttributeEdit->isValid($request->getPost('edit'))) {
-                        $values = $formAttributeEdit->getValues();
-                        $values = $values['edit'];
+                    $formAttributeEdit->setData($this->params()->fromPost());
+                    if ($formAttributeEdit->isValid()) {
+                        $values = $formAttributeEdit->getData();
 
-                        $attribute->setFromArray(array(
+                        $attribute->setFromArray([
                             'name'          => $values['name'],
                             'description'   => $values['description'],
                             'type_id'       => $values['type_id'] ? $values['type_id'] : null,
                             'unit_id'       => $values['unit_id'] ? $values['unit_id'] : null,
                             'precision'     => $values['precision'] ? $values['precision'] : null
-                        ));
+                        ]);
                         $attribute->save();
 
-                        return $this->_redirect($this->attributeUrl($attribute));
+                        return $this->redirect()->toUrl($this->attributeUrl($attribute));
                     }
                     break;
 
                 case 'option':
-                    if ($formListOption->isValid($request->getPost('option'))) {
-                        $values = $formListOption->getValues();
-                        $values = $values['option'];
+                    $formListOption->setData($this->params()->fromPost());
+                    if ($formListOption->isValid()) {
+                        $values = $formListOption->getData();
 
                         $new = $options->fetchNew();
-                        $new->setFromArray(array(
+                        $new->setFromArray([
                             'name'          => $values['name'],
                             'attribute_id'  => $attribute->id,
                             'parent_id'     => $values['parent_id'] ? $values['parent_id'] : null,
                             'position'      =>  1 + (int)$options->getAdapter()->fetchOne(
                                 $options->select()
-                                    ->from($options, array('MAX(position)'))
+                                    ->from($options, ['MAX(position)'])
                                     ->where('attribute_id = ?', $attribute->id)
                             )
-                        ));
+                        ]);
                         $new->save();
 
-                        return $this->_redirect($this->attributeUrl($attribute));
+                        return $this->redirect()->toUrl($this->attributeUrl($attribute));
                     }
                     break;
             }
 
         }
 
-        $this->view->assign(array(
+        return [
             //'itemType'      => $itemType,
             'attribute'         => $attribute,
             'formAttributeEdit' => $formAttributeEdit,
             'formAttributeNew'  => $formAttributeNew,
-            'attributes'        => $attributes->fetchAll(array(
+            'attributes'        => $attributes->fetchAll([
                 'parent_id = ?' => $attribute->id
-            ), 'position'),
+            ], 'position'),
             'options'           => $options->fetchAll(
                 $options->select()
                     ->where('attribute_id = ?', $attribute->id)
@@ -154,26 +159,29 @@ class Moder_AttrsController extends Zend_Controller_Action
                     ->order('position')
             ),
             'formListOption'    => $formListOption
-        ));
+        ];
     }
 
     private function zoneUrl($zone)
     {
-        return $this->_helper->url->url(array(
-            'module'     => 'moder',
-            'controller' => 'attrs',
-            'action'     => 'zone',
-            'zone_id'    => $zone->id
-        ), 'default', true);
+        return $this->url()->fromRoute('moder/attrs/params', [
+            'action'  => 'zone',
+            'zone_id' => $zone->id
+        ]);
     }
 
     public function zoneAction()
     {
+        if (!$this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+        
         $zones = new Attrs_Zones();
 
-        $zone = $zones->find($this->getParam('zone_id'))->current();
-        if (!$zone)
-            return $this->_forward('notfound', 'error');
+        $zone = $zones->find($this->params('zone_id'))->current();
+        if (!$zone) {
+            return $this->notFoundAction();
+        }
 
         $itemType = $zone->findParentAttrs_Item_Types();
 
@@ -181,7 +189,7 @@ class Moder_AttrsController extends Zend_Controller_Action
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            switch($this->getParam('form')) {
+            switch($this->params('form')) {
                 case 'attributes':
 
                     $zoneAttributes = new Attrs_Zone_Attributes();
@@ -196,32 +204,32 @@ class Moder_AttrsController extends Zend_Controller_Action
                                     ->where('attribute_id = ?', $attribute->id)
                             );
                             if (!$exists) {
-                                $zoneAttributes->insert(array(
+                                $zoneAttributes->insert([
                                     'zone_id'       => $zone->id,
                                     'attribute_id'  => $attribute->id,
                                     'position'      =>  1 + $zoneAttributes->getAdapter()->fetchOne(
                                         $zoneAttributes->select()
-                                            ->from($zoneAttributes, array('MAX(position)'))
+                                            ->from($zoneAttributes, ['MAX(position)'])
                                             ->where('zone_id = ?', $zone->id)
                                         )
-                                ));
+                                ]);
                             }
                         }
-                        $zoneAttributes->delete(array(
-                            $zoneAttributes->getAdapter()->quoteInto('zone_id = ?', $zone->id),
-                            $zoneAttributes->getAdapter()->quoteInto('attribute_id NOT IN (?)', $ids)
-                        ));
+                        $zoneAttributes->delete([
+                            'zone_id = ?'             => $zone->id,
+                            'attribute_id NOT IN (?)' => $ids
+                        ]);
                     } else {
-                        $zoneAttributes->delete(array(
-                            $zoneAttributes->getAdapter()->quoteInto('zone_id = ?', $zone->id)
-                        ));
+                        $zoneAttributes->delete([
+                            'zone_id = ?' => $zone->id
+                        ]);
                     }
                     break;
             }
-            return $this->_redirect($this->zoneUrl($zone));
+            return $this->redirect()->toUrl($this->zoneUrl($zone));
         }
 
-        $this->view->assign(array(
+        return [
             'itemType'   => $itemType,
             'zone'       => $zone,
             'attributes' => $attributes->fetchAll(
@@ -229,26 +237,32 @@ class Moder_AttrsController extends Zend_Controller_Action
             )
             /*'formAttribute' => $formAttribute,
             'attributes' => $group->findAttrs_Attributes()*/
-        ));
+        ];
     }
 
     public function attributeUpAction()
     {
+        if (!$this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+        
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->getParam('attribute_id'))->current();
-        if (!$attribute)
-            return $this->_forward('notfound', 'error');
+        $attribute = $attributes->find($this->params('attribute_id'))->current();
+        if (!$attribute) {
+            return $this->notFoundAction();
+        }
 
         $select = $attributes->select()
             ->from($attributes)
             ->where('attrs_attributes.position < ?', $attribute->position)
             ->order('attrs_attributes.position DESC')
             ->limit(1);
-        if ($attribute->parent_id)
+        if ($attribute->parent_id) {
             $select->where('attrs_attributes.parent_id = ?', $attribute->parent_id);
-        else
+        } else {
             $select->where('attrs_attributes.parent_id IS NULL');
+        }
         $prev = $attributes->fetchRow($select);
 
         if ($prev) {
@@ -265,28 +279,34 @@ class Moder_AttrsController extends Zend_Controller_Action
             $prev->save();
         }
 
-        return $this->_redirect($this->_helper->url->url(array(
+        return $this->redirect()->toRoute(null, [
             'action' => 'index'
-        )));
+        ], [], true);
     }
 
     public function attributeDownAction()
     {
+        if (!$this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+        
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->getParam('attribute_id'))->current();
-        if (!$attribute)
-            return $this->_forward('notfound', 'error');
+        $attribute = $attributes->find($this->params('attribute_id'))->current();
+        if (!$attribute) {
+            return $this->notFoundAction();
+        }
 
         $select = $attributes->select()
             ->from($attributes)
             ->where('attrs_attributes.position > ?', $attribute->position)
             ->order('attrs_attributes.position ASC')
             ->limit(1);
-        if ($attribute->parent_id)
+        if ($attribute->parent_id) {
             $select->where('attrs_attributes.parent_id = ?', $attribute->parent_id);
-        else
+        } else {
             $select->where('attrs_attributes.parent_id IS NULL');
+        }
         $next = $attributes->fetchRow($select);
 
         if ($next) {
@@ -303,24 +323,30 @@ class Moder_AttrsController extends Zend_Controller_Action
             $next->save();
         }
 
-        return $this->_redirect($this->_helper->url->url(array(
+        return $this->redirect()->toRoute(null, [
             'action' => 'index'
-        )));
+        ], [], true);
     }
 
     public function moveUpAttributeAction()
     {
+        if (!$this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+        
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->getParam('attribute_id'))->current();
-        if (!$attribute)
-            return $this->_forward('notfound', 'error');
+        $attribute = $attributes->find($this->params('attribute_id'))->current();
+        if (!$attribute) {
+            return $this->notFoundAction();
+        }
 
         $zones = new Attrs_Zones();
 
-        $zone = $zones->find($this->getParam('zone_id'))->current();
-        if (!$zone)
-            return $this->_forward('notfound', 'error');
+        $zone = $zones->find($this->params('zone_id'))->current();
+        if (!$zone) {
+            return $this->notFoundAction();
+        }
 
         $zoneAttributes = new Attrs_Zone_Attributes();
         $zoneAttribute = $zoneAttributes->fetchRow(
@@ -329,8 +355,9 @@ class Moder_AttrsController extends Zend_Controller_Action
                 ->where('attribute_id = ?', $attribute->id)
         );
 
-        if (!$zoneAttribute)
-            return $this->_forward('notfound', 'error');
+        if (!$zoneAttribute) {
+            return $this->notFoundAction();
+        }
 
         $select = $zoneAttributes->select()
             ->from($zoneAttributes)
@@ -360,22 +387,28 @@ class Moder_AttrsController extends Zend_Controller_Action
             $prev->save();
         }
 
-        return $this->_redirect($this->zoneUrl($zone));
+        return $this->redirect()->toUrl($this->zoneUrl($zone));
     }
 
     public function moveDownAttributeAction()
     {
+        if (!$this->user()->isAllowed('attrs', 'edit')) {
+            return $this->forbiddenAction();
+        }
+        
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->getParam('attribute_id'))->current();
-        if (!$attribute)
-            return $this->_forward('notfound', 'error');
+        $attribute = $attributes->find($this->params('attribute_id'))->current();
+        if (!$attribute) {
+            return $this->notFoundAction();
+        }
 
         $zones = new Attrs_Zones();
 
-        $zone = $zones->find($this->getParam('zone_id'))->current();
-        if (!$zone)
-            return $this->_forward('notfound', 'error');
+        $zone = $zones->find($this->params('zone_id'))->current();
+        if (!$zone) {
+            return $this->notFoundAction();
+        }
 
         $zoneAttributes = new Attrs_Zone_Attributes();
         $zoneAttribute = $zoneAttributes->fetchRow(
@@ -384,8 +417,9 @@ class Moder_AttrsController extends Zend_Controller_Action
                 ->where('attribute_id = ?', $attribute->id)
         );
 
-        if (!$zoneAttribute)
-            return $this->_forward('notfound', 'error');
+        if (!$zoneAttribute) {
+            return $this->notFoundAction();
+        }
 
         $select = $zoneAttributes->select()
             ->from($zoneAttributes)
@@ -394,10 +428,11 @@ class Moder_AttrsController extends Zend_Controller_Action
             ->where('attrs_zone_attributes.position > ?', $zoneAttribute->position)
             ->order('attrs_zone_attributes.position ASC')
             ->limit(1);
-        if ($attribute->parent_id)
+        if ($attribute->parent_id) {
             $select->where('attrs_attributes.parent_id = ?', $attribute->parent_id);
-        else
+        } else {
             $select->where('attrs_attributes.parent_id IS NULL');
+        }
         $next = $zoneAttributes->fetchRow($select);
 
         if ($next) {
@@ -414,8 +449,6 @@ class Moder_AttrsController extends Zend_Controller_Action
             $next->save();
         }
 
-        return $this->_redirect($this->zoneUrl($zone));
+        return $this->redirect()->toUrl($this->zoneUrl($zone));
     }
-
-
 }

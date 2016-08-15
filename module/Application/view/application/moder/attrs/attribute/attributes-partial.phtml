@@ -1,0 +1,35 @@
+<?php if (count($this->attributes)) { ?>
+    <ul>
+        <?php foreach ($this->attributes as $idx => $attribute) { ?>
+            <li>
+                <?php if ($idx < count($this->attributes)-1) { ?>
+                    <?=$this->htmlA($this->url('moder/attrs/params', [
+                        'action'       => 'attribute-down',
+                        'attribute_id' => $attribute->id
+                    ]), '<span class="fa fa-arrow-down"></span>', false) ?>
+                <?php } else { ?>
+                    <span class="fa fa-arrow-down" style="color:#999999"></span>
+                <?php } ?>
+                <?php if ($idx > 0) { ?>
+                    <?=$this->htmlA($this->url('moder/attrs/params', [
+                        'action'       => 'attribute-up',
+                        'attribute_id' => $attribute->id
+                    ]), '<span class="fa fa-arrow-up"></span>', false) ?>
+                <?php } else { ?>
+                    <span style="color:#999999" class="fa fa-arrow-up"></span>
+                <?php } ?>
+                <?=$this->htmlA($this->url('moder/attrs/params', [
+                    'action'       => 'attribute',
+                    'attribute_id' => $attribute->id
+                ]), $attribute->name) ?>
+                <?=$this->partial('application/moder/attrs/attribute/attributes-partial', [
+                    'attributes' => $attribute->getTable()->fetchAll(
+                        $attribute->getTable()->select()
+                            ->where('parent_id = ?', $attribute->id)
+                            ->order('position')
+                    )
+                ]) ?>
+            </li>
+        <?php } ?>
+    </ul>
+<?php } ?>

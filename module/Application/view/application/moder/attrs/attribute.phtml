@@ -1,35 +1,39 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'isAdminPage' => true,
             'blankPage'   => false,
             'needLeft'    => false,
             'needRight'   => false
-        ),
+        ],
         'pageId' => 101,
-        'args'   => array(
+        'args'   => [
             'ATTR_NAME' => $this->attribute->name
-        )
-    ));
+        ]
+    ]);
 ?>
 
 <div class="row">
     <div class="col-md-6">
         <h2>Парметры аттрибута</h2>
         <div class="well">
-            <?=$this->formAttributeEdit->render($this) ?>
+            <?=$this->partial('application/forms/bootstrap-vertical', [
+                'form' => $this->formAttributeEdit
+            ])?>
         </div>
 
         <h2>Список значений (для списковых типов)</h2>
         <div class="well">
-            <?=$this->partial('attrs/attribute/options-partial.phtml', array(
+            <?=$this->partial('application/moder/attrs/attribute/options-partial', [
                 'options' => $this->options
-            )) ?>
+            ]) ?>
         </div>
 
         <h2>Добавить значение</h2>
         <div class="well">
-            <?=$this->formListOption->render($this) ?>
+            <?=$this->partial('application/forms/bootstrap-vertical', [
+                'form' => $this->formListOption
+            ])?>
         </div>
     </div>
     <div class="col-md-6">
@@ -42,17 +46,19 @@
                         <th>Тип</th>
                         <th>Единица измерения</th>
                     </tr>
-                    <?=$this->partial('attrs/attribute/attributes-rows-partial.phtml', array(
-                        'attributes'    =>  $this->attributes,
-                        'deep'          =>  0
-                    )) ?>
+                    <?=$this->partial('application/moder/attrs/attribute/attributes-rows-partial', [
+                        'attributes' => $this->attributes,
+                        'deep'       => 0
+                    ]) ?>
                 </table>
             </div>
         <?php } ?>
 
         <h2>Добавить податтрибут</h2>
         <div class="well">
-            <?=$this->formAttributeNew->render($this) ?>
+            <?=$this->partial('application/forms/bootstrap-vertical', [
+                'form' => $this->formAttributeNew
+            ])?>
         </div>
     </div>
 </div>
