@@ -4,39 +4,32 @@ return array (
     /* Common words */
     'and' => 'and',
     '%1$s picures'       => array(
-        '%1$s picture',
-        '%1$s pictures',
+        '%1$s 图片',
     ),
     '%1$s vehicles'      => array(
-        '%1$s vehicle',
-        '%1$s vehicles',
+        '%1$s 车型',
     ),
     '%1$s comments'      => array(
-        '%1$s comment',
-        '%1$s comments',
+        '%1$s 评论',
     ),
     '%1$s messages'      => array(
-        '%1$s message',
-        '%1$s messages',
+        '%1$s 站内信',
     ),
     '%1$s topics'      => array(
-        '%1$s topic',
-        '%1$s topics',
+        '%1$s 话题',
     ),
 
-    'few seconds ago'    => 'few seconds ago',
-    'a minute ago'       => 'a minute ago',
+    'few seconds ago'    => '几秒钟前',
+    'a minute ago'       => '一分钟前',
     '%1$s minutes ago'   => array(
-        '%1$s minute ago',
-        '%1$s minutes ago'
+        '%1$s 几分钟前',
     ),
-    'an hour ago'        => 'an hour ago',
+    'an hour ago'        => '一小时前',
     '%1$s hours ago'     => array(
-        '%1$s hour ago',
-        '%1$s hours ago'
+        '%1$s 几小时前',
     ),
-    'yesterday'          => 'yesterday',
-    'today'              => 'today',
+    'yesterday'          => '昨天',
+    'today'              => '今天',
 
     'contributor' => 'contributor',
     'contributors' => 'contributors',
