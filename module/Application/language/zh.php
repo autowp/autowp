@@ -2,7 +2,7 @@
 
 return [
     '' => [
-        'plural_forms' => 'nplurals=2; plural=(n==1)?0:1'
+        'plural_forms' => 'nplurals=1; plural=0'
     ],
     /* Common words */
     'and' => 'and',
