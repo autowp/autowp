@@ -42,6 +42,12 @@
     <?php } ?>
 <?php $this->pageTitle()->captureEnd() ?>
 
+<?php if (isset($this->otherNames)) { ?>
+    <?php foreach ($this->otherNames as $name) { ?>
+        <p><?=$this->escape($name)?></p>
+    <?php } ?>
+<?php } ?>
+
 <?php if ($this->user()->inheritsRole('moder')) { ?>
     <p>
         <i class="fa fa-cog"></i>
@@ -122,10 +128,10 @@
 
 <?php if (!isset($this->modgroup)) { ?>
     <?=$this->partial('cars.phtml', $this->childListData)?>
-    
+
     <?php if ($this->currentPicturesCount) { ?>
         <h3><?=$this->escape($this->translate('catalogue/other-pictures-of-%1$s', $this->carFullName)) ?></h3>
-    
+
         <div class="row thumbnails">
             <?php foreach ($this->currentPictures as $picture) { ?>
                 <div class="col-md-3">
@@ -141,17 +147,17 @@
                 </div>
             <?php } ?>
         </div>
-    
+
         <?php if ($this->currentPicturesCount > 4) { ?>
             <i class="fa fa-th"></i>
             <?=$this->htmlA($this->currentPicturesUrl, $this->translate('carlist/all pictures').' ('.$this->currentPicturesCount.')')?>
         <?php } ?>
     <?php } ?>
-    
+
     <?php if (isset($this->paginator)) { ?>
         <?=$this->paginationControl($this->paginator) ?>
     <?php } ?>
-    
+
 <?php } else { ?>
 
     <?php foreach ($this->modifications as $modification) { ?>
@@ -159,7 +165,7 @@
         <h3>
             <?=$this->car()->htmlTitle(array_replace($this->car, $modification['nameParams']))?>
         </h3>
-        
+
         <div class="row thumbnails">
             <?php foreach ($modification['pictures'] as $picture) { ?>
                 <div class="col-md-3">
@@ -179,7 +185,7 @@
                 </div>
             <?php } ?>
         </div>
-        
+
         <ul class="list-inline">
 
             <?php if (isset($modification['url']) && $modification['url']) { ?>

@@ -1,0 +1,41 @@
+<?php
+    $classes = ['picture-preview'];
+    if (isset($this->colClass)) {
+        $classes[] = $this->colClass;
+    }
+    if ($this->moderVote !== null) {
+        if ($this->moderVote > 0) {
+            $classes[] = 'vote-accept';
+        } elseif ($this->moderVote < 0) {
+            $classes[] = 'vote-remove';
+        } else {
+            $classes[] = 'vote-neutral';
+        }
+    }
+?>
+<div class="<?=$this->escapeHtmlAttr(implode(' ', $classes))?>" data-id="<?=$this->id?>">
+    <div class="thumbnail clearfix">
+        <?=$this->htmlA($this->url, $this->htmlImg([
+            'src'     => $this->src,
+            'alt'     => $this->pic()->textTitle($this->name),
+            'title'   => $this->pic()->textTitle($this->name),
+            'shuffle' => true
+        ]), false) ?>
+        <div class="caption">
+            <p><?=$this->htmlA($this->url, $this->pic()->htmlTitle($this->name), false)?></p>
+            <?php if (!$this->disableBehaviour) { ?>
+                <?=$this->render('application/picture-behaviour.phtml')?>
+            <?php } ?>
+        </div>
+        <button type="button" class="btn btn-default btn-sm pull-left" data-toggle="button" aria-pressed="false" autocomplete="off">
+            <i class="fa fa-check"></i>
+        </button>
+        <?php if ($this->type == Picture::CAR_TYPE_ID) { ?>
+            <div style="margin-left: 35px;">
+                <?=$this->partial('application/moder/pictures/picture-perspective', array_replace([
+                    'tiny' => true
+                ], $this->perspective))?>
+            </div>
+        <?php } ?>
+    </div>
+</div>

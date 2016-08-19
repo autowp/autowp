@@ -1,11 +1,16 @@
+<?php
+    $tiny = isset($this->tiny) && $this->tiny;
+?>
 <form method="post" action="<?=$this->escapeHtmlAttr($this->url)?>" class="tiny" data-module="perspective-selector">
-    <label for="perspective_id">Ракурс</label>
+    <?php if (!$tiny) { ?>
+        <label for="perspective_id">Ракурс</label>
+    <?php } ?>
 
     <?=$this->formElement(
         (new Zend\Form\Element\Select('perspective_id'))
             ->setAttributes([
                 'id'    => 'perspective_id',
-                'class' => 'form-control'
+                'class' => 'form-control' . ($tiny ? ' input-sm' : '')
             ])
             ->setValueOptions($this->options)
             ->setValue($this->value)

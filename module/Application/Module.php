@@ -37,7 +37,7 @@ class Module implements ConsoleUsageProviderInterface,
     private $hostnameWhitelist = [
         'www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
         'i.wheelsage.org', 'en.wheelsage.org', 'fr.wheelsage.org',
-        'www.wheelsage.org', 'wheelsage.org'
+        'zh.wheelsage.org', 'www.wheelsage.org', 'wheelsage.org'
     ];
 
     /**
@@ -48,7 +48,7 @@ class Module implements ConsoleUsageProviderInterface,
     /**
      * @var array
      */
-    private $languageWhitelist = ['ru', 'en', 'fr'];
+    private $languageWhitelist = ['ru', 'en', 'fr', 'zh'];
 
     /**
      * @var array
@@ -56,6 +56,7 @@ class Module implements ConsoleUsageProviderInterface,
     private $whitelist = [
         'fr.wheelsage.org' => 'fr',
         'en.wheelsage.org' => 'en',
+        'zh.wheelsage.org' => 'zh',
         'autowp.ru'        => 'ru',
         'www.autowp.ru'    => 'ru',
         'ru.autowp.ru'     => 'ru'

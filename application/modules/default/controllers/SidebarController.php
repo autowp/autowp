@@ -40,9 +40,9 @@ class SidebarController extends Zend_Controller_Action
     private function subBrandGroups(array $brand)
     {
         $brandModel = new Brand();
-        
+
         $language = $this->_helper->language();
-        
+
         $rows = $brandModel->getList($language, function($select) use ($brand) {
             $select->where('parent_brand_id = ?', $brand['id']);
         });
@@ -68,7 +68,7 @@ class SidebarController extends Zend_Controller_Action
 
         $language = $this->_helper->language();
 
-        $cacheKey = 'SIDEBAR_' . $brand['id'] . '_' . $language . '_1';
+        $cacheKey = 'SIDEBAR_' . $brand['id'] . '_' . $language . '_2';
 
         if (!($groups = $cache->load($cacheKey))) {
 
@@ -128,7 +128,7 @@ class SidebarController extends Zend_Controller_Action
                 $caption = trim(preg_replace("|[[:space:]]+|", ' ', $caption));
                 $caption = ltrim($caption, '/');
                 if (!$caption) {
-                    $caption = $brandCarRow['car_name'];
+                    $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
                 }
                 $groups[] = array(
                     'car_id'  => $brandCarRow['car_id'],
@@ -337,7 +337,7 @@ class SidebarController extends Zend_Controller_Action
     public function brandAction()
     {
         $language = $this->_helper->language();
-        
+
         $brandModel = new Brand();
         $brand = $brandModel->getBrandById($this->getParam('brand_id'), $language);
         if (!$brand) {

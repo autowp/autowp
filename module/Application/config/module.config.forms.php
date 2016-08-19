@@ -322,7 +322,6 @@ return [
             ],
         ],
         'CommentForm' => [
-            //'hydrator' => 'ObjectProperty',
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
@@ -340,7 +339,7 @@ return [
                         'attributes' => [
                             'cols'      => 80,
                             'rows'      => 5,
-                            'maxlength' => 1024*4
+                            'maxlength' => 1024*16
                         ]
                     ],
                 ],
@@ -377,7 +376,7 @@ return [
                             'name' => 'StringLength',
                             'options' => [
                                 'min' => 0,
-                                'max' => 1024*4
+                                'max' => 1024*16
                             ]
                         ]
                     ]

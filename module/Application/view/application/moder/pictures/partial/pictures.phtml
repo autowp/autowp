@@ -1,0 +1,14 @@
+<?php
+    $items = $this->items;
+?>
+<?php while ($currentItems = array_splice($items, 0, $this->width)) { ?>
+    <div class="row" data-module="car-list">
+        <?php foreach ($currentItems as $item) { ?>
+            <?=$this->partial('application/moder/pictures/partial/picture.phtml', array_replace($item, [
+                'isModer'          => $this->isModer,
+                'disableBehaviour' => $this->disableBehaviour,
+                'colClass'         => $this->colClass
+            ])) ?>
+        <?php } ?>
+    </div>
+<?php } ?>

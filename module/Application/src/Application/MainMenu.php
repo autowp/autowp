@@ -139,7 +139,8 @@ class MainMenu
                     'url'            => $this->router->assemble([
                         'category_catname' => $row->catname
                     ], [
-                        'name' => 'categories/category'
+                        'action' => 'category',
+                        'name'   => 'categories'
                     ]),
                     'name'           => $langRow ? $langRow->name : $row->name,
                     'short_name'     => $langRow ? $langRow->short_name : $row->short_name,

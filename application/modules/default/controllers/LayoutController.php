@@ -157,6 +157,12 @@ class LayoutController extends Zend_Controller_Action
                 'hostname' => 'fr.wheelsage.org',
                 'flag'     => 'flag-FR'
             ),
+            array(
+                'name'     => '中文 (beta)',
+                'language' => 'zh',
+                'hostname' => 'zh.wheelsage.org',
+                'flag'     => 'flag-CN'
+            ),
         );
 
         $scheme = $this->getRequest()->getScheme();

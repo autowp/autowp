@@ -10,7 +10,7 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
     /**
      * @var array
      */
-    private $_languageWhitelist = ['ru', 'en', 'fr'];
+    private $_languageWhitelist = ['ru', 'en', 'fr', 'zh'];
 
     /**
      * @var array
@@ -18,6 +18,7 @@ class Project_Controller_Plugin_Language extends Zend_Controller_Plugin_Abstract
     private $_whitelist = array(
         'fr.wheelsage.org' => 'fr',
         'en.wheelsage.org' => 'en',
+        'zh.wheelsage.org' => 'zh',
         'autowp.ru'        => 'ru',
         'www.autowp.ru'    => 'ru',
         'ru.autowp.ru'     => 'ru'

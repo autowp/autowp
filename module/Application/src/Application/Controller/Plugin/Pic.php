@@ -410,6 +410,7 @@ class Pic extends AbstractPlugin
                 'url'       => $url,
                 'src'       => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
                 'moderVote' => $row['moder_votes_count'] > 0 ? $row['moder_votes'] : null,
+                'perspective_id' => $row['perspective_id']
             ];
 
             if (!$options['disableBehaviour']) {

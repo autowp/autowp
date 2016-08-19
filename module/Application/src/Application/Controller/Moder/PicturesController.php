@@ -1,9 +1,34 @@
 <?php
 
+namespace Application\Controller\Moder;
+
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
+
+use Application\Form\Moder\Inbox as InboxForm;
 use Application\Model\Message;
+use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\TrafficControl;
 
-class Moder_PicturesController extends Zend_Controller_Action
+use Brands;
+use Car_Parent;
+use Cars;
+use Comments;
+use Comment_Message;
+use Engines;
+use Factory;
+use Perspectives;
+use Picture;
+use Pictures_Moder_Votes;
+use Users;
+
+use Exception;
+
+use Zend_Db_Expr;
+use Zend_Session_Namespace;
+
+class PicturesController extends AbstractActionController
 {
     private $table;
 
@@ -16,6 +41,8 @@ class Moder_PicturesController extends Zend_Controller_Action
      * @var Engines
      */
     private $engineTable = null;
+
+    private $textStorage;
 
     /**
      * @return Engines
@@ -34,25 +61,24 @@ class Moder_PicturesController extends Zend_Controller_Action
             : $this->carParentTable = new Car_Parent();
     }
 
-    public function init()
+    public function __construct($textStorage)
     {
-        parent::init();
-
-        $this->table = $this->_helper->catalogue()->getPictureTable();
+        $this->table = new Picture();
+        $this->textStorage = $textStorage;
     }
 
     public function preDispatch()
     {
         parent::preDispatch();
 
-        if (!$this->_helper->user()->inheritsRole('moder') ) {
-            return $this->forward('forbidden', 'error', 'default');
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
         }
     }
 
     public function ownerTypeaheadAction()
     {
-        $q = $this->_getParam('query');
+        $q = $this->params()->fromQuery('query');
 
         $users = new Users();
 
@@ -101,20 +127,12 @@ class Moder_PicturesController extends Zend_Controller_Action
             }
         }
 
-        return $this->_helper->json(array_values($options));
+        return new JsonModel(array_values($options));
     }
 
     private function getFilterForm()
     {
         $db = $this->table->getAdapter();
-
-        $resOptions = $db->fetchCol(
-            $db->select()
-                ->from('pictures', new Zend_Db_Expr('CONCAT(width, "×", height) AS res'))
-                ->where('status = ?', Picture::STATUS_INBOX)
-                ->group(['width', 'height'])
-        );
-        $resOptions = array_combine($resOptions, $resOptions);
 
         $brandMultioptions = $db->fetchPairs(
             $db->select()
@@ -127,9 +145,8 @@ class Moder_PicturesController extends Zend_Controller_Action
                 ->order(['brands.position', 'brands.caption'])
         );
 
-        return new Application_Form_Moder_Inbox([
-            'action'                  => $this->_helper->url->url(),
-            'perspectiveMultioptions' => [
+        $form = new InboxForm(null, [
+            'perspectiveOptions' => [
                 ''     => 'любой',
                 'null' => 'не задан'
             ] + $db->fetchPairs(
@@ -138,13 +155,16 @@ class Moder_PicturesController extends Zend_Controller_Action
                     ->from('perspectives', ['id', 'name'])
                     ->order('position')
             ),
-            'brandMultioptions'       => [
+            'brandOptions'       => [
                 '' => 'любой'
             ] + $brandMultioptions,
-            'resolutionMultioptions' => [
-                '' => 'любое'
-            ] + $resOptions,
         ]);
+
+        $form->setAttribute('action', $this->url()->fromRoute(null, [
+            'action' => 'index'
+        ]));
+
+        return $form;
     }
 
     public function indexAction()
@@ -164,21 +184,24 @@ class Moder_PicturesController extends Zend_Controller_Action
         ];
 
         if ($this->getRequest()->isPost()) {
-            $post = $this->getRequest()->getPost();
-            foreach ($post as $key => &$value) {
-                if (strlen($value) == 0) {
-                    $value = null;
+            $form = $this->getFilterForm();
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $post = $form->getData();
+                foreach ($post as $key => $value) {
+                    if (strlen($value) == 0) {
+                        unset($post[$key]);
+                    }
                 }
+                $post['action'] = 'index';
+                return $this->redirect()->toRoute('moder/pictures/params', $post);
             }
-            unset($value);
-            return $this->_redirect($this->_helper->url->url(
-                $post
-            ));
         }
 
         $form = $this->getFilterForm();
-        $form->isValid($this->_getAllParams());
-        $formdata = $form->getValues();
+        $form->setData($this->params()->fromRoute());
+        $form->isValid();
+        $formdata = $form->getData();
 
         $select = $this->table->select(true)
             //->where('pictures.status = ?', Picture::STATUS_INBOX)
@@ -266,12 +289,6 @@ class Moder_PicturesController extends Zend_Controller_Action
                 $joinLeftComments = true;
                 $select->where('comment_topic.messages = 0 or comment_topic.messages is null');
             }
-        }
-
-        if ($formdata['resolution']) {
-            list ($width, $height) = explode('×', $formdata['resolution']);
-            $select->where('pictures.height = ?', $height)
-                   ->where('pictures.width = ?', $width);
         }
 
         if ($formdata['owner_id']) {
@@ -362,15 +379,50 @@ class Moder_PicturesController extends Zend_Controller_Action
                 ->where('comment_topic.type_id = ?', Comment_Message::PICTURES_TYPE_ID);
         }
 
-        $paginator = Zend_Paginator::factory($select)
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+
+        $paginator
             ->setItemCountPerPage($perPage)
-            ->setCurrentPageNumber($this->_getParam('page'));
+            ->setCurrentPageNumber($this->params('page'));
 
         $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
 
-        $picturesData = $this->_helper->pic->listData($select, [
+        $picturesData = $this->pic()->listData($select, [
             'width' => 4
         ]);
+
+        $perspectives = new Perspectives();
+        $multioptions = $perspectives->getAdapter()->fetchPairs(
+            $perspectives->getAdapter()->select()
+                ->from($perspectives->info('name'), ['id', 'name'])
+                ->order('position')
+        );
+
+        $multioptions = array_replace([
+            '' => '--'
+        ], $multioptions);
+
+        foreach ($picturesData['items'] as &$item) {
+            $picturePerspective = null;
+            if ($item['type'] == Picture::CAR_TYPE_ID) {
+                if ($this->user()->inheritsRole('moder')) {
+                    $perspectives = new Perspectives();
+
+                    $item['perspective'] = [
+                        'options' => $multioptions,
+                        'url'     => $this->url()->fromRoute('moder/pictures/params', [
+                            'action'     => 'picture-perspective',
+                            'picture_id' => $item['id']
+                        ]),
+                        'value'   => $item['perspective_id'],
+                        'user'    => null
+                    ];
+                }
+            }
+        }
+        unset($item);
 
         $reasons = [
             'плохое качество',
@@ -382,34 +434,36 @@ class Moder_PicturesController extends Zend_Controller_Action
         ];
         $reasons = array_combine($reasons, $reasons);
         if (isset($_COOKIE['customReason'])) {
-            foreach ((array)unserialize($_COOKIE['customReason']) as $reason)
-                if (strlen($reason) && !in_array($reason, $reasons))
+            foreach ((array)unserialize($_COOKIE['customReason']) as $reason) {
+                if (strlen($reason) && !in_array($reason, $reasons)) {
                     $reasons[$reason] = $reason;
+                }
+            }
         }
 
-        $this->view->assign([
+        return [
             'paginator'    => $paginator,
             'picturesData' => $picturesData,
             'form'         => $form,
             'reasons'      => $reasons
-        ]);
+        ];
     }
 
-    private function pictureUrl(Picture_Row $picture)
+    private function pictureUrl(Picture_Row $picture, $forceCanonical = false)
     {
-        return $this->_helper->url->url([
-            'module'        => 'moder',
-            'controller'    => 'pictures',
-            'action'        => 'picture',
-            'picture_id'    => $picture->id
-        ], 'default', true);
+        return $this->url()->fromRoute('moder/pictures/params', [
+            'action'     => 'picture',
+            'picture_id' => $picture->id
+        ], [
+            'force_canonical' => $forceCanonical
+        ]);
     }
 
     public function picturePerspectiveAction()
     {
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if ($picture->type != Picture::CAR_TYPE_ID)
@@ -427,12 +481,10 @@ class Moder_PicturesController extends Zend_Controller_Action
 
         $form = new Zend_Form([
             'method'    => 'post',
-            'action'    => $this->_helper->url->url([
-                'module'        => 'moder',
-                'controller'    => 'pictures',
-                'action'        => 'picture-perspective',
-                'picture_id'    => $picture->id
-            ], 'default', true),
+            'action'    => $this->url()->fromRoute('moder/pictures/params', [
+                'action'     => 'picture-perspective',
+                'picture_id' => $picture->id
+            ]),
             'elements'    => [
                 ['select', 'perspective_id', [
                     'required'     => false,
@@ -459,29 +511,30 @@ class Moder_PicturesController extends Zend_Controller_Action
         if ($request->isPost() && $form->isValid($request->getPost())) {
             $values = $form->getValues();
 
-            $user = $this->_helper->user()->get();
+            $user = $this->user()->get();
             $picture->perspective_id = $values['perspective_id'];
             $picture->change_perspective_user_id = $user->id;
             $picture->save();
 
-            $this->_helper->log(sprintf(
+            $this->log(sprintf(
                 'Установка ракурса картинки %s',
-                $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+                $picture->getCaption()
             ), [$picture]);
 
-            if ($request->isXmlHttpRequest())
-                return $this->_helper->json([
+            if ($request->isXmlHttpRequest()) {
+                return new JsonModel([
                     'ok' => true
                 ]);
+            }
 
-            return $this->_redirect($this->pictureUrl($picture));
+            return $this->redirect()->toUrl($this->pictureUrl($picture));
         }
 
-        $this->view->assign([
+        return [
             'picture' => $picture,
             'form'    => $form,
             'tiny'    => (bool)$this->getParam('tiny')
-        ]);
+        ];
     }
 
     private function enginesWalkTree($parentId, $brandId)
@@ -514,24 +567,24 @@ class Moder_PicturesController extends Zend_Controller_Action
 
     public function pictureSelectEngineAction()
     {
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if ($picture->type != Picture::ENGINE_TYPE_ID)
             throw new Exception('Картинка несовместимого типа');
 
-        $canMove = $this->_helper->user()->isAllowed('picture', 'move');
+        $canMove = $this->user()->isAllowed('picture', 'move');
         if (!$canMove) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
-        $this->view->picture = $picture;
-
         $brand = null;
-        $engines = new Engines();
-        $engine = $engines->find($this->_getParam('engine'))->current();
+        $brands = null;
+        $engines = null;
+        $engineTable = new Engines();
+        $engine = $engineTable->find($this->params('engine'))->current();
 
         if ($engine) {
             $brandTable = new Brands();
@@ -568,9 +621,9 @@ class Moder_PicturesController extends Zend_Controller_Action
                     ->where('engine_parent_cache.engine_id = ?', $engine->id)
             );
 
-            foreach ($rows as $brand) {
-                $brand->updatePicturesCache();
-                $brand->refreshEnginePicturesCount();
+            foreach ($rows as $cBrand) {
+                $cBrand->updatePicturesCache();
+                $cBrand->refreshEnginePicturesCount();
             }
 
             foreach ($oldBrands as $oldBrand) {
@@ -578,33 +631,32 @@ class Moder_PicturesController extends Zend_Controller_Action
                 $oldBrand->refreshEnginePicturesCount();
             }
 
-            $this->_helper->log(sprintf(
+            $this->log(sprintf(
                 'Назначение двигателя %s картинке %s',
-                $this->view->escape($engine->getMetaCaption()),
-                $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+                $engine->getMetaCaption(),
+                $picture->getCaption()
             ), [$engine, $picture]);
 
-            return $this->_redirect($this->pictureUrl($picture));
+            return $this->redirect()->toUrl($this->pictureUrl($picture));
         } else {
-            $brands = new Brands();
-            $brand = $brands->find($this->_getParam('brand_id'))->current();
+            $brandTable = new Brands();
+            $brand = $brandTable->find($this->params('brand_id'))->current();
             if ($brand) {
-                $engines = new Engines();
-                $this->view->engines = $engines->fetchAll(
-                    $engines->select(true)
+                $engineTable = new Engines();
+                $engines = $engineTable->fetchAll(
+                    $engineTable->select(true)
                         ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
                         ->where('brand_engine.brand_id = ?', $brand->id)
                         ->order('engines.caption')
                 );
 
-                $this->view->assign([
-                    'brand'   => $brand,
+                /*$this->view->assign([
                     'engines' => $this->enginesWalkTree(null, $brand->id)
-                ]);
+                ]);*/
 
             } else {
-                $this->view->brands = $brands->fetchAll(
-                    $brands->select(true)
+                $brands = $brandTable->fetchAll(
+                    $brandTable->select(true)
                         ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
                         ->group('brands.id')
                         ->order(['brands.position', 'brands.caption'])
@@ -612,29 +664,32 @@ class Moder_PicturesController extends Zend_Controller_Action
             }
         }
 
-        $this->view->brand = $brand;
+        return [
+            'picture' => $picture,
+            'brand'   => $brand,
+            'brands'  => $brands,
+            'engines' => $engines
+        ];
     }
 
     public function pictureSelectFactoryAction()
     {
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if ($picture->type != Picture::FACTORY_TYPE_ID) {
             throw new Exception('Картинка несовместимого типа');
         }
 
-        $canMove = $this->_helper->user()->isAllowed('picture', 'move');
+        $canMove = $this->user()->isAllowed('picture', 'move');
         if (!$canMove) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
-        $this->view->picture = $picture;
-
         $factoryTable = new Factory();
-        $factory = $factoryTable->find($this->_getParam('factory_id'))->current();
+        $factory = $factoryTable->find($this->params('factory_id'))->current();
 
         if ($factory) {
 
@@ -647,42 +702,47 @@ class Moder_PicturesController extends Zend_Controller_Action
                 'pattern' => $picture->getFileNamePattern(),
             ]);
 
-            $this->_helper->log(sprintf(
+            $this->log(sprintf(
                 'Назначение завода %s картинке %s',
-                $this->view->escape($factory->name),
-                $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+                htmlspecialchars($factory->name),
+                htmlspecialchars($picture->getCaption())
             ), [$factory, $picture]);
 
-            return $this->_redirect($this->pictureUrl($picture));
+            return $this->redirect()->toUrl($this->pictureUrl($picture));
 
         }
 
-        $this->view->factories = $factoryTable->fetchAll(
-            $factoryTable->select(true)
-                ->order('name')
-        );
+        return [
+            'picture'   => $picture,
+            'factories' => $factoryTable->fetchAll(
+                $factoryTable->select(true)
+                    ->order('name')
+            )
+        ];
     }
 
     public function pictureSelectCarAction()
     {
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
-        if ($picture->type != Picture::CAR_TYPE_ID)
+        if ($picture->type != Picture::CAR_TYPE_ID) {
             throw new Exception('Картинка несовместимого типа');
-
-        $canMove = $this->_helper->user()->isAllowed('picture', 'move');
-        if (!$canMove) {
-            return $this->forward('forbidden', 'error', 'default');
         }
 
-        $this->view->picture = $picture;
+        $canMove = $this->user()->isAllowed('picture', 'move');
+        if (!$canMove) {
+            return $this->forbiddenAction();
+        }
 
         $brand = null;
+        $brands = null;
+        $cars = null;
+        $haveConcepts = null;
         $carTable = new Cars();
-        $car = $carTable->find($this->_getParam('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
 
         if ($car) {
             $oldCar = $picture->findParentCars();
@@ -719,21 +779,16 @@ class Moder_PicturesController extends Zend_Controller_Action
             $namespace = new Zend_Session_Namespace('Moder_Car');
             $namespace->lastCarId = $car->id;
 
-            $this->_helper->log(sprintf(
+            $this->log(sprintf(
                 'Картинка %s связана с автомобилем %s',
-                $this->view->htmlA($this->pictureUrl($picture), $picture->id),
-                $this->view->htmlA($this->_helper->url->url([
-                    'module' => 'moder',
-                    'controller' => 'cars',
-                    'action'    => 'car',
-                    'car_id' => $car->id
-                ], 'default', true), $car->getFullName())
+                htmlspecialchars($picture->id),
+                htmlspecialchars($car->getFullName())
             ), [$car, $picture]);
 
-            return $this->_redirect($this->pictureUrl($picture));
+            return $this->redirect()->toUrl($this->pictureUrl($picture));
         } else {
-            $brands = new Brands();
-            $brand = $brands->find($this->_getParam('brand_id'))->current();
+            $brandTable = new Brands();
+            $brand = $brandTable->find($this->params('brand_id'))->current();
             if ($brand) {
 
                 $rows = $carTable->fetchAll(
@@ -753,25 +808,26 @@ class Moder_PicturesController extends Zend_Controller_Action
                         ->where('cars.is_concept')
                 );
 
-                $this->view->assign([
-                    'cars'         => $cars,
-                    'haveConcepts' => $haveConcepts,
-                    'conceptsUrl'  => $this->_helper->url->url([
-                        'action' => 'concepts',
-                    ]),
-                ]);
-
             } else {
-                $this->view->brands = $brands->fetchAll(null, ['position', 'caption']);
+                $brands = $brandTable->fetchAll(null, ['position', 'caption']);
             }
         }
 
-        $this->view->brand = $brand;
+        return [
+            'picture'      => $picture,
+            'brand'        => $brand,
+            'brands'       => $brands,
+            'cars'         => $cars,
+            'haveConcepts' => $haveConcepts,
+            'conceptsUrl'  => $this->url()->fromRoute(null, [
+                'action' => 'concepts',
+            ], [], true),
+        ];
     }
 
     private function loadCarSelect($parentId)
     {
-        $carTable = $this->_helper->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
         $carRows = $carTable->fetchAll(
             $carTable->select(true)
@@ -783,9 +839,9 @@ class Moder_PicturesController extends Zend_Controller_Action
         $cars = [];
         foreach ($carRows as $carRow) {
             $cars[] = [
-                'url'    => $this->_helper->url->url([
+                'url'    => $this->url()->fromRoute(null, [
                     'car_id' => $carRow->id
-                ]),
+                ], [], true),
                 'name'   => $carRow->getFullName(),
                 'childs' => $this->loadCarSelect($carRow->id)
             ];
@@ -796,23 +852,23 @@ class Moder_PicturesController extends Zend_Controller_Action
 
     public function pictureSelectBrandAction()
     {
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
-        if (!in_array($picture->type, [Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID, Picture::MIXED_TYPE_ID]))
+        if (!in_array($picture->type, [Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID, Picture::MIXED_TYPE_ID])) {
             throw new Exception('Картинка несовместимого типа');
-
-        $canMove = $this->_helper->user()->isAllowed('picture', 'move');
-        if (!$canMove) {
-            return $this->forward('forbidden', 'error', 'default');
         }
 
-        $this->view->picture = $picture;
+        $canMove = $this->user()->isAllowed('picture', 'move');
+        if (!$canMove) {
+            return $this->forbiddenAction();
+        }
 
-        $brands = new Brands();
-        $brand = $brands->find($this->_getParam('brand_id'))->current();
+        $brandTable = new Brands();
+        $brand = $brandTable->find($this->params('brand_id'))->current();
+        $brands = null;
 
         if ($brand) {
             $oldBrand = $picture->findParentBrands();
@@ -835,28 +891,32 @@ class Moder_PicturesController extends Zend_Controller_Action
             }
             $brand->updatePicturesCache();
 
-            $this->_helper->log(sprintf(
+            $this->log(sprintf(
                 'Назначение бренда %s картинке %s',
-                $this->view->escape($brand->caption), $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+                htmlspecialchars($brand->caption), htmlspecialchars($picture->getCaption())
             ), [$picture, $brand]);
 
-            return $this->_redirect($this->pictureUrl($picture));
+            return $this->redirect()->toUrl($this->pictureUrl($picture));
         } else {
-            $this->view->brands = $brands->fetchAll(null, ['position', 'caption']);
+            $brands = $brandTable->fetchAll(null, ['position', 'caption']);
         }
-    }
 
+        return [
+            'picture' => $picture,
+            'brands'  => $brands
+        ];
+    }
 
     private function pictureCanDelete($picture)
     {
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
         $canDelete = false;
         if (in_array($picture->status, [Picture::STATUS_INBOX, Picture::STATUS_NEW])) {
-            if ($this->_helper->user()->isAllowed('picture', 'remove')) {
+            if ($this->user()->isAllowed('picture', 'remove')) {
                 if ($this->pictureVoteExists($picture, $user)) {
                     $canDelete = true;
                 }
-            } elseif ($this->_helper->user()->isAllowed('picture', 'remove_by_vote')) {
+            } elseif ($this->user()->isAllowed('picture', 'remove_by_vote')) {
                 if ($this->pictureVoteExists($picture, $user)) {
                     $db = $this->table->getAdapter();
                     $acceptVotes = (int)$db->fetchOne(
@@ -893,16 +953,17 @@ class Moder_PicturesController extends Zend_Controller_Action
 
     public function deletePictureAction()
     {
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         $canDelete = $this->pictureCanDelete($picture);
-        if (!$canDelete)
-            throw new Exception('Forbidden');
+        if (!$canDelete) {
+            return $this->forbiddenAction();
+        }
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
         $picture->setFromArray([
             'status'                => Picture::STATUS_REMOVING,
             'removing_date'         => new Zend_Db_Expr('CURDATE()'),
@@ -913,7 +974,7 @@ class Moder_PicturesController extends Zend_Controller_Action
         if ($owner = $picture->findParentUsersByOwner()) {
             $message = sprintf(
                 "Добавленная вами картинка %s поставлена в очередь на удаление" . PHP_EOL,
-                $this->view->serverUrl($this->view->pic($picture)->url())
+                $this->pic()->url($picture->id, $picture->identity, true)
             );
 
             $requests = new Pictures_Moder_Votes();
@@ -935,22 +996,22 @@ class Moder_PicturesController extends Zend_Controller_Action
             $mModel->send(null, $owner->id, $message);
         }
 
-        $this->_helper->log(sprintf(
+        $this->log(sprintf(
             'Картинка %s поставлена в очередь на удаление',
-            $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+            htmlspecialchars($picture->getCaption())
         ), $picture);
 
-        return $this->_redirect($this->pictureUrl($picture));
+        return $this->redirect()->toUrl($this->pictureUrl($picture));
     }
 
     public function pictureVoteAction()
     {
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
-        $hideVote = (bool)$this->_getParam('hide-vote');
+        $hideVote = (bool)$this->params('hide-vote');
 
         $canDelete = $this->pictureCanDelete($picture);
 
@@ -983,25 +1044,23 @@ class Moder_PicturesController extends Zend_Controller_Action
             }
         }
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
         $voteExists = $this->pictureVoteExists($picture, $user);
 
         $request = $this->getRequest();
 
         $formPictureVote = null;
-        if (!$voteExists && $this->_helper->user()->isAllowed('picture', 'moder_vote'))
+        if (!$voteExists && $this->user()->isAllowed('picture', 'moder_vote'))
         {
             $form = new Application_Form_Moder_Picture_Vote([
-                'action' => $this->_helper->url->url([
-                    'module'     => 'moder',
-                    'controller' => 'pictures',
+                'action' => $this->url()->fromRoute('moder/pictures/params', [
                     'action'     => 'picture-vote',
                     'form'       => 'picture-vote',
                     'picture_id' => $picture->id
-                ], 'default'),
+                ], [], true),
             ]);
 
-            if ($request->isPost() && $this->_getParam('form') == 'picture-vote' && $form->isValid($request->getPost()))
+            if ($request->isPost() && $this->params('form') == 'picture-vote' && $form->isValid($request->getPost()))
             {
                 $values = $form->getValues();
 
@@ -1018,7 +1077,7 @@ class Moder_PicturesController extends Zend_Controller_Action
 
                 $vote = (bool)($values['vote'] == 'Хочу принять');
 
-                $user = $this->_helper->user()->get();
+                $user = $this->user()->get();
                 $moderVotes = new Pictures_Moder_Votes();
                 $moderVotes->insert([
                     'user_id'    => $user->id,
@@ -1037,18 +1096,18 @@ class Moder_PicturesController extends Zend_Controller_Action
                     $vote
                         ? 'Подана заявка на принятие картинки %s'
                         : 'Подана заявка на удаление картинки %s',
-                    $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+                    htmlspecialchars($picture->getCaption())
                 );
-                $this->_helper->log($message, $picture);
+                $this->log($message, $picture);
 
                 $owner = $picture->findParentUsersByOwner();
-                $ownerIsModer = $owner && $this->_helper->user($owner)->inheritsRole('moder');
+                $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
                 if ($ownerIsModer) {
-                    if ($owner->id != $this->_helper->user()->get()->id) {
+                    if ($owner->id != $this->user()->get()->id) {
                         $message = sprintf(
                             'Подана заявка на %s добавленной вами картинки %s'.PHP_EOL.' Причина: %s',
                             $vote ? 'удаление' : 'принятие',
-                            $this->view->serverUrl($this->pictureUrl($picture)),
+                            $this->pictureUrl($picture, true),
                             $values['reason']
                         );
 
@@ -1059,10 +1118,10 @@ class Moder_PicturesController extends Zend_Controller_Action
 
                 $referer = $request->getServer('HTTP_REFERER');
                 if ($referer) {
-                    return $this->_redirect($this->pictureUrl($picture));
+                    return $this->redirect()->toUrl($this->pictureUrl($picture));
                 }
 
-                return $this->_redirect($this->_helper->url->url());
+                return $this->redirect()->toRoute(null, [], [], true);
             }
 
             $formPictureVote = $form;
@@ -1071,21 +1130,19 @@ class Moder_PicturesController extends Zend_Controller_Action
         $formPictureUnvote = null;
         if ($voteExists) {
             $form = new Application_Form_Moder_Picture_Unvote([
-                'action' => $this->view->url([
-                    'module'     => 'moder',
-                    'controller' => 'pictures',
+                'action' => $this->url()->fromRoute('moder/pictures/params', [
                     'action'     => 'picture-vote',
                     'form'       => 'picture-unvote',
                     'picture_id' => $picture->id
-                ], 'default', true)
+                ])
             ]);
 
-            if ($request->isPost() && $this->_getParam('form') == 'picture-unvote' && $form->isValid($request->getPost())) {
+            if ($request->isPost() && $this->params('form') == 'picture-unvote' && $form->isValid($request->getPost())) {
                 $values = $form->getValues();
 
                 $moderVotes = new Pictures_Moder_Votes();
 
-                $user = $this->_helper->user()->get();
+                $user = $this->user()->get();
                 $moderVotes->delete([
                     'user_id = ?'    => $user->id,
                     'picture_id = ?' => $picture->id
@@ -1093,10 +1150,10 @@ class Moder_PicturesController extends Zend_Controller_Action
 
                 $referer = $request->getServer('HTTP_REFERER');
                 if ($referer) {
-                    return $this->_redirect($referer);
+                    return $this->redirect()->toUrl($referer);
                 }
 
-                return $this->_redirect($this->pictureUrl($picture));
+                return $this->redirect()->toUrl($this->pictureUrl($picture));
             }
 
             $formPictureUnvote = $form;
@@ -1105,39 +1162,36 @@ class Moder_PicturesController extends Zend_Controller_Action
         $deletePictureForm = null;
         if ($canDelete) {
             $form = new Application_Form_Moder_Picture_Delete([
-                'action' => $this->_helper->url->url([
-                    'module'     => 'moder',
-                    'controller' => 'pictures',
+                'action' => $this->url()->fromRoute('moder/pictures/params', [
                     'action'     => 'delete-picture',
                     'picture_id' => $picture->id,
                     'form'       => 'picture-delete'
-                ], 'default', true)
+                ])
             ]);
             $deletePictureForm = $form;
         }
 
-        $this->view->assign([
+        $moderVotes = null;
+        if (!$hideVote) {
+            $moderVotes = $picture->findPictures_Moder_Votes();
+        }
+
+        return [
             'isLastPicture'     => $isLastPicture,
             'acceptedCount'     => $acceptedCount,
             'canDelete'         => $canDelete,
             'deletePictureForm' => $deletePictureForm,
             'formPictureVote'   => $formPictureVote,
             'formPictureUnvote' => $formPictureUnvote,
-            'moderVotes'        => null
-        ]);
-
-        if (!$hideVote) {
-            $this->view->assign([
-                'moderVotes' => $picture->findPictures_Moder_Votes(),
-            ]);
-        }
+            'moderVotes'        => $moderVotes
+        ];
     }
 
     public function pictureAction()
     {
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         $prevPicture = $this->table->fetchRow(
@@ -1172,8 +1226,8 @@ class Moder_PicturesController extends Zend_Controller_Action
 
 
         $ban = false;
-        $canBan = $this->_helper->user()->isAllowed('user', 'ban');
-        $canViewIp = $this->_helper->user()->isAllowed('user', 'ip');
+        $canBan = $this->user()->isAllowed('user', 'ban');
+        $canViewIp = $this->user()->isAllowed('user', 'ip');
 
         if ($canBan && $picture->ip !== null && $picture->ip !== '') {
 
@@ -1186,9 +1240,9 @@ class Moder_PicturesController extends Zend_Controller_Action
         }
 
         $editPictureForm = new Application_Form_Moder_Picture_Edit([
-            'action' => $this->_helper->url->url([
+            'action' => $this->url()->fromRoute([
                 'form' => 'picture-edit'
-            ])
+            ], [], true)
         ]);
 
         $editPictureForm->populate($picture->toArray());
@@ -1197,13 +1251,12 @@ class Moder_PicturesController extends Zend_Controller_Action
             $picture->setFromArray($editPictureForm->getValues());
             $picture->save();
 
-            return $this->_redirect($this->pictureUrl($picture));
+            return $this->redirect()->toUrl($this->pictureUrl($picture));
         }
 
         $copyrightsForm = $this->getCopyrightsForm();
         if ($picture->copyrights_text_id) {
-            $textStorage = $this->_helper->textStorage();
-            $text = $textStorage->getText($picture->copyrights_text_id);
+            $text = $this->textStorage->getText($picture->copyrights_text_id);
             $copyrightsForm->populate([
                 'text' => $text
             ]);
@@ -1213,30 +1266,32 @@ class Moder_PicturesController extends Zend_Controller_Action
 
             $text = $values['text'];
 
-            $textStorage = $this->_helper->textStorage();
-
-            $user = $this->_helper->user()->get();
+            $user = $this->user()->get();
 
             if ($picture->copyrights_text_id) {
-                $textStorage->setText($picture->copyrights_text_id, $text, $user->id);
+                $this->textStorage->setText($picture->copyrights_text_id, $text, $user->id);
             } elseif ($text) {
-                $textId = $textStorage->createText($text, $user->id);
+                $textId = $this->textStorage->createText($text, $user->id);
                 $picture->copyrights_text_id = $textId;
                 $picture->save();
             }
 
-            $this->_helper->log(sprintf(
+            $this->log(sprintf(
                 'Редактирование текста копирайтов изображения %s',
-                $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+                htmlspecialchars($picture->getCaption())
             ), $picture);
 
             if ($picture->copyrights_text_id) {
-                $userIds = $textStorage->getTextUserIds($picture->copyrights_text_id);
+                $userIds = $this->textStorage->getTextUserIds($picture->copyrights_text_id);
                 $message = sprintf(
                     'Пользователь %s редактировал текст копирайтов изображения %s ( %s )',
-                    $this->view->serverUrl($user->getAboutUrl()),
+                    $this->url()->fromRoute('users/user', [
+                        'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                    ], [
+                        'force_canonical' => true
+                    ]),
                     $picture->getCaption(),
-                    $this->view->serverUrl($this->pictureUrl($picture))
+                    $this->pictureUrl($picture, true)
                 );
 
                 $mModel = new Message();
@@ -1250,20 +1305,8 @@ class Moder_PicturesController extends Zend_Controller_Action
                 }
             }
 
-            return $this->_redirect($this->pictureUrl($picture));
+            return $this->redirect()->toUrl($this->pictureUrl($picture));
         }
-
-        $this->view->assign([
-            'ban'             => $ban,
-            'canBan'          => $canBan,
-            'canViewIp'       => $canViewIp,
-            'prevPicture'     => $prevPicture,
-            'nextPicture'     => $nextPicture,
-            'prevNewPicture'  => $prevNewPicture,
-            'nextNewPicture'  => $nextNewPicture,
-            'editPictureForm' => $editPictureForm,
-            'copyrightsForm'  => $copyrightsForm
-        ]);
 
         if ($picture->image_id) {
             $imageStorage = $this->getInvokeArg('bootstrap')
@@ -1306,13 +1349,13 @@ class Moder_PicturesController extends Zend_Controller_Action
                         if (array_search($key, $NotSections) !== false)
                             continue;
 
-                        $exifStr .= '<p>['.$this->view->escape($key).']';
+                        $exifStr .= '<p>['.htmlspecialchars($key).']';
                         foreach ($section as $name => $val) {
-                            $exifStr .= "<br />".$this->view->escape($name).": ";
+                            $exifStr .= "<br />".htmlspecialchars($name).": ";
                             if (is_array($val))
-                                $exifStr .= $this->view->escape(implode(', ', $val));
+                                $exifStr .= htmlspecialchars(implode(', ', $val));
                             else
-                                $exifStr .= $this->view->escape($val);
+                                $exifStr .= htmlspecialchars($val);
                         }
 
                         $exifStr .= '</p>';
@@ -1325,17 +1368,17 @@ class Moder_PicturesController extends Zend_Controller_Action
 
 
 
-        $canMove =  $this->_helper->user()->isAllowed('picture', 'move');
+        $canMove =  $this->user()->isAllowed('picture', 'move');
 
-        $this->view->formModerPictureType = false;
+        $formModerPictureType = false;
         if ($canMove) {
             $form = new Application_Form_Moder_Picture_Type([
-                'action' => $this->_helper->url->url(['form' => 'picture-type'])
+                'action' => $this->url()->fromRoute(null, ['form' => 'picture-type'], [], true)
             ]);
             $form->populate($picture->toArray());
 
-            $this->view->formModerPictureType = $form;
-            if ($request->isPost() && $this->_getParam('form') == 'picture-type' && $form->isValid($request->getPost())) {
+            $formModerPictureType = $form;
+            if ($request->isPost() && $this->params('form') == 'picture-type' && $form->isValid($request->getPost())) {
                 $values = $form->getValues();
 
                 $oldType = $picture->type;
@@ -1366,22 +1409,12 @@ class Moder_PicturesController extends Zend_Controller_Action
                     }
                 }
 
-                $this->_helper->log(sprintf(
+                $this->log(sprintf(
                     'Изменение типа картинки %s',
-                    $this->view->htmlA($this->view->url([
-                        'module'     => 'moder',
-                        'controller' => 'pictures',
-                        'action'     => 'picture',
-                        'picture_id' => $picture->id
-                    ]), $picture->getCaption())
+                    htmlspecialchars($picture->getCaption())
                 ), $picture);
 
-                return $this->_redirect($this->view->url([
-                    'module'     => 'moder',
-                    'controller' => 'pictures',
-                    'action'     => 'picture',
-                    'picture_id' => $picture->id
-                ], null, true));
+                return $this->redirect()->toUrl($this->pictureUrl($picture));
             }
         }
 
@@ -1395,14 +1428,15 @@ class Moder_PicturesController extends Zend_Controller_Action
             }
         }
 
+        $unacceptPictureForm = null;
 
         $canUnaccept = ($picture->status == Picture::STATUS_ACCEPTED)
-                    && $this->_helper->user()->isAllowed('picture', 'unaccept');
+                    && $this->user()->isAllowed('picture', 'unaccept');
 
         if ($canUnaccept) {
 
             $form = new Zend_Form([
-                'action'     => $this->_helper->url->url(['form' => 'picture-unaccept']),
+                'action'     => $this->url()->fromRoute(['form' => 'picture-unaccept'], [], true),
                 'decorators' => [
                     'FormElements',
                     'PrepareElements',
@@ -1419,29 +1453,29 @@ class Moder_PicturesController extends Zend_Controller_Action
                 ]
             ]);
 
-            $this->view->unacceptPictureForm = $form;
+            $unacceptPictureForm = $form;
 
-            if ($request->isPost() && $this->_getParam('form') == 'picture-unaccept' && $form->isValid($request->getPost())) {
+            if ($request->isPost() && $this->params('form') == 'picture-unaccept' && $form->isValid($request->getPost())) {
                 $values = $form->getValues();
 
                 $previousStatusUserId = $picture->change_status_user_id;
 
-                $user = $this->_helper->user()->get();
+                $user = $this->user()->get();
                 $picture->status = Picture::STATUS_INBOX;
                 $picture->change_status_user_id = $user->id;
                 $picture->save();
 
 
 
-                $this->_helper->log(sprintf(
+                $this->log(sprintf(
                     'С картинки %s снят статус "принято"',
-                    $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+                    htmlspecialchars($picture->getCaption())
                 ), $picture);
 
 
                 $mModel = new Message();
 
-                $pictureUrl = $this->view->serverUrl($this->view->pic($picture)->url());
+                $pictureUrl = $this->pic()->url($picture->id, $picture->identity, true);
                 if ($previousStatusUserId != $user->id) {
                     $userTable = new Users();
                     foreach ($userTable->find($previousStatusUserId) as $prevUser) {
@@ -1454,32 +1488,32 @@ class Moder_PicturesController extends Zend_Controller_Action
                 }
 
                 $referer = $this->getRequest()->getServer('HTTP_REFERER');
-                return $this->_redirect($referer ? $referer : $this->view->url());
+                return $this->redirect()->toUrl($referer ? $referer : $this->url()->fromRoute(null, [], [], true));
             }
         }
 
         $canAccept = in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])
-                  && $this->_helper->user()->isAllowed('picture', 'accept');
+                  && $this->user()->isAllowed('picture', 'accept');
 
         $acceptPictureForm = null;
         if ($canAccept) {
 
             $acceptPictureForm = new Application_Form_Moder_Picture_Accept([
-                'action'  => $this->_helper->url->url([
+                'action'  => $this->url()->fromRoute(null, [
                     'form' => 'picture-accept'
-                ])
+                ], [], true)
             ]);
 
-            if ($request->isPost() && $this->_getParam('form') == 'picture-accept' && $acceptPictureForm->isValid($request->getPost())) {
+            if ($request->isPost() && $this->params('form') == 'picture-accept' && $acceptPictureForm->isValid($request->getPost())) {
 
                 $this->accept($picture);
 
                 $url = $request->getServer('HTTP_REFERER');
                 if (!$url) {
-                    $url = $this->_helper->url->url();
+                    $url = $this->url()->fromRoute(null, [], [], true);
                 }
 
-                return $this->_redirect($url);
+                return $this->redirect()->toUrl($url);
             }
         }
 
@@ -1487,9 +1521,9 @@ class Moder_PicturesController extends Zend_Controller_Action
         $restorePictureForm = null;
         if ($canRestore) {
             $restorePictureForm = new Application_Form_Moder_Picture_Restore([
-                'action' => $this->_helper->url->url([
+                'action' => $this->url()->fromRoute(null, [
                     'action' => 'restore'
-                ])
+                ], [], true)
             ]);
         }
 
@@ -1501,25 +1535,19 @@ class Moder_PicturesController extends Zend_Controller_Action
                 $canAcceptReplace = $this->canReplace($picture, $row);
 
                 $replacePicture = [
-                    'url' => $this->_helper->url->url([
-                        'module'     => 'moder',
-                        'controller' => 'pictures',
+                    'url' => $this->url()->fromRoute('moder/pictures/params', [
                         'action'     => 'picture',
                         'picture_id' => $row->id
-                    ]),
+                    ], [], true),
                     'canAccept' => $canAcceptReplace,
-                    'acceptUrl' => $this->_helper->url->url([
-                        'module'     => 'moder',
-                        'controller' => 'pictures',
+                    'acceptUrl' => $this->url()->fromRoute('moder/pictures/params', [
                         'action'     => 'accept-replace',
                         'picture_id' => $picture->id
-                    ]),
-                    'cancelUrl' => $this->_helper->url->url([
-                        'module'     => 'moder',
-                        'controller' => 'pictures',
+                    ], [], true),
+                    'cancelUrl' => $this->url()->fromRoute('moder/pictures/params', [
                         'action'     => 'cancel-replace',
                         'picture_id' => $picture->id
-                    ]),
+                    ], [], true),
                 ];
             }
         }
@@ -1530,7 +1558,7 @@ class Moder_PicturesController extends Zend_Controller_Action
         $image = $imageStorage->getImage($picture->image_id);
 
         if (!$image) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         $sourceUrl = $image->getSrc();
@@ -1562,7 +1590,18 @@ class Moder_PicturesController extends Zend_Controller_Action
         }
 
 
-        $this->view->assign([
+        return [
+            'ban'             => $ban,
+            'canBan'          => $canBan,
+            'canViewIp'       => $canViewIp,
+            'prevPicture'     => $prevPicture,
+            'nextPicture'     => $nextPicture,
+            'prevNewPicture'  => $prevNewPicture,
+            'nextNewPicture'  => $nextNewPicture,
+            'editPictureForm' => $editPictureForm,
+            'copyrightsForm'  => $copyrightsForm,
+            'unacceptPictureForm'           => $unacceptPictureForm,
+            'formModerPictureType'          => $formModerPictureType,
             'picture'                       => $picture,
             'canMove'                       => $canMove,
             'canNormalize'                  => $this->canNormalize($picture),
@@ -1587,81 +1626,77 @@ class Moder_PicturesController extends Zend_Controller_Action
             'sourceUrl'                     => $sourceUrl,
             'replacePicture'                => $replacePicture,
             'crop'                          => $crop
-        ]);
+        ];
     }
 
     private function canCrop()
     {
-        return $this->_helper->user()->isAllowed('picture', 'crop');
+        return $this->user()->isAllowed('picture', 'crop');
     }
 
     private function canNormalize(Picture_Row $picture)
     {
         return in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])
-            && $this->_helper->user()->isAllowed('picture', 'normalize');
+            && $this->user()->isAllowed('picture', 'normalize');
     }
 
     private function canFlop(Picture_Row $picture)
     {
         return in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX, Picture::STATUS_REMOVING])
-            && $this->_helper->user()->isAllowed('picture', 'flop');
+            && $this->user()->isAllowed('picture', 'flop');
     }
 
     private function canRestore(Picture_Row $picture)
     {
         return $picture->status == Picture::STATUS_REMOVING
-            && $this->_helper->user()->isAllowed('picture', 'restore');
+            && $this->user()->isAllowed('picture', 'restore');
     }
 
     public function restoreAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
 
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if (!$this->canRestore($picture)) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
         $picture->setFromArray([
             'status'                => Picture::STATUS_INBOX,
             'change_status_user_id' => $user->id
         ]);
         $picture->save();
 
-        $this->_helper->log(sprintf(
-            'Картинки %s восстановлена из очереди удаления',
-            $this->view->htmlA($this->_helper->url->url([
-                'controller' => 'picture',
-                'action'     => 'index',
-                'picture_id' => $picture->id
-            ]), $picture->getCaption())
+        $this->log(sprintf(
+            'Картинки `%s` восстановлена из очереди удаления',
+            htmlspecialchars($picture->getCaption())
         ), $picture);
 
         $referer = $this->getRequest()->getServer('HTTP_REFERER');
-        return $this->_redirect($referer ? $referer : $this->view->url());
+        return $this->redirect()->toUrl($referer ? $referer : $this->url()->fromRoute(null, [], [], true));
     }
 
     public function flopAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if (!$this->canFlop($picture)) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
         if ($picture->image_id) {
@@ -1671,12 +1706,12 @@ class Moder_PicturesController extends Zend_Controller_Action
             $imageStorage->flop($picture->image_id);
         }
 
-        $this->_helper->log(sprintf(
+        $this->log(sprintf(
             'К картинке %s применён flop',
-            $this->view->htmlA($this->view->pic($picture)->url(), $picture->getCaption())
+            htmlspecialchars($picture->getCaption())
         ), $picture);
 
-        return $this->_helper->json([
+        return new JsonModel([
             'ok' => true
         ]);
     }
@@ -1684,31 +1719,31 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function normalizeAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if (!$this->canNormalize($picture)) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if ($picture->image_id) {
             $imageStorage = $this->getInvokeArg('bootstrap')
                 ->getResource('imagestorage');
-        
+
             $imageStorage->normalize($picture->image_id);
         }
 
-        $this->_helper->log(sprintf(
+        $this->log(sprintf(
             'К картинке %s применён normalize',
-            $this->view->htmlA($this->view->pic($picture)->url(), $picture->getCaption())
+            htmlspecialchars($picture->getCaption())
         ), $picture);
 
-        return $this->_helper->json([
+        return new JsonModel([
             'ok' => true
         ]);
     }
@@ -1716,12 +1751,12 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function filesRepairAction()
     {
         /*if (!$this->getRequest()->isPost()) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }*/
 
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if ($picture->image_id) {
@@ -1733,7 +1768,7 @@ class Moder_PicturesController extends Zend_Controller_Action
             ]);
         }
 
-        return $this->_helper->json([
+        return new JsonModel([
             'ok' => true
         ]);
     }
@@ -1741,12 +1776,12 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function filesCorrectNamesAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         $imageStorage = $this->getInvokeArg('bootstrap')
@@ -1756,22 +1791,22 @@ class Moder_PicturesController extends Zend_Controller_Action
             'pattern' => $picture->getFileNamePattern(),
         ]);
 
-        return $this->_helper->json([
+        return new JsonModel([
             'ok' => true
         ]);
     }
 
     public function cropperSaveAction()
     {
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture || !$this->canCrop()) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
-        $left = round($this->_getParam('x'));
-        $top = round($this->_getParam('y'));
-        $width = round($this->_getParam('w'));
-        $height = round($this->_getParam('h'));
+        $left = round($this->params()->fromPost('x'));
+        $top = round($this->params()->fromPost('y'));
+        $width = round($this->params()->fromPost('w'));
+        $height = round($this->params()->fromPost('h'));
 
         $left = max(0, $left);
         $left = min($picture->width, $left);
@@ -1807,12 +1842,12 @@ class Moder_PicturesController extends Zend_Controller_Action
             'image' => $picture->image_id
         ]);
 
-        $this->_helper->log(sprintf(
+        $this->log(sprintf(
             'Выделение области на картинке %s',
-            $this->view->escape($picture->getCaption())
+            htmlspecialchars($picture->getCaption())
         ), [$picture]);
 
-        $this->_helper->json([
+        return new JsonModel([
             'ok' => true
         ]);
     }
@@ -1831,17 +1866,17 @@ class Moder_PicturesController extends Zend_Controller_Action
             );
             $cars[] = [
                 'name' => $row->getFullName(),
-                'url'  => $this->_helper->url->url([
+                'url'  => $this->url()->fromRoute([
                     'action' => 'picture-select-car',
                     'car_id' => $row['id']
-                ]),
+                ], [], true),
                 'haveChilds' => $haveChilds,
                 'isGroup'    => $row->is_group,
                 'type'       => null,
-                'loadUrl'    => $this->_helper->url->url([
+                'loadUrl'    => $this->url()->fromRoute([
                     'action' => 'car-childs',
                     'car_id' => $row['id']
-                ]),
+                ], [], true),
             ];
         }
 
@@ -1865,17 +1900,17 @@ class Moder_PicturesController extends Zend_Controller_Action
                 );
                 $items[] = [
                     'name' => $car->getFullName(),
-                    'url'  => $this->_helper->url->url([
+                    'url'  => $this->url()->fromRoute(null, [
                         'action' => 'picture-select-car',
                         'car_id' => $car['id']
-                    ]),
+                    ], [], true),
                     'haveChilds' => $haveChilds,
                     'isGroup'    => $car['is_group'],
                     'type'       => $carParentRow->type,
-                    'loadUrl'    => $this->_helper->url->url([
+                    'loadUrl'    => $this->url()->fromRoute(null, [
                         'action' => 'car-childs',
                         'car_id' => $car['id']
-                    ]),
+                    ], [], true),
                 ];
             }
         }
@@ -1885,17 +1920,17 @@ class Moder_PicturesController extends Zend_Controller_Action
 
     public function carChildsAction()
     {
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
         if (!$user) {
-            return $this->forward('only-registered');
+            return $this->forbiddenAction();
         }
 
         $carTable = new Cars();
         $carParentTable = $this->getCarParentTable();
 
-        $car = $carTable->find($this->_getParam('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         $rows = $carParentTable->fetchAll(
@@ -1905,18 +1940,21 @@ class Moder_PicturesController extends Zend_Controller_Action
                 ->order(['car_parent.type', 'cars.caption', 'cars.begin_year', 'cars.end_year'])
         );
 
-        $this->view->assign([
+        $viewModel = new ViewModel([
             'cars' => $this->prepareCarParentRows($rows)
         ]);
+        $viewModel->setTerminal(true);
+
+        return $viewModel;
     }
 
     public function conceptsAction()
     {
 
         $brandTable = new Brands();
-        $brand = $brandTable->find($this->_getParam('brand_id'))->current();
+        $brand = $brandTable->find($this->params('brand_id'))->current();
         if (!$brand) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         $carTable = new Cars();
@@ -1932,9 +1970,12 @@ class Moder_PicturesController extends Zend_Controller_Action
         );
         $concepts = $this->prepareCars($rows);
 
-        $this->view->assign([
+        $viewModel = new ViewModel([
             'concepts' => $concepts,
         ]);
+        $viewModel->setTerminal(true);
+
+        return $viewModel;
     }
 
     private function canReplace($picture, $replacedPicture)
@@ -1947,20 +1988,20 @@ class Moder_PicturesController extends Zend_Controller_Action
 
             case Picture::STATUS_INBOX:
             case Picture::STATUS_NEW:
-                $can1 = $this->_helper->user()->isAllowed('picture', 'accept');
+                $can1 = $this->user()->isAllowed('picture', 'accept');
                 break;
         }
 
         $can2 = false;
         switch ($replacedPicture->status) {
             case Picture::STATUS_ACCEPTED:
-                $can2 = $this->_helper->user()->isAllowed('picture', 'unaccept')
-                     && $this->_helper->user()->isAllowed('picture', 'remove_by_vote');
+                $can2 = $this->user()->isAllowed('picture', 'unaccept')
+                     && $this->user()->isAllowed('picture', 'remove_by_vote');
                 break;
 
             case Picture::STATUS_INBOX:
             case Picture::STATUS_NEW:
-                $can2 = $this->_helper->user()->isAllowed('picture', 'remove_by_vote');
+                $can2 = $this->user()->isAllowed('picture', 'remove_by_vote');
                 break;
 
             case Picture::STATUS_REMOVING:
@@ -1969,73 +2010,73 @@ class Moder_PicturesController extends Zend_Controller_Action
                 break;
         }
 
-        return $can1 && $can2 && $this->_helper->user()->isAllowed('picture', 'move');
+        return $can1 && $can2 && $this->user()->isAllowed('picture', 'move');
     }
 
     public function cancelReplaceAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if (!$picture->replace_picture_id) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         $replacePicture = $this->table->find($picture->replace_picture_id)->current();
         if (!$replacePicture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
-        if (!$this->_helper->user()->isAllowed('picture', 'move')) {
-            return $this->forward('forbidden', 'error', 'default');
+        if (!$this->user()->isAllowed('picture', 'move')) {
+            return $this->forbiddenAction();
         }
 
         $picture->replace_picture_id = null;
         $picture->save();
 
         // log
-        $this->_helper->log(sprintf(
+        $this->log(sprintf(
             'Замена %s на %s отклонена',
-            $this->view->htmlA($this->pictureUrl($replacePicture), $replacePicture->getCaption()),
-            $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+            htmlspecialchars($replacePicture->getCaption()),
+            htmlspecialchars($picture->getCaption())
         ), [$picture, $replacePicture]);
 
-        return $this->_redirect($this->_helper->url->url([
+        return $this->redirect()->toRoute(null, [
             'action' => 'picture'
-        ]));
+        ], [], true);
     }
 
     public function acceptReplaceAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
-        $picture = $this->table->find($this->_getParam('picture_id'))->current();
+        $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if (!$picture->replace_picture_id) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         $replacePicture = $this->table->find($picture->replace_picture_id)->current();
         if (!$replacePicture) {
-            return $this->forward('notfound', 'error', 'default');
+            return $this->notFoundAction();
         }
 
         if (!$this->canReplace($picture, $replacePicture)) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
         // statuses
         if ($picture->status != Picture::STATUS_ACCEPTED) {
@@ -2080,15 +2121,13 @@ class Moder_PicturesController extends Zend_Controller_Action
         }
         unset($recepients[$user->id]);
         if ($recepients) {
-            $url = $this->view->serverUrl($this->view->pic($picture)->url());
-            $replaceUrl = $this->view->serverUrl($this->view->pic($replacePicture)->url());
-            $moderUrl = $this->view->serverUrl($this->_helper->url->url([
-                'module'     => 'default',
-                'controller' => 'users',
-                'action'     => 'user',
-                'identity'   => $user->identity,
-                'user_id'    => $user->id
-            ], 'users', true));
+            $url = $this->pic()->url($picture->id, $picture->identity, true);
+            $replaceUrl = $this->pic()->url($replacePicture->id, $replacePicture->identity, true);
+            $moderUrl = $this->url()->fromRoute('users/user', [
+                'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+            ], [
+                'force_canonical' => true
+            ]);
 
             $message = sprintf(
                 '%s принял замену %s на %s',
@@ -2101,31 +2140,31 @@ class Moder_PicturesController extends Zend_Controller_Action
         }
 
         // log
-        $this->_helper->log(sprintf(
+        $this->log(sprintf(
             'Замена %s на %s',
-            $this->view->htmlA($this->pictureUrl($replacePicture), $replacePicture->getCaption()),
-            $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+            htmlspecialchars($replacePicture->getCaption()),
+            htmlspecialchars($picture->getCaption())
         ), [$picture, $replacePicture]);
 
-        return $this->_redirect($this->_helper->url->url([
+        return $this->redirect()->toRoute([
             'action' => 'picture'
-        ]));
+        ], [], true);
     }
 
     private function accept(Picture_Row $picture)
     {
-        $hasAcceptRight = $this->_helper->user()->isAllowed('picture', 'accept');
+        $hasAcceptRight = $this->user()->isAllowed('picture', 'accept');
 
         $canAccept = $hasAcceptRight
                   && in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX]);
 
         if ($canAccept) {
 
-            $user = $this->_helper->user()->get();
+            $user = $this->user()->get();
 
             $previousStatusUserId = $picture->change_status_user_id;
 
-            $pictureUrl = $this->view->serverUrl($this->view->pic($picture)->url());
+            $pictureUrl = $this->pic()->url($picture->id, $picture->identity, true);
 
             $picture->status = Picture::STATUS_ACCEPTED;
             $picture->change_status_user_id = $user->id;
@@ -2157,9 +2196,9 @@ class Moder_PicturesController extends Zend_Controller_Action
                 }
             }
 
-            $this->_helper->log(sprintf(
+            $this->log(sprintf(
                 'Картинка %s принята',
-                $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+                htmlspecialchars($picture->getCaption())
             ), $picture);
         }
     }
@@ -2167,33 +2206,33 @@ class Moder_PicturesController extends Zend_Controller_Action
     public function acceptAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
         foreach ($this->table->find($this->getParam('id')) as $picture) {
             $this->accept($picture);
         }
 
-        return $this->_helper->json(true);
+        return new JsonModel(true);
     }
 
     public function voteAction()
     {
         if (!$this->getRequest()->isPost()) {
-            return $this->forward('forbidden', 'error', 'default');
+            return $this->forbiddenAction();
         }
 
-        $pictureRows = $this->table->find($this->_getParam('id'));
+        $pictureRows = $this->table->find($this->params('id'));
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
         $request = $this->getRequest();
 
-        $hasVoteRight = $this->_helper->user()->isAllowed('picture', 'moder_vote');
+        $hasVoteRight = $this->user()->isAllowed('picture', 'moder_vote');
 
-        $vote = (int)$this->_getParam('vote');
+        $vote = (int)$this->params('vote');
 
-        $reason = trim($this->_getParam('reason'));
+        $reason = trim($this->params('reason'));
 
         $moderVotes = new Pictures_Moder_Votes();
 
@@ -2219,18 +2258,18 @@ class Moder_PicturesController extends Zend_Controller_Action
                     $vote
                         ? 'Подана заявка на принятие картинки %s'
                         : 'Подана заявка на удаление картинки %s',
-                    $this->view->htmlA($this->pictureUrl($picture), $picture->getCaption())
+                    htmlspecialchars($picture->getCaption())
                 );
-                $this->_helper->log($message, $picture);
+                $this->log($message, $picture);
 
                 $owner = $picture->findParentUsersByOwner();
-                $ownerIsModer = $owner && $this->_helper->user($owner)->inheritsRole('moder');
+                $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
                 if ($ownerIsModer) {
-                    if ($owner->id != $this->_helper->user()->get()->id) {
+                    if ($owner->id != $this->user()->get()->id) {
                         $message = sprintf(
                             'Подана заявка на %s добавленной вами картинки %s'.PHP_EOL.' Причина: %s',
                             $vote ? 'удаление' : 'принятие',
-                            $this->view->serverUrl($this->pictureUrl($picture)),
+                            $this->pictureUrl($picture, true),
                             $values['reason']
                         );
                         $mModel = new Message();
@@ -2240,16 +2279,16 @@ class Moder_PicturesController extends Zend_Controller_Action
             }
         }
 
-        return $this->_helper->json(true);
+        return new JsonModel(true);
     }
 
     private function getCopyrightsForm()
     {
         return new Project_Form([
             'method' => Zend_Form::METHOD_POST,
-            'action' => $this->_helper->url->url([
+            'action' => $this->url()->fromRoute([
                 'form' => 'copyrights-edit'
-            ]),
+            ], [], true),
             'decorators' => [
                 'PrepareElements',
                 ['viewScript', [

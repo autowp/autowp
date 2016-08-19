@@ -189,6 +189,10 @@ return [
             },
             Controller\Moder\PagesController::class => InvokableFactory::class,
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
+            Controller\Moder\PicturesController::class => function($sm) {
+                $textStorage = $sm->get(TextStorage\Service::class);
+                return new Controller\Moder\PicturesController($textStorage);
+            },
             Controller\Moder\RightsController::class => function($sm) {
                 $acl = $sm->get(Acl::class);
                 $cache = $sm->get('longCache');
@@ -507,6 +511,13 @@ return [
             'timezone' => 'Europe/Paris',
             'name'     => 'Français (beta)',
             'flag'     => 'flag-FR',
+            'cookie'   => '.wheelsage.org'
+        ],
+        'zh' => [
+            'hostname' => 'zh.wheelsage.org',
+            'timezone' => 'Asia/Beijing',
+            'name'     => '中文 (beta)',
+            'flag'     => 'flag-CN',
             'cookie'   => '.wheelsage.org'
         ]
     ],

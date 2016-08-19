@@ -2199,8 +2199,23 @@ class CatalogueController extends Zend_Controller_Action
         $currentCar['text'] = $text;
         $hasHtml = (bool)$currentCar['text'];
 
+        $carLangTable = new Car_Language();
+        $carLangRows = $carLangTable->fetchAll([
+            'car_id = ?' => $currentCar['id'],
+            'length(name) > 0'
+        ]);
+        $otherNames = [];
+        foreach ($carLangRows as $carLangRow) {
+            if ($currentCar['name'] != $carLangRow->name) {
+                if (!in_array($carLangRow->name, $otherNames)) {
+                    $otherNames[] = $carLangRow->name;
+                }
+            }
+        }
+
         $this->view->assign([
             'car'           => $currentCar,
+            'otherNames'    => $otherNames,
             'modificationGroups' => $this->_brandCarModifications($currentCar['id'], $modId),
             'paginator'     => $paginator,
             'breadcrumbs'   => $breadcrumbs,

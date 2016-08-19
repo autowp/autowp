@@ -1,0 +1,15 @@
+<?php foreach ($this->engines as $idx => $engine) { ?>
+    <?=$this->formButton('engine', $engine['id'], [
+        'type'    => 'submit',
+        'class'   => 'btn btn-link',
+        'value'   => $engine['id'],
+        'content' => $engine['name']
+    ])?><br />
+    <?php if (count($engine['childs'])) { ?>
+        <div style="margin-left:2em">
+            <?=$this->partial('pictures/picture-select-engine-walk-tree.phtml', [
+                'engines' => $engine['childs']
+            ])?>
+        </div>
+    <?php } ?>
+<?php } ?>

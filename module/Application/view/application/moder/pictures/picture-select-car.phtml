@@ -1,0 +1,88 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needLeft'    => false,
+            'needRight'   => false
+        ],
+        'pageId' => 151,
+        'args'   => [
+            'PICTURE_ID'   => $this->picture->id,
+            'PICTURE_NAME' => 'Изображение № "'.$this->picture->id.'"'
+        ]
+    ]);
+?>
+
+<?php if (!$this->brand) { ?>
+    <?php
+        $columns = 6;
+        $count = count($this->brands);
+        $perOne = ceil($count / $columns);
+        $idx = 0;
+    ?>
+    <div class="row">
+        <div class="col-lg-2 col-md-2">
+            <?php foreach ($this->brands as $brand) { ?>
+                <?php if ($idx && ($idx%$perOne == 0)) { ?>
+                    </div><div class="col-lg-2 col-md-2">
+                <?php } ?>
+                <?=$this->htmlA($this->url(null, [
+                    'brand_id' => $brand->id
+                ], [], true), $brand->caption) ?><br />
+                <?php $idx++ ?>
+            <?php } ?>
+        </div>
+    </div>
+<?php } else { ?>
+
+    <?php
+        $this->layout()->moduleName = 'moder/pictures/picture-select-car';
+    ?>
+
+    <div class="select-in-brand">
+
+        <?php if (count($this->cars) > 0) { ?>
+            <div style="margin: 5px 0">
+                <?=$this->partial('pictures/picture-select-car-cars.phtml', [
+                    'cars' => $this->cars
+                ])?>
+            </div>
+        <?php } ?>
+
+        <?php if (count($this->haveConcepts)) { ?>
+            <div style="margin: 5px 0">
+                <?=$this->htmlA([
+                    'href'      => '#',
+                    'class'     => 'arrow',
+                    'data-load' => $this->conceptsUrl
+                ], '<i class="fa fa-plus-circle"></i> Концепты и прототипы', false) ?>
+                <div style="margin:0 0 4px 18px;display:none">
+                    <div class="loading"><em>Loading ...</em></div>
+                </div>
+            </div>
+        <?php } ?>
+
+    </div>
+
+    <?php /*
+
+    <div class="concepts">
+        <p><a href="#"><i class="fa fa-plus-circle"></i>&#xa0;Концепты и прототипы</a></p>
+        <div style="margin:0 0 10px 20px;display:none">
+            <?php foreach ($this->conceptCars as $car) { ?>
+                <?=$this->partial('pictures/picture-select-car-tree.phtml', [
+                    'car' => $car
+                ])?>
+            <?php } ?>
+        </div>
+    </div>
+
+    <?php foreach ($this->cars as $car) { ?>
+        <?=$this->partial('pictures/picture-select-car-tree.phtml', [
+            'car' => $car
+        ])?>
+    <?php } ?>
+
+    */?>
+<?php } ?>

@@ -41,9 +41,9 @@ class Moder_CarsController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        $categories = array('0' => '--') + $this->getCategoriesOptions(null, 0);
+        $categories = ['0' => '--'] + $this->getCategoriesOptions(null, 0);
 
-        $form = new Project_Form(array(
+        $form = new Project_Form([
             'decorators'    => array(
                 'PrepareElements',
                 array('viewScript', array('viewScript' => 'forms/bootstrap-vertical.phtml')),
@@ -124,7 +124,7 @@ class Moder_CarsController extends Zend_Controller_Action
                     )
                 )),
             )
-        ));
+        ]);
 
         if ($this->getRequest()->isPost()) {
             $params = $this->getRequest()->getPost();
@@ -192,7 +192,7 @@ class Moder_CarsController extends Zend_Controller_Action
                         $ids
                     );
                     $select
-                        ->joinLeft(array('no_category'    => 'category_car'), $expr, null)
+                        ->joinLeft(['no_category' => 'category_car'], $expr, null)
                         ->where('no_category.car_id is null');
                 }
             }
@@ -220,11 +220,11 @@ class Moder_CarsController extends Zend_Controller_Action
             ->setItemCountPerPage(10)
             ->setCurrentPageNumber($this->getParam('page'));
 
-        $this->view->assign(array(
+        $this->view->assign([
             'form'      => $form,
             'paginator' => $paginator,
             'listData'  => $this->_helper->car->listData($paginator->getCurrentItems())
-        ));
+        ]);
     }
 
     public function alphaAction()
@@ -234,19 +234,19 @@ class Moder_CarsController extends Zend_Controller_Action
         $chars = $carAdapter->fetchCol(
             $carAdapter->select()
                 ->distinct()
-                ->from('cars', array('char' => new Zend_Db_Expr('UPPER(LEFT(caption, 1))')))
+                ->from('cars', ['char' => new Zend_Db_Expr('UPPER(LEFT(caption, 1))')])
                 ->order('char')
         );
-        $this->view->assign(array(
+        $this->view->assign([
             'chars' => $chars,
             'char'  => null
-        ));
+        ]);
 
-        $groups = array(
-            'numbers' => array(),
-            'english' => array(),
-            'other'   => array()
-        );
+        $groups = [
+            'numbers' => [],
+            'english' => [],
+            'other'   => []
+        ];
 
         foreach ($chars as $char) {
             if (preg_match('|^["0-9-]$|isu', $char)) {
@@ -267,7 +267,7 @@ class Moder_CarsController extends Zend_Controller_Action
             $this->view->cars = $carTable->fetchAll(
                 $carTable->select(true)
                      ->where('caption LIKE ?', $char.'%')
-                     ->order(array('caption', 'begin_year', 'end_year'))
+                     ->order(['caption', 'begin_year', 'end_year'])
             );
         }
     }
@@ -278,13 +278,13 @@ class Moder_CarsController extends Zend_Controller_Action
      */
     private function carModerUrl(Cars_Row $car, $full = false, $tab = null)
     {
-        $url = $this->_helper->url->url(array(
+        $url = $this->_helper->url->url([
             'module'     => 'moder',
             'controller' => 'cars',
             'action'     => 'car',
             'car_id'     => $car->id,
             'tab'        => $tab
-        ), 'default', true);
+        ], 'default', true);
 
         if ($full) {
             $url = $this->view->serverUrl($url);
@@ -320,15 +320,15 @@ class Moder_CarsController extends Zend_Controller_Action
         $select = $table->select(true)
             ->where('pictures.car_id = ?', $car->id)
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-            ->order(array('pictures.status', 'pictures.id'));
+            ->order(['pictures.status', 'pictures.id']);
 
-        $picturesData = $this->_helper->pic->listData($select, array(
+        $picturesData = $this->_helper->pic->listData($select, [
             'width' => 6
-        ));
+        ]);
 
-        $this->view->assign(array(
+        $this->view->assign([
             'picturesData' => $picturesData,
-        ));
+        ]);
     }
 
     private function getCategoriesOptions($parent, $deep = 0)
@@ -338,21 +338,21 @@ class Moder_CarsController extends Zend_Controller_Action
 
         $language = $this->_helper->language();
 
-        $filter = $parent ? array(
+        $filter = $parent ? [
             'parent_id = ?'    => $parent->id
-        ) : array(
+        ] : [
             'parent_id IS NULL'
-        );
+        ];
 
         $rows = $cdTable->fetchAll($filter, 'name');
 
-        $categories = array();
+        $categories = [];
 
         foreach ($rows as $row) {
-            $lRow = $cdlTable->fetchRow(array(
+            $lRow = $cdlTable->fetchRow([
                 'language = ?'    => $language,
                 'category_id = ?' => $row->id
-            ));
+            ]);
             $categories[$row->id] = str_repeat('…', $deep) . ($lRow ? $lRow->name : $row->name);
 
             $categories = $categories + $this->getCategoriesOptions($row, $deep+1);
@@ -366,12 +366,12 @@ class Moder_CarsController extends Zend_Controller_Action
         $pictures = $this->_helper->catalogue()->getPictureTable();
 
         $randomPicture = false;
-        $statuses = array(
+        $statuses = [
             Picture::STATUS_ACCEPTED,
             Picture::STATUS_NEW,
             Picture::STATUS_INBOX,
             Picture::STATUS_REMOVING
-        );
+        ];
         foreach ($statuses as $status) {
             $randomPicture = $pictures->fetchRow(
                 $pictures->select(true)
@@ -404,9 +404,9 @@ class Moder_CarsController extends Zend_Controller_Action
         if ($car->full_text_id) {
             $textStorage = $this->_helper->textStorage();
             $text = $textStorage->getText($car->full_text_id);
-            $textForm->populate(array(
+            $textForm->populate([
                 'text' => $text
-            ));
+            ]);
         }
 
         if ($canEditMeta) {
@@ -464,7 +464,7 @@ class Moder_CarsController extends Zend_Controller_Action
 
     private function getDescriptionForm()
     {
-        return new Project_Form(array(
+        return new Project_Form([
             'method' => Zend_Form::METHOD_POST,
             'action' => $this->_helper->url->url(array(
                 'form' => 'car-edit-description'
@@ -482,12 +482,12 @@ class Moder_CarsController extends Zend_Controller_Action
                     'decorators' => ['ViewHelper'],
                 )],
             ]
-        ));
+        ]);
     }
 
     private function getTextForm()
     {
-        return new Project_Form(array(
+        return new Project_Form([
             'method' => Zend_Form::METHOD_POST,
             'action' => $this->_helper->url->url(array(
                 'action' => 'save-desc'
@@ -505,7 +505,7 @@ class Moder_CarsController extends Zend_Controller_Action
                     'decorators' => ['ViewHelper'],
                 )],
             ]
-        ));
+        ]);
     }
 
     public function carAction()
@@ -525,9 +525,9 @@ class Moder_CarsController extends Zend_Controller_Action
         if ($canEditMeta) {
 
             $carParentTable = $this->getCarParentTable();
-            $haveChilds = (bool)$carParentTable->fetchRow(array(
+            $haveChilds = (bool)$carParentTable->fetchRow([
                 'parent_id = ?' => $car->id
-            ));
+            ]);
 
             $isGroupDisabled = $car->is_group && $haveChilds;
 
@@ -558,7 +558,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 }
             }
 
-            $form = new Application_Form_Moder_Car_Edit_Meta(array(
+            $form = new Application_Form_Moder_Car_Edit_Meta([
                 'inheritedCarType'   => $car->car_type_inherit ? $car->car_type_id : null,
                 'inheritedIsConcept' => $car->is_concept_inherit ? $car->is_concept : null,
                 'isGroupDisabled'    => $isGroupDisabled,
@@ -571,7 +571,7 @@ class Moder_CarsController extends Zend_Controller_Action
                     'car_id'      => $car->id,
                     'form'        => 'car-edit-meta'
                 )),
-            ));
+            ]);
 
             $oldData = $data = $car->toArray();
             if (!is_null($data['today'])) {
@@ -623,25 +623,25 @@ class Moder_CarsController extends Zend_Controller_Action
 
                 $newData = $car->toArray();
 
-                $fields = array(
-                    'caption'          => array('str', 'название автомобиля с "%s" на "%s"'),
-                    'body'             => array('str', 'номер кузова с "%s" на "%s"'),
-                    'begin_year'       => array('int', 'год начала выпуска c "%s" на "%s"'),
-                    'begin_month'      => array('int', 'месяц начала выпуска с "%s" на "%s"'),
-                    'end_year'         => array('int', 'год окончания выпуска с "%s" на "%s"'),
-                    'end_month'        => array('int', 'месяц окончания выпуска с "%s" на "%s"'),
-                    'today'            => array('bool', 'выпуск в наше время с "%s" на "%s"'),
-                    'produced'         => array('int', 'количество выпущенных единиц с "%s" на "%s"'),
-                    'produced_exactly' => array('bool', 'точность количества выпущенных единиц с "%s" на "%s"'),
-                    'is_concept'       => array('bool', 'флаг "концепт" с "%s" на "%s"'),
-                    'is_group'         => array('bool', 'флаг "группа" с "%s" на "%s"'),
-                    'car_type_id'      => array('car_type_id', 'тип кузова с "%s" на "%s"'),
-                    'begin_model_year' => array('int', 'модельный год начала выпуска c "%s" на "%s"'),
-                    'end_model_year'   => array('int', 'модельный год окончания выпуска c "%s" на "%s"'),
-                    'spec_id'          => array('spec_id', 'Spec с "%s" на "%s"'),
-                );
+                $fields = [
+                    'caption'          => ['str', 'название автомобиля с "%s" на "%s"'],
+                    'body'             => ['str', 'номер кузова с "%s" на "%s"'],
+                    'begin_year'       => ['int', 'год начала выпуска c "%s" на "%s"'],
+                    'begin_month'      => ['int', 'месяц начала выпуска с "%s" на "%s"'],
+                    'end_year'         => ['int', 'год окончания выпуска с "%s" на "%s"'],
+                    'end_month'        => ['int', 'месяц окончания выпуска с "%s" на "%s"'],
+                    'today'            => ['bool', 'выпуск в наше время с "%s" на "%s"'],
+                    'produced'         => ['int', 'количество выпущенных единиц с "%s" на "%s"'],
+                    'produced_exactly' => ['bool', 'точность количества выпущенных единиц с "%s" на "%s"'],
+                    'is_concept'       => ['bool', 'флаг "концепт" с "%s" на "%s"'],
+                    'is_group'         => ['bool', 'флаг "группа" с "%s" на "%s"'],
+                    'car_type_id'      => ['car_type_id', 'тип кузова с "%s" на "%s"'],
+                    'begin_model_year' => ['int', 'модельный год начала выпуска c "%s" на "%s"'],
+                    'end_model_year'   => ['int', 'модельный год окончания выпуска c "%s" на "%s"'],
+                    'spec_id'          => ['spec_id', 'Spec с "%s" на "%s"'],
+                ];
 
-                $changes = array();
+                $changes = [];
                 foreach ($fields as $field => $info) {
                     switch ($info[0]) {
                         case 'int':
@@ -715,9 +715,9 @@ class Moder_CarsController extends Zend_Controller_Action
             if ($car->text_id) {
                 $textStorage = $this->_helper->textStorage();
                 $description = $textStorage->getText($car->text_id);
-                $descriptionForm->populate(array(
+                $descriptionForm->populate([
                     'markdown' => $description
-                ));
+                ]);
             }
 
             if ($request->isPost() && $this->getParam('form') == 'car-edit-description' && $descriptionForm->isValid($request->getPost())) {
@@ -771,9 +771,9 @@ class Moder_CarsController extends Zend_Controller_Action
             if ($car->full_text_id) {
                 $textStorage = $this->_helper->textStorage();
                 $text = $textStorage->getText($car->full_text_id);
-                $textForm->populate(array(
+                $textForm->populate([
                     'text' => $text
-                ));
+                ]);
             }
 
             $this->view->assign([
@@ -787,7 +787,7 @@ class Moder_CarsController extends Zend_Controller_Action
         // количество картинок
         $picturesCount = $pictures->getAdapter()->fetchOne(
             $pictures->getAdapter()->select()
-                ->from('pictures', array(new Zend_Db_Expr('COUNT(1)')))
+                ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
                 ->where('type = ?', Picture::CAR_TYPE_ID)
                 ->where('car_id = ?', $car->id)
         );
@@ -795,10 +795,10 @@ class Moder_CarsController extends Zend_Controller_Action
         $ucsTable = new User_Car_Subscribe();
 
         $user = $this->_helper->user()->get();
-        $ucsRow = $ucsTable->fetchRow(array(
+        $ucsRow = $ucsTable->fetchRow([
             'user_id = ?' => $user->id,
             'car_id = ?'  => $car->id
-        ));
+        ]);
 
         $db = $carTable->getAdapter();
 
@@ -843,7 +843,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 ->where('car_id = ?', $car->id)
         );
 
-        $tabs = array(
+        $tabs = [
             'meta' => array(
                 'icon'  => 'glyphicon glyphicon-pencil',
                 'title' => 'Мета',
@@ -910,17 +910,17 @@ class Moder_CarsController extends Zend_Controller_Action
                 )),
                 'count' => $picturesCount,
             ),
-        );
+        ];
 
         if ($this->_helper->user()->get()->id == 1) {
-            $tabs['modifications'] = array(
+            $tabs['modifications'] = [
                 'icon'      => 'glyphicon glyphicon-th',
                 'title'     => 'Модификации',
                 'data-load' => $this->_helper->url->url(array(
                     'action' => 'car-modifications'
                 )),
                 'count' => 0
-            );
+            ];
         }
 
         $currentTab = $this->getParam('tab', 'meta');
@@ -931,7 +931,7 @@ class Moder_CarsController extends Zend_Controller_Action
         $specService = new Application_Service_Specifications();
         $specsCount = $specService->getSpecsCount(1, $car->id);
 
-        $this->view->assign(array(
+        $this->view->assign([
             'picturesCount'  => $picturesCount,
             'canEditMeta'    => $canEditMeta,
             'car'            => $car,
@@ -939,7 +939,7 @@ class Moder_CarsController extends Zend_Controller_Action
             'subscribed'     => (bool)$ucsRow,
             'tabs'           => $tabs,
             'specsCount'     => $specsCount
-        ));
+        ]);
     }
 
     public function deleteCarFromBrandAction()
@@ -961,7 +961,7 @@ class Moder_CarsController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
 
         $sql = 'DELETE FROM brands_cars WHERE (brand_id = ?) AND (car_id = ?) LIMIT 1';
-        $brands->getAdapter()->query($sql, array($brand->id, $car->id));
+        $brands->getAdapter()->query($sql, [$brand->id, $car->id]);
 
         $user = $this->_helper->user()->get();
         $ucsTable = new User_Car_Subscribe();
@@ -979,7 +979,7 @@ class Moder_CarsController extends Zend_Controller_Action
             $this->view->htmlA($this->carModerUrl($car), $car->getFullName()),
             $brand->caption
         );
-        $this->_helper->log($message, array($brand, $car));
+        $this->_helper->log($message, [$brand, $car]);
 
         return $this->redirectToCar($car, 'catalogue');
     }
@@ -1009,7 +1009,7 @@ class Moder_CarsController extends Zend_Controller_Action
         } else {
             $this->view->brands = $brands->fetchAll(
                 $brands->select()
-                       ->order(array('brands.position', 'brands.caption'))
+                       ->order(['brands.position', 'brands.caption'])
             );
         }
     }
@@ -1051,22 +1051,22 @@ class Moder_CarsController extends Zend_Controller_Action
 
             $catname = $catnameTemplate . ($i ? '_' . $i : '');
 
-            $exists = (bool)$brandsCars->fetchRow(array(
+            $exists = (bool)$brandsCars->fetchRow([
                 'brand_id = ?' => $brand->id,
                 'catname = ?'  => $catname
-            ));
+            ]);
 
             $i++;
 
         } while ($exists);
 
 
-        $brandsCars->insert(array(
+        $brandsCars->insert([
             'brand_id' => $brand->id,
             'car_id'   => $car->id,
             'type'     => Brands_Cars::TYPE_DEFAULT,
             'catname'  => $catname ? $catname : 'car' . $car->id
-        ));
+        ]);
 
         $user = $this->_helper->user()->get();
         $ucsTable = new User_Car_Subscribe();
@@ -1084,14 +1084,14 @@ class Moder_CarsController extends Zend_Controller_Action
             $this->view->htmlA($this->carModerUrl($car), $car->getFullName()),
             $brand->caption
         );
-        $this->_helper->log($message, array($brand, $car));
+        $this->_helper->log($message, [$brand, $car]);
 
         $url = $this->carModerUrl($car, true, 'catalogue');
         if ($this->getRequest()->isXmlHttpRequest()) {
-            return $this->_helper->json(array(
+            return $this->_helper->json([
                 'ok'  => true,
                 'url' => $url
-            ));
+            ]);
         } else {
             return $this->_redirect($url);
         }
@@ -1120,10 +1120,10 @@ class Moder_CarsController extends Zend_Controller_Action
         $type = (int)$this->getParam('type');
 
         $brandCarTable = new Brand_Car();
-        $brandCarRow = $brandCarTable->fetchRow(array(
+        $brandCarRow = $brandCarTable->fetchRow([
             'brand_id = ?' => $brand->id,
             'car_id = ?'   => $car->id
-        ));
+        ]);
 
         if (!$brandCarRow) {
             return $this->_forward('notfound', 'error', 'default');
@@ -1133,9 +1133,9 @@ class Moder_CarsController extends Zend_Controller_Action
         $brandCarRow->save();
 
         if ($this->getRequest()->isXmlHttpRequest()) {
-            return $this->_helper->json(array(
+            return $this->_helper->json([
                 'ok' => true
-            ));
+            ]);
         } else {
             return $this->_redirect($this->carModerUrl($car));
         }
@@ -1162,16 +1162,16 @@ class Moder_CarsController extends Zend_Controller_Action
         }
 
         $brandCarTable = new Brand_Car();
-        $brandCarRow = $brandCarTable->fetchRow(array(
+        $brandCarRow = $brandCarTable->fetchRow([
             'brand_id = ?' => $brand->id,
             'car_id = ?'   => $car->id
-        ));
+        ]);
 
         if (!$brandCarRow) {
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $form = new Project_Form(array(
+        $form = new Project_Form([
             'elements' => array(
                 array('text', 'catname', array(
                     'filters'    => array('StringTrim', 'StringToLower', 'Filename_Safe'),
@@ -1192,7 +1192,7 @@ class Moder_CarsController extends Zend_Controller_Action
                     )
                 ))
             )
-        ));
+        ]);
 
         $ok = false;
         if ($form->isValid($this->getRequest()->getPost())) {
@@ -1204,10 +1204,10 @@ class Moder_CarsController extends Zend_Controller_Action
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
-            return $this->_helper->json(array(
+            return $this->_helper->json([
                 'ok' => $ok,
                 'messages' => $form->getMessages()
-            ));
+            ]);
         } else {
             return $this->_redirect($this->carModerUrl($car, false, 'catalogue'));
         }
@@ -1236,10 +1236,10 @@ class Moder_CarsController extends Zend_Controller_Action
 
         if ($twinsGroup) {
             $twinsGroupsCars = new Twins_Groups_Cars();
-            $twinsGroupsCars->insert(array(
+            $twinsGroupsCars->insert([
                 'twins_group_id' => $twinsGroup->id,
                 'car_id' => $car->id
-            ));
+            ]);
 
             // обновляем кэши
             $car->updateRelatedTwinsGroupsCount();
@@ -1248,7 +1248,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 'Автомобиль %s добавлен в группу близнецов %s',
                 $this->view->htmlA($this->carModerUrl($car), $car->getFullName()),
                 $this->view->escape($twinsGroup->name)
-            ), array($twinsGroup, $car));
+            ), [$twinsGroup, $car]);
 
             return $this->redirectToCar($car, 'twins');
 
@@ -1277,14 +1277,14 @@ class Moder_CarsController extends Zend_Controller_Action
                         ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
                         ->join('twins_groups_cars', 'car_parent_cache.car_id = twins_groups_cars.car_id', null)
                         ->group('brands.id')
-                        ->order(array('brands.position', 'brands.caption'))
+                        ->order(['brands.position', 'brands.caption'])
                 );
             }
         }
 
-        $form = new Application_Form_Moder_Twins_Group_Add(array(
+        $form = new Application_Form_Moder_Twins_Group_Add([
             'action' => $this->_helper->url->url()
-        ));
+        ]);
         $request = $this->getRequest();
         if ($request->isPost() && $form->isValid($request->getPost())) {
             $values = $form->getValues();
@@ -1292,10 +1292,10 @@ class Moder_CarsController extends Zend_Controller_Action
 
             $id = $twinsGroups->insert($values);
 
-            return $this->_forward('car-select-twins-group', 'cars', 'moder', array(
+            return $this->_forward('car-select-twins-group', 'cars', 'moder', [
                 'car_id'         => $car->id,
                 'twins_group_id' => $id
-            ));
+            ]);
         }
         $this->view->formTwinsGroupAdd = $form;
 
@@ -1361,16 +1361,16 @@ class Moder_CarsController extends Zend_Controller_Action
 
         if ($factory) {
             $factoryCarTable = new Factory_Car();
-            $factoryCarTable->insert(array(
+            $factoryCarTable->insert([
                 'factory_id' => $factory->id,
                 'car_id'     => $car->id
-            ));
+            ]);
 
             $this->_helper->log(sprintf(
                 'Автомобиль %s добавлен к заводу %s',
                 $this->view->htmlA($this->carModerUrl($car), $car->getFullName()),
                 $this->view->escape($factory->name)
-            ), array($factory, $car));
+            ), [$factory, $car]);
 
             return $this->redirectToCar($car, 'factories');
 
@@ -1425,21 +1425,21 @@ class Moder_CarsController extends Zend_Controller_Action
 
         $language = $this->_helper->language();
 
-        $filter = $parent ? array(
+        $filter = $parent ? [
             'parent_id = ?' => $parent->id
-        ) : array(
+        ] : [
             'parent_id IS NULL'
-        );
+        ];
 
         $rows = $cdTable->fetchAll($filter, 'name');
 
-        $categories = array();
+        $categories = [];
 
         foreach ($rows as $row) {
-            $lRow = $cdlTable->fetchRow(array(
+            $lRow = $cdlTable->fetchRow([
                 'language = ?'    => $language,
                 'category_id = ?' => $row->id
-            ));
+            ]);
 
             $childs = $this->getCategoriesArray($row, $selection, $deep+1);
 
@@ -1456,7 +1456,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 }
             }
 
-            $category = array(
+            $category = [
                 'id'            => $row->id,
                 'name'          => $lRow ? $lRow->name : $row->name,
                 'categories'    => $childs,
@@ -1465,7 +1465,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 'inherited'     => $inherited,
                 'user'          => $checked ? $selection[$row->id]['user'] : false,
                 'inheritedFrom' => $checked ? $selection[$row->id]['inheritedFrom'] : array()
-            );
+            ];
 
             $categories[] = $category;
         }
@@ -1497,24 +1497,24 @@ class Moder_CarsController extends Zend_Controller_Action
         $categories = $cTable->find($this->getParam('category'));
 
         // insert new
-        $insertedNames = array();
-        $ids = array();
+        $insertedNames = [];
+        $ids = [];
         foreach ($categories as $category) {
             $ids[] = $category->id;
 
-            $ccRow = $ccTable->fetchRow(array(
+            $ccRow = $ccTable->fetchRow([
                 'category_id = ?' => $category->id,
                 'car_id = ?'      => $car->id
-            ));
+            ]);
             if (!$ccRow) {
                 $user = $this->_helper->user()->get();
                 $ccRow = $ccTable->fetchNew();
-                $ccRow->setFromArray(array(
+                $ccRow->setFromArray([
                     'car_id'       => $car->id,
                     'category_id'  => $category->id,
                     'add_datetime' => new Zend_Db_Expr('NOW()'),
                     'user_id'      => $user->id
-                ));
+                ]);
                 $ccRow->save();
 
                 $insertedNames[] = $category->name;
@@ -1522,11 +1522,11 @@ class Moder_CarsController extends Zend_Controller_Action
         }
 
         // delete old
-        $deletedNames = array();
-        $notify = array();
-        $filter = array(
+        $deletedNames = [];
+        $notify = [];
+        $filter = [
             'car_id = ?' => $car->id,
-        );
+        ];
         if (count($ids)) {
             $filter['category_id NOT IN (?)'] = $ids;
         }
@@ -1559,13 +1559,13 @@ class Moder_CarsController extends Zend_Controller_Action
         foreach ($notify as $userId => $categories) {
             $notifyUser = $users->find($userId)->current();
 
-            $categoryNames = array();
+            $categoryNames = [];
             foreach ($categories as $category) {
-                $categoryNames[] = $category->name . ' (' . $this->view->serverUrl($this->_helper->url->url(array(
+                $categoryNames[] = $category->name . ' (' . $this->view->serverUrl($this->_helper->url->url([
                     'controller'       => 'category',
                     'action'           => 'category',
                     'category_catname' => $category->catname
-                ), 'category', true)) .')';
+                ], 'category', true)) .')';
             }
 
             if ($notifyUser && count($categoryNames)) {
@@ -1576,12 +1576,12 @@ class Moder_CarsController extends Zend_Controller_Action
             }
         }
 
-        return $this->_helper->json(array(
+        return $this->_helper->json([
             'ok' => true,
             'n'  => count($notify),
             'd'  => $deletedNames,
             'f'  => $filter
-        ));
+        ]);
     }
 
     public function carCategoriesAction()
@@ -1606,26 +1606,26 @@ class Moder_CarsController extends Zend_Controller_Action
 
         $selected = $db->fetchPairs(
             $db->select()
-                ->from('category_car', array('category_id', 'user_id'))
+                ->from('category_car', ['category_id', 'user_id'])
                 ->where('car_id = ?', $car->id)
         );
 
         $inherited = $db->fetchCol(
             $db->select()
-                ->from('category_car', array('category_id'))
+                ->from('category_car', ['category_id'])
                 ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
                 ->where('car_parent_cache.car_id = ?', $car->id)
                 //->where('car_parent_cache.diff > 0')
         );
 
-        $selection = array();
+        $selection = [];
 
         foreach ($selected as $id => $value) {
-            $selection[$id] = array(
+            $selection[$id] = [
                 'inherited'     => false,
                 'inheritedFrom' => array(),
                 'user'          => $users->find($value)->current()
-            );
+            ];
         }
 
         foreach ($inherited as $id) {
@@ -1639,29 +1639,29 @@ class Moder_CarsController extends Zend_Controller_Action
                         ->where('category_car.category_id = ?', $id)
                 );
 
-                $inheritedFrom = array();
+                $inheritedFrom = [];
                 foreach ($carRows as $carRow) {
-                    $inheritedFrom[] = array(
+                    $inheritedFrom[] = [
                         'name' => $carRow->getFullName(),
                         'url'  => $this->carModerUrl($carRow)
-                    );
+                    ];
                 }
 
-                $selection[$id] = array(
+                $selection[$id] = [
                     'inherited'     => true,
                     'inheritedFrom' => $inheritedFrom,
                     'user'          => null
-                );
+                ];
             }
         }
 
         $categories = $this->getCategoriesArray(null, $selection, 0);
 
-        $this->view->assign(array(
+        $this->view->assign([
             'canEditMeta' => $canEditMeta,
             'car'         => $car,
             'categories'  => $categories
-        ));
+        ]);
     }
 
     public function subscribeAction()
@@ -1681,9 +1681,9 @@ class Moder_CarsController extends Zend_Controller_Action
         $ucsTable = new User_Car_Subscribe();
         $ucsTable->subscribe($user, $car);
 
-        return $this->_helper->json(array(
+        return $this->_helper->json([
             'ok' => true
-        ));
+        ]);
     }
 
     public function unsubscribeAction()
@@ -1703,9 +1703,9 @@ class Moder_CarsController extends Zend_Controller_Action
         $ucsTable = new User_Car_Subscribe();
         $ucsTable->unsubscribe($user, $car);
 
-        return $this->_helper->json(array(
+        return $this->_helper->json([
             'ok' => true
-        ));
+        ]);
     }
 
     public function saveNameAction()
@@ -1729,23 +1729,23 @@ class Moder_CarsController extends Zend_Controller_Action
 
         $carLangTable = new Car_Language();
 
-        $changes = array();
+        $changes = [];
 
         foreach ($this->allowedLanguages as $lang) {
             $value = trim($this->getParam($lang));
 
-            $row = $carLangTable->fetchRow(array(
+            $row = $carLangTable->fetchRow([
                 'car_id = ?'   => $car->id,
                 'language = ?' => $lang
-            ));
+            ]);
 
             if ($value) {
 
                 if (!$row) {
-                    $row = $carLangTable->createRow(array(
+                    $row = $carLangTable->createRow([
                         'car_id'   => $car->id,
                         'language' => $lang
-                    ));
+                    ]);
                 }
 
                 if ($row->name != $value) {
@@ -1817,7 +1817,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 ->order($this->_helper->catalogue()->carsOrdering())
         );
 
-        $graphItems = array();
+        $graphItems = [];
         foreach ($allParents as $c) {
             $graphItems[$c->id] = $c->getFullName();
         }
@@ -1834,22 +1834,22 @@ class Moder_CarsController extends Zend_Controller_Action
                 ->where('car_id in (?)', $graphItemsIds)
                 ->where('parent_id in (?)', $graphItemsIds)
         );
-        $graphLinks = array();
+        $graphLinks = [];
         foreach ($carParentRows as $carParentRow) {
-            $graphLinks[] = array(
+            $graphLinks[] = [
                 'car_id'    => $carParentRow->car_id,
                 'parent_id' => $carParentRow->parent_id
-            );
+            ];
         }
 
-        $carParentRows = $carParentTable->fetchAll(array(
+        $carParentRows = $carParentTable->fetchAll([
             'parent_id = ?' => $car->id
-        ));
+        ]);
 
-        $childCars = array();
+        $childCars = [];
         foreach ($carParentRows as $carParentRow) {
             $childRow = $carTable->find($carParentRow->car_id)->current();
-            $childCars[] = array(
+            $childCars[] = [
                 'name'      => $childRow->getFullName(),
                 'isPrimary' => $carParentRow->is_primary,
                 'treeUrl'   => $this->_helper->url->url(array(
@@ -1865,16 +1865,16 @@ class Moder_CarsController extends Zend_Controller_Action
                     'parent_id' => $car->id,
                     'value'     => !$carParentRow->is_primary
                 ))
-            );
+            ];
         }
 
-        $this->view->assign(array(
+        $this->view->assign([
             'car'        => $car,
             'parents'    => $parents,
             'childs'     => $childCars,
             'graphItems' => $graphItems,
             'graphLinks' => $graphLinks
-        ));
+        ]);
     }
 
     public function rebuildTreeAction()
@@ -1896,9 +1896,9 @@ class Moder_CarsController extends Zend_Controller_Action
 
         $cpcTable->rebuildCache($car);
 
-        return $this->_redirect($this->_helper->url->url(array(
+        return $this->_redirect($this->_helper->url->url([
             'action' => 'tree'
-        )));
+        ]));
     }
 
     public function setIsPrimaryAction()
@@ -1926,10 +1926,10 @@ class Moder_CarsController extends Zend_Controller_Action
         }
 
         $carParentTable = $this->getCarParentTable();
-        $carParentRow = $carParentTable->fetchRow(array(
+        $carParentRow = $carParentTable->fetchRow([
             'car_id = ?'    => $car->id,
             'parent_id = ?' => $parentCar->id
-        ));
+        ]);
 
         if (!$carParentRow) {
             return $this->_forward('notfound', 'error', 'default');
@@ -1938,12 +1938,12 @@ class Moder_CarsController extends Zend_Controller_Action
         $carParentRow->is_primary = (bool)$this->getParam('value');
         $carParentRow->save();
 
-        return $this->_redirect($this->_helper->url->url(array(
+        return $this->_redirect($this->_helper->url->url([
             'module'     => 'moder',
             'controller' => 'cars',
             'action'     => 'tree',
             'car_id'     => $parentCar->id,
-        ), 'default', true));
+        ], 'default', true));
     }
 
     public function removeParentAction()
@@ -1984,7 +1984,7 @@ class Moder_CarsController extends Zend_Controller_Action
             $this->view->htmlA($this->carModerUrl($parentCar), $parentCar->getFullName()),
             $this->view->htmlA($this->carModerUrl($car), $car->getFullName())
         );
-        $this->_helper->log($message, array($car, $parentCar));
+        $this->_helper->log($message, [$car, $parentCar]);
 
         return $this->_redirect($this->getRequest()->getServer('HTTP_REFERER'));
     }
@@ -2009,10 +2009,10 @@ class Moder_CarsController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
         }
 
-        $this->view->assign(array(
+        $this->view->assign([
             'car'       => $car,
             'parentCar' => $parentCar
-        ));
+        ]);
     }
 
     public function addParentAction()
@@ -2055,17 +2055,17 @@ class Moder_CarsController extends Zend_Controller_Action
             $this->view->htmlA($this->carModerUrl($parentCar), $parentCar->getFullName()),
             $this->view->htmlA($this->carModerUrl($car), $car->getFullName())
         );
-        $this->_helper->log($message, array($car, $parentCar));
+        $this->_helper->log($message, [$car, $parentCar]);
 
-        $url = $this->_helper->url->url(array(
+        $url = $this->_helper->url->url([
             'action' => 'car',
             'tab'    => 'catalogue'
-        ));
+        ]);
         if ($this->getRequest()->isXmlHttpRequest()) {
-            return $this->_helper->json(array(
+            return $this->_helper->json([
                 'ok'  => true,
                 'url' => $url
-            ));
+            ]);
         } else {
             return $this->_redirect($url);
         }
@@ -2097,7 +2097,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 }
             }
 
-            $result[] = array(
+            $result[] = [
                 'url'   => $this->_helper->url->url([
                     'action'     => 'add-car-to-brand',
                     'brand_id'   => $brandRow['id']
@@ -2105,7 +2105,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 'name'  => $brandRow['name'],
                 'image' => $img,
                 'type'  => 'brand'
-            );
+            ];
         }
 
 
@@ -2157,9 +2157,9 @@ class Moder_CarsController extends Zend_Controller_Action
         }
 
         $specTable = new Spec();
-        $specRow = $specTable->fetchRow(array(
+        $specRow = $specTable->fetchRow([
             'INSTR(?, short_name)' => $query
-        ));
+        ]);
 
         $specId = null;
         if ($specRow) {
@@ -2172,7 +2172,7 @@ class Moder_CarsController extends Zend_Controller_Action
         $select = $carTable->select(true)
             ->where('cars.is_group')
             ->where('cars.caption like ?', $query . '%')
-            ->order(array('length(cars.caption)', 'cars.is_group desc', 'cars.caption'))
+            ->order(['length(cars.caption)', 'cars.is_group desc', 'cars.caption'])
             ->limit(15);
 
         if ($specId) {
@@ -2215,7 +2215,7 @@ class Moder_CarsController extends Zend_Controller_Action
         $carRows = $carTable->fetchAll($select);
 
         foreach ($carRows as $carRow) {
-            $result[] = array(
+            $result[] = [
                 'url'      => $this->_helper->url->url([
                     'action'    => 'add-parent',
                     'parent_id' => $carRow->id
@@ -2223,7 +2223,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 'is_group' => (boolean)$carRow->is_group,
                 'name'     => $carRow->getFullName($language),
                 'type'     => 'car'
-            );
+            ];
         }
 
         $this->_helper->json($result);
@@ -2241,7 +2241,7 @@ class Moder_CarsController extends Zend_Controller_Action
 
         $twinsGroupsTable = new Twins_Groups();
 
-        $twinsGroups = array();
+        $twinsGroups = [];
         $canEditTwins = $this->_helper->user()->isAllowed('twins', 'edit');
 
         $twinsGroupRows = $twinsGroupsTable->fetchAll(
@@ -2250,20 +2250,20 @@ class Moder_CarsController extends Zend_Controller_Action
                 ->where('twins_groups_cars.car_id = ?', $car->id)
         );
         foreach ($twinsGroupRows as $twinsGroupRow) {
-            $twinsGroup = array(
+            $twinsGroup = [
                 'id'        => $twinsGroupRow->id,
                 'name'      => $twinsGroupRow->name,
                 'inherited' => false,
-            );
+            ];
 
             if ($canEditTwins) {
-                $twinsGroup['removeUrl'] = $this->_helper->url->url(array(
+                $twinsGroup['removeUrl'] = $this->_helper->url->url([
                     'module'         => 'moder',
                     'controller'     => 'cars',
                     'action'         => 'car-remove-from-twins-group',
                     'car_id'         => $car->id,
                     'twins_group_id' => $twinsGroup['id']
-                ), 'default', true);
+                ], 'default', true);
             }
 
             $twinsGroups[$twinsGroupRow->id] = $twinsGroup;
@@ -2287,36 +2287,36 @@ class Moder_CarsController extends Zend_Controller_Action
                     ->where('twins_groups_cars.twins_group_id = ?', $twinsGroupRow->id)
             );
 
-            $inheritedFrom = array();
+            $inheritedFrom = [];
             foreach ($carRows as $carRow) {
-                $inheritedFrom[] = array(
+                $inheritedFrom[] = [
                     'name' => $carRow->getFullName(),
                     'url'  => $this->carModerUrl($carRow)
-                );
+                ];
             }
 
-            $twinsGroups[$twinsGroupRow->id] = array(
+            $twinsGroups[$twinsGroupRow->id] = [
                 'id'            => $twinsGroupRow->id,
                 'name'          => $twinsGroupRow->name,
                 'inherited'     => true,
                 'inheritedFrom' => $inheritedFrom
-            );
+            ];
         }
 
         foreach ($twinsGroups as &$twinsGroup) {
-            $twinsGroup['url'] = $this->_helper->url->url(array(
+            $twinsGroup['url'] = $this->_helper->url->url([
                 'module'         => 'moder',
                 'controller'     => 'twins',
                 'action'         => 'twins-group',
                 'twins_group_id' => $twinsGroup['id']
-            ), 'default', true);
+            ], 'default', true);
         }
 
-        $this->view->assign(array(
+        $this->view->assign([
             'car'          => $car,
             'twinsGroups'  => $twinsGroups,
             'canEditTwins' => $canEditTwins,
-        ));
+        ]);
     }
 
     public function carFactoriesAction()
@@ -2330,7 +2330,7 @@ class Moder_CarsController extends Zend_Controller_Action
 
         $factoryTable = new Factory();
 
-        $factories = array();
+        $factories = [];
         $canEditFactory = $this->_helper->user()->isAllowed('factory', 'edit');
 
         $factoriesRows = $factoryTable->fetchAll(
@@ -2339,20 +2339,20 @@ class Moder_CarsController extends Zend_Controller_Action
                 ->where('factory_car.car_id = ?', $car->id)
         );
         foreach ($factoriesRows as $factoriesRow) {
-            $factory = array(
+            $factory = [
                 'id'        => $factoriesRow->id,
                 'name'      => $factoriesRow->name,
                 'inherited' => false,
-            );
+            ];
 
             if ($canEditFactory) {
-                $factory['removeUrl'] = $this->_helper->url->url(array(
+                $factory['removeUrl'] = $this->_helper->url->url([
                     'module'     => 'moder',
                     'controller' => 'cars',
                     'action'     => 'car-remove-from-factory',
                     'car_id'     => $car->id,
                     'factory_id' => $factory['id']
-                ), 'default', true);
+                ], 'default', true);
             }
 
             $factories[$factoriesRow->id] = $factory;
@@ -2376,53 +2376,53 @@ class Moder_CarsController extends Zend_Controller_Action
                     ->where('factory_car.factory_id = ?', $factoriesRow->id)
             );
 
-            $inheritedFrom = array();
+            $inheritedFrom = [];
             foreach ($carRows as $carRow) {
-                $inheritedFrom[] = array(
+                $inheritedFrom[] = [
                     'name' => $carRow->getFullName(),
                     'url'  => $this->carModerUrl($carRow)
-                );
+                ];
             }
 
-            $factories[$factoriesRow->id] = array(
+            $factories[$factoriesRow->id] = [
                 'id'            => $factoriesRow->id,
                 'name'          => $factoriesRow->name,
                 'inherited'     => true,
                 'inheritedFrom' => $inheritedFrom
-            );
+            ];
         }
 
         foreach ($factories as &$factory) {
-            $factory['url'] = $this->_helper->url->url(array(
+            $factory['url'] = $this->_helper->url->url([
                 'module'     => 'moder',
                 'controller' => 'factory',
                 'action'     => 'factory',
                 'factory_id' => $factory['id']
-            ), 'default', true);
+            ], 'default', true);
         }
 
-        $this->view->assign(array(
+        $this->view->assign([
             'car'            => $car,
             'factories'      => $factories,
             'canEditFactory' => $canEditFactory,
-        ));
+        ]);
     }
 
     private function carTreeWalk(Cars_Row $car, $carParentRow = null)
     {
-        $data = array(
+        $data = [
             'name'   => $car->getFullName(),
             'url'    => $this->carModerUrl($car),
-            'childs' => array(),
+            'childs' => [],
             'type'   => $carParentRow ? $carParentRow->type : null
-        );
+        ];
 
         $carParentTable = $this->getCarParentTable();
         $carParentRows = $carParentTable->fetchAll(
             $carParentTable->select(true)
                 ->join('cars', 'car_parent.car_id = cars.id', null)
                 ->where('car_parent.parent_id = ?', $car['id'])
-                ->order(array_merge(array('car_parent.type'), $this->_helper->catalogue()->carsOrdering()))
+                ->order(array_merge(['car_parent.type'], $this->_helper->catalogue()->carsOrdering()))
         );
 
         $carTable = $this->_helper->catalogue()->getCarTable();
@@ -2445,9 +2445,9 @@ class Moder_CarsController extends Zend_Controller_Action
             return $this->_forward('notfound', 'error');
         }
 
-        $this->view->assign(array(
+        $this->view->assign([
             'car' => $this->carTreeWalk($car)
-        ));
+        ]);
     }
 
     public function carCatalogueAction()
@@ -2467,28 +2467,28 @@ class Moder_CarsController extends Zend_Controller_Action
                 ->where('car_id = ?', $car->id)
         );
 
-        $brands = array();
+        $brands = [];
         foreach ($brandCarRows as $brandCarRow) {
             $brandRow = $brandTable->find($brandCarRow->brand_id)->current();
             if ($brandRow) {
 
                 if ($brandCarRow->catname) {
-                    $url = $this->_helper->url->url(array(
+                    $url = $this->_helper->url->url([
                         'controller'    => 'catalogue',
                         'action'        => 'brand-car',
                         'brand_catname' => $brandRow->folder,
                         'car_catname'   => $brandCarRow->catname
-                    ), 'catalogue', true);
+                    ], 'catalogue', true);
                 } else {
-                    $url = $this->_helper->url->url(array(
+                    $url = $this->_helper->url->url([
                         'controller'    => 'catalogue',
                         'action'        => 'car',
                         'brand_catname' => $brandRow->folder,
                         'car_id'        => $car->id
-                    ), 'catalogue', true);
+                    ], 'catalogue', true);
                 }
 
-                $brands[] = array(
+                $brands[] = [
                     'name'     => $brandRow->caption,
                     'type'     => $brandCarRow->type,
                     'catname'  => $brandCarRow->catname,
@@ -2514,7 +2514,7 @@ class Moder_CarsController extends Zend_Controller_Action
                         'action'   => 'set-brand-car-catname',
                         'brand_id' => $brandRow->id,
                     )),
-                );
+                ];
             }
         }
 
@@ -2524,30 +2524,30 @@ class Moder_CarsController extends Zend_Controller_Action
                 ->where('car_parent_cache.car_id = ?', $car->id)
                 ->where('car_parent_cache.car_id <> car_parent_cache.parent_id')
         );
-        $inheritBrands = array();
+        $inheritBrands = [];
         foreach ($brandCarRows as $brandCarRow) {
             $brandRow = $brandTable->find($brandCarRow->brand_id)->current();
             if ($brandRow) {
 
                 if ($brandCarRow->catname) {
-                    $url = $this->_helper->url->url(array(
+                    $url = $this->_helper->url->url([
                         'controller'    => 'catalogue',
                         'action'        => 'brand-car',
                         'brand_catname' => $brandRow->folder,
                         'car_catname'   => $brandCarRow->catname
-                    ), 'catalogue', true);
+                    ], 'catalogue', true);
                 } else {
-                    $url = $this->_helper->url->url(array(
+                    $url = $this->_helper->url->url([
                         'controller'    => 'catalogue',
                         'action'        => 'car',
                         'brand_catname' => $brandRow->folder,
                         'car_id'        => $car->id
-                    ), 'catalogue', true);
+                    ], 'catalogue', true);
                 }
 
                 $inheritedCar = $carTable->find($brandCarRow->car_id)->current();
 
-                $inheritBrands[] = array(
+                $inheritBrands[] = [
                     'name'     => $brandRow->caption,
                     'type'     => $brandCarRow->type,
                     'catname'  => $brandCarRow->catname,
@@ -2567,12 +2567,12 @@ class Moder_CarsController extends Zend_Controller_Action
                             'car_id'     => $inheritedCar->id,
                         ))
                     )
-                );
+                ];
             }
         }
 
 
-        $relevantBrands = array();
+        $relevantBrands = [];
 
         if (strlen($car->caption) > 0) {
             $rows = $brandTable->fetchAll(
@@ -2598,13 +2598,13 @@ class Moder_CarsController extends Zend_Controller_Action
         }
         $canUseTree = true;
 
-        $parents = array();
-        $childs = array();
+        $parents = [];
+        $childs = [];
         if ($canUseTree) {
 
             $carParentTable = $this->getCarParentTable();
 
-            $order = array_merge(array('car_parent.type'), $this->_helper->catalogue()->carsOrdering());
+            $order = array_merge(['car_parent.type'], $this->_helper->catalogue()->carsOrdering());
 
             $carParentRows = $carParentTable->fetchAll(
                 $carParentTable->select(true)
@@ -2623,7 +2623,7 @@ class Moder_CarsController extends Zend_Controller_Action
             $childs = $this->perepareCatalogueCars($carParentRows, false);
         }
 
-        $this->view->assign(array(
+        $this->view->assign([
             'car'                 => $car,
             'canMove'             => $this->canMove($car),
             'brands'              => $brands,
@@ -2644,7 +2644,7 @@ class Moder_CarsController extends Zend_Controller_Action
                 Car_Parent::TYPE_TUNING  => $this->view->translate('catalogue/related'),
                 Car_Parent::TYPE_SPORT   => 'спорт'
             )
-        ));
+        ]);
     }
 
     /**
@@ -2679,11 +2679,11 @@ class Moder_CarsController extends Zend_Controller_Action
 
     private function walkUpUntilBrand($id, array $path)
     {
-        $urls = array();
+        $urls = [];
 
-        $brandCarRows = $this->getBrandCarTable()->fetchAll(array(
+        $brandCarRows = $this->getBrandCarTable()->fetchAll([
             'car_id = ?' => $id
-        ));
+        ]);
 
         foreach ($brandCarRows as $brandCarRow) {
 

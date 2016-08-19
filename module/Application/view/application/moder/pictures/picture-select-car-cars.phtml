@@ -1,0 +1,38 @@
+<?php
+    $lastType = null;
+?>
+<?php foreach ($this->cars as $car) { ?>
+    <?php if ($lastType != $car['type']) { ?>
+        <?php
+            $lastType = $car['type'];
+        ?>
+        <div class="text-muted">
+            <?php
+                switch ($car['type']) {
+                    case Car_Parent::TYPE_TUNING: print $this->escapeHtml($this->translate('catalogue/related')); break;
+                    case Car_Parent::TYPE_SPORT:  print 'Sport'; break;
+                }
+            ?>
+        </div>
+    <?php } ?>
+    <?php if ($car['haveChilds']) { ?>
+        <div>
+            <?=$this->htmlA([
+                'href'      => '#',
+                'class'     => 'arrow',
+                'data-load' => $car['loadUrl']
+            ], '<i class="fa fa-plus-circle"></i> ' . $this->escapeHtml($car['name']), false) ?>
+            <div style="margin:0 0 4px 18px;display:none">
+                <?php if (!$car['isGroup']) { ?>
+                    <?=$this->htmlA($car['url'], $car['name']) ?><br />
+                <?php } ?>
+                <div class="loading"><em>Loading ...</em></div>
+                <?php if ($car['isGroup']) { ?>
+                    <?=$this->htmlA($car['url'], 'другая модификация') ?>
+                <?php } ?>
+            </div>
+        </div>
+    <?php } else { ?>
+        <?=$this->htmlA($car['url'], $car['name']) ?><br />
+    <?php } ?>
+<?php } ?>

@@ -14,6 +14,7 @@ class Language
      */
     private $whitelist = [
         'fr.wheelsage.org'  => 'fr',
+        'zh.wheelsage.org'  => 'zh',
         'en.wheelsage.org'  => 'en',
         'wheelsage.org'     => 'en',
         'www.wheelsage.org' => 'en',

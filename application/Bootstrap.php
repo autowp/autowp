@@ -6,6 +6,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         'wheelsage.org'     => '.wheelsage.org',
         'fr.wheelsage.org'  => '.wheelsage.org',
         'en.wheelsage.org'  => '.wheelsage.org',
+        'zh.wheelsage.org'  => '.wheelsage.org',
         'www.wheelsage.org' => '.wheelsage.org',
         'en.autowp.ru'      => '.autowp.ru',
         'autowp.ru'         => '.autowp.ru',

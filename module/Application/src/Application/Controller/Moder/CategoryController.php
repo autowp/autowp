@@ -71,7 +71,7 @@ class CategoryController extends AbstractActionController
     private function getLanguages()
     {
         return [
-            'ru', 'en', 'fr'
+            'ru', 'en', 'fr', 'zh'
         ];
     }
 
