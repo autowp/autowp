@@ -7,39 +7,32 @@ return [
     /* Common words */
     'and' => 'and',
     '%1$s picures'       => [
-        '%1$s picture',
-        '%1$s pictures',
+        '%1$s 图片',
     ],
     '%1$s vehicles'      => [
-        '%1$s vehicle',
-        '%1$s vehicles',
+        '%1$s 车型',
     ],
     '%1$s comments'      => [
-        '%1$s comment',
-        '%1$s comments',
+        '%1$s 评论',
     ],
     '%1$s messages'      => [
-        '%1$s message',
-        '%1$s messages',
+        '%1$s 站内信',
     ],
     '%1$s topics'      => [
-        '%1$s topic',
-        '%1$s topics',
+        '%1$s 话题',
     ],
 
-    'few seconds ago'    => 'few seconds ago',
-    'a minute ago'       => 'a minute ago',
+    'few seconds ago'    => '几秒钟前',
+    'a minute ago'       => '一分钟前',
     '%1$s minutes ago'   => [
-        '%1$s minute ago',
-        '%1$s minutes ago'
+        '%1$s 几分钟前',
     ],
-    'an hour ago'        => 'an hour ago',
+    'an hour ago'        => '一小时前',
     '%1$s hours ago'     => [
-        '%1$s hour ago',
-        '%1$s hours ago'
+        '%1$s 几小时前',
     ],
-    'yesterday'          => 'yesterday',
-    'today'              => 'today',
+    'yesterday'          => '昨天',
+    'today'              => '今天',
 
     'contributor' => 'contributor',
     'contributors' => 'contributors',
@@ -394,7 +387,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'picture/all-images-have-owners' => 'All images have owners.',
     'picture/if-you-found-error' => 'If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.',
     'picture/where-to-talk' => 'Discuss anything and just talk about cars and not only can you on <a href="/forums/">the forum</a>',
-    
+
     'users/user/recent-activity' => 'Recent activity',
     'users/user/recent-uploads' => 'Recent uploads',
     'users/user/recent-comments' => 'Recent comments',
