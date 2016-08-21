@@ -307,7 +307,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'login/login-or-password-is-incorrect' => '您已登陆或密码错误',
     'login/user-%value%-not-found' => '用户名或注册邮箱 "%value%" 不存在',
 
-    'registration/if-you-registered' => '如果您已注册，请不要重复操作，只需在右侧输入用户名和密码即可登录'
+    'registration/if-you-registered' => '如果您已注册，请不要重复操作，只需在右侧输入用户名和密码即可登录',
 
     'forums/go-to-theme-%1$s' => '前往主题 "%1$s"',
     'forums/go-to-theme' => '前往主题…',
@@ -434,7 +434,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'donate/project' => 'WheelsAge.org',
     'donate/comment-hint' => '您的建议',
     'donate/success-text' => '感谢您的支持.
-        
+
 我们尽己所能让您满意.',
 
     'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s )',
