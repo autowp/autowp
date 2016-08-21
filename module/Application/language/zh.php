@@ -47,8 +47,7 @@ return [
     'layout/brand' => 'WheelsAge.org',
     'layout/personal-messages' => '站内信',
     'layout/you-have-%1$s-new-messages' => [
-        '你有一条未读站内信',
-        '你有多条未读站内信',
+        '你有一条未读站内信'
     ],
 
     'layout/search' => '搜索',
@@ -260,7 +259,7 @@ return [
     'comments/message' => '站内信',
     'comments/send' => '发送',
     'comments/cancel' => '取消',
-    '很抱歉稍后您才可以发表新评论.
+    'comments/need-wait-text' => '很抱歉稍后您才可以发表新评论.
 
 This is due to the presence of the threshold "messages per hour", necessary to prevent spam and some other negative aspects.
 
@@ -427,7 +426,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
 
 如果您希望资助我们每日的工作，可以通过PayPal或Yandex.Money进行捐助.
 
-在捐助的同时可以告诉我们您对网站的愿景ninWith a money donation you can send us your vision about the future of the encyclopedia and the way it must move and we\'ll be much more obligated and grateful to your words.
+在捐助的同时可以告诉我们您对网站的愿景
 
 原则上我们进行不记名捐助，但如果您要求，我们会标记您的贡献.',
     'donate/target' => '为了维持网站运营',
