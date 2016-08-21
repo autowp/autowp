@@ -98,7 +98,7 @@ return array (
     'brands/new-cars-of-brand' => '新车型 %s',
 
     'brands/more-companies'    => [
-        '更多厂商'
+        '更多 %s 厂商'
     ],
 
     /* Layout */
