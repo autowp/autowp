@@ -42,7 +42,7 @@ return [
     'sumbit' => '上传',
 
     /* Layout */
-    'layout/meta/description' => 'WheelsAge.org.汽车图片的百科全书. ',
+    'layout/meta/description' => 'WheelsAge.org.汽车图片的百科全书.',
     'layout/meta/keywords' => '汽车',
     'layout/brand' => 'WheelsAge.org',
     'layout/personal-messages' => '站内信',
@@ -72,7 +72,7 @@ return [
     'kW'  => 'kW',
     'hp'  => 'hp',
     'spec/%1$s-gear' => [
-        '档位数',
+        '%1$s 档位数',
     ],
 
     /* PAGINATOR */
@@ -99,10 +99,9 @@ return [
 
     'all-link'                 => '所有',
 
-    'brands/new-cars-of-brand' => '新车型',
+    'brands/new-cars-of-brand' => '新车型 %s',
 
     'brands/more-companies'    => [
-        '更多厂商',
         '更多厂商'
     ],
 
@@ -124,11 +123,9 @@ return [
     'carlist/twins'           => '姊妹车型',
     'carlist/produced/one'    => '总产量1辆',
     'carlist/produced/%1$s'   => [
-        '总产量 %1$s 辆',
         '总产量 %1$s 辆'
     ],
     'carlist/produced-about/%1$s' => [
-        '总产量约 %1$s 辆',
         '总产量约 %1$s 辆'
     ],
     'carlist/specifications'  => '技术指标',
@@ -138,7 +135,7 @@ return [
     'picturelist/engine' => '发动机',
     'picturelist/engine-%s' => '发动机e-%s',
     'picturelist/logotype' => '商标',
-    'picturelist/logotype-%s' => '-%s 商标',
+    'picturelist/logotype-%s' => '%s 商标',
     'picturelist/mixed' => '杂项',
     'picturelist/mixed-%s' => '%s miscellaneous',
     'picturelist/unsorted' => '未分类',
@@ -148,18 +145,16 @@ return [
 
     /* Categories */
     'category/%s cars'        => [
-        '共 %s 辆车',
         '共 %s 辆车'
     ],
     'category/%s new cars'    => [
-        '共 %s 辆新车',
         '共 %s 辆新车'
     ],
 
     /* most */
     'most/fastest' => '最快车型',
     'most/fastest/param' => '最高时速',
-    'most/slowest' =>'最慢车型 ',
+    'most/slowest' => '最慢车型',
     'most/slowest/param' => '最高时速',
     'most/dynamic' => 'dynamic',
     'most/dynamic/param' => 'acceleration',
@@ -281,15 +276,15 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'perspective/3/4-left'       => '¾ 左侧',
     'perspective/3/4-right'      => '¾ 右侧',
     'perspective/cutaway'        => 'cutaway',
-    'perspective/front-strict'   => '前方 (strict]',
-    'perspective/left-strict'    => '左侧 (strict]',
-    'perspective/right-strict'   => '右侧 (strict]',
-    'perspective/back-strict'    => '后防 (strict]',
+    'perspective/front-strict'   => '前方 (strict)',
+    'perspective/left-strict'    => '左侧 (strict)',
+    'perspective/right-strict'   => '右侧 (strict)',
+    'perspective/back-strict'    => '后防 (strict)',
     'perspective/n/a'            => 'n/a',
     'perspective/label'          => 'label',
     'perspective/upper'          => 'upper',
     'perspective/under-the-hood' => 'under the hood',
-    'perspective/upper-strict'   => 'upper (strict]',
+    'perspective/upper-strict'   => 'upper (strict)',
     'perspective/bottom'         => '底部',
     'perspective/dashboard'      => '仪表台',
     'perspective/boot'           => 'boot',
@@ -300,7 +295,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'login/name' => '用户名',
     'login/login-or-email' => '用户名或邮箱',
     'login/password' => '密码',
-    'login/password-confirm' => '密码(again]',
+    'login/password-confirm' => '密码(again)',
     'login/captcha' => '请输入验证码',
     'login/registration' => '注册',
     'login/forgot-password?' => '忘记密码?',
@@ -340,7 +335,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'forums/theme/moderators' => '管理员',
     'forums/theme/cars' => '车型',
     'forums/topic/name' => '标题',
-    'forums/topic/text' =>'站内信 ',
+    'forums/topic/text' => '站内信',
     'forums/topic/subscribe-to-new-messages' => '发送新消息',
     'forums/notification-mail/from' => 'wheelsage.org自动提示',
     'forums/notification-mail/subject' => '新论坛消息',
@@ -442,7 +437,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
         
 我们尽己所能让您满意.',
 
-    'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s ]',
+    'message/user-cancel-car-engine' => '%1$s cancel engine %2$s for %3$s ( %4$s )',
 
     'car-type/roadster'       => '跑车',
     'car-type/spyder'         => '敞篷跑车',
