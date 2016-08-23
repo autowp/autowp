@@ -142,29 +142,18 @@
                 switch ($this->picture->type) {
                     case Picture::CAR_TYPE_ID:
                         ?>
-                        <p>Автомобиль:
-                        <?php $car = $this->picture->findParentCars() ?>
-                        <?php if ($car) { ?>
-                            <?=$this->htmlA($this->url('moder/cars/params', [
-                                'action'     => 'car',
-                                'car_id'     => $car->id
-                            ]), $car->getFullName()) ?>
-                        <?php } else { ?>
-                            Не задан
-                        <?php } ?>
-                        </p>
-                        <?php if ($this->canMove) { ?>
-                            <?php if ($this->lastCar) { ?>
-                                <p><?=$this->htmlA(
-                                    $this->url(null, [
-                                        'action'     => 'move',
-                                        'picture_id' => $this->picture->id,
-                                        'type_id'    => Picture::CAR_TYPE_ID,
-                                        'car_id'     => $this->lastCar->id
-                                    ]), 'переместить в '. $this->lastCar->getFullName()
-                                ) ?></p>
+                        <p>
+                            Автомобиль:
+                            <?php $car = $this->picture->findParentCars() ?>
+                            <?php if ($car) { ?>
+                                <?=$this->htmlA($this->url('moder/cars/params', [
+                                    'action'     => 'car',
+                                    'car_id'     => $car->id
+                                ]), $car->getFullName()) ?>
+                            <?php } else { ?>
+                                Не задан
                             <?php } ?>
-                        <?php } ?>
+                        </p>
                         <?php
                         break;
 
@@ -249,18 +238,33 @@
                 }
             ?>
             <?php if ($this->canMove) { ?>
+                <?php if ($this->lastCar) { ?>
+                    <p><?=$this->htmlA([
+                        'class' => 'btn btn-default',
+                        'href'  => $this->url(null, [
+                            'action'     => 'move',
+                            'picture_id' => $this->picture->id,
+                            'type'       => Picture::CAR_TYPE_ID,
+                            'car_id'     => $this->lastCar->id
+                        ])
+                    ], '<i class="fa fa-arrow-right"></i> переместить в ' . $this->escapeHtml($this->lastCar->getFullName()), false) ?></p>
+                <?php } ?>
                 <?php foreach ($this->relatedBrands as $brand) { ?>
-                    <p><?=$this->htmlA(
-                        $this->url(null, [
+                    <p><?=$this->htmlA([
+                        'class' => 'btn btn-default',
+                        'href' => $this->url(null, [
                             'action'     => 'move',
                             'brand_id'   => $brand['id'],
                             'picture_id' => $this->picture->id
-                        ]), 'Переместить в ' . $brand['name'] . ' ...'
-                    ) ?></p>
+                        ])
+                    ], '<i class="fa fa-arrow-right"></i> переместить в ' . $this->escapeHtml($brand['name']) . ' ...', false) ?></p>
                 <?php } ?>
-                <p><?=$this->htmlA($this->url('moder/pictures/params', [
-                    'action' => 'move'
-                ], [], true), 'Переместить в ...')?></p>
+                <p><?=$this->htmlA([
+                    'class' => 'btn btn-default',
+                    'href' => $this->url('moder/pictures/params', [
+                        'action' => 'move'
+                    ], [], true),
+                ], '<i class="fa fa-arrow-right"></i> переместить в ...', false)?></p>
             <?php } ?>
         </div>
 

@@ -49,7 +49,6 @@ define(
                         vote: $(this).data('vote'), 
                         reason: self.currentReason
                     };
-                    
                     $.post(options.voteUrl, params, function(result) {
                         if (result) {
                             window.location = window.location;

@@ -685,4 +685,52 @@ class Picture extends Project_Db_Table
 
         return true;
     }
+
+    public function moveToFactory($pictureId, $id, $userId)
+    {
+        $picture = $this->find($pictureId)->current();
+        if (!$picture) {
+            return false;
+        }
+
+        $factoryTable = new Factory();
+        $factory = $factoryTable->find($id)->current();
+
+        if (!$factory) {
+            return false;
+        }
+
+        $oldParams = [
+            'type'       => $picture->type,
+            'engine_id'  => $picture->engine_id,
+            'brand_id'   => $picture->brand_id,
+            'car_id'     => $picture->car_id,
+            'factory_id' => $picture->factory_id
+        ];
+
+        $picture->setFromArray([
+            'car_id'     => null,
+            'factory_id' => $factory->id,
+            'brand_id'   => null,
+            'engine_id'  => null,
+            'type'       => Picture::FACTORY_TYPE_ID,
+        ]);
+        $picture->save();
+
+        $this->imageStorage->changeImageName($picture->image_id, [
+            'pattern' => $picture->getFileNamePattern(),
+        ]);
+
+        $this->refreshCounts($oldParams);
+        $this->refreshCounts($picture->toArray());
+
+        $log = new Log_Events();
+        $log($userId, sprintf(
+            'Назначение завода %s картинке %s',
+            htmlspecialchars($factory->name),
+            htmlspecialchars($picture->getCaption())
+        ), [$factory, $picture]);
+
+        return true;
+    }
 }

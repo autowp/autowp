@@ -10,10 +10,10 @@
     ]);
     $this->layout()->moduleName = 'moder/pictures/index';
     $this->layout()->moduleOptions = [
-        'acceptUrl' => $this->url(null, [
+        'acceptUrl' => $this->url('moder/pictures/params', [
             'action' => 'accept'
         ], [], true),
-        'voteUrl' => $this->url(null, [
+        'voteUrl' => $this->url('moder/pictures/params', [
             'action' => 'vote'
         ], [], true),
     ];

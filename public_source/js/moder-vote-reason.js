@@ -1,5 +1,4 @@
 define(
-    'moder-vote-reason',
     ['jquery'],
     function($) {
         

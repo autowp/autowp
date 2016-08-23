@@ -19,6 +19,7 @@ use Cars;
 use Cars_Rowset;
 use Comments;
 use Comment_Message;
+use Comment_Topic;
 use Engines;
 use Factory;
 use Perspectives;
@@ -511,56 +512,6 @@ class PicturesController extends AbstractActionController
         return $engines;
     }
 
-    public function pictureSelectFactoryAction()
-    {
-        if (!$this->user()->inheritsRole('moder') ) {
-            return $this->forbiddenAction();
-        }
-
-        $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
-            return $this->notFoundAction();
-        }
-
-        if ($picture->type != Picture::FACTORY_TYPE_ID) {
-            throw new Exception('Картинка несовместимого типа');
-        }
-
-        $canMove = $this->user()->isAllowed('picture', 'move');
-        if (!$canMove) {
-            return $this->forbiddenAction();
-        }
-
-        $factoryTable = new Factory();
-        $factory = $factoryTable->find($this->params('factory_id'))->current();
-
-        if ($factory) {
-
-            $picture->factory_id = $factory->id;
-            $picture->save();
-
-            $this->imageStorage()->changeImageName($picture->image_id, [
-                'pattern' => $picture->getFileNamePattern(),
-            ]);
-
-            $this->log(sprintf(
-                'Назначение завода %s картинке %s',
-                htmlspecialchars($factory->name),
-                htmlspecialchars($picture->getCaption())
-            ), [$factory, $picture]);
-
-            return $this->redirect()->toUrl($this->pictureUrl($picture));
-
-        }
-
-        return [
-            'picture'   => $picture,
-            'factories' => $factoryTable->fetchAll(
-                $factoryTable->select(true)
-                    ->order('name')
-            )
-        ];
-    }
 
     private function pictureCanDelete($picture)
     {
@@ -903,10 +854,10 @@ class PicturesController extends AbstractActionController
 
 
         $ban = false;
-        $canBan = $this->user()->isAllowed('user', 'ban');
+        $canBan = $this->user()->isAllowed('user', 'ban') && $picture->ip !== null && $picture->ip !== '';
         $canViewIp = $this->user()->isAllowed('user', 'ip');
 
-        if ($canBan && $picture->ip !== null && $picture->ip !== '') {
+        if ($canBan) {
 
             $service = new TrafficControl();
             $ban = $service->getBanInfo(inet_ntop($picture->ip));
@@ -1185,12 +1136,14 @@ class PicturesController extends AbstractActionController
             }
         }
 
-        $this->banForm->setAttribute('action', $this->url()->fromRoute('ban/ban-ip', [
-            'ip' => inet_ntop($picture->ip)
-        ]));
-        $this->banForm->populateValues([
-            'submit' => 'Забанить'
-        ]);
+        if ($canBan) {
+            $this->banForm->setAttribute('action', $this->url()->fromRoute('ban/ban-ip', [
+                'ip' => inet_ntop($picture->ip)
+            ]));
+            $this->banForm->populateValues([
+                'submit' => 'Забанить'
+            ]);
+        }
 
         $picturePerspective = null;
         if ($picture->type == Picture::CAR_TYPE_ID) {
@@ -1928,7 +1881,7 @@ class PicturesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        foreach ($this->table->find($this->params('id')) as $picture) {
+        foreach ($this->table->find($this->params()->fromPost('id')) as $picture) {
             $this->accept($picture);
         }
 
@@ -1947,7 +1900,7 @@ class PicturesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $pictureRows = $this->table->find($this->params('id'));
+        $pictureRows = $this->table->find($this->params()->fromPost('id'));
 
         $user = $this->user()->get();
 
@@ -1955,9 +1908,9 @@ class PicturesController extends AbstractActionController
 
         $hasVoteRight = $this->user()->isAllowed('picture', 'moder_vote');
 
-        $vote = (int)$this->params('vote');
+        $vote = (int)$this->params()->fromPost('vote');
 
-        $reason = trim($this->params('reason'));
+        $reason = trim($this->params()->fromPost('reason'));
 
         $moderVotes = new Pictures_Moder_Votes();
 
@@ -2051,6 +2004,13 @@ class PicturesController extends AbstractActionController
                     $namespace->lastCarId = $this->params('car_id');
                     break;
 
+                case Picture::FACTORY_TYPE_ID:
+                    $success = $this->table->moveToFactory($picture->id, $this->params('factory_id'), $userId);
+                    if (!$success) {
+                        return $this->notFoundAction();
+                    }
+                    break;
+
                 default:
                     throw new Exception("Unexpected type");
                     break;
@@ -2062,9 +2022,12 @@ class PicturesController extends AbstractActionController
         $brandModel = new Brand();
         $brand = $brandModel->getBrandById($this->params('brand_id'), $this->language());
         $brands = null;
+        $factories = null;
         $cars = null;
         $haveConcepts = null;
         $haveEngines = null;
+
+        $showFactories = false;
 
         if ($brand) {
             $carTable = new Cars();
@@ -2094,6 +2057,16 @@ class PicturesController extends AbstractActionController
                     ->where('brand_engine.brand_id = ?', $brand['id'])
             );
 
+        } elseif ($this->params('factories')) {
+
+            $showFactories = true;
+
+            $factoryTable = new Factory();
+            $factories = $factoryTable->fetchAll(
+                $factoryTable->select(true)
+                    ->order('name')
+            );
+
         } else {
             $brands = $brandModel->getList($this->language(), function($select) { });
         }
@@ -2103,6 +2076,7 @@ class PicturesController extends AbstractActionController
             'brand'        => $brand,
             'brands'       => $brands,
             'cars'         => $cars,
+            'factories'    => $factories,
             'haveConcepts' => $haveConcepts,
             'haveEngines'  => $haveEngines,
             'conceptsUrl'  => $this->url()->fromRoute(null, [
@@ -2110,7 +2084,8 @@ class PicturesController extends AbstractActionController
             ], [], true),
             'enginesUrl'   => $this->url()->fromRoute(null, [
                 'action' => 'engines'
-            ], [], true)
+            ], [], true),
+            'showFactories' => $showFactories
         ];
     }
 }

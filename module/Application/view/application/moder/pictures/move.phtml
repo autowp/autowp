@@ -14,103 +14,126 @@
     ]);
 ?>
 
-<?php if (!$this->brand) { ?>
-    <?php
-        $columns = 6;
-        $count = count($this->brands);
-        $perOne = ceil($count / $columns);
-        $idx = 0;
-    ?>
-    <div class="row">
-        <div class="col-lg-2 col-md-2">
-            <?php foreach ($this->brands as $brand) { ?>
-                <?php if ($idx && ($idx%$perOne == 0)) { ?>
-                    </div><div class="col-lg-2 col-md-2">
-                <?php } ?>
-                <?=$this->htmlA($this->url(null, [
-                    'brand_id' => $brand['id']
-                ], [], true), $brand['name']) ?><br />
-                <?php $idx++ ?>
-            <?php } ?>
-        </div>
-    </div>
+<ul class="nav nav-pills" style="margin-bottom: 30px">
+    <li<?=$this->showFactories ? '' : ' class="active"'?>><?=$this->htmlA($this->url('moder/pictures/params', [
+        'action'     => 'move',
+        'picture_id' => $this->picture->id,
+    ]), 'Бренды')?></li>
+    <li<?=$this->showFactories ? ' class="active"' : ''?>><?=$this->htmlA($this->url('moder/pictures/params', [
+        'action'     => 'move',
+        'picture_id' => $this->picture->id,
+        'factories'  => 1
+    ]), 'Заводы')?></li>
+</ul>
+
+<?php if ($this->showFactories) { ?>
+
+    <?php foreach ($this->factories as $factory) { ?>
+        <?=$this->htmlA($this->url(null, [
+            'factory_id' => $factory['id'],
+            'type'       => Picture::FACTORY_TYPE_ID
+        ], [], true), $factory['name']) ?><br />
+    <?php } ?>
 <?php } else { ?>
 
-    <?php
-        $this->layout()->moduleName = 'moder/pictures/picture-select-car';
-    ?>
-
-    <div class="select-in-brand">
-
-        <?php if (count($this->cars) > 0) { ?>
-            <div style="margin: 5px 0">
-                <?=$this->partial('application/moder/pictures/picture-select-car-cars.phtml', [
-                    'cars' => $this->cars
-                ])?>
+    <?php if (!$this->brand) { ?>
+        <?php
+            $columns = 6;
+            $count = count($this->brands);
+            $perOne = ceil($count / $columns);
+            $idx = 0;
+        ?>
+        <div class="row">
+            <div class="col-lg-2 col-md-2">
+                <?php foreach ($this->brands as $brand) { ?>
+                    <?php if ($idx && ($idx%$perOne == 0)) { ?>
+                        </div><div class="col-lg-2 col-md-2">
+                    <?php } ?>
+                    <?=$this->htmlA($this->url(null, [
+                        'brand_id' => $brand['id']
+                    ], [], true), $brand['name']) ?><br />
+                    <?php $idx++ ?>
+                <?php } ?>
             </div>
-        <?php } ?>
-
-        <?php if (count($this->haveConcepts)) { ?>
-            <div style="margin: 5px 0">
-                <?=$this->htmlA([
-                    'href'      => '#',
-                    'class'     => 'arrow',
-                    'data-load' => $this->conceptsUrl
-                ], '<i class="fa fa-plus-circle"></i> Концепты и прототипы', false) ?>
-                <div style="margin:0 0 4px 18px;display:none">
-                    <div class="loading"><em>Loading ...</em></div>
-                </div>
-            </div>
-        <?php } ?>
-
-        <?php if ($this->haveEngines) { ?>
-            <div style="margin: 5px 0">
-                <?=$this->htmlA([
-                    'href'      => '#',
-                    'class'     => 'arrow',
-                    'data-load' => $this->enginesUrl
-                ], '<i class="fa fa-plus-circle"></i> Двигатели', false)?>
-                <div style="margin:0 0 4px 18px;display:none">
-                    <div class="loading"><em>Loading ...</em></div>
-                </div>
-            </div>
-        <?php } ?>
-
-        <div style="margin: 5px 0">
-            <?=$this->htmlA($this->url(null, [
-                'action' => 'move',
-                'type'   => Picture::LOGO_TYPE_ID
-            ], [], true), 'логотип ' . $this->brand['name']) ?><br />
-            <?=$this->htmlA($this->url(null, [
-                'action' => 'move',
-                'type'   => Picture::MIXED_TYPE_ID
-            ], [], true), 'разное (несколько автомобилей на одной картинке)') ?><br />
-            <?=$this->htmlA($this->url(null, [
-                'action' => 'move',
-                'type'   => Picture::UNSORTED_TYPE_ID
-            ], [], true), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
         </div>
+    <?php } else { ?>
 
-    </div>
+        <?php
+            $this->layout()->moduleName = 'moder/pictures/picture-select-car';
+        ?>
 
-    <?php /*
+        <div class="select-in-brand">
 
-    <div class="concepts">
-        <p><a href="#"><i class="fa fa-plus-circle"></i>&#xa0;Концепты и прототипы</a></p>
-        <div style="margin:0 0 10px 20px;display:none">
-            <?php foreach ($this->conceptCars as $car) { ?>
-                <?=$this->partial('pictures/picture-select-car-tree.phtml', [
-                    'car' => $car
-                ])?>
+            <?php if (count($this->cars) > 0) { ?>
+                <div style="margin: 5px 0">
+                    <?=$this->partial('application/moder/pictures/picture-select-car-cars.phtml', [
+                        'cars' => $this->cars
+                    ])?>
+                </div>
             <?php } ?>
+
+            <?php if (count($this->haveConcepts)) { ?>
+                <div style="margin: 5px 0">
+                    <?=$this->htmlA([
+                        'href'      => '#',
+                        'class'     => 'arrow',
+                        'data-load' => $this->conceptsUrl
+                    ], '<i class="fa fa-plus-circle"></i> Концепты и прототипы', false) ?>
+                    <div style="margin:0 0 4px 18px;display:none">
+                        <div class="loading"><em>Loading ...</em></div>
+                    </div>
+                </div>
+            <?php } ?>
+
+            <?php if ($this->haveEngines) { ?>
+                <div style="margin: 5px 0">
+                    <?=$this->htmlA([
+                        'href'      => '#',
+                        'class'     => 'arrow',
+                        'data-load' => $this->enginesUrl
+                    ], '<i class="fa fa-plus-circle"></i> Двигатели', false)?>
+                    <div style="margin:0 0 4px 18px;display:none">
+                        <div class="loading"><em>Loading ...</em></div>
+                    </div>
+                </div>
+            <?php } ?>
+
+            <div style="margin: 5px 0">
+                <?=$this->htmlA($this->url(null, [
+                    'action' => 'move',
+                    'type'   => Picture::LOGO_TYPE_ID
+                ], [], true), 'логотип ' . $this->brand['name']) ?><br />
+                <?=$this->htmlA($this->url(null, [
+                    'action' => 'move',
+                    'type'   => Picture::MIXED_TYPE_ID
+                ], [], true), 'разное (несколько автомобилей на одной картинке)') ?><br />
+                <?=$this->htmlA($this->url(null, [
+                    'action' => 'move',
+                    'type'   => Picture::UNSORTED_TYPE_ID
+                ], [], true), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
+            </div>
+
         </div>
-    </div>
 
-    <?php foreach ($this->cars as $car) { ?>
-        <?=$this->partial('pictures/picture-select-car-tree.phtml', [
-            'car' => $car
-        ])?>
+        <?php /*
+
+        <div class="concepts">
+            <p><a href="#"><i class="fa fa-plus-circle"></i>&#xa0;Концепты и прототипы</a></p>
+            <div style="margin:0 0 10px 20px;display:none">
+                <?php foreach ($this->conceptCars as $car) { ?>
+                    <?=$this->partial('pictures/picture-select-car-tree.phtml', [
+                        'car' => $car
+                    ])?>
+                <?php } ?>
+            </div>
+        </div>
+
+        <?php foreach ($this->cars as $car) { ?>
+            <?=$this->partial('pictures/picture-select-car-tree.phtml', [
+                'car' => $car
+            ])?>
+        <?php } ?>
+
+        */?>
     <?php } ?>
-
-    */?>
 <?php } ?>
