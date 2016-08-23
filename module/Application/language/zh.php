@@ -364,7 +364,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'feedback/title' => '反馈',
     'feedback/name'  => '标题',
     'feedback/message' => '内容',
-    'feedback/donate-text' => '如果您希望表达自己的支持，您可以通过 [捐款支持][/donate]',
+    'feedback/donate-text' => '如果您希望表达自己的支持，您可以通过 [捐款支持](/donate)',
 
     'map/museums-and-factories' => '工厂及博物馆',
 
