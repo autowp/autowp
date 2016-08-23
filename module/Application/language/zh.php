@@ -101,7 +101,7 @@ return [
     'brands/new-cars-of-brand' => '新品牌 %s',
 
     'brands/more-companies'    => [
-        '全部' %s 品牌'
+        '全部 %s 品牌'
     ],
 
     /* Layout */
@@ -132,7 +132,7 @@ return [
     'carlist/edit-specs' => '编辑性能参数',
 
     'picturelist/engine' => '发动机',
-    'picturelist/engine-%s' => 'e-%s 个发动机',
+    'picturelist/engine-%s' => '%s 个发动机',
     'picturelist/logotype' => '商标',
     'picturelist/logotype-%s' => '%s 个商标',
     'picturelist/mixed' => '杂项',
@@ -404,7 +404,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
         "电子邮件地址: %2\$s\n" .
         "为了确认注册, 请您点击链接进入电子邮件 %3\$s\n\n" .
         "如果您没有注册成功，请删除这条消息\n\n" .
-        "诚挚的autowp机器人 %4\$s",
+        "诚挚的机器人 %4\$s",
     'users/registration/email-confirm/token-not-found' => '链接已超时',
     'users/registration/email-confirm/success-text' => '您的电子邮件地址已成功确认.',
     'users/registration/success/email-sent' => 'Message with instructions to verify your e-mail sent.',
@@ -414,7 +414,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
         "在 %1\$s 您或他人要求修改账户联系地址为 %2\$s\n" .
         "为了验证操作, 您需要点击链接 %3\$s\n\n" .
         "如果这条信息错误发送到您的收件箱，请删除\n\n" .
-        "诚挚的autowp机器人 %1\$s\n",
+        "诚挚的机器人 %1\$s\n",
     'users/change-email/confirmation-message-sent' => '验证邮件已发送到您的电子邮箱',
 
     'user/add-to-contacts' => '添加到好友',
