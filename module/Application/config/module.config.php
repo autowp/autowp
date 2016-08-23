@@ -9,6 +9,8 @@ use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 use Autowp\Image;
 use Autowp\TextStorage;
 
+use Picture;
+
 use Zend_Application_Resource_Db;
 use Zend_Application_Resource_Cachemanager;
 use Zend_Application_Resource_Session;
@@ -190,8 +192,13 @@ return [
             Controller\Moder\PagesController::class => InvokableFactory::class,
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
             Controller\Moder\PicturesController::class => function($sm) {
+                $table = $sm->get(Picture::class);
                 $textStorage = $sm->get(TextStorage\Service::class);
-                return new Controller\Moder\PicturesController($textStorage);
+                $pictureForm = $sm->get('ModerPictureForm');
+                $copyrightsForm = $sm->get('ModerPictureCopyrightsForm');
+                $voteForm = $sm->get('ModerPictureVoteForm');
+                $banForm = $sm->get('BanForm');
+                return new Controller\Moder\PicturesController($table, $textStorage, $pictureForm, $copyrightsForm, $voteForm, $banForm);
             },
             Controller\Moder\RightsController::class => function($sm) {
                 $acl = $sm->get(Acl::class);
@@ -438,6 +445,11 @@ return [
             },
             FileSize::class => function($sm) {
                 return new FileSize();
+            },
+            Picture::class => function($sm) {
+                return new Picture([
+                    'imageStorage' => $sm->get(Image\Storage::class)
+                ]);
             }
         ],
         'aliases' => [

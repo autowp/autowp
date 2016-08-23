@@ -1,5 +1,7 @@
 <?php
 
+use Autowp\Image;
+
 class Picture extends Project_Db_Table
 {
     const
@@ -66,6 +68,25 @@ class Picture extends Project_Db_Table
     );
 
     private $prefixedPerspectives = array(5, 6, 17, 20, 21, 22);
+
+    /**
+     * @var Image\Storage
+     */
+    private $imageStorage;
+
+    /**
+     * setOptions()
+     *
+     * @param array $options
+     * @return Zend_Db_Table_Abstract
+     */
+    public function setOptions(Array $options)
+    {
+        if (isset($options['imageStorage'])) {
+            $this->imageStorage = $options['imageStorage'];
+            unset($options['imageStorage']);
+        }
+    }
 
     public static function getResolutions()
     {
@@ -319,7 +340,7 @@ class Picture extends Project_Db_Table
             $table = new Cars();
 
             $db = $table->getAdapter();
-            
+
             $columns = [
                 'id',
                 'begin_model_year', 'end_model_year',
@@ -461,5 +482,207 @@ class Picture extends Project_Db_Table
         }
 
         return $result;
+    }
+
+    private function refreshCounts($params)
+    {
+        switch ($params['type']) {
+            case Picture::CAR_TYPE_ID:
+                if ($params['car_id']) {
+                    $carTable = new Cars();
+                    $car = $carTable->find($params['car_id'])->current();
+                    if ($car) {
+                        $car->refreshPicturesCount();
+                        //TODO: brands_cars_cache
+                        foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+                            $brand->updatePicturesCache();
+                            $brand->refreshPicturesCount();
+                        }
+                    }
+                }
+                break;
+            case Picture::ENGINE_TYPE_ID:
+                if ($params['engine_id']) {
+                    $brandTable = new Brands();
+                    $brands = $brandTable->fetchAll(
+                        $brandTable->select(true)
+                            ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
+                            ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
+                            ->where('engine_parent_cache.engine_id = ?', $params['engine_id'])
+                            ->group('brands.id')
+                    );
+
+                    foreach ($brands as $brand) {
+                        $brand->updatePicturesCache();
+                        $brand->refreshEnginePicturesCount();
+                    }
+                }
+                break;
+            case Picture::MIXED_TYPE_ID:
+            case Picture::LOGO_TYPE_ID:
+            case Picture::UNSORTED_TYPE_ID:
+                if ($params['brand_id']) {
+                    $brandTable = new Brands();
+                    $brand = $brandTable->find($params['brand_id'])->current();
+                    if ($brand) {
+                        $brand->updatePicturesCache();
+                    }
+                }
+                break;
+            case Picture::FACTORY_TYPE_ID:
+                if ($params['factory_id']) {
+
+                }
+                break;
+        }
+    }
+
+    public function moveToEngine($pictureId, $id, $userId)
+    {
+        $picture = $this->find($pictureId)->current();
+        if (!$picture) {
+            return false;
+        }
+
+        $engineTable = new Engines();
+        $engine = $engineTable->find($id)->current();
+
+        if (!$engine) {
+            return false;
+        }
+
+        $oldParams = [
+            'type'       => $picture->type,
+            'engine_id'  => $picture->engine_id,
+            'brand_id'   => $picture->brand_id,
+            'car_id'     => $picture->car_id,
+            'factory_id' => $picture->factory_id
+        ];
+
+        $picture->setFromArray([
+            'car_id'     => null,
+            'factory_id' => null,
+            'brand_id'   => null,
+            'engine_id'  => $engine->id,
+            'type'       => Picture::ENGINE_TYPE_ID,
+        ]);
+        $picture->save();
+
+        if ($picture->image_id) {
+            $this->imageStorage->changeImageName($picture->image_id, [
+                'pattern' => $picture->getFileNamePattern(),
+            ]);
+        }
+
+        $this->refreshCounts($oldParams);
+        $this->refreshCounts($picture->toArray());
+
+        $log = new Log_Events();
+        $log($userId, sprintf(
+            'Назначение двигателя %s картинке %s',
+            $engine->getMetaCaption(),
+            $picture->getCaption()
+        ), [$engine, $picture]);
+
+        return true;
+    }
+
+    public function moveToCar($pictureId, $id, $userId)
+    {
+        $picture = $this->find($pictureId)->current();
+        if (!$picture) {
+            return false;
+        }
+
+        $carTable = new Cars();
+        $car = $carTable->find($id)->current();
+
+        if (!$car) {
+            return false;
+        }
+
+        $oldParams = [
+            'type'       => $picture->type,
+            'engine_id'  => $picture->engine_id,
+            'brand_id'   => $picture->brand_id,
+            'car_id'     => $picture->car_id,
+            'factory_id' => $picture->factory_id
+        ];
+
+        $picture->setFromArray([
+            'car_id'     => $car->id,
+            'factory_id' => null,
+            'brand_id'   => null,
+            'engine_id'  => null,
+            'type'       => Picture::CAR_TYPE_ID,
+        ]);
+        $picture->save();
+
+        if ($picture->image_id) {
+            $this->imageStorage->changeImageName($picture->image_id, [
+                'pattern' => $picture->getFileNamePattern(),
+            ]);
+        }
+
+        $this->refreshCounts($oldParams);
+        $this->refreshCounts($picture->toArray());
+
+        $log = new Log_Events();
+        $log($userId, sprintf(
+            'Картинка %s связана с автомобилем %s',
+            htmlspecialchars($picture->id),
+            htmlspecialchars($car->getFullName())
+        ), [$car, $picture]);
+
+        return true;
+    }
+
+    public function moveToBrand($pictureId, $id, $type, $userId)
+    {
+        $picture = $this->find($pictureId)->current();
+        if (!$picture) {
+            return false;
+        }
+
+        $brandTable = new Brands();
+        $brand = $brandTable->find($id)->current();
+        if (!$brand) {
+            return false;
+        }
+
+        $oldParams = [
+            'type'       => $picture->type,
+            'engine_id'  => $picture->engine_id,
+            'brand_id'   => $picture->brand_id,
+            'car_id'     => $picture->car_id,
+            'factory_id' => $picture->factory_id
+        ];
+
+        $picture->setFromArray([
+            'car_id'     => null,
+            'factory_id' => null,
+            'brand_id'   => $brand->id,
+            'engine_id'  => null,
+            'type'       => $type,
+        ]);
+        $picture->save();
+
+        if ($picture->image_id) {
+            $this->imageStorage->changeImageName($picture->image_id, [
+                'pattern' => $picture->getFileNamePattern(),
+            ]);
+        }
+
+        $this->refreshCounts($oldParams);
+        $this->refreshCounts($picture->toArray());
+
+        $log = new Log_Events();
+        $log($userId, sprintf(
+            'Назначение бренда %s картинке %s',
+            htmlspecialchars($brand->caption),
+            htmlspecialchars($picture->getCaption())
+        ), [$picture, $brand]);
+
+        return true;
     }
 }

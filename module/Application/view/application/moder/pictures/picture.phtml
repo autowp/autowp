@@ -100,12 +100,16 @@
 
         <h3>Настройки</h3>
         <div class="well">
-        	<?=$this->editPictureForm->render($this) ?>
-    	</div>
+            <?=$this->partial('application/forms/bootstrap-vertical', [
+                'form' => $this->editPictureForm
+            ])?>
+        </div>
 
-    	<h3>Копирайты</h3>
+        <h3>Копирайты</h3>
         <div class="well">
-            <?=$this->copyrightsForm->render($this)?>
+            <?=$this->partial('application/forms/markdown', [
+                'form' => $this->copyrightsForm
+            ])?>
             <?php if ($this->picture->copyrights_text_id) { ?>
                 <p>
                     <?=$this->htmlA([
@@ -132,17 +136,13 @@
 
     <div class="col-md-6">
 
-        <h3>Тип картинки</h3>
+        <h3>Место в каталоге</h3>
         <div class="well">
-            <?php if ($this->formModerPictureType) { ?>
-                <?=$this->formModerPictureType->render($this) ?>
-            <?php } ?>
-            <p>
             <?php
                 switch ($this->picture->type) {
                     case Picture::CAR_TYPE_ID:
                         ?>
-                        Автомобиль:
+                        <p>Автомобиль:
                         <?php $car = $this->picture->findParentCars() ?>
                         <?php if ($car) { ?>
                             <?=$this->htmlA($this->url('moder/cars/params', [
@@ -152,35 +152,17 @@
                         <?php } else { ?>
                             Не задан
                         <?php } ?>
+                        </p>
                         <?php if ($this->canMove) { ?>
-                            <?php if ($car) { ?>
-                                <?php foreach ($car->findBrandsViaBrands_Cars() as $brand) { ?>
-                                    <br />
-                                    <?=$this->htmlA(
-                                        $this->url(null, [
-                                            'action'     => 'picture-select-car',
-                                            'brand_id'   => $brand->id,
-                                            'picture_id' => $this->picture->id
-                                        ]), 'выбрать автомобиль из '.$brand->caption .' ...'
-                                    ) ?>
-                                <?php } ?>
-                            <?php } ?>
-                            <br />
-                            <?=$this->htmlA(
-                                $this->url(null, [
-                                    'action'     => 'picture-select-car',
-                                    'picture_id' => $this->picture->id
-                                ]), 'выбрать автомобиль'
-                            ) ?>
                             <?php if ($this->lastCar) { ?>
-                                <br />
-                                <?=$this->htmlA(
+                                <p><?=$this->htmlA(
                                     $this->url(null, [
-                                        'action'     => 'picture-select-car',
+                                        'action'     => 'move',
                                         'picture_id' => $this->picture->id,
+                                        'type_id'    => Picture::CAR_TYPE_ID,
                                         'car_id'     => $this->lastCar->id
                                     ]), 'переместить в '. $this->lastCar->getFullName()
-                                ) ?>
+                                ) ?></p>
                             <?php } ?>
                         <?php } ?>
                         <?php
@@ -188,79 +170,55 @@
 
                     case Picture::LOGO_TYPE_ID:
                         ?>
-                        Логотип бренда:
-                        <?php $brand = $this->picture->findParentBrands() ?>
-                        <?php if ($brand) { ?>
-                            <?=$this->htmlA($this->url('moder/brands/params', [
-                                'action'     => 'brand',
-                                'brand_id'   => $brand->id
-                            ]), $brand->caption) ?>
-                        <?php } else { ?>
-                            Не задан
-                        <?php } ?>
-                        <?php if ($this->canMove) { ?>
-                            <br />
-                            <?=$this->htmlA(
-                                $this->url(null, [
-                                    'action'     => 'picture-select-brand',
-                                    'picture_id' => $this->picture->id
-                                ]), 'выбрать бренд'
-                            ) ?>
-                        <?php } ?>
+                        <p>
+                            Логотип бренда:
+                            <?php if ($brand = $this->picture->findParentBrands()) { ?>
+                                <?=$this->htmlA($this->url('moder/brands/params', [
+                                    'action'     => 'brand',
+                                    'brand_id'   => $brand->id
+                                ]), $brand->caption) ?>
+                            <?php } else { ?>
+                                Не задан
+                            <?php } ?>
+                        </p>
                         <?php
                         break;
 
                     case Picture::MIXED_TYPE_ID:
                         ?>
-                        Смешанное бренда:
-                        <?php $brand = $this->picture->findParentBrands() ?>
-                        <?php if ($brand) { ?>
-                            <?=$this->htmlA($this->url('moder/brands/params', [
-                                'action'   => 'brand',
-                                'brand_id' => $brand->id
-                            ]), $brand->caption) ?>
-                        <?php } else { ?>
-                            Не задан
-                        <?php } ?>
-                        <?php if ($this->canMove) { ?>
-                            <br />
-                            <?=$this->htmlA(
-                                $this->url(null, [
-                                    'action'     => 'picture-select-brand',
-                                    'picture_id' => $this->picture->id
-                                ]), 'выбрать бренд'
-                            ) ?>
-                        <?php } ?>
+                        <p>
+                            Смешанное бренда:
+                            <?php if ($brand = $this->picture->findParentBrands()) { ?>
+                                <?=$this->htmlA($this->url('moder/brands/params', [
+                                    'action'   => 'brand',
+                                    'brand_id' => $brand->id
+                                ]), $brand->caption) ?>
+                            <?php } else { ?>
+                                Не задан
+                            <?php } ?>
+                        </p>
                         <?php
                         break;
 
                     case Picture::UNSORTED_TYPE_ID:
                         ?>
-                        Несортировано бренда:
-                        <?php $brand = $this->picture->findParentBrands() ?>
-                        <?php if ($brand) { ?>
-                            <?=$this->htmlA($this->url('moder/brands/params', [
-                                'action'   => 'brand',
-                                'brand_id' => $brand->id
-                            ]), $brand->caption) ?>
-                        <?php } else { ?>
-                            Не задан
-                        <?php } ?>
-                        <?php if ($this->canMove) { ?>
-                            <br />
-                            <?=$this->htmlA(
-                                $this->url(null, [
-                                    'action'     => 'picture-select-brand',
-                                    'picture_id' => $this->picture->id
-                                ]), 'выбрать бренд'
-                            ) ?>
-                        <?php } ?>
+                        <p>
+                            Несортировано бренда:
+                            <?php if ($brand = $this->picture->findParentBrands()) { ?>
+                                <?=$this->htmlA($this->url('moder/brands/params', [
+                                    'action'   => 'brand',
+                                    'brand_id' => $brand->id
+                                ]), $brand->caption) ?>
+                            <?php } else { ?>
+                                Не задан
+                            <?php } ?>
+                        </p>
                         <?php
                         break;
 
                     case Picture::ENGINE_TYPE_ID:
                         ?>
-                        Двигатель:
+                        <p>Двигатель:
                         <?php $engine = $this->picture->findParentEngines() ?>
                         <?php if ($engine) { ?>
                             <?=$this->htmlA($this->url('moder/engines/params', [
@@ -270,21 +228,13 @@
                         <?php } else { ?>
                             Не задан
                         <?php } ?>
-                        <?php if ($this->canMove) { ?>
-                            <br />
-                            <?=$this->htmlA(
-                                $this->url(null, [
-                                    'action'     => 'picture-select-engine',
-                                    'picture_id' => $this->picture->id
-                                ]), 'выбрать двигатель'
-                            ) ?>
-                        <?php } ?>
+                        </p>
                         <?php
                         break;
 
                     case Picture::FACTORY_TYPE_ID:
                         ?>
-                        Завод:
+                        <p>Завод:
                         <?php if ($factory = $this->picture->findParentFactory()) { ?>
                             <?=$this->htmlA($this->url('moder/factories/params', [
                                 'action'     => 'factory',
@@ -293,29 +243,32 @@
                         <?php } else { ?>
                             Не задан
                         <?php } ?>
-                        <?php if ($this->canMove) { ?>
-                            <br />
-                            <?=$this->htmlA(
-                                $this->url(null, [
-                                    'action'     => 'picture-select-factory',
-                                    'picture_id' => $this->picture->id
-                                ]), 'выбрать завод'
-                            ) ?>
-                        <?php } ?>
+                        </p>
                         <?php
                         break;
                 }
             ?>
-            </p>
+            <?php if ($this->canMove) { ?>
+                <?php foreach ($this->relatedBrands as $brand) { ?>
+                    <p><?=$this->htmlA(
+                        $this->url(null, [
+                            'action'     => 'move',
+                            'brand_id'   => $brand['id'],
+                            'picture_id' => $this->picture->id
+                        ]), 'Переместить в ' . $brand['name'] . ' ...'
+                    ) ?></p>
+                <?php } ?>
+                <p><?=$this->htmlA($this->url('moder/pictures/params', [
+                    'action' => 'move'
+                ], [], true), 'Переместить в ...')?></p>
+            <?php } ?>
         </div>
 
 
     <?php if ($this->picture->type == Picture::CAR_TYPE_ID) { ?>
         <h3>Ракурс</h3>
         <div class="well">
-            <?=$this->action('picture-perspective', 'pictures', 'moder', [
-                'picture_id' => $this->picture->id
-            ]) ?>
+            <?=$this->partial('application/moder/pictures/picture-perspective', $this->picturePerspective)?>
         </div>
     <?php } ?>
 
@@ -343,7 +296,7 @@
 
     <h3>Статус/Удаление/Принятие</h3>
     <div class="well">
-        <p><?php
+        <div style="margin-bottom:15px"><?php
             $changeStatusUserHtml = '';
             if ($this->picture->change_status_user_id) {
                 $changeStatusUserHtml = ' '.$this->user($this->picture->findParentUsersByChange_Status_User());
@@ -353,39 +306,43 @@
                 case Picture::STATUS_NEW:
                 case Picture::STATUS_INBOX:
                     ?>
-                    <strong class="label label-warning">Не принято <?=$changeStatusUserHtml?><?=(Picture::STATUS_INBOX == $this->picture->status ? ' (новое)' : '')?></strong>
+                    <p><strong class="label label-warning">Не принято <?=$changeStatusUserHtml?><?=(Picture::STATUS_INBOX == $this->picture->status ? ' (новое)' : '')?></strong></p>
                     <?php if ($this->canAccept) { ?>
-                        <?=$this->acceptPictureForm->render($this) ?>
+                        <form action="<?=$this->escapeHtmlAttr($this->acceptUrl)?>" method="post">
+                            <button type="submit" class="btn btn-success">Принять</button>
+                        </form>
                     <?php } ?>
                     <?php
                     break;
 
                 case Picture::STATUS_ACCEPTED:
                     ?>
-                    <strong class="label label-success">Принято</strong>
+                    <p><strong class="label label-success">Принято</strong></p>
                     <?=$changeStatusUserHtml?>
                     <?php if ($this->canUnaccept) { ?>
-                        <?=$this->unacceptPictureForm->render($this) ?>
+                        <form action="<?=$this->escapeHtmlAttr($this->unacceptUrl)?>" method="post">
+                            <button type="submit" class="btn btn-warning">Сделать не принятой</button>
+                        </form>
                     <?php } ?>
                     <?php
                     break;
 
                 case Picture::STATUS_REMOVING:
-                    ?><strong class="label label-danger">Поставлено в очередь на удаление</strong> <?=$changeStatusUserHtml?>
+                    ?><p><strong class="label label-danger">Поставлено в очередь на удаление</strong> <?=$changeStatusUserHtml?></p>
                     <?php if ($this->canRestore) { ?>
-                        <?=$this->restorePictureForm->render($this) ?>
+                        <form action="<?=$this->escapeHtmlAttr($this->restoreUrl)?>" method="post">
+                            <button type="submit" class="btn btn-success">Восстановить</button>
+                        </form>
                     <?php }
                     break;
 
                 case Picture::STATUS_REMOVED:
-                    ?><strong style="color:red">Удалено <?=$changeStatusUserHtml?></strong><?php
+                    ?><p><strong style="color:red">Удалено <?=$changeStatusUserHtml?></strong></p><?php
                     break;
             }
-        ?></p>
+        ?></div>
 
-        <?=$this->action('picture-vote', 'pictures', 'moder', [
-            'picture_id' => $this->picture->id
-        ])?>
+        <?=$this->partial('application/moder/pictures/picture-vote', $this->pictureVote)?>
     </div>
 
     <?php if ($this->canNormalize || $this->canFlop || $this->canCrop) { ?>
@@ -449,36 +406,9 @@
             <?php } ?>
 
             <?php if ($this->canBan) { ?>
-                <form action="<?=$this->url('ban/ban-ip', [
-                    'ip' => inet_ntop($this->picture->ip)
-                ]) ?>" method="post" class="form-horizontal">
-                    <fieldset>
-                        <legend>Забанить</legend>
-                        <div class="control-group">
-                            <label class="control-label" for="period">На время</label>
-                            <div class="controls">
-                                <?=$this->formSelect('period', '1', [], [
-                                    1  => 'час',
-                                    2  => '2 часа',
-                                    4  => '4 часа',
-                                    8  => '8 часов',
-                                    16 => '16 часов',
-                                    24 => 'сутки',
-                                    48 => 'двое суток',
-                                ])?>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="period">Причина</label>
-                            <div class="controls">
-                                <?=$this->formText('reason', '')?>
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <button class="btn btn-danger" type="submit">забанить</button>
-                        </div>
-                    </fieldset>
-                </form>
+                <?=$this->partial('application/forms/bootstrap-horizontal', [
+                    'form' => $this->banForm
+                ])?>
             <?php } ?>
         <?php } ?>
     </div>

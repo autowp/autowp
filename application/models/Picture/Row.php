@@ -1,5 +1,6 @@
 <?php
 
-class Picture_Row extends Pictures_Row {
+class Picture_Row extends Pictures_Row
+{
 
 }

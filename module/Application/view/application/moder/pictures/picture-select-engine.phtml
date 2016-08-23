@@ -30,16 +30,16 @@
                         </td><td valign="top" style="width:<?=$width ?>%">
                     <?php } ?>
                     <?=$this->htmlA($this->url(null, [
-                        'brand_id' => $brand->id
-                    ], [], true), $brand->caption) ?><br />
+                        'brand_id' => $brand['id']
+                    ], [], true), $brand['name']) ?><br />
                     <?php $idx++ ?>
                 <?php } ?>
             </td>
         </tr></tbody></table>
     <?php } else { ?>
         <form action="" method="post">
-            <?=$this->formHidden('brand', $this->brand->id)?>
-            <?=$this->partial('pictures/picture-select-engine-walk-tree.phtml', [
+            <input type="hidden" name="brand" value="<?=(int)$this->brand->id?>" />
+            <?=$this->partial('application/moder/pictures/picture-select-engine-walk-tree.phtml', [
                 'engines' => $this->engines
             ])?>
         </form>

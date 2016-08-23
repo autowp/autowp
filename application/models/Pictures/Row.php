@@ -147,6 +147,7 @@ class Pictures_Row extends Project_Db_Table_Row
             $brandId = null;
             $carId = null;
             $engineId = null;
+            $factoryId = null;
 
             // вычисляем старые значения
             switch ($typeID)
@@ -165,9 +166,11 @@ class Pictures_Row extends Project_Db_Table_Row
                     }
                     break;
                 case Picture::ENGINE_TYPE_ID:
+                    $engineId = $this->engine_id;
                     break;
 
                 case Picture::FACTORY_TYPE_ID:
+                    $factoryId = $this->factory_id;
                     break;
                 default:
                     throw new Exception('Unknown typeId');
@@ -208,6 +211,7 @@ class Pictures_Row extends Project_Db_Table_Row
                     $newEngineId = $engineId;
                     break;
                 case Picture::FACTORY_TYPE_ID:
+                    $newFactoryId = $factoryId;
                     break;
                 default:
                     throw new Exception('Unknown typeId');

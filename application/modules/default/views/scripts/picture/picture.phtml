@@ -7,14 +7,14 @@
             /*->headMeta('twitter:image:width',  $image->width() )
             ->headMeta('twitter:image:height', $image->height());*/
     }
-    
+
     $this->layout()->moduleName = 'default/picture';
     $this->layout()->moduleOptions = array(
         'gallery2'   => isset($this->gallery2) && $this->gallery2,
         'galleryUrl' => $this->galleryUrl,
         'gallery'    => $this->gallery
     );
-    
+
     //$this->headTitle($this->pic()->textTitle($this->name), 'SET');
 ?>
 
@@ -342,7 +342,6 @@
     <div class="well">
         <div class="row">
             <div class="col-md-6">
-                Удаление<br/>
                 <?=$this->action('picture-vote', 'pictures', 'moder', array(
                     'picture_id' => $this->picture->id,
                     'hide-vote'  => true

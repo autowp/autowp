@@ -11,12 +11,12 @@ class Project_Form_Element_Car_Body extends Zend_Form_Element_Text
     /**
      * @var string
      */
-    protected $maxlength = '15';
+    protected $maxlength = '20';
 
     /**
      * @var string
      */
-    protected $size = '15';
+    protected $size = '20';
 
     public function __construct($spec, $options = null)
     {

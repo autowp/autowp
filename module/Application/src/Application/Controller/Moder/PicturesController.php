@@ -2,11 +2,13 @@
 
 namespace Application\Controller\Moder;
 
+use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Application\Form\Moder\Inbox as InboxForm;
+use Application\Model\Brand;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\TrafficControl;
@@ -14,12 +16,14 @@ use Application\Service\TrafficControl;
 use Brands;
 use Car_Parent;
 use Cars;
+use Cars_Rowset;
 use Comments;
 use Comment_Message;
 use Engines;
 use Factory;
 use Perspectives;
 use Picture;
+use Picture_Row;
 use Pictures_Moder_Votes;
 use Users;
 
@@ -45,6 +49,26 @@ class PicturesController extends AbstractActionController
     private $textStorage;
 
     /**
+     * @var Form
+     */
+    private $pictureForm;
+
+    /**
+     * @var Form
+     */
+    private $copyrightsForm;
+
+    /**
+     * @var Form
+     */
+    private $voteForm;
+
+    /**
+     * @var Form
+     */
+    private $banForm;
+
+    /**
      * @return Engines
      */
     private function getEngineTable()
@@ -54,6 +78,7 @@ class PicturesController extends AbstractActionController
             : $this->engineTable = new Engines();
     }
 
+
     private function getCarParentTable()
     {
         return $this->carParentTable
@@ -61,19 +86,14 @@ class PicturesController extends AbstractActionController
             : $this->carParentTable = new Car_Parent();
     }
 
-    public function __construct($textStorage)
+    public function __construct(Picture $table, $textStorage, Form $pictureForm, Form $copyrightsForm, Form $voteForm, Form $banForm)
     {
-        $this->table = new Picture();
+        $this->table = $table;
         $this->textStorage = $textStorage;
-    }
-
-    public function preDispatch()
-    {
-        parent::preDispatch();
-
-        if (!$this->user()->inheritsRole('moder') ) {
-            return $this->forbiddenAction();
-        }
+        $this->pictureForm = $pictureForm;
+        $this->copyrightsForm = $copyrightsForm;
+        $this->voteForm = $voteForm;
+        $this->banForm = $banForm;
     }
 
     public function ownerTypeaheadAction()
@@ -169,6 +189,10 @@ class PicturesController extends AbstractActionController
 
     public function indexAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $perPage = 24;
 
         $orders = [
@@ -459,84 +483,6 @@ class PicturesController extends AbstractActionController
         ]);
     }
 
-    public function picturePerspectiveAction()
-    {
-        $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
-            return $this->notFoundAction();
-        }
-
-        if ($picture->type != Picture::CAR_TYPE_ID)
-            throw new Exception('Картинка несовместимого типа');
-
-        $perspectives = new Perspectives();
-
-        $multioptions = [
-            ''    => '--'
-        ] + $perspectives->getAdapter()->fetchPairs(
-            $perspectives->getAdapter()->select()
-                ->from($perspectives->info('name'), ['id', 'name'])
-                ->order('position')
-        );
-
-        $form = new Zend_Form([
-            'method'    => 'post',
-            'action'    => $this->url()->fromRoute('moder/pictures/params', [
-                'action'     => 'picture-perspective',
-                'picture_id' => $picture->id
-            ]),
-            'elements'    => [
-                ['select', 'perspective_id', [
-                    'required'     => false,
-                    'label'        => 'Ракурс',
-                    'decorators'   => ['ViewHelper'],
-                    'multioptions' => $multioptions,
-
-                ]],
-            ],
-            'class' => 'tiny',
-            'decorators'    => [
-                'PrepareElements',
-                ['viewScript', ['viewScript' => 'forms/pictures/perspective.phtml']],
-                'Form'
-            ],
-        ]);
-
-        $form->populate([
-            'perspective_id' => $picture->perspective_id
-        ]);
-
-        $request = $this->getRequest();
-
-        if ($request->isPost() && $form->isValid($request->getPost())) {
-            $values = $form->getValues();
-
-            $user = $this->user()->get();
-            $picture->perspective_id = $values['perspective_id'];
-            $picture->change_perspective_user_id = $user->id;
-            $picture->save();
-
-            $this->log(sprintf(
-                'Установка ракурса картинки %s',
-                $picture->getCaption()
-            ), [$picture]);
-
-            if ($request->isXmlHttpRequest()) {
-                return new JsonModel([
-                    'ok' => true
-                ]);
-            }
-
-            return $this->redirect()->toUrl($this->pictureUrl($picture));
-        }
-
-        return [
-            'picture' => $picture,
-            'form'    => $form,
-            'tiny'    => (bool)$this->getParam('tiny')
-        ];
-    }
-
     private function enginesWalkTree($parentId, $brandId)
     {
         $engineTable = $this->getEngineTable();
@@ -565,115 +511,12 @@ class PicturesController extends AbstractActionController
         return $engines;
     }
 
-    public function pictureSelectEngineAction()
+    public function pictureSelectFactoryAction()
     {
-        $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
-            return $this->notFoundAction();
-        }
-
-        if ($picture->type != Picture::ENGINE_TYPE_ID)
-            throw new Exception('Картинка несовместимого типа');
-
-        $canMove = $this->user()->isAllowed('picture', 'move');
-        if (!$canMove) {
+        if (!$this->user()->inheritsRole('moder') ) {
             return $this->forbiddenAction();
         }
 
-        $brand = null;
-        $brands = null;
-        $engines = null;
-        $engineTable = new Engines();
-        $engine = $engineTable->find($this->params('engine'))->current();
-
-        if ($engine) {
-            $brandTable = new Brands();
-
-            $oldBrand = null;
-            $oldEngine = $picture->findParentEngines();
-            if ($oldEngine) {
-
-                $oldBrands = $brandTable->fetchAll(
-                    $brandTable->select(true)
-                        ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
-                        ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
-                        ->where('engine_parent_cache.engine_id = ?', $oldEngine->id)
-                        ->group('brands.id')
-                );
-            }
-
-            $picture->engine_id = $engine->id;
-            $picture->save();
-
-            if ($picture->image_id) {
-                $imageStorage = $this->getInvokeArg('bootstrap')
-                    ->getResource('imagestorage');
-                $imageStorage->changeImageName($picture->image_id, [
-                    'pattern' => $picture->getFileNamePattern(),
-                ]);
-            } else {
-                $picture->correctFileName();
-            }
-            $rows = $brandTable->fetchAll(
-                $brandTable->select(true)
-                    ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
-                    ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
-                    ->where('engine_parent_cache.engine_id = ?', $engine->id)
-            );
-
-            foreach ($rows as $cBrand) {
-                $cBrand->updatePicturesCache();
-                $cBrand->refreshEnginePicturesCount();
-            }
-
-            foreach ($oldBrands as $oldBrand) {
-                $oldBrand->updatePicturesCache();
-                $oldBrand->refreshEnginePicturesCount();
-            }
-
-            $this->log(sprintf(
-                'Назначение двигателя %s картинке %s',
-                $engine->getMetaCaption(),
-                $picture->getCaption()
-            ), [$engine, $picture]);
-
-            return $this->redirect()->toUrl($this->pictureUrl($picture));
-        } else {
-            $brandTable = new Brands();
-            $brand = $brandTable->find($this->params('brand_id'))->current();
-            if ($brand) {
-                $engineTable = new Engines();
-                $engines = $engineTable->fetchAll(
-                    $engineTable->select(true)
-                        ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
-                        ->where('brand_engine.brand_id = ?', $brand->id)
-                        ->order('engines.caption')
-                );
-
-                /*$this->view->assign([
-                    'engines' => $this->enginesWalkTree(null, $brand->id)
-                ]);*/
-
-            } else {
-                $brands = $brandTable->fetchAll(
-                    $brandTable->select(true)
-                        ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
-                        ->group('brands.id')
-                        ->order(['brands.position', 'brands.caption'])
-                );
-            }
-        }
-
-        return [
-            'picture' => $picture,
-            'brand'   => $brand,
-            'brands'  => $brands,
-            'engines' => $engines
-        ];
-    }
-
-    public function pictureSelectFactoryAction()
-    {
         $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
             return $this->notFoundAction();
@@ -696,9 +539,7 @@ class PicturesController extends AbstractActionController
             $picture->factory_id = $factory->id;
             $picture->save();
 
-            $imageStorage = $this->getInvokeArg('bootstrap')
-                ->getResource('imagestorage');
-            $imageStorage->changeImageName($picture->image_id, [
+            $this->imageStorage()->changeImageName($picture->image_id, [
                 'pattern' => $picture->getFileNamePattern(),
             ]);
 
@@ -718,192 +559,6 @@ class PicturesController extends AbstractActionController
                 $factoryTable->select(true)
                     ->order('name')
             )
-        ];
-    }
-
-    public function pictureSelectCarAction()
-    {
-        $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
-            return $this->notFoundAction();
-        }
-
-        if ($picture->type != Picture::CAR_TYPE_ID) {
-            throw new Exception('Картинка несовместимого типа');
-        }
-
-        $canMove = $this->user()->isAllowed('picture', 'move');
-        if (!$canMove) {
-            return $this->forbiddenAction();
-        }
-
-        $brand = null;
-        $brands = null;
-        $cars = null;
-        $haveConcepts = null;
-        $carTable = new Cars();
-        $car = $carTable->find($this->params('car_id'))->current();
-
-        if ($car) {
-            $oldCar = $picture->findParentCars();
-
-            $picture->car_id = $car->id;
-            $picture->save();
-
-            // обнволяем кэш старого автомобиля
-            if ($oldCar) {
-                $oldCar->refreshPicturesCount();
-                foreach ($oldCar->findBrandsViaBrands_Cars() as $brand)
-                {
-                    $brand->updatePicturesCache();
-                    $brand->refreshPicturesCount();
-                }
-            }
-            // обнволяем кэш нового автомобиля
-            $car->refreshPicturesCount();
-            foreach ($car->findBrandsViaBrands_Cars() as $brand) {
-                $brand->updatePicturesCache();
-                $brand->refreshPicturesCount();
-            }
-
-            if ($picture->image_id) {
-                $imageStorage = $this->getInvokeArg('bootstrap')
-                    ->getResource('imagestorage');
-                $imageStorage->changeImageName($picture->image_id, [
-                    'pattern' => $picture->getFileNamePattern(),
-                ]);
-            } else {
-                $picture->correctFileName();
-            }
-
-            $namespace = new Zend_Session_Namespace('Moder_Car');
-            $namespace->lastCarId = $car->id;
-
-            $this->log(sprintf(
-                'Картинка %s связана с автомобилем %s',
-                htmlspecialchars($picture->id),
-                htmlspecialchars($car->getFullName())
-            ), [$car, $picture]);
-
-            return $this->redirect()->toUrl($this->pictureUrl($picture));
-        } else {
-            $brandTable = new Brands();
-            $brand = $brandTable->find($this->params('brand_id'))->current();
-            if ($brand) {
-
-                $rows = $carTable->fetchAll(
-                    $carTable->select(true)
-                        ->join('brands_cars', 'cars.id=brands_cars.car_id', null)
-                        ->where('brands_cars.brand_id = ?', $brand->id)
-                        ->where('NOT cars.is_concept')
-                        ->order(['cars.caption', 'cars.begin_year', 'cars.end_year', 'cars.begin_model_year', 'cars.end_model_year'])
-                );
-                $cars = $this->prepareCars($rows);
-
-                $haveConcepts = (bool)$carTable->fetchRow(
-                    $carTable->select(true)
-                        ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                        ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                        ->where('brands_cars.brand_id = ?', $brand->id)
-                        ->where('cars.is_concept')
-                );
-
-            } else {
-                $brands = $brandTable->fetchAll(null, ['position', 'caption']);
-            }
-        }
-
-        return [
-            'picture'      => $picture,
-            'brand'        => $brand,
-            'brands'       => $brands,
-            'cars'         => $cars,
-            'haveConcepts' => $haveConcepts,
-            'conceptsUrl'  => $this->url()->fromRoute(null, [
-                'action' => 'concepts',
-            ], [], true),
-        ];
-    }
-
-    private function loadCarSelect($parentId)
-    {
-        $carTable = $this->catalogue()->getCarTable();
-
-        $carRows = $carTable->fetchAll(
-            $carTable->select(true)
-                ->join('car_parent', 'cars.id = car_parent.car_id', null)
-                ->where('car_parent.parent_id = ?', $parentId)
-                ->order(['cars.caption', 'cars.body', 'cars.begin_year', 'cars.end_year'])
-        );
-
-        $cars = [];
-        foreach ($carRows as $carRow) {
-            $cars[] = [
-                'url'    => $this->url()->fromRoute(null, [
-                    'car_id' => $carRow->id
-                ], [], true),
-                'name'   => $carRow->getFullName(),
-                'childs' => $this->loadCarSelect($carRow->id)
-            ];
-        }
-
-        return $cars;
-    }
-
-    public function pictureSelectBrandAction()
-    {
-        $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
-            return $this->notFoundAction();
-        }
-
-        if (!in_array($picture->type, [Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID, Picture::MIXED_TYPE_ID])) {
-            throw new Exception('Картинка несовместимого типа');
-        }
-
-        $canMove = $this->user()->isAllowed('picture', 'move');
-        if (!$canMove) {
-            return $this->forbiddenAction();
-        }
-
-        $brandTable = new Brands();
-        $brand = $brandTable->find($this->params('brand_id'))->current();
-        $brands = null;
-
-        if ($brand) {
-            $oldBrand = $picture->findParentBrands();
-
-            $picture->brand_id = $brand->id;
-            $picture->save();
-
-            if ($picture->image_id) {
-                $imageStorage = $this->getInvokeArg('bootstrap')
-                    ->getResource('imagestorage');
-                $imageStorage->changeImageName($picture->image_id, [
-                    'pattern' => $picture->getFileNamePattern(),
-                ]);
-            } else {
-                $picture->correctFileName();
-            }
-
-            if ($oldBrand) {
-                $oldBrand->updatePicturesCache();
-            }
-            $brand->updatePicturesCache();
-
-            $this->log(sprintf(
-                'Назначение бренда %s картинке %s',
-                htmlspecialchars($brand->caption), htmlspecialchars($picture->getCaption())
-            ), [$picture, $brand]);
-
-            return $this->redirect()->toUrl($this->pictureUrl($picture));
-        } else {
-            $brands = $brandTable->fetchAll(null, ['position', 'caption']);
-        }
-
-        return [
-            'picture' => $picture,
-            'brands'  => $brands
         ];
     }
 
@@ -940,6 +595,7 @@ class PicturesController extends AbstractActionController
         return $canDelete;
     }
 
+
     private function pictureVoteExists($picture, $user)
     {
         $db = $this->table->getAdapter();
@@ -953,6 +609,10 @@ class PicturesController extends AbstractActionController
 
     public function deletePictureAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
             return $this->notFoundAction();
@@ -1004,8 +664,45 @@ class PicturesController extends AbstractActionController
         return $this->redirect()->toUrl($this->pictureUrl($picture));
     }
 
+    public function picturePerspectiveAction()
+    {
+        $picture = $this->table->find($this->params('picture_id'))->current();
+        if (!$picture) {
+            return $this->forward('notfound', 'error', 'default');
+        }
+
+        if ($picture->type != Picture::CAR_TYPE_ID) {
+            throw new Exception('Картинка несовместимого типа');
+        }
+
+        $perspectives = new Perspectives();
+
+        $request = $this->getRequest();
+
+        if ($request->isPost()) {
+            $user = $this->user()->get();
+            $perspectiveId = (int)$this->params()->fromPost('perspective_id');
+            $picture->perspective_id = $perspectiveId ? $perspectiveId : null;
+            $picture->change_perspective_user_id = $user->id;
+            $picture->save();
+
+            $this->log(sprintf(
+                'Установка ракурса картинки %s',
+                htmlspecialchars($picture->getCaption())
+            ), [$picture]);
+        }
+
+        return new JsonModel([
+            'ok' => true
+        ]);
+    }
+
     public function pictureVoteAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
             return $this->notFoundAction();
@@ -1049,97 +746,82 @@ class PicturesController extends AbstractActionController
 
         $request = $this->getRequest();
 
-        $formPictureVote = null;
-        if (!$voteExists && $this->user()->isAllowed('picture', 'moder_vote'))
-        {
-            $form = new Application_Form_Moder_Picture_Vote([
-                'action' => $this->url()->fromRoute('moder/pictures/params', [
-                    'action'     => 'picture-vote',
-                    'form'       => 'picture-vote',
-                    'picture_id' => $picture->id
-                ], [], true),
-            ]);
+        if (!$voteExists && $this->user()->isAllowed('picture', 'moder_vote')) {
+            $this->voteForm->setAttribute('action', $this->url()->fromRoute('moder/pictures/params', [
+                'action'     => 'picture-vote',
+                'form'       => 'picture-vote',
+                'picture_id' => $picture->id
+            ], [], true));
 
-            if ($request->isPost() && $this->params('form') == 'picture-vote' && $form->isValid($request->getPost()))
-            {
-                $values = $form->getValues();
+            if ($request->isPost() && $this->params('form') == 'picture-vote') {
+                $this->voteForm->setData($this->params()->fromPost());
+                if ($this->voteForm->isValid()) {
+                    $values = $this->voteForm->getData();
 
-                if ($customReason = $request->getCookie('customReason')) {
-                    $customReason = (array)unserialize($customReason);
-                } else {
-                    $customReason = [];
-                }
-
-                $customReason[] = $values['reason'];
-                $customReason = array_unique($customReason);
-
-                setcookie('customReason', serialize($customReason), time()+60*60*24*30, '/');
-
-                $vote = (bool)($values['vote'] == 'Хочу принять');
-
-                $user = $this->user()->get();
-                $moderVotes = new Pictures_Moder_Votes();
-                $moderVotes->insert([
-                    'user_id'    => $user->id,
-                    'picture_id' => $picture->id,
-                    'day_date'   => new Zend_Db_Expr('NOW()'),
-                    'reason'     => $values['reason'],
-                    'vote'       => $vote ? 1 : 0
-                ]);
-
-                if ($vote && $picture->status == Picture::STATUS_REMOVING) {
-                    $picture->status = Picture::STATUS_INBOX;
-                    $picture->save();
-                }
-
-                $message = sprintf(
-                    $vote
-                        ? 'Подана заявка на принятие картинки %s'
-                        : 'Подана заявка на удаление картинки %s',
-                    htmlspecialchars($picture->getCaption())
-                );
-                $this->log($message, $picture);
-
-                $owner = $picture->findParentUsersByOwner();
-                $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
-                if ($ownerIsModer) {
-                    if ($owner->id != $this->user()->get()->id) {
-                        $message = sprintf(
-                            'Подана заявка на %s добавленной вами картинки %s'.PHP_EOL.' Причина: %s',
-                            $vote ? 'удаление' : 'принятие',
-                            $this->pictureUrl($picture, true),
-                            $values['reason']
-                        );
-
-                        $mModel = new Message();
-                        $mModel->send(null, $owner->id, $message);
+                    if ($customReason = $request->getCookie('customReason')) {
+                        $customReason = (array)unserialize($customReason);
+                    } else {
+                        $customReason = [];
                     }
-                }
 
-                $referer = $request->getServer('HTTP_REFERER');
-                if ($referer) {
-                    return $this->redirect()->toUrl($this->pictureUrl($picture));
-                }
+                    $customReason[] = $values['reason'];
+                    $customReason = array_unique($customReason);
 
-                return $this->redirect()->toRoute(null, [], [], true);
+                    setcookie('customReason', serialize($customReason), time()+60*60*24*30, '/');
+
+                    $vote = (bool)($values['vote']);
+
+                    $user = $this->user()->get();
+                    $moderVotes = new Pictures_Moder_Votes();
+                    $moderVotes->insert([
+                        'user_id'    => $user->id,
+                        'picture_id' => $picture->id,
+                        'day_date'   => new Zend_Db_Expr('NOW()'),
+                        'reason'     => $values['reason'],
+                        'vote'       => $vote ? 1 : 0
+                    ]);
+
+                    if ($vote && $picture->status == Picture::STATUS_REMOVING) {
+                        $picture->status = Picture::STATUS_INBOX;
+                        $picture->save();
+                    }
+
+                    $message = sprintf(
+                        $vote
+                            ? 'Подана заявка на принятие картинки %s'
+                            : 'Подана заявка на удаление картинки %s',
+                        htmlspecialchars($picture->getCaption())
+                    );
+                    $this->log($message, $picture);
+
+                    $owner = $picture->findParentUsersByOwner();
+                    $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
+                    if ($ownerIsModer) {
+                        if ($owner->id != $this->user()->get()->id) {
+                            $message = sprintf(
+                                'Подана заявка на %s добавленной вами картинки %s'.PHP_EOL.' Причина: %s',
+                                $vote ? 'удаление' : 'принятие',
+                                $this->pictureUrl($picture, true),
+                                $values['reason']
+                            );
+
+                            $mModel = new Message();
+                            $mModel->send(null, $owner->id, $message);
+                        }
+                    }
+
+                    $referer = $request->getServer('HTTP_REFERER');
+                    if ($referer) {
+                        return $this->redirect()->toUrl($this->pictureUrl($picture));
+                    }
+
+                    return $this->redirect()->toRoute(null, [], [], true);
+                }
             }
-
-            $formPictureVote = $form;
         }
 
-        $formPictureUnvote = null;
         if ($voteExists) {
-            $form = new Application_Form_Moder_Picture_Unvote([
-                'action' => $this->url()->fromRoute('moder/pictures/params', [
-                    'action'     => 'picture-vote',
-                    'form'       => 'picture-unvote',
-                    'picture_id' => $picture->id
-                ])
-            ]);
-
-            if ($request->isPost() && $this->params('form') == 'picture-unvote' && $form->isValid($request->getPost())) {
-                $values = $form->getValues();
-
+            if ($request->isPost() && $this->params('form') == 'picture-unvote') {
                 $moderVotes = new Pictures_Moder_Votes();
 
                 $user = $this->user()->get();
@@ -1149,26 +831,9 @@ class PicturesController extends AbstractActionController
                 ]);
 
                 $referer = $request->getServer('HTTP_REFERER');
-                if ($referer) {
-                    return $this->redirect()->toUrl($referer);
-                }
-
-                return $this->redirect()->toUrl($this->pictureUrl($picture));
+                $url = $referer ? $referer : $this->pictureUrl($picture);
+                return $this->redirect()->toUrl($url);
             }
-
-            $formPictureUnvote = $form;
-        }
-
-        $deletePictureForm = null;
-        if ($canDelete) {
-            $form = new Application_Form_Moder_Picture_Delete([
-                'action' => $this->url()->fromRoute('moder/pictures/params', [
-                    'action'     => 'delete-picture',
-                    'picture_id' => $picture->id,
-                    'form'       => 'picture-delete'
-                ])
-            ]);
-            $deletePictureForm = $form;
         }
 
         $moderVotes = null;
@@ -1180,15 +845,27 @@ class PicturesController extends AbstractActionController
             'isLastPicture'     => $isLastPicture,
             'acceptedCount'     => $acceptedCount,
             'canDelete'         => $canDelete,
-            'deletePictureForm' => $deletePictureForm,
-            'formPictureVote'   => $formPictureVote,
-            'formPictureUnvote' => $formPictureUnvote,
+            'deleteUrl'         => $this->url()->fromRoute('moder/pictures/params', [
+                'action'     => 'delete-picture',
+                'picture_id' => $picture->id,
+                'form'       => 'picture-delete'
+            ]),
+            'formPictureVote'   => $this->voteForm,
+            'unvoteUrl'         => $this->url()->fromRoute('moder/pictures/params', [
+                'action'     => 'picture-vote',
+                'form'       => 'picture-unvote',
+                'picture_id' => $picture->id
+            ]),
             'moderVotes'        => $moderVotes
         ];
     }
 
     public function pictureAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
             return $this->notFoundAction();
@@ -1239,78 +916,88 @@ class PicturesController extends AbstractActionController
             }
         }
 
-        $editPictureForm = new Application_Form_Moder_Picture_Edit([
-            'action' => $this->url()->fromRoute([
-                'form' => 'picture-edit'
-            ], [], true)
+        $this->pictureForm->setAttribute('action', $this->url()->fromRoute(null, [
+            'form' => 'picture-edit'
+        ], [], true));
+
+        $this->pictureForm->populateValues([
+            'name' => $picture->name
         ]);
-
-        $editPictureForm->populate($picture->toArray());
         $request = $this->getRequest();
-        if ($request->isPost() && ($this->getParam('form') == 'picture-edit') && $editPictureForm->isValid($request->getPost())) {
-            $picture->setFromArray($editPictureForm->getValues());
-            $picture->save();
+        if ($request->isPost() && $this->params()->fromRoute('form') == 'picture-edit') {
+            $this->pictureForm->setData($this->params()->fromPost());
+            if ($this->pictureForm->isValid()) {
+                $values = $this->pictureForm->getData();
+                $picture->setFromArray([
+                    'name' => $values['name']
+                ]);
+                $picture->save();
 
-            return $this->redirect()->toUrl($this->pictureUrl($picture));
+                return $this->redirect()->toUrl($this->pictureUrl($picture));
+            }
         }
 
-        $copyrightsForm = $this->getCopyrightsForm();
+        $this->copyrightsForm->setAttribute('action', $this->url()->fromRoute(null, [
+            'form' => 'copyrights-edit'
+        ], [], true));
         if ($picture->copyrights_text_id) {
             $text = $this->textStorage->getText($picture->copyrights_text_id);
-            $copyrightsForm->populate([
+            $this->copyrightsForm->populateValues([
                 'text' => $text
             ]);
         }
-        if ($request->isPost() && ($this->getParam('form') == 'copyrights-edit') && $copyrightsForm->isValid($request->getPost())) {
-            $values = $copyrightsForm->getValues();
+        if ($request->isPost() && ($this->params()->fromRoute('form') == 'copyrights-edit')) {
+            $this->copyrightsForm->setData($this->params()->fromPost());
+            if ($this->copyrightsForm->isValid()) {
+                $values = $this->copyrightsForm->getData();
 
-            $text = $values['text'];
+                $text = $values['text'];
 
-            $user = $this->user()->get();
+                $user = $this->user()->get();
 
-            if ($picture->copyrights_text_id) {
-                $this->textStorage->setText($picture->copyrights_text_id, $text, $user->id);
-            } elseif ($text) {
-                $textId = $this->textStorage->createText($text, $user->id);
-                $picture->copyrights_text_id = $textId;
-                $picture->save();
-            }
+                if ($picture->copyrights_text_id) {
+                    $this->textStorage->setText($picture->copyrights_text_id, $text, $user->id);
+                } elseif ($text) {
+                    $textId = $this->textStorage->createText($text, $user->id);
+                    $picture->copyrights_text_id = $textId;
+                    $picture->save();
+                }
 
-            $this->log(sprintf(
-                'Редактирование текста копирайтов изображения %s',
-                htmlspecialchars($picture->getCaption())
-            ), $picture);
+                $this->log(sprintf(
+                    'Редактирование текста копирайтов изображения %s',
+                    htmlspecialchars($picture->getCaption())
+                ), $picture);
 
-            if ($picture->copyrights_text_id) {
-                $userIds = $this->textStorage->getTextUserIds($picture->copyrights_text_id);
-                $message = sprintf(
-                    'Пользователь %s редактировал текст копирайтов изображения %s ( %s )',
-                    $this->url()->fromRoute('users/user', [
-                        'user_id' => $user->identity ? $user->identity : 'user' . $user->id
-                    ], [
-                        'force_canonical' => true
-                    ]),
-                    $picture->getCaption(),
-                    $this->pictureUrl($picture, true)
-                );
+                if ($picture->copyrights_text_id) {
+                    $userIds = $this->textStorage->getTextUserIds($picture->copyrights_text_id);
+                    $message = sprintf(
+                        'Пользователь %s редактировал текст копирайтов изображения %s ( %s )',
+                        $this->url()->fromRoute('users/user', [
+                            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                        ], [
+                            'force_canonical' => true
+                        ]),
+                        $picture->getCaption(),
+                        $this->pictureUrl($picture, true)
+                    );
 
-                $mModel = new Message();
-                $userTable = new Users();
-                foreach ($userIds as $userId) {
-                    if ($userId != $user->id) {
-                        foreach ($userTable->find($userId) as $userRow) {
-                            $mModel->send(null, $userRow->id, $message);
+                    $mModel = new Message();
+                    $userTable = new Users();
+                    foreach ($userIds as $userId) {
+                        if ($userId != $user->id) {
+                            foreach ($userTable->find($userId) as $userRow) {
+                                $mModel->send(null, $userRow->id, $message);
+                            }
                         }
                     }
                 }
-            }
 
-            return $this->redirect()->toUrl($this->pictureUrl($picture));
+                return $this->redirect()->toUrl($this->pictureUrl($picture));
+            }
         }
 
         if ($picture->image_id) {
-            $imageStorage = $this->getInvokeArg('bootstrap')
-                ->getResource('imagestorage');
+            $imageStorage = $this->imageStorage();
             $iptcStr = $imageStorage->getImageIPTC($picture->image_id);
 
             $exifStr = $imageStorage->getImageEXIF($picture->image_id);
@@ -1370,54 +1057,6 @@ class PicturesController extends AbstractActionController
 
         $canMove =  $this->user()->isAllowed('picture', 'move');
 
-        $formModerPictureType = false;
-        if ($canMove) {
-            $form = new Application_Form_Moder_Picture_Type([
-                'action' => $this->url()->fromRoute(null, ['form' => 'picture-type'], [], true)
-            ]);
-            $form->populate($picture->toArray());
-
-            $formModerPictureType = $form;
-            if ($request->isPost() && $this->params('form') == 'picture-type' && $form->isValid($request->getPost())) {
-                $values = $form->getValues();
-
-                $oldType = $picture->type;
-                $oldEngineId = $picture->engine_id;
-
-                $picture->type = $values['type'];
-                $picture->save();
-
-                if ($oldType == Picture::ENGINE_TYPE_ID) {
-                    $engineTable = new Engines();
-                    $oldEngine = $engineTable->find($oldEngineId)->current();
-                    if ($oldEngine) {
-                        $oldEngineBrand = $oldEngine->findParentBrands();
-                        if ($oldEngineBrand) {
-                            $oldEngineBrand->refreshEnginePicturesCount();
-                        }
-                    }
-                }
-
-                if ($picture->type == Picture::ENGINE_TYPE_ID) {
-                    $engineTable = new Engines();
-                    $engine = $engineTable->find($picture->engine_id)->current();
-                    if ($engine) {
-                        $engineBrand = $engine->findParentBrands();
-                        if ($engineBrand) {
-                            $engineBrand->refreshEnginePicturesCount();
-                        }
-                    }
-                }
-
-                $this->log(sprintf(
-                    'Изменение типа картинки %s',
-                    htmlspecialchars($picture->getCaption())
-                ), $picture);
-
-                return $this->redirect()->toUrl($this->pictureUrl($picture));
-            }
-        }
-
         $lastCar = null;
         $namespace = new Zend_Session_Namespace('Moder_Car');
         if (isset($namespace->lastCarId)) {
@@ -1435,37 +1074,15 @@ class PicturesController extends AbstractActionController
 
         if ($canUnaccept) {
 
-            $form = new Zend_Form([
-                'action'     => $this->url()->fromRoute(['form' => 'picture-unaccept'], [], true),
-                'decorators' => [
-                    'FormElements',
-                    'PrepareElements',
-                    'Form',
-                ],
-                'elements'   => [
-                    ['submit', 'send', [
-                        'required'   => false,
-                        'ignore'     => true,
-                        'label'      => 'Сделать не принятой',
-                        'class'      => 'btn btn-warning',
-                        'decorators' => ['ViewHelper']
-                    ]]
-                ]
-            ]);
-
-            $unacceptPictureForm = $form;
-
-            if ($request->isPost() && $this->params('form') == 'picture-unaccept' && $form->isValid($request->getPost())) {
-                $values = $form->getValues();
-
+            if ($request->isPost() && $this->params('form') == 'picture-unaccept') {
                 $previousStatusUserId = $picture->change_status_user_id;
 
                 $user = $this->user()->get();
-                $picture->status = Picture::STATUS_INBOX;
-                $picture->change_status_user_id = $user->id;
+                $picture->setFromArray([
+                    'status'                => Picture::STATUS_INBOX,
+                    'change_status_user_id' => $user->id
+                ]);
                 $picture->save();
-
-
 
                 $this->log(sprintf(
                     'С картинки %s снят статус "принято"',
@@ -1495,37 +1112,19 @@ class PicturesController extends AbstractActionController
         $canAccept = in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])
                   && $this->user()->isAllowed('picture', 'accept');
 
-        $acceptPictureForm = null;
         if ($canAccept) {
 
-            $acceptPictureForm = new Application_Form_Moder_Picture_Accept([
-                'action'  => $this->url()->fromRoute(null, [
-                    'form' => 'picture-accept'
-                ], [], true)
-            ]);
-
-            if ($request->isPost() && $this->params('form') == 'picture-accept' && $acceptPictureForm->isValid($request->getPost())) {
+            if ($request->isPost() && $this->params('form') == 'picture-accept') {
 
                 $this->accept($picture);
 
-                $url = $request->getServer('HTTP_REFERER');
-                if (!$url) {
-                    $url = $this->url()->fromRoute(null, [], [], true);
-                }
-
+                $referer = $request->getServer('HTTP_REFERER');
+                $url = $referer ? $referer : $this->url()->fromRoute(null, [], [], true);
                 return $this->redirect()->toUrl($url);
             }
         }
 
         $canRestore = $this->canRestore($picture);
-        $restorePictureForm = null;
-        if ($canRestore) {
-            $restorePictureForm = new Application_Form_Moder_Picture_Restore([
-                'action' => $this->url()->fromRoute(null, [
-                    'action' => 'restore'
-                ], [], true)
-            ]);
-        }
 
         $replacePicture = null;
         if ($picture->replace_picture_id) {
@@ -1552,8 +1151,7 @@ class PicturesController extends AbstractActionController
             }
         }
 
-        $imageStorage = $this->getInvokeArg('bootstrap')
-            ->getResource('imagestorage');
+        $imageStorage = $this->imageStorage();
 
         $image = $imageStorage->getImage($picture->image_id);
 
@@ -1568,8 +1166,6 @@ class PicturesController extends AbstractActionController
         if ($image) {
             $galleryFullUrl = $image->getSrc();
         }
-
-
 
 
         $canCrop = $this->canCrop();
@@ -1589,6 +1185,66 @@ class PicturesController extends AbstractActionController
             }
         }
 
+        $this->banForm->setAttribute('action', $this->url()->fromRoute('ban/ban-ip', [
+            'ip' => inet_ntop($picture->ip)
+        ]));
+        $this->banForm->populateValues([
+            'submit' => 'Забанить'
+        ]);
+
+        $picturePerspective = null;
+        if ($picture->type == Picture::CAR_TYPE_ID) {
+            $perspectives = new Perspectives();
+
+            $multioptions = $perspectives->getAdapter()->fetchPairs(
+                $perspectives->getAdapter()->select()
+                    ->from($perspectives->info('name'), ['id', 'name'])
+                    ->order('position')
+            );
+
+            $multioptions = array_replace([
+                '' => '--'
+            ], $multioptions);
+
+            $user = $picture->findParentUsersByChange_Perspective_User();
+
+            $picturePerspective = [
+                'options' => $multioptions,
+                'url'     => $this->url()->fromRoute('moder/pictures/params', [
+                    'action'     => 'picture-perspective',
+                    'picture_id' => $picture->id
+                ]),
+                'user'    => $user,
+                'value'   => $picture->perspective_id
+            ];
+        }
+
+        $relatedBrands = [];
+        switch ($picture->type) {
+            case Picture::CAR_TYPE_ID:
+                if ($picture->car_id) {
+                    $brandModel = new Brand();
+                    $relatedBrands = $brandModel->getList($this->language(), function($select) use ($picture) {
+                        $select
+                            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                            ->where('car_parent_cache.car_id = ?', $picture->car_id)
+                            ->group('brands.id');
+                    });
+                }
+                break;
+
+            case Picture::UNSORTED_TYPE_ID:
+            case Picture::MIXED_TYPE_ID:
+            case Picture::LOGO_TYPE_ID:
+                if ($picture->brand_id) {
+                    $brandModel = new Brand();
+                    $relatedBrands = $brandModel->getList($this->language(), function($select) use ($picture) {
+                        $select->where('brands.id = ?', $picture->brand_id);
+                    });
+                }
+                break;
+        }
 
         return [
             'ban'             => $ban,
@@ -1598,10 +1254,8 @@ class PicturesController extends AbstractActionController
             'nextPicture'     => $nextPicture,
             'prevNewPicture'  => $prevNewPicture,
             'nextNewPicture'  => $nextNewPicture,
-            'editPictureForm' => $editPictureForm,
-            'copyrightsForm'  => $copyrightsForm,
-            'unacceptPictureForm'           => $unacceptPictureForm,
-            'formModerPictureType'          => $formModerPictureType,
+            'editPictureForm' => $this->pictureForm,
+            'copyrightsForm'  => $this->copyrightsForm,
             'picture'                       => $picture,
             'canMove'                       => $canMove,
             'canNormalize'                  => $this->canNormalize($picture),
@@ -1610,8 +1264,15 @@ class PicturesController extends AbstractActionController
             'canRestore'                    => $canRestore,
             'canAccept'                     => $canAccept,
             'canUnaccept'                   => $canUnaccept,
-            'acceptPictureForm'             => $acceptPictureForm,
-            'restorePictureForm'            => $restorePictureForm,
+            'unacceptUrl'                   => $this->url()->fromRoute(null, [
+                'form' => 'picture-unaccept'
+            ], [], true),
+            'acceptUrl'                     => $this->url()->fromRoute(null, [
+                'form' => 'picture-accept'
+            ], [], true),
+            'restoreUrl'                    => $this->url()->fromRoute(null, [
+                'action' => 'restore'
+            ], [], true),
             'iptc'                          => $iptcStr,
             'exif'                          => $exifStr,
             'lastCar'                       => $lastCar,
@@ -1625,7 +1286,11 @@ class PicturesController extends AbstractActionController
             'galleryFullUrl'                => $galleryFullUrl,
             'sourceUrl'                     => $sourceUrl,
             'replacePicture'                => $replacePicture,
-            'crop'                          => $crop
+            'crop'                          => $crop,
+            'banForm'                       => $this->banForm,
+            'picturePerspective'            => $picturePerspective,
+            'pictureVote'                   => $this->pictureVote($picture->id, []),
+            'relatedBrands'                 => $relatedBrands
         ];
     }
 
@@ -1700,10 +1365,7 @@ class PicturesController extends AbstractActionController
         }
 
         if ($picture->image_id) {
-            $imageStorage = $this->getInvokeArg('bootstrap')
-                ->getResource('imagestorage');
-
-            $imageStorage->flop($picture->image_id);
+            $this->imageStorage()->flop($picture->image_id);
         }
 
         $this->log(sprintf(
@@ -1732,10 +1394,7 @@ class PicturesController extends AbstractActionController
         }
 
         if ($picture->image_id) {
-            $imageStorage = $this->getInvokeArg('bootstrap')
-                ->getResource('imagestorage');
-
-            $imageStorage->normalize($picture->image_id);
+            $this->imageStorage()->normalize($picture->image_id);
         }
 
         $this->log(sprintf(
@@ -1750,9 +1409,13 @@ class PicturesController extends AbstractActionController
 
     public function filesRepairAction()
     {
-        /*if (!$this->getRequest()->isPost()) {
+        if (!$this->user()->inheritsRole('moder') ) {
             return $this->forbiddenAction();
-        }*/
+        }
+
+        if (!$this->getRequest()->isPost()) {
+            return $this->forbiddenAction();
+        }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture) {
@@ -1760,10 +1423,7 @@ class PicturesController extends AbstractActionController
         }
 
         if ($picture->image_id) {
-            $imageStorage = $this->getInvokeArg('bootstrap')
-                ->getResource('imagestorage');
-
-            $imageStorage->flush([
+            $this->imageStorage()->flush([
                 'image' => $picture->image_id
             ]);
         }
@@ -1775,6 +1435,10 @@ class PicturesController extends AbstractActionController
 
     public function filesCorrectNamesAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         if (!$this->getRequest()->isPost()) {
             return $this->notFoundAction();
         }
@@ -1784,10 +1448,7 @@ class PicturesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $imageStorage = $this->getInvokeArg('bootstrap')
-            ->getResource('imagestorage');
-
-        $imageStorage->changeImageName($picture->image_id, [
+        $this->imageStorage()->changeImageName($picture->image_id, [
             'pattern' => $picture->getFileNamePattern(),
         ]);
 
@@ -1798,6 +1459,10 @@ class PicturesController extends AbstractActionController
 
     public function cropperSaveAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $picture = $this->table->find($this->params('picture_id'))->current();
         if (!$picture || !$this->canCrop()) {
             return $this->notFoundAction();
@@ -1835,10 +1500,7 @@ class PicturesController extends AbstractActionController
         }
         $picture->save();
 
-        $imageStorage = $this->getInvokeArg('bootstrap')
-            ->getResource('imagestorage');
-
-        $imageStorage->flush([
+        $this->imageStorage()->flush([
             'image' => $picture->image_id
         ]);
 
@@ -1866,14 +1528,15 @@ class PicturesController extends AbstractActionController
             );
             $cars[] = [
                 'name' => $row->getFullName(),
-                'url'  => $this->url()->fromRoute([
-                    'action' => 'picture-select-car',
-                    'car_id' => $row['id']
+                'url'  => $this->url()->fromRoute(null, [
+                    'action' => 'move',
+                    'car_id' => $row['id'],
+                    'type'   => Picture::CAR_TYPE_ID
                 ], [], true),
                 'haveChilds' => $haveChilds,
                 'isGroup'    => $row->is_group,
                 'type'       => null,
-                'loadUrl'    => $this->url()->fromRoute([
+                'loadUrl'    => $this->url()->fromRoute(null, [
                     'action' => 'car-childs',
                     'car_id' => $row['id']
                 ], [], true),
@@ -1901,8 +1564,9 @@ class PicturesController extends AbstractActionController
                 $items[] = [
                     'name' => $car->getFullName(),
                     'url'  => $this->url()->fromRoute(null, [
-                        'action' => 'picture-select-car',
-                        'car_id' => $car['id']
+                        'action' => 'move',
+                        'car_id' => $car['id'],
+                        'type'   => Picture::CAR_TYPE_ID
                     ], [], true),
                     'haveChilds' => $haveChilds,
                     'isGroup'    => $car['is_group'],
@@ -1920,6 +1584,10 @@ class PicturesController extends AbstractActionController
 
     public function carChildsAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $user = $this->user()->get();
         if (!$user) {
             return $this->forbiddenAction();
@@ -1950,6 +1618,9 @@ class PicturesController extends AbstractActionController
 
     public function conceptsAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
 
         $brandTable = new Brands();
         $brand = $brandTable->find($this->params('brand_id'))->current();
@@ -1973,9 +1644,45 @@ class PicturesController extends AbstractActionController
         $viewModel = new ViewModel([
             'concepts' => $concepts,
         ]);
-        $viewModel->setTerminal(true);
+        return $viewModel->setTerminal(true);
+    }
 
-        return $viewModel;
+    public function enginesAction()
+    {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
+        $brandTable = new Brands();
+        $brand = $brandTable->find($this->params('brand_id'))->current();
+        if (!$brand) {
+            return $this->notFoundAction();
+        }
+
+        $engineTable = new Engines();
+        $rows = $engineTable->fetchAll(
+            $engineTable->select(true)
+                ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
+                ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
+                ->where('brand_engine.brand_id = ?', $brand->id)
+                ->order('engines.caption')
+        );
+        $engines = [];
+        foreach ($rows as $row) {
+            $engines[] = [
+                'name' => $row->getMetaCaption(),
+                'url'  => $this->url()->fromRoute(null, [
+                    'action'    => 'move',
+                    'type'      => Picture::ENGINE_TYPE_ID,
+                    'engine_id' => $row->id
+                ], [], true)
+            ];
+        }
+
+        $viewModel = new ViewModel([
+            'engines' => $engines,
+        ]);
+        return $viewModel->setTerminal(true);
     }
 
     private function canReplace($picture, $replacedPicture)
@@ -2015,6 +1722,10 @@ class PicturesController extends AbstractActionController
 
     public function cancelReplaceAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         if (!$this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
@@ -2054,6 +1765,10 @@ class PicturesController extends AbstractActionController
 
     public function acceptReplaceAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         if (!$this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
@@ -2205,19 +1920,29 @@ class PicturesController extends AbstractActionController
 
     public function acceptAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         if (!$this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
-        foreach ($this->table->find($this->getParam('id')) as $picture) {
+        foreach ($this->table->find($this->params('id')) as $picture) {
             $this->accept($picture);
         }
 
-        return new JsonModel(true);
+        return new JsonModel([
+            'status' => true
+        ]);
     }
 
     public function voteAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         if (!$this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
@@ -2279,30 +2004,113 @@ class PicturesController extends AbstractActionController
             }
         }
 
-        return new JsonModel(true);
+        return new JsonModel([
+            'status' => true
+        ]);
     }
 
-    private function getCopyrightsForm()
+    public function moveAction()
     {
-        return new Project_Form([
-            'method' => Zend_Form::METHOD_POST,
-            'action' => $this->url()->fromRoute([
-                'form' => 'copyrights-edit'
+        $canMove = $this->user()->isAllowed('picture', 'move');
+        if (!$canMove) {
+            return $this->forbiddenAction();
+        }
+
+        $picture = $this->table->find($this->params('picture_id'))->current();
+        if (!$picture) {
+            return $this->notFoundAction();
+        }
+
+        $type = trim($this->params('type'));
+        if (strlen($type)) {
+            $userId = $this->user()->get()->id;
+            switch ($type) {
+                case Picture::LOGO_TYPE_ID:
+                case Picture::MIXED_TYPE_ID:
+                case Picture::UNSORTED_TYPE_ID:
+                    $success = $this->table->moveToBrand($picture->id, $this->params('brand_id'), $type, $userId);
+                    if (!$success) {
+                        return $this->notFoundAction();
+                    }
+                    break;
+
+                case Picture::ENGINE_TYPE_ID:
+                    $success = $this->table->moveToEngine($picture->id, $this->params('engine_id'), $userId);
+                    if (!$success) {
+                        return $this->notFoundAction();
+                    }
+                    break;
+
+                case Picture::CAR_TYPE_ID:
+                    $success = $this->table->moveToCar($picture->id, $this->params('car_id'), $userId);
+                    if (!$success) {
+                        return $this->notFoundAction();
+                    }
+
+                    $namespace = new Zend_Session_Namespace('Moder_Car');
+                    $namespace->lastCarId = $this->params('car_id');
+                    break;
+
+                default:
+                    throw new Exception("Unexpected type");
+                    break;
+            }
+
+            return $this->redirect()->toUrl($this->pictureUrl($picture));
+        }
+
+        $brandModel = new Brand();
+        $brand = $brandModel->getBrandById($this->params('brand_id'), $this->language());
+        $brands = null;
+        $cars = null;
+        $haveConcepts = null;
+        $haveEngines = null;
+
+        if ($brand) {
+            $carTable = new Cars();
+
+            $rows = $carTable->fetchAll(
+                $carTable->select(true)
+                    ->join('brands_cars', 'cars.id=brands_cars.car_id', null)
+                    ->where('brands_cars.brand_id = ?', $brand['id'])
+                    ->where('NOT cars.is_concept')
+                    ->order(['cars.caption', 'cars.begin_year', 'cars.end_year', 'cars.begin_model_year', 'cars.end_model_year'])
+            );
+            $cars = $this->prepareCars($rows);
+
+            $haveConcepts = (bool)$carTable->fetchRow(
+                $carTable->select(true)
+                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
+                    ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                    ->where('brands_cars.brand_id = ?', $brand['id'])
+                    ->where('cars.is_concept')
+            );
+
+            $engineTable = new Engines();
+            $haveEngines = (bool)$engineTable->fetchRow(
+                $engineTable->select(true)
+                    ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
+                    ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
+                    ->where('brand_engine.brand_id = ?', $brand['id'])
+            );
+
+        } else {
+            $brands = $brandModel->getList($this->language(), function($select) { });
+        }
+
+        return [
+            'picture'      => $picture,
+            'brand'        => $brand,
+            'brands'       => $brands,
+            'cars'         => $cars,
+            'haveConcepts' => $haveConcepts,
+            'haveEngines'  => $haveEngines,
+            'conceptsUrl'  => $this->url()->fromRoute(null, [
+                'action' => 'concepts'
             ], [], true),
-            'decorators' => [
-                'PrepareElements',
-                ['viewScript', [
-                    'viewScript' => 'forms/markdown.phtml'
-                ]],
-                'Form'
-            ],
-            'elements' => [
-                ['textarea', 'text', [
-                    'required'   => false,
-                    'decorators' => ['ViewHelper'],
-                    'rows'       => 5
-                ]],
-            ]
-        ]);
+            'enginesUrl'   => $this->url()->fromRoute(null, [
+                'action' => 'engines'
+            ], [], true)
+        ];
     }
 }

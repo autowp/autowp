@@ -6,7 +6,7 @@
             'needLeft'    => false,
             'needRight'   => false
         ],
-        'pageId' => 151,
+        'pageId' => 149,
         'args'   => [
             'PICTURE_ID'   => $this->picture->id,
             'PICTURE_NAME' => 'Изображение № "'.$this->picture->id.'"'
@@ -28,8 +28,8 @@
                     </div><div class="col-lg-2 col-md-2">
                 <?php } ?>
                 <?=$this->htmlA($this->url(null, [
-                    'brand_id' => $brand->id
-                ], [], true), $brand->caption) ?><br />
+                    'brand_id' => $brand['id']
+                ], [], true), $brand['name']) ?><br />
                 <?php $idx++ ?>
             <?php } ?>
         </div>
@@ -44,7 +44,7 @@
 
         <?php if (count($this->cars) > 0) { ?>
             <div style="margin: 5px 0">
-                <?=$this->partial('pictures/picture-select-car-cars.phtml', [
+                <?=$this->partial('application/moder/pictures/picture-select-car-cars.phtml', [
                     'cars' => $this->cars
                 ])?>
             </div>
@@ -62,6 +62,34 @@
                 </div>
             </div>
         <?php } ?>
+
+        <?php if ($this->haveEngines) { ?>
+            <div style="margin: 5px 0">
+                <?=$this->htmlA([
+                    'href'      => '#',
+                    'class'     => 'arrow',
+                    'data-load' => $this->enginesUrl
+                ], '<i class="fa fa-plus-circle"></i> Двигатели', false)?>
+                <div style="margin:0 0 4px 18px;display:none">
+                    <div class="loading"><em>Loading ...</em></div>
+                </div>
+            </div>
+        <?php } ?>
+
+        <div style="margin: 5px 0">
+            <?=$this->htmlA($this->url(null, [
+                'action' => 'move',
+                'type'   => Picture::LOGO_TYPE_ID
+            ], [], true), 'логотип ' . $this->brand['name']) ?><br />
+            <?=$this->htmlA($this->url(null, [
+                'action' => 'move',
+                'type'   => Picture::MIXED_TYPE_ID
+            ], [], true), 'разное (несколько автомобилей на одной картинке)') ?><br />
+            <?=$this->htmlA($this->url(null, [
+                'action' => 'move',
+                'type'   => Picture::UNSORTED_TYPE_ID
+            ], [], true), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
+        </div>
 
     </div>
 

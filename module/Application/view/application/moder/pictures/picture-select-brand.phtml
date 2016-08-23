@@ -26,8 +26,8 @@
                 </div><div class="col-lg-2 col-md-2">
             <?php } ?>
             <?=$this->htmlA($this->url(null, [
-                'brand_id' => $brand->id
-            ], [], true), $brand->caption) ?><br />
+                'brand_id' => $brand['id']
+            ], [], true), $brand['name']) ?><br />
             <?php $idx++ ?>
         <?php } ?>
     </div>

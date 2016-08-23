@@ -3,6 +3,7 @@
 namespace Application;
 
 use Comment_Message;
+use Picture;
 use Users;
 
 use Zend\Validator as ZendValidator;
@@ -1673,6 +1674,212 @@ return [
                     ]
                 ]
             ],
+        ],
+        'ModerPictureForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'name',
+                        'options' => [
+                            'label' => 'Особое название'
+                        ],
+                        'attributes' => [
+                            'size'      => 60,
+                            'maxlength' => 255,
+                        ]
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'name' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim'],
+                        ['name' => Filter\SingleSpaces::class]
+                    ]
+                ]
+            ],
+        ],
+        'ModerPictureTypeForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post',
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Select',
+                        'name' => 'type',
+                        'options' => [
+                            'label' => 'Тип',
+                            'options' => [
+                                Picture::UNSORTED_TYPE_ID => 'Несортировано',
+                                Picture::CAR_TYPE_ID      => 'Автомобиль',
+                                Picture::LOGO_TYPE_ID     => 'Логотип',
+                                Picture::MIXED_TYPE_ID    => 'Разное',
+                                Picture::ENGINE_TYPE_ID   => 'Двигатель',
+                                Picture::FACTORY_TYPE_ID  => 'Завод',
+                            ]
+                        ],
+                        'attributes' => [
+                            'class' => 'form-control'
+                        ]
+                    ],
+                ]
+            ],
+            'input_filter' => [
+                'type' => [
+                    'required' => true,
+                    'filters'  => [
+                        ['name' => 'Digits']
+                    ]
+                ]
+            ],
+        ],
+        'ModerPictureCopyrightsForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post'
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Textarea',
+                        'name' => 'text',
+                        'options' => [
+                            'label'     => 'Copyrights',
+                        ],
+                        'attributes' => [
+                            'rows'       => 5
+                        ]
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'text' => [
+                    'required' => false,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'min' => 0,
+                                'max' => 4096
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ],
+        'ModerPictureVoteForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post'
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type' => 'Text',
+                        'name' => 'reason',
+                        'options' => [
+                            'label'     => 'Причина',
+                        ],
+                        'attributes' => [
+                            'size'      => 60,
+                            'maxlength' => 255,
+                            'class'     => 'form-control',
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type'    => 'Select',
+                        'name'    => 'vote',
+                        'options' => [
+                            'options' => [
+                                '1' => 'Хочу принять',
+                                '0' => 'Хочу удалить'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'reason' => [
+                    'required' => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'vote' => [
+                    'required' => true
+                ]
+            ]
+        ],
+        'BanForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post'
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type'    => 'Select',
+                        'name'    => 'period',
+                        'options' => [
+                            'label'   => 'На время',
+                            'options' => [
+                                1  => 'час',
+                                2  => '2 часа',
+                                4  => '4 часа',
+                                8  => '8 часов',
+                                16 => '16 часов',
+                                24 => 'сутки',
+                                48 => 'двое суток',
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type'    => 'Text',
+                        'name'    => 'reason',
+                        'options' => [
+                            'label' => 'Причина'
+                        ]
+                    ]
+                ],
+                [
+                    'spec' => [
+                        'type'    => 'Submit',
+                        'name'    => 'submit',
+                        'options' => [
+                            'label' => 'Забанить',
+                        ]
+                    ]
+                ]
+            ],
+            'input_filter' => [
+                'period' => [
+                    'required' => true
+                ],
+                'reason' => [
+                    'required' => true,
+                    'filters'  => [
+                        ['name' => 'StringTrim']
+                    ]
+                ],
+                'submit' => [
+                    'required' => false
+                ]
+            ]
         ],
     ]
 ];

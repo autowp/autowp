@@ -4,7 +4,7 @@ define(
         return {
             init: function(options) {
                 
-                /*$('.model, .generation, .design-project, .concepts, .car').children('p').each(function() {
+                /*$('.concepts, .car').children('p').each(function() {
                     var $p = $(this),
                         $content = $p.next();
 
