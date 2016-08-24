@@ -1814,7 +1814,7 @@ class PicturesController extends AbstractActionController
             htmlspecialchars($picture->getCaption())
         ), [$picture, $replacePicture]);
 
-        return $this->redirect()->toRoute([
+        return $this->redirect()->toRoute(null, [
             'action' => 'picture'
         ], [], true);
     }

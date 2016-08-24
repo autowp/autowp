@@ -356,7 +356,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'account/profile/use-gravatar' => '您可以上传头像或使用 <a href="http://gravatar.com/">Gravatar</a>',
     'account/profile/photo/delete' => '删除头像',
     'account/profile/other' => '其它信息',
-    'account/profile/votes-per-day' => '平均每日投票y',
+    'account/profile/votes-per-day' => '平均每日投票',
     'account/profile/votes-left' => '已进行投票',
     'account/profile/timezone' => '时区',
     'account/profile/language' => '语言',
