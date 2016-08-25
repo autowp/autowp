@@ -54,11 +54,11 @@ return [
     'layout/footer' => '请知悉，autowp服务器中全部素材都是由浏览者添加的.<br />' .
                        '站长没有这些素材的相关法律信息.<br />' .
                        '所有图片仅用于传播知识.<br />' .
-                       '<a href="mailto:autowp@yandex.ru">举报侵权行为</a>.',
+                       '<a href="mailto:autowp@yandex.ru">举报侵权行为.</a>',
 
     /* Picture preview */
-    'picture-preview/no-comments' => '无',
-    'picture-preview/no-ratio'    => '无',
+    'picture-preview/no-comments' => '暂无评论',
+    'picture-preview/no-ratio'    => '暂无比例',
     'Resolution'                  => '分辨率',
     'Filesize'                    => '文件大小',
     'Ratio'                       => '长宽比',
@@ -71,16 +71,16 @@ return [
     'kW'  => 'kW',
     'hp'  => 'hp',
     'spec/%1$s-gear' => [
-        '%1$s 档位数',
+        '%1$s档',
     ],
 
     /* PAGINATOR */
-    'next'                     => '下一张',
-    'previous'                 => '上一张',
+    'next'                     => '下一页',
+    'previous'                 => '上一页',
 
     /* INDEX */
     'index/brands'             => '品牌',
-    'index/factories'          => '厂商',
+    'index/factories'          => '工厂',
     'mosts/fastest/roadster'          => '最快的敞篷跑车',
     'mosts/mighty/sedan/today'        => '当今动力最强的四门轿车',
     'mosts/dynamic/universal/2000-09' => '21世纪初最快的旅行轿车',
@@ -101,7 +101,7 @@ return [
     'brands/new-cars-of-brand' => '新品牌 %s',
 
     'brands/more-companies'    => [
-        '全部 %s 品牌'
+        '全部 %s 个品牌'
     ],
 
     /* Layout */
@@ -118,7 +118,7 @@ return [
 
     /* CAR LIST */
     'carlist/all pictures'    => '全部图片',
-    'carlist/details'         => '详细信息',
+    'carlist/details'         => '详细分类',
     'carlist/twins'           => '姊妹车型',
     'carlist/produced/one'    => '总产量1辆',
     'carlist/produced/%1$s'   => [
@@ -236,12 +236,12 @@ return [
     'catalogue/all-pictures-of-%1$s' => '%1$s的所有图片',
     'catalogue/brand/links' => '链接',
     'catalogue/brand/popular-images' => '热门图片',
-    'catalogue/brand/new-pictures' => '新图片',
+    'catalogue/brand/new-pictures' => '按上传时间',
     'catalogue/link-category/official' => '官方网站',
     'catalogue/link-category/helper'   => '协助发展',
     'catalogue/link-category/club'     => '俱乐部',
     'catalogue/link-category/default'  => '其它',
-    'catalogue/chronological' => '年份',
+    'catalogue/chronological' => '按车型年代',
     'catalogue/related' => '相关目录',
     'catalogue/related-with-%1$s' => '共有 %1$s 个相关目录',
     'catalogue/sport' => '赛事',
@@ -253,7 +253,7 @@ return [
     /* comments */
     'comments/title' => '评论',
     'comments/reply' => '回复',
-    'comments/what-to-do-for-write-comments' => '为方便发表评论，您需要<a href="/login">注册账号或用社交网站账号登陆</a>',
+    'comments/what-to-do-for-write-comments' => '为方便发表评论,您需要<a href="/login">注册账号或用社交网站账号登陆</a>',
     'comments/it-requires-attention-of-moderators' => '向管理员发送提示',
     'comments/form-title' => '添加评论',
     'comments/message' => '站内信',
@@ -261,9 +261,9 @@ return [
     'comments/cancel' => '取消',
     'comments/need-wait-text' => '很抱歉稍后您才可以发表新评论.
 
-This is due to the presence of the threshold "messages per hour", necessary to prevent spam and some other negative aspects.
+这是由于为了防止灌水和其他不端行为,每小时发送的消息数受到限制.
 
-Next, you can leave a comment in the "%s", as long as you have the time to clarify the idea you want to convey to the public:',
+现在您可以在"%s"中发表评论,建议使用清晰易懂的措辞表达您的看法:',
 
     /*perspectives*/
     'perspective/front'          => '前方',
@@ -289,7 +289,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'perspective/boot'           => 'boot',
     'perspective/logo'           => '商标',
 
-    'login/sign-in' => '登陆',
+    'login/sign-in' => '登录',
     'login/sign-out' => '注销',
     'login/name' => '用户名',
     'login/login-or-email' => '用户名或邮箱',
@@ -299,11 +299,11 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'login/registration' => '注册',
     'login/forgot-password?' => '忘记密码?',
     'login/success-text' => '欢迎您来到我们的网站',
-    'login/remember' => '保持登陆状态',
+    'login/remember' => '保持登录状态',
     'login/if-you-lose-password' => '如果您忘记了密码,您可以填写表格  <a href="/restorepassword">重设电子邮件</a>',
     'login/if-you-not-registered' => '如果您尚未注册<a href="/registration">现在就可注册</a>!',
-    'login/sign-in-using-account' => '登录当前账号',
-    'login/login-or-password-is-incorrect' => '您已登陆或密码错误',
+    'login/sign-in-using-account' => '使用已有账号登录',
+    'login/login-or-password-is-incorrect' => '您已登录或密码错误',
     'login/user-%value%-not-found' => '用户名或注册邮箱 "%value%" 不存在',
 
     'registration/if-you-registered' => '如果您已注册，请不要重复操作，只需在右侧输入用户名和密码即可登录',
@@ -378,7 +378,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'picture/propose-image-replacement' => '建议更换图片',
     'picture/moderators-about-this-picture' => '相关管理员',
     'picture/all-images-have-owners' => '任何图片都有权益人.',
-    'picture/if-you-found-error' => '如果您认为有用户上传了不正确的照片，我们诚挚地请您撰写评论并指出错误.',
+    'picture/if-you-found-error' => '如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误.',
     'picture/where-to-talk' => '前往<a href="/forums/">论坛</a>可以讨论任何车型的任何话题 ',
 
     'users/user/recent-activity' => '最新动态',
@@ -426,7 +426,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
 
 如果您希望资助我们每日的工作，可以通过PayPal或Yandex.Money进行捐助.
 
-在捐助的同时可以告诉我们您对网站的愿景
+在捐助的同时可以告诉我们您对网站的愿景.
 
 原则上我们进行不记名捐助，但如果您要求，我们会标记您的贡献.',
     'donate/target' => '为了维持网站运营',
