@@ -9,7 +9,7 @@ $zf2uri = ['/api/', '/oauth', '/users', '/rules', '/about', '/info', '/pulse',
     '/moder/rights', '/registration', '/login', '/picture/', '/telegram',
     '/account', '/moder/brands', '/moder/museum', '/moder/pages',
     '/moder/factory', '/moder/category', '/moder/engines', '/moder/attrs',
-    '/moder/pictures'];
+    '/moder/pictures']; // , '/moder/cars/index'
 
 $zf2ExactUri = ['/log', '/moder', '/new', '/factory', '/ban'];
 

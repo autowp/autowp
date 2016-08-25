@@ -153,69 +153,6 @@ return [
                 $service = $sm->get(Service\UsersService::class);
                 return new Controller\Console\UsersController($service);
             },
-            Controller\Moder\AttrsController::class => InvokableFactory::class,
-            Controller\Moder\BrandsController::class => function($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $logoForm = $sm->get('BrandLogoForm');
-                $descForm = $sm->get('DescriptionForm');
-                return new Controller\Moder\BrandsController($textStorage, $logoForm, $descForm);
-            },
-            Controller\Moder\CategoryController::class => function($sm) {
-                return new Controller\Moder\CategoryController();
-            },
-            Controller\Moder\CommentsController::class => function($sm) {
-                $form = $sm->get('ModerCommentsFilterForm');
-                return new Controller\Moder\CommentsController($form);
-            },
-            Controller\Moder\EnginesController::class => function($sm) {
-                $filterForm = $sm->get('ModerFactoryFilterForm');
-                $editForm = $sm->get('ModerEngineForm');
-                return new Controller\Moder\EnginesController($filterForm, $editForm);
-            },
-            Controller\Moder\FactoryController::class => function($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $addForm = $sm->get('ModerFactoryAddForm');
-                $editForm = $sm->get('ModerFactoryEditForm');
-                $descForm = $sm->get('DescriptionForm');
-                $filterForm = $sm->get('ModerFactoryFilterForm');
-                return new Controller\Moder\FactoryController($textStorage, $addForm, $editForm, $descForm, $filterForm);
-            },
-            Controller\Moder\HotlinkController::class => InvokableFactory::class,
-            Controller\Moder\IndexController::class => function($sm) {
-                $form = $sm->get('AddBrandForm');
-                return new Controller\Moder\IndexController($form);
-            },
-            Controller\Moder\MuseumController::class => function($sm) {
-                $form = $sm->get('MuseumForm');
-                return new Controller\Moder\MuseumController($form);
-            },
-            Controller\Moder\PagesController::class => InvokableFactory::class,
-            Controller\Moder\PerspectivesController::class => InvokableFactory::class,
-            Controller\Moder\PicturesController::class => function($sm) {
-                $table = $sm->get(Picture::class);
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $pictureForm = $sm->get('ModerPictureForm');
-                $copyrightsForm = $sm->get('ModerPictureCopyrightsForm');
-                $voteForm = $sm->get('ModerPictureVoteForm');
-                $banForm = $sm->get('BanForm');
-                return new Controller\Moder\PicturesController($table, $textStorage, $pictureForm, $copyrightsForm, $voteForm, $banForm);
-            },
-            Controller\Moder\RightsController::class => function($sm) {
-                $acl = $sm->get(Acl::class);
-                $cache = $sm->get('longCache');
-                $roleForm = $sm->get('ModerAclRoleForm');
-                $ruleForm = $sm->get('ModerAclRuleForm');
-                $roleParentForm = $sm->get('ModerAclRoleParentForm');
-                return new Controller\Moder\RightsController($acl, $cache, $roleForm, $ruleForm, $roleParentForm);
-            },
-            Controller\Moder\TrafficController::class => InvokableFactory::class,
-            Controller\Moder\TwinsController::class => function($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $editForm = $sm->get('ModerTwinsEditForm');
-                $descForm = $sm->get('DescriptionForm');
-                return new Controller\Moder\TwinsController($textStorage, $editForm, $descForm);
-            },
-            Controller\Moder\UsersController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [

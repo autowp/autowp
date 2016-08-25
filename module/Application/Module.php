@@ -102,6 +102,7 @@ class Module implements ConsoleUsageProviderInterface,
             __DIR__ . '/config/module.config.forms.php',
             __DIR__ . '/config/module.config.imagestorage.php',
             __DIR__ . '/config/module.config.routes.php',
+            __DIR__ . '/config/module.config.moder.php',
         ];
 
         // Merge all module config options
@@ -169,12 +170,12 @@ class Module implements ConsoleUsageProviderInterface,
         Zend_Translate::setCache($longCache);
     }
 
-    public function getConsoleBanner(Console $console) 
+    public function getConsoleBanner(Console $console)
     {
         return 'WheelsAge Module';
     }
 
-    public function getConsoleUsage(Console $console) 
+    public function getConsoleUsage(Console $console)
     {
         //description command
         return [
