@@ -1,0 +1,18 @@
+<?=$this->htmlA($this->car['url'], $this->car['name'])?>
+<?php if (count($this->car['childs'])) { ?>
+    <ul>
+        <?php foreach ($this->car['childs'] as $car) { ?>
+            <?php
+                $isTuning = $car['type'] == Car_Parent::TYPE_TUNING;
+                $isSport  = $car['type'] == Car_Parent::TYPE_SPORT;
+            ?>
+            <li class="<?=$isTuning ? 'tuning' : ''?><?=$isSport ? 'sport' : ''?>">
+                <?php if ($isTuning) { ?>Тюнинг: <?php } ?>
+                <?php if ($isSport) { ?>Спорт: <?php } ?>
+                <?=$this->partial('application/moder/cars/partial/car-tree', [
+                    'car' => $car
+                ])?>
+            </li>
+        <?php } ?>
+    </ul>
+<?php } ?>

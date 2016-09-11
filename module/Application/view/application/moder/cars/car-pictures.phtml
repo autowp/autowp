@@ -1,0 +1,9 @@
+<div class="btn-group">
+    <?=$this->htmlA([
+        'href'  => $this->url(null, [
+            'action'    => 'organize-pictures',
+        ], [], true),
+        'class' => 'btn btn-default',
+    ], 'Турбо объединятор картинок в группы')?>
+</div>
+<?=$this->partial('application/pictures', $this->picturesData)?>

@@ -1,0 +1,20 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needRight'   => false
+        ],
+        'pageId' => 78,
+        'args'   => [
+            'CAR_ID'   => $this->car->id,
+            'CAR_NAME' => $this->car->getFullName()
+        ]
+    ]);
+
+    //$this->layout()->moduleName = 'moder/cars/car';
+?>
+<p>Инструмент позволяет объединить несколько автомобилей в одну новую группу</p>
+<?=$this->partial('application/forms/bootstrap-horizontal', [
+    'form' => $this->form
+])?>

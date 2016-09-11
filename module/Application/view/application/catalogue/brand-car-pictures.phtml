@@ -1,0 +1,46 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ],
+        'pageId' => 34,
+        'args'   => [
+            'BRAND_CATNAME'  => $this->brand['catname'],
+            'BRAND_NAME'     => $this->brand['name'],
+            'CAR_CATNAME'    => $this->carCatname,
+            'CAR_NAME'       => $this->carFullName,
+            'SHORT_CAR_NAME' => $this->carShortName
+        ],
+        'breadcrumbsReplace' => [
+            'pageId'      => 33,
+            'breadcrumbs' => $this->breadcrumbs
+        ]
+    ]);
+?>
+
+<?=$this->partial('application/catalogue/partial/brand-car-menu', [
+    'title' => $this->carFullName,
+    'stock' => [
+        'count'  => $this->stockCount,
+        'active' => false
+    ],
+    'tuning' => [
+        'count'  => $this->tuningCount,
+        'active' => false
+    ],
+    'sport' => [
+        'count'  => $this->sportCount,
+        'active' => false
+    ],
+    'pictures' => [
+        'count'  => $this->picturesCount,
+        'active' => true
+    ],
+]) ?>
+
+<?=$this->render('catalogue/partial/modification-filter.phtml')?>
+
+<?=$this->partial('application/pictures', $this->picturesData)?>
+<?=$this->paginationControl($this->paginator) ?>

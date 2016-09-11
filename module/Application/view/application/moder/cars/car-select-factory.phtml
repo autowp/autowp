@@ -1,0 +1,34 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needRight'   => false
+        ],
+        'pageId' => 178,
+        'args'   => [
+            'CAR_ID'   => $this->car->id,
+            'CAR_NAME' => $this->car->getFullName()
+        ]
+    ]);
+?>
+
+<div class="well">
+    <form action="<?=$this->escapeHtmlAttr($this->url(null, [], [], true))?>" method="post">
+        <?php foreach ($this->factories as $factory) { ?>
+            <?=$this->formElement(
+                (new Zend\Form\Element\Button('factory_id', [
+                    'label' => $factory['name']
+                ]))
+                    ->setValue($factory['id'])
+                    ->setAttributes([
+                        'class' => 'btn btn-link',
+                        'type'  => 'submit'
+                    ])
+            )?>
+            <?php /*=$this->formButton('factory_id', $factory['id'], [
+                'type'    => 'submit',
+            ]) */ ?><br />
+        <?php } ?>
+    </form>
+</div>

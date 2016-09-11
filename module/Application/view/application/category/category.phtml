@@ -18,30 +18,16 @@
         ]
     ]);
 ?>
-<div class="row">
-    <div class="col-md-4">
-        <div class="well nav-tree">
-            <?=$this->partial('application/category/menu', [
-                'categories' => $this->categories,
-                'category'   => $this->category,
-                'isOther'    => $this->isOther,
-                'deep'       => 1
-            ])?>
-        </div>
-    </div>
-    <div class="col-md-8">
-        <?=$this->partial('application/cars', $this->listData)?>
-        <?=$this->paginationControl($this->paginator, null, null, [
-            'urlParams' => $this->urlParams
-        ]) ?>
+<?=$this->partial('application/cars', $this->listData)?>
+<?=$this->paginationControl($this->paginator, null, null, [
+    'urlParams' => $this->urlParams
+]) ?>
 
-        <?php if (count($this->contributors)) { ?>
-            <p>
-                Составители:
-                <?php foreach ($this->contributors as $contributor) { ?>
-                    <?=$this->user($contributor)?>
-                <?php } ?>
-            </p>
+<?php if (count($this->contributors)) { ?>
+    <p>
+        Составители:
+        <?php foreach ($this->contributors as $contributor) { ?>
+            <?=$this->user($contributor)?>
         <?php } ?>
-    </div>
-</div>
+    </p>
+<?php } ?>

@@ -2,13 +2,13 @@
 
 namespace Application\Form\Element;
 
-use Zend\Form\Element\Text;
+use Zend\Form\Element\Number;
 use Zend\InputFilter\InputProviderInterface;
 
-class Year extends Text implements InputProviderInterface
+class Year extends Number implements InputProviderInterface
 {
     protected $attributes = [
-        'type'      => 'text',
+        'type'      => 'number',
         'maxlength' => 4,
         'size'      => 4
     ];

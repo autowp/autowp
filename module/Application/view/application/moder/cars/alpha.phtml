@@ -1,0 +1,35 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needRight'   => false
+        ],
+        'pageId' => 74,
+    ]);
+?>
+<div class="well">
+    <?php foreach ($this->groups as $group) { ?>
+        <div class="btn-group">
+            <?php foreach ($group as $char) { ?>
+                <?=$this->htmlA([
+                    'class' => 'btn btn-default',
+                    'href'  => $this->url('moder/cars/params', ['char' => $char], [], true),
+                ], $char) ?>
+            <?php } ?>
+        </div>
+    <?php } ?>
+</div>
+
+<?php if ($this->char) { ?>
+    <h3>Автомобили</h3>
+    <div class="well">
+        <?php foreach ($this->cars as $car) { ?>
+            <?=$this->htmlA($this->url('moder/cars/params', [
+                'action' => 'car',
+                'car_id' => $car->id
+            ], [], true), $car->getFullName()) ?>
+            <br />
+        <?php } ?>
+    </div>
+<?php } ?>

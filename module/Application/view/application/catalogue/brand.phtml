@@ -1,0 +1,113 @@
+<?php
+    $this->pageEnv([
+        'layout'    => [
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ],
+        'pageId'    => 10,
+        'pageTitle' => '',
+        'args'      => [
+            'BRAND_CATNAME' => $this->brand['catname'],
+            'BRAND_NAME'    => $this->brand['name'],
+        ]
+    ]);
+?>
+
+<header>
+    <div class="jumbotron brand-hero-unit">
+        <?=$this->img($this->brand['img'], [
+            'format' => 'logo',
+            'alt'    => 'логотип ' . $this->brand['name'],
+            'class'  => 'logo'
+        ])?>
+        <div class="content">
+            <?php /* if ($this->brandLanguage) { ?>
+                <h1><?=$this->escapeHtml($this->brandLanguage->name) ?></h1>
+                <p>
+                    <?=$this->escapeHtml($this->brand->caption) ?>
+                    <?php if ( $this->brand->full_caption && ($this->brand->full_caption != $this->brand->caption) ) { ?>
+                        <small>(<?=$this->escapeHtml($this->brand->full_caption)?>)</small>
+                    <?php } ?>
+                </p>
+            <?php } else { */ ?>
+                <h1>
+                    <?=$this->escapeHtml($this->brand['name']) ?>
+                    <?php if ( $this->brand['full_name'] && ($this->brand['full_name'] != $this->brand['name']) ) { ?>
+                        <small>(<?=$this->escapeHtml($this->brand['full_name'])?>)</small>
+                    <?php } ?>
+                </h1>
+            <?php /*}*/ ?>
+            <?php if ($this->description) { ?>
+                <?=$this->markdown($this->description)?>
+            <?php } ?>
+        </div>
+    </div>
+    <ul class="nav nav-pills">
+        <li>
+            <?=$this->htmlA($this->url('catalogue', [
+                'action' => 'cars'
+            ], [], true), '<i class="fa fa-road"></i> ' . $this->escapeHtml($this->translate('catalogue/chronological')), false)?>
+        </li>
+        <li>
+            <?=$this->htmlA($this->url('catalogue', [
+                'action' => 'recent'
+            ], [], true), '<i class="fa fa-th"></i> '. $this->escapeHtml($this->translate('catalogue/brand/new-pictures')), false)?>
+        </li>
+        <?php if ($this->haveTwins) { ?>
+            <li>
+                <?=$this->htmlA($this->url('twins/brand', [
+                    'brand_catname' => $this->brand['catname']
+                ]), '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(25)->name), false)?>
+            </li>
+        <?php } ?>
+        <?php if ($this->mostsActive) { ?>
+            <li>
+                <?=$this->htmlA($this->url('catalogue', [
+                    'action'        => 'brand-mosts',
+                    'brand_catname' => $this->brand['catname']
+                ]), '<i class="fa fa-sort-amount-desc"></i> ' . $this->escapeHtml($this->page(21)->name), false)?>
+            </li>
+        <?php } ?>
+    </ul>
+</header>
+
+<?php if ($this->topPictures && count($this->topPictures)) { ?>
+    <section>
+        <h2><?=$this->escapeHtml($this->translate('catalogue/brand/popular-images')) ?></h2>
+        <?=$this->partial('application/pictures', $this->topPictures)?>
+    </section>
+<?php } ?>
+
+<?php if (count($this->factories)) { ?>
+    <section>
+        <h2>Factories</h2>
+        <div class="row">
+            <?php foreach ($this->factories as $factory) { ?>
+                <div class="col-sm-3">
+                    <?=$this->htmlA([
+                        'class' => 'thumbnail',
+                        'href'  => $factory['url']
+                    ], $this->htmlImg($factory['src']), false)?>
+                    <p><?=$this->htmlA($factory['url'], $factory['name'])?></p>
+                </div>
+            <?php } ?>
+        </div>
+    </section>
+<?php } ?>
+
+<?php if (count($this->link_types)) { ?>
+    <section>
+        <h2><?=$this->escapeHtml($this->translate('catalogue/brand/links')) ?></h2>
+        <?php foreach ($this->link_types as $key => $type) { ?>
+            <?php if (count($type['links'])) { ?>
+                <p>
+                    <strong><?=$this->escapeHtml($this->translate('catalogue/link-category/' . $key)) ?></strong><br />
+                    <?php foreach ($type['links'] as $link) { ?>
+                        <?=$this->htmlA($link->url, $link->caption ? $link->caption : $link->url)?><br />
+                    <?php } ?>
+                </p>
+            <?php } ?>
+        <?php } ?>
+    </section>
+<?php } ?>

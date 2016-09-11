@@ -1,0 +1,17 @@
+<div id="BrandGroupsContainer" class="well">
+    <ul>
+        <?php foreach ($this->groups as $group) {
+            ?><li><?php
+                echo $this->htmlA(['href' => $group['url']], $group['caption']);
+                if ( isset($group['childs']) && (count($group['childs']) > 0) ) {
+                    $items = [];
+                    foreach ($group['childs'] as $subgroup) {
+                        $items[] = $this->htmlA(['href' => $subgroup['url']], $subgroup['caption']);
+                    }
+
+                    ?><div><?=implode(', ', $items) ?></div><?php
+                }
+            ?></li><?php
+        } ?>
+    </ul>
+</div>

@@ -12,19 +12,10 @@
         ]
     ]);
 ?>
-<div class="row">
-    <div class="col-sm-8 col-sm-push-4">
-        <?=$this->partial('application/pictures', $this->picturesData)?>
-        <?=$this->paginationControl($this->paginator, null, null, [
-            'route'     => 'twins/group/pictures/page',
-            'urlParams' => [
-                'id' => $this->group['id']
-            ]
-        ]) ?>
-    </div>
-    <div class="col-sm-4 col-sm-pull-8">
-        <?=$this->partial('application/twins/partial/sidebar', [
-            'brands'  => $this->brands
-        ])?>
-    </div>
-</div>
+<?=$this->partial('application/pictures', $this->picturesData)?>
+<?=$this->paginationControl($this->paginator, null, null, [
+    'route'     => 'twins/group/pictures/page',
+    'urlParams' => [
+        'id' => $this->group['id']
+    ]
+]) ?>

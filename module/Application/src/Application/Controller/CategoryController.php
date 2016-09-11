@@ -4,6 +4,7 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
@@ -318,7 +319,7 @@ class CategoryController extends AbstractActionController
             }
         }
 
-        $key = 'CATEGORY_MENU324_' . $topCategory->id . '_' . $language;
+        $key = 'CATEGORY_MENU325_' . $topCategory->id . '_' . $language;
 
         $menu = $this->cache->getItem($key, $success);
         if (!$success) {
@@ -330,11 +331,19 @@ class CategoryController extends AbstractActionController
 
         $this->categoriesMenuActive($menu, $currentCategory, $isOther);
 
+        $sideBarModel = new ViewModel([
+            'categories' => $menu,
+            'category'   => $currentCategory,
+            'isOther'    => $isOther,
+            'deep'       => 1
+        ]);
+        $sideBarModel->setTemplate('application/category/menu');
+        $this->layout()->addChild($sideBarModel, 'sidebar');
+
         $data = [
             'category'     => $currentCategory,
             'categoryLang' => $categoryLang,
             'isOther'      => $isOther,
-            'categories'   => $menu,
         ];
 
         $result =  $callback($language, $topCategory, $currentCategory,

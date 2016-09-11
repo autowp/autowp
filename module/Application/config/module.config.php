@@ -45,6 +45,10 @@ return [
                 $cache = $sm->get('longCache');
                 return new Controller\BrandsController($cache);
             },
+            Controller\CatalogueController::class => function($sm) {
+                $textStorage = $sm->get(TextStorage\Service::class);
+                return new Controller\CatalogueController($textStorage);
+            },
             Controller\CategoryController::class => function($sm) {
                 $cache = $sm->get('longCache');
                 return new Controller\CategoryController($cache);
@@ -167,31 +171,36 @@ return [
                 $textStorage = $sm->get(TextStorage\Service::class);
                 return new Controller\Plugin\Car($textStorage);
             },
+            'fileSize' => function($sm) {
+            return new Controller\Plugin\FileSize(
+                    $sm->get(Language::class),
+                    $sm->get(FileSize::class)
+                    );
+            },
             'imageStorage' => function($sm) {
                 $storage = $sm->get(Image\Storage::class);
                 return new Controller\Plugin\ImageStorage($storage);
-            },
-            'oauth2' => Factory\OAuth2PluginFactory::class,
-            'user' => function($sm) {
-                $acl = $sm->get(Acl::class);
-                $config = $sm->get('Config');
-                return new Controller\Plugin\User($acl, $config['hosts']);
             },
             'language' => function($sm) {
                 $language = $sm->get(Language::class);
                 return new Controller\Plugin\Language($language);
             },
+            'oauth2' => Factory\OAuth2PluginFactory::class,
             'pic' => function($sm) {
                 $viewHelperManager = $sm->get('ViewHelperManager');
                 $carHelper = $viewHelperManager->get('car');
                 $textStorage = $sm->get(TextStorage\Service::class);
                 return new Controller\Plugin\Pic($textStorage, $carHelper);
             },
-            'fileSize' => function($sm) {
-                return new Controller\Plugin\FileSize(
-                    $sm->get(Language::class),
-                    $sm->get(FileSize::class)
-                );
+            'sidebar' => function ($sm) {
+                $cache = $sm->get('fastCache');
+                $translator = $sm->get('translator');
+                return new Controller\Plugin\Sidebar($cache, $translator);
+            },
+            'user' => function($sm) {
+                $acl = $sm->get(Acl::class);
+                $config = $sm->get('Config');
+                return new Controller\Plugin\User($acl, $config['hosts']);
             },
         ]
     ],
@@ -235,6 +244,12 @@ return [
             'pictures'    => View\Helper\Pictures::class,
             'moderMenu'   => View\Helper\ModerMenu::class,
             'count'       => View\Helper\Count::class,
+            View\Helper\FormElement::class => Form\View\Helper\FormElement::class,
+            'form_element'                 => Form\View\Helper\FormElement::class,
+            'formelement'                  => Form\View\Helper\FormElement::class,
+            'formElement'                  => Form\View\Helper\FormElement::class,
+            'FormElement'                  => Form\View\Helper\FormElement::class,
+            'formpicturemulticheckbox' => Form\View\Helper\FormPictureMultiCheckbox::class
         ],
         'factories' => [
             'mainMenu' => function($sm) {
@@ -498,7 +513,8 @@ return [
     ],
     'filters' => [
         'factories' => [
-            Filter\SingleSpaces::class => InvokableFactory::class
+            Filter\SingleSpaces::class => InvokableFactory::class,
+            \Autowp\Filter\Filename\Safe::class => InvokableFactory::class,
         ],
     ],
 

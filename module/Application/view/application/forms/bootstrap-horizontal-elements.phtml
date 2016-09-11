@@ -16,11 +16,11 @@
         </div>
     <?php } elseif ($element instanceof Zend\Form\Element\Multicheckbox) { ?>
         <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
-            <label class="col-md-2 control-label" for="<?=$element->getId()?>">
+            <label class="col-md-2 control-label">
                 <?=$this->escapeHtml($this->translate($element->getLabel()))?>
             </label>
             <div class="col-md-10">
-                <?=$element ?>
+                <?=$this->formElement($element)?>
                 <?php foreach ($element->getMessages() as $error) { ?>
                     <p class="help-block"><?=$this->escapeHtml($error)?></p>
                 <?php } ?>
@@ -45,14 +45,29 @@
     <?php } elseif ($element instanceof Zend\Form\Element\Hidden) { ?>
         <?=$this->formElement($element)?>
     <?php } elseif ($element instanceof Zend\Form\Fieldset) { ?>
-        <fieldset>
-            <?php if ($legend = $element->getLabel()) { ?>
-                <legend><?=$this->escapeHtml($this->translate($legend))?></legend>
-            <?php } ?>
-            <?=$this->partial('application/forms/bootstrap-horizontal-elements', [
-                'form' => $element
-            ])?>
-        </fieldset>
+        <?php if ($element->getAttribute('class') == 'form-inline') { ?>
+            <div class="form-group">
+                <label class="col-md-2 control-label">
+                    <?=$this->escapeHtml($this->translate($element->getLabel()))?>
+                </label>
+                <div class="col-md-10">
+                    <fieldset class="form-inline">
+                        <?=$this->partial('application/forms/bootstrap-inline-elements', [
+                            'form' => $element
+                        ])?>
+                    </fieldset>
+                </div>
+            </div>
+        <?php } else { ?>
+            <fieldset>
+                <?php if ($legend = $element->getLabel()) { ?>
+                    <legend><?=$this->escapeHtml($this->translate($legend))?></legend>
+                <?php } ?>
+                <?=$this->partial('application/forms/bootstrap-horizontal-elements', [
+                    'form' => $element
+                ])?>
+            </fieldset>
+        <?php } ?>
     <?php } elseif (!$element instanceof Zend\Form\Element\Submit) { ?>
         <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
             <label class="col-md-2 control-label">

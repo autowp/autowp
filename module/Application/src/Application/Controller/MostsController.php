@@ -3,6 +3,7 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
 
 use Application\Service\Mosts;
 
@@ -122,6 +123,10 @@ class MostsController extends AbstractActionController
             $car['pictures'] = $pictures;
         }
         unset($car);
+
+        $sideBarModel = new ViewModel($data);
+        $sideBarModel->setTemplate('application/mosts/sidebar');
+        $this->layout()->addChild($sideBarModel, 'sidebar');
 
         return $data;
     }

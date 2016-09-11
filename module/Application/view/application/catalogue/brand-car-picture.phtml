@@ -1,0 +1,23 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ],
+        'pageId' => 194,
+        'args'   => [
+            'BRAND_CATNAME'  => $this->brand['catname'],
+            'BRAND_NAME'     => $this->brand['name'],
+            'CAR_CATNAME'    => $this->carCatname,
+            'CAR_NAME'       => $this->carFullName,
+            'SHORT_CAR_NAME' => $this->carShortName,
+            'PICTURE_NAME'   => $this->pic()->textTitle($this->picture['name']),
+        ],
+        'breadcrumbsReplace' => [
+            'pageId'      => 33,
+            'breadcrumbs' => $this->breadcrumbs
+        ]
+    ]);
+?>
+<?=$this->partial('application/picture/picture', $this->picture)?>

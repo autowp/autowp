@@ -4,6 +4,7 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 
 use Application\Model\Twins;
 use Autowp\TextStorage;
@@ -75,7 +76,11 @@ class TwinsController extends AbstractActionController
             $brand['selected'] = in_array($brand['id'], $selectedIds);
         }
 
-        return $arr;
+        $sideBarModel = new ViewModel([
+            'brands' => $arr
+        ]);
+        $sideBarModel->setTemplate('application/twins/partial/sidebar');
+        $this->layout()->addChild($sideBarModel, 'sidebar');
     }
 
     public function specificationsAction()
@@ -129,11 +134,12 @@ class TwinsController extends AbstractActionController
             }
         ]);
 
+        $this->getBrands($twins->getGroupBrandIds($group['id']));
+
         return [
             'group'        => $group,
             'paginator'    => $paginator,
-            'picturesData' => $picturesData,
-            'brands'       => $this->getBrands($twins->getGroupBrandIds($group['id']))
+            'picturesData' => $picturesData
         ];
     }
 
@@ -163,6 +169,8 @@ class TwinsController extends AbstractActionController
             $description = $this->textStorage->getText($group['text_id']);
         }
 
+        $this->getBrands($this->getTwins()->getGroupBrandIds($group['id']));
+
         return [
             'group'              => $group,
             'description'        => $description,
@@ -184,8 +192,7 @@ class TwinsController extends AbstractActionController
             ]),
             'picturesUrl'        => $this->url()->fromRoute('twins/group/pictures', [
                 'id' => $group['id'],
-            ]),
-            'brands'             => $this->getBrands($this->getTwins()->getGroupBrandIds($group['id']))
+            ])
         ];
     }
 
@@ -371,12 +378,13 @@ class TwinsController extends AbstractActionController
 
         $groups = $this->prepareList($paginator->getCurrentItems());
 
+        $this->getBrands([$brand->id]);
+
         return [
             'groups'    => $groups,
             'paginator' => $paginator,
             'brand'     => $brand,
-            'canEdit'   => $canEdit,
-            'brands'    => $this->getBrands([$brand->id])
+            'canEdit'   => $canEdit
         ];
     }
 
@@ -390,11 +398,12 @@ class TwinsController extends AbstractActionController
 
         $groups = $this->prepareList($paginator->getCurrentItems());
 
+        $this->getBrands([]);
+
         return [
             'groups'    => $groups,
             'paginator' => $paginator,
-            'canEdit'   => $canEdit,
-            'brands'    => $this->getBrands([])
+            'canEdit'   => $canEdit
         ];
     }
 
@@ -448,14 +457,15 @@ class TwinsController extends AbstractActionController
                 ]
             ]);
 
+            $this->getBrands($twins->getGroupBrandIds($group['id']));
+
             return array_replace($data, [
                 'group'      => $group,
                 'gallery2'   => true,
                 'galleryUrl' => $this->url()->fromRoute('twins/group/pictures/picture/gallery', [
                     'id'         => $group['id'],
                     'picture_id' => $picture['identity'] ? $picture['identity'] : $picture['id']
-                ]),
-                'brands'     => $this->getBrands($twins->getGroupBrandIds($group['id']))
+                ])
             ]);
         });
     }

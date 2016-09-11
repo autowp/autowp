@@ -1,0 +1,40 @@
+<h3>Распределение фотографий по модификациям</h3>
+<form action="<?=$this->escapeHtmlAttr($this->url(null, [], [], true))?>" method="post">
+    <input type="submit" value="Сохранить" class="btn btn-primary btn-block" style="margin:30px 0" />
+    <div class="row">
+        <?php foreach ($this->pictures as $picture) { ?>
+            <div class="col-md-6">
+                <p><?=$this->htmlA($picture['url'], $picture['name'])?></p>
+                <div class="row" style="margin-bottom:20px">
+                    <div class="col-xs-4">
+                        <?=$this->htmlA($picture['url'], $this->htmlImg([
+                            'src' => $picture['src'],
+                            'style' => 'max-width:100%'
+                        ]), false)?>
+                    </div>
+                    <div class="col-xs-8">
+                        <?php foreach ($this->groups as $group) { ?>
+                            <?php if (count($group['modifications']) > 0 ) { ?>
+                                <div>
+                                    <?=$this->escapeHtml($group['name'] ? $group['name'] : 'Другие')?>
+                                    <div class="btn-group" data-toggle="buttons">
+                                        <?php foreach ($group['modifications'] as $modification) { ?>
+                                            <?php
+                                                $active = in_array($modification['id'], $picture['modificationIds']);
+                                            ?>
+                                            <label class="btn btn-default btn-xs<?=$active ? ' active' : ''?>">
+                                                <input type="checkbox" name="picture[<?=(int)$picture['id']?>][]" value="<?=(int)$modification['id']?>" autocomplete="off"<?=$active ? ' checked' : ''?> />
+                                                <?=$this->escapeHtml($modification['name'])?>
+                                            </label>
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                            <?php } ?>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+    <input type="submit" value="Сохранить" class="btn btn-primary btn-block" style="margin:30px 0" />
+</form>

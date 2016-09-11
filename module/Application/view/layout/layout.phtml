@@ -1,6 +1,6 @@
 <?php
     $blankPage = isset($this->layout()->blankPage) ? $this->layout()->blankPage : $this->blankPage;
-    $needLeft  = isset($this->layout()->needLeft)  ? $this->layout()->needLeft  : $this->needLeft;
+    $needLeft  = isset($this->sidebar);
     $needRight = isset($this->layout()->needRight) ? $this->layout()->needRight : $this->needRight;
     $isAdminPage = isset($this->layout()->isAdminPage) ? $this->layout()->isAdminPage : $this->isAdminPage;
 
@@ -89,7 +89,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 </div>
                 <?php if ($needLeft) { ?>
                     <div class="col-sm-<?=$spanLeft?> col-sm-pull-<?=$spanCenter?>">
-                        <?=$this->layout()->sidebar ?>
+                        <?php if (isset($this->sidebar)) { ?>
+                            <?=$this->sidebar ?>
+                        <?php } ?>
                     </div>
                 <?php } ?>
                 <?php if ($needRight) { ?>

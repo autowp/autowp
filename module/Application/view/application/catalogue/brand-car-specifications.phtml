@@ -1,0 +1,36 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ],
+        'pageId' => 36,
+        'args'   => [
+            'BRAND_CATNAME'  => $this->brand['catname'],
+            'BRAND_NAME'     => $this->brand['name'],
+            'CAR_CATNAME'    => $this->carCatname,
+            'CAR_NAME'       => $this->carFullName,
+            'SHORT_CAR_NAME' => $this->carShortName
+        ],
+        'breadcrumbsReplace' => [
+            'pageId'      => 33,
+            'breadcrumbs' => $this->breadcrumbs
+        ]
+    ]);
+    $this->layout()->moduleName = 'default/catalogue/brand-car-specifications';
+    $this->layout()->moduleOptions = [
+        'disabled' => true
+    ];
+?>
+<?=$this->specs->render($this)?>
+<?php if (count($this->contributors)) { ?>
+    <p>
+        Составители:
+        <?php foreach ($this->contributors as $contributor) { ?>
+            <?=$this->user($contributor)?>
+        <?php } ?>
+    </p>
+<?php } ?>
+
+<p>Информация собрана участниками проекта. Если вы нашли ошибку или желаете заполнить пробелы, вы можете сделать это, пройдя процедуру регистрации на сайте.</p>

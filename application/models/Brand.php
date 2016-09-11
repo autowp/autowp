@@ -267,7 +267,7 @@ class Brand
             'id',
             'type_id',
             'catname' => 'folder',
-            'name'    => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.caption)'
+            'name'    => 'IF(brand_language.name IS NOT NULL and LENGTH(brand_language.name)>0, brand_language.name, brands.caption)'
         ];
         foreach ($options['columns'] as $column => $expr) {
             switch ($expr) {

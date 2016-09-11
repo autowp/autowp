@@ -1,19 +1,7 @@
-<ul class="nav nav-pills nav-stacked">
-    <?php foreach ($this->categories as $category) { ?>
-        <li<?=$category['active'] ? ' class="active"' : '' ?>>
-            <?=$this->htmlA(
-                $category['url'],
-                $this->escapeHtml($category['short_name']) .
-                    '&#xa0;<span class="count">('.($category['cars_count'] - $category['new_cars_count']) . ($category['new_cars_count'] > 0 ? '<span>+'.$category['new_cars_count'].'</span>' : '') .')</span>',
-                false
-            )?>
-            <?php if (isset($category['categories']) && $category['categories'] && $category['active']) { ?>
-                <?=$this->partial('application/category/menu', [
-                    'categories' => $category['categories'],
-                    'category'   => $this->category,
-                    'isOther'    => $this->isOther
-                ])?>
-            <?php } ?>
-        </li>
-    <?php } ?>
-</ul>
+<div class="well nav-tree">
+    <?=$this->partial('application/category/partial/menu', [
+        'categories' => $this->categories,
+        'category'   => $this->category,
+        'isOther'    => $this->isOther
+    ])?>
+</div>

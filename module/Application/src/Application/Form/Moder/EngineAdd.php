@@ -76,7 +76,7 @@ class EngineAdd extends Form implements InputFilterProviderInterface
         ];
         if (!$this->disableBrand) {
             $spec['brand_id'] = [
-                'required' => false
+                'required' => true
             ];
         }
 

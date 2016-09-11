@@ -1,0 +1,17 @@
+<form action="<?=$this->escapeHtmlAttr($this->url(null, [
+    'action' => 'save-name'
+], [], true))?>" method="post" class="form-horizontal">
+    <?php foreach ($this->languages as $code => $name) { ?>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label"><?=$this->escapeHtml($name)?></label>
+            <div class="col-lg-10 col-md-10">
+                <input type="text" name="<?=$this->escapeHtmlAttr($code)?>" value="<?=$this->escapeHtmlAttr($this->langValues[$code])?>" class="form-control" />
+            </div>
+        </div>
+    <?php } ?>
+    <div class="row">
+        <div class="col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2">
+            <input type="submit" class="btn btn-primary" value="Сохранить" />
+        </div>
+    </div>
+</form>

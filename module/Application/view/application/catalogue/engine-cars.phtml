@@ -1,0 +1,36 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ],
+        'pageId' => 172,
+        'args'   => [
+            'BRAND_NAME'    => $this->brand['name'],
+            'BRAND_CATNAME' => $this->brand['catname'],
+            'ENGINE_ID'     => $this->engine['id'],
+            'ENGINE_NAME'   => $this->engine['name']
+        ]
+    ]);
+?>
+<?=$this->partial('application/catalogue/partial/brand-engine-menu', [
+    'title' => $this->engine['name'],
+    'tree'  => [
+        'count'  => $this->childsCount,
+        'active' => false
+    ],
+    'cars'  => [
+        'count'  => $this->carsCount,
+        'active' => true
+    ],
+    'specs' => [
+        'count'  => $this->specsCount,
+        'active' => false
+    ],
+    'pictures' => [
+        'count'  => $this->picturesCount,
+        'active' => false
+    ]
+]) ?>
+<?=$this->partial('application/cars', $this->cars)?>

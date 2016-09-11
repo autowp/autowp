@@ -1,0 +1,191 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needRight'   => false
+        ],
+        'pageId' => 78,
+        'args'   => [
+            'CAR_ID'   => $this->car->id,
+            'CAR_NAME' => $this->car()->textTitle($this->car->getNameData($this->language()))
+        ]
+    ]);
+
+    $this->layout()->moduleName = 'moder/cars/car';
+?>
+<?php $this->pageTitle()->setAutoEscape(false)->captureStart('SET') ?>
+    <?=$this->car()->htmlTitle($this->car->getNameData($this->language()))?>
+<?php $this->pageTitle()->captureEnd() ?>
+
+<div class="row">
+    <div class="col-md-2">
+        <?php if ($this->randomPicture) { ?>
+            <?=$this->img($this->randomPicture->getFormatRequest(), [
+                'format' => 'picture-thumb',
+            ])?>
+        <?php } ?>
+    </div>
+    <div class="col-md-5">
+        <div class="well">
+            <p>В базе данных чиcлится под номером <strong><?=$this->car->id?></strong></p>
+
+            <p>
+                <?php if ($this->user()->isAllowed('specifications', 'edit')) { ?>
+                    <?=$this->htmlA($this->url('cars/params', [
+                        'action' => 'car-specifications-editor',
+                        'car_id' => $this->car->id
+                    ]), $this->translate('carlist/edit-specs')) ?>
+                    <?php if ($this->specsCount > 0) { ?>
+                        <span class="badge"><?=$this->specsCount?></span>
+                    <?php } ?>
+                <?php } ?>
+            </p>
+            <p><?=$this->htmlA($this->url('log/params', [
+                'action' => 'index'
+            ], [], true), 'Журнал событий') ?></p>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="well">
+            <p>Подписка на уведомления об изменениях</p>
+            <p class="subscription">
+                <?=$this->htmlA([
+                    'class' => 'btn btn-success subscribed',
+                    'href'  => $this->url('moder/cars/params', [
+                        'action' => 'unsubscribe'
+                    ], [], true),
+                    'style' => $this->subscribed ? null : 'display:none'
+                ], '<i class="fa fa-check"></i> Оформлена', false)?>
+                <?=$this->htmlA([
+                    'class' => 'btn btn-default not-subscribed',
+                    'href'  => $this->url('moder/cars/params', [
+                        'action' => 'subscribe'
+                    ], [], true),
+                    'style' => $this->subscribed ? 'display:none' : null
+                ], '<i class="fa fa-times"></i> Не оформлена', false)?>
+            </p>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs" id="myTab">
+    <?php foreach ($this->tabs as $id => $tab) { ?>
+        <li>
+            <?=$this->htmlA(
+                [
+                    'href'          => '#'.$id,
+                    'data-toggle'   => 'tab',
+                    'data-load'     => isset($tab['data-load']) ? $tab['data-load'] : null,
+                    'data-activate' => $tab['active'] ? '1' : null
+                ],
+                ($tab['icon'] ? '<span class="'.$tab['icon'].'"></span> ' : '') .
+                $this->escapeHtml($tab['title']) .
+                ($tab['count'] ? ' <span class="badge">'.$tab['count'].'</span>' : ''),
+                false
+            )?>
+        </li>
+    <?php } ?>
+</ul>
+
+<div class="tab-content well">
+    <div class="tab-pane<?=$this->tabs['meta']['active'] ? ' active' : ''?>" id="meta">
+        <?php if ($this->canEditMeta) { ?>
+            <?=$this->partial('application/forms/bootstrap-horizontal', [
+                'form' => $this->formModerCarEditMeta
+            ])?>
+
+            <h3>Краткое описание</h3>
+            <div class="well">
+                <?=$this->partial('application/forms/markdown', [
+                    'form' => $this->descriptionForm
+                ])?>
+                <?php if ($this->car->text_id) { ?>
+                    <p>
+                        <?=$this->htmlA([
+                            'class' => 'pull-right',
+                            'href'  => $this->url('info/text', [
+                                'id' => $this->car->text_id
+                            ])
+                        ], 'History')?>
+                    </p>
+                <?php } ?>
+            </div>
+        <?php } else { ?>
+            <table class="table table-condensed">
+                <tr>
+                    <td>Полное название авто:</td>
+                    <td><?=$this->escapeHtml($this->car->caption) ?></td>
+                </tr>
+                <tr>
+                    <td>Индекс кузова:</td>
+                    <td><?=$this->escapeHtml($this->car->body)?></td>
+                </tr>
+                <tr>
+                    <td>Начало выпуска:</td>
+                    <td>
+                        <?=($this->car->begin_year > 0 ? $this->car->begin_year : '????') ?>
+                        <?=($this->car->begin_month > 0 ? $this->car->begin_month : '??') ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">Год окончания выпуска:</td>
+                    <td>
+                        <?=($this->car->end_year > 0 ? $this->car->end_year : '????') ?>
+                        <?=($this->car->end_month > 0 ? $this->car->end_month : '??') ?>
+                        <?php if ($this->car->today) { ?>
+                            н.в.
+                        <?php } elseif (!is_null($this->car->today)) { ?>
+                            выпуск закончен
+                        <?php } ?>
+                        <br />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Выпущено единиц:</td>
+                    <td>
+                        <?=$this->car->produced ?>
+                        <?=($this->car->produced_exactly ? 'точно' : 'примерно') ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">Концепт (прототип):</td>
+                    <td><?=$this->car->is_concept ? 'Да' : 'Нет' ?></td>
+                </tr>
+                <tr>
+                   <td valign="top">Лимитированная версия:</td>
+                    <td><?=($this->car->is_le ? 'Да' : 'Нет') ?></td>
+                </tr>
+                <tr><td valign="top">Краткое описание:</td></tr>
+                <tr><td colspan="2" valign="top">
+                    <?=$this->markup($this->description) ?>
+                </td></tr>
+            </table>
+        <?php } ?>
+    </div>
+    <div class="tab-pane<?=$this->tabs['name']['active'] ? ' active' : ''?>" id="name">Loading ...</div>
+    <div class="tab-pane<?=$this->tabs['desc']['active'] ? ' active' : ''?>" id="desc">
+        <?=$this->partial('application/forms/markdown', [
+            'form' => $this->textForm
+        ])?>
+        <?php if ($this->car->full_text_id) { ?>
+            <p>
+                <?=$this->htmlA([
+                    'class' => 'pull-right',
+                    'href'  => $this->url('info/text', [
+                        'id' => $this->car->full_text_id
+                    ])
+                ], 'History')?>
+            </p>
+        <?php } ?>
+    </div>
+    <div class="tab-pane<?=$this->tabs['catalogue']['active'] ? ' active' : ''?>" id="catalogue">Loading ...</div>
+    <div class="tab-pane<?=$this->tabs['tree']['active'] ? ' active' : ''?>" id="tree">Loading ...</div>
+    <div class="tab-pane<?=$this->tabs['categories']['active'] ? ' active' : ''?>" id="categories">Loading ...</div>
+    <div class="tab-pane<?=$this->tabs['factories']['active'] ? ' active' : ''?>" id="factories">Loading ...</div>
+    <div class="tab-pane<?=$this->tabs['twins']['active'] ? ' active' : ''?>" id="twins">Loading ...</div>
+    <div class="tab-pane<?=$this->tabs['pictures']['active'] ? ' active' : ''?>" id="pictures">Loading ...</div>
+    <?php if ($this->user()->get()->id == 1) { ?>
+        <div class="tab-pane<?=$this->tabs['modifications']['active'] ? ' active' : ''?>" id="modifications">Loading ...</div>
+    <?php } ?>
+</div>

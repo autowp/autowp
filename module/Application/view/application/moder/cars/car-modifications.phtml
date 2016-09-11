@@ -1,0 +1,51 @@
+<h3>Модификации</h3>
+<p>
+    <?=$this->htmlA([
+        'class' => 'btn btn-primary',
+        'href'  => $this->url(null, [
+            'action' => 'car-modification-pictures'
+        ], [], true)
+    ], 'Распределить изображения')?>
+    <?=$this->htmlA([
+        'class' => 'btn btn-success',
+        'href'  => $this->url('moder/modification/params', [
+            'action' => 'add',
+            'car_id' => $this->car['id'],
+        ], [], true)
+    ], '<i class="fa fa-plus"></i> добавить модификацию', false)?>
+</p>
+<div class="row">
+    <div class="col-md-6">
+        <?php foreach ($this->groups as $group) { ?>
+            <?php if (count($group['modifications']) > 0) { ?>
+                <div class="row">
+                    <div class="col-md-2">
+                        <h4><?=$this->escapeHtml($group['name'] ? $group['name'] : 'Без группы')?></h4>
+                    </div>
+                    <div class="col-md-10">
+                        <?php foreach ($group['modifications'] as $modification) { ?>
+                            <?php if ($modification['canDelete']) { ?>
+                                <form action="<?=$this->escapeHtmlAttr($modification['deleteUrl'])?>" method="post" class="pull-left" style="margin-right: 10px">
+                                    <button type="submit" class="btn btn-danger btn-xs"><span class="fa fa-times"></span></button>
+                                </form>
+                            <?php } ?>
+                            <p>
+                                <?=$this->htmlA($modification['url'], $modification['name'])?>
+                                <?php if ($modification['count']) { ?>
+                                    <span class="badge"><?=(int)$modification['count']?></span>
+                                <?php } ?>
+                                <?php if ($modification['inherited']) { ?>
+                                    <small><em>Inherited from <?=$this->htmlA($modification['inheritedFrom']['url'], $modification['inheritedFrom']['name'])?></em></small>
+                                <?php } ?>
+                            </p>
+                        <?php } ?>
+                    </div>
+                </div>
+            <?php } ?>
+        <?php } ?>
+    </div>
+    <div class="col-md-6">
+        <h3>Несочитаемое</h3>
+
+    </div>
+</div>

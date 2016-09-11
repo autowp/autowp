@@ -5,19 +5,27 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 
+use Application\Form\Moder\Car as CarForm;
+use Application\Form\Moder\CarOrganize as CarOrganizeForm;
+use Application\Form\Moder\CarOrganizePictures as CarOrganizePicturesForm;
 use Application\Model\Brand;
 use Application\Model\Message;
 use Application\Model\Modification;
 use Application\Model\DbTable\Modification as ModificationTable;
+use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Filter\Filename\Safe;
 
 use Application_Service_Specifications;
 use Brand_Car;
+use Brands;
 use Brands_Cars;
 use Car_Language;
+use Car_Parent;
 use Car_Parent_Cache;
 use Car_Types;
+use Cars_Row;
 use Category;
 use Category_Car;
 use Category_Language;
@@ -25,6 +33,8 @@ use Category_Parent;
 use Factory;
 use Factory_Car;
 use Modification_Group;
+use Picture;
+use Pictures_Row;
 use Spec;
 use Twins_Groups;
 use Twins_Groups_Cars;
@@ -32,6 +42,7 @@ use User_Car_Subscribe;
 use Users;
 
 use Zend_Db_Expr;
+use Zend_Locale;
 use Zend_Session_Namespace;
 
 use Exception;
@@ -57,9 +68,48 @@ class CarsController extends AbstractActionController
 
     private $textStorage;
 
-    public function __construct($textStorage)
+    private $translator;
+
+    /**
+     * @var Form
+     */
+    private $descForm;
+
+    /**
+     * @var Form
+     */
+    private $textForm;
+
+    /**
+     * @var Form
+     */
+    private $twinsForm;
+
+    /**
+     * @var Form
+     */
+    private $brandCarForm;
+
+    /**
+     * @var Form
+     */
+    private $carParentForm;
+
+    /**
+     * @var Form
+     */
+    private $filterForm;
+
+    public function __construct($textStorage, $translator, Form $descForm, Form $textForm, Form $twinsForm, Form $brandCarForm, Form $carParentForm, Form $filterForm)
     {
         $this->textStorage = $textStorage;
+        $this->translator = $translator;
+        $this->descForm = $descForm;
+        $this->textForm = $textForm;
+        $this->twinsForm = $twinsForm;
+        $this->brandCarForm = $brandCarForm;
+        $this->carParentForm = $carParentForm;
+        $this->filterForm = $filterForm;
     }
 
     public function preDispatch()
@@ -78,108 +128,43 @@ class CarsController extends AbstractActionController
 
     public function indexAction()
     {
-        $categories = ['0' => '--'] + $this->getCategoriesOptions(null, 0);
+        $categories = ['' => '--'] + $this->getCategoriesOptions(null, 0);
 
-        $form = new Project_Form([
-            'decorators'    => [
-                'PrepareElements',
-                array('viewScript', array('viewScript' => 'forms/bootstrap-vertical.phtml')),
-                'Form'
-            ],
-            'action'   => $this->url()->fromRoute(null, [], [], true),
-            'method'   => 'post',
-            'elements' => array(
-                array('text', 'name', array(
-                    'label'      => 'Name',
-                    'decorators' => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('text', 'no_name', array(
-                    'label'      => 'Name (исключить)',
-                    'decorators' => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('Car_Spec', 'spec', array(
-                    'decorators' => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('text', 'from_year', array(
-                    'label'      => 'From year',
-                    'validators' => array(
-                        'Int'
-                    ),
-                    'decorators' => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('text', 'to_year', array(
-                    'label'      => 'To year',
-                    'validators' => array(
-                        'Int'
-                    ),
-                    'decorators' => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('text', 'description', array(
-                    'label'      => 'Description',
-                    'decorators' => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('select', 'category', array(
-                    'label'        => 'Category',
-                    'multioptions' => $categories,
-                    'decorators'   => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('select', 'no_category', array(
-                    'label'        => 'Category (исключить)',
-                    'multioptions' => $categories,
-                    'decorators'   => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('checkbox', 'no_parent', array(
-                    'label'        => 'Без родителей',
-                    'decorators'   => array(
-                        'ViewHelper'
-                    )
-                )),
-                array('select', 'order', array(
-                    'label'        => 'Сортировка',
-                    'multioptions' => array(
-                        0 => 'id asc',
-                        1 => 'id desc',
-                    ),
-                    'decorators'   => array(
-                        'ViewHelper'
-                    )
-                )),
-            )
-        ]);
+        $specTable = new Spec();
+        $specOptions = $this->loadSpecs($specTable, null, 0);
+
+        $this->filterForm->setAttribute('action', $this->url()->fromRoute(null, [], [], true));
+
+        $this->filterForm->get('category')->setValueOptions($categories);
+        $this->filterForm->get('no_category')->setValueOptions($categories);
+        $this->filterForm->get('spec')->setValueOptions(array_replace(['' => '--'], $specOptions));
+
+
 
         if ($this->getRequest()->isPost()) {
-            $params = $this->getRequest()->getPost();
-            unset($params['submit']);
-            foreach ($params as $key => $value) {
-                /*if (strlen($value) <= 0) {
-                    unset($params[$key]);
-                }*/
+            $this->filterForm->setData($this->params()->fromPost());
+            if ($this->filterForm->isValid()) {
+                $params = $this->filterForm->getData();
+                foreach ($params as $key => $value) {
+                    if (strlen($value) <= 0) {
+                        unset($params[$key]);
+                    }
+                }
+
+                return $this->redirect()->toRoute('moder/cars/params', array_replace($params, [
+                    'action' => 'index'
+                ]));
             }
-            return $this->redirect()->toRoute('moder/cars/params', $params, [], true);
         }
+
+        $this->filterForm->setData($this->params()->fromRoute());
 
         $cars = $this->catalogue()->getCarTable();
 
         $select = $cars->select(true);
 
-        if ($form->isValid($this->_getAllParams())) {
-            $values = $form->getValues();
+        if ($this->filterForm->isValid()) {
+            $values = $this->filterForm->getData();
 
             if ($values['name']) {
                 $select->where('cars.caption like ?', '%' . $values['name'] . '%');
@@ -199,10 +184,6 @@ class CarsController extends AbstractActionController
 
             if ($values['to_year']) {
                 $select->where('cars.end_year = ?', $values['to_year']);
-            }
-
-            if ($values['description']) {
-                $select->where('cars.description like ?', '%' . $values['description'] . '%');
             }
 
             if ($values['category']) {
@@ -252,12 +233,16 @@ class CarsController extends AbstractActionController
             }
         }
 
-        $paginator = Zend_Paginator::factory($select)
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+
+        $paginator
             ->setItemCountPerPage(10)
             ->setCurrentPageNumber($this->params('page'));
 
         return [
-            'form'      => $form,
+            'form'      => $this->filterForm,
             'paginator' => $paginator,
             'listData'  => $this->car()->listData($paginator->getCurrentItems())
         ];
@@ -294,7 +279,7 @@ class CarsController extends AbstractActionController
         $cars = [];
         $char = null;
 
-        $c = $this->params()->fromQuery('char');
+        $c = $this->params('char');
 
         if ($c) {
             $char = mb_substr(trim($c), 0, 1);
@@ -364,9 +349,11 @@ class CarsController extends AbstractActionController
             'width' => 6
         ]);
 
-        return [
+        $model = new ViewModel([
             'picturesData' => $picturesData,
-        ];
+        ]);
+
+        return $model->setTerminal(true);
     }
 
     private function getCategoriesOptions($parent, $deep = 0)
@@ -441,19 +428,17 @@ class CarsController extends AbstractActionController
 
         if ($car->full_text_id) {
             $text = $this->textStorage->getText($car->full_text_id);
-            $textForm->populate([
+            $textForm->populateValues([
                 'text' => $text
             ]);
         }
 
-        if ($canEditMeta) {
+        if ($canEditMeta && $this->getRequest()->isPost()) {
+            $textForm->setData($this->params()->fromPost());
+            if ($textForm->isValid()) {
+                $values = $textForm->getData();
 
-            $request = $this->getRequest();
-
-            if ($request->isPost() && $textForm->isValid($request->getPost())) {
-                $values = $textForm->getValues();
-
-                $text = $values['text'];
+                $text = $values['markdown'];
 
                 $user = $this->user()->get();
 
@@ -464,7 +449,6 @@ class CarsController extends AbstractActionController
                     $car->full_text_id = $textId;
                     $car->save();
                 }
-
 
                 $this->log(sprintf(
                     'Редактирование полного описания автомобиля %s',
@@ -495,7 +479,6 @@ class CarsController extends AbstractActionController
                     }
                 }
             }
-
         }
 
         return $this->redirectToCar($car, 'desc');
@@ -503,48 +486,55 @@ class CarsController extends AbstractActionController
 
     private function getDescriptionForm()
     {
-        return new Project_Form([
-            'method' => Zend_Form::METHOD_POST,
-            'action' => $this->url()->fromRoute('moder/cars/params', [
+        $this->descForm->setAttribute(
+            'action',
+            $this->url()->fromRoute('moder/cars/params', [
                 'form' => 'car-edit-description'
-            ], [], true),
-            'decorators' => [
-                'PrepareElements',
-                ['viewScript', [
-                    'viewScript' => 'forms/markdown.phtml'
-                ]],
-                'Form'
-            ],
-            'elements' => [
-                ['Brand_Description', 'markdown', [
-                    'required'   => false,
-                    'decorators' => ['ViewHelper'],
-                ]],
-            ]
-        ]);
+            ], [], true)
+        );
+
+        return $this->descForm;
     }
 
     private function getTextForm()
     {
-        return new Project_Form([
-            'method' => Zend_Form::METHOD_POST,
-            'action' => $this->url()->fromRoute('moder/cars/params', [
+        $this->textForm->setAttribute(
+            'action',
+            $this->url()->fromRoute('moder/cars/params', [
                 'action' => 'save-desc'
-            ], [], true),
-            'decorators' => [
-                'PrepareElements',
-                ['viewScript', [
-                    'viewScript' => 'forms/markdown.phtml'
-                ]],
-                'Form'
+            ], [], true)
+        );
+
+        return $this->textForm;
+    }
+
+    private function carToForm(Cars_Row $car)
+    {
+        return [
+            'name'        => $car->caption,
+            'body'        => $car->body,
+            'car_type_id' => $car->car_type_inherit ? 'inherited' : ($car->car_type_id ? $car->car_type_id : ''),
+            'spec_id'     => $car->spec_inherit ? 'inherited' : ($car->spec_id ? $car->spec_id : ''),
+            'is_concept'  => $car->is_concept_inherit ? 'inherited' : (bool)$car->is_concept,
+            'is_group'    => $car->is_group,
+            'model_year'  => [
+                'begin' => $car->begin_model_year,
+                'end'   => $car->end_model_year,
             ],
-            'elements' => [
-                ['textarea', 'text', [
-                    'required'   => false,
-                    'decorators' => ['ViewHelper'],
-                ]],
-            ]
-        ]);
+            'begin' => [
+                'year'  => $car->begin_year,
+                'month' => $car->begin_month,
+            ],
+            'end' => [
+                'year'  => $car->end_year,
+                'month' => $car->end_month,
+                'today' => $car->today === null ? '' : $car->today
+            ],
+            'produced' => [
+                'count'   => $car->produced,
+                'exactly' => $car->produced_exactly
+            ],
+        ];
     }
 
     public function carAction()
@@ -597,157 +587,147 @@ class CarsController extends AbstractActionController
                 }
             }
 
-            $form = new Application_Form_Moder_Car_Edit_Meta([
+            $formModerCarEditMeta = new CarForm(null, [
+                'translator'         => $this->translator,
                 'inheritedCarType'   => $car->car_type_inherit ? $car->car_type_id : null,
                 'inheritedIsConcept' => $car->is_concept_inherit ? $car->is_concept : null,
                 'isGroupDisabled'    => $isGroupDisabled,
                 'specOptions'        => array_replace(['' => '-'], $specOptions),
                 'inheritedSpec'      => $inheritedSpec,
-                'action'             => $this->url()->fromRoute('moder/cars/params', [
-                    'action'      => 'car',
-                    'car_id'      => $car->id,
-                    'form'        => 'car-edit-meta'
-                ], [], true),
             ]);
+            $formModerCarEditMeta->setAttribute('action', $this->url()->fromRoute('moder/cars/params', [
+                'action' => 'car',
+                'car_id' => $car->id,
+                'form'   => 'car-edit-meta'
+            ], [], true));
 
-            $oldData = $data = $car->toArray();
-            if (!is_null($data['today'])) {
-                switch ($data['today']) {
-                    case 0:
-                        $data['today'] = 1;
-                        break;
+            $data = $this->carToForm($car);
 
-                    case 1:
-                        $data['today'] = 2;
-                        break;
-                }
-            }
+            $oldData = $car->toArray();
 
-            if ($data['car_type_inherit']) {
-                $data['car_type_id'] = 'inherited';
-            }
-            unset($data['car_type_inherit']);
-
-            if ($data['is_concept_inherit']) {
-                $data['is_concept'] = 'inherited';
-            }
-            unset($data['is_concept_inherit']);
-
-            if ($data['spec_inherit']) {
-                $data['spec_id'] = 'inherited';
-            }
-            unset($data['spec_inherit']);
-
-            $form->populate($data);
+            $formModerCarEditMeta->populateValues($data);
 
             $request = $this->getRequest();
 
             $textForm = null;
             $descriptionForm = null;
-            $formModerCarEditMeta = null;
 
-            if ($request->isPost() && $this->params('form') == 'car-edit-meta' && $form->isValid($request->getPost())) {
+            if ($request->isPost() && $this->params('form') == 'car-edit-meta') {
+                $formModerCarEditMeta->setData($this->params()->fromPost());
+                if ($formModerCarEditMeta->isValid()) {
 
-                $user = $this->user()->get();
-                $ucsTable = new User_Car_Subscribe();
-                $ucsTable->subscribe($user, $car);
+                    $values = $formModerCarEditMeta->getData();
 
-                $values = $form->getValues();
+                    $user = $this->user()->get();
+                    $ucsTable = new User_Car_Subscribe();
+                    $ucsTable->subscribe($user, $car);
 
-                if ($haveChilds) {
-                    $values['is_group'] = 1;
-                }
-
-                $car->setFromArray($this->prepareCarMetaToSave($values))->save();
-
-                $carTable->updateInteritance($car);
-
-                $newData = $car->toArray();
-
-                $fields = [
-                    'caption'          => ['str', 'название автомобиля с "%s" на "%s"'],
-                    'body'             => ['str', 'номер кузова с "%s" на "%s"'],
-                    'begin_year'       => ['int', 'год начала выпуска c "%s" на "%s"'],
-                    'begin_month'      => ['int', 'месяц начала выпуска с "%s" на "%s"'],
-                    'end_year'         => ['int', 'год окончания выпуска с "%s" на "%s"'],
-                    'end_month'        => ['int', 'месяц окончания выпуска с "%s" на "%s"'],
-                    'today'            => ['bool', 'выпуск в наше время с "%s" на "%s"'],
-                    'produced'         => ['int', 'количество выпущенных единиц с "%s" на "%s"'],
-                    'produced_exactly' => ['bool', 'точность количества выпущенных единиц с "%s" на "%s"'],
-                    'is_concept'       => ['bool', 'флаг "концепт" с "%s" на "%s"'],
-                    'is_group'         => ['bool', 'флаг "группа" с "%s" на "%s"'],
-                    'car_type_id'      => ['car_type_id', 'тип кузова с "%s" на "%s"'],
-                    'begin_model_year' => ['int', 'модельный год начала выпуска c "%s" на "%s"'],
-                    'end_model_year'   => ['int', 'модельный год окончания выпуска c "%s" на "%s"'],
-                    'spec_id'          => ['spec_id', 'Spec с "%s" на "%s"'],
-                ];
-
-                $changes = [];
-                foreach ($fields as $field => $info) {
-                    switch ($info[0]) {
-                        case 'int':
-                            $old = is_null($oldData[$field]) ? null : (int)$oldData[$field];
-                            $new = is_null($newData[$field]) ? null : (int)$newData[$field];
-                            if ($old !== $new)
-                                $changes[] = sprintf($info[1], $old, $new);
-                            break;
-                        case 'str':
-                            $old = is_null($oldData[$field]) ? null : (string)$oldData[$field];
-                            $new = is_null($newData[$field]) ? null : (string)$newData[$field];
-                            if ($old !== $new)
-                                $changes[] = sprintf($info[1], $old, $new);
-                            break;
-                        case 'bool':
-                            $old = is_null($oldData[$field]) ? null : ($oldData[$field] ? 'да' : 'нет');
-                            $new = is_null($newData[$field]) ? null : ($newData[$field] ? 'да' : 'нет');
-                            if ($old !== $new)
-                                $changes[] = sprintf($info[1], $old, $new);
-                            break;
-
-                        case 'spec_id':
-                            $old = $oldData[$field];
-                            $new = $newData[$field];
-                            if ($old !== $new) {
-                                $old = $specTable->find($old)->current();
-                                $new = $specTable->find($new)->current();
-                                $changes[] = sprintf($info[1], $old ? $old->short_name : '-', $new ? $new->short_name : '-');
-                            }
-                            break;
-
-                        case 'car_type_id':
-                            $carTypeTable = new Car_Types();
-                            $old = $oldData[$field];
-                            $new = $newData[$field];
-                            if ($old !== $new) {
-                                $old = $carTypeTable->find($old)->current();
-                                $new = $carTypeTable->find($new)->current();
-                                $changes[] = sprintf($info[1], $old ? $old->name : '-', $new ? $new->name : '-');
-                            }
-                            break;
+                    if ($haveChilds) {
+                        $values['is_group'] = 1;
                     }
-                }
 
-                $car->updateOrderCache();
+                    $car->setFromArray($this->prepareCarMetaToSave($values))->save();
 
-                $message = sprintf(
-                    'Редактирование мета-информации автомобиля %s',
-                    htmlspecialchars($car->getFullName()).
-                    ( count($changes) ? '<p>'.implode('<br />', $changes).'</p>' : '')
-                );
-                $this->log($message, $car);
+                    $carTable->updateInteritance($car);
 
-                $mModel = new Message();
+                    $newData = $car->toArray();
 
-                $user = $this->user()->get();
-                $message = 'Пользователь http://www.autowp.ru' . $user->getAboutUrl() . ' редактировал информацию об автомобиле '.$car->getFullName().' ('.$this->carModerUrl($car, true).")\n".
-                           ( count($changes) ? implode("\n", $changes) : '');
-                foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
-                    if ($subscriber && ($subscriber->id != $user->id)) {
-                        $mModel->send(null, $subscriber->id, $message);
+                    $fields = [
+                        'caption'          => ['str', 'название автомобиля с "%s" на "%s"'],
+                        'body'             => ['str', 'номер кузова с "%s" на "%s"'],
+                        'begin_year'       => ['int', 'год начала выпуска c "%s" на "%s"'],
+                        'begin_month'      => ['int', 'месяц начала выпуска с "%s" на "%s"'],
+                        'end_year'         => ['int', 'год окончания выпуска с "%s" на "%s"'],
+                        'end_month'        => ['int', 'месяц окончания выпуска с "%s" на "%s"'],
+                        'today'            => ['bool', 'выпуск в наше время с "%s" на "%s"'],
+                        'produced'         => ['int', 'количество выпущенных единиц с "%s" на "%s"'],
+                        'produced_exactly' => ['bool', 'точность количества выпущенных единиц с "%s" на "%s"'],
+                        'is_concept'       => ['bool', 'флаг "концепт" с "%s" на "%s"'],
+                        'is_group'         => ['bool', 'флаг "группа" с "%s" на "%s"'],
+                        'car_type_id'      => ['car_type_id', 'тип кузова с "%s" на "%s"'],
+                        'begin_model_year' => ['int', 'модельный год начала выпуска c "%s" на "%s"'],
+                        'end_model_year'   => ['int', 'модельный год окончания выпуска c "%s" на "%s"'],
+                        'spec_id'          => ['spec_id', 'Spec с "%s" на "%s"'],
+                    ];
+
+                    $changes = [];
+                    foreach ($fields as $field => $info) {
+                        switch ($info[0]) {
+                            case 'int':
+                                $old = is_null($oldData[$field]) ? null : (int)$oldData[$field];
+                                $new = is_null($newData[$field]) ? null : (int)$newData[$field];
+                                if ($old !== $new)
+                                    $changes[] = sprintf($info[1], $old, $new);
+                                break;
+                            case 'str':
+                                $old = is_null($oldData[$field]) ? null : (string)$oldData[$field];
+                                $new = is_null($newData[$field]) ? null : (string)$newData[$field];
+                                if ($old !== $new)
+                                    $changes[] = sprintf($info[1], $old, $new);
+                                break;
+                            case 'bool':
+                                $old = is_null($oldData[$field]) ? null : ($oldData[$field] ? 'да' : 'нет');
+                                $new = is_null($newData[$field]) ? null : ($newData[$field] ? 'да' : 'нет');
+                                if ($old !== $new)
+                                    $changes[] = sprintf($info[1], $old, $new);
+                                break;
+
+                            case 'spec_id':
+                                $old = $oldData[$field];
+                                $new = $newData[$field];
+                                if ($old !== $new) {
+                                    $old = $specTable->find($old)->current();
+                                    $new = $specTable->find($new)->current();
+                                    $changes[] = sprintf($info[1], $old ? $old->short_name : '-', $new ? $new->short_name : '-');
+                                }
+                                break;
+
+                            case 'car_type_id':
+                                $carTypeTable = new Car_Types();
+                                $old = $oldData[$field];
+                                $new = $newData[$field];
+                                if ($old !== $new) {
+                                    $old = $carTypeTable->find($old)->current();
+                                    $new = $carTypeTable->find($new)->current();
+                                    $oldName = $old ? $this->translator->translate($old->name) : '-';
+                                    $newName = $new ? $this->translator->translate($new->name) : '-';
+                                    $changes[] = sprintf($info[1], $oldName, $newName);
+                                }
+                                break;
+                        }
                     }
-                }
 
-                return $this->redirectToCar($car, 'meta');
+                    $car->updateOrderCache();
+
+                    $message = sprintf(
+                        'Редактирование мета-информации автомобиля %s',
+                        htmlspecialchars($car->getFullName()).
+                        ( count($changes) ? '<p>'.implode('<br />', $changes).'</p>' : '')
+                    );
+                    $this->log($message, $car);
+
+                    $mModel = new Message();
+
+                    $user = $this->user()->get();
+                    $message = sprintf(
+                        "Пользователь %s редактировал информацию об автомобиле %s (%s)\n".
+                        ( count($changes) ? implode("\n", $changes) : ''),
+                        $car->getFullName(),
+                        $this->carModerUrl($car, true),
+                        $this->url()->fromRoute('users/user', [
+                            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                        ], [
+                            'force_canonical' => true
+                        ])
+                    );
+                    foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
+                        if ($subscriber && ($subscriber->id != $user->id)) {
+                            $mModel->send(null, $subscriber->id, $message);
+                        }
+                    }
+
+                    return $this->redirectToCar($car, 'meta');
+                }
             }
 
 
@@ -755,69 +735,70 @@ class CarsController extends AbstractActionController
 
             if ($car->text_id) {
                 $description = $this->textStorage->getText($car->text_id);
-                $descriptionForm->populate([
+                $descriptionForm->populateValues([
                     'markdown' => $description
                 ]);
             }
 
-            if ($request->isPost() && $this->params('form') == 'car-edit-description' && $descriptionForm->isValid($request->getPost())) {
-                $values = $descriptionForm->getValues();
+            if ($request->isPost() && $this->params('form') == 'car-edit-description') {
+                $descriptionForm->setData($this->params()->fromPost());
+                if ($descriptionForm->isValid()) {
+                    $values = $descriptionForm->getData();
 
-                $text = $values['markdown'];
+                    $text = $values['markdown'];
 
-                $user = $this->user()->get();
+                    $user = $this->user()->get();
 
-                if ($car->text_id) {
-                    $this->textStorage->setText($car->text_id, $text, $user->id);
-                } elseif ($text) {
-                    $textId = $this->textStorage->createText($text, $user->id);
-                    $car->text_id = $textId;
-                    $car->save();
-                }
+                    if ($car->text_id) {
+                        $this->textStorage->setText($car->text_id, $text, $user->id);
+                    } elseif ($text) {
+                        $textId = $this->textStorage->createText($text, $user->id);
+                        $car->text_id = $textId;
+                        $car->save();
+                    }
 
 
-                $this->log(sprintf(
-                    'Редактирование описания автомобиля %s',
-                    htmlspecialchars($car->getFullName())
-                ), $car);
+                    $this->log(sprintf(
+                        'Редактирование описания автомобиля %s',
+                        htmlspecialchars($car->getFullName())
+                    ), $car);
 
-                if ($car->text_id) {
-                    $userIds = $this->textStorage->getTextUserIds($car->text_id);
-                    $message = sprintf(
-                        'Пользователь %s редактировал описание автомобиля %s ( %s )',
-                        $this->url()->fromRoute('users/user', [
-                            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
-                        ], [
-                            'force_canonical' => true
-                        ]),
-                        $car->getFullName(),
-                        $this->carModerUrl($car, true)
-                    );
+                    if ($car->text_id) {
+                        $userIds = $this->textStorage->getTextUserIds($car->text_id);
+                        $message = sprintf(
+                            'Пользователь %s редактировал описание автомобиля %s ( %s )',
+                            $this->url()->fromRoute('users/user', [
+                                'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                            ], [
+                                'force_canonical' => true
+                            ]),
+                            $car->getFullName(),
+                            $this->carModerUrl($car, true)
+                        );
 
-                    $mModel = new Message();
-                    $userTable = new Users();
-                    foreach ($userIds as $userId) {
-                        if ($userId != $user->id) {
-                            foreach ($userTable->find($userId) as $userRow) {
-                                $mModel->send(null, $userRow->id, $message);
+                        $mModel = new Message();
+                        $userTable = new Users();
+                        foreach ($userIds as $userId) {
+                            if ($userId != $user->id) {
+                                foreach ($userTable->find($userId) as $userRow) {
+                                    $mModel->send(null, $userRow->id, $message);
+                                }
                             }
                         }
                     }
-                }
 
-                return $this->redirectToCar($car, 'meta');
+                    return $this->redirectToCar($car, 'meta');
+                }
             }
 
             $textForm = $this->getTextForm();
 
             if ($car->full_text_id) {
                 $text = $this->textStorage->getText($car->full_text_id);
-                $textForm->populate([
-                    'text' => $text
+                $textForm->populateValues([
+                    'markdown' => $text
                 ]);
             }
-
-            $formModerCarEditMeta = $form;
         }
 
 
@@ -942,7 +923,7 @@ class CarsController extends AbstractActionController
             'pictures' => [
                 'icon'      => 'glyphicon glyphicon-th',
                 'title'     => 'Картинки',
-                'data-load' => $this->url()->fromRoute([
+                'data-load' => $this->url()->fromRoute('moder/cars/params', [
                     'action' => 'car-pictures'
                 ], [], true),
                 'count' => $picturesCount,
@@ -953,7 +934,7 @@ class CarsController extends AbstractActionController
             $tabs['modifications'] = [
                 'icon'      => 'glyphicon glyphicon-th',
                 'title'     => 'Модификации',
-                'data-load' => $this->url()->fromRoute([
+                'data-load' => $this->url()->fromRoute('moder/cars/params', [
                     'action' => 'car-modifications'
                 ], [], true),
                 'count' => 0
@@ -978,7 +959,7 @@ class CarsController extends AbstractActionController
             'specsCount'     => $specsCount,
             'textForm'             => $textForm,
             'descriptionForm'      => $descriptionForm,
-            'formModerCarEditMeta' => $form
+            'formModerCarEditMeta' => $formModerCarEditMeta
         ];
     }
 
@@ -1046,7 +1027,11 @@ class CarsController extends AbstractActionController
         $brands = $this->getBrandTable();
         $brand = $brands->find($this->params('brand_id'))->current();
         if ($brand) {
-            return $this->_forward('add-car-to-brand');
+            return $this->forward()->dispatch(self::class, [
+                'action'   => 'add-car-to-brand',
+                'car_id'   => $car->id,
+                'brand_id' => $brand->id
+            ]);
         }
 
         return [
@@ -1161,7 +1146,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $type = (int)$this->params('type');
+        $type = (int)$this->params()->fromPost('type');
 
         $brandCarTable = new Brand_Car();
         $brandCarRow = $brandCarTable->fetchRow([
@@ -1215,42 +1200,29 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $form = new Project_Form([
-            'elements' => [
-                ['text', 'catname', array(
-                    'filters'    => array('StringTrim', 'StringToLower', 'Filename_Safe'),
-                    'validators' => array(
-                        array('StringLength', true, array(
-                            'min' => 1,
-                            'max' => 50
-                        )),
-                        array('Callback', true, function($value) use ($brand, $car, $brandCarTable) {
-                            $brandCarRow = $brandCarTable->fetchRow(array(
-                                'brand_id = ?' => $brand->id,
-                                'catname = ?'  => $value,
-                                'car_id <> ?'  => $car->id
-                            ));
-
-                            return !$brandCarRow;
-                        })
-                    )
-                )]
-            ]
-        ]);
-
         $ok = false;
-        if ($form->isValid($this->getRequest()->getPost())) {
-            $values = $form->getValues();
-            $brandCarRow->catname = $values['catname'] ? $values['catname'] : $car->id;
-            $brandCarRow->save();
+        $this->brandCarForm->setData($this->params()->fromPost());
+        if ($this->brandCarForm->isValid()) {
+            $values = $this->brandCarForm->getData();
 
-            $ok = true;
+            $sameBrandCarRow = $brandCarTable->fetchRow([
+                'brand_id = ?' => $brand->id,
+                'catname = ?'  => $values['catname'],
+                'car_id <> ?'  => $car->id
+            ]);
+
+            if (!$sameBrandCarRow) {
+                $brandCarRow->catname = $values['catname'] ? $values['catname'] : $car->id;
+                $brandCarRow->save();
+
+                $ok = true;
+            }
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
             return new JsonModel([
                 'ok' => $ok,
-                'messages' => $form->getMessages()
+                'messages' => $this->brandCarForm->getMessages()
             ]);
         } else {
             return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
@@ -1323,26 +1295,27 @@ class CarsController extends AbstractActionController
             );
         }
 
-        $form = new Application_Form_Moder_Twins_Group_Add([
-            'action' => $this->url()->fromRoute('moder/cars/params', [], [], true)
-        ]);
-        $request = $this->getRequest();
-        if ($request->isPost() && $form->isValid($request->getPost())) {
-            $values = $form->getValues();
-            $values['add_datetime'] = new Zend_Db_Expr('NOW()');
+        $this->twinsForm->setAttribute('action', $this->url()->fromRoute('moder/cars/params', [], [], true));
+        if ($this->getRequest()->isPost()) {
+            $this->twinsForm->setData($this->params()->fromPost());
+            if ($this->twinsForm->isValid()) {
+                $values = $this->twinsForm->getData();
+                $values['add_datetime'] = new Zend_Db_Expr('NOW()');
 
-            $id = $twinsGroups->insert($values);
+                $id = $twinsGroups->insert($values);
 
-            return $this->_forward('car-select-twins-group', 'cars', 'moder', [
-                'car_id'         => $car->id,
-                'twins_group_id' => $id
-            ]);
+                return $this->forward()->dispatch(self::class, [
+                    'action'         => 'car-select-twins-group',
+                    'car_id'         => $car->id,
+                    'twins_group_id' => $id
+                ]);
+            }
         }
 
         return [
             'car'               => $car,
             'brand'             => $brand,
-            'formTwinsGroupAdd' => $form,
+            'formTwinsGroupAdd' => $this->twinsForm,
             'canEditTwins'      => $canEditTwins,
             'brands'            => $brands,
             'groups'            => $groups
@@ -1403,7 +1376,7 @@ class CarsController extends AbstractActionController
 
         $factoryTable = new Factory();
 
-        $factory = $factoryTable->find($this->params('factory_id'))->current();
+        $factory = $factoryTable->find($this->params()->fromPost('factory_id'))->current();
 
         if ($factory) {
             $factoryCarTable = new Factory_Car();
@@ -1541,7 +1514,7 @@ class CarsController extends AbstractActionController
         $cTable = new Category();
         $ccTable = new Category_Car();
 
-        $categories = $cTable->find($this->params('category'));
+        $categories = $cTable->find($this->params()->fromPost('category'));
 
         // insert new
         $insertedNames = [];
@@ -1618,17 +1591,14 @@ class CarsController extends AbstractActionController
 
             if ($notifyUser && count($categoryNames)) {
                 $user = $this->user()->get();
-                $message =    'Пользователь http://www.autowp.ru' . $user->getAboutUrl() . ' отменил вашу привязку автомобиля ' . $car->getFullName().' ('.$this->carModerUrl($car, true).') ' .
-                            (count($categoryNames) > 1 ? 'к категориям ' : 'к категории ') . implode(', ', $categoryNames);
+                $message = 'Пользователь http://www.autowp.ru' . $user->getAboutUrl() . ' отменил вашу привязку автомобиля ' . $car->getFullName().' ('.$this->carModerUrl($car, true).') ' .
+                           (count($categoryNames) > 1 ? 'к категориям ' : 'к категории ') . implode(', ', $categoryNames);
                 $mModel->send(null, $notifyUser->id, $message);
             }
         }
 
         return new JsonModel([
-            'ok' => true,
-            'n'  => count($notify),
-            'd'  => $deletedNames,
-            'f'  => $filter
+            'ok' => true
         ]);
     }
 
@@ -1705,11 +1675,13 @@ class CarsController extends AbstractActionController
 
         $categories = $this->getCategoriesArray(null, $selection, 0);
 
-        return [
+        $model = new ViewModel([
             'canEditMeta' => $canEditMeta,
             'car'         => $car,
             'categories'  => $categories
-        ];
+        ]);
+
+        return $model->setTerminal(true);
     }
 
     public function subscribeAction()
@@ -2354,11 +2326,13 @@ class CarsController extends AbstractActionController
             ]);
         }
 
-        return [
+        $model = new ViewModel([
             'car'          => $car,
             'twinsGroups'  => $twinsGroups,
             'canEditTwins' => $canEditTwins,
-        ];
+        ]);
+
+        return $model->setTerminal(true);
     }
 
     public function carFactoriesAction()
@@ -2439,11 +2413,13 @@ class CarsController extends AbstractActionController
             ]);
         }
 
-        return [
+        $model = new ViewModel([
             'car'            => $car,
             'factories'      => $factories,
             'canEditFactory' => $canEditFactory,
-        ];
+        ]);
+
+        return $model->setTerminal(true);
     }
 
     private function carTreeWalk(Cars_Row $car, $carParentRow = null)
@@ -2483,9 +2459,11 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        return [
+        $model = new ViewModel([
             'car' => $this->carTreeWalk($car)
-        ];
+        ]);
+
+        return $model->setTerminal(true);
     }
 
     public function carCatalogueAction()
@@ -2649,7 +2627,7 @@ class CarsController extends AbstractActionController
             $childs = $this->perepareCatalogueCars($carParentRows, false);
         }
 
-        return [
+        $model = new ViewModel([
             'car'                 => $car,
             'canMove'             => $this->canMove($car),
             'brands'              => $brands,
@@ -2657,7 +2635,7 @@ class CarsController extends AbstractActionController
             'publicUrls'          => $this->carPublicUrls($car),
             'brandCarTypeOptions' => [
                 Brand_Car::TYPE_DEFAULT => 'стоковая модель',
-                Brand_Car::TYPE_TUNING  => $this->view->translate('catalogue/related'),
+                Brand_Car::TYPE_TUNING  => $this->translator->translate('catalogue/related'),
                 Brand_Car::TYPE_SPORT   => 'спорт',
                 Brand_Car::TYPE_DESIGN  => 'дизайн'
             ],
@@ -2667,10 +2645,12 @@ class CarsController extends AbstractActionController
             'childs'              => $childs,
             'carParentTypeOptions' => [
                 Car_Parent::TYPE_DEFAULT => 'подвид',
-                Car_Parent::TYPE_TUNING  => $this->view->translate('catalogue/related'),
+                Car_Parent::TYPE_TUNING  => $this->translator->translate('catalogue/related'),
                 Car_Parent::TYPE_SPORT   => 'спорт'
             ]
-        ];
+        ]);
+
+        return $model->setTerminal(true);
     }
 
     /**
@@ -2867,11 +2847,13 @@ class CarsController extends AbstractActionController
             }
         }
 
-        return [
+        $model = new ViewModel([
             'car'        => $car,
             'languages'  => $languages,
             'langValues' => $langValues
-        ];
+        ]);
+
+        return $model->setTerminal(true);
     }
 
     public function carParentSetTypeAction()
@@ -2897,7 +2879,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $carParentRow->type = $this->params('type');
+        $carParentRow->type = $this->params()->fromPost('type');
         $carParentRow->save();
 
         $cpcTable = new Car_Parent_Cache();
@@ -2933,76 +2915,53 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $form = new Project_Form(array(
-            'elements' => array(
-                array('text', 'name', array(
-                    'required'   => false,
-                    'filters'    => array('StringTrim'),
-                    'validators' => array(
-                        array('StringLength', true, array(
-                            'min' => 1,
-                            'max' => 50
-                        ))
-                    )
-                )),
-                array('text', 'catname', array(
-                    'required'   => false,
-                    'filters'    => array('StringTrim', 'StringToLower', 'Filename_Safe'),
-                    'validators' => array(
-                        array('StringLength', true, array(
-                            'min' => 1,
-                            'max' => 50
-                        )),
-                        array('Callback', true, function($value) use ($carParentRow, $carParentTable) {
-                            $row = $carParentTable->fetchRow(array(
-                                'parent_id = ?' => $carParentRow->parent_id,
-                                'catname = ?'   => $value,
-                                'car_id <> ?'   => $carParentRow->car_id
-                            ));
-
-                            return !$row;
-                        })
-                    )
-                ))
-            )
-        ));
-
         $ok = false;
         $messages = [];
 
-        $data = $this->getRequest()->getPost();
+        $data = $this->params()->fromPost();
         if (!isset($data['catname']) || !strlen($data['catname']) || (!$carParentRow->manual_catname && ($data['catname'] == $carParentRow->car_id))) {
             if (isset($data['name'])) {
                 $data['catname'] = $data['name'];
             }
         }
 
-        if ($form->isValid($data)) {
+        $this->carParentForm->setData($data);
+        if ($this->carParentForm->isValid()) {
 
-            $values = $form->getValues();
+            $values = $this->carParentForm->getData();
 
-            $nameIsEmpty = strlen($values['name']) == 0;
+            $row = $carParentTable->fetchRow([
+                'parent_id = ?' => $carParentRow->parent_id,
+                'catname = ?'   => $values['catname'],
+                'car_id <> ?'   => $carParentRow->car_id
+            ]);
 
-            if (!$nameIsEmpty) {
-                $carParentRow->name = $values['name'];
-            } else {
-                $carParentRow->name = null;
+            if (!$row) {
+
+                $nameIsEmpty = strlen($values['name']) == 0;
+
+                if (!$nameIsEmpty) {
+                    $carParentRow->name = $values['name'];
+                } else {
+                    $carParentRow->name = null;
+                }
+
+                $catnameIsEmpty = strlen($values['catname']) == 0 || $values['catname'] == '_';
+                if (!$catnameIsEmpty) {
+                    $carParentRow->catname = $values['catname'];
+                    $carParentRow->manual_catname = 1;
+                } else {
+                    $carParentRow->catname = $carParentRow->car_id;
+                    $carParentRow->manual_catname = 0;
+                }
+
+                $carParentRow->save();
+
+                $ok = true;
+
             }
-
-            $catnameIsEmpty = strlen($values['catname']) == 0 || $values['catname'] == '_';
-            if (!$catnameIsEmpty) {
-                $carParentRow->catname = $values['catname'];
-                $carParentRow->manual_catname = 1;
-            } else {
-                $carParentRow->catname = $carParentRow->car_id;
-                $carParentRow->manual_catname = 0;
-            }
-
-            $carParentRow->save();
-
-            $ok = true;
         } else {
-            $messages = array_values($form->catname->getMessages());
+            $messages = array_values($this->carParentForm->catname->getMessages());
         }
 
         $urls = [
@@ -3049,6 +3008,7 @@ class CarsController extends AbstractActionController
             $carTable->select(true)
                 ->join('car_parent', 'cars.id = car_parent.car_id', null)
                 ->where('car_parent.parent_id = ?', $car['id'])
+                ->where('cars.is_group')
                 ->order(array_merge(['car_parent.type'], $this->catalogue()->carsOrdering()))
         );
         foreach ($childRows as $childRow) {
@@ -3075,7 +3035,11 @@ class CarsController extends AbstractActionController
         $parent = $carTable->find($this->params('parent_id'))->current();
 
         if ($parent) {
-            return $this->_forward('add-parent');
+            return $this->forward()->dispatch(self::class, [
+                'action'    => 'add-parent',
+                'car_id'    => $car->id,
+                'parent_id' => $parent->id
+            ]);
         }
 
         $brandTable = $this->getBrandTable();
@@ -3177,90 +3141,93 @@ class CarsController extends AbstractActionController
             }
         }
 
-        $form = new Application_Form_Moder_Car_Organize([
-            'action'             => $this->url()->fromRoute('moder/cars/params', [], [], true),
+        $form = new CarOrganizeForm(null, [
             'childOptions'       => $childs,
             'inheritedCarType'   => $car->car_type_id,
             'inheritedIsConcept' => $car->is_concept,
             'specOptions'        => array_replace(['' => '-'], $specOptions),
-            'inheritedSpec'      => $inheritedSpec
+            'inheritedSpec'      => $inheritedSpec,
+            'translator'         => $this->translator
         ]);
 
-        $form->populate([
-            'is_group' => true
-        ]);
+        $form->setAttribute('action', $this->url()->fromRoute('moder/cars/params', [], [], true));
 
-        $request = $this->getRequest();
-        if ($request->isPost() && $form->isValid($request->getPost())) {
-            $values = $form->getValues();
+        $data = $this->carToForm($car);
+        $data['is_group'] = true;
 
-            $values['is_group'] = true;
-            $values['produced_exactly'] = false;
-            $values['description'] = '';
+        $form->populateValues($data);
 
-            $newCar = $carTable->createRow(
-                $this->prepareCarMetaToSave($values)
-            );
-            $newCar->save();
+        if ($this->getRequest()->isPost()) {
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $values = $form->getData();
 
-            $newCar->updateOrderCache();
+                $values['is_group'] = true;
 
-            $cpcTable = new Car_Parent_Cache();
-            $cpcTable->rebuildCache($newCar);
+                $newCar = $carTable->createRow(
+                    $this->prepareCarMetaToSave($values)
+                );
+                $newCar->save();
 
-            $url = $this->url()->fromRoute('moder/cars/params', [
-                'action'     => 'car',
-                'car_id'     => $newCar->id
-            ]);
-            $this->log(sprintf(
-                'Создан новый автомобиль %s',
-                htmlspecialchars($newCar->getFullName())
-            ), $newCar);
+                $newCar->updateOrderCache();
 
+                $cpcTable = new Car_Parent_Cache();
+                $cpcTable->rebuildCache($newCar);
 
-            $carParentTable->addParent($newCar, $car);
-
-            $message = sprintf(
-                '%s выбран как родительский автомобиль для %s',
-                htmlspecialchars($car->getFullName()),
-                htmlspecialchars($newCar->getFullName())
-            );
-            $this->log($message, [$car, $newCar]);
-
-            $carTable->updateInteritance($newCar);
+                $url = $this->url()->fromRoute('moder/cars/params', [
+                    'action' => 'car',
+                    'car_id' => $newCar->id
+                ]);
+                $this->log(sprintf(
+                    'Создан новый автомобиль %s',
+                    htmlspecialchars($newCar->getFullName())
+                ), $newCar);
 
 
-            $childCarRows = $carTable->find($values['childs']);
-
-            foreach ($childCarRows as $childCarRow) {
-                $carParentTable->addParent($childCarRow, $newCar);
+                $carParentTable->addParent($newCar, $car);
 
                 $message = sprintf(
                     '%s выбран как родительский автомобиль для %s',
-                    htmlspecialchars($newCar->getFullName()),
-                    htmlspecialchars($childCarRow->getFullName())
-                );
-                $this->log($message, [$newCar, $childCarRow]);
-
-                $carParentTable->removeParent($childCarRow, $car);
-                $message = sprintf(
-                    '%s перестал быть родительским автомобилем для %s',
                     htmlspecialchars($car->getFullName()),
-                    htmlspecialchars($childCarRow->getFullName())
+                    htmlspecialchars($newCar->getFullName())
                 );
-                $this->log($message, [$car, $childCarRow]);
+                $this->log($message, [$car, $newCar]);
 
-                $carTable->updateInteritance($childCarRow);
+                $carTable->updateInteritance($newCar);
+
+
+                $childCarRows = $carTable->find($values['childs']);
+
+                foreach ($childCarRows as $childCarRow) {
+                    $carParentTable->addParent($childCarRow, $newCar);
+
+                    $message = sprintf(
+                        '%s выбран как родительский автомобиль для %s',
+                        htmlspecialchars($newCar->getFullName()),
+                        htmlspecialchars($childCarRow->getFullName())
+                    );
+                    $this->log($message, [$newCar, $childCarRow]);
+
+                    $carParentTable->removeParent($childCarRow, $car);
+                    $message = sprintf(
+                        '%s перестал быть родительским автомобилем для %s',
+                        htmlspecialchars($car->getFullName()),
+                        htmlspecialchars($childCarRow->getFullName())
+                    );
+                    $this->log($message, [$car, $childCarRow]);
+
+                    $carTable->updateInteritance($childCarRow);
+                }
+
+                $specService = new Application_Service_Specifications();
+                $specService->updateActualValues(1, $newCar->id);
+
+                $user = $this->user()->get();
+                $ucsTable = new User_Car_Subscribe();
+                $ucsTable->subscribe($user, $newCar);
+
+                return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
             }
-
-            $specService = new Application_Service_Specifications();
-            $specService->updateActualValues(1, $newCar->id);
-
-            $user = $this->user()->get();
-            $ucsTable = new User_Car_Subscribe();
-            $ucsTable->subscribe($user, $newCar);
-
-            return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
         }
 
         return [
@@ -3272,28 +3239,20 @@ class CarsController extends AbstractActionController
 
     private function prepareCarMetaToSave(array $values)
     {
-        $endYear = (int)$values['end_year'];
+        $endYear = (int)$values['end']['year'];
 
         $today = null;
         if ($endYear) {
             if ($endYear < date('Y')) {
-                $today = false;
+                $today = 0;
             } else {
                 $today = null;
             }
         } else {
-            switch ($values['today']) {
-                case 0:
-                    $today = null;
-                    break;
-
-                case 1:
-                    $today = false;
-                    break;
-
-                case 2:
-                    $today = true;
-                    break;
+            if (strlen($values['end']['today'])) {
+                $today = $values['end']['today'] ? 1 : 0;
+            } else {
+                $today = null;
             }
         }
 
@@ -3317,17 +3276,17 @@ class CarsController extends AbstractActionController
         }
 
         $result = [
-            'caption'            => $values['caption'],
+            'caption'            => $values['name'],
             'body'               => $values['body'],
             'car_type_id'        => $carTypeId,
             'car_type_inherit'   => $carTypeInherit ? 1 : 0,
-            'begin_model_year'   => $values['begin_model_year'],
-            'end_model_year'     => $values['end_model_year'],
-            'begin_year'         => $values['begin_year'],
-            'begin_month'        => $values['begin_month'],
+            'begin_model_year'   => $values['model_year']['begin'] ? $values['model_year']['begin'] : null,
+            'end_model_year'     => $values['model_year']['end'] ? $values['model_year']['end'] : null,
+            'begin_year'         => $values['begin']['year'] ? $values['begin']['year'] : null,
+            'begin_month'        => $values['begin']['month'] ? $values['begin']['month'] : null,
             'end_year'           => $endYear ? $endYear : null,
-            'end_month'          => $values['end_month'],
-            'today'              => $today ? 1 : 0,
+            'end_month'          => $values['end']['month'] ? $values['end']['month'] : null,
+            'today'              => $today,
             'is_concept'         => $isConcept ? 1 : 0,
             'is_concept_inherit' => $isConceptInherit ? 1 : 0,
             'is_group'           => $values['is_group'] ? 1 : 0,
@@ -3349,16 +3308,9 @@ class CarsController extends AbstractActionController
             $result['spec_inherit'] = $specInherit ? 1 : 0;
         }
 
-        if (array_key_exists('description', $values)) {
-            $result['description'] = $values['description'];
-        }
-
         if (array_key_exists('produced', $values)) {
-            $result['produced'] = $values['produced'];
-        }
-
-        if (array_key_exists('produced_exactly', $values)) {
-            $result['produced_exactly'] = $values['produced_exactly'] ? 1 : 0;
+            $result['produced'] = strlen($values['produced']['count']) ? (int)$values['produced']['count'] : null;
+            $result['produced_exactly'] = $values['produced']['exactly'] ? 1 : 0;
         }
 
         return $result;
@@ -3387,63 +3339,63 @@ class CarsController extends AbstractActionController
             }
         }
 
-        $form = new Application_Form_Moder_Car_New([
+        $form = new CarForm(null, [
             'inheritedCarType'   => $parentCar ? $parentCar->car_type_id : null,
             'inheritedIsConcept' => $parentCar ? $parentCar->is_concept : null,
             'specOptions'        => array_replace(['' => '-'], $specOptions),
-            'action'             => $this->url()->fromRoute('moder/cars/params', [], [], true),
-            'inheritedSpec'      => $inheritedSpec
+            'inheritedSpec'      => $inheritedSpec,
+            'translator'         => $this->translator
         ]);
+        $form->setAttribute('action', $this->url()->fromRoute('moder/cars/params', [], [], true));
 
-        $request = $this->getRequest();
+        if ($this->getRequest()->isPost()) {
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
 
-        if ($request->isPost() && $form->isValid($request->getPost())) {
+                $values = $this->prepareCarMetaToSave($form->getData());
 
-            $values = $this->prepareCarMetaToSave($form->getValues());
-            $values['produced_exactly'] = 0;
-            $values['description'] = '';
+                $car = $carTable->createRow($values);
+                $car->save();
 
-            $car = $carTable->createRow($values);
-            $car->save();
+                $car->updateOrderCache();
 
-            $car->updateOrderCache();
+                $cpcTable = new Car_Parent_Cache();
+                $cpcTable->rebuildCache($car);
 
-            $cpcTable = new Car_Parent_Cache();
-            $cpcTable->rebuildCache($car);
+                $namespace = new Zend_Session_Namespace('Moder_Car');
+                $namespace->lastCarId = $car->id;
 
-            $namespace = new Zend_Session_Namespace('Moder_Car');
-            $namespace->lastCarId = $car->id;
-
-            $url = $this->url()->fromRoute('moder/cars/params', [
-                'action' => 'car',
-                'car_id' => $car->id
-            ]);
-            $this->log(sprintf(
-                'Создан новый автомобиль %s',
-                htmlspecialchars($car->getFullName())
-            ), $car);
-
-            $user = $this->user()->get();
-            $ucsTable = new User_Car_Subscribe();
-            $ucsTable->subscribe($user, $car);
-
-            if ($parentCar) {
-                $this->getCarParentTable()->addParent($car, $parentCar);
-
-                $message = sprintf(
-                    '%s выбран как родительский автомобиль для %s',
-                    htmlspecialchars($parentCar->getFullName()),
+                $url = $this->url()->fromRoute('moder/cars/params', [
+                    'action' => 'car',
+                    'car_id' => $car->id
+                ]);
+                $this->log(sprintf(
+                    'Создан новый автомобиль %s',
                     htmlspecialchars($car->getFullName())
-                );
-                $this->log($message, [$car, $parentCar]);
+                ), $car);
+
+                $user = $this->user()->get();
+                $ucsTable = new User_Car_Subscribe();
+                $ucsTable->subscribe($user, $car);
+
+                if ($parentCar) {
+                    $this->getCarParentTable()->addParent($car, $parentCar);
+
+                    $message = sprintf(
+                        '%s выбран как родительский автомобиль для %s',
+                        htmlspecialchars($parentCar->getFullName()),
+                        htmlspecialchars($car->getFullName())
+                    );
+                    $this->log($message, [$car, $parentCar]);
+                }
+
+                $carTable->updateInteritance($car);
+
+                $specService = new Application_Service_Specifications();
+                $specService->updateInheritedValues(1, $car->id);
+
+                return $this->redirect()->toUrl($url);
             }
-
-            $carTable->updateInteritance($car);
-
-            $specService = new Application_Service_Specifications();
-            $specService->updateInheritedValues(1, $car->id);
-
-            return $this->redirect()->toUrl($url);
         }
 
         return [
@@ -3476,7 +3428,7 @@ class CarsController extends AbstractActionController
 
         $carParentTable = $this->getCarParentTable();
         $carTable = $this->catalogue()->getCarTable();
-        $imageStorage = $this->getInvokeArg('bootstrap')->getResource('imagestorage');
+        $imageStorage = $this->imageStorage();
 
         $childs = [];
         $pictureTable = $this->catalogue()->getPictureTable();
@@ -3512,107 +3464,109 @@ class CarsController extends AbstractActionController
             }
         }
 
-        $form = new Application_Form_Moder_Car_OrganizePictures([
-            'action'             => $this->url()->fromRoute('moder/cars/params', [], [], true),
+        $form = new CarOrganizePicturesForm(null, [
             'childOptions'       => $childs,
             'inheritedCarType'   => $car->car_type_id,
             'inheritedIsConcept' => $car->is_concept,
             'specOptions'        => array_replace(['' => '-'], $specOptions),
-            'inheritedSpec'      => $inheritedSpec
+            'inheritedSpec'      => $inheritedSpec,
+            'translator'         => $this->translator
         ]);
 
+        $form->setAttribute('action', $this->url()->fromRoute('moder/cars/params', [], [], true));
 
-        $form->populate([
-            'is_group' => true
-        ]);
+        $data = $this->carToForm($car);
+        $data['is_group'] = false;
 
-        $request = $this->getRequest();
-        if ($request->isPost() && $form->isValid($request->getPost())) {
-            $values = $form->getValues();
+        $form->populateValues($data);
 
-            $values['is_group'] = false;
-            $values['produced_exactly'] = false;
-            $values['description'] = '';
+        if ($this->getRequest()->isPost()) {
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $values = $form->getData();
 
-            $newCar = $carTable->createRow(
-                $this->prepareCarMetaToSave($values)
-            );
-            $newCar->save();
+                $values['is_group'] = false;
+                $values['produced_exactly'] = false;
+                $values['description'] = '';
 
-            $newCar->updateOrderCache();
+                $newCar = $carTable->createRow(
+                    $this->prepareCarMetaToSave($values)
+                );
+                $newCar->save();
 
-            $cpcTable = new Car_Parent_Cache();
-            $cpcTable->rebuildCache($newCar);
+                $newCar->updateOrderCache();
 
-            $url = $this->url()->fromRoute('moder/cars/params', [
-                'action'     => 'car',
-                'car_id'     => $newCar->id
-            ]);
-            $this->log(sprintf(
-                'Создан новый автомобиль %s',
-                htmlspecialchars($newCar->getFullName())
-            ), $newCar);
+                $cpcTable = new Car_Parent_Cache();
+                $cpcTable->rebuildCache($newCar);
 
-            $car->is_group = 1;
-            $car->save();
+                $url = $this->url()->fromRoute('moder/cars/params', [
+                    'action'     => 'car',
+                    'car_id'     => $newCar->id
+                ]);
+                $this->log(sprintf(
+                    'Создан новый автомобиль %s',
+                    htmlspecialchars($newCar->getFullName())
+                ), $newCar);
 
-            $carParentTable->addParent($newCar, $car);
+                $car->is_group = 1;
+                $car->save();
 
-            $message = sprintf(
-                '%s выбран как родительский автомобиль для %s',
-                htmlspecialchars($car->getFullName()),
-                htmlspecialchars($newCar->getFullName())
-            );
-            $this->log($message, [$car, $newCar]);
+                $carParentTable->addParent($newCar, $car);
 
-            $carTable->updateInteritance($newCar);
+                $message = sprintf(
+                    '%s выбран как родительский автомобиль для %s',
+                    htmlspecialchars($car->getFullName()),
+                    htmlspecialchars($newCar->getFullName())
+                );
+                $this->log($message, [$car, $newCar]);
+
+                $carTable->updateInteritance($newCar);
 
 
-            $pictureRows = $pictureTable->find($values['childs']);
+                $pictureRows = $pictureTable->find($values['childs']);
 
-            foreach ($pictureRows as $pictureRow) {
-                $pictureRow->car_id = $newCar->id;
-                $pictureRow->save();
+                foreach ($pictureRows as $pictureRow) {
+                    $pictureRow->car_id = $newCar->id;
+                    $pictureRow->save();
 
-                if ($pictureRow->image_id) {
-                    $imageStorage = $this->getInvokeArg('bootstrap')
-                        ->getResource('imagestorage');
-                    $imageStorage->changeImageName($pictureRow->image_id, [
-                        'pattern' => $pictureRow->getFileNamePattern(),
-                    ]);
-                } else {
-                    $pictureRow->correctFileName();
+                    if ($pictureRow->image_id) {
+                        $this->imageStorage()->changeImageName($pictureRow->image_id, [
+                            'pattern' => $pictureRow->getFileNamePattern(),
+                        ]);
+                    } else {
+                        $pictureRow->correctFileName();
+                    }
+
+                    $this->log(sprintf(
+                        'Картинка %s связана с автомобилем %s',
+                        htmlspecialchars($pictureRow->id),
+                        htmlspecialchars($car->getFullName())
+                    ), [$car, $pictureRow]);
                 }
 
-                $this->log(sprintf(
-                    'Картинка %s связана с автомобилем %s',
-                    htmlspecialchars($pictureRow->id),
-                    htmlspecialchars($car->getFullName())
-                ), [$car, $pictureRow]);
+                // обнволяем кэш старого автомобиля
+                $car->refreshPicturesCount();
+                foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+                    $brand->updatePicturesCache();
+                    $brand->refreshPicturesCount();
+                }
+
+                // обнволяем кэш нового автомобиля
+                $newCar->refreshPicturesCount();
+                foreach ($newCar->findBrandsViaBrands_Cars() as $brand) {
+                    $brand->updatePicturesCache();
+                    $brand->refreshPicturesCount();
+                }
+
+                $specService = new Application_Service_Specifications();
+                $specService->updateActualValues(1, $newCar->id);
+
+                $user = $this->user()->get();
+                $ucsTable = new User_Car_Subscribe();
+                $ucsTable->subscribe($user, $newCar);
+
+                return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
             }
-
-            // обнволяем кэш старого автомобиля
-            $car->refreshPicturesCount();
-            foreach ($car->findBrandsViaBrands_Cars() as $brand) {
-                $brand->updatePicturesCache();
-                $brand->refreshPicturesCount();
-            }
-
-            // обнволяем кэш нового автомобиля
-            $newCar->refreshPicturesCount();
-            foreach ($newCar->findBrandsViaBrands_Cars() as $brand) {
-                $brand->updatePicturesCache();
-                $brand->refreshPicturesCount();
-            }
-
-            $specService = new Application_Service_Specifications();
-            $specService->updateActualValues(1, $newCar->id);
-
-            $user = $this->user()->get();
-            $ucsTable = new User_Car_Subscribe();
-            $ucsTable->subscribe($user, $newCar);
-
-            return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
         }
 
         return [
@@ -3723,10 +3677,10 @@ class CarsController extends AbstractActionController
             'modifications' => $this->carMofificationsGroupModifications($car, null),
         ];
 
-        return [
+        $model = new ViewModel([
             'car'    => $car,
             'groups' => $groups
-        ];
+        ]);
     }
 
     public function carModificationPicturesAction()
@@ -3743,7 +3697,7 @@ class CarsController extends AbstractActionController
         $mgTable = new Modification_Group();
         $pictureTable = new Picture();
         $db = $mpTable->getAdapter();
-        $imageStorage = $this->getInvokeArg('bootstrap')->getResource('imagestorage');
+        $imageStorage = $this->imageStorage();
         $language = $this->language();
 
 

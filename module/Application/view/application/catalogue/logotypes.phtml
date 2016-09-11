@@ -1,0 +1,16 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needLeft'  => true,
+            'needRight' => false
+        ],
+        'pageId' => 39,
+        'args'   => [
+            'BRAND_NAME'    => $this->brand['name'],
+            'BRAND_CATNAME' => $this->brand['catname'],
+        ]
+    ]);
+?>
+<?=$this->partial('application/pictures', $this->picturesData)?>
+<?=$this->paginationControl($this->paginator) ?>

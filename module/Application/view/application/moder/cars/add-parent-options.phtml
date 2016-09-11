@@ -1,0 +1,40 @@
+<?php
+    $carHtml = '<strong>' . $this->escapeHtml($this->car->getFullName()) . '</strong>';
+    $parentCarHtml = '<strong>' . $this->escapeHtml($this->parentCar->getFullName()) . '</strong>';
+?>
+<h3>Выбор</h3>
+<p>Вы пытаетесь сделать автомобиль <?=$carHtml?> подавтомобилем для <?=$parentCarHtml?></p>
+<p>Для этого необходимо создать группу.</p>
+<p>Мы сделаем это автоматически, но вам предстоит выбрать вариант исполнения</p>
+
+<form class="panel panel-default" method="post" action="<?=$this->escapeHtml($this->url(null, [
+    'variant' => 1
+], [], true))?>">
+    <div class="panel-heading">
+        <h3 class="panel-title">Вариант 1</h3>
+    </div>
+    <div class="panel-body">
+        <p><?=$parentCarHtml?> <span class="text-muted">(заменить на одноименную группу)</span></p>
+        <ul>
+            <li><?=$carHtml?></li>
+            <li><?=$parentCarHtml?> <span class="text-muted">(переместить автомобиль с фото сюда)</span></li>
+        </ul>
+        <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> Выбрать</button>
+    </div>
+</form>
+
+<form class="panel panel-default" method="post" action="<?=$this->escapeHtml($this->url(null, [
+    'variant' => 2
+], [], true))?>">
+    <div class="panel-heading">
+        <h3 class="panel-title">Вариант 2</h3>
+    </div>
+    <div class="panel-body">
+        <p><?=$parentCarHtml?> <span class="text-muted">(оставить как есть)</span></p>
+        <ul>
+            <li><?=$carHtml?></li>
+            <li><strong>Другие фото</strong> <span class="text-muted">(имевшиеся ранее фото оставить в этой папке)</span></li>
+        </ul>
+        <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> Выбрать</button>
+    </div>
+</form>
