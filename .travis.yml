@@ -14,6 +14,7 @@ addons:
 install:
   - printf "\n" | pecl install imagick
 before_script: 
+  - sudo apt-get install php5-imagick
   - phpenv config-add test/_files/travis.php.ini
   - composer install --dev
   - mysql -u root -e 'create database autowp_test;'
