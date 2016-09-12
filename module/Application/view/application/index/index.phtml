@@ -1,74 +1,177 @@
-<div class="jumbotron">
-    <h1>Welcome to <span class="zf-green">Zend Framework</span></h1>
-
-    <p>
-        Congratulations! You have successfully installed the
-        <a href="https://github.com/zendframework/ZendSkeletonApplication" target="_blank">ZF Skeleton Application</a>.
-        You are currently running Zend Framework version <?= \Application\Module::VERSION ?>.
-        This skeleton can serve as a simple starting point for you to begin
-        building your application on ZF.
-    </p>
-
-    <p><a class="btn btn-success btn-lg" href="https://github.com/zendframework/zendframework" target="_blank">Fork Zend Framework on GitHub &raquo;</a></p>
-</div>
-
+<?php
+    $this->pageEnv([
+        'layout'    => [
+            'blankPage' => false,
+            'needRight' => false
+        ],
+        'pageTitle' => '',
+        'pageId'    => 1
+    ]);
+    $this->layout()->moduleName = 'default/index';
+?>
+<?php /*
+<?php $this->headStyle()->captureStart()?>
+html {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    filter: grayscale(100%);
+}
+<?php $this->headStyle()->captureEnd()?>
+*/ ?>
 <div class="row">
+    <div class="col-md-6">
+        <?php if ($this->carOfDay['name']) { ?>
+            <h2>
+                <?=$this->car()->htmlTitle($this->carOfDay['name'])?>
+                <small><?=$this->escapeHtml($this->translate('car-of-day')) ?></small>
+            </h2>
 
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Follow Development</h3>
-            </div>
-            <div class="panel-body">
+            <?php if ($this->carOfDay['pictures']) { ?>
+                <div class="row thumbnails">
+                    <?php foreach ($this->carOfDay['pictures'] as $idx => $picture) { ?>
+                        <?php if ($idx == 0) { ?>
+                            <?php if ($picture) { ?>
+                                <div class="col-sm-8">
+                                    <?=$this->htmlA([
+                                        'href'  => $picture['url'],
+                                        'class' => 'thumbnail'
+                                    ], $this->htmlImg([
+                                        'src'   => $picture['src'],
+                                        'title' => $this->pic()->textTitle($picture['name']),
+                                        'alt'   => $this->pic()->textTitle($picture['name']),
+                                    ]), false)?>
+                                </div>
+                            <?php } ?>
+                        <?php } ?>
+                    <?php } ?>
+                    <div class="col-sm-4">
+                        <?php foreach ($this->carOfDay['pictures'] as $idx => $picture) { ?>
+                            <?php if ($idx == 1 || $idx == 2) { ?>
+                                <?php if ($picture) { ?>
+                                    <?=$this->htmlA([
+                                        'href'  => $picture['url'],
+                                        'class' => 'thumbnail'
+                                    ], $this->htmlImg([
+                                        'src'   => $picture['src'],
+                                        'title' => $this->pic()->textTitle($picture['name']),
+                                        'alt'   => $this->pic()->textTitle($picture['name']),
+                                    ]), false)?>
+                                <?php } ?>
+                            <?php } ?>
+                        <?php } ?>
+                    </div>
+                </div>
+                <div class="row thumbnails">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <?php foreach ($this->carOfDay['pictures'] as $idx => $picture) { ?>
+                                <?php if ($idx > 2) { ?>
+                                    <?php if ($picture) { ?>
+                                        <div class="col-sm-4">
+                                            <?=$this->htmlA([
+                                                'href'  => $picture['url'],
+                                                'class' => 'thumbnail'
+                                            ], $this->htmlImg([
+                                                'src'   => $picture['src'],
+                                                'title' => $this->pic()->textTitle($picture['name']),
+                                                'alt'   => $this->pic()->textTitle($picture['name']),
+                                            ]), false)?>
+                                        </div>
+                                    <?php } ?>
+                                <?php } ?>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
+                <?php if ($this->carOfDay['links']) { ?>
+                    <p>
+                        <?php foreach ($this->carOfDay['links'] as $i => $item) { ?>
+                            <?php if ($i) { ?> &#xa0; <?php } ?>
+                            <span class="fa fa-<?=$item['icon']?>"></span>
+                            <?=$this->htmlA($item['url'], $item['text'] . (isset($item['count']) ? ' ('.$item['count'].')' : ''))?>
+                        <?php } ?>
+                    </p>
+                <?php } ?>
+            <?php } ?>
+        <?php } ?>
+
+        <div class="page-header-small">
+            <h3><?=$this->escapeHtml($this->page(51)->name) ?> <small><?=$this->htmlA('/new', $this->translate('all-link'))?></small></h3>
+        </div>
+        <?=$this->partial('application/pictures', $this->newPictures)?>
+        <p>
+            <span class="fa fa-th"></span>
+            <?=$this->htmlA('/new', $this->translate('All new pictures') . ' …') ?>
+        </p>
+    </div>
+    <div class="col-md-6">
+        <?=$this->partial('application/index/partial/brands', $this->brands)?>
+
+        <div class="row">
+
+            <div class="col-md-6">
+                <h4><?=$this->escapeHtml($this->page(25)->name) ?> <small><?=$this->htmlA('/twins', $this->translate('all-link'))?></small></h4>
                 <p>
-                    Zend Framework is under active development. If you are
-                    interested in following the development of ZF, you can check
-                    <a href="http://framework.zend.com/blog/">ZF dev blog</a>,
-                    and <a href="https://github.com/issues?utf8=%E2%9C%93&q=is:issue+org:zendframework">ZF issue tracker</a>
-                    (link requires a GitHub account). This is a great resource
-                    for staying up to date with the latest developments!
+                    <?php foreach ($this->twinsBlock['brands'] as $brand) { ?>
+                        <?=$this->htmlA($brand['url'], $brand['name']) ?>
+                        <span class="count">(<?=$brand['count'] - $brand['new_count'] ?><?php if ($brand['new_count'] > 0) { ?><span>+<?=$brand['new_count'] ?></span><?php } ?>)</span>,
+                    <?php } ?>
+                    <?php if ($more = $this->twinsBlock['more_count']) { ?>
+                        …
+                        <?=$this->escapeHtml($this->translate('and'))?>
+                        <?=$this->htmlA(
+                            '/twins',
+                            sprintf($this->translatePlural('brands/more-companies', 'brands/more-companies', $more), $more)
+                        )?>
+                    <?php } ?>
                 </p>
+                <?php if ($this->language() == 'ru') { ?>
+                    <p>Вы знаете, что Daewoo Matiz имеет аж целых <a href="/twins/group87">шесть клонов</a>? А знаете, что <a href="/twins/group5">общего у Lotus и Kia</a>? Уверены, что вам покажется интересным этот раздел.</p>
+                <?php } ?>
+            </div>
 
-                <p><a class="btn btn-success pull-right" href="http://framework.zend.com/" target="_blank">ZF Development Portal &raquo;</a></p>
+            <div class="col-md-6">
+                <h4><?=$this->escapeHtml($this->page(22)->name) ?> <small><?=$this->htmlA('/category', $this->translate('all-link'))?></small></h4>
+                <p>
+                    <?php foreach ($this->categories as $category) { ?>
+                        <?=$this->htmlA($category['url'], $category['short_name'])?>&#xa0;<span class="count">(<?=$category['cars_count']-$category['new_cars_count'] ?><?php if ($category['new_cars_count'] > 0) { ?><span>+<?=$category['new_cars_count'] ?></span><?php } ?>)</span>,
+                    <?php } ?>
+                </p>
+                <?php if ($this->language() == 'ru') { ?>
+                    <p>А знаете ли вы, какая техника помогала блюсти правопорядок на улицах мировых городов в разное время? А на каких автомобилях ездил Папа Римский? Нет? Тогда вам точно в этот раздел.</p>
+                <?php } ?>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Discover Modules</h3>
-            </div>
-            <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4><?=$this->escapeHtml($this->page(21)->name) ?> <small><?=$this->htmlA('/mosts', $this->translate('all-link'))?></small></h4>
                 <p>
-                    The community is working on developing a community site to
-                    serve as a repository and gallery for ZF modules. The
-                    project is available <a href="https://github.com/zendframework/modules.zendframework.com">on GitHub</a>.
-                    The site is currently live and currently contains a list of
-                    some of the modules already available for ZF.
+                    <?php foreach ($this->mosts as $url => $name) { ?>
+                        <?=$this->htmlA($url, $this->translate($name)) ?>,
+                    <?php } ?>
+                    …
                 </p>
-
-                <p><a class="btn btn-success pull-right" href="http://modules.zendframework.com/" target="_blank">Explore ZF Modules &raquo;</a></p>
+                <?php if ($this->language() == 'ru') { ?>
+                    <p>Хотите знать, какой автомобиль был самым быстрым? Хотите знать, сколько весит самый могучий карьерный самосвал? Заходите и узнаете!</p>
+                <?php } ?>
             </div>
-        </div>
-    </div>
 
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Help &amp; Support</h3>
-            </div>
-            <div class="panel-body">
-                <p>
-                    If you need any help or support while developing with ZF,
-                    you may reach us via IRC: <a href="irc://irc.freenode.net/zftalk">#zftalk on Freenode</a>.
-                    We'd love to hear any questions or feedback you may have
-                    regarding this release. Alternatively, you may subscribe
-                    and post questions to the <a href="http://framework.zend.com/archives/">mailing lists</a>.
-                </p>
-
-                <p><a class="btn btn-success pull-right" href="http://webchat.freenode.net?channels=zftalk" target="_blank">Ping us on IRC &raquo;</a></p>
+            <div class="col-md-6">
+                <h4><?=$this->escapeHtml($this->translate('index/factories'))?> <small><?=$this->htmlA('/map', $this->translate('all-link'))?></small></h4>
+                <?php foreach ($this->factories as $factory) {
+                    echo $this->htmlA($factory['url'], $factory['name']) .
+                        '&#xa0;<span class="count">(' . $factory['count'] . ')</span> ';
+                } ?>
             </div>
         </div>
     </div>
 </div>
+
+<?php if (count($this->specsCars) > 0) { ?>
+    <h4>
+        <?=$this->escapeHtml($this->translate('carlist/specifications'))?>
+        <small><?=$this->htmlA('/users/rating', $this->page(173)->name)?></small>
+    </h4>
+    <?=$this->partial('application/index/partial/specs-cars', $this->specsCars)?>
+<?php } ?>

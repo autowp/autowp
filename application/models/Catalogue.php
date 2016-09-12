@@ -5,7 +5,7 @@ use Autowp\Image\Storage\Request;
 class Catalogue
 {
     private $_picturesPerPage = 20;
-    
+
     private $carsPerPage = 7;
 
     /**
@@ -50,24 +50,24 @@ class Catalogue
 
     private $perspectiveLangTable;
 
-    private $perspectivePrefix = array();
+    private $perspectivePrefix = [];
 
-    private $prefixedPerspectives = array(5, 6, 17, 20, 21);
+    private $prefixedPerspectives = [5, 6, 17, 20, 21];
 
     /**
      * @return array
      */
     public function carsOrdering()
     {
-        return array(
+        return [
             'cars.begin_order_cache',
             'cars.end_order_cache',
             'cars.caption',
             'cars.body',
             'cars.spec_id'
-        );
+        ];
 
-        /*return array(
+        /*return [
             new Zend_Db_Expr('cars.begin_year IS NULL'),
             'cars.begin_year',
             new Zend_Db_Expr('cars.begin_month IS NULL'),
@@ -78,7 +78,7 @@ class Catalogue
             'cars.end_month',
             'cars.caption',
             'cars.body'
-        );*/
+        ];*/
     }
 
     /**
@@ -86,10 +86,10 @@ class Catalogue
      */
     public function picturesOrdering()
     {
-        return array(
+        return [
             'pictures.width DESC', 'pictures.height DESC',
             'pictures.add_date DESC', 'pictures.id DESC'
-        );
+        ];
     }
 
     public function getCarsPerPage()
@@ -188,7 +188,7 @@ class Catalogue
      */
     public function cataloguePaths(Cars_Row $car)
     {
-        return $this->walkUpUntilBrand($car->id, array());
+        return $this->walkUpUntilBrand($car->id, []);
     }
 
     /**
@@ -199,11 +199,11 @@ class Catalogue
      */
     private function walkUpUntilBrand($id, array $path)
     {
-        $urls = array();
+        $urls = [];
 
-        $brandCarRows = $this->getBrandCarTable()->fetchAll(array(
+        $brandCarRows = $this->getBrandCarTable()->fetchAll([
             'car_id = ?' => $id
-        ));
+        ]);
 
         foreach ($brandCarRows as $brandCarRow) {
 
@@ -212,32 +212,32 @@ class Catalogue
                 throw new Exception("Broken link `{$brandCarRow->brand_id}`");
             }
 
-            $urls[] = array(
+            $urls[] = [
                 'brand_catname' => $brand->folder,
                 'car_catname'   => $brandCarRow->catname ? $brandCarRow->catname : 'car' . $brandCarRow->car_id,
                 'path'          => $path
-            );
+            ];
         }
 
-        $parentRows = $this->getCarParentTable()->fetchAll(array(
+        $parentRows = $this->getCarParentTable()->fetchAll([
             'car_id = ?' => $id
-        ));
+        ]);
         foreach ($parentRows as $parentRow) {
             $urls = array_merge(
                 $urls,
-                $this->walkUpUntilBrand($parentRow->parent_id, array_merge(array($parentRow->catname), $path))
+                $this->walkUpUntilBrand($parentRow->parent_id, array_merge([$parentRow->catname], $path))
             );
         }
 
         return $urls;
     }
 
-    public function engineCataloguePaths(Engines_Row $engine, array $options = array())
+    public function engineCataloguePaths(Engines_Row $engine, array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'brand_id' => null,
             'limit'    => null
-        );
+        ];
         $options = array_merge($defaults, $options);
 
         return $this->engineWalkUpUntilBrand($engine->id, $options);
@@ -251,7 +251,7 @@ class Catalogue
      */
     private function engineWalkUpUntilBrand($id, $options)
     {
-        $urls = array();
+        $urls = [];
 
         $engineTable = $this->getEngineTable();
 
@@ -264,15 +264,15 @@ class Catalogue
 
         $limit = $options['limit'];
 
-        $path = array();
+        $path = [];
 
         while ($engineRow) {
 
             array_unshift($path, $engineRow->id);
 
-            $brandEngineRows = $this->getBrandEngineTable()->fetchAll(array(
+            $brandEngineRows = $this->getBrandEngineTable()->fetchAll([
                 'engine_id = ?' => $engineRow->id
-            ));
+            ]);
 
             foreach ($brandEngineRows as $brandEngineRow) {
 
@@ -285,10 +285,10 @@ class Catalogue
                     throw new Exception("Broken link `{$brandCarRow->brand_id}`");
                 }
 
-                $urls[] = array(
+                $urls[] = [
                     'brand_catname' => $brand->folder,
                     'path'          => $path
-                );
+                ];
 
                 if ($limit !== null) {
                     $limit--;
@@ -303,9 +303,9 @@ class Catalogue
             }
 
             if ($engineRow->parent_id) {
-                $engineRow = $engineTable->fetchRow(array(
+                $engineRow = $engineTable->fetchRow([
                     'id = ?' => $engineRow->parent_id
-                ));
+                ]);
             } else {
                 $engineRow = null;
             }
@@ -328,10 +328,10 @@ class Catalogue
     {
         if (in_array($id, $this->prefixedPerspectives)) {
             if (!isset($this->perspectivePrefix[$id][$language])) {
-                $row = $this->getPerspectiveLangTable()->fetchRow(array(
+                $row = $this->getPerspectiveLangTable()->fetchRow([
                     'perspective_id = ?' => $id,
                     'language = ?'       => $language
-                ));
+                ]);
                 if ($row) {
                     $this->perspectivePrefix[$id][$language] = self::mbUcfirst($row->name) . ' ';
                 } else {
@@ -352,9 +352,9 @@ class Catalogue
      */
     public function buildPicturesName(array $pictures, $language)
     {
-        return $this->getPictureTable()->getNames($pictures, array(
+        return $this->getPictureTable()->getNames($pictures, [
             'language' => $language
-        ));
+        ]);
     }
 
     /**
@@ -364,7 +364,7 @@ class Catalogue
      */
     public function buildPictureName(array $picture, $language)
     {
-        $defaults = array(
+        $defaults = [
             'id'             => null,
             'name'           => null,
             'type'           => null,
@@ -372,7 +372,7 @@ class Catalogue
             'engine_id'      => null,
             'car_id'         => null,
             'perspective_id' => null,
-        );
+        ];
         $picture = array_replace($defaults, $picture);
 
         if ($picture['name']) {
@@ -440,16 +440,16 @@ class Catalogue
      */
     public function getPictureFormatRequest(array $picture)
     {
-        $options = array(
+        $options = [
             'imageId' => $picture['image_id']
-        );
+        ];
         if ($this->cropParametersExists($picture)) {
-            $options['crop'] = array(
+            $options['crop'] = [
                 'left'   => $picture['crop_left'],
                 'top'    => $picture['crop_top'],
                 'width'  => $picture['crop_width'],
                 'height' => $picture['crop_height']
-            );
+            ];
         }
 
         return new Request($options);

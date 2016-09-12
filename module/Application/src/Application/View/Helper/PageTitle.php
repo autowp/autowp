@@ -67,7 +67,7 @@ class PageTitle extends AbstractStandalone
 
         $output = $this->renderTitle();
 
-        return $indent . '<div class="page-header"><h1>' . $output . '</h1></div>';
+        return $output ? $indent . '<div class="page-header"><h1>' . $output . '</h1></div>' : '';
     }
 
     /**

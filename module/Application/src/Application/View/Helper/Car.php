@@ -62,7 +62,7 @@ class Car extends AbstractHelper
 
     public function htmlTitle(array $car)
     {
-        $defaults = array(
+        $defaults = [
             'begin_model_year' => null,
             'end_model_year'   => null,
             'spec'             => null,
@@ -74,7 +74,7 @@ class Car extends AbstractHelper
             'today'            => null,
             'begin_month'      => null,
             'end_month'        => null
-        );
+        ];
         $car = array_replace($defaults, $car);
 
         $view = $this->view;
@@ -221,7 +221,7 @@ class Car extends AbstractHelper
 
     public function textTitle(array $car)
     {
-        $defaults = array(
+        $defaults = [
             'begin_model_year' => null,
             'end_model_year'   => null,
             'spec'             => null,
@@ -233,7 +233,7 @@ class Car extends AbstractHelper
             'today'            => null,
             'begin_month'      => null,
             'end_month'        => null
-        );
+        ];
         $car = array_replace($defaults, $car);
 
         $view = $this->view;
@@ -389,7 +389,7 @@ class Car extends AbstractHelper
             }
         }
 
-        return $this->htmlTitle(array(
+        return $this->htmlTitle([
             'begin_model_year' => $car['begin_model_year'],
             'end_model_year'   => $car['end_model_year'],
             'spec'             => $spec,
@@ -401,28 +401,28 @@ class Car extends AbstractHelper
             'today'            => $car['today'],
             'begin_month'      => $car['begin_month'],
             'end_month'        => $car['end_month']
-        ));
+        ]);
     }
 
     public function catalogueLinks()
     {
         if (!$this->_car) {
-            return array();
+            return [];
         }
 
-        $result = array();
+        $result = [];
 
         foreach ($this->_carPublicUrls($this->_car) as $url) {
-            $result[] = array(
-                'url' => $this->view->url(array(
+            $result[] = [
+                'url' => $this->view->url([
                     'module'        => 'default',
                     'controller'    => 'catalogue',
                     'action'        => 'brand-car',
                     'brand_catname' => $url['brand_catname'],
                     'car_catname'   => $url['car_catname'],
                     'path'          => $url['path']
-                ), 'catalogue', true)
-            );
+                ], 'catalogue', true)
+            ];
         }
 
         return $result;
@@ -465,16 +465,16 @@ class Car extends AbstractHelper
 
     private function _carPublicUrls(Cars_Row $car)
     {
-        return $this->_walkUpUntilBrand($car->id, array());
+        return $this->_walkUpUntilBrand($car->id, []);
     }
 
     private function _walkUpUntilBrand($id, array $path)
     {
-        $urls = array();
+        $urls = [];
 
-        $brandCarRows = $this->_getBrandCarTable()->fetchAll(array(
+        $brandCarRows = $this->_getBrandCarTable()->fetchAll([
             'car_id = ?' => $id
-        ));
+        ]);
 
         foreach ($brandCarRows as $brandCarRow) {
 
@@ -483,22 +483,22 @@ class Car extends AbstractHelper
                 throw new Exception("Broken link `{$brandCarRow->brand_id}`");
             }
 
-            $urls[] = array(
+            $urls[] = [
                 'brand_catname' => $brand->folder,
                 'car_catname'   => $brandCarRow->catname ? $brandCarRow->catname : 'car' . $brandCarRow->car_id,
                 'path'          => $path
-            );
+            ];
         }
 
         $carParentTable = $this->_getCarParentTable();
 
-        $parentRows = $this->_getCarParentTable()->fetchAll(array(
+        $parentRows = $this->_getCarParentTable()->fetchAll([
             'car_id = ?' => $id
-        ));
+        ]);
         foreach ($parentRows as $parentRow) {
             $urls = array_merge(
                 $urls,
-                $this->_walkUpUntilBrand($parentRow->parent_id, array_merge(array($parentRow->catname), $path))
+                $this->_walkUpUntilBrand($parentRow->parent_id, array_merge([$parentRow->catname], $path))
             );
         }
 

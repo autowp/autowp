@@ -7,7 +7,11 @@ $zf2uri = ['/api/', '/oauth', '/users', '/rules', '/about', '/info', '/pulse',
     '/pictures', '/comments', '/registration', '/login', '/picture/',
     '/telegram', '/account'];
 
-$zf2ExactUri = ['/log', '/new', '/factory', '/ban'];
+$zf2ExactUri = ['/log', '/new', '/factory', '/ban', '/'];
+
+if ($_SERVER['REMOTE_ADDR'] == '46.188.125.241') {
+
+}
 
 $useZF2 = php_sapi_name() === 'cli';
        //|| isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] == '46.188.125.123';

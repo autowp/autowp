@@ -77,7 +77,11 @@ return [
                 $translator = $sm->get('translator');
                 return new Controller\ForumsController($newTopicForm, $commentForm, $transport, $translator);
             },
-            Controller\IndexController::class        => InvokableFactory::class,
+            Controller\IndexController::class => function($sm) {
+                $cache = $sm->get('fastCache');
+                $translator = $sm->get('translator');
+                return new Controller\IndexController($cache, $translator);
+            },
             Controller\InboxController::class        => InvokableFactory::class,
             Controller\InfoController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);

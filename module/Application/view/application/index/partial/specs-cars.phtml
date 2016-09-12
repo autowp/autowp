@@ -21,15 +21,15 @@
                             <div class="col-sm-4">
                                 <?php if ($picture) { ?>
                                     <?=$this->htmlA(
-                                        array(
+                                        [
                                             'href'  => $picture['url'],
                                             'class' =>'thumbnail'
-                                        ),
-                                        $this->htmlImg(array(
+                                        ],
+                                        $this->htmlImg([
                                             'src'   => $picture['src'],
                                             'alt'   => $this->pic()->textTitle($picture['name']),
                                             'title' => $this->pic()->textTitle($picture['name']),
-                                        )),
+                                        ]),
                                         false
                                     )?>
                                 <?php } else { ?>
@@ -73,7 +73,7 @@
                         <?php if (count($item['specsLinks']) > 1) { ?>
                             <li>
                                 <i class="fa fa-list-alt"></i>
-                                <?=$this->escape($this->translate('carlist/specifications'))?>
+                                <?=$this->escapeHtml($this->translate('carlist/specifications'))?>
                                 <?php foreach ($item['specsLinks'] as $specLink) { ?>
                                     <?=$this->htmlA($specLink['url'], $specLink['name'])?>
                                 <?php } ?>
@@ -120,7 +120,7 @@
 
                     <?php if (count($item['contributors'])) { ?>
                         <p>
-                            <?=$this->escape($this->translate(count($item['contributors']) > 1 ? 'contributors' : 'contributor'))?>:
+                            <?=$this->escapeHtml($this->translate(count($item['contributors']) > 1 ? 'contributors' : 'contributor'))?>:
                             <?php foreach ($item['contributors'] as $contributor) { ?>
                                 <?=$this->user($contributor)?>
                             <?php } ?>

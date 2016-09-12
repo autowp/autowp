@@ -19,8 +19,8 @@ return [
                     ]
                 ]
             ],
-            /*'home' => [
-             'type' => Literal::class,
+            'index' => [
+                'type' => Literal::class,
                 'options' => [
                     'route'    => '/',
                     'defaults' => [
@@ -28,7 +28,7 @@ return [
                         'action'     => 'index',
                     ],
                 ],
-            ],*/
+            ],
             'about' => [
                 'type' => Literal::class,
                 'options' => [
