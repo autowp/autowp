@@ -65,10 +65,19 @@ class Project_View_Helper_Page extends Zend_View_Helper_Abstract
             case 'title':
             case 'breadcrumbs':
                 $key = 'page/' . $this->_doc->id. '/' . $name;
-                
+
                 $result = $this->view->translate($key);
                 if (!$result) {
                     $result = $this->view->translate($key, 'en');
+                }
+
+                if (!$result && ($name != 'name')) {
+                    $key = 'page/' . $this->_doc->id. '/name';
+
+                    $result = $this->view->translate($key);
+                    if (!$result) {
+                        $result = $this->view->translate($key, 'en');
+                    }
                 }
 
                 return $result;

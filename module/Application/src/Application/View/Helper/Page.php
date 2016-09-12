@@ -71,10 +71,19 @@ class Page extends AbstractHelper
                 $key = 'page/' . $this->doc->id. '/' . $name;
 
                 $result = $this->view->translate($key);
-                if (!$result) {
+                if (!$result || $result == $key) {
                     $result = $this->view->translate($key, null, 'en');
                 }
-                
+
+                if ((!$result || $result == $key) && ($name != 'name')) {
+                    $key = 'page/' . $this->doc->id. '/name';
+
+                    $result = $this->view->translate($key);
+                    if (!$result || $result == $key) {
+                        $result = $this->view->translate($key, null, 'en');
+                    }
+                }
+
                 return $result;
 
             case 'onPath':

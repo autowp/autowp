@@ -54,7 +54,7 @@ class MainMenu
      * @var array
      */
     private $hosts = [];
-    
+
     private $translator;
 
     public function __construct($request, TreeRouteStack $router, Language $language, StorageInterface $cache, $hosts, $translator)
@@ -66,7 +66,7 @@ class MainMenu
         $this->cache = $cache;
 
         $this->pageTable = new Pages();
-        
+
         $this->translator = $translator;
     }
 
@@ -94,14 +94,14 @@ class MainMenu
 
         $result = [];
         foreach ($db->fetchAll($select) as $row) {
-            
+
             $key = 'page/' . $row['id'] . '/name';
-            
+
             $name = $this->translator->translate($key);
             if (!$name) {
                 $name = $this->translator->translate($key, null, 'en');
             }
-            
+
             $result[] = [
                 'id'    => $row['id'],
                 'url'   => $row['url'],
@@ -170,7 +170,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '11_' . $language;
+        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '12_' . $language;
 
         $secondMenu = $this->cache->getItem($key, $success);
         if (!$success) {
