@@ -44,8 +44,7 @@ class LayoutController extends Zend_Controller_Action
 
         $select = $db->select()
             ->from($table->info('name'), array(
-                'id', 'url', 'class',
-                'name' => 'if(length(page_language.name) > 0, page_language.name, pages.name)'
+                'id', 'url', 'class'
             ))
             ->joinLeft('page_language', $expr, null)
             ->where('pages.parent_id = ?', $id)
@@ -58,10 +57,18 @@ class LayoutController extends Zend_Controller_Action
 
         $result = array();
         foreach ($db->fetchAll($select) as $row) {
+            
+            $key = 'page/' . $row['id'] . '/name';
+            
+            $name = $this->view->translate($key);
+            if (!$name) {
+                $name = $this->view->translate($key, 'en');
+            }
+            
             $result[] = array(
                 'id'    => $row['id'],
                 'url'   => $row['url'],
-                'name'  => $row['name'],
+                'name'  => $name,
                 'class' => $row['class']
             );
         }
@@ -180,14 +187,14 @@ class LayoutController extends Zend_Controller_Action
         $logedIn = $this->_helper->user()->logedIn();
 
 
-        $key = 'MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '5_' . $language;
+        $key = 'MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '6_' . $language;
         if (!($pages = $cache->load($key))) {
             $pages = $this->getMenuData(2, $logedIn, $language);
 
             $cache->save($pages, null, array(), 1800);
         }
 
-        $key = 'SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '11_' . $language;
+        $key = 'SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '12_' . $language;
         if (!($secondMenu = $cache->load($key))) {
             $secondMenu = $this->getMenuData(87, $logedIn, $language);
 

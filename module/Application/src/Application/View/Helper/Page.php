@@ -16,10 +16,7 @@ class Page extends AbstractHelper
      * @var Zend_Db_Table
      */
     private $pageTable;
-    /**
-     * @var Zend_Db_Table
-     */
-    private $pageLanguageTable;
+
     /**
      * @var Page_Row
      */
@@ -35,15 +32,9 @@ class Page extends AbstractHelper
      */
     private $pages = [];
 
-    /**
-     * @var array
-     */
-    private $langPages = [];
-
     public function __construct()
     {
         $this->pageTable = new Pages();
-        $this->pageLanguageTable = new Page_Language();
     }
 
     public function __invoke($value)
@@ -77,24 +68,14 @@ class Page extends AbstractHelper
             case 'name':
             case 'title':
             case 'breadcrumbs':
-                $field = $name;
+                $key = 'page/' . $this->doc->id. '/' . $name;
 
-                $id = $this->doc->id;
-                $lang = $this->view->language();
-
-                if (!isset($this->langPages[$id][$lang])) {
-                    $this->langPages[$id][$lang] = $this->pageLanguageTable->fetchRow(array(
-                        'page_id = ?'  => $id,
-                        'language = ?' => $lang
-                    ));
+                $result = $this->view->translate($key);
+                if (!$result) {
+                    $result = $this->view->translate($key, null, 'en');
                 }
-
-                $langDoc = $this->langPages[$id][$lang];
-
-                if ($langDoc && $langDoc[$field]) {
-                    return $langDoc[$field];
-                }
-                return $this->doc[$field];
+                
+                return $result;
 
             case 'onPath':
                 return $this->isParentOrSelf($this->_currentPage, $this->doc);

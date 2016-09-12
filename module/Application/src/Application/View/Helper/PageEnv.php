@@ -5,7 +5,6 @@ namespace Application\View\Helper;
 use Zend\View\Helper\AbstractHelper;
 
 use Pages;
-use Page_Language;
 
 use Zend_Db_Table;
 use Zend_Locale;
@@ -17,11 +16,6 @@ class PageEnv extends AbstractHelper
      * @var Zend_Db_Table
      */
     private $pageTable;
-
-    /**
-     * @var Zend_Db_Table
-     */
-    private $pageLanguageTable;
 
     /**
      * @var array
@@ -36,7 +30,6 @@ class PageEnv extends AbstractHelper
     public function __construct()
     {
         $this->pageTable = new Pages();
-        $this->pageLanguageTable = new Page_Language();
 
         if (Zend_Registry::isRegistered('Zend_Locale')) {
             $locale = new Zend_Locale(Zend_Registry::get('Zend_Locale'));

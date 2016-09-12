@@ -5,10 +5,7 @@ class Project_View_Helper_Page extends Zend_View_Helper_Abstract
      * @var Zend_Db_Table
      */
     protected $_pageTable;
-    /**
-     * @var Zend_Db_Table
-     */
-    protected $_pageLanguageTable;
+
     /**
      * @var Page_Row
      */
@@ -22,12 +19,9 @@ class Project_View_Helper_Page extends Zend_View_Helper_Abstract
 
     protected $_pages = array();
 
-    protected $_langPages = array();
-
     public function __construct()
     {
         $this->_pageTable = new Pages();
-        $this->_pageLanguageTable = new Page_Language();
 
         if (Zend_Registry::isRegistered('Zend_Locale')) {
             $locale = new Zend_Locale(Zend_Registry::get('Zend_Locale'));
@@ -70,24 +64,14 @@ class Project_View_Helper_Page extends Zend_View_Helper_Abstract
             case 'name':
             case 'title':
             case 'breadcrumbs':
-                $field = $name;
-
-                $id = $this->_doc->id;
-                $lang = $this->_language;
-
-                if (!isset($this->_langPages[$id][$lang])) {
-                    $this->_langPages[$id][$lang] = $this->_pageLanguageTable->fetchRow(array(
-                        'page_id = ?'  => $id,
-                        'language = ?' => $lang
-                    ));
+                $key = 'page/' . $this->_doc->id. '/' . $name;
+                
+                $result = $this->view->translate($key);
+                if (!$result) {
+                    $result = $this->view->translate($key, 'en');
                 }
 
-                $langDoc = $this->_langPages[$id][$lang];
-
-                if ($langDoc && $langDoc[$field]) {
-                    return $langDoc[$field];
-                }
-                return $this->_doc[$field];
+                return $result;
 
             case 'onPath':
                 return $this->_isParentOrSelf($this->_currentPage, $this->_doc);

@@ -710,7 +710,7 @@ class CarsController extends AbstractActionController
 
                     $user = $this->user()->get();
                     $message = sprintf(
-                        "Пользователь %s редактировал информацию об автомобиле %s (%s)\n".
+                        "Пользователь %s редактировал информацию об автомобиле %s ( %s )\n" .
                         ( count($changes) ? implode("\n", $changes) : ''),
                         $car->getFullName(),
                         $this->carModerUrl($car, true),
@@ -1752,7 +1752,7 @@ class CarsController extends AbstractActionController
         $changes = [];
 
         foreach ($this->allowedLanguages as $lang) {
-            $value = trim($this->params($lang));
+            $value = trim($this->params()->fromPost($lang));
 
             $row = $carLangTable->fetchRow([
                 'car_id = ?'   => $car->id,

@@ -360,8 +360,9 @@ return [
                 $cache = $sm->get('longCache');
                 $request = $sm->get('Request');
                 $config = $sm->get('Config');
+                $translator = $sm->get('translator');
 
-                return new MainMenu($request, $router, $language, $cache, $config['hosts']);
+                return new MainMenu($request, $router, $language, $cache, $config['hosts'], $translator);
             },
             Language::class => function($sm) {
 

@@ -54,8 +54,10 @@ class MainMenu
      * @var array
      */
     private $hosts = [];
+    
+    private $translator;
 
-    public function __construct($request, TreeRouteStack $router, Language $language, StorageInterface $cache, $hosts)
+    public function __construct($request, TreeRouteStack $router, Language $language, StorageInterface $cache, $hosts, $translator)
     {
         $this->request = $request;
         $this->router = $router;
@@ -64,6 +66,8 @@ class MainMenu
         $this->cache = $cache;
 
         $this->pageTable = new Pages();
+        
+        $this->translator = $translator;
     }
 
     /**
@@ -76,15 +80,10 @@ class MainMenu
     {
         $db = $this->pageTable->getAdapter();
 
-        $expr = 'pages.id = page_language.page_id and ' .
-                $db->quoteInto('page_language.language = ?', $language);
-
         $select = $db->select()
             ->from($this->pageTable->info('name'), [
-                'id', 'url', 'class',
-                'name' => 'if(length(page_language.name) > 0, page_language.name, pages.name)'
+                'id', 'url', 'class'
             ])
-            ->joinLeft('page_language', $expr, null)
             ->where('pages.parent_id = ?', $id)
             ->order('pages.position');
         if ($logedIn) {
@@ -95,10 +94,18 @@ class MainMenu
 
         $result = [];
         foreach ($db->fetchAll($select) as $row) {
+            
+            $key = 'page/' . $row['id'] . '/name';
+            
+            $name = $this->translator->translate($key);
+            if (!$name) {
+                $name = $this->translator->translate($key, null, 'en');
+            }
+            
             $result[] = [
                 'id'    => $row['id'],
                 'url'   => $row['url'],
-                'name'  => $row['name'],
+                'name'  => $name,
                 'class' => $row['class']
             ];
         }
@@ -163,7 +170,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '10_' . $language;
+        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '11_' . $language;
 
         $secondMenu = $this->cache->getItem($key, $success);
         if (!$success) {
@@ -190,7 +197,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '_5_' . $language;
+        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '_7_' . $language;
 
         $pages = $this->cache->getItem($key, $success);
         if (!$success) {
