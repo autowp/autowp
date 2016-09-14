@@ -52,7 +52,7 @@ class Catalogue
 
     private $perspectivePrefix = [];
 
-    private $prefixedPerspectives = [5, 6, 17, 20, 21];
+    private $prefixedPerspectives = [5, 6, 17, 20, 21, 23];
 
     /**
      * @return array

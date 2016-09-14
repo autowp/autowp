@@ -67,7 +67,7 @@ class Picture extends Project_Db_Table
         ),
     );
 
-    private $prefixedPerspectives = array(5, 6, 17, 20, 21, 22);
+    private $prefixedPerspectives = array(5, 6, 17, 20, 21, 22, 23);
 
     /**
      * @var Image\Storage

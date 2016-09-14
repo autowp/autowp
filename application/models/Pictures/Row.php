@@ -9,7 +9,7 @@ class Pictures_Row extends Project_Db_Table_Row
 
     private $perspectiveTable;
     private $perspectivePrefix = array();
-    private $prefixedPerspectives = array(5, 6, 17, 20, 21, 22);
+    private $prefixedPerspectives = array(5, 6, 17, 20, 21, 22, 23);
 
     private function getPerspectiveTable()
     {
