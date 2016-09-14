@@ -316,6 +316,7 @@ return [
     'perspective/dashboard'      => 'комбинация приборов',
     'perspective/boot'           => 'багажник',
     'perspective/logo'           => 'логотип',
+    'perspective/mascot'         => 'маскот',
 
     'login/sign-in' => 'Вход',
     'login/sign-out' => 'Выход',

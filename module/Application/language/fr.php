@@ -302,6 +302,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'perspective/dashboard'      => 'tableau de bord',
     'perspective/boot'           => 'coffre',
     'perspective/logo'           => 'logo',
+    'perspective/mascot'         => 'mascot',
 
     'login/sign-in' => 'Entrée',
     'login/sign-out' => 'Sortie',

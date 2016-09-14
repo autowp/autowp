@@ -285,6 +285,7 @@ return array (
     'perspective/dashboard'      => '仪表台',
     'perspective/boot'           => 'boot',
     'perspective/logo'           => '商标',
+    'perspective/mascot'         => 'mascot',
 
     'login/sign-in' => '登录',
     'login/sign-out' => '注销',
