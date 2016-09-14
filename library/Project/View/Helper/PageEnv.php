@@ -8,11 +8,6 @@ class Project_View_Helper_PageEnv extends Zend_View_Helper_Abstract
     protected $_pageTable;
 
     /**
-     * @var Zend_Db_Table
-     */
-    protected $_pageLanguageTable;
-
-    /**
      * @var array
      */
     protected $_onPath = array();
@@ -25,7 +20,6 @@ class Project_View_Helper_PageEnv extends Zend_View_Helper_Abstract
     public function __construct()
     {
         $this->_pageTable = new Pages();
-        $this->_pageLanguageTable = new Page_Language();
 
         if (Zend_Registry::isRegistered('Zend_Locale')) {
             $locale = new Zend_Locale(Zend_Registry::get('Zend_Locale'));

@@ -9,7 +9,7 @@
         <div class="text-muted">
             <?php
                 switch ($car['type']) {
-                    case Car_Parent::TYPE_TUNING: print $this->escape($this->translate('catalogue/related')); break;
+                    case Car_Parent::TYPE_TUNING: print $this->escapeHtml($this->translate('catalogue/related')); break;
                     case Car_Parent::TYPE_SPORT:  print 'Sport'; break;
                 }
             ?>
@@ -17,11 +17,11 @@
     <?php } ?>
     <?php if ($car['haveChilds']) { ?>
         <div>
-            <?=$this->htmlA(array(
+            <?=$this->htmlA([
                 'href'      => '#',
                 'class'     => 'arrow',
                 'data-load' => $car['loadUrl']
-            ), '<i class="fa fa-plus-circle"></i> ' . $this->car()->htmlTitle($car), false) ?>
+            ], '<i class="fa fa-plus-circle"></i> ' . $this->car()->htmlTitle($car), false) ?>
             <div style="margin:0 0 4px 18px;display:none">
                 <?php if (!$car['isGroup']) { ?>
                     <?=$this->htmlA($car['url'], $this->car()->htmlTitle($car), false) ?><br />

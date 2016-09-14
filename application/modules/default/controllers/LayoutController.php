@@ -39,14 +39,10 @@ class LayoutController extends Zend_Controller_Action
         $table = $this->_getPageTable();
         $db = $this->_getPageTable()->getAdapter();
 
-        $expr = 'pages.id = page_language.page_id and ' .
-                $db->quoteInto('page_language.language = ?', $language);
-
         $select = $db->select()
             ->from($table->info('name'), array(
                 'id', 'url', 'class'
             ))
-            ->joinLeft('page_language', $expr, null)
             ->where('pages.parent_id = ?', $id)
             ->order('pages.position');
         if ($logedIn) {
@@ -57,14 +53,14 @@ class LayoutController extends Zend_Controller_Action
 
         $result = array();
         foreach ($db->fetchAll($select) as $row) {
-            
+
             $key = 'page/' . $row['id'] . '/name';
-            
+
             $name = $this->view->translate($key);
             if (!$name) {
                 $name = $this->view->translate($key, 'en');
             }
-            
+
             $result[] = array(
                 'id'    => $row['id'],
                 'url'   => $row['url'],

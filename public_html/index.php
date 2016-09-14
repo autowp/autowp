@@ -5,12 +5,12 @@ $zf2uri = ['/api/', '/oauth', '/users', '/rules', '/about', '/info', '/pulse',
     '/inbox', '/new/', '/articles', '/feedback', '/mosts', '/restorepassword',
     '/voting', '/twins', '/ban/', '/forums', '/category', '/moder', '/chart',
     '/pictures', '/comments', '/registration', '/login', '/picture/',
-    '/telegram', '/account'];
+    '/telegram', '/account', '/upload'];
 
 $zf2ExactUri = ['/log', '/new', '/factory', '/ban', '/'];
 
-if ($_SERVER['REMOTE_ADDR'] == '46.188.125.241') {
-
+if ($_SERVER['REMOTE_ADDR'] == '89.188.125.42') {
+    
 }
 
 $useZF2 = php_sapi_name() === 'cli';

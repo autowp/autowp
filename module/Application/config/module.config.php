@@ -133,6 +133,11 @@ return [
                 $cache = $sm->get('longCache');
                 return new Controller\UsersController($cache);
             },
+            Controller\UploadController::class => function($sm) {
+                $partial = $sm->get('ViewHelperManager')->get('partial');
+                $telegram = $sm->get(Service\TelegramService::class);
+                return new Controller\UploadController($partial, $telegram);
+            },
             Controller\VotingController::class       => InvokableFactory::class,
             Controller\Api\ContactsController::class => InvokableFactory::class,
             Controller\Api\PictureController::class  => InvokableFactory::class,

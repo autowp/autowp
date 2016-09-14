@@ -712,13 +712,13 @@ class CarsController extends AbstractActionController
                     $message = sprintf(
                         "Пользователь %s редактировал информацию об автомобиле %s ( %s )\n" .
                         ( count($changes) ? implode("\n", $changes) : ''),
-                        $car->getFullName(),
-                        $this->carModerUrl($car, true),
                         $this->url()->fromRoute('users/user', [
                             'user_id' => $user->identity ? $user->identity : 'user' . $user->id
                         ], [
                             'force_canonical' => true
-                        ])
+                        ]),
+                        $car->getFullName(),
+                        $this->carModerUrl($car, true)
                     );
                     foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                         if ($subscriber && ($subscriber->id != $user->id)) {

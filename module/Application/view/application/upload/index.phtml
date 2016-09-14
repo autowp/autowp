@@ -1,22 +1,21 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
-            'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 29
-    ));
+    ]);
 
     $this->layout()->moduleName = 'default/upload/index';
-    $this->layout()->moduleOptions = array(
+    $this->layout()->moduleOptions = [
         'cropMsg'      => $this->translate('upload/picture/crop'),
         'croppedToMsg' => $this->translate('upload/picture/cropped-to'),
-        'cropSaveUrl'  => $this->url(array(
+        'cropSaveUrl'  => $this->url(null, [
             'controller' => 'upload',
             'action'     => 'crop-save',
-        ), 'default', true)
-    );
+        ])
+    ];
 ?>
 <div class="well">
     <p>Если у вас есть изображения, которых вы не нашли на этом сайте и они соответствуют тематике сайта, то вы можете добавить их в наш каталог, воспользовавшись формой, расположенной ниже.</p>
@@ -41,30 +40,30 @@
     <?php if ($this->selected) { ?>
         <div style="margin:20px 0">
             <p style="margin:10px">
-                <strong><?=$this->escape($this->selectedName) ?></strong>
-                [<?=$this->htmlA($this->url(array(
-                    'module'     => 'default',
-                    'controller' => 'upload',
-                    'action'     => 'select-brand'
-                ), 'default', true), 'выбрать другую рубрику') ?>]
+                <strong><?=$this->escapeHtml($this->selectedName) ?></strong>
+                [<?=$this->htmlA($this->url(null, [
+                    'action' => 'select-brand'
+                ]), 'выбрать другую рубрику') ?>]
             </p>
-            <?=$this->form->render($this) ?>
+            <?=$this->partial('application/forms/bootstrap-horizontal', [
+                'form' => $this->form
+            ])?>
         </div>
 
         <?php if (!$this->isSimple) { ?>
-            <p>Если имеют место проблемы с добавлением фото, можно попробовать использовать <?=$this->htmlA($this->url(array(
+            <p>Если имеют место проблемы с добавлением фото, можно попробовать использовать <?=$this->htmlA($this->url(null, [
                 'simple' => '1'
-            )), 'упрощенный интерфейс')?></p>
+            ], [], true), 'упрощенный интерфейс')?></p>
         <?php } ?>
 
         <div class="progress-area"></div>
     <?php } else { ?>
-        <p style="margin:10px"><?=$this->htmlA(array(
+        <p style="margin:10px"><?=$this->htmlA([
             'class' => 'btn btn-primary btn-lg',
-            'href'  => $this->url(array(
+            'href'  => $this->url(null, [
                 'action' => 'select-brand'
-            ))
-        ), '<i class="fa fa-upload"></i> Добавить изображение', false) ?></p>
+            ], [], true)
+        ], '<i class="fa fa-upload"></i> Добавить изображение', false) ?></p>
     <?php } ?>
 </div>
 <div class="pictures"></div>

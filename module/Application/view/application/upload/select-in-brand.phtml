@@ -1,9 +1,11 @@
 <?php
-    $this->layout()->assign(array(
-        'blankPage' => false,
-        'needLeft'  => false,
-        'needRight' => false
-    ));
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needRight' => false
+        ],
+        'pageId' => 30
+    ]);
     $this->pageTitle('Выбор бренда');
 
     $this->layout()->moduleName = 'default/upload/select-in-brand';
@@ -12,19 +14,19 @@
 <div class="select-in-brand">
     <?php if (count($this->cars) > 0) { ?>
         <div style="margin: 5px 0">
-            <?=$this->partial('upload/select-in-brand-cars.phtml', array(
+            <?=$this->partial('application/upload/select-in-brand-cars', [
                 'cars' => $this->cars
-            ))?>
+            ])?>
         </div>
     <?php } ?>
 
-    <?php if (count($this->haveConcepts)) { ?>
+    <?php if ($this->haveConcepts) { ?>
         <div style="margin: 5px 0">
-            <?=$this->htmlA(array(
+            <?=$this->htmlA([
                 'href'      => '#',
                 'class'     => 'arrow',
                 'data-load' => $this->conceptsUrl
-            ), '<i class="fa fa-plus-circle"></i> Концепты и прототипы', false) ?>
+            ], '<i class="fa fa-plus-circle"></i> Концепты и прототипы', false) ?>
             <div style="margin:0 0 4px 18px;display:none">
                 <div class="loading"><em>Loading ...</em></div>
             </div>
@@ -33,11 +35,11 @@
 
     <?php if ($this->haveEngines) { ?>
         <div style="margin: 5px 0">
-            <?=$this->htmlA(array(
+            <?=$this->htmlA([
                 'href'      => '#',
                 'class'     => 'arrow',
                 'data-load' => $this->enginesUrl
-            ), '<i class="fa fa-plus-circle"></i> Двигатели', false)?>
+            ], '<i class="fa fa-plus-circle"></i> Двигатели', false)?>
             <div style="margin:0 0 4px 18px;display:none">
                 <div class="loading"><em>Loading ...</em></div>
             </div>
@@ -45,17 +47,17 @@
     <?php } ?>
 
     <div style="margin: 5px 0">
-        <?=$this->htmlA($this->url(array(
+        <?=$this->htmlA($this->url('upload/params', [
             'action' => 'index',
             'type'   => Picture::LOGO_TYPE_ID
-        )), 'логотип ' . $this->brand['name']) ?><br />
-        <?=$this->htmlA($this->url(array(
+        ], [], true), 'логотип ' . $this->brand['name']) ?><br />
+        <?=$this->htmlA($this->url('upload/params', [
             'action' => 'index',
             'type'   => Picture::MIXED_TYPE_ID
-        )), 'разное (несколько автомобилей на одной картинке)') ?><br />
-        <?=$this->htmlA($this->url(array(
+        ], [], true), 'разное (несколько автомобилей на одной картинке)') ?><br />
+        <?=$this->htmlA($this->url('upload/params', [
             'action' => 'index',
             'type'   => Picture::UNSORTED_TYPE_ID
-        )), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
+        ], [], true), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
     </div>
 </div>

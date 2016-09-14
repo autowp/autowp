@@ -5,7 +5,6 @@ namespace Application\View\Helper;
 use Zend\View\Helper\AbstractHelper;
 
 use Pages;
-use Page_Language;
 
 use Zend_Db_Table;
 use Zend_Db_Table_Row;
