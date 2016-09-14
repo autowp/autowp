@@ -1019,4 +1019,8 @@ return array (
     'page/196/breadcrumbs' => "Пожертвование",
     'page/197/breadcrumbs' => "История изменения текста",
     'page/198/breadcrumbs' => "Контакты",
+    
+    'page/201/name'        => "Маскоты",
+    'page/201/title'       => "Маскоты",
+    'page/201/breadcrumbs' => "Маскоты",
 );

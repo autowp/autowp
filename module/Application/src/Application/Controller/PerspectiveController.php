@@ -10,7 +10,7 @@ use Zend_Paginator;
 
 use Picture;
 
-class CutawayController extends AbstractActionController
+class PerspectiveController extends AbstractActionController
 {
     public function indexAction()
     {
@@ -18,7 +18,7 @@ class CutawayController extends AbstractActionController
 
         $select = $pictures->select(true)
             ->where('status in (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
-            ->where('perspective_id = ?', 9)
+            ->where('perspective_id = ?', (int)$this->params('perspective'))
             ->order('add_date DESC');
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -36,6 +36,7 @@ class CutawayController extends AbstractActionController
         ]);
 
         return [
+            'page'         => (int)$this->params('page'),
             'paginator'    => $paginator,
             'picturesData' => $picturesData,
         ];

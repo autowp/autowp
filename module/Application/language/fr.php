@@ -1027,4 +1027,8 @@ Allons essayer de ne pas vous décevoir.',
     'page/196/breadcrumbs' => "Donation",
     'page/197/breadcrumbs' => "Texte Histoire",
     'page/198/breadcrumbs' => "Contacts",
+    
+    'page/201/name'        => "Mascots",
+    'page/201/title'       => "Mascots",
+    'page/201/breadcrumbs' => "Mascots",
 ];

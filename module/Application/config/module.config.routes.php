@@ -482,8 +482,22 @@ return [
                 'options' => [
                     'route'    => '/cutaway[/page:page]',
                     'defaults' => [
-                        'controller' => Controller\CutawayController::class,
-                        'action'     => 'index',
+                        'controller'  => Controller\PerspectiveController::class,
+                        'action'      => 'index',
+                        'perspective' => 9,
+                        'page'        => 109
+                    ],
+                ]
+            ],
+            'mascots' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/mascots[/page:page]',
+                    'defaults' => [
+                        'controller'  => Controller\PerspectiveController::class,
+                        'action'      => 'index',
+                        'perspective' => 23,
+                        'page'        => 201
                     ],
                 ]
             ],

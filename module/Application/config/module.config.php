@@ -58,7 +58,6 @@ return [
                 $commentForm = $sm->get('CommentForm');
                 return new Controller\CommentsController($commentForm);
             },
-            Controller\CutawayController::class      => InvokableFactory::class,
             Controller\DonateController::class       => InvokableFactory::class,
             Controller\FactoriesController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
@@ -104,6 +103,7 @@ return [
             },
             Controller\NewController::class          => InvokableFactory::class,
             Controller\MuseumsController::class      => InvokableFactory::class,
+            Controller\PerspectiveController::class  => InvokableFactory::class,
             Controller\PictureController::class      => InvokableFactory::class,
             Controller\PictureFileController::class  => InvokableFactory::class,
             Controller\PulseController::class        => InvokableFactory::class,

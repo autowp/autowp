@@ -1026,4 +1026,8 @@ We will try not to disappoint you.',
     'page/196/breadcrumbs' => "Donate",
     'page/197/breadcrumbs' => "Text history",
     'page/198/breadcrumbs' => "Contacts",
+    
+    'page/201/name'        => "Mascots",
+    'page/201/title'       => "Mascots",
+    'page/201/breadcrumbs' => "Mascots",
 ];
