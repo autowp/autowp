@@ -2,7 +2,6 @@
     $this->pageEnv([
         'layout' => [
             'blankPage' => false,
-            'needLeft'  => false,
             'needRight' => false
         ],
         'pageId' => 75,
@@ -13,16 +12,40 @@
     <?php foreach ($this->events as $event) { ?>
         <tr>
             <td>
+                <?php if ($event['user']) { ?>
+                    <?=$this->user($event['user'])?>
+                <?php } ?>
                 <?php if ($event['date']) { ?>
+                    <br />
                     <?=$this->escapeHtml($this->humanTime($event['date']))?>
                 <?php } ?>
             </td>
             <td>
-                <?php if ($event['user']) { ?>
-                    <?=$this->user($event['user'])?>
+                <?=$event['desc']?>
+            </td>
+            <td>
+                <?php foreach ($event['vehicles'] as $vehicle) { ?>
+                    Vehicle: <?=$this->htmlA($vehicle['url'], $this->car()->htmlTitle($vehicle['name']), false)?><br />
+                <?php } ?>
+                <?php foreach ($event['brands'] as $brand) { ?>
+                    Brand: <?=$this->htmlA($this->url('moder/brands/params', [
+                        'action'   => 'brand',
+                        'brand_id' => $brand['id']
+                    ]), $brand['name'])?><br />
+                <?php } ?>
+                <?php foreach ($event['engines'] as $engine) { ?>
+                    Engine: <?=$this->htmlA($engine['url'], $engine['name'])?><br />
+                <?php } ?>
+                <?php foreach ($event['pictures'] as $picture) { ?>
+                    Picture: <?=$this->htmlA($picture['url'], $this->pic()->htmlTitle($picture['name']), false)?><br />
+                <?php } ?>
+                <?php foreach ($event['twinsGroups'] as $group) { ?>
+                    Twins: <?=$this->htmlA($group['url'], $group['name'])?><br />
+                <?php } ?>
+                <?php foreach ($event['factories'] as $factory) { ?>
+                    Factory: <?=$this->htmlA($factory['url'], $factory['name'])?><br />
                 <?php } ?>
             </td>
-            <td><?=$event['desc']?></td>
         </tr>
     <?php } ?>
 </table>
