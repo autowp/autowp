@@ -42,7 +42,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'status',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Статус',
+                    'label'   => 'moder/picture/filter/status',
                     'options' => [
                         ''                       => 'любой',
                         Picture::STATUS_INBOX    => 'инбокс',
@@ -57,7 +57,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'car_type_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Тип кузова',
+                    'label'   => 'moder/picture/filter/vehicle-type',
                     'options' => $carTypeOptions,
                 ]
             ],
@@ -65,7 +65,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'perspective_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Ракурс name',
+                    'label'   => 'moder/picture/filter/perspective',
                     'options' => $this->perspectiveOptions
                 ]
             ],
@@ -73,7 +73,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'brand_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Бренд',
+                    'label'   => 'moder/picture/filter/brand',
                     'options' => $this->brandOptions
                 ]
             ],
@@ -81,14 +81,14 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'car_id',
                 'type'    => 'Text',
                 'options' => [
-                    'label' => 'Автомобиль (id)',
+                    'label' => 'moder/picture/filter/vehicle',
                 ]
             ],
             [
                 'name'    => 'type_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Тип',
+                    'label'   => 'moder/picture/filter/type',
                     'options' => [
                         ''                        => 'любой',
                         Picture::CAR_TYPE_ID      => 'автомобиль',
@@ -104,7 +104,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'comments',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Комментарии',
+                    'label'   => 'moder/picture/filter/comments',
                     'options' => [
                         ''  => 'не важно',
                         '1' => 'есть',
@@ -116,14 +116,14 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'owner_id',
                 'type'    => 'Text',
                 'options' => [
-                    'label' => 'Добавил'
+                    'label' => 'moder/picture/filter/owner'
                 ]
             ],
             [
                 'name'    => 'replace',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Замена',
+                    'label'   => 'moder/picture/filter/replace',
                     'options' => [
                         ''  => 'не важно',
                         '1' => 'замена',
@@ -135,7 +135,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'requests',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Заявки на принятие/удаление',
+                    'label'   => 'moder/picture/filter/votes',
                     'options' => [
                         ''  => 'не важно',
                         '0' => 'нет',
@@ -149,7 +149,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'special_name',
                 'type'    => 'Checkbox',
                 'options' => [
-                    'label' => 'Только с особым названием',
+                    'label' => 'moder/picture/filter/special-name',
                     'value' => '1',
                 ]
             ],
@@ -157,7 +157,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'lost',
                 'type'    => 'Checkbox',
                 'options' => [
-                    'label' => 'Без привязки',
+                    'label' => 'moder/picture/filter/not-linked',
                     'value' => '1',
                 ]
             ],
@@ -165,7 +165,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'order',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Сортировать по',
+                    'label'   => 'moder/picture/filter/order',
                     'options' => [
                         1 => 'Дата добавления (новые)',
                         2 => 'Дата добавления (старые)',
@@ -269,7 +269,13 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'required' => false
             ],
             'car_id' => [
-                'required' => false
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
             ],
             'type_id' => [
                 'required' => false
@@ -278,7 +284,13 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'required' => false
             ],
             'owner_id' => [
-                'required' => false
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
             ],
             'replace' => [
                 'required' => false

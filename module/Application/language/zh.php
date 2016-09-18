@@ -1019,4 +1019,26 @@ return [
 
     'moder-menu/title' => 'Moderator menu',
     'moder-menu/inbox' => 'Inbox',
+
+    'moder/picture/inbox' => 'Inbox',
+    'moder/picture/missing-perspective' => 'Missing perspective',
+    'moder/picture/delete-queue' => 'Delete queue',
+    'moder/picture/votes' => 'Votes',
+    'moder/picture/comments' => 'Comments',
+    'moder/picture/new-votes' => 'New votes',
+    'moder/picture/replaces' => 'Replaces',
+
+    'moder/picture/filter/status' => 'Status',
+    'moder/picture/filter/vehicle-type' => 'Vehicle type',
+    'moder/picture/filter/perspective' => 'Perspective',
+    'moder/picture/filter/brand' => 'Brand',
+    'moder/picture/filter/vehicle' => 'Vehicle (id)',
+    'moder/picture/filter/type' => 'Type',
+    'moder/picture/filter/comments' => 'Comments',
+    'moder/picture/filter/owner' => 'Uploaded by (id)',
+    'moder/picture/filter/replace' => 'Replacement',
+    'moder/picture/filter/votes' => 'Votes',
+    'moder/picture/filter/special-name' => 'Special name only',
+    'moder/picture/filter/not-linked' => 'Not linked',
+    'moder/picture/filter/order' => 'Order by',
 ];

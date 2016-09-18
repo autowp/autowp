@@ -324,7 +324,7 @@
 <?php } ?>
 
 <?php if ($this->user()->inheritsRole('moder')) { ?>
-    <h3><?=$this->htmlA($this->url('moder/index'), 'Панель модератора') ?></h3>
+    <h3><?=$this->htmlA($this->url('moder/index'), $this->page(67)->name) ?></h3>
     <div class="well">
         <div class="row">
             <div class="col-md-6">

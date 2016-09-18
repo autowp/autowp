@@ -431,7 +431,8 @@ return [
                 $copyrightsForm = $sm->get('ModerPictureCopyrightsForm');
                 $voteForm = $sm->get('ModerPictureVoteForm');
                 $banForm = $sm->get('BanForm');
-                return new Controller\Moder\PicturesController($table, $textStorage, $pictureForm, $copyrightsForm, $voteForm, $banForm);
+                $translator = $sm->get('translator');
+                return new Controller\Moder\PicturesController($table, $textStorage, $pictureForm, $copyrightsForm, $voteForm, $banForm, $translator);
             },
             Controller\Moder\RightsController::class => function($sm) {
                 $acl = $sm->get(Acl::class);

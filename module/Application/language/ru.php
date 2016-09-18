@@ -1047,4 +1047,26 @@ return [
 
     'moder-menu/title' => 'Меню модератора',
     'moder-menu/inbox' => 'Инбокс',
+
+    'moder/picture/inbox' => 'Инбокс',
+    'moder/picture/missing-perspective' => 'Пропущен ракурс',
+    'moder/picture/delete-queue' => 'Очередь удаления',
+    'moder/picture/votes' => 'Голоса',
+    'moder/picture/comments' => 'Зафлудили',
+    'moder/picture/new-votes' => 'Новые заявки',
+    'moder/picture/replaces' => 'Новые замены',
+
+    'moder/picture/filter/status' => 'Статус',
+    'moder/picture/filter/vehicle-type' => 'Тип кузова',
+    'moder/picture/filter/perspective' => 'Ракурс',
+    'moder/picture/filter/brand' => 'Бренд',
+    'moder/picture/filter/vehicle' => 'Автомобиль (id)',
+    'moder/picture/filter/type' => 'Тип',
+    'moder/picture/filter/comments' => 'Комментарии',
+    'moder/picture/filter/owner' => 'Добавил (id)',
+    'moder/picture/filter/replace' => 'Замена',
+    'moder/picture/filter/votes' => 'Заявки на принятие/удаление',
+    'moder/picture/filter/special-name' => 'Только с особым названием',
+    'moder/picture/filter/not-linked' => 'Без привязки',
+    'moder/picture/filter/order' => 'Сортировать по',
 ];

@@ -13,9 +13,7 @@
         <?php if ($element instanceof Zend\Form\Element) { ?>
             <?php if ($element instanceof Zend\Form\Element\File) { ?>
                 <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
-                    <label class="control-label" for="<?=$element->getId()?>">
-                        <?=$this->escapeHtml($this->translate($element->getLabel()))?>
-                    </label>
+                    <?=$this->formLabel($element)?>
                     <?=$element?>
                     <?php foreach ($element->getMessages() as $error) { ?>
                         <p class="help-block"><?=$this->escapeHtml($error)?></p>
@@ -23,9 +21,7 @@
                 </div>
             <?php } elseif ($element instanceof Zend\Form\Element\Multicheckbox) { ?>
                 <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
-                    <label class="control-label" for="<?=$element->getId()?>">
-                        <?=$this->escapeHtml($this->translate($element->getLabel()))?>
-                    </label>
+                    <?=$this->formLabel($element)?>
                     <?=$element ?>
                     <?php foreach ($element->getMessages() as $error) { ?>
                         <p class="help-block"><?=$this->escapeHtml($error)?></p>
@@ -47,9 +43,7 @@
                 <?=$this->formElement($element)?>
             <?php } elseif (!$element instanceof Zend\Form\Element\Submit) { ?>
                 <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
-                    <label class="control-label">
-                        <?=$this->escapeHtml($this->translate($element->getLabel()))?>
-                    </label>
+                    <?=$this->formLabel($element)?>
                     <?=$this->formElement(
                         $element
                             ->setAttribute('class', $element->getAttribute('class') . ' form-control')
@@ -63,9 +57,7 @@
             <?=$element->render($this)?>
         <?php } elseif ($element instanceof Zend\Form\DisplayGroup) { ?>
             <div class="form-group">
-                <label class="control-label">
-                    <?=$this->escapeHtml($this->translate($element->getLegend()))?>
-                </label>
+                <?=$this->formLabel($element)?>
                 <?=$element->render($this)?>
             </div>
         <?php } ?>
