@@ -276,7 +276,7 @@ class UploadController extends AbstractActionController
             $tempFilePaths[] = $data['tmp_name'];
         }
 
-        
+
 
         $result = [];
 
@@ -287,11 +287,11 @@ class UploadController extends AbstractActionController
             if ($width <= 0) {
                 throw new Exception("Width <= 0");
             }
-    
+
             if ($height <= 0) {
                 throw new Exception("Height <= 0");
             }
-    
+
             // подбираем имя для файла
             switch ($imageType) {
                 case IMAGETYPE_JPEG:
@@ -301,15 +301,15 @@ class UploadController extends AbstractActionController
                     throw new Exception("Unsupported image type");
             }
             $ext = image_type_to_extension($imageType, false);
-    
+
             $imageId = $this->imageStorage()->addImageFromFile($tempFilePath, 'picture', [
                 'extension' => $ext,
                 'pattern'   => 'autowp_' . rand()
             ]);
-    
+
             $image = $this->imageStorage()->getImage($imageId);
             $fileSize = $image->getFileSize();
-    
+
             // добавляем запись о картинке в БД
             $picture = $pictureTable->createRow([
                 'image_id'      => $imageId,
@@ -332,19 +332,19 @@ class UploadController extends AbstractActionController
                 'replace_picture_id' => $replacePicture ? $replacePicture->id : null,
             ]);
             $picture->save();
-    
-    
+
+
             // инкрементируем счётчик добавленных картинок
             if ($user) {
                 $user->pictures_added = new Zend_Db_Expr('pictures_added+1');
                 $user->save();
             }
-    
+
             // переименовываем файл под автомобиль
             $this->imageStorage()->changeImageName($picture->image_id, [
                 'pattern' => $picture->getFileNamePattern(),
             ]);
-    
+
             // пересчитываем цифры
             switch ($picture->type) {
                 case Picture::UNSORTED_TYPE_ID:
@@ -367,7 +367,7 @@ class UploadController extends AbstractActionController
                     }
                     break;
             }
-    
+
             // добавляем комментарий
             if ($values['note']) {
                 $commentTable = new Comments();
@@ -381,14 +381,14 @@ class UploadController extends AbstractActionController
                     'moderatorAttention' => Comment_Message::MODERATOR_ATTENTION_NONE
                 ]);
             }
-    
+
             $formatRequest = $picture->getFormatRequest();
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-thumb');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-medium');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-gallery-full');
-    
-            //$this->telegram->notifyInbox($picture->id);
-    
+
+            $this->telegram->notifyInbox($picture->id);
+
             $result[] = $picture;
         }
 

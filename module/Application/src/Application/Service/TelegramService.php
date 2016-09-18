@@ -134,8 +134,9 @@ class TelegramService
                 $url = $this->router->assemble([
                     'picture_id' => $picture->identity ? $picture->identity : $picture->id,
                 ], [
-                    'name' => 'picture',
-                    'force_canonical' => true
+                    'name'            => 'picture/picture',
+                    'force_canonical' => true,
+                    'uri'             => \Zend\Uri\UriFactory::factory('http://wheelsage.org')
                 ]);
 
                 $this->sendMessage([
