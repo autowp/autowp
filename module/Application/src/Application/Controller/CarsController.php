@@ -595,7 +595,7 @@ class CarsController extends AbstractActionController
             $user = $row->findParentUsers();
 
             $items[] = [
-                'date'     => $row->getDate('update_date'),
+                'date'     => $row->getDateTime('update_date'),
                 'user'     => $user,
                 'itemType' => [
                     'id'   => $itemType->id,

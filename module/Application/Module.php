@@ -17,7 +17,6 @@ use Project_Auth_Adapter_Remember;
 use Users;
 use Zend_Auth;
 use Zend_Cache_Manager;
-use Zend_Date;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Expr;
 use Zend_Locale;
@@ -168,7 +167,6 @@ class Module implements ConsoleUsageProviderInterface,
         $localeCache = $cacheManager->getCache('locale');
 
         Zend_Locale_Data::setCache($localeCache);
-        Zend_Date::setOptions(['cache' => $localeCache]);
     }
 
     public function getConsoleBanner(Console $console)

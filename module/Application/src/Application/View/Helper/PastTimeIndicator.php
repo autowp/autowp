@@ -4,7 +4,6 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
 
-use Zend_Date;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -12,7 +11,7 @@ use DateTimeZone;
 class PastTimeIndicator extends AbstractHtmlElement
 {
     /**
-     * @var Zend_Date
+     * @var DateTime
      */
     private $pastLimit;
 
@@ -24,15 +23,12 @@ class PastTimeIndicator extends AbstractHtmlElement
     }
 
     /**
-     * @param Zend_Date|DateTime $date
+     * @param DateTime $date
      * @return string
      */
     public function __invoke($time)
     {
         if (!$time instanceof DateTime) {
-            if (!$time instanceof Zend_Date) {
-                $time = new Zend_Date($time);
-            }
             $dt = new DateTime();
             $dt->setTimestamp($time->getTimestamp());
             $tz = new DateTimeZone($time->getTimezone());

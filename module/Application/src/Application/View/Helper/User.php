@@ -8,7 +8,6 @@ use Zend\Permissions\Acl\Acl;
 
 use Zend_Auth;
 use Zend_Acl_Role_Interface;
-use Zend_Date;
 
 use DateInterval;
 use DateTime;
@@ -216,14 +215,7 @@ class User extends AbstractHelper
 
         $tz = $this->timezone();
 
-        if ($time instanceof DateTime) {
-            $time->setTimezone(new DateTimeZone($tz));
-        } else {
-            if (!($time instanceof Zend_Date)) {
-                $time = new Zend_Date($time);
-            }
-            $time->setTimeZone($tz);
-        }
+        $time->setTimezone(new DateTimeZone($tz));
 
         return $this->view->humanTime($time);
     }
@@ -236,15 +228,7 @@ class User extends AbstractHelper
 
         $tz = $this->timezone();
 
-        if ($time instanceof DateTime) {
-            $time->setTimezone(new DateTimeZone($tz));
-        } else {
-            if (!($time instanceof Zend_Date)) {
-                $time = new Zend_Date($time);
-            }
-
-            $time->setTimeZone($tz);
-        }
+        $time->setTimezone(new DateTimeZone($tz));
 
         return $this->view->humanDate($time);
     }

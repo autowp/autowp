@@ -9,8 +9,6 @@ use DateTime;
 use DateTimeZone;
 use IntlDateFormatter;
 
-use Zend_Date;
-
 class HumanDate extends AbstractHelper
 {
     /**
@@ -29,7 +27,7 @@ class HumanDate extends AbstractHelper
     /**
      * Converts time to fuzzy time strings
      *
-     * @param string|integer|Zend_Date|DateTime|array $time
+     * @param string|integer|DateTime|array $time
      */
     public function __invoke($time = null)
     {
@@ -38,9 +36,6 @@ class HumanDate extends AbstractHelper
         }
 
         if (!$time instanceof DateTime) {
-            if (!$time instanceof Zend_Date) {
-                $time = new Zend_Date($time);
-            }
             $dateTime = new DateTime();
             $dateTime->setTimestamp($time->getTimestamp());
             $timezone = new DateTimeZone($time->getTimezone());

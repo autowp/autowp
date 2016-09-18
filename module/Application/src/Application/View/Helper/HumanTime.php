@@ -4,8 +4,6 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Zend_Date;
-
 use DateTime;
 
 class HumanTime extends AbstractHelper
@@ -13,7 +11,7 @@ class HumanTime extends AbstractHelper
     /**
      * Converts time to fuzzy time strings
      *
-     * @param string|integer|Zend_Date|DateTime|array $time
+     * @param string|integer|DateTime|array $time
      */
     public function __invoke($time = null)
     {
@@ -22,9 +20,6 @@ class HumanTime extends AbstractHelper
         }
 
         if (!$time instanceof DateTime) {
-            if (!$time instanceof Zend_Date) {
-                $time = new Zend_Date($time);
-            }
             $dateTime = new DateTime();
             $dateTime->setTimestamp($time->getTimestamp());
             $time = $dateTime;
