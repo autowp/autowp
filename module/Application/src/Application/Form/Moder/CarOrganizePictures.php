@@ -21,6 +21,8 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
 
     private $translator;
 
+    private $language = 'en';
+
     /**
      * @var Car_Types
      */
@@ -111,14 +113,16 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
                 'name'    => 'begin',
                 'type'    => \Application\Form\Fieldset\CarBegin::class,
                 'options' => [
-                    'label' => 'Begin'
+                    'label'    => 'Begin',
+                    'language' => $this->language
                 ]
             ],
             [
                 'name'    => 'end',
                 'type'    => \Application\Form\Fieldset\CarEnd::class,
                 'options' => [
-                    'label' => 'End'
+                    'label'    => 'End',
+                    'language' => $this->language
                 ]
             ],
             [

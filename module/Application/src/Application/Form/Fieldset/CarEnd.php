@@ -7,6 +7,28 @@ use Zend\InputFilter\InputFilterProviderInterface;
 
 class CarEnd extends Fieldset implements InputFilterProviderInterface
 {
+    private $language = 'en';
+
+    /**
+     * @param  array|Traversable $options
+     * @return Element|ElementInterface
+     * @throws Exception\InvalidArgumentException
+     */
+    public function setOptions($options)
+    {
+        parent::setOptions($options);
+
+        if (isset($options['language'])) {
+            $this->language = $options['language'];
+
+            $this->get('month')->setOptions([
+                'language' => $this->language
+            ]);
+        }
+
+        return $this;
+    }
+
     public function __construct($name = null, $options = [])
     {
         parent::__construct($name, $options);
@@ -29,7 +51,8 @@ class CarEnd extends Fieldset implements InputFilterProviderInterface
                 'name'    => 'month',
                 'type'    => \Application\Form\Element\Month::class,
                 'options' => [
-                    'label' => 'месяц'
+                    'label'    => 'месяц',
+                    'language' => $this->language
                 ],
                 'attributes' => [
                     'placeholder'  => 'месяц',

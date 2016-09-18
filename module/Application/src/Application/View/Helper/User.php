@@ -10,6 +10,7 @@ use Zend_Auth;
 use Zend_Acl_Role_Interface;
 use Zend_Date;
 
+use DateInterval;
 use DateTime;
 use DateTimeZone;
 
@@ -118,8 +119,10 @@ class User extends AbstractHelper
                 ]);
 
                 $classes = ['user'];
-                if ($lastOnline = $user->getDate('last_online')) {
-                    if (Zend_Date::now()->subMonth(6)->isLater($lastOnline)) {
+                if ($lastOnline = $user->getDateTime('last_online')) {
+                    $date = new DateTime();
+                    $date->sub(new DateInterval('P6M'));
+                    if ($date > $lastOnline) {
                         $classes[] = 'long-away';
                     }
                 } else {

@@ -2,16 +2,15 @@
     $this->pageEnv([
         'layout' => [
             'blankPage' => false,
-            'needLeft'  => false,
             'needRight' => true
         ],
         'pageId' => 105,
     ]);
 ?>
 
-<?=$this->markdown(sprintf($this->translate('comments/need-wait-text'), $this->nextMessageTime))?>
+<?=$this->markdown(sprintf($this->translate('comments/need-wait-text')))?>
 
-<h2><?=$this->escape($this->translate('comments/form-title'))?></h2>
+<h2><?=$this->escapeHtml($this->translate('comments/form-title'))?></h2>
 <?=$this->partial('application/forms/comment', [
     'form' => $this->form
 ])?>

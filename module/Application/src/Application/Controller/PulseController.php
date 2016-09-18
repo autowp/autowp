@@ -4,7 +4,8 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Zend_Date;
+use DateInterval;
+use DateTime;
 
 use Log_Events;
 use Users;
@@ -39,8 +40,8 @@ class PulseController extends AbstractActionController
         $logTable = new Log_Events();
         $logAdapter = $logTable->getAdapter();
 
-        $now = Zend_Date::now();
-        $from = Zend_Date::now()->subDay(1);
+        $now = new DateTime();
+        $from = (new DateTime())->sub(new DateInterval('P1D'));
 
         $rows = $logAdapter->fetchAll(
             $logAdapter->select()
@@ -50,8 +51,8 @@ class PulseController extends AbstractActionController
                     'hour' => 'hour(add_datetime)',
                     'value' => 'count(1)'
                 ])
-                ->where('add_datetime >= ?', $from->get(MYSQL_DATETIME))
-                ->where('add_datetime <= ?', $now->get(MYSQL_DATETIME))
+                ->where('add_datetime >= ?', $from->format(MYSQL_DATETIME_FORMAT))
+                ->where('add_datetime <= ?', $now->format(MYSQL_DATETIME_FORMAT))
                 ->group(['user_id', 'date', 'hour'])
         );
 
@@ -65,17 +66,19 @@ class PulseController extends AbstractActionController
         $grid = [];
         $legend = [];
 
+        $hour = new DateInterval('PT1H');
+
         foreach ($data as $uid => $dates) {
 
             $line = [];
 
             $cDate = clone $from;
-            while ($now->isLater($cDate)) {
-                $dateStr = $cDate->get(MYSQL_DATE) . ' ' . $cDate->get(Zend_Date::HOUR_SHORT);
+            while ($now > $cDate) {
+                $dateStr = $cDate->format('Y-m-d G');
 
                 $line[$dateStr] = isset($dates[$dateStr]) ? $dates[$dateStr] : 0;
 
-                $cDate->addHour(1);
+                $cDate->add($hour);
             }
 
             $color = $this->randomColor();

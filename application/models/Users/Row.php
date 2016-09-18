@@ -46,12 +46,13 @@ class Users_Row extends Project_Db_Table_Row
 
     public function nextMessageTime()
     {
-        $lastMessageTime = $this->getDate('last_message_time');
+        $lastMessageTime = $this->getDateTime('last_message_time');
 
         if ($lastMessageTime) {
-            $messaging_interval = $this->getMessagingInterval();
-            if ($messaging_interval) {
-                return $lastMessageTime->addSecond($messaging_interval);
+            $messagingInterval = $this->getMessagingInterval();
+            if ($messagingInterval) {
+                $interval = new DateInterval('PT'.$messagingInterval.'S');
+                return $lastMessageTime->add($interval);
             }
         }
 

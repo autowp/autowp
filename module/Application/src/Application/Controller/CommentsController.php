@@ -16,9 +16,9 @@ use Twins_Groups;
 use Voting;
 use Users;
 
+use DateTime;
 use Exception;
 
-use Zend_Date;
 use Zend_Db_Expr;
 
 class CommentsController extends AbstractRestfulController
@@ -46,7 +46,7 @@ class CommentsController extends AbstractRestfulController
     private function needWait()
     {
         if ($nextMessageTime = $this->nextMessageTime()) {
-            return $nextMessageTime->isLater(Zend_Date::now());
+            return $nextMessageTime > new DateTime();
         }
 
         return false;

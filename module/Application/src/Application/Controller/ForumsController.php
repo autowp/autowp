@@ -12,7 +12,8 @@ use Application\Model\Message;
 use Comments;
 use Users;
 
-use Zend_Date;
+use DateTime;
+
 use Zend_Db_Expr;
 
 class ForumsController extends AbstractActionController
@@ -22,7 +23,7 @@ class ForumsController extends AbstractActionController
     private $newTopicForm;
 
     private $commentForm;
-    
+
     private $translator;
 
     public function __construct($newTopicForm, $commentForm, $transport, $translator)
@@ -110,17 +111,17 @@ class ForumsController extends AbstractActionController
             ]),
         ]);
     }
-    
+
     private function sendMessageEmailNotification($email, $topicName, $url)
     {
         $subject = $this->translator->translate('forums/notification-mail/subject');
-        
+
         $message = sprintf(
             $this->translator->translate('forums/notification-mail/body'),
             $topicName,
             $url
         );
-        
+
         $mail = new Mail\Message();
         $mail
             ->setEncoding('utf-8')
@@ -330,7 +331,7 @@ class ForumsController extends AbstractActionController
         $user = $this->user()->get();
         if ($user) {
             if ($nextMessageTime = $user->nextMessageTime()) {
-                return $nextMessageTime->isLater(Zend_Date::now());
+                return $nextMessageTime > new DateTime();
             }
         }
 

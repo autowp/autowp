@@ -80,7 +80,13 @@
         <?php } ?>
     </p>
 <?php } ?>
-<p>Опрос проводится с <?=$this->voting->getDate('begin_date')->get(Zend_Date::DATES)?> по <?=$this->voting->getDate('end_date')->get(Zend_Date::DATES)?></p>
+<p>
+    <?=$this->escapeHtml(sprintf(
+        'Опрос проводится с %s по %s',
+        $this->dateFormat($this->voting->getDateTime('begin_date'), IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, $this->language()),
+        $this->dateFormat($this->voting->getDateTime('end_date'), IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, $this->language())
+    ))?>
+</p>
 
 <div id="comments">
     <?=$this->comments([

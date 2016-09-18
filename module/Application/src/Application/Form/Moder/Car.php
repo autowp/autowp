@@ -21,6 +21,8 @@ class Car extends Form implements InputFilterProviderInterface
 
     private $translator;
 
+    private $language = 'en';
+
     /**
      * @var Car_Types
      */
@@ -111,14 +113,16 @@ class Car extends Form implements InputFilterProviderInterface
                 'name'    => 'begin',
                 'type'    => \Application\Form\Fieldset\CarBegin::class,
                 'options' => [
-                    'label' => 'Begin'
+                    'label'    => 'Begin',
+                    'language' => $this->language
                 ]
             ],
             [
                 'name'    => 'end',
                 'type'    => \Application\Form\Fieldset\CarEnd::class,
                 'options' => [
-                    'label' => 'End'
+                    'label'    => 'End',
+                    'language' => $this->language
                 ]
             ],
             [
@@ -177,6 +181,10 @@ class Car extends Form implements InputFilterProviderInterface
      */
     public function setOptions($options)
     {
+        if (isset($options['language'])) {
+            $this->language = $options['language'];
+        }
+
         if (isset($options['inheritedCarType'])) {
             $this->inheritedCarType = $options['inheritedCarType'];
             unset($options['inheritedCarType']);
@@ -253,15 +261,15 @@ class Car extends Form implements InputFilterProviderInterface
     private function getCarTypeOptions($parentId = null)
     {
         if ($parentId) {
-            $filter = array(
+            $filter = [
                 'parent_id = ?' => $parentId
-            );
+            ];
         } else {
             $filter = 'parent_id is null';
         }
 
         $rows = $this->getCarTypeTable()->fetchAll($filter, 'position');
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[$row->id] = $row->name;
 

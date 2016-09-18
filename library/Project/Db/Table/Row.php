@@ -38,10 +38,13 @@ class Project_Db_Table_Row extends Zend_Db_Table_Row
             throw new Exception('Column '.$col.' not found');
         }
 
+        $str = $this[$col];
+
         $result = null;
         switch ($metadata[$col]['DATA_TYPE']) {
             case 'date':
-                $format = 'Y-m-d';
+                $format = 'Y-m-d H:i:s';
+                $str .= '00:00:00';
                 break;
 
             case 'datetime':
@@ -53,12 +56,12 @@ class Project_Db_Table_Row extends Zend_Db_Table_Row
                 throw new Exception('Column type not a date type');
         }
 
-        if (!$this[$col]) {
+        if (!$str) {
             return null;
         }
 
         $tz = new DateTimeZone(MYSQL_TIMEZONE);
 
-        return DateTime::createFromFormat($format, $this[$col], $tz);
+        return DateTime::createFromFormat($format, $str, $tz);
     }
 }

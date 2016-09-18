@@ -588,6 +588,7 @@ class CarsController extends AbstractActionController
             }
 
             $formModerCarEditMeta = new CarForm(null, [
+                'language'           => $this->language(),
                 'translator'         => $this->translator,
                 'inheritedCarType'   => $car->car_type_inherit ? $car->car_type_id : null,
                 'inheritedIsConcept' => $car->is_concept_inherit ? $car->is_concept : null,
@@ -3142,6 +3143,7 @@ class CarsController extends AbstractActionController
         }
 
         $form = new CarOrganizeForm(null, [
+            'language'           => $this->language(),
             'childOptions'       => $childs,
             'inheritedCarType'   => $car->car_type_id,
             'inheritedIsConcept' => $car->is_concept,
@@ -3465,6 +3467,7 @@ class CarsController extends AbstractActionController
         }
 
         $form = new CarOrganizePicturesForm(null, [
+            'language'           => $this->language(),
             'childOptions'       => $childs,
             'inheritedCarType'   => $car->car_type_id,
             'inheritedIsConcept' => $car->is_concept,

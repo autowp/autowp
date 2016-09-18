@@ -1,13 +1,15 @@
 <?php if ($this->canUseTree) { ?>
     <h4>Структура</h4>
-    <div class="btn-group">
-        <?=$this->htmlA([
-            'href'  => $this->url(null, [
-                'action' => 'organize',
-            ], [], true),
-            'class' => 'btn btn-default',
-        ], 'Турбо объединятор в группы')?>
-    </div>
+    <?php if ($this->car['is_group']) { ?>
+        <div class="btn-group">
+            <?=$this->htmlA([
+                'href'  => $this->url(null, [
+                    'action' => 'organize',
+                ], [], true),
+                'class' => 'btn btn-default',
+            ], 'Турбо объединятор в группы')?>
+        </div>
+    <?php } ?>
     <table class="table">
         <thead>
             <tr>

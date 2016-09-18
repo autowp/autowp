@@ -5,7 +5,8 @@ namespace Application\Form\Element;
 use Zend\Form\Element\Select;
 use Zend\InputFilter\InputProviderInterface;
 
-use Zend_Date;
+use DateTime;
+use IntlDateFormatter;
 
 class Month extends Select implements InputProviderInterface
 {
@@ -18,29 +19,45 @@ class Month extends Select implements InputProviderInterface
      */
     protected $label = 'Месяц';
 
-    /**
-     * @param  null|int|string  $name    Optional name for the element
-     * @param  array            $options Optional options for the element
-     * @throws Exception\InvalidArgumentException
-     */
-    public function __construct($name = null, $options = [])
-    {
-        $multioptions = [
-            ''  =>  '--'
-        ];
+    private $language = 'en';
 
-        $date = new Zend_Date([
-            'year'  =>  2000,
-            'month' =>  1,
-            'day'   =>  1
-        ]);
-        for ($i=1; $i<=12; $i++) {
-            $multioptions[$i] = sprintf('%02d - ', $i) . $date->setMonth($i)->toString('MMMM');
+    /**
+     * @param  array|Traversable $options
+     * @return Month|ElementInterface
+     * @throws InvalidArgumentException
+     */
+    public function setOptions($options)
+    {
+        if (isset($options['language'])) {
+            $this->language = $options['language'];
         }
 
-        $options['options'] = $multioptions;
+        if (!isset($options['options']) && !isset($options['value_options'])) {
 
-        parent::__construct($name, $options);
+            $multioptions = [
+                '' => '--'
+            ];
+
+            $dateFormatter = new IntlDateFormatter($this->language, IntlDateFormatter::LONG, IntlDateFormatter::NONE, null, null, 'MM - MMMM');
+
+            $date = new DateTime();
+            for ($i=1; $i<=12; $i++) {
+                $date->setDate(2000, $i, 1);
+                $multioptions[$i] = $dateFormatter->format($date);
+            }
+
+            $options['value_options'] = $multioptions;
+
+            /*if (isset($this->options['value_options'])) {
+                $this->setValueOptions($this->options['value_options']);
+            }*/
+
+            //var_dump($options); exit;
+        }
+
+        parent::setOptions($options);
+
+        return $this;
     }
 
     /**
