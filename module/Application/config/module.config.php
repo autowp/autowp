@@ -52,7 +52,8 @@ return [
             Controller\CatalogueController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
                 $cache = $sm->get('longCache');
-                return new Controller\CatalogueController($textStorage, $cache);
+                $translator = $sm->get('translator');
+                return new Controller\CatalogueController($textStorage, $cache, $translator);
             },
             Controller\CategoryController::class => function($sm) {
                 $cache = $sm->get('longCache');
@@ -136,7 +137,8 @@ return [
             },
             Controller\UsersController::class => function($sm) {
                 $cache = $sm->get('longCache');
-                return new Controller\UsersController($cache);
+                $translator = $sm->get('translator');
+                return new Controller\UsersController($cache, $translator);
             },
             Controller\UploadController::class => function($sm) {
                 $partial = $sm->get('ViewHelperManager')->get('partial');
@@ -204,7 +206,8 @@ return [
                 $viewHelperManager = $sm->get('ViewHelperManager');
                 $carHelper = $viewHelperManager->get('car');
                 $textStorage = $sm->get(TextStorage\Service::class);
-                return new Controller\Plugin\Pic($textStorage, $carHelper);
+                $translator = $sm->get('translator');
+                return new Controller\Plugin\Pic($textStorage, $carHelper, $translator);
             },
             'sidebar' => function ($sm) {
                 $cache = $sm->get('fastCache');
@@ -252,7 +255,6 @@ return [
             'humanTime'   => View\Helper\HumanTime::class,
             'markdown'    => View\Helper\Markdown::class,
             'pastTimeIndicator' => View\Helper\PastTimeIndicator::class,
-            'inlinePicture' => View\Helper\InlinePicture::class,
             'pic'         => View\Helper\Pic::class,
             'img'         => View\Helper\Img::class,
             'pictures'    => View\Helper\Pictures::class,
@@ -299,6 +301,10 @@ return [
                 $imageStorage = $sm->get(Image\Storage::class);
                 return new View\Helper\ImageStorage($imageStorage);
             },
+            'inlinePicture' => function($sm) {
+                $translator = $sm->get('translator');
+                return new View\Helper\InlinePicture($translator);
+            }
         ]
     ],
     'translator' => [

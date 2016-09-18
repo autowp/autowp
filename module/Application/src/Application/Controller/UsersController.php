@@ -24,9 +24,12 @@ class UsersController extends AbstractActionController
 {
     private $cache;
 
-    public function __construct($cache)
+    private $translator;
+
+    public function __construct($cache, $translator)
     {
         $this->cache = $cache;
+        $this->translator = $translator;
     }
 
     private function getUser()
@@ -42,7 +45,7 @@ class UsersController extends AbstractActionController
                 'not deleted'
             ]);
         }
-        
+
         return $users->fetchRow([
             'identity = ?' => $identity,
             'not deleted'
@@ -69,7 +72,7 @@ class UsersController extends AbstractActionController
         );
 
         $pictures = $this->catalogue()->getPictureTable();
-        $lastPictures = $pictures->fetchAll(
+        $lastPictureRows = $pictures->fetchAll(
             $pictures->select()
                 ->from('pictures')
                 ->where('owner_id = ?', $user->id)
@@ -77,6 +80,16 @@ class UsersController extends AbstractActionController
                 ->limit(12)
         );
 
+        $lastPictures = [];
+        foreach ($lastPictureRows as $lastPictureRow) {
+            $lastPictures[] = [
+                'url'  => $this->pic()->url($lastPictureRow->id, $lastPictureRow->identity),
+                'name' => $lastPictureRow->getCaption([
+                    'language'   => $this->language(),
+                    'translator' => $this->translator
+                ])
+            ];
+        }
 
         $comments = new Comment_Message();
         $lastComments = $comments->fetchAll(
@@ -268,28 +281,28 @@ class UsersController extends AbstractActionController
     {
         $userTable = new Users();
         $brandTable = new Brands();
-        
+
         $select = $userTable->select(true)
             ->where('not deleted')
             ->limit(30)
             ->where('specs_volume > 0')
             ->order('specs_volume desc');
-        
+
         $valueTitle = 'users/rating/specs-volume';
-        
+
         $db = $brandTable->getAdapter();
-        
+
         $precisionLimit = 50;
-        
+
         $users = [];
         foreach ($userTable->fetchAll($select) as $idx => $user) {
             $brands = [];
             if ($idx < 5) {
-        
+
                 $cacheKey = 'RATING_USER_BRAND_5_'.$precisionLimit.'_' . $user->id;
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (!$success) {
-        
+
                     $carSelect = $db->select()
                         ->from('brands_cars', ['brand_id', 'count(1)'])
                         ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
@@ -299,7 +312,7 @@ class UsersController extends AbstractActionController
                         ->group('brands_cars.brand_id')
                         ->order('count(1) desc')
                         ->limit($precisionLimit);
-        
+
                     $engineSelect = $db->select()
                         ->join('brand_engine', ['brand_id', 'count(1)'])
                         ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
@@ -309,7 +322,7 @@ class UsersController extends AbstractActionController
                         ->group('brand_engine.brand_id')
                         ->order('count(1) desc')
                         ->limit($precisionLimit);
-        
+
                     $data = [];
                     foreach ([$carSelect, $engineSelect] as $select) {
                         $pairs = $db->fetchPairs($select);
@@ -321,10 +334,10 @@ class UsersController extends AbstractActionController
                             }
                         }
                     }
-        
+
                     arsort($data, SORT_NUMERIC);
                     $data = array_slice($data, 0, 3, true);
-        
+
                     foreach ($data as $brandId => $value) {
                         $row = $brandTable->find($brandId)->current();
                         $brands[] = [
@@ -337,10 +350,10 @@ class UsersController extends AbstractActionController
                         ];
                     }
                 }
-        
+
                 $this->cache->setItem($cacheKey, $brands);
             }
-        
+
             $users[] = [
                 'row'    => $user,
                 'volume' => $user->specs_volume,
@@ -348,36 +361,36 @@ class UsersController extends AbstractActionController
                 'weight' => $user->specs_weight
             ];
         }
-        
+
         return [
             'users'      => $users,
             'rating'     => 'specs',
             'valueTitle' => $valueTitle
         ];
     }
-    
+
     private function picturesRating()
     {
         $userTable = new Users();
         $brandTable = new Brands();
-        
+
         $select = $userTable->select(true)
             ->where('not deleted')
             ->limit(30)
             ->where('pictures_added > 0')
             ->order('pictures_added desc');
-        
+
         $valueTitle = 'users/rating/pictures';
-        
+
         $users = [];
         foreach ($userTable->fetchAll($select) as $idx => $user) {
             $brands = [];
             if ($idx < 10) {
-        
+
                 $cacheKey = 'RATING_USER_PICTURES_BRAND_6_' . $user->id;
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (!$success) {
-        
+
                     $select = $brandTable->select(true)
                         ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                         ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
@@ -387,7 +400,7 @@ class UsersController extends AbstractActionController
                         ->where('pictures.owner_id = ?', $user->id)
                         ->order('count(distinct pictures.id) desc')
                         ->limit(3);
-        
+
                     foreach ($brandTable->fetchAll($select) as $brand) {
                         $brands[] = [
                             'name' => $brand->caption,
@@ -398,17 +411,17 @@ class UsersController extends AbstractActionController
                         ];
                     }
                 }
-        
+
                 $this->cache->setItem($cacheKey, $brands);
             }
-        
+
             $users[] = [
                 'row'    => $user,
                 'volume' => $user->pictures_added,
                 'brands' => $brands
             ];
         }
-        
+
         return [
             'users'      => $users,
             'rating'     => 'pictures',

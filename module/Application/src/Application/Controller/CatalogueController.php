@@ -41,10 +41,13 @@ class CatalogueController extends AbstractActionController
 
     private $cache;
 
-    public function __construct($textStorage, $cache)
+    private $translator;
+
+    public function __construct($textStorage, $cache, $translator)
     {
         $this->textStorage = $textStorage;
         $this->cache = $cache;
+        $this->translator = $translator;
     }
 
     private function _brandAction(Callable $callback)
@@ -2168,7 +2171,8 @@ class CatalogueController extends AbstractActionController
 
                 $currentPictures[] = [
                     'name' => $pictureRow->getCaption([
-                        'language' => $language
+                        'language'   => $language,
+                        'translator' => $this->translator
                     ]),
                     'src'  => $imageInfo ? $imageInfo->getSrc() : null,
                     'url'  => $this->url()->fromRoute('catalogue', [
@@ -2569,7 +2573,7 @@ class CatalogueController extends AbstractActionController
             }
 
             if ($isModer || ($user->id == $picture->owner_id)) {
-                $this->getResponse()->setHttpResponseCode(404);
+                //$this->getResponse()->setStatusCode(404);
             } else {
                 return $this->notFoundAction();
             }

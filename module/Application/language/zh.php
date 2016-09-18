@@ -271,7 +271,7 @@ return [
     'perspective/left'           => '左侧',
     'perspective/right'          => '右侧',
     'perspective/interior'       => '内饰',
-    'perspective/font-panel'     => '前脸',
+    'perspective/front-panel'    => '前脸',
     'perspective/3/4-left'       => '¾ 左侧',
     'perspective/3/4-right'      => '¾ 右侧',
     'perspective/cutaway'        => '剖面',

@@ -105,9 +105,9 @@
                 <ul>
                     <?php foreach ($this->last_pictures as $picture) { ?>
                         <li><?=$this->htmlA([
-                            'href'  => $this->pic($picture)->url(),
+                            'href'  => $picture['url'],
                             'class' => 'picture-hover-preview'
-                        ], $picture->getCaption())?></li>
+                        ], $picture['name'])?></li>
                     <?php } ?>
                 </ul>
             </div>

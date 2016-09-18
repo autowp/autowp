@@ -350,10 +350,11 @@ class Catalogue
      * @param string $language
      * @return array
      */
-    public function buildPicturesName(array $pictures, $language)
+    public function buildPicturesName(array $pictures, $language, $translator)
     {
         return $this->getPictureTable()->getNames($pictures, [
-            'language' => $language
+            'language'   => $language,
+            'translator' => $translator
         ]);
     }
 

@@ -285,7 +285,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'perspective/left'           => 'left',
     'perspective/right'          => 'right',
     'perspective/interior'       => 'interior',
-    'perspective/font-panel'     => 'front panel',
+    'perspective/front-panel'    => 'front panel',
     'perspective/3/4-left'       => '¾ left',
     'perspective/3/4-right'      => '¾ right',
     'perspective/cutaway'        => 'cutaway',

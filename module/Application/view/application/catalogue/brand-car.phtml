@@ -124,7 +124,7 @@
     <?=$this->partial('application/cars', $this->childListData)?>
 
     <?php if ($this->currentPicturesCount) { ?>
-        <h3><?=$this->escapeHtml($this->translate('catalogue/other-pictures-of-%1$s', $this->carFullName)) ?></h3>
+        <h3><?=$this->escapeHtml(sprintf($this->translate('catalogue/other-pictures-of-%1$s'), $this->carFullName)) ?></h3>
 
         <div class="row thumbnails">
             <?php foreach ($this->currentPictures as $picture) { ?>

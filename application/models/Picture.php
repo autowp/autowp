@@ -133,7 +133,7 @@ class Picture extends Project_Db_Table
         return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
     }
 
-    public function getNames($rows, array $options = array())
+    public function getNames($rows, array $options = [])
     {
         $result = array();
 
@@ -205,15 +205,16 @@ class Picture extends Project_Db_Table
             }
         }
 
-        $translate = Zend_Registry::get('Zend_Translate');
+        $translate = $options['translator'];
 
-        $perspectives = array();
+        $perspectives = [];
         if (count($perspectiveIds)) {
             $perspectiveTable = new Perspectives();
             $pRows = $perspectiveTable->find(array_keys($perspectiveIds));
 
             foreach ($pRows as $row) {
                 $name = $translate->translate($row->name, $language);
+                //$name = $row->name;
                 $perspectives[$row->id] = self::mbUcfirst($name) . ' ';
             }
         }

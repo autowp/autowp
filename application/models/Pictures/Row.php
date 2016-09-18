@@ -3,6 +3,8 @@
 use Autowp\Filter\Filename\Safe;
 use Autowp\Image\Storage\Request;
 
+use Exception;
+
 class Pictures_Row extends Project_Db_Table_Row
 {
     private $_caption_cache = array();
@@ -23,14 +25,13 @@ class Pictures_Row extends Project_Db_Table_Row
         return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
     }
 
-    private function getPerspectivePrefix($id, $language)
+    private function getPerspectivePrefix($id, $language, $translator)
     {
         if (in_array($id, $this->prefixedPerspectives)) {
             if (!isset($this->perspectivePrefix[$id][$language])) {
                 $row = $this->getPerspectiveTable()->find($id)->current();
                 if ($row) {
-                    $translate = Zend_Registry::get('Zend_Translate');
-                    $name = $translate->translate($row->name, $language);
+                    $name = $translator->translate($row->name, 'default', $language);
                     $this->perspectivePrefix[$id][$language] = self::mbUcfirst($name) . ' ';
                 } else {
                     $this->perspectivePrefix[$id][$language] = '';
@@ -43,13 +44,18 @@ class Pictures_Row extends Project_Db_Table_Row
         return '';
     }
 
-    public function getCaption(array $options = array())
+    public function getCaption(array $options = [])
     {
         if ($this->name) {
             return $this->name;
         }
 
+        if (!isset($options['translator'])) {
+            throw new Exception('`translator` expected');
+        }
+
         $language = isset($options['language']) ? $options['language'] : 'en';
+        $translator = $options['translator'];
 
         if (isset($this->_caption_cache[$language])) {
             return $this->_caption_cache[$language];
@@ -61,7 +67,7 @@ class Pictures_Row extends Project_Db_Table_Row
             case Picture::CAR_TYPE_ID:
                 $car = $this->findParentCars();
                 if ($car) {
-                    $caption = $this->getPerspectivePrefix($this->perspective_id, $language) .
+                    $caption = $this->getPerspectivePrefix($this->perspective_id, $language, $translator) .
                                $car->getFullName($language);
                 }
                 break;

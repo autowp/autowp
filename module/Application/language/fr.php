@@ -285,7 +285,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'perspective/left'           => 'gauche',
     'perspective/right'          => 'droit',
     'perspective/interior'       => 'intérieur',
-    'perspective/font-panel'     => 'panneau avant',
+    'perspective/front-panel'    => 'panneau avant',
     'perspective/3/4-left'       => '¾ gauche',
     'perspective/3/4-right'      => '¾ droit',
     'perspective/cutaway'        => 'cutaway',

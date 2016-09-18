@@ -234,8 +234,6 @@ class Inbox extends Form implements InputFilterProviderInterface
             $filter = 'parent_id is null';
         }
 
-        //$translate = Zend_Registry::get('Zend_Translate');
-
         $rows = $this->getCarTypeTable()->fetchAll($filter, 'position');
         $result = [];
         foreach ($rows as $row) {

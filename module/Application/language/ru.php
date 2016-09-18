@@ -299,7 +299,7 @@ return [
     'perspective/left'           => 'левый бок',
     'perspective/right'          => 'правый бок',
     'perspective/interior'       => 'интерьер',
-    'perspective/font-panel'     => 'торпедо',
+    'perspective/front-panel'    => 'торпедо',
     'perspective/3/4-left'       => '¾ левый бок',
     'perspective/3/4-right'      => '¾ правый бок',
     'perspective/cutaway'        => 'cutaway',

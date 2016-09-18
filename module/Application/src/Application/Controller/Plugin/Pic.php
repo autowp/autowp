@@ -47,10 +47,13 @@ class Pic extends AbstractPlugin
 
     private $carHelper;
 
-    public function __construct($textStorage, $carHelper)
+    private $translator;
+
+    public function __construct($textStorage, $carHelper, $translator)
     {
         $this->textStorage = $textStorage;
         $this->carHelper = $carHelper;
+        $this->translator = $translator;
     }
 
     /**
@@ -1245,7 +1248,8 @@ class Pic extends AbstractPlugin
         // names
         $pictureTable = new Picture();
         $names = $pictureTable->getNames($rows, [
-            'language' => $language
+            'language'   => $language,
+            'translator' => $this->translator
         ]);
 
         // comments

@@ -24,7 +24,6 @@ use Zend_Locale;
 use Zend_Locale_Data;
 use Zend_Locale_Exception;
 use Zend_Registry;
-use Zend_Translate;
 
 class Module implements ConsoleUsageProviderInterface,
     ConsoleBannerProviderInterface, ConfigProviderInterface
@@ -167,7 +166,6 @@ class Module implements ConsoleUsageProviderInterface,
 
         Zend_Locale_Data::setCache($localeCache);
         Zend_Date::setOptions(['cache' => $localeCache]);
-        Zend_Translate::setCache($longCache);
     }
 
     public function getConsoleBanner(Console $console)
@@ -287,23 +285,7 @@ class Module implements ConsoleUsageProviderInterface,
         // Locale
         $locale = new Zend_Locale($language);
 
-        // Translation
-        $translate = new Zend_Translate('Array', APPLICATION_PATH . '/languages', null, [
-            'scan'            => Zend_Translate::LOCALE_FILENAME,
-            'disableNotices'  => true,
-            'logUntranslated' => false,
-            'locale'          => $locale,
-        ]);
-
-        $translate->addTranslation([
-            'content' => APPLICATION_PATH . '/../vendor/zendframework/zendframework1/resources/languages/',
-            'scan'    => Zend_Translate::LOCALE_DIRECTORY,
-            'locale'  => $locale,
-        ]);
-        $translate->setLocale($locale);
-
         // populate for wide-engine
-        Zend_Registry::set('Zend_Translate', $translate);
         Zend_Registry::set('Zend_Locale', $locale);
 
         $translator = $serviceManager->get('MvcTranslator');
