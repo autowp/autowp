@@ -1,0 +1,94 @@
+<?php foreach ($this->form->getIterator() as $element) { ?>
+    <?php
+        $classes = $this->parents;
+        $attrId = str_replace('attr-', '', $element->getAttribute('id'));
+    ?>
+
+    <?php if ($element instanceof Zend\Form\Fieldset) { ?>
+        <?php
+            $classes[] = 'subform-header';
+        ?>
+        <tr class="<?=$this->escapeHtmlAttr(implode(' ', $classes))?>" id="subform-<?=$this->attribute['id']?>">
+            <td colspan="4" style="padding-left:<?=$this->deep * 20?>px">
+                <h4><?=$this->escapeHtml($element->getLabel())?></h4>
+            </td>
+        </tr>
+        <?=$this->partial('application/cars/partial/form-elements', [
+            'form'               => $element,
+            'deep'               => $this->deep + 1,
+            'parents'            => array_merge($parents, [$element->getAttribute('id')]),
+            'allValues'          => $this->allValues,
+            'actualValues'       => $this->actualValues,
+            'editableAttributes' => $this->editableAttributes,
+            'service'            => $this->service
+        ])?>
+    <?php } else { ?>
+
+        <?php
+            $classes[] = 'element-row';
+            if ($element->getMessages()) {
+                $classes[] = 'has-error';
+            }
+        ?>
+        <tr class="<?=$this->escapeHtmlAttr(implode(' ', $classes))?>">
+            <td>
+                <label style="padding-left:<?=$this->deep * 20?>px">
+                    <?=$this->escapeHtml($element->getLabel())?>
+                </label>
+            </td>
+            <td>
+                <?php if ($this->unit) { ?>
+                    <div class="input-group">
+                        <?=$this->partial('application/cars/partial/form-element.phtml', [
+                            'element' => $element
+                        ])?>
+                        <span class="input-group-addon" title="<?=$this->escapeHtmlAttr($this->unit['name'])?>" class="unit">
+                            <?=$this->escapeHtml($this->unit['abbr'])?>
+                        </span>
+                    </div>
+                <?php } else { ?>
+                    <?=$this->partial('application/cars/partial/form-element.phtml', [
+                        'element' => $element
+                    ])?>
+                <?php } ?>
+                <?php foreach ($element->getMessages() as $error) { ?>
+                    <p class="help-block"><?=$this->escapeHtml($error)?></p>
+                <?php } ?>
+                <?php if ($desc = $element->getAttribute('data-desc')) { ?>
+                    <small><?=$this->escapeHtml($desc)?></small>
+                <?php } ?>
+            </td>
+            <td class="actual">
+                <?php if (array_key_exists($attrId, $this->actualValues)) { ?>
+                    <?php
+                        $value = $this->actualValues[$attrId];
+                    ?>
+                    <?php if ($value === null) { ?>
+                        <em>нет</em>
+                    <?php } else { ?>
+                        <?=$this->escapeHtml($value)?>
+                        <?php if ($unitId = $element->getAttribute('data-unit')) { ?>
+                            <?php if ($unit = $this->service->getUnit($unitId)) { ?>
+                                <span class="unit" title="<?=$this->escapeHtmlAttr($unit['name'])?>"><?=$this->escapeHtml($unit['abbr'])?></span>
+                            <?php } ?>
+                        <?php } ?>
+                    <?php } ?>
+                <?php } ?>
+            </td>
+            <td>
+                <?php if (isset($this->allValues[$attrId])) { ?>
+                    <?php foreach ($this->allValues[$attrId] as $value) { ?>
+                        <?php if ($value['value'] === null) { ?>
+                            <em>нет</em>
+                        <?php } else { ?>
+                            <?=$this->escapeHtml($value['value'])?>
+                        <?php } ?>
+                        <?=$this->user($value['user'])?>
+                        <span class="date">[<?=$this->escapeHtml($this->humanTime($value['date']))?>]</span>
+                        <br />
+                    <?php } ?>
+                <?php } ?>
+            </td>
+        </tr>
+    <?php } ?>
+<?php } ?>

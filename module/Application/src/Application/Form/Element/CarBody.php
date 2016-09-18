@@ -40,7 +40,7 @@ class CarBody extends Text implements InputProviderInterface
                 [
                     'name' => 'StringLength',
                     'options' => [
-                        'min' => 2,
+                        'min' => 1,
                         'max' => 20
                     ]
                 ]

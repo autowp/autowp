@@ -249,7 +249,7 @@ class IndexController extends AbstractActionController
             $carOfDay = $carTable->find($carId)->current();
             if ($carOfDay) {
 
-                $key = 'CAR_OF_DAY_77_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
+                $key = 'CAR_OF_DAY_78_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
 
                 $carOfDayInfo = $this->cache->getItem($key, $success);
                 if (!$success) {
@@ -475,7 +475,7 @@ class IndexController extends AbstractActionController
 
         $userTable = new Users();
 
-        $cacheKey = 'INDEX_SPEC_CARS_5_' . $language;
+        $cacheKey = 'INDEX_SPEC_CARS_8_' . $language;
         $cars = $this->cache->getItem($cacheKey, $success);
         if (!$success) {
 

@@ -387,7 +387,7 @@ class UploadController extends AbstractActionController
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-medium');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-gallery-full');
     
-            $this->telegram->notifyInbox($picture->id);
+            //$this->telegram->notifyInbox($picture->id);
     
             $result[] = $picture;
         }

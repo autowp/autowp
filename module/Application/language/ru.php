@@ -409,7 +409,7 @@ return [
     'picture/all-images-have-owners' => 'Все изображения являются чьей-либо собственностью.',
     'picture/if-you-found-error' => 'Если вы считаете, что пользователи сайта ошиблись, разместив данную картинку в этом разделе, то было бы здорово, если бы вы написали об этом в комментариях и указали на ошибку.',
     'picture/where-to-talk' => 'Поделиться своей радостью, обсудить наболевшее и просто поболтать об автомобилях и не только вы можете на нашем <a href="/forums/" title="Перейти в форум">форуме</a>',
-    
+
     'users/user/recent-activity' => 'Активность на сайте',
     'users/user/recent-uploads' => 'Последние добавленные изображения',
     'users/user/recent-comments' => 'Последние комментарии',
@@ -548,7 +548,7 @@ return [
     'car-type-rp/2-floor-bus'    => '2-х этажных автобусов',
     'car-type-rp/town-car'       => 'Таун каров',
     'car-type-rp/barchetta'      => 'Баркетта',
-    
+
     'page/1/name' => "Главная страница",
     'page/2/name' => "Главное меню",
     'page/10/name' => "Бренд",
@@ -712,7 +712,7 @@ return [
     'page/196/name' => "Пожертвование",
     'page/197/name' => "История изменения текста",
     'page/198/name' => "Контакты",
-    
+
     'page/1/title' => "Энциклопедия автомобилей в картинках. AutoWP.ru",
     'page/2/title' => "",
     'page/10/title' => "%BRAND_NAME%",
@@ -876,7 +876,7 @@ return [
     'page/196/title' => "Пожертвование",
     'page/197/title' => "История изменения текста",
     'page/198/title' => "Контакты",
-    
+
     'page/1/breadcrumbs' => "",
     'page/2/breadcrumbs' => "",
     'page/10/breadcrumbs' => "%BRAND_NAME%",
@@ -1040,8 +1040,11 @@ return [
     'page/196/breadcrumbs' => "Пожертвование",
     'page/197/breadcrumbs' => "История изменения текста",
     'page/198/breadcrumbs' => "Контакты",
-    
+
     'page/201/name'        => "Маскоты",
     'page/201/title'       => "Маскоты",
     'page/201/breadcrumbs' => "Маскоты",
+
+    'moder-menu/title' => 'Меню модератора',
+    'moder-menu/inbox' => 'Инбокс',
 ];

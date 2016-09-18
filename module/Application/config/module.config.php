@@ -45,6 +45,10 @@ return [
                 $cache = $sm->get('longCache');
                 return new Controller\BrandsController($cache);
             },
+            Controller\CarsController::class => function($sm) {
+                $filterForm = $sm->get('AttrsLogFilterForm');
+                return new Controller\CarsController($filterForm);
+            },
             Controller\CatalogueController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
                 return new Controller\CatalogueController($textStorage);

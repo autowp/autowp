@@ -286,7 +286,6 @@ class Brand
                     }
             }
         }
-        //var_dump($columns);
 
         $select = $db->select()
             ->from('brands', $columns)

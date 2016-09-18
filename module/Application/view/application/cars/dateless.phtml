@@ -1,17 +1,16 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
-            'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 1,
-    ));
+    ]);
 ?>
 
 <div class="row">
     <div class="col-md-8 col-md-offset-2">
-        <?=$this->partial('cars.phtml', $this->childListData)?>
+        <?=$this->partial('application/cars', $this->childListData)?>
 
         <?php if (isset($this->paginator)) { ?>
             <?=$this->paginationControl($this->paginator) ?>

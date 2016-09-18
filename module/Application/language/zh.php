@@ -571,7 +571,7 @@ return [
     'page/63/name' => "用户上传的图片",
     'page/66/name' => "%BRAND_NAME% %DESIGN_PROJECT_NAME%的所有图片",
     'page/67/name' => "管理员页面",
-    'page/68/name' => "Страницы сайта",
+    'page/68/name' => "Pages",
     'page/69/name' => "Добавить",
     'page/70/name' => "Изменить",
     'page/71/name' => "Права",
@@ -607,7 +607,7 @@ return [
     'page/106/name' => "Rules",
     'page/107/name' => "规定",
     'page/109/name' => "Cutaway",
-    'page/110/name' => "Комментарии",
+    'page/110/name' => "Comments",
     'page/111/name' => "Engine spec editor %ENGINE_NAME%",
     'page/114/name' => "Журнал ТТХ",
     'page/115/name' => "Музеи",
@@ -771,7 +771,7 @@ return [
     'page/106/title' => "Rules",
     'page/107/title' => "规定",
     'page/109/title' => "",
-    'page/110/title' => "Комментарии",
+    'page/110/title' => "Comments",
     'page/111/title' => "Engine spec editor %ENGINE_NAME%",
     'page/114/title' => "Журнал ТТХ",
     'page/115/title' => "Музеи",
@@ -1012,8 +1012,11 @@ return [
     'page/196/breadcrumbs' => "Donate",
     'page/197/breadcrumbs' => "Text history",
     'page/198/breadcrumbs' => "Contacts",
-    
+
     'page/201/name'        => "Mascots",
     'page/201/title'       => "Mascots",
     'page/201/breadcrumbs' => "Mascots",
+
+    'moder-menu/title' => 'Moderator menu',
+    'moder-menu/inbox' => 'Inbox',
 ];

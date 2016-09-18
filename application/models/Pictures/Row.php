@@ -137,96 +137,6 @@ class Pictures_Row extends Project_Db_Table_Row
     /**
      * @return void
      */
-    protected function _update()
-    {
-        if (array_key_exists('type', $this->_modifiedFields))
-        {
-            $newTypeID = intval($this->_data['type']);
-            $typeID = intval($this->_cleanData['type']);
-
-            $brandId = null;
-            $carId = null;
-            $engineId = null;
-            $factoryId = null;
-
-            // вычисляем старые значения
-            switch ($typeID)
-            {
-                case Picture::UNSORTED_TYPE_ID:
-                case Picture::MIXED_TYPE_ID:
-                case Picture::LOGO_TYPE_ID:
-                    $brandId = $this->brand_id;
-                    break;
-                case Picture::CAR_TYPE_ID:
-                    $brandId = null;
-                    $car = $this->findParentCars();
-                    if ($car)
-                    {
-                        $carId = $car->id;
-                    }
-                    break;
-                case Picture::ENGINE_TYPE_ID:
-                    $engineId = $this->engine_id;
-                    break;
-
-                case Picture::FACTORY_TYPE_ID:
-                    $factoryId = $this->factory_id;
-                    break;
-                default:
-                    throw new Exception('Unknown typeId');
-            }
-
-            // вычисляем новые значения
-            $newBrandId = null;
-            $newCarId = null;
-            $newEngineId = null;
-            $newFactoryId = null;
-            switch ($newTypeID)
-            {
-                case Picture::UNSORTED_TYPE_ID:
-                case Picture::MIXED_TYPE_ID:
-                case Picture::LOGO_TYPE_ID:
-                    $newBrandId = null;
-                    if ($brandId)
-                        $newBrandId = $brandId;
-                    elseif ($carId)
-                    {
-                        $cars = new Cars();
-                        $car = $cars->find($carId)->current();
-                        foreach ($car->findBrandsViaBrands_Cars() as $brand)
-                            $newBrandId = $brand->id;
-                    }
-                    elseif ($engineId)
-                    {
-                        $engines = new Engines();
-                        $engine = $engines->find($engineId)->current();
-                        if ($engine)
-                            $newBrandId = $engine->brand_id;
-                    }
-                    break;
-                case Picture::CAR_TYPE_ID:
-                    $newCarId = $carId;
-                    break;
-                case Picture::ENGINE_TYPE_ID:
-                    $newEngineId = $engineId;
-                    break;
-                case Picture::FACTORY_TYPE_ID:
-                    $newFactoryId = $factoryId;
-                    break;
-                default:
-                    throw new Exception('Unknown typeId');
-            }
-
-            $this->car_id = $newCarId;
-            $this->brand_id = $newBrandId;
-            $this->engine_id = $newEngineId;
-            $this->factory_id = $newFactoryId;
-        }
-    }
-
-    /**
-     * @return void
-     */
     protected function _postUpdate()
     {
         // удаляем ссылки
@@ -242,10 +152,10 @@ class Pictures_Row extends Project_Db_Table_Row
                     $car->refreshPicturesCount();
                     foreach ($car->findBrandsViaBrands_Cars() as $brand)
                     {
-                        $bpcTable->delete(array(
+                        $bpcTable->delete([
                             $bpcTable->getAdapter()->quoteInto('picture_id = ?', $this->id),
                             $bpcTable->getAdapter()->quoteInto('brand_id = ?', $brand->id)
-                        ));
+                        ]);
                         $brand->refreshPicturesCount();
                     }
                 }

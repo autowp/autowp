@@ -2,8 +2,6 @@
 
 namespace Application;
 
-use Comment_Message;
-use Picture;
 use Users;
 
 use Zend\Validator as ZendValidator;
@@ -32,7 +30,9 @@ return [
                         'type' => 'Text',
                         'name' => 'name',
                         'options' => [
-                            'label'        => 'feedback/name',
+                            'label' => 'feedback/name',
+                        ],
+                        'attributes' => [
                             'maxlength'    => 255,
                             'size'         => 80,
                             'autocomplete' => 'name',
@@ -44,7 +44,9 @@ return [
                         'type' => 'Text',
                         'name' => 'email',
                         'options' => [
-                            'label'        => 'E-mail',
+                            'label' => 'E-mail',
+                        ],
+                        'attributes' => [
                             'maxlength'    => 255,
                             'size'         => 80,
                             'autocomplete' => 'email',
@@ -57,8 +59,10 @@ return [
                         'name' => 'message',
                         'options' => [
                             'label' => 'feedback/message',
-                            'cols'  => 80,
-                            'rows'  => 8,
+                        ],
+                        'attributes' => [
+                            'cols' => 80,
+                            'rows' => 8,
                         ]
                     ],
                 ],
@@ -125,7 +129,9 @@ return [
                         'type' => 'Text',
                         'name' => 'email',
                         'options' => [
-                            'label'        => 'E-mail',
+                            'label' => 'E-mail',
+                        ],
+                        'attributes' => [
                             'maxlength'    => 255,
                             'size'         => 80,
                             'autocomplete' => 'email',
@@ -170,9 +176,11 @@ return [
                         'type' => 'Password',
                         'name' => 'password',
                         'options' => [
-                            'label'        => 'Пароль',
-                            'size'         => Users::MAX_PASSWORD,
-                            'maxlength'    => Users::MAX_PASSWORD
+                            'label' => 'Пароль',
+                        ],
+                        'attributes' => [
+                            'size'      => Users::MAX_PASSWORD,
+                            'maxlength' => Users::MAX_PASSWORD
                         ]
                     ],
                 ],
@@ -181,9 +189,11 @@ return [
                         'type' => 'Password',
                         'name' => 'password_confirm',
                         'options' => [
-                            'label'        => 'Пароль (еще раз)',
-                            'size'         => Users::MAX_PASSWORD,
-                            'maxlength'    => Users::MAX_PASSWORD
+                            'label' => 'Пароль (еще раз)',
+                        ],
+                        'attributes' => [
+                            'size'      => Users::MAX_PASSWORD,
+                            'maxlength' => Users::MAX_PASSWORD
                         ]
                     ],
                 ],
@@ -1223,6 +1233,23 @@ return [
                 ],
                 'submit' => [
                     'required' => false
+                ]
+            ]
+        ],
+        'AttrsLogFilterForm' => [
+            'type'     => 'Zend\Form\Form',
+            'attributes'  => [
+                'method' => 'post'
+            ],
+            'elements' => [
+                [
+                    'spec' => [
+                        'type'    => 'Text',
+                        'name'    => 'user_id',
+                        'options' => [
+                            'label'   => 'Пользователь'
+                        ]
+                    ]
                 ]
             ]
         ],

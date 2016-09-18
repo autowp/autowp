@@ -2,7 +2,6 @@
     $this->pageEnv([
         'layout' => [
             'blankPage' => false,
-            'needLeft'  => false,
             'needRight' => false
         ],
         'pageId' => 111,
@@ -14,5 +13,9 @@
     $this->layout()->moduleName = 'default/cars/engine-spec-editor';
 ?>
 <div class="well">
-    <?=$this->form->render($this) ?>
+    <?=$this->partial('application/cars/partial/form', [
+        'form'    => $this->form,
+        'data'    => $this->formData,
+        'service' => $this->service
+    ])?>
 </div>

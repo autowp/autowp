@@ -11,7 +11,7 @@
     <tbody>
         <?php foreach ($this->values as $value) { ?>
             <tr>
-                <td><?=$this->escape($this->humanTime($value['date']))?></td>
+                <td><?=$this->escapeHtml($this->humanTime($value['date']))?></td>
                 <td>
                     <?php if ($value['user']) { ?>
                         <?=$this->user($value['user'])?>
@@ -19,19 +19,19 @@
                 </td>
                 <td>
                     <?php if ($value['attribute']) {
-                        echo $this->escape($value['attribute']->name);
+                        echo $this->escapeHtml($value['attribute']->name);
                         if ($value['unit']) {
-                            echo ', ' . $this->escape($value['unit']->name);
+                            echo ', ' . $this->escapeHtml($value['unit']->name);
                         }
                     } ?>
                 </td>
                 <td>
-                    <?=$this->escape($value['userValue'])?>
+                    <?=$this->escapeHtml($value['userValue'])?>
                     /
-                    <?=$this->escape($value['value'])?>
+                    <?=$this->escapeHtml($value['value'])?>
                 </td>
                 <td>
-                    <form action="<?=$this->escape($value['deleteUrl'])?>" method="post">
+                    <form action="<?=$this->escapeHtmlAttr($value['deleteUrl'])?>" method="post">
                         <button type="submit" class="btn btn-danger btn-xs">
                             <i class="fa fa-times"></i>
                         </button>
@@ -41,14 +41,10 @@
         <?php } ?>
     </tbody>
 </table>
-<form action="<?=$this->escape($this->url(array(
+<form action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
     'action' => 'move'
-)))?>" method="post">
-    <?=$this->formText('to_item_id', null, array(
-        'placeholder' => 'id'
-    ))?>
-    <?=$this->formText('to_item_type_id', null, array(
-        'placeholder' => 'type'
-    ))?>
+], [], true))?>" method="post">
+    <input type="text" name="to_item_id" placeholder="id" />
+    <input type="text" name="to_item_type_id" placeholder="type" />
     <button type="submit">Перенести</button>
 </form>

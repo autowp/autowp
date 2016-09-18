@@ -12,19 +12,19 @@
 <div class="row">
     <div class="col-md-6">
         <?php if ($this->user()->inheritsRole('cars-moder')) { ?>
-            <h3>Автомобили</h3>
+            <h3><?=$this->escapeHtml($this->page(131)->name)?></h3>
             <div class="well">
                 <ul class="list-unstyled">
                     <li>
                         <i class="fa fa-align-left"></i>
-                        <?=$this->htmlA($this->url('moder/cars'), 'Автомобили')?>
+                        <?=$this->htmlA($this->url('moder/cars'), $this->page(131)->name)?>
                     </li>
 
                     <li>
                         <i class="fa fa-sort-alpha-asc"></i>
                         <?=$this->htmlA($this->url('moder/cars', [
                             'action' => 'alpha'
-                        ]), 'Алфавитный список автомобилей')?>
+                        ]), $this->page(74)->name)?>
                     </li>
 
                     <?php if ($this->user()->isAllowed('car', 'add')) { ?>
@@ -32,42 +32,42 @@
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA($this->url('moder/cars', [
                                 'action' => 'new',
-                            ]), 'добавить')?>
+                            ]), $this->page(163)->name)?>
                         </li>
                     <?php } ?>
                 </ul>
             </div>
         <?php } ?>
-        <h3>Двигатели</h3>
+        <h3><?=$this->escapeHtml($this->page(82)->name)?></h3>
         <div class="well">
             <ul class="list-unstyled">
                 <li>
                     <i class="fa fa-align-left"></i>
-                    <?=$this->htmlA($this->url('moder/engines'), 'Двигатели')?>
+                    <?=$this->htmlA($this->url('moder/engines'), $this->page(82)->name)?>
                 </li>
                 <?php if ($this->user()->isAllowed('engine', 'add')) { ?>
                     <li>
                         <i class="fa fa-plus"></i>
                         <?=$this->htmlA($this->url('moder/engines', [
                             'action' => 'add',
-                        ]), 'добавить')?>
+                        ]), $this->page(170)->name)?>
                     </li>
                 <?php } ?>
             </ul>
         </div>
-        <h3>Заводы</h3>
+        <h3><?=$this->escapeHtml($this->page(175)->name)?></h3>
         <div class="well">
             <ul class="list-unstyled">
                 <li>
                     <i class="fa fa-align-left"></i>
-                    <?=$this->htmlA($this->url('moder/factories'), 'Заводы')?>
+                    <?=$this->htmlA($this->url('moder/factories'), $this->page(175)->name)?>
                 </li>
                 <?php if ($this->user()->isAllowed('factory', 'add')) { ?>
                     <li>
                         <i class="fa fa-plus"></i>
                         <?=$this->htmlA($this->url('moder/factories', [
                             'action' => 'add',
-                        ]), 'добавить')?>
+                        ]), $this->page(176)->name)?>
                     </li>
                 <?php } ?>
             </ul>

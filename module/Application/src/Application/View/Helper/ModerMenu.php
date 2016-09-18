@@ -24,7 +24,7 @@ class ModerMenu extends AbstractHtmlElement
 
             $items[] = [
                 'href'  => '/moder/pictures/index/order/1/status/inbox',
-                'label' => 'Инбокс',
+                'label' => $this->view->translate('moder-menu/inbox'),
                 'count' => $inboxCount,
                 'icon'  => 'fa fa-th'
             ];
@@ -41,7 +41,7 @@ class ModerMenu extends AbstractHtmlElement
                     'action'              => 'index',
                     'moderator_attention' => Comment_Message::MODERATOR_ATTENTION_REQUIRED
                 ]),
-                'label' => 'Комментарии',
+                'label' => $this->view->page(110)->name,
                 'count' => $attentionCount,
                 'icon'  => 'fa fa-comment'
             ];
@@ -49,14 +49,14 @@ class ModerMenu extends AbstractHtmlElement
             if ($this->view->user()->inheritsRole('pages-moder')) {
                 $items[] = [
                     'href'  => $this->view->url('moder/pages'),
-                    'label' => 'Страницы сайта',
+                    'label' => $this->view->page(68)->name,
                     'icon'  => 'fa fa-book'
                 ];
             }
 
             $items[] = [
                 'href'  => $this->view->url('moder/cars'),
-                'label' => 'Автомобили',
+                'label' => $this->view->page(131)->name,
                 'icon'  => 'fa fa-car'
             ];
         }

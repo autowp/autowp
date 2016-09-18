@@ -1,90 +1,119 @@
 <?php
 
+namespace Application\Controller;
+
+use Zend\Form\Form;
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
+
 use Application\Model\Message;
 use Application\Model\Brand;
+use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-class CarsController extends Zend_Controller_Action
+use Application_Service_Specifications;
+use Attrs_Attributes;
+use Attrs_Item_Types;
+use Attrs_User_Values;
+use Cars;
+use Cars_Row;
+use Engines;
+use User_Car_Subscribe;
+use Users;
+use Users_Row;
+
+class CarsController extends AbstractActionController
 {
     /**
      * @var Engines
      */
-    private $_engineTable = null;
+    private $engineTable = null;
+
+    /**
+     * @var Form
+     */
+    private $filterForm;
+
+    public function __construct(Form $filterForm)
+    {
+        $this->filterForm = $filterForm;
+    }
 
     /**
      * @return Engines
      */
     private function getEngineTable()
     {
-        return $this->_engineTable
-            ? $this->_engineTable
-            : $this->_engineTable = new Engines();
-    }
-
-    public function preDispatch()
-    {
-        parent::preDispatch();
-
-        if (!$this->_helper->user()->isAllowed('specifications', 'edit')) {
-            return $this->forward('index', 'login', 'default');
-        }
+        return $this->engineTable
+            ? $this->engineTable
+            : $this->engineTable = new Engines();
     }
 
     private function carModerUrl(Cars_Row $car)
     {
-        return $this->view->serverUrl($this->_helper->url->url([
-            'module'     => 'moder',
-            'controller' => 'cars',
-            'action'     => 'car',
-            'car_id'     => $car->id,
-        ], 'default', true));
+        return $this->url()->fromRoute('moder/cars/params', [
+            'action' => 'car',
+            'car_id' => $car->id,
+        ], [
+            'force_canonical' => true
+        ]);
     }
 
     private function editorUrl($car, $tab = null)
     {
-        return $this->_helper->url->url([
-            'module'     => 'default',
-            'controller' => 'cars',
-            'action'     => 'car-specifications-editor',
-            'car_id'     => $car->id,
-            'tab'        => $tab
-        ], 'default', true);
+        return $this->url()->fromRoute('cars/params', [
+            'action' => 'car-specifications-editor',
+            'car_id' => $car->id,
+            'tab'    => $tab
+        ]);
     }
 
     public function carSpecificationsEditorAction()
     {
-        $editOnlyMode = $this->_helper->user()->get()->specs_weight < 0.10;
+        if (!$this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $editOnlyMode = $this->user()->get()->specs_weight < 0.10;
 
         $carTable = new Cars();
 
-        $car = $carTable->find($this->getParam('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         $service = new Application_Service_Specifications();
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
-        $carForm = $service->getCarForm($car, $user, [
+        $result = $service->getCarForm2($car, $user, [
             'editOnlyMode' => $editOnlyMode,
-            'action' => $this->_helper->url->url([
-                'form' => 'car',
-                'tab'  => 'spec'
-            ])
         ]);
+
+        $carForm = $result['form'];
+        $carFormData = $result['data'];
+
+        //print_r($carFormData['allValues']); exit;
+
+        $carForm->setAttribute('action', $this->url()->fromRoute('cars/params', [
+            'form' => 'car',
+            'tab'  => 'spec'
+        ], [], true));
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            if ($carForm->isValid($request->getPost())) {
-                $service->saveAttrsZoneAttributes($carForm, $user);
+            $carForm->setData($this->params()->fromPost());
+            if ($carForm->isValid()) {
+
+                $service->saveCarAttributes($car, $carForm->getData(), $user);
 
                 $user->invalidateSpecsVolume();
 
                 $mModel = new Message();
 
                 $message = sprintf(
-                        '%s внес ттх для автомобиля %s',
-                        $this->userUrl($user), $car->getFullName($this->_helper->language())
+                    '%s внес ттх для автомобиля %s',
+                    $this->userUrl($user), $car->getFullName($this->language())
                 );
 
                 $contribPairs = $service->getContributors(1, [$car->id]);
@@ -104,7 +133,7 @@ class CarsController extends Zend_Controller_Action
                     }
                 }
 
-                return $this->redirect($this->editorUrl($car, 'spec'));
+                return $this->redirect()->toUrl($this->editorUrl($car, 'spec'));
             }
         }
 
@@ -124,12 +153,10 @@ class CarsController extends Zend_Controller_Action
             foreach ($carRows as $carRow) {
                 $engineInheritedFrom[] = [
                     'name' => $carRow->getFullName(),
-                    'url'  => $this->_helper->url->url([
-                        'module' => 'moder',
-                        'controller' => 'cars',
+                    'url'  => $this->url()->fromRoute('moder/cars/params', [
                         'action' => 'car',
                         'car_id' => $carRow->id
-                    ], 'default', true)
+                    ])
                 ];
             }
         }
@@ -153,9 +180,9 @@ class CarsController extends Zend_Controller_Action
             'result' => [
                 'icon'      => 'fa fa-table',
                 'title'     => 'Результат',
-                'data-load' => $this->_helper->url->url([
+                'data-load' => $this->url()->fromRoute('cars/params', [
                     'action' => 'car-specs'
-                ]),
+                ], [], true),
                 'count' => 0,
             ],
             'admin' => [
@@ -165,35 +192,41 @@ class CarsController extends Zend_Controller_Action
             ],
         ];
 
-        $currentTab = $this->getParam('tab', 'info');
+        $currentTab = $this->params('tab', 'info');
         foreach ($tabs as $id => &$tab) {
             $tab['active'] = $id == $currentTab;
         }
 
-        $isSpecsAdmin = $this->_helper->user()->isAllowed('specifications', 'admin');
+        $isSpecsAdmin = $this->user()->isAllowed('specifications', 'admin');
 
         if (!$isSpecsAdmin) {
             unset($tabs['admin']);
         }
 
-        $this->view->assign([
+        return [
             'car'                 => $car,
             'engine'              => $engine,
             'engineInherited'     => $engineInherited,
             'engineInheritedFrom' => $engineInheritedFrom,
             'form'                => $carForm,
+            'formData'            => $carFormData,
             'tabs'                => $tabs,
-            'isSpecsAdmin'        => $isSpecsAdmin
-        ]);
+            'isSpecsAdmin'        => $isSpecsAdmin,
+            'service'             => $service
+        ];
     }
 
     public function carSpecsAction()
     {
+        if (!$this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = new Cars();
 
-        $car = $carTable->find($this->getParam('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         $service = new Application_Service_Specifications();
@@ -202,30 +235,32 @@ class CarsController extends Zend_Controller_Action
             'language' => 'en'
         ]);
 
-        $this->view->assign([
+        $viewModel = new ViewModel([
             'specs' => $specs,
         ]);
+
+        return $viewModel->setTerminal(true);
     }
 
     public function moveAction()
     {
-        if (!$this->_helper->user()->isAllowed('specifications', 'admin')) {
+        if (!$this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
         }
 
         //$carTable = new Cars();
         $aitTable = new Attrs_Item_Types();
 
-        $itemId = (int)$this->getParam('item_id');
-        $itemType = $aitTable->find($this->getParam('item_type_id'))->current();
+        $itemId = (int)$this->params('item_id');
+        $itemType = $aitTable->find($this->params('item_type_id'))->current();
         if (!$itemType) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
-        $toItemId = (int)$this->getParam('to_item_id');
-        $toItemType = $aitTable->find($this->getParam('to_item_type_id'))->current();
+        $toItemId = (int)$this->params('to_item_id');
+        $toItemType = $aitTable->find($this->params('to_item_type_id'))->current();
         if (!$toItemType) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         $service = new Application_Service_Specifications();
@@ -315,25 +350,25 @@ class CarsController extends Zend_Controller_Action
 
         }
 
-        return $this->redirect($this->_helper->url->url([
+        return $this->redirect()->toRoute('cars/params', [
             'action' => 'car-specifications-editor'
-        ]));
+        ], [], true);
     }
 
     public function specsAdminAction()
     {
         $carTable = new Cars();
 
-        if (!$this->_helper->user()->isAllowed('specifications', 'admin')) {
+        if (!$this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
         }
 
         $aitTable = new Attrs_Item_Types();
 
-        $itemId = (int)$this->getParam('item_id');
-        $itemType = $aitTable->find($this->getParam('item_type_id'))->current();
+        $itemId = (int)$this->params('item_id');
+        $itemType = $aitTable->find($this->params('item_type_id'))->current();
         if (!$itemType) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         $auvTable = new Attrs_User_Values();
@@ -357,26 +392,26 @@ class CarsController extends Zend_Controller_Action
                 'value'     => $specService->getActualValueText($attribute->id, $itemType->id, $row->item_id),
                 'userValue' => $specService->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id),
                 'date'      => $row->getDate('update_date'),
-                'deleteUrl' => $this->_helper->url->url([
-                    'action'  => 'delete-value',
+                'deleteUrl' => $this->url()->fromRoute('cars/params', [
+                    'action'       => 'delete-value',
                     'attribute_id' => $row->attribute_id,
                     'item_type_id' => $row->item_type_id,
                     'item_id'      => $row->item_id,
                     'user_id'      => $row->user_id
-                ])
+                ], [], true)
             ];
         }
 
-        $this->view->assign([
+        return [
             'values'     => $values,
             'itemId'     => $itemId,
             'itemTypeId' => $itemType->id
-        ]);
+        ];
     }
 
     public function deleteValueAction()
     {
-        if (!$this->_helper->user()->isAllowed('specifications', 'admin')) {
+        if (!$this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
         }
 
@@ -387,83 +422,88 @@ class CarsController extends Zend_Controller_Action
 
         $aitTable = new Attrs_Item_Types();
 
-        $itemType = $aitTable->find($this->getParam('item_type_id'))->current();
+        $itemType = $aitTable->find($this->params('item_type_id'))->current();
         if (!$itemType) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
-        $itemId = (int)$this->getParam('item_id');
-        $userId = (int)$this->getParam('user_id');
+        $itemId = (int)$this->params('item_id');
+        $userId = (int)$this->params('user_id');
 
         $specService = new Application_Service_Specifications();
-        $specService->deleteUserValue((int)$this->getParam('attribute_id'), $itemType->id, $itemId, $userId);
+        $specService->deleteUserValue((int)$this->params('attribute_id'), $itemType->id, $itemId, $userId);
 
-        return $this->redirect($request->getServer('HTTP_REFERER'));
+        return $this->redirect()->toUrl($request->getServer('HTTP_REFERER'));
     }
 
     public function engineSpecEditorAction()
     {
-        $editOnlyMode = $this->_helper->user()->get()->specs_weight < 0.10;
+        if (!$this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
+        $editOnlyMode = $this->user()->get()->specs_weight < 0.10;
 
         $engines = $this->getEngineTable();
 
-        $engine = $engines->find($this->getParam('engine_id'))->current();
+        $engine = $engines->find($this->params('engine_id'))->current();
         if (!$engine) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         $service = new Application_Service_Specifications();
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
 
-        $form = $service->getEngineForm($engine, $user, [
+        $result = $service->getEngineForm2($engine, $user, [
             'editOnlyMode' => $editOnlyMode,
-            'action'       => $this->_helper->url->url()
         ]);
+
+        $form = $result['form'];
+        $formData = $result['data'];
+
+        $form->setAttribute('action', $this->url()->fromRoute(null, [], [], true));
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            if ($form->isValid($request->getPost())) {
-                $service->saveAttrsZoneAttributes($form, $user);
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+
+                $service->saveEngineAttributes($engine, $form->getData(), $user);
 
                 $user->invalidateSpecsVolume();
 
-                return $this->redirect($this->_helper->url->url());
+                return $this->redirect()->toRoute(null, [], [], true);
             }
         }
 
-        $this->view->assign([
-            'engine' => $engine,
-            'form'   => $form
-        ]);
+        return [
+            'engine'   => $engine,
+            'form'     => $form,
+            'formData' => $formData,
+            'service'  => $service
+        ];
     }
 
     public function attrsChangeLogAction()
     {
-        $filter = new Application_Form_Attrs_ChangeLogFilter([
-            'action' => $this->_helper->url->url([
-                'module'     => 'default',
-                'controller' => 'cars',
-                'action'     => 'attrs-change-log'
-            ])
-        ]);
+        if (!$this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
 
-        $filter->populate($this->_getAllParams());
+        $this->filterForm->setAttribute('action', $this->url()->fromRoute('cars/params', [
+            'action' => 'attrs-change-log'
+        ], [], true));
 
         if ($this->getRequest()->isPost()) {
-            $filter->isValid($this->getRequest()->getPost());
-            $values = $filter->getValues();
+            $this->filterForm->setData($this->params()->fromPost());
+            if ($this->filterForm->isValid()) {
+                $values = $this->filterForm->getData();
 
-            if ($values['user_id']) {
-                return $this->redirect($this->_helper->url->url([
-                    'user_id' => $values['user_id'],
+                return $this->redirect()->toRoute('cars/params', [
+                    'user_id' => $values['user_id'] ? $values['user_id'] : null,
                     'page'    => null
-                ]));
-            } else {
-                return $this->redirect($this->_helper->url->url([
-                    'user_id' => null,
-                    'page'    => null
-                ]));
+                ], [], true);
             }
         }
 
@@ -472,20 +512,31 @@ class CarsController extends Zend_Controller_Action
         $select = $userValues->select()
             ->order('update_date DESC');
 
-        if ($user_id = $this->getParam('user_id'))
-            $select->where('user_id = ?', $user_id);
+        $this->filterForm->setData($this->params()->fromRoute());
 
-        $paginator = Zend_Paginator::factory($select)
+        if ($this->filterForm->isValid()) {
+            $values = $this->filterForm->getData();
+
+            if ($user_id = $values['user_id']) {
+                $select->where('user_id = ?', $user_id);
+            }
+        }
+
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+
+        $paginator
             ->setItemCountPerPage(30)
             ->setPageRange(20)
-            ->setCurrentPageNumber($this->getParam('page'));
+            ->setCurrentPageNumber($this->params('page'));
 
         $items = [];
 
         $cars = new Cars();
         $engines = $this->getEngineTable();
 
-        $isModerator = $this->_helper->user()->inheritsRole('moder');
+        $isModerator = $this->user()->inheritsRole('moder');
 
         $service = new Application_Service_Specifications();
 
@@ -500,40 +551,32 @@ class CarsController extends Zend_Controller_Action
                 $car = $cars->find($row->item_id)->current();
                 if ($car) {
                     $objectName = $car->getFullName();
-                    $editorUrl = $this->_helper->url->url([
-                        'module'     => 'default',
-                        'controller' => 'cars',
-                        'action'     => 'car-specifications-editor',
-                        'car_id'     => $car->id
-                    ], 'default', true);
+                    $editorUrl = $this->url()->fromRoute('cars/params', [
+                        'action' => 'car-specifications-editor',
+                        'car_id' => $car->id
+                    ]);
 
                     if ($isModerator) {
-                        $moderUrl = $this->_helper->url->url([
-                            'module'     => 'moder',
-                            'controller' => 'cars',
-                            'action'     => 'car',
-                            'car_id'     => $car->id
-                        ], 'default', true);
+                        $moderUrl = $this->url()->fromRoute('moder/cars/params', [
+                            'action' => 'car',
+                            'car_id' => $car->id
+                        ]);
                     }
                 }
             } elseif ($itemType->id == 3) {
                 $engine = $engines->find($row->item_id)->current();
                 if ($engine) {
                     $objectName = $engine->caption;
-                    $editorUrl = $this->_helper->url->url([
-                        'module'     => 'default',
-                        'controller' => 'cars',
-                        'action'     => 'engine-spec-editor',
-                        'engine_id'  => $engine->id
-                    ], 'default', true);
+                    $editorUrl = $this->url()->fromRoute('cars/params', [
+                        'action'    => 'engine-spec-editor',
+                        'engine_id' => $engine->id
+                    ]);
 
                     if ($isModerator) {
-                        $moderUrl = $this->_helper->url->url([
-                            'module'     => 'moder',
-                            'controller' => 'engines',
-                            'action'     => 'engine',
-                            'engine_id'  => $engine->id
-                        ], 'default', true);
+                        $moderUrl = $this->url()->fromRoute('moder/engines/params', [
+                            'action'    => 'engine',
+                            'engine_id' => $engine->id
+                        ]);
                     }
                 }
             }
@@ -569,30 +612,34 @@ class CarsController extends Zend_Controller_Action
             ];
         }
 
-        $this->view->assign([
+        return [
             'paginator'   => $paginator,
-            'filter'      => $filter,
+            'filter'      => $this->filterForm,
             'items'       => $items,
             'isModerator' => $isModerator
-        ]);
+        ];
     }
 
     private function userUrl(Users_Row $user)
     {
-        return $this->view->serverUrl($user->getAboutUrl());
+        return $this->url()->fromRoute('users/user', [
+            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+        ], [
+            'force_canonical' => true
+        ]);
     }
 
     public function cancelCarEngineAction()
     {
-        if (!$this->_helper->user()->isAllowed('specifications', 'edit-engine')) {
+        if (!$this->user()->isAllowed('specifications', 'edit-engine')) {
             return $this->forward('forbidden', 'error');
         }
 
         $carTable = new Cars();
 
-        $car = $carTable->find($this->getParam('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         $engine = $car->findParentEngines();
@@ -609,11 +656,11 @@ class CarsController extends Zend_Controller_Action
 
             $message = sprintf(
                 'У автомобиля %s убран двигатель (был %s)',
-                $this->view->htmlA($this->editorUrl($car), $car->getFullName()), $this->view->escape($engine->getMETACaption())
+                htmlspecialchars($car->getFullName()), htmlspecialchars($engine->getMETACaption())
             );
-            $this->_helper->log($message, $car);
+            $this->log($message, $car);
 
-            $user = $this->_helper->user()->get();
+            $user = $this->user()->get();
             $ucsTable = new User_Car_Subscribe();
 
             $mModel = new Message();
@@ -629,20 +676,20 @@ class CarsController extends Zend_Controller_Action
             }
         }
 
-        return $this->redirect($this->editorUrl($car, 'engine'));
+        return $this->redirect()->toUrl($this->editorUrl($car, 'engine'));
     }
 
     public function inheritCarEngineAction()
     {
-        if (!$this->_helper->user()->isAllowed('specifications', 'edit-engine')) {
+        if (!$this->user()->isAllowed('specifications', 'edit-engine')) {
             return $this->forward('forbidden', 'error');
         }
 
         $carTable = new Cars();
 
-        $car = $carTable->find($this->getParam('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         if (!$car->engine_inherit) {
@@ -657,11 +704,11 @@ class CarsController extends Zend_Controller_Action
 
             $message = sprintf(
                 'У автомобиля %s установлено наследование двигателя',
-                $this->view->htmlA($this->editorUrl($car), $car->getFullName())
+                htmlspecialchars($car->getFullName())
             );
-            $this->_helper->log($message, $car);
+            $this->log($message, $car);
 
-            $user = $this->_helper->user()->get();
+            $user = $this->user()->get();
             $ucsTable = new User_Car_Subscribe();
 
             $mModel = new Message();
@@ -677,7 +724,7 @@ class CarsController extends Zend_Controller_Action
             }
         }
 
-        return $this->redirect($this->editorUrl($car, 'engine'));
+        return $this->redirect()->toUrl($this->editorUrl($car, 'engine'));
     }
 
     private function enginesWalkTree($parentId, $brandId)
@@ -710,33 +757,26 @@ class CarsController extends Zend_Controller_Action
 
     public function selectCarEngineAction()
     {
-        if (!$this->_helper->user()->isAllowed('specifications', 'edit-engine')) {
+        if (!$this->user()->isAllowed('specifications', 'edit-engine')) {
             return $this->forward('forbidden', 'error');
         }
 
-        if (!$this->_helper->user()->isAllowed('specifications', 'edit')) {
+        if (!$this->user()->isAllowed('specifications', 'edit')) {
             return $this->forward('index', 'login', 'default');
         }
 
         $carTable = new Cars();
 
-        $car = $carTable->find($this->getParam('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
-        $this->view->assign([
-            'car'     => $car,
-            'brand'   => false,
-            'brands'  => [],
-            'engines' => []
-        ]);
-
-        $language = $this->_helper->language();
+        $language = $this->language();
 
         $brandModel = new Brand();
 
-        $brand = $brandModel->getBrandByCatname($this->getParam('brand'), $language);
+        $brand = $brandModel->getBrandByCatname($this->params()->fromPost('brand'), $language);
 
         if (!$brand) {
 
@@ -746,24 +786,25 @@ class CarsController extends Zend_Controller_Action
                     ->group('brands.id');
             });
 
-            $this->view->assign([
-                'brands' => $brands
-            ]);
-
-            return;
+            return [
+                'car'     => $car,
+                'brand'   => false,
+                'brands'  => $brands,
+                'engines' => []
+            ];
         }
 
         $engineTable = $this->getEngineTable();
 
-        $engine = $engineTable->find($this->getParam('engine'))->current();
+        $engine = $engineTable->find($this->params()->fromPost('engine'))->current();
         if (!$engine) {
 
-            $this->view->assign([
+            return [
+                'car'     => $car,
                 'brand'   => $brand,
+                'brands'  => [],
                 'engines' => $this->enginesWalkTree(null, $brand['id'])
-            ]);
-
-            return;
+            ];
         }
 
         $car->engine_inherit = 0;
@@ -775,14 +816,14 @@ class CarsController extends Zend_Controller_Action
         $service = new Application_Service_Specifications();
         $service->updateActualValues(1, $car->id);
 
-        $user = $this->_helper->user()->get();
+        $user = $this->user()->get();
         $ucsTable = new User_Car_Subscribe();
 
         $message = sprintf(
             'Автомобилю %s назначен двигатель %s',
-            $this->view->htmlA($this->editorUrl($car), $car->getFullName()), $this->view->escape($engine->caption)
+            htmlspecialchars($car->getFullName()), htmlspecialchars($engine->caption)
         );
-        $this->_helper->log($message, $car);
+        $this->log($message, $car);
 
         $mModel = new Message();
 
@@ -796,20 +837,20 @@ class CarsController extends Zend_Controller_Action
             }
         }
 
-        return $this->redirect($this->editorUrl($car, 'engine'));
+        return $this->redirect()->toUrl($this->editorUrl($car, 'engine'));
     }
 
     public function refreshInheritanceAction()
     {
-        if (!$this->_helper->user()->isAllowed('specifications', 'admin')) {
+        if (!$this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
         }
 
         $carTable = new Cars();
 
-        $car = $carTable->find($this->getParam('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
         $carTable->updateInteritance($car);
@@ -818,32 +859,34 @@ class CarsController extends Zend_Controller_Action
 
         $service->updateActualValues(1, $car->id);
 
-        return $this->redirect($this->editorUrl($car, 'admin'));
+        return $this->redirect()->toUrl($this->editorUrl($car, 'admin'));
     }
 
     public function editValueAction()
     {
-        if (!$this->_helper->user()->isAllowed('specifications', 'edit')) {
+        if (!$this->user()->isAllowed('specifications', 'edit')) {
             return $this->forward('forbidden', 'error');
         }
 
-        $attrId = (int)$this->getParam('attr');
-        $itemTypeId = (int)$this->getParam('item_type');
-        $itemId = (int)$this->getParam('item');
+        $attrId = (int)$this->params('attr');
+        $itemTypeId = (int)$this->params('item_type');
+        $itemId = (int)$this->params('item');
 
-        $language = $this->_helper->language();
+        $language = $this->language();
 
         $service = new Application_Service_Specifications();
         $form = $service->getEditValueForm($attrId, $itemTypeId, $itemId, $language);
         if (!$form) {
-            return $this->forward('notfound', 'error');
+            return $this->notFoundAction();
         }
 
-        $form->setAction($this->_helper->url->url());
+        $form->setAction($this->url()->fromRoute(null, [], [], true));
 
-        $this->view->assign([
+        $viewModel = new ViewModel([
             'form' => $form
         ]);
+
+        return $viewModel->setTerminal(true);
     }
 
     public function lowWeightAction()
@@ -853,25 +896,33 @@ class CarsController extends Zend_Controller_Action
 
     public function datelessAction()
     {
+        if (!$this->user()->isAllowed('specifications', 'edit')) {
+            return $this->forbiddenAction();
+        }
+
         $listCars = [];
 
-        $carTable = $this->_helper->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
         $select = $carTable->select(true)
             ->where('cars.begin_year is null and cars.begin_model_year is null')
-            ->order($this->_helper->catalogue()->carsOrdering());
+            ->order($this->catalogue()->carsOrdering());
 
-        $paginator = Zend_Paginator::factory($select)
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+
+        $paginator
             ->setItemCountPerPage(20)
-            ->setCurrentPageNumber($this->getParam('page'));
+            ->setCurrentPageNumber($this->params('page'));
 
         foreach ($paginator->getCurrentItems() as $row) {
             $listCars[] = $row;
         }
 
-        $this->view->assign([
+        return [
             'paginator'     => $paginator,
-            'childListData' => $this->_helper->car->listData($listCars),
-        ]);
+            'childListData' => $this->car()->listData($listCars),
+        ];
     }
 }

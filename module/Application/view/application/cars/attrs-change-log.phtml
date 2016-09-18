@@ -1,15 +1,16 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
-            'needLeft'  => false,
             'needRight' => false
-        ),
+        ],
         'pageId' => 103,
-    ));
+    ]);
 ?>
 <div class="well">
-    <?=$this->filter->render($this) ?>
+    <?=$this->partial('application/forms/bootstrap-horizontal', [
+        'form' => $this->filter
+    ])?>
     <table class="specs-log">
         <thead>
             <tr>
@@ -23,28 +24,28 @@
         </thead>
         <?php foreach ($this->items as $idx => $item) { ?>
             <tr class="<?=$idx%2 ? 'odd' : 'even'?>">
-                <td><?=$this->escape($this->humanTime($item['date'])) ?></td>
+                <td><?=$this->escapeHtml($this->humanTime($item['date'])) ?></td>
                 <td><?=$this->user($item['user']) ?></td>
                 <td>
                     <?php if ($item['itemType']) { ?>
-                        <?=$this->escape($item['itemType']['name']) ?>
+                        <?=$this->escapeHtml($item['itemType']['name']) ?>
                     <?php } ?>
                     <?php if ($this->isModerator) { ?>
                         <?=$this->htmlA($item['object']['moderUrl'], $item['object']['name']) ?>
                     <?php } else { ?>
-                        <?=$this->escape($item['object']['name']) ?>
+                        <?=$this->escapeHtml($item['object']['name']) ?>
                     <?php } ?>
                 </td>
                 <td class="attribute">
                     <?php foreach ($item['path'] as $j => $node) { ?>
                         <?php if ($j) { ?> / <?php } ?>
-                        <span><?=$this->escape($node)?></span>
+                        <span><?=$this->escapeHtml($node)?></span>
                     <?php } ?>
                 </td>
                 <td style="text-align:center">
-                    <?=$this->escape($item['value'])?>
+                    <?=$this->escapeHtml($item['value'])?>
                     <?php if ($item['unit']) { ?>
-                        <span class="unit"><?=$this->escape($item['unit']->abbr) ?></span>
+                        <span class="unit"><?=$this->escapeHtml($item['unit']->abbr) ?></span>
                     <?php } ?>
                 </td>
                 <td class="link">

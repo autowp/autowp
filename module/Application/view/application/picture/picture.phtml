@@ -145,7 +145,7 @@
                         }
 
                         if ($this->user()->isAllowed('specifications', 'edit')) {
-                            $list[] = $this->htmlA($this->url('cars', [
+                            $list[] = $this->htmlA($this->url('cars/params', [
                                 'action' => 'car-specifications-editor',
                                 'car_id' => $car->id
                             ]), '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')), false);

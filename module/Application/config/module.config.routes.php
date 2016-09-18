@@ -485,7 +485,7 @@ return [
                         'controller'  => Controller\PerspectiveController::class,
                         'action'      => 'index',
                         'perspective' => 9,
-                        'page'        => 109
+                        'page_id'     => 109
                     ],
                 ]
             ],
@@ -497,7 +497,7 @@ return [
                         'controller'  => Controller\PerspectiveController::class,
                         'action'      => 'index',
                         'perspective' => 23,
-                        'page'        => 201
+                        'page_id'     => 201
                     ],
                 ]
             ],

@@ -31,7 +31,7 @@ class Project_Application_Resource_Acl
                 throw new Exception('Cache not initialized');
             }
 
-            $this->_acl = $this->_cache->load(__CLASS__);
+            $this->_acl = $this->_cache->load(__CLASS__ . '_2');
             if (!$this->_acl instanceof Project_Acl) {
                 $this->_acl = new Project_Acl();
                 $this->_cache->save($this->_acl, null, array(), $this->_cacheLifetime);
