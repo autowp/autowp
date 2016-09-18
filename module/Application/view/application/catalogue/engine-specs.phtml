@@ -33,4 +33,6 @@
         'active' => false
     ]
 ]) ?>
-<?=$this->specs->render($this)?>
+<?=$this->partial('application/specs', [
+    'table' => $this->specs,
+])?>

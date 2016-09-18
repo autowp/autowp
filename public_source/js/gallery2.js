@@ -1,8 +1,6 @@
 define(
-    'gallery2',
     ['jquery'],
     function($) {
-        
         
         var Carousel = function (element, options) {
             this.$element    = $(element)

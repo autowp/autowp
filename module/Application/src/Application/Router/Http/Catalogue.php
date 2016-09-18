@@ -11,6 +11,8 @@ use Brands;
 use Car_Parent;
 use Car_Types;
 
+use Exception;
+
 class Catalogue implements RouteInterface
 {
     const DELIMETER = '/';
@@ -881,6 +883,10 @@ class Catalogue implements RouteInterface
                     $sValue = urlencode($sValue);
                 }
             }
+        }
+
+        if (!isset($data['brand_catname'])) {
+            throw new Exception('`brand_catname` expected');
         }
 
         $url = [$data['brand_catname']];

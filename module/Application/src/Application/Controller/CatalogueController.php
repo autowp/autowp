@@ -15,7 +15,6 @@ use Application\Service\Mosts;
 use Exception;
 
 use Application_Service_Specifications;
-use Brand;
 use Brands_Cars;
 use Car_Language;
 use Car_Parent;
@@ -40,9 +39,12 @@ class CatalogueController extends AbstractActionController
 
     private $textStorage;
 
-    public function __construct($textStorage)
+    private $cache;
+
+    public function __construct($textStorage, $cache)
     {
         $this->textStorage = $textStorage;
+        $this->cache = $cache;
     }
 
     private function _brandAction(Callable $callback)
@@ -561,12 +563,10 @@ class CatalogueController extends AbstractActionController
 
             $language = $this->language();
 
-            $cache = $this->getInvokeArg('bootstrap')
-                ->getResource('cachemanager')->getCache('long');
-
             $pictures = $this->catalogue()->getPictureTable();
-            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_5_' . $language;
-            if (!($topPictures = $cache->load($key))) {
+            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_6_' . $language;
+            $topPictures = $this->cache->getItem($key, $success);
+            if (!$success) {
 
                 $select = $this->selectOrderFromPictures()
                     ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
@@ -607,7 +607,7 @@ class CatalogueController extends AbstractActionController
                     }
                 ]);
 
-                $cache->save($topPictures, $key, [], 60 * 10);
+                $this->cache->setItem($key, $topPictures);
             }
 
             $types = [
@@ -677,7 +677,7 @@ class CatalogueController extends AbstractActionController
 
     private function typePictures($type)
     {
-        $this->_brandAction(function($brand) use ($type) {
+        return $this->_brandAction(function($brand) use ($type) {
 
             $select = $this->typePicturesSelect($brand['id'], $type);
 
@@ -733,7 +733,7 @@ class CatalogueController extends AbstractActionController
 
             $select = $this->typePicturesSelect($brand['id'], $type, false);
 
-            $this->_pictureAction($select, function($select, $picture) use ($brand, $type) {
+            return $this->_pictureAction($select, function($select, $picture) use ($brand, $type) {
 
                 $this->sidebar()->brand([
                     'brand_id' => $brand['id'],
@@ -791,8 +791,9 @@ class CatalogueController extends AbstractActionController
             }
 
             return new JsonModel($this->pic()->gallery2($select, [
-                'page'      => $this->params('page'),
-                'pictureId' => $this->params('pictureId'),
+                'page'      => $this->params()->fromQuery('page'),
+                'pictureId' => $this->params()->fromQuery('pictureId'),
+                'reuseParams' => true,
                 'urlParams' => [
                     'action' => str_replace('-gallery', '-picture', $this->params('action'))
                 ]
@@ -1202,8 +1203,9 @@ class CatalogueController extends AbstractActionController
             }
 
             return new JsonModel($this->pic()->gallery2($select, [
-                'page'      => $this->params('page'),
-                'pictureId' => $this->params('pictureId'),
+                'page'      => $this->params()->fromQuery('page'),
+                'pictureId' => $this->params()->fromQuery('pictureId'),
+                'reuseParams' => true,
                 'urlParams' => [
                     'action' => 'engine-picture'
                 ]
@@ -1216,7 +1218,7 @@ class CatalogueController extends AbstractActionController
         return $this->_engineAction(function($brand, $engineRow, $path) {
             $select = $this->enginePicturesSelect($engineRow, false);
 
-            $this->_pictureAction($select, function($select, $picture) use ($brand, $engineRow) {
+            return $this->_pictureAction($select, function($select, $picture) use ($brand, $engineRow) {
 
                 $this->sidebar()->brand([
                     'brand_id'   => $brand['id'],
@@ -1986,7 +1988,7 @@ class CatalogueController extends AbstractActionController
 
         $mTable = new ModificationTable();
         $pictureTable = $this->catalogue()->getPictureTable();
-        $imageStorage = $this->getInvokeArg('bootstrap')->getResource('imagestorage');
+        $imageStorage = $this->imageStorage();
 
         $language = $this->language();
 
@@ -2156,7 +2158,7 @@ class CatalogueController extends AbstractActionController
             );
             $pPaginator->setItemCountPerPage(4);
 
-            $imageStorage = $this->getInvokeArg('bootstrap')->getResource('imagestorage');
+            $imageStorage = $this->imageStorage();
             $language = $this->language();
 
             $currentPictures = [];
@@ -2260,7 +2262,7 @@ class CatalogueController extends AbstractActionController
                 'path'          => $path,
                 'exact'         => true,
                 'page'          => null
-            ] [], true),
+            ], [], true),
             'childListData' => $this->car()->listData($listCars, [
                 'disableDescription' => false,
                 'type'       => $type == Car_Parent::TYPE_DEFAULT ? $type : null,
@@ -2648,8 +2650,9 @@ class CatalogueController extends AbstractActionController
             }
 
             return new JsonModel($this->pic()->gallery2($select, [
-                'page'      => $this->params('page'),
-                'pictureId' => $this->params('pictureId'),
+                'page'      => $this->params()->fromQuery('page'),
+                'pictureId' => $this->params()->fromQuery('pictureId'),
+                'reuseParams' => true,
                 'urlParams' => [
                     'action' => 'brand-car-picture'
                 ]

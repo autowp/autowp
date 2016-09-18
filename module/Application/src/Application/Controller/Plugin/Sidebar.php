@@ -26,7 +26,7 @@ class Sidebar extends AbstractPlugin
 
     private $translator;
 
-    public function __construct(StorageInterface $cache)
+    public function __construct(StorageInterface $cache, $translator)
     {
         $this->cache = $cache;
         $this->translator = $translator;

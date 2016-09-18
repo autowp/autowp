@@ -1308,10 +1308,11 @@ class Pic extends AbstractPlugin
                         $name = htmlspecialchars($name);
                     }
 
+                    $reuseParams = isset($options['reuseParams']) && $options['reuseParams'];
                     $url = $controller->url()->fromRoute($route, array_replace($options['urlParams'], [
                         'picture_id' => $row['identity'] ? $row['identity'] : $id,
                         'gallery'    => null,
-                    ]));
+                    ]), [], $reuseParams);
 
                     $gallery[] = [
                         'id'          => $id,

@@ -3,14 +3,14 @@
         <li<?=$this->tree['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url('catalogue', [
                 'action' => 'engines',
-            ], [], true), '<i class="fa fa-list"></i> ' . $this->escape($this->title) . ' <span class="badge">'.$this->tree['count'].'</span>', false) ?>
+            ], [], true), '<i class="fa fa-list"></i> ' . $this->escapeHtml($this->title) . ' <span class="badge">'.$this->tree['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->specs['count'] > 0) { ?>
         <li<?=$this->specs['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url('catalogue', [
                 'action' => 'engine-specs',
-            ], [], true), '<i class="fa fa-list-alt"></i> ' . $this->escape($this->translate('carlist/specifications')) . ' <span class="badge">'.$this->specs['count'].'</span>', false) ?>
+            ], [], true), '<i class="fa fa-list-alt"></i> ' . $this->escapeHtml($this->translate('carlist/specifications')) . ' <span class="badge">'.$this->specs['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->cars['count'] > 0) { ?>

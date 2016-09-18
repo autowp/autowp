@@ -18,7 +18,7 @@ class Telegram
 
     private $token;
 
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
         $this->webhook = isset($options['webhook']) ? $options['webhook'] : null;
@@ -48,10 +48,10 @@ class Telegram
 
     public function registerWebhook()
     {
-        $message = $this->getApi()->setWebhook(array(
+        $message = $this->getApi()->setWebhook([
             'url'         => $this->webhook,
             'certificate' => ''
-        ));
+        ]);
     }
 
     public function getWebhookUpdates()
@@ -106,9 +106,9 @@ class Telegram
         if (count($brandIds)) {
             $telegramBrandTable = new Telegram_Brand();
 
-            $filter = array(
+            $filter = [
                 'brand_id in (?)' => $brandIds
-            );
+            ];
 
             $authorChatId = $db->fetchOne(
                 $db->select()

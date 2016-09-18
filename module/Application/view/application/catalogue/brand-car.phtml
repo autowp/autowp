@@ -2,7 +2,6 @@
     $this->pageEnv([
         'layout' => [
             'blankPage' => false,
-            'needLeft'  => true,
             'needRight' => false
         ],
         'pageId' => 33,
@@ -29,11 +28,14 @@
         <small class="produced">
             <?php if ($this->car['produced'] > 1) { ?>
                 <?=$this->escapeHtml(
-                    $this->translate([
-                        $this->car['produced_exactly'] ? 'carlist/produced/%1$s' : 'carlist/produced-about/%1$s',
-                        null,
+                    sprintf(
+                        $this->translatePlural(
+                            $this->car['produced_exactly'] ? 'carlist/produced/%1$s' : 'carlist/produced-about/%1$s',
+                            $this->car['produced_exactly'] ? 'carlist/produced/%1$s' : 'carlist/produced-about/%1$s',
+                            $this->car['produced']
+                        ),
                         $this->car['produced']
-                    ], $this->car['produced'])
+                    )
                 )?>
             <?php } else {?>
                 <?=$this->escapeHtml($this->translate('carlist/produced/one'))?>

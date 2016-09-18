@@ -23,7 +23,9 @@
         'disabled' => true
     ];
 ?>
-<?=$this->specs->render($this)?>
+<?=$this->partial('application/specs', [
+    'table' => $this->specs,
+])?>
 <?php if (count($this->contributors)) { ?>
     <p>
         Составители:

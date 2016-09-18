@@ -51,7 +51,8 @@ return [
             },
             Controller\CatalogueController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
-                return new Controller\CatalogueController($textStorage);
+                $cache = $sm->get('longCache');
+                return new Controller\CatalogueController($textStorage, $cache);
             },
             Controller\CategoryController::class => function($sm) {
                 $cache = $sm->get('longCache');
