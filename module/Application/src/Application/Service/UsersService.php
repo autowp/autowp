@@ -13,9 +13,9 @@ use User_Remember;
 use Users;
 use Users_Row;
 
+use DateTime;
 use Exception;
 
-use Zend_Date;
 use Zend_Db_Expr;
 
 class UsersService
@@ -319,9 +319,10 @@ class UsersService
         );
 
         $age = 0;
-        $regDate = $userRow->getDate('reg_date');
+        $regDate = $userRow->getDateTime('reg_date');
         if ($regDate) {
-            $diff = Zend_Date::now()->sub($regDate)->toValue();
+            $now = new DateTime();
+            $diff = $now->getTimestamp() - $regDate->getTimestamp();
             $age = ((($diff / 60) / 60) / 24) / 365;
         }
 

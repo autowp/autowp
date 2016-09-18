@@ -31,13 +31,15 @@ class Users_Row extends Project_Db_Table_Row
 
     public function getMessagingInterval()
     {
-        $date = $this->getDate('reg_date');
+        $date = $this->getDateTime('reg_date');
         $defaultInterval = 300;
 
-        if (!$date)
+        if (!$date) {
             return $defaultInterval;
+        }
 
-        if (Zend_Date::now()->subDay(10)->isLater($date)) {
+        $tenDaysBefore = (new DateTime())->sub(new DateInterval('P10D'));
+        if ($tenDaysBefore > $date) {
             return $this->messaging_interval;
         } else {
             return max($this->messaging_interval, $defaultInterval);

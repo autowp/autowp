@@ -391,7 +391,7 @@ class CarsController extends AbstractActionController
                 'user'      => $user,
                 'value'     => $specService->getActualValueText($attribute->id, $itemType->id, $row->item_id),
                 'userValue' => $specService->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id),
-                'date'      => $row->getDate('update_date'),
+                'date'      => $row->getDateTime('update_date'),
                 'deleteUrl' => $this->url()->fromRoute('cars/params', [
                     'action'       => 'delete-value',
                     'attribute_id' => $row->attribute_id,

@@ -971,7 +971,7 @@ class Pic extends AbstractPlugin
             'name'              => $name,
             'picture'           => $picture,
             'owner'             => $picture->findParentUsersByOwner(),
-            'addDate'           => $picture->getDate('add_date'),
+            'addDate'           => $picture->getDateTime('add_date'),
             'ofLinks'           => $ofLinks,
             'moderVotes'        => $moderVotes,
             'sourceUrl'         => $sourceUrl,

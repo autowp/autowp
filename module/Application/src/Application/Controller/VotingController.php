@@ -5,7 +5,8 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Zend_Date;
+use DateTime;
+
 use Zend_Db_Expr;
 
 use Voting;
@@ -19,8 +20,10 @@ class VotingController extends AbstractActionController
     {
         $canVote = false;
 
-        if ($voting->getDate('begin_date')->isEarlier(Zend_Date::now())) {
-            if ($voting->getDate('end_date')->isLater(Zend_Date::now())) {
+        $now = new DateTime();
+
+        if ($voting->getDateTime('begin_date') < $now) {
+            if ($voting->getDateTime('end_date') > $now) {
 
                 $user = $this->user()->get();
                 if ($user) {

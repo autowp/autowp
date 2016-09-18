@@ -40,12 +40,12 @@
                 <td><?=$this->escapeHtml($user->role)?></td>
                 <td><?=$this->user($user)?></td>
                 <td>
-                    <?php if ($date = $user->getDate('last_online')) { ?>
+                    <?php if ($date = $user->getDateTime('last_online')) { ?>
                         <?=$this->humanTime($date)?>
                     <?php } ?>
                 </td>
                 <td>
-                    <?php if ($date = $user->getDate('reg_date')) { ?>
+                    <?php if ($date = $user->getDateTime('reg_date')) { ?>
                         <?=$this->humanTime($date)?>
                     <?php } ?>
                 </td>

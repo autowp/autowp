@@ -61,7 +61,7 @@ class ArticlesController extends AbstractActionController
                 'name'        => $row->name,
                 'description' => $row->description,
                 'author'      => $row->findParentUsers(),
-                'date'        => $row->getDate('first_enabled_datetime'),
+                'date'        => $row->getDateTime('first_enabled_datetime'),
                 'url'         => $this->url()->fromRoute('articles', [
                     'action'          => 'article',
                     'article_catname' => $row->catname

@@ -443,7 +443,7 @@ class Application_Service_Specifications
                 'item_type_id = ?'    => $itemTypeId,
             ]);
             foreach ($valueDescRows as $valueDescRow) {
-                $dates[$valueDescRow->attribute_id][$valueDescRow->user_id] = $valueDescRow->getDate('update_date');
+                $dates[$valueDescRow->attribute_id][$valueDescRow->user_id] = $valueDescRow->getDateTime('update_date');
             }
         }
 
@@ -536,7 +536,7 @@ class Application_Service_Specifications
                 'item_type_id = ?'    => $itemTypeId,
             ]);
             foreach ($valueDescRows as $valueDescRow) {
-                $dates[$valueDescRow->attribute_id][$valueDescRow->user_id] = $valueDescRow->getDate('update_date');
+                $dates[$valueDescRow->attribute_id][$valueDescRow->user_id] = $valueDescRow->getDateTime('update_date');
             }
         }
 

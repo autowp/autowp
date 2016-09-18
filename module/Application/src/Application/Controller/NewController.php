@@ -22,7 +22,6 @@ class NewController extends AbstractActionController
             'select'       => $pictureTable->select(true)
                 ->where('pictures.status = ?', Picture::STATUS_ACCEPTED),
             'orderColumn'  => 'accept_datetime',
-            //'minDate'      => Zend_Date::now()->subMonth(1),
             'currentDate'  => $this->params('date'),
         ]);
 

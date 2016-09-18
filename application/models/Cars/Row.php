@@ -60,7 +60,7 @@ class Cars_Row extends Project_Db_Table_Row
 
     public static function buildFullName(array $options)
     {
-        $defaults = array(
+        $defaults = [
             'begin_model_year' => null,
             'end_model_year'   => null,
             'spec'             => null,
@@ -69,7 +69,7 @@ class Cars_Row extends Project_Db_Table_Row
             'begin_year'       => null,
             'end_year'         => null,
             'today'            => null
-        );
+        ];
         $options = array_replace($defaults, $options);
 
         $result = $options['name'];
@@ -104,11 +104,11 @@ class Cars_Row extends Project_Db_Table_Row
             $result .= ' ('.$options['body'].')';
         }
 
-        $years = self::buildYearsString(array(
+        $years = self::buildYearsString([
             'begin_year' => $options['begin_year'],
             'end_year'   => $options['end_year'],
             'today'      => $options['today']
-        ));
+        ]);
         if ($years) {
             $result .= " '".$years;
         }
@@ -119,10 +119,10 @@ class Cars_Row extends Project_Db_Table_Row
     public function getNameData($language = 'en')
     {
         $carLangTable = new Car_Language();
-        $carLangRow = $carLangTable->fetchRow(array(
+        $carLangRow = $carLangTable->fetchRow([
             'car_id = ?'   => $this->id,
             'language = ?' => (string)$language
-        ));
+        ]);
 
         $name = $carLangRow ? $carLangRow->name : $this->caption;
 
@@ -136,7 +136,7 @@ class Cars_Row extends Project_Db_Table_Row
             }
         }
 
-        return array(
+        return [
             'begin_model_year' => $this->begin_model_year,
             'end_model_year'   => $this->end_model_year,
             'spec'             => $spec,
@@ -146,7 +146,7 @@ class Cars_Row extends Project_Db_Table_Row
             'begin_year'       => $this->begin_year,
             'end_year'         => $this->end_year,
             'today'            => $this->today
-        );
+        ];
     }
 
     public function getFullName($language = 'en')
@@ -156,11 +156,11 @@ class Cars_Row extends Project_Db_Table_Row
 
     public function getYearsString()
     {
-        return self::buildYearsString(array(
+        return self::buildYearsString([
             'begin_year' => $this->begin_year,
             'end_year'   => $this->end_year,
             'today'      => $this->today
-        ));
+        ]);
     }
 
     /**
@@ -247,7 +247,7 @@ class Cars_Row extends Project_Db_Table_Row
     public function getOrientedPictureList(array $perspectiveGroupIds, &$interiors = 0)
     {
         $pictureTable = new Picture();
-        $pictures = array();
+        $pictures = [];
         $db = $this->getTable()->getAdapter();
 
         foreach ($perspectiveGroupIds as $groupId) {
@@ -255,16 +255,16 @@ class Cars_Row extends Project_Db_Table_Row
                 $pictureTable->select(true)
                     ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                    ->join(array('mp' => 'perspectives_groups_perspectives'), 'pictures.perspective_id=mp.perspective_id', null)
+                    ->join(['mp' => 'perspectives_groups_perspectives'], 'pictures.perspective_id=mp.perspective_id', null)
                     ->where('mp.group_id=?', $groupId)
                     ->where('car_parent_cache.parent_id = ?', $this->id)
                     ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
-                    ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
-                    ->order(array(
+                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                    ->order([
                         'mp.position',
                         new Zend_Db_expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
                         'pictures.width DESC', 'pictures.height DESC'
-                    ))
+                    ])
                     ->limit(1)
             );
 
@@ -275,7 +275,7 @@ class Cars_Row extends Project_Db_Table_Row
             }
         }
 
-        $ids = array();
+        $ids = [];
         foreach ($pictures as $picture)
             if ($picture)
                 $ids[] = $picture->id;
@@ -289,7 +289,7 @@ class Cars_Row extends Project_Db_Table_Row
                     ->where('pictures.type=?', Picture::CAR_TYPE_ID)
                     ->where('car_parent_cache.parent_id = ?', $this->id)
                     ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
-                    ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->limit(1);
 
                 if (count($ids) > 0) {
@@ -316,7 +316,7 @@ class Cars_Row extends Project_Db_Table_Row
 
         $sql = 'SELECT COUNT(pictures.id) '.
                'FROM pictures WHERE pictures.car_id=? AND pictures.type=?';
-        $this->pictures_count = (int)$db->fetchOne($sql, array($this->id, Picture::CAR_TYPE_ID));
+        $this->pictures_count = (int)$db->fetchOne($sql, [$this->id, Picture::CAR_TYPE_ID]);
         $this->save();
 
         foreach ($this->findBrandsViaBrands_Cars() as $brand)
@@ -329,7 +329,7 @@ class Cars_Row extends Project_Db_Table_Row
     {
         $db = $this->getTable()->getAdapter();
         $sql = 'DELETE FROM brands_cars WHERE (brand_id=?) AND (car_id=?) LIMIT 1';
-        $db->query($sql, array($brand->id, $this->id));
+        $db->query($sql, [$brand->id, $this->id]);
 
         $brand->updatePicturesCache();
         $brand->refreshPicturesCount();
@@ -362,7 +362,7 @@ class Cars_Row extends Project_Db_Table_Row
 
     public function getEquipesIds()
     {
-        $result = array();
+        $result = [];
         foreach ($this->findEquipes() as $equipe) {
             $result[] = $equipe->id;
         }
@@ -373,46 +373,51 @@ class Cars_Row extends Project_Db_Table_Row
     {
         $begin = null;
         if ($this->begin_year) {
-            $begin = new Zend_Date(array(
-                'year'  => $this->begin_year,
-                'month' => $this->begin_month ? $this->begin_month : 1,
-                'day'   => 1
-            ));
+            $begin = new DateTime();
+            $begin->setDate(
+                $this->begin_year,
+                $this->begin_month ? $this->begin_month : 1,
+                1
+            );
         } elseif ($this->begin_model_year) {
-            $begin = new Zend_Date(array( // approximation
-                'year'  => $this->begin_model_year-1,
-                'month' => 10,
-                'day'   => 1
-            ));
+            $begin = new DateTime();
+            $begin->setDate( // approximation
+                $this->begin_model_year-1,
+                10,
+                1
+            );
         } else {
-            $begin = new Zend_Date(array(
-                'year'  => 2100,
-                'month' => 1,
-                'day'   => 1
-            ));
+            $begin = new DateTime();
+            $begin->setDate(
+                2100,
+                1,
+                1
+            );
         }
 
         $end = null;
         if ($this->end_year) {
-            $end = new Zend_Date(array(
-                'year'  => $this->end_year,
-                'month' => $this->end_month ? $this->end_month : 12,
-                'day'   => 1
-            ));
+            $end = new DateTime();
+            $end->setDate(
+                $this->end_year,
+                $this->end_month ? $this->end_month : 12,
+                1
+            );
         } elseif ($this->end_model_year) {
-            $end = new Zend_Date(array( // approximation
-                'year'  => $this->end_model_year,
-                'month' => 9,
-                'day'   => 30
-            ));
+            $end = new DateTime();
+            $end->setDate( // approximation
+                $this->end_model_year,
+                9,
+                30
+            );
         } else {
             $end = $begin;
         }
 
-        $this->setFromArray(array(
-            'begin_order_cache' => $begin ? $begin->get(MYSQL_DATE) : null,
-              'end_order_cache' =>   $end ?   $end->get(MYSQL_DATE) : null,
-        ));
+        $this->setFromArray([
+            'begin_order_cache' => $begin ? $begin->format(MYSQL_DATETIME_FORMAT) : null,
+              'end_order_cache' =>   $end ?   $end->format(MYSQL_DATETIME_FORMAT) : null,
+        ]);
         $this->save();
     }
 }

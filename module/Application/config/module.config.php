@@ -143,7 +143,8 @@ return [
             Controller\UploadController::class => function($sm) {
                 $partial = $sm->get('ViewHelperManager')->get('partial');
                 $telegram = $sm->get(Service\TelegramService::class);
-                return new Controller\UploadController($partial, $telegram);
+                $translator = $sm->get('translator');
+                return new Controller\UploadController($partial, $telegram, $translator);
             },
             Controller\VotingController::class       => InvokableFactory::class,
             Controller\Api\ContactsController::class => InvokableFactory::class,

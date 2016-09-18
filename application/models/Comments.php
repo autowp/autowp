@@ -192,7 +192,7 @@ class Comments
                 'id'                  => $row->id,
                 'author'              => $author,
                 'message'             => $row->message,
-                'datetime'            => $row->getDate('datetime'),
+                'datetime'            => $row->getDateTime('datetime'),
                 'ip'                  => $row->ip ? inet_ntop($row->ip) : null,
                 'vote'                => $row->vote,
                 'moderator_attention' => $row->moderator_attention,

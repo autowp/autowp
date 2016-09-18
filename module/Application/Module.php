@@ -25,6 +25,9 @@ use Zend_Locale_Data;
 use Zend_Locale_Exception;
 use Zend_Registry;
 
+use DateInterval;
+use DateTime;
+
 class Module implements ConsoleUsageProviderInterface,
     ConsoleBannerProviderInterface, ConfigProviderInterface
 {
@@ -439,9 +442,9 @@ class Module implements ConsoleUsageProviderInterface,
 
                 if ($user) {
                     $changes = false;
-                    $nowExpiresDate = Zend_Date::now()->subMinute(1);
-                    $lastOnline = $user->getDate('last_online');
-                    if (!$lastOnline || ($lastOnline->isEarlier($nowExpiresDate))) {
+                    $nowExpiresDate = (new DateTime())->sub(new DateInterval('PT1S'));
+                    $lastOnline = $user->getDateTime('last_online');
+                    if (!$lastOnline || ($lastOnline < $nowExpiresDate)) {
                         $user->last_online = new Zend_Db_Expr('NOW()');
                         $changes = true;
                     }

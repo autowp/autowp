@@ -36,10 +36,13 @@ class UploadController extends AbstractActionController
      */
     private $telegram;
 
-    public function __construct($partial, TelegramService $telegram)
+    private $translator;
+
+    public function __construct($partial, TelegramService $telegram, $translator)
     {
         $this->partial = $partial;
         $this->telegram = $telegram;
+        $this->translator = $translator;
     }
 
     private function getCarParentTable()
@@ -782,7 +785,10 @@ class UploadController extends AbstractActionController
 
         $this->log(sprintf(
             'Выделение области на картинке %s',
-            htmlspecialchars($picture->getCaption())
+            htmlspecialchars($picture->getCaption([
+                'language'   => $this->language(),
+                'translator' => $this->translator
+            ]))
         ), [$picture]);
 
         $image = $this->imageStorage()->getFormatedImage($picture->getFormatRequest(), 'picture-thumb');
