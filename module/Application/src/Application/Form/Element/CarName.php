@@ -18,7 +18,7 @@ class CarName extends Text implements InputProviderInterface
     /**
      * @var null|string
      */
-    protected $label = 'Полное название авто';
+    protected $label = 'moder/vehicle/name';
 
     /**
      * Provide default input rules for this element

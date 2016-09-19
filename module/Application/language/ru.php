@@ -507,6 +507,9 @@ return [
     'car-type/2-floor-bus'    => '2-х этажный автобус',
     'car-type/town-car'       => 'Таун кар',
     'car-type/barchetta'      => 'Баркетта',
+    'car-type/moto'           => 'Мото',
+    'car-type/tractor'        => 'Трактор',
+    'car-type/tracked'        => 'Гусеничная платформа',
 
     'car-type-rp/roadster'       => 'Родстеров',
     'car-type-rp/spyder'         => 'Спайдеров',
@@ -548,6 +551,9 @@ return [
     'car-type-rp/2-floor-bus'    => '2-х этажных автобусов',
     'car-type-rp/town-car'       => 'Таун каров',
     'car-type-rp/barchetta'      => 'Баркетта',
+    'car-type-rp/moto'           => 'Мото',
+    'car-type-rp/tractor'        => 'Тракторов',
+    'car-type-rp/tracked'        => 'Гусеничных платформ',
 
     'page/1/name' => "Главная страница",
     'page/2/name' => "Главное меню",
@@ -1069,4 +1075,15 @@ return [
     'moder/picture/filter/special-name' => 'Только с особым названием',
     'moder/picture/filter/not-linked' => 'Без привязки',
     'moder/picture/filter/order' => 'Сортировать по',
+    
+    'moder/vehicle/name' => 'Название',
+    'moder/vehicle/body' => 'Номер кузова',
+    'moder/vehicle/spec' => 'Рынок',
+    'moder/vehicle/type' => 'Тип кузова',
+    'moder/vehicle/model-years' => 'Модельные года',
+    'moder/vehicle/begin' => 'Начало',
+    'moder/vehicle/end' => 'Окончание',
+    'moder/vehicle/produced' => 'Произведено',
+    'moder/vehicle/concept' => 'Концепт (прототип)',
+    'moder/vehicle/group' => 'Группа',
 ];

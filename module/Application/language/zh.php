@@ -479,6 +479,9 @@ return [
     'car-type/2-floor-bus'    => '双层客车',
     'car-type/town-car'       => 'Town car',
     'car-type/barchetta'      => 'Barchetta',
+    'car-type/moto'           => 'Moto',
+    'car-type/tractor'        => 'Tractor',
+    'car-type/tracked'        => 'Tracked platform',
 
     'car-type-rp/roadster'       => '跑车',
     'car-type-rp/spyder'         => '敞篷跑车',
@@ -520,6 +523,9 @@ return [
     'car-type-rp/2-floor-bus'    => '双层客车',
     'car-type-rp/town-car'       => 'Town car',
     'car-type-rp/barchetta'      => 'Barchetta',
+    'car-type-rp/moto'           => 'Moto',
+    'car-type-rp/tractor'        => 'Tractor',
+    'car-type-rp/tracked'        => 'Tracked platform',
 
     'page/1/name' => "主页",
     'page/2/name' => "Главное меню",
@@ -1041,4 +1047,15 @@ return [
     'moder/picture/filter/special-name' => 'Special name only',
     'moder/picture/filter/not-linked' => 'Not linked',
     'moder/picture/filter/order' => 'Order by',
+    
+    'moder/vehicle/name' => 'Name',
+    'moder/vehicle/body' => 'Body number',
+    'moder/vehicle/spec' => 'Spec',
+    'moder/vehicle/type' => 'Type',
+    'moder/vehicle/model-years' => 'Model years',
+    'moder/vehicle/begin' => 'Begin',
+    'moder/vehicle/end' => 'End',
+    'moder/vehicle/produced' => 'Produced',
+    'moder/vehicle/concept' => 'Concept (prototype)',
+    'moder/vehicle/group' => 'Group',
 ];

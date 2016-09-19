@@ -84,7 +84,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 'name'    => 'spec_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Spec',
+                    'label'   => 'moder/vehicle/spec',
                     'options' => $specOptions,
                 ],
                 'attributes' => [
@@ -95,7 +95,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 'name'    => 'car_type_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Тип кузова',
+                    'label'   => 'moder/vehicle/type',
                     'options' => $carTypeOptions
                 ],
                 'attributes' => [
@@ -106,14 +106,14 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 'name'    => 'model_year',
                 'type'    => \Application\Form\Fieldset\CarModelYears::class,
                 'options' => [
-                    'label' => 'Model years'
+                    'label' => 'moder/vehicle/model-years'
                 ]
             ],
             [
                 'name'    => 'begin',
                 'type'    => \Application\Form\Fieldset\CarBegin::class,
                 'options' => [
-                    'label'    => 'Begin',
+                    'label'    => 'moder/vehicle/begin',
                     'language' => $this->language
                 ]
             ],
@@ -121,7 +121,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 'name'    => 'end',
                 'type'    => \Application\Form\Fieldset\CarEnd::class,
                 'options' => [
-                    'label'    => 'End',
+                    'label'    => 'moder/vehicle/end',
                     'language' => $this->language
                 ]
             ],
@@ -129,14 +129,14 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 'name'    => 'produced',
                 'type'    => \Application\Form\Fieldset\CarProduced::class,
                 'options' => [
-                    'label' => 'Produced'
+                    'label' => 'moder/vehicle/produced'
                 ]
             ],
             [
                 'name'    => 'is_concept',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Концепт (прототип)',
+                    'label'   => 'moder/vehicle/concept',
                     'options' => $isConceptOptions
                 ],
                 'attributes' => [
@@ -147,7 +147,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 'name'    => 'is_group',
                 'type'    => 'Checkbox',
                 'options' => [
-                    'label' => 'Группа'
+                    'label' => 'moder/vehicle/group'
                 ],
                 'attributes' => [
                     'readonly' => true,

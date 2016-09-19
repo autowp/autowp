@@ -18,7 +18,7 @@ class CarBody extends Text implements InputProviderInterface
     /**
      * @var null|string
      */
-    protected $label = 'Номер кузова';
+    protected $label = 'moder/vehicle/body';
 
     /**
      * Provide default input rules for this element
