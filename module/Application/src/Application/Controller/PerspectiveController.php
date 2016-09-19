@@ -6,8 +6,6 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Zend_Paginator;
-
 use Picture;
 
 class PerspectiveController extends AbstractActionController

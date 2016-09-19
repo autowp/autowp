@@ -6,7 +6,6 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Zend_Db_Table_Select;
-use Zend_Paginator;
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
@@ -65,14 +64,9 @@ class DayPictures
     private $_minDate = null;
 
     /**
-     * @var Zend_Paginator
-     */
-    private $paginator = null;
-
-    /**
      * @var \Zend\Paginator\Paginator
      */
-    private $paginator2;
+    private $paginator;
 
     /**
      * @param array $options
@@ -399,7 +393,7 @@ class DayPictures
     }
 
     /**
-     * @return Zend_Paginator|false
+     * @return \Zend\Paginator\Paginator|false
      */
     public function getPaginator()
     {
@@ -411,31 +405,12 @@ class DayPictures
 
             $select = $this->getCurrentDateSelect();
 
-            $this->paginator = Zend_Paginator::factory($select);
-        }
-
-        return $this->paginator;
-    }
-
-    /**
-     * @return \Zend\Paginator|false
-     */
-    public function getPaginator2()
-    {
-        if (!$this->currentDate) {
-            return false;
-        }
-
-        if ($this->paginator2 === null) {
-
-            $select = $this->getCurrentDateSelect();
-
-            $this->paginator2 = new \Zend\Paginator\Paginator(
-                    new Zend1DbTableSelect($select)
+            $this->paginator = new \Zend\Paginator\Paginator(
+                new Zend1DbTableSelect($select)
             );
         }
 
-        return $this->paginator2;
+        return $this->paginator;
     }
 
     /**
@@ -449,9 +424,12 @@ class DayPictures
         $select = $this->selectClone()
             ->where($column . ' >= ?', $this->startOfDayDbValue($date))
             ->where($column . ' <= ?', $this->endOfDayDbValue($date));
+        
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
 
-        return Zend_Paginator::factory($select)
-            ->getTotalItemCount();
+        return $paginator->getTotalItemCount();
     }
 
     /**

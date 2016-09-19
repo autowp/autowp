@@ -52,7 +52,7 @@ class NewController extends AbstractActionController
         // for date formatting fix
         //$this->_setParam('date', $service->getCurrentDateStr());
 
-        $paginator = $service->getPaginator2()
+        $paginator = $service->getPaginator()
             ->setItemCountPerPage(self::PER_PAGE)
             ->setCurrentPageNumber($this->params('page'));
 

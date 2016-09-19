@@ -5,10 +5,11 @@ namespace Application\Controller\Console;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Paginator\Adapter\Zend1DbTableSelect;
+
 use Exception;
 
 use Zend_Db_Adapter_Abstract;
-use Zend_Paginator;
 use Zend_Session;
 
 use Cars;
@@ -97,9 +98,14 @@ class MaintenanceController extends AbstractActionController
         $console = Console::getInstance();
 
         $carTable = new Cars();
-
-        $paginator = Zend_Paginator::factory($carTable->select(true)->order('id'))
-            ->setItemCountPerPage(100);
+        
+        $select = $carTable->select(true)
+            ->order('id');
+        
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+        $paginator->setItemCountPerPage(100);
 
         $pagesCount = $paginator->count();
         for ($i=1; $i<=$pagesCount; $i++) {

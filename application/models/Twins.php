@@ -10,7 +10,7 @@ use Picture;
 use Cars;
 
 use Zend_Db_Expr;
-use Zend_Paginator;
+use Zend_Db_Select;
 
 class Twins
 {
@@ -80,10 +80,10 @@ class Twins
      */
     public function getBrands(array $options)
     {
-        $defaults = array(
+        $defaults = [
             'language' => 'en',
             'limit'    => null
-        );
+        ];
         $options = array_merge($defaults, $options);
 
         $language = $options['language'];
@@ -95,23 +95,23 @@ class Twins
         $langExpr = $db->quoteInto('brands.id = brand_language.brand_id and brand_language.language = ?', $language);
 
         $select = $db->select(true)
-            ->from('brands', array(
+            ->from('brands', [
                 'id',
                 'name'      => 'IFNULL(brand_language.name, brands.caption)',
                 'folder'    => 'folder',
                 'count'     => new Zend_Db_Expr('count(distinct tg.id)'),
                 'new_count' => new Zend_Db_Expr('count(distinct if(tg.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), tg.id, null))'),
-            ))
+            ])
             ->joinLeft('brand_language', $langExpr, null)
             ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
             ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
             ->join(
-                array('tgc' => 'twins_groups_cars'),
+                ['tgc' => 'twins_groups_cars'],
                 'car_parent_cache.car_id = tgc.car_id',
                 null
             )
             ->join(
-                array('tg' => 'twins_groups'),
+                ['tg' => 'twins_groups'],
                 'tgc.twins_group_id = tg.id',
                 null
             )
@@ -145,7 +145,7 @@ class Twins
         $select = $db->select()
             ->from($pictureTable->info('name'), null)
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-            ->join(array('tgc' => 'twins_groups_cars'), 'tgc.car_id = car_parent_cache.parent_id', null)
+            ->join(['tgc' => 'twins_groups_cars'], 'tgc.car_id = car_parent_cache.parent_id', null)
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
             ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW]);
 
@@ -154,7 +154,7 @@ class Twins
             if ($groupId) {
 
                 $select
-                    ->columns(array('tgc.twins_group_id', 'COUNT(1)'))
+                    ->columns(['tgc.twins_group_id', 'COUNT(1)'])
                     ->group('tgc.twins_group_id')
                     ->where('tgc.twins_group_id in (?)', $groupId);
 
@@ -162,7 +162,7 @@ class Twins
 
             } else {
 
-                $result = array();
+                $result = [];
             }
 
         } else {
@@ -189,7 +189,7 @@ class Twins
                 ->from($brandTable->info('name'), 'id')
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->join(array('tgc' => 'twins_groups_cars'), 'car_parent_cache.car_id = tgc.car_id', null)
+                ->join(['tgc' => 'twins_groups_cars'], 'car_parent_cache.car_id = tgc.car_id', null)
                 ->where('tgc.twins_group_id = ?', $groupId)
         );
     }
@@ -208,7 +208,7 @@ class Twins
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
                 ->join(
-                    array('tgc' => 'twins_groups_cars'),
+                    ['tgc' => 'twins_groups_cars'],
                     'car_parent_cache.car_id = tgc.car_id',
                     null
                 )
@@ -217,13 +217,13 @@ class Twins
 
     /**
      * @param array $options
-     * @return Zend_Paginator
+     * @return \Zend\Paginator\Paginator
      */
-    public function getGroupsPaginator2(array $options = array())
+    public function getGroupsPaginator(array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'brandId' => null
-        );
+        ];
         $options = array_merge($defaults, $options);
 
         $brandId = (int)$options['brandId'];
@@ -233,7 +233,7 @@ class Twins
 
         if ($options['brandId']) {
             $select
-                ->join(array('tgc' => 'twins_groups_cars'), 'twins_groups.id = tgc.twins_group_id', null)
+                ->join(['tgc' => 'twins_groups_cars'], 'twins_groups.id = tgc.twins_group_id', null)
                 ->join('car_parent_cache', 'tgc.car_id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brandId)
@@ -243,34 +243,6 @@ class Twins
         return new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)
         );
-    }
-
-    /**
-     * @param array $options
-     * @return Zend_Paginator
-     */
-    public function getGroupsPaginator(array $options = array())
-    {
-        $defaults = array(
-            'brandId' => null
-        );
-        $options = array_merge($defaults, $options);
-
-        $brandId = (int)$options['brandId'];
-
-        $select = $this->getGroupsTable()->select(true)
-            ->order('twins_groups.add_datetime desc');
-
-        if ($options['brandId']) {
-            $select
-                ->join(array('tgc' => 'twins_groups_cars'), 'twins_groups.id = tgc.twins_group_id', null)
-                ->join('car_parent_cache', 'tgc.car_id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brandId)
-                ->group('twins_groups.id');
-        }
-
-        return Zend_Paginator::factory($select);
     }
 
     /**
@@ -291,13 +263,13 @@ class Twins
     /**
      * @param int $groupId
      * @param array $options
-     * @return Zend_Paginator
+     * @return Zend_Db_Select
      */
-    public function getGroupPicturesSelect($groupId, array $options = array())
+    public function getGroupPicturesSelect($groupId, array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'ordering' => null
-        );
+        ];
         $options = array_merge($defaults, $options);
 
         $ordering = $options['ordering'];
@@ -305,8 +277,8 @@ class Twins
         $select = $this->getPictureTable()->select(true)
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-            ->join(array('tgc' => 'twins_groups_cars'), 'tgc.car_id = car_parent_cache.parent_id', null)
-            ->where('pictures.status IN (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED))
+            ->join(['tgc' => 'twins_groups_cars'], 'tgc.car_id = car_parent_cache.parent_id', null)
+            ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
             ->where('tgc.twins_group_id = ?', (int)$groupId);
 
         if ($ordering) {
@@ -327,11 +299,11 @@ class Twins
             return null;
         }
 
-        return array(
+        return [
             'id'      => $row->id,
             'name'    => $row->name,
             'text_id' => $row->text_id
-        );
+        ];
     }
 
     /**
@@ -350,12 +322,12 @@ class Twins
                 ->group('twins_groups.id')
         );
 
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
-            $result[] = array(
+            $result[] = [
                 'id'   => $row->id,
                 'name' => $row->name
-            );
+            ];
         }
 
         return $result;
@@ -373,23 +345,23 @@ class Twins
 
         $rows = $db->fetchAll(
             $db->select()
-                ->from($groupTable->info('name'), array('id', 'name'))
+                ->from($groupTable->info('name'), ['id', 'name'])
                 ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
                 ->join('car_parent_cache', 'twins_groups_cars.car_id = car_parent_cache.parent_id', 'car_id')
                 ->where('car_parent_cache.car_id IN (?)', $carIds)
-                ->group(array('car_parent_cache.car_id', 'twins_groups.id'))
+                ->group(['car_parent_cache.car_id', 'twins_groups.id'])
         );
 
-        $result = array();
+        $result = [];
         foreach ($carIds as $carId) {
-            $result[(int)$carId] = array();
+            $result[(int)$carId] = [];
         }
         foreach ($rows as $row) {
             $carId = (int)$row['car_id'];
-            $result[$carId][] = array(
+            $result[$carId][] = [
                 'id'   => $row['id'],
                 'name' => $row['name']
-            );
+            ];
         }
 
         return $result;

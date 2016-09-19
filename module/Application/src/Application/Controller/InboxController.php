@@ -116,7 +116,7 @@ class InboxController extends AbstractActionController
             return $this->redirect()->toUrl($url);
         }
 
-        $paginator = $service->getPaginator2()
+        $paginator = $service->getPaginator()
             ->setItemCountPerPage(self::PER_PAGE)
             ->setCurrentPageNumber($this->params('page'));
 

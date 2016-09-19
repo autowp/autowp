@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Modification as ModificationTable;
 
+use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Exception;
@@ -32,7 +33,6 @@ use Users;
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;
-use Zend_Paginator;
 
 class Pic extends AbstractPlugin
 {
@@ -1209,12 +1209,15 @@ class Pic extends AbstractPlugin
             ->bind([
                 'type_id' => Comment_Message::PICTURES_TYPE_ID
             ]);
+            
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbSelect($select)
+        );
 
-        $count = Zend_Paginator::factory($select)->getTotalItemCount();
+        $count = $paginator->getTotalItemCount();
 
 
-
-        $paginator = Zend_Paginator::factory($count)
+        $paginator = \Zend\Paginator\factory::factory($count)
             ->setItemCountPerPage($itemsPerPage)
             ->setCurrentPageNumber($options['page']);
 

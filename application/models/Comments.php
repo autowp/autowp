@@ -116,13 +116,6 @@ class Comments
         return $messageId;
     }
 
-    public function getPaginator2($type, $item, $perPage = 0, $page = 0)
-    {
-        return $this->getMessagePaginator2($type, $item)
-            ->setItemCountPerPage($perPage)
-            ->setCurrentPageNumber($page);
-    }
-
     public function getPaginator($type, $item, $perPage = 0, $page = 0)
     {
         return $this->getMessagePaginator($type, $item)
@@ -398,25 +391,9 @@ class Comments
     /**
      * @param int $type
      * @param int $item
-     * @return Zend_Paginator
-     */
-    public function getMessagePaginator($type, $item)
-    {
-        return Zend_Paginator::factory(
-            $this->_getMessageTable()->select(true)
-                ->where('item_id = ?', (int)$item)
-                ->where('type_id = ?', (int)$type)
-                ->where('parent_id is null')
-                ->order('datetime')
-        );
-    }
-
-/**
-     * @param int $type
-     * @param int $item
      * @return \Zend\Paginator\Paginator
      */
-    public function getMessagePaginator2($type, $item)
+    public function getMessagePaginator($type, $item)
     {
         $select = $this->_getMessageTable()->select(true)
             ->where('item_id = ?', (int)$item)

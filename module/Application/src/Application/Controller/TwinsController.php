@@ -370,7 +370,7 @@ class TwinsController extends AbstractActionController
 
         $canEdit = $this->user()->isAllowed('twins', 'edit');
 
-        $paginator = $this->getTwins()->getGroupsPaginator2([
+        $paginator = $this->getTwins()->getGroupsPaginator([
                 'brandId' => $brand->id
             ])
             ->setItemCountPerPage(self::GROUPS_PER_PAGE)
@@ -392,7 +392,7 @@ class TwinsController extends AbstractActionController
     {
         $canEdit = $this->user()->isAllowed('twins', 'edit');
 
-        $paginator = $this->getTwins()->getGroupsPaginator2()
+        $paginator = $this->getTwins()->getGroupsPaginator()
             ->setItemCountPerPage(self::GROUPS_PER_PAGE)
             ->setCurrentPageNumber($this->params('page'));
 

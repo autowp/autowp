@@ -278,7 +278,7 @@ class Forums
         $topics = [];
 
         foreach ($paginator->getCurrentItems() as $topicRow) {
-            $topicPaginator = $comments->getMessagePaginator2(Comment_Message::FORUMS_TYPE_ID, $topicRow->id)
+            $topicPaginator = $comments->getMessagePaginator(Comment_Message::FORUMS_TYPE_ID, $topicRow->id)
                 ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
                 ->setPageRange(10);
 
@@ -619,18 +619,18 @@ class Forums
         $comments = new Comments();
 
         $messages = $comments->get(
-                Comment_Message::FORUMS_TYPE_ID,
-                $topic['id'],
-                $userId,
-                self::TOPICS_PER_PAGE,
-                $page
+            Comment_Message::FORUMS_TYPE_ID,
+            $topic['id'],
+            $userId,
+            self::TOPICS_PER_PAGE,
+            $page
         );
 
-        $paginator = $comments->getPaginator2(
-                Comment_Message::FORUMS_TYPE_ID,
-                $topic['id'],
-                self::TOPICS_PER_PAGE,
-                $page
+        $paginator = $comments->getPaginator(
+            Comment_Message::FORUMS_TYPE_ID,
+            $topic['id'],
+            self::TOPICS_PER_PAGE,
+            $page
         );
 
         $canSubscribe = false;
