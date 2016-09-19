@@ -12,7 +12,6 @@ use geoPHP;
 use Point;
 
 use Zend_Db_Expr;
-use Zend_Json;
 use Zend_Http_Client;
 
 class MuseumController extends AbstractActionController
@@ -169,7 +168,7 @@ class MuseumController extends AbstractActionController
 
             $response = $client->request();
             if ($response->isSuccessful()) {
-                $result = Zend_Json::decode($response->getBody());
+                $result = \Zend\Json\Json::decode($response->getBody());
 
                 if ($result['status'] == 'OK') {
                     if (isset($result['results'][0]["geometry"]['location'])) {

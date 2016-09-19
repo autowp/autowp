@@ -138,8 +138,8 @@ require(['application'], function(App) {
             : null;
     ?>
     <?php if (isset($this->layout()->moduleName)) { ?>
-        require([<?=Zend_Json::encode($this->layout()->moduleName)?>], function(Module) {
-            Module.init(<?=Zend_Json::encode($moduleOptions)?>);
+        require([<?=Zend\Json\Json::encode($this->layout()->moduleName)?>], function(Module) {
+            Module.init(<?=Zend\Json\Json::encode($moduleOptions)?>);
         });
     <?php } ?>
 });
