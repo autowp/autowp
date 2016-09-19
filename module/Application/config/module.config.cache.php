@@ -3,65 +3,6 @@
 namespace Application;
 
 return [
-    'cachemanager' => [
-        'fast' => [
-            'frontend' => [
-                'name' => 'Core',
-                'customFrontendNaming' => 0,
-                'options' => [
-                    'lifetime' => 180,
-                    'automatic_serialization' => true
-                ]
-            ],
-            'backend' => [
-                'name' => 'Memcached',
-                'options' => [
-                    'servers' => [
-                        'host' => 'localhost',
-                        'port' => 11211
-                    ]
-                ]
-            ]
-        ],
-        'long' => [
-            'frontend' => [
-                'name' => 'Core',
-                'customFrontendNaming' => 0,
-                'options' => [
-                    'lifetime' => 600,
-                    'automatic_serialization' => true
-                ]
-            ],
-            'backend' => [
-                'name' => 'Memcached',
-                'options' => [
-                    'servers' => [
-                        'host' => 'localhost',
-                        'port' => 11211
-                    ]
-                ]
-            ]
-        ],
-        'locale' => [
-            'frontend' => [
-                'name' => 'Core',
-                'customFrontendNaming' => 0,
-                'options' => [
-                    'lifetime' => 600,
-                    'automatic_serialization' => true
-                ]
-            ],
-            'backend' => [
-                'name' => 'Memcached',
-                'options' => [
-                    'servers' => [
-                        'host' => 'localhost',
-                        'port' => 11211
-                    ]
-                ]
-            ]
-        ]
-    ],
     'caches' => [
         'fastCache' => [
             'adapter' => [

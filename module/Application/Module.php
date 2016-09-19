@@ -16,10 +16,8 @@ use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Project_Auth_Adapter_Remember;
 use Users;
 use Zend_Auth;
-use Zend_Cache_Manager;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Expr;
-use Zend_Registry;
 
 use DateInterval;
 use DateTime;
@@ -139,10 +137,6 @@ class Module implements ConsoleUsageProviderInterface,
         set_include_path(APPLICATION_PATH . '/../library' . PATH_SEPARATOR . get_include_path());
 
         $serviceManager = $e->getApplication()->getServiceManager();
-
-        $cacheManager = $serviceManager->get(Zend_Cache_Manager::class);
-
-        Zend_Registry::set('Cachemanager', $cacheManager);
 
         $serviceManager->get(Zend_Db_Adapter_Abstract::class);
         $serviceManager->get('session');

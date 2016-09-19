@@ -12,9 +12,7 @@ use Autowp\TextStorage;
 use Picture;
 
 use Zend_Application_Resource_Db;
-use Zend_Application_Resource_Cachemanager;
 use Zend_Application_Resource_Session;
-use Zend_Cache_Manager;
 use Zend_Db_Adapter_Abstract;
 use Zend_View;
 
@@ -372,11 +370,6 @@ return [
                 return new Service\TelegramService($config['telegram'], $router);
             },
             'translator' => \Zend\Mvc\I18n\TranslatorFactory::class,
-            Zend_Cache_Manager::class => function($sm) {
-                $config = $sm->get('Config');
-                $resource = new Zend_Application_Resource_Cachemanager($config['cachemanager']);
-                return $resource->init();
-            },
             MainMenu::class => function($sm) {
 
                 $router = $sm->get('HttpRouter');
