@@ -19,13 +19,11 @@ use Zend_Auth;
 use Zend_Cache_Manager;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Expr;
-use Zend_Locale;
-use Zend_Locale_Data;
-use Zend_Locale_Exception;
 use Zend_Registry;
 
 use DateInterval;
 use DateTime;
+use Locale;
 
 class Module implements ConsoleUsageProviderInterface,
     ConsoleBannerProviderInterface, ConfigProviderInterface
@@ -149,8 +147,6 @@ class Module implements ConsoleUsageProviderInterface,
         $serviceManager->get(Zend_Db_Adapter_Abstract::class);
         $serviceManager->get('session');
 
-        $this->initLocaleAndTranslate($cacheManager);
-
         error_reporting(E_ALL);
         ini_set('display_errors', true);
 
@@ -158,15 +154,6 @@ class Module implements ConsoleUsageProviderInterface,
         $eventManager->attach( \Zend\Mvc\MvcEvent::EVENT_DISPATCH, [$this, 'preDispatch'], 100 );
 
         \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
-    }
-
-
-    private function initLocaleAndTranslate($cacheManager)
-    {
-        $longCache = $cacheManager->getCache('long');
-        $localeCache = $cacheManager->getCache('locale');
-
-        Zend_Locale_Data::setCache($localeCache);
     }
 
     public function getConsoleBanner(Console $console)
@@ -215,7 +202,7 @@ class Module implements ConsoleUsageProviderInterface,
             }
 
             if (in_array($hostname, $this->userDetectable)) {
-                $userLanguage = $this->detectUserLanguage();
+                $userLanguage = $this->detectUserLanguage($request);
 
                 $hosts = $this->getConfig()['hosts'];
 
@@ -239,28 +226,18 @@ class Module implements ConsoleUsageProviderInterface,
 
             if (isset($this->whitelist[$hostname])) {
                 $language = $this->whitelist[$hostname];
-            } else {
-
-                try {
-                    $locale = new Zend_Locale(Zend_Locale::BROWSER);
-                    $localeLanguage = $locale->getLanguage();
-                    $isAllowed = in_array($localeLanguage, $this->languageWhitelist);
-                    if ($isAllowed) {
-                        $language = $localeLanguage;
-                    }
-                } catch (Zend_Locale_Exception $e) {
-                }
             }
 
             $this->initLocaleAndTranslate2($serviceManager, $language);
         }
     }
 
-    private function detectUserLanguage()
+    private function detectUserLanguage($request)
     {
         $result = null;
 
         $auth = Zend_Auth::getInstance();
+
         if ($auth->hasIdentity()) {
 
             $userTable = new Users();
@@ -275,6 +252,20 @@ class Module implements ConsoleUsageProviderInterface,
             }
         }
 
+        if (!$result) {
+            $acceptLanguage = $request->getServer('HTTP_ACCEPT_LANGUAGE');
+            if ($acceptLanguage) {
+                $locale = Locale::acceptFromHttp($acceptLanguage);
+                if ($locale) {
+                    $localeLanguage = Locale::getPrimaryLanguage($locale);
+                    $isAllowed = in_array($localeLanguage, $this->languageWhitelist);
+                    if ($isAllowed) {
+                        $result = $localeLanguage;
+                    }
+                }
+            }
+        }
+
         return $result;
     }
 
@@ -283,12 +274,6 @@ class Module implements ConsoleUsageProviderInterface,
      */
     private function initLocaleAndTranslate2($serviceManager, $language)
     {
-        // Locale
-        $locale = new Zend_Locale($language);
-
-        // populate for wide-engine
-        Zend_Registry::set('Zend_Locale', $locale);
-
         $translator = $serviceManager->get('MvcTranslator');
         $translator->setLocale($language);
     }

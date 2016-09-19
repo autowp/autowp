@@ -42,10 +42,10 @@ use User_Car_Subscribe;
 use Users;
 
 use Zend_Db_Expr;
-use Zend_Locale;
 use Zend_Session_Namespace;
 
 use Exception;
+use Locale;
 
 class CarsController extends AbstractActionController
 {
@@ -2833,19 +2833,16 @@ class CarsController extends AbstractActionController
         $langValues = [];
 
         $language = $this->language();
-        $list = Zend_Locale::getTranslationList('language', $language);
 
-        foreach ($list as $code => $content) {
-            if (in_array($code, $this->allowedLanguages)) {
-                $languages[$code] = $content;
+        foreach ($this->allowedLanguages as $code) {
+            $languages[$code] = Locale::getDisplayLanguage($code, $language);
 
-                $carLangRow = $carLangTable->fetchRow([
-                    'car_id = ?'   => $car->id,
-                    'language = ?' => $code
-                ]);
+            $carLangRow = $carLangTable->fetchRow([
+                'car_id = ?'   => $car->id,
+                'language = ?' => $code
+            ]);
 
-                $langValues[$code] = $carLangRow ? $carLangRow->name : null;
-            }
+            $langValues[$code] = $carLangRow ? $carLangRow->name : null;
         }
 
         $model = new ViewModel([

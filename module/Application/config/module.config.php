@@ -189,10 +189,10 @@ return [
                 return new Controller\Plugin\Car($textStorage);
             },
             'fileSize' => function($sm) {
-            return new Controller\Plugin\FileSize(
+                return new Controller\Plugin\FileSize(
                     $sm->get(Language::class),
                     $sm->get(FileSize::class)
-                    );
+                );
             },
             'imageStorage' => function($sm) {
                 $storage = $sm->get(Image\Storage::class);
@@ -246,7 +246,6 @@ return [
     'view_helpers' => [
         'invokables' => [
             'car'         => View\Helper\Car::class,
-            'pageEnv'     => View\Helper\PageEnv::class,
             'page'        => View\Helper\Page::class,
             'htmlA'       => View\Helper\HtmlA::class,
             'htmlImg'     => View\Helper\HtmlImg::class,
@@ -269,6 +268,10 @@ return [
             'formpicturemulticheckbox' => Form\View\Helper\FormPictureMultiCheckbox::class
         ],
         'factories' => [
+            'pageEnv' => function($sm) {
+                $language = $sm->get(Language::class);
+                return new View\Helper\PageEnv($language);
+            },
             'mainMenu' => function($sm) {
                 return new View\Helper\MainMenu($sm->get(MainMenu::class));
             },

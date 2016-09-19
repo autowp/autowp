@@ -1,6 +1,14 @@
 <?php
 
 use Zend\Mvc\Application;
+
+/*if ($_SERVER['REMOTE_ADDR'] == '46.188.125.241') {
+    $locale = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+    $localeLanguage = Locale::getPrimaryLanguage($locale);
+    print $localeLanguage;
+    exit;
+}*/
+
 /**
  * This makes our life easier when dealing with paths. Everything is relative
  * to the application root now.

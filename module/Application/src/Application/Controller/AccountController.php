@@ -26,10 +26,11 @@ use Users;
 
 use Zend_Auth;
 use Zend_Db_Expr;
-use Zend_Locale;
 
+use DateTimeZone;
 use Exception;
 use Imagick;
+use Locale;
 
 class AccountController extends AbstractActionController
 {
@@ -442,20 +443,20 @@ class AccountController extends AbstractActionController
         }
 
         $language = $this->language();
-        $list = Zend_Locale::getTranslationList("timezonetowindows", $language);
-        $list = array_values($list);
-        $list[] = 'UTC';
-        foreach ($list as $key => $value) {
-            if (strncmp($value, 'Etc/', 4) == 0) {
-                unset($list[$key]);
+
+        foreach (DateTimeZone::listAbbreviations() as $group) {
+            foreach ($group as $timeZone) {
+                $tzId = $timeZone['timezone_id'];
+                if ($tzId) {
+                    $list[] = $tzId;
+                }
             }
         }
         sort($list, SORT_STRING);
         $list = array_combine($list, $list);
 
         foreach ($this->hosts as $language => $options) {
-            $name = Zend_Locale::getTranslation($language, 'language', $language);
-            $languages[$language] = $name;
+            $languages[$language] = Locale::getDisplayLanguage($language, $language);
         }
 
         $this->settingsForm->setAttribute('action', $this->url()->fromRoute('account/profile', [
