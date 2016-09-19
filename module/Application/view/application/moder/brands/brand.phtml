@@ -29,7 +29,7 @@
             ])?>
         <?php } ?>
         <div class="well">
-            <p>В базе данных чиcлится под номером <strong><?=$this->brand->id ?></strong></p>
+            <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->brand->id))?></p>
             <p>
                 Автомобилей: <strong><?=$this->brand->cars_count ?></strong><br />
                 Двигателей: <strong><?=$this->brand->engines_count ?></strong><br />
@@ -44,7 +44,7 @@
             <p><?=$this->htmlA($this->url('log/params', [
                 'action'   => 'index',
                 'brand_id' => $this->brand->id
-            ]), 'Журнал событий по бренду') ?></p>
+            ]), $this->translate('moder/log-of-events')) ?></p>
         </div>
 
         <h3>Мета-информация</h3>

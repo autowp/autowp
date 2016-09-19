@@ -16,13 +16,13 @@
 <div class="row">
     <div class="col-lg-6 col-md-6">
         <div class="well">
-            <p>В базе данных чиcлится под номером <strong><?=$this->engine->id ?></strong></p>
+            <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->engine->id))?></p>
             <?php if ($lastEditor = $this->engine->findParentUsersByLast_Editor()) { ?>
                 <p>Последний раз редактировал информацию: <?=$this->user($lastEditor) ?></p>
             <?php } ?>
             <p><?=$this->htmlA($this->url('log/params', [
                 'engine_id' => $this->engine->id
-            ]), 'Журнал событий по двигателю') ?></p>
+            ]), $this->translate('moder/log-of-events')) ?></p>
             <p>
                 <?=$this->htmlA($this->url('cars/params', [
                     'action'    => 'engine-spec-editor',

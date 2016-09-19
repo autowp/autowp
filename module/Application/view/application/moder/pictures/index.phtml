@@ -78,6 +78,8 @@
             <?php } ?>
         </h2>
         <?=$this->partial('application/moder/pictures/partial/pictures.phtml', $this->picturesData)?>
-        <?=$this->paginationControl($this->paginator) ?>
+        <?=$this->paginationControl($this->paginator, null, null, [
+            'route' => 'moder/pictures/params'
+        ]) ?>
     </div>
 </div>

@@ -9,7 +9,7 @@
         'pageId' => 72,
         'args'   => [
             'PICTURE_ID'   => $this->picture->id,
-            'PICTURE_NAME' => 'Изображение № "'.$this->picture->id.'"'
+            'PICTURE_NAME' => sprintf($this->translate('moder/picture/picture-n-%s'), $this->picture->id)
         ]
     ]);
 
@@ -46,26 +46,26 @@
         <?php if ($this->prevPicture) { ?>
             <?=$this->htmlA($this->url(null, [
                 'picture_id' => $this->prevPicture->id
-            ], [], true), '<< предыдущее') ?>
+            ], [], true), $this->translate('moder/picture/previous')) ?>
             <br />
         <?php } ?>
         <?php if ($this->prevNewPicture) { ?>
             <?=$this->htmlA($this->url(null, [
                 'picture_id' => $this->prevNewPicture->id
-            ], [], true), '<< предыдущее не обработанное') ?>
+            ], [], true), $this->translate('moder/picture/previous-new')) ?>
         <?php } ?>
     </div>
     <div class="col-md-6">
         <?php if ($this->nextPicture) { ?>
             <?=$this->htmlA($this->url(null, [
                 'picture_id' => $this->nextPicture->id
-            ], [], true), 'следующее >>') ?>
+            ], [], true), $this->translate('moder/picture/next')) ?>
             <br />
         <?php } ?>
         <?php if ($this->nextNewPicture) { ?>
             <?=$this->htmlA($this->url(null, [
                 'picture_id' => $this->nextNewPicture->id
-            ], [], true), 'следующее не обработанное >>') ?>
+            ], [], true), $this->translate('moder/picture/next-new')) ?>
         <?php } ?>
     </div>
 </div>
@@ -82,14 +82,14 @@
             ])?>
         <?php } ?>
 
-        <p>В базе данных чиcлится под номером <b><?=$this->picture->id?></b></p>
+        <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->picture->id))?></p>
         <?php $url = $this->pic($this->picture)->url() ?>
         <p>На сайте: <?=$this->htmlA($url, $url) ?></p>
         <p>Картинка: <?=$this->htmlA($this->sourceUrl, parse_url($this->sourceUrl, PHP_URL_PATH))?></p>
         <?=$this->htmlA($this->url('log/params', [
             'action'     => 'index',
             'picture_id' => $this->picture->id
-        ]), 'Журнал событий по картинке') ?>
+        ]), $this->translate('moder/log-of-events')) ?>
 
         <h3>Характеристики изображения:</h3>
         <div class="well">
@@ -136,14 +136,14 @@
 
     <div class="col-md-6">
 
-        <h3>Место в каталоге</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/picture/catalogue'))?></h3>
         <div class="well">
             <?php
                 switch ($this->picture->type) {
                     case Picture::CAR_TYPE_ID:
                         ?>
                         <p>
-                            Автомобиль:
+                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/vehicle'))?>
                             <?php $car = $this->picture->findParentCars() ?>
                             <?php if ($car) { ?>
                                 <?=$this->htmlA($this->url('moder/cars/params', [
@@ -151,7 +151,7 @@
                                     'car_id'     => $car->id
                                 ]), $car->getFullName()) ?>
                             <?php } else { ?>
-                                Не задан
+                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
                             <?php } ?>
                         </p>
                         <?php
@@ -160,14 +160,14 @@
                     case Picture::LOGO_TYPE_ID:
                         ?>
                         <p>
-                            Логотип бренда:
+                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/logo'))?>
                             <?php if ($brand = $this->picture->findParentBrands()) { ?>
                                 <?=$this->htmlA($this->url('moder/brands/params', [
                                     'action'     => 'brand',
                                     'brand_id'   => $brand->id
                                 ]), $brand->caption) ?>
                             <?php } else { ?>
-                                Не задан
+                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
                             <?php } ?>
                         </p>
                         <?php
@@ -176,14 +176,14 @@
                     case Picture::MIXED_TYPE_ID:
                         ?>
                         <p>
-                            Смешанное бренда:
+                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/mixed'))?>
                             <?php if ($brand = $this->picture->findParentBrands()) { ?>
                                 <?=$this->htmlA($this->url('moder/brands/params', [
                                     'action'   => 'brand',
                                     'brand_id' => $brand->id
                                 ]), $brand->caption) ?>
                             <?php } else { ?>
-                                Не задан
+                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
                             <?php } ?>
                         </p>
                         <?php
@@ -192,14 +192,14 @@
                     case Picture::UNSORTED_TYPE_ID:
                         ?>
                         <p>
-                            Несортировано бренда:
+                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/unsorted'))?>
                             <?php if ($brand = $this->picture->findParentBrands()) { ?>
                                 <?=$this->htmlA($this->url('moder/brands/params', [
                                     'action'   => 'brand',
                                     'brand_id' => $brand->id
                                 ]), $brand->caption) ?>
                             <?php } else { ?>
-                                Не задан
+                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
                             <?php } ?>
                         </p>
                         <?php
@@ -207,31 +207,33 @@
 
                     case Picture::ENGINE_TYPE_ID:
                         ?>
-                        <p>Двигатель:
-                        <?php $engine = $this->picture->findParentEngines() ?>
-                        <?php if ($engine) { ?>
-                            <?=$this->htmlA($this->url('moder/engines/params', [
-                                'action'    => 'engine',
-                                'engine_id' => $engine->id
-                            ]), $engine->caption) ?>
-                        <?php } else { ?>
-                            Не задан
-                        <?php } ?>
-                        </p>
+                        <p>
+                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/engine'))?>
+                            <?php $engine = $this->picture->findParentEngines() ?>
+                            <?php if ($engine) { ?>
+                                <?=$this->htmlA($this->url('moder/engines/params', [
+                                    'action'    => 'engine',
+                                    'engine_id' => $engine->id
+                                ]), $engine->caption) ?>
+                            <?php } else { ?>
+                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
+                            <?php } ?>
+                            </p>
                         <?php
                         break;
 
                     case Picture::FACTORY_TYPE_ID:
                         ?>
-                        <p>Завод:
-                        <?php if ($factory = $this->picture->findParentFactory()) { ?>
-                            <?=$this->htmlA($this->url('moder/factories/params', [
-                                'action'     => 'factory',
-                                'factory_id' => $factory->id
-                            ]), $factory->name) ?>
-                        <?php } else { ?>
-                            Не задан
-                        <?php } ?>
+                        <p>
+                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/factory'))?>
+                            <?php if ($factory = $this->picture->findParentFactory()) { ?>
+                                <?=$this->htmlA($this->url('moder/factories/params', [
+                                    'action'     => 'factory',
+                                    'factory_id' => $factory->id
+                                ]), $factory->name) ?>
+                            <?php } else { ?>
+                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
+                            <?php } ?>
                         </p>
                         <?php
                         break;
@@ -247,7 +249,7 @@
                             'type'       => Picture::CAR_TYPE_ID,
                             'car_id'     => $this->lastCar->id
                         ])
-                    ], '<i class="fa fa-arrow-right"></i> переместить в ' . $this->escapeHtml($this->lastCar->getFullName()), false) ?></p>
+                    ], '<i class="fa fa-arrow-right"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' . $this->escapeHtml($this->lastCar->getFullName()), false) ?></p>
                 <?php } ?>
                 <?php foreach ($this->relatedBrands as $brand) { ?>
                     <p><?=$this->htmlA([
@@ -257,20 +259,20 @@
                             'brand_id'   => $brand['id'],
                             'picture_id' => $this->picture->id
                         ])
-                    ], '<i class="fa fa-arrow-right"></i> переместить в ' . $this->escapeHtml($brand['name']) . ' ...', false) ?></p>
+                    ], '<i class="fa fa-arrow-right"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' . $this->escapeHtml($brand['name']) . ' ...', false) ?></p>
                 <?php } ?>
                 <p><?=$this->htmlA([
                     'class' => 'btn btn-default',
                     'href' => $this->url('moder/pictures/params', [
                         'action' => 'move'
                     ], [], true),
-                ], '<i class="fa fa-arrow-right"></i> переместить в ...', false)?></p>
+                ], '<i class="fa fa-arrow-right"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ...', false)?></p>
             <?php } ?>
         </div>
 
 
     <?php if ($this->picture->type == Picture::CAR_TYPE_ID) { ?>
-        <h3>Ракурс</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></h3>
         <div class="well">
             <?=$this->partial('application/moder/pictures/picture-perspective', $this->picturePerspective)?>
         </div>
@@ -298,7 +300,7 @@
     <?php } ?>
 
 
-    <h3>Статус/Удаление/Принятие</h3>
+    <h3><?=$this->escapeHtml($this->translate('moder/picture/acceptance'))?></h3>
     <div class="well">
         <div style="margin-bottom:15px"><?php
             $changeStatusUserHtml = '';
@@ -310,10 +312,14 @@
                 case Picture::STATUS_NEW:
                 case Picture::STATUS_INBOX:
                     ?>
-                    <p><strong class="label label-warning">Не принято <?=$changeStatusUserHtml?><?=(Picture::STATUS_INBOX == $this->picture->status ? ' (новое)' : '')?></strong></p>
+                    <p><strong class="label label-warning">
+                        <?=$this->escapeHtml($this->translate('moder/picture/acceptance/not-accepted'))?>
+                        <?=$changeStatusUserHtml?>
+                        <?=(Picture::STATUS_INBOX == $this->picture->status ? ' (новое)' : '')?>
+                    </strong></p>
                     <?php if ($this->canAccept) { ?>
                         <form action="<?=$this->escapeHtmlAttr($this->acceptUrl)?>" method="post">
-                            <button type="submit" class="btn btn-success">Принять</button>
+                            <button type="submit" class="btn btn-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/accept'))?></button>
                         </form>
                     <?php } ?>
                     <?php
@@ -321,27 +327,35 @@
 
                 case Picture::STATUS_ACCEPTED:
                     ?>
-                    <p><strong class="label label-success">Принято</strong></p>
+                    <p><strong class="label label-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/accepted'))?></strong></p>
                     <?=$changeStatusUserHtml?>
                     <?php if ($this->canUnaccept) { ?>
                         <form action="<?=$this->escapeHtmlAttr($this->unacceptUrl)?>" method="post">
-                            <button type="submit" class="btn btn-warning">Сделать не принятой</button>
+                            <button type="submit" class="btn btn-warning"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/unaccept'))?></button>
                         </form>
                     <?php } ?>
                     <?php
                     break;
 
                 case Picture::STATUS_REMOVING:
-                    ?><p><strong class="label label-danger">Поставлено в очередь на удаление</strong> <?=$changeStatusUserHtml?></p>
+                    ?><p>
+                        <strong class="label label-danger">
+                            <?=$this->escapeHtml($this->translate('moder/picture/acceptance/in-delete-queue'))?>
+                        </strong>
+                        <?=$changeStatusUserHtml?>
+                    </p>
                     <?php if ($this->canRestore) { ?>
                         <form action="<?=$this->escapeHtmlAttr($this->restoreUrl)?>" method="post">
-                            <button type="submit" class="btn btn-success">Восстановить</button>
+                            <button type="submit" class="btn btn-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/restore'))?></button>
                         </form>
                     <?php }
                     break;
 
                 case Picture::STATUS_REMOVED:
-                    ?><p><strong style="color:red">Удалено <?=$changeStatusUserHtml?></strong></p><?php
+                    ?><p><strong style="color:red">
+                        <?=$this->escapeHtml($this->translate('moder/picture/acceptance/removed'))?>
+                        <?=$changeStatusUserHtml?>
+                    </strong></p><?php
                     break;
             }
         ?></div>

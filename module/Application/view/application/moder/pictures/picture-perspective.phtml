@@ -3,7 +3,7 @@
 ?>
 <form method="post" action="<?=$this->escapeHtmlAttr($this->url)?>" class="tiny" data-module="perspective-selector">
     <?php if (!$tiny) { ?>
-        <label for="perspective_id">Ракурс</label>
+        <label for="perspective_id"><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></label>
     <?php } ?>
 
     <?=$this->formElement(
@@ -17,5 +17,8 @@
     )?>
 </form>
 <?php if ($this->user) { ?>
-    <p>Установил: <?=$this->user($this->user) ?></p>
+    <p>
+        <?=$this->escapeHtml($this->translate('moder/picture/perspective-by'))?>
+        <?=$this->user($this->user) ?>
+    </p>
 <?php } ?>

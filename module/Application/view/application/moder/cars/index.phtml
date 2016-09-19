@@ -26,6 +26,8 @@
             <?php } ?>
         </h2>
         <?=$this->partial('application/cars', $this->listData)?>
-        <?=$this->paginationControl($this->paginator) ?>
+        <?=$this->paginationControl($this->paginator, null, null, [
+            'route' => 'moder/cars/params'
+        ]) ?>
     </div>
 </div>

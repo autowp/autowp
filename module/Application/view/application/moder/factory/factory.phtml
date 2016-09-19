@@ -17,11 +17,11 @@
 <div class="row">
     <div class="col-md-8">
         <div class="well">
-            <p>В базе данных чиcлится под номером <strong><?=$this->factory->id ?></strong></p>
+            <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->factory->id))?></p>
             <p><?=$this->htmlA($this->url('log/params', [
                 'action'     => 'index',
                 'factory_id' => $this->factory->id
-            ]), 'Журнал событий по заводу') ?></p>
+            ]), $this->translate('moder/log-of-events')) ?></p>
 
             <?php
                 $url = $this->url('factories/factory', [

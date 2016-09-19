@@ -21,12 +21,12 @@
 <div class="row">
     <div class="col-md-6">
         <div class="well">
+            <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->group->id))?></p>
             <p>
-                В базе данных чиcлится под номером <strong><?=$this->group->id ?></strong><br />
                 На сайте: <?=$this->htmlA($url, $url) ?><br />
                 <?=$this->htmlA($this->url('log/params', [
                     'twins_group_id' => $this->group->id
-                ]), 'Журнал событий по группе') ?>
+                ]), $this->translate('moder/log-of-events')) ?>
             </p>
         </div>
 

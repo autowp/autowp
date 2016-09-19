@@ -1054,6 +1054,9 @@ return [
     'moder-menu/title' => 'Меню модератора',
     'moder-menu/inbox' => 'Инбокс',
 
+    'moder/database-id-%s' => 'В базе данных чиcлится под номером %s',
+    'moder/log-of-events' => 'Журнал событий',
+
     'moder/picture/inbox' => 'Инбокс',
     'moder/picture/missing-perspective' => 'Пропущен ракурс',
     'moder/picture/delete-queue' => 'Очередь удаления',
@@ -1075,7 +1078,7 @@ return [
     'moder/picture/filter/special-name' => 'Только с особым названием',
     'moder/picture/filter/not-linked' => 'Без привязки',
     'moder/picture/filter/order' => 'Сортировать по',
-    
+
     'moder/vehicle/name' => 'Название',
     'moder/vehicle/body' => 'Номер кузова',
     'moder/vehicle/spec' => 'Рынок',
@@ -1086,4 +1089,46 @@ return [
     'moder/vehicle/produced' => 'Произведено',
     'moder/vehicle/concept' => 'Концепт (прототип)',
     'moder/vehicle/group' => 'Группа',
+
+    'moder/picture/edit-picture-%s' => 'Управление изображением №%s',
+    'moder/picture/edit-vehicle-%s' => 'Управление автомобилем %s',
+    'moder/picture/edit-brand-%s' => 'Управление брендом %s',
+    'moder/picture/edit-engine-%s' => 'Управление двигателем %s',
+    'moder/picture/edit-factory-%s' => 'Управление заводом %s',
+
+    'moder/picture/picture-n-%s' => 'Изображение №%s',
+    'moder/picture/previous' => '<< предыдущее',
+    'moder/picture/next' => 'следующее >>',
+    'moder/picture/previous-new' => '<< предыдущее не обработанное',
+    'moder/picture/next-new' => 'следующее не обработанное >>',
+
+    'moder/picture/catalogue' => 'Место в каталоге',
+    'moder/picture/catalogue/vehicle' => 'Автомобиль: ',
+    'moder/picture/catalogue/logo' => 'Логотип бренда: ',
+    'moder/picture/catalogue/mixed' => 'Смешанное бренда: ',
+    'moder/picture/catalogue/unsorted' => 'Несортировано бренда: ',
+    'moder/picture/catalogue/engine' => 'Двигатель: ',
+    'moder/picture/catalogue/factory' => 'Завод: ',
+    'moder/picture/catalogue/not-set' => 'не задан',
+    'moder/picture/catalogue/move-to' => 'переместить в',
+
+    'moder/picture/perspective' => 'Ракурс',
+    'moder/picture/perspective-by' => 'Установил: ',
+
+    'moder/picture/acceptance' => 'Статус/Удаление/Принятие',
+    'moder/picture/acceptance/accepted' => 'Принято',
+    'moder/picture/acceptance/not-accepted' => 'Не принято',
+    'moder/picture/acceptance/in-delete-queue' => 'Поставлено в очередь на удаление',
+    'moder/picture/acceptance/accept' => 'Принять',
+    'moder/picture/acceptance/delete' => 'Удалить',
+    'moder/picture/acceptance/unaccept' => 'Сделать не принятой',
+    'moder/picture/acceptance/restore' => 'Восстановить',
+    'moder/picture/acceptance/removed' => 'Удалено',
+
+    'moder/picture/acceptance/want-accept' => 'Хочу принять',
+    'moder/picture/acceptance/want-delete' => 'Хочу удалить',
+    'moder/picture/acceptance/cancel-vote' => 'Отменить мою заявку',
+    'moder/picture/acceptance/already-voted' => 'Уже подали: ',
+    'moder/picture/acceptance/that-is-one-accepted-picture' => 'Это единственная принятая картинка этого автомобиля',
+    'moder/picture/acceptance/accepted-pictures-is-%s' => 'Принятых картинок этого автомобиля всего %s',
 ];

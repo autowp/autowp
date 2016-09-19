@@ -1,7 +1,7 @@
 <?php foreach ($this->form->getIterator() as $element) { ?>
     <?php
         $element->setLabelAttributes(array_replace([
-            'class' => 'col-md-2'
+            'class' => 'col-md-2 control-label'
         ], $element->getLabelAttributes()))
     ?>
     <?php if ($element instanceof Zend\Form\Element\File) { ?>

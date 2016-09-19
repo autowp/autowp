@@ -15,20 +15,24 @@
         </div>
 
         <div class="btn-group btn-group-sm">
-            <button type="submit" name="vote" value="1" class="btn btn-success">Хочу принять</button>
-            <button type="submit" name="vote" value="0" class="btn btn-danger">Хочу удалить</button>
+            <button type="submit" name="vote" value="1" class="btn btn-success">
+                <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-accept'))?>
+            </button>
+            <button type="submit" name="vote" value="0" class="btn btn-danger">
+                <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-delete'))?>
+            </button>
         </div>
     </form>
 <?php } ?>
 
 <?php if ($this->voteExists) { ?>
     <form action="<?=$this->escapeHtmlAttr($this->pictureUnvoteUrl)?>" method="post">
-        <input type="submit" name="send" id="send" value="Отменить мою заявку" class="btn btn-default">
+        <input type="submit" name="send" id="send" value="<?=$this->escapeHtmlAttr($this->translate('moder/picture/acceptance/cancel-vote'))?>" class="btn btn-default">
     </form>
 <?php } ?>
 
 <?php if (isset($this->moderVotes) && count($this->moderVotes) > 0) { ?>
-    Уже подали:
+    <?=$this->escapeHtml($this->translate('moder/picture/acceptance/already-voted'))?>
     <?php $idx = 0 ?>
     <?php foreach ($this->moderVotes as $vote) { ?>
         <?php if ($idx++ > 0) { ?>, <?php } ?>
@@ -41,12 +45,16 @@
 
 <?php if ($this->canDelete) { ?>
     <form action="<?=$this->escapeHtmlAttr($this->pictureDeleteUrl)?>" method="post">
-        <input type="submit" name="send" id="send" value="Удалить" class="btn btn-danger">
+        <input type="submit" name="send" id="send" value="<?=$this->escapeHtmlAttr($this->translate('moder/picture/acceptance/delete'))?>" class="btn btn-danger">
     </form>
 <?php } ?>
 
 <?php if ($this->isLastPicture) { ?>
-    <p><span class="label label-warning">Это единственная принятая картинка этого автомобиля</span></p>
+    <p><span class="label label-warning">
+        <?=$this->escapeHtml($this->translate('moder/picture/acceptance/that-is-one-accepted-picture'))?>
+    </span></p>
 <?php } elseif ($this->acceptedCount !== null && $this->acceptedCount <= 4) { ?>
-    <p><span class="label label-warning">Принятых картинок этого автомобиля всего <?=$this->acceptedCount ?></span></p>
+    <p><span class="label label-warning">
+        <?=$this->escapeHtml(sprintf($this->translate('moder/picture/acceptance/accepted-pictures-is-%s'), $this->acceptedCount))?>
+    </span></p>
 <?php } ?>

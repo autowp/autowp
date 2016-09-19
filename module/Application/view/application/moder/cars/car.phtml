@@ -28,7 +28,7 @@
     </div>
     <div class="col-md-5">
         <div class="well">
-            <p>В базе данных чиcлится под номером <strong><?=$this->car->id?></strong></p>
+            <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->car->id))?></p>
 
             <p>
                 <?php if ($this->user()->isAllowed('specifications', 'edit')) { ?>
@@ -42,8 +42,9 @@
                 <?php } ?>
             </p>
             <p><?=$this->htmlA($this->url('log/params', [
-                'action' => 'index'
-            ], [], true), 'Журнал событий') ?></p>
+                'action' => 'index',
+                'car_id' => $this->car['id']
+            ]), $this->translate('moder/log-of-events')) ?></p>
         </div>
     </div>
     <div class="col-md-5">
