@@ -1,5 +1,4 @@
 define(
-    'default/map/index',
     ['jquery', 'googlemaps'],
     function($, googlemaps) {
         return {

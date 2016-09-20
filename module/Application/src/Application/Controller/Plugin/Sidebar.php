@@ -93,7 +93,7 @@ class Sidebar extends AbstractPlugin
     {
         $language = $this->getController()->language();
 
-        $cacheKey = 'SIDEBAR_' . $brand['id'] . '_' . $language . '_3';
+        $cacheKey = 'SIDEBAR_' . $brand['id'] . '_' . $language . '_5';
 
         $groups = $this->cache->getItem($cacheKey, $success);
 

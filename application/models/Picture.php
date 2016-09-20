@@ -538,7 +538,7 @@ class Picture extends Project_Db_Table
         }
     }
 
-    public function moveToEngine($pictureId, $id, $userId)
+    public function moveToEngine($pictureId, $id, $userId, array $options)
     {
         $picture = $this->find($pictureId)->current();
         if (!$picture) {
@@ -582,13 +582,13 @@ class Picture extends Project_Db_Table
         $log($userId, sprintf(
             'Назначение двигателя %s картинке %s',
             $engine->getMetaCaption(),
-            $picture->getCaption()
+            $picture->getCaption($options)
         ), [$engine, $picture]);
 
         return true;
     }
 
-    public function moveToCar($pictureId, $id, $userId)
+    public function moveToCar($pictureId, $id, $userId, array $options)
     {
         $picture = $this->find($pictureId)->current();
         if (!$picture) {
@@ -638,7 +638,7 @@ class Picture extends Project_Db_Table
         return true;
     }
 
-    public function moveToBrand($pictureId, $id, $type, $userId)
+    public function moveToBrand($pictureId, $id, $type, $userId, array $options)
     {
         $picture = $this->find($pictureId)->current();
         if (!$picture) {
@@ -681,13 +681,13 @@ class Picture extends Project_Db_Table
         $log($userId, sprintf(
             'Назначение бренда %s картинке %s',
             htmlspecialchars($brand->caption),
-            htmlspecialchars($picture->getCaption())
+            htmlspecialchars($picture->getCaption($options))
         ), [$picture, $brand]);
 
         return true;
     }
 
-    public function moveToFactory($pictureId, $id, $userId)
+    public function moveToFactory($pictureId, $id, $userId, array $options)
     {
         $picture = $this->find($pictureId)->current();
         if (!$picture) {
@@ -729,7 +729,7 @@ class Picture extends Project_Db_Table
         $log($userId, sprintf(
             'Назначение завода %s картинке %s',
             htmlspecialchars($factory->name),
-            htmlspecialchars($picture->getCaption())
+            htmlspecialchars($picture->getCaption($options))
         ), [$factory, $picture]);
 
         return true;

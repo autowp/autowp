@@ -1,7 +1,6 @@
 define(
-    'default/pulse',
     ['jquery', 'bootstrap', 'brand-popover', 'raphael'],
-    function($, Bootstrap, BrandPopover) {
+    function($, Bootstrap, BrandPopover, Raphael) {
         return {
             init: function() {
                 

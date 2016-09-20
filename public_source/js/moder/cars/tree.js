@@ -1,5 +1,5 @@
 define(
-    ['jquery', 'bootstrap', 'dracula'],
+    ['jquery', 'bootstrap'],
     function($) {
         return {
             init: function(options) {

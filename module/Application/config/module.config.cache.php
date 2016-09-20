@@ -9,6 +9,7 @@ return [
                 'name'     =>'memcached',
                 'lifetime' => 180,
                 'options'  => [
+                    'ttl' => 180,
                     'servers'   => [
                         ['localhost', 11211]
                     ],
@@ -32,6 +33,7 @@ return [
                 'name'     =>'memcached',
                 'lifetime' => 600,
                 'options'  => [
+                    'ttl' => 600,
                     'servers'   => [
                         ['localhost', 11211]
                     ],

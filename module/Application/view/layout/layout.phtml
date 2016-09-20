@@ -33,18 +33,18 @@
                 ->appendName('description', $this->translate('layout/meta/description'));
             echo $this->headTitle();
             echo $this
-                ->headLink(array('rel' => 'shortcut icon', 'href' => '/favicon.ico', 'type' => 'image/x-icon'), 'PREPEND')
+                ->headLink(['rel' => 'shortcut icon', 'href' => '/favicon.ico', 'type' => 'image/x-icon'], 'PREPEND')
                 ->appendStylesheet('/css/styles.css', 'screen');
             echo $this->headScript()
                 ->appendFile(
                     'http://html5shim.googlecode.com/svn/trunk/html5.js',
                     'text/javascript',
-                    array('conditional' => 'lt IE 9')
+                    ['conditional' => 'lt IE 9']
                 )
                 ->appendFile(
-                    '/vendor/scottjehl/Respond/dest/respond.min.js',
+                    '/js/respond.js',
                     'text/javascript',
-                    array('conditional' => 'lt IE 9')
+                    ['conditional' => 'lt IE 9']
                 );
 
             echo $this->headStyle();

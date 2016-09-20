@@ -2032,21 +2032,30 @@ class PicturesController extends AbstractActionController
                 case Picture::LOGO_TYPE_ID:
                 case Picture::MIXED_TYPE_ID:
                 case Picture::UNSORTED_TYPE_ID:
-                    $success = $this->table->moveToBrand($picture->id, $this->params('brand_id'), $type, $userId);
+                    $success = $this->table->moveToBrand($picture->id, $this->params('brand_id'), $type, $userId, [
+                        'language'   => $this->language(),
+                        'translator' => $this->translator
+                    ]);
                     if (!$success) {
                         return $this->notFoundAction();
                     }
                     break;
 
                 case Picture::ENGINE_TYPE_ID:
-                    $success = $this->table->moveToEngine($picture->id, $this->params('engine_id'), $userId);
+                    $success = $this->table->moveToEngine($picture->id, $this->params('engine_id'), $userId, [
+                        'language'   => $this->language(),
+                        'translator' => $this->translator
+                    ]);
                     if (!$success) {
                         return $this->notFoundAction();
                     }
                     break;
 
                 case Picture::CAR_TYPE_ID:
-                    $success = $this->table->moveToCar($picture->id, $this->params('car_id'), $userId);
+                    $success = $this->table->moveToCar($picture->id, $this->params('car_id'), $userId, [
+                        'language'   => $this->language(),
+                        'translator' => $this->translator
+                    ]);
                     if (!$success) {
                         return $this->notFoundAction();
                     }
@@ -2056,7 +2065,10 @@ class PicturesController extends AbstractActionController
                     break;
 
                 case Picture::FACTORY_TYPE_ID:
-                    $success = $this->table->moveToFactory($picture->id, $this->params('factory_id'), $userId);
+                    $success = $this->table->moveToFactory($picture->id, $this->params('factory_id'), $userId, [
+                        'language'   => $this->language(),
+                        'translator' => $this->translator
+                    ]);
                     if (!$success) {
                         return $this->notFoundAction();
                     }

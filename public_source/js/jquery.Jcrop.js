@@ -1,0 +1,1 @@
+../../node_modules/jcrop-0.9.12/js/jquery.Jcrop.js

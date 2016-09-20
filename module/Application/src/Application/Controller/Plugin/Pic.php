@@ -729,7 +729,7 @@ class Pic extends AbstractPlugin
             $links[$controller->url()->fromRoute('moder/pictures/params', [
                 'action'     => 'picture',
                 'picture_id' => $picture->id
-            ])] = 'Управление изображением №'.$picture->id;
+            ])] = sprintf($this->translator->translate('moder/picture/edit-picture-%s'), $picture->id);
 
             switch ($picture->type) {
                 case Picture::CAR_TYPE_ID:
@@ -738,7 +738,7 @@ class Pic extends AbstractPlugin
                             'action' => 'car',
                             'car_id' => $car->id
                         ]);
-                        $links[$url] = 'Управление автомобилем ' . $car->getFullName();
+                        $links[$url] = sprintf($this->translator->translate('moder/picture/edit-vehicle-%s'), $car->getFullName());
 
                         $brandTable = new Brands();
 
@@ -755,7 +755,7 @@ class Pic extends AbstractPlugin
                                 'action'   => 'brand',
                                 'brand_id' => $brand->id
                             ]);
-                            $links[$url] = 'Управление брендом ' . $brand->caption;
+                            $links[$url] = sprintf($this->translator->translate('moder/picture/edit-brand-%s'), $brand->caption);
                         }
 
                     }
@@ -768,7 +768,7 @@ class Pic extends AbstractPlugin
                             'action'    => 'engine',
                             'engine_id' => $engine->id
                         ]);
-                        $links[$url] = 'Управление двигателем ' . $engine->caption;
+                        $links[$url] = sprintf($this->translator->translate('moder/picture/edit-engine-%s'), $engine->caption);
                     }
                     break;
 
@@ -777,7 +777,7 @@ class Pic extends AbstractPlugin
                         $links[$controller->url()->fromRoute('moder/factories/params', [
                             'action'     => 'factory',
                             'factory_id' => $factory->id
-                        ])] = 'Управление заводом ' . $factory->name;
+                        ])] = sprintf($this->translator->translate('moder/picture/edit-factory-%s'), $factory->name);
                     }
                     break;
 
@@ -789,7 +789,7 @@ class Pic extends AbstractPlugin
                             'action'   => 'brand',
                             'brand_id' => $brand->id
                         ]);
-                        $links[$url] = 'Управление брендом ' . $brand->caption;
+                        $links[$url] = sprintf($this->translator->translate('moder/picture/edit-brand-%s'), $brand->caption);
                     }
                     break;
             }
@@ -1209,15 +1209,18 @@ class Pic extends AbstractPlugin
             ->bind([
                 'type_id' => Comment_Message::PICTURES_TYPE_ID
             ]);
-            
+
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbSelect($select)
         );
 
         $count = $paginator->getTotalItemCount();
 
+        $paginator = new \Zend\Paginator\Paginator(
+            new \Zend\Paginator\Adapter\NullFill($count)
+        );
 
-        $paginator = \Zend\Paginator\factory::factory($count)
+        $paginator
             ->setItemCountPerPage($itemsPerPage)
             ->setCurrentPageNumber($options['page']);
 

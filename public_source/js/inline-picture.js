@@ -1,5 +1,4 @@
 define(
-    'inline-picture',
     ['jquery'],
     function($) {
         return function InlinePicture(element) {

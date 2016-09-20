@@ -147,31 +147,7 @@ return [
             Controller\VotingController::class       => InvokableFactory::class,
             Controller\Api\ContactsController::class => InvokableFactory::class,
             Controller\Api\PictureController::class  => InvokableFactory::class,
-            Controller\Api\UsersController::class => InvokableFactory::class,
-            Controller\Console\BuildController::class => InvokableFactory::class,
-            Controller\Console\ImageStorageController::class => InvokableFactory::class,
-            Controller\Console\MaintenanceController::class => function($sm) {
-                $db = $sm->get(Zend_Db_Adapter_Abstract::class);
-                $sessionConfig = $sm->get('Config')['session'];
-                return new Controller\Console\MaintenanceController($db, $sessionConfig);
-            },
-            Controller\Console\MessageController::class => InvokableFactory::class,
-            Controller\Console\MidnightController::class => InvokableFactory::class,
-            Controller\Console\PicturesController::class => InvokableFactory::class,
-            Controller\Console\SpecsController::class => InvokableFactory::class,
-            Controller\Console\TelegramController::class => function($sm) {
-                $service = $sm->get(Service\TelegramService::class);
-                return new Controller\Console\TelegramController($service);
-            },
-            Controller\Console\TrafficController::class => InvokableFactory::class,
-            Controller\Console\TwitterController::class => function($sm) {
-                $twitterConfig = $sm->get('Config')['twitter'];
-                return new Controller\Console\TwitterController($twitterConfig);
-            },
-            Controller\Console\UsersController::class => function($sm) {
-                $service = $sm->get(Service\UsersService::class);
-                return new Controller\Console\UsersController($service);
-            },
+            Controller\Api\UsersController::class    => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [

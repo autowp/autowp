@@ -2,18 +2,41 @@
 
 namespace Application;
 
+use Zend\ServiceManager\Factory\InvokableFactory;
+
+use Zend_Db_Adapter_Abstract;
+
 return [
+    'controllers' => [
+        'factories' => [
+            Controller\Console\ImageStorageController::class => InvokableFactory::class,
+            Controller\Console\MaintenanceController::class => function($sm) {
+                $db = $sm->get(Zend_Db_Adapter_Abstract::class);
+                $sessionConfig = $sm->get('Config')['session'];
+                return new Controller\Console\MaintenanceController($db, $sessionConfig);
+            },
+            Controller\Console\MessageController::class  => InvokableFactory::class,
+            Controller\Console\MidnightController::class => InvokableFactory::class,
+            Controller\Console\PicturesController::class => InvokableFactory::class,
+            Controller\Console\SpecsController::class    => InvokableFactory::class,
+            Controller\Console\TelegramController::class => function($sm) {
+                $service = $sm->get(Service\TelegramService::class);
+                return new Controller\Console\TelegramController($service);
+            },
+            Controller\Console\TrafficController::class => InvokableFactory::class,
+            Controller\Console\TwitterController::class => function($sm) {
+                $twitterConfig = $sm->get('Config')['twitter'];
+                return new Controller\Console\TwitterController($twitterConfig);
+            },
+            Controller\Console\UsersController::class => function($sm) {
+                $service = $sm->get(Service\UsersService::class);
+                return new Controller\Console\UsersController($service);
+            },
+        ]
+    ],
     'console' => [
         'router' => [
             'routes' => [
-                'build' => [
-                    'options' => [
-                        'route'    => 'build (js|css|all):action [--fast|-f]',
-                        'defaults' => [
-                            'controller' => Controller\Console\BuildController::class,
-                        ]
-                    ]
-                ],
                 'image-storage' => [
                     'options' => [
                         'route'    => 'image-storage (clear-empty-dirs):action <dirname>',

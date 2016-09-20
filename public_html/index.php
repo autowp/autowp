@@ -2,13 +2,6 @@
 
 use Zend\Mvc\Application;
 
-/*if ($_SERVER['REMOTE_ADDR'] == '46.188.125.241') {
-    $locale = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-    $localeLanguage = Locale::getPrimaryLanguage($locale);
-    print $localeLanguage;
-    exit;
-}*/
-
 /**
  * This makes our life easier when dealing with paths. Everything is relative
  * to the application root now.
@@ -26,11 +19,11 @@ if (php_sapi_name() === 'cli-server') {
 include __DIR__ . '/../vendor/autoload.php';
 if (! class_exists(Application::class)) {
     throw new RuntimeException(
-            "Unable to load application.\n"
-            . "- Type `composer install` if you are developing locally.\n"
-            . "- Type `vagrant ssh -c 'composer install'` if you are using Vagrant.\n"
-            . "- Type `docker-compose run zf composer install` if you are using Docker.\n"
-            );
+        "Unable to load application.\n"
+        . "- Type `composer install` if you are developing locally.\n"
+        . "- Type `vagrant ssh -c 'composer install'` if you are using Vagrant.\n"
+        . "- Type `docker-compose run zf composer install` if you are using Docker.\n"
+    );
 }
 
 // Define path to application directory

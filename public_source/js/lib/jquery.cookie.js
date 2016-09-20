@@ -1,1 +1,0 @@
-../../../vendor/components/jquery-cookie/jquery.cookie.js

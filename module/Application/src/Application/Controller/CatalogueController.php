@@ -921,7 +921,8 @@ class CatalogueController extends AbstractActionController
                     //$pictures[] = $pictureRow;
 
                     $caption = $pictureRow->getCaption([
-                        'language' => $language
+                        'language'   => $language,
+                        'translator' => $this->translator
                     ]);
 
                     $url = $this->url()->fromRoute('catalogue', [
@@ -952,7 +953,8 @@ class CatalogueController extends AbstractActionController
                     foreach ($pictureRows as $pictureRow) {
                         //$pictures[] = $pictureRow;
                         $caption = $pictureRow->getCaption([
-                            'language' => $language
+                            'language'   => $language,
+                            'translator' => $this->translator
                         ]);
 
                         $url = $this->pic()->href($pictureRow->toArray());

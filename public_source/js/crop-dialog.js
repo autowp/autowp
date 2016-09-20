@@ -1,5 +1,4 @@
 define(
-    'crop-dialog',
     ['jquery', 'bootstrap', 'jcrop'],
     function($) {
         
@@ -113,7 +112,7 @@ define(
                             trueSize: [self.width, self.height],
                             keySupport: false
                         });
-                    
+                        
                     }, 100);
                 });
                 

@@ -5,14 +5,12 @@
 /composer
 /container-interop
 /doctrine
-/fortawesome
 /guzzle
 /guzzlehttp
 /illuminate
 /irazasyed
 /ircmaxell
 /jakeasmith
-/kpdecker
 /kriswallsmith
 /league
 /michelf
@@ -26,8 +24,7 @@
 /robloach
 /sebastian
 /symfony
-/twbs
-/twitter
 /webmozart
 /zendframework
 /zfcampus
+/autoload.php

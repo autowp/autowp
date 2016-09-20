@@ -1,6 +1,6 @@
 define(
-    ['jquery'],
-    function($) {
+    ['jquery', 'filesize'],
+    function($, filesize) {
         
         var Carousel = function (element, options) {
             this.$element    = $(element)
@@ -343,7 +343,7 @@ define(
                     '</a>'
                 ).attr('href', item.sourceUrl);
                 
-                $source.find('.badge').text(item.filesize);
+                $source.find('.badge').text(filesize(item.filesize));
                 
                 var $details = $(
                     '<a class="details carousel-control" role="button">' +

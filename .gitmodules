@@ -1,32 +1,8 @@
-[submodule "vendor/tapmodo/Jcrop"]
-	path = vendor/tapmodo/Jcrop
-	url = git://github.com/tapmodo/Jcrop.git
-	
-[submodule "vendor/DmitryBaranovskiy/raphael"]
-	path = vendor/DmitryBaranovskiy/raphael
-	url = git://github.com/DmitryBaranovskiy/raphael.git
-
 [submodule "vendor/artpolikarpov/Flags"]
 	path = vendor/artpolikarpov/Flags
 	url = git://github.com/artpolikarpov/Flags.git
 	
-[submodule "vendor/jrburke/requirejs"]
-	path = vendor/jrburke/requirejs
-	url = git://github.com/jrburke/requirejs.git
-	
 [submodule "vendor/kpdecker/jsdiff"]
 	path = vendor/kpdecker/jsdiff
 	url = git://github.com/kpdecker/jsdiff.git
-
-[submodule "vendor/millermedeiros/requirejs-plugins"]
-	path = vendor/millermedeiros/requirejs-plugins
-	url = git://github.com/millermedeiros/requirejs-plugins.git
-
-[submodule "vendor/requirejs/domReady"]
-	path = vendor/requirejs/domReady
-	url = git://github.com/requirejs/domReady.git
-	
-[submodule "vendor/scottjehl/Respond"]
-	path = vendor/scottjehl/Respond
-	url = git://github.com/scottjehl/Respond.git
 

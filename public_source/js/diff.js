@@ -1,1 +1,1 @@
-../../vendor/kpdecker/jsdiff/dist/diff.js
+../../node_modules/diff/dist/diff.js
