@@ -865,12 +865,12 @@ class CarsController extends AbstractActionController
         $tabs = [
             'meta' => [
                 'icon'  => 'glyphicon glyphicon-pencil',
-                'title' => 'Мета',
+                'title' => 'moder/vehicle/tabs/meta',
                 'count' => 0,
             ],
             'name' => [
                 'icon'      => 'glyphicon glyphicon-align-left',
-                'title'     => 'Название',
+                'title'     => 'moder/vehicle/tabs/name',
                 'data-load' => $this->url()->fromRoute('moder/cars/params', [
                     'action' => 'car-name'
                 ], [], true),
@@ -878,12 +878,12 @@ class CarsController extends AbstractActionController
             ],
             'desc' => [
                 'icon'  => 'glyphicon glyphicon-align-left',
-                'title' => 'Описание',
+                'title' => 'moder/vehicle/tabs/description',
                 'count' => (bool)$car->full_text_id,
             ],
             'catalogue' => [
                 'icon'      => false,
-                'title'     => 'Каталог',
+                'title'     => 'moder/vehicle/tabs/catalogue',
                 'data-load' => $this->url()->fromRoute('moder/cars/params', [
                     'action' => 'car-catalogue'
                 ], [], true),
@@ -891,7 +891,7 @@ class CarsController extends AbstractActionController
             ],
             'tree' => [
                 'icon'      => 'fa fa-tree',
-                'title'     => 'Дерево',
+                'title'     => 'moder/vehicle/tabs/tree',
                 'data-load' => $this->url()->fromRoute('moder/cars/params', [
                     'action' => 'car-tree'
                 ], [], true),
@@ -899,7 +899,7 @@ class CarsController extends AbstractActionController
             ],
             'categories' => [
                 'icon'      => 'glyphicon glyphicon-tag',
-                'title'     => 'Категории',
+                'title'     => 'moder/vehicle/tabs/categories',
                 'data-load' => $this->url()->fromRoute('moder/cars/params', [
                     'action' => 'car-categories'
                 ], [], true),
@@ -907,7 +907,7 @@ class CarsController extends AbstractActionController
             ],
             'twins' => [
                 'icon'      => 'glyphicon glyphicon-adjust',
-                'title'     => 'Близнецы',
+                'title'     => 'moder/vehicle/tabs/twins',
                 'data-load' => $this->url()->fromRoute('moder/cars/params', [
                     'action' => 'car-twins'
                 ], [], true),
@@ -915,7 +915,7 @@ class CarsController extends AbstractActionController
             ],
             'factories' => [
                 'icon'      => 'fa fa-cogs',
-                'title'     => 'Заводы',
+                'title'     => 'moder/vehicle/tabs/factories',
                 'data-load' => $this->url()->fromRoute('moder/cars/params', [
                     'action' => 'car-factories'
                 ], [], true),
@@ -923,7 +923,7 @@ class CarsController extends AbstractActionController
             ],
             'pictures' => [
                 'icon'      => 'glyphicon glyphicon-th',
-                'title'     => 'Картинки',
+                'title'     => 'moder/vehicle/tabs/pictures',
                 'data-load' => $this->url()->fromRoute('moder/cars/params', [
                     'action' => 'car-pictures'
                 ], [], true),
@@ -934,7 +934,7 @@ class CarsController extends AbstractActionController
         if ($this->user()->get()->id == 1) {
             $tabs['modifications'] = [
                 'icon'      => 'glyphicon glyphicon-th',
-                'title'     => 'Модификации',
+                'title'     => 'moder/vehicle/tabs/modifications',
                 'data-load' => $this->url()->fromRoute('moder/cars/params', [
                     'action' => 'car-modifications'
                 ], [], true),

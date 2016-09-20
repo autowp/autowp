@@ -2,7 +2,4 @@
 	path = vendor/artpolikarpov/Flags
 	url = git://github.com/artpolikarpov/Flags.git
 	
-[submodule "vendor/kpdecker/jsdiff"]
-	path = vendor/kpdecker/jsdiff
-	url = git://github.com/kpdecker/jsdiff.git
 

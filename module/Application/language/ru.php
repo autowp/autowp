@@ -1090,6 +1090,17 @@ return [
     'moder/vehicle/concept' => 'Концепт (прототип)',
     'moder/vehicle/group' => 'Группа',
 
+    'moder/vehicle/tabs/meta' => 'Мета',
+    'moder/vehicle/tabs/name' => 'Название',
+    'moder/vehicle/tabs/description' => 'Описание',
+    'moder/vehicle/tabs/catalogue' => 'Каталог',
+    'moder/vehicle/tabs/tree' => 'Дерево',
+    'moder/vehicle/tabs/categories' => 'Категории',
+    'moder/vehicle/tabs/twins' => 'Близнецы',
+    'moder/vehicle/tabs/factories' => 'Заводы',
+    'moder/vehicle/tabs/pictures' => 'Картинки',
+    'moder/vehicle/tabs/modifications' => 'Модификации',
+
     'moder/picture/edit-picture-%s' => 'Управление изображением №%s',
     'moder/picture/edit-vehicle-%s' => 'Управление автомобилем %s',
     'moder/picture/edit-brand-%s' => 'Управление брендом %s',
