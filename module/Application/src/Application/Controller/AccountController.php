@@ -823,7 +823,7 @@ class AccountController extends AbstractActionController
                 case Application_Service_Specifications::ITEM_TYPE_CAR:
                     $car = $carTable->find($conflict['itemId'])->current();
                     $conflict['object'] = $car ? $car->getFullName($language) : null;
-                    $conflict['url'] = $this->url()->fromRoute('cars', [
+                    $conflict['url'] = $this->url()->fromRoute('cars/params', [
                         'action' => 'car-specifications-editor',
                         'car_id' => $conflict['itemId'],
                         'tab'    => 'spec'
@@ -832,7 +832,7 @@ class AccountController extends AbstractActionController
                 case Application_Service_Specifications::ITEM_TYPE_ENGINE:
                     $engine = $engineTable->find($conflict['itemId'])->current();
                     $conflict['object'] = $engine ? 'Двигатель ' . $engine->caption : null;
-                    $conflict['url'] = $this->url()->fromRoute('cars', [
+                    $conflict['url'] = $this->url()->fromRoute('cars/params', [
                         'action'    => 'engine-spec-editor',
                         'engine_id' => $conflict['itemId'],
                         'tab'       => 'engine'

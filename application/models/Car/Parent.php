@@ -4,7 +4,7 @@ class Car_Parent extends Project_Db_Table
 {
     protected $_name = 'car_parent';
     protected $_primary = ['car_id', 'parent_id'];
-    
+
     protected $_referenceMap = array(
         'Car' => array(
             'columns'       => array('car_id'),
@@ -144,18 +144,18 @@ class Car_Parent extends Project_Db_Table
         $cpcTable->rebuildCache($car);
     }
 
-    public function getPathsToBrand($carId, $brand, array $options = array())
+    public function getPathsToBrand($carId, $brand, array $options = [])
     {
         $carId = (int)$carId;
         if (!$carId) {
             throw new Exception("carId not provided");
         }
-        
+
         $brandId = $brand;
         if ($brandId instanceof Brands_Row) {
             $brandId = $brandId->id;
         }
-        
+
 
         $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
 
@@ -167,10 +167,10 @@ class Car_Parent extends Project_Db_Table
             'brand_id = ?' => $brandId
         ), null, $limit);
         foreach ($brandCarRows as $brandCarRow) {
-            $result[] = array(
+            $result[] = [
                 'car_catname' => $brandCarRow->catname,
-                'path'        => array()
-            );
+                'path'        => []
+            ];
         }
 
         if ($breakOnFirst && count($result)) {
@@ -185,10 +185,10 @@ class Car_Parent extends Project_Db_Table
             $paths = $this->getPathsToBrand($parent->parent_id, $brandId, $options);
 
             foreach ($paths as $path) {
-                $result[] = array(
+                $result[] = [
                     'car_catname' => $path['car_catname'],
-                    'path'        => array_merge($path['path'], array($parent->catname))
-                );
+                    'path'        => array_merge($path['path'], [$parent->catname])
+                ];
             }
 
             if ($breakOnFirst && count($result)) {

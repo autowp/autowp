@@ -2321,7 +2321,7 @@ class CarsController extends AbstractActionController
         }
 
         foreach ($twinsGroups as &$twinsGroup) {
-            $twinsGroup['url'] = $this->url()->fromRoute('moder/cars/params', [
+            $twinsGroup['url'] = $this->url()->fromRoute('moder/twins/params', [
                 'action'         => 'twins-group',
                 'twins_group_id' => $twinsGroup['id']
             ]);
@@ -2529,54 +2529,6 @@ class CarsController extends AbstractActionController
             }
         }
 
-        $brandCarRows = $brandCarTable->fetchAll(
-            $brandCarTable->select(true)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->where('car_parent_cache.car_id = ?', $car->id)
-                ->where('car_parent_cache.car_id <> car_parent_cache.parent_id')
-        );
-        $inheritBrands = [];
-        foreach ($brandCarRows as $brandCarRow) {
-            $brandRow = $brandTable->find($brandCarRow->brand_id)->current();
-            if ($brandRow) {
-
-                if ($brandCarRow->catname) {
-                    $url = $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car',
-                        'brand_catname' => $brandRow->folder,
-                        'car_catname'   => $brandCarRow->catname
-                    ]);
-                } else {
-                    $url = $this->url()->fromRoute('catalogue', [
-                        'action'        => 'car',
-                        'brand_catname' => $brandRow->folder,
-                        'car_id'        => $car->id
-                    ]);
-                }
-
-                $inheritedCar = $carTable->find($brandCarRow->car_id)->current();
-
-                $inheritBrands[] = [
-                    'name'     => $brandRow->caption,
-                    'type'     => $brandCarRow->type,
-                    'catname'  => $brandCarRow->catname,
-                    'moderUrl' => $this->url()->fromRoute('moder/brands/params', [
-                        'action'     => 'brand',
-                        'brand_id'   => $brandRow->id
-                    ]),
-                    'url' => $url,
-                    'car' => [
-                        'name' => $inheritedCar->getFullName(),
-                        'url'  => $this->url()->fromRoute('moder/cars/params', [
-                            'action'     => 'car',
-                            'car_id'     => $inheritedCar->id,
-                        ], [], true)
-                    ]
-                ];
-            }
-        }
-
-
         $relevantBrands = [];
 
         if (strlen($car->caption) > 0) {
@@ -2605,49 +2557,46 @@ class CarsController extends AbstractActionController
 
         $parents = [];
         $childs = [];
-        if ($canUseTree) {
 
-            $carParentTable = $this->getCarParentTable();
+        $carParentTable = $this->getCarParentTable();
 
-            $order = array_merge(['car_parent.type'], $this->catalogue()->carsOrdering());
+        $order = array_merge(['car_parent.type'], $this->catalogue()->carsOrdering());
 
-            $carParentRows = $carParentTable->fetchAll(
-                $carParentTable->select(true)
-                    ->join('cars', 'car_parent.parent_id = cars.id', null)
-                    ->where('car_parent.car_id = ?', $car->id)
-                    ->order($order)
-            );
-            $parents = $this->perepareCatalogueCars($carParentRows, true);
+        $carParentRows = $carParentTable->fetchAll(
+            $carParentTable->select(true)
+                ->join('cars', 'car_parent.parent_id = cars.id', null)
+                ->where('car_parent.car_id = ?', $car->id)
+                ->order($order)
+        );
+        $parents = $this->perepareCatalogueCars($carParentRows, true);
 
-            $carParentRows = $carParentTable->fetchAll(
-                $carParentTable->select(true)
-                    ->join('cars', 'car_parent.car_id = cars.id', null)
-                    ->where('car_parent.parent_id = ?', $car->id)
-                    ->order($order)
-            );
-            $childs = $this->perepareCatalogueCars($carParentRows, false);
-        }
+        $carParentRows = $carParentTable->fetchAll(
+            $carParentTable->select(true)
+                ->join('cars', 'car_parent.car_id = cars.id', null)
+                ->where('car_parent.parent_id = ?', $car->id)
+                ->order($order)
+        );
+        $childs = $this->perepareCatalogueCars($carParentRows, false);
 
         $model = new ViewModel([
             'car'                 => $car,
             'canMove'             => $this->canMove($car),
             'brands'              => $brands,
-            'inheritBrands'       => $inheritBrands,
             'publicUrls'          => $this->carPublicUrls($car),
             'brandCarTypeOptions' => [
-                Brand_Car::TYPE_DEFAULT => 'стоковая модель',
+                Brand_Car::TYPE_DEFAULT => $this->translator->translate('catalogue/stock-model'),
                 Brand_Car::TYPE_TUNING  => $this->translator->translate('catalogue/related'),
-                Brand_Car::TYPE_SPORT   => 'спорт',
-                Brand_Car::TYPE_DESIGN  => 'дизайн'
+                Brand_Car::TYPE_SPORT   => $this->translator->translate('catalogue/sport'),
+                Brand_Car::TYPE_DESIGN  => $this->translator->translate('catalogue/design'),
             ],
             'relevantBrands'      => $relevantBrands,
             'canUseTree'          => $canUseTree,
             'parents'             => $parents,
             'childs'              => $childs,
             'carParentTypeOptions' => [
-                Car_Parent::TYPE_DEFAULT => 'подвид',
+                Car_Parent::TYPE_DEFAULT => $this->translator->translate('catalogue/sub-model'),
                 Car_Parent::TYPE_TUNING  => $this->translator->translate('catalogue/related'),
-                Car_Parent::TYPE_SPORT   => 'спорт'
+                Car_Parent::TYPE_SPORT   => $this->translator->translate('catalogue/sport'),
             ]
         ]);
 
@@ -2730,6 +2679,7 @@ class CarsController extends AbstractActionController
         $cars = [];
 
         $carTable = $this->catalogue()->getCarTable();
+        $carParentTable = new Car_Parent();
 
         $parentIds = [];
         foreach ($carParentRows as $carParentRow) {
@@ -2781,6 +2731,66 @@ class CarsController extends AbstractActionController
                 $duplicateRow = $carTable->fetchRow($select);
             }
 
+            $inheritBrands = [];
+            if ($parent) {
+                $brandCarTable = new Brand_Car();
+                $brandTable = $this->getBrandTable();
+
+                $brandCarRows = $brandCarTable->fetchAll(
+                    $brandCarTable->select(true)
+                        ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                        ->where('car_parent_cache.car_id = ?', $carRow->id)
+                );
+
+                foreach ($brandCarRows as $brandCarRow) {
+                    $brandRow = $brandTable->find($brandCarRow->brand_id)->current();
+                    if ($brandRow) {
+
+                        $url = $this->url()->fromRoute('catalogue', [
+                            'action'        => 'brand',
+                            'brand_catname' => $brandRow->folder
+                        ]);
+
+                        $inheritedCar = null;
+                        if ($brandCarRow->car_id != $carParentRow->parent_id) {
+
+                            $inheritedCar = $carTable->find($brandCarRow->car_id)->current();
+
+                            $paths = $carParentTable->getPathsToBrand($inheritedCar->id, $brandRow->id);
+
+                            $publicUrls = [];
+                            foreach ($paths as $path) {
+                                $publicUrls[] = $this->url()->fromRoute('catalogue', array_replace([
+                                    'action' => 'brand-car',
+                                    'brand_catname' => $brandRow->folder
+                                ], $path));
+                            }
+
+                            $inheritedCar = [
+                                'name' => $inheritedCar->getFullName(),
+                                'url'  => $this->url()->fromRoute('moder/cars/params', [
+                                    'action' => 'car',
+                                    'car_id' => $inheritedCar->id,
+                                ], [], true),
+                                'publicUrls' => $publicUrls,
+                                'type' => $brandCarRow->type
+                            ];
+                        }
+
+                        $inheritBrands[] = [
+                            'name'     => $brandRow->caption,
+                            'type'     => $brandCarRow->type,
+                            'catname'  => $brandCarRow->catname,
+                            'moderUrl' => $this->url()->fromRoute('moder/brands/params', [
+                                'action'   => 'brand',
+                                'brand_id' => $brandRow->id
+                            ]),
+                            'url' => $url,
+                            'car' => $inheritedCar
+                        ];
+                    }
+                }
+            }
 
             $cars[] = [
                 'id'         => $carRow->id,
@@ -2812,7 +2822,8 @@ class CarsController extends AbstractActionController
                     'action'     => 'car-parent-set-catname',
                     'car_id'     => $carParentRow->car_id,
                     'parent_id'  => $carParentRow->parent_id
-                ], [], true)
+                ], [], true),
+                'inheritBrands' => $inheritBrands
             ];
         }
 
