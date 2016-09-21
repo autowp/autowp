@@ -1147,4 +1147,6 @@ We will try not to disappoint you.',
     'moder/picture/acceptance/already-voted' => 'Already voted: ',
     'moder/picture/acceptance/that-is-one-accepted-picture' => 'That is single picture of that vehicle',
     'moder/picture/acceptance/accepted-pictures-is-%s' => 'Accepted pictures count still %s',
+
+    'moder/edit-object' => 'edit',
 ];

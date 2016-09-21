@@ -56,7 +56,7 @@
         <?=$this->htmlA($this->url('moder/cars/params', [
             'action' => 'car',
             'car_id' => $this->car['id']
-        ]), 'управление')?>
+        ]), $this->translate('moder/edit-object'))?>
 
         <?php if ($this->user()->isAllowed('car', 'add') && $this->car['is_group']) { ?>
             <i class="fa fa-plus"></i>
@@ -192,7 +192,7 @@
             <?php if ($this->isCarModer) { ?>
                 <li>
                     <i class="fa fa-cog"></i>
-                    <?=$this->htmlA('#' /*$item['moderUrl']*/, 'управление') ?>
+                    <?=$this->htmlA('#' /*$item['moderUrl']*/, $this->translate('moder/edit-object')) ?>
                 </li>
             <?php } ?>
 

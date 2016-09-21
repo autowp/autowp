@@ -1165,4 +1165,6 @@ return [
     'moder/picture/acceptance/already-voted' => 'Уже подали: ',
     'moder/picture/acceptance/that-is-one-accepted-picture' => 'Это единственная принятая картинка этого автомобиля',
     'moder/picture/acceptance/accepted-pictures-is-%s' => 'Принятых картинок этого автомобиля всего %s',
+
+    'moder/edit-object' => 'управление',
 ];

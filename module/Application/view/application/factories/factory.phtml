@@ -37,7 +37,7 @@
             <?=$this->htmlA($this->url('moder/factories/params', [
                 'action'     => 'factory',
                 'factory_id' => $this->factory->id
-            ]), '<i class="fa fa-cog"></i> Управление', false) ?>
+            ]), '<i class="fa fa-cog"></i> ' . $this->escapeHtml($this->translate('moder/edit-object')), false) ?>
         </li>
     <?php } ?>
 </ul>
