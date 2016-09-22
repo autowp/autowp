@@ -6,8 +6,8 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Perspectives;
 use Perspective_Group;
-use Perspectives_Groups_Perspectives;
-use Perspectives_Pages;
+use Perspective_Group_Perspective;
+use Perspective_Page;
 
 class PerspectivesController extends AbstractActionController
 {
@@ -19,8 +19,8 @@ class PerspectivesController extends AbstractActionController
 
         $prspModel = new Perspectives();
         $prspGroupsModel = new Perspective_Group();
-        $prspGroupsPrspModel = new Perspectives_Groups_Perspectives();
-        $prspPagesModel = new Perspectives_Pages();
+        $prspGroupsPrspModel = new Perspective_Group_Perspective();
+        $prspPagesModel = new Perspective_Page();
 
         $data = [];
         foreach ($prspPagesModel->fetchAll(null, 'id') as $page) {

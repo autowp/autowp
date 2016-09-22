@@ -6,7 +6,7 @@ class Perspective_Group extends Zend_Db_Table
     protected $_referenceMap = [
         'Page' => [
             'columns'       => ['page_id'],
-            'refTableClass' => 'Perspectives_Pages',
+            'refTableClass' => 'Perspective_Page',
             'refColumns'    => ['id']
         ]
     ];

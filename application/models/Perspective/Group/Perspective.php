@@ -1,6 +1,6 @@
 <?php
 
-class Perspectives_Groups_Perspectives extends Zend_Db_Table
+class Perspective_Group_Perspective extends Zend_Db_Table
 {
     protected $_name = 'perspectives_groups_perspectives';
     protected $_primary = ['group_id', 'perspective_id'];
