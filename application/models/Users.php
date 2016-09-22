@@ -3,7 +3,7 @@
 class Users extends Project_Db_Table
 {
     protected $_name = 'users';
-    protected $_rowClass = 'Users_Row';
+    protected $_rowClass = 'User_Row';
 
     const MAX_NAME = 50;
     const MIN_PASSWORD = 6;

@@ -19,7 +19,7 @@ use Car_Row;
 use Engines;
 use User_Car_Subscribe;
 use Users;
-use Users_Row;
+use User_Row;
 
 class CarsController extends AbstractActionController
 {
@@ -620,7 +620,7 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    private function userUrl(Users_Row $user)
+    private function userUrl(User_Row $user)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user->identity ? $user->identity : 'user' . $user->id

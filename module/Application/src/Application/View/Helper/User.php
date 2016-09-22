@@ -14,7 +14,7 @@ use DateTime;
 use DateTimeZone;
 
 use Users;
-use Users_Row;
+use User_Row;
 
 use Exception;
 
@@ -58,7 +58,7 @@ class User extends AbstractHelper
             $user = $this->getLogedInUser();
         }
 
-        if (!$user instanceof Users_Row) {
+        if (!$user instanceof User_Row) {
             $user = $this->user($user);
         }
 
@@ -68,7 +68,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return Users_Row|bool
+     * @return User_Row|bool
      */
     private function getLogedInUser()
     {
@@ -90,7 +90,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return Users_Row
+     * @return User_Row
      */
     public function get()
     {

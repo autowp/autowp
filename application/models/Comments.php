@@ -134,7 +134,7 @@ class Comments
      */
     private function _get($type, $item, $parentId, $userId, $perPage = 0, $page = 0)
     {
-        if ($userId instanceof Users_Row) {
+        if ($userId instanceof User_Row) {
             $userId = $userId->id;
         }
 

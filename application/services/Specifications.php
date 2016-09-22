@@ -419,11 +419,11 @@ class Application_Service_Specifications
     /**
      * @param int $itemId
      * @param int $zoneId
-     * @param Users_Row $user
+     * @param User_Row $user
      * @param array $options
      * @return Application_Form_Attrs_Zone_Attributes
      */
-    private function getForm($itemId, $zoneId, Users_Row $user, array $options)
+    private function getForm($itemId, $zoneId, User_Row $user, array $options)
     {
         $multioptions = $this->_getListsOptions($this->loadZone($zoneId));
 
@@ -519,7 +519,7 @@ class Application_Service_Specifications
         return $form;
     }
 
-    public function getFormData($itemId, $zoneId, Users_Row $user)
+    public function getFormData($itemId, $zoneId, User_Row $user)
     {
         $zone = $this->_getZone($zoneId);
         $itemTypeId = $zone->item_type_id;
@@ -729,7 +729,7 @@ class Application_Service_Specifications
     /**
      * @param int $itemId
      * @param int $zoneId
-     * @param Users_Row $user
+     * @param User_Row $user
      * @param array $options
      * @return AttrsZoneAttributesForm
      */
@@ -791,7 +791,7 @@ class Application_Service_Specifications
      * @param array $options
      * @return Application_Form_Attrs_Zone_Attributes
      */
-    public function getCarForm(Car_Row $car, Users_Row $user, array $options)
+    public function getCarForm(Car_Row $car, User_Row $user, array $options)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         return $this->getForm($car->id, $zoneId, $user, $options);
@@ -799,11 +799,11 @@ class Application_Service_Specifications
 
     /**
      * @param Car_Row $car
-     * @param Users_Row $user
+     * @param User_Row $user
      * @param array $options
      * @return array
      */
-    public function getCarForm2(Car_Row $car, Users_Row $user, array $options)
+    public function getCarForm2(Car_Row $car, User_Row $user, array $options)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         return [
@@ -814,11 +814,11 @@ class Application_Service_Specifications
 
     /**
      * @param Engine_Row $engine
-     * @param Users_Row $user
+     * @param User_Row $user
      * @param array $options
      * @return Application_Form_Attrs_Zone_Attributes
      */
-    public function getEngineForm(Engine_Row $engine, Users_Row $user, array $options)
+    public function getEngineForm(Engine_Row $engine, User_Row $user, array $options)
     {
         $zoneId = 5;
         return $this->getForm($engine->id, $zoneId, $user, $options);
@@ -826,11 +826,11 @@ class Application_Service_Specifications
 
     /**
      * @param Engine_Row $engine
-     * @param Users_Row $user
+     * @param User_Row $user
      * @param array $options
      * @return array
      */
-    public function getEngineForm2(Engine_Row $engine, Users_Row $user, array $options)
+    public function getEngineForm2(Engine_Row $engine, User_Row $user, array $options)
     {
         $zoneId = 5;
         return [
@@ -1109,9 +1109,9 @@ class Application_Service_Specifications
 
     /**
      * @param Application_Form_Attrs_Zone_Attributes $form
-     * @param Users_Row $user
+     * @param User_Row $user
      */
-    public function saveAttrsZoneAttributes(Application_Form_Attrs_Zone_Attributes $form, Users_Row $user)
+    public function saveAttrsZoneAttributes(Application_Form_Attrs_Zone_Attributes $form, User_Row $user)
     {
         $zone = $form->getZone();
 
@@ -1136,9 +1136,9 @@ class Application_Service_Specifications
     /**
      * @param Car_Row $car
      * @param array $values
-     * @param Users_Row $user
+     * @param User_Row $user
      */
-    public function saveCarAttributes(Car_Row $car, array $values, Users_Row $user)
+    public function saveCarAttributes(Car_Row $car, array $values, User_Row $user)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         $zone = $this->_getZone($zoneId);
@@ -1165,9 +1165,9 @@ class Application_Service_Specifications
     /**
      * @param Engine_Row $car
      * @param array $values
-     * @param Users_Row $user
+     * @param User_Row $user
      */
-    public function saveEngineAttributes(Engine_Row $engine, array $values, Users_Row $user)
+    public function saveEngineAttributes(Engine_Row $engine, array $values, User_Row $user)
     {
         $zoneId = 5;
         $zone = $this->_getZone($zoneId);

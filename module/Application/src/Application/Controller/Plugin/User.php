@@ -11,7 +11,7 @@ use Zend_Acl_Role_Interface;
 use Zend_Auth;
 
 use Users;
-use Users_Row;
+use User_Row;
 
 class User extends AbstractPlugin
 {
@@ -31,7 +31,7 @@ class User extends AbstractPlugin
     private $users = [];
 
     /**
-     * @var Users_Row
+     * @var User_Row
      */
     private $user = null;
 
@@ -58,7 +58,7 @@ class User extends AbstractPlugin
 
     /**
      * @param int $id
-     * @return Users_Row
+     * @return User_Row
      */
     private function user($id)
     {
@@ -83,7 +83,7 @@ class User extends AbstractPlugin
             $user = $this->getLogedInUser();
         }
 
-        if (!$user instanceof Users_Row) {
+        if (!$user instanceof User_Row) {
             $user = $this->user($user);
         }
 
@@ -93,7 +93,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return Users_Row
+     * @return User_Row
      */
     private function getLogedInUser()
     {
@@ -115,7 +115,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return Users_Row
+     * @return User_Row
      */
     public function get()
     {
