@@ -5,16 +5,16 @@ namespace Application\View\Helper;
 use Zend\View\Helper\AbstractHtmlElement;
 
 use Picture;
-use Pictures_Row;
+use Picture_Row;
 
 class Pic extends AbstractHtmlElement
 {
     /**
-     * @var Pictures_Row
+     * @var Picture_Row
      */
     private $picture = null;
 
-    public function __invoke(Pictures_Row $picture = null)
+    public function __invoke(Picture_Row $picture = null)
     {
         $this->picture = $picture;
 

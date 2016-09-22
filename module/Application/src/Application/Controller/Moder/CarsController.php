@@ -34,7 +34,7 @@ use Factory;
 use Factory_Car;
 use Modification_Group;
 use Picture;
-use Pictures_Row;
+use Picture_Row;
 use Spec;
 use Twins_Groups;
 use Twins_Groups_Cars;
@@ -3449,7 +3449,7 @@ class CarsController extends AbstractActionController
                 ->order(['pictures.status', 'pictures.id'])
         );
         foreach ($rows as $row) {
-            $request = Pictures_Row::buildFormatRequest($row->toArray());
+            $request = Picture_Row::buildFormatRequest($row->toArray());
             $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
             if ($imageInfo) {
                 $childs[$row->id] = $imageInfo->getSrc();
@@ -3778,7 +3778,7 @@ class CarsController extends AbstractActionController
 
         foreach ($pictureRows as $pictureRow) {
 
-            $request = Pictures_Row::buildFormatRequest($pictureRow->toArray());
+            $request = Picture_Row::buildFormatRequest($pictureRow->toArray());
             $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
 
             $modificationIds = $db->fetchCol(

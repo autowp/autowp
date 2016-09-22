@@ -4,7 +4,7 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Pictures_Row;
+use Picture_Row;
 
 use Exception;
 
@@ -17,7 +17,7 @@ class InlinePicture extends AbstractHelper
         $this->translator = $translator;
     }
 
-    public function __invoke(Pictures_Row $picture)
+    public function __invoke(Picture_Row $picture)
     {
         if (!$this->translator) {
             throw new Exception('`translator` expected');

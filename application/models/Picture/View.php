@@ -12,7 +12,7 @@ class Picture_View extends Project_Db_Table
         )
     );
 
-    public function inc(Pictures_Row $picture)
+    public function inc(Picture_Row $picture)
     {
         $sql = '
             INSERT INTO picture_view (picture_id, views)
@@ -40,10 +40,10 @@ class Picture_View extends Project_Db_Table
     }
 
     /**
-     * @param Pictures_Row $picture
+     * @param Picture_Row $picture
      * @return int
      */
-    public function get(Pictures_Row $picture)
+    public function get(Picture_Row $picture)
     {
         $view = $this->fetchRow(array(
             'picture_id = ?' => $picture->id

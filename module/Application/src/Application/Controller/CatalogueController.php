@@ -27,7 +27,7 @@ use Factory;
 use Modification_Group;
 use Perspectives_Groups;
 use Picture;
-use Pictures_Row;
+use Picture_Row;
 use Users;
 
 use Zend_Db_Expr;
@@ -536,7 +536,7 @@ class CatalogueController extends AbstractActionController
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = Pictures_Row::buildFormatRequest($picture);
+            $requests[$idx] = Picture_Row::buildFormatRequest($picture);
         }
 
         $imagesInfo = $this->imageStorage()->getFormatedImages($requests, 'picture-thumb');
