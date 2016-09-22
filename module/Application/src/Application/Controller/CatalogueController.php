@@ -15,7 +15,7 @@ use Application\Service\Mosts;
 use Exception;
 
 use Application_Service_Specifications;
-use Brands_Cars;
+use Brand_Car;
 use Car_Language;
 use Car_Parent;
 use Car_Types;
@@ -1525,7 +1525,7 @@ class CatalogueController extends AbstractActionController
                     ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
                         'brand_car_catname' => 'catname'
                     ])
-                    ->where('brands_cars.type = ?', Brands_Cars::TYPE_DESIGN)
+                    ->where('brands_cars.type = ?', Brand_Car::TYPE_DESIGN)
                     ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
                     ->where('car_parent_cache.car_id = ?', $currentCar['id'])
             );

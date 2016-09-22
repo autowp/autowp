@@ -495,7 +495,7 @@ class Picture extends Project_Db_Table
                     if ($car) {
                         $car->refreshPicturesCount();
                         //TODO: brands_cars_cache
-                        foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+                        foreach ($car->findBrandsViaBrand_Car() as $brand) {
                             $brand->refreshPicturesCount();
                         }
                     }

@@ -362,7 +362,7 @@ class UploadController extends AbstractActionController
                     $car = $picture->findParentCars();
                     if ($car) {
                         $car->refreshPicturesCount();
-                        foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+                        foreach ($car->findBrandsViaBrand_Car() as $brand) {
                             $brand->refreshPicturesCount();
                         }
                     }

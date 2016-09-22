@@ -20,7 +20,6 @@ use Autowp\Filter\Filename\Safe;
 use Application_Service_Specifications;
 use Brand_Car;
 use Brands;
-use Brands_Cars;
 use Car_Language;
 use Car_Parent;
 use Car_Parent_Cache;
@@ -57,7 +56,7 @@ class CarsController extends AbstractActionController
     private $carParentTable;
 
     /**
-     * @var Brands_Cars
+     * @var Brand_Car
      */
     private $brandCarTable;
 
@@ -1060,7 +1059,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        foreach ($car->findBrandsViaBrands_Cars() as $iBrand) {
+        foreach ($car->findBrandsViaBrand_Car() as $iBrand) {
             if ($iBrand->id == $brand->id) {
                 throw new Exception('Автомобиль уже связан с брендом '.$iBrand->caption);
             }
@@ -1089,7 +1088,7 @@ class CarsController extends AbstractActionController
         $brandsCars->insert([
             'brand_id' => $brand->id,
             'car_id'   => $car->id,
-            'type'     => Brands_Cars::TYPE_DEFAULT,
+            'type'     => Brand_Car::TYPE_DEFAULT,
             'catname'  => $catname ? $catname : 'car' . $car->id
         ]);
 
@@ -2598,13 +2597,13 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @return Brands_Cars
+     * @return Brand_Car
      */
     private function getBrandCarTable()
     {
         return $this->brandCarTable
             ? $this->brandCarTable
-            : $this->brandCarTable = new Brands_Cars();
+            : $this->brandCarTable = new Brand_Car();
     }
 
     /**
@@ -3541,13 +3540,13 @@ class CarsController extends AbstractActionController
 
                 // обнволяем кэш старого автомобиля
                 $car->refreshPicturesCount();
-                foreach ($car->findBrandsViaBrands_Cars() as $brand) {
+                foreach ($car->findBrandsViaBrand_Car() as $brand) {
                     $brand->refreshPicturesCount();
                 }
 
                 // обнволяем кэш нового автомобиля
                 $newCar->refreshPicturesCount();
-                foreach ($newCar->findBrandsViaBrands_Cars() as $brand) {
+                foreach ($newCar->findBrandsViaBrand_Car() as $brand) {
                     $brand->refreshPicturesCount();
                 }
 

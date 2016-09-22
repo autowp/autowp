@@ -319,8 +319,7 @@ class Cars_Row extends Project_Db_Table_Row
         $this->pictures_count = (int)$db->fetchOne($sql, [$this->id, Picture::CAR_TYPE_ID]);
         $this->save();
 
-        foreach ($this->findBrandsViaBrands_Cars() as $brand)
-        {
+        foreach ($this->findBrandsViaBrand_Car() as $brand) {
             $brand->refreshPicturesCount();
         }
     }

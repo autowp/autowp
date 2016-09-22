@@ -14,7 +14,7 @@ class Catalogue
     private $brandTable;
 
     /**
-     * @var Brands_Cars
+     * @var Brand_Car
      */
     private $brandCarTable;
 
@@ -113,13 +113,13 @@ class Catalogue
     }
 
     /**
-     * @return Brands_Cars
+     * @return Brand_Car
      */
     public function getBrandCarTable()
     {
         return $this->brandCarTable
             ? $this->brandCarTable
-            : $this->brandCarTable = new Brands_Cars();
+            : $this->brandCarTable = new Brand_Car();
     }
 
     /**
