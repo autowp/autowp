@@ -331,16 +331,7 @@ class Cars_Row extends Project_Db_Table_Row
         $sql = 'DELETE FROM brands_cars WHERE (brand_id=?) AND (car_id=?) LIMIT 1';
         $db->query($sql, [$brand->id, $this->id]);
 
-        $brand->updatePicturesCache();
         $brand->refreshPicturesCount();
-        $brand->refreshActivePicturesCount();
-    }
-
-    public function updateRelatedTwinsGroupsCount()
-    {
-        foreach ($this->findBrandsViaBrands_Cars() as $brand) {
-            $brand->updateTwinsGroupsCount();
-        }
     }
 
     public function getAttrsZone()

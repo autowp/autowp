@@ -355,7 +355,6 @@ class UploadController extends AbstractActionController
                 case Picture::MIXED_TYPE_ID:
                     $brand = $picture->findParentBrands();
                     if ($brand) {
-                        $brand->updatePicturesCache();
                         $brand->refreshPicturesCount();
                     }
                     break;
@@ -364,7 +363,6 @@ class UploadController extends AbstractActionController
                     if ($car) {
                         $car->refreshPicturesCount();
                         foreach ($car->findBrandsViaBrands_Cars() as $brand) {
-                            $brand->updatePicturesCache();
                             $brand->refreshPicturesCount();
                         }
                     }

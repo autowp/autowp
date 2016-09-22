@@ -182,8 +182,6 @@ class CatalogueController extends AbstractActionController
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brand['id'])
-                /*->join('brands_pictures_cache', 'pictures.id=brands_pictures_cache.picture_id', null)
-                ->where('brands_pictures_cache.brand_id = ?', $brand['id'])*/
                 ->group('pictures.id')
                 ->order([
                     'pictures.accept_datetime DESC',

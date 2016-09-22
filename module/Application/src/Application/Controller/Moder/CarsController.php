@@ -992,12 +992,7 @@ class CarsController extends AbstractActionController
         $ucsTable = new User_Car_Subscribe();
         $ucsTable->subscribe($user, $car);
 
-        $brand->updatePicturesCache();
         $brand->RefreshPicturesCount();
-        $brand->RefreshActivePicturesCount();
-
-        // обновляем кэши близнецов
-        $car->updateRelatedTwinsGroupsCount();
 
         $message = sprintf(
             'Автомобиль %s отсоединен от бренда %s',
@@ -1102,12 +1097,7 @@ class CarsController extends AbstractActionController
         $ucsTable = new User_Car_Subscribe();
         $ucsTable->subscribe($user, $car);
 
-        $brand->updatePicturesCache();
         $brand->refreshPicturesCount();
-        $brand->refreshActivePicturesCount();
-
-        // обновляем кэши близнецов
-        $car->updateRelatedTwinsGroupsCount();
 
         $message = sprintf(
             'Автомобиль %s добавлен к бренду %s',
@@ -1256,9 +1246,6 @@ class CarsController extends AbstractActionController
                 'car_id' => $car->id
             ]);
 
-            // обновляем кэши
-            $car->updateRelatedTwinsGroupsCount();
-
             $this->log(sprintf(
                 'Автомобиль %s добавлен в группу близнецов %s',
                 htmlspecialchars($car->getFullName()),
@@ -1355,9 +1342,6 @@ class CarsController extends AbstractActionController
         if ($twinsGroup->findCarsViaTwins_Groups_Cars()->count() <= 0) {
             $twinsGroup->delete();
         }
-
-        // обновляем кэши
-        $car->updateRelatedTwinsGroupsCount();
 
         return $this->redirectToCar($car, 'twins');
     }
@@ -3558,14 +3542,12 @@ class CarsController extends AbstractActionController
                 // обнволяем кэш старого автомобиля
                 $car->refreshPicturesCount();
                 foreach ($car->findBrandsViaBrands_Cars() as $brand) {
-                    $brand->updatePicturesCache();
                     $brand->refreshPicturesCount();
                 }
 
                 // обнволяем кэш нового автомобиля
                 $newCar->refreshPicturesCount();
                 foreach ($newCar->findBrandsViaBrands_Cars() as $brand) {
-                    $brand->updatePicturesCache();
                     $brand->refreshPicturesCount();
                 }
 

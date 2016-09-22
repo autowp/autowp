@@ -496,7 +496,6 @@ class Picture extends Project_Db_Table
                         $car->refreshPicturesCount();
                         //TODO: brands_cars_cache
                         foreach ($car->findBrandsViaBrands_Cars() as $brand) {
-                            $brand->updatePicturesCache();
                             $brand->refreshPicturesCount();
                         }
                     }
@@ -514,7 +513,6 @@ class Picture extends Project_Db_Table
                     );
 
                     foreach ($brands as $brand) {
-                        $brand->updatePicturesCache();
                         $brand->refreshEnginePicturesCount();
                     }
                 }
@@ -522,18 +520,8 @@ class Picture extends Project_Db_Table
             case Picture::MIXED_TYPE_ID:
             case Picture::LOGO_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:
-                if ($params['brand_id']) {
-                    $brandTable = new Brands();
-                    $brand = $brandTable->find($params['brand_id'])->current();
-                    if ($brand) {
-                        $brand->updatePicturesCache();
-                    }
-                }
                 break;
             case Picture::FACTORY_TYPE_ID:
-                if ($params['factory_id']) {
-
-                }
                 break;
         }
     }
