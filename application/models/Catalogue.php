@@ -232,7 +232,7 @@ class Catalogue
         return $urls;
     }
 
-    public function engineCataloguePaths(Engines_Row $engine, array $options = [])
+    public function engineCataloguePaths(Engine_Row $engine, array $options = [])
     {
         $defaults = [
             'brand_id' => null,

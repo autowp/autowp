@@ -58,9 +58,9 @@ class Engine_Parent_Cache extends Project_Db_Table
     }
 
     /**
-     * @param Engines_Row $engine
+     * @param Engine_Row $engine
      */
-    public function rebuildOnRemoveParent(Engines_Row $engine)
+    public function rebuildOnRemoveParent(Engine_Row $engine)
     {
         $table = new Engines();
 
@@ -82,7 +82,7 @@ class Engine_Parent_Cache extends Project_Db_Table
         ));
     }
 
-    public function rebuildOnCreate(Engines_Row $engine)
+    public function rebuildOnCreate(Engine_Row $engine)
     {
         // self
         $this->insert(array(
@@ -92,9 +92,9 @@ class Engine_Parent_Cache extends Project_Db_Table
     }
 
     /**
-     * @param Engines_Row $engine
+     * @param Engine_Row $engine
      */
-    public function rebuildOnAddParent(Engines_Row $engine)
+    public function rebuildOnAddParent(Engine_Row $engine)
     {
         $table = new Engines();
 

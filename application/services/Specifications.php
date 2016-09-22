@@ -813,24 +813,24 @@ class Application_Service_Specifications
     }
 
     /**
-     * @param Engines_Row $engine
+     * @param Engine_Row $engine
      * @param Users_Row $user
      * @param array $options
      * @return Application_Form_Attrs_Zone_Attributes
      */
-    public function getEngineForm(Engines_Row $engine, Users_Row $user, array $options)
+    public function getEngineForm(Engine_Row $engine, Users_Row $user, array $options)
     {
         $zoneId = 5;
         return $this->getForm($engine->id, $zoneId, $user, $options);
     }
 
     /**
-     * @param Engines_Row $engine
+     * @param Engine_Row $engine
      * @param Users_Row $user
      * @param array $options
      * @return array
      */
-    public function getEngineForm2(Engines_Row $engine, Users_Row $user, array $options)
+    public function getEngineForm2(Engine_Row $engine, Users_Row $user, array $options)
     {
         $zoneId = 5;
         return [
@@ -1163,11 +1163,11 @@ class Application_Service_Specifications
     }
 
     /**
-     * @param Engines_Row $car
+     * @param Engine_Row $car
      * @param array $values
      * @param Users_Row $user
      */
-    public function saveEngineAttributes(Engines_Row $engine, array $values, Users_Row $user)
+    public function saveEngineAttributes(Engine_Row $engine, array $values, Users_Row $user)
     {
         $zoneId = 5;
         $zone = $this->_getZone($zoneId);
