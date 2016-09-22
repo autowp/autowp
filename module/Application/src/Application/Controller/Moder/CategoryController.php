@@ -394,10 +394,10 @@ class CategoryController extends AbstractActionController
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @return string
      */
-    private function carModerUrl(Cars_Row $car, $full = false, $tab = null)
+    private function carModerUrl(Car_Row $car, $full = false, $tab = null)
     {
         return $this->url()->fromRoute('moder/cars/params', [
             'action' => 'car',

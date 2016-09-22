@@ -247,7 +247,7 @@ class Twins
 
     /**
      * @param int $groupId
-     * @return Cars_Row[]
+     * @return Car_Row[]
      */
     public function getGroupCars($groupId)
     {

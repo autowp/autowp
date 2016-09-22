@@ -10,7 +10,7 @@ use Application\Model\Twins;
 
 use Application_Service_Specifications;
 use Car_Parent;
-use Cars_Row;
+use Car_Row;
 use Category;
 use Category_Language;
 use Factory;
@@ -120,7 +120,7 @@ class IndexController extends AbstractActionController
         return $pictures;
     }
 
-    private function carLinks(Cars_Row $car)
+    private function carLinks(Car_Row $car)
     {
         $items = [];
 

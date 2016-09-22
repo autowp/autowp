@@ -17,7 +17,7 @@ class Moder_ModificationController extends Zend_Controller_Action
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @return string
      */
     private function carModerUrl($carId, $full = false, $tab = null)
@@ -34,7 +34,7 @@ class Moder_ModificationController extends Zend_Controller_Action
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @return void
      */
     private function redirectToCar($carId, $tab = null)

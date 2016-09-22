@@ -18,7 +18,7 @@ class User_Car_Subscribe extends Project_Db_Table
         )
     );
 
-    public function subscribe(Users_Row $user, Cars_Row $car)
+    public function subscribe(Users_Row $user, Car_Row $car)
     {
         $row = $this->fetchRow(array(
                'user_id = ?' => $user->id,
@@ -32,7 +32,7 @@ class User_Car_Subscribe extends Project_Db_Table
         }
     }
 
-    public function unsubscribe(Users_Row $user, Cars_Row $car)
+    public function unsubscribe(Users_Row $user, Car_Row $car)
     {
         $row = $this->fetchRow(array(
             'user_id = ?' => $user->id,
@@ -43,7 +43,7 @@ class User_Car_Subscribe extends Project_Db_Table
         }
     }
 
-    public function getCarSubscribers(Cars_Row $car)
+    public function getCarSubscribers(Car_Row $car)
     {
         $uTable = new Users();
 

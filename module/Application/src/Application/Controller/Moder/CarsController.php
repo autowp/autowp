@@ -24,7 +24,7 @@ use Car_Language;
 use Car_Parent;
 use Car_Parent_Cache;
 use Car_Types;
-use Cars_Row;
+use Car_Row;
 use Category;
 use Category_Car;
 use Category_Language;
@@ -120,7 +120,7 @@ class CarsController extends AbstractActionController
         }
     }
 
-    private function canMove(Cars_Row $car)
+    private function canMove(Car_Row $car)
     {
         return $this->user()->isAllowed('car', 'move');
     }
@@ -300,10 +300,10 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @return string
      */
-    private function carModerUrl(Cars_Row $car, $full = false, $tab = null)
+    private function carModerUrl(Car_Row $car, $full = false, $tab = null)
     {
         return $this->url()->fromRoute('moder/cars/params', [
             'action' => 'car',
@@ -315,15 +315,15 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @return void
      */
-    private function redirectToCar(Cars_Row $car, $tab = null)
+    private function redirectToCar(Car_Row $car, $tab = null)
     {
         return $this->redirect()->toUrl($this->carModerUrl($car, true, $tab));
     }
 
-    private function canEditMeta(Cars_Row $car)
+    private function canEditMeta(Car_Row $car)
     {
         return $this->user()->isAllowed('car', 'edit_meta');
     }
@@ -507,7 +507,7 @@ class CarsController extends AbstractActionController
         return $this->textForm;
     }
 
-    private function carToForm(Cars_Row $car)
+    private function carToForm(Car_Row $car)
     {
         return [
             'name'        => $car->caption,
@@ -2406,7 +2406,7 @@ class CarsController extends AbstractActionController
         return $model->setTerminal(true);
     }
 
-    private function carTreeWalk(Cars_Row $car, $carParentRow = null)
+    private function carTreeWalk(Car_Row $car, $carParentRow = null)
     {
         $data = [
             'name'   => $car->getFullName(),
@@ -2652,7 +2652,7 @@ class CarsController extends AbstractActionController
         return $urls;
     }
 
-    private function carPublicUrls(Cars_Row $car)
+    private function carPublicUrls(Car_Row $car)
     {
         return $this->walkUpUntilBrand($car->id, []);
     }
@@ -2985,7 +2985,7 @@ class CarsController extends AbstractActionController
         ]);
     }
 
-    private function carSelectParentWalk(Cars_Row $car)
+    private function carSelectParentWalk(Car_Row $car)
     {
         $data = [
             'name'   => $car->getFullName(),
@@ -3568,7 +3568,7 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    private function carMofificationsGroupModifications(Cars_Row $car, $groupId)
+    private function carMofificationsGroupModifications(Car_Row $car, $groupId)
     {
         $modModel = new Modification();
         $mTable = new ModificationTable();

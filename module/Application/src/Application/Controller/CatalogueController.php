@@ -20,7 +20,7 @@ use Car_Language;
 use Car_Parent;
 use Car_Types;
 use Cars;
-use Cars_Row;
+use Car_Row;
 use Comment_Message;
 use Engines;
 use Factory;
@@ -1374,7 +1374,7 @@ class CatalogueController extends AbstractActionController
             );
 
             foreach ($rows as $row) {
-                $result[$row['id']] = Cars_Row::buildFullName($row);
+                $result[$row['id']] = Car_Row::buildFullName($row);
             }
         }
 
@@ -1444,7 +1444,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $carFullName = Cars_Row::buildFullName($currentCar);
+            $carFullName = Car_Row::buildFullName($currentCar);
 
             // prefetch car names
             $ids = [];

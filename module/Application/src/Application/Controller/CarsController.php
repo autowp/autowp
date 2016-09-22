@@ -15,7 +15,7 @@ use Attrs_Attributes;
 use Attrs_Item_Types;
 use Attrs_User_Values;
 use Cars;
-use Cars_Row;
+use Car_Row;
 use Engines;
 use User_Car_Subscribe;
 use Users;
@@ -48,7 +48,7 @@ class CarsController extends AbstractActionController
             : $this->engineTable = new Engines();
     }
 
-    private function carModerUrl(Cars_Row $car)
+    private function carModerUrl(Car_Row $car)
     {
         return $this->url()->fromRoute('moder/cars/params', [
             'action' => 'car',

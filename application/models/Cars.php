@@ -4,8 +4,7 @@ class Cars extends Project_Db_Table
 {
     protected $_name = 'cars';
     protected $_use_selects_cache = true;
-    protected $_rowClass = 'Cars_Row';
-    protected $_rowsetClass = 'Cars_Rowset';
+    protected $_rowClass = 'Car_Row';
     protected $_referenceMap = array(
         'Type' => array(
             'columns'       => array('car_type_id'),
@@ -40,7 +39,7 @@ class Cars extends Project_Db_Table
         return parent::insert($data);
     }
 
-    public function updateInteritance(Cars_Row $car)
+    public function updateInteritance(Car_Row $car)
     {
         $parents = $this->fetchAll(
             $this->select(true)

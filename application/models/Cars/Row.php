@@ -1,6 +1,6 @@
 <?php
 
-class Cars_Row extends Project_Db_Table_Row
+class Car_Row extends Project_Db_Table_Row
 {
     /**
      * @var Spec

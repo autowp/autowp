@@ -787,23 +787,23 @@ class Application_Service_Specifications
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @param array $options
      * @return Application_Form_Attrs_Zone_Attributes
      */
-    public function getCarForm(Cars_Row $car, Users_Row $user, array $options)
+    public function getCarForm(Car_Row $car, Users_Row $user, array $options)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         return $this->getForm($car->id, $zoneId, $user, $options);
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @param Users_Row $user
      * @param array $options
      * @return array
      */
-    public function getCarForm2(Cars_Row $car, Users_Row $user, array $options)
+    public function getCarForm2(Car_Row $car, Users_Row $user, array $options)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         return [
@@ -1134,11 +1134,11 @@ class Application_Service_Specifications
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @param array $values
      * @param Users_Row $user
      */
-    public function saveCarAttributes(Cars_Row $car, array $values, Users_Row $user)
+    public function saveCarAttributes(Car_Row $car, array $values, Users_Row $user)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         $zone = $this->_getZone($zoneId);

@@ -183,10 +183,10 @@ class Catalogue
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @return array
      */
-    public function cataloguePaths(Cars_Row $car)
+    public function cataloguePaths(Car_Row $car)
     {
         return $this->walkUpUntilBrand($car->id, []);
     }

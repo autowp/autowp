@@ -13,7 +13,7 @@ use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Application_Service_Specifications;
 use Cars;
-use Cars_Row;
+use Car_Row;
 use Comment_Message;
 use Comment_Topic;
 use Picture;
@@ -295,7 +295,7 @@ class TwinsController extends AbstractActionController
                     ];
                 }
 
-                $name = Cars_Row::buildFullName([
+                $name = Car_Row::buildFullName([
                     'begin_model_year' => $car['begin_model_year'],
                     'end_model_year'   => $car['end_model_year'],
                     'spec'             => $car['spec'],
