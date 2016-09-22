@@ -152,7 +152,7 @@ class Car_Parent extends Project_Db_Table
         }
 
         $brandId = $brand;
-        if ($brandId instanceof Brands_Row) {
+        if ($brandId instanceof Brand_Row) {
             $brandId = $brandId->id;
         }
 

@@ -325,7 +325,7 @@ class Cars_Row extends Project_Db_Table_Row
         }
     }
 
-    public function deleteFromBrand(Brands_Row $brand)
+    public function deleteFromBrand(Brand_Row $brand)
     {
         $db = $this->getTable()->getAdapter();
         $sql = 'DELETE FROM brands_cars WHERE (brand_id=?) AND (car_id=?) LIMIT 1';

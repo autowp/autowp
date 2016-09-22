@@ -9,7 +9,7 @@ use Application\Model\DbTable\BrandLink;
 use Application\Model\Message;
 
 use Brand_Language;
-use Brands_Row;
+use Brand_Row;
 use Cars;
 use Users;
 
@@ -42,10 +42,10 @@ class BrandsController extends AbstractActionController
     }
 
     /**
-     * @param Brands_Row $car
+     * @param Brand_Row $car
      * @return string
      */
-    private function brandModerUrl(Brands_Row $brand, $forceCanonical)
+    private function brandModerUrl(Brand_Row $brand, $forceCanonical)
     {
         return $this->url()->fromRoute('moder/brands/params', [
             'action'   => 'brand',

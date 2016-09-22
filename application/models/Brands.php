@@ -6,7 +6,7 @@ class Brands extends Project_Db_Table
 {
     protected $_name = 'brands';
     protected $_primary = 'id';
-    protected $_rowClass = 'Brands_Row';
+    protected $_rowClass = 'Brand_Row';
     protected $_referenceMap = array(
         'Type' => array(
             'columns'       => array('type_id'),
@@ -17,7 +17,7 @@ class Brands extends Project_Db_Table
 
     /**
      * @param string $catname
-     * @return Brands_Row
+     * @return Brand_Row
      */
     public function findRowByCatname($catname)
     {
@@ -28,7 +28,7 @@ class Brands extends Project_Db_Table
 
     /**
      * @param string $caption
-     * @return Brands_Row
+     * @return Brand_Row
      */
     public function fetchRowByCaption($caption)
     {

@@ -9,14 +9,14 @@ class Brand extends Project_Db_Table
 {
     protected $_name = 'brands';
     protected $_primary = 'id';
-    protected $_rowClass = 'Brands_Row';
-    protected $_referenceMap = array(
-        'Type' => array(
-            'columns'       => array('type_id'),
+    protected $_rowClass = 'Brand_Row';
+    protected $_referenceMap = [
+        'Type' => [
+            'columns'       => ['type_id'],
             'refTableClass' => 'Brand_Types',
-            'refColumns'    => array('id')
-        )
-    );
+            'refColumns'    => ['id']
+        ]
+    ];
 
     /**
      * @param array $data
@@ -37,7 +37,7 @@ class Brand extends Project_Db_Table
             throw new Exception('Name is too long');
         }
 
-        if ($this->fetchRow(array('folder = ?' => $data['folder']))) {
+        if ($this->fetchRow(['folder = ?' => $data['folder']])) {
             throw new Exception('Folder ' . $data['folder'] . ' already exists');
         }
 
