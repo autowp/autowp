@@ -90,6 +90,7 @@ return [
     /* INDEX */
     'index/brands'             => 'Marques',
     'index/factories'          => 'Usines',
+    'index/specifications'     => 'Specifications',
     'mosts/fastest/roadster'          => 'La plupart des roadsters les plus rapides',
     'mosts/mighty/sedan/today'        => 'La plupart puissantes berlines aujourd\'hui',
     'mosts/dynamic/universal/2000-09' => 'La plupart des universaux dynamiques années 2000',
@@ -379,6 +380,26 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'account/profile/timezone' => 'Fuseau horaire',
     'account/profile/language' => 'Langue',
 
+    'account/access/change-password' => 'Change password',
+    'account/access/self-delete' => 'Delete account',
+    'account/access/change-password/current' => 'Current',
+    'account/access/change-password/new' => 'New',
+    'account/access/change-password/new-confirm' => 'New (confirm)',
+
+    'account/specs/weight' => 'Weight',
+
+    'account/specs/conflicts/filter/all' => 'All',
+    'account/specs/conflicts/filter/i-disagree' => 'I disagree',
+    'account/specs/conflicts/filter/do-not-agree-with-me' => 'Do not agree with me',
+    'account/specs/conflicts/filter/errors' => 'Errors',
+
+    'account/specs/conflicts/title/object' => 'Object',
+    'account/specs/conflicts/title/parameter' => 'Parameter',
+    'account/specs/conflicts/title/my-value' => 'My value',
+    'account/specs/conflicts/title/other-values' => 'Other values',
+
+    'account/specs/conflicts/my-value/none' => 'none',
+
     'feedback/title' => 'Retour d\'information',
     'feedback/name'  => 'Votre nom',
     'feedback/message' => 'Message',
@@ -398,6 +419,34 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'picture/all-images-have-owners' => 'Toutes les images ont propriétaires.',
     'picture/if-you-found-error' => 'Si vous pensez que utilisateurs du site s\'est trompé en affichant cette image dans cette section, ce serait bien si vous avez écrit à ce sujet dans les commentaires et ont indiqué à l\'erreur.',
     'picture/where-to-talk' => 'Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur <a href="/forums/">notre forum</a>',
+
+    'users/user/known-as:' => 'Known as: ',
+    'users/user/before-known-as:' => 'before known as: ',
+    'users/user/type:' => 'Account type: ',
+    'users/user/type/moderator' => 'Moderator',
+    'users/user/type/visitor' => 'Visitor',
+
+    'users/user/upload-pictures:' => 'Images uploaded: ',
+    'users/user/pictures-left-on-site:' => 'left on site: ',
+
+    'users/for-moderators' => 'For moderators',
+    'users/for-moderators/remove-photo' => 'Delete user photo',
+    'users/for-moderators/remove-user' => 'Delete user',
+    'users/for-moderators/last-visit-from-ip' => 'Last visit fom IP-address: ',
+
+    'ban/that-address-is-banned' => 'That address is banned',
+    'ban/until' => 'until',
+    'ban/unban' => 'unban',
+    'ban/ban' => 'Ban',
+    'ban/reason' => 'Reason',
+    'ban/period' => 'For period',
+    'ban/period/hour' => 'hour',
+    'ban/period/2-hours' => '2 hours',
+    'ban/period/4-hours' => '4 hours',
+    'ban/period/8-hours' => '8 hours',
+    'ban/period/16-hours' => '16 hours',
+    'ban/period/day' => 'day',
+    'ban/period/2-days' => '2 days',
 
     'users/user/recent-activity' => 'Recent activity',
     'users/user/recent-uploads' => 'Recent uploads',

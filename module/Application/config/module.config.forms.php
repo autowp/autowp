@@ -845,34 +845,34 @@ return [
             'elements' => [
                 [
                     'spec' => [
-                        'type' => 'Password',
-                        'name' => 'password_old',
+                        'type'    => 'Password',
+                        'name'    => 'password_old',
                         'options' => [
-                            'label'        => 'Текущий',
-                            'size'         => Users::MAX_PASSWORD,
-                            'maxlength'    => Users::MAX_PASSWORD
+                            'label'     => 'account/access/change-password/current',
+                            'size'      => Users::MAX_PASSWORD,
+                            'maxlength' => Users::MAX_PASSWORD
                         ]
                     ],
                 ],
                 [
                     'spec' => [
-                        'type' => 'Password',
-                        'name' => 'password',
+                        'type'    => 'Password',
+                        'name'    => 'password',
                         'options' => [
-                            'label'        => 'Новый',
-                            'size'         => Users::MAX_PASSWORD,
-                            'maxlength'    => Users::MAX_PASSWORD
+                            'label'     => 'account/access/change-password/new',
+                            'size'      => Users::MAX_PASSWORD,
+                            'maxlength' => Users::MAX_PASSWORD
                         ]
                     ],
                 ],
                 [
                     'spec' => [
-                        'type' => 'Password',
-                        'name' => 'password_confirm',
+                        'type'    => 'Password',
+                        'name'    => 'password_confirm',
                         'options' => [
-                            'label'        => 'Новый (ещё раз)',
-                            'size'         => Users::MAX_PASSWORD,
-                            'maxlength'    => Users::MAX_PASSWORD
+                            'label'     => 'account/access/change-password/new-confirm',
+                            'size'      => Users::MAX_PASSWORD,
+                            'maxlength' => Users::MAX_PASSWORD
                         ]
                     ],
                 ]

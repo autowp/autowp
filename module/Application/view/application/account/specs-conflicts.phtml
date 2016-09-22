@@ -12,37 +12,37 @@
 ?>
 
 <p class="pull-right">
-    Weight: <?=number_format($this->weight, 2 , '.', ' ')?>
+    <?=$this->escapeHtml($this->translate('account/specs/weight'))?>: <?=number_format($this->weight, 2 , '.', ' ')?>
 </p>
 
 <ul class="nav nav-pills" style="margin-bottom:10px">
     <li<?=$this->filter == '0' ? ' class="active"' : ''?>>
-        <?=$this->htmlA($this->url('account/specs-conflicts'), 'Все')?>
+        <?=$this->htmlA($this->url('account/specs-conflicts'), $this->translate('account/specs/conflicts/filter/all'))?>
     </li>
     <li<?=$this->filter == '-1' ? ' class="active"' : ''?>>
         <?=$this->htmlA($this->url('account/specs-conflicts/params', [
             'conflict' => -1,
-        ]), 'Я не согласен')?>
+        ]), $this->translate('account/specs/conflicts/filter/i-disagree'))?>
     </li>
     <li<?=$this->filter == '1' ? ' class="active"' : ''?>>
         <?=$this->htmlA($this->url('account/specs-conflicts/params', [
             'conflict' => 1,
-        ]), 'Не согласны со мной')?>
+        ]), $this->translate('account/specs/conflicts/filter/do-not-agree-with-me'))?>
     </li>
     <li<?=$this->filter == 'minus-weight' ? ' class="active"' : ''?>>
         <?=$this->htmlA($this->url('account/specs-conflicts/params', [
             'conflict' => 'minus-weight',
-        ]), 'Ошибки')?>
+        ]), $this->translate('account/specs/conflicts/filter/errors'))?>
     </li>
 </ul>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Объект</th>
-            <th>Характеристика</th>
-            <th>Моё значение</th>
-            <th>Другие значения</th>
+            <th><?=$this->escapeHtml($this->translate('account/specs/conflicts/title/object'))?></th>
+            <th><?=$this->escapeHtml($this->translate('account/specs/conflicts/title/parameter'))?></th>
+            <th><?=$this->escapeHtml($this->translate('account/specs/conflicts/title/my-value'))?></th>
+            <th><?=$this->escapeHtml($this->translate('account/specs/conflicts/title/other-values'))?></th>
         </tr>
     </thead>
     <tbody>
@@ -67,7 +67,7 @@
                 <td>
                     <?php foreach ($conflict['values'] as $value) { ?>
                         <?php if ($value['value'] === null) { ?>
-                            <em>нет</em>
+                            <em><?=$this->escapeHtml($this->translate('account/specs/conflicts/my-value/none'))?></em>
                         <?php } else { ?>
                             <?=$this->escapeHtml($value['value'])?>
                             <?=$this->escapeHtml($conflict['unit']['abbr'])?>

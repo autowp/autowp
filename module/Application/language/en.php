@@ -90,6 +90,7 @@ return [
     /* INDEX */
     'index/brands'             => 'Brands',
     'index/factories'          => 'Factories',
+    'index/specifications'     => 'Specifications',
     'mosts/fastest/roadster'          => 'Most fastest roadsters',
     'mosts/mighty/sedan/today'        => 'Most mighty sedans today',
     'mosts/dynamic/universal/2000-09' => 'Most dynamic universals in 2000\'s',
@@ -379,6 +380,26 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'account/profile/timezone' => 'Timezone',
     'account/profile/language' => 'Language',
 
+    'account/access/change-password' => 'Change password',
+    'account/access/self-delete' => 'Delete account',
+    'account/access/change-password/current' => 'Current',
+    'account/access/change-password/new' => 'New',
+    'account/access/change-password/new-confirm' => 'New (confirm)',
+
+    'account/specs/weight' => 'Weight',
+
+    'account/specs/conflicts/filter/all' => 'All',
+    'account/specs/conflicts/filter/i-disagree' => 'I disagree',
+    'account/specs/conflicts/filter/do-not-agree-with-me' => 'Do not agree with me',
+    'account/specs/conflicts/filter/errors' => 'Errors',
+
+    'account/specs/conflicts/title/object' => 'Object',
+    'account/specs/conflicts/title/parameter' => 'Parameter',
+    'account/specs/conflicts/title/my-value' => 'My value',
+    'account/specs/conflicts/title/other-values' => 'Other values',
+
+    'account/specs/conflicts/my-value/none' => 'none',
+
     'feedback/title' => 'Feedback',
     'feedback/name'  => 'Your name',
     'feedback/message' => 'Message',
@@ -398,6 +419,34 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'picture/all-images-have-owners' => 'All images have owners.',
     'picture/if-you-found-error' => 'If you think that the users of the site made a mistake by posting this image in this section, it would be nice if you wrote about it in the comments and pointed out the error.',
     'picture/where-to-talk' => 'Discuss anything and just talk about cars and not only can you on <a href="/forums/">the forum</a>',
+
+    'users/user/known-as:' => 'Known as: ',
+    'users/user/before-known-as:' => 'before known as: ',
+    'users/user/type:' => 'Account type: ',
+    'users/user/type/moderator' => 'Moderator',
+    'users/user/type/visitor' => 'Visitor',
+
+    'users/user/upload-pictures:' => 'Images uploaded: ',
+    'users/user/pictures-left-on-site:' => 'left on site: ',
+
+    'users/for-moderators' => 'For moderators',
+    'users/for-moderators/remove-photo' => 'Delete user photo',
+    'users/for-moderators/remove-user' => 'Delete user',
+    'users/for-moderators/last-visit-from-ip' => 'Last visit fom IP-address: ',
+
+    'ban/that-address-is-banned' => 'That address is banned',
+    'ban/until' => 'until',
+    'ban/unban' => 'unban',
+    'ban/ban' => 'Ban',
+    'ban/reason' => 'Reason',
+    'ban/period' => 'For period',
+    'ban/period/hour' => 'hour',
+    'ban/period/2-hours' => '2 hours',
+    'ban/period/4-hours' => '4 hours',
+    'ban/period/8-hours' => '8 hours',
+    'ban/period/16-hours' => '16 hours',
+    'ban/period/day' => 'day',
+    'ban/period/2-days' => '2 days',
 
     'users/user/recent-activity' => 'Recent activity',
     'users/user/recent-uploads' => 'Recent uploads',

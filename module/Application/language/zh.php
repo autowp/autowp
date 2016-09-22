@@ -81,6 +81,7 @@ return [
     /* INDEX */
     'index/brands'             => '品牌',
     'index/factories'          => '工厂',
+    'index/specifications'     => 'Specifications',
     'mosts/fastest/roadster'          => '最快的敞篷跑车',
     'mosts/mighty/sedan/today'        => '当今动力最强的四门轿车',
     'mosts/dynamic/universal/2000-09' => '21世纪初最快的旅行轿车',
@@ -365,6 +366,26 @@ return [
     'account/profile/timezone' => '时区',
     'account/profile/language' => '语言',
 
+    'account/access/change-password' => 'Change password',
+    'account/access/self-delete' => 'Delete account',
+    'account/access/change-password/current' => 'Current',
+    'account/access/change-password/new' => 'New',
+    'account/access/change-password/new-confirm' => 'New (confirm)',
+
+    'account/specs/weight' => 'Weight',
+
+    'account/specs/conflicts/filter/all' => 'All',
+    'account/specs/conflicts/filter/i-disagree' => 'I disagree',
+    'account/specs/conflicts/filter/do-not-agree-with-me' => 'Do not agree with me',
+    'account/specs/conflicts/filter/errors' => 'Errors',
+
+    'account/specs/conflicts/title/object' => 'Object',
+    'account/specs/conflicts/title/parameter' => 'Parameter',
+    'account/specs/conflicts/title/my-value' => 'My value',
+    'account/specs/conflicts/title/other-values' => 'Other values',
+
+    'account/specs/conflicts/my-value/none' => 'none',
+
     'feedback/title' => '反馈',
     'feedback/name'  => '标题',
     'feedback/message' => '内容',
@@ -384,6 +405,34 @@ return [
     'picture/all-images-have-owners' => '任何图片都有权益人.',
     'picture/if-you-found-error' => '如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。',
     'picture/where-to-talk' => '前往<a href="/forums/">论坛</a>可以讨论任何车型的任何话题。',
+
+    'users/user/known-as:' => 'Known as: ',
+    'users/user/before-known-as:' => 'before known as: ',
+    'users/user/type:' => 'Account type: ',
+    'users/user/type/moderator' => 'Moderator',
+    'users/user/type/visitor' => 'Visitor',
+
+    'users/user/upload-pictures:' => 'Images uploaded: ',
+    'users/user/pictures-left-on-site:' => 'left on site: ',
+
+    'users/for-moderators' => 'For moderators',
+    'users/for-moderators/remove-photo' => 'Delete user photo',
+    'users/for-moderators/remove-user' => 'Delete user',
+    'users/for-moderators/last-visit-from-ip' => 'Last visit fom IP-address: ',
+
+    'ban/that-address-is-banned' => 'That address is banned',
+    'ban/until' => 'until',
+    'ban/unban' => 'unban',
+    'ban/ban' => 'Ban',
+    'ban/reason' => 'Reason',
+    'ban/period' => 'For period',
+    'ban/period/hour' => 'hour',
+    'ban/period/2-hours' => '2 hours',
+    'ban/period/4-hours' => '4 hours',
+    'ban/period/8-hours' => '8 hours',
+    'ban/period/16-hours' => '16 hours',
+    'ban/period/day' => 'day',
+    'ban/period/2-days' => '2 days',
 
     'users/user/recent-activity' => '最新动态',
     'users/user/recent-uploads' => '最新上传',
@@ -1075,7 +1124,7 @@ return [
     'moder/vehicle/tabs/factories' => '工厂',
     'moder/vehicle/tabs/pictures' => '图片',
     'moder/vehicle/tabs/modifications' => '改款',
-    
+
     'moder/vehicle/catalogue/add-vehicle' => '添加车型',
     'moder/vehicle/catalogue/title/name' => '车名',
     'moder/vehicle/catalogue/title/link' => '链接',
@@ -1133,6 +1182,6 @@ return [
     'moder/picture/acceptance/already-voted' => '已表决: ',
     'moder/picture/acceptance/that-is-one-accepted-picture' => '此车唯一的照片',
     'moder/picture/acceptance/accepted-pictures-is-%s' => 'Accepted pictures count still %s',
-    
+
     'moder/edit-object' => 'edit',
 ];

@@ -10,7 +10,7 @@
 ?>
 <div class="row">
     <div class="col-sm-8 col-sm-push-4">
-        <h2>Изменить пароль</h2>
+        <h2><?=$this->escapeHtml($this->translate('account/access/change-password'))?></h2>
         <div class="well">
             <?=$this->partial('application/forms/bootstrap-horizontal', [
                 'form' => $this->formPassword
@@ -20,7 +20,7 @@
         <p><?=$this->htmlA([
             'href'  => $this->url('account/delete'),
             'class' => "btn btn-danger btn-lg"
-        ], '<i class="fa fa-times"></i> Удалить учётную запись', false)?></p>
+        ], '<i class="fa fa-times"></i> ' . $this->escapeHtml($this->translate('account/access/self-delete')), false)?></p>
     </div>
     <div class="col-sm-4 col-sm-pull-8">
         <?=$this->partial('application/account/sidebar', $this->sidebar)?>

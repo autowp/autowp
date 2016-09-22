@@ -99,6 +99,7 @@ return [
     /* INDEX */
     'index/brands'             => 'Компании',
     'index/factories'          => 'Заводы',
+    'index/specifications'     => 'Характеристики',
     'mosts/fastest/roadster'          => 'Самые быстрые родстеры',
     'mosts/mighty/sedan/today'        => 'Самые мощные седаны нашего времени',
     'mosts/dynamic/universal/2000-09' => 'Самые динамичные универсалы 2000ых',
@@ -393,6 +394,26 @@ return [
     'account/profile/timezone' => 'Часовой пояс',
     'account/profile/language' => 'Язык',
 
+    'account/access/change-password' => 'Изменить пароль',
+    'account/access/self-delete' => 'Удалить учётную запись',
+    'account/access/change-password/current' => 'Текущий',
+    'account/access/change-password/new' => 'Новый',
+    'account/access/change-password/new-confirm' => 'Новый (ещё раз)',
+
+    'account/specs/weight' => 'Вес',
+
+    'account/specs/conflicts/filter/all' => 'Все',
+    'account/specs/conflicts/filter/i-disagree' => 'Я не согласен',
+    'account/specs/conflicts/filter/do-not-agree-with-me' => 'Не согласны со мной',
+    'account/specs/conflicts/filter/errors' => 'Ошибки',
+
+    'account/specs/conflicts/title/object' => 'Объект',
+    'account/specs/conflicts/title/parameter' => 'Характеристика',
+    'account/specs/conflicts/title/my-value' => 'Моё значение',
+    'account/specs/conflicts/title/other-values' => 'Другие значения',
+
+    'account/specs/conflicts/my-value/none' => 'нет',
+
     'feedback/title' => 'Обратная связь',
     'feedback/name'  => 'Ваше имя',
     'feedback/message' => 'Сообщение',
@@ -412,6 +433,34 @@ return [
     'picture/all-images-have-owners' => 'Все изображения являются чьей-либо собственностью.',
     'picture/if-you-found-error' => 'Если вы считаете, что пользователи сайта ошиблись, разместив данную картинку в этом разделе, то было бы здорово, если бы вы написали об этом в комментариях и указали на ошибку.',
     'picture/where-to-talk' => 'Поделиться своей радостью, обсудить наболевшее и просто поболтать об автомобилях и не только вы можете на нашем <a href="/forums/" title="Перейти в форум">форуме</a>',
+
+    'users/user/known-as:' => 'Представился как: ',
+    'users/user/before-known-as:' => 'ранее известен как: ',
+    'users/user/type:' => 'Тип учетной записи: ',
+    'users/user/type/moderator' => 'Модератор',
+    'users/user/type/visitor' => 'Посетитель',
+
+    'users/user/upload-pictures:' => 'Добавил изображений: ',
+    'users/user/pictures-left-on-site:' => 'из них на сайте осталось: ',
+
+    'users/for-moderators' => 'Для модераторов',
+    'users/for-moderators/remove-photo' => 'Удалить фотографию пользователя',
+    'users/for-moderators/remove-user' => 'Удалить пользователя',
+    'users/for-moderators/last-visit-from-ip' => 'Последний раз заходил с IP-адреса: ',
+
+    'ban/that-address-is-banned' => 'Этот адрес забанил',
+    'ban/until' => 'до',
+    'ban/unban' => 'снять бан',
+    'ban/ban' => 'Забанить',
+    'ban/reason' => 'Причина',
+    'ban/period' => 'На время',
+    'ban/period/hour' => 'час',
+    'ban/period/2-hours' => '2 часа',
+    'ban/period/4-hours' => '4 часа',
+    'ban/period/8-hours' => '8 часов',
+    'ban/period/16-hours' => '16 часов',
+    'ban/period/day' => 'сутки',
+    'ban/period/2-days' => 'двое суток',
 
     'users/user/recent-activity' => 'Активность на сайте',
     'users/user/recent-uploads' => 'Последние добавленные изображения',

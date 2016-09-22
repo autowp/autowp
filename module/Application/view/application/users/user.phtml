@@ -24,7 +24,7 @@
             <?php if ($this->currentUser->img) { ?>
                 <?=$this->img($this->currentUser->img, [
                     'format' => 'photo',
-                    'alt'    => 'фотография ' . $this->currentUser->getCompoundName(),
+                    'alt'    => $this->currentUser->getCompoundName(),
                 ])?>
             <?php } elseif ($this->currentUser->e_mail) { ?>
                 <?=$this->gravatar($this->currentUser->e_mail, [
@@ -35,17 +35,21 @@
         </div>
 
         <p>
-            Представился как: <strong>«<?=$this->escapeHtml($this->currentUser->getCompoundName()) ?>»</strong>
+            <?=$this->escapeHtml($this->translate('users/user/known-as:'))?>
+            <strong>«<?=$this->escapeHtml($this->currentUser->getCompoundName()) ?>»</strong>
             <?php foreach ($this->renames as $rename) { ?>
-                <div style="color:#666666;margin-left:40px;cursor:help" title="<?=$this->escapeHtmlAttr($this->user()->humanTime($rename->getDateTime('date')))?>">ранее известен как <strong style="color:#666666">«<?=$this->escapeHtml($rename->old_name) ?>»</strong></div>
+                <div style="color:#666666;margin-left:40px;cursor:help" title="<?=$this->escapeHtmlAttr($this->user()->humanTime($rename->getDateTime('date')))?>">
+                    <?=$this->escapeHtml($this->translate('users/user/before-known-as:'))?>
+                    <strong style="color:#666666">«<?=$this->escapeHtml($rename->old_name) ?>»</strong>
+                </div>
             <?php } ?>
         </p>
 
-        <p>Тип учетной записи: <strong>
+        <p><?=$this->escapeHtml($this->translate('users/user/type:'))?> <strong>
         <?php if ($this->user($this->currentUser)->inheritsRole('moder')) { ?>
-            Модератор
+            <?=$this->escapeHtml($this->translate('users/user/type/moderator'))?>
         <?php } else { ?>
-            Посетитель
+            <?=$this->escapeHtml($this->translate('users/user/type/visitor'))?>
         <?php } ?>
         </strong></p>
 
@@ -84,9 +88,9 @@
         <h2><?=$this->escapeHtml($this->translate('users/user/recent-activity'))?></h2>
         <div class="well">
             <?php if ($this->currentUser->pictures_added > 0) { ?>
-                <p>Добавил изображений: <strong><?=$this->currentUser->pictures_added ?></strong></p>
+                <p><?=$this->escapeHtml($this->translate('users/user/upload-pictures:'))?> <strong><?=$this->currentUser->pictures_added ?></strong></p>
                 <?php if ($this->picturesExists < $this->currentUser->pictures_added) { ?>
-                    <p>из них на сайте осталось: <strong><?=$this->picturesExists?></strong></p>
+                    <p><?=$this->escapeHtml($this->translate('users/user/pictures-left-on-site:'))?> <strong><?=$this->picturesExists?></strong></p>
                 <?php } ?>
 
                 <p><a href="<?=$this->escapeHtmlAttr($this->url('users/user/pictures', [
@@ -165,14 +169,16 @@
         <?php } */ ?>
 
         <?php if ($this->canViewIp) { ?>
-            <h2>Для модераторов</h2>
+            <h2><?=$this->escapeHtml($this->translate('users/for-moderators'))?></h2>
             <div class="well">
                 <?php if ($this->canRemovePhoto && $this->currentUser->photo) { ?>
                     <form action="<?=$this->escapeHtmlAttr($this->url('moder/users/params', [
                         'action' => 'remove-user-photo',
                         'id'     => $this->currentUser->id
                     ]))?>" method="post">
-                        <button type="submit" class="btn btn-warning btn-block">Удалить фотографию пользователя</button>
+                        <button type="submit" class="btn btn-warning btn-block">
+                            <?=$this->escapeHtml($this->translate('users/for-moderators/remove-photo'))?>
+                        </button>
                     </form>
                 <?php } ?>
 
@@ -181,23 +187,25 @@
                         'action' => 'delete-user',
                         'id'     => $this->currentUser->id
                     ]))?>" method="post">
-                        <button type="submit" class="btn btn-danger btn-block">Удалить пользователя</button>
+                        <button type="submit" class="btn btn-danger btn-block">
+                            <?=$this->escapeHtml($this->translate('users/for-moderators/remove-user'))?>
+                        </button>
                     </form>
                 <?php } ?>
 
                 <p>
-                    Последний раз заходил с IP-адреса:
+                    <?=$this->escapeHtml($this->translate('users/for-moderators/last-visit-from-ip'))?>
                     <?=inet_ntop($this->currentUser->last_ip) ?>
                 </p>
 
                 <?php if ($this->ban) { ?>
                     <p>
-                        Этот адрес забанил
+                        <?=$this->escapeHtml($this->translate('ban/that-address-is-banned'))?>
                         <?php if ($this->ban['user']) { ?>
                             <?=$this->user($this->ban['user']) ?>
                         <?php } ?>
                         <?php if ($this->ban['up_to']) { ?>
-                            до
+                            <?=$this->escapeHtml($this->translate('ban/until'))?>
                             <?=$this->escapeHtml($this->humanTime($this->ban['up_to'])) ?>
                             <?php if ($this->ban['reason']) { ?>
                                 (<?=$this->escapeHtml($this->ban['reason'])?>)
@@ -209,7 +217,7 @@
                         <form action="<?=$this->escapeHtmlAttr($this->url('ban/unban-user', [
                             'user_id' => $this->currentUser->id
                         ])) ?>" method="post" style="margin:10px 0">
-                            <input type="submit" value="снять бан" />
+                            <input type="submit" value="<?=$this->escapeHtmlAttr('ban/unban')?>" />
                         </form>
                     <?php } ?>
                 <?php } ?>
@@ -219,32 +227,38 @@
                         'user_id' => $this->currentUser->id
                     ])) ?>" method="post" class="form-horizontal">
                         <fieldset>
-                            <legend>Забанить</legend>
+                            <legend><?=$this->escapeHtml($this->translate('ban/ban'))?></legend>
                             <div class="control-group">
-                                <label class="control-label" for="period">На время</label>
+                                <label class="control-label" for="period">
+                                    <?=$this->escapeHtml($this->translate('ban/period'))?>
+                                </label>
                                 <div class="controls">
                                     <?=$this->formElement((new Zend\Form\Element\Select('period'))
                                         ->setValueOptions([
-                                            1  => 'час',
-                                            2  => '2 часа',
-                                            4  => '4 часа',
-                                            8  => '8 часов',
-                                            16 => '16 часов',
-                                            24 => 'сутки',
-                                            48 => 'двое суток',
+                                            1  => $this->translate('ban/period/hour'),
+                                            2  => $this->translate('ban/period/2-hours'),
+                                            4  => $this->translate('ban/period/4-hours'),
+                                            8  => $this->translate('ban/period/8-hours'),
+                                            16 => $this->translate('ban/period/16-hours'),
+                                            24 => $this->translate('ban/period/day'),
+                                            48 => $this->translate('ban/period/2-days'),
                                         ])
                                         ->setValue('1')
                                     )?>
                                 </div>
                             </div>
                             <div class="control-group">
-                                <label class="control-label" for="period">Причина</label>
+                                <label class="control-label" for="period">
+                                    <?=$this->escapeHtml($this->translate('ban/reason'))?>
+                                </label>
                                 <div class="controls">
                                     <?=$this->formElement(new Zend\Form\Element\Text('reason'))?>
                                 </div>
                             </div>
                             <div class="form-actions">
-                                <button class="btn btn-danger" type="submit">забанить</button>
+                                <button class="btn btn-danger" type="submit">
+                                    <?=$this->escapeHtml($this->translate('ban/ban'))?>
+                                </button>
                             </div>
                         </fieldset>
                     </form>

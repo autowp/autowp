@@ -420,4 +420,40 @@ class Picture_Row extends Project_Db_Table_Row
 
         return new Request($request);
     }
+
+    public function canAccept()
+    {
+        if (!in_array($this->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])) {
+            return false;
+        }
+
+        $moderVoteTable = new Picture_Moder_Vote();
+        $deleteVote = $moderVoteTable->fetchRow([
+            'picture_id = ?' => $this->id,
+            'vote = 0'
+        ]);
+        if ($deleteVote) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function canDelete()
+    {
+        if (!in_array($this->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])) {
+            return false;
+        }
+
+        $moderVoteTable = new Picture_Moder_Vote();
+        $acceptVote = $moderVoteTable->fetchRow([
+            'picture_id = ?' => $this->id,
+            'vote > 0'
+        ]);
+        if ($acceptVote) {
+            return false;
+        }
+
+        return true;
+    }
 }
