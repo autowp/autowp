@@ -24,7 +24,7 @@ use Factory;
 use Perspectives;
 use Picture;
 use Picture_Row;
-use Pictures_Moder_Votes;
+use Picture_Moder_Vote;
 use Users;
 
 use Exception;
@@ -591,7 +591,7 @@ class PicturesController extends AbstractActionController
                 $this->pic()->url($picture->id, $picture->identity, true)
             );
 
-            $requests = new Pictures_Moder_Votes();
+            $requests = new Picture_Moder_Vote();
             $deleteRequests = $requests->fetchAll(
                 $requests->select()
                          ->where('picture_id = ?', $picture->id)
@@ -732,7 +732,7 @@ class PicturesController extends AbstractActionController
                     $vote = (bool)($values['vote']);
 
                     $user = $this->user()->get();
-                    $moderVotes = new Pictures_Moder_Votes();
+                    $moderVotes = new Picture_Moder_Vote();
                     $moderVotes->insert([
                         'user_id'    => $user->id,
                         'picture_id' => $picture->id,
@@ -785,7 +785,7 @@ class PicturesController extends AbstractActionController
 
         if ($voteExists) {
             if ($request->isPost() && $this->params('form') == 'picture-unvote') {
-                $moderVotes = new Pictures_Moder_Votes();
+                $moderVotes = new Picture_Moder_Vote();
 
                 $user = $this->user()->get();
                 $moderVotes->delete([
@@ -801,7 +801,7 @@ class PicturesController extends AbstractActionController
 
         $moderVotes = null;
         if (!$hideVote) {
-            $moderVotes = $picture->findPictures_Moder_Votes();
+            $moderVotes = $picture->findPicture_Moder_Vote();
         }
 
         return [
@@ -1961,7 +1961,7 @@ class PicturesController extends AbstractActionController
 
         $reason = trim($this->params()->fromPost('reason'));
 
-        $moderVotes = new Pictures_Moder_Votes();
+        $moderVotes = new Picture_Moder_Vote();
 
         foreach ($pictureRows as $picture) {
 

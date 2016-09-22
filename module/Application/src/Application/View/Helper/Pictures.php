@@ -7,7 +7,7 @@ use Zend\View\Helper\AbstractHelper;
 use Comment_Message;
 use Comment_Topic;
 use Picture_View;
-use Pictures_Moder_Votes;
+use Picture_Moder_Vote;
 use Picture_Row;
 
 use Zend_Db_Expr;
@@ -31,13 +31,13 @@ class Pictures extends AbstractHelper
     private $moderVoteTable = null;
 
     /**
-     * @return Pictures_Moder_Votes
+     * @return Picture_Moder_Vote
      */
     private function getModerVoteTable()
     {
         return $this->moderVoteTable
             ? $this->moderVoteTable
-            : $this->moderVoteTable = new Pictures_Moder_Votes();
+            : $this->moderVoteTable = new Picture_Moder_Vote();
     }
 
     /**

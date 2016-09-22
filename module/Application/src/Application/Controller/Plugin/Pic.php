@@ -25,7 +25,7 @@ use Engines;
 use Perspectives;
 use Picture;
 use Picture_View;
-use Pictures_Moder_Votes;
+use Picture_Moder_Vote;
 use Picture_Row;
 use Users;
 
@@ -56,13 +56,13 @@ class Pic extends AbstractPlugin
     }
 
     /**
-     * @return Pictures_Moder_Votes
+     * @return Picture_Moder_Vote
      */
     private function getModerVoteTable()
     {
         return $this->moderVoteTable
             ? $this->moderVoteTable
-            : $this->moderVoteTable = new Pictures_Moder_Votes();
+            : $this->moderVoteTable = new Picture_Moder_Vote();
     }
 
     /**
@@ -799,7 +799,7 @@ class Pic extends AbstractPlugin
         $userTable = new Users();
 
         $moderVotes = [];
-        foreach ($picture->findPictures_Moder_Votes() as $moderVote) {
+        foreach ($picture->findPicture_Moder_Vote() as $moderVote) {
             $moderVotes[] = [
                 'vote'   => $moderVote->vote,
                 'reason' => $moderVote->reason,

@@ -124,7 +124,7 @@ class Brand_Row extends Project_Db_Table_Row
         $this->save();
     }
 
-    public function RefreshUnsortedPicturesCount()
+    public function refreshUnsortedPicturesCount()
     {
         $db = $this->getTable()->getAdapter();
         $sql = 'SELECT COUNT(id) FROM pictures '.
