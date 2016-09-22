@@ -25,7 +25,7 @@ use Comment_Message;
 use Engines;
 use Factory;
 use Modification_Group;
-use Perspectives_Groups;
+use Perspective_Group;
 use Picture;
 use Picture_Row;
 use Users;
@@ -1975,7 +1975,7 @@ class CatalogueController extends AbstractActionController
 
     private function getPerspectiveGroupIds($pageId)
     {
-        $perspectivesGroups = new Perspectives_Groups();
+        $perspectivesGroups = new Perspective_Group();
         $db = $perspectivesGroups->getAdapter();
         return $db->fetchCol(
             $db->select()

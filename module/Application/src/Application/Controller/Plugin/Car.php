@@ -15,7 +15,7 @@ use Car_Language;
 use Car_Parent;
 use Category;
 use Category_Language;
-use Perspectives_Groups;
+use Perspective_Group;
 use Picture;
 use Spec;
 
@@ -553,7 +553,7 @@ class Car extends AbstractPlugin
     private function getPerspectiveGroupIds($pageId)
     {
         if (!isset($this->_perspectiveCache[$pageId])) {
-            $perspectivesGroups = new Perspectives_Groups();
+            $perspectivesGroups = new Perspective_Group();
             $db = $perspectivesGroups->getAdapter();
             $this->_perspectiveCache[$pageId] = $db->fetchCol(
                 $db->select()

@@ -14,7 +14,7 @@ use Car_Row;
 use Category;
 use Category_Language;
 use Factory;
-use Perspectives_Groups;
+use Perspective_Group;
 use Picture;
 use Users;
 
@@ -34,7 +34,7 @@ class IndexController extends AbstractActionController
 
     private function getOrientedPictureList($car)
     {
-        $perspectivesGroups = new Perspectives_Groups();
+        $perspectivesGroups = new Perspective_Group();
 
         $db = $perspectivesGroups->getAdapter();
         $perspectivesGroupIds = $db->fetchCol(

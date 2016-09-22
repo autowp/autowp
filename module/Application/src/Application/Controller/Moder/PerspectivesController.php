@@ -5,7 +5,7 @@ namespace Application\Controller\Moder;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Perspectives;
-use Perspectives_Groups;
+use Perspective_Group;
 use Perspectives_Groups_Perspectives;
 use Perspectives_Pages;
 
@@ -18,7 +18,7 @@ class PerspectivesController extends AbstractActionController
         }
 
         $prspModel = new Perspectives();
-        $prspGroupsModel = new Perspectives_Groups();
+        $prspGroupsModel = new Perspective_Group();
         $prspGroupsPrspModel = new Perspectives_Groups_Perspectives();
         $prspPagesModel = new Perspectives_Pages();
 

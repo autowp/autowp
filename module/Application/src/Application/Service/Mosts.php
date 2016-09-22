@@ -7,7 +7,7 @@ use Application\Service\SpecificationsService;
 use Car_Types;
 use Cars;
 use Exception;
-use Perspectives_Groups;
+use Perspective_Group;
 use Picture;
 use Project_Most;
 use Zend_Db_Expr;
@@ -455,7 +455,7 @@ class Mosts
     {
         if ($this->_perspectiveGroups === null) {
 
-            $pgTable = new Perspectives_Groups();
+            $pgTable = new Perspective_Group();
             $groups = $pgTable->fetchAll(
                 $pgTable->select(true)
                     ->where('page_id = ?', 1)
