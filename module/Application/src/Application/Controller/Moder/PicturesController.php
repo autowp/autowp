@@ -518,9 +518,9 @@ class PicturesController extends AbstractActionController
 
     private function pictureCanDelete($picture)
     {
-        $user = $this->user()->get();
         $canDelete = false;
-        if (in_array($picture->status, [Picture::STATUS_INBOX, Picture::STATUS_NEW])) {
+        if ($picture->canDelete()) {
+            $user = $this->user()->get();
             if ($this->user()->isAllowed('picture', 'remove')) {
                 if ($this->pictureVoteExists($picture, $user)) {
                     $canDelete = true;
@@ -1081,8 +1081,7 @@ class PicturesController extends AbstractActionController
             }
         }
 
-        $canAccept = in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])
-                  && $this->user()->isAllowed('picture', 'accept');
+        $canAccept = $this->canAccept($picture);
 
         if ($canAccept) {
 
@@ -1864,12 +1863,14 @@ class PicturesController extends AbstractActionController
         ], [], true);
     }
 
+    private function canAccept(Picture_Row $picture)
+    {
+        return $picture->canAccept() && $this->user()->isAllowed('picture', 'accept');
+    }
+
     private function accept(Picture_Row $picture)
     {
-        $hasAcceptRight = $this->user()->isAllowed('picture', 'accept');
-
-        $canAccept = $hasAcceptRight
-                  && in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX]);
+        $canAccept = $this->canAccept($picture);
 
         if ($canAccept) {
 
