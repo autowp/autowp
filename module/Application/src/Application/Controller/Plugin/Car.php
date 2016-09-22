@@ -5,18 +5,17 @@ namespace Application\Controller\Plugin;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\Twins;
+use Application\Service\SpecificationsService;
 
 use Autowp\TextStorage\Service as TextStorage;
 
-use Application_Service_Specifications;
 use Brands;
 use Brand_Car;
-use Brands_Cars;
 use Car_Language;
 use Car_Parent;
 use Category;
 use Category_Language;
-use Perspectives_Groups;
+use Perspective_Group;
 use Picture;
 use Spec;
 
@@ -166,7 +165,7 @@ class Car extends AbstractPlugin
             $carIds[] = (int)$car->id;
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
 
         $hasSpecs = [];
         if (!$disableSpecs && !$specificationsUrl) {
@@ -277,7 +276,7 @@ class Car extends AbstractPlugin
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
                     'brand_car_catname' => 'catname'
                 ])
-                ->where('brands_cars.type = ?', Brands_Cars::TYPE_DESIGN)
+                ->where('brands_cars.type = ?', Brand_Car::TYPE_DESIGN)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
                 ->where('car_parent_cache.car_id IN (?)', $carIds ? $carIds : 0)
                 ->group('car_parent_cache.car_id')
@@ -554,7 +553,7 @@ class Car extends AbstractPlugin
     private function getPerspectiveGroupIds($pageId)
     {
         if (!isset($this->_perspectiveCache[$pageId])) {
-            $perspectivesGroups = new Perspectives_Groups();
+            $perspectivesGroups = new Perspective_Group();
             $db = $perspectivesGroups->getAdapter();
             $this->_perspectiveCache[$pageId] = $db->fetchCol(
                 $db->select()

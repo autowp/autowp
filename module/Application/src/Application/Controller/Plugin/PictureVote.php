@@ -130,9 +130,9 @@ class PictureVote extends AbstractPlugin
 
     private function pictureCanDelete($picture)
     {
-        $user = $this->getController()->user()->get();
         $canDelete = false;
-        if (in_array($picture->status, [Picture::STATUS_INBOX, Picture::STATUS_NEW])) {
+        if ($picture->canDelete()) {
+            $user = $this->getController()->user()->get();
             if ($this->getController()->user()->isAllowed('picture', 'remove')) {
                 if ($this->pictureVoteExists($picture, $user)) {
                     $canDelete = true;

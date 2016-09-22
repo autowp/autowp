@@ -4,14 +4,15 @@ namespace Application\Service;
 
 use Zend\Mail;
 
-use Application_Service_Specifications;
+use Application\Service\SpecificationsService;
+
 use Comment_Message;
 use Picture;
 use Project_Auth_Adapter_Login;
 use User_Password_Remind;
 use User_Remember;
 use Users;
-use Users_Row;
+use User_Row;
 
 use DateTime;
 use Exception;
@@ -133,7 +134,7 @@ class UsersService
         ]);
         $user->save();
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
         $service->refreshUserConflicts($user->id);
 
         $this->sendRegistrationConfirmEmail($user, $host['hostname']);
@@ -144,11 +145,11 @@ class UsersService
     }
 
     /**
-     * @param Users_Row $user
+     * @param User_Row $user
      * @param string $email
      * @param string $language
      */
-    public function changeEmailStart(Users_Row $user, $email, $language)
+    public function changeEmailStart(User_Row $user, $email, $language)
     {
         $host = $this->getHostOptions($language);
 
@@ -163,7 +164,7 @@ class UsersService
 
     /**
      * @param string $code
-     * @return boolean|Users_Row
+     * @return boolean|User_Row
      */
     public function emailChangeFinish($code)
     {
@@ -191,10 +192,10 @@ class UsersService
     }
 
     /**
-     * @param Users_Row $user
+     * @param User_Row $user
      * @param string $hostname
      */
-    public function sendRegistrationConfirmEmail(Users_Row $user, $hostname)
+    public function sendRegistrationConfirmEmail(User_Row $user, $hostname)
     {
         if ($user->email_to_check && $user->email_check_code) {
 
@@ -229,10 +230,10 @@ class UsersService
     }
 
     /**
-     * @param Users_Row $user
+     * @param User_Row $user
      * @param string $hostname
      */
-    public function sendChangeConfirmEmail(Users_Row $user, $hostname)
+    public function sendChangeConfirmEmail(User_Row $user, $hostname)
     {
         if ($user->email_to_check && $user->email_check_code) {
 
@@ -354,7 +355,7 @@ class UsersService
         ]);
     }
 
-    public function setPassword(Users_Row $user, $password)
+    public function setPassword(User_Row $user, $password)
     {
         $uTable = $this->getTable();
         $passwordExpr = $this->passwordHashExpr($password);

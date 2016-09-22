@@ -25,6 +25,7 @@ class UserText extends AbstractHtmlElement
         'autowp.ru',
         'fr.wheelsage.org',
         'en.wheelsage.org',
+        'zh.wheelsage.org',
         'wheelsage.org'
     ];
 

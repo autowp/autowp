@@ -6,15 +6,14 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Modification as ModificationTable;
-
 use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Service\SpecificationsService;
 
 use Exception;
 
-use Application_Service_Specifications;
 use Brands;
-use Brands_Cars;
+use Brand_Car;
 use Car_Parent;
 use Car_Language;
 use Cars;
@@ -27,7 +26,7 @@ use Perspectives;
 use Picture;
 use Picture_View;
 use Pictures_Moder_Votes;
-use Pictures_Row;
+use Picture_Row;
 use Users;
 
 use Zend_Db_Expr;
@@ -367,7 +366,7 @@ class Pic extends AbstractPlugin
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = Pictures_Row::buildFormatRequest($picture);
+            $requests[$idx] = Picture_Row::buildFormatRequest($picture);
         }
 
         $imagesInfo = $imageStorage->getFormatedImages($requests, 'picture-thumb');
@@ -425,7 +424,7 @@ class Pic extends AbstractPlugin
 
                 $item = array_replace($item, [
                     'resolution'     => (int)$row['width'] . '×' . (int)$row['height'],
-                    'cropped'        => Pictures_Row::checkCropParameters($row),
+                    'cropped'        => Picture_Row::checkCropParameters($row),
                     'cropResolution' => $row['crop_width'] . '×' . $row['crop_height'],
                     'status'         => $row['status'],
                     'views'          => (int)$row['views'],
@@ -519,7 +518,7 @@ class Pic extends AbstractPlugin
                         }
                     }
 
-                    $specService = new Application_Service_Specifications();
+                    $specService = new SpecificationsService();
                     $engineHasSpecs = $specService->hasSpecs(3, $engine->id);
 
                     if ($engineHasSpecs) {
@@ -639,7 +638,7 @@ class Pic extends AbstractPlugin
                             ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
                                 'brand_car_catname' => 'catname'
                             ])
-                            ->where('brands_cars.type = ?', Brands_Cars::TYPE_DESIGN)
+                            ->where('brands_cars.type = ?', Brand_Car::TYPE_DESIGN)
                             ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
                             ->where('car_parent_cache.car_id = ?', $car->id)
                     );
@@ -1049,9 +1048,9 @@ class Pic extends AbstractPlugin
         $cropRequests = [];
         $imageIds = [];
         foreach ($rows as $idx => $picture) {
-            $request = Pictures_Row::buildFormatRequest($picture);
+            $request = Picture_Row::buildFormatRequest($picture);
             $fullRequests[$idx] = $request;
-            if (Pictures_Row::checkCropParameters($picture)) {
+            if (Picture_Row::checkCropParameters($picture)) {
                 $cropRequests[$idx] = $request;
             }
             $ids[] = (int)$picture['id'];
@@ -1098,7 +1097,7 @@ class Pic extends AbstractPlugin
                 if ($image) {
                     $sUrl = $image->getSrc();
 
-                    if (Pictures_Row::checkCropParameters($row)) {
+                    if (Picture_Row::checkCropParameters($row)) {
                         $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
 
                         $crop['crop'] = [
@@ -1236,9 +1235,9 @@ class Pic extends AbstractPlugin
         $cropRequests = [];
         $imageIds = [];
         foreach ($rows as $idx => $picture) {
-            $request = Pictures_Row::buildFormatRequest($picture);
+            $request = Picture_Row::buildFormatRequest($picture);
             $fullRequests[$idx] = $request;
-            if (Pictures_Row::checkCropParameters($picture)) {
+            if (Picture_Row::checkCropParameters($picture)) {
                 $cropRequests[$idx] = $request;
             }
             $ids[] = (int)$picture['id'];
@@ -1288,7 +1287,7 @@ class Pic extends AbstractPlugin
                 if ($image) {
                     $sUrl = $image->getSrc();
 
-                    if (Pictures_Row::checkCropParameters($row)) {
+                    if (Picture_Row::checkCropParameters($row)) {
                         $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
 
                         $crop['crop'] = [

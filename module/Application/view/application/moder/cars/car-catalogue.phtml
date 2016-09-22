@@ -211,13 +211,11 @@
                 </tr>
             <?php } ?>
             <tr class="success" data-id="<?=$this->car['id']?>">
-                <td>
+                <td colspan="3">
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-arrow-right"></i>
                     <?=$this->car()->htmlTitle($this->car->getNameData($this->language()))?>
                 </td>
-                <td></td>
-                <td></td>
                 <td class="urls">
                     <?php foreach ($this->publicUrls as $url) { ?>
                         <?=$this->htmlA($url, $url)?><br />

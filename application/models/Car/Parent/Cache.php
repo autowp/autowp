@@ -103,7 +103,7 @@ class Car_Parent_Cache extends Project_Db_Table
         return $ids;
     }*/
 
-    /*public function rebuildCache(Cars_Row $car)
+    /*public function rebuildCache(Car_Row $car)
     {
         $id = (int)$car->id;
 
@@ -150,7 +150,7 @@ class Car_Parent_Cache extends Project_Db_Table
         }
     }*/
 
-    public function rebuildCache(Cars_Row $car)
+    public function rebuildCache(Car_Row $car)
     {
         $id = (int)$car->id;
 
@@ -196,7 +196,7 @@ class Car_Parent_Cache extends Project_Db_Table
                 $row->sport = $info['sport'] ? 1 : 0;
                 $changes = true;
             }
-            
+
             if ($row->design xor $info['design']) {
                 $row->design = $info['design'] ? 1 : 0;
                 $changes = true;

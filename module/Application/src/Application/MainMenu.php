@@ -11,7 +11,7 @@ use Zend\Router\Http\TreeRouteStack;
 use Category;
 use Category_Language;
 use Pages;
-use Users_Row;
+use User_Row;
 
 class MainMenu
 {
@@ -210,10 +210,10 @@ class MainMenu
     }
 
     /**
-     * @param Users_Row $user
+     * @param User_Row $user
      * @return array
      */
-    public function getMenu(Users_Row $user = null)
+    public function getMenu(User_Row $user = null)
     {
         $newMessages = 0;
         if ($user) {

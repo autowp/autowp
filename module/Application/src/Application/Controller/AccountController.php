@@ -8,13 +8,13 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Application\Controller\LoginController;
-use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 use Application\Model\Forums;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
+use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
-use Application_Service_Specifications;
 use Cars;
 use Engines;
 use LoginState;
@@ -797,7 +797,7 @@ class AccountController extends AbstractActionController
             return $this->forwadToLogin();
         }
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         $filter = $this->params('conflict', '0');
         $page = (int)$this->params('page');
@@ -820,7 +820,7 @@ class AccountController extends AbstractActionController
             }
 
             switch ($conflict['itemTypeId']) {
-                case Application_Service_Specifications::ITEM_TYPE_CAR:
+                case SpecificationsService::ITEM_TYPE_CAR:
                     $car = $carTable->find($conflict['itemId'])->current();
                     $conflict['object'] = $car ? $car->getFullName($language) : null;
                     $conflict['url'] = $this->url()->fromRoute('cars/params', [
@@ -829,7 +829,7 @@ class AccountController extends AbstractActionController
                         'tab'    => 'spec'
                     ]);
                     break;
-                case Application_Service_Specifications::ITEM_TYPE_ENGINE:
+                case SpecificationsService::ITEM_TYPE_ENGINE:
                     $engine = $engineTable->find($conflict['itemId'])->current();
                     $conflict['object'] = $engine ? 'Двигатель ' . $engine->caption : null;
                     $conflict['url'] = $this->url()->fromRoute('cars/params', [

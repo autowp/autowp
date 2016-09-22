@@ -8,7 +8,7 @@ use Comment_Message;
 use Comment_Topic;
 use Picture_View;
 use Pictures_Moder_Votes;
-use Pictures_Row;
+use Picture_Row;
 
 use Zend_Db_Expr;
 
@@ -66,7 +66,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function behaviour(Pictures_Row $picture)
+    public function behaviour(Picture_Row $picture)
     {
         return $this->_behaviour($picture, $this->isPictureModer());
     }
@@ -163,7 +163,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    private function _behaviour(Pictures_Row $picture, $isModer)
+    private function _behaviour(Picture_Row $picture, $isModer)
     {
         $ctTable = $this->getCommentTopicTable();
         if ($this->view->user()->logedIn()) {
@@ -200,7 +200,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    private function getModerVote(Pictures_Row $picture)
+    private function getModerVote(Picture_Row $picture)
     {
         $moderVoteTable = $this->getModerVoteTable();
         $db = $moderVoteTable->getAdapter();
@@ -224,7 +224,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function picture(Pictures_Row $picture)
+    public function picture(Picture_Row $picture)
     {
         $view = $this->view;
 

@@ -1,5 +1,6 @@
 <?php
-class Engines_Row extends Project_Db_Table_Row
+
+class Engine_Row extends Project_Db_Table_Row
 {
     /**
      * @deprecated
@@ -15,7 +16,7 @@ class Engines_Row extends Project_Db_Table_Row
             'groupJoinLimit' => null
         ];
         $options = array_merge($defaults, $options);
-        
+
         $carTable = new Cars();
 
         $db = $this->getTable()->getAdapter();
@@ -54,8 +55,8 @@ class Engines_Row extends Project_Db_Table_Row
         if ($options['groupJoinLimit'] && count($carIds) <= $options['groupJoinLimit']) {
             return $carIds;
         }
-        
-        
+
+
         do {
             // look for same root
 

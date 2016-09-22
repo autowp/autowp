@@ -9,17 +9,17 @@ use Zend\View\Model\ViewModel;
 use Application\Model\Message;
 use Application\Model\Brand;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Service\SpecificationsService;
 
-use Application_Service_Specifications;
 use Attrs_Attributes;
 use Attrs_Item_Types;
 use Attrs_User_Values;
 use Cars;
-use Cars_Row;
+use Car_Row;
 use Engines;
 use User_Car_Subscribe;
 use Users;
-use Users_Row;
+use User_Row;
 
 class CarsController extends AbstractActionController
 {
@@ -48,7 +48,7 @@ class CarsController extends AbstractActionController
             : $this->engineTable = new Engines();
     }
 
-    private function carModerUrl(Cars_Row $car)
+    private function carModerUrl(Car_Row $car)
     {
         return $this->url()->fromRoute('moder/cars/params', [
             'action' => 'car',
@@ -82,7 +82,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         $user = $this->user()->get();
 
@@ -229,7 +229,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         $specs = $service->specifications([$car], [
             'language' => 'en'
@@ -263,7 +263,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         $userValueTable = new Attrs_User_Values();
         $attrTable = new Attrs_Attributes();
@@ -378,7 +378,7 @@ class CarsController extends AbstractActionController
             'item_type_id = ?' => $itemType->id
         ], 'update_date');
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
 
         $values = [];
         foreach ($rows as $row) {
@@ -430,7 +430,7 @@ class CarsController extends AbstractActionController
         $itemId = (int)$this->params('item_id');
         $userId = (int)$this->params('user_id');
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $specService->deleteUserValue((int)$this->params('attribute_id'), $itemType->id, $itemId, $userId);
 
         return $this->redirect()->toUrl($request->getServer('HTTP_REFERER'));
@@ -451,7 +451,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         $user = $this->user()->get();
 
@@ -538,7 +538,7 @@ class CarsController extends AbstractActionController
 
         $isModerator = $this->user()->inheritsRole('moder');
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         foreach ($paginator->getCurrentItems() as $row) {
             $objectName = null;
@@ -620,7 +620,7 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    private function userUrl(Users_Row $user)
+    private function userUrl(User_Row $user)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user->identity ? $user->identity : 'user' . $user->id
@@ -649,7 +649,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
         $service->updateActualValues(1, $car->id);
 
         if ($engine) {
@@ -699,7 +699,7 @@ class CarsController extends AbstractActionController
 
             $carTable->updateInteritance($car);
 
-            $service = new Application_Service_Specifications();
+            $service = new SpecificationsService();
             $service->updateActualValues(1, $car->id);
 
             $message = sprintf(
@@ -813,7 +813,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
         $service->updateActualValues(1, $car->id);
 
         $user = $this->user()->get();
@@ -855,7 +855,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         $service->updateActualValues(1, $car->id);
 
@@ -874,7 +874,7 @@ class CarsController extends AbstractActionController
 
         $language = $this->language();
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
         $form = $service->getEditValueForm($attrId, $itemTypeId, $itemId, $language);
         if (!$form) {
             return $this->notFoundAction();

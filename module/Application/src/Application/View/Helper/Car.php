@@ -5,9 +5,9 @@ namespace Application\View\Helper;
 use Zend\View\Helper\AbstractHelper;
 
 use Brands;
-use Brands_Cars;
+use Brand_Car;
 use Car_Parent;
-use Cars_Row;
+use Car_Row;
 use Spec;
 
 use Exception;
@@ -15,28 +15,28 @@ use Exception;
 class Car extends AbstractHelper
 {
     /**
-     * @var Cars_Row
+     * @var Car_Row
      */
     private $_car = null;
 
     private $_monthFormat = '<small class="month">%02d.</small>';
 
-    private $_textMonthFormat = '%02d.';
+    private $textMonthFormat = '%02d.';
 
     /**
-     * @var Brands_Cars
+     * @var Brand_Car
      */
-    private $_brandCarTable;
+    private $brandCarTable;
 
     /**
      * @var Car_Parent
      */
-    private $_carParentTable;
+    private $carParentTable;
 
     /**
      * @var Brands
      */
-    private $_brandTable;
+    private $brandTable;
 
     /**
      * @var Spec
@@ -53,7 +53,7 @@ class Car extends AbstractHelper
             : $this->specTable = new Spec();
         }
 
-    public function __invoke(Cars_Row $car = null)
+    public function __invoke(Car_Row $car = null)
     {
         $this->_car = $car;
 
@@ -303,7 +303,7 @@ class Car extends AbstractHelper
                 $result .= ' \'';
 
                 if ($equalM) {
-                    $result .= sprintf($this->_textMonthFormat, $bm).$by;
+                    $result .= sprintf($this->textMonthFormat, $bm).$by;
                 } else {
                     if ($equalY) {
                         if ($bm && $em)
@@ -312,14 +312,14 @@ class Car extends AbstractHelper
                                 $result .= $by;
                     } else {
                         if ($equalS) {
-                            $result .=  (($bm ? sprintf($this->_textMonthFormat, $bm) : '').$by).
+                            $result .=  (($bm ? sprintf($this->textMonthFormat, $bm) : '').$by).
                             '–'.
-                            ($em ? sprintf($this->_textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
+                            ($em ? sprintf($this->textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
                         } else {
-                            $result .=  (($bm ? sprintf($this->_textMonthFormat, $bm) : '').($by ? $by : '????')).
+                            $result .=  (($bm ? sprintf($this->textMonthFormat, $bm) : '').($by ? $by : '????')).
                             (
                                     $ey
-                                    ? '–'.($em ? sprintf($this->_textMonthFormat, $em) : '').$ey
+                                    ? '–'.($em ? sprintf($this->textMonthFormat, $em) : '').$ey
                                     : (
                                             $car['today']
                                             ? ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
@@ -336,7 +336,7 @@ class Car extends AbstractHelper
                 $result .= " '";
 
                 if ($equalM) {
-                    $result .= sprintf($this->_textMonthFormat, $bm).$by;
+                    $result .= sprintf($this->textMonthFormat, $bm).$by;
                 } else {
                     if ($equalY) {
                         if ($bm && $em) {
@@ -348,14 +348,14 @@ class Car extends AbstractHelper
                         }
                     } else {
                         if ($equalS) {
-                            $result .=  (($bm ? sprintf($this->_textMonthFormat, $bm) : '').$by).
+                            $result .=  (($bm ? sprintf($this->textMonthFormat, $bm) : '').$by).
                             '–'.
-                            ($em ? sprintf($this->_textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
+                            ($em ? sprintf($this->textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
                         } else {
-                            $result .=  (($bm ? sprintf($this->_textMonthFormat, $bm) : '').($by ? $by : '????')).
+                            $result .=  (($bm ? sprintf($this->textMonthFormat, $bm) : '').($by ? $by : '????')).
                             (
                                 $ey
-                                    ? '–'.($em ? sprintf($this->_textMonthFormat, $em) : '').$ey
+                                    ? '–'.($em ? sprintf($this->textMonthFormat, $em) : '').$ey
                                     : (
                                         $car['today']
                                             ? ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
@@ -434,23 +434,23 @@ class Car extends AbstractHelper
     }
 
     /**
-     * @return Brands_Cars
+     * @return Brand_Car
      */
-    private function _getBrandCarTable()
+    private function getBrandCarTable()
     {
-        return $this->_brandCarTable
-            ? $this->_brandCarTable
-            : $this->_brandCarTable = new Brands_Cars();
+        return $this->brandCarTable
+            ? $this->brandCarTable
+            : $this->brandCarTable = new Brand_Car();
     }
 
     /**
      * @return Brands
      */
-    private function _getBrandTable()
+    private function getBrandTable()
     {
-        return $this->_brandTable
-            ? $this->_brandTable
-            : $this->_brandTable = new Brands();
+        return $this->brandTable
+            ? $this->brandTable
+            : $this->brandTable = new Brands();
     }
 
     /**
@@ -458,12 +458,12 @@ class Car extends AbstractHelper
      */
     private function _getCarParentTable()
     {
-        return $this->_carParentTable
-            ? $this->_carParentTable
-            : $this->_carParentTable = new Car_Parent();
+        return $this->carParentTable
+            ? $this->carParentTable
+            : $this->carParentTable = new Car_Parent();
     }
 
-    private function _carPublicUrls(Cars_Row $car)
+    private function _carPublicUrls(Car_Row $car)
     {
         return $this->_walkUpUntilBrand($car->id, []);
     }
@@ -472,13 +472,13 @@ class Car extends AbstractHelper
     {
         $urls = [];
 
-        $brandCarRows = $this->_getBrandCarTable()->fetchAll([
+        $brandCarRows = $this->getBrandCarTable()->fetchAll([
             'car_id = ?' => $id
         ]);
 
         foreach ($brandCarRows as $brandCarRow) {
 
-            $brand = $this->_getBrandTable()->find($brandCarRow->brand_id)->current();
+            $brand = $this->getBrandTable()->find($brandCarRow->brand_id)->current();
             if (!$brand) {
                 throw new Exception("Broken link `{$brandCarRow->brand_id}`");
             }

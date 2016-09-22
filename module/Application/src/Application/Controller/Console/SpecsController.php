@@ -5,14 +5,15 @@ namespace Application\Controller\Console;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Application_Service_Specifications;
+use Application\Service\SpecificationsService;
+
 use Users;
 
 class SpecsController extends AbstractActionController
 {
     public function refreshConflictFlagsAction()
     {
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         $service->refreshConflictFlags();
 
@@ -21,7 +22,7 @@ class SpecsController extends AbstractActionController
 
     public function refreshUsersStatAction()
     {
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         $service->refreshUsersConflictsStat();
 
@@ -33,7 +34,7 @@ class SpecsController extends AbstractActionController
         $typeId = $this->params('type_id');
         $itemId = $this->params('item_id');
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         $service->refreshItemConflictFlags($typeId, $itemId);
 
@@ -45,7 +46,7 @@ class SpecsController extends AbstractActionController
     {
         $userId = $this->params('user_id');
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
 
         $service->refreshUserConflicts($userId);
 

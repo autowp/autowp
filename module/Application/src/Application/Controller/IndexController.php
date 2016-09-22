@@ -7,14 +7,14 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\Model\CarOfDay;
 use Application\Model\Brand;
 use Application\Model\Twins;
+use Application\Service\SpecificationsService;
 
-use Application_Service_Specifications;
 use Car_Parent;
-use Cars_Row;
+use Car_Row;
 use Category;
 use Category_Language;
 use Factory;
-use Perspectives_Groups;
+use Perspective_Group;
 use Picture;
 use Users;
 
@@ -34,7 +34,7 @@ class IndexController extends AbstractActionController
 
     private function getOrientedPictureList($car)
     {
-        $perspectivesGroups = new Perspectives_Groups();
+        $perspectivesGroups = new Perspective_Group();
 
         $db = $perspectivesGroups->getAdapter();
         $perspectivesGroupIds = $db->fetchCol(
@@ -120,7 +120,7 @@ class IndexController extends AbstractActionController
         return $pictures;
     }
 
-    private function carLinks(Cars_Row $car)
+    private function carLinks(Car_Row $car)
     {
         $items = [];
 
@@ -154,7 +154,7 @@ class IndexController extends AbstractActionController
             }
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         if ($specService->hasSpecs(1, $car->id)) {
 
             foreach ($cataloguePaths as $path) {
@@ -495,7 +495,7 @@ class IndexController extends AbstractActionController
             $this->cache->setItem($cacheKey, $cars);
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
 
         $specsCars = $this->car()->listData($cars, [
             'disableLargePictures' => true,

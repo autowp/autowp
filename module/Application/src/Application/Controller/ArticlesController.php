@@ -103,7 +103,7 @@ class ArticlesController extends AbstractActionController
             ];
 
         foreach ($article->findCarsViaArticles_Cars() as $car) {
-            $brands = $car->findBrandsViaBrands_Cars();
+            $brands = $car->findBrandsViaBrand_Car();
             if (count($brands) > 0) {
                 foreach ($brands as $brand) {
                     $links[] = [

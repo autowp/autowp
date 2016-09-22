@@ -11,23 +11,23 @@ use Application\Model\Brand;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\Mosts;
+use Application\Service\SpecificationsService;
 
 use Exception;
 
-use Application_Service_Specifications;
-use Brands_Cars;
+use Brand_Car;
 use Car_Language;
 use Car_Parent;
 use Car_Types;
 use Cars;
-use Cars_Row;
+use Car_Row;
 use Comment_Message;
 use Engines;
 use Factory;
 use Modification_Group;
-use Perspectives_Groups;
+use Perspective_Group;
 use Picture;
-use Pictures_Row;
+use Picture_Row;
 use Users;
 
 use Zend_Db_Expr;
@@ -182,8 +182,6 @@ class CatalogueController extends AbstractActionController
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brand['id'])
-                /*->join('brands_pictures_cache', 'pictures.id=brands_pictures_cache.picture_id', null)
-                ->where('brands_pictures_cache.brand_id = ?', $brand['id'])*/
                 ->group('pictures.id')
                 ->order([
                     'pictures.accept_datetime DESC',
@@ -235,7 +233,7 @@ class CatalogueController extends AbstractActionController
 
             $carParentTable = new Car_Parent();
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
 
             $this->sidebar()->brand([
                 'brand_id'    => $brand['id'],
@@ -408,7 +406,7 @@ class CatalogueController extends AbstractActionController
 
             $carParentTable = new Car_Parent();
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
 
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
@@ -536,7 +534,7 @@ class CatalogueController extends AbstractActionController
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = Pictures_Row::buildFormatRequest($picture);
+            $requests[$idx] = Picture_Row::buildFormatRequest($picture);
         }
 
         $imagesInfo = $this->imageStorage()->getFormatedImages($requests, 'picture-thumb');
@@ -895,7 +893,7 @@ class CatalogueController extends AbstractActionController
             }
 
             $pictureTable = $this->catalogue()->getPictureTable();
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
             $carTable = $this->catalogue()->getCarTable();
 
             $language = $this->language();
@@ -1109,7 +1107,7 @@ class CatalogueController extends AbstractActionController
                 'name' => $engineRow->caption
             ];
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
 
             $specs = $specService->engineSpecifications([$engine], [
                 'language' => 'en'
@@ -1153,7 +1151,7 @@ class CatalogueController extends AbstractActionController
             );
             $childsCount = $paginator->getTotalItemCount();
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
             $specsCount = $specService->getSpecsCount(3, $engineRow->id);
 
             $picturesSelect = $this->enginePicturesSelect($engineRow, true);
@@ -1376,7 +1374,7 @@ class CatalogueController extends AbstractActionController
             );
 
             foreach ($rows as $row) {
-                $result[$row['id']] = Cars_Row::buildFullName($row);
+                $result[$row['id']] = Car_Row::buildFullName($row);
             }
         }
 
@@ -1446,7 +1444,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $carFullName = Cars_Row::buildFullName($currentCar);
+            $carFullName = Car_Row::buildFullName($currentCar);
 
             // prefetch car names
             $ids = [];
@@ -1527,7 +1525,7 @@ class CatalogueController extends AbstractActionController
                     ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
                         'brand_car_catname' => 'catname'
                     ])
-                    ->where('brands_cars.type = ?', Brands_Cars::TYPE_DESIGN)
+                    ->where('brands_cars.type = ?', Brand_Car::TYPE_DESIGN)
                     ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
                     ->where('car_parent_cache.car_id = ?', $currentCar['id'])
             );
@@ -1702,7 +1700,7 @@ class CatalogueController extends AbstractActionController
                     'onlyExactlyPictures' => true,
                     'specificationsUrl' => function($listCar) use ($brand, $brandCarCatname, $path) {
 
-                        $specService = new Application_Service_Specifications();
+                        $specService = new SpecificationsService();
                         $hasSpecs = $specService->hasSpecs(1, $listCar->id);
 
                         if (!$hasSpecs) {
@@ -1977,7 +1975,7 @@ class CatalogueController extends AbstractActionController
 
     private function getPerspectiveGroupIds($pageId)
     {
-        $perspectivesGroups = new Perspectives_Groups();
+        $perspectivesGroups = new Perspective_Group();
         $db = $perspectivesGroups->getAdapter();
         return $db->fetchCol(
             $db->select()
@@ -2209,7 +2207,7 @@ class CatalogueController extends AbstractActionController
             $ids[] = $car->id;
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $hasChildSpecs = $specService->hasChildSpecs(1, $ids);
 
         $picturesSelect = $this->selectFromPictures()
@@ -2723,7 +2721,7 @@ class CatalogueController extends AbstractActionController
                 $childCars = $carTable->fetchAll($select);
             }
 
-            $service = new Application_Service_Specifications();
+            $service = new SpecificationsService();
 
             $cars = [];
             foreach ($childCars as $childCar) {
@@ -2781,7 +2779,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
             $service = new Mosts([
                 'specs' => $specService
             ]);

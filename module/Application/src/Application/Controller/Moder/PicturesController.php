@@ -16,7 +16,6 @@ use Application\Service\TrafficControl;
 use Brands;
 use Car_Parent;
 use Cars;
-use Cars_Rowset;
 use Comments;
 use Comment_Message;
 use Comment_Topic;
@@ -31,6 +30,7 @@ use Users;
 use Exception;
 
 use Zend_Db_Expr;
+use Zend_Db_Table_Rowset;
 use Zend_Session_Namespace;
 
 class PicturesController extends AbstractActionController
@@ -1499,7 +1499,7 @@ class PicturesController extends AbstractActionController
         ]);
     }
 
-    private function prepareCars(Cars_Rowset $rows)
+    private function prepareCars(Zend_Db_Table_Rowset $rows)
     {
         $carParentTable = $this->getCarParentTable();
         $carParentAdapter = $carParentTable->getAdapter();

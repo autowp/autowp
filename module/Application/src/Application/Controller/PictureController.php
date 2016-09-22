@@ -8,7 +8,7 @@ use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand;
 use Picture;
-use Pictures_Row;
+use Picture_Row;
 
 class PictureController extends AbstractActionController
 {
@@ -49,7 +49,7 @@ class PictureController extends AbstractActionController
         return $viewModel;
     }
 
-    private function getPicturesSelect(Pictures_Row $picture)
+    private function getPicturesSelect(Picture_Row $picture)
     {
         $pictureTable = $this->catalogue()->getPictureTable();
 

@@ -15,17 +15,16 @@ use Application\Model\Message;
 use Application\Model\Modification;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Service\SpecificationsService;
 use Autowp\Filter\Filename\Safe;
 
-use Application_Service_Specifications;
 use Brand_Car;
 use Brands;
-use Brands_Cars;
 use Car_Language;
 use Car_Parent;
 use Car_Parent_Cache;
 use Car_Types;
-use Cars_Row;
+use Car_Row;
 use Category;
 use Category_Car;
 use Category_Language;
@@ -34,7 +33,7 @@ use Factory;
 use Factory_Car;
 use Modification_Group;
 use Picture;
-use Pictures_Row;
+use Picture_Row;
 use Spec;
 use Twins_Groups;
 use Twins_Groups_Cars;
@@ -57,7 +56,7 @@ class CarsController extends AbstractActionController
     private $carParentTable;
 
     /**
-     * @var Brands_Cars
+     * @var Brand_Car
      */
     private $brandCarTable;
 
@@ -121,7 +120,7 @@ class CarsController extends AbstractActionController
         }
     }
 
-    private function canMove(Cars_Row $car)
+    private function canMove(Car_Row $car)
     {
         return $this->user()->isAllowed('car', 'move');
     }
@@ -301,10 +300,10 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @return string
      */
-    private function carModerUrl(Cars_Row $car, $full = false, $tab = null)
+    private function carModerUrl(Car_Row $car, $full = false, $tab = null)
     {
         return $this->url()->fromRoute('moder/cars/params', [
             'action' => 'car',
@@ -316,15 +315,15 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @return void
      */
-    private function redirectToCar(Cars_Row $car, $tab = null)
+    private function redirectToCar(Car_Row $car, $tab = null)
     {
         return $this->redirect()->toUrl($this->carModerUrl($car, true, $tab));
     }
 
-    private function canEditMeta(Cars_Row $car)
+    private function canEditMeta(Car_Row $car)
     {
         return $this->user()->isAllowed('car', 'edit_meta');
     }
@@ -508,7 +507,7 @@ class CarsController extends AbstractActionController
         return $this->textForm;
     }
 
-    private function carToForm(Cars_Row $car)
+    private function carToForm(Car_Row $car)
     {
         return [
             'name'        => $car->caption,
@@ -947,7 +946,7 @@ class CarsController extends AbstractActionController
             $tab['active'] = $id == $currentTab;
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $specsCount = $specService->getSpecsCount(1, $car->id);
 
         return [
@@ -992,12 +991,7 @@ class CarsController extends AbstractActionController
         $ucsTable = new User_Car_Subscribe();
         $ucsTable->subscribe($user, $car);
 
-        $brand->updatePicturesCache();
         $brand->RefreshPicturesCount();
-        $brand->RefreshActivePicturesCount();
-
-        // обновляем кэши близнецов
-        $car->updateRelatedTwinsGroupsCount();
 
         $message = sprintf(
             'Автомобиль %s отсоединен от бренда %s',
@@ -1065,7 +1059,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        foreach ($car->findBrandsViaBrands_Cars() as $iBrand) {
+        foreach ($car->findBrandsViaBrand_Car() as $iBrand) {
             if ($iBrand->id == $brand->id) {
                 throw new Exception('Автомобиль уже связан с брендом '.$iBrand->caption);
             }
@@ -1094,7 +1088,7 @@ class CarsController extends AbstractActionController
         $brandsCars->insert([
             'brand_id' => $brand->id,
             'car_id'   => $car->id,
-            'type'     => Brands_Cars::TYPE_DEFAULT,
+            'type'     => Brand_Car::TYPE_DEFAULT,
             'catname'  => $catname ? $catname : 'car' . $car->id
         ]);
 
@@ -1102,12 +1096,7 @@ class CarsController extends AbstractActionController
         $ucsTable = new User_Car_Subscribe();
         $ucsTable->subscribe($user, $car);
 
-        $brand->updatePicturesCache();
         $brand->refreshPicturesCount();
-        $brand->refreshActivePicturesCount();
-
-        // обновляем кэши близнецов
-        $car->updateRelatedTwinsGroupsCount();
 
         $message = sprintf(
             'Автомобиль %s добавлен к бренду %s',
@@ -1256,9 +1245,6 @@ class CarsController extends AbstractActionController
                 'car_id' => $car->id
             ]);
 
-            // обновляем кэши
-            $car->updateRelatedTwinsGroupsCount();
-
             $this->log(sprintf(
                 'Автомобиль %s добавлен в группу близнецов %s',
                 htmlspecialchars($car->getFullName()),
@@ -1355,9 +1341,6 @@ class CarsController extends AbstractActionController
         if ($twinsGroup->findCarsViaTwins_Groups_Cars()->count() <= 0) {
             $twinsGroup->delete();
         }
-
-        // обновляем кэши
-        $car->updateRelatedTwinsGroupsCount();
 
         return $this->redirectToCar($car, 'twins');
     }
@@ -1995,7 +1978,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $specService->updateActualValues(1, $car->id);
 
         $message = sprintf(
@@ -2066,7 +2049,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $specService->updateActualValues(1, $car->id);
 
         $message = sprintf(
@@ -2423,7 +2406,7 @@ class CarsController extends AbstractActionController
         return $model->setTerminal(true);
     }
 
-    private function carTreeWalk(Cars_Row $car, $carParentRow = null)
+    private function carTreeWalk(Car_Row $car, $carParentRow = null)
     {
         $data = [
             'name'   => $car->getFullName(),
@@ -2614,13 +2597,13 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @return Brands_Cars
+     * @return Brand_Car
      */
     private function getBrandCarTable()
     {
         return $this->brandCarTable
             ? $this->brandCarTable
-            : $this->brandCarTable = new Brands_Cars();
+            : $this->brandCarTable = new Brand_Car();
     }
 
     /**
@@ -2669,7 +2652,7 @@ class CarsController extends AbstractActionController
         return $urls;
     }
 
-    private function carPublicUrls(Cars_Row $car)
+    private function carPublicUrls(Car_Row $car)
     {
         return $this->walkUpUntilBrand($car->id, []);
     }
@@ -3002,7 +2985,7 @@ class CarsController extends AbstractActionController
         ]);
     }
 
-    private function carSelectParentWalk(Cars_Row $car)
+    private function carSelectParentWalk(Car_Row $car)
     {
         $data = [
             'name'   => $car->getFullName(),
@@ -3229,7 +3212,7 @@ class CarsController extends AbstractActionController
                     $carTable->updateInteritance($childCarRow);
                 }
 
-                $specService = new Application_Service_Specifications();
+                $specService = new SpecificationsService();
                 $specService->updateActualValues(1, $newCar->id);
 
                 $user = $this->user()->get();
@@ -3401,7 +3384,7 @@ class CarsController extends AbstractActionController
 
                 $carTable->updateInteritance($car);
 
-                $specService = new Application_Service_Specifications();
+                $specService = new SpecificationsService();
                 $specService->updateInheritedValues(1, $car->id);
 
                 return $this->redirect()->toUrl($url);
@@ -3449,7 +3432,7 @@ class CarsController extends AbstractActionController
                 ->order(['pictures.status', 'pictures.id'])
         );
         foreach ($rows as $row) {
-            $request = Pictures_Row::buildFormatRequest($row->toArray());
+            $request = Picture_Row::buildFormatRequest($row->toArray());
             $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
             if ($imageInfo) {
                 $childs[$row->id] = $imageInfo->getSrc();
@@ -3557,19 +3540,17 @@ class CarsController extends AbstractActionController
 
                 // обнволяем кэш старого автомобиля
                 $car->refreshPicturesCount();
-                foreach ($car->findBrandsViaBrands_Cars() as $brand) {
-                    $brand->updatePicturesCache();
+                foreach ($car->findBrandsViaBrand_Car() as $brand) {
                     $brand->refreshPicturesCount();
                 }
 
                 // обнволяем кэш нового автомобиля
                 $newCar->refreshPicturesCount();
-                foreach ($newCar->findBrandsViaBrands_Cars() as $brand) {
-                    $brand->updatePicturesCache();
+                foreach ($newCar->findBrandsViaBrand_Car() as $brand) {
                     $brand->refreshPicturesCount();
                 }
 
-                $specService = new Application_Service_Specifications();
+                $specService = new SpecificationsService();
                 $specService->updateActualValues(1, $newCar->id);
 
                 $user = $this->user()->get();
@@ -3587,7 +3568,7 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    private function carMofificationsGroupModifications(Cars_Row $car, $groupId)
+    private function carMofificationsGroupModifications(Car_Row $car, $groupId)
     {
         $modModel = new Modification();
         $mTable = new ModificationTable();
@@ -3778,7 +3759,7 @@ class CarsController extends AbstractActionController
 
         foreach ($pictureRows as $pictureRow) {
 
-            $request = Pictures_Row::buildFormatRequest($pictureRow->toArray());
+            $request = Picture_Row::buildFormatRequest($pictureRow->toArray());
             $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
 
             $modificationIds = $db->fetchCol(

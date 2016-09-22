@@ -14,7 +14,7 @@ class Catalogue
     private $brandTable;
 
     /**
-     * @var Brands_Cars
+     * @var Brand_Car
      */
     private $brandCarTable;
 
@@ -113,13 +113,13 @@ class Catalogue
     }
 
     /**
-     * @return Brands_Cars
+     * @return Brand_Car
      */
     public function getBrandCarTable()
     {
         return $this->brandCarTable
             ? $this->brandCarTable
-            : $this->brandCarTable = new Brands_Cars();
+            : $this->brandCarTable = new Brand_Car();
     }
 
     /**
@@ -183,10 +183,10 @@ class Catalogue
     }
 
     /**
-     * @param Cars_Row $car
+     * @param Car_Row $car
      * @return array
      */
-    public function cataloguePaths(Cars_Row $car)
+    public function cataloguePaths(Car_Row $car)
     {
         return $this->walkUpUntilBrand($car->id, []);
     }
@@ -232,7 +232,7 @@ class Catalogue
         return $urls;
     }
 
-    public function engineCataloguePaths(Engines_Row $engine, array $options = [])
+    public function engineCataloguePaths(Engine_Row $engine, array $options = [])
     {
         $defaults = [
             'brand_id' => null,

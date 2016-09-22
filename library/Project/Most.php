@@ -1,5 +1,7 @@
 <?php
 
+use Application\Service\SpecificationsService;
+
 class Project_Most
 {
     protected $_carsCount = 10;
@@ -15,7 +17,7 @@ class Project_Most
     protected $_adapter = array();
 
     /**
-     * @var Application_Service_Specifications
+     * @var SpecificationsService
      */
     protected $_specs;
 
@@ -52,10 +54,10 @@ class Project_Most
     }
 
     /**
-     * @param Application_Service_Specifications $value
+     * @param SpecificationsService $value
      * @return Project_Most
      */
-    public function setSpecs(Application_Service_Specifications $value)
+    public function setSpecs(SpecificationsService $value)
     {
         $this->_specs = $value;
 
@@ -63,7 +65,7 @@ class Project_Most
     }
 
     /**
-     * @return Application_Service_Specifications
+     * @return SpecificationsService
      */
     public function getSpecs()
     {

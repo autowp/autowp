@@ -86,7 +86,7 @@ class Car_Parent extends Project_Db_Table
         return array_unique($ids);
     }
 
-    public function addParent(Cars_Row $car, Cars_Row $parent, array $options = array())
+    public function addParent(Car_Row $car, Car_Row $parent, array $options = array())
     {
         if (!$parent->is_group) {
             throw new Exception("Only groups can have childs");
@@ -127,7 +127,7 @@ class Car_Parent extends Project_Db_Table
         $cpcTable->rebuildCache($car);
     }
 
-    public function removeParent(Cars_Row $car, Cars_Row $parent)
+    public function removeParent(Car_Row $car, Car_Row $parent)
     {
         $id = (int)$car->id;
         $parentId = (int)$parent->id;
@@ -152,7 +152,7 @@ class Car_Parent extends Project_Db_Table
         }
 
         $brandId = $brand;
-        if ($brandId instanceof Brands_Row) {
+        if ($brandId instanceof Brand_Row) {
             $brandId = $brandId->id;
         }
 
