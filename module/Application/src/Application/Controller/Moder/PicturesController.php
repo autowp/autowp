@@ -1880,11 +1880,10 @@ class PicturesController extends AbstractActionController
 
             $pictureUrl = $this->pic()->url($picture->id, $picture->identity, true);
 
-            $picture->status = Picture::STATUS_ACCEPTED;
-            $picture->change_status_user_id = $user->id;
-            if (!$picture->accept_datetime) {
-                $picture->accept_datetime = new Zend_Db_Expr('NOW()');
+            $pictureTable = new Picture();
 
+            $success = $pictureTable->accept($picture->id, $user->id, $isFirstTimeAccepted);
+            if ($success && $isFirstTimeAccepted) {
                 $owner = $picture->findParentUsersByOwner();
                 if ( $owner && ($owner->id != $user->id) ) {
                     $message = sprintf(
@@ -1896,7 +1895,6 @@ class PicturesController extends AbstractActionController
                     $mModel->send(null, $owner->id, $message);
                 }
             }
-            $picture->save();
 
             if ($previousStatusUserId != $user->id) {
                 $userTable = new Users();

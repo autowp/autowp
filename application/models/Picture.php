@@ -24,50 +24,50 @@ class Picture extends Project_Db_Table
 
     protected $_rowClass = 'Picture_Row';
 
-    protected $_referenceMap = array(
-        'Car' => array(
-            'columns'       => array('car_id'),
+    protected $_referenceMap = [
+        'Car' => [
+            'columns'       => ['car_id'],
             'refTableClass' => 'Cars',
-            'refColumns'    => array('id')
-        ),
-        'Brand' => array(
-            'columns'       => array('brand_id'),
+            'refColumns'    => ['id']
+        ],
+        'Brand' => [
+            'columns'       => ['brand_id'],
             'refTableClass' => 'Brands',
-            'refColumns'    => array('id')
-        ),
-        'Engine' => array(
-            'columns'       => array('engine_id'),
+            'refColumns'    => ['id']
+        ],
+        'Engine' => [
+            'columns'       => ['engine_id'],
             'refTableClass' => 'Engines',
-            'refColumns'    => array('id')
-        ),
-        'Factory' => array(
-            'columns'       => array('factory_id'),
+            'refColumns'    => ['id']
+        ],
+        'Factory' => [
+            'columns'       => ['factory_id'],
             'refTableClass' => 'Factory',
-            'refColumns'    => array('id')
-        ),
-        'Owner' => array(
-            'columns'       => array('owner_id'),
+            'refColumns'    => ['id']
+        ],
+        'Owner' => [
+            'columns'       => ['owner_id'],
             'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        ),
-        'Change_Perspective_User' => array(
-            'columns'       => array('change_perspective_user_id'),
+            'refColumns'    => ['id']
+        ],
+        'Change_Perspective_User' => [
+            'columns'       => ['change_perspective_user_id'],
             'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        ),
-        'Change_Status_User' => array(
-            'columns'       => array('change_status_user_id'),
+            'refColumns'    => ['id']
+        ],
+        'Change_Status_User' => [
+            'columns'       => ['change_status_user_id'],
             'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        ),
-        'Source' => array(
-            'columns'       => array('source_id'),
+            'refColumns'    => ['id']
+        ],
+        'Source' => [
+            'columns'       => ['source_id'],
             'refTableClass' => 'Sources',
-            'refColumns'    => array('id')
-        ),
-    );
+            'refColumns'    => ['id']
+        ],
+    ];
 
-    private $prefixedPerspectives = array(5, 6, 17, 20, 21, 22, 23);
+    private $prefixedPerspectives = [5, 6, 17, 20, 21, 22, 23];
 
     /**
      * @var Image\Storage
@@ -135,16 +135,16 @@ class Picture extends Project_Db_Table
 
     public function getNames($rows, array $options = [])
     {
-        $result = array();
+        $result = [];
 
         $language = isset($options['language']) ? $options['language'] : 'en';
 
         // prefetch
-        $carIds = array();
-        $perspectiveIds = array();
-        $engineIds = array();
-        $brandIds = array();
-        $factoryIds = array();
+        $carIds = [];
+        $perspectiveIds = [];
+        $engineIds = [];
+        $brandIds = [];
+        $factoryIds = [];
         foreach ($rows as $index => $row) {
             switch ($row['type']) {
                 case Picture::CAR_TYPE_ID:
@@ -170,14 +170,14 @@ class Picture extends Project_Db_Table
             }
         }
 
-        $cars = array();
+        $cars = [];
         if (count($carIds)) {
             $table = new Cars();
 
             $db = $table->getAdapter();
 
             $select = $db->select()
-                ->from('cars', array(
+                ->from('cars', [
                     'id',
                     'begin_model_year', 'end_model_year',
                     'spec' => 'spec.short_name',
@@ -185,13 +185,13 @@ class Picture extends Project_Db_Table
                     'body',
                     'name' => 'if(length(car_language.name) > 0, car_language.name, cars.caption)',
                     'begin_year', 'end_year', 'today',
-                ))
+                ])
                 ->where('cars.id in (?)', array_keys($carIds))
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :language', null);
 
-            foreach ($db->fetchAll($select, array('language' => $language)) as $row) {
-                $cars[$row['id']] = array(
+            foreach ($db->fetchAll($select, ['language' => $language]) as $row) {
+                $cars[$row['id']] = [
                     'begin_model_year' => $row['begin_model_year'],
                     'end_model_year'   => $row['end_model_year'],
                     'spec'             => $row['spec'],
@@ -201,7 +201,7 @@ class Picture extends Project_Db_Table
                     'begin_year'       => $row['begin_year'],
                     'end_year'         => $row['end_year'],
                     'today'            => $row['today']
-                );
+                ];
             }
         }
 
@@ -219,7 +219,7 @@ class Picture extends Project_Db_Table
             }
         }
 
-        $engines = array();
+        $engines = [];
         if (count($engineIds)) {
             $table = new Engines();
             foreach ($table->find(array_keys($engineIds)) as $row) {
@@ -227,7 +227,7 @@ class Picture extends Project_Db_Table
             }
         }
 
-        $factories = array();
+        $factories = [];
         if (count($factoryIds)) {
             $table = new Factory();
             foreach ($table->find(array_keys($factoryIds)) as $row) {
@@ -235,7 +235,7 @@ class Picture extends Project_Db_Table
             }
         }
 
-        $brands = array();
+        $brands = [];
         if (count($brandIds)) {
             $table = new Brands();
             foreach ($table->find(array_keys($brandIds)) as $row) {
@@ -257,9 +257,9 @@ class Picture extends Project_Db_Table
                     if ($car) {
                         //$perspective = isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : '';
                         //$caption = $perspective . $car;
-                        $caption = array_replace($car, array(
+                        $caption = array_replace($car, [
                             'perspective' => isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : null
-                        ));
+                        ]);
                     }
                     break;
 
@@ -298,19 +298,19 @@ class Picture extends Project_Db_Table
         return $result;
     }
 
-    public function getNameData($rows, array $options = array())
+    public function getNameData($rows, array $options = [])
     {
-        $result = array();
+        $result = [];
 
         $language = isset($options['language']) ? $options['language'] : 'en';
         $large = isset($options['large']) && $options['large'];
 
         // prefetch
-        $carIds = array();
-        $perspectiveIds = array();
-        $engineIds = array();
-        $brandIds = array();
-        $factoryIds = array();
+        $carIds = [];
+        $perspectiveIds = [];
+        $engineIds = [];
+        $brandIds = [];
+        $factoryIds = [];
         foreach ($rows as $index => $row) {
             switch ($row['type']) {
                 case Picture::CAR_TYPE_ID:
@@ -336,7 +336,7 @@ class Picture extends Project_Db_Table
             }
         }
 
-        $cars = array();
+        $cars = [];
         if (count($carIds)) {
             $table = new Cars();
 
@@ -362,7 +362,7 @@ class Picture extends Project_Db_Table
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :language', null);
 
-            foreach ($db->fetchAll($select, array('language' => $language)) as $row) {
+            foreach ($db->fetchAll($select, ['language' => $language]) as $row) {
                 $data = [
                     'begin_model_year' => $row['begin_model_year'],
                     'end_model_year'   => $row['end_model_year'],
@@ -382,7 +382,7 @@ class Picture extends Project_Db_Table
             }
         }
 
-        $perspectives = array();
+        $perspectives = [];
         if (count($perspectiveIds)) {
             $perspectiveTable = new Perspectives();
             $pRows = $perspectiveTable->find(array_keys($perspectiveIds));
@@ -392,7 +392,7 @@ class Picture extends Project_Db_Table
             }
         }
 
-        $engines = array();
+        $engines = [];
         if (count($engineIds)) {
             $table = new Engines();
             foreach ($table->find(array_keys($engineIds)) as $row) {
@@ -400,7 +400,7 @@ class Picture extends Project_Db_Table
             }
         }
 
-        $factories = array();
+        $factories = [];
         if (count($factoryIds)) {
             $table = new Factory();
             foreach ($table->find(array_keys($factoryIds)) as $row) {
@@ -408,7 +408,7 @@ class Picture extends Project_Db_Table
             }
         }
 
-        $brands = array();
+        $brands = [];
         if (count($brandIds)) {
             $table = new Brands();
             foreach ($table->find(array_keys($brandIds)) as $row) {
@@ -418,58 +418,58 @@ class Picture extends Project_Db_Table
 
         foreach ($rows as $index => $row) {
             if ($row['name']) {
-                $result[$row['id']] = array(
+                $result[$row['id']] = [
                     'type' => $row['type'],
                     'name' => $row['name']
-                );
+                ];
                 continue;
             }
 
-            $caption = array(
+            $caption = [
                 'type' => $row['type'],
-            );
+            ];
 
             switch ($row['type']) {
                 case Picture::CAR_TYPE_ID:
                     $car = isset($cars[$row['car_id']]) ? $cars[$row['car_id']] : null;
                     if ($car) {
-                        $caption = array(
+                        $caption = [
                             'type' => $row['type'],
                             'car' => $car,
                             'perspective' => isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : null
-                        );
+                        ];
                     } else {
-                        $caption = array(
+                        $caption = [
                             'type' => $row['type'],
                             'car' => null,
                             'perspective' => isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : null
-                        );
+                        ];
                     }
                     break;
 
                 case Picture::ENGINE_TYPE_ID:
                     $engine = isset($engines[$row['engine_id']]) ? $engines[$row['engine_id']] : null;
-                    $caption = array(
+                    $caption = [
                         'type' => $row['type'],
                         'engine' => $engine
-                    );
+                    ];
                     break;
 
                 case Picture::LOGO_TYPE_ID:
                 case Picture::MIXED_TYPE_ID:
                 case Picture::UNSORTED_TYPE_ID:
                     $brand = isset($brands[$row['brand_id']]) ? $brands[$row['brand_id']] : null;
-                    $caption = array(
+                    $caption = [
                         'type' => $row['type'],
                         'brand' => $brand
-                    );
+                    ];
                     break;
 
                 case Picture::FACTORY_TYPE_ID:
-                    $caption = array(
+                    $caption = [
                         'type' => $row['type'],
                         'factory' => isset($factories[$row['factory_id']]) ? $factories[$row['factory_id']] : null
-                    );
+                    ];
                     break;
 
                 default:
@@ -483,6 +483,31 @@ class Picture extends Project_Db_Table
         }
 
         return $result;
+    }
+
+    public function accept($pictureId, $userId, &$isFirstTimeAccepted)
+    {
+        $isFirstTimeAccepted = false;
+
+        $picture = $this->find($pictureId)->current();
+        if (!$picture) {
+            return false;
+        }
+
+        $picture->setFromArray([
+            'status' => Picture::STATUS_ACCEPTED,
+            'change_status_user_id' => $userId
+        ]);
+        if (!$picture->accept_datetime) {
+            $picture->accept_datetime = new Zend_Db_Expr('NOW()');
+
+            $isFirstTimeAccepted = true;
+        }
+        $picture->save();
+
+        $this->refreshCounts($picture->toArray());
+
+        return true;
     }
 
     private function refreshCounts($params)
