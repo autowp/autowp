@@ -1,9 +1,43 @@
 <?php
 
+namespace Application\Service;
+
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-class Application_Service_Specifications
+use Attrs_Attributes;
+use Attrs_List_Options;
+use Attrs_Types;
+use Attrs_Values;
+use Attrs_Values_Float;
+use Attrs_Values_Int;
+use Attrs_Values_List;
+use Attrs_Values_String;
+use Attrs_Units;
+use Attrs_User_Values;
+use Attrs_User_Values_Int;
+use Attrs_User_Values_Float;
+use Attrs_User_Values_List;
+use Attrs_User_Values_String;
+use Attrs_Zones;
+use Car_Parent;
+use Car_Row;
+use Car_Types;
+use Cars;
+use Engine_Row;
+use Engines;
+use Picture;
+use Project_Spec_Table_Car;
+use Project_Spec_Table_Engine;
+use Users;
+use User_Row;
+
+use Exception;
+
+use Zend_Db_Expr;
+use Zend_Locale_Format;
+
+class SpecificationsService
 {
     const ITEM_TYPE_CAR = 1;
     const ITEM_TYPE_ENGINE = 3;
@@ -416,109 +450,6 @@ class Application_Service_Specifications
         return $this->_listOptions[$attributeId][$id];
     }
 
-    /**
-     * @param int $itemId
-     * @param int $zoneId
-     * @param User_Row $user
-     * @param array $options
-     * @return Application_Form_Attrs_Zone_Attributes
-     */
-    private function getForm($itemId, $zoneId, User_Row $user, array $options)
-    {
-        $multioptions = $this->_getListsOptions($this->loadZone($zoneId));
-
-        $zoneUserValues = $this->getZoneUsersValues($zoneId, $itemId);
-
-        $zone = $this->_getZone($zoneId);
-        $itemTypeId = $zone->item_type_id;
-
-        $userValueTable = $this->_getUserValueTable();
-
-        // fetch values dates
-        $dates = [];
-        if (count($zoneUserValues)) {
-            $valueDescRows = $userValueTable->fetchAll([
-                'attribute_id IN (?)' => array_keys($zoneUserValues),
-                'item_id = ?'         => $itemId,
-                'item_type_id = ?'    => $itemTypeId,
-            ]);
-            foreach ($valueDescRows as $valueDescRow) {
-                $dates[$valueDescRow->attribute_id][$valueDescRow->user_id] = $valueDescRow->getDateTime('update_date');
-            }
-        }
-
-        $currentUserValues = [];
-        $allValues = [];
-        foreach ($zoneUserValues as $attributeId => $users) {
-            foreach ($users as $userId => $value) {
-                $date = null;
-                if (isset($dates[$attributeId][$userId])) {
-                    $date = $dates[$attributeId][$userId];
-                }
-
-                $attribute = $this->_getAttribute($attributeId);
-                if (!$attribute) {
-                    throw new Exception("Attribute `$attributeId` not found");
-                }
-
-                $allValues[$attributeId][] = [
-                    'user'  => $this->_getUser($userId),
-                    'value' => $this->_valueToText($attribute, $value),
-                    'date'  => $date
-                ];
-
-                if ($userId == $user->id) {
-                    $currentUserValues[$attributeId] = $value;
-                }
-            }
-        }
-
-        $zoneActualValues = $this->getZoneActualValues($zoneId, $itemId);
-        $actualValues = [];
-        foreach ($zoneActualValues as $attributeId => $value) {
-            $attribute = $this->_getAttribute($attributeId);
-            if (!$attribute) {
-                throw new Exception("Attribute `$attributeId` not found");
-            }
-
-            $actualValues[$attributeId] = $this->_valueToText($attribute, $value);
-        }
-
-        $options = array_replace($options, [
-            'service'      => $this,
-            'zone'         => $this->_getZone($zoneId),
-            'itemId'       => $itemId,
-            'allValues'    => $allValues,
-            'actualValues' => $actualValues,
-            'multioptions' => $multioptions,
-            'editableAttributes' => array_keys($currentUserValues)
-        ]);
-
-        //$currentUserValues = $this->getZoneUserValues($zoneId, $itemId, $user->id);
-
-        $form = new Application_Form_Attrs_Zone_Attributes($options);
-        $formValues = $this->_walkTree($zoneId, function($attribute) use ($currentUserValues) {
-            if (array_key_exists($attribute['id'], $currentUserValues)) {
-                $value = $currentUserValues[$attribute['id']];
-                if (is_array($value)) {
-                    foreach ($value as $oneValue) {
-                        if ($oneValue === null) {
-                            return [self::NULL_VALUE_STR];
-                        }
-                    }
-                    return $value;
-                } else {
-                    return $value === null ? self::NULL_VALUE_STR : $value;
-                }
-            } else {
-                return null;
-            }
-        });
-        $form->populate($formValues);
-
-        return $form;
-    }
-
     public function getFormData($itemId, $zoneId, User_Row $user)
     {
         $zone = $this->_getZone($zoneId);
@@ -879,7 +810,7 @@ class Application_Service_Specifications
     }
 
     /**
-     * @return Application_Service_Specifications
+     * @return SpecificationsService
      */
     protected function _loadAttributes()
     {
@@ -1104,32 +1035,6 @@ class Application_Service_Specifications
             $this->_propageteEngine($attribute, $itemTypeId, $itemId);
 
             $this->refreshConflictFlag($attribute['id'], $itemTypeId, $itemId);
-        }
-    }
-
-    /**
-     * @param Application_Form_Attrs_Zone_Attributes $form
-     * @param User_Row $user
-     */
-    public function saveAttrsZoneAttributes(Application_Form_Attrs_Zone_Attributes $form, User_Row $user)
-    {
-        $zone = $form->getZone();
-
-        $attributes = $this->getAttributes([
-            'zone'   => $zone->id,
-            'parent' => 0
-        ]);
-
-        $values = $this->collectFormData($zone->id, $attributes, $form->getValues());
-
-        foreach ($values as $attributeId => $value) {
-            $this->setUserValue(
-                $user->id,
-                $attributeId,
-                $zone->item_type_id,
-                $form->getItemId(),
-                $value
-            );
         }
     }
 

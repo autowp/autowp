@@ -7,8 +7,8 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Moder\EngineAdd as EngineAddForm;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Service\SpecificationsService;
 
-use Application_Service_Specifications;
 use Brand_Engine;
 use Brands;
 use Engine_Parent_Cache;
@@ -201,7 +201,7 @@ class EnginesController extends AbstractActionController
             ];
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $specsCount = $specService->getSpecsCount(3, $engine->id);
 
         return [
@@ -378,7 +378,7 @@ class EnginesController extends AbstractActionController
                     $epcTable = new Engine_Parent_Cache();
                     $epcTable->rebuildOnAddParent($engine);
 
-                    $specService = new Application_Service_Specifications();
+                    $specService = new SpecificationsService();
                     $specService->updateActualValues(3, $engine->id);
                 }
 
@@ -445,7 +445,7 @@ class EnginesController extends AbstractActionController
         $epcTable = new Engine_Parent_Cache();
         $epcTable->rebuildOnRemoveParent($engine);
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $specService->updateActualValues(3, $engine->id);
 
         $this->log(sprintf(
@@ -496,7 +496,7 @@ class EnginesController extends AbstractActionController
             $epcTable->rebuildOnRemoveParent($engine);
             $epcTable->rebuildOnAddParent($engine);
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
             $specService->updateActualValues(3, $engine->id);
 
             $this->log(sprintf(

@@ -15,9 +15,9 @@ use Application\Model\Message;
 use Application\Model\Modification;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Service\SpecificationsService;
 use Autowp\Filter\Filename\Safe;
 
-use Application_Service_Specifications;
 use Brand_Car;
 use Brands;
 use Car_Language;
@@ -946,7 +946,7 @@ class CarsController extends AbstractActionController
             $tab['active'] = $id == $currentTab;
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $specsCount = $specService->getSpecsCount(1, $car->id);
 
         return [
@@ -1978,7 +1978,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $specService->updateActualValues(1, $car->id);
 
         $message = sprintf(
@@ -2049,7 +2049,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $specService->updateActualValues(1, $car->id);
 
         $message = sprintf(
@@ -3212,7 +3212,7 @@ class CarsController extends AbstractActionController
                     $carTable->updateInteritance($childCarRow);
                 }
 
-                $specService = new Application_Service_Specifications();
+                $specService = new SpecificationsService();
                 $specService->updateActualValues(1, $newCar->id);
 
                 $user = $this->user()->get();
@@ -3384,7 +3384,7 @@ class CarsController extends AbstractActionController
 
                 $carTable->updateInteritance($car);
 
-                $specService = new Application_Service_Specifications();
+                $specService = new SpecificationsService();
                 $specService->updateInheritedValues(1, $car->id);
 
                 return $this->redirect()->toUrl($url);
@@ -3550,7 +3550,7 @@ class CarsController extends AbstractActionController
                     $brand->refreshPicturesCount();
                 }
 
-                $specService = new Application_Service_Specifications();
+                $specService = new SpecificationsService();
                 $specService->updateActualValues(1, $newCar->id);
 
                 $user = $this->user()->get();

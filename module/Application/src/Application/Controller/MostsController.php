@@ -6,10 +6,10 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
 use Application\Service\Mosts;
+use Application\Service\SpecificationsService;
 
 use Autowp\TextStorage;
 
-use Application_Service_Specifications;
 use Car_Parent;
 use Picture;
 
@@ -24,7 +24,7 @@ class MostsController extends AbstractActionController
 
     public function indexAction()
     {
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $service = new Mosts([
             'specs' => $specService
         ]);

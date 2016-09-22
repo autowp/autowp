@@ -2,6 +2,8 @@
 
 namespace Application\Service;
 
+use Application\Service\SpecificationsService;
+
 use Car_Types;
 use Cars;
 use Exception;
@@ -353,7 +355,7 @@ class Mosts
     private $_perspectiveGroups = null;
 
     /**
-     * @var Application_Service_Specifications
+     * @var SpecificationsService
      */
     private $_specs = null;
 

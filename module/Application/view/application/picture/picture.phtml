@@ -151,7 +151,7 @@
                             ]), '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')), false);
                         }
 
-                        $specService = new Application_Service_Specifications();
+                        $specService = new Application\Service\SpecificationsService();
 
                         if ($specService->hasSpecs(1, $car->id)) {
 

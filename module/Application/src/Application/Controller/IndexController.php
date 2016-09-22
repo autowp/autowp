@@ -7,8 +7,8 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\Model\CarOfDay;
 use Application\Model\Brand;
 use Application\Model\Twins;
+use Application\Service\SpecificationsService;
 
-use Application_Service_Specifications;
 use Car_Parent;
 use Car_Row;
 use Category;
@@ -154,7 +154,7 @@ class IndexController extends AbstractActionController
             }
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         if ($specService->hasSpecs(1, $car->id)) {
 
             foreach ($cataloguePaths as $path) {
@@ -495,7 +495,7 @@ class IndexController extends AbstractActionController
             $this->cache->setItem($cacheKey, $cars);
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
 
         $specsCars = $this->car()->listData($cars, [
             'disableLargePictures' => true,

@@ -11,10 +11,10 @@ use Application\Model\Brand;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\Mosts;
+use Application\Service\SpecificationsService;
 
 use Exception;
 
-use Application_Service_Specifications;
 use Brand_Car;
 use Car_Language;
 use Car_Parent;
@@ -233,7 +233,7 @@ class CatalogueController extends AbstractActionController
 
             $carParentTable = new Car_Parent();
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
 
             $this->sidebar()->brand([
                 'brand_id'    => $brand['id'],
@@ -406,7 +406,7 @@ class CatalogueController extends AbstractActionController
 
             $carParentTable = new Car_Parent();
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
 
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
@@ -893,7 +893,7 @@ class CatalogueController extends AbstractActionController
             }
 
             $pictureTable = $this->catalogue()->getPictureTable();
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
             $carTable = $this->catalogue()->getCarTable();
 
             $language = $this->language();
@@ -1107,7 +1107,7 @@ class CatalogueController extends AbstractActionController
                 'name' => $engineRow->caption
             ];
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
 
             $specs = $specService->engineSpecifications([$engine], [
                 'language' => 'en'
@@ -1151,7 +1151,7 @@ class CatalogueController extends AbstractActionController
             );
             $childsCount = $paginator->getTotalItemCount();
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
             $specsCount = $specService->getSpecsCount(3, $engineRow->id);
 
             $picturesSelect = $this->enginePicturesSelect($engineRow, true);
@@ -1700,7 +1700,7 @@ class CatalogueController extends AbstractActionController
                     'onlyExactlyPictures' => true,
                     'specificationsUrl' => function($listCar) use ($brand, $brandCarCatname, $path) {
 
-                        $specService = new Application_Service_Specifications();
+                        $specService = new SpecificationsService();
                         $hasSpecs = $specService->hasSpecs(1, $listCar->id);
 
                         if (!$hasSpecs) {
@@ -2207,7 +2207,7 @@ class CatalogueController extends AbstractActionController
             $ids[] = $car->id;
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $hasChildSpecs = $specService->hasChildSpecs(1, $ids);
 
         $picturesSelect = $this->selectFromPictures()
@@ -2721,7 +2721,7 @@ class CatalogueController extends AbstractActionController
                 $childCars = $carTable->fetchAll($select);
             }
 
-            $service = new Application_Service_Specifications();
+            $service = new SpecificationsService();
 
             $cars = [];
             foreach ($childCars as $childCar) {
@@ -2779,7 +2779,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $specService = new Application_Service_Specifications();
+            $specService = new SpecificationsService();
             $service = new Mosts([
                 'specs' => $specService
             ]);

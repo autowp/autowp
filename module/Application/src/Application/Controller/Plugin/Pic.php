@@ -6,13 +6,12 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Modification as ModificationTable;
-
 use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Service\SpecificationsService;
 
 use Exception;
 
-use Application_Service_Specifications;
 use Brands;
 use Brand_Car;
 use Car_Parent;
@@ -519,7 +518,7 @@ class Pic extends AbstractPlugin
                         }
                     }
 
-                    $specService = new Application_Service_Specifications();
+                    $specService = new SpecificationsService();
                     $engineHasSpecs = $specService->hasSpecs(3, $engine->id);
 
                     if ($engineHasSpecs) {

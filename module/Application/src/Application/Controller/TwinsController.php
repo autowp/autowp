@@ -10,8 +10,8 @@ use Application\Model\Twins;
 use Autowp\TextStorage;
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Service\SpecificationsService;
 
-use Application_Service_Specifications;
 use Cars;
 use Car_Row;
 use Comment_Message;
@@ -90,7 +90,7 @@ class TwinsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
         $specs = $service->specifications($this->getTwins()->getGroupCars($group['id']), [
             'language' => 'en'
         ]);
@@ -156,7 +156,7 @@ class TwinsController extends AbstractActionController
 
         $hasSpecs = false;
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
 
         foreach ($carList as $car) {
             $hasSpecs = $hasSpecs || $specService->hasSpecs(1, $car->id);
@@ -205,7 +205,7 @@ class TwinsController extends AbstractActionController
 
         $language = $this->language();
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
 
         $ids = [];
         foreach ($list as $group) {

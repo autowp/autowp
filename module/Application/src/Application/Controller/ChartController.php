@@ -5,7 +5,8 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
-use Application_Service_Specifications;
+use Application\Service\SpecificationsService;
+
 use Attrs_Attributes;
 use Cars;
 use Spec;
@@ -66,7 +67,7 @@ class ChartController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
         $dataTable = $specService->getValueDataTable($attrRow->type_id);
 
         $dataTableName = $dataTable->info('name');

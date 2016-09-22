@@ -5,10 +5,10 @@ namespace Application\Controller\Plugin;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\Twins;
+use Application\Service\SpecificationsService;
 
 use Autowp\TextStorage\Service as TextStorage;
 
-use Application_Service_Specifications;
 use Brands;
 use Brand_Car;
 use Car_Language;
@@ -165,7 +165,7 @@ class Car extends AbstractPlugin
             $carIds[] = (int)$car->id;
         }
 
-        $specService = new Application_Service_Specifications();
+        $specService = new SpecificationsService();
 
         $hasSpecs = [];
         if (!$disableSpecs && !$specificationsUrl) {

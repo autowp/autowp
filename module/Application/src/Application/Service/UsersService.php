@@ -4,7 +4,8 @@ namespace Application\Service;
 
 use Zend\Mail;
 
-use Application_Service_Specifications;
+use Application\Service\SpecificationsService;
+
 use Comment_Message;
 use Picture;
 use Project_Auth_Adapter_Login;
@@ -133,7 +134,7 @@ class UsersService
         ]);
         $user->save();
 
-        $service = new Application_Service_Specifications();
+        $service = new SpecificationsService();
         $service->refreshUserConflicts($user->id);
 
         $this->sendRegistrationConfirmEmail($user, $host['hostname']);
