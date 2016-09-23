@@ -81,7 +81,7 @@
                 <p><?=$this->htmlA($this->url('moder/engines/params', [
                     'action'    => 'engine',
                     'engine_id' => $this->engine->id
-                ]), $this->engine->getMETACaption())?></p>
+                ]), $this->engine->caption)?></p>
                 <?php if ($this->engineInherited) { ?>
                     <?php foreach ($this->engineInheritedFrom as $car) { ?>
                         <h6><em>Inherited from <?=$this->htmlA($car['url'], $car['name'])?></em></h6>
@@ -133,7 +133,7 @@
             <?php } ?>
         <?php } else { ?>
             <?php if ($this->engine) { ?>
-                <p><?=$this->escapeHtml($this->engine->getMETACaption())?></p>
+                <p><?=$this->escapeHtml($this->engine->caption)?></p>
                 <?php if ($this->engineInherited) { ?>
                     <?php foreach ($this->engineInheritedFrom as $car) { ?>
                         <h6><em>Inherited from <?=$this->escapeHtml($car['name'])?></em></h6>

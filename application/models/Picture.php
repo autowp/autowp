@@ -596,7 +596,7 @@ class Picture extends Table
         $log = new Log_Events();
         $log($userId, sprintf(
             'Назначение двигателя %s картинке %s',
-            $engine->getMetaCaption(),
+            $engine->caption,
             $picture->getCaption($options)
         ), [$engine, $picture]);
 

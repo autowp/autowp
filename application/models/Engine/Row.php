@@ -4,14 +4,6 @@ use Application\Db\Table\Row;
 
 class Engine_Row extends Row
 {
-    /**
-     * @deprecated
-     */
-    public function getMetaCaption()
-    {
-        return $this->caption;
-    }
-
     public function getRelatedCarGroupId(array $options = [])
     {
         $defaults = [

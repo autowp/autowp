@@ -1655,7 +1655,7 @@ class PicturesController extends AbstractActionController
         $engines = [];
         foreach ($rows as $row) {
             $engines[] = [
-                'name' => $row->getMetaCaption(),
+                'name' => $row->caption,
                 'url'  => $this->url()->fromRoute(null, [
                     'action'    => 'move',
                     'type'      => Picture::ENGINE_TYPE_ID,

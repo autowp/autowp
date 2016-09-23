@@ -138,7 +138,7 @@ class UploadController extends AbstractActionController
                 $engine = $engines->find($engineId)->current();
                 if ($engine) {
                     $selected = true;
-                    $selectedName = $engine->getMetaCaption();
+                    $selectedName = $engine->caption;
                 }
                 break;
         }
@@ -653,7 +653,7 @@ class UploadController extends AbstractActionController
         $engines = [];
         foreach ($rows as $row) {
             $engines[] = [
-                'name' => $row->getMetaCaption(),
+                'name' => $row->caption,
                 'url'  => $this->url()->fromRoute('upload/params', [
                     'action'    => 'index',
                     'type'      => Picture::ENGINE_TYPE_ID,

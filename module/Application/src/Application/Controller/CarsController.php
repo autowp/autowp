@@ -660,7 +660,7 @@ class CarsController extends AbstractActionController
 
             $message = sprintf(
                 'У автомобиля %s убран двигатель (был %s)',
-                htmlspecialchars($car->getFullName()), htmlspecialchars($engine->getMETACaption())
+                htmlspecialchars($car->getFullName()), htmlspecialchars($engine->caption)
             );
             $this->log($message, $car);
 

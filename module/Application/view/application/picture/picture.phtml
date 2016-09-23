@@ -229,7 +229,7 @@
 
                     if ($this->engine) {
                         if ($this->engineHasSpecs) {
-                            $list[] = $this->htmlA($this->engineSpecsUrl, '<i class="fa fa-list-alt"></i> Технические характеристики ' . $this->escapeHtml($this->engine->getMETACaption()), false);
+                            $list[] = $this->htmlA($this->engineSpecsUrl, '<i class="fa fa-list-alt"></i> Технические характеристики ' . $this->escapeHtml($this->engine->caption), false);
                         }
 
                         if ($this->user()->isAllowed('specifications', 'edit')) {

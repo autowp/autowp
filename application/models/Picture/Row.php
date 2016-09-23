@@ -251,7 +251,7 @@ class Picture_Row extends Row
                 if ($engine) {
                     $result = implode('/', [
                         'engines',
-                        $filenameFilter->filter($engine->getMetaCaption())
+                        $filenameFilter->filter($engine->caption)
                     ]);
                 }
                 break;

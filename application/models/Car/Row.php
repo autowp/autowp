@@ -183,8 +183,9 @@ class Car_Row extends Row
     {
         $result = htmlspecialchars($this->caption);
 
-        if (strlen($this->body) > 0)
+        if (strlen($this->body) > 0) {
             $result .= ' ('.htmlspecialchars($this->body).')';
+        }
 
         $by = $this->begin_year;
         $bm = $this->begin_month;
@@ -210,13 +211,12 @@ class Car_Row extends Row
           }
           else
           {
-            if ($equalY)
-            {
-              if ($bm && $em)
-
-                $result .= '<span class="month">'.($bm ? sprintf('%02d', $bm) : '??').'–'.($em ? sprintf('%02d', $em) : '??').'.</span>'.$by;
-              else
-                $result .= $by;
+            if ($equalY) {
+                if ($bm && $em) {
+                    $result .= '<span class="month">'.($bm ? sprintf('%02d', $bm) : '??').'–'.($em ? sprintf('%02d', $em) : '??').'.</span>'.$by;
+                } else {
+                    $result .= $by;
+                }
             }
             else
             {
@@ -250,7 +250,7 @@ class Car_Row extends Row
         return $result;
     }
 
-    public function getOrientedPictureList(array $perspectiveGroupIds, &$interiors = 0)
+    public function getOrientedPictureList(array $perspectiveGroupIds)
     {
         $pictureTable = new Picture();
         $pictures = [];
