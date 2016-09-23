@@ -111,15 +111,6 @@ class CarsController extends AbstractActionController
         $this->filterForm = $filterForm;
     }
 
-    public function preDispatch()
-    {
-        parent::preDispatch();
-
-        if (!$this->user()->inheritsRole('moder') ) {
-            return $this->forbiddenAction();
-        }
-    }
-
     private function canMove(Car_Row $car)
     {
         return $this->user()->isAllowed('car', 'move');
@@ -127,6 +118,10 @@ class CarsController extends AbstractActionController
 
     public function indexAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $categories = ['' => '--'] + $this->getCategoriesOptions(null, 0);
 
         $specTable = new Spec();
@@ -249,6 +244,10 @@ class CarsController extends AbstractActionController
 
     public function alphaAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
         $carAdapter = $carTable->getAdapter();
         $chars = $carAdapter->fetchCol(
@@ -330,6 +329,10 @@ class CarsController extends AbstractActionController
 
     public function carPicturesAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -414,6 +417,10 @@ class CarsController extends AbstractActionController
 
     public function saveDescAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -538,6 +545,10 @@ class CarsController extends AbstractActionController
 
     public function carAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -965,6 +976,10 @@ class CarsController extends AbstractActionController
 
     public function deleteCarFromBrandAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -1005,6 +1020,10 @@ class CarsController extends AbstractActionController
 
     public function carSelectBrandAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
         $car = $cars->find($this->params('car_id'))->current();
         if (!$car) {
@@ -1040,6 +1059,10 @@ class CarsController extends AbstractActionController
 
     public function addCarToBrandAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -1118,6 +1141,10 @@ class CarsController extends AbstractActionController
 
     public function setBrandCarTypeAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -1162,6 +1189,10 @@ class CarsController extends AbstractActionController
 
     public function setBrandCarCatnameAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -1221,6 +1252,10 @@ class CarsController extends AbstractActionController
 
     public function carSelectTwinsGroupAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
         $car = $cars->find($this->params('car_id'))->current();
         if (!$car) {
@@ -1311,6 +1346,10 @@ class CarsController extends AbstractActionController
 
     public function carRemoveFromTwinsGroupAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
         $car = $cars->find($this->params('car_id'))->current();
         if (!$car)
@@ -1347,6 +1386,10 @@ class CarsController extends AbstractActionController
 
     public function carSelectFactoryAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
         $car = $cars->find($this->params('car_id'))->current();
         if (!$car) {
@@ -1388,8 +1431,13 @@ class CarsController extends AbstractActionController
         ];
     }
 
+
     public function carRemoveFromFactoryAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
         $car = $cars->find($this->params('car_id'))->current();
         if (!$car) {
@@ -1479,6 +1527,10 @@ class CarsController extends AbstractActionController
 
     public function carCategoriesSaveAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -1588,6 +1640,10 @@ class CarsController extends AbstractActionController
 
     public function carCategoriesAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
@@ -1670,6 +1726,10 @@ class CarsController extends AbstractActionController
 
     public function subscribeAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         if (!$this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
@@ -1692,6 +1752,10 @@ class CarsController extends AbstractActionController
 
     public function unsubscribeAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         if (!$this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
@@ -1714,6 +1778,10 @@ class CarsController extends AbstractActionController
 
     public function saveNameAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         if (!$this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
@@ -1787,6 +1855,10 @@ class CarsController extends AbstractActionController
 
     public function treeAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
@@ -1883,6 +1955,10 @@ class CarsController extends AbstractActionController
 
     public function rebuildTreeAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
@@ -1907,6 +1983,10 @@ class CarsController extends AbstractActionController
 
     public function setIsPrimaryAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
@@ -1950,6 +2030,10 @@ class CarsController extends AbstractActionController
 
     public function removeParentAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         if (!$this->getRequest()->isPost()) {
             return $this->notFoundAction();
         }
@@ -1993,6 +2077,10 @@ class CarsController extends AbstractActionController
 
     public function addParentOptionsAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
@@ -2019,6 +2107,10 @@ class CarsController extends AbstractActionController
 
     public function addParentAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         /*if (!$this->getRequest()->isPost()) {
             return $this->notFoundAction();
         }*/
@@ -2075,6 +2167,10 @@ class CarsController extends AbstractActionController
 
     public function carAutocompleteAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $query = trim($this->params()->fromQuery('q'));
 
         $result = [];
@@ -2233,6 +2329,10 @@ class CarsController extends AbstractActionController
 
     public function carTwinsAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -2321,6 +2421,10 @@ class CarsController extends AbstractActionController
 
     public function carFactoriesAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -2406,6 +2510,7 @@ class CarsController extends AbstractActionController
         return $model->setTerminal(true);
     }
 
+
     private function carTreeWalk(Car_Row $car, $carParentRow = null)
     {
         $data = [
@@ -2436,6 +2541,10 @@ class CarsController extends AbstractActionController
 
     public function carTreeAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
@@ -2452,6 +2561,10 @@ class CarsController extends AbstractActionController
 
     public function carCatalogueAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -2815,6 +2928,10 @@ class CarsController extends AbstractActionController
 
     public function carNameAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
         $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
@@ -2850,6 +2967,10 @@ class CarsController extends AbstractActionController
 
     public function carParentSetTypeAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
@@ -2884,6 +3005,10 @@ class CarsController extends AbstractActionController
 
     public function carParentSetCatnameAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
@@ -3013,6 +3138,10 @@ class CarsController extends AbstractActionController
 
     public function carSelectParentAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $this->catalogue()->getCarTable();
         $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
@@ -3084,6 +3213,10 @@ class CarsController extends AbstractActionController
 
     public function organizeAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $carTable = $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -3407,6 +3540,10 @@ class CarsController extends AbstractActionController
 
     public function organizePicturesAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -3643,6 +3780,10 @@ class CarsController extends AbstractActionController
 
     public function carModificationsAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
@@ -3677,6 +3818,10 @@ class CarsController extends AbstractActionController
 
     public function carModificationPicturesAction()
     {
+        if (!$this->user()->inheritsRole('moder') ) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
