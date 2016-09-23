@@ -1,6 +1,14 @@
 <?php
 
-class Project_Auth_Adapter_Login implements Zend_Auth_Adapter_Interface
+namespace Application\Auth\Adapter;
+
+use Zend_Auth_Adapter_Exception;
+use Zend_Auth_Adapter_Interface;
+use Zend_Auth_Result;
+
+use Users;
+
+class Id implements Zend_Auth_Adapter_Interface
 {
     /**
      * $_identity - Identity value
@@ -10,41 +18,21 @@ class Project_Auth_Adapter_Login implements Zend_Auth_Adapter_Interface
     protected $_identity = null;
 
     /**
-     * $_credential - Credential values
-     *
-     * @var string
-     */
-    protected $_credentialExpr = null;
-
-    /**
      * $_authenticateResultInfo
      *
      * @var array
      */
     protected $_authenticateResultInfo = null;
 
-    public function __construct($identity, $credentialExpr)
-    {
-        $this->_identity = (string)$identity;
-        $this->_credentialExpr = (string)$credentialExpr;
-    }
-
     public function authenticate()
     {
         $this->_authenticateSetup();
 
         $userTable = new Users();
-        $filter = array(
+        $userRow = $userTable->fetchRow(array(
             'not deleted',
-            'password = ' . $this->_credentialExpr
-        );
-        if (mb_strpos($this->_identity, '@') !== false) {
-            $filter['e_mail = ?'] = (string)$this->_identity;
-        } else {
-            $filter['login = ?'] = (string)$this->_identity;
-        }
-
-        $userRow = $userTable->fetchRow($filter);
+            'id = ?' => (int)$this->_identity
+        ));
 
         if (!$userRow) {
             $this->_authenticateResultInfo['code'] = Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND;
@@ -72,15 +60,9 @@ class Project_Auth_Adapter_Login implements Zend_Auth_Adapter_Interface
 
         if ($this->_identity == '') {
             $exception = 'A value for the identity was not provided prior to authentication with Zend_Auth_Adapter_DbTable.';
-        } elseif ($this->_credentialExpr === null) {
-            $exception = 'A credential value was not provided prior to authentication with Zend_Auth_Adapter_DbTable.';
-        }
+        } else
 
         if (null !== $exception) {
-            /**
-             * @see Zend_Auth_Adapter_Exception
-             */
-            require_once 'Zend/Auth/Adapter/Exception.php';
             throw new Zend_Auth_Adapter_Exception($exception);
         }
 
@@ -106,5 +88,17 @@ class Project_Auth_Adapter_Login implements Zend_Auth_Adapter_Interface
             $this->_authenticateResultInfo['identity'],
             $this->_authenticateResultInfo['messages']
         );
+    }
+
+    /**
+     * setIdentity() - set the value to be used as the identity
+     *
+     * @param  string $value
+     * @return Id Provides a fluent interface
+     */
+    public function setIdentity($value)
+    {
+        $this->_identity = $value;
+        return $this;
     }
 }

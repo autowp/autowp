@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Uri\Http as HttpUri;
 use Zend\View\Model\ViewModel;
 
+use Application\Auth\Adapter\Id as IdAuthAdapter;
 use Application\Service\UsersService;
 
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
@@ -18,7 +19,6 @@ use Exception;
 use Imagick;
 
 use LoginState;
-use Project_Auth_Adapter_Id;
 use User_Account;
 use Users;
 
@@ -335,7 +335,7 @@ class LoginController extends AbstractActionController
 
         $stateRow->delete();
 
-        $adapter = new Project_Auth_Adapter_Id();
+        $adapter = new IdAuthAdapter();
         $adapter->setIdentity($uRow->id);
         $authResult = Zend_Auth::getInstance()->authenticate($adapter);
         if ($authResult->isValid()) {

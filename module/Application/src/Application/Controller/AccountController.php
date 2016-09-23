@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Application\Auth\Adapter\Id as IdAuthAdapter;
 use Application\Controller\LoginController;
 use Application\Model\Forums;
 use Application\Model\Message;
@@ -19,7 +20,6 @@ use Cars;
 use Engines;
 use LoginState;
 use Picture;
-use Project_Auth_Adapter_Id;
 use User_Account;
 use User_Renames;
 use Users;
@@ -535,7 +535,7 @@ class AccountController extends AbstractActionController
 
         if ($user) {
             if (!$this->user()->logedIn()) {
-                $adapter = new Project_Auth_Adapter_Id();
+                $adapter = new IdAuthAdapter();
                 $adapter->setIdentity($user->id);
                 $result = Zend_Auth::getInstance()->authenticate($adapter);
 

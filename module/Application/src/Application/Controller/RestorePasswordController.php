@@ -6,9 +6,9 @@ use Zend\Mail;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Form\Form;
 
+use Application\Auth\Adapter\Id as IdAuthAdapter;
 use Application\Service\UsersService;
 
-use Project_Auth_Adapter_Id;
 use User_Password_Remind;
 use Users;
 
@@ -129,7 +129,7 @@ class RestorePasswordController extends AbstractActionController
 
                 $uprRow->delete();
 
-                $adapter = new Project_Auth_Adapter_Id();
+                $adapter = new IdAuthAdapter();
                 $adapter->setIdentity($user->id);
 
                 $result = Zend_Auth::getInstance()->authenticate($adapter);

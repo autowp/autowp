@@ -13,7 +13,7 @@ use Zend\ModuleManager\Feature\ConsoleBannerProviderInterface;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 
-use Project_Auth_Adapter_Remember;
+use Application\Auth\Adapter\Remember as RememberAuthAdapter;
 use Users;
 use Zend_Auth;
 use Zend_Db_Adapter_Abstract;
@@ -316,7 +316,7 @@ class Module implements ConsoleUsageProviderInterface,
             if (!$auth->hasIdentity()) {
                 $cookies = $request->getCookie();
                 if ($cookies && isset($cookies['remember'])) {
-                    $adapter = new Project_Auth_Adapter_Remember();
+                    $adapter = new RememberAuthAdapter();
                     $adapter->setCredential($cookies['remember']);
                     $result = $auth->authenticate($adapter);
                 }

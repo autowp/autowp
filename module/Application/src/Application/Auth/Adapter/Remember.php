@@ -1,13 +1,21 @@
 <?php
 
-class Project_Auth_Adapter_Id implements Zend_Auth_Adapter_Interface
+namespace Application\Auth\Adapter;
+
+use Zend_Auth_Adapter_Exception;
+use Zend_Auth_Adapter_Interface;
+use Zend_Auth_Result;
+
+use Users;
+
+class Remember implements Zend_Auth_Adapter_Interface
 {
     /**
-     * $_identity - Identity value
+     * $_credential - Credential values
      *
      * @var string
      */
-    protected $_identity = null;
+    protected $_credential = null;
 
     /**
      * $_authenticateResultInfo
@@ -21,10 +29,13 @@ class Project_Auth_Adapter_Id implements Zend_Auth_Adapter_Interface
         $this->_authenticateSetup();
 
         $userTable = new Users();
-        $userRow = $userTable->fetchRow(array(
-            'not deleted',
-            'id = ?' => (int)$this->_identity
-        ));
+
+        $userRow = $userTable->fetchRow(
+            $userTable->select(true)
+                ->join('user_remember', 'users.id=user_remember.user_id', null)
+                ->where('user_remember.token = ?', (string)$this->_credential)
+                ->where('not users.deleted')
+        );
 
         if (!$userRow) {
             $this->_authenticateResultInfo['code'] = Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND;
@@ -50,15 +61,11 @@ class Project_Auth_Adapter_Id implements Zend_Auth_Adapter_Interface
     {
         $exception = null;
 
-        if ($this->_identity == '') {
-            $exception = 'A value for the identity was not provided prior to authentication with Zend_Auth_Adapter_DbTable.';
-        } else
+        if ($this->_credential === null) {
+            $exception = 'A credential value was not provided prior to authentication with Zend_Auth_Adapter_DbTable.';
+        }
 
         if (null !== $exception) {
-            /**
-             * @see Zend_Auth_Adapter_Exception
-             */
-            require_once 'Zend/Auth/Adapter/Exception.php';
             throw new Zend_Auth_Adapter_Exception($exception);
         }
 
@@ -87,14 +94,14 @@ class Project_Auth_Adapter_Id implements Zend_Auth_Adapter_Interface
     }
 
     /**
-     * setIdentity() - set the value to be used as the identity
+     * setCredential() - set the credential value to be used
      *
-     * @param  string $value
-     * @return Zend_Auth_Adapter_DbTable Provides a fluent interface
+     * @param  string $credential
+     * @return Remember Provides a fluent interface
      */
-    public function setIdentity($value)
+    public function setCredential($credential)
     {
-        $this->_identity = $value;
+        $this->_credential = $credential;
         return $this;
     }
 }

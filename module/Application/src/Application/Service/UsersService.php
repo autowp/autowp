@@ -4,11 +4,11 @@ namespace Application\Service;
 
 use Zend\Mail;
 
+use Application\Auth\Adapter\Login as LoginAuthAdapter;
 use Application\Service\SpecificationsService;
 
 use Comment_Message;
 use Picture;
-use Project_Auth_Adapter_Login;
 use User_Password_Remind;
 use User_Remember;
 use Users;
@@ -269,11 +269,11 @@ class UsersService
     /**
      * @param string $login
      * @param string $password
-     * @return Project_Auth_Adapter_Login
+     * @return LoginAuthAdapter
      */
     public function getAuthAdapterLogin($login, $password)
     {
-        return new Project_Auth_Adapter_Login(
+        return new LoginAuthAdapter(
             $login,
             $this->passwordHashExpr($password)
         );
