@@ -1,15 +1,17 @@
 <?php
 
-class Category_Language extends Project_Db_Table
+use Application\Db\Table;
+
+class Category_Language extends Table
 {
     protected $_name = 'category_language';
-    protected $_primary = array('category_id', 'language');
+    protected $_primary = ['category_id', 'language'];
 
-    protected $_referenceMap = array(
-        'Category' => array(
-            'columns'       => array('category_id'),
+    protected $_referenceMap = [
+        'Category' => [
+            'columns'       => ['category_id'],
             'refTableClass' => 'Category',
-            'refColumns'    => array('id')
-        )
-    );
+            'refColumns'    => ['id']
+        ]
+    ];
 }

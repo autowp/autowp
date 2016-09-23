@@ -1,7 +1,9 @@
 <?php
 
-class Voting extends Project_Db_Table
+use Application\Db\Table;
+
+class Voting extends Table
 {
     protected $_name = 'voting';
-    protected $_primary = array('id');
+    protected $_primary = ['id'];
 }

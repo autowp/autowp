@@ -2,18 +2,18 @@
 
 namespace Application\Model\DbTable;
 
-use Project_Db_Table;
+use Application\Db\Table;
 
-class BrandLink extends Project_Db_Table
+class BrandLink extends Table
 {
     protected $_name = 'links';
     protected $_primary = 'id';
     
-    protected $_referenceMap = array(
-        'Brand' => array(
-            'columns'       => array('brandId'),
+    protected $_referenceMap = [
+        'Brand' => [
+            'columns'       => ['brandId'],
             'refTableClass' => 'Brands',
-            'refColumns'    => array('id')
-        )
-    );
+            'refColumns'    => ['id']
+        ]
+    ];
 }

@@ -1,19 +1,21 @@
 <?php
 
-class Comment_Vote extends Project_Db_Table
+use Application\Db\Table;
+
+class Comment_Vote extends Table
 {
     protected $_name = 'comment_vote';
-    protected $_primary = array('user_id', 'comment_id');
-    protected $_referenceMap = array(
-        'User' => array(
-            'columns'       => array('user_id'),
+    protected $_primary = ['user_id', 'comment_id'];
+    protected $_referenceMap = [
+        'User' => [
+            'columns'       => ['user_id'],
             'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        ),
-        'Comment' => array(
-            'columns'       => array('comment_id'),
+            'refColumns'    => ['id']
+        ],
+        'Comment' => [
+            'columns'       => ['comment_id'],
             'refTableClass' => 'Comment_Message',
-            'refColumns'    => array('id')
-        ),
-    );
+            'refColumns'    => ['id']
+        ],
+    ];
 }

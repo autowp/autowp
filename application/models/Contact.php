@@ -2,19 +2,20 @@
 
 namespace Application\Model;
 
-use Project_Db_Table;
+use Application\Db\Table;
+
 use Zend_Db_Expr;
 
 class Contact
 {
     /**
-     * @var Project_Db_Table
+     * @var Table
      */
-    private $_table;
+    private $table;
     
     public function __construct()
     {
-        $this->_table = new Project_Db_Table([
+        $this->table = new Table([
             'name'    => 'contact',
             'primary' => ['user_id', 'contact_user_id']
         ]);
@@ -22,12 +23,12 @@ class Contact
     
     public function create($userId, $contactUserId)
     {
-        $row = $this->_table->fetchRow([
+        $row = $this->table->fetchRow([
             'user_id = ?'         => (int)$userId,
             'contact_user_id = ?' => (int)$contactUserId
         ]);
         if (!$row) {
-            $row = $this->_table->createRow([
+            $row = $this->table->createRow([
                 'user_id'         => (int)$userId,
                 'contact_user_id' => (int)$contactUserId,
                 'timestamp'       => new Zend_Db_Expr('now()')
@@ -38,7 +39,7 @@ class Contact
     
     public function delete($userId, $contactUserId)
     {
-        $row = $this->_table->fetchRow([
+        $row = $this->table->fetchRow([
             'user_id = ?'         => (int)$userId,
             'contact_user_id = ?' => (int)$contactUserId
         ]);
@@ -49,7 +50,7 @@ class Contact
     
     public function exists($userId, $contactUserId)
     {
-        $row = $this->_table->fetchRow([
+        $row = $this->table->fetchRow([
             'user_id = ?'         => (int)$userId,
             'contact_user_id = ?' => (int)$contactUserId
         ]);

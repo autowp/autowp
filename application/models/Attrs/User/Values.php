@@ -1,23 +1,25 @@
 <?php
 
-class Attrs_User_Values extends Project_Db_Table
+use Application\Db\Table;
+
+class Attrs_User_Values extends Table
 {
     protected $_name = 'attrs_user_values';
-    protected $_referenceMap    = array(
-        'Attribute' => array(
-            'columns'       => array('attribute_id'),
+    protected $_referenceMap = [
+        'Attribute' => [
+            'columns'       => ['attribute_id'],
             'refTableClass' => 'Attrs_Attributes',
-            'refColumns'    => array('id')
-        ),
-        'User' => array(
-            'columns'       => array('user_id'),
+            'refColumns'    => ['id']
+        ],
+        'User' => [
+            'columns'       => ['user_id'],
             'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        ),
-        'ItemType' => array(
-            'columns'       => array('item_type_id'),
+            'refColumns'    => ['id']
+        ],
+        'ItemType' => [
+            'columns'       => ['item_type_id'],
             'refTableClass' => 'Attrs_Item_Types',
-            'refColumns'    => array('id')
-        )
-    );
+            'refColumns'    => ['id']
+        ]
+    ];
 }

@@ -1,5 +1,8 @@
 <?php
-class Factory_Row extends Project_Db_Table_Row
+
+use Application\Db\Table\Row;
+
+class Factory_Row extends Row
 {
     public function getRelatedCarGroupId()
     {

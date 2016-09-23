@@ -1,6 +1,8 @@
 <?php
 
-class Attrs_Attributes_Row extends Project_Db_Table_Row
+use Application\Db\Table\Row;
+
+class Attrs_Attributes_Row extends Row
 {
     public function isMayBeMultiple()
     {

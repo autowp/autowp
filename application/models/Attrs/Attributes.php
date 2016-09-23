@@ -1,24 +1,26 @@
 <?php
 
-class Attrs_Attributes extends Project_Db_Table
+use Application\Db\Table;
+
+class Attrs_Attributes extends Table
 {
     protected $_name = 'attrs_attributes';
     protected $_rowClass = 'Attrs_Attributes_Row';
-    protected $_referenceMap = array(
-        'Parent' => array(
-            'columns'       => array('parent_id'),
+    protected $_referenceMap = [
+        'Parent' => [
+            'columns'       => ['parent_id'],
             'refTableClass' => 'Attrs_Attributes',
-            'refColumns'    => array('id')
-        ),
-        'Unit' => array(
-            'columns'       => array('unit_id'),
+            'refColumns'    => ['id']
+        ],
+        'Unit' => [
+            'columns'       => ['unit_id'],
             'refTableClass' => 'Attrs_Units',
-            'refColumns'    => array('id')
-        ),
-        'Type' => array(
-            'columns'       => array('type_id'),
+            'refColumns'    => ['id']
+        ],
+        'Type' => [
+            'columns'       => ['type_id'],
             'refTableClass' => 'Attrs_Types',
-            'refColumns'    => array('id')
-        )
-    );
+            'refColumns'    => ['id']
+        ]
+    ];
 }

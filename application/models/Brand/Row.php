@@ -1,6 +1,8 @@
 <?php
 
-class Brand_Row extends Project_Db_Table_Row
+use Application\Db\Table\Row;
+
+class Brand_Row extends Row
 {
     /**
      * @var Brand_Language

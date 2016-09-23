@@ -1,14 +1,16 @@
 <?php
 
-class User_Account extends Project_Db_Table
+use Application\Db\Table;
+
+class User_Account extends Table
 {
     protected $_name = 'user_account';
 
-    protected $_referenceMap = array(
-        'User' => array(
-            'columns'       => array('user_id'),
+    protected $_referenceMap = [
+        'User' => [
+            'columns'       => ['user_id'],
             'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        ),
-    );
+            'refColumns'    => ['id']
+        ],
+    ];
 }

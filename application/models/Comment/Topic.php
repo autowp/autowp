@@ -1,9 +1,11 @@
 <?php
 
-class Comment_Topic extends Project_Db_Table
+use Application\Db\Table;
+
+class Comment_Topic extends Table
 {
     protected $_name = 'comment_topic';
-    protected $_primary = array('type_id', 'item_id');
+    protected $_primary = ['type_id', 'item_id'];
 
     /**
      * @param int $typeId
@@ -12,10 +14,10 @@ class Comment_Topic extends Project_Db_Table
      */
     public function getTopic($typeId, $itemId)
     {
-        $topic = $this->fetchRow(array(
+        $topic = $this->fetchRow([
             'item_id = ?' => $itemId,
             'type_id = ?' => $typeId
-        ));
+        ]);
         if (!$topic) {
 
             $cmTable = new Comment_Message();
@@ -23,12 +25,12 @@ class Comment_Topic extends Project_Db_Table
             $lastUpdate = $cmTable->getLastUpdate($typeId, $itemId);
             $messagesCount = $cmTable->getMessagesCount($typeId, $itemId);
 
-            $topic = $this->createRow(array(
+            $topic = $this->createRow([
                 'item_id'     => $itemId,
                 'type_id'     => $typeId,
                 'last_update' => $lastUpdate,
                 'messages'    => $messagesCount
-            ));
+            ]);
             $topic->save();
         }
 
@@ -45,25 +47,25 @@ class Comment_Topic extends Project_Db_Table
 
         $messagesCount = $cmTable->getMessagesCount($typeId, $itemId);
 
-        $topic = $this->fetchRow(array(
+        $topic = $this->fetchRow([
             'item_id = ?' => $itemId,
             'type_id = ?' => $typeId
-        ));
+        ]);
 
         if ($messagesCount > 0) {
             $lastUpdate = $cmTable->getLastUpdate($typeId, $itemId);
 
             if (!$topic) {
-                $topic = $this->createRow(array(
+                $topic = $this->createRow([
                     'item_id' => $itemId,
                     'type_id' => $typeId,
-                ));
+                ]);
             }
 
-            $topic->setFromArray(array(
+            $topic->setFromArray([
                 'last_update' => $lastUpdate,
                 'messages'    => $messagesCount
-            ));
+            ]);
             $topic->save();
         } else {
             if ($topic) {
@@ -84,7 +86,7 @@ class Comment_Topic extends Project_Db_Table
             values (?, ?, ?, NOW())
             on duplicate key update `timestamp` = values(`timestamp`)
         ';
-        $this->getAdapter()->query($sql, array($userId, $typeId, $itemId));
+        $this->getAdapter()->query($sql, [$userId, $typeId, $itemId]);
     }
 
     /**
@@ -96,7 +98,7 @@ class Comment_Topic extends Project_Db_Table
     {
         if (is_array($itemId)) {
 
-            $result = array();
+            $result = [];
 
             if ($itemId) {
 
@@ -104,15 +106,15 @@ class Comment_Topic extends Project_Db_Table
 
                 $pairs = $db->fetchPairs(
                     $db->select()
-                        ->from($this->info('name'), array('item_id', 'messages'))
+                        ->from($this->info('name'), ['item_id', 'messages'])
                         ->where('item_id in (?)', $itemId)
                         ->where('type_id = ?', $typeId)
                 );
 
                 foreach ($pairs as $itemId => $count) {
-                    $result[$itemId] = array(
+                    $result[$itemId] = [
                         'messages' => $count
-                    );
+                    ];
                 }
 
             }
@@ -121,18 +123,18 @@ class Comment_Topic extends Project_Db_Table
 
             $messages = 0;
 
-            $topic = $this->fetchRow(array(
+            $topic = $this->fetchRow([
                 'item_id = ?' => $itemId,
                 'type_id = ?' => $typeId
-            ));
+            ]);
 
             if ($topic) {
                 $messages = (int)$topic->messages;
             }
 
-            $result = array(
+            $result = [
                 'messages' => $messages,
-            );
+            ];
         }
 
         return $result;
@@ -156,30 +158,30 @@ class Comment_Topic extends Project_Db_Table
 
         if (is_array($itemId)) {
 
-            $result = array();
+            $result = [];
 
             if (count($itemId) > 0) {
                 $select = $db->select()
-                    ->from('comment_topic_view', array('item_id', 'timestamp'))
+                    ->from('comment_topic_view', ['item_id', 'timestamp'])
                     ->where('comment_topic_view.type_id = :type_id')
                     ->where('comment_topic_view.user_id = :user_id')
                     ->where('comment_topic_view.item_id in (?)', $itemId);
 
-                $pairs = $db->fetchPairs($select, array(
+                $pairs = $db->fetchPairs($select, [
                     'user_id' => $userId,
                     'type_id' => $typeId
-                ));
+                ]);
             } else {
-                $pairs = array();
+                $pairs = [];
             }
 
             foreach ($pairs as $id => $viewTime) {
                 if ($viewTime) {
-                    $newMessages = (int)$db->fetchOne($newMessagesSelect, array(
+                    $newMessages = (int)$db->fetchOne($newMessagesSelect, [
                         'item_id'  => $id,
                         'type_id'  => $typeId,
                         'datetime' => $viewTime,
-                    ));
+                    ]);
 
                     $result[$id] = $newMessages;
                 }
@@ -198,21 +200,21 @@ class Comment_Topic extends Project_Db_Table
                     ->where('comment_topic_view.item_id = :item_id')
                     ->where('comment_topic_view.type_id = :type_id')
                     ->where('comment_topic_view.user_id = :user_id'),
-                array(
+                [
                     'item_id' => $itemId,
                     'type_id' => $typeId,
                     'user_id' => $userId,
-                )
+                ]
             );
 
             if (!$viewTime) {
                 $newMessages = null;
             } else {
-                $newMessages = (int)$db->fetchOne($newMessagesSelect, array(
+                $newMessages = (int)$db->fetchOne($newMessagesSelect, [
                     'item_id'  => $itemId,
                     'type_id'  => $typeId,
                     'datetime' => $viewTime,
-                ));
+                ]);
             }
 
             return $newMessages;
@@ -237,11 +239,11 @@ class Comment_Topic extends Project_Db_Table
 
         if (is_array($itemId)) {
 
-            $result = array();
+            $result = [];
 
             if (count($itemId) > 0) {
                 $select = $db->select()
-                    ->from('comment_topic', array('item_id', 'messages'))
+                    ->from('comment_topic', ['item_id', 'messages'])
                     ->where('comment_topic.type_id = :type_id')
                     ->where('comment_topic.item_id in (?)', $itemId)
                     ->joinLeft(
@@ -252,12 +254,12 @@ class Comment_Topic extends Project_Db_Table
                         'timestamp'
                     );
 
-                $rows = $db->fetchAll($select, array(
+                $rows = $db->fetchAll($select, [
                     'user_id' => $userId,
                     'type_id' => $typeId
-                ));
+                ]);
             } else {
-                $rows = array();
+                $rows = [];
             }
 
             foreach ($rows as $row) {
@@ -268,17 +270,17 @@ class Comment_Topic extends Project_Db_Table
                 if (!$viewTime) {
                     $newMessages = $messages;
                 } else {
-                    $newMessages = (int)$db->fetchOne($newMessagesSelect, array(
+                    $newMessages = (int)$db->fetchOne($newMessagesSelect, [
                         'item_id'  => $id,
                         'type_id'  => $typeId,
                         'datetime' => $viewTime,
-                    ));
+                    ]);
                 }
 
-                $result[$id] = array(
+                $result[$id] = [
                     'messages'    => $messages,
                     'newMessages' => $newMessages
-                );
+                ];
             }
 
             return $result;
@@ -287,10 +289,10 @@ class Comment_Topic extends Project_Db_Table
             $messages = 0;
             $newMessages = 0;
 
-            $topic = $this->fetchRow(array(
+            $topic = $this->fetchRow([
                 'item_id = ?' => $itemId,
                 'type_id = ?' => $typeId
-            ));
+            ]);
 
             if ($topic) {
                 $messages = (int)$topic->messages;
@@ -303,28 +305,28 @@ class Comment_Topic extends Project_Db_Table
                         ->where('comment_topic_view.item_id = :item_id')
                         ->where('comment_topic_view.type_id = :type_id')
                         ->where('comment_topic_view.user_id = :user_id'),
-                    array(
+                    [
                         'item_id' => $itemId,
                         'type_id' => $typeId,
                         'user_id' => $userId,
-                    )
+                    ]
                 );
 
                 if (!$viewTime) {
                     $newMessages = $messages;
                 } else {
-                    $newMessages = (int)$db->fetchOne($newMessagesSelect, array(
+                    $newMessages = (int)$db->fetchOne($newMessagesSelect, [
                         'item_id'  => $itemId,
                         'type_id'  => $typeId,
                         'datetime' => $viewTime,
-                    ));
+                    ]);
                 }
             }
 
-            return array(
+            return [
                 'messages'    => $messages,
                 'newMessages' => $newMessages
-            );
+            ];
         }
     }
 }

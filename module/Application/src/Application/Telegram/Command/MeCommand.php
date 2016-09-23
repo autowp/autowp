@@ -1,6 +1,6 @@
 <?php
 
-namespace Project\Telegram\Command;
+namespace Application\Telegram\Command;
 
 use Telegram\Bot\Commands\Command;
 

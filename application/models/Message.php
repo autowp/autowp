@@ -2,9 +2,9 @@
 
 namespace Application\Model;
 
-use Project_Db_Table;
 use Users;
 
+use Application\Db\Table;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend\Paginator\Paginator;
@@ -14,7 +14,7 @@ use Zend_Db_Expr;
 class Message
 {
     /**
-     * @var Project_Db_Table
+     * @var Table
      */
     private $table;
 
@@ -22,10 +22,10 @@ class Message
 
     public function __construct()
     {
-        $this->table = new Project_Db_Table(array(
+        $this->table = new Table([
             'name'    => 'personal_messages',
             'primary' => 'id'
-        ));
+        ]);
     }
 
     public function send($fromId = null, $toId, $message)
@@ -41,13 +41,13 @@ class Message
             throw new \Exception('Сообщение слишком длинное');
         }
 
-        $this->table->insert(array(
+        $this->table->insert([
             'from_user_id' => $fromId ? (int)$fromId : null,
             'to_user_id'   => (int)$toId,
             'contents'     => $message,
             'add_datetime' => new Zend_Db_Expr('NOW()'),
             'readen'       => 0
-        ));
+        ]);
     }
 
     public function getNewCount($userId)
@@ -55,7 +55,7 @@ class Message
         $db = $this->table->getAdapter();
         return $db->fetchOne(
             $db->select()
-                ->from($this->table->info('name'), array('COUNT(1)'))
+                ->from($this->table->info('name'), ['COUNT(1)'])
                 ->where('to_user_id = ?', (int)$userId)
                 ->where('NOT readen')
         );
@@ -63,52 +63,52 @@ class Message
 
     public function delete($userId, $messageId)
     {
-        $this->table->update(array(
+        $this->table->update([
             'deleted_by_from'  => 1
-        ), array(
+        ], [
             'from_user_id = ?' => (int)$userId,
             'id = ?'           => (int)$messageId
-        ));
+        ]);
 
-        $this->table->update(array(
+        $this->table->update([
             'deleted_by_to'  => 1
-        ), array(
+        ], [
             'to_user_id = ?' => (int)$userId,
             'id = ?'         => (int)$messageId
-        ));
+        ]);
     }
 
     public function deleteAllSystem($userId)
     {
-        $this->table->delete(array(
+        $this->table->delete([
             'to_user_id = ?' => (int)$userId,
             'from_user_id IS NULL'
-        ));
+        ]);
     }
 
     public function deleteAllSent($userId)
     {
-        $this->table->update(array(
+        $this->table->update([
             'deleted_by_from' => 1
-        ), array(
+        ], [
             'from_user_id = ?' => (int)$userId,
-        ));
+        ]);
     }
 
     public function recycle()
     {
-        return $this->table->delete(array(
+        return $this->table->delete([
             'deleted_by_to',
             'deleted_by_from OR from_user_id IS NULL'
-        ));
+        ]);
     }
 
     public function recycleSystem()
     {
-        return $this->table->delete(array(
+        return $this->table->delete([
             'from_user_id is null',
             'add_datetime < date_sub(now(), interval 6 month)'
-        ));
+        ]);
     }
 
     private function getSystemSelect($userId)
@@ -143,10 +143,10 @@ class Message
             ->where('from_user_id = :user_id and to_user_id = :with_user_id and NOT deleted_by_from')
             ->orWhere('from_user_id = :with_user_id and to_user_id = :user_id and NOT deleted_by_to')
             ->order('add_datetime DESC')
-            ->bind(array(
+            ->bind([
                 'user_id'      => (int)$userId,
                 'with_user_id' => (int)$withUserId
-            ));
+            ]);
     }
 
     public function getSystemCount($userId)
@@ -220,11 +220,11 @@ class Message
     public function markReaden($ids)
     {
         if (count($ids)) {
-            $this->table->update(array(
+            $this->table->update([
                 'readen' => 1
-            ), array(
+            ], [
                 'id IN (?)' => $ids
-            ));
+            ]);
         }
     }
 
@@ -330,18 +330,18 @@ class Message
         $this->markReaden($markReaden);
 
         return [
-            'messages'  => $this->prepareList($userId, $rows, array(
+            'messages'  => $this->prepareList($userId, $rows, [
                 'allMessagesLink' => false
-            )),
+            ]),
             'paginator' => $paginator
         ];
     }
 
     private function prepareList($userId, $rows, array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'allMessagesLink' => true
-        );
+        ];
         $options = array_replace($defaults, $options);
 
         $cache = [];
@@ -370,7 +370,7 @@ class Message
                 }
             }
 
-            $messages[] = array(
+            $messages[] = [
                 'id'              => $message->id,
                 'author'          => $author,
                 'authorUrl'       => $author ? $author->getAboutUrl() : null,
@@ -381,7 +381,7 @@ class Message
                 'canReply'        => $canReply,
                 'dialogCount'     => $dialogCount,
                 'allMessagesLink' => $options['allMessagesLink']
-            );
+            ];
         }
 
         return $messages;

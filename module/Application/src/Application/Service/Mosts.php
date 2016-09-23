@@ -2,6 +2,7 @@
 
 namespace Application\Service;
 
+use Application\Most;
 use Application\Service\SpecificationsService;
 
 use Car_Types;
@@ -9,56 +10,55 @@ use Cars;
 use Exception;
 use Perspective_Group;
 use Picture;
-use Project_Most;
 use Zend_Db_Expr;
 
 class Mosts
 {
-    private $_ratings = array (
-        array(
+    private $_ratings = [
+        [
             'catName'   => 'fastest',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 47,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'slowest',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 47,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'dynamic',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'acceleration',
-                'attributes' => array(
+                'attributes' => [
                     'to100kmh' => 48,
                     'to60mph'  => 175,
-                ),
+                ],
                 'order'     => 'ASC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'static',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 48,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
+            ]
+        ],
 
-        array(
+        [
             'catName'   => 'mighty',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'       => 'power',
-                'attributes' => array(
+                'attributes' => [
                     'power'            => 33,
                     'cylindersLayout'  => 26,
                     'cylindersCount'   => 25,
@@ -66,15 +66,15 @@ class Mosts
                     'powerOnFrequency' => 34,
                     'turbo'            => 99,
                     'volume'           => 31
-                ),
+                ],
                 'order'      => 'DESC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'weak',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'       => 'power',
-                'attributes' => array(
+                'attributes' => [
                     'power'            => 33,
                     'cylindersLayout'  => 26,
                     'cylindersCount'   => 25,
@@ -82,273 +82,273 @@ class Mosts
                     'powerOnFrequency' => 34,
                     'turbo'            => 99,
                     'volume'           => 31
-                ),
+                ],
                 'order'      => 'ASC'
-            )
-        ),
+            ]
+        ],
 
-        array(
+        [
             'catName'   => 'big-engine',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 31,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'small-engine',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 31,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
+            ]
+        ],
 
-        array(
+        [
             'catName'   => 'nimblest',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 11,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
+            ]
+        ],
 
-        array(
+        [
             'catName'   => 'economical',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 81,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'gluttonous',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 81,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
+            ]
+        ],
 
-        array(
+        [
             'catName'   => 'clenaly',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 82,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'dirty',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 82,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'heavy',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 72,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'lightest',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 72,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
+            ]
+        ],
 
-        array(
+        [
             'catName'   => 'longest',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 1,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'shortest',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 1,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
+            ]
+        ],
 
-        array(
+        [
             'catName'   => 'widest',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 2,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'narrow',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 2,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
+            ]
+        ],
 
-        array(
+        [
             'catName'   => 'highest',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 3,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'lowest',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'     => 'attr',
                 'attribute' => 3,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
+            ]
+        ],
 
-        array(
+        [
             'catName'   => 'air',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 64,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'antiair',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 64,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
+            ]
+        ],
 
 
         //equipes.backaxis_tyrewidth*equipes.backaxis_tyreseries/100+equipes.backaxis_radius*25.4
 
-        array(
+        [
             'catName'   => 'bigwheel',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'       => 'wheelsize',
                 'order'      => 'DESC',
-                'attributes' => array(
-                    'rear' => array(
+                'attributes' => [
+                    'rear' => [
                         'tyrewidth'  => 91,
                         'tyreseries' => 94,
                         'radius'     => 92,
                         'rimwidth'   => 93
-                    ),
-                    'front' => array(
+                    ],
+                    'front' => [
                         'tyrewidth'  => 87,
                         'tyreseries' => 90,
                         'radius'     => 88,
                         'rimwidth'   => 89
-                    ),
-                )
-            )
-        ),
-        array(
+                    ],
+                ]
+            ]
+        ],
+        [
             'catName'   => 'smallwheel',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'       => 'wheelsize',
                 'order'      => 'ASC',
-                'attributes' => array(
-                    'rear' => array(
+                'attributes' => [
+                    'rear' => [
                         'tyrewidth'  => 91,
                         'tyreseries' => 94,
                         'radius'     => 92,
                         'rimwidth'   => 93
-                    ),
-                    'front' => array(
+                    ],
+                    'front' => [
                         'tyrewidth'  => 87,
                         'tyreseries' => 90,
                         'radius'     => 88,
                         'rimwidth'   => 89
-                    ),
-                )
-            )
-        ),
+                    ],
+                ]
+            ]
+        ],
 
-        array(
+        [
             'catName'   => 'bigbrakes',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'       => 'brakes',
                 'order'      => 'DESC',
-                'attributes' => array(
-                    'rear' => array(
+                'attributes' => [
+                    'rear' => [
                         'diameter'  => 147,
                         'thickness' => 149,
-                    ),
-                    'front' => array(
+                    ],
+                    'front' => [
                         'diameter'  => 146,
                         'thickness' => 148,
-                    ),
-                )
-            )
-        ),
-        array(
+                    ],
+                ]
+            ]
+        ],
+        [
             'catName'   => 'smallbrakes',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'       => 'brakes',
                 'order'      => 'ASC',
-                'attributes' => array(
-                    'rear' => array(
+                'attributes' => [
+                    'rear' => [
                         'diameter'  => 147,
                         'thickness' => 149,
-                    ),
-                    'front' => array(
+                    ],
+                    'front' => [
                         'diameter'  => 146,
                         'thickness' => 148,
-                    ),
-                )
-            )
-        ),
+                    ],
+                ]
+            ]
+        ],
 
 
-        array(
+        [
             'catName'   => 'bigclearance',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 7,
                 'itemType'  => 1,
                 'order'     => 'DESC'
-            )
-        ),
-        array(
+            ]
+        ],
+        [
             'catName'   => 'smallclearance',
-            'adapter'   => array(
+            'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 7,
                 'itemType'  => 1,
                 'order'     => 'ASC'
-            )
-        ),
-    );
+            ]
+        ],
+    ];
 
     private $_years = null;
 
@@ -359,12 +359,12 @@ class Mosts
      */
     private $_specs = null;
 
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->_specs = $options['specs'];
     }
 
-    private function _betweenYearsExpr($from, $to)
+    private function betweenYearsExpr($from, $to)
     {
         return 'cars.begin_order_cache between "'.$from.'-01-01" and "'.$to.'-12-31" or ' .
                'cars.end_order_cache between "'.$from.'-01-01" and "'.$to.'-12-31" or ' .
@@ -378,69 +378,69 @@ class Mosts
 
             $prevYear = $cy-1;
 
-            $this->_years = array(
-                array(
+            $this->_years = [
+                [
                     'name'   => 'mosts/period/before1920',
                     'folder' => 'before1920',
                     'where'  => 'cars.begin_order_cache <= "1919-12-31" or ' .
                                 'cars.end_order_cache <= "1919-12-31"'
-                ),
-                array(
+                ],
+                [
                     'name'   => 'mosts/period/1920-29',
                     'folder' => '1920-29',
-                    'where'  => $this->_betweenYearsExpr(1920, 1929)
-                ),
-                array(
+                    'where'  => $this->betweenYearsExpr(1920, 1929)
+                ],
+                [
                     'name'   => 'mosts/period/1930-39',
                     'folder' => '1930-39',
-                    'where'  => $this->_betweenYearsExpr(1930, 1939)
-                ),
-                array(
+                    'where'  => $this->betweenYearsExpr(1930, 1939)
+                ],
+                [
                     'name'   => 'mosts/period/1940-49',
                     'folder' => '1940-49',
-                    'where'  => $this->_betweenYearsExpr(1940, 1949)
-                ),
-                array(
+                    'where'  => $this->betweenYearsExpr(1940, 1949)
+                ],
+                [
                     'name'   => 'mosts/period/1950-59',
                     'folder' => '1950-59',
-                    'where'  => $this->_betweenYearsExpr(1950, 1959)
-                ),
-                array(
+                    'where'  => $this->betweenYearsExpr(1950, 1959)
+                ],
+                [
                     'name'   => 'mosts/period/1960-69',
                     'folder' => '1960-69',
-                    'where'  => $this->_betweenYearsExpr(1960, 1969)
-                ),
-                array(
+                    'where'  => $this->betweenYearsExpr(1960, 1969)
+                ],
+                [
                     'name'   => 'mosts/period/1970-79',
                     'folder' => '1970-79',
-                    'where'  => $this->_betweenYearsExpr(1970, 1979)
-                ),
-                array(
+                    'where'  => $this->betweenYearsExpr(1970, 1979)
+                ],
+                [
                     'name'   => 'mosts/period/1980-89',
                     'folder' => '1980-89',
-                    'where'  => $this->_betweenYearsExpr(1980, 1989)
-                ),
-                array(
+                    'where'  => $this->betweenYearsExpr(1980, 1989)
+                ],
+                [
                     'name'   => 'mosts/period/1990-99',
                     'folder' => '1990-99',
-                    'where'  => $this->_betweenYearsExpr(1990, 1999)
-                ),
-                array(
+                    'where'  => $this->betweenYearsExpr(1990, 1999)
+                ],
+                [
                     'name'   => 'mosts/period/2000-09',
                     'folder' => '2000-09',
-                    'where'  => $this->_betweenYearsExpr(2000, 2009)
-                ),
-                array(
+                    'where'  => $this->betweenYearsExpr(2000, 2009)
+                ],
+                [
                     'name'   => 'mosts/period/2010-'.($prevYear%100),
                     'folder' => '2010-'.($prevYear%100),
-                    'where'  => $this->_betweenYearsExpr(2010, $prevYear)
-                ),
-                array(
+                    'where'  => $this->betweenYearsExpr(2010, $prevYear)
+                ],
+                [
                     'name'   => 'mosts/period/present',
                     'folder' => 'today',
                     'where'  => 'cars.end_order_cache >="'.$cy.'-01-01" and cars.end_order_cache<"2100-01-01" or cars.end_order_cache is null and cars.today'
-                )
-            );
+                ]
+            ];
         }
 
         return $this->_years;
@@ -461,7 +461,7 @@ class Mosts
                     ->where('page_id = ?', 1)
                     ->order('position')
             );
-            $g = array();
+            $g = [];
             foreach ($groups as $group) {
                 $g[] = $group->id;
             }
@@ -475,7 +475,7 @@ class Mosts
     public function getCarTypes($language, $brandId)
     {
         $carTypesTable = new Car_Types();
-        $carTypes = array();
+        $carTypes = [];
         $select = $carTypesTable->select(true)
             ->where('car_types.parent_id IS NULL')
             ->order('car_types.position');
@@ -493,7 +493,7 @@ class Mosts
 
         foreach ($carTypesTable->fetchAll($select) as $row) {
 
-            $childs = array();
+            $childs = [];
 
             $select = $select = $carTypesTable->select(true)
                 ->where('car_types.parent_id = ?', $row->id)
@@ -511,19 +511,19 @@ class Mosts
 
             foreach ($carTypesTable->fetchAll($select) as $srow) {
 
-                $childs[] = array(
+                $childs[] = [
                     'id'      => $srow->id,
                     'catname' => $srow->catname,
                     'name'    => $srow->name_rp
-                );
+                ];
             }
 
-            $carTypes[] = array(
+            $carTypes[] = [
                 'id'      => $row->id,
                 'catname' => $row->catname,
                 'name'    => $row->name_rp,
                 'childs'  => $childs
-            );
+            ];
         }
 
         return $carTypes;
@@ -531,18 +531,18 @@ class Mosts
 
     public function getCarTypeData($carType, $language)
     {
-        return array(
+        return [
             'id'      => $carType->id,
             'catname' => $carType->catname,
             'name'    => $carType->name,
             'name_rp' => $carType->name_rp,
-        );
+        ];
     }
 
-    private function _getOrientedPictureList($carId, array $perspective_group_ids)
+    private function getOrientedPictureList($carId, array $perspective_group_ids)
     {
         $pictureTable = new Picture();
-        $pictures = array();
+        $pictures = [];
         $db = $pictureTable->getAdapter();
 
         foreach ($perspective_group_ids as $groupId) {
@@ -550,16 +550,16 @@ class Mosts
                 $pictureTable->select(true)
                     ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                    ->join(array('mp' => 'perspectives_groups_perspectives'), 'pictures.perspective_id=mp.perspective_id', null)
+                    ->join(['mp' => 'perspectives_groups_perspectives'], 'pictures.perspective_id=mp.perspective_id', null)
                     ->where('mp.group_id = ?', $groupId)
                     ->where('car_parent_cache.parent_id = ?', $carId)
                     ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
-                    ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
-                    ->order(array(
+                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                    ->order([
                         'mp.position',
                         new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
                         'pictures.width DESC', 'pictures.height DESC'
-                    ))
+                    ])
                     ->limit(1)
             );
 
@@ -570,7 +570,7 @@ class Mosts
             }
         }
 
-        $ids = array();
+        $ids = [];
         foreach ($pictures as $picture) {
             if ($picture) {
                 $ids[] = $picture->id;
@@ -584,7 +584,7 @@ class Mosts
                     ->where('pictures.type=?', Picture::CAR_TYPE_ID)
                     ->where('car_parent_cache.parent_id = ?', $carId)
                     ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
-                    ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->limit(1);
 
                 if (count($ids) > 0) {
@@ -612,7 +612,7 @@ class Mosts
         $select = $carsTable->select(true);
 
         if ($carType) {
-            $ids = $this->_getCarTypesIds($carType);
+            $ids = $this->getCarTypesIds($carType);
             if (count($ids) == 1) {
                 $select->where('cars.car_type_id = ?', $ids[0]);
             } else {
@@ -633,42 +633,42 @@ class Mosts
                 ->group('cars.id');
         }
 
-        $most = new Project_Most(array(
+        $most = new Most([
             'specs'      => $this->_specs,
             'carsSelect' => $select,
             'adapter'    => $cMost['adapter'],
             'carsCount'  => 7,
-        ));
+        ]);
 
         $g = $this->getPrespectiveGroups();
 
         $data = $most->getData();
         foreach ($data['cars'] as &$car) {
-            $car['pictures'] = $this->_getOrientedPictureList($car['car']->id, $g);
+            $car['pictures'] = $this->getOrientedPictureList($car['car']->id, $g);
         }
 
         return $data;
     }
 
-    private function _getCarTypesIds($carType)
+    private function getCarTypesIds($carType)
     {
-        $result = array($carType->id);
+        $result = [$carType->id];
         foreach ($carType->findCar_Types() as $child) {
             $result[] = $child->id;
-            $result = array_merge($result, $this->_getCarTypesIds($child));
+            $result = array_merge($result, $this->getCarTypesIds($child));
         }
         return $result;
     }
 
     public function getData($options)
     {
-        $defaults = array(
+        $defaults = [
             'language' => null,
             'most'     => null,
             'years'    => null,
             'carType'  => null,
             'brandId'  => null
-        );
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -693,9 +693,9 @@ class Mosts
         }
 
         $carTypesTable = new Car_Types();
-        $carType = $carTypesTable->fetchRow(array(
+        $carType = $carTypesTable->fetchRow([
             'catname = ?' => (string)$carTypeCatname
-        ));
+        ]);
 
         $years = $this->getYears();
 
@@ -741,33 +741,33 @@ class Mosts
 
         // sidebar
         $carTypeCatname = $carTypeData ? $carTypeData['catname'] : null;
-        $mosts = array();
+        $mosts = [];
         foreach ($ratings as $id => $most) {
-            $mosts[] = array(
+            $mosts[] = [
                 'active' => $id == $mostId,
                 'name'   => 'most/'.$most['catName'],
-                'params' => array(
+                'params' => [
                     'most_catname'  => $most['catName'],
                     'shape_catname' => $carTypeCatname,
                     'years_catname' => $cYear['folder']
-                )
-            );
+                ]
+            ];
         }
 
         $carTypes = $this->getCarTypes($language, $brandId);
 
-        $sidebarCarTypes = array();
+        $sidebarCarTypes = [];
         foreach ($carTypes as $carType) {
-            $sidebarCarType = array(
+            $sidebarCarType = [
                 'active' => $carTypeData && $carType['id'] == $carTypeData['id'],
                 'name'   => $carType['name'],
-                'params' => array(
+                'params' => [
                     'most_catname'  => $cMost['catName'],
                     'shape_catname' => $carType['catname'],
                     'years_catname' => $cYear['folder']
-                ),
-                'childs' => array()
-            );
+                ],
+                'childs' => []
+            ];
 
             $childActive = false;
             if ($carType['childs']) {
@@ -776,15 +776,15 @@ class Mosts
                     if ($active) {
                         $childActive = true;
                     }
-                    $sidebarCarType['childs'][] = array(
+                    $sidebarCarType['childs'][] = [
                         'active' => $active,
                         'name'   => $child['name'],
-                        'params' => array(
+                        'params' => [
                             'most_catname'  => $cMost['catName'],
                             'shape_catname' => $child['catname'],
                             'years_catname' => $cYear['folder']
-                        )
-                    );
+                        ]
+                    ];
                 }
             }
 
@@ -795,34 +795,34 @@ class Mosts
             $sidebarCarTypes[] = $sidebarCarType;
         }
 
-        $sidebar = array(
+        $sidebar = [
             'mosts'    => $mosts,
             'carTypes' => $sidebarCarTypes
-        );
+        ];
 
-        $yearsMenu = array();
+        $yearsMenu = [];
         foreach ($years as $id => $year) {
-            $yearsMenu[] = array(
+            $yearsMenu[] = [
                 'active' => !is_null($yearId) && ($id == $yearId),
                 'name'   => $year['name'],
-                'params' => array(
+                'params' => [
                     'most_catname'  => $cMost['catName'],
                     'shape_catname' => $carTypeCatname ? $carTypeCatname : 'car',
                     'years_catname' => $year['folder']
-                )
-            );
+                ]
+            ];
         }
-        $yearsMenu[] = array(
+        $yearsMenu[] = [
             'active' => is_null($yearId),
             'name'   => 'mosts/period/all-time',
-            'params' => array(
+            'params' => [
                 'most_catname'  => $cMost['catName'],
                 'shape_catname' => $carTypeCatname ? $carTypeCatname : null,
                 'years_catname' => null
-            )
-        );
+            ]
+        ];
 
-        return array(
+        return [
             'carList'  => $data,
             'carType'  => $carTypeData,
             'years'    => $yearsMenu,
@@ -830,6 +830,6 @@ class Mosts
             'yearId'   => $yearId,
             'cMost'    => $cMost,
             'sidebar'  => $sidebar
-        );
+        ];
     }
 }

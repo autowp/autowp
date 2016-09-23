@@ -1,11 +1,13 @@
 <?php
 
+use Application\Db\Table\Row;
+
 use Autowp\Filter\Filename\Safe;
 use Autowp\Image\Storage\Request;
 
 use Exception;
 
-class Picture_Row extends Project_Db_Table_Row
+class Picture_Row extends Row
 {
     private $_caption_cache = [];
 

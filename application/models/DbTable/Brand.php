@@ -3,9 +3,9 @@
 namespace Application\Model\DbTable;
 
 use Autowp\Filter\Filename\Safe;
-use Project_Db_Table;
+use Application\Db\Table;
 
-class Brand extends Project_Db_Table
+class Brand extends Table
 {
     protected $_name = 'brands';
     protected $_primary = 'id';

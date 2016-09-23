@@ -1,5 +1,8 @@
 <?php
-class Log_Events_Row extends Project_Db_Table_Row
+
+use Application\Db\Table\Row;
+
+class Log_Events_Row extends Row
 {
     public function assign($items)
     {

@@ -1,15 +1,17 @@
 <?php
 
-class Referer_Whitelist extends Project_Db_Table
+use Application\Db\Table;
+
+class Referer_Whitelist extends Table
 {
     protected $_name = 'referer_whitelist';
-    protected $_primary = array('host');
+    protected $_primary = ['host'];
 
     public function containsHost($host)
     {
-        return (bool)$this->fetchRow(array(
+        return (bool)$this->fetchRow([
             'host = ?' => (string)$host
-        ));
+        ]);
     }
 
     public function containsUrl($url)

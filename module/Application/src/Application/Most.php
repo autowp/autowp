@@ -1,8 +1,16 @@
 <?php
 
+namespace Application;
+
 use Application\Service\SpecificationsService;
 
-class Project_Most
+use Zend_Db_Table_Select;
+
+use Project_Most_Adapter_Abstract;
+
+use Exception;
+
+class Most
 {
     protected $_carsCount = 10;
 
@@ -14,7 +22,7 @@ class Project_Most
     /**
      * @var Project_Most_Adapter_Abstract
      */
-    protected $_adapter = array();
+    protected $_adapter = null;
 
     /**
      * @var SpecificationsService
@@ -55,7 +63,7 @@ class Project_Most
 
     /**
      * @param SpecificationsService $value
-     * @return Project_Most
+     * @return Most
      */
     public function setSpecs(SpecificationsService $value)
     {
@@ -119,7 +127,7 @@ class Project_Most
 
     /**
      * @param Zend_Db_Table_Select $select
-     * @return Project_Most
+     * @return Most
      */
     public function setCarsSelect(Zend_Db_Table_Select $select)
     {

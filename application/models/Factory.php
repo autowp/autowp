@@ -1,6 +1,8 @@
 <?php
 
-class Factory extends Project_Db_Table
+use Application\Db\Table;
+
+class Factory extends Table
 {
     protected $_name = 'factory';
     protected $_primary = 'id';

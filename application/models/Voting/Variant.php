@@ -1,14 +1,16 @@
 <?php
 
-class Voting_Variant extends Project_Db_Table
+use Application\Db\Table;
+
+class Voting_Variant extends Table
 {
     protected $_name = 'voting_variant';
     protected $_primary = 'id';
-    protected $_referenceMap    = array(
-        'Voting' => array(
-            'columns'           => array('voting_id'),
-            'refTableClass'     => 'Voting',
-            'refColumns'        => array('id')
-        )
-    );
+    protected $_referenceMap = [
+        'Voting' => [
+            'columns'       => ['voting_id'],
+            'refTableClass' => 'Voting',
+            'refColumns'    => ['id']
+        ]
+    ];
 }

@@ -1,6 +1,14 @@
 <?php
 
-class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTable
+namespace Application\Session\SaveHandler;
+
+use Zend_Auth;
+use Zend_Config;
+use Zend_Db_Expr;
+use Zend_Session_SaveHandler_DbTable;
+use Zend_Session_SaveHandler_Exception;
+
+class DbTable extends Zend_Session_SaveHandler_DbTable
 {
     const USERID_COLUMN = 'userIdColumn';
 
@@ -52,14 +60,9 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
         if ($config instanceof Zend_Config) {
             $config = $config->toArray();
         } else if (!is_array($config)) {
-            /**
-             * @see Zend_Session_SaveHandler_Exception
-             */
-            require_once 'Zend/Session/SaveHandler/Exception.php';
-
             throw new Zend_Session_SaveHandler_Exception(
                 '$config must be an instance of Zend_Config or array of key/value pairs containing '
-              . 'configuration options for Project_Session_SaveHandler_DbTable and Zend_Db_Table_Abstract.');
+              . 'configuration options for Application\\Session\\SaveHandler\\DbTable and Zend_Db_Table_Abstract.');
         }
 
         foreach ($config as $key => $value) {
@@ -113,15 +116,15 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
             $lifetime = new Zend_Db_Expr($lifetimeColumn);
         }
 
-        $colNames = array($userIdColumn, $modifiedColumn, $dataColumn, $lifetimeColumn);
-        $colValues = array('?', '?', '?', '?');
-        $args = array($this->getUserId(), time(), (string)$data, $this->_lifetime);
-        $updateExprs = array(
+        $colNames = [$userIdColumn, $modifiedColumn, $dataColumn, $lifetimeColumn];
+        $colValues = ['?', '?', '?', '?'];
+        $args = [$this->getUserId(), time(), (string)$data, $this->_lifetime];
+        $updateExprs = [
             $userIdColumn . ' = values('.$userIdColumn.')',
             $modifiedColumn . ' = values('.$modifiedColumn.')',
             $dataColumn . ' = values('.$dataColumn.')',
             $lifetimeColumn . ' = '.$db->quote($lifetime)
-        );
+        ];
 
         $primary = $this->_getPrimary($id, self::PRIMARY_TYPE_ASSOC);
         foreach ($primary as $column => $value) {
@@ -139,13 +142,13 @@ class Project_Session_SaveHandler_DbTable extends Zend_Session_SaveHandler_DbTab
 
         return $stmt->rowCount() > 0;
 
-        /*$data = array(
+        /*$data = [
             $this->_userIdColumn   => $this->getUserId(),
             $this->_modifiedColumn => time(),
             $this->_dataColumn     => (string)$data
-        );
+        ];
 
-        $rows = call_user_func_array(array(&$this, 'find'), $this->_getPrimary($id));
+        $rows = call_user_func_array([&$this, 'find'], $this->_getPrimary($id));
 
         if (count($rows)) {
             $data[$this->_lifetimeColumn] = $this->_getLifetime($rows->current());

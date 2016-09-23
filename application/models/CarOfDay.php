@@ -2,8 +2,9 @@
 
 namespace Application\Model;
 
+use Application\Db\Table;
+
 use Cars;
-use Project_Db_Table;
 use Picture;
 
 use Zend_Db_Expr;
@@ -13,13 +14,13 @@ use Zend_Service_Twitter;
 class CarOfDay
 {
     /**
-     * @var Project_Db_Table
+     * @var Table
      */
     private $_table;
 
     public function __construct()
     {
-        $this->_table = new Project_Db_Table([
+        $this->_table = new Table([
             'name'    => 'of_day',
             'primary' => 'day_date'
         ]);

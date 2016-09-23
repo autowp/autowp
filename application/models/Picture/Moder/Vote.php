@@ -1,6 +1,8 @@
 <?php
 
-class Picture_Moder_Vote extends Project_Db_Table
+use Application\Db\Table;
+
+class Picture_Moder_Vote extends Table
 {
     protected $_name = 'pictures_moder_votes';
     protected $_primary = ['picture_id', 'user_id'];

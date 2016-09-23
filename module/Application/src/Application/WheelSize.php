@@ -1,6 +1,8 @@
 <?php
 
-class Project_WheelSize
+namespace Application;
+
+class WheelSize
 {
     protected $width = null;
     protected $series = null;

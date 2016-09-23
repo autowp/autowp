@@ -1,6 +1,8 @@
 <?php
 
-class Attrs_Units extends Project_Db_Table
+use Application\Db\Table;
+
+class Attrs_Units extends Table
 {
     protected $_name = 'attrs_units';
 }

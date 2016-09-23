@@ -1,17 +1,19 @@
 <?php
 
-class User_Remember extends Project_Db_Table
+use Application\Db\Table;
+
+class User_Remember extends Table
 {
     protected $_name = 'user_remember';
 
-    protected $_primary = array('token');
+    protected $_primary = ['token'];
 
-    protected $_referenceMap = array(
-        'User' => array(
-            'columns'       => array('user_id'),
+    protected $_referenceMap = [
+        'User' => [
+            'columns'       => ['user_id'],
             'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        )
-    );
+            'refColumns'    => ['id']
+        ]
+    ];
 
 }

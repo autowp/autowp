@@ -1,5 +1,7 @@
 <?php
 
+use Application\Wheelsize as WheelsizeObject;
+
 class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
 {
     protected $_attributes;
@@ -93,7 +95,7 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
 
         foreach ($this->_attributes as $wheel) {
 
-            $wheelObj = new Project_WheelSize(
+            $wheelObj = new WheelsizeObject(
                 $specService->getActualValue($wheel['tyrewidth'], $car->id, 1),
                 $specService->getActualValue($wheel['tyreseries'], $car->id, 1),
                 $specService->getActualValue($wheel['radius'], $car->id, 1),

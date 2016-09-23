@@ -419,7 +419,7 @@ return [
         'gc_maxlifetime'      => 1440,
         'remember_me_seconds' => 86400,
         'saveHandler' => [
-            'class' => "Project_Session_SaveHandler_DbTable",
+            'class' => Application\Session\SaveHandler\DbTable::class,
             'options' => [
                 'name'           => "session",
                 'primary'        => "id",

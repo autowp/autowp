@@ -1,5 +1,8 @@
 <?php
-class Attrs_Types_Row extends Project_Db_Table_Row
+
+use Application\Db\Table\Row;
+
+class Attrs_Types_Row extends Row
 {
 
 }

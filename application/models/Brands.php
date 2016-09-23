@@ -1,19 +1,21 @@
 <?php
 
+use Application\Db\Table;
+
 use Autowp\Filter\Filename\Safe;
 
-class Brands extends Project_Db_Table
+class Brands extends Table
 {
     protected $_name = 'brands';
     protected $_primary = 'id';
     protected $_rowClass = 'Brand_Row';
-    protected $_referenceMap = array(
-        'Type' => array(
-            'columns'       => array('type_id'),
+    protected $_referenceMap = [
+        'Type' => [
+            'columns'       => ['type_id'],
             'refTableClass' => 'Brand_Types',
-            'refColumns'    => array('id')
-        )
-    );
+            'refColumns'    => ['id']
+        ]
+    ];
 
     /**
      * @param string $catname
@@ -21,9 +23,9 @@ class Brands extends Project_Db_Table
      */
     public function findRowByCatname($catname)
     {
-        return $this->fetchRow(array(
+        return $this->fetchRow([
             'folder = ?' => (string)$catname
-        ));
+        ]);
     }
 
     /**
@@ -32,9 +34,9 @@ class Brands extends Project_Db_Table
      */
     public function fetchRowByCaption($caption)
     {
-        return $this->fetchRow(array(
+        return $this->fetchRow([
             'caption = ?' => (string)$caption
-        ));
+        ]);
     }
 
     /**
@@ -56,7 +58,7 @@ class Brands extends Project_Db_Table
             throw new Exception('Name is too long');
         }
 
-        if ($this->fetchRow(array('folder = ?' => $data['folder']))) {
+        if ($this->fetchRow(['folder = ?' => $data['folder']])) {
             throw new Exception('Folder ' . $data['folder'] . ' already exists');
         }
 

@@ -2,10 +2,12 @@
 
 namespace Application\Service;
 
+use Application\Telegram\Command\InboxCommand;
+use Application\Telegram\Command\MeCommand;
+use Application\Telegram\Command\StartCommand;
+
 use Picture;
-use Project\Telegram\Command\InboxCommand;
-use Project\Telegram\Command\MeCommand;
-use Project\Telegram\Command\StartCommand;
+
 use Telegram\Bot\Api;
 use Telegram_Brand;
 

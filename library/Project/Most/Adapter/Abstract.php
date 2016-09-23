@@ -1,9 +1,11 @@
 <?php
 
+use Application\Most;
+
 abstract class Project_Most_Adapter_Abstract
 {
     /**
-     * @var Project_Most
+     * @var Most
      */
     protected $_most;
 
@@ -12,7 +14,7 @@ abstract class Project_Most_Adapter_Abstract
         $this->setOptions($options);
     }
 
-    public function setMost(Project_Most $most)
+    public function setMost(Most $most)
     {
         $this->_most = $most;
 

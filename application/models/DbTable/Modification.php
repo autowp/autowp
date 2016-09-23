@@ -2,9 +2,9 @@
 
 namespace Application\Model\DbTable;
 
-use Project_Db_Table;
+use Application\Db\Table;
 
-class Modification extends Project_Db_Table
+class Modification extends Table
 {
     protected $_name = 'modification';
     protected $_primary = 'id';

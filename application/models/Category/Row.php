@@ -1,5 +1,8 @@
 <?php
-class Category_Row extends Project_Db_Table_Row
+
+use Application\Db\Table\Row;
+
+class Category_Row extends Row
 {
     private static $categoryCarTable;
 

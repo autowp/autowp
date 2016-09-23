@@ -1,6 +1,8 @@
 <?php
 
-class Attrs_Item_Types extends Project_Db_Table
+use Application\Db\Table;
+
+class Attrs_Item_Types extends Table
 {
     protected $_name = 'attrs_item_types';
 }

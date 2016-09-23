@@ -1,9 +1,11 @@
 <?php
 
-class Referer extends Project_Db_Table
+use Application\Db\Table;
+
+class Referer extends Table
 {
     protected $_name = 'referer';
-    protected $_primary = array('url');
+    protected $_primary = ['url'];
 
     public function addUrl($url, $accept)
     {
@@ -19,7 +21,7 @@ class Referer extends Project_Db_Table
                    values (?, ?, 1, NOW(), ?)
                    on duplicate key
                    update count=count+1, host=VALUES(host), last_date=VALUES(last_date), accept=VALUES(accept)
-               ', array($host, $url, $accept));
+               ', [$host, $url, $accept]);
         }
     }
 
@@ -32,7 +34,7 @@ class Referer extends Project_Db_Table
             $medias = explode(',', $accept);
             if ($medias) {
                 $firstMedia = trim($medias[0]);
-                if (in_array($firstMedia, array('image/png'))) {
+                if (in_array($firstMedia, ['image/png'])) {
                     $result = true;
                 }
             }

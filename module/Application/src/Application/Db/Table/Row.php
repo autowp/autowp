@@ -1,6 +1,15 @@
 <?php
 
-class Project_Db_Table_Row extends Zend_Db_Table_Row
+namespace Application\Db\Table;
+
+use Zend_Db_Table_Abstract;
+use Zend_Db_Table_Row;
+
+use DateTime;
+use DateTimeZone;
+use Exception;
+
+class Row extends Zend_Db_Table_Row
 {
     public function getDateTime($col)
     {

@@ -1,16 +1,18 @@
 <?php
 
-class Picture_View extends Project_Db_Table
+use Application\Db\Table;
+
+class Picture_View extends Table
 {
     protected $_name = 'picture_view';
     protected $_primary = 'picture_id';
-    protected $_referenceMap    = array(
-        'Picture' => array(
-            'columns'       => array('picture_id'),
+    protected $_referenceMap = [
+        'Picture' => [
+            'columns'       => ['picture_id'],
             'refTableClass' => 'Picture',
-            'refColumns'    => array('id')
-        )
-    );
+            'refColumns'    => ['id']
+        ]
+    ];
 
     public function inc(Picture_Row $picture)
     {
@@ -19,22 +21,22 @@ class Picture_View extends Project_Db_Table
             VALUES (?, 1)
             ON DUPLICATE KEY UPDATE views=views+1
         ';
-        $this->getAdapter()->query($sql, array(
+        $this->getAdapter()->query($sql, [
             $picture->id
-        ));
+        ]);
 
-        /*$view = $this->fetchRow(array(
+        /*$view = $this->fetchRow([
             'picture_id = ?'    =>    $picture->id
-        ));
+        ]);
         if ($view) {
             $view->views = new Zend_Db_Expr('views + 1');
             $view->save();
         } else {
             $view = $this->fetchNew();
-            $view->setFromArray(array(
+            $view->setFromArray([
                 'picture_id'    =>    $picture->id,
                 'views'            =>    1
-            ));
+            ]);
             $view->save();
         }*/
     }
@@ -45,9 +47,9 @@ class Picture_View extends Project_Db_Table
      */
     public function get(Picture_Row $picture)
     {
-        $view = $this->fetchRow(array(
+        $view = $this->fetchRow([
             'picture_id = ?' => $picture->id
-        ));
+        ]);
 
         return $view ? (int)$view->views : 0;
     }
@@ -59,14 +61,14 @@ class Picture_View extends Project_Db_Table
     public function getValues(array $ids)
     {
         if (count($ids) <= 0) {
-            return array();
+            return [];
         }
 
         $db = $this->getAdapter();
 
         return $db->fetchPairs(
             $db->select()
-                ->from($this->info('name'), array('picture_id', 'views'))
+                ->from($this->info('name'), ['picture_id', 'views'])
                 ->where('picture_id in (?)', $ids)
         );
     }

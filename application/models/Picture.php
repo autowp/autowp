@@ -2,7 +2,9 @@
 
 use Autowp\Image;
 
-class Picture extends Project_Db_Table
+use Application\Db\Table;
+
+class Picture extends Table
 {
     const
         UNSORTED_TYPE_ID = 0,

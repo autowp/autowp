@@ -2,9 +2,9 @@
 
 namespace Application\Model\DbTable;
 
-use Project_Db_Table;
+use Application\Db\Table;
 
-class Museum extends Project_Db_Table
+class Museum extends Table
 {
     protected $_name = 'museum';
     protected $_primary = 'id';

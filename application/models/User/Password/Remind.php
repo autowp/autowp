@@ -1,15 +1,17 @@
 <?php
 
-class User_Password_Remind extends Project_Db_Table
+use Application\Db\Table;
+
+class User_Password_Remind extends Table
 {
     protected $_name = 'user_password_remind';
     protected $_primary = 'hash';
 
-    protected $_referenceMap = array(
-        'User' => array(
-            'columns'       => array('user_id'),
+    protected $_referenceMap = [
+        'User' => [
+            'columns'       => ['user_id'],
             'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        ),
-    );
+            'refColumns'    => ['id']
+        ],
+    ];
 }

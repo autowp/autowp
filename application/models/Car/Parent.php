@@ -1,22 +1,24 @@
 <?php
 
-class Car_Parent extends Project_Db_Table
+use Application\Db\Table;
+
+class Car_Parent extends Table
 {
     protected $_name = 'car_parent';
     protected $_primary = ['car_id', 'parent_id'];
 
-    protected $_referenceMap = array(
-        'Car' => array(
-            'columns'       => array('car_id'),
+    protected $_referenceMap = [
+        'Car' => [
+            'columns'       => ['car_id'],
             'refTableClass' => 'Car',
-            'refColumns'    => array('id')
-        ),
-        'Parent' => array(
-            'columns'       => array('parent_id'),
+            'refColumns'    => ['id']
+        ],
+        'Parent' => [
+            'columns'       => ['parent_id'],
             'refTableClass' => 'Car',
-            'refColumns'    => array('id')
-        ),
-    );
+            'refColumns'    => ['id']
+        ],
+    ];
 
     const
         TYPE_DEFAULT = 0,
@@ -49,8 +51,8 @@ class Car_Parent extends Project_Db_Table
         $cpTableName = $this->info('name');
         $adapter = $this->getAdapter();
 
-        $toCheck = array($id);
-        $ids = array();
+        $toCheck = [$id];
+        $ids = [];
 
         while (count($toCheck) > 0) {
             $ids = array_merge($ids, $toCheck);
@@ -70,8 +72,8 @@ class Car_Parent extends Project_Db_Table
         $cpTableName = $this->info('name');
         $adapter = $this->getAdapter();
 
-        $toCheck = array($id);
-        $ids = array();
+        $toCheck = [$id];
+        $ids = [];
 
         while (count($toCheck) > 0) {
             $ids = array_merge($ids, $toCheck);
@@ -86,7 +88,7 @@ class Car_Parent extends Project_Db_Table
         return array_unique($ids);
     }
 
-    public function addParent(Car_Row $car, Car_Row $parent, array $options = array())
+    public function addParent(Car_Row $car, Car_Row $parent, array $options = [])
     {
         if (!$parent->is_group) {
             throw new Exception("Only groups can have childs");
@@ -95,11 +97,11 @@ class Car_Parent extends Project_Db_Table
         $id = (int)$car->id;
         $parentId = (int)$parent->id;
 
-        $defaults = array(
+        $defaults = [
             'type'    => self::TYPE_DEFAULT,
             'catname' => $id,
             'name'    => null
-        );
+        ];
         $options = array_merge($defaults, $options);
 
         $parentIds = $this->collectParentIds($parentId);
@@ -107,19 +109,19 @@ class Car_Parent extends Project_Db_Table
             throw new Exception('Cycle detected');
         }
 
-        $row = $this->fetchRow(array(
+        $row = $this->fetchRow([
             'car_id = ?'    => $id,
             'parent_id = ?' => $parentId
-        ));
+        ]);
         if (!$row) {
-            $row = $this->createRow(array(
+            $row = $this->createRow([
                 'car_id'    => $id,
                 'parent_id' => $parentId,
                 'catname'   => $options['catname'],
                 'name'      => $options['name'],
                 'timestamp' => new Zend_Db_Expr('now()'),
                 'type'      => $options['type']
-            ));
+            ]);
             $row->save();
         }
 
@@ -132,10 +134,10 @@ class Car_Parent extends Project_Db_Table
         $id = (int)$car->id;
         $parentId = (int)$parent->id;
 
-        $row = $this->fetchRow(array(
+        $row = $this->fetchRow([
             'car_id = ?'    => $id,
             'parent_id = ?' => $parentId
-        ));
+        ]);
         if ($row) {
             $row->delete();
         }
@@ -159,13 +161,13 @@ class Car_Parent extends Project_Db_Table
 
         $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
 
-        $result = array();
+        $result = [];
 
         $limit = $breakOnFirst ? 1 : null;
-        $brandCarRows = $this->getBrandCarTable()->fetchAll(array(
+        $brandCarRows = $this->getBrandCarTable()->fetchAll([
             'car_id = ?'   => $carId,
             'brand_id = ?' => $brandId
-        ), null, $limit);
+        ], null, $limit);
         foreach ($brandCarRows as $brandCarRow) {
             $result[] = [
                 'car_catname' => $brandCarRow->catname,
@@ -177,9 +179,9 @@ class Car_Parent extends Project_Db_Table
             return $result;
         }
 
-        $parents = $this->fetchAll(array(
+        $parents = $this->fetchAll([
             'car_id = ?' => $carId
-        ));
+        ]);
 
         foreach ($parents as $parent) {
             $paths = $this->getPathsToBrand($parent->parent_id, $brandId, $options);
@@ -199,7 +201,7 @@ class Car_Parent extends Project_Db_Table
         return $result;
     }
 
-    public function getPaths($carId, array $options = array())
+    public function getPaths($carId, array $options = [])
     {
         $carId = (int)$carId;
         if (!$carId) {
@@ -208,7 +210,7 @@ class Car_Parent extends Project_Db_Table
 
         $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
 
-        $result = array();
+        $result = [];
 
         $db = $this->getBrandCarTable()->getAdapter();
 
@@ -223,30 +225,30 @@ class Car_Parent extends Project_Db_Table
 
         $brandCarRows = $db->fetchAll($select);
         foreach ($brandCarRows as $brandCarRow) {
-            $result[] = array(
+            $result[] = [
                 'brand_catname' => $brandCarRow['folder'],
                 'car_catname'   => $brandCarRow['catname'],
-                'path'          => array()
-            );
+                'path'          => []
+            ];
         }
 
         if ($breakOnFirst && count($result)) {
             return $result;
         }
 
-        $parents = $this->fetchAll(array(
+        $parents = $this->fetchAll([
             'car_id = ?' => $carId
-        ));
+        ]);
 
         foreach ($parents as $parent) {
             $paths = $this->getPaths($parent->parent_id, $options);
 
             foreach ($paths as $path) {
-                $result[] = array(
+                $result[] = [
                     'brand_catname' => $path['brand_catname'],
                     'car_catname'   => $path['car_catname'],
-                    'path'          => array_merge($path['path'], array($parent->catname))
-                );
+                    'path'          => array_merge($path['path'], [$parent->catname])
+                ];
             }
 
             if ($breakOnFirst && count($result)) {

@@ -1,6 +1,8 @@
 <?php
 
-class Votes extends Project_Db_Table
+use Application\Db\Table;
+
+class Votes extends Table
 {
     protected $_name = 'votes';
     protected $_primary = ['picture_id', 'day_date'];

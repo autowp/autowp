@@ -1,6 +1,8 @@
 <?php
 
-class Log_Events extends Project_Db_Table
+use Application\Db\Table;
+
+class Log_Events extends Table
 {
     protected $_name = 'log_events';
     protected $_rowClass = 'Log_Events_Row';

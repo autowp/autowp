@@ -1,5 +1,8 @@
 <?php
-class Comment_Message_Row extends Project_Db_Table_Row
+
+use Application\Db\Table\Row;
+
+class Comment_Message_Row extends Row
 {
     public function getUrl($absolute = false)
     {

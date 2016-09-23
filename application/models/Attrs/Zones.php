@@ -1,14 +1,16 @@
 <?php
 
-class Attrs_Zones extends Project_Db_Table
+use Application\Db\Table;
+
+class Attrs_Zones extends Table
 {
     protected $_name = 'attrs_zones';
     protected $_rowClass = 'Attrs_Zone_Row';
-    protected $_referenceMap = array(
-        'Item_Type' => array(
-            'columns'       => array('item_type_id'),
+    protected $_referenceMap = [
+        'Item_Type' => [
+            'columns'       => ['item_type_id'],
             'refTableClass' => 'Attrs_Item_Types',
-            'refColumns'    => array('id')
-        )
-    );
+            'refColumns'    => ['id']
+        ]
+    ];
 }

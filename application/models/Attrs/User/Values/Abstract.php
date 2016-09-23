@@ -1,6 +1,8 @@
 <?php
 
-class Attrs_User_Values_Abstract extends Project_Db_Table
+use Application\Db\Table;
+
+class Attrs_User_Values_Abstract extends Table
 {
     protected $_referenceMap = array(
         'Attribute' => array(

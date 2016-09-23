@@ -1,15 +1,17 @@
 <?php
 
-class Referer_Blacklist extends Project_Db_Table
+use Application\Db\Table;
+
+class Referer_Blacklist extends Table
 {
     protected $_name = 'referer_blacklist';
-    protected $_primary = array('host');
+    protected $_primary = ['host'];
 
     public function containsHost($host)
     {
-        return (bool)$this->fetchRow(array(
+        return (bool)$this->fetchRow([
             'host = ?' => (string)$host
-        ));
+        ]);
     }
 
     public function containsUrl($url)
@@ -24,9 +26,9 @@ class Referer_Blacklist extends Project_Db_Table
 
     public function fetchRowByHost($host)
     {
-        return $this->fetchRow(array(
+        return $this->fetchRow([
             'host = ?' => (string)$host
-        ));
+        ]);
     }
 
     public function fetchRowByUrl($url)

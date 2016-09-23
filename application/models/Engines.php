@@ -1,6 +1,8 @@
 <?php
 
-class Engines extends Project_Db_Table
+use Application\Db\Table;
+
+class Engines extends Table
 {
     protected $_name = 'engines';
     protected $_primary = 'id';

@@ -1,17 +1,11 @@
 <?php
 
-class Category_Parent extends Project_Db_Table
+use Application\Db\Table;
+
+class Category_Parent extends Table
 {
     protected $_name = 'category_parent';
     protected $_primary = ['category_id', 'parent_id'];
-
-    /*protected $_referenceMap    = array(
-        'Parent' => array(
-            'columns'           => array('parent_id'),
-            'refTableClass'     => 'Car_Types',
-            'refColumns'        => array('id')
-        ),
-    );*/
 
     public function rebuild()
     {

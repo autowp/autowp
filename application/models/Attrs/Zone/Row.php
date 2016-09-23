@@ -1,8 +1,10 @@
 <?php
 
-class Attrs_Zone_Row extends Project_Db_Table_Row
+use Application\Db\Table\Row;
+
+class Attrs_Zone_Row extends Row
 {
-    public function hasAttribute(Project_Db_Table_Row $attribute)
+    public function hasAttribute(Row $attribute)
     {
         $attributes = new Attrs_Zone_Attributes();
         return (bool)$attributes->getAdapter()->fetchOne(
@@ -14,7 +16,7 @@ class Attrs_Zone_Row extends Project_Db_Table_Row
         );
     }
 
-    public function findAttributes(Project_Db_Table_Row $parent = null)
+    public function findAttributes(Row $parent = null)
     {
         $table = new Attrs_Attributes();
         $select = $table->select()

@@ -1,6 +1,8 @@
 <?php
 
-class Articles_Row extends Project_Db_Table_Row
+use Application\Db\Table\Row;
+
+class Articles_Row extends Row
 {
     /**
      * @deprecated

@@ -1,6 +1,8 @@
 <?php
 
-class Modification_Picture extends Project_Db_Table
+use Application\Db\Table;
+
+class Modification_Picture extends Table
 {
     protected $_name = 'modification_picture';
     protected $_primary = ['modification_id', 'picture_id'];

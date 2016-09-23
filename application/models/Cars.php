@@ -1,33 +1,34 @@
 <?php
 
-class Cars extends Project_Db_Table
+use Application\Db\Table;
+
+class Cars extends Table
 {
     protected $_name = 'cars';
     protected $_use_selects_cache = true;
     protected $_rowClass = 'Car_Row';
-    protected $_referenceMap = array(
-        'Type' => array(
-            'columns'       => array('car_type_id'),
+    protected $_referenceMap = [
+        'Type' => [
+            'columns'       => ['car_type_id'],
             'refTableClass' => 'Car_Types',
-            'refColumns'    => array('id')
-        ),
-        'Meta_Last_Editor' => array(
-            'columns'       => array('meta_last_editor_id'),
+            'refColumns'    => ['id']
+        ],
+        'Meta_Last_Editor' => [
+            'columns'       => ['meta_last_editor_id'],
             'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        ),
-        'Tech_Last_Editor' => array(
-            'columns'       => array('tech_last_editor_id'),
+            'refColumns'    => ['id']
+        ],
+        'Tech_Last_Editor' => [
+            'columns'       => ['tech_last_editor_id'],
             'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        ),
-        'Engine' => array(
-            'columns'       => array('engine_id'),
+            'refColumns'    => ['id']
+        ],
+        'Engine' => [
+            'columns'       => ['engine_id'],
             'refTableClass' => 'Engines',
-            'refColumns'    => array('id')
-        )
-    );
-
+            'refColumns'    => ['id']
+        ]
+    ];
 
     public function insert(array $data)
     {
@@ -66,7 +67,7 @@ class Cars extends Project_Db_Table
         }
 
         if ($car->engine_inherit) {
-            $map = array();
+            $map = [];
             foreach ($parents as $parent) {
                 $engineId = $parent->engine_id;
                 if ($engineId) {
@@ -97,7 +98,7 @@ class Cars extends Project_Db_Table
         }
 
         if ($car->car_type_inherit) {
-            $map = array();
+            $map = [];
             foreach ($parents as $parent) {
                 $typeId = $parent->car_type_id;
                 if ($typeId) {
@@ -114,7 +115,7 @@ class Cars extends Project_Db_Table
             $db = $carTypeParentTable->getAdapter();
             foreach ($map as $id => $count) {
 
-                $otherIds = array_diff(array_keys($map), array($id));
+                $otherIds = array_diff(array_keys($map), [$id]);
 
                 if (count($otherIds)) {
                     $isParentOf = $db->fetchCol(
@@ -154,7 +155,7 @@ class Cars extends Project_Db_Table
         }
 
         if ($car->spec_inherit) {
-            $map = array();
+            $map = [];
             foreach ($parents as $parent) {
                 $specId = $parent->spec_id;
                 if ($specId) {

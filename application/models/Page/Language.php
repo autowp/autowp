@@ -1,14 +1,16 @@
 <?php
 
-class Page_Language extends Project_Db_Table
+use Application\Db\Table;
+
+class Page_Language extends Table
 {
     protected $_name = 'page_language';
 
-    protected $_referenceMap = array(
-        'Page' => array(
-            'columns'       => array('page_id'),
+    protected $_referenceMap = [
+        'Page' => [
+            'columns'       => ['page_id'],
             'refTableClass' => 'Pages',
-            'refColumns'    => array('id')
-        )
-    );
+            'refColumns'    => ['id']
+        ]
+    ];
 }

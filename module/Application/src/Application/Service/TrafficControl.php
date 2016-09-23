@@ -2,111 +2,113 @@
 
 namespace Application\Service;
 
+use Application\Db\Table;
+
 use DateInterval;
 use DateTime;
 use DateTimeZone;
-use Project_Db_Table;
+
 use Zend_Db_Expr;
 
 class TrafficControl
 {
     /**
-     * @var Project_Db_Table
+     * @var Table
      */
-    private $_bannedTable;
+    private $bannedTable;
 
     /**
-     * @var Project_Db_Table
+     * @var Table
      */
-    private $_whitelistTable;
+    private $whitelistTable;
 
     /**
-     * @var Project_Db_Table
+     * @var Table
      */
-    private $_monitoringTable;
+    private $monitoringTable;
 
     /**
      * @var array
      */
-    private $_autobanProfiles = [
-        array(
+    private $autobanProfiles = [
+        [
             'limit'  => 3000,
             'reason' => 'daily limit',
-            'group'  => array(),
+            'group'  => [],
             'time'   => 10*24*3600
-        ),
-        array(
+        ],
+        [
             'limit'  => 1000,
             'reason' => 'hourly limit',
-            'group'  => array('hour'),
+            'group'  => ['hour'],
             'time'   => 5*24*3600
-        ),
-        array(
+        ],
+        [
             'limit'  => 300,
             'reason' => 'ten limit',
-            'group'  => array('hour', 'tenminute'),
+            'group'  => ['hour', 'tenminute'],
             'time'   => 24*3600
-        ),
-        array(
+        ],
+        [
             'limit'  => 80,
             'reason' => 'min limit',
-            'group'  => array('hour', 'tenminute', 'minute'),
+            'group'  => ['hour', 'tenminute', 'minute'],
             'time'   => 12*3600
-        ),
+        ],
     ];
 
     /**
-     * @return Project_Db_Table
+     * @return Table
      */
-    private function _getBannedTable()
+    private function getBannedTable()
     {
-        if (!$this->_bannedTable) {
-            $this->_bannedTable = new Project_Db_Table(array(
+        if (!$this->bannedTable) {
+            $this->bannedTable = new Table([
                 'name'    => 'banned_ip',
                 'primary' => 'ip'
-            ));
+            ]);
         }
 
-        return $this->_bannedTable;
+        return $this->bannedTable;
     }
 
     /**
-     * @return Project_Db_Table
+     * @return Table
      */
-    private function _getWhitelistTable()
+    private function getWhitelistTable()
     {
-        if (!$this->_whitelistTable) {
-            $this->_whitelistTable = new Project_Db_Table(array(
+        if (!$this->whitelistTable) {
+            $this->whitelistTable = new Table([
                 'name'    => 'ip_whitelist',
                 'primary' => 'ip'
-            ));
+            ]);
         }
 
-        return $this->_whitelistTable;
+        return $this->whitelistTable;
     }
 
     /**
-     * @return Project_Db_Table
+     * @return Table
      */
-    private function _getMonitoringTable()
+    private function getMonitoringTable()
     {
-        if (!$this->_monitoringTable) {
-            $this->_monitoringTable = new Project_Db_Table(array(
+        if (!$this->monitoringTable) {
+            $this->monitoringTable = new Table([
                 'name'    => 'ip_monitoring4',
                 'primary' => ['ip', 'day_date', 'hour', 'tenminute', 'minute']
-            ));
+            ]);
         }
 
-        return $this->_monitoringTable;
+        return $this->monitoringTable;
     }
 
     /**
      * @param string $ip
      * @return string
      */
-    private function _ip2binary($ip)
+    private function ip2binary($ip)
     {
-        $table = $this->_getBannedTable();
+        $table = $this->getBannedTable();
 
         return $table->getAdapter()->fetchOne('select INET6_ATON(?)', $ip);
     }
@@ -119,33 +121,33 @@ class TrafficControl
      */
     public function ban($ip, $seconds, $byUserId, $reason)
     {
-        $table = $this->_getBannedTable();
+        $table = $this->getBannedTable();
 
-        $row = $table->fetchRow(array(
+        $row = $table->fetchRow([
             'ip = INET6_ATON(?)' => $ip
-        ));
+        ]);
 
         $datetime = new DateTime();
         $datetime->setTimezone(new DateTimeZone(MYSQL_TIMEZONE));
         $datetime->add(new DateInterval('PT'.$seconds.'S'));
         $dateStr = $datetime->format(MYSQL_DATETIME_FORMAT);
 
-        $data = array(
+        $data = [
             'up_to'      => $dateStr,
             'by_user_id' => $byUserId,
             'reason'     => $reason
-        );
+        ];
 
         if (!$row) {
             $expr = $table->getAdapter()->quoteInto('INET6_ATON(?)', $ip);
 
-            $table->insert(array_replace($data, array(
+            $table->insert(array_replace($data, [
                 'ip' => new Zend_Db_Expr($expr),
-            )));
+            ]));
         } else {
-            $table->update($data, array(
+            $table->update($data, [
                 'ip = INET6_ATON(?)' => $ip
-            ));
+            ]);
         }
     }
 
@@ -154,26 +156,26 @@ class TrafficControl
      */
     public function unban($ip)
     {
-        $this->_getBannedTable()->delete(array(
+        $this->getBannedTable()->delete([
             'ip = INET6_ATON(?)' => $ip
-        ));
+        ]);
     }
 
     /**
      * @param array $profile
      * @return void
      */
-    private function _autoBanByProfile(array $profile)
+    private function autoBanByProfile(array $profile)
     {
-        $table = $this->_getBannedTable();
+        $table = $this->getBannedTable();
 
         $db = $table->getAdapter();
 
-        $group = array_merge(array('ip'), $profile['group']);
+        $group = array_merge(['ip'], $profile['group']);
 
         $rows = $db->fetchAll(
             $db->select()
-                ->from('ip_monitoring4', array('ip', 'c' => new Zend_Db_Expr('SUM(count)')))
+                ->from('ip_monitoring4', ['ip', 'c' => new Zend_Db_Expr('SUM(count)')])
                 ->where('day_date = CURDATE()')
                 ->group($group)
                 ->having('c > ?', $profile['limit'])
@@ -196,8 +198,8 @@ class TrafficControl
      */
     public function autoBan()
     {
-        foreach ($this->_autobanProfiles as $profile) {
-            $this->_autoBanByProfile($profile);
+        foreach ($this->autobanProfiles as $profile) {
+            $this->autoBanByProfile($profile);
         }
     }
 
@@ -207,11 +209,11 @@ class TrafficControl
      */
     private function _inWhiteList($ip)
     {
-        $table = $this->_getWhitelistTable();
+        $table = $this->getWhitelistTable();
 
-        return (bool)$table->fetchRow(array(
+        return (bool)$table->fetchRow([
             'ip = UNHEX(?)' => bin2hex($ip)
-        ));
+        ]);
     }
 
     /**
@@ -220,11 +222,11 @@ class TrafficControl
      */
     public function inWhiteList($ip)
     {
-        $table = $this->_getWhitelistTable();
+        $table = $this->getWhitelistTable();
 
-        return (bool)$table->fetchRow(array(
+        return (bool)$table->fetchRow([
             'ip = INET6_ATON(?)' => $ip
-        ));
+        ]);
     }
 
     /**
@@ -232,7 +234,7 @@ class TrafficControl
      */
     public function getTopData()
     {
-        $bannedTable = $this->_getBannedTable();
+        $bannedTable = $this->getBannedTable();
 
         $sql = 'SELECT ip, INET6_NTOA(ip) as ip_text, SUM(count) AS count FROM ip_monitoring4 '.
                'WHERE day_date=CURDATE() GROUP BY ip '.
@@ -242,17 +244,17 @@ class TrafficControl
         $result = [];
 
         foreach ($rows as $row) {
-            $banRow = $bannedTable->fetchRow(array(
+            $banRow = $bannedTable->fetchRow([
                 'ip = unhex(?)' => bin2hex($row['ip']),
                 'up_to >= NOW()'
-            ));
+            ]);
 
-            $result[] = array(
+            $result[] = [
                 'ip'        => $row['ip_text'],
                 'count'     => $row['count'],
                 'ban'       => $banRow ? $banRow->toArray() : null,
                 'whitelist' => $this->_inWhiteList($row['ip'])
-            );
+            ];
         }
         unset($row);
 
@@ -264,7 +266,7 @@ class TrafficControl
      */
     public function getWhitelistData()
     {
-        $whitelistTable = $this->_getWhitelistTable();
+        $whitelistTable = $this->getWhitelistTable();
 
         $db = $whitelistTable->getAdapter();
 
@@ -273,12 +275,12 @@ class TrafficControl
                 ->from($whitelistTable->info('name'), ['description', 'ip_text' => 'INET6_NTOA(ip)'])
                 ->order('ip')
         );
-        $items = array();
+        $items = [];
         foreach ($rows as $row) {
-            $items[] = array(
+            $items[] = [
                 'ip'          => $row['ip_text'],
                 'description' => $row['description']
-            );
+            ];
         }
 
         return $items;
@@ -289,11 +291,11 @@ class TrafficControl
      */
     public function deleteFromWhitelist($ip)
     {
-        $whitelistTable = $this->_getWhitelistTable();
+        $whitelistTable = $this->getWhitelistTable();
 
-        $row = $whitelistTable->fetchRow(array(
+        $row = $whitelistTable->fetchRow([
             'ip = INET6_ATON(?)' => $ip
-        ));
+        ]);
 
         if ($row) {
             $row->delete();
@@ -308,18 +310,18 @@ class TrafficControl
     {
         $banRow = $this->unban($ip);
 
-        $whitelistTable = $this->_getWhitelistTable();
+        $whitelistTable = $this->getWhitelistTable();
 
-        $row = $whitelistTable->fetchRow(array(
+        $row = $whitelistTable->fetchRow([
             'ip = inet6_aton(?)' => $ip
-        ));
+        ]);
 
         if (!$row) {
             $expr = $whitelistTable->getAdapter()->quoteInto('inet6_aton(?)', $ip);
-            $whitelistTable->insert(array(
+            $whitelistTable->insert([
                 'ip'          => new Zend_Db_Expr($expr),
                 'description' => $description
-            ));
+            ]);
         }
     }
 
@@ -329,18 +331,18 @@ class TrafficControl
      */
     public function getBanInfo($ip)
     {
-        $table = $this->_getBannedTable();
+        $table = $this->getBannedTable();
 
-        $row = $table->fetchRow(array(
+        $row = $table->fetchRow([
             'ip = INET6_ATON(?)' => $ip,
             'up_to >= NOW()'
-        ));
+        ]);
 
         if (!$row) {
             return false;
         }
 
-        return array(
+        return [
             'up_to'   => DateTime::createFromFormat(
                 MYSQL_DATETIME_FORMAT,
                 $row->up_to,
@@ -348,7 +350,7 @@ class TrafficControl
             ),
             'user_id' => $row->by_user_id,
             'reason'  => $row->reason
-        );
+        ];
     }
 
     /**
@@ -356,7 +358,7 @@ class TrafficControl
      */
     public function pushHit($ip)
     {
-        $table = $this->_getBannedTable();
+        $table = $this->getBannedTable();
 
         $sql = '
             INSERT INTO ip_monitoring4 (ip, day_date, hour, tenminute, minute, count)
@@ -368,9 +370,9 @@ class TrafficControl
 
     public function autoWhitelist()
     {
-        $monitoringTable = $this->_getMonitoringTable();
-        $whitelistTable = $this->_getWhitelistTable();
-        $bannedTable = $this->_getBannedTable();
+        $monitoringTable = $this->getMonitoringTable();
+        $whitelistTable = $this->getWhitelistTable();
+        $bannedTable = $this->getBannedTable();
 
         $db = $monitoringTable->getAdapter();
 
@@ -425,16 +427,16 @@ class TrafficControl
 
 
                 if ($whitelist) {
-                    $whitelistTable->insert(array(
+                    $whitelistTable->insert([
                         'ip'          => $ip,
                         'description' => $whitelistDesc
-                    ));
+                    ]);
 
                     $this->unban($ipText);
 
-                    $monitoringTable->delete(array(
+                    $monitoringTable->delete([
                         'ip = INET6_ATON(?)' => $ipText
-                    ));
+                    ]);
 
                     print ' whitelisted';
                 }
@@ -446,11 +448,11 @@ class TrafficControl
 
     public function gc()
     {
-        $count = $this->_getMonitoringTable()->delete([
+        $count = $this->getMonitoringTable()->delete([
             'day_date < CURDATE()'
         ]);
 
-        $count += $this->_getBannedTable()->delete(
+        $count += $this->getBannedTable()->delete(
             'up_to < NOW()'
         );
 
