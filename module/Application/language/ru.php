@@ -350,6 +350,7 @@ return [
     'forums/theme/topics' => 'Топики',
     'forums/theme/author' => 'Автор',
     'forums/theme/last-message' => 'Последнее сообщение',
+    'forums/theme/subscription' => 'Подписка',
     'forums/theme/total:' => 'Всего',
     'forums/theme/all-other' => 'Обо всём',
     'forums/theme/photos' => 'Фото-темы',
@@ -413,6 +414,14 @@ return [
     'account/specs/conflicts/title/other-values' => 'Другие значения',
 
     'account/specs/conflicts/my-value/none' => 'нет',
+    
+    'account/email/your-current-email:' => 'Ваш текущий адрес e-mail: ',
+    'account/email/your-dont-enter-email' => 'Вы не указали адрес e-mail',
+    'account/email/text' => 'На этой странице вы можете изменить свой адрес электронной почты (e-mail)
+    
+На новый адрес будет выслано письмо с инструкциями по его подтверждению',
+    
+    'account/accounts/add' => 'Добавить учётную запись',
 
     'feedback/title' => 'Обратная связь',
     'feedback/name'  => 'Ваше имя',

@@ -336,6 +336,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'forums/theme/topics' => 'Sujets',
     'forums/theme/author' => 'Auteur',
     'forums/theme/last-message' => 'Dernier message',
+    'forums/theme/subscription' => 'Subscription',
     'forums/theme/total:' => 'Total',
     'forums/theme/all-other' => 'Tout les autres',
     'forums/theme/photos' => 'Thèmes de la photo',
@@ -399,6 +400,14 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'account/specs/conflicts/title/other-values' => 'Other values',
 
     'account/specs/conflicts/my-value/none' => 'none',
+    
+    'account/email/your-current-email:' => 'Your current e-mail address: ',
+    'account/email/your-dont-enter-email' => 'You don\'t input e-mail address',
+    'account/email/text' => 'On this page you can change your e-mail address.
+    
+Message with instructions to confirm will sent to new address.',
+    
+    'account/accounts/add' => 'Add account',
 
     'feedback/title' => 'Retour d\'information',
     'feedback/name'  => 'Votre nom',

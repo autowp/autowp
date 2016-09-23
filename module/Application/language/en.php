@@ -336,6 +336,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'forums/theme/topics' => 'Topics',
     'forums/theme/author' => 'Author',
     'forums/theme/last-message' => 'Last message',
+    'forums/theme/subscription' => 'Subscription',
     'forums/theme/total:' => 'Total',
     'forums/theme/all-other' => 'All other',
     'forums/theme/photos' => 'Photo themes',
@@ -399,6 +400,14 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'account/specs/conflicts/title/other-values' => 'Other values',
 
     'account/specs/conflicts/my-value/none' => 'none',
+    
+    'account/email/your-current-email:' => 'Your current e-mail address: ',
+    'account/email/your-dont-enter-email' => 'You don\'t input e-mail address',
+    'account/email/text' => 'On this page you can change your e-mail address.
+
+Message with instructions to confirm will sent to new address.',
+    
+    'account/accounts/add' => 'Add account',
 
     'feedback/title' => 'Feedback',
     'feedback/name'  => 'Your name',

@@ -40,7 +40,7 @@
             </div>
         <?php } ?>
         <form action="<?=$this->escapeHtmlAttr($this->url())?>" method="post" class="well">
-            <h3>Добавить учётную запись</h3>
+            <h3><?=$this->escapeHtml($this->translate('account/accounts/add'))?></h3>
             <div class="form-group">
                 <select name="type" class="form-control">
                     <?php foreach ($this->types as $value => $name) { ?>

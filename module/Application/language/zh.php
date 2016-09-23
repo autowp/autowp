@@ -322,6 +322,7 @@ return [
     'forums/theme/topics' => '话题',
     'forums/theme/author' => '作者',
     'forums/theme/last-message' => '最新回复',
+    'forums/theme/subscription' => 'Subscription',
     'forums/theme/total:' => '全部',
     'forums/theme/all-other' => '全部其它话题',
     'forums/theme/photos' => '图片版块',
@@ -385,6 +386,14 @@ return [
     'account/specs/conflicts/title/other-values' => 'Other values',
 
     'account/specs/conflicts/my-value/none' => 'none',
+    
+    'account/email/your-current-email:' => 'Your current e-mail address: ',
+    'account/email/your-dont-enter-email' => 'You don\'t input e-mail address',
+    'account/email/text' => 'On this page you can change your e-mail address.
+    
+Message with instructions to confirm will sent to new address.',
+    
+    'account/accounts/add' => 'Add account',
 
     'feedback/title' => '反馈',
     'feedback/name'  => '标题',
