@@ -15,7 +15,7 @@
 <div class="well">
     <?=$this->markdown(strtr($this->translate('about/text'), [
         '%users%'          => implode(' ', $users),
-        '%total-pictures%' => $this->totalPictures,
+        '%total-pictures%' => $this->numberFormat($this->totalPictures),
         '%total-vehicles%' => $this->totalCars,
         '%total-size%'     => $this->fileSize($this->picturesSize),
         '%total-users%'    => $this->totalUsers,
