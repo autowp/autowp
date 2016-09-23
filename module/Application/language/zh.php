@@ -620,7 +620,7 @@ Message with instructions to confirm will sent to new address.',
     
 Разработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
     
-Перевод сайта на француский язык: %fr-translator%
+Перевод сайта на французский язык: %fr-translator%
     
 Перевод сайта на китайский язык: %zh-translator%
     
