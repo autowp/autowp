@@ -91,6 +91,8 @@ class AboutController extends AbstractActionController
 
         return [
             'developer'     => $userTable->find(1)->current(),
+            'frTranslator'  => $userTable->find(3282)->current(),
+            'zhTranslator'  => $userTable->find(25155)->current(),
             'contributors'  => $contributors,
             'totalPictures' => $totalPictures,
             'picturesSize'  => $pictureTableAdapter->fetchOne(

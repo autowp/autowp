@@ -1,43 +1,28 @@
 <?php
-    $this->pageEnv(array(
-        'layout' => array(
+    $this->pageEnv([
+        'layout' => [
             'blankPage' => false,
-            'needLeft'  => false,
             'needRight' => true
-        ),
+        ],
         'pageId' => 136,
-    ));
+    ]);
+    
+    $users = [];
+    foreach ($this->contributors as $user) {
+        $users[] = $this->user($user)->__toString();
+    }
 ?>
 <div class="well">
-    <h3>Наши люди</h3>
-    <p>Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.</p>
-    <p>Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.</p>
-    <p>Нас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:</p>
-    <?php foreach ($this->contributors as $user) { ?>
-        <?=$this->user($user) ?>
-    <?php } ?>
-
-    <h4>"Цветовая дифференциация штанов"</h4>
-    <p>Так завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из "зеленых", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что "зеленые" - это самые отзывчивые и заинтересованные в жизни проекта люди.</p>
-    <p>Некоторая часть "зеленых" наделена модераторскими функциями.</p>
-
-    <h3>Диалог и обратная связь</h3>
-    <p>Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на <a href="http://www.autowp.ru/forums/">форуме</a>, задать лично через систему обмена сообщениями или написать в "<a href="http://www.autowp.ru/feedback">обратную связь</a>" администрации сайта.</p>
-    <p>Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами, вы можете задать их Обаме - ему настолько же неинтересно это слышать, как и нам.</p>
-
-    <h3>Цифры</h3>
-    <p>Так сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:</p>
-    <ul>
-        <li>на сайте более <?=$this->totalPictures?> изображений, <?=$this->totalCars?> автомобилей, что составляет порядка <?=$this->fileSize($this->picturesSize)?> данных</li>
-        <li>зарегистрировано около <?=$this->totalUsers?> пользователей, оставивших более <?=$this->totalComments?> сообщений</li>
-    </ul>
-
-    <h3>Разработка</h3>
-    <p>Разработка и поддержка проекта ведется в основном силами <?=$this->user($this->developer)?></p>
-    <p>Сайт работает на <a href="http://framework.zend.com/">Zend Framework</a>, <a href="http://jquery.com/">jQuery</a>, <a href="http://getbootstrap.com/">Twitter bootstrap</a>, а также многих других "умных словах".</p>
-    <p>Часть исходного кода сайта является открытой и намечен курс на дальнейшее его раскрытие, чтобы каждый желающий имел возможность влиять на суть и качество проекта.</p>
-    <p><i class="fa fa-github"></i> <a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a></p>
-
-    <h3>Поддержать проект</h3>
-    <p>Вы можете поддержать наш проект <a href="/donate">финансово</a> или <a href="/feedback">морально</a></p>
+    <?=$this->markdown(strtr($this->translate('about/text'), [
+        '%users%'          => implode(' ', $users),
+        '%total-pictures%' => $this->totalPictures,
+        '%total-vehicles%' => $this->totalCars,
+        '%total-size%'     => $this->fileSize($this->picturesSize),
+        '%total-users%'    => $this->totalUsers,
+        '%total-comments%' => $this->totalComments,
+        '%github%'         => '<i class="fa fa-github"></i> <a href="https://github.com/autowp/autowp">https://github.com/autowp/autowp</a>',
+        '%developer%'      => $this->user($this->developer)->__toString(),
+        '%fr-translator%'  => $this->user($this->frTranslator)->__toString(),
+        '%zh-translator%'  => $this->user($this->zhTranslator)->__toString(),
+    ]))?>
 </div>

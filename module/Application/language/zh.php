@@ -587,6 +587,52 @@ Message with instructions to confirm will sent to new address.',
     'car-type-rp/moto'           => '摩托车',
     'car-type-rp/tractor'        => '拖拉机',
     'car-type-rp/tracked'        => '履带平台',
+    
+    'about/text' => '### Наши люди
+Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
+    
+Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
+    
+Нас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:
+    
+%users%
+    
+#### "Цветовая дифференциация штанов"
+    
+Так завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из "зеленых", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что "зеленые" - это самые отзывчивые и заинтересованные в жизни проекта люди.
+    
+Некоторая часть "зеленых" наделена модераторскими функциями.
+    
+### Диалог и обратная связь
+    
+Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/feedback)" администрации сайта.
+    
+Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами имею единственный ответ: мы не размещаем рекламу.
+    
+### Цифры
+    
+Так сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:
+    
+* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных
+* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений
+    
+### Разработка
+    
+Разработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+    
+Перевод сайта на француский язык: %fr-translator%
+    
+Перевод сайта на китайский язык: %zh-translator%
+    
+Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
+    
+Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
+    
+%github%
+    
+### Поддержать проект
+    
+Вы можете поддержать наш проект [финансово](/donate) или [морально](/feedback)',
 
     'page/1/name' => "主页",
     'page/2/name' => "主目录",
@@ -622,7 +668,6 @@ Message with instructions to confirm will sent to new address.',
     'page/45/name' => "新话题",
     'page/48/name' => "个人主页",
     'page/49/name' => "站内信",
-    'page/50/name' => "AutoWP.ru网站广告",
     'page/51/name' => "最新添加",
     'page/52/name' => "注册",
     'page/53/name' => "确定",
@@ -664,7 +709,6 @@ Message with instructions to confirm will sent to new address.',
     'page/94/name' => "已上传图片",
     'page/96/name' => "多重目录车型",
     'page/97/name' => "角度",
-    'page/98/name' => "删除该队列",
     'page/100/name' => "属性",
     'page/101/name' => "%ATTR_NAME%",
     'page/102/name' => "性能参数编辑者%CAR_NAME%",
@@ -786,7 +830,6 @@ Message with instructions to confirm will sent to new address.',
     'page/45/title' => "新话题",
     'page/48/title' => "个人主页",
     'page/49/title' => "站内信",
-    'page/50/title' => "AutoWP.ru网站广告",
     'page/51/title' => "最新添加",
     'page/52/title' => "注册",
     'page/53/title' => "确定",
@@ -828,7 +871,6 @@ Message with instructions to confirm will sent to new address.',
     'page/94/title' => "尚未审核",
     'page/96/title' => "",
     'page/97/title' => "",
-    'page/98/title' => "",
     'page/100/title' => "",
     'page/101/title' => "%ATTR_NAME%",
     'page/102/title' => "性能参数编辑者 %CAR_NAME%",
@@ -950,7 +992,6 @@ Message with instructions to confirm will sent to new address.',
     'page/45/breadcrumbs' => "新话题",
     'page/48/breadcrumbs' => "",
     'page/49/breadcrumbs' => "",
-    'page/50/breadcrumbs' => "",
     'page/51/breadcrumbs' => "",
     'page/52/breadcrumbs' => "",
     'page/53/breadcrumbs' => "",
@@ -992,7 +1033,6 @@ Message with instructions to confirm will sent to new address.',
     'page/94/breadcrumbs' => "",
     'page/96/breadcrumbs' => "",
     'page/97/breadcrumbs' => "",
-    'page/98/breadcrumbs' => "",
     'page/100/breadcrumbs' => "",
     'page/101/breadcrumbs' => "%ATTR_NAME%",
     'page/102/breadcrumbs' => "Specs editors",
@@ -1083,6 +1123,10 @@ Message with instructions to confirm will sent to new address.',
     'page/201/name'        => "立标",
     'page/201/title'       => "立标",
     'page/201/breadcrumbs' => "立标",
+    
+    'page/202/name'        => 'Perspectives',
+    'page/202/title'       => 'Perspectives',
+    'page/202/breadcrumbs' => 'Perspectives',
 
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',

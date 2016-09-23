@@ -602,9 +602,55 @@ Allons essayer de ne pas vous décevoir.',
     'car-type-rp/moto'           => 'Moto',
     'car-type-rp/tractor'        => 'Tractor',
     'car-type-rp/tracked'        => 'Tracked platform',
+    
+    'about/text' => '### Наши люди
+Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
+    
+Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
+    
+Нас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:
+    
+%users%
+    
+#### "Цветовая дифференциация штанов"
+    
+Так завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из "зеленых", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что "зеленые" - это самые отзывчивые и заинтересованные в жизни проекта люди.
+    
+Некоторая часть "зеленых" наделена модераторскими функциями.
+    
+### Диалог и обратная связь
+    
+Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/feedback)" администрации сайта.
+    
+Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами имею единственный ответ: мы не размещаем рекламу.
+    
+### Цифры
+    
+Так сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:
+    
+* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных
+* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений
+    
+### Разработка
+    
+Разработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+    
+Перевод сайта на француский язык: %fr-translator%
+    
+Перевод сайта на китайский язык: %zh-translator%
+    
+Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
+    
+Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
+    
+%github%
+    
+### Поддержать проект
+    
+Вы можете поддержать наш проект [финансово](/donate) или [морально](/feedback)',
 
     'page/1/name' => "Page d'accueil",
-    'page/2/name' => "Главное меню",
+    'page/2/name' => "Main menu",
     'page/10/name' => "Marque",
     'page/14/name' => "%BRAND_NAME% les voitures dans l'ordre chronologique",
     'page/15/name' => "Les dernières photos de %BRAND_NAME%",
@@ -614,7 +660,7 @@ Allons essayer de ne pas vous décevoir.',
     'page/21/name' => "Les meilleurs",
     'page/22/name' => "Catégories",
     'page/23/name' => "%CATEGORY_NAME%",
-    'page/24/name' => "Лимитированные и специальные серии автомобилей",
+    'page/24/name' => "Limited editions",
     'page/25/name' => "Jumeaux",
     'page/26/name' => "%TWINS_GROUP_NAME%",
     'page/27/name' => "Caractéristiques de %TWINS_GROUP_NAME%",
@@ -637,7 +683,6 @@ Allons essayer de ne pas vous décevoir.',
     'page/45/name' => "New topic",
     'page/48/name' => "Page personnelle",
     'page/49/name' => "Messages personnels",
-    'page/50/name' => "Реклама на сайте AutoWP.ru",
     'page/51/name' => "Nouvelles photos",
     'page/52/name' => "Enregistrement",
     'page/53/name' => "ok",
@@ -679,7 +724,6 @@ Allons essayer de ne pas vous décevoir.',
     'page/94/name' => "En attente de modération",
     'page/96/name' => "Автомобили-близнецы",
     'page/97/name' => "Ракурсы",
-    'page/98/name' => "Очередь на удаление",
     'page/100/name' => "Аттрибуты",
     'page/101/name' => "%ATTR_NAME%",
     'page/102/name' => "Voiture %CAR_NAME% spécifications éditeur",
@@ -801,7 +845,6 @@ Allons essayer de ne pas vous décevoir.',
     'page/45/title' => "New topic",
     'page/48/title' => "Page personnelle",
     'page/49/title' => "Messages personnels",
-    'page/50/title' => "Реклама на сайте AutoWP.ru",
     'page/51/title' => "",
     'page/52/title' => "Enregistrement",
     'page/53/title' => "Inscription réussie",
@@ -843,7 +886,6 @@ Allons essayer de ne pas vous décevoir.',
     'page/94/title' => "En attente de modération",
     'page/96/title' => "",
     'page/97/title' => "",
-    'page/98/title' => "",
     'page/100/title' => "",
     'page/101/title' => "%ATTR_NAME%",
     'page/102/title' => "Voiture %CAR_NAME% spécifications éditeur",
@@ -965,7 +1007,6 @@ Allons essayer de ne pas vous décevoir.',
     'page/45/breadcrumbs' => "New topic",
     'page/48/breadcrumbs' => "",
     'page/49/breadcrumbs' => "",
-    'page/50/breadcrumbs' => "",
     'page/51/breadcrumbs' => "",
     'page/52/breadcrumbs' => "",
     'page/53/breadcrumbs' => "",
@@ -1007,7 +1048,6 @@ Allons essayer de ne pas vous décevoir.',
     'page/94/breadcrumbs' => "",
     'page/96/breadcrumbs' => "",
     'page/97/breadcrumbs' => "",
-    'page/98/breadcrumbs' => "",
     'page/100/breadcrumbs' => "",
     'page/101/breadcrumbs' => "%ATTR_NAME%",
     'page/102/breadcrumbs' => "Voitures spécifications éditeur",
@@ -1098,6 +1138,10 @@ Allons essayer de ne pas vous décevoir.',
     'page/201/name'        => "Mascots",
     'page/201/title'       => "Mascots",
     'page/201/breadcrumbs' => "Mascots",
+    
+    'page/202/name'        => 'Perspectives',
+    'page/202/title'       => 'Perspectives',
+    'page/202/breadcrumbs' => 'Perspectives',
 
     'moder-menu/title' => 'Moderator menu',
     'moder-menu/inbox' => 'Inbox',

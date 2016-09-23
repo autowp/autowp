@@ -154,6 +154,8 @@ class PagesController extends AbstractActionController
                     $values[$lang] = $langPage->toArray();
                 }
             }
+        } else {
+            $values['parent_id'] = $this->params('parent_id');
         }
 
         $form->populateValues($values);

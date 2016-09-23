@@ -62,26 +62,26 @@ class IndexController extends AbstractActionController
         $menu = [];
 
         if ($this->user()->isAllowed('rights', 'edit')) {
-            $menu[$this->url()->fromRoute('moder/rights')] = 'Права';
+            $menu[$this->url()->fromRoute('moder/rights')] = 'page/71/name';
         }
 
-        $menu[$this->url()->fromRoute('moder/comments')] = 'Комментарии';
+        $menu[$this->url()->fromRoute('moder/comments')] = 'page/110/name';
 
         $menu['/moder/users'] = 'Пользователи';
         if ($this->user()->isAllowed('museums', 'manage')) {
-            $menu[$this->url()->fromRoute('moder/museum')] = 'Музеи';
+            $menu[$this->url()->fromRoute('moder/museum')] = 'page/115/name';
         }
 
-        $menu['/moder/pictures'] = 'Картинки';
+        $menu['/moder/pictures'] = 'page/73/name';
 
-        $menu[$this->url()->fromRoute('moder/perspectives')] = 'Справка по ракурсам';
+        $menu[$this->url()->fromRoute('moder/perspectives')] = 'page/202/name';
 
-        $menu['/moder/index/stat'] = 'Статистика';
+        $menu['/moder/index/stat'] = 'page/119/name';
         $menu[$this->url()->fromRoute('moder/hotlink')] = 'Hotlinks';
 
         return [
-            'menu'          => $menu,
-            'addBrandForm'  => $this->addBrandForm,
+            'menu'         => $menu,
+            'addBrandForm' => $this->addBrandForm,
         ];
     }
 

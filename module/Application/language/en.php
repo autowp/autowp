@@ -601,15 +601,61 @@ We will try not to disappoint you.',
     'car-type-rp/moto'           => 'Moto',
     'car-type-rp/tractor'        => 'Tractor',
     'car-type-rp/tracked'        => 'Tracked platform',
+    
+    'about/text' => '### Наши люди
+Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
+    
+Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
+    
+Нас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:
+    
+%users%
+    
+#### "Цветовая дифференциация штанов"
+    
+Так завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из "зеленых", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что "зеленые" - это самые отзывчивые и заинтересованные в жизни проекта люди.
+    
+Некоторая часть "зеленых" наделена модераторскими функциями.
+    
+### Диалог и обратная связь
+    
+Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/feedback)" администрации сайта.
+    
+Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами имею единственный ответ: мы не размещаем рекламу.
+    
+### Цифры
+    
+Так сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:
+    
+* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных
+* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений
+    
+### Разработка
+    
+Разработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+    
+Перевод сайта на француский язык: %fr-translator%
+    
+Перевод сайта на китайский язык: %zh-translator%
+    
+Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
+    
+Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
+    
+%github%
+    
+### Поддержать проект
+    
+Вы можете поддержать наш проект [финансово](/donate) или [морально](/feedback)',
 
     'page/1/name' => "Index page",
-    'page/2/name' => "Главное меню",
+    'page/2/name' => "Main menu",
     'page/10/name' => "Brand",
     'page/14/name' => "%BRAND_NAME% cars in chronological order",
     'page/15/name' => "Last pictures of %BRAND_NAME%",
     'page/18/name' => "%PICTURE_NAME%",
     'page/19/name' => "Brands",
-    'page/20/name' => "Тип производителей",
+    'page/20/name' => "Brand type",
     'page/21/name' => "Mostly",
     'page/22/name' => "Categories",
     'page/23/name' => "%CATEGORY_NAME%",
@@ -636,7 +682,6 @@ We will try not to disappoint you.',
     'page/45/name' => "New topic",
     'page/48/name' => "Cabinet",
     'page/49/name' => "Personal messages",
-    'page/50/name' => "Реклама на сайте AutoWP.ru",
     'page/51/name' => "New pictures",
     'page/52/name' => "Registration",
     'page/53/name' => "ok",
@@ -653,15 +698,15 @@ We will try not to disappoint you.',
     'page/66/name' => "All pictures of %BRAND_NAME% %DESIGN_PROJECT_NAME%",
     'page/67/name' => "Moderator page",
     'page/68/name' => "Pages",
-    'page/69/name' => "Добавить",
-    'page/70/name' => "Изменить",
-    'page/71/name' => "Права",
+    'page/69/name' => "Add",
+    'page/70/name' => "Edit",
+    'page/71/name' => "Rights",
     'page/72/name' => "%PICTURE_NAME%",
     'page/73/name' => "Pictures",
-    'page/74/name' => "Автомобили по алфавиту",
-    'page/75/name' => "Журнал событий",
+    'page/74/name' => "Alphabetical vehicles list",
+    'page/75/name' => "Log of events",
     'page/76/name' => "Inbox",
-    'page/77/name' => "Трафик",
+    'page/77/name' => "Traffic",
     'page/78/name' => "%CAR_NAME%",
     'page/79/name' => "Sign in",
     'page/80/name' => "Sent",
@@ -676,26 +721,25 @@ We will try not to disappoint you.',
     'page/91/name' => "Registration",
     'page/93/name' => "Message sent",
     'page/94/name' => "Unmoderated",
-    'page/96/name' => "Автомобили-близнецы",
-    'page/97/name' => "Ракурсы",
-    'page/98/name' => "Очередь на удаление",
-    'page/100/name' => "Аттрибуты",
+    'page/96/name' => "Twins",
+    'page/97/name' => "Perspectives",
+    'page/100/name' => "Attributes",
     'page/101/name' => "%ATTR_NAME%",
     'page/102/name' => "Specs editors %CAR_NAME%",
     'page/103/name' => "History",
-    'page/104/name' => "Пользовательская статистика",
+    'page/104/name' => "User statistics",
     'page/105/name' => "Add a comment",
     'page/106/name' => "Rules",
-    'page/107/name' => "Заявки на удаление",
+    'page/107/name' => "Delete votes",
     'page/109/name' => "Cutaway",
     'page/110/name' => "Comments",
     'page/111/name' => "Engine spec editor %ENGINE_NAME%",
-    'page/114/name' => "Журнал ТТХ",
-    'page/115/name' => "Музеи",
-    'page/116/name' => "Музей",
+    'page/114/name' => "Specifications log",
+    'page/115/name' => "Museums",
+    'page/116/name' => "Museum",
     'page/117/name' => "Map",
-    'page/118/name' => "Новый",
-    'page/119/name' => "Статистика",
+    'page/118/name' => "New",
+    'page/119/name' => "Statistics",
     'page/120/name' => "Блоки",
     'page/122/name' => "Specifications",
     'page/123/name' => "My accounts",
@@ -800,7 +844,6 @@ We will try not to disappoint you.',
     'page/45/title' => "New topic",
     'page/48/title' => "Cabinet",
     'page/49/title' => "Personal messages",
-    'page/50/title' => "Реклама на сайте AutoWP.ru",
     'page/51/title' => "",
     'page/52/title' => "Registration",
     'page/53/title' => "Successful registration",
@@ -822,8 +865,8 @@ We will try not to disappoint you.',
     'page/71/title' => "",
     'page/72/title' => "%PICTURE_NAME%",
     'page/73/title' => "Pictures",
-    'page/74/title' => "Автомобили по алфавиту",
-    'page/75/title' => "Журнал событий",
+    'page/74/title' => "Alphabetical vehicles list",
+    'page/75/title' => "Log of events",
     'page/76/title' => "Inbox",
     'page/77/title' => "",
     'page/78/title' => "%CAR_NAME%",
@@ -842,7 +885,6 @@ We will try not to disappoint you.',
     'page/94/title' => "Unmoderated",
     'page/96/title' => "",
     'page/97/title' => "",
-    'page/98/title' => "",
     'page/100/title' => "",
     'page/101/title' => "%ATTR_NAME%",
     'page/102/title' => "Specs editors %CAR_NAME%",
@@ -850,15 +892,15 @@ We will try not to disappoint you.',
     'page/104/title' => "",
     'page/105/title' => "Add a comment",
     'page/106/title' => "Rules",
-    'page/107/title' => "Заявки на удаление",
+    'page/107/title' => "Delete votes",
     'page/109/title' => "",
     'page/110/title' => "Comments",
     'page/111/title' => "Engine spec editor %ENGINE_NAME%",
-    'page/114/title' => "Журнал ТТХ",
-    'page/115/title' => "Музеи",
-    'page/116/title' => "Музей",
+    'page/114/title' => "Log of events",
+    'page/115/title' => "Museums",
+    'page/116/title' => "Museum",
     'page/117/title' => "Map",
-    'page/118/title' => "Новый",
+    'page/118/title' => "New",
     'page/119/title' => "",
     'page/120/title' => "",
     'page/122/title' => "Specifications",
@@ -964,7 +1006,6 @@ We will try not to disappoint you.',
     'page/45/breadcrumbs' => "New topic",
     'page/48/breadcrumbs' => "",
     'page/49/breadcrumbs' => "",
-    'page/50/breadcrumbs' => "",
     'page/51/breadcrumbs' => "",
     'page/52/breadcrumbs' => "",
     'page/53/breadcrumbs' => "",
@@ -986,8 +1027,8 @@ We will try not to disappoint you.',
     'page/71/breadcrumbs' => "",
     'page/72/breadcrumbs' => "%PICTURE_NAME%",
     'page/73/breadcrumbs' => "",
-    'page/74/breadcrumbs' => "Автомобили по алфавиту",
-    'page/75/breadcrumbs' => "Журнал событий",
+    'page/74/breadcrumbs' => "Alphabetical vehicles list",
+    'page/75/breadcrumbs' => "Log of events",
     'page/76/breadcrumbs' => "Inbox",
     'page/77/breadcrumbs' => "",
     'page/78/breadcrumbs' => "%CAR_NAME%",
@@ -1006,7 +1047,6 @@ We will try not to disappoint you.',
     'page/94/breadcrumbs' => "",
     'page/96/breadcrumbs' => "",
     'page/97/breadcrumbs' => "",
-    'page/98/breadcrumbs' => "",
     'page/100/breadcrumbs' => "",
     'page/101/breadcrumbs' => "%ATTR_NAME%",
     'page/102/breadcrumbs' => "Specs editors",
@@ -1019,10 +1059,10 @@ We will try not to disappoint you.',
     'page/110/breadcrumbs' => "",
     'page/111/breadcrumbs' => "Engine spec editor",
     'page/114/breadcrumbs' => "",
-    'page/115/breadcrumbs' => "Музеи",
+    'page/115/breadcrumbs' => "Museums",
     'page/116/breadcrumbs' => "%MUSEUM_NAME%",
     'page/117/breadcrumbs' => "",
-    'page/118/breadcrumbs' => "Новый",
+    'page/118/breadcrumbs' => "New",
     'page/119/breadcrumbs' => "",
     'page/120/breadcrumbs' => "",
     'page/122/breadcrumbs' => "Specifications",
@@ -1097,6 +1137,10 @@ We will try not to disappoint you.',
     'page/201/name'        => "Mascots",
     'page/201/title'       => "Mascots",
     'page/201/breadcrumbs' => "Mascots",
+    
+    'page/202/name'        => 'Perspectives',
+    'page/202/title'       => 'Perspectives',
+    'page/202/breadcrumbs' => 'Perspectives',
 
     'moder-menu/title' => 'Moderator menu',
     'moder-menu/inbox' => 'Inbox',

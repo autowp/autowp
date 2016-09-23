@@ -84,7 +84,7 @@
         <h2>Другие инструменты</h2>
         <div class="well">
             <?php foreach ($this->menu as $url => $name) { ?>
-                <?=$this->htmlA($url, $name) ?>
+                <?=$this->htmlA($url, $this->translate($name)) ?>
                 <br />
             <?php } ?>
         </div>
