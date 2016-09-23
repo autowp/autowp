@@ -1,56 +1,65 @@
 <?php
 
-class Project_Most_Adapter_Acceleration extends Project_Most_Adapter_Abstract
+namespace Applicaton\Most\Adapter;
+
+use Zend_Db_Expr;
+use Zend_Db_Select;
+use Zend_Db_Table_Abstract;
+use Zend_Db_Table_Select;
+
+use Attrs_Attributes;
+
+class Acceleration extends AbstractAdapter
 {
-    protected $_attributes;
+    protected $attributes;
 
-    protected $_order;
+    protected $order;
 
-    protected $_attributesTable;
+    protected $attributesTable;
 
     const MPH60_TO_KMH100 = 0.98964381346271110050637609692728;
 
     public function __construct(array $options)
     {
-        $this->_attributesTable = new Attrs_Attributes();
+        $this->attributesTable = new Attrs_Attributes();
 
         parent::__construct($options);
     }
 
     public function setAttributes(array $value)
     {
-        $this->_attributes = $value;
+        $this->attributes = $value;
 
-        $this->_kmhAttribute =  $this->_attributesTable->find($this->_attributes['to100kmh'])->current();
-        $this->_mphAttribute =  $this->_attributesTable->find($this->_attributes['to60mph'])->current();
+        $this->kmhAttribute =  $this->attributesTable->find($this->attributes['to100kmh'])->current();
+        $this->mphAttribute =  $this->attributesTable->find($this->attributes['to60mph'])->current();
     }
 
     public function setOrder($value)
     {
-        $this->_order = $value;
+        $this->order = $value;
     }
 
     public function getCars(Zend_Db_Table_Select $select)
     {
-        $axises = array(
-            array(
-                'attr' => $this->_kmhAttribute,
+        $axises = [
+            [
+                'attr' => $this->kmhAttribute,
                 'q'    => 1
-            ),
-            array(
-                'attr' => $this->_mphAttribute,
+            ],
+            [
+                'attr' => $this->mphAttribute,
                 'q'    => self::MPH60_TO_KMH100
-            )
-        );
+            ]
+        ];
 
         $wheres = implode($select->getPart( Zend_Db_Select::WHERE ));
         $joins = $select->getPart( Zend_Db_Select::FROM );
         unset($joins['cars']);
 
-        $limit = $this->_most->getCarsCount();
+        $limit = $this->most->getCarsCount();
 
         $axisBaseSelect = $axisSelect = $select->getAdapter()->select()
-            ->from('cars', array());
+            ->from('cars', []);
         if ($wheres) {
             $axisSelect->where($wheres);
         }
@@ -61,9 +70,9 @@ class Project_Most_Adapter_Acceleration extends Project_Most_Adapter_Abstract
         }
         $axisSelect->reset(Zend_Db_Table::COLUMNS);
 
-        $specService = $this->_most->getSpecs();
+        $specService = $this->most->getSpecs();
 
-        $selects = array();
+        $selects = [];
         foreach ($axises as $axis) {
             $axisSelect = clone $axisBaseSelect;
 
@@ -74,12 +83,12 @@ class Project_Most_Adapter_Acceleration extends Project_Most_Adapter_Abstract
             $valueColumn = $axis['q'] != 1 ? new Zend_Db_Expr('axis.value / ' . $axis['q']) : 'axis.value';
 
             $axisSelect
-                ->columns(array('car_id' => 'cars.id', 'size_value' => $valueColumn))
-                ->join(array('axis' => $attrValuesTable), 'cars.id = axis.item_id', null)
+                ->columns(['car_id' => 'cars.id', 'size_value' => $valueColumn])
+                ->join(['axis' => $attrValuesTable], 'cars.id = axis.item_id', null)
                 ->where('axis.item_type_id = ?', 1)
                 ->where('axis.attribute_id = ?', $attr->id)
                 ->where('axis.value > 0')
-                ->order('size_value ' . $this->_order)
+                ->order('size_value ' . $this->order)
                 ->limit($limit);
 
             $selects[] = $axisSelect->assemble();
@@ -87,53 +96,53 @@ class Project_Most_Adapter_Acceleration extends Project_Most_Adapter_Abstract
 
         $select
             ->join(
-                array('tbl' => new Zend_Db_Expr('((' . $selects[0] . ') UNION (' . $selects[1] . '))')),
+                ['tbl' => new Zend_Db_Expr('((' . $selects[0] . ') UNION (' . $selects[1] . '))')],
                 'cars.id = tbl.car_id',
                 null
             )
             ->group('cars.id');
 
 
-        if ($this->_order == 'asc') {
-            $select->order('min(tbl.size_value) ' . $this->_order);
+        if ($this->order == 'asc') {
+            $select->order('min(tbl.size_value) ' . $this->order);
         } else {
-            $select->order('max(tbl.size_value) ' . $this->_order);
+            $select->order('max(tbl.size_value) ' . $this->order);
         }
 
         $cars = $select->getTable()->fetchAll($select);
 
-        $result = array();
+        $result = [];
 
         foreach ($cars as $car) {
 
-            $result[] = array(
+            $result[] = [
                 'car'       => $car,
-                'valueHtml' => $this->_getText($car),
-            );
+                'valueHtml' => $this->getText($car),
+            ];
         }
 
-        return array(
+        return [
             'unit' => null,
             'cars' => $result,
-        );
+        ];
     }
 
-    protected function _getText($car)
+    protected function getText($car)
     {
-        $text = array();
+        $text = [];
 
-        $axises = array(
-            array(
-                'attr' => $this->_kmhAttribute,
+        $axises = [
+            [
+                'attr' => $this->kmhAttribute,
                 'unit' => 'сек до&#xa0;100&#xa0;км/ч'
-            ),
-            array(
-                'attr' => $this->_mphAttribute,
+            ],
+            [
+                'attr' => $this->mphAttribute,
                 'unit' => 'сек до&#xa0;60&#xa0;миль/ч'
-            )
-        );
+            ]
+        ];
 
-        $specService = $this->_most->getSpecs();
+        $specService = $this->most->getSpecs();
 
         foreach ($axises as $axis) {
 

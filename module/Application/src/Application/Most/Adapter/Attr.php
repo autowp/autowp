@@ -1,26 +1,36 @@
 <?php
 
-class Project_Most_Adapter_Attr extends Project_Most_Adapter_Abstract
+namespace Applicaton\Most\Adapter;
+
+use Zend_Db_Table_Abstract;
+use Zend_Db_Table_Select;
+
+use Attrs_Attributes;
+use Attrs_Item_Types;
+
+use Exception;
+
+class Attr extends AbstractAdapter
 {
-    protected $_attribute;
+    protected $attribute;
 
-    protected $_itemType;
+    protected $itemType;
 
-    protected $_order;
+    protected $order;
 
     public function setAttribute($value)
     {
-        $this->_attribute = (int)$value;
+        $this->attribute = (int)$value;
     }
 
     public function setItemType($value)
     {
-        $this->_itemType = (int)$value;
+        $this->itemType = (int)$value;
     }
 
     public function setOrder($value)
     {
-        $this->_order = $value;
+        $this->order = $value;
     }
 
     public function getCars(Zend_Db_Table_Select $select)
@@ -28,17 +38,17 @@ class Project_Most_Adapter_Attr extends Project_Most_Adapter_Abstract
         $itemTypes = new Attrs_Item_Types();
         $attributes = new Attrs_Attributes();
 
-        $attribute = $attributes->find($this->_attribute)->current();
+        $attribute = $attributes->find($this->attribute)->current();
         if (!$attribute) {
-            throw new Exception("Attribute '{$this->_attribute}' not found");
+            throw new Exception("Attribute '{$this->attribute}' not found");
         }
 
-        $itemType = $itemTypes->find($this->_itemType)->current();
+        $itemType = $itemTypes->find($this->itemType)->current();
         if (!$itemType) {
-            throw new Exception("Item type '{$this->_itemType}' not found");
+            throw new Exception("Item type '{$this->itemType}' not found");
         }
 
-        $specService = $this->_most->getSpecs();
+        $specService = $this->most->getSpecs();
 
         $valuesTable = $specService->getValueDataTable($attribute->type_id);
         $tableName = $valuesTable->info(Zend_Db_Table_Abstract::NAME);
@@ -48,24 +58,24 @@ class Project_Most_Adapter_Attr extends Project_Most_Adapter_Abstract
             ->where($tableName.'.attribute_id = ?', $attribute->id)
             ->where($tableName.'.value IS NOT NULL')
             ->join($tableName, 'cars.id='.$tableName.'.item_id', null)
-            ->order($tableName.'.value ' . $this->_order);
+            ->order($tableName.'.value ' . $this->order);
 
         $cars = $select->getTable()->fetchAll($select);
 
-        $result = array();
+        $result = [];
         foreach ($cars as $car) {
 
             $valueText = $specService->getActualValueText($attribute->id, $itemType->id, $car->id);
 
-            $result[] = array(
+            $result[] = [
                 'car'       => $car,
                 'valueText' => $valueText,
-            );
+            ];
         }
 
-        return array(
+        return [
             'unit' => $attribute->findParentAttrs_Units(),
             'cars' => $result,
-        );
+        ];
     }
 }

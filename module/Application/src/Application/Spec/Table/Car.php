@@ -1,24 +1,19 @@
 <?php
 
-class Project_Spec_Table_Car extends Project_Spec_Table_Abstract
+namespace Application\Spec\Table;
+
+class Car extends AbstractTable
 {
-    protected $_cars;
+    protected $cars;
 
-    public function __construct($cars, $attributes, array $options = array())
+    public function __construct($cars, $attributes, array $options = [])
     {
-        $this->_cars = $cars;
-        $this->_attributes = $attributes;
-    }
-
-    public function render(Zend_View_Abstract $view)
-    {
-        return $view->partial('specs.phtml', array(
-            'table' => $this,
-        ));
+        $this->cars = $cars;
+        $this->attributes = $attributes;
     }
 
     public function getCars()
     {
-        return $this->_cars;
+        return $this->cars;
     }
 }

@@ -4,6 +4,8 @@ namespace Application\Service;
 
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Spec\Table\Car as CarSpecTable;
+use Application\Spec\Table\Engine as EngineSpecTable;
 
 use Attrs_Attributes;
 use Attrs_List_Options;
@@ -27,8 +29,6 @@ use Cars;
 use Engine_Row;
 use Engines;
 use Picture;
-use Project_Spec_Table_Car;
-use Project_Spec_Table_Engine;
 use Users;
 use User_Row;
 
@@ -1641,7 +1641,7 @@ class SpecificationsService
         // load units
         $this->_addUnitsToAttributes($attributes);
 
-        return new Project_Spec_Table_Car($result, $attributes);
+        return new CarSpecTable($result, $attributes);
     }
 
     public function engineSpecifications($engines, array $options)
@@ -1678,7 +1678,7 @@ class SpecificationsService
         // load units
         $this->_addUnitsToAttributes($attributes);
 
-        return new Project_Spec_Table_Engine($result, $attributes);
+        return new EngineSpecTable($result, $attributes);
     }
 
     protected function _addUnitsToAttributes(&$attributes)

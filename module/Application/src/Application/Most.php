@@ -6,7 +6,7 @@ use Application\Service\SpecificationsService;
 
 use Zend_Db_Table_Select;
 
-use Project_Most_Adapter_Abstract;
+use Application\Most\Adapter\AbstractAdapter;
 
 use Exception;
 
@@ -20,7 +20,7 @@ class Most
     protected $_carsSelect;
 
     /**
-     * @var Project_Most_Adapter_Abstract
+     * @var AbstractAdapter
      */
     protected $_adapter = null;
 
@@ -82,7 +82,7 @@ class Most
 
     public function setAdapter($options)
     {
-        $adapterNamespace = 'Project_Most_Adapter';
+        $adapterNamespace = 'Application\\Most\\Adapter\\';
 
         $adapter = null;
         if (isset($options['name'])) {
@@ -94,7 +94,7 @@ class Most
             throw new Exception('Adapter name must be specified in a string');
         }
 
-        $adapterName = $adapterNamespace . '_';
+        $adapterName = $adapterNamespace . '\\';
         $adapterName .= str_replace(' ', '_', ucwords(str_replace('_', ' ', strtolower($adapter))));
 
         /*
@@ -107,8 +107,13 @@ class Most
         /*
          * Verify that the object created is a descendent of the abstract adapter type.
          */
-        if (! $mostAdapter instanceof Project_Most_Adapter_Abstract) {
-            throw new Exception("Adapter class '$adapterName' does not extend Project_Most_Adapter_Abstract");
+        if (! $mostAdapter instanceof AbstractAdapter) {
+            throw new Exception(
+                sprintf(
+                    "Adapter class %s does not extend %s", 
+                    $adapterName, AbstractAdapter::class
+                )
+            );
         }
 
         $this->_adapter = $mostAdapter;

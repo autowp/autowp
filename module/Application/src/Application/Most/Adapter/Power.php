@@ -1,6 +1,16 @@
 <?php
 
-class Project_Most_Adapter_Power extends Project_Most_Adapter_Abstract
+namespace Applicaton\Most\Adapter;
+
+use Attrs_Attributes;
+use Attrs_Item_Types;
+
+use Zend_Db_Expr;
+use Zend_Db_Select;
+use Zend_Db_Table_Abstract;
+use Zend_Db_Table_Select;
+
+class Power extends AbstractAdapter
 {
     protected $_attribute;
 
@@ -37,7 +47,7 @@ class Project_Most_Adapter_Power extends Project_Most_Adapter_Abstract
             )
         ');
 
-        $limit = $this->_most->getCarsCount();
+        $limit = $this->most->getCarsCount();
 
 
 
@@ -48,7 +58,7 @@ class Project_Most_Adapter_Power extends Project_Most_Adapter_Abstract
 
         $powerAttr = $attributes->find($this->_attributes['power'])->current();
 
-        $specService = $this->_most->getSpecs();
+        $specService = $this->most->getSpecs();
 
         $valuesTable = $specService->getValueDataTable($powerAttr->type_id);
         $valuesTableName = $valuesTable->info(Zend_Db_Table_Abstract::NAME);
@@ -58,7 +68,7 @@ class Project_Most_Adapter_Power extends Project_Most_Adapter_Abstract
         $funct = $this->_order == 'ASC' ? 'min' : 'max';
         $expr = $funct.'('.$valuesTableName.'.value)';
         $attrsSelect = $db->select()
-            ->from('engines', array('cars.id', 'V' => new Zend_Db_Expr($expr)))
+            ->from('engines', ['cars.id', 'V' => new Zend_Db_Expr($expr)])
             ->join('cars', 'engines.id = cars.engine_id', null)
             ->join($valuesTableName, 'engines.id='.$valuesTableName.'.item_id', null)
             ->where($valuesTableName.'.item_type_id = ?', $engineItemType->id)
@@ -88,7 +98,7 @@ class Project_Most_Adapter_Power extends Project_Most_Adapter_Abstract
         $funct = $this->_order == 'ASC' ? 'min' : 'max';
            $expr = $funct.'('.$valuesTableName.'.value)';
         $attrsSelect = $db->select()
-            ->from('cars', array('cars.id', 'V' => new Zend_Db_Expr($expr)))
+            ->from('cars', ['cars.id', 'V' => new Zend_Db_Expr($expr)])
             ->join($valuesTableName, 'cars.id='.$valuesTableName.'.item_id', null)
             ->where($valuesTableName.'.item_type_id = ?', $carItemType->id)
             ->where($valuesTableName.'.attribute_id = ?', $powerAttr->id)
@@ -119,7 +129,7 @@ class Project_Most_Adapter_Power extends Project_Most_Adapter_Abstract
                 ->order('power ' . $this->_order)
         );
 
-        $result = array();
+        $result = [];
         foreach ($cars as $car) {
 
             $html = '';
@@ -148,7 +158,7 @@ class Project_Most_Adapter_Power extends Project_Most_Adapter_Abstract
 
             $engText = '';
             if (strlen($cyl) || $turbo || $volume) {
-                $a = array();
+                $a = [];
 
                 if ($cyl) {
                     $a[] = htmlspecialchars($cyl);
@@ -164,16 +174,16 @@ class Project_Most_Adapter_Power extends Project_Most_Adapter_Abstract
                 $html .= '<p class="note">'.implode(', ', $a).'</p>';
             }
 
-            $result[] = array(
+            $result[] = [
                 'car'         =>  $car,
                 'valueHtml'    => $html,
-            );
+            ];
         }
 
-        return array(
+        return [
             'unit' => null,//$attribute->findParentAttrs_Units(),
             'cars' => $result,
-        );
+        ];
     }
 
     protected function _cylinders($layout, $cylinders, $valve_per_cylinder = null)

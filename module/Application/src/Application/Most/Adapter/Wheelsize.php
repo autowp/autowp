@@ -1,8 +1,12 @@
 <?php
 
+namespace Applicaton\Most\Adapter;
+
 use Application\Wheelsize as WheelsizeObject;
 
-class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
+use Zend_Db_Table_Select;
+
+class Wheelsize extends AbstractAdapter
 {
     protected $_attributes;
 
@@ -24,12 +28,12 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
 
     public function setAttributes(array $value)
     {
-        /*$defaults = array(
+        /*$defaults = [
             'tyrewidth'  => null,
             'tyreseries' => null,
             'radius'  => null,
             'rimwidth'   => null
-        );*/
+        ];*/
         $this->_attributes = $value;
     }
 
@@ -42,7 +46,7 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
     {
         $wheel = $this->_attributes['rear'];
 
-        $specService = $this->_most->getSpecs();
+        $specService = $this->most->getSpecs();
 
         $tyrewidth  = $this->_attributesTable->find($wheel['tyrewidth'])->current();
         $tyrewidthValuesTable = $specService->getValueDataTable($tyrewidth->type_id)->info(Zend_Db_Table_Abstract::NAME);
@@ -54,15 +58,15 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
         $radiusValuesTable = $specService->getValueDataTable($radius->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
         $select
-            ->join(array('tyrewidth' => $tyrewidthValuesTable), 'cars.id = tyrewidth.item_id', null)
+            ->join(['tyrewidth' => $tyrewidthValuesTable], 'cars.id = tyrewidth.item_id', null)
             ->where('tyrewidth.item_type_id = ?', 1)
             ->where('tyrewidth.attribute_id = ?', $tyrewidth->id)
             ->where('tyrewidth.value > 0')
-            ->join(array('tyreseries' => $tyreseriesValuesTable), 'cars.id = tyreseries.item_id', null)
+            ->join(['tyreseries' => $tyreseriesValuesTable], 'cars.id = tyreseries.item_id', null)
             ->where('tyreseries.item_type_id = ?', 1)
             ->where('tyreseries.attribute_id = ?', $tyreseries->id)
             ->where('tyreseries.value > 0')
-            ->join(array('radius' => $radiusValuesTable), 'cars.id = radius.item_id', null)
+            ->join(['radius' => $radiusValuesTable], 'cars.id = radius.item_id', null)
             ->where('radius.item_type_id = ?', 1)
             ->where('radius.attribute_id = ?', $radius->id)
             ->where('radius.value > 0')
@@ -71,27 +75,27 @@ class Project_Most_Adapter_Wheelsize extends Project_Most_Adapter_Abstract
 
         $cars = $select->getTable()->fetchAll($select);
 
-        $result = array();
+        $result = [];
 
         foreach ($cars as $car) {
 
-            $result[] = array(
+            $result[] = [
                 'car'       =>  $car,
                 'valueText' => $this->_getWheelSizeText($car),
-            );
+            ];
         }
 
-        return array(
+        return [
             'unit' => null,
             'cars' => $result,
-        );
+        ];
     }
 
     protected function _getWheelSizeText($car)
     {
-        $text = array();
+        $text = [];
 
-        $specService = $this->_most->getSpecs();
+        $specService = $this->most->getSpecs();
 
         foreach ($this->_attributes as $wheel) {
 
