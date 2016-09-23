@@ -1,1 +1,1 @@
-../../node_modules/chart.js/dist/Chart.bundle.js
+../../node_modules/chart.js/dist/Chart.js

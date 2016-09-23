@@ -5,6 +5,8 @@ namespace Application\Model;
 use Application\Model\DbTable\Brand as Table;
 use Zend_Db_Expr;
 
+use Transliterator;
+
 class Brand
 {
     const TOP_COUNT = 150;
@@ -137,13 +139,22 @@ class Brand
 
         $result = [];
 
+        $tr = Transliterator::create('Any-Latin;Latin-ASCII;');
+
         foreach ($rows as $row) {
 
             $name = $row['name'];
 
-            $char = str_replace('Š', 'S', mb_strtoupper(mb_substr($name, 0, 1)));
-            $char = str_replace('Ö', 'O', $char);
-            $char = str_replace('Ẽ', 'E', $char);
+            $char = mb_substr($name, 0, 1);
+
+            if (preg_match("/^\p{Han}$/u", $char)) {
+                $char = mb_substr($tr->transliterate($char), 0, 1);
+            }
+
+            if (!preg_match("/^\p{Cyrillic}$/u", $char)) {
+                $char = $tr->transliterate($char);
+            }
+            $char = mb_strtoupper($char);
 
             if (!isset($result[$char])) {
                 $result[$char] = [
