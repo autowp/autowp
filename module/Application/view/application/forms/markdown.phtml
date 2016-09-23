@@ -1,22 +1,17 @@
 <?=$this->form()->openTag($this->form)?>
-<p>
-    Синтаксис Markdown.
-    Несколько описаний языка:
-    <a href="https://ru.wikipedia.org/wiki/Markdown">1</a>,
-    <a href="https://en.wikipedia.org/wiki/Markdown">2</a>,
-    <a href="https://guides.github.com/features/mastering-markdown/">3</a>,
-    <a href="https://daringfireball.net/projects/markdown/basics">4</a>,
-    <a href="http://rukeba.com/by-the-way/markdown-sintaksis-po-russki/">5</a>
-</p>
-<p>Ссылки на внутрисайтовые страницы следует писать не полностью: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins></p>
+<?=$this->markdown($this->translate('moder/markdown/description'))?>
 <?php foreach ($this->form->getElements() as $element) { ?>
-	<div data-module="markdown-edit-tabbar">
+    <div data-module="markdown-edit-tabbar">
         <ul id="myTabs-markdown" class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
-                <a href="#markdown-edit" id="markdown-tab" role="tab" data-toggle="tab" aria-expanded="true" aria-controls="edit">Edit</a>
+                <a href="#markdown-edit" id="markdown-tab" role="tab" data-toggle="tab" aria-expanded="true" aria-controls="edit">
+                    <?=$this->escapeHtml($this->translate('moder/markdown/edit'))?>
+                </a>
             </li>
             <li role="presentation">
-                <a href="#markdown-preview" class="tab-preview" id="markdown-tab" role="tab" data-toggle="tab" aria-expanded="false" aria-controls="preview">Preview</a>
+                <a href="#markdown-preview" class="tab-preview" id="markdown-tab" role="tab" data-toggle="tab" aria-expanded="false" aria-controls="preview">
+                    <?=$this->escapeHtml($this->translate('moder/markdown/preview'))?>
+                </a>
             </li>
         </ul>
         <div id="myTabContent" class="tab-content">

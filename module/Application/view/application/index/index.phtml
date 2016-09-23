@@ -126,7 +126,7 @@ html {
                     <?php } ?>
                 </p>
                 <?php if ($this->language() == 'ru') { ?>
-                    <p>Вы знаете, что Daewoo Matiz имеет аж целых <a href="/twins/group87">шесть клонов</a>? А знаете, что <a href="/twins/group5">общего у Lotus и Kia</a>? Уверены, что вам покажется интересным этот раздел.</p>
+                    <?=$this->markdown($this->translate('index/twins/description'))?>
                 <?php } ?>
             </div>
 
@@ -138,7 +138,7 @@ html {
                     <?php } ?>
                 </p>
                 <?php if ($this->language() == 'ru') { ?>
-                    <p>А знаете ли вы, какая техника помогала блюсти правопорядок на улицах мировых городов в разное время? А на каких автомобилях ездил Папа Римский? Нет? Тогда вам точно в этот раздел.</p>
+                    <?=$this->markdown($this->translate('index/categories/description'))?>
                 <?php } ?>
             </div>
         </div>
@@ -153,7 +153,7 @@ html {
                     …
                 </p>
                 <?php if ($this->language() == 'ru') { ?>
-                    <p>Хотите знать, какой автомобиль был самым быстрым? Хотите знать, сколько весит самый могучий карьерный самосвал? Заходите и узнаете!</p>
+                    <?=$this->markdown($this->translate('index/categories/mosts'))?>
                 <?php } ?>
             </div>
 

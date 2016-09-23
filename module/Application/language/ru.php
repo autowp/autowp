@@ -100,6 +100,10 @@ return [
     'index/brands'             => 'Компании',
     'index/factories'          => 'Заводы',
     'index/specifications'     => 'Характеристики',
+    'index/twins/description' => 'Вы знаете, что Daewoo Matiz имеет аж целых [шесть клонов](/twins/group87)? А знаете, что [общего у Lotus и Kia](/twins/group5)? Уверены, что вам покажется интересным этот раздел.',
+    'index/categories/description' => 'А знаете ли вы, какая техника помогала блюсти правопорядок на улицах мировых городов в разное время? А на каких автомобилях ездил Папа Римский? Нет? Тогда вам точно в этот раздел.',
+    'index/categories/mosts' => 'Хотите знать, какой автомобиль был самым быстрым? Хотите знать, сколько весит самый могучий карьерный самосвал? Заходите и узнаете.',
+
     'mosts/fastest/roadster'          => 'Самые быстрые родстеры',
     'mosts/mighty/sedan/today'        => 'Самые мощные седаны нашего времени',
     'mosts/dynamic/universal/2000-09' => 'Самые динамичные универсалы 2000ых',
@@ -414,13 +418,13 @@ return [
     'account/specs/conflicts/title/other-values' => 'Другие значения',
 
     'account/specs/conflicts/my-value/none' => 'нет',
-    
+
     'account/email/your-current-email:' => 'Ваш текущий адрес e-mail: ',
     'account/email/your-dont-enter-email' => 'Вы не указали адрес e-mail',
     'account/email/text' => 'На этой странице вы можете изменить свой адрес электронной почты (e-mail)
-    
+
 На новый адрес будет выслано письмо с инструкциями по его подтверждению',
-    
+
     'account/accounts/add' => 'Добавить учётную запись',
 
     'feedback/title' => 'Обратная связь',
@@ -615,26 +619,26 @@ return [
     'car-type-rp/moto'           => 'Мото',
     'car-type-rp/tractor'        => 'Тракторов',
     'car-type-rp/tracked'        => 'Гусеничных платформ',
-    
+
     'about/text' => '### Наши люди
 Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
-    
+
 Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
-    
+
 Нас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:
-    
+
 %users%
 
 #### "Цветовая дифференциация штанов"
-    
+
 Так завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из "зеленых", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что "зеленые" - это самые отзывчивые и заинтересованные в жизни проекта люди.
-    
+
 Некоторая часть "зеленых" наделена модераторскими функциями.
 
 ### Диалог и обратная связь
-    
+
 Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/feedback)" администрации сайта.
-    
+
 Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами имею единственный ответ: мы не размещаем рекламу.
 
 ### Цифры
@@ -645,13 +649,13 @@ return [
 * зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений
 
 ### Разработка
-    
+
 Разработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
 
 Перевод сайта на французский язык: %fr-translator%
-    
+
 Перевод сайта на китайский язык: %zh-translator%
-    
+
 Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
 
 Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
@@ -659,7 +663,7 @@ return [
 %github%
 
 ### Поддержать проект
-    
+
 Вы можете поддержать наш проект [финансово](/donate) или [морально](/feedback)',
 
     'page/1/name' => "Главная страница",
@@ -1151,7 +1155,7 @@ return [
     'page/201/name'        => "Маскоты",
     'page/201/title'       => "Маскоты",
     'page/201/breadcrumbs' => "Маскоты",
-    
+
     'page/202/name'        => 'Справка по ракурсам',
     'page/202/title'       => 'Справка по ракурсам',
     'page/202/breadcrumbs' => 'Справка по ракурсам',
@@ -1205,6 +1209,12 @@ return [
     'moder/vehicle/tabs/factories' => 'Заводы',
     'moder/vehicle/tabs/pictures' => 'Картинки',
     'moder/vehicle/tabs/modifications' => 'Модификации',
+
+    'moder/vehicle/meta/description' => 'Краткое описание',
+
+    'moder/vehicle/subscription/title' => 'Подписка на уведомления об изменениях',
+    'moder/vehicle/subscription/subscribed' => 'Оформлена',
+    'moder/vehicle/subscription/not-subscribed' => 'Не оформлена',
 
     'moder/vehicle/catalogue/add-vehicle' => 'добавить автомобиль',
     'moder/vehicle/catalogue/title/name' => 'Название',
@@ -1269,4 +1279,18 @@ return [
     'moder/picture/acceptance/accepted-pictures-is-%s' => 'Принятых картинок этого автомобиля всего %s',
 
     'moder/edit-object' => 'управление',
+
+    'moder/markdown/description' => 'Синтаксис Markdown.
+
+Несколько описаний языка:
+[1](https://ru.wikipedia.org/wiki/Markdown),
+[2](https://en.wikipedia.org/wiki/Markdown),
+[3](https://guides.github.com/features/mastering-markdown/),
+[4](https://daringfireball.net/projects/markdown/basics),
+[5](http://rukeba.com/by-the-way/markdown-sintaksis-po-russki)
+
+Ссылки на внутрисайтовые страницы следует писать не полностью: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins>',
+    'moder/markdown/edit' => 'Редактировать',
+    'moder/markdown/preview' => 'Предварительный просмотр',
+    'moder/markdown/history' => 'История',
 ];

@@ -91,6 +91,10 @@ return [
     'index/brands'             => 'Brands',
     'index/factories'          => 'Factories',
     'index/specifications'     => 'Specifications',
+    'index/twins/description' => 'Вы знаете, что Daewoo Matiz имеет аж целых [шесть клонов](/twins/group87)? А знаете, что [общего у Lotus и Kia](/twins/group5)? Уверены, что вам покажется интересным этот раздел.',
+    'index/categories/description' => 'А знаете ли вы, какая техника помогала блюсти правопорядок на улицах мировых городов в разное время? А на каких автомобилях ездил Папа Римский? Нет? Тогда вам точно в этот раздел.',
+    'index/categories/mosts' => 'Хотите знать, какой автомобиль был самым быстрым? Хотите знать, сколько весит самый могучий карьерный самосвал? Заходите и узнаете.',
+
     'mosts/fastest/roadster'          => 'Most fastest roadsters',
     'mosts/mighty/sedan/today'        => 'Most mighty sedans today',
     'mosts/dynamic/universal/2000-09' => 'Most dynamic universals in 2000\'s',
@@ -400,13 +404,13 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'account/specs/conflicts/title/other-values' => 'Other values',
 
     'account/specs/conflicts/my-value/none' => 'none',
-    
+
     'account/email/your-current-email:' => 'Your current e-mail address: ',
     'account/email/your-dont-enter-email' => 'You don\'t input e-mail address',
     'account/email/text' => 'On this page you can change your e-mail address.
 
 Message with instructions to confirm will sent to new address.',
-    
+
     'account/accounts/add' => 'Add account',
 
     'feedback/title' => 'Feedback',
@@ -601,51 +605,51 @@ We will try not to disappoint you.',
     'car-type-rp/moto'           => 'Moto',
     'car-type-rp/tractor'        => 'Tractor',
     'car-type-rp/tracked'        => 'Tracked platform',
-    
+
     'about/text' => '### People
 Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
-    
+
 Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
-    
+
 Нас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:
-    
+
 %users%
-    
+
 #### "Цветовая дифференциация штанов"
-    
+
 Так завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из "зеленых", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что "зеленые" - это самые отзывчивые и заинтересованные в жизни проекта люди.
-    
+
 Некоторая часть "зеленых" наделена модераторскими функциями.
-    
+
 ### Feedback
-    
+
 Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/feedback)" администрации сайта.
-    
+
 Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами имею единственный ответ: мы не размещаем рекламу.
-    
+
 ### Numbers
-    
+
 Так сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:
-    
+
 * на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных
 * зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений
-    
+
 ### Development
-    
+
 Разработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
-    
+
 French site translation: %fr-translator%
-    
+
 Chinese site translation: %zh-translator%
-    
+
 Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
-    
+
 Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
-    
+
 %github%
-    
+
 ### Поддержать проект
-    
+
 You can support our project by [finances](/donate) or [moral](/feedback)',
 
     'page/1/name' => "Index page",
@@ -1137,7 +1141,7 @@ You can support our project by [finances](/donate) or [moral](/feedback)',
     'page/201/name'        => "Mascots",
     'page/201/title'       => "Mascots",
     'page/201/breadcrumbs' => "Mascots",
-    
+
     'page/202/name'        => 'Perspectives',
     'page/202/title'       => 'Perspectives',
     'page/202/breadcrumbs' => 'Perspectives',
@@ -1191,6 +1195,12 @@ You can support our project by [finances](/donate) or [moral](/feedback)',
     'moder/vehicle/tabs/factories' => 'Factories',
     'moder/vehicle/tabs/pictures' => 'Pictures',
     'moder/vehicle/tabs/modifications' => 'Modifications',
+
+    'moder/vehicle/meta/description' => 'Short description',
+
+    'moder/vehicle/subscription/title' => 'Changes notifications subscription',
+    'moder/vehicle/subscription/subscribed' => 'Subscribed',
+    'moder/vehicle/subscription/not-subscribed' => 'Not subscribed',
 
     'moder/vehicle/catalogue/add-vehicle' => 'add vehicle',
     'moder/vehicle/catalogue/title/name' => 'Name',
@@ -1251,4 +1261,16 @@ You can support our project by [finances](/donate) or [moral](/feedback)',
     'moder/picture/acceptance/accepted-pictures-is-%s' => 'Accepted pictures count still %s',
 
     'moder/edit-object' => 'edit',
+
+    'moder/markdown/description' => 'Markdown syntax.
+
+Few manuals:
+[1](https://en.wikipedia.org/wiki/Markdown),
+[2](https://guides.github.com/features/mastering-markdown/),
+[3](https://daringfireball.net/projects/markdown/basics),
+
+Interlan hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins>',
+    'moder/markdown/edit' => 'Edit',
+    'moder/markdown/preview' => 'Preview',
+    'moder/markdown/history' => 'History',
 ];
