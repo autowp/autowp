@@ -1,6 +1,6 @@
 <?php
 
-namespace Applicaton\Most\Adapter;
+namespace Application\Most\Adapter;
 
 use Zend_Db_Table_Select;
 

@@ -82,7 +82,7 @@ class Most
 
     public function setAdapter($options)
     {
-        $adapterNamespace = 'Application\\Most\\Adapter\\';
+        $adapterNamespace = 'Application\\Most\\Adapter';
 
         $adapter = null;
         if (isset($options['name'])) {

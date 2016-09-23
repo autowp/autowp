@@ -1,6 +1,6 @@
 <?php
 
-namespace Applicaton\Most\Adapter;
+namespace Application\Most\Adapter;
 
 use Application\Most;
 
