@@ -88,7 +88,7 @@ class CarsController extends AbstractActionController
 
         $result = $service->getCarForm2($car, $user, [
             'editOnlyMode' => $editOnlyMode,
-        ]);
+        ], $this->language());
 
         $carForm = $result['form'];
         $carFormData = $result['data'];
@@ -379,6 +379,8 @@ class CarsController extends AbstractActionController
         ], 'update_date');
 
         $specService = new SpecificationsService();
+        
+        $language = $this->language();
 
         $values = [];
         foreach ($rows as $row) {
@@ -389,8 +391,8 @@ class CarsController extends AbstractActionController
                 'attribute' => $attribute,
                 'unit'      => $unit,
                 'user'      => $user,
-                'value'     => $specService->getActualValueText($attribute->id, $itemType->id, $row->item_id),
-                'userValue' => $specService->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id),
+                'value'     => $specService->getActualValueText($attribute->id, $itemType->id, $row->item_id, $language),
+                'userValue' => $specService->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id, $language),
                 'date'      => $row->getDateTime('update_date'),
                 'deleteUrl' => $this->url()->fromRoute('cars/params', [
                     'action'       => 'delete-value',
@@ -457,7 +459,7 @@ class CarsController extends AbstractActionController
 
         $result = $service->getEngineForm2($engine, $user, [
             'editOnlyMode' => $editOnlyMode,
-        ]);
+        ], $this->language());
 
         $form = $result['form'];
         $formData = $result['data'];
@@ -506,6 +508,8 @@ class CarsController extends AbstractActionController
                 ], [], true);
             }
         }
+        
+        $language = $this->language();
 
         $userValues = new Attrs_User_Values();
 
@@ -607,7 +611,7 @@ class CarsController extends AbstractActionController
                     'moderUrl'  => $moderUrl
                 ],
                 'path'     => $path,
-                'value'    => $service->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id),
+                'value'    => $service->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id, $language),
                 'unit'     => $attribute->findParentAttrs_Units()
             ];
         }

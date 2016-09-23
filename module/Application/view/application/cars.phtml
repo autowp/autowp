@@ -17,7 +17,7 @@
                                         null,
                                         $item['produced']
                                     ),
-                                    Zend_Locale_Format::toNumber($item['produced'])
+                                    NumberFormatter::create($this->language(), NumberFormatter::DECIMAL)->format($item['produced'])
                                 )
                             ) ?>
                         <?php } else {?>

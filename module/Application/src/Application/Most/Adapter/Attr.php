@@ -33,7 +33,7 @@ class Attr extends AbstractAdapter
         $this->order = $value;
     }
 
-    public function getCars(Zend_Db_Table_Select $select)
+    public function getCars(Zend_Db_Table_Select $select, $language)
     {
         $itemTypes = new Attrs_Item_Types();
         $attributes = new Attrs_Attributes();
@@ -65,7 +65,7 @@ class Attr extends AbstractAdapter
         $result = [];
         foreach ($cars as $car) {
 
-            $valueText = $specService->getActualValueText($attribute->id, $itemType->id, $car->id);
+            $valueText = $specService->getActualValueText($attribute->id, $itemType->id, $car->id, $language);
 
             $result[] = [
                 'car'       => $car,

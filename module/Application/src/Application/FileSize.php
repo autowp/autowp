@@ -2,8 +2,9 @@
 
 namespace Application;
 
-use Zend_Locale_Format;
 use Zend_Measure_Binary;
+
+use NumberFormatter;
 
 class FileSize
 {
@@ -32,7 +33,8 @@ class FileSize
     public function __invoke($locale, $fileSize, $precision = 0, $norm = 'traditional', $type = null)
     {
         //get localised input value
-        $fileSize = Zend_Locale_Format::getFloat((int)$fileSize, ['locale' => $locale]);
+        $formatter = new NumberFormatter($locale, NumberFormatter::DECIMAL);
+        $fileSize = $formatter->format((int)$fileSize);
 
         $measure = new Zend_Measure_Binary($fileSize);
 

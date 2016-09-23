@@ -803,16 +803,16 @@ class AccountController extends AbstractActionController
         $page = (int)$this->params('page');
 
         $userId = $this->user()->get()->id;
+        
+        $language = $this->language();
 
-        $data = $service->getConflicts($userId, $filter, $page, 50);
+        $data = $service->getConflicts($userId, $filter, $page, 50, $language);
         $conflicts = $data['conflicts'];
         $paginator = $data['paginator'];
 
         $userTable = new Users();
         $carTable = new Cars();
         $engineTable = new Engines();
-
-        $language = $this->language();
 
         foreach ($conflicts as &$conflict) {
             foreach ($conflict['values'] as &$value) {
