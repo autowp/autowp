@@ -1,58 +1,70 @@
 <?php
 
-class Project_Most_Adapter_Brakes extends Project_Most_Adapter_Abstract
+namespace Applicaton\Most\Adapter;
+
+use Zend_Db_Table_Select;
+
+use Attrs_Attributes;
+use Attrs_Item_Types;
+
+use Zend_Db_Expr;
+use Zend_Db_Select;
+use Zend_Db_Table;
+use Zend_Db_Table_Abstract;
+
+class Brakes extends AbstractAdapter
 {
-    protected $_attributes;
+    protected $attributes;
 
-    protected $_order;
+    protected $order;
 
-    protected $_attributesTable;
+    protected $attributesTable;
 
-    protected $_carItemType;
+    protected $carItemType;
 
     public function __construct(array $options)
     {
         parent::__construct($options);
 
-        $this->_attributesTable = new Attrs_Attributes();
+        $this->attributesTable = new Attrs_Attributes();
 
         $itemTypes = new Attrs_Item_Types();
-        $this->_carItemType = $itemTypes->find(1)->current();
+        $this->carItemType = $itemTypes->find(1)->current();
     }
 
     public function setAttributes(array $value)
     {
-        /*$defaults = array(
+        /*$defaults = [
             'tyrewidth'  => null,
             'tyreseries' => null,
             'radius'  => null,
             'rimwidth'   => null
-        );*/
-        $this->_attributes = $value;
+        ];*/
+        $this->attributes = $value;
     }
 
     public function setOrder($value)
     {
-        $this->_order = $value;
+        $this->order = $value;
     }
 
     public function getCars(Zend_Db_Table_Select $select)
     {
-        $rear = $this->_attributes['rear'];
-        $front = $this->_attributes['front'];
+        $rear = $this->attributes['rear'];
+        $front = $this->attributes['front'];
 
         $wheres = implode($select->getPart( Zend_Db_Select::WHERE ));
         $joins = $select->getPart( Zend_Db_Select::FROM );
         unset($joins['cars']);
 
-        $limit = $this->_most->getCarsCount();
+        $limit = $this->most->getCarsCount();
 
-        $specService = $this->_most->getSpecs();
+        $specService = $this->most->getSpecs();
 
-        $selects = array();
-        foreach (array($rear, $front) as $axis) {
+        $selects = [];
+        foreach ([$rear, $front] as $axis) {
             $axisSelect = $select->getAdapter()->select()
-                ->from('cars', array());
+                ->from('cars', []);
             if ($wheres) {
                 $axisSelect->where($wheres);
             }
@@ -63,24 +75,24 @@ class Project_Most_Adapter_Brakes extends Project_Most_Adapter_Abstract
             }
             $axisSelect->reset(Zend_Db_Table::COLUMNS);
 
-            $diameter  = $this->_attributesTable->find($axis['diameter'])->current();
+            $diameter  = $this->attributesTable->find($axis['diameter'])->current();
             $diameterValuesTable = $specService->getValueDataTable($diameter->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
-            $thickness = $this->_attributesTable->find($axis['thickness'])->current();
+            $thickness = $this->attributesTable->find($axis['thickness'])->current();
             $thicknessValuesTable = $specService->getValueDataTable($thickness->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
             $axisSelect
-                ->columns(array('car_id' => 'cars.id', 'size_value' => new Zend_Db_Expr('diameter.value*thickness.value')))
-                ->join(array('diameter' => $diameterValuesTable), 'cars.id = diameter.item_id', null)
+                ->columns(['car_id' => 'cars.id', 'size_value' => new Zend_Db_Expr('diameter.value*thickness.value')])
+                ->join(['diameter' => $diameterValuesTable], 'cars.id = diameter.item_id', null)
                 ->where('diameter.item_type_id = ?', 1)
                 ->where('diameter.attribute_id = ?', $diameter->id)
                 ->where('diameter.value > 0')
-                ->join(array('thickness' => $thicknessValuesTable), 'cars.id = thickness.item_id', null)
+                ->join(['thickness' => $thicknessValuesTable], 'cars.id = thickness.item_id', null)
                 ->where('thickness.item_type_id = ?', 1)
                 ->where('thickness.attribute_id = ?', $thickness->id)
                 ->where('thickness.value > 0')
                 ->group('cars.id')
-                ->order('size_value ' . $this->_order)
+                ->order('size_value ' . $this->order)
                 ->limit($limit);
 
             $selects[] = $axisSelect->assemble();
@@ -88,49 +100,49 @@ class Project_Most_Adapter_Brakes extends Project_Most_Adapter_Abstract
 
         $select
             ->join(
-                array('tbl' => new Zend_Db_Expr('((' . $selects[0] . ') UNION (' . $selects[1] . '))')),
+                ['tbl' => new Zend_Db_Expr('((' . $selects[0] . ') UNION (' . $selects[1] . '))')],
                 'cars.id = tbl.car_id',
                 null
             )
             ->group('cars.id');
 
 
-        if ($this->_order == 'asc') {
-            $select->order('min(tbl.size_value) ' . $this->_order);
+        if ($this->order == 'asc') {
+            $select->order('min(tbl.size_value) ' . $this->order);
         } else {
-            $select->order('max(tbl.size_value) ' . $this->_order);
+            $select->order('max(tbl.size_value) ' . $this->order);
         }
 
         //print $select; exit;
 
         $cars = $select->getTable()->fetchAll($select);
 
-        $result = array();
+        $result = [];
 
         foreach ($cars as $car) {
 
-            $result[] = array(
+            $result[] = [
                 'car'       => $car,
                 'valueHtml' => $this->_getBrakesText($car),
-            );
+            ];
         }
 
-        return array(
+        return [
             'unit' => null,
             'cars' => $result,
-        );
+        ];
     }
 
     protected function _getBrakesText($car)
     {
-        $text = array();
+        $text = [];
 
-        $rear = $this->_attributes['rear'];
-        $front = $this->_attributes['front'];
+        $rear = $this->attributes['rear'];
+        $front = $this->attributes['front'];
 
-        $specService = $this->_most->getSpecs();
+        $specService = $this->most->getSpecs();
 
-        foreach (array($front, $rear) as $axis) {
+        foreach ([$front, $rear] as $axis) {
 
             $diameterValue = $specService->getActualValue($axis['diameter'], $car->id, 1);
             $thicknessValue = $specService->getActualValue($axis['thickness'], $car->id, 1);

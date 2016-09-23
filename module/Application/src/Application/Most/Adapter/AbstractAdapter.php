@@ -1,13 +1,17 @@
 <?php
 
+namespace Applicaton\Most\Adapter;
+
 use Application\Most;
 
-abstract class Project_Most_Adapter_Abstract
+use Zend_Db_Table_Select;
+
+abstract class AbstractAdapter
 {
     /**
      * @var Most
      */
-    protected $_most;
+    protected $most;
 
     public function __construct(array $options)
     {
@@ -16,7 +20,7 @@ abstract class Project_Most_Adapter_Abstract
 
     public function setMost(Most $most)
     {
-        $this->_most = $most;
+        $this->most = $most;
 
         return $this;
     }

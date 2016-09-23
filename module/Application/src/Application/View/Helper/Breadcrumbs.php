@@ -6,8 +6,6 @@ use Zend\View\Helper\AbstractHelper;
 
 use Exception;
 
-use Zend_View_Abstract;
-
 class Breadcrumbs extends AbstractHelper
 {
     private $data = [];
@@ -53,11 +51,6 @@ class Breadcrumbs extends AbstractHelper
 
             if (!$items) {
                 return '';
-            }
-
-            $endTag = ' />';
-            if (($this->view instanceof Zend_View_Abstract) && !$this->view->doctype()->isXhtml()) {
-                $endTag= '>';
             }
 
             return  '<ul class="breadcrumb">'.

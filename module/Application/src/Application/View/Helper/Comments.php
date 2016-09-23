@@ -8,14 +8,8 @@ use Zend\View\Helper\AbstractHelper;
 
 class Comments extends AbstractHelper
 {
-    /**
-     * @var Zend_View
-     */
-    private $oldView;
-
-    public function __construct($view, $form)
+    public function __construct($form)
     {
-        $this->oldView = $view;
         $this->form = $form;
     }
 
@@ -60,8 +54,7 @@ class Comments extends AbstractHelper
             'type'              => $type,
             'canAddComments'    => $canAddComments,
             'canRemoveComments' => $canRemoveComments,
-            'form'              => $form,
-            'view'              => $this->oldView
+            'form'              => $form
         ]);
     }
 }

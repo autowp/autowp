@@ -14,7 +14,6 @@ use Picture;
 use Zend_Application_Resource_Db;
 use Zend_Application_Resource_Session;
 use Zend_Db_Adapter_Abstract;
-use Zend_View;
 
 return [
 
@@ -267,9 +266,8 @@ return [
                 return new View\Helper\HumanDate($language->getLanguage());
             },
             'comments' => function($sm) {
-                $view = $sm->get(Zend_View::class);
                 $commentForm = $sm->get('CommentForm');
-                return new View\Helper\Comments($view, $commentForm);
+                return new View\Helper\Comments($commentForm);
             },
             'userText' => function($sm) {
                 $router = $sm->get('Router');
@@ -367,11 +365,6 @@ return [
                 $options = $sm->get('Config')['textstorage'];
                 $options['dbAdapter'] = $sm->get(Zend_Db_Adapter_Abstract::class);
                 return new TextStorage\Service($options);
-            },
-            Zend_View::class => function($sm) {
-                return new Zend_View([
-                    'scriptPath' => APPLICATION_PATH . '/modules/default/views/scripts/'
-                ]);
             },
             'MailTransport' => function($sm) {
                 $config = $sm->get('Config');
