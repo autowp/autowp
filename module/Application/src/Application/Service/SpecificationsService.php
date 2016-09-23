@@ -648,7 +648,7 @@ class SpecificationsService
      * @param array $options
      * @return AttrsZoneAttributesForm
      */
-    private function getForm2($itemId, $zoneId, $user, array $options)
+    private function getForm($itemId, $zoneId, $user, array $options)
     {
         $multioptions = $this->_getListsOptions($this->loadZone($zoneId));
 
@@ -703,26 +703,15 @@ class SpecificationsService
 
     /**
      * @param Car_Row $car
-     * @param array $options
-     * @return Application_Form_Attrs_Zone_Attributes
-     */
-    public function getCarForm(Car_Row $car, User_Row $user, array $options)
-    {
-        $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
-        return $this->getForm($car->id, $zoneId, $user, $options);
-    }
-
-    /**
-     * @param Car_Row $car
      * @param User_Row $user
      * @param array $options
      * @return array
      */
-    public function getCarForm2(Car_Row $car, User_Row $user, array $options, $language)
+    public function getCarForm(Car_Row $car, User_Row $user, array $options, $language)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         return [
-            'form' => $this->getForm2($car->id, $zoneId, $user, $options),
+            'form' => $this->getForm($car->id, $zoneId, $user, $options),
             'data' => $this->getFormData($car->id, $zoneId, $user, $language)
         ];
     }
@@ -731,25 +720,13 @@ class SpecificationsService
      * @param Engine_Row $engine
      * @param User_Row $user
      * @param array $options
-     * @return Application_Form_Attrs_Zone_Attributes
-     */
-    public function getEngineForm(Engine_Row $engine, User_Row $user, array $options)
-    {
-        $zoneId = 5;
-        return $this->getForm($engine->id, $zoneId, $user, $options);
-    }
-
-    /**
-     * @param Engine_Row $engine
-     * @param User_Row $user
-     * @param array $options
      * @return array
      */
-    public function getEngineForm2(Engine_Row $engine, User_Row $user, array $options, $language)
+    public function getEngineForm(Engine_Row $engine, User_Row $user, array $options, $language)
     {
         $zoneId = 5;
         return [
-            'form' => $this->getForm2($engine->id, $zoneId, $user, $options),
+            'form' => $this->getForm($engine->id, $zoneId, $user, $options),
             'data' => $this->getFormData($engine->id, $zoneId, $user, $language)
         ];
     }

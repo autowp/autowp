@@ -15,26 +15,9 @@ class Comments
     private $voteTable;
 
     /**
-     * @var Application_Form_Comment
-     */
-    private $addForm;
-
-    /**
-     * @param array $options
-     * @return Application_Form_Comment
-     */
-    public function getAddForm($options)
-    {
-        if (!$this->addForm) {
-            $this->addForm = new Application_Form_Comment($options);
-        }
-        return $this->addForm;
-    }
-
-    /**
      * @return Comment_Message
      */
-    protected function _getMessageTable()
+    protected function getMessageTable()
     {
         return $this->messageTable
             ? $this->messageTable
@@ -44,7 +27,7 @@ class Comments
     /**
      * @return Comment_Vote
      */
-    protected function _getVoteTable()
+    protected function getVoteTable()
     {
         return $this->voteTable
             ? $this->voteTable
@@ -64,7 +47,7 @@ class Comments
 
         $parentMessage = null;
         if ($parentId) {
-            $parentMessage = $this->_getMessageTable()->fetchRow([
+            $parentMessage = $this->getMessageTable()->fetchRow([
                 'type_id = ?' => $typeId,
                 'item_id = ?' => $itemId,
                 'id = ?'      => $parentId
@@ -78,7 +61,7 @@ class Comments
             }
         }
 
-        $messageTable = $this->_getMessageTable();
+        $messageTable = $this->getMessageTable();
         $db = $messageTable->getAdapter();
 
         $data = [
@@ -153,7 +136,7 @@ class Comments
             } else {
                 $filter[] = 'parent_id is null';
             }
-            $rows = $this->_getMessageTable()->fetchAll($filter, 'datetime');
+            $rows = $this->getMessageTable()->fetchAll($filter, 'datetime');
         }
 
         $comments = [];
@@ -163,7 +146,7 @@ class Comments
 
             $vote = null;
             if ($userId) {
-                $voteRow = $this->_getVoteTable()->fetchRow([
+                $voteRow = $this->getVoteTable()->fetchRow([
                     'comment_id = ?' => $row->id,
                     'user_id = ?'    => (int)$userId
                 ]);
@@ -226,7 +209,7 @@ class Comments
      */
     public function deleteMessage($id, $userId)
     {
-        $comment = $this->_getMessageTable()->find($id)->current();
+        $comment = $this->getMessageTable()->find($id)->current();
 
         if ($comment->moderator_attention == Comment_Message::MODERATOR_ATTENTION_REQUIRED) {
             return false;
@@ -248,7 +231,7 @@ class Comments
      */
     public function restoreMessage($id)
     {
-        $comment = $this->_getMessageTable()->find($id)->current();
+        $comment = $this->getMessageTable()->find($id)->current();
         if ($comment) {
             $comment->deleted = 0;
             $comment->save();
@@ -260,7 +243,7 @@ class Comments
      */
     public function completeMessage($id)
     {
-        $comment = $this->_getMessageTable()->fetchRow([
+        $comment = $this->getMessageTable()->fetchRow([
             'id = ?'                  => (int)$id,
             'moderator_attention = ?' => Comment_Message::MODERATOR_ATTENTION_REQUIRED
         ]);
@@ -279,7 +262,7 @@ class Comments
      */
     public function voteMessage($id, $userId, $vote)
     {
-        $message = $this->_getMessageTable()->find($id)->current();
+        $message = $this->getMessageTable()->find($id)->current();
         if (!$message) {
             return [
                 'success' => false,
@@ -294,7 +277,7 @@ class Comments
             ];
         }
 
-        $voteTable = $this->_getVoteTable();
+        $voteTable = $this->getVoteTable();
         $voteRow = $voteTable->fetchRow([
             'comment_id = ?' => $message->id,
             'user_id = ?'    => $userId
@@ -334,12 +317,12 @@ class Comments
      */
     public function getVotes($id)
     {
-        $message = $this->_getMessageTable()->find($id)->current();
+        $message = $this->getMessageTable()->find($id)->current();
         if (!$message) {
             return false;
         }
 
-        $voteTable = $this->_getVoteTable();
+        $voteTable = $this->getVoteTable();
         $voteRows = $voteTable->fetchAll([
             'comment_id = ?' => $message->id,
         ]);
@@ -367,7 +350,7 @@ class Comments
      */
     public function moveMessages($srcTypeId, $srcItemId, $dstTypeId, $dstItemId)
     {
-        $this->_getMessageTable()->update([
+        $this->getMessageTable()->update([
             'type_id' => $dstTypeId,
             'item_id' => $dstItemId
         ], [
@@ -382,7 +365,7 @@ class Comments
      */
     public function getLastMessageRow($type, $item)
     {
-        return $this->_getMessageTable()->fetchRow([
+        return $this->getMessageTable()->fetchRow([
             'type_id = ?' => (int)$type,
             'item_id = ?' => (int)$item
         ], 'datetime DESC');
@@ -395,7 +378,7 @@ class Comments
      */
     public function getMessagePaginator($type, $item)
     {
-        $select = $this->_getMessageTable()->select(true)
+        $select = $this->getMessageTable()->select(true)
             ->where('item_id = ?', (int)$item)
             ->where('type_id = ?', (int)$type)
             ->where('parent_id is null')
@@ -413,7 +396,7 @@ class Comments
      */
     public function topicHaveModeratorAttention($type, $item)
     {
-        return (bool)$this->_getMessageTable()->fetchRow([
+        return (bool)$this->getMessageTable()->fetchRow([
             'item_id = ?'             => (int)$item,
             'type_id = ?'             => (int)$type,
             'moderator_attention = ?' => Comment_Message::MODERATOR_ATTENTION_REQUIRED
@@ -426,7 +409,7 @@ class Comments
      */
     public function getMessageRow($id)
     {
-        return $this->_getMessageTable()->fetchRow([
+        return $this->getMessageTable()->fetchRow([
             'id = ?' => (int)$id
         ]);
     }
@@ -439,7 +422,7 @@ class Comments
     {
         $root = $message;
 
-        $table = $this->_getMessageTable();
+        $table = $this->getMessageTable();
 
         while ($root->parent_id) {
             $root = $table->fetchRow([
@@ -461,7 +444,7 @@ class Comments
     {
         $root = $this->getMessageRoot($message);
 
-        $table = $this->_getMessageTable();
+        $table = $this->getMessageTable();
         $db = $table->getAdapter();
 
         $count = $db->fetchOne(
@@ -491,7 +474,7 @@ class Comments
 
     public function updateRepliesCount()
     {
-        $db = $this->_getMessageTable()->getAdapter();
+        $db = $this->getMessageTable()->getAdapter();
 
         $db->query('
             create temporary table __cms
@@ -517,7 +500,7 @@ class Comments
         $newItemId = (int)$newItemId;
         $parentId = (int)$parentId;
 
-        $rows = $this->_getMessageTable()->fetchAll([
+        $rows = $this->getMessageTable()->fetchAll([
             'parent_id = ?' => $parentId
         ]);
 

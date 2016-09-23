@@ -95,23 +95,15 @@ class ArticlesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $links = array();
-        foreach ($article->findBrandsViaArticles_Brands() as $brand)
+        $links = [];
+        foreach ($article->findBrandsViaArticles_Brands() as $brand) {
             $links[] = [
-                'url'  => $brand->getUrl(),
+                'url'  => $this->url()->fromRoute('catalogue', [
+                    'action'        => 'brand',
+                    'brand_catname' => $brand->catname
+                ]),
                 'name' => $brand->caption
             ];
-
-        foreach ($article->findCarsViaArticles_Cars() as $car) {
-            $brands = $car->findBrandsViaBrand_Car();
-            if (count($brands) > 0) {
-                foreach ($brands as $brand) {
-                    $links[] = [
-                        'url'  => $brand->getUrl() . 'car' . $car->id,
-                        'name' => $car->getFullName()
-                    ];
-                }
-            }
         }
 
         $selectedBrandIds = [];

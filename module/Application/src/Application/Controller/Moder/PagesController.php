@@ -8,7 +8,6 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\Form\Moder\Page as PageForm;
 
 use Pages;
-use Page_Language;
 
 use Zend_Db_Expr;
 
@@ -19,19 +18,9 @@ class PagesController extends AbstractActionController
      */
     private $table;
 
-    /**
-     * @var Page_Language
-     */
-    private $langTable;
-
-    private $languages = [
-        'ru', 'en', 'fr'
-    ];
-
     public function __construct()
     {
         $this->table = new Pages();
-        $this->langTable = new Page_Language();
     }
 
     private function getPagesList($parentId)
@@ -134,8 +123,7 @@ class PagesController extends AbstractActionController
         }
 
         $form = new PageForm(null, [
-            'languages' => $this->languages,
-            'parents'   => $this->getParentOptions()
+            'parents' => $this->getParentOptions()
         ]);
 
         $form->setAttribute('action', $this->url()->fromRoute('moder/pages/params', [
@@ -144,17 +132,7 @@ class PagesController extends AbstractActionController
         ]));
 
         $values = $page->toArray();
-        if ($page->id) {
-            foreach ($this->languages as $lang) {
-                $langPage = $this->langTable->fetchRow([
-                    'page_id = ?'  => $page->id,
-                    'language = ?' => $lang
-                ]);
-                if ($langPage) {
-                    $values[$lang] = $langPage->toArray();
-                }
-            }
-        } else {
+        if (!$page->id) {
             $values['parent_id'] = $this->params('parent_id');
         }
 
@@ -211,26 +189,6 @@ class PagesController extends AbstractActionController
                     'position'        => $position
                 ]);
                 $page->save();
-
-                foreach ($this->languages as $lang) {
-                    $langValues = $values[$lang];
-                    unset($values[$lang]);
-
-                    $langPage = $this->langTable->fetchRow([
-                        'page_id = ?'  => $page->id,
-                        'language = ?' => $lang
-                    ]);
-
-                    if (!$langPage) {
-                        $langPage = $this->langTable->createRow([
-                            'page_id'  => $page->id,
-                            'language' => $lang
-                        ]);
-                    }
-
-                    $langPage->setFromArray($langValues);
-                    $langPage->save();
-                }
 
                 return $this->redirect()->toRoute('moder/pages/params', [
                     'action'  => 'item',

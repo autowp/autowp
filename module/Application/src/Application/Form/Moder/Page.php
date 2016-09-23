@@ -11,8 +11,6 @@ use Pages;
 
 class Page extends Form implements InputFilterProviderInterface
 {
-    private $languages = [];
-
     private $parents = [];
 
     public function __construct($name = null, $options = [])
@@ -102,17 +100,6 @@ class Page extends Form implements InputFilterProviderInterface
             $this->add($element);
         }
 
-        foreach ($this->languages as $language) {
-            $this->add([
-                'name'    => $language,
-                'type'    => PageLanguage::class,
-                'options' => [
-                    'label' => $language
-                ]
-            ]);
-            $this->get($language)->setWrapElements(true)->prepare();
-        }
-
         $this->setAttribute('method', 'post');
     }
 
@@ -126,11 +113,6 @@ class Page extends Form implements InputFilterProviderInterface
      */
     public function setOptions($options)
     {
-        if (isset($options['languages'])) {
-            $this->languages = $options['languages'];
-            unset($options['languages']);
-        }
-
         if (isset($options['parents'])) {
             $this->parents = $options['parents'];
             unset($options['parents']);

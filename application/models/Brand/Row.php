@@ -21,22 +21,12 @@ class Brand_Row extends Row
 
     public function getLanguageName($language)
     {
-        $langRow = $this->_getLanguageTable()->fetchRow(array(
+        $langRow = $this->_getLanguageTable()->fetchRow([
             'brand_id = ?' => $this->id,
             'language = ?' => $language
-        ));
+        ]);
 
         return $langRow ? $langRow->name : $this->caption;
-    }
-
-    /**
-     * @deprecated
-     * @param bool $absolute
-     * @return string
-     */
-    public function getUrl($absolute = false)
-    {
-        return ($absolute ? HOST : '/').$this->folder.'/';
     }
 
     public function getLogoPath()
@@ -56,7 +46,7 @@ class Brand_Row extends Row
         $db = $this->getTable()->getAdapter();
         return $db->fetchOne(
             $db->select()
-                ->from(array('bcc' => 'brands_cars_cache'), array('COUNT(1)'))
+                ->from(['bcc' => 'brands_cars_cache'], ['COUNT(1)'])
                 ->join('cars', 'bcc.car_id=cars.id', null)
                 ->where('bcc.brand_id=?', $this->id)
                 ->where('cars.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY)')
@@ -80,7 +70,7 @@ class Brand_Row extends Row
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(pictures.id)'))
                 ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-                ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+                ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $this->id)
@@ -93,9 +83,9 @@ class Brand_Row extends Row
         $db = $this->getTable()->getAdapter();
         $sql = 'SELECT COUNT(id) FROM pictures '.
                'WHERE brand_id=? AND type=? AND pictures.status IN (?, ?)';
-        $this->logopictures_count = (int)$db->fetchOne($sql, array(
+        $this->logopictures_count = (int)$db->fetchOne($sql, [
             $this->id, Picture::LOGO_TYPE_ID,
-            Picture::STATUS_ACCEPTED, Picture::STATUS_NEW));
+            Picture::STATUS_ACCEPTED, Picture::STATUS_NEW]);
         $this->save();
     }
 
@@ -104,9 +94,9 @@ class Brand_Row extends Row
         $db = $this->getTable()->getAdapter();
         $sql = 'SELECT COUNT(id) FROM pictures '.
                'WHERE brand_id=? AND type=? AND pictures.status IN (?, ?)';
-        $this->mixedpictures_count = (int)$db->fetchOne($sql, array(
+        $this->mixedpictures_count = (int)$db->fetchOne($sql, [
             $this->id, Picture::MIXED_TYPE_ID,
-            Picture::STATUS_ACCEPTED, Picture::STATUS_NEW));
+            Picture::STATUS_ACCEPTED, Picture::STATUS_NEW]);
         $this->save();
     }
 
@@ -120,9 +110,9 @@ class Brand_Row extends Row
                 INNER JOIN brand_engine ON engine_parent_cache.parent_id = brand_engine.engine_id
             WHERE brand_engine.brand_id = ? and pictures.type = ?
                 AND pictures.status IN (?, ?)
-        ', array(
+        ', [
             $this->id, Picture::ENGINE_TYPE_ID, Picture::STATUS_ACCEPTED, Picture::STATUS_NEW
-        ));
+        ]);
         $this->save();
     }
 
@@ -131,9 +121,9 @@ class Brand_Row extends Row
         $db = $this->getTable()->getAdapter();
         $sql = 'SELECT COUNT(id) FROM pictures '.
                'WHERE brand_id=? AND type=? AND pictures.status IN (?, ?)';
-        $this->unsortedpictures_count = (int)$db->fetchOne($sql, array(
+        $this->unsortedpictures_count = (int)$db->fetchOne($sql, [
             $this->id, Picture::UNSORTED_TYPE_ID,
-            Picture::STATUS_ACCEPTED, Picture::STATUS_NEW));
+            Picture::STATUS_ACCEPTED, Picture::STATUS_NEW]);
         $this->save();
     }
 

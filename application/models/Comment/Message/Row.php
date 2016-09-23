@@ -4,6 +4,11 @@ use Application\Db\Table\Row;
 
 class Comment_Message_Row extends Row
 {
+    /**
+     * @deprecated
+     * @param bool $absolute
+     * @return string
+     */
     public function getUrl($absolute = false)
     {
         switch ($this->type_id)
@@ -26,7 +31,11 @@ class Comment_Message_Row extends Row
             case Comment_Message::ARTICLES_TYPE_ID:
                 $articles = new Articles();
                 $article = $articles->find($this->item_id)->current();
-                return $article->getUrl($absolute);
+                if ($article) {
+                    return ($absolute ? HOST : '/').'articles/'.$article->catname.'/';
+                } else {
+                    return false;
+                }
 
             case Comment_Message::FORUMS_TYPE_ID:
                 return ($absolute ? HOST : '/').'forums/topic-message/message_id/'.(int)$this->id;
