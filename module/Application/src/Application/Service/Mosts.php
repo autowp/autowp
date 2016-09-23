@@ -605,7 +605,7 @@ class Mosts
         return $pictures;
     }
 
-    public function getCarsData($cMost, $carType, $cYear, $brandId)
+    public function getCarsData($cMost, $carType, $cYear, $brandId, $language)
     {
         $carsTable = new Cars();
 
@@ -642,7 +642,7 @@ class Mosts
 
         $g = $this->getPrespectiveGroups();
 
-        $data = $most->getData();
+        $data = $most->getData($language);
         foreach ($data['cars'] as &$car) {
             $car['pictures'] = $this->getOrientedPictureList($car['car']->id, $g);
         }
@@ -711,14 +711,11 @@ class Mosts
             foreach ($years as $idx => $year) {
                 $cSelect = clone $select;
                 $cSelect->where($year['where']);
-                //print $select;
                 $rowExists = (bool)$carsTable->fetchRow($cSelect);
-                //var_dump($year['where'], $rowExists);
                 if (!$rowExists) {
                     unset($years[$idx]);
                 }
             }
-            //exit;
         }
 
         $yearId = null;
@@ -737,7 +734,7 @@ class Mosts
             $carTypeData = $this->getCarTypeData($carType, $language);
         }
 
-        $data = $this->getCarsData($cMost, $carType, $cYear, $brandId);
+        $data = $this->getCarsData($cMost, $carType, $cYear, $brandId, $language);
 
         // sidebar
         $carTypeCatname = $carTypeData ? $carTypeData['catname'] : null;

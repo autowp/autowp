@@ -4,8 +4,6 @@ namespace Application;
 
 use Zend_Measure_Binary;
 
-use NumberFormatter;
-
 class FileSize
 {
     /**
@@ -32,10 +30,6 @@ class FileSize
      */
     public function __invoke($locale, $fileSize, $precision = 0, $norm = 'traditional', $type = null)
     {
-        //get localised input value
-        $formatter = new NumberFormatter($locale, NumberFormatter::DECIMAL);
-        $fileSize = $formatter->format((int)$fileSize);
-
         $measure = new Zend_Measure_Binary($fileSize);
 
         $measure->setType('BYTE');

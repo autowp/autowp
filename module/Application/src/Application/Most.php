@@ -121,13 +121,13 @@ class Most
         return $this;
     }
 
-    public function getData()
+    public function getData($language)
     {
         $select = clone $this->_carsSelect;
 
         $select->limit($this->_carsCount);
 
-        return $this->_adapter->getCars($select);
+        return $this->_adapter->getCars($select, $language);
     }
 
     /**
