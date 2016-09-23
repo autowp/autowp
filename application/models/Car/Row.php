@@ -120,6 +120,10 @@ class Car_Row extends Row
 
     public function getNameData($language = 'en')
     {
+        if (!is_string($language)) {
+            throw new Exception('`language` is not string');
+        }
+        
         $carLangTable = new Car_Language();
         $carLangRow = $carLangTable->fetchRow([
             'car_id = ?'   => $this->id,

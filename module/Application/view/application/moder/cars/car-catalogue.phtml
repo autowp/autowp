@@ -154,9 +154,7 @@
                             <br />
                             <div class="text-warning"><small>
                                 <?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/possible-duplicate-parent'))?>
-                                <?=$this->escapeHtml($car['duplicateRow']->getFullName([
-                                    'language' => $this->language()
-                                ]))?>
+                                <?=$this->escapeHtml($car['duplicateRow']->getFullName($this->language()))?>
                             </small></div>
                         <?php } ?>
                     </td>
@@ -241,7 +239,7 @@
                             <br />
                             <div class="text-warning"><small>
                                 <?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/possible-duplicate-child'))?>
-                                <?=$this->escapeHtml($car['duplicateRow']->getFullName())?>
+                                <?=$this->escapeHtml($car['duplicateRow']->getFullName($this->language()))?>
                             </small></div>
                         <?php } ?>
                     </td>

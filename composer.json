@@ -48,9 +48,6 @@
         }
     ],
     "autoload": {
-        "psr-0": {
-            "Project_": "library/"
-        },
         "psr-4": {
             "Application\\Model\\": "application/models",
             "Application\\Model\\DbTable\\": "application/models/DbTable",
@@ -59,9 +56,7 @@
             "ZF\\ApiProblem\\": "vendor/autowp/zf-api-problem/src/"
         },
         "classmap": [
-            "application/models/",
-            "library/Project/Telegram",
-            "module/Application/src/Application/Paginator/Adapter/"
+            "application/models/"
         ]
     },
     "require-dev": {

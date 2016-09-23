@@ -80,7 +80,7 @@
             <td></td>
             <?php foreach ($this->table->getCars() as $car) { ?>
                 <td>
-                    <?=$this->htmlA($this->url('cars', [
+                    <?=$this->htmlA($this->url('cars/params', [
                         'action' => 'car-specifications-editor',
                         'car_id' => $car['id']
                     ]), $this->translate('carlist/edit-specs'))?>
