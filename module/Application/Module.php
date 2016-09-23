@@ -134,8 +134,6 @@ class Module implements ConsoleUsageProviderInterface,
         defined('MYSQL_TIMEZONE') || define('MYSQL_TIMEZONE', 'UTC');
         defined('MYSQL_DATETIME_FORMAT') || define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
 
-        set_include_path(APPLICATION_PATH . '/../library' . PATH_SEPARATOR . get_include_path());
-
         $serviceManager = $e->getApplication()->getServiceManager();
 
         $serviceManager->get(Zend_Db_Adapter_Abstract::class);

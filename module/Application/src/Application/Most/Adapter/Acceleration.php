@@ -39,7 +39,7 @@ class Acceleration extends AbstractAdapter
         $this->order = $value;
     }
 
-    public function getCars(Zend_Db_Table_Select $select)
+    public function getCars(Zend_Db_Table_Select $select, $language)
     {
         $axises = [
             [
@@ -117,7 +117,7 @@ class Acceleration extends AbstractAdapter
 
             $result[] = [
                 'car'       => $car,
-                'valueHtml' => $this->getText($car),
+                'valueHtml' => $this->getText($car, $language),
             ];
         }
 
@@ -127,7 +127,7 @@ class Acceleration extends AbstractAdapter
         ];
     }
 
-    protected function getText($car)
+    protected function getText($car, $language)
     {
         $text = [];
 
@@ -146,7 +146,7 @@ class Acceleration extends AbstractAdapter
 
         foreach ($axises as $axis) {
 
-            $value = $specService->getActualValueText($axis['attr']->id, 1, $car->id);
+            $value = $specService->getActualValueText($axis['attr']->id, 1, $car->id, $language);
 
             if ($value > 0) {
                 $text[] = $value . ' <span class="unit">' . $axis['unit'] . '</span>';

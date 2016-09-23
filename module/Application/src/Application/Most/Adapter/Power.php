@@ -28,7 +28,7 @@ class Power extends AbstractAdapter
         $this->_order = $value;
     }
 
-    public function getCars(Zend_Db_Table_Select $select)
+    public function getCars(Zend_Db_Table_Select $select, $language)
     {
         $carsTable = $select->getTable();
         $db = $carsTable->getAdapter();
@@ -134,7 +134,7 @@ class Power extends AbstractAdapter
 
             $html = '';
             $value = $specService->getActualValue($powerAttr->id, $car->id, 1);
-            $turbo = $specService->getActualValueText($this->_attributes['turbo'], 1, $car->id);
+            $turbo = $specService->getActualValueText($this->_attributes['turbo'], 1, $car->id, $language);
             switch ($turbo) {
                 case 'нет': $turbo = null; break;
                 case 'есть': $turbo = 'турбонаддув'; break;
@@ -145,7 +145,7 @@ class Power extends AbstractAdapter
                     break;
             }
             $volume = $specService->getActualValue($this->_attributes['volume'], $car->id, 1);
-            $cylindersLayout = $specService->getActualValueText($this->_attributes['cylindersLayout'], 1, $car->id);
+            $cylindersLayout = $specService->getActualValueText($this->_attributes['cylindersLayout'], 1, $car->id, $language);
             $cylindersCount = $specService->getActualValue($this->_attributes['cylindersCount'], $car->id, 1);
             $valvePerCylinder = $specService->getActualValue($this->_attributes['valvePerCylinder'], $car->id, 1);
 

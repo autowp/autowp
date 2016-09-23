@@ -42,7 +42,7 @@ class Wheelsize extends AbstractAdapter
         $this->_order = $value;
     }
 
-    public function getCars(Zend_Db_Table_Select $select)
+    public function getCars(Zend_Db_Table_Select $select, $language)
     {
         $wheel = $this->_attributes['rear'];
 

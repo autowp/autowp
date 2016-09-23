@@ -41,5 +41,5 @@ abstract class AbstractAdapter
         return $this;
     }
 
-    abstract public function getCars(Zend_Db_Table_Select $select);
+    abstract public function getCars(Zend_Db_Table_Select $select, $language);
 }

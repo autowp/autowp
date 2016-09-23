@@ -48,7 +48,7 @@ class Brakes extends AbstractAdapter
         $this->order = $value;
     }
 
-    public function getCars(Zend_Db_Table_Select $select)
+    public function getCars(Zend_Db_Table_Select $select, $language)
     {
         $rear = $this->attributes['rear'];
         $front = $this->attributes['front'];
