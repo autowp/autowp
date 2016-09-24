@@ -25,7 +25,7 @@
                 'href'      => '#',
                 'class'     => 'arrow',
                 'data-load' => $this->conceptsUrl
-            ], '<i class="fa fa-plus-circle"></i> Концепты и прототипы', false) ?>
+            ], '<i class="fa fa-plus-circle"></i> ' . $this->escapeHtml($this->translate('upload/select/concepts')), false) ?>
             <div style="margin:0 0 4px 18px;display:none">
                 <div class="loading"><em>Loading ...</em></div>
             </div>
@@ -38,7 +38,7 @@
                 'href'      => '#',
                 'class'     => 'arrow',
                 'data-load' => $this->enginesUrl
-            ], '<i class="fa fa-plus-circle"></i> Двигатели', false)?>
+            ], '<i class="fa fa-plus-circle"></i> ' . $this->escapeHtml($this->translate('upload/select/engines')), false)?>
             <div style="margin:0 0 4px 18px;display:none">
                 <div class="loading"><em>Loading ...</em></div>
             </div>
@@ -49,14 +49,14 @@
         <?=$this->htmlA($this->url('upload/params', [
             'action' => 'index',
             'type'   => Picture::LOGO_TYPE_ID
-        ], [], true), 'логотип ' . $this->brand['name']) ?><br />
+        ], [], true), $this->translate('upload/select/logo')) ?><br />
         <?=$this->htmlA($this->url('upload/params', [
             'action' => 'index',
             'type'   => Picture::MIXED_TYPE_ID
-        ], [], true), 'разное (несколько автомобилей на одной картинке)') ?><br />
+        ], [], true), $this->translate('upload/select/mixed-long')) ?><br />
         <?=$this->htmlA($this->url('upload/params', [
             'action' => 'index',
             'type'   => Picture::UNSORTED_TYPE_ID
-        ], [], true), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
+        ], [], true), $this->translate('upload/select/unsorted-long')) ?>
     </div>
 </div>

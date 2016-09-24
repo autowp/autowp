@@ -33,9 +33,6 @@
     </ul>
     <p><span class="label label-warning">Убедительная просьба</span>, перед добавлением изображений, убедиться в их отсутствии в каталоге.</p>
     <p>Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.</p>
-    <?php if (!$this->user()->logedIn()) { ?>
-        <p>Если вы хотите, чтобы все ваши изображения были подписаны вашим именем, вам необходимо <a href="/registration/">зарегистрироваться</a></p>
-    <?php } ?>
 
     <?php if ($this->selected) { ?>
         <div style="margin:20px 0">
@@ -43,18 +40,12 @@
                 <strong><?=$this->escapeHtml($this->selectedName) ?></strong>
                 [<?=$this->htmlA($this->url(null, [
                     'action' => 'select-brand'
-                ]), 'выбрать другую рубрику') ?>]
+                ]), $this->translate('upload/select-another')) ?>]
             </p>
             <?=$this->partial('application/forms/bootstrap-horizontal', [
                 'form' => $this->form
             ])?>
         </div>
-
-        <?php if (!$this->isSimple) { ?>
-            <p>Если имеют место проблемы с добавлением фото, можно попробовать использовать <?=$this->htmlA($this->url(null, [
-                'simple' => '1'
-            ], [], true), 'упрощенный интерфейс')?></p>
-        <?php } ?>
 
         <div class="progress-area"></div>
     <?php } else { ?>
@@ -63,7 +54,7 @@
             'href'  => $this->url(null, [
                 'action' => 'select-brand'
             ], [], true)
-        ], '<i class="fa fa-upload"></i> Добавить изображение', false) ?></p>
+        ], '<i class="fa fa-upload"></i> ' . $this->escapeHtml($this->translate('upload/add-picture')), false) ?></p>
     <?php } ?>
 </div>
 <div class="pictures"></div>

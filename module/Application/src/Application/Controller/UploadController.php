@@ -67,8 +67,6 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $isSimple = (bool)$this->params('simple');
-
         $pictureTable = $this->catalogue()->getPictureTable();
 
         $replace = $this->params('replace');
@@ -112,13 +110,13 @@ class UploadController extends AbstractActionController
                     $selected = true;
                     switch ($type) {
                         case Picture::UNSORTED_TYPE_ID:
-                            $selectedName = $brand->caption . ' / Несортировано';
+                            $selectedName = $brand->caption . ' / ' . $this->translator->translate('upload/select/unsorted');
                             break;
                         case Picture::MIXED_TYPE_ID:
-                            $selectedName = $brand->caption . ' / Разное';
+                            $selectedName = $brand->caption . ' / ' . $this->translator->translate('upload/select/mixed');
                             break;
                         case Picture::LOGO_TYPE_ID:
-                            $selectedName = $brand->caption . ' / Логотипы';
+                            $selectedName = $brand->caption . ' / ' . $this->translator->translate('upload/select/logo');
                             break;
                     }
                 }
@@ -149,7 +147,6 @@ class UploadController extends AbstractActionController
 
             $form = new UploadForm(null, [
                 'multipleFiles' => !$replacePicture,
-                'class'         => $isSimple ? 'disable-ajax' : ''
             ]);
 
             $form->setAttribute('action', $this->url()->fromRoute('upload/params', [], [], true));
@@ -226,7 +223,6 @@ class UploadController extends AbstractActionController
             'form'         => $form,
             'selected'     => $selected,
             'selectedName' => $selectedName,
-            'isSimple'     => $isSimple
         ];
     }
 

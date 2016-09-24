@@ -74,7 +74,7 @@ return [
                             'label' => 'login/captcha',
                             'captcha' => [
                                 'class'   => 'Image',
-                                'font'    => APPLICATION_PATH . '/resources/fonts/arial.ttf',
+                                'font'    => __DIR__ . '/../assets/fonts/arial.ttf',
                                 'imgDir'  => APPLICATION_PATH . '/../public_html/img/captcha/',
                                 'imgUrl'  => '/img/captcha/',
                                 'wordLen' => 4,
@@ -523,7 +523,7 @@ return [
                             'label' => 'login/captcha',
                             'captcha' => [
                                 'class'   => 'Image',
-                                'font'    => APPLICATION_PATH . '/resources/fonts/arial.ttf',
+                                'font'    => __DIR__ . '/../assets/fonts/arial.ttf',
                                 'imgDir'  => APPLICATION_PATH . '/../public_html/img/captcha/',
                                 'imgUrl'  => '/img/captcha/',
                                 'wordLen' => 4,

@@ -12,7 +12,7 @@ define(
                 
                 var $progress = $('.progress-area');
                 this.$pictures = $('.pictures');
-                $('form:not(.disable-ajax)').each(function() {
+                $('form').each(function() {
                     var $form = $(this);
                     $form.on('submit', function(e) {
 
