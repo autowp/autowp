@@ -254,6 +254,10 @@ return [
             'language' => function($sm) {
                 return new View\Helper\Language($sm->get(Language::class));
             },
+            'languagePicker' => function($sm) {
+                $languagePicker = $sm->get(LanguagePicker::class);
+                return new View\Helper\LanguagePicker($languagePicker);
+            },
             'user' => function($sm) {
                 $acl = $sm->get(Acl::class);
                 return new View\Helper\User($acl);
@@ -347,16 +351,22 @@ return [
                 return new Service\TelegramService($config['telegram'], $router);
             },
             'translator' => \Zend\Mvc\I18n\TranslatorFactory::class,
+            LanguagePicker::class => function($sm) {
+                $request = $sm->get('Request');
+                $config = $sm->get('Config');
+
+                return new LanguagePicker($request, $config['hosts']);
+            },
             MainMenu::class => function($sm) {
 
                 $router = $sm->get('HttpRouter');
                 $language = $sm->get(Language::class);
                 $cache = $sm->get('longCache');
-                $request = $sm->get('Request');
                 $config = $sm->get('Config');
                 $translator = $sm->get('translator');
+                $languagePicker = $sm->get(LanguagePicker::class);
 
-                return new MainMenu($request, $router, $language, $cache, $config['hosts'], $translator);
+                return new MainMenu($router, $language, $cache, $config['hosts'], $translator, $languagePicker);
             },
             Language::class => function($sm) {
 

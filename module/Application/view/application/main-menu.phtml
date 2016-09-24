@@ -113,7 +113,7 @@
                                     'hreflang' => $item['language']
                                 ]);
                             ?>
-                            <li<?=$item['active'] ? ' class="active"' : ''?>>
+                            <li<?=$item['language'] == $this->language() ? ' class="active"' : ''?>>
                                 <a href="<?=$this->escapeHtmlAttr($item['url'])?>">
                                     <i class="<?=$this->escapeHtmlAttr($item['flag'])?>"></i>
                                     <?=$this->escapeHtml($item['name'])?>

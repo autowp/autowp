@@ -20,8 +20,6 @@ class MainMenu
      */
     private $pageTable;
 
-    private $request;
-
     /**
      * @var TreeRouteStack
      */
@@ -57,9 +55,13 @@ class MainMenu
 
     private $translator;
 
-    public function __construct($request, TreeRouteStack $router, Language $language, StorageInterface $cache, $hosts, $translator)
+    /**
+     * @var LanguagePicker
+     */
+    private $languagePicker;
+
+    public function __construct(TreeRouteStack $router, Language $language, StorageInterface $cache, $hosts, $translator, LanguagePicker $languagePicker)
     {
-        $this->request = $request;
         $this->router = $router;
         $this->language = $language;
         $this->hosts = $hosts;
@@ -68,6 +70,7 @@ class MainMenu
         $this->pageTable = new Pages();
 
         $this->translator = $translator;
+        $this->languagePicker = $languagePicker;
     }
 
     /**
@@ -225,26 +228,10 @@ class MainMenu
 
         $searchHostname = 'www.autowp.ru';
 
-        $languages = [];
-
-        $uri = $this->request->getUri();
         foreach ($this->hosts as $itemLanguage => $item) {
-            $active = $itemLanguage == $language;
-            if ($active) {
+            if ($itemLanguage == $language) {
                 $searchHostname = $item['hostname'];
             }
-
-            $clone = clone $uri;
-            $clone->setHost($item['hostname']);
-
-            $languages[] = [
-                'name'     => $item['name'],
-                'language' => $itemLanguage,
-                'hostname' => $item['hostname'],
-                'flag'     => $item['flag'],
-                'url'      => $clone->__toString(),
-                'active'   => $active
-            ];
         }
 
         $logedIn = (bool)$user;
@@ -254,7 +241,7 @@ class MainMenu
             'secondMenu'     => $this->getSecondaryMenu($logedIn),
             'pm'             => $newMessages,
             'categories'     => $this->getCategoriesItems(),
-            'languages'      => $languages,
+            'languages'      => $this->languagePicker->getItems(),
             'language'       => $language,
             'searchHostname' => $searchHostname
         ];

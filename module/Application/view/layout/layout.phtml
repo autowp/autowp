@@ -102,7 +102,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             </div>
 
             <?php if ((!$blankPage) && (!$isAdminPage) ) { ?>
-                <div class="bottom-line"><p><strong>AutoWP.ru '2005&ndash;<?=$this->escapeHtml($this->translate('present-time-abbr'))?></strong></p></div>
+                <div class="bottom-line"><p><strong>
+                    <?=$this->escapeHtml($this->translate('layout/brand'))?> '2005&ndash;<?=$this->escapeHtml($this->translate('present-time-abbr'))?>
+                </strong></p></div>
 
                 <footer class="footer">
                     <div class="row">
@@ -123,6 +125,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                         <div class="col-md-6">
                             <p class="copyrights"><?=$this->translate('layout/footer')?></p>
                         </div>
+                    </div>
+                    <div class="text-center">
+                        <?php foreach ($this->languagePicker() as $item) { ?>
+                            <?php if ($item['language'] == $this->language()) { ?>
+                                <i class="<?=$this->escapeHtmlAttr($item['flag'])?>"></i>
+                                <?=$this->escapeHtml($item['name'])?>
+                            <?php } else { ?>
+                                <a href="<?=$this->escapeHtmlAttr($item['url'])?>">
+                                    <i class="<?=$this->escapeHtmlAttr($item['flag'])?>"></i>
+                                    <?=$this->escapeHtml($item['name'])?>
+                                </a>
+                            <?php } ?>
+                        <?php } ?>
                     </div>
                 </footer>
             <?php } ?>
