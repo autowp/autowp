@@ -607,51 +607,51 @@ Allons essayer de ne pas vous décevoir.',
     'car-type-rp/tractor'        => 'Tractor',
     'car-type-rp/tracked'        => 'Tracked platform',
 
-    'about/text' => '### Наши люди
-Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
+    'about/text' => '### Notre gens
+Son existence de notre projet est obligé de les gens qui viennent ici et ont contribué leur temps et leur connaissances.
 
-Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
+Quelqu'un ajoute matériaux, et quelqu'un aide à trouver des erreurs dans les existants. Quelqu'un qui se specialize dans une marque particulière, mais quelqu'un a le temps pour tout. Quelqu'un remplit le site étape par étape sans beaucoup d'attention, mais quelqu'un qui recueille ovation avec rares, mais brûlants photos.
 
-Нас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:
+Nous sommes nombreux, nous sommes différents, et c'est très bien. Voici quelques-uns d'entre nous:
 
 %users%
 
-#### "Цветовая дифференциация штанов"
+#### "La différenciation de la couleur des utilisateurs"
 
-Так завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из "зеленых", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что "зеленые" - это самые отзывчивые и заинтересованные в жизни проекта люди.
+Donc, il est arrivé que nous mettons en évidence certains de nos gens d'une couleur spéciale – vert, mais pas seulement - c'est une etiquette spéciale. Vous savez, si vous voyez une personne de «vert», vous pouvez toujours l'attraper et demander quoi que ce soit autour de notre projet, car les “verts” sont les plus sensibles et intéressés gens par la vie de projet.
 
-Некоторая часть "зеленых" наделена модераторскими функциями.
+Une partie des "verts" sont les modérateurs.
 
-### Диалог и обратная связь
+### Dialogue et retour d'information.
 
-Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/feedback)" администрации сайта.
+Si vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/forums/), demander personnellement via la messagerie, ou écrire dans le "[Retour d'information](/feedback)" de l'administration du site.
 
-Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами, все они имеют единственный ответ: мы не размещаем рекламу.
+Si vous avez des questions concernant la publicité, échange de lien ou de promouvoir votre produit par d'autres moyens, ils ont tous une réponse: on ne place pas la publicité.
 
-### Цифры
+### Nombres
 
-Так сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:
+C'est ainsi, que nous aimons le nombre élevé de vanité amuse, ainsi que de leur spectacle. À votre attention sont présentés quelques-unes:
 
-* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных
-* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений
+* sur le site il y a plus de %total-pictures% images, %total-vehicles% véhicules, ce qui représente environ %total-size% GB de données
+* il y a environ %total-users% membres, qui ont écrit plus de %total-comments% messages.
 
-### Разработка
+### Développement
 
-Разработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+Développement et maintenance du projet est réalisée principalement par %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
 
-Перевод сайта на французский язык: %fr-translator%
+La traduction du site en français: %fr-translator%
 
-Перевод сайта на китайский язык: %zh-translator%
+La traduction du site en chinois: %zh-translator%
 
-Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
+Le site propulsé par [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), ainsi que de nombreux autres.
 
-Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
+Une partie du code source du site est ouverte et un cours de communication supplémentaire, que tout le monde a eu l'occasion d'influencer la nature et la qualité du projet.
 
 %github%
 
-### Поддержать проект
+### Soutenir le projet
 
-Вы можете поддержать наш проект [финансово](/donate) или [морально](/feedback)',
+Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/feedback)',
 
     'page/1/name' => "Page d'accueil",
     'page/2/name' => "Main menu",
