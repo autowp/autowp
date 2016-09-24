@@ -53,7 +53,7 @@ return [
 
     'deleted-user' => 'удалённый пользователь',
 
-    'sumbit' => 'Отправить',
+    'submit' => 'Отправить',
 
     /* Layout */
     'layout/meta/description' => 'Энциклопедия автомобилей в картинках. AutoWP.ru',

@@ -39,7 +39,7 @@ return [
 
     'deleted-user' => '用户已注销',
 
-    'sumbit' => '上传',
+    'submit' => '上传',
 
     /* Layout */
     'layout/meta/description' => 'WheelsAge.org。汽车图片的百科全书。',

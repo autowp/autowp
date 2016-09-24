@@ -46,7 +46,7 @@ return [
 
     'deleted-user' => 'deleted user',
 
-    'sumbit' => 'Submit',
+    'submit' => 'Submit',
 
     /* Layout */
     'layout/meta/description' => 'Encyclopedia of cars in the pictures. WheelsAge.org',

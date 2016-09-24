@@ -46,7 +46,7 @@ return [
 
     'deleted-user' => 'utilisateur supprimé',
 
-    'sumbit' => 'Envoyer',
+    'submit' => 'Envoyer',
 
     /* Layout */
     'layout/meta/description' => 'Encyclopédie de voitures en images. WheelsAge.org',
