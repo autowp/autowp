@@ -636,7 +636,7 @@ Message with instructions to confirm will sent to new address.',
 
 ### 支持我们
 
-您可以通过 [捐助](/donate) 或[反馈意见](/feedback)支持我们网站
+您可以通过 [捐助](/donate) 或[反馈意见](/feedback)支持我们网站',
 
     'page/1/name' => "主页",
     'page/2/name' => "主目录",
@@ -1248,7 +1248,7 @@ Message with instructions to confirm will sent to new address.',
 
     'moder/edit-object' => '编辑',
 
-    'moder/markdown/description' => '降价语法.
+    'moder/markdown/description' => 'Markdown syntax.
 
 使用指南:
 [1](https://en.wikipedia.org/wiki/Markdown),

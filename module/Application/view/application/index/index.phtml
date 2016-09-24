@@ -125,7 +125,7 @@ html {
                         )?>
                     <?php } ?>
                 </p>
-                <?php if ($this->language() == 'ru') { ?>
+                <?php if (in_array($this->language(), ['ru', 'zh'])) { ?>
                     <?=$this->markdown($this->translate('index/twins/description'))?>
                 <?php } ?>
             </div>
@@ -137,7 +137,7 @@ html {
                         <?=$this->htmlA($category['url'], $category['short_name'])?>&#xa0;<span class="count">(<?=$category['cars_count']-$category['new_cars_count'] ?><?php if ($category['new_cars_count'] > 0) { ?><span>+<?=$category['new_cars_count'] ?></span><?php } ?>)</span>,
                     <?php } ?>
                 </p>
-                <?php if ($this->language() == 'ru') { ?>
+                <?php if (in_array($this->language(), ['ru', 'zh'])) { ?>
                     <?=$this->markdown($this->translate('index/categories/description'))?>
                 <?php } ?>
             </div>
@@ -152,7 +152,7 @@ html {
                     <?php } ?>
                     …
                 </p>
-                <?php if ($this->language() == 'ru') { ?>
+                <?php if (in_array($this->language(), ['ru', 'zh'])) { ?>
                     <?=$this->markdown($this->translate('index/categories/mosts'))?>
                 <?php } ?>
             </div>
