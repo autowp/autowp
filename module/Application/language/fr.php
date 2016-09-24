@@ -632,7 +632,7 @@ Si vous avez des questions concernant la publicité, échange de lien ou de prom
 
 C'est ainsi, que nous aimons le nombre élevé de vanité amuse, ainsi que de leur spectacle. À votre attention sont présentés quelques-unes:
 
-* sur le site il y a plus de %total-pictures% images, %total-vehicles% véhicules, ce qui représente environ %total-size% GB de données
+* sur le site il y a plus de %total-pictures% images, %total-vehicles% véhicules, ce qui représente environ %total-size% de données
 * il y a environ %total-users% membres, qui ont écrit plus de %total-comments% messages.
 
 ### Développement
