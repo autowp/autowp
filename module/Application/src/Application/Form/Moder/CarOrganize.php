@@ -55,16 +55,16 @@ class CarOrganize extends Form implements InputFilterProviderInterface
         }
 
         $isConceptOptions = [
-            '0' => 'нет',
-            '1' => 'да',
+            '0' => 'moder/vehicle/is-concept/no',
+            '1' => 'moder/vehicle/is-concept/yes',
         ];
         if (!is_null($this->inheritedIsConcept)) {
             $isConceptOptions = array_merge([
-                'inherited' => 'inherited (' . ($this->inheritedIsConcept ? 'да' : 'нет') . ')'
+                'inherited' => $this->inheritedIsConcept ? 'moder/vehicle/is-concept/inherited-yes': 'moder/vehicle/is-concept/inherited-no'
             ], $isConceptOptions);
         } else {
             $isConceptOptions = array_merge([
-                'inherited' => 'inherited'
+                'inherited' => 'moder/vehicle/is-concept/inherited'
             ], $isConceptOptions);
         }
 

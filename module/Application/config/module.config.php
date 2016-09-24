@@ -145,7 +145,10 @@ return [
             },
             Controller\VotingController::class       => InvokableFactory::class,
             Controller\Api\ContactsController::class => InvokableFactory::class,
-            Controller\Api\PictureController::class  => InvokableFactory::class,
+            Controller\Api\PictureController::class => function($sm) {
+                $translator = $sm->get('translator');
+                return new Controller\Api\PictureController($translator);
+            },
             Controller\Api\UsersController::class    => InvokableFactory::class,
         ],
     ],

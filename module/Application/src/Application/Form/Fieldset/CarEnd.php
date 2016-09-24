@@ -38,10 +38,10 @@ class CarEnd extends Fieldset implements InputFilterProviderInterface
                 'name'    => 'year',
                 'type'    => \Application\Form\Element\Year::class,
                 'options' => [
-                    'label' => 'год'
+                    'label' => 'moder/vehicle/year'
                 ],
                 'attributes' => [
-                    'placeholder' => 'год',
+                    'placeholder' => 'moder/vehicle/year',
                     'style'       => 'width: 10%',
                     'min'         => 1800,
                     'max'         => date('Y') + 10
@@ -51,27 +51,28 @@ class CarEnd extends Fieldset implements InputFilterProviderInterface
                 'name'    => 'month',
                 'type'    => \Application\Form\Element\Month::class,
                 'options' => [
-                    'label'    => 'месяц',
+                    'label'    => 'moder/vehicle/month',
                     'language' => $this->language
                 ],
                 'attributes' => [
-                    'placeholder'  => 'месяц',
-                    'style'        => 'width: 20%'
+                    'title' => 'moder/vehicle/month',
+                    'style' => 'width: 20%'
                 ]
             ],
             [
                 'name'    => 'today',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'наше время',
+                    'label'   => 'moder/vehicle/today',
                     'options' => [
                         ''  => '--',
-                        '0' => 'выпуск закончен',
-                        '1' => 'производится в н.в.'
+                        '0' => 'moder/vehicle/today/ended',
+                        '1' => 'moder/vehicle/today/continue'
                     ]
                 ],
                 'attributes' => [
-                    'style' => 'width: 20%'
+                    'style' => 'width: 20%',
+                    'title' => 'moder/vehicle/today',
                 ]
             ],
         ];

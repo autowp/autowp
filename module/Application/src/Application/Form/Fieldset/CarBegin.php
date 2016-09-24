@@ -40,10 +40,10 @@ class CarBegin extends Fieldset implements InputFilterProviderInterface
                 'name'    => 'year',
                 'type'    => \Application\Form\Element\Year::class,
                 'options' => [
-                    'label' => 'год'
+                    'label' => 'moder/vehicle/year'
                 ],
                 'attributes' => [
-                    'placeholder' => 'год',
+                    'placeholder' => 'moder/vehicle/year',
                     'style'       => 'width: 10%',
                     'min'         => 1800,
                     'max'         => date('Y') + 10
@@ -53,12 +53,12 @@ class CarBegin extends Fieldset implements InputFilterProviderInterface
                 'name'    => 'month',
                 'type'    => \Application\Form\Element\Month::class,
                 'options' => [
-                    'label'    => 'месяц',
+                    'label'    => 'moder/vehicle/month',
                     'language' => $this->language
                 ],
                 'attributes' => [
-                    'placeholder' => 'месяц',
-                    'style'       => 'width: 20%'
+                    'title' => 'moder/vehicle/month',
+                    'style' => 'width: 20%'
                 ]
             ],
         ];
