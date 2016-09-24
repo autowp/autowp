@@ -1,6 +1,6 @@
 <?php
-    $carHtml = '<strong>' . $this->escapeHtml($this->car->getFullName()) . '</strong>';
-    $parentCarHtml = '<strong>' . $this->escapeHtml($this->parentCar->getFullName()) . '</strong>';
+    $carHtml = '<strong>' . $this->escapeHtml($this->car->getFullName($this->language())) . '</strong>';
+    $parentCarHtml = '<strong>' . $this->escapeHtml($this->parentCar->getFullName($this->language())) . '</strong>';
 ?>
 <h3>Выбор</h3>
 <p>Вы пытаетесь сделать автомобиль <?=$carHtml?> подавтомобилем для <?=$parentCarHtml?></p>

@@ -149,7 +149,7 @@
                                 <?=$this->htmlA($this->url('moder/cars/params', [
                                     'action'     => 'car',
                                     'car_id'     => $car->id
-                                ]), $car->getFullName()) ?>
+                                ]), $car->getFullName($this->language())) ?>
                             <?php } else { ?>
                                 <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
                             <?php } ?>
@@ -249,7 +249,7 @@
                             'type'       => Picture::CAR_TYPE_ID,
                             'car_id'     => $this->lastCar->id
                         ])
-                    ], '<i class="fa fa-arrow-right"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' . $this->escapeHtml($this->lastCar->getFullName()), false) ?></p>
+                    ], '<i class="fa fa-arrow-right"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' . $this->escapeHtml($this->lastCar->getFullName($this->language())), false) ?></p>
                 <?php } ?>
                 <?php foreach ($this->relatedBrands as $brand) { ?>
                     <p><?=$this->htmlA([

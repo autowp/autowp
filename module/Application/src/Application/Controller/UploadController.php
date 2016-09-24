@@ -104,19 +104,19 @@ class UploadController extends AbstractActionController
             case Picture::UNSORTED_TYPE_ID:
             case Picture::MIXED_TYPE_ID:
             case Picture::LOGO_TYPE_ID:
-                $brands = new Brands();
-                $brand = $brands->find($brandId)->current();
+                $brandModel = new Brand();
+                $brand = $brandModel->getBrandById($brandId, $this->language());
                 if ($brand) {
                     $selected = true;
                     switch ($type) {
                         case Picture::UNSORTED_TYPE_ID:
-                            $selectedName = $brand->caption . ' / ' . $this->translator->translate('upload/select/unsorted');
+                            $selectedName = $brand['name'] . ' / ' . $this->translator->translate('upload/select/unsorted');
                             break;
                         case Picture::MIXED_TYPE_ID:
-                            $selectedName = $brand->caption . ' / ' . $this->translator->translate('upload/select/mixed');
+                            $selectedName = $brand['name'] . ' / ' . $this->translator->translate('upload/select/mixed');
                             break;
                         case Picture::LOGO_TYPE_ID:
-                            $selectedName = $brand->caption . ' / ' . $this->translator->translate('upload/select/logo');
+                            $selectedName = $brand['name'] . ' / ' . $this->translator->translate('upload/select/logo');
                             break;
                     }
                 }
@@ -127,7 +127,7 @@ class UploadController extends AbstractActionController
                 $car = $cars->find($carId)->current();
                 if ($car) {
                     $selected = true;
-                    $selectedName = $car->getFullName();
+                    $selectedName = $car->getFullName($this->language());
                 }
                 break;
 

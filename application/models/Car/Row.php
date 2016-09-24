@@ -123,7 +123,7 @@ class Car_Row extends Row
         if (!is_string($language)) {
             throw new Exception('`language` is not string');
         }
-        
+
         $carLangTable = new Car_Language();
         $carLangRow = $carLangTable->fetchRow([
             'car_id = ?'   => $this->id,
@@ -155,7 +155,7 @@ class Car_Row extends Row
         ];
     }
 
-    public function getFullName($language = 'en')
+    public function getFullName($language)
     {
         return self::buildFullName($this->getNameData($language));
     }

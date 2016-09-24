@@ -69,7 +69,7 @@
                 <?=$this->htmlA($this->url('moder/cars/params', [
                     'action' => 'car',
                     'car_id' => $car->id
-                ]), $car->getFullName()) ?><br />
+                ]), $car->getFullName($this->language())) ?><br />
             <?php } ?>
         </div>
     </div>

@@ -163,7 +163,7 @@
                                     'path'          => $path['path']
                                 ]);
 
-                                $name = $car->getFullName();
+                                $name = $car->getFullName($this->language());
                                 $list[] = $this->htmlA(
                                     $url,
                                     '<i class="fa fa-list-alt"></i> ' .

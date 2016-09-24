@@ -458,7 +458,7 @@ class CarsController extends AbstractActionController
 
                 $this->log(sprintf(
                     'Редактирование полного описания автомобиля %s',
-                    htmlspecialchars($car->getFullName())
+                    htmlspecialchars($car->getFullName('en'))
                 ), $car);
 
                 if ($car->full_text_id) {
@@ -470,7 +470,7 @@ class CarsController extends AbstractActionController
                         ], [
                             'force_canonical' => true
                         ]),
-                        $car->getFullName(),
+                        $car->getFullName('en'),
                         $this->carModerUrl($car, true)
                     );
 
@@ -712,7 +712,7 @@ class CarsController extends AbstractActionController
 
                     $message = sprintf(
                         'Редактирование мета-информации автомобиля %s',
-                        htmlspecialchars($car->getFullName()).
+                        htmlspecialchars($car->getFullName('en')).
                         ( count($changes) ? '<p>'.implode('<br />', $changes).'</p>' : '')
                     );
                     $this->log($message, $car);
@@ -728,7 +728,7 @@ class CarsController extends AbstractActionController
                         ], [
                             'force_canonical' => true
                         ]),
-                        $car->getFullName(),
+                        $car->getFullName('en'),
                         $this->carModerUrl($car, true)
                     );
                     foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
@@ -771,7 +771,7 @@ class CarsController extends AbstractActionController
 
                     $this->log(sprintf(
                         'Редактирование описания автомобиля %s',
-                        htmlspecialchars($car->getFullName())
+                        htmlspecialchars($car->getFullName('en'))
                     ), $car);
 
                     if ($car->text_id) {
@@ -783,7 +783,7 @@ class CarsController extends AbstractActionController
                             ], [
                                 'force_canonical' => true
                             ]),
-                            $car->getFullName(),
+                            $car->getFullName('en'),
                             $this->carModerUrl($car, true)
                         );
 
@@ -1010,7 +1010,7 @@ class CarsController extends AbstractActionController
 
         $message = sprintf(
             'Автомобиль %s отсоединен от бренда %s',
-            htmlspecialchars($car->getFullName()),
+            htmlspecialchars($car->getFullName('en')),
             $brand->caption
         );
         $this->log($message, [$brand, $car]);
@@ -1123,7 +1123,7 @@ class CarsController extends AbstractActionController
 
         $message = sprintf(
             'Автомобиль %s добавлен к бренду %s',
-            htmlspecialchars($car->getFullName()),
+            htmlspecialchars($car->getFullName('en')),
             $brand->caption
         );
         $this->log($message, [$brand, $car]);
@@ -1282,7 +1282,7 @@ class CarsController extends AbstractActionController
 
             $this->log(sprintf(
                 'Автомобиль %s добавлен в группу близнецов %s',
-                htmlspecialchars($car->getFullName()),
+                htmlspecialchars($car->getFullName('en')),
                 htmlspecialchars($twinsGroup->name)
             ), [$twinsGroup, $car]);
 
@@ -1414,7 +1414,7 @@ class CarsController extends AbstractActionController
 
             $this->log(sprintf(
                 'Автомобиль %s добавлен к заводу %s',
-                htmlspecialchars($car->getFullName()),
+                htmlspecialchars($car->getFullName('en')),
                 htmlspecialchars($factory->name)
             ), [$factory, $car]);
 
@@ -1603,7 +1603,7 @@ class CarsController extends AbstractActionController
         }
 
         if ($deletedNames || $insertedNames) {
-            $logText =  'Изменение категорий автомобиля ' . $car->getFullName() . '. ' .
+            $logText =  'Изменение категорий автомобиля ' . $car->getFullName('en') . '. ' .
                         ($deletedNames ? 'Удалено: ' . implode(', ', $deletedNames) . '. ' : '') .
                         ($insertedNames ? 'Добавлено: ' . implode(', ', $insertedNames) . '. ' : '');
             $this->log(htmlspecialchars($logText), $car);
@@ -1627,7 +1627,7 @@ class CarsController extends AbstractActionController
 
             if ($notifyUser && count($categoryNames)) {
                 $user = $this->user()->get();
-                $message = 'Пользователь http://www.autowp.ru' . $user->getAboutUrl() . ' отменил вашу привязку автомобиля ' . $car->getFullName().' ('.$this->carModerUrl($car, true).') ' .
+                $message = 'Пользователь http://www.autowp.ru' . $user->getAboutUrl() . ' отменил вашу привязку автомобиля ' . $car->getFullName('en').' ('.$this->carModerUrl($car, true).') ' .
                            (count($categoryNames) > 1 ? 'к категориям ' : 'к категории ') . implode(', ', $categoryNames);
                 $mModel->send(null, $notifyUser->id, $message);
             }
@@ -1700,7 +1700,7 @@ class CarsController extends AbstractActionController
                 $inheritedFrom = [];
                 foreach ($carRows as $carRow) {
                     $inheritedFrom[] = [
-                        'name' => $carRow->getFullName(),
+                        'name' => $carRow->getFullName('en'),
                         'url'  => $this->carModerUrl($carRow)
                     ];
                 }
@@ -1844,7 +1844,7 @@ class CarsController extends AbstractActionController
             unset($change); // prevent future bugs
             $message = sprintf(
                 'Редактирование названий автомобиля %s',
-                htmlspecialchars($car->getFullName()).
+                htmlspecialchars($car->getFullName('en')).
                 ( count($changes) ? '<p>'.implode('<br />', $changes).'</p>' : '')
             );
             $this->log($message, $car);
@@ -1895,10 +1895,10 @@ class CarsController extends AbstractActionController
 
         $graphItems = [];
         foreach ($allParents as $c) {
-            $graphItems[$c->id] = $c->getFullName();
+            $graphItems[$c->id] = $c->getFullName($this->language());
         }
         foreach ($allChilds as $c) {
-            $graphItems[$c->id] = $c->getFullName();
+            $graphItems[$c->id] = $c->getFullName($this->language());
         }
 
         $graphItemsIds = array_keys($graphItems);
@@ -1926,7 +1926,7 @@ class CarsController extends AbstractActionController
         foreach ($carParentRows as $carParentRow) {
             $childRow = $carTable->find($carParentRow->car_id)->current();
             $childCars[] = [
-                'name'      => $childRow->getFullName(),
+                'name'      => $childRow->getFullName($this->language()),
                 'isPrimary' => $carParentRow->is_primary,
                 'treeUrl'   => $this->url()->fromRoute('moder/cars/params', [
                     'car_id' => $childRow->id
@@ -2067,8 +2067,8 @@ class CarsController extends AbstractActionController
 
         $message = sprintf(
             '%s перестал быть родительским автомобилем для %s',
-            htmlspecialchars($parentCar->getFullName()),
-            htmlspecialchars($car->getFullName())
+            htmlspecialchars($parentCar->getFullName('en')),
+            htmlspecialchars($car->getFullName('en'))
         );
         $this->log($message, [$car, $parentCar]);
 
@@ -2146,8 +2146,8 @@ class CarsController extends AbstractActionController
 
         $message = sprintf(
             '%s выбран как родительский автомобиль для %s',
-            htmlspecialchars($parentCar->getFullName()),
-            htmlspecialchars($car->getFullName())
+            htmlspecialchars($parentCar->getFullName('en')),
+            htmlspecialchars($car->getFullName('en'))
         );
         $this->log($message, [$car, $parentCar]);
 
@@ -2390,7 +2390,7 @@ class CarsController extends AbstractActionController
             $inheritedFrom = [];
             foreach ($carRows as $carRow) {
                 $inheritedFrom[] = [
-                    'name' => $carRow->getFullName(),
+                    'name' => $carRow->getFullName($this->language()),
                     'url'  => $this->carModerUrl($carRow)
                 ];
             }
@@ -2481,7 +2481,7 @@ class CarsController extends AbstractActionController
             $inheritedFrom = [];
             foreach ($carRows as $carRow) {
                 $inheritedFrom[] = [
-                    'name' => $carRow->getFullName(),
+                    'name' => $carRow->getFullName($this->language()),
                     'url'  => $this->carModerUrl($carRow)
                 ];
             }
@@ -2514,7 +2514,7 @@ class CarsController extends AbstractActionController
     private function carTreeWalk(Car_Row $car, $carParentRow = null)
     {
         $data = [
-            'name'   => $car->getFullName(),
+            'name'   => $car->getFullName($this->language()),
             'url'    => $this->carModerUrl($car),
             'childs' => [],
             'type'   => $carParentRow ? $carParentRow->type : null
@@ -2863,7 +2863,7 @@ class CarsController extends AbstractActionController
                             }
 
                             $inheritedCar = [
-                                'name' => $inheritedCar->getFullName(),
+                                'name' => $inheritedCar->getFullName($this->language()),
                                 'url'  => $this->url()->fromRoute('moder/cars/params', [
                                     'action' => 'car',
                                     'car_id' => $inheritedCar->id,
@@ -3113,7 +3113,7 @@ class CarsController extends AbstractActionController
     private function carSelectParentWalk(Car_Row $car)
     {
         $data = [
-            'name'   => $car->getFullName(),
+            'name'   => $car->getFullName($this->language()),
             'url'    => $this->url()->fromRoute('moder/cars/params', [
                 'parent_id' => $car['id']
             ], [], true),
@@ -3245,7 +3245,7 @@ class CarsController extends AbstractActionController
         $childs = [];
         foreach ($carParentRows as $childRow) {
             $carRow = $carTable->find($childRow->car_id)->current();
-            $childs[$carRow->id] = $carRow->getFullName();
+            $childs[$carRow->id] = $carRow->getFullName($this->language());
         }
 
         $specTable = new Spec();
@@ -3306,7 +3306,7 @@ class CarsController extends AbstractActionController
                 ]);
                 $this->log(sprintf(
                     'Создан новый автомобиль %s',
-                    htmlspecialchars($newCar->getFullName())
+                    htmlspecialchars($newCar->getFullName('en'))
                 ), $newCar);
 
 
@@ -3314,8 +3314,8 @@ class CarsController extends AbstractActionController
 
                 $message = sprintf(
                     '%s выбран как родительский автомобиль для %s',
-                    htmlspecialchars($car->getFullName()),
-                    htmlspecialchars($newCar->getFullName())
+                    htmlspecialchars($car->getFullName('en')),
+                    htmlspecialchars($newCar->getFullName('en'))
                 );
                 $this->log($message, [$car, $newCar]);
 
@@ -3329,16 +3329,16 @@ class CarsController extends AbstractActionController
 
                     $message = sprintf(
                         '%s выбран как родительский автомобиль для %s',
-                        htmlspecialchars($newCar->getFullName()),
-                        htmlspecialchars($childCarRow->getFullName())
+                        htmlspecialchars($newCar->getFullName('en')),
+                        htmlspecialchars($childCarRow->getFullName('en'))
                     );
                     $this->log($message, [$newCar, $childCarRow]);
 
                     $carParentTable->removeParent($childCarRow, $car);
                     $message = sprintf(
                         '%s перестал быть родительским автомобилем для %s',
-                        htmlspecialchars($car->getFullName()),
-                        htmlspecialchars($childCarRow->getFullName())
+                        htmlspecialchars($car->getFullName('en')),
+                        htmlspecialchars($childCarRow->getFullName('en'))
                     );
                     $this->log($message, [$car, $childCarRow]);
 
@@ -3497,7 +3497,7 @@ class CarsController extends AbstractActionController
                 ]);
                 $this->log(sprintf(
                     'Создан новый автомобиль %s',
-                    htmlspecialchars($car->getFullName())
+                    htmlspecialchars($car->getFullName('en'))
                 ), $car);
 
                 $user = $this->user()->get();
@@ -3509,8 +3509,8 @@ class CarsController extends AbstractActionController
 
                     $message = sprintf(
                         '%s выбран как родительский автомобиль для %s',
-                        htmlspecialchars($parentCar->getFullName()),
-                        htmlspecialchars($car->getFullName())
+                        htmlspecialchars($parentCar->getFullName('en')),
+                        htmlspecialchars($car->getFullName('en'))
                     );
                     $this->log($message, [$car, $parentCar]);
                 }
@@ -3636,7 +3636,7 @@ class CarsController extends AbstractActionController
                 ]);
                 $this->log(sprintf(
                     'Создан новый автомобиль %s',
-                    htmlspecialchars($newCar->getFullName())
+                    htmlspecialchars($newCar->getFullName('en'))
                 ), $newCar);
 
                 $car->is_group = 1;
@@ -3646,8 +3646,8 @@ class CarsController extends AbstractActionController
 
                 $message = sprintf(
                     '%s выбран как родительский автомобиль для %s',
-                    htmlspecialchars($car->getFullName()),
-                    htmlspecialchars($newCar->getFullName())
+                    htmlspecialchars($car->getFullName('en')),
+                    htmlspecialchars($newCar->getFullName('en'))
                 );
                 $this->log($message, [$car, $newCar]);
 
@@ -3671,7 +3671,7 @@ class CarsController extends AbstractActionController
                     $this->log(sprintf(
                         'Картинка %s связана с автомобилем %s',
                         htmlspecialchars($pictureRow->id),
-                        htmlspecialchars($car->getFullName())
+                        htmlspecialchars($car->getFullName('en'))
                     ), [$car, $pictureRow]);
                 }
 

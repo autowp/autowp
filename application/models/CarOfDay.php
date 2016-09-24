@@ -31,9 +31,9 @@ class CarOfDay
         $dayRow = $this->_table->fetchRow([
             'day_date = CURDATE()'
         ]);
-        
+
         $db = $this->_table->getAdapter();
-        
+
         if (!$dayRow) {
             $dayRow = $this->_table->createRow([
                 'day_date' => new Zend_Db_Expr('CURDATE()')
@@ -137,7 +137,7 @@ class CarOfDay
 
         $url = 'http://wheelsage.org/picture/' . ($picture->identity ? $picture->identity : $picture->id);
 
-        $text = 'Автомобиль дня: ' . $car->getFullName() . ' ' . $url;
+        $text = 'Vehicle of the day: ' . $car->getFullName('en') . ' ' . $url;
 
         $token = new Zend_Oauth_Token_Access();
         $token->setParams($twOptions['token']);

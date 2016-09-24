@@ -1512,7 +1512,7 @@ class PicturesController extends AbstractActionController
                     ->where('parent_id = ?', $row->id)
             );
             $cars[] = [
-                'name' => $row->getFullName(),
+                'name' => $row->getFullName($this->language()),
                 'url'  => $this->url()->fromRoute(null, [
                     'action' => 'move',
                     'car_id' => $row['id'],
@@ -1547,7 +1547,7 @@ class PicturesController extends AbstractActionController
                         ->where('parent_id = ?', $car->id)
                 );
                 $items[] = [
-                    'name' => $car->getFullName(),
+                    'name' => $car->getFullName($this->language()),
                     'url'  => $this->url()->fromRoute(null, [
                         'action' => 'move',
                         'car_id' => $car['id'],

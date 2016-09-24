@@ -737,7 +737,7 @@ class Pic extends AbstractPlugin
                             'action' => 'car',
                             'car_id' => $car->id
                         ]);
-                        $links[$url] = sprintf($this->translator->translate('moder/picture/edit-vehicle-%s'), $car->getFullName());
+                        $links[$url] = sprintf($this->translator->translate('moder/picture/edit-vehicle-%s'), $car->getFullName($language));
 
                         $brandTable = new Brands();
 

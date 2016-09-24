@@ -286,7 +286,7 @@ class CategoryController extends AbstractActionController
                 );
 
                 if ($categoryLinksCount < count($brandNames)) {
-                    $childs[$carRow->id] = str_repeat('...', $carParentRow->diff) . ' ' . implode(', ', $brandNames) . ': ' . $carRow->getFullName();
+                    $childs[$carRow->id] = str_repeat('...', $carParentRow->diff) . ' ' . implode(', ', $brandNames) . ': ' . $carRow->getFullName($this->language());
                 }
             }
         }
@@ -340,7 +340,7 @@ class CategoryController extends AbstractActionController
             ]);
             $this->log(sprintf(
                 'Создан новый автомобиль %s',
-                $newCar->getFullName()
+                $newCar->getFullName('en')
             ), $newCar);
 
             $ccTable = new Category_Car();
@@ -363,8 +363,8 @@ class CategoryController extends AbstractActionController
 
                 $message = sprintf(
                     '%s выбран как родительский автомобиль для %s',
-                    $newCar->getFullName(),
-                    $childCarRow->getFullName()
+                    $newCar->getFullName('en'),
+                    $childCarRow->getFullName('en')
                 );
                 $this->log($message, [$newCar, $childCarRow]);
 

@@ -152,7 +152,7 @@ class CarsController extends AbstractActionController
 
             foreach ($carRows as $carRow) {
                 $engineInheritedFrom[] = [
-                    'name' => $carRow->getFullName(),
+                    'name' => $carRow->getFullName($this->language()),
                     'url'  => $this->url()->fromRoute('moder/cars/params', [
                         'action' => 'car',
                         'car_id' => $carRow->id
@@ -379,7 +379,7 @@ class CarsController extends AbstractActionController
         ], 'update_date');
 
         $specService = new SpecificationsService();
-        
+
         $language = $this->language();
 
         $values = [];
@@ -508,7 +508,7 @@ class CarsController extends AbstractActionController
                 ], [], true);
             }
         }
-        
+
         $language = $this->language();
 
         $userValues = new Attrs_User_Values();
@@ -554,7 +554,7 @@ class CarsController extends AbstractActionController
             if ($itemType->id == 1) {
                 $car = $cars->find($row->item_id)->current();
                 if ($car) {
-                    $objectName = $car->getFullName();
+                    $objectName = $car->getFullName($this->language());
                     $editorUrl = $this->url()->fromRoute('cars/params', [
                         'action' => 'car-specifications-editor',
                         'car_id' => $car->id
@@ -660,7 +660,7 @@ class CarsController extends AbstractActionController
 
             $message = sprintf(
                 'У автомобиля %s убран двигатель (был %s)',
-                htmlspecialchars($car->getFullName()), htmlspecialchars($engine->caption)
+                htmlspecialchars($car->getFullName('en')), htmlspecialchars($engine->caption)
             );
             $this->log($message, $car);
 
@@ -671,7 +671,7 @@ class CarsController extends AbstractActionController
 
             $message = sprintf(
                 '%s отменил двигатель %s для автомобиля %s ( %s )',
-                $this->userUrl($user), $engine->caption, $car->getFullName(), $this->carModerUrl($car)
+                $this->userUrl($user), $engine->caption, $car->getFullName('en'), $this->carModerUrl($car)
             );
             foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
@@ -708,7 +708,7 @@ class CarsController extends AbstractActionController
 
             $message = sprintf(
                 'У автомобиля %s установлено наследование двигателя',
-                htmlspecialchars($car->getFullName())
+                htmlspecialchars($car->getFullName('en'))
             );
             $this->log($message, $car);
 
@@ -719,7 +719,7 @@ class CarsController extends AbstractActionController
 
             $message = sprintf(
                 '%s установил наследование двигателя автомобилю %s ( %s )',
-                $this->userUrl($user), $car->getFullName(), $this->carModerUrl($car)
+                $this->userUrl($user), $car->getFullName('en'), $this->carModerUrl($car)
             );
             foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
@@ -825,7 +825,7 @@ class CarsController extends AbstractActionController
 
         $message = sprintf(
             'Автомобилю %s назначен двигатель %s',
-            htmlspecialchars($car->getFullName()), htmlspecialchars($engine->caption)
+            htmlspecialchars($car->getFullName('en')), htmlspecialchars($engine->caption)
         );
         $this->log($message, $car);
 
@@ -833,7 +833,7 @@ class CarsController extends AbstractActionController
 
         $message = sprintf(
             '%s назначил двигатель %s автомобилю %s ( %s )',
-            $this->userUrl($user), $engine->caption, $car->getFullName(), $this->carModerUrl($car)
+            $this->userUrl($user), $engine->caption, $car->getFullName('en'), $this->carModerUrl($car)
         );
         foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
             if ($subscriber && ($subscriber->id != $user->id)) {
