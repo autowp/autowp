@@ -82,9 +82,9 @@ return [
     'index/brands'             => '品牌',
     'index/factories'          => '工厂',
     'index/specifications'     => '性能参数',
-    'index/twins/description' => 'Вы знаете, что Daewoo Matiz имеет аж целых [шесть клонов](/twins/group87)? А знаете, что [общего у Lotus и Kia](/twins/group5)? Уверены, что вам покажется интересным этот раздел.',
-    'index/categories/description' => 'А знаете ли вы, какая техника помогала блюсти правопорядок на улицах мировых городов в разное время? А на каких автомобилях ездил Папа Римский? Нет? Тогда вам точно в этот раздел.',
-    'index/categories/mosts' => 'Хотите знать, какой автомобиль был самым быстрым? Хотите знать, сколько весит самый могучий карьерный самосвал? Заходите и узнаете.',
+    'index/twins/description' => '你或许早就知道大宇曼蒂兹有了6个[克隆车](/twins/group87)? 可是你知道 [莲花和起亚的姊妹车](/twins/group5)吗? 我们相信这是一个很有趣的版块。',
+    'index/categories/description' => '你知道在不同时期是哪种技术帮助了全世界的城市街道遵守法律和秩序的吗？教皇乘坐哪些车？不知道？那么你应该阅读这一版块。',
+    'index/categories/mosts' => '想知道哪款车是最快的？想知道最强大的矿用卡车有多重？快来了解一下。',
 
     'mosts/fastest/roadster'          => '最快的敞篷跑车',
     'mosts/mighty/sedan/today'        => '当今动力最强的四门轿车',
@@ -454,7 +454,7 @@ Message with instructions to confirm will sent to new address.',
     'users/user/last-visited' => '最后登陆于',
     'users/user/send-personal-message' => '发送站内信',
     'users/user/log' => '在线中',
-    'users/user/uploaded-pictures' => '未审核图片',
+    'users/user/uploaded-pictures' => '已上传图片',
     'users/user/not-upload-pictures' => '未上传图片',
 
     'users/rating/specifications' => '备注',
@@ -473,7 +473,7 @@ Message with instructions to confirm will sent to new address.',
         "诚挚的机器人 %4\$s",
     'users/registration/email-confirm/token-not-found' => '链接已超时',
     'users/registration/email-confirm/success-text' => '您的电子邮件地址已成功确认。',
-    'users/registration/success/email-sent' => 'Message with instructions to verify your e-mail sent.',
+    'users/registration/success/email-sent' => '用于确认电子邮件地址的邮件已发送。',
     'users/change-email/confirm-subject' => '电子邮件确认于 %1$s',
     'users/change-email/confirm-message' =>
         "您好.\n\n" .
@@ -592,51 +592,51 @@ Message with instructions to confirm will sent to new address.',
     'car-type-rp/tractor'        => '拖拉机',
     'car-type-rp/tracked'        => '履带平台',
 
-    'about/text' => '### Наши люди
-Своим существованием наш проект обязан людям, приходящим сюда и вкладывающим своё время и знания.
+    'about/text' => '### 我们的团队
+来到这里投入时间和知识的人们是本网站存在的根基。
 
-Кто-то добавляет материалы, а кто-то помогает найти ошибки в уже имещихся. Кто-то специализируется на конкретной марке, а кто-то успевает за всем. Кто-то без лишнего внимания со стороны наполняет сайт шаг за шагом, а кто-то собирает овации редкими, но жгучими фото.
+我们当中既有人添加图片，也有人帮助修改错误。有的人钟爱某一品牌，也有人喜爱所有车型。不仅有人一步一步充实网站，更有人贡献出自己稀有的图片收藏。.
 
-Нас много и мы разные, и это прекрасно. Вот лишь некоторые из нас:
+在这个庞大的群体中，每个人都与众不同，这里是一些主要成员:
 
 %users%
 
-#### "Цветовая дифференциация штанов"
+#### "不同颜色的用户名"
 
-Так завелось, что мы выделяем некоторых наших людей особым цветом - зеленым. Не просто так - это особая метка. Знайте, если вы видите кого-то из "зеленых", вы всегда можете схватить его и спросить о чем угодно вокруг нашего проекта, потому что "зеленые" - это самые отзывчивые и заинтересованные в жизни проекта люди.
+首先，我们当中一些人被一种特殊的颜色标记着———绿色，这是一个特殊的标签，当你看到绿色用户名时，可以向他们任何一位咨询关于网站的问题，因为绿色代表着本站最重要、最热情的一群人。
 
-Некоторая часть "зеленых" наделена модераторскими функциями.
+绿色标记往往意味着管理员身份。
 
-### Диалог и обратная связь
+### 意见反馈
 
-Если у вас есть какие-то замечания, предложения или иные мысли, вы можете озвучить их на [форуме](/forums/), задать лично через систему обмена сообщениями или написать в "[обратную связь](/feedback)" администрации сайта.
+如果您有任何意见、建议或其他的想法，可以在[форуме](/forums/)联系他们, 选择通过站内信或写 "[обратную связь](/feedback)" 反馈网站的管理。
 
-Если у вас есть вопросы о размещении рекламы, обмена ссылками или продвижении вашего продукта иными способами имею единственный ответ: мы не размещаем рекламу.
+如果您有关于广告、交换链接或推广产品的问题，很抱歉：我们不设置广告。
 
 ### Цифры
 
 Так сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:
 
-* на сайте более %total-pictures% изображений, %total-vehicles% автомобилей, что составляет порядка %total-size% данных
-* зарегистрировано около %total-users% пользователей, оставивших более %total-comments% сообщений
+* 线上收录了超过%total-pictures%张图片，%total-vehicles%款车型，数据总量超过%total-size%GB。
+* 共有%total-users%名用户发表了%total-comments%条评论。
 
-### Разработка
+### 开发
 
-Разработка и поддержка проекта ведется в основном силами %developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+网站的发展和技术支持主要来自%developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
 
-Перевод сайта на французский язык: %fr-translator%
+法语页面建设者: %fr-translator%
 
-Перевод сайта на китайский язык: %zh-translator%
+中文页面建设者: %zh-translator%
 
-Сайт работает на [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
+技术支持 [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
 
-Исходный кода сайта является открытым, чтобы каждый желающий имел возможность влиять на суть и качество проекта.
+网站源代码向所有人开放，每个人都有机会影响网站的性质和质量。
 
 %github%
 
-### Поддержать проект
+### 支持我们
 
-Вы можете поддержать наш проект [финансово](/donate) или [морально](/feedback)',
+您可以通过 [捐助](/donate) 或[反馈意见](/feedback)支持我们网站
 
     'page/1/name' => "主页",
     'page/2/name' => "主目录",
@@ -774,7 +774,7 @@ Message with instructions to confirm will sent to new address.',
     'page/170/name' => "添加",
     'page/171/name' => "选择母公司",
     'page/172/name' => "配备%ENGINE_NAME%发动机的车型",
-    'page/173/name' => "统计",
+    'page/173/name' => "贡献排行榜",
     'page/174/name' => "技术参数",
     'page/175/name' => "工厂",
     'page/176/name' => "添加",
@@ -937,7 +937,7 @@ Message with instructions to confirm will sent to new address.',
     'page/171/title' => "选择母公司",
     'page/172/title' => "配备%ENGINE_NAME%发动机的车型",
     'page/173/title' => "详细",
-    'page/174/title' => "贡献排行榜",
+    'page/174/title' => "统计",
     'page/175/title' => "工厂",
     'page/176/title' => "添加",
     'page/177/title' => "%FACTORY_NAME%",
@@ -1098,7 +1098,7 @@ Message with instructions to confirm will sent to new address.',
     'page/170/breadcrumbs' => "添加",
     'page/171/breadcrumbs' => "选择上级目录",
     'page/172/breadcrumbs' => "车辆",
-    'page/173/breadcrumbs' => "统计",
+    'page/173/breadcrumbs' => "贡献排行榜",
     'page/174/breadcrumbs' => "性能参数",
     'page/175/breadcrumbs' => "工厂",
     'page/176/breadcrumbs' => "添加",
@@ -1128,9 +1128,9 @@ Message with instructions to confirm will sent to new address.',
     'page/201/title'       => "立标",
     'page/201/breadcrumbs' => "立标",
 
-    'page/202/name'        => 'Perspectives',
-    'page/202/title'       => 'Perspectives',
-    'page/202/breadcrumbs' => 'Perspectives',
+    'page/202/name'        => '剖视',
+    'page/202/title'       => '剖视',
+    'page/202/breadcrumbs' => '剖视',
 
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',
@@ -1182,11 +1182,11 @@ Message with instructions to confirm will sent to new address.',
     'moder/vehicle/tabs/pictures' => '图片',
     'moder/vehicle/tabs/modifications' => '改款',
 
-    'moder/vehicle/meta/description' => 'Short description',
+    'moder/vehicle/meta/description' => '简介',
 
-    'moder/vehicle/subscription/title' => 'Changes notifications subscription',
-    'moder/vehicle/subscription/subscribed' => 'Subscribed',
-    'moder/vehicle/subscription/not-subscribed' => 'Not subscribed',
+    'moder/vehicle/subscription/title' => '改变订阅通知',
+    'moder/vehicle/subscription/subscribed' => '已订阅',
+    'moder/vehicle/subscription/not-subscribed' => '未订阅',
 
     'moder/vehicle/catalogue/add-vehicle' => '添加车型',
     'moder/vehicle/catalogue/title/name' => '车名',
@@ -1248,15 +1248,15 @@ Message with instructions to confirm will sent to new address.',
 
     'moder/edit-object' => '编辑',
 
-    'moder/markdown/description' => 'Markdown syntax.
+    'moder/markdown/description' => '降价语法.
 
-Few manuals:
+使用指南:
 [1](https://en.wikipedia.org/wiki/Markdown),
 [2](https://guides.github.com/features/mastering-markdown/),
 [3](https://daringfireball.net/projects/markdown/basics),
 
 Interlan hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins>',
-    'moder/markdown/edit' => 'Edit',
-    'moder/markdown/preview' => 'Preview',
-    'moder/markdown/history' => 'History',
+    'moder/markdown/edit' => '编辑',
+    'moder/markdown/preview' => '预览',
+    'moder/markdown/history' => '历史',
 ];
