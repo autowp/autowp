@@ -607,7 +607,7 @@ Allons essayer de ne pas vous décevoir.',
     'car-type-rp/tractor'        => 'Tractor',
     'car-type-rp/tracked'        => 'Tracked platform',
 
-    'about/text' => '### Notre gens
+    'about/text' => "### Notre gens
 Son existence de notre projet est obligé de les gens qui viennent ici et ont contribué leur temps et leur connaissances.
 
 Quelqu'un ajoute matériaux, et quelqu'un aide à trouver des erreurs dans les existants. Quelqu'un qui se specialize dans une marque particulière, mais quelqu'un a le temps pour tout. Quelqu'un remplit le site étape par étape sans beaucoup d'attention, mais quelqu'un qui recueille ovation avec rares, mais brûlants photos.
@@ -616,15 +616,15 @@ Nous sommes nombreux, nous sommes différents, et c'est très bien. Voici quelqu
 
 %users%
 
-#### "La différenciation de la couleur des utilisateurs"
+#### \"La différenciation de la couleur des utilisateurs\"
 
 Donc, il est arrivé que nous mettons en évidence certains de nos gens d'une couleur spéciale – vert, mais pas seulement - c'est une etiquette spéciale. Vous savez, si vous voyez une personne de «vert», vous pouvez toujours l'attraper et demander quoi que ce soit autour de notre projet, car les “verts” sont les plus sensibles et intéressés gens par la vie de projet.
 
-Une partie des "verts" sont les modérateurs.
+Une partie des \"verts\" sont les modérateurs.
 
 ### Dialogue et retour d'information.
 
-Si vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/forums/), demander personnellement via la messagerie, ou écrire dans le "[Retour d'information](/feedback)" de l'administration du site.
+Si vous avez des commentaires, suggestions ou autres idées, vous pouvez les annoncer sur [le forum](/forums/), demander personnellement via la messagerie, ou écrire dans le \"[Retour d'information](/feedback)\" de l'administration du site.
 
 Si vous avez des questions concernant la publicité, échange de lien ou de promouvoir votre produit par d'autres moyens, ils ont tous une réponse: on ne place pas la publicité.
 
@@ -651,7 +651,7 @@ Une partie du code source du site est ouverte et un cours de communication suppl
 
 ### Soutenir le projet
 
-Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/feedback)',
+Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/feedback)",
 
     'page/1/name' => "Page d'accueil",
     'page/2/name' => "Main menu",
