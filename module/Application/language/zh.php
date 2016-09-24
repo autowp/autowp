@@ -391,13 +391,13 @@ return [
 
     'account/specs/conflicts/my-value/none' => '暂无',
 
-    'account/email/your-current-email:' => 'Your current e-mail address: ',
-    'account/email/your-dont-enter-email' => 'You don\'t input e-mail address',
-    'account/email/text' => 'On this page you can change your e-mail address.
+    'account/email/your-current-email:' => '您当前的电子邮件地址: ',
+    'account/email/your-dont-enter-email' => '您没有输入电子邮件地址',
+    'account/email/text' => '您可以在本页修改您的电子邮件地址。
 
-Message with instructions to confirm will sent to new address.',
+确认邮件已发送到您的新电子邮箱地址。',
 
-    'account/accounts/add' => 'Add account',
+    'account/accounts/add' => '添加账号',
 
     'feedback/title' => '反馈',
     'feedback/name'  => '标题',
@@ -609,20 +609,20 @@ Message with instructions to confirm will sent to new address.',
 
 ### 意见反馈
 
-如果您有任何意见、建议或其他的想法，可以在[форуме](/forums/)联系他们, 选择通过站内信或写 "[обратную связь](/feedback)" 反馈网站的管理。
+如果您有任何意见、建议或其他的想法，可以到[论坛](/forums/)联系他们, 选择通过站内信或写 "[意见反馈](/feedback)" 为网站管理提建议。
 
 如果您有关于广告、交换链接或推广产品的问题，很抱歉：我们不设置广告。
 
-### Цифры
+### 资源
 
-Так сложилось, что мы любим тешить своё тщеславие большими цифрами, а также всем их показывать. Вашему вниманию некоторые из них:
+对于庞大的图片数量我们不能免俗地产生一种自豪感，并且想把这些数字公布出来。下面是其中一部分:
 
 * 线上收录了超过%total-pictures%张图片，%total-vehicles%款车型，数据总量超过%total-size%GB。
 * 共有%total-users%名用户发表了%total-comments%条评论。
 
 ### 开发
 
-网站的发展和技术支持主要来自%developer% ([contributors](https://github.com/autowp/autowp/graphs/contributors))
+网站的发展和技术支持主要来自%developer% ([首要贡献者](https://github.com/autowp/autowp/graphs/contributors))
 
 法语页面建设者: %fr-translator%
 
@@ -706,7 +706,7 @@ Message with instructions to confirm will sent to new address.',
     'page/85/name' => "%BRAND_NAME%",
     'page/86/name' => "图片已成功上传",
     'page/87/name' => "更多",
-    'page/89/name' => "评论",
+    'page/89/name' => "意见反馈",
     'page/90/name' => "注销",
     'page/91/name' => "注册",
     'page/93/name' => "已发送信息",
@@ -1244,7 +1244,7 @@ Message with instructions to confirm will sent to new address.',
     'moder/picture/acceptance/cancel-vote' => '取消我的表决',
     'moder/picture/acceptance/already-voted' => '已表决: ',
     'moder/picture/acceptance/that-is-one-accepted-picture' => '此车唯一的图片',
-    'moder/picture/acceptance/accepted-pictures-is-%s' => 'Accepted pictures count still %s',
+    'moder/picture/acceptance/accepted-pictures-is-%s' => '接受的图片仍然属于%s',
 
     'moder/edit-object' => '编辑',
 
