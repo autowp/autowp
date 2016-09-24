@@ -2,7 +2,6 @@
     $this->pageEnv([
         'layout' => [
             'blankPage' => false,
-            'needLeft'  => false,
             'needRight' => false
         ],
         'pageId' => 198,
@@ -22,10 +21,10 @@
                             <li class="media">
                                 <div class="media-left media-middle">
                                     <?php if (!$user->deleted) { ?>
-                                        <?=$this->htmlA(array(
+                                        <?=$this->htmlA([
                                             'href'  => $user->getAboutUrl(),
                                             'class' => 'photo'
-                                        ), $this->user($user)->avatar(), false) ?>
+                                        ], $this->user($user)->avatar(), false) ?>
                                     <?php } ?>
                                 </div>
                                 <div class="media-body">

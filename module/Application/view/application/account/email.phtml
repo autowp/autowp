@@ -2,7 +2,6 @@
     $this->pageEnv([
         'layout' => [
             'blankPage' => false,
-            'needLeft'  => false,
             'needRight' => false
         ],
         'pageId' => 55,
@@ -13,7 +12,7 @@
         <div class="well">
             <?php if ($email = $this->user()->get()->e_mail) { ?>
                 <p>
-                    <?=$this->escapeHtml($this->translate('account/email/your-current-email:'))?> 
+                    <?=$this->escapeHtml($this->translate('account/email/your-current-email:'))?>
                     <?=$this->htmlA('mailto:' . $email, $email) ?>
                 </p>
             <?php } else { ?>
