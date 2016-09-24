@@ -46,18 +46,18 @@
             <div>
                 <span class="vote" data-id="<?=$comment['id']?>">
                     <?php if ($this->user()->logedIn()) { ?>
-                        <?=$this->htmlA(array(
+                        <?=$this->htmlA([
                             'href'  => '#',
                             'class' => 'vote-up' . ($comment['userVote'] > 0 ? ' active' : '')
-                        ), '<i class="fa fa-thumbs-o-up"></i>', false)?>
-                        <?=$this->htmlA(array(
+                        ], '<i class="fa fa-thumbs-o-up"></i>', false)?>
+                        <?=$this->htmlA([
                             'href'  => '#',
                             'class' => 'value' . ($comment['vote'] == 0 ? ' zero' : '')
-                        ), ($comment['vote'] > 0 ? '+' : '') . $comment['vote'])?>
-                        <?=$this->htmlA(array(
+                        ], ($comment['vote'] > 0 ? '+' : '') . $comment['vote'])?>
+                        <?=$this->htmlA([
                             'href'  => '#',
                             'class' => 'vote-down' . ($comment['userVote'] < 0 ? ' active' : '')
-                        ), '<i class="fa fa-thumbs-o-down"></i>', false)?>
+                        ], '<i class="fa fa-thumbs-o-down"></i>', false)?>
                     <?php } else { ?>
                         <i class="fa fa-thumbs-o-up"></i>
                         <span class="value"><?=$comment['vote'] ?></span>

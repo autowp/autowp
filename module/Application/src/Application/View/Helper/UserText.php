@@ -197,14 +197,14 @@ class UserText extends AbstractHtmlElement
     private function tryPictureLinkParams(array $params)
     {
         $map = [
-            array(
+            [
                 'controller' => \Application\Controller\PictureController::class,
                 'action'     => 'index'
-            ),
-            array(
+            ],
+            [
                 'controller' => \Application\Controller\CatalogueController::class,
                 'action'     => 'brand-car-picture'
-            )
+            ]
         ];
 
         $pictureId = null;
@@ -224,15 +224,15 @@ class UserText extends AbstractHtmlElement
 
         if ($pictureId) {
             $pictureTable = new Picture();
-            $picture = $pictureTable->fetchRow(array(
+            $picture = $pictureTable->fetchRow([
                 'id = ?' => $pictureId,
                 'identity IS NULL'
-            ));
+            ]);
 
             if (!$picture) {
-                $picture = $pictureTable->fetchRow(array(
+                $picture = $pictureTable->fetchRow([
                     'identity = ?' => $pictureId
-                ));
+                ]);
             }
 
             if ($picture) {

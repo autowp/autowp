@@ -48,9 +48,9 @@ class UsersController extends AbstractActionController
         printf("%d user remember rows was deleted\n", $count);
 
         $uprTable = new User_Password_Remind();
-        $count = $uprTable->delete(array(
+        $count = $uprTable->delete([
             'created < DATE_SUB(NOW(), INTERVAL 10 DAY)'
-        ));
+        ]);
 
         printf("%d password remind rows was deleted\n", $count);
     }

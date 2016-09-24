@@ -71,7 +71,7 @@ class DayPictures
     /**
      * @param array $options
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->timezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
         $this->dbTimezone = new DateTimeZone(self::DEFAULT_TIMEZONE);
@@ -424,7 +424,7 @@ class DayPictures
         $select = $this->selectClone()
             ->where($column . ' >= ?', $this->startOfDayDbValue($date))
             ->where($column . ' <= ?', $this->endOfDayDbValue($date));
-        
+
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)
         );

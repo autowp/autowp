@@ -69,11 +69,11 @@ class Remember implements Zend_Auth_Adapter_Interface
             throw new Zend_Auth_Adapter_Exception($exception);
         }
 
-        $this->_authenticateResultInfo = array(
+        $this->_authenticateResultInfo = [
             'code'     => Zend_Auth_Result::FAILURE,
             'identity' => null,
-            'messages' => array()
-        );
+            'messages' => []
+        ];
 
         return true;
     }

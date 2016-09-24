@@ -119,9 +119,6 @@ return [
         'plus de %s marques'
     ],
 
-    /* Layout */
-    'breadcrumbs/title'       => 'Chemin',
-
     /* BRAND PAGE*/
     'unsorted'                => 'Non triés',
     'engines'                 => 'Moteurs',

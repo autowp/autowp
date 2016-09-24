@@ -129,9 +129,6 @@ return [
         'ещё %s компаний'
     ],
 
-    /* Layout */
-    'breadcrumbs/title'       => 'Путь - дорога',
-
     /* BRAND PAGE*/
     'unsorted'                => 'Несортировано',
     'engines'                 => 'Двигатели',

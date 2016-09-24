@@ -30,26 +30,26 @@ class MeCommand extends Command
 
         $telegramChatTable = new \Telegram_Chat();
 
-        $telegramChatRow = $telegramChatTable->fetchRow(array(
+        $telegramChatRow = $telegramChatTable->fetchRow([
             'chat_id = ?' => $chatId
-        ));
+        ]);
 
         if (count($args) <= 0) {
             if (!$telegramChatRow || !$telegramChatRow->user_id) {
-                $this->replyWithMessage(array(
+                $this->replyWithMessage([
                     'disable_web_page_preview' => true,
                     'text' => 'Use this command to identify you as autowp.ru user.' . PHP_EOL .
                               'For example type "/me 12345" to identify you as user number 12345'
-                ));
+                ]);
             } else {
 
                 $userTable = new \Users();
                 $userRow = $userTable->find($telegramChatRow->user_id)->current();
 
-                $this->replyWithMessage(array(
+                $this->replyWithMessage([
                     'disable_web_page_preview' => true,
                     'text' => 'You identified as ' . $userRow->name
-                ));
+                ]);
             }
         } else {
 
@@ -61,16 +61,16 @@ class MeCommand extends Command
 
             if (!$userRow) {
 
-                $this->replyWithMessage(array(
+                $this->replyWithMessage([
                     'text' => 'User "' . $args[0] . '" not found'
-                ));
+                ]);
 
             } else {
 
                 if (!$telegramChatRow) {
-                    $telegramChatRow = $telegramChatTable->createRow(array(
+                    $telegramChatRow = $telegramChatTable->createRow([
                         'chat_id' => $chatId
-                    ));
+                    ]);
                     $telegramChatRow->save();
                 }
 
@@ -83,9 +83,9 @@ class MeCommand extends Command
                     $command = '/me ' . $userRow->id . ' ' . $token;
                     $userRow->sendPersonalMessage(null, "To complete identifications type `$command` to @autowp_bot");
 
-                    $this->replyWithMessage(array(
+                    $this->replyWithMessage([
                         'text' => 'Check you personal messages / system notifications'
-                    ));
+                    ]);
 
                 } else {
 
@@ -93,18 +93,18 @@ class MeCommand extends Command
 
                     if (strcmp($telegramChatRow->token, $token) != 0) {
                         $command = '/me ' . $userRow->id;
-                        $this->replyWithMessage(array(
+                        $this->replyWithMessage([
                             'text' => "Token not matched. Try again with `$command`"
-                        ));
+                        ]);
                     } else {
 
                         $telegramChatRow->user_id = $userRow->id;
                         $telegramChatRow->token = null;
                         $telegramChatRow->save();
 
-                        $this->replyWithMessage(array(
+                        $this->replyWithMessage([
                             'text' => "Complete. Nice to see you, `{$userRow->name}`"
-                        ));
+                        ]);
 
                     }
                 }

@@ -156,9 +156,9 @@ class User extends AbstractHelper
 
         if ($user) {
             if ($user->img) {
-                $image = $this->view->img($user->img, array(
+                $image = $this->view->img($user->img, [
                     'format' => 'avatar',
-                ));
+                ]);
 
                 if ($image && $image->exists()) {
                     return $image;
@@ -167,10 +167,10 @@ class User extends AbstractHelper
 
             if ($user->e_mail) {
                 // gravatar
-                return $this->view->gravatar($user->e_mail, array(
+                return $this->view->gravatar($user->e_mail, [
                     'img_size'    => 70,
                     'default_img' => 'http://www.autowp.ru/_.gif'
-                ));
+                ]);
             }
         }
 

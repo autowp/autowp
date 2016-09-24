@@ -30,15 +30,15 @@ class PicturesController extends AbstractActionController
         if ($count) {
             $console->writeLine(sprintf("Removing %d pictures", $count));
 
-            $adapter = new Zend_ProgressBar_Adapter_Console(array(
+            $adapter = new Zend_ProgressBar_Adapter_Console([
                 'textWidth' => 80,
-                'elements'  => array(
+                'elements'  => [
                     Zend_ProgressBar_Adapter_Console::ELEMENT_PERCENT,
                     Zend_ProgressBar_Adapter_Console::ELEMENT_BAR,
                     Zend_ProgressBar_Adapter_Console::ELEMENT_ETA,
                     Zend_ProgressBar_Adapter_Console::ELEMENT_TEXT
-                )
-            ));
+                ]
+            ]);
             $progressBar = new Zend_ProgressBar($adapter, 0, count($pictures));
 
             foreach ($pictures as $idx => $picture) {

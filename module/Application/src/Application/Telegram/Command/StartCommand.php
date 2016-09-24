@@ -22,13 +22,13 @@ class StartCommand extends Command
      */
     public function handle($arguments)
     {
-        $this->replyWithMessage(array(
+        $this->replyWithMessage([
             'text' => 'Hello! Welcome to our bot, Here are our available commands:'
-        ));
+        ]);
 
-        $this->replyWithChatAction(array(
+        $this->replyWithChatAction([
             'action' => Actions::TYPING
-        ));
+        ]);
 
         $commands = $this->getTelegram()->getCommands();
 
@@ -39,9 +39,9 @@ class StartCommand extends Command
         }
 
         // Reply with the commands list
-        $this->replyWithMessage(array(
+        $this->replyWithMessage([
             'text' => $response
-        ));
+        ]);
 
         // Trigger another command dynamically from within this command
         // When you want to chain multiple commands within one or process the request further.

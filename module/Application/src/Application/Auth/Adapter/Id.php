@@ -29,10 +29,10 @@ class Id implements Zend_Auth_Adapter_Interface
         $this->_authenticateSetup();
 
         $userTable = new Users();
-        $userRow = $userTable->fetchRow(array(
+        $userRow = $userTable->fetchRow([
             'not deleted',
             'id = ?' => (int)$this->_identity
-        ));
+        ]);
 
         if (!$userRow) {
             $this->_authenticateResultInfo['code'] = Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND;
@@ -66,11 +66,11 @@ class Id implements Zend_Auth_Adapter_Interface
             throw new Zend_Auth_Adapter_Exception($exception);
         }
 
-        $this->_authenticateResultInfo = array(
+        $this->_authenticateResultInfo = [
             'code'     => Zend_Auth_Result::FAILURE,
             'identity' => null,
-            'messages' => array()
-        );
+            'messages' => []
+        ];
 
         return true;
     }

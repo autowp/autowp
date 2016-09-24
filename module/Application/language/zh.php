@@ -109,9 +109,6 @@ return [
         '全部 %s 个品牌'
     ],
 
-    /* Layout */
-    'breadcrumbs/title'       => 'Way',
-
     /* BRAND PAGE*/
     'unsorted'                => '未分类',
     'engines'                 => '发动机',

@@ -274,15 +274,15 @@ class CarOrganize extends Form implements InputFilterProviderInterface
     private function getCarTypeOptions($parentId = null)
     {
         if ($parentId) {
-            $filter = array(
+            $filter = [
                 'parent_id = ?' => $parentId
-            );
+            ];
         } else {
             $filter = 'parent_id is null';
         }
 
         $rows = $this->getCarTypeTable()->fetchAll($filter, 'position');
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[$row->id] = $row->name;
 

@@ -18,7 +18,7 @@ class Breadcrumbs extends AbstractHelper
     public function __invoke($url = null, $name = null, $placement = 'append')
     {
         if ($url || $name) {
-            $node = array('url' => $url, 'name' => $name);
+            $node = ['url' => $url, 'name' => $name];
             switch ($placement) {
                 case 'append':
                     $this->data[] = $node;
@@ -53,12 +53,7 @@ class Breadcrumbs extends AbstractHelper
                 return '';
             }
 
-            return  '<ul class="breadcrumb">'.
-                        /*'<strong style="margin-right:8px">'.
-                            $this->view->escape($this->view->translate('breadcrumbs/title')) .
-                        ':</strong>'.*/
-                        implode($items).
-                    '</ul>';
+            return  '<ul class="breadcrumb">'. implode($items). '</ul>';
         } catch (Exception $e) {
             print $e->getMessage();
         }

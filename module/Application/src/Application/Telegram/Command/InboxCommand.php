@@ -24,46 +24,46 @@ class InboxCommand extends Command
         if ($arguments) {
             $brandTable = new \Brands();
 
-            $brandRow = $brandTable->fetchRow(array(
+            $brandRow = $brandTable->fetchRow([
                 'caption = ?' => (string)$arguments
-            ));
+            ]);
 
             if ($brandRow) {
 
                 $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
 
                 $telegramBrandTable = new \Telegram_Brand();
-                $telegramBrandRow = $telegramBrandTable->fetchRow(array(
+                $telegramBrandRow = $telegramBrandTable->fetchRow([
                     'brand_id = ?' => $brandRow->id,
                     'chat_id  = ?' => $chatId
-                ));
+                ]);
 
                 if ($telegramBrandRow) {
                     $telegramBrandRow->delete();
-                    $this->replyWithMessage(array(
+                    $this->replyWithMessage([
                         'text' => 'Successful unsubscribed from ' . $brandRow->caption
-                    ));
+                    ]);
                 } else {
-                    $telegramBrandRow = $telegramBrandTable->createRow(array(
+                    $telegramBrandRow = $telegramBrandTable->createRow([
                         'brand_id' => $brandRow->id,
                         'chat_id'  => $chatId
-                    ));
+                    ]);
                     $telegramBrandRow->save();
-                    $this->replyWithMessage(array(
+                    $this->replyWithMessage([
                         'text' => 'Successful subscribed to ' . $brandRow->caption
-                    ));
+                    ]);
                 }
 
             } else {
-                $this->replyWithMessage(array(
+                $this->replyWithMessage([
                     'text' => 'Brand "' . $arguments . '" not found'
-                ));
+                ]);
             }
 
         } else {
-            $this->replyWithMessage(array(
+            $this->replyWithMessage([
                 'text' => "Plase, type brand name. For Example /inbox BMW"
-            ));
+            ]);
         }
     }
 }

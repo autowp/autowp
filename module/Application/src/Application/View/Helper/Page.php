@@ -59,11 +59,6 @@ class Page extends AbstractHelper
             return '';
         }
         switch ($name) {
-            /*case 'html':
-                return $this->doc->getHtml(array(
-                    'language' => $this->view->language()
-                ));*/
-
             case 'name':
             case 'title':
             case 'breadcrumbs':

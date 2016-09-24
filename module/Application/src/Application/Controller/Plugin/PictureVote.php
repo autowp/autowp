@@ -142,13 +142,13 @@ class PictureVote extends AbstractPlugin
                     $db = $this->table->getAdapter();
                     $acceptVotes = (int)$db->fetchOne(
                         $db->select()
-                            ->from('pictures_moder_votes', array(new Zend_Db_Expr('COUNT(1)')))
+                            ->from('pictures_moder_votes', [new Zend_Db_Expr('COUNT(1)')])
                             ->where('picture_id = ?', $picture->id)
                             ->where('vote > 0')
                     );
                     $deleteVotes = (int)$db->fetchOne(
                         $db->select()
-                            ->from('pictures_moder_votes', array(new Zend_Db_Expr('COUNT(1)')))
+                            ->from('pictures_moder_votes', [new Zend_Db_Expr('COUNT(1)')])
                             ->where('picture_id = ?', $picture->id)
                             ->where('vote = 0')
                     );

@@ -79,7 +79,7 @@ class Pictures extends AbstractHelper
      */
     private function renderBehaviour(array $picture, $isModer)
     {
-        return $this->view->partial('application/picture-behaviour', array(
+        return $this->view->partial('application/picture-behaviour', [
             'isModer'        => $isModer,
             'resolution'     => $picture['width'].'×'.$picture['height'],
             'status'         => $picture['status'],
@@ -89,7 +89,7 @@ class Pictures extends AbstractHelper
             'msgCount'       => $picture['msgCount'],
             'newMsgCount'    => $picture['newMsgCount'],
             'url'            => $picture['url']
-        ));
+        ]);
 
         /*$view = $this->view;
 
@@ -122,17 +122,16 @@ class Pictures extends AbstractHelper
             $views = round($views / 1000) . 'K';
         }
 
-        $behaviour = array(
-            array(
+        $behaviour = [
+            [
                 'dt' => $view->escape($view->translate('Resolution')),
                 'dd' => $resolution
-            ),
-            array(
+            ],
+            [
                 'dt' => $view->escape($view->translate('Views')),
                 'dd' => $views
-            ),
-
-        );
+            ],
+        ];
 
         if ($isModer) {
             switch ($picture['status']) {
@@ -143,18 +142,18 @@ class Pictures extends AbstractHelper
                 case Picture::STATUS_REMOVING: $a2 = '<span class="label label-danger">удаляется</span>'; break;
             }
 
-            $behaviour[] = array(
+            $behaviour[] = [
                 'dt' => 'Статус',
                 'dd' => $a2
-            );
+            ];
         }
 
-        $behaviour[] = array(
+        $behaviour[] = [
             'dt' => $view->htmlA($url. '#comments', $view->translate('Comments count')),
             'dd' => $comments
-        );
+        ];
 
-        $behaviourHtml = array();
+        $behaviourHtml = [];
         foreach ($behaviour as $row) {
             $behaviourHtml[] = '<dt>' . $row['dt'] . '</dt><dd>' . $row['dd'] . '</dd>';
         }
@@ -207,10 +206,10 @@ class Pictures extends AbstractHelper
 
         $row = $db->fetchRow(
             $db->select()
-                ->from($moderVoteTable->info('name'), array(
+                ->from($moderVoteTable->info('name'), [
                     'vote'  => new Zend_Db_Expr('sum(if(vote, 1, -1))'),
                     'count' => 'count(1)'
-                ))
+                ])
                 ->where('picture_id = ?', $picture->id)
         );
 
@@ -230,19 +229,19 @@ class Pictures extends AbstractHelper
 
         $isModer = $this->isPictureModer();
 
-        $caption = $picture->getCaption(array(
+        $caption = $picture->getCaption([
             'language' => $view->language()->get()
-        ));
+        ]);
         $escCaption = $view->escape($caption);
 
         $url = $view->pic($picture)->url();
 
-        $imageHtml = $this->view->img($picture->getFormatRequest(), array(
+        $imageHtml = $this->view->img($picture->getFormatRequest(), [
             'format'  => 'picture-thumb',
             'alt'     => $caption,
             'title'   => $caption,
             'shuffle' => true
-        ));
+        ]);
 
         if ($isModer && $picture->name) {
             $escCaption = '<span style="color:darkgreen" title="Картинке задано особое название">'.$escCaption.'</span>';
@@ -250,7 +249,7 @@ class Pictures extends AbstractHelper
 
         $moderVote = $this->getModerVote($picture);
 
-        $classes = array('picture-preview');
+        $classes = ['picture-preview'];
         if ($moderVote !== null) {
             if ($moderVote > 0) {
                 $classes[] = 'vote-accept';
@@ -290,7 +289,7 @@ class Pictures extends AbstractHelper
 
     private function splitBy3Level(array $items, $perLine, $perSuperCol)
     {
-        $html = array();
+        $html = [];
 
         $itemsCount = count($items);
         $lineCount = ceil($itemsCount / $perLine);

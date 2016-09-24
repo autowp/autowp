@@ -56,7 +56,7 @@ class AclFactory implements FactoryInterface
     private function load(Acl $acl)
     {
         $roles = new Acl_Roles();
-        $loaded = array();
+        $loaded = [];
         foreach ($roles->fetchAll() as $role) {
             $this->addRole($acl, $roles, $role, $loaded, 1);
         }
@@ -104,7 +104,7 @@ class AclFactory implements FactoryInterface
             ->join('acl_roles_parents', 'acl_roles.id=acl_roles_parents.parent_role_id', null)
             ->where('acl_roles_parents.role_id = ?', $role->id);
 
-        $parents = array();
+        $parents = [];
         foreach ($roles->fetchAll($select) as $parentRole) {
             $parents[] = $parentRole->name;
 

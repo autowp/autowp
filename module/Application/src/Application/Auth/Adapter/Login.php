@@ -42,10 +42,10 @@ class Login implements Zend_Auth_Adapter_Interface
         $this->_authenticateSetup();
 
         $userTable = new Users();
-        $filter = array(
+        $filter = [
             'not deleted',
             'password = ' . $this->_credentialExpr
-        );
+        ];
         if (mb_strpos($this->_identity, '@') !== false) {
             $filter['e_mail = ?'] = (string)$this->_identity;
         } else {
@@ -88,11 +88,11 @@ class Login implements Zend_Auth_Adapter_Interface
             throw new Zend_Auth_Adapter_Exception($exception);
         }
 
-        $this->_authenticateResultInfo = array(
+        $this->_authenticateResultInfo = [
             'code'     => Zend_Auth_Result::FAILURE,
             'identity' => null,
-            'messages' => array()
-        );
+            'messages' => []
+        ];
 
         return true;
     }

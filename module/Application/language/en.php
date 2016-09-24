@@ -119,9 +119,6 @@ return [
         'more %s companies'
     ],
 
-    /* Layout */
-    'breadcrumbs/title'       => 'Way',
-
     /* BRAND PAGE*/
     'unsorted'                => 'Unsorted',
     'engines'                 => 'Engines',

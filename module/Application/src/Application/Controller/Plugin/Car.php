@@ -97,16 +97,16 @@ class Car extends AbstractPlugin
 
             $select = $pictureTableAdapter->select()
                 ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-                ->where('pictures.status IN (?)', array(Picture::STATUS_NEW, Picture::STATUS_ACCEPTED));
+                ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED]);
 
             if ($onlyExactly) {
                 $select
-                    ->from($pictureTable->info('name'), array('pictures.car_id', new Zend_Db_Expr('COUNT(1)')))
+                    ->from($pictureTable->info('name'), ['pictures.car_id', new Zend_Db_Expr('COUNT(1)')])
                     ->where('pictures.car_id IN (?)', $carIds)
                     ->group('pictures.car_id');
             } else {
                 $select
-                    ->from($pictureTable->info('name'), array('car_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')))
+                    ->from($pictureTable->info('name'), ['car_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id IN (?)', $carIds)
                     ->group('car_parent_cache.parent_id');
@@ -175,7 +175,7 @@ class Car extends AbstractPlugin
         if ($carIds) {
             $childsCounts = $carParentAdapter->fetchPairs(
                 $carParentAdapter->select()
-                    ->from($carParentTable->info('name'), array('parent_id', new Zend_Db_Expr('count(1)')))
+                    ->from($carParentTable->info('name'), ['parent_id', new Zend_Db_Expr('count(1)')])
                     ->where('parent_id IN (?)', $carIds)
                     ->group('parent_id')
             );
@@ -190,12 +190,12 @@ class Car extends AbstractPlugin
             $langExpr = $db->quoteInto('category.id = category_language.category_id and category_language.language = ?', $language);
             $categoryRows = $db->fetchAll(
                 $db->select()
-                    ->from($categoryTable->info('name'), array('name', 'catname'))
+                    ->from($categoryTable->info('name'), ['name', 'catname'])
                     ->join('category_car', 'category.id = category_car.category_id', null)
                     ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', 'car_id')
-                    ->joinLeft('category_language', $langExpr, array('lang_name' => 'name'))
+                    ->joinLeft('category_language', $langExpr, ['lang_name' => 'name'])
                     ->where('car_parent_cache.car_id IN (?)', $carIds)
-                    ->group(array('car_parent_cache.car_id', 'category.id'))
+                    ->group(['car_parent_cache.car_id', 'category.id'])
             );
 
             foreach ($categoryRows as $category) {
@@ -236,10 +236,10 @@ class Car extends AbstractPlugin
         if ($carIds && $typeUrl) {
             $rows = $carParentAdapter->fetchAll(
                 $carParentAdapter->select()
-                    ->from($carParentTable->info('name'), array('parent_id', 'type', 'count' => 'count(1)'))
+                    ->from($carParentTable->info('name'), ['parent_id', 'type', 'count' => 'count(1)'])
                     ->where('parent_id IN (?)', $carIds)
-                    ->where('type IN (?)', array(Car_Parent::TYPE_TUNING, Car_Parent::TYPE_SPORT))
-                    ->group(array('parent_id', 'type'))
+                    ->where('type IN (?)', [Car_Parent::TYPE_TUNING, Car_Parent::TYPE_SPORT])
+                    ->group(['parent_id', 'type'])
             );
 
             foreach ($rows as $row) {
@@ -255,11 +255,11 @@ class Car extends AbstractPlugin
         // lang names
         $carsLangName = [];
         if ($carIds) {
-            $carLangRows = $this->getCarLanguageTable()->fetchAll(array(
+            $carLangRows = $this->getCarLanguageTable()->fetchAll([
                 'car_id IN (?)' => $carIds,
                 'language = ?'  => $language,
                 'length(name) > 0'
-            ));
+            ]);
             foreach ($carLangRows as $carLangRow) {
                 $carsLangName[$carLangRow->car_id] = $carLangRow->name;
             }
@@ -282,14 +282,14 @@ class Car extends AbstractPlugin
                 ->group('car_parent_cache.car_id')
         );
         foreach ($designCarsRows as $designCarsRow) {
-            $carsDesignProject[$designCarsRow['car_id']] = array(
+            $carsDesignProject[$designCarsRow['car_id']] = [
                 'brandName' => $designCarsRow['brand_name'],
                 'url'       => $controller->url()->fromRoute('catalogue', [
                     'action'        => 'brand-car',
                     'brand_catname' => $designCarsRow['brand_catname'],
                     'car_catname'   => $designCarsRow['brand_car_catname']
                 ])
-            );
+            ];
         }
 
         // total pictures
@@ -383,7 +383,7 @@ class Car extends AbstractPlugin
                 }
             }*/
 
-            $item = array(
+            $item = [
                 'id'               => $car->id,
                 'row'              => $car,
                 'name'             => $car->caption,
@@ -399,7 +399,7 @@ class Car extends AbstractPlugin
                 'childsCount'      => $childsCount,
                 'specsLinks'       => $specsLinks,
                 'largeFormat'      => $useLargeFormat,
-            );
+            ];
 
             if (!$disableTwins) {
                 $item['twinsGroups'] = isset($carsTwinsGroups[$car->id]) ? $carsTwinsGroups[$car->id] : [];
@@ -441,9 +441,9 @@ class Car extends AbstractPlugin
                 }
 
                 if ($url) {
-                    $item['details'] = array(
+                    $item['details'] = [
                         'url' => $url
-                    );
+                    ];
                 }
             }
 
@@ -473,18 +473,18 @@ class Car extends AbstractPlugin
 
                 $tuningCount = isset($carsTypeCounts[$car->id][Car_Parent::TYPE_TUNING]) ? $carsTypeCounts[$car->id][Car_Parent::TYPE_TUNING] : 0;
                 if ($tuningCount) {
-                    $item['tuning'] = array(
+                    $item['tuning'] = [
                         'count' => $tuningCount,
                         'url'   => $typeUrl($car, Car_Parent::TYPE_TUNING)
-                    );
+                    ];
                 }
 
                 $sportCount = isset($carsTypeCounts[$car->id][Car_Parent::TYPE_SPORT]) ? $carsTypeCounts[$car->id][Car_Parent::TYPE_SPORT] : 0;
                 if ($sportCount) {
-                    $item['sport'] = array(
+                    $item['sport'] = [
                         'count' => $sportCount,
                         'url'   => $typeUrl($car, Car_Parent::TYPE_SPORT)
-                    );
+                    ];
                 }
             }
 
@@ -510,9 +510,9 @@ class Car extends AbstractPlugin
 
 
         // prefetch names
-        $pictureNames = $pictureTable->getNameData($allPictures, array(
+        $pictureNames = $pictureTable->getNameData($allPictures, [
             'language' => $language
-        ));
+        ]);
 
         // prefetch images
         $imagesInfo = [];
@@ -535,14 +535,14 @@ class Car extends AbstractPlugin
         }
         unset($item, $picture);
 
-        return array(
+        return [
             'specEditor'         => $specEditor,
             'isCarModer'         => $isCarModer,
             'disableDescription' => $disableDescription,
             'disableDetailsLink' => $disableDetailsLink,
             'disableTitle'       => $disableTitle,
             'items'              => $items,
-        );
+        ];
     }
 
     private function getPictureTable()
@@ -568,14 +568,14 @@ class Car extends AbstractPlugin
 
     private function getPictureSelect($car, array $options)
     {
-        $defaults = array(
+        $defaults = [
             'onlyExactlyPictures' => false,
             'perspectiveGroup'    => false,
             'type'                => null,
             'exclude'             => [],
             'dateSort'            => false,
             'onlyChilds'          => null
-        );
+        ];
         $options = array_merge($defaults, $options);
 
         $pictureTable = $this->getPictureTable();
@@ -584,14 +584,14 @@ class Car extends AbstractPlugin
         $select = $db->select()
             ->from(
                 $pictureTable->info('name'),
-                array(
+                [
                     'id', 'name', 'type', 'brand_id', 'engine_id', 'car_id', 'factory_id',
                     'perspective_id', 'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
-                )
+                ]
             )
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
-            ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+            ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
             ->limit(1);
 
         $order = [];
@@ -627,7 +627,7 @@ class Car extends AbstractPlugin
 
         if ($options['perspectiveGroup']) {
             $select
-                ->join(array('mp' => 'perspectives_groups_perspectives'), 'pictures.perspective_id = mp.perspective_id', null)
+                ->join(['mp' => 'perspectives_groups_perspectives'], 'pictures.perspective_id = mp.perspective_id', null)
                 ->where('mp.group_id = ?', $options['perspectiveGroup']);
 
             $order[] = 'mp.position';
@@ -638,17 +638,17 @@ class Car extends AbstractPlugin
         }
 
         if ($options['dateSort']) {
-            $select->join(array('picture_car' => 'cars'), 'cars.id = picture_car.id', null);
-            $order = array_merge($order, array('picture_car.begin_order_cache', 'picture_car.end_order_cache'));
+            $select->join(['picture_car' => 'cars'], 'cars.id = picture_car.id', null);
+            $order = array_merge($order, ['picture_car.begin_order_cache', 'picture_car.end_order_cache']);
         }
-        $order = array_merge($order, array('pictures.width DESC', 'pictures.height DESC'));
+        $order = array_merge($order, ['pictures.width DESC', 'pictures.height DESC']);
 
         $select->order($order);
 
         if ($options['onlyChilds']) {
             $select
                 ->join(
-                    array('cpc_oc' => 'car_parent_cache'),
+                    ['cpc_oc' => 'car_parent_cache'],
                     'cpc_oc.car_id = pictures.car_id',
                     null
                 )
@@ -670,14 +670,14 @@ class Car extends AbstractPlugin
 
         foreach ($perspectiveGroupIds as $groupId) {
 
-            $select = $this->getPictureSelect($car, array(
+            $select = $this->getPictureSelect($car, [
                 'onlyExactlyPictures' => $onlyExactlyPictures,
                 'perspectiveGroup'    => $groupId,
                 'type'                => $type,
                 'exclude'             => $usedIds,
                 'dateSort'            => $dateSort,
                 'onlyChilds'          => $onlyChilds
-            ));
+            ]);
 
             $picture = $db->fetchRow($select);
 
@@ -693,13 +693,13 @@ class Car extends AbstractPlugin
 
         if ($needMore > 0) {
 
-            $select = $this->getPictureSelect($car, array(
+            $select = $this->getPictureSelect($car, [
                 'onlyExactlyPictures' => $onlyExactlyPictures,
                 'type'                => $type,
                 'exclude'             => $usedIds,
                 'dateSort'            => $dateSort,
                 'onlyChilds'          => $onlyChilds
-            ));
+            ]);
 
             $rows = $db->fetchAll(
                 $select->limit($needMore)
@@ -747,11 +747,11 @@ class Car extends AbstractPlugin
                     $url = $picHelper->href($picture);
                 }
 
-                $result[] = array(
+                $result[] = [
                     'format' => $format,
                     'row'    => $picture,
                     'url'    => $url,
-                );
+                ];
             } else {
                 $result[] = false;
             }

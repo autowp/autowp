@@ -142,7 +142,7 @@ class Upload extends Form implements InputFilterProviderInterface
                 'filters'  => [
                     ['name' => 'StringTrim']
                 ],
-                'validators'  => array(
+                'validators'  => [
                     [
                         'name' => 'StringLength',
                         'options' => [
@@ -150,7 +150,7 @@ class Upload extends Form implements InputFilterProviderInterface
                             'max' => 4096
                         ]
                     ]
-                ),
+                ]
             ],
         ];
     }
