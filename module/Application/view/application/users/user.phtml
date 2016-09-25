@@ -155,18 +155,6 @@
             </div>
         <?php } ?>
 
-        <?php /* if ($this->currentUser->own_car || $this->currentUser->dream_car) { ?>
-            <h2>Автомобиль</h2>
-            <div class="well">
-                <?php if ($this->currentUser->own_car) { ?>
-                    <p>Личный: <strong><?=$this->escape($this->currentUser->own_car) ?></strong></p>
-                <?php } ?>
-                <?php if ($this->currentUser->dream_car) { ?>
-                    <p>Желаемый: <strong><?=$this->escape($this->currentUser->dream_car) ?></strong></p>
-                <?php } ?>
-            </div>
-        <?php } */ ?>
-
         <?php if ($this->canViewIp) { ?>
             <h2><?=$this->escapeHtml($this->translate('users/for-moderators'))?></h2>
             <div class="well">

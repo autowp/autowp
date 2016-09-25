@@ -21,7 +21,7 @@
                     <?=$this->pastTimeIndicator($comment['datetime']);?>
                 </div>
             <?php } ?>
-            <?=$comment['author'] ? $this->user($comment['author']) : 'Аноним'?>
+            <?=$comment['author'] ? $this->user($comment['author']) : $this->escapeHtml($this->translate('comments/author/anonymous'))?>
         </div>
         <div class="photo">
             <?php if ($comment['author'] && !$comment['author']->deleted) { ?>
@@ -40,7 +40,9 @@
             <?php } ?>
 
             <?php if ($this->canRemoveComments || $comment['deleted']) { ?>
-                <p class="alert alert-warning deleted-message">Сообщение удалено администрацией сайта</p>
+                <p class="alert alert-warning deleted-message">
+                    <?=$this->escapeHtml($this->translate('comments/message-deleted-by-admin'))?>
+                </p>
             <?php } ?>
 
             <div>
@@ -83,11 +85,11 @@
                     <?=$this->htmlA([
                         'href'  => '#',
                         'class' => 'btn btn-danger btn-xs pull-right comment-remove-button',
-                    ], '<i class="fa fa-trash"></i></span> Удалить', false) ?>
+                    ], '<i class="fa fa-trash"></i></span> ' . $this->escapeHtml($this->translate('comments/message/delete')), false) ?>
                     <?=$this->htmlA([
                         'href'  => '#',
                         'class' => 'btn btn-success btn-xs pull-right comment-restore-button',
-                    ], '<i class="fa fa-arrow-up"></i> Восстановить', false) ?>
+                    ], '<i class="fa fa-arrow-up"></i> ' . $this->escapeHtml($this->translate('comments/message/restore')), false) ?>
                 <?php } ?>
 
                 <?php if ($this->canMoveMessage) { ?>
@@ -96,7 +98,7 @@
                             'id' => $comment['id']
                         ])),
                         'class' => 'btn btn-default btn-xs pull-right',
-                    ], '<i class="fa fa-arrows"></i> Переместить', false) ?>
+                    ], '<i class="fa fa-arrows"></i> ' . $this->escapeHtml($this->translate('comments/message/move')), false) ?>
                 <?php } ?>
 
                 <?php if ($this->canViewIp && $comment['ip']) { ?>

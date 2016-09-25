@@ -118,6 +118,7 @@ return [
         'plus d\'%s marque',
         'plus de %s marques'
     ],
+    'brands/pictures:' => 'pictures: ',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Non triés',
@@ -253,6 +254,7 @@ return [
     'upload/select/logo' => 'logotype',
     'upload/select/engines' => 'Engines',
     'upload/select/concepts' => 'Concepts & prototypes',
+    'upload/select/other-modification' => 'other modification',
 
     'upload/add-picture' => 'Add picture',
     'upload/select-another' => 'select another catalogue',
@@ -304,6 +306,7 @@ return [
     'catalogue/vehicle/inbox' => 'inbox',
     'catalogue/vehicle/comments' => 'comments',
     'catalogue/engine/add-engine' => 'add engine',
+    'catalogue/engine/mounted-on:' => 'Mounted on:',
 
     /* comments */
     'comments/title' => 'Commentaires',
@@ -314,11 +317,17 @@ return [
     'comments/message' => 'Message',
     'comments/send' => 'Envoyer',
     'comments/cancel' => 'Annuler',
-	'comments/need-wait-text' => 'Malheureusement, il faut attendre un peu pour obtenir la possibilité de laisser un commentaire.
+    'comments/need-wait-text' => 'Malheureusement, il faut attendre un peu pour obtenir la possibilité de laisser un commentaire.
 
 Cela est dû à la présence d\'un seuil "messages par heure" nécessaire pour lutter contre le spam et autres moments négatifs.
 
 Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le temps de clarifier l\'idée que vous voulez transmettre au public:',
+
+    'comments/author/anonymous' => 'Anonymous',
+    'comments/message-deleted-by-admin' => 'Message deleted by site administration',
+    'comments/message/delete' => 'Delete',
+    'comments/message/restore' => 'Restore',
+    'comments/message/move' => 'Move',
 
     /*perspectives*/
     'perspective/front'          => 'avant',
@@ -445,6 +454,19 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
 Message with instructions to confirm will sent to new address.',
 
     'account/accounts/add' => 'Add account',
+    'account/accounts/remove' => 'Remove',
+    'account/accounts/connect-failed' => 'Failed to connect with account. Error occured or access to account denied',
+    'account/accounts/disconnect-failed' => 'Не удалось удалить учетную запись.
+
+Такое бывает, если привязанная учётная запись является единственным способом авторизации, т.е. не задан e-mail или другие учётный записи.',
+
+    'account/delete/text' => 'Мы сожалем, что вам пришлось оказаться на этой странице, и вы планируете покинуть наш сайт навсегда, но не можем вам в этом отказать.
+
+Нажав на красную кнопку, все данные, касающиеся вас, будут обезличены или удалены.
+
+Этот процесс необратим, поэтому хорошенько подумайте и не принимайте поспешных решений.',
+    'account/deleted/text' => 'Account removed.
+Good luck.',
 
     'feedback/title' => 'Retour d\'information',
     'feedback/name'  => 'Votre nom',

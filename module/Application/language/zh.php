@@ -108,6 +108,7 @@ return [
     'brands/more-companies'    => [
         '全部 %s 个品牌'
     ],
+    'brands/pictures:' => 'pictures: ',
 
     /* BRAND PAGE*/
     'unsorted'                => '未分类',
@@ -239,6 +240,7 @@ return [
     'upload/select/logo' => '商标',
     'upload/select/engines' => '发动机',
     'upload/select/concepts' => '概念车及原型车',
+    'upload/select/other-modification' => 'other modification',
 
     'upload/add-picture' => '添加图片',
     'upload/select-another' => '选择另一个目录',
@@ -290,6 +292,7 @@ return [
     'catalogue/vehicle/inbox' => 'inbox',
     'catalogue/vehicle/comments' => 'comments',
     'catalogue/engine/add-engine' => 'add engine',
+    'catalogue/engine/mounted-on:' => 'Mounted on:',
 
     /* comments */
     'comments/title' => '评论',
@@ -305,6 +308,12 @@ return [
 这是由于为了防止灌水和其他不端行为，每小时发送的消息数受到限制。
 
 现在您可以在"%s"中发表评论，建议使用清晰易懂的措辞表达您的看法:',
+
+    'comments/author/anonymous' => 'Anonymous',
+    'comments/message-deleted-by-admin' => 'Message deleted by site administration',
+    'comments/message/delete' => 'Delete',
+    'comments/message/restore' => 'Restore',
+    'comments/message/move' => 'Move',
 
     /*perspectives*/
     'perspective/front'          => '前方',
@@ -431,6 +440,19 @@ return [
 确认邮件已发送到您的新电子邮箱地址。',
 
     'account/accounts/add' => '添加账号',
+    'account/accounts/remove' => 'Remove',
+    'account/accounts/connect-failed' => 'Failed to connect with account. Error occured or access to account denied',
+    'account/accounts/disconnect-failed' => 'Не удалось удалить учетную запись.
+
+Такое бывает, если привязанная учётная запись является единственным способом авторизации, т.е. не задан e-mail или другие учётный записи.',
+
+    'account/delete/text' => 'Мы сожалем, что вам пришлось оказаться на этой странице, и вы планируете покинуть наш сайт навсегда, но не можем вам в этом отказать.
+
+Нажав на красную кнопку, все данные, касающиеся вас, будут обезличены или удалены.
+
+Этот процесс необратим, поэтому хорошенько подумайте и не принимайте поспешных решений.',
+    'account/deleted/text' => 'Account removed.
+Good luck.',
 
     'feedback/title' => '反馈',
     'feedback/name'  => '标题',

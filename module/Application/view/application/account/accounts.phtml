@@ -15,7 +15,7 @@
                     <p>
                         <?php if ($account['canRemove']) { ?>
                             <form action="<?=$this->escapeHtmlAttr($account['removeUrl'])?>" method="post">
-                                <button type="submit" class="btn btn-xs btn-danger" title="Удалить">
+                                <button type="submit" class="btn btn-xs btn-danger" title="<?=$this->escapeHtml($this->translate('account/accounts/remove'))?>">
                                     <i class="fa fa-times"></i>
                                 </button>
                                 &#xa0;

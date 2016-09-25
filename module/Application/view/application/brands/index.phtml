@@ -62,7 +62,7 @@
                             echo '<span data-href="'.$this->escapeHtmlAttr($brand['newCarsUrl']).'" data-toggle="popover" data-container="body" class="popover-handler" title="'.$this->escapeHtmlAttr(sprintf($this->translate('brands/new-cars-of-brand'), $brand['name'])).'">+'.$newCars.'</span>';
                         } ?>)</small>
                     </h4>
-                    <p><small>картинок: (<?=$brand['totalPictures'] ?>)</small></p>
+                    <p><small><?=$this->escapeHtml($this->translate('brands/pictures:'))?> (<?=$brand['totalPictures'] ?>)</small></p>
                 </div><?php
             ?></div><?php
         } ?>

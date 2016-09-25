@@ -24,7 +24,7 @@
 
 <?php if (count($this->contributors)) { ?>
     <p>
-        Составители:
+        <?=$this->escapeHtml($this->translate('catalogue/specifications/contributors:'))?>
         <?php foreach ($this->contributors as $contributor) { ?>
             <?=$this->user($contributor)?>
         <?php } ?>

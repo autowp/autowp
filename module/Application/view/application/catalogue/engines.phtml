@@ -78,7 +78,7 @@
             <?php } ?>
         </div>
         <?php if (count($engine['cars'])) { ?>
-            <p>Устанавливался на:</p>
+            <p><?=$this->escapeHtml($this->translate('catalogue/engine/mounted-on:'))?></p>
             <ul>
                 <?php foreach ($engine['cars'] as $car) { ?>
                     <li><?=$this->htmlA($car['url'], $this->car()->htmlTitle($car['name']), false)?></li>

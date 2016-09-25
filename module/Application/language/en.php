@@ -118,6 +118,7 @@ return [
         'more %s company',
         'more %s companies'
     ],
+    'brands/pictures:' => 'pictures: ',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Unsorted',
@@ -253,6 +254,7 @@ return [
     'upload/select/logo' => 'logotype',
     'upload/select/engines' => 'Engines',
     'upload/select/concepts' => 'Concepts & prototypes',
+    'upload/select/other-modification' => 'other modification',
 
     'upload/add-picture' => 'Add picture',
     'upload/select-another' => 'select another catalogue',
@@ -304,6 +306,7 @@ return [
     'catalogue/vehicle/inbox' => 'inbox',
     'catalogue/vehicle/comments' => 'comments',
     'catalogue/engine/add-engine' => 'add engine',
+    'catalogue/engine/mounted-on:' => 'Mounted on:',
 
     /* comments */
     'comments/title' => 'Comments',
@@ -314,11 +317,17 @@ return [
     'comments/message' => 'Message',
     'comments/send' => 'Send',
     'comments/cancel' => 'Cancel',
-	'comments/need-wait-text' => 'Unfortunately you have to wait a bit to be able to leave a comment.
+    'comments/need-wait-text' => 'Unfortunately you have to wait a bit to be able to leave a comment.
 
 This is due to the presence of the threshold "messages per hour", necessary to prevent spam and some other negative aspects.
 
 Next, you can leave a comment in the "%s", as long as you have the time to clarify the idea you want to convey to the public:',
+
+    'comments/author/anonymous' => 'Anonymous',
+    'comments/message-deleted-by-admin' => 'Message deleted by site administration',
+    'comments/message/delete' => 'Delete',
+    'comments/message/restore' => 'Restore',
+    'comments/message/move' => 'Move',
 
     /*perspectives*/
     'perspective/front'          => 'front',
@@ -445,6 +454,19 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
 Message with instructions to confirm will sent to new address.',
 
     'account/accounts/add' => 'Add account',
+    'account/accounts/remove' => 'Remove',
+    'account/accounts/connect-failed' => 'Failed to connect with account. Error occured or access to account denied',
+    'account/accounts/disconnect-failed' => 'Не удалось удалить учетную запись.
+
+Такое бывает, если привязанная учётная запись является единственным способом авторизации, т.е. не задан e-mail или другие учётный записи.',
+
+    'account/delete/text' => 'Мы сожалем, что вам пришлось оказаться на этой странице, и вы планируете покинуть наш сайт навсегда, но не можем вам в этом отказать.
+
+Нажав на красную кнопку, все данные, касающиеся вас, будут обезличены или удалены.
+
+Этот процесс необратим, поэтому хорошенько подумайте и не принимайте поспешных решений.',
+    'account/deleted/text' => 'Account removed.
+Good luck.',
 
     'feedback/title' => 'Feedback',
     'feedback/name'  => 'Your name',
@@ -504,6 +526,7 @@ Message with instructions to confirm will sent to new address.',
     'users/user/log' => 'User\'s log',
     'users/user/uploaded-pictures' => 'Uploaded pictures',
     'users/user/not-upload-pictures' => 'Not upload pictures',
+
 
     'users/rating/specifications' => 'Specifications',
     'users/rating/pictures' => 'Pictures',
