@@ -1149,7 +1149,7 @@ return [
     'page/142/breadcrumbs' => "%ATTR_ITEMTYPE_NAME% %ZONE_NAME%",
     'page/143/breadcrumbs' => "%TWINS_GROUP_NAME%",
     'page/144/breadcrumbs' => "品牌选项",
-    'page/146/breadcrumbs' => "姊妹车型选项,
+    'page/146/breadcrumbs' => "姊妹车型选项",
     'page/147/breadcrumbs' => "设计项目选项",
     'page/148/breadcrumbs' => "Cropper",
     'page/149/breadcrumbs' => "移动图片",
