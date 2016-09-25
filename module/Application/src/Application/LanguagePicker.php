@@ -40,8 +40,6 @@ class LanguagePicker
             ];
         }
 
-        $logedIn = (bool)$user;
-
         return $languages;
     }
 }

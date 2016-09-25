@@ -1,16 +1,27 @@
-/* Пиктограммы государственных флагов в спрайте */
-/* v0.2, 28 февраля 2012 года */
-/* @author Артём Поликарпов, artpolikarpov.ru (artpolikarpov@gmail.com) */
-/* @author Никита Иванов (исходные пиктограммы флагов), nickivanov.ru (nickivanov@nickivanov.ru) */
-/* Набор распостраняется на условиях лицензии CC-BY-SA */
-/* Эти летом я был: в <i class="flag-HN"></i> Гондурасе, <i class="flag-LI"></i> Лихтенштейне, и <i class="flag-SE"></i> Швеции. */
+.flag-icon-background {
+    background-size: contain;
+    background-position: 50%;
+    background-repeat: no-repeat;
+}
 
-.flag-CN, .flag-GB, .flag-RU, .flag-FR { background: url("/img/flags.png") no-repeat 0 9px; display: -moz-inline-box; -moz-box-orient: vertical; display: inline-block; *display: inline; *zoom: 1; vertical-align: baseline; position: relative; overflow: hidden; width: 16px; height: 9px; font-size: 0; line-height: 0; margin: 0; padding: 0; }
+.flag-icon {
+    .flag-icon-background;
+    position: relative;
+    display: inline-block;
+    width: unit((4 / 3), em);
+    line-height: 1em;
+    &:before {
+        content: "\00a0";
+    }
+}
 
-.flag-CN { background-position: 0 -432px; }
+.flag-icon(@country) {
+    .flag-icon-@{country} {
+        background-image: ~"url(/img/vendor/flag-icon-css/@{country}.svg)";
+    }
+}
 
-.flag-FR { background-position: 0 -693px; }
-
-.flag-GB { background-position: 0 -711px; }
-
-.flag-RU { background-position: 0 -1764px; }
+.flag-icon(gb);
+.flag-icon(cn);
+.flag-icon(ru);
+.flag-icon(fr);

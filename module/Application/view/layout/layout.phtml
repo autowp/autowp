@@ -126,19 +126,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                             <p class="copyrights"><?=$this->translate('layout/footer')?></p>
                         </div>
                     </div>
-                    <div class="text-center">
+                    <p class="language-picker">
                         <?php foreach ($this->languagePicker() as $item) { ?>
-                            <?php if ($item['language'] == $this->language()) { ?>
-                                <i class="<?=$this->escapeHtmlAttr($item['flag'])?>"></i>
-                                <?=$this->escapeHtml($item['name'])?>
-                            <?php } else { ?>
+                            <?php if ($item['language'] != $this->language()) { ?>
                                 <a href="<?=$this->escapeHtmlAttr($item['url'])?>">
                                     <i class="<?=$this->escapeHtmlAttr($item['flag'])?>"></i>
                                     <?=$this->escapeHtml($item['name'])?>
                                 </a>
                             <?php } ?>
                         <?php } ?>
-                    </div>
+                    </p>
                 </footer>
             <?php } ?>
         </div>

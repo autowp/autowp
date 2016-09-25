@@ -13,10 +13,11 @@ var gulp = require("gulp")
   , uglify = require('gulp-uglify')
   , shell = require("gulp-shell")
   , urlAdjuster = require('gulp-css-url-adjuster')
+  , embed = require('gulp-image-embed')
   , packageJSON = require("./package")
 ;
 
-gulp.task("build.css", ["copy.jcrop"], function () {
+gulp.task("build.css", ["copy.jcrop", 'copy.flags'], function () {
     return gulp.src([
         './public_source/less/styles.less'
     ])
@@ -27,6 +28,11 @@ gulp.task("build.css", ["copy.jcrop"], function () {
         .pipe(concat("styles.css"))
         .pipe(urlAdjuster({
             replace: ['Jcrop.gif', '/img/vendor/Jcrop.gif']
+        }))
+        .pipe(embed({
+            asset: './public_html',
+            extension: ['svg'],
+            include: [/flag-icon-css/]
         }))
         .pipe(gulpif(!argv.fast, cleanCSS({
             keepSpecialComments: 1
@@ -72,6 +78,16 @@ gulp.task("copy.jcrop", function () {
         './node_modules/jcrop-0.9.12/css/Jcrop.gif'
     ])
         .pipe(gulpCopy("./public_html/img/vendor", {prefix: 3}));
+});
+
+gulp.task("copy.flags", function () {
+    return gulp.src([
+        './node_modules/flag-icon-css/flags/4x3/cn.svg',
+        './node_modules/flag-icon-css/flags/4x3/ru.svg',
+        './node_modules/flag-icon-css/flags/4x3/gb.svg',
+        './node_modules/flag-icon-css/flags/4x3/fr.svg'
+    ])
+        .pipe(gulpCopy("./public_html/img/vendor/flag-icon-css", {prefix: 4}));
 });
 
 gulp.task("build", ['build.css', 'build.js.gz', 'copy.fonts']);
