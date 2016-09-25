@@ -1238,24 +1238,24 @@ return [
     'moder/vehicle/catalogue/title/remove' => '删除',
     'moder/vehicle/catalogue/select' => '选择 ...',
     'moder/vehicle/catalogue/select-placeholder' => '添加上级目录 ...',
-    'moder/vehicle/catalogue/possible-duplicate-parent' => '可能原因: 车型已通过: '继承,
+    'moder/vehicle/catalogue/possible-duplicate-parent' => '可能原因: 车型已通过: ',
     'moder/vehicle/catalogue/possible-duplicate-child' => '可能原因: 车型已存在于子目录: ',
     'moder/vehicle/catalogue/parent-name-placeholder' => '车名',
     'moder/vehicle/catalogue/parent-catname-placeholder' => 'URL part',
     'moder/vehicle/catalogue/turbo-group-creator' => 'Turbo group creator',
     'moder/vehicle/catalogue/add-brand' => '品牌 ...',
     'moder/vehicle/catalogue/add-brand-%s' => '品牌 %s',
-    
+
     'moder/vehicle/twins/select-or-create' => 'Select or create group ...',
     'moder/vehicle/twins/group-not-selected' => 'Group not selected',
     'moder/vehicle/twins/remove' => 'Remove',
     'moder/vehicle/twins/inherited-from' => 'Inherited from',
- 
+
     'moder/vehicle/factories/select-factory' => 'Select factory ...',
     'moder/vehicle/factories/factory-not-selected' => 'Factory not selected',
     'moder/vehicle/factories/remove' => 'Remove',
     'moder/vehicle/factories/inherited-from' => 'Inherited from',
- 
+
     'moder/vehicle/link-type-prefix/design' => 'Design: ',
     'moder/vehicle/link-type-prefix/sport' => 'Sport: ',
     'moder/vehicle/link-type-prefix/related' => 'Related: ',

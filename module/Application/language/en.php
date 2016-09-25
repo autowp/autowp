@@ -1325,7 +1325,7 @@ Few manuals:
 [2](https://guides.github.com/features/mastering-markdown/),
 [3](https://daringfireball.net/projects/markdown/basics),
 
-Interlan hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins>',
+Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins>',
     'moder/markdown/edit' => 'Edit',
     'moder/markdown/preview' => 'Preview',
     'moder/markdown/history' => 'History',
