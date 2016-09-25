@@ -29,7 +29,7 @@
     <li>
         <?=$this->htmlA($this->url('factories/factory-cars', [
             'id' => $this->factory->id,
-        ]), 'Автомобили') ?>
+        ]), $this->translate('factories/factory-cars')) ?>
     </li>
     <?php if ($this->canEdit) { ?>
         <li>
@@ -50,12 +50,12 @@
 <?php } ?>
 
 <?php if ($this->pictures && count($this->pictures['items']) > 0) { ?>
-    <h3>Фотографии</h3>
+    <h3><?=$this->escapeHtml($this->translate('factories/factory/pictures'))?></h3>
     <?=$this->partial('application/pictures', $this->pictures)?>
 <?php } ?>
 
 <?php if (count($this->carPictures) > 0) { ?>
-    <h3>Автомобили</h3>
+    <h3><?=$this->escapeHtml($this->translate('factories/factory-cars'))?></h3>
     <?php
         $items = $this->carPictures;
     ?>

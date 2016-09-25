@@ -13,15 +13,15 @@
 ?>
 <?php if ($this->user()->logedIn()) { ?>
     <?php if ($this->needWait) { ?>
-        <p class="alert alert-block alert-warning">Для добавления нового сообщения вам необходимо подождать некоторое время</p>
+        <p class="alert alert-block alert-warning">
+            <?=$this->escapeHtml($this->translate('forums/need-wait-to-post'))?>
+        </p>
     <?php } ?>
     <?=$this->partial('application/forms/bootstrap-horizontal', [
         'form' => $this->formTopicNew
     ])?>
 <?php } else { ?>
     <div class="alert alert-block alert-error">
-        <p>Добавлять топики могут только зарегистрированные пользователи.</p>
-        <p>Если Вы уже зарегистрированны на сайте, то Вам необходимо осуществить вход на сайт.</p>
-        <p>Если Вы ещё не зарегистрированы, сделайте это сейчас <a href="/registration/">на странице регистрации</a>.
+        <?=$this->markdown($this->translate('forums/register-to-create-topic'))?>
     </div>
 <?php } ?>

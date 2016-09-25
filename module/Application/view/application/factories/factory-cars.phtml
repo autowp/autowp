@@ -20,7 +20,7 @@
     <li class="active">
         <?=$this->htmlA($this->url('factories/factory-cars', [
             'id' => $this->factory->id,
-        ]), 'Автомобили') ?>
+        ]), $this->translate('factories/factory-cars')) ?>
     </li>
 </ul>
 <?=$this->partial('application/cars', $this->carsData)?>

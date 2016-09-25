@@ -294,6 +294,9 @@ return [
     'catalogue/engine/add-engine' => 'add engine',
     'catalogue/engine/mounted-on:' => 'Mounted on:',
 
+    'factories/factory-cars' => 'Vehicles',
+    'factories/factory/pictures' => 'Pictures',
+
     /* comments */
     'comments/title' => '评论',
     'comments/reply' => '回复',
@@ -396,6 +399,19 @@ return [
         "阅读请点击链接 %2\$s\n\n" .
         "您可以在帐户设置退订通知消息，\n\n" .
         "诚挚的www.wheelsage.org机器人\n",
+    'forums/subscribe' => 'Subscribe to new replies notifications',
+    'forums/subscribed' => 'You are subscribed to new replies notifications',
+    'forums/unsubscribe' => 'Unsubscribe',
+    'forums/topic-closed-text' => 'Topic is closed by site administration',
+    'forums/need-wait-to-post' => 'Для добавления нового сообщения вам необходимо подождать некоторое время',
+    'forums/register-to-post' => 'Чтобы иметь возможность создавать топики и отвечать в них, Вам необходимо [зарегистрироваться](/registration/).',
+    'forums/register-to-create-topic' => 'Добавлять топики могут только зарегистрированные пользователи.
+
+Если Вы уже зарегистрированны на сайте, то Вам необходимо осуществить вход на сайт.
+
+Если Вы ещё не зарегистрированы, сделайте это сейчас [на странице регистрации](/registration/).',
+    'forums/topic/close' => 'close',
+    'forums/topic/delete' => 'delete',
 
     'account/personal-message/reply' => '站内信',
     'account/personal-message/delete' => '删除',
@@ -458,6 +474,7 @@ Good luck.',
     'feedback/name'  => '标题',
     'feedback/message' => '内容',
     'feedback/donate-text' => '如果您希望表达自己的支持，您可以通过 [捐款支持](/donate)',
+    'feedback/sent' => 'Your message was sent',
 
     'map/museums-and-factories' => '工厂及博物馆',
 

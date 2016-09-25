@@ -308,6 +308,9 @@ return [
     'catalogue/engine/add-engine' => 'add engine',
     'catalogue/engine/mounted-on:' => 'Mounted on:',
 
+    'factories/factory-cars' => 'Vehicles',
+    'factories/factory/pictures' => 'Pictures',
+
     /* comments */
     'comments/title' => 'Commentaires',
     'comments/reply' => 'répondre',
@@ -410,6 +413,19 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
         "To go to the viewing messages, use the link %2\$s\n\n" .
         "Unsubscribe from the receipt of the notification, you can in account settings\n\n" .
         "Sincerely, robot www.wheelsage.org\n",
+    'forums/subscribe' => 'Subscribe to new replies notifications',
+    'forums/subscribed' => 'You are subscribed to new replies notifications',
+    'forums/unsubscribe' => 'Unsubscribe',
+    'forums/topic-closed-text' => 'Topic is closed by site administration',
+    'forums/need-wait-to-post' => 'Для добавления нового сообщения вам необходимо подождать некоторое время',
+    'forums/register-to-post' => 'Чтобы иметь возможность создавать топики и отвечать в них, Вам необходимо [зарегистрироваться](/registration/).',
+    'forums/register-to-create-topic' => 'Добавлять топики могут только зарегистрированные пользователи.
+
+Если Вы уже зарегистрированны на сайте, то Вам необходимо осуществить вход на сайт.
+
+Если Вы ещё не зарегистрированы, сделайте это сейчас [на странице регистрации](/registration/).',
+    'forums/topic/close' => 'close',
+    'forums/topic/delete' => 'delete',
 
     'account/personal-message/reply' => 'répondre',
     'account/personal-message/delete' => 'effacer',
@@ -472,6 +488,7 @@ Good luck.',
     'feedback/name'  => 'Votre nom',
     'feedback/message' => 'Message',
     'feedback/donate-text' => 'Si vous êtes venu ici pour exprimer des mots de soutien, il est possible [de l\'exprimer en devises](/donate)',
+    'feedback/sent' => 'Your message was sent',
 
     'map/museums-and-factories' => 'Les musées et les usines',
 

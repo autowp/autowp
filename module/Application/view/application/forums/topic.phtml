@@ -38,15 +38,20 @@
         </div>
         <div class="col-sm-6 text-right">
             <?php if ($this->canSubscribe) { ?>
-                <form action="<?=$this->escapeHtml($this->subscribeUrl) ?>" method="post"><div>
+                <form action="<?=$this->escapeHtmlAttr($this->subscribeUrl) ?>" method="post"><div>
                     <i class="fa fa-envelope"></i>
-                    <a href="#" onclick="this.parentNode.parentNode.submit();return false;">Подписаться на получение уведомлений<br />о новых сообщениях в этом топике</a>
+                    <a href="#" onclick="this.parentNode.parentNode.submit();return false;">
+                        <?=$this->escapeHtml($this->translate('forums/subscribe'))?>
+                    </a>
                 </div></form>
             <?php } ?>
             <?php if ($this->canUnsubscribe) { ?>
-                <form action="<?=$this->escapeHtml($this->unsubscribeUrl) ?>" method="post"><div>
+                <form action="<?=$this->escapeHtmlAttr($this->unsubscribeUrl) ?>" method="post"><div>
                     <i class="fa fa-envelope"></i>
-                    Вы подписаны на получение уведомлений<br />о новых сообщения в этом топике. <a href="#" onclick="this.parentNode.parentNode.submit();return false;">Отписаться</a>
+                    <?=$this->escapeHtml($this->translate('forums/subscribed'))?>
+                    <a href="#" onclick="this.parentNode.parentNode.submit();return false;">
+                        <?=$this->escapeHtml($this->translate('forums/unsubscribe'))?>
+                    </a>
                 </div></form>
             <?php } ?>
         </div>
@@ -55,12 +60,14 @@
     <?php if ($this->topic['status'] == Application\Model\Forums::STATUS_NORMAL) { ?>
         <?php if (!$this->user()->logedIn()) { ?>
             <div class="well">
-                <p>Чтобы иметь возможность создавать топики и отвечать в них, Вам необходимо <a href="/registration/">зарегистрироваться</a>.</p>
+                <?=$this->markdown($this->translate('forums/register-to-post'))?>
             </div>
         <?php } ?>
         <?php if ($this->canAddComments) { ?>
             <?php if ($this->needWait) { ?>
-                <p class="alert alert-block alert-warning">Для добавления нового сообщения вам необходимо подождать некоторое время</p>
+                <p class="alert alert-block alert-warning">
+                    <?=$this->escapeHtml($this->translate('forums/need-wait-to-post'))?>
+                </p>
             <?php } ?>
             <div class="form-holder">
                 <?=$this->partial('application/forms/comment', [
@@ -69,6 +76,8 @@
             </div>
         <?php } ?>
     <?php } else { ?>
-        <p class="alert alert-block alert-error">Обсуждение закрыто администрацией форума</p>
+        <p class="alert alert-block alert-error">
+            <?=$this->escapeHtml($this->translate('forums/topic-closed-text'))?>
+        </p>
     <?php } ?>
 </section>

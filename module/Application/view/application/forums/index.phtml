@@ -146,7 +146,7 @@
                                         <i class="fa fa-check-circle"></i>
                                     </button>
                                 <?php } else { ?>
-                                    <button title="закрыть" class="btn btn-xs btn-warning close-topic" id="close-topic-<?=$topic['id'] ?>">
+                                    <button title="<?=$this->escapeHtmlAttr($this->translate('forums/topic/close'))?>" class="btn btn-xs btn-warning close-topic" id="close-topic-<?=$topic['id'] ?>">
                                         <i class="fa fa-times-circle"></i>
                                     </button>
                                 <?php } ?>
@@ -157,7 +157,7 @@
                                     'class' => 'btn btn-default btn-xs',
                                     'title' => 'переместить'
                                 ], '<i class="fa fa-share"></i>', false) ?>
-                                <button title="удалить" class="btn btn-xs btn-danger delete" id="delete-topic-<?=$topic['id'] ?>">
+                                <button title="<?=$this->escapeHtmlAttr($this->translate('forums/topic/delete'))?>" class="btn btn-xs btn-danger delete" id="delete-topic-<?=$topic['id'] ?>">
                                     <i class="fa fa-ban"></i>
                                 </button>
                             </div>
