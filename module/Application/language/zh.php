@@ -259,7 +259,7 @@ return [
 
 **我们恳请您**, 在添加图片之前请确保它不存在于现有目录中。
 
-请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。
+请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => '%1$s的其它图片',
@@ -443,6 +443,7 @@ return [
     'picture/all-images-have-owners' => '任何图片都有权益人.',
     'picture/if-you-found-error' => '如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。',
     'picture/where-to-talk' => '前往<a href="/forums/">论坛</a>可以讨论任何车型的任何话题。',
+    'picture/other-languages' => 'In other languages',
 
     'users/user/known-as:' => '用户名: ',
     'users/user/before-known-as:' => '先前用户名: ',
@@ -1172,6 +1173,12 @@ return [
     'moder/picture/replaces' => '替换',
 
     'moder/picture/filter/status' => '状态',
+    'moder/picture/filter/status/any' => 'any',
+    'moder/picture/filter/status/inbox' => 'inbox',
+    'moder/picture/filter/status/new' => 'not moderated (old)',
+    'moder/picture/filter/status/accepted' => 'accepted',
+    'moder/picture/filter/status/removing' => 'in delete queue',
+    'moder/picture/filter/status/all-except-removing' => 'all, except removing',
     'moder/picture/filter/vehicle-type' => '车型',
     'moder/picture/filter/perspective' => '透视',
     'moder/picture/filter/brand' => '品牌',
@@ -1238,6 +1245,20 @@ return [
     'moder/vehicle/catalogue/turbo-group-creator' => 'Turbo group creator',
     'moder/vehicle/catalogue/add-brand' => '品牌 ...',
     'moder/vehicle/catalogue/add-brand-%s' => '品牌 %s',
+    
+    'moder/vehicle/twins/select-or-create' => 'Select or create group ...',
+    'moder/vehicle/twins/group-not-selected' => 'Group not selected',
+    'moder/vehicle/twins/remove' => 'Remove',
+    'moder/vehicle/twins/inherited-from' => 'Inherited from',
+ 
+    'moder/vehicle/factories/select-factory' => 'Select factory ...',
+    'moder/vehicle/factories/factory-not-selected' => 'Factory not selected',
+    'moder/vehicle/factories/remove' => 'Remove',
+    'moder/vehicle/factories/inherited-from' => 'Inherited from',
+ 
+    'moder/vehicle/link-type-prefix/design' => 'Design: ',
+    'moder/vehicle/link-type-prefix/sport' => 'Sport: ',
+    'moder/vehicle/link-type-prefix/related' => 'Related: ',
 
     'moder/picture/edit-picture-%s' => '编辑图片№%s',
     'moder/picture/edit-vehicle-%s' => '编辑车型%s',
@@ -1290,7 +1311,7 @@ return [
 [2](https://guides.github.com/features/mastering-markdown/),
 [3](https://daringfireball.net/projects/markdown/basics),
 
-Interlan hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins>',
+Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw/</ins>',
     'moder/markdown/edit' => '编辑',
     'moder/markdown/preview' => '预览',
     'moder/markdown/history' => '历史',
