@@ -4,6 +4,7 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 use Zend\Paginator\Paginator;
 
 use Application\Model\DbTable\BrandLink;
@@ -2900,8 +2901,8 @@ class CatalogueController extends AbstractActionController
             }
             unset($car);
 
-            $sideBarModel = new ViewModel([]);
-            $sideBarModel->setTemplate('application/most/sidebar');
+            $sideBarModel = new ViewModel($data);
+            $sideBarModel->setTemplate('application/mosts/sidebar');
             $this->layout()->addChild($sideBarModel, 'sidebar');
 
             return $data;
