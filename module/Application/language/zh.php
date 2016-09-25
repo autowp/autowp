@@ -5,7 +5,7 @@ return [
         'plural_forms' => 'nplurals=1; plural=0'
     ],
     /* Common words */
-    'and' => 'and',
+    'and' => '还有',
     '%1$s picures'       => [
         '%1$s 张图片',
     ],
@@ -134,15 +134,15 @@ return [
     'carlist/edit-specs' => '编辑性能参数',
 
     'picturelist/engine' => '发动机',
-    'picturelist/engine-%s' => '%s 个发动机',
+    'picturelist/engine-%s' => '%s 发动机',
     'picturelist/logotype' => '商标',
-    'picturelist/logotype-%s' => '%s 个商标',
+    'picturelist/logotype-%s' => '%s 商标',
     'picturelist/mixed' => '其它',
     'picturelist/mixed-%s' => '%s 其它',
     'picturelist/unsorted' => '未分类',
     'picturelist/unsorted-%s' => '-%s 未分类',
 
-    'present-time-abbr'       => 'pr.',
+    'present-time-abbr'       => '推出时间',
 
     /* Categories */
     'category/%s cars'        => [
@@ -232,34 +232,34 @@ return [
     /* upload */
     'upload/picture/crop' => 'crop',
     'upload/picture/cropped-to' => 'cropped to %s',
-    'upload/select/unsorted' => 'unsorted',
-    'upload/select/unsorted-long' => 'unsorted (not existent vehicle or engine)',
-    'upload/select/mixed' => 'mixed',
-    'upload/select/mixed-long' => 'mixed (few vehicles on one picture)',
-    'upload/select/logo' => 'logotype',
-    'upload/select/engines' => 'Engines',
-    'upload/select/concepts' => 'Concepts & prototypes',
+    'upload/select/unsorted' => '未分类',
+    'upload/select/unsorted-long' => '未分类(无车辆或发动机)',
+    'upload/select/mixed' => '其它',
+    'upload/select/mixed-long' => '其它(几辆车在同一张图中)',
+    'upload/select/logo' => '商标',
+    'upload/select/engines' => '发动机',
+    'upload/select/concepts' => '概念车及原型车',
 
-    'upload/add-picture' => 'Add picture',
-    'upload/select-another' => 'select another catalogue',
-    'upload/description' => 'Если у вас есть изображения, которых вы не нашли на этом сайте и они соответствуют тематике сайта, то вы можете добавить их в наш каталог, воспользовавшись формой, расположенной ниже.
+    'upload/add-picture' => '添加图片',
+    'upload/select-another' => '选择另一个目录',
+    'upload/description' => '如果您有没有在这个网站找到对应主题的图片，可以通过下面的目录添加它们。
 
-Было бы здорово, если бы вы указали, что за автомобиль изображён на картинке, чтобы облегчить её добавление и избежать ошибки.
+遵循下列指示可以让添加照片更轻松，希望您仔细阅读。
 
-Требования, предъявляемые к добавляемым картинкам:
+添加照片相关要求:
 
-* Формат [JPEG](http://ru.wikipedia.org/wiki/JPEG) или [PNG](http://ru.wikipedia.org/wiki/PNG). Разрешение от: 640×360 до 4096×4096.
-* Изображение должно по возможности быть отличного качества, не содержать различных артефактов изменения размера или компрессии (размытия, нечёткости, расплытия цветов, ребристости прямых линий и т.д.). Исключение составляют редкие фото(производителя), сканы из проспектов. Решение об оставлении такого фото на сайте принимает модераторский состав.
-* Отсутствие надписей и логотипов посторонних сайтов, нанесенных не авторами/владельцами материала.
-* Автомобиль должен иметь первоначальный вид как при выходе с завода. Не должны присутствовать признаки <em>самодельного тюнинга</em>, желательно отстутвие изменений, связанных со старением автомобиля.
-* Автомобиль должен полностью помещаться на фотографии. Исключение составляют случаи, когда изображение демонстрирует интерьер автомобиля или какую-то отличительную черту (как, например, название ограниченной серии автомобиля).
-* Основной и единственной темой изображения должен являться автомобиль, логотип автокомпании или двигатель. Наличие в кадре посторонних предметов или людей - нежелательно.
-* Любительские фотографии вашего автомобиля, автомобиля ваших друзей или любого другого, встретившегося вам на улице, а также фотографии с выставок - не будут приняты на сайт 100%. Если только вы не профессионал.
-* Для первых фотографий автомобиля возможны пониженные требования.
+* [JPEG](http://ru.wikipedia.org/wiki/JPEG)或[PNG](http://ru.wikipedia.org/wiki/PNG)格式。分辨率范围: 从640×360至4096×4096。
+* 图像质量应尽可能高，且没有被调整过尺寸或压缩（模糊、模糊化、颜色失真、罗纹线等）。珍贵的扫描图片(生产商拍摄)例外。图片在网站的存留由一部分管理员决定。
+* 图像不能有非该图像的作者/所有者添加的水印。
+* 图像车辆必须保持原厂状态，不能存在<em>个人改装</em>，因年代久远产生的老化则可以接受。
+* 图像中的汽车必须完整显示。唯一的例外是图像显示的是内饰或该车型的某一显著特征（例如某个限量车型的名称）。
+* 图像主要和唯一的主题必须是汽车，汽车公司的商标或发动机，不允许有人物存在。
+* 图像必须是专业图片，您自己或朋友的爱车照片、街拍以及车展上拍摄的照片不能保证100％被接受。
+* 对于一款车型的首张照片，要求可能会提高。
 
-**Убедительная просьба**, перед добавлением изображений, убедиться в их отсутствии в каталоге.
+**我们恳请您**, 在添加图片之前请确保它不存在于现有目录中。
 
-Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.',
+请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => '%1$s的其它图片',
@@ -286,17 +286,17 @@ return [
     /* comments */
     'comments/title' => '评论',
     'comments/reply' => '回复',
-    'comments/what-to-do-for-write-comments' => '为方便发表评论,您需要<a href="/login">注册账号或用社交网站账号登陆</a>',
+    'comments/what-to-do-for-write-comments' => '为方便发表评论，您需要<a href="/login">注册账号或用社交网站账号登陆</a>',
     'comments/it-requires-attention-of-moderators' => '向管理员发送提示',
     'comments/form-title' => '添加评论',
     'comments/message' => '站内信',
     'comments/send' => '发表',
     'comments/cancel' => '取消',
-    'comments/need-wait-text' => '很抱歉稍后您才可以发表新评论.
+    'comments/need-wait-text' => '很抱歉稍后您才可以发表新评论。
 
-这是由于为了防止灌水和其他不端行为,每小时发送的消息数受到限制.
+这是由于为了防止灌水和其他不端行为，每小时发送的消息数受到限制。
 
-现在您可以在"%s"中发表评论,建议使用清晰易懂的措辞表达您的看法:',
+现在您可以在"%s"中发表评论，建议使用清晰易懂的措辞表达您的看法:',
 
     /*perspectives*/
     'perspective/front'          => '前方',
@@ -351,7 +351,7 @@ return [
     'forums/theme/topics' => '话题',
     'forums/theme/author' => '作者',
     'forums/theme/last-message' => '最新回复',
-    'forums/theme/subscription' => 'Subscription',
+    'forums/theme/subscription' => '订阅',
     'forums/theme/total:' => '全部',
     'forums/theme/all-other' => '全部其它话题',
     'forums/theme/photos' => '图片版块',
@@ -443,7 +443,6 @@ return [
     'picture/all-images-have-owners' => '任何图片都有权益人.',
     'picture/if-you-found-error' => '如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。',
     'picture/where-to-talk' => '前往<a href="/forums/">论坛</a>可以讨论任何车型的任何话题。',
-    'picture/other-languages' => 'In other languages',
 
     'users/user/known-as:' => '用户名: ',
     'users/user/before-known-as:' => '先前用户名: ',
@@ -454,7 +453,7 @@ return [
     'users/user/upload-pictures:' => '已上传图片: ',
     'users/user/pictures-left-on-site:' => '被采纳图片: ',
 
-    'users/for-moderators' => 'For moderators',
+    'users/for-moderators' => '管理员页面',
     'users/for-moderators/remove-photo' => '删除用户图片',
     'users/for-moderators/remove-user' => '删除用户',
     'users/for-moderators/last-visit-from-ip' => '最后访问IP地址: ',
@@ -570,9 +569,9 @@ return [
     'car-type/2-floor-bus'    => '双层客车',
     'car-type/town-car'       => 'Town car',
     'car-type/barchetta'      => 'Barchetta',
-    'car-type/moto'           => 'Moto',
-    'car-type/tractor'        => 'Tractor',
-    'car-type/tracked'        => 'Tracked platform',
+    'car-type/moto'           => '摩托车',
+    'car-type/tractor'        => '拖拉机',
+    'car-type/tracked'        => '履带底盘',
 
     'car-type-rp/roadster'       => '跑车',
     'car-type-rp/spyder'         => '敞篷跑车',
@@ -616,7 +615,7 @@ return [
     'car-type-rp/barchetta'      => 'Barchetta',
     'car-type-rp/moto'           => '摩托车',
     'car-type-rp/tractor'        => '拖拉机',
-    'car-type-rp/tracked'        => '履带平台',
+    'car-type-rp/tracked'        => '履带底盘',
 
     'about/text' => '### 我们的团队
 来到这里投入时间和知识的人们是本网站存在的根基。
@@ -654,7 +653,7 @@ return [
 
 中文页面建设者: %zh-translator%
 
-技术支持 [Zend Framework](http://framework.zend.com/), [jQuery](http://jquery.com/), [Twitter bootstrap](http://getbootstrap.com/), а также многих других "умных словах".
+技术支持 [Zend Framework](http://framework.zend.com/)、[jQuery](http://jquery.com/)、[Twitter bootstrap](http://getbootstrap.com/)，还有许多优秀的计算机语言.
 
 网站源代码向所有人开放，每个人都有机会影响网站的性质和质量。
 
@@ -1173,12 +1172,6 @@ return [
     'moder/picture/replaces' => '替换',
 
     'moder/picture/filter/status' => '状态',
-    'moder/picture/filter/status/any' => 'any',
-    'moder/picture/filter/status/inbox' => 'inbox',
-    'moder/picture/filter/status/new' => 'not moderated (old)',
-    'moder/picture/filter/status/accepted' => 'accepted',
-    'moder/picture/filter/status/removing' => 'in delete queue',
-    'moder/picture/filter/status/all-except-removing' => 'all, except removing',
     'moder/picture/filter/vehicle-type' => '车型',
     'moder/picture/filter/perspective' => '透视',
     'moder/picture/filter/brand' => '品牌',
@@ -1201,17 +1194,17 @@ return [
     'moder/vehicle/end' => '停产',
     'moder/vehicle/produced' => '产量',
     'moder/vehicle/concept' => '概念车(原型车)',
-    'moder/vehicle/group' => 'Group',
-    'moder/vehicle/year' => 'year',
-    'moder/vehicle/month' => 'month',
-    'moder/vehicle/today' => 'today',
-    'moder/vehicle/today/ended' => 'ended',
+    'moder/vehicle/group' => '组',
+    'moder/vehicle/year' => '年',
+    'moder/vehicle/month' => '月',
+    'moder/vehicle/today' => '现在',
+    'moder/vehicle/today/ended' => '截止',
     'moder/vehicle/today/continue' => 'continue in pr.',
-    'moder/vehicle/is-concept/no' => 'no',
-    'moder/vehicle/is-concept/yes' => 'yes',
-    'moder/vehicle/is-concept/inherited-no' => 'inherited (no)',
-    'moder/vehicle/is-concept/inherited-yes' => 'inherited (yes)',
-    'moder/vehicle/is-concept/inherited' => 'inherited',
+    'moder/vehicle/is-concept/no' => '否',
+    'moder/vehicle/is-concept/yes' => '是',
+    'moder/vehicle/is-concept/inherited-no' => '无继承性',
+    'moder/vehicle/is-concept/inherited-yes' => '有继承性',
+    'moder/vehicle/is-concept/inherited' => '已有继承性',
 
     'moder/vehicle/tabs/meta' => 'Meta',
     'moder/vehicle/tabs/name' => '车名',
@@ -1238,27 +1231,13 @@ return [
     'moder/vehicle/catalogue/title/remove' => '删除',
     'moder/vehicle/catalogue/select' => '选择 ...',
     'moder/vehicle/catalogue/select-placeholder' => '添加上级目录 ...',
-    'moder/vehicle/catalogue/possible-duplicate-parent' => '可能原因: 车型已 inherited via: ',
+    'moder/vehicle/catalogue/possible-duplicate-parent' => '可能原因: 车型已通过: '继承,
     'moder/vehicle/catalogue/possible-duplicate-child' => '可能原因: 车型已存在于子目录: ',
     'moder/vehicle/catalogue/parent-name-placeholder' => '车名',
     'moder/vehicle/catalogue/parent-catname-placeholder' => 'URL part',
     'moder/vehicle/catalogue/turbo-group-creator' => 'Turbo group creator',
     'moder/vehicle/catalogue/add-brand' => '品牌 ...',
     'moder/vehicle/catalogue/add-brand-%s' => '品牌 %s',
-
-    'moder/vehicle/twins/select-or-create' => 'Select or create group ...',
-    'moder/vehicle/twins/group-not-selected' => 'Group not selected',
-    'moder/vehicle/twins/remove' => 'Remove',
-    'moder/vehicle/twins/inherited-from' => 'Inherited from',
-
-    'moder/vehicle/factories/select-factory' => 'Select factory ...',
-    'moder/vehicle/factories/factory-not-selected' => 'Factory not selected',
-    'moder/vehicle/factories/remove' => 'Remove',
-    'moder/vehicle/factories/inherited-from' => 'Inherited from',
-
-    'moder/vehicle/link-type-prefix/design' => 'Design: ',
-    'moder/vehicle/link-type-prefix/sport' => 'Sport: ',
-    'moder/vehicle/link-type-prefix/related' => 'Related: ',
 
     'moder/picture/edit-picture-%s' => '编辑图片№%s',
     'moder/picture/edit-vehicle-%s' => '编辑车型%s',
