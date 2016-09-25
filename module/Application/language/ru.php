@@ -1421,4 +1421,9 @@ return [
     'moder/markdown/edit' => 'Редактировать',
     'moder/markdown/preview' => 'Предварительный просмотр',
     'moder/markdown/history' => 'История',
+
+    'votings/do-vote' => 'Голосовать',
+    'votings/who-voted' => 'Кто проголосовал?',
+    'votings/voting/voters/show-all' => 'показать всех',
+    'votings/voting/voters/show-contributors' => 'показать только от 100 закаченных картинок',
 ];

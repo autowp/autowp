@@ -42,7 +42,7 @@
                     </li>
                 <?php } ?>
             </ul>
-            <input type="submit" class="btn btn-primary" value="Голосовать" />
+            <input type="submit" class="btn btn-primary" value="<?=$this->escapeHtmlAttr($this->translate('votings/do-vote'))?>" />
         </form>
     <?php } else { ?>
         <?php foreach ($this->variants as $variant) { ?>
@@ -52,7 +52,7 @@
                     'href'  => $this->url('votings/voting-variant-votes', [
                         'id' => $variant['id']
                     ])
-                ], 'Кто проголосовал?')?></p>
+                ], $this->translate('votings/who-voted'))?></p>
             <?php } ?>
             <?=$this->escapeHtml($variant['name'])?>
             <?php if ($variant['text']) { ?>
@@ -70,12 +70,12 @@
             <?=$this->htmlA($this->url('votings/voting', [
                 'id'     => $this->voting->id,
                 'filter' => null
-            ]), 'показать всех')?>
+            ]), $this->translate('votings/voting/voters/show-all'))?>
         <?php } else { ?>
             <?=$this->htmlA($this->url('votings/voting', [
                 'id'     => $this->voting->id,
                 'filter' => 1
-            ]), 'показать только от 100 закаченных картинок')?>
+            ]), $this->translate('votings/voting/voters/show-contributors'))?>
         <?php } ?>
     </p>
 <?php } ?>

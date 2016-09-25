@@ -1391,4 +1391,9 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/markdown/edit' => '编辑',
     'moder/markdown/preview' => '预览',
     'moder/markdown/history' => '历史',
+
+    'votings/do-vote' => 'Vote',
+    'votings/who-voted' => 'Who voted?',
+    'votings/voting/voters/show-all' => 'show all',
+    'votings/voting/voters/show-contributors' => 'show from 100 uploaded pictures',
 ];
