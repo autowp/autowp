@@ -1330,6 +1330,35 @@ return [
     'moder/picture/acceptance/that-is-one-accepted-picture' => 'Это единственная принятая картинка этого автомобиля',
     'moder/picture/acceptance/accepted-pictures-is-%s' => 'Принятых картинок этого автомобиля всего %s',
 
+    'moder/brands/vehicles-count:' => 'Автомобилей: ',
+    'moder/brands/engines-count:' => 'Двигателей: ',
+    'moder/brands/vehicle-pictures-count:' => 'Картинок автомобилей: ',
+    'moder/brands/engine-pictures-count:' => 'Картинок двигателей: ',
+    'moder/brands/logo-pictures-count:' => 'Картинок логотипов: ',
+    'moder/brands/mixed-pictures-count:' => 'Смешанных картинок: ',
+    'moder/brands/unsorted-pictures-count:' => 'Несортированных картинок: ',
+    'moder/brands/total-pictures-count:' => 'Всего картинок: ',
+    'moder/brands/public-url:' => 'На сайте: ',
+
+    'moder/brands/meta-data' => 'Мета-информация',
+    'moder/brands/meta-data/name' => 'Название',
+    'moder/brands/meta-data/full-name' => 'Полное название',
+    'moder/brands/description' => 'Краткое описание',
+    'moder/brands/logo' => 'Логотип',
+    'moder/brands/logo/description' => '* Логотип должен быть строго в формате PNG.
+* Все прозрачные области должны быть прозрачными, а не белыми!
+* Логотип должен касаться краев изображения. Никаких полей не не надо
+* Закачивайте в максимальном доступном разрешении - это обеспечит качество и возможность в будущем где-то воспользоваться этим крупным фото. На сайте все размеры будут подогнанны',
+
+    'moder/brands/vehicles' => 'Автомобили',
+    'moder/brands/links' => 'Ссылки',
+    'moder/brands/links/text' => 'Текст',
+    'moder/brands/links/address' => 'Адрес',
+    'moder/brands/links/type' => 'Тип',
+    'moder/brands/links/type/interest-link' => 'Интересная ссылка',
+    'moder/brands/links/type/official' => 'официальный сайт',
+    'moder/brands/links/type/club' => 'клуб',
+
     'moder/edit-object' => 'управление',
 
     'moder/markdown/description' => 'Синтаксис Markdown.
