@@ -27,11 +27,11 @@
 ])?>
 <?php if (count($this->contributors)) { ?>
     <p>
-        Составители:
+        <?=$this->escapeHtml($this->translate('catalogue/specifications/contributors:'))?>
         <?php foreach ($this->contributors as $contributor) { ?>
             <?=$this->user($contributor)?>
         <?php } ?>
     </p>
 <?php } ?>
 
-<p>Информация собрана участниками проекта. Если вы нашли ошибку или желаете заполнить пробелы, вы можете сделать это, пройдя процедуру регистрации на сайте.</p>
+<?=$this->markdown($this->translate('catalogue/specifications/disclaimer'))?>

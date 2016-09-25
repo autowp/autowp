@@ -63,7 +63,7 @@
             <?=$this->htmlA($this->url('moder/cars/params', [
                 'action'    => 'new',
                 'parent_id' => $this->car['id']
-            ]), 'добавить автомобиль')?>
+            ]), $this->translate('moder/vehicle/catalogue/add-vehicle'))?>
         <?php } ?>
 
         <?php if ($this->canAcceptPicture && $this->inboxCount) { ?>
@@ -72,7 +72,7 @@
                 'action'     => 'index',
                 'car_id'     => $this->car['id'],
                 'status'     => 'inbox'
-            ]), 'inbox ('.$this->inboxCount.')')?>
+            ]), $this->translate('catalogue/vehicle/inbox') . ' ('.$this->inboxCount.')')?>
         <?php } ?>
 
         <?php if ($this->requireAttention) { ?>
@@ -81,7 +81,7 @@
                 'action'     => 'index',
                 'car_id'     => $this->car['id'],
                 'moderator_attention' => '1'
-            ]), 'comments ('.$this->requireAttention.')')?>
+            ]), $this->translate('catalogue/vehicle/comments') . ' ('.$this->requireAttention.')')?>
         <?php } ?>
     </p>
 <?php } ?>

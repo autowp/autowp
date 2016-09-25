@@ -17,14 +17,14 @@
         <li<?=$this->cars['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url('catalogue', [
                 'action' => 'engine-cars',
-            ], [], true), '<span class="fa fa-car"></span> Автомобили <span class="badge">'.$this->cars['count'].'</span>', false) ?>
+            ], [], true), '<span class="fa fa-car"></span> '.$this->escapeHtml($this->translate('catalogue/engine-menu/vehicles')).' <span class="badge">'.$this->cars['count'].'</span>', false) ?>
         </li>
     <?php } ?>
     <?php if ($this->pictures['count'] > 0) { ?>
         <li<?=$this->pictures['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url('catalogue', [
                 'action' => 'engine-pictures',
-            ], [], true), '<i class="fa fa-th"></i> Изображения <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
+            ], [], true), '<i class="fa fa-th"></i> '.$this->escapeHtml($this->translate('catalogue/engine-menu/pictures')).' <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
         </li>
     <?php } ?>
 </ul>

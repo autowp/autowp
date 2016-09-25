@@ -311,6 +311,14 @@ return [
     'catalogue/specifications' => 'Технические характеристики',
     'catalogue/other-photos' => 'Другие фото',
 
+    'catalogue/engine-menu/vehicles' => 'Автомобили',
+    'catalogue/engine-menu/pictures' => 'Изображения',
+    'catalogue/specifications/contributors:' => 'Составители:',
+    'catalogue/specifications/disclaimer' => 'Информация собрана участниками проекта. Если вы нашли ошибку или желаете заполнить пробелы, вы можете сделать это, пройдя процедуру регистрации на сайте.',
+    'catalogue/vehicle/inbox' => 'инбокс',
+    'catalogue/vehicle/comments' => 'комментарии',
+    'catalogue/engine/add-engine' => 'добавить двигатель',
+
     /* comments */
     'comments/title' => 'Комментарии',
     'comments/reply' => 'ответить',

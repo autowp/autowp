@@ -297,6 +297,14 @@ return [
     'catalogue/specifications' => 'Caractéristiques',
     'catalogue/other-photos' => 'Plus d\'images',
 
+    'catalogue/engine-menu/vehicles' => 'Vehicles',
+    'catalogue/engine-menu/pictures' => 'Pictures',
+    'catalogue/specifications/contributors:' => 'Contributors:',
+    'catalogue/specifications/disclaimer' => 'Information collected by site members. Если вы нашли ошибку или желаете заполнить пробелы, вы можете сделать это, пройдя процедуру регистрации на сайте.',
+    'catalogue/vehicle/inbox' => 'inbox',
+    'catalogue/vehicle/comments' => 'comments',
+    'catalogue/engine/add-engine' => 'add engine',
+
     /* comments */
     'comments/title' => 'Commentaires',
     'comments/reply' => 'répondre',

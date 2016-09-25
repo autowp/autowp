@@ -283,6 +283,14 @@ return [
     'catalogue/specifications' => '性能参数',
     'catalogue/other-photos' => '其它图片',
 
+    'catalogue/engine-menu/vehicles' => 'Vehicles',
+    'catalogue/engine-menu/pictures' => 'Pictures',
+    'catalogue/specifications/contributors:' => 'Contributors:',
+    'catalogue/specifications/disclaimer' => 'Information collected by site members. Если вы нашли ошибку или желаете заполнить пробелы, вы можете сделать это, пройдя процедуру регистрации на сайте.',
+    'catalogue/vehicle/inbox' => 'inbox',
+    'catalogue/vehicle/comments' => 'comments',
+    'catalogue/engine/add-engine' => 'add engine',
+
     /* comments */
     'comments/title' => '评论',
     'comments/reply' => '回复',

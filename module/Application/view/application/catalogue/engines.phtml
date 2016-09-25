@@ -27,12 +27,12 @@
                 <?=$this->htmlA($this->url('moder/engines/params', [
                     'action'    => 'add',
                     'parent_id' => $this->engine->id
-                ]), 'добавить двигатель')?>
+                ]), $this->translate('catalogue/engine/add-engine'))?>
             <?php } else { ?>
                 <?=$this->htmlA($this->url('moder/engines/params', [
                     'action'   => 'add',
                     'brand_id' => $this->brand['id']
-                ]), 'добавить двигатель')?>
+                ]), $this->translate('catalogue/engine/add-engine'))?>
             <?php } ?>
         <?php } ?>
     </p>
