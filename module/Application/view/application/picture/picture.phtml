@@ -92,7 +92,10 @@
         <?php } ?>
 
         <?php if ($this->replacePicture) { ?>
-            <p>Фото предложено на замену <?=$this->htmlA($this->replacePicture, $this->serverUrl($this->replacePicture))?></p>
+            <p>
+                <?=$this->escapeHtml($this->translate('picture/picture-suggested-to-replace'))?>
+                <?=$this->htmlA($this->replacePicture, $this->serverUrl($this->replacePicture))?>
+            </p>
         <?php } ?>
 
     </div>
@@ -215,28 +218,33 @@
                     if (count($this->engineCars) > 0) {
                         if (count($this->engineCars) == 1)
                             foreach ($this->engineCars as $car) {
-                                $list[] = 'Такой двигатель устанавливается на автомобиль ' . $this->htmlA($car['url'], $car['name']);
+                                $list[] = $this->escapeHtml($this->translate('picture/that-engine-is-mounted-to-vehicle')) . $this->htmlA($car['url'], $car['name']);
                             }
                         else {
                             $a = [];
                             foreach ($this->engineCars as $car) {
                                 $a[] = $this->htmlA($car['url'], $car['name']);
                             }
-                            $list[] = 'Такой двигатель устанавливается на автомобили: '.
+                            $list[] = $this->escapeHtml($this->translate('picture/that-engine-is-mounted-to-vehicles:')) .
                                       $this->htmlList($a, false, [], false);
                         }
                     }
 
                     if ($this->engine) {
                         if ($this->engineHasSpecs) {
-                            $list[] = $this->htmlA($this->engineSpecsUrl, '<i class="fa fa-list-alt"></i> Технические характеристики ' . $this->escapeHtml($this->engine->caption), false);
+                            $list[] = $this->htmlA(
+                                $this->engineSpecsUrl,
+                                '<i class="fa fa-list-alt"></i> ' .
+                                sprintf($this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')), $this->escapeHtml($this->engine->caption)),
+                                false
+                            );
                         }
 
                         if ($this->user()->isAllowed('specifications', 'edit')) {
                             $list[] = $this->htmlA($this->url('cars', [
                                 'action'     => 'engine-spec-editor',
                                 'engine_id'  => $this->engine->id
-                            ]), '<i class="fa fa-pencil"></i> Ввод ТТХ', false);
+                            ]), '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')), false);
                         }
                     }
                     break;
@@ -245,12 +253,12 @@
                     if ($this->factory) {
                         $list[] = $this->htmlA($this->url('factories/factory', [
                             'id' => $this->factory->id
-                        ]), 'Подробнее о заводе ...');
+                        ]), $this->translate('picture/factory-details'));
                     }
                     if (count($this->factoryCars) > 0) {
                         if (count($this->factoryCars) == 1)
                             foreach ($this->factoryCars as $car) {
-                                $list[] = 'На этом заводе производился такой автомобиль, как ' . $this->htmlA($car['url'], $car['name']);
+                                $list[] = $this->escapeHtml($this->translate('picture/on-that-factory-produced-vehicle')) . ' ' . $this->htmlA($car['url'], $car['name']);
                             }
                         else {
                             $a = [];
@@ -261,10 +269,10 @@
                             if ($this->factoryCarsMore) {
                                 $a[] = ' и ' . $this->htmlA($this->url('factories/factory-cars', [
                                     'id' => $this->factory->id
-                                ]), 'другие ...');
+                                ]), $this->translate('picture/on-that-factory-produced-vehicles/and-other'));
                             }
 
-                            $list[] = 'На этом заводе производились такие автомобили, как: '.
+                            $list[] = $this->escapeHtml($this->translate('picture/on-that-factory-produced-vehicles:')) .
                                       $this->htmlList($a, false, [], false);
                         }
                     }

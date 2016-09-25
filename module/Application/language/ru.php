@@ -290,6 +290,9 @@ return [
 **Убедительная просьба**, перед добавлением изображений, убедиться в их отсутствии в каталоге.
 
 Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.',
+    'upload/only-registered' => 'Только зарегистрированный пользователи могут загружать изображения
+
+[Авторизируйтесь](/login/) или [зарегистрируйтесь](/registration/)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Другие изображения %1$s',
@@ -519,6 +522,13 @@ return [
     'picture/if-you-found-error' => 'Если вы считаете, что пользователи сайта ошиблись, разместив данную картинку в этом разделе, то было бы здорово, если бы вы написали об этом в комментариях и указали на ошибку.',
     'picture/where-to-talk' => 'Поделиться своей радостью, обсудить наболевшее и просто поболтать об автомобилях и не только вы можете на нашем <a href="/forums/" title="Перейти в форум">форуме</a>',
     'picture/other-languages' => 'На других языках',
+    'picture/picture-suggested-to-replace' => 'Фото предложено на замену',
+    'picture/that-engine-is-mounted-to-vehicle' => 'Такой двигатель устанавливается на автомобиль',
+    'picture/that-engine-is-mounted-to-vehicles:' => 'Такой двигатель устанавливается на автомобили:',
+    'picture/factory-details' => 'Подробнее о заводе ...',
+    'picture/on-that-factory-produced-vehicle' => 'На этом заводе производился такой автомобиль, как',
+    'picture/on-that-factory-produced-vehicles:' => 'На этом заводе производились такие автомобили, как: ',
+    'picture/on-that-factory-produced-vehicles/and-other' => 'другие ...',
 
     'users/user/known-as:' => 'Представился как: ',
     'users/user/before-known-as:' => 'ранее известен как: ',
@@ -1426,4 +1436,35 @@ return [
     'votings/who-voted' => 'Кто проголосовал?',
     'votings/voting/voters/show-all' => 'показать всех',
     'votings/voting/voters/show-contributors' => 'показать только от 100 закаченных картинок',
+
+    'museums/museum/address:' => 'Адрес:',
+    'museums/museum/on-the-map' => 'на карте',
+    'museums/museum/website:' => 'Web-сайт: ',
+
+    'restore-password/text' => 'Если вы забыли свой пароль - введите ваш e-mail (который вы указали при регистрации) и на него будет выслан пароль.',
+    'restore-password/new-password/text' => 'Введите новый пароль',
+    'restore-password/new-password/saved' => 'Новый пароль успешно сохранён.
+
+Не забывайте его',
+
+    'twins/group/description' => 'Описание',
+
+    'specifications-editor/not-save' => 'Данные не сохранены из-за ошибки. Подробности ниже',
+    'specifications-editor/parameter' => 'Характеристика',
+    'specifications-editor/your-value' => 'Ваше значение',
+    'specifications-editor/actual-value' => 'Актуальное значение',
+    'specifications-editor/all-values' => 'Введеные значения',
+
+    'specifications-editor/log/date' => 'Дата',
+    'specifications-editor/log/user' => 'Пользователь',
+    'specifications-editor/log/object' => 'Объект',
+    'specifications-editor/log/attribute' => 'Атрибут',
+    'specifications-editor/log/value' => 'Значение',
+    'specifications-editor/log/editor' => 'Редактор',
+    'specifications-editor/log/to-editor' => 'в редактор',
+    'specifications-editor/log/low-weight-text' => 'Зарегистрировано большое количество конфликтов в данных, введеных вами. Другие люди часто опревергают информацию, предоставленную вами.
+
+Ввод данных временно приостановлен. Просьба исправить ситуацию, провести ревизию конфликтов.
+
+Осуществить это поможет [специальный интерфейс](/account/specs-conflicts/conflict/minus-weight), в котором собраны по крайней мере те ошибки, которые обнаружили посетители сайта.',
 ];

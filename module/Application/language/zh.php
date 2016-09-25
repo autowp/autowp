@@ -262,6 +262,9 @@ return [
 **我们恳请您**, 在添加图片之前请确保它不存在于现有目录中。
 
 请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。',
+    'upload/only-registered' => 'Only registered users can upload pictures
+
+[Login](/login/) or [register](/registration/)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => '%1$s的其它图片',
@@ -491,6 +494,13 @@ return [
     'picture/if-you-found-error' => '如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。',
     'picture/where-to-talk' => '前往<a href="/forums/">论坛</a>可以讨论任何车型的任何话题。',
     'picture/other-languages' => '其它语言翻译',
+    'picture/picture-suggested-to-replace' => 'Picture suggested to replace',
+    'picture/that-engine-is-mounted-to-vehicle' => 'That engine is mounted to vehicle',
+    'picture/that-engine-is-mounted-to-vehicles:' => 'That engine is mounted to vehicles:',
+    'picture/factory-details' => 'Factory details ...',
+    'picture/on-that-factory-produced-vehicle' => 'На этом заводе производился такой автомобиль, как',
+    'picture/on-that-factory-produced-vehicles:' => 'На этом заводе производились такие автомобили, как: ',
+    'picture/on-that-factory-produced-vehicles/and-other' => 'other ...',
 
     'users/user/known-as:' => '用户名: ',
     'users/user/before-known-as:' => '先前用户名: ',
@@ -1396,4 +1406,35 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'votings/who-voted' => '表决用户',
     'votings/voting/voters/show-all' => '显示全部',
     'votings/voting/voters/show-contributors' => '从100张已上传图片中显示',
+
+    'museums/museum/address:' => 'Address:',
+    'museums/museum/on-the-map' => 'on the map',
+    'museums/museum/website:' => 'Web-site: ',
+
+    'restore-password/text' => 'If you lost your password - input your e-mail and you give instruction to create new one',
+    'restore-password/new-password/text' => 'Enter new password',
+    'restore-password/new-password/saved' => 'New password saved.
+
+Don\'t forget it,',
+
+    'twins/group/description' => 'Description',
+
+    'specifications-editor/not-save' => 'Data not save because of error. Details below',
+    'specifications-editor/parameter' => 'Parameter',
+    'specifications-editor/your-value' => 'Your value',
+    'specifications-editor/actual-value' => 'Current value',
+    'specifications-editor/all-values' => 'All values',
+
+    'specifications-editor/log/date' => 'Date',
+    'specifications-editor/log/user' => 'User',
+    'specifications-editor/log/object' => 'Object',
+    'specifications-editor/log/attribute' => 'Attribyte',
+    'specifications-editor/log/value' => 'Value',
+    'specifications-editor/log/editor' => 'Editor',
+    'specifications-editor/log/to-editor' => 'to editor',
+    'specifications-editor/log/low-weight-text' => 'Зарегистрировано большое количество конфликтов в данных, введеных вами. Другие люди часто опревергают информацию, предоставленную вами.
+
+Ввод данных временно приостановлен. Просьба исправить ситуацию, провести ревизию конфликтов.
+
+Осуществить это поможет [специальный интерфейс](/account/specs-conflicts/conflict/minus-weight), в котором собраны по крайней мере те ошибки, которые обнаружили посетители сайта.',
 ];

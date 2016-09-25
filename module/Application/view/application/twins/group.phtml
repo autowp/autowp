@@ -17,20 +17,20 @@
     <?php if ($this->hasSpecs) {?>
         <li>
             <i class="fa fa-list-alt"></i>
-            <?=$this->htmlA($this->specsUrl, 'технические характеристики')?>
+            <?=$this->htmlA($this->specsUrl, $this->translate('carlist/specifications'))?>
         </li>
     <?php } ?>
 
     <?php if ($this->picturesCount) { ?>
         <li>
             <i class="fa fa-th"></i>
-            <?=$this->htmlA($this->picturesUrl, 'все картинки ('.$this->picturesCount.')')?>
+            <?=$this->htmlA($this->picturesUrl, $this->translate('carlist/all pictures') . ' ('.$this->picturesCount.')')?>
         </li>
     <?php } ?>
 </ul>
 
 <?php if (strlen($this->description)){ ?>
-    <h3>Описание</h3>
+    <h3><?=$this->escapeHtml($this->translate('twins/group/description'))?></h3>
     <div class="well"><?=$this->markdown($this->description) ?></div>
 <?php } ?>
 

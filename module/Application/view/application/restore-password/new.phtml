@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col-md-8 col-md-offset-2">
         <div class="well">
-            <p>Введите новый пароль</p>
+            <?=$this->markdown($this->translate('restore-password/new-password/text'))?>
             <?=$this->partial('application/forms/bootstrap-horizontal', [
                 'form' => $this->form
             ])?>

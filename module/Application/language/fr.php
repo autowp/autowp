@@ -276,6 +276,9 @@ return [
 **Убедительная просьба**, перед добавлением изображений, убедиться в их отсутствии в каталоге.
 
 Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.',
+    'upload/only-registered' => 'Only registered users can upload pictures
+
+[Login](/login/) or [register](/registration/)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Autres photos de %1$s',
@@ -505,6 +508,13 @@ Good luck.',
     'picture/if-you-found-error' => 'Si vous pensez que utilisateurs du site s\'est trompé en affichant cette image dans cette section, ce serait bien si vous avez écrit à ce sujet dans les commentaires et ont indiqué à l\'erreur.',
     'picture/where-to-talk' => 'Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur <a href="/forums/">notre forum</a>',
     'picture/other-languages' => 'In other languages',
+    'picture/picture-suggested-to-replace' => 'Picture suggested to replace',
+    'picture/that-engine-is-mounted-to-vehicle' => 'That engine is mounted to vehicle',
+    'picture/that-engine-is-mounted-to-vehicles:' => 'That engine is mounted to vehicles:',
+    'picture/factory-details' => 'Factory details ...',
+    'picture/on-that-factory-produced-vehicle' => 'На этом заводе производился такой автомобиль, как',
+    'picture/on-that-factory-produced-vehicles:' => 'На этом заводе производились такие автомобили, как: ',
+    'picture/on-that-factory-produced-vehicles/and-other' => 'other ...',
 
     'users/user/known-as:' => 'Known as: ',
     'users/user/before-known-as:' => 'before known as: ',
@@ -1411,4 +1421,35 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'votings/who-voted' => 'Who voted?',
     'votings/voting/voters/show-all' => 'show all',
     'votings/voting/voters/show-contributors' => 'show from 100 uploaded pictures',
+
+    'museums/museum/address:' => 'Address:',
+    'museums/museum/on-the-map' => 'on the map',
+    'museums/museum/website:' => 'Web-site: ',
+
+    'restore-password/text' => 'If you lost your password - input your e-mail and you give instruction to create new one',
+    'restore-password/new-password/text' => 'Enter new password',
+    'restore-password/new-password/saved' => 'New password saved.
+
+Don\'t forget it,',
+
+    'twins/group/description' => 'Description',
+
+    'specifications-editor/not-save' => 'Data not save because of error. Details below',
+    'specifications-editor/parameter' => 'Parameter',
+    'specifications-editor/your-value' => 'Your value',
+    'specifications-editor/actual-value' => 'Current value',
+    'specifications-editor/all-values' => 'All values',
+
+    'specifications-editor/log/date' => 'Date',
+    'specifications-editor/log/user' => 'User',
+    'specifications-editor/log/object' => 'Object',
+    'specifications-editor/log/attribute' => 'Attribyte',
+    'specifications-editor/log/value' => 'Value',
+    'specifications-editor/log/editor' => 'Editor',
+    'specifications-editor/log/to-editor' => 'to editor',
+    'specifications-editor/log/low-weight-text' => 'Зарегистрировано большое количество конфликтов в данных, введеных вами. Другие люди часто опревергают информацию, предоставленную вами.
+
+Ввод данных временно приостановлен. Просьба исправить ситуацию, провести ревизию конфликтов.
+
+Осуществить это поможет [специальный интерфейс](/account/specs-conflicts/conflict/minus-weight), в котором собраны по крайней мере те ошибки, которые обнаружили посетители сайта.',
 ];

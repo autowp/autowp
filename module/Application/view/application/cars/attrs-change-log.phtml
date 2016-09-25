@@ -14,12 +14,12 @@
     <table class="specs-log">
         <thead>
             <tr>
-               <th>Дата</th>
-               <th>Пользователь</th>
-               <th>Объект</th>
-               <th>Аттрибут</th>
-               <th>Значение</th>
-               <th>Редактор</th>
+               <th><?=$this->escapeHtml($this->translate('specifications-editor/log/date'))?></th>
+               <th><?=$this->escapeHtml($this->translate('specifications-editor/log/user'))?></th>
+               <th><?=$this->escapeHtml($this->translate('specifications-editor/log/object'))?></th>
+               <th><?=$this->escapeHtml($this->translate('specifications-editor/log/attribute'))?></th>
+               <th><?=$this->escapeHtml($this->translate('specifications-editor/log/value'))?></th>
+               <th><?=$this->escapeHtml($this->translate('specifications-editor/log/editor'))?></th>
             </tr>
         </thead>
         <?php foreach ($this->items as $idx => $item) { ?>
@@ -49,7 +49,7 @@
                     <?php } ?>
                 </td>
                 <td class="link">
-                    <?=$this->htmlA($item['object']['editorUrl'], 'в редактор') ?>
+                    <?=$this->htmlA($item['object']['editorUrl'], $this->translate('specifications-editor/log/to-editor')) ?>
                 </td>
             </tr>
         <?php } ?>

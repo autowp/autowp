@@ -24,11 +24,17 @@
 
 <div class="well">
     <?php if ($this->museum->address) { ?>
-        <p>Адрес: <?=$this->escapeHtml($this->museum->address)?></p>
+        <p>
+            <?=$this->escapeHtml($this->translate('museums/museum/address:'))?>
+            <?=$this->escapeHtml($this->museum->address)?>
+        </p>
     <?php } ?>
 
     <?php if ($this->museum->url) { ?>
-        <p>Web: <?=$this->htmlA($this->museum->url, $this->museum->url)?></p>
+        <p>
+            <?=$this->escapeHtml($this->translate('museums/museum/website'))?>
+            <?=$this->htmlA($this->museum->url, $this->museum->url)?>
+        </p>
     <?php } ?>
 
     <?=$this->museum->description ?>
