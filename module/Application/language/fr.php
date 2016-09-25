@@ -457,6 +457,7 @@ Message with instructions to confirm will sent to new address.',
     'picture/all-images-have-owners' => 'Toutes les images ont propriétaires.',
     'picture/if-you-found-error' => 'Si vous pensez que utilisateurs du site s\'est trompé en affichant cette image dans cette section, ce serait bien si vous avez écrit à ce sujet dans les commentaires et ont indiqué à l\'erreur.',
     'picture/where-to-talk' => 'Partagez votre joie, discuter urgente et simplement bavarder sur les automobiles et non seulement vous pouvez sur <a href="/forums/">notre forum</a>',
+    'picture/other-languages' => 'In other languages',
 
     'users/user/known-as:' => 'Known as: ',
     'users/user/before-known-as:' => 'before known as: ',
@@ -1187,6 +1188,12 @@ Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/fe
     'moder/picture/replaces' => 'Replaces',
 
     'moder/picture/filter/status' => 'Status',
+    'moder/picture/filter/status/any' => 'any',
+    'moder/picture/filter/status/inbox' => 'inbox',
+    'moder/picture/filter/status/new' => 'not moderated (old)',
+    'moder/picture/filter/status/accepted' => 'accepted',
+    'moder/picture/filter/status/removing' => 'in delete queue',
+    'moder/picture/filter/status/all-except-removing' => 'all, except removing',
     'moder/picture/filter/vehicle-type' => 'Vehicle type',
     'moder/picture/filter/perspective' => 'Perspective',
     'moder/picture/filter/brand' => 'Brand',
@@ -1253,6 +1260,20 @@ Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/fe
     'moder/vehicle/catalogue/turbo-group-creator' => 'Turbo group creator',
     'moder/vehicle/catalogue/add-brand' => 'Brand ...',
     'moder/vehicle/catalogue/add-brand-%s' => 'Brand %s',
+
+    'moder/vehicle/twins/select-or-create' => 'Select or create group ...',
+    'moder/vehicle/twins/group-not-selected' => 'Group not selected',
+    'moder/vehicle/twins/remove' => 'Remove',
+    'moder/vehicle/twins/inherited-from' => 'Inherited from',
+
+    'moder/vehicle/factories/select-factory' => 'Select factory ...',
+    'moder/vehicle/factories/factory-not-selected' => 'Factory not selected',
+    'moder/vehicle/factories/remove' => 'Remove',
+    'moder/vehicle/factories/inherited-from' => 'Inherited from',
+
+    'moder/vehicle/link-type-prefix/design' => 'Design: ',
+    'moder/vehicle/link-type-prefix/sport' => 'Sport: ',
+    'moder/vehicle/link-type-prefix/related' => 'Related: ',
 
     'moder/picture/edit-picture-%s' => 'Edit picture №%s',
     'moder/picture/edit-vehicle-%s' => 'Edit vehicle %s',

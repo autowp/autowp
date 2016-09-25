@@ -6,7 +6,7 @@
                     <?=$this->htmlA($factory['url'], $factory['name']) ?>
                     <?php if ($factory['inherited'] && count($factory['inheritedFrom'])) { ?>
                         <h6><em>
-                            Inherited from
+                            <?=$this->escapeHtml($this->translate('moder/vehicle/factories/inherited-from'))?>
                             <?php foreach ($factory['inheritedFrom'] as $car) { ?>
                                 <?=$this->htmlA($car['url'], $car['name'])?>
                             <?php } ?>
@@ -17,7 +17,8 @@
                     <td>
                         <form action="<?=$this->escapeHtmlAttr($factory['removeUrl']) ?>" method="post">
                             <button type="submit" class="btn btn-danger btn-xs">
-                                <i class="fa fa-times"></i> Удалить
+                                <i class="fa fa-times"></i>
+                                <?=$this->escapeHtml($this->translate('moder/vehicle/factories/remove'))?>
                             </button>
                         </form>
                     </td>
@@ -26,11 +27,11 @@
         <?php } ?>
     </tbody></table>
 <?php } else { ?>
-    <p>Завод не задан</p>
+    <p><?=$this->escapeHtml($this->translate('moder/vehicle/factories/factory-not-selected'))?></p>
 <?php } ?>
 <?php if ($this->canEditFactory) { ?>
     <p><?=$this->htmlA($this->url('moder/cars/params', [
         'action' => 'car-select-factory',
         'car_id' => $this->car->id
-    ]), 'Выбрать завод ...') ?></p>
+    ]), $this->translate('moder/vehicle/factories/select-factory')) ?></p>
 <?php } ?>

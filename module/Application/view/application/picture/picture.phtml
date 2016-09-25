@@ -40,7 +40,7 @@
             <?php if ($this->picture->type == Picture::CAR_TYPE_ID) { ?>
                 <?php if (isset($this->altNames) && count($this->altNames)) { ?>
                     <div class="languages">
-                        <p>In other languages</p>
+                        <p><?=$this->escapeHtml($this->translate('picture/other-languages'))?></p>
                         <ul class="list-unstyled">
                             <?php foreach ($this->altNames as $name => $languages) { ?>
                                 <li>

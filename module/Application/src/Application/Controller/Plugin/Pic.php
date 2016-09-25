@@ -4,6 +4,7 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+use Application\Model\Brand;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Paginator\Adapter\Zend1DbSelect;
@@ -619,7 +620,7 @@ class Pic extends AbstractPlugin
                     }
 
                     foreach ($altNames as $name => $codes) {
-                        if (strcmp($name, $defaultName) != 0) {
+                        if (strcmp($name, $currentLangName) != 0) {
                             $altNames2[$name] = $codes;
                         }
                     }
@@ -724,76 +725,7 @@ class Pic extends AbstractPlugin
 
         $moderLinks = [];
         if ($isModer) {
-            $links = [];
-            $links[$controller->url()->fromRoute('moder/pictures/params', [
-                'action'     => 'picture',
-                'picture_id' => $picture->id
-            ])] = sprintf($this->translator->translate('moder/picture/edit-picture-%s'), $picture->id);
-
-            switch ($picture->type) {
-                case Picture::CAR_TYPE_ID:
-                    if ($car) {
-                        $url = $controller->url()->fromRoute('moder/cars/params', [
-                            'action' => 'car',
-                            'car_id' => $car->id
-                        ]);
-                        $links[$url] = sprintf($this->translator->translate('moder/picture/edit-vehicle-%s'), $car->getFullName($language));
-
-                        $brandTable = new Brands();
-
-                        $brandRows = $brandTable->fetchAll(
-                            $brandTable->select(true)
-                                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                                ->where('car_parent_cache.car_id = ?', $car->id)
-                                ->group('brands.id')
-                        );
-
-                        foreach ($brandRows as $brand) {
-                            $url = $controller->url()->fromRoute('moder/brands/params', [
-                                'action'   => 'brand',
-                                'brand_id' => $brand->id
-                            ]);
-                            $links[$url] = sprintf($this->translator->translate('moder/picture/edit-brand-%s'), $brand->caption);
-                        }
-
-                    }
-
-                    break;
-
-                case Picture::ENGINE_TYPE_ID:
-                    if ($engine = $picture->findParentEngines()) {
-                        $url = $controller->url()->fromRoute('moder/engines/params', [
-                            'action'    => 'engine',
-                            'engine_id' => $engine->id
-                        ]);
-                        $links[$url] = sprintf($this->translator->translate('moder/picture/edit-engine-%s'), $engine->caption);
-                    }
-                    break;
-
-                case Picture::FACTORY_TYPE_ID:
-                    if ($factory = $picture->findParentFactory()) {
-                        $links[$controller->url()->fromRoute('moder/factories/params', [
-                            'action'     => 'factory',
-                            'factory_id' => $factory->id
-                        ])] = sprintf($this->translator->translate('moder/picture/edit-factory-%s'), $factory->name);
-                    }
-                    break;
-
-                case Picture::MIXED_TYPE_ID:
-                case Picture::LOGO_TYPE_ID:
-                case Picture::UNSORTED_TYPE_ID:
-                    if ($brand = $picture->findParentBrands()) {
-                        $url = $controller->url()->fromRoute('moder/brands/params', [
-                            'action'   => 'brand',
-                            'brand_id' => $brand->id
-                        ]);
-                        $links[$url] = sprintf($this->translator->translate('moder/picture/edit-brand-%s'), $brand->caption);
-                    }
-                    break;
-            }
-
-            $moderLinks = $links;
+            $moderLinks = $this->getModerLinks($picture);
         }
 
         $userTable = new Users();
@@ -1008,6 +940,86 @@ class Pic extends AbstractPlugin
         $views->inc($picture);
 
         return $data;
+    }
+
+    private function getModerLinks($picture)
+    {
+        $controller = $this->getController();
+        $language = $controller->language();
+
+        $links = [];
+        $links[$controller->url()->fromRoute('moder/pictures/params', [
+            'action'     => 'picture',
+            'picture_id' => $picture->id
+        ])] = sprintf($this->translator->translate('moder/picture/edit-picture-%s'), $picture->id);
+
+        switch ($picture->type) {
+            case Picture::CAR_TYPE_ID:
+                $car = $picture->findParentCars();
+                if ($car) {
+                    $url = $controller->url()->fromRoute('moder/cars/params', [
+                        'action' => 'car',
+                        'car_id' => $car->id
+                    ]);
+                    $links[$url] = sprintf($this->translator->translate('moder/picture/edit-vehicle-%s'), $car->getFullName($language));
+
+                    $brandModel = new Brand();
+                    $brands = $brandModel->getList(['language' => $language], function($select) use ($car) {
+                        $select
+                            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                            ->where('car_parent_cache.car_id = ?', $car->id)
+                            ->group('brands.id');
+                    });
+
+                        foreach ($brands as $brand) {
+                            $url = $controller->url()->fromRoute('moder/brands/params', [
+                                'action'   => 'brand',
+                                'brand_id' => $brand['id']
+                            ]);
+                            $links[$url] = sprintf($this->translator->translate('moder/picture/edit-brand-%s'), $brand['name']);
+                        }
+
+                }
+
+                break;
+
+            case Picture::ENGINE_TYPE_ID:
+                if ($engine = $picture->findParentEngines()) {
+                    $url = $controller->url()->fromRoute('moder/engines/params', [
+                        'action'    => 'engine',
+                        'engine_id' => $engine->id
+                    ]);
+                    $links[$url] = sprintf($this->translator->translate('moder/picture/edit-engine-%s'), $engine->caption);
+                }
+                break;
+
+            case Picture::FACTORY_TYPE_ID:
+                if ($factory = $picture->findParentFactory()) {
+                    $links[$controller->url()->fromRoute('moder/factories/params', [
+                        'action'     => 'factory',
+                        'factory_id' => $factory->id
+                    ])] = sprintf($this->translator->translate('moder/picture/edit-factory-%s'), $factory->name);
+                }
+                break;
+
+            case Picture::MIXED_TYPE_ID:
+            case Picture::LOGO_TYPE_ID:
+            case Picture::UNSORTED_TYPE_ID:
+
+                $brandModel = new Brand();
+                $brand = $brandModel->getBrandById($picture->brand_id, $language);
+                if ($brand) {
+                    $url = $controller->url()->fromRoute('moder/brands/params', [
+                        'action'   => 'brand',
+                        'brand_id' => $brand['id']
+                    ]);
+                    $links[$url] = sprintf($this->translator->translate('moder/picture/edit-brand-%s'), $brand['name']);
+                }
+                break;
+        }
+
+        return $links;
     }
 
     public function gallery(Zend_Db_Table_Select $picSelect)

@@ -1402,7 +1402,7 @@ class CatalogueController extends AbstractActionController
             $columns = [
                 'cars.id',
                 'cars.is_concept',
-                'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                'name' => 'if(length(car_language.name) > 0, car_language.name, cars.caption)',
                 'cars.begin_model_year', 'cars.end_model_year',
                 'spec' => 'spec.short_name',
                 'cars.body', 'cars.today', 'cars.produced', 'cars.produced_exactly',

@@ -471,6 +471,7 @@ return [
     'picture/all-images-have-owners' => 'Все изображения являются чьей-либо собственностью.',
     'picture/if-you-found-error' => 'Если вы считаете, что пользователи сайта ошиблись, разместив данную картинку в этом разделе, то было бы здорово, если бы вы написали об этом в комментариях и указали на ошибку.',
     'picture/where-to-talk' => 'Поделиться своей радостью, обсудить наболевшее и просто поболтать об автомобилях и не только вы можете на нашем <a href="/forums/" title="Перейти в форум">форуме</a>',
+    'picture/other-languages' => 'На других языках',
 
     'users/user/known-as:' => 'Представился как: ',
     'users/user/before-known-as:' => 'ранее известен как: ',
@@ -1200,6 +1201,12 @@ return [
     'moder/picture/replaces' => 'Новые замены',
 
     'moder/picture/filter/status' => 'Статус',
+    'moder/picture/filter/status/any' => 'любой',
+    'moder/picture/filter/status/inbox' => 'инбокс',
+    'moder/picture/filter/status/new' => 'немодерированые (old)',
+    'moder/picture/filter/status/accepted' => 'принятый',
+    'moder/picture/filter/status/removing' => 'в очереди на удаление',
+    'moder/picture/filter/status/all-except-removing' => 'все, кроме удалённых',
     'moder/picture/filter/vehicle-type' => 'Тип кузова',
     'moder/picture/filter/perspective' => 'Ракурс',
     'moder/picture/filter/brand' => 'Бренд',
@@ -1266,6 +1273,16 @@ return [
     'moder/vehicle/catalogue/turbo-group-creator' => 'Турбо объединятор в группы',
     'moder/vehicle/catalogue/add-brand' => 'Бренд ...',
     'moder/vehicle/catalogue/add-brand-%s' => 'Бренд %s',
+
+    'moder/vehicle/twins/select-or-create' => 'Выбрать или создать группу ...',
+    'moder/vehicle/twins/group-not-selected' => 'Группа не задана',
+    'moder/vehicle/twins/remove' => 'Удалить',
+    'moder/vehicle/twins/inherited-from' => 'Унаследовано от',
+
+    'moder/vehicle/factories/select-factory' => 'Выбрать завод ...',
+    'moder/vehicle/factories/factory-not-selected' => 'Завод не задан',
+    'moder/vehicle/factories/remove' => 'Удалить',
+    'moder/vehicle/factories/inherited-from' => 'Унаследовано от',
 
     'moder/vehicle/link-type-prefix/design' => 'Дизайн: ',
     'moder/vehicle/link-type-prefix/sport' => 'Спорт: ',

@@ -44,12 +44,12 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'options' => [
                     'label'   => 'moder/picture/filter/status',
                     'options' => [
-                        ''                       => 'любой',
-                        Picture::STATUS_INBOX    => 'инбокс',
-                        Picture::STATUS_NEW      => 'немодерированые (old)',
-                        Picture::STATUS_ACCEPTED => 'принятый',
-                        Picture::STATUS_REMOVING => 'в очереди на удаление',
-                        'custom1'                => 'все, кроме удалённых'
+                        ''                       => 'moder/picture/filter/status/any',
+                        Picture::STATUS_INBOX    => 'moder/picture/filter/status/inbox',
+                        Picture::STATUS_NEW      => 'moder/picture/filter/status/new',
+                        Picture::STATUS_ACCEPTED => 'moder/picture/filter/status/accepted',
+                        Picture::STATUS_REMOVING => 'moder/picture/filter/status/removing',
+                        'custom1'                => 'moder/picture/filter/status/all-except-removing'
                     ],
                 ]
             ],

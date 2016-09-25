@@ -6,7 +6,7 @@
                     <?=$this->htmlA($twinsGroup['url'], $twinsGroup['name']) ?>
                     <?php if ($twinsGroup['inherited'] && count($twinsGroup['inheritedFrom'])) { ?>
                         <h6><em>
-                            Inherited from
+                            <?=$this->escapeHtml($this->translate('moder/vehicle/twins/inherited-from'))?>
                             <?php foreach ($twinsGroup['inheritedFrom'] as $car) { ?>
                                 <?=$this->htmlA($car['url'], $car['name'])?>
                             <?php } ?>
@@ -17,7 +17,8 @@
                     <td>
                         <form action="<?=$this->escapeHtmlAttr($twinsGroup['removeUrl']) ?>" method="post">
                             <button type="submit" class="btn btn-danger btn-xs">
-                                <i class="fa fa-times"></i> Удалить
+                                <i class="fa fa-times"></i>
+                                <?=$this->escapeHtml($this->translate('moder/vehicle/twins/remove'))?>
                             </button>
                         </form>
                     </td>
@@ -26,11 +27,11 @@
         <?php } ?>
     </tbody></table>
 <?php } else { ?>
-    <p>Группа не задана</p>
+    <p><?=$this->escapeHtml($this->translate('moder/vehicle/twins/group-not-selected'))?></p>
 <?php } ?>
 <?php if ($this->canEditTwins) { ?>
     <p><?=$this->htmlA($this->url('moder/cars/params', [
         'action' => 'car-select-twins-group',
         'car_id' => $this->car->id
-    ]), 'Выбрать или создать группу ...') ?></p>
+    ]), $this->translate('moder/vehicle/twins/select-or-create')) ?></p>
 <?php } ?>

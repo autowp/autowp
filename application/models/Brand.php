@@ -258,6 +258,16 @@ class Brand
         return $brand->id;
     }
 
+    public function getBrand($options, callable $callback)
+    {
+        $result = $this->getList($options, $callback);
+        if (count($result) > 0) {
+            return $result;
+        }
+
+        return null;
+    }
+
     public function getList($options, callable $callback)
     {
         if (is_string($options)) {
