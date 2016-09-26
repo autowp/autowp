@@ -16,6 +16,8 @@ class Brand
     const MAX_NAME = 80;
 
     const MAX_FULLNAME = 255;
+    
+    const ICON_FORMAT = 'brandicon';
 
     /**
      * @var Table
@@ -321,5 +323,68 @@ class Brand
         $items = $db->fetchAll($select);
 
         return $items;
+    }
+    
+    public function createIconsSprite($imageStorage, $destImg, $destCss)
+    {
+        $list = $this->getList([
+            'language' => 'en',
+            'columns'  => [
+                'img'
+            ]
+        ], function($select) {
+            $select->where('img');
+        });
+        
+        $images = [];
+        
+        $format = $imageStorage->getFormat(self::ICON_FORMAT);
+        
+        $background = $format->getBackground();
+        
+        foreach ($list as $brand) {
+            $img = false;
+            if ($brand['img']) {
+                $imageInfo = $imageStorage->getFormatedImage($brand['img'], self::ICON_FORMAT);
+                if ($imageInfo) {
+                    $img = $imageInfo->getSrc();
+                }
+            }
+        
+            if ($img) {
+                $img = str_replace('http://i.wheelsage.org/', PUBLIC_DIR . '/', $img);
+                $images[$brand['catname']] = escapeshellarg($img);
+            }
+        }
+        
+        $count = count($images);
+        $width = (int)ceil(sqrt($count));
+        $height = ceil($count / $width);
+        
+        $cmd = sprintf(
+            'montage ' . implode(' ' , $images) . ' -background %s -geometry +0+0 -tile %dx %s',
+            escapeshellarg($background ? $background : 'none'),
+            $width,
+            escapeshellarg($destImg)
+        );
+        
+        //print $cmd . PHP_EOL;
+        exec($cmd);
+        
+        $css = [];
+        $index = 0;
+        foreach ($images as $catname => $img) {
+            $top = floor($index / $width);
+            $left = $index - $top * $width;
+            $css[] = sprintf(
+                '.brandicon-%s {background-position: -%dpx -%dpx}',
+                $catname,
+                $left * $format->getWidth(),
+                $top * $format->getHeight()
+            );
+            $index++;
+        }
+        
+        file_put_contents($destCss, implode(' ', $css));
     }
 }

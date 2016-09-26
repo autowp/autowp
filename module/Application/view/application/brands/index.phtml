@@ -38,33 +38,19 @@
             $newCars = $brand['newCars'];
             $oldCars = $brand['totalCars'] - $newCars;
 
-            /*if ($idx && ($idx % 4 == 0)) {
-                ?></div><div class="row brand-icons"><?php
-            }*/
-
-            ?><div class="row">
-                <div class="col-sm-4">
-                    <?php if ($brand['logo']) { ?>
-                        <?=$this->htmlA($brand['url'], $this->htmlImg([
-                            'src'   => $brand['logo'],
-                            'alt'   => 'логотип '. $brand['name'],
-                            'title' => 'логотип '. $brand['name'],
-                            'class' => 'max-width'
-                        ]), false) ?>
-                    <?php } else { ?>
-                        &#xa0;
-                    <?php } ?>
-                </div>
-                <div class="col-sm-8">
-                    <h4>
-                        <?=$this->htmlA($brand['url'], $brand['name'])?>
-                        <small>(<?=$oldCars ?><?php if ($newCars > 0) {
-                            echo '<span data-href="'.$this->escapeHtmlAttr($brand['newCarsUrl']).'" data-toggle="popover" data-container="body" class="popover-handler" title="'.$this->escapeHtmlAttr(sprintf($this->translate('brands/new-cars-of-brand'), $brand['name'])).'">+'.$newCars.'</span>';
-                        } ?>)</small>
-                    </h4>
-                    <p><small><?=$this->escapeHtml($this->translate('brands/pictures:'))?> (<?=$brand['totalPictures'] ?>)</small></p>
-                </div><?php
-            ?></div><?php
+            ?><div>
+                <?=$this->htmlA([
+                    'href'  => $brand['url'],
+                    'class' => 'brandicon brandicon-' . $brand['catname']
+                ], '') ?>
+                <h4>
+                    <?=$this->htmlA($brand['url'], $brand['name'])?>
+                    <small>(<?=$oldCars ?><?php if ($newCars > 0) {
+                        echo '<span data-href="'.$this->escapeHtmlAttr($brand['newCarsUrl']).'" data-toggle="popover" data-container="body" class="popover-handler" title="'.$this->escapeHtmlAttr(sprintf($this->translate('brands/new-cars-of-brand'), $brand['name'])).'">+'.$newCars.'</span>';
+                    } ?>)</small>
+                </h4>
+                <p><small><?=$this->escapeHtml($this->translate('brands/pictures:'))?> <?=$brand['totalPictures'] ?></small></p>
+            </div><?php
         } ?>
     </div>
 <?php } ?>

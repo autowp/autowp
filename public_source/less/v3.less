@@ -415,18 +415,24 @@ span.count {
 }
 
 .brand-icons {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    align-content: center;
-    
     > div {
+        display: inline-block;
         width: 25%;
-        margin-bottom: 20px;
-        align-self: center;
+        margin: 0 0 30px 0;
+        min-height: 70px;
+        padding: 0 30px 0 0;
+        vertical-align: top;
     }
+}
+
+.brandicon {
+    background-image: url(/img/brands.png);
+    background-repeat: no-repeat;
+    background-position: -100% -100%;
+    float: left;
+    margin: 0 30px 30px 0;
+    width: 70px;
+    height: 70px;
 }
 
 .article { 

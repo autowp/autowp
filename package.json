@@ -51,7 +51,7 @@
     "gulp-gzip": ">=1.4.0",
     "gulp-if": ">=2.0.1",
     "gulp-image-embed": "0.0.2",
-    "gulp-imagemin": ">=3.0.3",
+    "gulp-imagemin": "^3.0.3",
     "gulp-jshint": ">=2.0.0",
     "gulp-less": ">=3.0.5",
     "gulp-shell": ">=0.5.2",

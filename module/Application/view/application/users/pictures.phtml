@@ -17,14 +17,19 @@
 ?>
 
 <?php for ($i=0; $i<$rows; $i++) { ?>
-    <div class="row">
-        <?php for ($j=0; $j<$cols; $j++) { ?>
-            <div class="col-md-3"><div class="row">
+    <div class="brand-icons">
+        <?php for ($j=0; $j<$cols; $j++) {
+            ?><div>
                 <?php
                     $idx = $j*$rows+$i;
                     $brand = $idx < $count ? $this->brands[$idx] : 0;
                 ?>
                 <?php if ($brand) { ?>
+                    <?=$this->htmlA([
+                        'href'  => $brand['url'],
+                        'class' => 'brandicon brandicon-' . $brand['catname']
+                    ], '') ?>
+                
                     <?php
                         $image = $this->img($brand['img'], [
                             'alt'    => 'логотип '. $brand['name'],
@@ -32,20 +37,11 @@
                             'format' => 'brandicon'
                         ]);
                     ?>
-                    <div class="col-md-4">
-                        <?php if ($image->exists()) { ?>
-                            <?=$this->htmlA($brand['url'], $image, false);?>
-                        <?php } else { ?>
-                            &#xa0;
-                        <?php } ?>
-                    </div>
-                    <div class="col-md-8">
-                        <h4><?=$this->htmlA($brand['url'], $brand['name'])?> <span class="count">(<?=$brand['picturesCount'] ?>)</span></h4>
-                    </div>
+                    <h4><?=$this->htmlA($brand['url'], $brand['name'])?> <span class="count">(<?=$brand['picturesCount'] ?>)</span></h4>
                 <?php } else { ?>
-                    <div class="col-md-12">&#xa0;</div>
+                    &#xa0;
                 <?php } ?>
-            </div></div>
-        <?php } ?>
+            </div><?php 
+        } ?>
     </div>
 <?php } ?>

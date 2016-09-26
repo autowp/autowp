@@ -11,6 +11,7 @@ var gulp = require("gulp")
   , gulpCopy = require("gulp-copy")
   , cleanCSS = require('gulp-clean-css')
   , uglify = require('gulp-uglify')
+//  , imagemin = require('gulp-imagemin')
   , shell = require("gulp-shell")
   , urlAdjuster = require('gulp-css-url-adjuster')
   , embed = require('gulp-image-embed')
@@ -24,6 +25,9 @@ gulp.task("build.css", ["copy.jcrop", 'copy.flags'], function () {
         .pipe(less())
         .pipe(addsrc.append([
             './node_modules/jcrop-0.9.12/css/jquery.Jcrop.css'
+        ]))
+        .pipe(addsrc.append([
+            './public_html/css/brands.css'
         ]))
         .pipe(concat("styles.css"))
         .pipe(urlAdjuster({
@@ -89,5 +93,13 @@ gulp.task("copy.flags", function () {
     ])
         .pipe(gulpCopy("./public_html/img/vendor/flag-icon-css", {prefix: 4}));
 });
+
+/*gulp.task("minify.brands.png", function () {
+    return gulp.src([
+         './public_html/img/brands.png'
+    ])
+      .pipe(imagemin())
+      .pipe('./public_html/img/');
+  });*/
 
 gulp.task("build", ['build.css', 'build.js.gz', 'copy.fonts']);

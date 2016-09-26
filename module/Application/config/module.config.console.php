@@ -9,6 +9,7 @@ use Zend_Db_Adapter_Abstract;
 return [
     'controllers' => [
         'factories' => [
+            Controller\Console\BuildController::class => InvokableFactory::class,
             Controller\Console\ImageStorageController::class => InvokableFactory::class,
             Controller\Console\MaintenanceController::class => function($sm) {
                 $db = $sm->get(Zend_Db_Adapter_Abstract::class);
@@ -37,6 +38,14 @@ return [
     'console' => [
         'router' => [
             'routes' => [
+                'build' => [
+                    'options' => [
+                        'route'    => 'build (brands-sprite):action',
+                        'defaults' => [
+                            'controller' => Controller\Console\BuildController::class,
+                        ]
+                    ]
+                ],
                 'image-storage' => [
                     'options' => [
                         'route'    => 'image-storage (clear-empty-dirs):action <dirname>',

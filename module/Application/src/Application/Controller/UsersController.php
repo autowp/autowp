@@ -192,6 +192,7 @@ class UsersController extends AbstractActionController
             $brands[] = [
                 'img'           => $row['img'],
                 'name'          => $row['name'],
+                'catname'       => $row['catname'],
                 'picturesCount' => $row['pictures_count'],
                 'url'           => $this->url()->fromRoute('users/user/pictures/brand', [
                     'user_id'       => $user->identity ? $user->identity : 'user' . $user->id,
