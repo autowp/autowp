@@ -16,7 +16,7 @@
     <span title="<?=$this->escapeHtmlAttr($this->translate('Resolution'))?>">
         <?=$this->escapeHtml($this->resolution)?>
         <?php if ($this->isModer && $this->cropped) { ?>
-            <i class="fa fa-scissors" style="cursor:help" title="На картинке выделена область автомобиля (<?=$this->escapeHtml($this->cropResolution)?>)"></i>
+            <i class="fa fa-scissors" style="cursor:help" title="<?=$this->escapeHtmlAttr($this->translate('picture-preview/crop-desc'))?> (<?=$this->escapeHtml($this->cropResolution)?>)"></i>
         <?php } ?>
         <?php /*<i class="fa fa-file-image-o"></i>*/?>
     </span>

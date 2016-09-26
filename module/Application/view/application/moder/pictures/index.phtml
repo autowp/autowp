@@ -42,7 +42,7 @@
 </ul>
 <div class="row">
     <div class="col-lg-4 col-md-4">
-        <h2>Фильтр</h2>
+        <h2><?=$this->escapeHtml($this->translate('moder/pictures/filter'))?></h2>
         <div class="well">
             <?=$this->partial('application/forms/bootstrap-vertical', [
                 'form' => $this->form
@@ -57,7 +57,10 @@
             </button>
 
             <div class="input-group-btn pull-left" style="margin-left:20px">
-                <button type="button" class="btn btn-default dropdown-toggle dropdown-reason-toggle" data-toggle="dropdown" aria-expanded="true">Сообщение <span class="caret"></span></button>
+                <button type="button" class="btn btn-default dropdown-toggle dropdown-reason-toggle" data-toggle="dropdown" aria-expanded="true">
+                    <?=$this->escapeHtml($this->translate('moder/pictures/acceptance/message'))?>
+                    <span class="caret"></span>
+                </button>
                 <ul class="dropdown-menu dropdown-reason" role="menu">
                     <?php foreach ($this->reasons as $reason) { ?>
                         <li><?=$this->htmlA([
@@ -65,8 +68,6 @@
                             'data-reason' => $reason
                         ], $reason)?></li>
                     <?php } ?>
-                    <?php /*<li class="divider"></li>
-                    <li><a href="#">Своя</a></li>*/?>
                 </ul>
                 <button name="vote" class="btn btn-success btn-vote" data-vote="1">
                     <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-accept'))?>

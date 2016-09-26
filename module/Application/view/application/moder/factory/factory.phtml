@@ -29,7 +29,7 @@
                 ]);
             ?>
             <p>
-                <?=$this->escapeHtml($this->translate('moder/factoreis/puclic-url:'))?>
+                <?=$this->escapeHtml($this->translate('moder/factories/puclic-url:'))?>
                 <?=$this->htmlA($url, $url)?>
             </p>
         </div>
@@ -42,7 +42,7 @@
             <?php } ?>
         </div>
 
-        <h3><?=$this->escapeHtml($this->translate('moder/factoreis/factory/short-description'))?></h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/factories/factory/short-description'))?></h3>
         <div class="well">
             <?php if ($this->canEdit) { ?>
                 <?=$this->partial('application/forms/markdown', [
@@ -65,7 +65,7 @@
         </div>
     </div>
     <div class="col-md-4">
-        <h3><?=$this->escapeHtml($this->translate('moder/factoreis/factory/vehicles'))?></h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/factories/factory/vehicles'))?></h3>
         <div class="well">
             <?php  foreach ($this->cars as $car) { ?>
                 <?=$this->htmlA($this->url('moder/cars/params', [

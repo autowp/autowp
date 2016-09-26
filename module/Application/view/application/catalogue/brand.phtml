@@ -17,7 +17,7 @@
     <div class="jumbotron brand-hero-unit">
         <?=$this->img($this->brand['img'], [
             'format' => 'logo',
-            'alt'    => 'логотип ' . $this->brand['name'],
+            'alt'    => sptintf($this->translate('catalogue/brand/logo-of-%s'), $this->brand['name']),
             'class'  => 'logo'
         ])?>
         <div class="content">

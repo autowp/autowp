@@ -81,7 +81,7 @@
 <?php } ?>
 <p>
     <?=$this->escapeHtml(sprintf(
-        'Опрос проводится с %s по %s',
+        $this->translate('votings/voting/voters/during-%s-%s'),
         $this->dateFormat($this->voting->getDateTime('begin_date'), IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, $this->language()),
         $this->dateFormat($this->voting->getDateTime('end_date'), IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, $this->language())
     ))?>

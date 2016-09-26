@@ -10,7 +10,7 @@
 ?>
 <div class="row">
     <div class="col-md-6">
-        <h2>Зоны</h2>
+        <h2><?=$this->escapeHtml($this->translate('moder/attrs/zones'))?></h2>
         <div class="well">
             <ul>
                 <?php foreach ($this->itemTypes as $itemType) { ?>
@@ -30,7 +30,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <h2>Характеристики</h2>
+        <h2><?=$this->escapeHtml($this->translate('moder/attrs/attributes'))?></h2>
         <div class="well">
             <?=$this->partial('application/moder/attrs/attribute/attributes-partial', [
                 'attributes' => $this->attributes

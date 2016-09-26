@@ -75,6 +75,7 @@ return [
     /* Picture preview */
     'picture-preview/no-comments' => 'нет',
     'picture-preview/no-ratio'    => 'нет',
+    'picture-preview/crop-desc'   => 'На картинке выделена область автомобиля',
     'Resolution'                  => 'Разрешение',
     'Filesize'                    => 'Размер',
     'Ratio'                       => 'Оценка',
@@ -297,6 +298,7 @@ return [
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Другие изображения %1$s',
     'catalogue/all-pictures-of-%1$s' => 'Все изображения %1$s',
+    'catalogue/brand/logo-of-%s' => 'логотип %s',
     'catalogue/brand/links' => 'Ссылки',
     'catalogue/brand/popular-images' => 'Популярные картинки',
     'catalogue/brand/new-pictures' => 'Новые фото',
@@ -441,8 +443,10 @@ return [
 Если Вы уже зарегистрированны на сайте, то Вам необходимо осуществить вход на сайт.
 
 Если Вы ещё не зарегистрированы, сделайте это сейчас [на странице регистрации](/registration/).',
+    'forums/topic/open' => 'открыть',
     'forums/topic/close' => 'закрыть',
     'forums/topic/delete' => 'удалить',
+    'forums/topic/move' => 'переместить',
 
     'account/personal-message/reply' => 'ответить',
     'account/personal-message/delete' => 'удалить',
@@ -450,6 +454,7 @@ return [
     'account/personal-message/system-notification' => 'Системное уведомление',
     'account/personal-message/delete-all-sent' => 'Удалить все отправленные сообщения',
     'account/personal-message/delete-all-system' => 'Удалить все уведомления',
+    'account/personal-message/new' => 'новое',
     'account/profile/personal' => 'Личные данные',
     'account/profile/photo' => 'Фотография',
     'account/profile/use-gravatar' => 'Вы можете загрузить своё фото или использовать сервис <a href="http://gravatar.com/">Gravatar</a>',
@@ -528,7 +533,9 @@ return [
     'picture/factory-details' => 'Подробнее о заводе ...',
     'picture/on-that-factory-produced-vehicle' => 'На этом заводе производился такой автомобиль, как',
     'picture/on-that-factory-produced-vehicles:' => 'На этом заводе производились такие автомобили, как: ',
+    'picture/on-that-factory-produced-vehicles/and' => 'и',
     'picture/on-that-factory-produced-vehicles/and-other' => 'другие ...',
+    'picture/photo-is-owned-by' => 'Фотоматериал является собственностью',
 
     'users/user/known-as:' => 'Представился как: ',
     'users/user/before-known-as:' => 'ранее известен как: ',
@@ -1281,6 +1288,12 @@ return [
     'moder/picture/filter/not-linked' => 'Без привязки',
     'moder/picture/filter/order' => 'Сортировать по',
 
+    'moder/pictures/filter' => 'Фильтр',
+    'moder/pictures/acceptance/message' => 'Сообщение',
+    'moder/pictures/picture/inbox-mark' => '(новое)',
+
+    'moder/vehicles/filter' => 'Фильтр',
+
     'moder/vehicle/name' => 'Название',
     'moder/vehicle/body' => 'Номер кузова',
     'moder/vehicle/spec' => 'Рынок',
@@ -1360,9 +1373,21 @@ return [
 
     'moder/vehicle/add/as-submodel' => 'В автомобиль',
 
+    'moder/attrs/zones' => 'Зоны',
+    'moder/attrs/parameters' => 'Парметры аттрибута',
+    'moder/attrs/parameters/options-list' => 'Список значений (для списковых типов)',
+    'moder/attrs/parameters/options-list/add' => 'Добавить значение',
+    'moder/attrs/attributes' => 'Аттрибуты',
+    'moder/attrs/attribute/name' => 'Название',
+    'moder/attrs/attribute/type' => 'Тип',
+    'moder/attrs/attribute/unit' => 'Единица измерения',
+    'moder/attrs/attribute/add-subattribute' => 'Добавить податтрибут',
+    'moder/attrs/attributes-order' => 'Порядок аттрибутов',
+
     'moder/categories/name' => 'Название',
     'moder/categories/add' => 'Добавить',
     'moder/categories/edit' => 'Изменить',
+    'moder/categories/new' => 'Новый',
 
     'moder/picture/edit-picture-%s' => 'Управление изображением №%s',
     'moder/picture/edit-vehicle-%s' => 'Управление автомобилем %s',
@@ -1498,11 +1523,12 @@ return [
     'moder/museums/museum/name' => 'название',
     'moder/museums/museum/address' => 'адрес',
 
-    'moder/factoreis/title' => 'Заводы',
-    'moder/factoreis/add' => 'добавить завод',
-    'moder/factoreis/puclic-url:' => 'На сайте: ',
-    'moder/factoreis/factory/short-description' => 'Краткое описание',
-    'moder/factoreis/factory/vehicles' => 'Автомобили завода',
+    'moder/factories/title' => 'Заводы',
+    'moder/factories/filter' => 'Фильтр',
+    'moder/factories/add' => 'добавить завод',
+    'moder/factories/puclic-url:' => 'На сайте: ',
+    'moder/factories/factory/short-description' => 'Краткое описание',
+    'moder/factories/factory/vehicles' => 'Автомобили завода',
 
     'moder/comments/title' => 'Комментарии',
     'moder/comments/filter' => 'Фильтр',
@@ -1526,9 +1552,13 @@ return [
     'moder/engines/engine/last-edit:' => 'Последний раз редактировал информацию:',
 
     'moder/pages/name' => 'Название',
+    'moder/pages/new' => 'Новый',
+
+    'moder/index/other-tools' => 'Другие инструменты',
 
     'votings/do-vote' => 'Голосовать',
     'votings/who-voted' => 'Кто проголосовал?',
+    'votings/voting/voters/during-%s-%s' => 'Опрос проводится с %s по %s',
     'votings/voting/voters/show-all' => 'показать всех',
     'votings/voting/voters/show-contributors' => 'показать только от 100 закаченных картинок',
 
@@ -1592,4 +1622,5 @@ return [
     'specifications-editor/admin/user' => 'Пользователь',
     'specifications-editor/admin/parameter' => 'Характеристика',
     'specifications-editor/admin/value' => 'Значение',
+    'specifications-editor/admin/move' => 'Перенести',
 ];

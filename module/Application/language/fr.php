@@ -67,6 +67,7 @@ return [
     /* Picture preview */
     'picture-preview/no-comments' => 'non',
     'picture-preview/no-ratio'    => 'non',
+    'picture-preview/crop-desc'   => 'Image is cropped',
     'Resolution'                  => 'Résolution',
     'Filesize'                    => 'Taille du fichier',
     'Ratio'                       => 'Ratio',
@@ -283,6 +284,7 @@ return [
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Autres photos de %1$s',
     'catalogue/all-pictures-of-%1$s' => 'Toutes les images de %1$s',
+    'catalogue/brand/logo-of-%s' => '%s logotype',
     'catalogue/brand/links' => 'Références',
     'catalogue/brand/popular-images' => 'Images populaires',
     'catalogue/brand/new-pictures' => 'Nouvelles photos',
@@ -427,8 +429,10 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
 Если Вы уже зарегистрированны на сайте, то Вам необходимо осуществить вход на сайт.
 
 Если Вы ещё не зарегистрированы, сделайте это сейчас [на странице регистрации](/registration/).',
+    'forums/topic/open' => 'open',
     'forums/topic/close' => 'close',
     'forums/topic/delete' => 'delete',
+    'forums/topic/move' => 'move',
 
     'account/personal-message/reply' => 'répondre',
     'account/personal-message/delete' => 'effacer',
@@ -436,6 +440,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'account/personal-message/system-notification' => 'Système notification',
     'account/personal-message/delete-all-sent' => 'Supprimer tous les messages envoyés',
     'account/personal-message/delete-all-system' => 'Supprimer toutes les notifications système',
+    'account/personal-message/new' => 'new',
     'account/profile/personal' => 'Les données personnelles',
     'account/profile/photo' => 'Photo',
     'account/profile/use-gravatar' => 'Vous pouvez télécharger votre photo ou utiliser le service <a href="http://gravatar.com/">Gravatar</a>',
@@ -514,7 +519,9 @@ Good luck.',
     'picture/factory-details' => 'Factory details ...',
     'picture/on-that-factory-produced-vehicle' => 'На этом заводе производился такой автомобиль, как',
     'picture/on-that-factory-produced-vehicles:' => 'На этом заводе производились такие автомобили, как: ',
+    'picture/on-that-factory-produced-vehicles/and' => 'and',
     'picture/on-that-factory-produced-vehicles/and-other' => 'other ...',
+    'picture/photo-is-owned-by' => 'Photo is owned by',
 
     'users/user/known-as:' => 'Known as: ',
     'users/user/before-known-as:' => 'before known as: ',
@@ -1268,6 +1275,12 @@ Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/fe
     'moder/picture/filter/not-linked' => 'Not linked',
     'moder/picture/filter/order' => 'Order by',
 
+    'moder/pictures/filter' => 'Filter',
+    'moder/pictures/acceptance/message' => 'Message',
+    'moder/pictures/picture/inbox-mark' => '(new)',
+
+    'moder/vehicles/filter' => 'Filter',
+
     'moder/vehicle/name' => 'Name',
     'moder/vehicle/body' => 'Body number',
     'moder/vehicle/spec' => 'Spec',
@@ -1347,9 +1360,21 @@ Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/fe
 
     'moder/vehicle/add/as-submodel' => 'As submodel',
 
+    'moder/attrs/zones' => 'Zones',
+    'moder/attrs/parameters' => 'Attribute parameters',
+    'moder/attrs/parameters/options-list' => 'Values list (for select)',
+    'moder/attrs/parameters/options-list/add' => 'Add value',
+    'moder/attrs/attributes' => 'Attributes',
+    'moder/attrs/attribute/name' => 'Name',
+    'moder/attrs/attribute/type' => 'Type',
+    'moder/attrs/attribute/unit' => 'Unit',
+    'moder/attrs/attribute/add-subattribute' => 'add subattribute',
+    'moder/attrs/attributes-order' => 'Attributes order',
+
     'moder/categories/name' => 'Name',
     'moder/categories/add' => 'Add',
     'moder/categories/edit' => 'Edit',
+    'moder/categories/new' => 'New',
 
     'moder/picture/edit-picture-%s' => 'Edit picture №%s',
     'moder/picture/edit-vehicle-%s' => 'Edit vehicle %s',
@@ -1483,11 +1508,12 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/museums/museum/name' => 'name',
     'moder/museums/museum/address' => 'address',
 
-    'moder/factoreis/title' => 'Factoreis',
-    'moder/factoreis/add' => 'add factory',
-    'moder/factoreis/puclic-url:' => 'Public URL: ',
-    'moder/factoreis/factory/short-description' => 'Short description',
-    'moder/factoreis/factory/vehicles' => 'Factory vehicles',
+    'moder/factories/title' => 'Factories',
+    'moder/factories/filter' => 'Filter',
+    'moder/factories/add' => 'add factory',
+    'moder/factories/puclic-url:' => 'Public URL: ',
+    'moder/factories/factory/short-description' => 'Short description',
+    'moder/factories/factory/vehicles' => 'Factory vehicles',
 
     'moder/comments/title' => 'Comments',
     'moder/comments/filter' => 'Filter',
@@ -1511,9 +1537,13 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/engines/engine/last-edit:' => 'Last time edit:',
 
     'moder/pages/name' => 'Name',
+    'moder/pages/new' => 'New',
+
+    'moder/index/other-tools' => 'Other tools',
 
     'votings/do-vote' => 'Vote',
     'votings/who-voted' => 'Who voted?',
+    'votings/voting/voters/during-%s-%s' => 'Voting during %s to %s',
     'votings/voting/voters/show-all' => 'show all',
     'votings/voting/voters/show-contributors' => 'show from 100 uploaded pictures',
 
@@ -1577,4 +1607,5 @@ Don\'t forget it,',
     'specifications-editor/admin/user' => 'User',
     'specifications-editor/admin/parameter' => 'Parameter',
     'specifications-editor/admin/value' => 'Value',
+    'specifications-editor/admin/move' => 'Move',
 ];

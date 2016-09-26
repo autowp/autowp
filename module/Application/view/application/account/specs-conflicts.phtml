@@ -53,7 +53,7 @@
                 <td><?=$this->escapeHtml($conflict['attribute'])?></td>
                 <td>
                     <?php if ($conflict['value'] === null) { ?>
-                        <em>нет</em>
+                        <em><?=$this->escapeHtml($this->translate('account/specs/conflicts/my-value/none'))?></em>
                     <?php } else { ?>
                         <?=$this->escapeHtml($conflict['value'])?>
                         <?php if ($conflict['unit']) { ?>

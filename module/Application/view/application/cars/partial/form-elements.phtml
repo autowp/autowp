@@ -64,7 +64,7 @@
                         $value = $this->actualValues[$attrId];
                     ?>
                     <?php if ($value === null) { ?>
-                        <em>нет</em>
+                        <em><?=$this->escapeHtml($this->translate('account/specs/conflicts/my-value/none'))?></em>
                     <?php } else { ?>
                         <?=$this->escapeHtml($value)?>
                         <?php if ($unitId = $element->getAttribute('data-unit')) { ?>
@@ -79,7 +79,7 @@
                 <?php if (isset($this->allValues[$attrId])) { ?>
                     <?php foreach ($this->allValues[$attrId] as $value) { ?>
                         <?php if ($value['value'] === null) { ?>
-                            <em>нет</em>
+                            <em><?=$this->escapeHtml($this->translate('account/specs/conflicts/my-value/none'))?></em>
                         <?php } else { ?>
                             <?=$this->escapeHtml($value['value'])?>
                         <?php } ?>

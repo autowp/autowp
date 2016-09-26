@@ -29,11 +29,11 @@
                         'href'  => $brand['url'],
                         'class' => 'brandicon brandicon-' . $brand['catname']
                     ], '') ?>
-                
+
                     <?php
                         $image = $this->img($brand['img'], [
-                            'alt'    => 'логотип '. $brand['name'],
-                            'title'  => 'логотип '. $brand['name'],
+                            'alt'    => $brand['name'],
+                            'title'  => $brand['name'],
                             'format' => 'brandicon'
                         ]);
                     ?>
@@ -41,7 +41,7 @@
                 <?php } else { ?>
                     &#xa0;
                 <?php } ?>
-            </div><?php 
+            </div><?php
         } ?>
     </div>
 <?php } ?>

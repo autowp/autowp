@@ -19,7 +19,7 @@
                 </div>
                 <div>
                     <?php if ($message['isNew']) { ?>
-                        <span class="label label-info">новое</span>
+                        <span class="label label-info"><?=$this->escapeHtml($this->translate('account/personal-message/new'))?></span>
                     <?php } ?>
                     <?php if ($message['canDelete']) { ?>
                         <?=$this->htmlA([

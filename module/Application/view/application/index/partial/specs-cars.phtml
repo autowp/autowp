@@ -59,7 +59,7 @@
                         <?php if (isset($item['sport']) && $item['sport']) { ?>
                             <li>
                                 <i class="fa fa-align-left"></i>
-                                <?=$this->htmlA($item['sport']['url'], 'Спорт ('.$item['sport']['count'].')')?>
+                                <?=$this->htmlA($item['sport']['url'], $this->translate('catalogue/sport') . ' ('.$item['sport']['count'].')')?>
                             </li>
                         <?php } ?>
 

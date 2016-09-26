@@ -142,7 +142,7 @@
                         <td>
                             <div class="btn-group">
                                 <?php if ($topic['status'] == \Application\Model\Forums::STATUS_CLOSED) { ?>
-                                    <button title="открыть" class="btn btn-xs btn-warning open" id="open-topic-<?=$topic['id'] ?>">
+                                    <button title="<?=$this->escapeHtmlAttr($this->translate('forums/topic/open'))?>" class="btn btn-xs btn-warning open" id="open-topic-<?=$topic['id'] ?>">
                                         <i class="fa fa-check-circle"></i>
                                     </button>
                                 <?php } else { ?>
@@ -155,7 +155,7 @@
                                         'topic_id' => $topic['id'],
                                     ]),
                                     'class' => 'btn btn-default btn-xs',
-                                    'title' => 'переместить'
+                                    'title' => $this->translate('forums/topic/move')
                                 ], '<i class="fa fa-share"></i>', false) ?>
                                 <button title="<?=$this->escapeHtmlAttr($this->translate('forums/topic/delete'))?>" class="btn btn-xs btn-danger delete" id="delete-topic-<?=$topic['id'] ?>">
                                     <i class="fa fa-ban"></i>

@@ -7,8 +7,8 @@
                 $isSport  = $car['type'] == Car_Parent::TYPE_SPORT;
             ?>
             <li class="<?=$isTuning ? 'tuning' : ''?><?=$isSport ? 'sport' : ''?>">
-                <?php if ($isTuning) { ?>Тюнинг: <?php } ?>
-                <?php if ($isSport) { ?>Спорт: <?php } ?>
+                <?php if ($isTuning) { ?><?=$this->escapeHtml($this->translate('catalogue/related'))?>: <?php } ?>
+                <?php if ($isSport) { ?><?=$this->escapeHtml($this->translate('catalogue/sport'))?>: <?php } ?>
                 <?=$this->partial('application/moder/cars/partial/car-tree', [
                     'car' => $car
                 ])?>

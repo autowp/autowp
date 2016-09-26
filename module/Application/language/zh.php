@@ -59,6 +59,7 @@ return [
     /* Picture preview */
     'picture-preview/no-comments' => '暂无评论',
     'picture-preview/no-ratio'    => '暂无比例',
+    'picture-preview/crop-desc'   => 'Image is cropped',
     'Resolution'                  => '分辨率',
     'Filesize'                    => '文件大小',
     'Ratio'                       => '长宽比',
@@ -269,6 +270,7 @@ return [
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => '%1$s的其它图片',
     'catalogue/all-pictures-of-%1$s' => '%1$s的所有图片',
+    'catalogue/brand/logo-of-%s' => '%s logotype',
     'catalogue/brand/links' => '链接',
     'catalogue/brand/popular-images' => '热门图片',
     'catalogue/brand/new-pictures' => '按上传时间',
@@ -413,8 +415,10 @@ return [
 如果您已经注册，您必须登录才能进行操作。
 
 如果您还未注册，现在就可以到[注册页面](/registration/)注册。',
+    'forums/topic/open' => 'open',
     'forums/topic/close' => '关闭',
     'forums/topic/delete' => '删除',
+    'forums/topic/move' => 'move',
 
     'account/personal-message/reply' => '站内信',
     'account/personal-message/delete' => '删除',
@@ -422,6 +426,7 @@ return [
     'account/personal-message/system-notification' => '系统提示',
     'account/personal-message/delete-all-sent' => '清空发件箱',
     'account/personal-message/delete-all-system' => '清空系统提示',
+    'account/personal-message/new' => 'new',
     'account/profile/personal' => '个人信息',
     'account/profile/photo' => '头像',
     'account/profile/use-gravatar' => '您可以上传头像或使用 <a href="http://gravatar.com/">Gravatar</a>',
@@ -500,7 +505,9 @@ return [
     'picture/factory-details' => 'Factory details ...',
     'picture/on-that-factory-produced-vehicle' => 'На этом заводе производился такой автомобиль, как',
     'picture/on-that-factory-produced-vehicles:' => 'На этом заводе производились такие автомобили, как: ',
+    'picture/on-that-factory-produced-vehicles/and' => 'and',
     'picture/on-that-factory-produced-vehicles/and-other' => 'other ...',
+    'picture/photo-is-owned-by' => 'Photo is owned by',
 
     'users/user/known-as:' => '用户名: ',
     'users/user/before-known-as:' => '先前用户名: ',
@@ -1253,6 +1260,12 @@ return [
     'moder/picture/filter/not-linked' => 'Not linked',
     'moder/picture/filter/order' => 'Order by',
 
+    'moder/pictures/filter' => 'Filter',
+    'moder/pictures/acceptance/message' => 'Message',
+    'moder/pictures/picture/inbox-mark' => '(new)',
+
+    'moder/vehicles/filter' => 'Filter',
+
     'moder/vehicle/name' => '车名',
     'moder/vehicle/body' => '车身代号',
     'moder/vehicle/spec' => '规格',
@@ -1332,9 +1345,21 @@ return [
 
     'moder/vehicle/add/as-submodel' => 'As submodel',
 
+    'moder/attrs/zones' => 'Zones',
+    'moder/attrs/parameters' => 'Attribute parameters',
+    'moder/attrs/parameters/options-list' => 'Values list (for select)',
+    'moder/attrs/parameters/options-list/add' => 'Add value',
+    'moder/attrs/attributes' => 'Attributes',
+    'moder/attrs/attribute/name' => 'Name',
+    'moder/attrs/attribute/type' => 'Type',
+    'moder/attrs/attribute/unit' => 'Unit',
+    'moder/attrs/attribute/add-subattribute' => 'add subattribute',
+    'moder/attrs/attributes-order' => 'Attributes order',
+
     'moder/categories/name' => 'Name',
     'moder/categories/add' => 'Add',
     'moder/categories/edit' => 'Edit',
+    'moder/categories/new' => 'New',
 
     'moder/picture/edit-picture-%s' => '编辑图片№%s',
     'moder/picture/edit-vehicle-%s' => '编辑车型%s',
@@ -1468,11 +1493,12 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/museums/museum/name' => 'name',
     'moder/museums/museum/address' => 'address',
 
-    'moder/factoreis/title' => 'Factoreis',
-    'moder/factoreis/add' => 'add factory',
-    'moder/factoreis/puclic-url:' => 'Public URL: ',
-    'moder/factoreis/factory/short-description' => 'Short description',
-    'moder/factoreis/factory/vehicles' => 'Factory vehicles',
+    'moder/factories/title' => 'Factories',
+    'moder/factories/filter' => 'Filter',
+    'moder/factories/add' => 'add factory',
+    'moder/factories/puclic-url:' => 'Public URL: ',
+    'moder/factories/factory/short-description' => 'Short description',
+    'moder/factories/factory/vehicles' => 'Factory vehicles',
 
     'moder/comments/title' => 'Comments',
     'moder/comments/filter' => 'Filter',
@@ -1496,9 +1522,13 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/engines/engine/last-edit:' => 'Last time edit:',
 
     'moder/pages/name' => 'Name',
+    'moder/pages/new' => 'New',
+
+    'moder/index/other-tools' => 'Other tools',
 
     'votings/do-vote' => '表决',
     'votings/who-voted' => '表决用户',
+    'votings/voting/voters/during-%s-%s' => 'Voting during %s to %s',
     'votings/voting/voters/show-all' => '显示全部',
     'votings/voting/voters/show-contributors' => '从100张已上传图片中显示',
 
@@ -1562,4 +1592,5 @@ Don\'t forget it,',
     'specifications-editor/admin/user' => 'User',
     'specifications-editor/admin/parameter' => 'Parameter',
     'specifications-editor/admin/value' => 'Value',
+    'specifications-editor/admin/move' => 'Move',
 ];

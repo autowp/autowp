@@ -80,7 +80,7 @@
                 ])?>
             </div>
         <?php } ?>
-        <h2>Другие инструменты</h2>
+        <h2><?=$this->escapeHtml($this->translate('moder/index/other-tools'))?></h2>
         <div class="well">
             <?php foreach ($this->menu as $url => $name) { ?>
                 <?=$this->htmlA($url, $this->translate($name)) ?>
