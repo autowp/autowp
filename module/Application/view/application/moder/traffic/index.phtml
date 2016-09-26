@@ -36,13 +36,13 @@
                 <td>
                     <?php if ($row['ban']) { ?>
                         <form action="<?=$this->escapeHtmlAttr($row['unbanUrl'])?>" method="post" style="margin:0">
-                            <input type="submit" value="Разбанить" class="btn btn-xs btn-info" />
+                            <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('ban/unban'))?>" class="btn btn-xs btn-info" />
                         </form>
                     <?php } ?>
                     <form action="<?=$this->escapeHtmlAttr($row['banUrl'])?>" method="post" style="margin:0">
                         <input type="hidden" name="period" value="240" />
                         <input type="hidden" name="reason" value="" />
-                        <input type="submit" value="Забанить" class="btn btn-xs btn-danger" />
+                        <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('ban/ban'))?>" class="btn btn-xs btn-danger" />
                     </form>
                 </td>
                 <td>

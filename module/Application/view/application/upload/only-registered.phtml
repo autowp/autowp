@@ -5,6 +5,5 @@
     ]);
 ?>
 <div class="alert alert-warning">
-    <p>Только зарегистрированный пользователи могут загружать изображения</p>
-    <p><a href="/login/">Авторизируйтесь</a> или <a href="/registration/">зарегистрируйтесь</a></p>
+    <?=$this->markdown($this->translate('upload/only-registered'))?>
 </div>

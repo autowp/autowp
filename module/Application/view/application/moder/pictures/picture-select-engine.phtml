@@ -8,7 +8,7 @@
         'pageId' => 152,
         'args'   => [
             'PICTURE_ID'   => $this->picture->id,
-            'PICTURE_NAME' => 'Изображение № "'.$this->picture->id.'"'
+            'PICTURE_NAME' => sprintf($this->translate('moder/picture/picture-n-%s'), $this->picture->id)
         ]
     ]);
 ?>

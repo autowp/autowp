@@ -8,7 +8,7 @@
         'pageId' => 149,
         'args'   => [
             'PICTURE_ID'   => $this->picture->id,
-            'PICTURE_NAME' => 'Изображение № "'.$this->picture->id.'"'
+            'PICTURE_NAME' => sprintf($this->translate('moder/picture/picture-n-%s'), $this->picture->id)
         ]
     ]);
 ?>
@@ -17,12 +17,12 @@
     <li<?=$this->showFactories ? '' : ' class="active"'?>><?=$this->htmlA($this->url('moder/pictures/params', [
         'action'     => 'move',
         'picture_id' => $this->picture->id,
-    ]), 'Бренды')?></li>
+    ]), $this->translate('moder/pciture/move/brands'))?></li>
     <li<?=$this->showFactories ? ' class="active"' : ''?>><?=$this->htmlA($this->url('moder/pictures/params', [
         'action'     => 'move',
         'picture_id' => $this->picture->id,
         'factories'  => 1
-    ]), 'Заводы')?></li>
+    ]), $this->translate('moder/pciture/move/factories'))?></li>
 </ul>
 
 <?php if ($this->showFactories) { ?>
@@ -90,7 +90,7 @@
                         'href'      => '#',
                         'class'     => 'arrow',
                         'data-load' => $this->enginesUrl
-                    ], '<i class="fa fa-plus-circle"></i> Двигатели', false)?>
+                    ], '<i class="fa fa-plus-circle"></i> ' . $this->escapeHtml($this->translate('moder/pciture/move/engines')), false)?>
                     <div style="margin:0 0 4px 18px;display:none">
                         <div class="loading"><em>Loading ...</em></div>
                     </div>
@@ -101,15 +101,15 @@
                 <?=$this->htmlA($this->url(null, [
                     'action' => 'move',
                     'type'   => Picture::LOGO_TYPE_ID
-                ], [], true), 'логотип ' . $this->brand['name']) ?><br />
+                ], [], true), $this->translate('upload/select/logo')) ?><br />
                 <?=$this->htmlA($this->url(null, [
                     'action' => 'move',
                     'type'   => Picture::MIXED_TYPE_ID
-                ], [], true), 'разное (несколько автомобилей на одной картинке)') ?><br />
+                ], [], true), $this->translate('upload/select/mixed-long')) ?><br />
                 <?=$this->htmlA($this->url(null, [
                     'action' => 'move',
                     'type'   => Picture::UNSORTED_TYPE_ID
-                ], [], true), 'несортировано (автомобиль или двигатель, которого нет на сайте)') ?>
+                ], [], true), $this->translate('upload/select/unsorted-long')) ?>
             </div>
 
         </div>

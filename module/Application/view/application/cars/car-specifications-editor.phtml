@@ -21,23 +21,23 @@
                 'car_id' => $this->car->id
             ]))?>">
                 <i class="fa fa-cog"></i>
-                Управление <?=$this->escapeHtml($this->car->getFullName($this->language()))?>
+                <?=$this->escapeHtml($this->translate('moder/edit-object'))?>
+                <?=$this->escapeHtml($this->car->getFullName($this->language()))?>
             </a>
         </li>
     <?php } ?>
     <li>
-        <a href="/forums/topic/2988"><i class="fa fa-comment"></i> Обсуждение на форуме</a>
-    </li>
-    <li>
-        <a href="/cars/attrs-change-log"><i class="fa fa-list"></i> Журнал ТТХ</a>
+        <a href="/cars/attrs-change-log">
+            <i class="fa fa-list"></i>
+            <?=$this->escapeHtml($this->translate('specifications-editor/log'))?>
+        </a>
     </li>
 </ul>
 
 
 <?php if ($this->user()->get()->specs_weight < 1) { ?>
     <div class="alert alert-danger">
-        <strong>Внимание!</strong> Вроятно, у вас накопилось существенное количество ошибок.
-        Некоторые из них, обнаруженные другими посетителями, вы можете найти <a href="/account/specs-conflicts">здесь</a>
+        <?=$this->markdown($this->translate('specifications-editor/errors-alert'))?>
     </div>
 <?php } ?>
 
@@ -64,17 +64,10 @@
 
 <div class="tab-content well">
     <div class="tab-pane<?=$this->tabs['info']['active'] ? ' active' : ''?>" id="info">
-        <p>Просьба отнестить со всей ответственностью ко всем выполняемым действиям, т.к. они станут достоянием общественности.</p>
-
-        <p>Теперь подробнее о структуре самих характеристик.</p>
-        <p>Все характеристики организованы в виде дерева элементов "параметр - значение". Значения могут быть числовыми и текстовыми.</p>
-        <p>Важной особенностью является тот факт, что каждая характеристика может быть задана одновременно несколькими пользователями. В этом случае актуальным (используемым) значением является то, которое система сочтет приоритетным по ряду признаков.</p>
-        <p>Если вы столкнулись с ситуацией, когда вам не удаётся перекрыть введенное кем-то ранее значение, то вы можете просто написать об этом автору. Впрочем в процессе реализации система автоматического уведомления автором о том, что с его значением кто-то не согласен.</p>
-        <p>&#xa0;</p>
-        <p>Все значения, которые здесь вводятся - отображаются на сайте, в характеристиках, используются в построении разделы "самые-самые", а также отображаются в некоторых других местах сайта.</p>
+        <?=$this->markdown($this->translate('specifications-editor/description'))?>
     </div>
     <div class="tab-pane<?=$this->tabs['engine']['active'] ? ' active' : ''?>" id="engine">
-        <h2>Двигатель из каталога</h2>
+        <h2><?=$this->escapeHtml($this->translate('specifications-editor/engine'))?></h2>
 
         <?php if ($this->user()->isAllowed('specifications', 'edit-engine')) { ?>
             <?php if ($this->engine) { ?>
@@ -84,50 +77,53 @@
                 ]), $this->engine->caption)?></p>
                 <?php if ($this->engineInherited) { ?>
                     <?php foreach ($this->engineInheritedFrom as $car) { ?>
-                        <h6><em>Inherited from <?=$this->htmlA($car['url'], $car['name'])?></em></h6>
+                        <h6><em>
+                            <?=$this->escapeHtml($this->translate('specifications-editor/engine/inherited-from'))?>
+                            <?=$this->htmlA($car['url'], $car['name'])?>
+                        </em></h6>
                     <?php } ?>
                 <?php } ?>
                 <form id="select-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                     'action' => 'select-car-engine',
                     'car_id' => $this->car->id
                 ], [], true))?>">
-                    <input type="submit" value="Выбрать другой двигатель" class="btn btn-primary" />
+                    <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('specifications-editor/engine/select-another'))?>" class="btn btn-primary" />
                 </form>
                 <form id="select-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                     'action' => 'cancel-car-engine',
                     'car_id' => $this->car->id
                 ], [], true))?>">
-                    <input type="submit" value="Отменить двигатель" class="btn btn-warning" />
+                    <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('specifications-editor/engine/cancel'))?>" class="btn btn-warning" />
                 </form>
                 <?php if (!$this->engineInherited) { ?>
                     <form id="inherit-car-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                         'action' => 'inherit-car-engine',
                         'car_id' => $this->car->id
                     ], [], true))?>">
-                        <input type="submit" value="Наследовать двигатель" class="btn btn-warning" />
+                        <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/inherit'))?>" class="btn btn-warning" />
                     </form>
                 <?php } ?>
             <?php } else { ?>
-                <p>[не выбран]</p>
+                <p><?=$this->escapeHtml($this->translate('specifications-editor/engine/not-selected'))?></p>
                 <form id="select-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                     'action' => 'select-car-engine',
                     'car_id' => $this->car->id
                 ], [], true))?>">
-                    <input type="submit" value="Выбрать двигатель" class="btn btn-primary" />
+                    <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/select'))?>" class="btn btn-primary" />
                 </form>
                 <?php if (!$this->engineInherited) { ?>
                     <form id="inherit-car-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                         'action' => 'inherit-car-engine',
                         'car_id' => $this->car->id
                     ], [], true))?>">
-                        <input type="submit" value="Наследовать двигатель" class="btn btn-warning" />
+                        <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/inherit'))?>" class="btn btn-warning" />
                     </form>
                 <?php } else { ?>
                     <form id="inherit-car-engine" method="post" action="<?=$this->escapeHtmlAttr($this->url('cars/params', [
                         'action' => 'cancel-car-engine',
                         'car_id' => $this->car->id
                     ], [], true))?>">
-                        <input type="submit" value="Не наследовать двигатель" class="btn btn-warning" />
+                        <input type="submit" value="<?=$this->escapeHtml($this->translate('specifications-editor/engine/dont-inherit'))?>" class="btn btn-warning" />
                     </form>
                 <?php } ?>
             <?php } ?>

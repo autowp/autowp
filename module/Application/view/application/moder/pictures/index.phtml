@@ -52,7 +52,9 @@
     <div class="col-lg-8 col-md-8">
 
         <div class="toolbar clearfix">
-            <button class="btn btn-success btn-accept pull-left" disabled="disabled">Принять</button>
+            <button class="btn btn-success btn-accept pull-left" disabled="disabled">
+                <?=$this->escapeHtml($this->translate('moder/picture/acceptance/accept'))?>
+            </button>
 
             <div class="input-group-btn pull-left" style="margin-left:20px">
                 <button type="button" class="btn btn-default dropdown-toggle dropdown-reason-toggle" data-toggle="dropdown" aria-expanded="true">Сообщение <span class="caret"></span></button>
@@ -66,8 +68,12 @@
                     <?php /*<li class="divider"></li>
                     <li><a href="#">Своя</a></li>*/?>
                 </ul>
-                <button name="vote" class="btn btn-success btn-vote" data-vote="1">Хочу принять</button>
-                <button name="vote" class="btn btn-danger btn-vote" data-vote="0">Хочу удалить</button>
+                <button name="vote" class="btn btn-success btn-vote" data-vote="1">
+                    <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-accept'))?>
+                </button>
+                <button name="vote" class="btn btn-danger btn-vote" data-vote="0">
+                    <?=$this->escapeHtml($this->translate('moder/picture/acceptance/want-delete'))?>
+                </button>
             </div>
         </div>
 

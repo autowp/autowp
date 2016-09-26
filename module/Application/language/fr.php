@@ -1230,6 +1230,10 @@ Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/fe
     'page/202/title'       => 'Perspectives',
     'page/202/breadcrumbs' => 'Perspectives',
 
+    'page/203/name'        => 'Users',
+    'page/203/title'       => 'Users',
+    'page/203/breadcrumbs' => 'Users',
+
     'moder-menu/title' => 'Moderator menu',
     'moder-menu/inbox' => 'Inbox',
 
@@ -1417,6 +1421,19 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/markdown/preview' => 'Preview',
     'moder/markdown/history' => 'History',
 
+    'moder/users/login' => 'Login',
+    'moder/users/name' => 'Name',
+    'moder/users/role' => 'Role',
+    'moder/users/profile' => 'Profile',
+    'moder/users/last-visit' => 'Last visit',
+    'moder/users/registration' => 'Registration',
+
+    'moder/twins/public-url:' => 'Public URL: ',
+    'moder/twins/meta-data' => 'Meta-data',
+    'moder/twins/name' => 'Name',
+    'moder/twins/short-description' => 'Short description',
+    'moder/twins/vehicles' => 'Vehicles',
+
     'votings/do-vote' => 'Vote',
     'votings/who-voted' => 'Who voted?',
     'votings/voting/voters/show-all' => 'show all',
@@ -1434,12 +1451,34 @@ Don\'t forget it,',
 
     'twins/group/description' => 'Description',
 
+    'specifications-editor/description' => 'Просьба отнестить со всей ответственностью ко всем выполняемым действиям, т.к. они станут достоянием общественности.
+
+
+О структуре самих характеристик.
+
+Все характеристики организованы в виде дерева элементов "параметр - значение". Значения могут быть числовыми и текстовыми.
+
+Важной особенностью является тот факт, что каждая характеристика может быть задана одновременно несколькими пользователями. В этом случае актуальным (используемым) значением является то, которое система сочтет приоритетным по ряду признаков.
+
+Если вы столкнулись с ситуацией, когда вам не удаётся перекрыть введенное кем-то ранее значение, то вы можете просто написать об этом автору. Впрочем в процессе реализации система автоматического уведомления автором о том, что с его значением кто-то не согласен.
+
+
+Все значения, которые здесь вводятся - отображаются на сайте, в характеристиках, используются в построении разделы "самые-самые", а также отображаются в некоторых других местах сайта.',
     'specifications-editor/not-save' => 'Data not save because of error. Details below',
     'specifications-editor/parameter' => 'Parameter',
     'specifications-editor/your-value' => 'Your value',
     'specifications-editor/actual-value' => 'Current value',
     'specifications-editor/all-values' => 'All values',
+    'specifications-editor/engine' => 'Engine from catalogue',
+    'specifications-editor/engine/inherited-from' => 'Inherited from',
+    'specifications-editor/engine/select-another' => 'Select another engine',
+    'specifications-editor/engine/cancel' => 'Cancel engine',
+    'specifications-editor/engine/inherit' => 'Inherit engine',
+    'specifications-editor/engine/not-selected' => '[not selected]',
+    'specifications-editor/engine/select' => 'Select engine',
+    'specifications-editor/engine/dont-inherit' => 'Don\'t inherit engine',
 
+    'specifications-editor/log' => 'Log of values',
     'specifications-editor/log/date' => 'Date',
     'specifications-editor/log/user' => 'User',
     'specifications-editor/log/object' => 'Object',
@@ -1452,4 +1491,12 @@ Don\'t forget it,',
 Ввод данных временно приостановлен. Просьба исправить ситуацию, провести ревизию конфликтов.
 
 Осуществить это поможет [специальный интерфейс](/account/specs-conflicts/conflict/minus-weight), в котором собраны по крайней мере те ошибки, которые обнаружили посетители сайта.',
+    'specifications-editor/errors-alert' => '**Внимание!** Вроятно, у вас накопилось существенное количество ошибок.
+
+Некоторые из них, обнаруженные другими посетителями, вы можете найти [здесь](/account/specs-conflicts)',
+
+    'specifications-editor/admin/date' => 'Date',
+    'specifications-editor/admin/user' => 'User',
+    'specifications-editor/admin/parameter' => 'Parameter',
+    'specifications-editor/admin/value' => 'Value',
 ];

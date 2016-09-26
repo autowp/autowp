@@ -1243,6 +1243,10 @@ return [
     'page/202/title'       => 'Справка по ракурсам',
     'page/202/breadcrumbs' => 'Справка по ракурсам',
 
+    'page/203/name'        => 'Пользователи',
+    'page/203/title'       => 'Пользователи',
+    'page/203/breadcrumbs' => 'Пользователи',
+
     'moder-menu/title' => 'Меню модератора',
     'moder-menu/inbox' => 'Инбокс',
 
@@ -1387,6 +1391,35 @@ return [
     'moder/picture/acceptance/that-is-one-accepted-picture' => 'Это единственная принятая картинка этого автомобиля',
     'moder/picture/acceptance/accepted-pictures-is-%s' => 'Принятых картинок этого автомобиля всего %s',
 
+    'moder/picture/public-url:' => 'На сайте: ',
+    'moder/picture/image:' => 'Картинка: ',
+    'moder/picture/image-specs:' => 'Характеристики изображения: ',
+    'moder/picture/resolution:' => 'Разрешение: ',
+    'moder/picture/filesize:' => 'Размер файла: ',
+    'moder/picture/upload-date:' => 'Добавлено: ',
+    'moder/picture/settings' => 'Настройки',
+    'moder/picture/copyrights' => 'Копирайты',
+
+    'moder/picture/replacement' => 'Замена',
+    'moder/picture/replacement/photo-suggested-to-replace' => 'Фото предложено на замену',
+    'moder/picture/replacement/accept-and-delete-double' => 'Принять замену и удалить дубль',
+    'moder/picture/replacement/cancel' => 'Отклонить замену',
+
+    'moder/picture/edit-and-repair' => 'Редактирование и устранение проблем',
+    'moder/picture/edit-and-repair/normalize' => 'Автоконтраст',
+    'moder/picture/edit-and-repair/flop' => 'Отразить',
+    'moder/picture/edit-and-repair/crop' => 'Выделить область',
+    'moder/picture/edit-and-repair/repair-all-files' => 'Исправить все файлы',
+    'moder/picture/edit-and-repair/rebuild-files-names' => 'Пересчитать имена файлов',
+
+    'moder/picture/uploader' => 'Закачал',
+    'moder/picture/uploader/unknown' => 'Неизвестно',
+    'moder/picture/uploader/id-address:' => 'IP-адрес закачавшего: ',
+
+    'moder/pciture/move/brands' => 'Бренды',
+    'moder/pciture/move/factories' => 'Заводы',
+    'moder/pciture/move/engines' => 'Двигатели',
+
     'moder/brands/vehicles-count:' => 'Автомобилей: ',
     'moder/brands/engines-count:' => 'Двигателей: ',
     'moder/brands/vehicle-pictures-count:' => 'Картинок автомобилей: ',
@@ -1432,6 +1465,19 @@ return [
     'moder/markdown/preview' => 'Предварительный просмотр',
     'moder/markdown/history' => 'История',
 
+    'moder/users/login' => 'Логин',
+    'moder/users/name' => 'Имя',
+    'moder/users/role' => 'Роль',
+    'moder/users/profile' => 'Профиль',
+    'moder/users/last-visit' => 'Последний заход',
+    'moder/users/registration' => 'Регистрация',
+
+    'moder/twins/public-url:' => 'На сайте: ',
+    'moder/twins/meta-data' => 'Мета-информация',
+    'moder/twins/name' => 'Название',
+    'moder/twins/short-description' => 'Краткое описание',
+    'moder/twins/vehicles' => 'Автомобили',
+
     'votings/do-vote' => 'Голосовать',
     'votings/who-voted' => 'Кто проголосовал?',
     'votings/voting/voters/show-all' => 'показать всех',
@@ -1449,12 +1495,34 @@ return [
 
     'twins/group/description' => 'Описание',
 
+    'specifications-editor/description' => 'Просьба отнестить со всей ответственностью ко всем выполняемым действиям, т.к. они станут достоянием общественности.
+
+
+О структуре самих характеристик.
+
+Все характеристики организованы в виде дерева элементов "параметр - значение". Значения могут быть числовыми и текстовыми.
+
+Важной особенностью является тот факт, что каждая характеристика может быть задана одновременно несколькими пользователями. В этом случае актуальным (используемым) значением является то, которое система сочтет приоритетным по ряду признаков.
+
+Если вы столкнулись с ситуацией, когда вам не удаётся перекрыть введенное кем-то ранее значение, то вы можете просто написать об этом автору. Впрочем в процессе реализации система автоматического уведомления автором о том, что с его значением кто-то не согласен.
+
+
+Все значения, которые здесь вводятся - отображаются на сайте, в характеристиках, используются в построении разделы "самые-самые", а также отображаются в некоторых других местах сайта.',
     'specifications-editor/not-save' => 'Данные не сохранены из-за ошибки. Подробности ниже',
     'specifications-editor/parameter' => 'Характеристика',
     'specifications-editor/your-value' => 'Ваше значение',
     'specifications-editor/actual-value' => 'Актуальное значение',
     'specifications-editor/all-values' => 'Введеные значения',
+    'specifications-editor/engine' => 'Двигатель из каталога',
+    'specifications-editor/engine/inherited-from' => 'Унаследовано от',
+    'specifications-editor/engine/select-another' => 'Выбрать другой двигатель',
+    'specifications-editor/engine/cancel' => 'Отменить двигатель',
+    'specifications-editor/engine/inherit' => 'Наследовать двигатель',
+    'specifications-editor/engine/not-selected' => '[не выбран]',
+    'specifications-editor/engine/select' => 'Выбрать двигатель',
+    'specifications-editor/engine/dont-inherit' => 'Не наследовать двигатель',
 
+    'specifications-editor/log' => 'Журнал ТТХ',
     'specifications-editor/log/date' => 'Дата',
     'specifications-editor/log/user' => 'Пользователь',
     'specifications-editor/log/object' => 'Объект',
@@ -1467,4 +1535,12 @@ return [
 Ввод данных временно приостановлен. Просьба исправить ситуацию, провести ревизию конфликтов.
 
 Осуществить это поможет [специальный интерфейс](/account/specs-conflicts/conflict/minus-weight), в котором собраны по крайней мере те ошибки, которые обнаружили посетители сайта.',
+    'specifications-editor/errors-alert' => '**Внимание!** Вроятно, у вас накопилось существенное количество ошибок.
+
+Некоторые из них, обнаруженные другими посетителями, вы можете найти [здесь](/account/specs-conflicts)',
+
+    'specifications-editor/admin/date' => 'Дата',
+    'specifications-editor/admin/user' => 'Пользователь',
+    'specifications-editor/admin/parameter' => 'Характеристика',
+    'specifications-editor/admin/value' => 'Значение',
 ];

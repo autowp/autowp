@@ -83,28 +83,37 @@
 
         <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->picture->id))?></p>
         <?php $url = $this->pic($this->picture)->url() ?>
-        <p>На сайте: <?=$this->htmlA($url, $url) ?></p>
-        <p>Картинка: <?=$this->htmlA($this->sourceUrl, parse_url($this->sourceUrl, PHP_URL_PATH))?></p>
+        <p>
+            <?=$this->escapeHtml($this->translate('moder/picture/public-url:'))?>
+            <?=$this->htmlA($url, $url) ?>
+        </p>
+        <p>
+            <?=$this->escapeHtml($this->translate('moder/picture/image:'))?>
+            <?=$this->htmlA($this->sourceUrl, parse_url($this->sourceUrl, PHP_URL_PATH))?>
+        </p>
         <?=$this->htmlA($this->url('log/params', [
             'action'     => 'index',
             'picture_id' => $this->picture->id
         ]), $this->translate('moder/log-of-events')) ?>
 
-        <h3>Характеристики изображения:</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/picture/image-specs:'))?></h3>
         <div class="well">
-            Разрешение: <b><?=$this->picture->width ?>×<?=$this->picture->height ?></b><br />
-            Размер файла: <b><?=$this->fileSize($this->picture->filesize) ?></b><br />
-            Добавлено: <b><?=$this->picture->add_date ?></b>
+            <?=$this->escapeHtml($this->translate('moder/picture/resolution:'))?>
+            <b><?=$this->picture->width ?>×<?=$this->picture->height ?></b><br />
+            <?=$this->escapeHtml($this->translate('moder/picture/filesize:'))?>
+            <b><?=$this->fileSize($this->picture->filesize) ?></b><br />
+            <?=$this->escapeHtml($this->translate('moder/picture/upload-date:'))?>
+            <b><?=$this->picture->add_date ?></b>
         </div>
 
-        <h3>Настройки</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/picture/settings'))?></h3>
         <div class="well">
             <?=$this->partial('application/forms/bootstrap-vertical', [
                 'form' => $this->editPictureForm
             ])?>
         </div>
 
-        <h3>Копирайты</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/picture/copyrights'))?></h3>
         <div class="well">
             <?=$this->partial('application/forms/markdown', [
                 'form' => $this->copyrightsForm
@@ -278,20 +287,23 @@
     <?php } ?>
 
     <?php if ($this->replacePicture) { ?>
-        <h3>Замена</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/picture/replacement'))?></h3>
         <div class="well">
-            <p>Фото предложено на замену <?=$this->htmlA($this->replacePicture['url'], $this->serverUrl($this->replacePicture['url']))?></p>
+            <p>
+                <?=$this->escapeHtml($this->translate('moder/picture/replacement/photo-suggested-to-replace'))?>
+                <?=$this->htmlA($this->replacePicture['url'], $this->serverUrl($this->replacePicture['url']))?>
+            </p>
             <?php if ($this->replacePicture['canAccept']) { ?>
                 <form action="<?=$this->escapeHtmlAttr($this->replacePicture['acceptUrl'])?>" method="post">
                     <button type="submit" class="btn btn-primary">
                         <i class="fa fa-exchange"></i>
-                        Принять замену и удалить дубль
+                        <?=$this->escapeHtml($this->translate('moder/picture/replacement/accept-and-delete-double'))?>
                     </button>
                 </form>
                 <form action="<?=$this->escapeHtmlAttr($this->replacePicture['cancelUrl'])?>" method="post">
                     <button type="submit" class="btn btn-danger">
                         <i class="fa fa-times"></i>
-                        Отклонить замену
+                        <?=$this->escapeHtml($this->translate('moder/picture/replacement/cancel'))?>
                     </button>
                 </form>
             <?php } ?>
@@ -364,49 +376,63 @@
     </div>
 
     <?php if ($this->canNormalize || $this->canFlop || $this->canCrop) { ?>
-        <h3>Редактирование и устранение проблем</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair'))?></h3>
         <div class="well">
 
             <div class="btn-group">
 
                 <?php if ($this->canNormalize) { ?>
-                    <button class="btn btn-danger normalize"><i class="fa fa-signal"></i> Автоконтраст</button>
+                    <button class="btn btn-danger normalize">
+                        <i class="fa fa-signal"></i>
+                        <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/normalize'))?>
+                    </button>
                 <?php } ?>
                 <?php if ($this->canFlop) { ?>
-                    <button class="btn btn-danger flop"><i class="fa fa-arrows-h"></i> Отразить</button>
+                    <button class="btn btn-danger flop">
+                        <i class="fa fa-arrows-h"></i>
+                        <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/flop'))?>
+                    </button>
                 <?php } ?>
                 <?php if ($this->canCrop) { ?>
                     <button class="btn btn-success crop">
-                        <i class="fa fa-crop"></i> Выделить область
+                        <i class="fa fa-crop"></i>
+                        <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/crop'))?>
                     </button>
                 <?php } ?>
             </div>
 
             <div class="btn-group">
-                <button class="btn btn-default files-repair"><i class="fa fa-wrench"></i> Исправить все файлы</button>
-                <button class="btn btn-default files-correct-names"><i class="fa fa-wrench"></i> Пересчитать имена файлов</button>
+                <button class="btn btn-default files-repair">
+                    <i class="fa fa-wrench"></i>
+                    <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/repair-all-files'))?>
+                </button>
+                <button class="btn btn-default files-correct-names">
+                    <i class="fa fa-wrench"></i>
+                    <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/rebuild-files-names'))?>
+                </button>
             </div>
 
         </div>
     <?php } ?>
 
-    <h3>Закачал</h3>
+    <h3><?=$this->escapeHtml($this->translate('moder/picture/uploader'))?></h3>
     <div class="well">
         <?php if ($user = $this->picture->findParentUsersByOwner()) { ?>
             <?=$this->user($user) ?>
         <?php } else { ?>
-            Неизвестно
+            <?=$this->escapeHtml($this->translate('moder/picture/uploader/unknown'))?>
         <?php } ?>
         <?php if ($this->picture->ip) { ?>
-            IP-адрес закачавшего: <b><?=$this->escapeHtml(inet_ntop($this->picture->ip))?></b><br />
+            <?=$this->escapeHtml($this->translate('moder/picture/uploader/id-address:'))?>
+            <b><?=$this->escapeHtml(inet_ntop($this->picture->ip))?></b><br />
             <?php if ($this->ban) { ?>
                 <p>
-                    Этот адрес забанил
+                    <?=$this->escapeHtml($this->translate('ban/that-address-is-banned'))?>
                     <?php if ($this->ban['user']) { ?>
                         <?=$this->user($this->ban['user']) ?>
                     <?php } ?>
                     <?php if ($this->ban['up_to']) { ?>
-                        до
+                        <?=$this->escapeHtml($this->translate('ban/until'))?>
                         <?=$this->ban['up_to']->format(MYSQL_DATETIME_FORMAT) ?>
                         <?php if ($this->ban['reason']) { ?>
                             (<?=$this->escapeHtml($this->ban['reason'])?>)
@@ -418,7 +444,7 @@
                     <form action="<?=$this->url('ban/unban-ip', [
                         'ip' => inet_ntop($this->picture->ip)
                     ]) ?>" method="post" style="margin:10px 0">
-                        <input type="submit" value="снять бан" />
+                        <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('ban/unban'))?>" />
                     </form>
                 <?php } ?>
             <?php } ?>

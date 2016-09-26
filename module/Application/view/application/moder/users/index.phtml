@@ -4,22 +4,22 @@
             'isAdminPage' => true,
             'blankPage'   => false,
             'needRight'   => false
-        ]
+        ],
+        'pageId' => 203
     ]);
 ?>
 <table class="table table-bordered table-striped">
-    <caption>Пользователи</caption>
     <thead>
         <tr>
             <th>id</th>
             <th></th>
-            <th>Логин</th>
+            <th><?=$this->escapeHtml($this->translate('moder/users/login'))?></th>
             <th>E-mail</th>
-            <th>Имя</th>
-            <th>Роль</th>
-            <th>Профиль</th>
-            <th>Последний заход</th>
-            <th>Регистрация</th>
+            <th><?=$this->escapeHtml($this->translate('moder/users/name'))?></th>
+            <th><?=$this->escapeHtml($this->translate('moder/users/role'))?></th>
+            <th><?=$this->escapeHtml($this->translate('moder/users/profile'))?></th>
+            <th><?=$this->escapeHtml($this->translate('moder/users/last-visit'))?></th>
+            <th><?=$this->escapeHtml($this->translate('moder/users/registration'))?></th>
         </tr>
     </thead>
     <tbody>

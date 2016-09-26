@@ -22,14 +22,15 @@
         <div class="well">
             <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->group->id))?></p>
             <p>
-                На сайте: <?=$this->htmlA($url, $url) ?><br />
+                <?=$this->escapeHtml($this->translate('moder/twins/public-url:'))?>
+                <?=$this->htmlA($url, $url) ?><br />
                 <?=$this->htmlA($this->url('log/params', [
                     'twins_group_id' => $this->group->id
                 ]), $this->translate('moder/log-of-events')) ?>
             </p>
         </div>
 
-        <h2>Мета-информация</h2>
+        <h2><?=$this->escapeHtml($this->translate('moder/twins/meta-data'))?></h2>
         <div class="well">
 
             <?php if ($this->canEdit) { ?>
@@ -39,14 +40,14 @@
             <?php } else { ?>
                 <table><tbody>
                     <tr>
-                        <td>Название</td>
+                        <td><?=$this->escapeHtml($this->translate('moder/twins/name'))?></td>
                         <td><?=$this->escapeHtml($this->group->name) ?></td>
                     </tr>
                 </tbody></table>
             <?php } ?>
         </div>
 
-        <h3>Краткое описание</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/twins/short-description'))?></h3>
         <div class="well">
             <?php if ($this->canEdit) { ?>
                 <?=$this->partial('application/forms/markdown', [
@@ -68,7 +69,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <h2>Автомобили</h2>
+        <h2><?=$this->escapeHtml($this->translate('moder/twins/vehicles'))?></h2>
         <div class="well">
             <ul>
                 <?php foreach ($this->cars as $car) { ?>

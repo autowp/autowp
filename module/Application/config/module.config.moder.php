@@ -1120,7 +1120,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'name',
                         'options' => [
-                            'label' => 'Название',
+                            'label' => 'moder/twins/name',
                         ],
                         'attributes' => [
                             'maxlength'  => 255,
