@@ -5,13 +5,14 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Application\Model\DbTable\Voting;
+use Application\Model\DbTable\Voting\Variant as VotingVariant;
+use Application\Model\DbTable\Voting\VariantVote as VotingVariantVote;
+
 use DateTime;
 
 use Zend_Db_Expr;
 
-use Voting;
-use Voting_Variant;
-use Voting_Variant_Vote;
 use Users;
 
 class VotingController extends AbstractActionController
@@ -27,7 +28,7 @@ class VotingController extends AbstractActionController
 
                 $user = $this->user()->get();
                 if ($user) {
-                    $vvvTable = new Voting_Variant_Vote();
+                    $vvvTable = new VotingVariantVote();
                     $voted = (bool)$vvvTable->fetchRow(
                         $vvvTable->select(true)
                             ->join('voting_variant', 'voting_variant_vote.voting_variant_id = voting_variant.id', null)
@@ -48,7 +49,7 @@ class VotingController extends AbstractActionController
     public function votingAction()
     {
         $vTable = new Voting();
-        $vvTable = new Voting_Variant();
+        $vvTable = new VotingVariant();
 
         $voting = $vTable->find($this->params('id'))->current();
 
@@ -57,7 +58,7 @@ class VotingController extends AbstractActionController
         }
 
         $filter = (int)$this->params('filter');
-        $vvvTable = new Voting_Variant_Vote();
+        $vvvTable = new VotingVariantVote();
 
         $variants = [];
         $vvRows = $vvTable->fetchAll([
@@ -127,14 +128,14 @@ class VotingController extends AbstractActionController
 
     public function votingVariantVotesAction()
     {
-        $vvTable = new Voting_Variant();
+        $vvTable = new VotingVariant();
         $variant = $vvTable->find($this->params('id'))->current();
 
         if (!$variant) {
             return $this->notFoundAction();
         }
 
-        $vvvTable = new Voting_Variant_Vote();
+        $vvvTable = new VotingVariantVote();
 
         $uTable = new Users();
         $users = $uTable->fetchAll(
@@ -170,7 +171,7 @@ class VotingController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $vvTable = new Voting_Variant();
+        $vvTable = new VotingVariant();
         $vvRows = $vvTable->find($this->params()->fromPost('variant'));
 
         if (!$voting->multivariant) {
@@ -179,7 +180,7 @@ class VotingController extends AbstractActionController
             }
         }
 
-        $vvvTable = new Voting_Variant_Vote();
+        $vvvTable = new VotingVariantVote();
         $vvvAdapter = $vvvTable->getAdapter();
 
         $user = $this->user()->get();

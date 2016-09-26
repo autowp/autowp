@@ -1,5 +1,7 @@
 <?php
 
+namespace Application\Model\DbTable;
+
 use Application\Db\Table;
 
 class Voting extends Table

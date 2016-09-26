@@ -7,13 +7,13 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Application\Model\DbTable\Museum;
+use Application\Model\DbTable\Voting;
 use Application\Model\Message;
 
 use Articles;
 use Comment_Message;
 use Comments;
 use Twins_Groups;
-use Voting;
 use Users;
 
 use DateTime;
