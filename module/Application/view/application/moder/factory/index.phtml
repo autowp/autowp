@@ -23,14 +23,14 @@
                     <i class="fa fa-plus"></i>
                     <?=$this->htmlA($this->url('moder/factories/params', [
                         'action'     => 'add',
-                    ]), 'добавить завод')?>
+                    ]), $this->translate('moder/factoreis/add'))?>
                 </li>
             <?php } ?>
         </ul>
     </div>
     <div class="col-lg-8 col-md-8">
         <h2>
-            Заводы
+            <?=$this->escapeHtml($this->translate('moder/factoreis/title'))?>
             <?php if ($count = $this->paginator->getTotalItemCount()) {?>
                 <small><?=$this->escapeHtml(sprintf($this->translatePlural('%1$s factories', '%1$s factories', $count), $count))?></small>
             <?php } ?>

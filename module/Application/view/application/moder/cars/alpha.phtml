@@ -22,7 +22,7 @@
 </div>
 
 <?php if ($this->char) { ?>
-    <h3>Автомобили</h3>
+    <h3><?=$this->escapeHtml($this->page(74)->name)?></h3>
     <div class="well">
         <?php foreach ($this->cars as $car) { ?>
             <?=$this->htmlA($this->url('moder/cars/params', [

@@ -13,16 +13,16 @@
         'action' => 'item'
     ]),
     'class' => 'btn btn-success'
-], 'Добавить музей')?></p>
+], $this->translate('moder/museums/add'))?></p>
 
 <table class="table table-bordered table-striped">
     <caption>Музеи</caption>
     <thead>
         <tr>
             <th>id</th>
-            <th>картинка</th>
-            <th>название</th>
-            <th>адрес</th>
+            <th><?=$this->escapeHtml($this->translate('moder/museums/museum/image'))?></th>
+            <th><?=$this->escapeHtml($this->translate('moder/museums/museum/name'))?></th>
+            <th><?=$this->escapeHtml($this->translate('moder/museums/museum/address'))?></th>
             <th>url</th>
         </tr>
     </thead>

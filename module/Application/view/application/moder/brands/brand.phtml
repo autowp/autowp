@@ -73,11 +73,11 @@
             <?php } else { ?>
                 <table><tbody>
                     <tr>
-                        <td>Название</td>
+                        <td><?=$this->escapeHtml($this->translate('moder/brands/meta-data/name'))?></td>
                         <td><?=$this->escapeHtml($this->brand->caption) ?></td>
                     </tr>
                     <tr>
-                        <td>Полное название</td>
+                        <td><?=$this->escapeHtml($this->translate('moder/brands/meta-data/full-name'))?></td>
                         <td><?=$this->escapeHtml($this->brand->full_caption) ?></td>
                     </tr>
                 </tbody></table>
@@ -209,7 +209,9 @@
                                                 ) ?>
                                             </td>
                                         </tr>
-                                        <tr><td colspan="3"><input class="btn btn-primary" type="submit" value="Сохранить" /></td></tr>
+                                        <tr><td colspan="3">
+                                            <input class="btn btn-primary" type="submit" value="<?=$this->escapeHtmlAttr($this->translate('submit'))?>" />
+                                        </td></tr>
                                     </tbody>
                                 </table>
                             </form>

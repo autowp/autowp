@@ -17,7 +17,10 @@
         <div class="well">
             <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->engine->id))?></p>
             <?php if ($lastEditor = $this->engine->findParentUsersByLast_Editor()) { ?>
-                <p>Последний раз редактировал информацию: <?=$this->user($lastEditor) ?></p>
+                <p>
+                    <?=$this->escapeHtml($this->translate('moder/engines/engine/last-edit:'))?>
+                    <?=$this->user($lastEditor) ?>
+                </p>
             <?php } ?>
             <p><?=$this->htmlA($this->url('log/params', [
                 'engine_id' => $this->engine->id
@@ -26,7 +29,7 @@
                 <?=$this->htmlA($this->url('cars/params', [
                     'action'    => 'engine-spec-editor',
                     'engine_id' => $this->engine->id
-                ]), 'Ввод ТТХ двигателя') ?>
+                ]), $this->translate('moder/engines/engine/edit-specs')) ?>
                 <?php if ($this->specsCount > 0) { ?>
                     <span class="badge"><?=$this->specsCount?></span>
                 <?php } ?>
@@ -41,15 +44,15 @@
             <?php } ?>
         </div>
 
-        <h3>Бренды</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/engines/engine/brands'))?></h3>
         <div class="well">
             <table class="table table-border">
                 <thead>
                     <tr>
-                        <th>Бренд</th>
-                        <th>На сайте</th>
+                        <th><?=$this->escapeHtml($this->translate('moder/engines/engine/brands/brand'))?></th>
+                        <th><?=$this->escapeHtml($this->translate('moder/engines/engine/brands/public-url'))?></th>
                         <?php if ($this->canEdit) { ?>
-                            <th>Уд.</th>
+                            <th><?=$this->escapeHtml($this->translate('moder/engines/engine/brands/remove'))?></th>
                         <?php } ?>
                     </tr>
                 </thead>
@@ -59,7 +62,10 @@
                             <td>
                                 <?=$this->htmlA($brand['moderUrl'], $brand['name'])?>
                                 <?php if ($brand['inherited']) { ?>
-                                    <h6><em>Inherited from <?=$this->htmlA($brand['inheritedFrom']['url'], $brand['inheritedFrom']['name'])?></em></h6>
+                                    <h6><em>
+                                        <?=$this->escapeHtml($this->translate('moder/engines/engine/brands/inherited-from'))?>
+                                        <?=$this->htmlA($brand['inheritedFrom']['url'], $brand['inheritedFrom']['name'])?>
+                                    </em></h6>
                                 <?php } ?>
                             </td>
                             <td>
@@ -87,13 +93,15 @@
                     'action'    => 'add-brand',
                     'engine_id' => $this->engine->id
                 ]))?>" method="post">
-                    <button type="submit" class="btn btn-default">Добавить бренд</button>
+                    <button type="submit" class="btn btn-default">
+                        <?=$this->escapeHtml($this->translate('moder/engines/engine/brands/add'))?>
+                    </button>
                 </form>
             <?php } ?>
         </div>
     </div>
     <div class="col-lg-6 col-md-6">
-        <h3>Родительский двигатель</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/engines/engine/parent'))?></h3>
         <div class="well">
             <?php if ($this->parentEngine) { ?>
                 <?=$this->htmlA($this->url('moder/engines/params', [
@@ -107,18 +115,22 @@
                         'action'    => 'cancel-parent',
                         'engine_id' => $this->engine->id
                     ]))?>" method="post">
-                        <button type="submit" class="btn btn-warning">Отменить</button>
+                        <button type="submit" class="btn btn-warning">
+                            <?=$this->escapeHtml($this->translate('moder/engines/engine/cancel'))?>
+                        </button>
                     </form>
                 <?php } ?>
                 <form action="<?=$this->escapeHtmlAttr($this->url('moder/engines/params', [
                     'action'     => 'select-parent',
                     'engine_id'  => $this->engine->id
                 ]))?>" method="post">
-                    <button type="submit" class="btn btn-primary">Выбрать ...</button>
+                    <button type="submit" class="btn btn-primary">
+                        <?=$this->escapeHtml($this->translate('moder/engines/engine/select'))?>
+                    </button>
                 </form>
             <?php } ?>
         </div>
-        <h3>Подварианты двигателя</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/engines/engine/subengines'))?></h3>
         <div class="well">
             <?php foreach ($this->childEngines as $engine) { ?>
                 <?=$this->htmlA($this->url('moder/engines/params', [
@@ -129,9 +141,9 @@
             <?=$this->htmlA($this->url('moder/engines/params', [
                 'action'    => 'add',
                 'parent_id' => $this->engine->id
-            ]), 'добавить двигатель ...')?>
+            ]), $this->translate('moder/engines/add'))?>
         </div>
-        <h3>Автомобили на этом двигателе</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/engines/engine/vehicles'))?></h3>
         <div class="well">
             <?php foreach ($this->cars as $car) { ?>
                 <?=$this->htmlA($this->url('moder/cars/params', [

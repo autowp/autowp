@@ -6,7 +6,7 @@
                 <?=$this->escapeHtml($car['name']) ?>
             </a>
             <ul>
-                <li><?=$this->htmlA($car['url'], 'сюда') ?></li>
+                <li><?=$this->htmlA($car['url'], $this->translate('moder/vehicle/move/here')) ?></li>
                 <?=$this->partial('application/moder/cars/partial/car-select-parent', [
                     'cars' => $car['childs']
                 ])?>

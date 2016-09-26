@@ -28,7 +28,10 @@
                     'id'     => $this->factory->id
                 ]);
             ?>
-            <p>На сайте: <?=$this->htmlA($url, $url)?></p>
+            <p>
+                <?=$this->escapeHtml($this->translate('moder/factoreis/puclic-url:'))?>
+                <?=$this->htmlA($url, $url)?>
+            </p>
         </div>
 
         <div class="well">
@@ -39,7 +42,7 @@
             <?php } ?>
         </div>
 
-        <h3>Краткое описание</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/factoreis/factory/short-description'))?></h3>
         <div class="well">
             <?php if ($this->canEdit) { ?>
                 <?=$this->partial('application/forms/markdown', [
@@ -56,13 +59,13 @@
                             'action' => 'text',
                             'id'     => $this->factory->text_id
                         ])
-                    ], 'History')?>
+                    ], $this->translate('moder/markdown/history'))?>
                 </p>
             <?php } ?>
         </div>
     </div>
     <div class="col-md-4">
-        <h3>Автомобили завода</h3>
+        <h3><?=$this->escapeHtml($this->translate('moder/factoreis/factory/vehicles'))?></h3>
         <div class="well">
             <?php  foreach ($this->cars as $car) { ?>
                 <?=$this->htmlA($this->url('moder/cars/params', [

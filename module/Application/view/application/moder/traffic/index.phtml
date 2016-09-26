@@ -55,11 +55,13 @@
                 </td>
                 <td>
                     <?php if ($row['ban']) { ?>
-                        забанен до <?=$row['ban']['up_to'] ?>
+                        <?=$this->escapeHtml($this->translate('ban/until'))?>
+                        <?=$row['ban']['up_to'] ?>
                         <?php if ($row['ban']['user']) { ?>
                             by <?=$this->user($row['ban']['user'])?>
                             <?php if ($row['ban']['reason']) { ?>
-                                because <?=$this->escapeHtml($row['ban']['reason']) ?>
+                                <?=$this->escapeHtml($this->translate('ban/reason'))?>
+                                <?=$this->escapeHtml($row['ban']['reason']) ?>
                             <?php } ?>
                         <?php } ?>
                     <?php } ?>

@@ -9,7 +9,10 @@
     ]);
 ?>
 <?php if ($this->parentCar) { ?>
-    <p>В автомобиль <?=$this->car($this->parentCar)->title()?></p>
+    <p>
+        <?=$this->escapeHtml($this->translate('moder/vehicle/add/as-submodel'))?>
+        <?=$this->car($this->parentCar)->title()?>
+    </p>
 <?php } ?>
 <?=$this->partial('application/forms/bootstrap-horizontal', [
     'form' => $this->form

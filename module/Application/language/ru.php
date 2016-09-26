@@ -1289,6 +1289,9 @@ return [
     'moder/vehicle/begin' => 'Начало',
     'moder/vehicle/end' => 'Окончание',
     'moder/vehicle/produced' => 'Произведено',
+    'moder/vehicle/produced/number' => 'единиц',
+    'moder/vehicle/produced/about' => 'примерно',
+    'moder/vehicle/produced/exactly' => 'точно',
     'moder/vehicle/concept' => 'Концепт (прототип)',
     'moder/vehicle/group' => 'Группа',
     'moder/vehicle/year' => 'год',
@@ -1332,6 +1335,7 @@ return [
     'moder/vehicle/catalogue/parent-name-placeholder' => 'Название',
     'moder/vehicle/catalogue/parent-catname-placeholder' => 'часть URL',
     'moder/vehicle/catalogue/turbo-group-creator' => 'Турбо объединятор в группы',
+    'moder/vehicle/catalogue/turbo-group-creator/text' => 'Tool for join few vehicles into sub-model',
     'moder/vehicle/catalogue/add-brand' => 'Бренд ...',
     'moder/vehicle/catalogue/add-brand-%s' => 'Бренд %s',
 
@@ -1348,6 +1352,17 @@ return [
     'moder/vehicle/link-type-prefix/design' => 'Дизайн: ',
     'moder/vehicle/link-type-prefix/sport' => 'Спорт: ',
     'moder/vehicle/link-type-prefix/related' => 'Связанные: ',
+
+    'moder/vehicle/move/here' => 'сюда',
+
+    'moder/vehicle/pictures/turbo-group-creator' => 'Турбо объединятор картинок в группы',
+    'moder/vehicle/pictures/turbo-group-creator/text' => 'Инструмент позволяет объединить несколько картинок в автомобиль',
+
+    'moder/vehicle/add/as-submodel' => 'В автомобиль',
+
+    'moder/categories/name' => 'Название',
+    'moder/categories/add' => 'Добавить',
+    'moder/categories/edit' => 'Изменить',
 
     'moder/picture/edit-picture-%s' => 'Управление изображением №%s',
     'moder/picture/edit-vehicle-%s' => 'Управление автомобилем %s',
@@ -1477,6 +1492,40 @@ return [
     'moder/twins/name' => 'Название',
     'moder/twins/short-description' => 'Краткое описание',
     'moder/twins/vehicles' => 'Автомобили',
+
+    'moder/museums/add' => 'Добавить музей',
+    'moder/museums/museum/image' => 'картинка',
+    'moder/museums/museum/name' => 'название',
+    'moder/museums/museum/address' => 'адрес',
+
+    'moder/factoreis/title' => 'Заводы',
+    'moder/factoreis/add' => 'добавить завод',
+    'moder/factoreis/puclic-url:' => 'На сайте: ',
+    'moder/factoreis/factory/short-description' => 'Краткое описание',
+    'moder/factoreis/factory/vehicles' => 'Автомобили завода',
+
+    'moder/comments/title' => 'Комментарии',
+    'moder/comments/filter' => 'Фильтр',
+    'moder/comments/not-readed' => 'не прочитано',
+
+    'moder/engines/add' => 'добавить двигатель',
+    'moder/engines/filter' => 'Фильтр',
+    'moder/engines/as-subengine' => 'В двигатель',
+    'moder/engines/engine/vehicles' => 'Автомобили на этом двигателе',
+    'moder/engines/engine/subengines' => 'Подварианты двигателя',
+    'moder/engines/engine/parent' => 'Родительский двигатель',
+    'moder/engines/engine/cancel' => 'Отменить',
+    'moder/engines/engine/select' => 'Выбрать ...',
+    'moder/engines/engine/brands' => 'Бренды',
+    'moder/engines/engine/brands/add' => 'Добавить бренд',
+    'moder/engines/engine/brands/brand' => 'Бренд',
+    'moder/engines/engine/brands/public-url' => 'На сайте',
+    'moder/engines/engine/brands/remove' => 'Уд.',
+    'moder/engines/engine/brands/inherited-from' => 'Унаследовано от',
+    'moder/engines/engine/edit-specs' => 'Ввод ТТХ двигателя',
+    'moder/engines/engine/last-edit:' => 'Последний раз редактировал информацию:',
+
+    'moder/pages/name' => 'Название',
 
     'votings/do-vote' => 'Голосовать',
     'votings/who-voted' => 'Кто проголосовал?',

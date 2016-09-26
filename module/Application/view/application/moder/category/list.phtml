@@ -10,14 +10,14 @@
                         'action'    => 'item',
                         'parent_id' => $page['id']
                     ])
-                ], 'Добавить') ?>
+                ], $this->translate('moder/categories/add')) ?>
                 <?=$this->htmlA([
                     'class' => "btn btn-xs btn-default",
                     'href'  => $this->url('moder/category/params', [
                         'action' => 'item',
                         'id'     => $page['id']
                     ])
-                ], 'Изменить') ?>
+                ], $this->translate('moder/categories/edit')) ?>
             </div>
         </td>
     </tr>

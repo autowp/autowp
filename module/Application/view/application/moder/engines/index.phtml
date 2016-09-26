@@ -10,7 +10,7 @@
 ?>
 <div class="row">
     <div class="col-lg-4 col-md-4">
-        <h2>Фильтр</h2>
+        <h2><?=$this->escapeHtml($this->translate('moder/engines/filter'))?></h2>
         <div class="well">
             <?=$this->partial('application/forms/bootstrap-vertical', [
                 'form' => $this->form
@@ -23,14 +23,14 @@
                     <i class="fa fa-plus"></i>
                     <?=$this->htmlA($this->url('moder/engines/params', [
                         'action'     => 'add',
-                    ]), 'добавить двигатель')?>
+                    ]), $this->translate('moder/engines/add'))?>
                 </li>
             <?php } ?>
         </ul>
     </div>
     <div class="col-lg-8 col-md-8">
         <h2>
-            Двигатели
+            <?=$this->escapeHtml($this->translate('page/82/name'))?>
             <?php if ($count = $this->paginator->getTotalItemCount()) {?>
                 <small><?=$this->escapeHtml(sprintf($this->translatePlural('%1$s engines', '%1$s engines', $count), $count))?></small>
             <?php } ?>

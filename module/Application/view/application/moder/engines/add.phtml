@@ -9,7 +9,10 @@
     ]);
 ?>
 <?php if ($this->parentEngine) { ?>
-    <p>В двигатель <?=$this->escapeHtml($this->parentEngine->caption)?></p>
+    <p>
+        <?=$this->escapeHtml($this->translate('moder/engines/as-subengine'))?>
+        <?=$this->escapeHtml($this->parentEngine->caption)?>
+    </p>
 <?php } ?>
 <?=$this->partial('application/forms/bootstrap-horizontal', [
     'form' => $this->form

@@ -1261,6 +1261,9 @@ return [
     'moder/vehicle/begin' => '投产',
     'moder/vehicle/end' => '停产',
     'moder/vehicle/produced' => '产量',
+    'moder/vehicle/produced/number' => 'number',
+    'moder/vehicle/produced/about' => 'about',
+    'moder/vehicle/produced/exactly' => 'exactly',
     'moder/vehicle/concept' => '概念车(原型车)',
     'moder/vehicle/group' => '组',
     'moder/vehicle/year' => '年',
@@ -1304,6 +1307,7 @@ return [
     'moder/vehicle/catalogue/parent-name-placeholder' => '车名',
     'moder/vehicle/catalogue/parent-catname-placeholder' => '域名部分',
     'moder/vehicle/catalogue/turbo-group-creator' => '涡轮制造商',
+    'moder/vehicle/catalogue/turbo-group-creator/text' => 'Tool for join few vehicles into sub-model',
     'moder/vehicle/catalogue/add-brand' => '品牌 ...',
     'moder/vehicle/catalogue/add-brand-%s' => '品牌 %s',
 
@@ -1320,6 +1324,17 @@ return [
     'moder/vehicle/link-type-prefix/design' => '设计: ',
     'moder/vehicle/link-type-prefix/sport' => '赛事: ',
     'moder/vehicle/link-type-prefix/related' => '相关: ',
+
+    'moder/vehicle/move/here' => 'here',
+
+    'moder/vehicle/pictures/turbo-group-creator' => 'Turbo group creator from pcitures',
+    'moder/vehicle/pictures/turbo-group-creator/text' => 'Tool for join few pictures in sub-vehicle',
+
+    'moder/vehicle/add/as-submodel' => 'As submodel',
+
+    'moder/categories/name' => 'Name',
+    'moder/categories/add' => 'Add',
+    'moder/categories/edit' => 'Edit',
 
     'moder/picture/edit-picture-%s' => '编辑图片№%s',
     'moder/picture/edit-vehicle-%s' => '编辑车型%s',
@@ -1362,6 +1377,35 @@ return [
     'moder/picture/acceptance/already-voted' => '已表决: ',
     'moder/picture/acceptance/that-is-one-accepted-picture' => '此车唯一的图片',
     'moder/picture/acceptance/accepted-pictures-is-%s' => '接受的图片仍然属于%s',
+
+    'moder/picture/public-url:' => 'Public URL: ',
+    'moder/picture/image:' => 'Image: ',
+    'moder/picture/image-specs:' => 'Image specs: ',
+    'moder/picture/resolution:' => 'Resolution: ',
+    'moder/picture/filesize:' => 'File size: ',
+    'moder/picture/upload-date:' => 'Upload date: ',
+    'moder/picture/settings' => 'Settings',
+    'moder/picture/copyrights' => 'Copyrights',
+
+    'moder/picture/replacement' => 'Replacement',
+    'moder/picture/replacement/photo-suggested-to-replace' => 'Photo suggested to replace',
+    'moder/picture/replacement/accept-and-delete-double' => 'Accept and remove double',
+    'moder/picture/replacement/cancel' => 'Cancel replacement',
+
+    'moder/picture/edit-and-repair' => 'Edit and repait',
+    'moder/picture/edit-and-repair/normalize' => 'Normailze',
+    'moder/picture/edit-and-repair/flop' => 'Flop',
+    'moder/picture/edit-and-repair/crop' => 'Crop area',
+    'moder/picture/edit-and-repair/repair-all-files' => 'Repair all files',
+    'moder/picture/edit-and-repair/rebuild-files-names' => 'Rebuild files names',
+
+    'moder/picture/uploader' => 'Uploader',
+    'moder/picture/uploader/unknown' => 'Unknown',
+    'moder/picture/uploader/id-address:' => 'IP-address of uploader: ',
+
+    'moder/pciture/move/brands' => 'Brands',
+    'moder/pciture/move/factories' => 'Factories',
+    'moder/pciture/move/engines' => 'Engines',
 
     'moder/brands/vehicles-count:' => '车型: ',
     'moder/brands/engines-count:' => '发动机: ',
@@ -1418,6 +1462,40 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/twins/name' => 'Name',
     'moder/twins/short-description' => 'Short description',
     'moder/twins/vehicles' => 'Vehicles',
+
+    'moder/museums/add' => 'Add museum',
+    'moder/museums/museum/image' => 'image',
+    'moder/museums/museum/name' => 'name',
+    'moder/museums/museum/address' => 'address',
+
+    'moder/factoreis/title' => 'Factoreis',
+    'moder/factoreis/add' => 'add factory',
+    'moder/factoreis/puclic-url:' => 'Public URL: ',
+    'moder/factoreis/factory/short-description' => 'Short description',
+    'moder/factoreis/factory/vehicles' => 'Factory vehicles',
+
+    'moder/comments/title' => 'Comments',
+    'moder/comments/filter' => 'Filter',
+    'moder/comments/not-readed' => 'not readed',
+
+    'moder/engines/add' => 'add engines',
+    'moder/engines/filter' => 'Filter',
+    'moder/engines/as-subengine' => 'As submodel',
+    'moder/engines/engine/vehicles' => 'Vehicles with that engine',
+    'moder/engines/engine/subengines' => 'Engine submodels',
+    'moder/engines/engine/parent' => 'Parent engine',
+    'moder/engines/engine/cancel' => 'Cancel',
+    'moder/engines/engine/select' => 'Select ...',
+    'moder/engines/engine/brands' => 'Brands',
+    'moder/engines/engine/brands/add' => 'Add brand',
+    'moder/engines/engine/brands/brand' => 'Brand',
+    'moder/engines/engine/brands/public-url' => 'Puclic URL',
+    'moder/engines/engine/brands/remove' => 'Rm.',
+    'moder/engines/engine/brands/inherited-from' => 'Inherited from',
+    'moder/engines/engine/edit-specs' => 'Edit specs',
+    'moder/engines/engine/last-edit:' => 'Last time edit:',
+
+    'moder/pages/name' => 'Name',
 
     'votings/do-vote' => '表决',
     'votings/who-voted' => '表决用户',

@@ -17,7 +17,7 @@
         <td><?=$page['id'] ?></td>
         <td style="padding-left:<?=$this->level * 20?>px"><?=$this->escapeHtml($page['name']) ?></td>
         <td><?=$this->escapeHtml($page['breadcrumbs']) ?></td>
-        <td><?=$this->escapeHtml($page['isGroupNode'] ? 'да' : 'нет') ?></td>
+        <td><?=$this->escapeHtml($page['isGroupNode'] ? 'yes' : 'no') ?></td>
         <td>
             <form class="btn-group" action="<?=$this->escapeHtmlAttr($page['deleteUrl'])?>" style="white-space:nowrap">
                 <?=$this->htmlA([

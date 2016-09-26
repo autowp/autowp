@@ -2075,36 +2075,6 @@ class CarsController extends AbstractActionController
         return $this->redirect()->toUrl($this->getRequest()->getServer('HTTP_REFERER'));
     }
 
-    public function addParentOptionsAction()
-    {
-        if (!$this->user()->inheritsRole('moder') ) {
-            return $this->forbiddenAction();
-        }
-
-        $carTable = $this->catalogue()->getCarTable();
-
-        $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
-            return $this->notFoundAction();
-        }
-
-        $canEditMeta = $this->canEditMeta($car);
-
-        if (!$canEditMeta) {
-            return $this->notFoundAction();
-        }
-
-        $parentCar = $carTable->find($this->params('parent_id'))->current();
-        if (!$parentCar) {
-            return $this->notFoundAction();
-        }
-
-        return [
-            'car'       => $car,
-            'parentCar' => $parentCar
-        ];
-    }
-
     public function addParentAction()
     {
         if (!$this->user()->inheritsRole('moder') ) {

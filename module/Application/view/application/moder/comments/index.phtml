@@ -10,7 +10,7 @@
 ?>
 <div class="row">
     <div class="col-md-4">
-        <h2>Фильтр</h2>
+        <h2><?=$this->escapeHtml($this->translate('moder/comments/filter'))?></h2>
         <div class="well">
             <?=$this->partial('application/forms/bootstrap-vertical', [
                 'form' => $this->form
@@ -19,7 +19,7 @@
     </div>
     <div class="col-md-8">
         <h2>
-            Комментарии
+            <?=$this->escapeHtml($this->translate('moder/comments/title'))?>
             <?php if ($count = $this->paginator->getTotalItemCount()) {?>
                 <small><?=$this->escapeHtml(sprintf($this->translatePlural('%1$s comments', null, $count), $count)) ?></small>
             <?php } ?>
@@ -28,7 +28,7 @@
             <?php foreach ($this->comments as $comment) { ?>
                 <li>
                     <?php if ($comment['new']) { ?>
-                        <span class="label label-warning">не прочитано</span>
+                        <span class="label label-warning"><?=$this->escapeHtml($this->translate('moder/comments/not-readed'))?></span>
                     <?php } ?>
                     <?=$comment['status']?>
                     <?=$this->htmlA($comment['url'], $comment['message'])?>

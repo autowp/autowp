@@ -1,6 +1,6 @@
 <h3>Распределение фотографий по модификациям</h3>
 <form action="<?=$this->escapeHtmlAttr($this->url(null, [], [], true))?>" method="post">
-    <input type="submit" value="Сохранить" class="btn btn-primary btn-block" style="margin:30px 0" />
+    <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('submit'))?>" class="btn btn-primary btn-block" style="margin:30px 0" />
     <div class="row">
         <?php foreach ($this->pictures as $picture) { ?>
             <div class="col-md-6">
@@ -36,5 +36,5 @@
             </div>
         <?php } ?>
     </div>
-    <input type="submit" value="Сохранить" class="btn btn-primary btn-block" style="margin:30px 0" />
+    <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('submit'))?>" class="btn btn-primary btn-block" style="margin:30px 0" />
 </form>

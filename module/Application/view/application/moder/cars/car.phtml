@@ -115,51 +115,47 @@
         <?php } else { ?>
             <table class="table table-condensed">
                 <tr>
-                    <td>Полное название авто:</td>
+                    <td><?=$this->escapeHtml($this->translate('moder/vehicle/name'))?>:</td>
                     <td><?=$this->escapeHtml($this->car->caption) ?></td>
                 </tr>
                 <tr>
-                    <td>Индекс кузова:</td>
+                    <td><?=$this->escapeHtml($this->translate('moder/vehicle/body'))?>:</td>
                     <td><?=$this->escapeHtml($this->car->body)?></td>
                 </tr>
                 <tr>
-                    <td>Начало выпуска:</td>
+                    <td><?=$this->escapeHtml($this->translate('moder/vehicle/begin'))?>:</td>
                     <td>
                         <?=($this->car->begin_year > 0 ? $this->car->begin_year : '????') ?>
                         <?=($this->car->begin_month > 0 ? $this->car->begin_month : '??') ?>
                     </td>
                 </tr>
                 <tr>
-                    <td valign="top">Год окончания выпуска:</td>
+                    <td valign="top"><?=$this->escapeHtml($this->translate('moder/vehicle/end'))?>:</td>
                     <td>
                         <?=($this->car->end_year > 0 ? $this->car->end_year : '????') ?>
                         <?=($this->car->end_month > 0 ? $this->car->end_month : '??') ?>
                         <?php if ($this->car->today) { ?>
-                            н.в.
+                            <?=$this->escapeHtml($this->translate('moder/vehicle/today/continue'))?>
                         <?php } elseif (!is_null($this->car->today)) { ?>
-                            выпуск закончен
+                            <?=$this->escapeHtml($this->translate('moder/vehicle/today/ended'))?>
                         <?php } ?>
                         <br />
                     </td>
                 </tr>
                 <tr>
-                    <td>Выпущено единиц:</td>
+                    <td><?=$this->escapeHtml($this->translate('moder/vehicle/produced'))?>:</td>
                     <td>
                         <?=$this->car->produced ?>
-                        <?=($this->car->produced_exactly ? 'точно' : 'примерно') ?>
+                        <?=$this->escapeHtml($this->transalte($this->car->produced_exactly ? 'moder/vehicle/produced/exactly' : 'moder/vehicle/produced/about')) ?>
                     </td>
                 </tr>
                 <tr>
-                    <td valign="top">Концепт (прототип):</td>
-                    <td><?=$this->car->is_concept ? 'Да' : 'Нет' ?></td>
+                    <td valign="top"><?=$this->escapeHtml($this->translate('moder/vehicle/concept'))?>:</td>
+                    <td><?=$this->car->is_concept ? 'Yes' : 'No' ?></td>
                 </tr>
-                <tr>
-                   <td valign="top">Лимитированная версия:</td>
-                    <td><?=($this->car->is_le ? 'Да' : 'Нет') ?></td>
-                </tr>
-                <tr><td valign="top">Краткое описание:</td></tr>
+                <tr><td valign="top"></td></tr>
                 <tr><td colspan="2" valign="top">
-                    <?=$this->markup($this->description) ?>
+                    <?=$this->markdown($this->description) ?>
                 </td></tr>
             </table>
         <?php } ?>

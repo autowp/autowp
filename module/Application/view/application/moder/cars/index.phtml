@@ -19,7 +19,7 @@
     </div>
     <div class="col-lg-8 col-md-8">
         <h2>
-            Автомобили
+            <?=$this->escapeHtml($this->page(131)->name)?>
             <?php if ($count = $this->paginator->getTotalItemCount()) {?>
                 <small><?=$this->escapeHtml(sprintf($this->translatePlural('%1$s vehicles', '%1$s vehicles', $count), $count))?></small>
             <?php } ?>

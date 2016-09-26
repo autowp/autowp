@@ -14,7 +14,7 @@
 
     //$this->layout()->moduleName = 'moder/cars/car';
 ?>
-<p>Инструмент позволяет объединить несколько картинок в автомобиль</p>
+<?=$this->markdown($this->translate('moder/vehicle/pictures/turbo-group-creator'))?>
 <?=$this->partial('application/forms/bootstrap-horizontal', [
     'form' => $this->form
 ])?>

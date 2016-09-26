@@ -16,7 +16,7 @@ class CarProduced extends Fieldset implements InputFilterProviderInterface
                 'name'    => 'count',
                 'type'    => 'Number',
                 'options' => [
-                    'label'   => 'единиц'
+                    'label'   => 'moder/vehicle/produced/number'
                 ],
                 'attributes' => [
                     'style' => 'width: 10%',
@@ -30,8 +30,8 @@ class CarProduced extends Fieldset implements InputFilterProviderInterface
                 'options' => [
                     'label'   => 'точно?',
                     'options' => [
-                        '0' => 'примерно',
-                        '1' => 'точно'
+                        '0' => 'moder/vehicle/produced/about',
+                        '1' => 'moder/vehicle/produced/exactly'
                     ]
                 ],
                 'attributes' => [
