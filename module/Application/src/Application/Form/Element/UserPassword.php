@@ -34,6 +34,7 @@ class UserPassword extends Password implements InputProviderInterface
                 [
                     'name' => 'StringLength',
                     'options' => [
+                        'min' => Users::MIN_PASSWORD,
                         'max' => Users::MAX_PASSWORD
                     ]
                 ]

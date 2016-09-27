@@ -87,7 +87,7 @@
         <h3><?=$this->escapeHtml($this->translate('moder/brands/description'))?></h3>
         <div class="well">
             <?php if ($this->canEdit) { ?>
-                <?=$this->partial('application/forms/bootstrap-horizontal', [
+                <?=$this->partial('application/forms/markdown', [
                     'form' => $this->descriptionForm
                 ])?>
             <?php } else { ?>
