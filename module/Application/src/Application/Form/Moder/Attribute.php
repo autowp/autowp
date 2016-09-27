@@ -15,34 +15,34 @@ class Attribute extends Form implements InputFilterProviderInterface
     public function __construct($name = null, $options = [])
     {
         parent::__construct($name, $options);
-        
+
         $typesTable = new Attrs_Types();
         $db = $typesTable->getAdapter();
         $typeOptions = $db->fetchPairs(
             $db->select()
                 ->from($typesTable->info('name'), ['id', 'name'])
         );
-        
+
         $unitTable = new Attrs_Units();
         $db = $unitTable->getAdapter();
         $unitOptions = $db->fetchPairs(
             $db->select()
                 ->from($unitTable->info('name'), ['id', 'name'])
         );
-    
+
         $elements = [
             [
                 'name'    => 'name',
                 'type'    => 'Text',
                 'options' => [
-                    'label' => 'Название'
+                    'label' => 'attrs/attribute/name'
                 ]
             ],
             [
                 'name'    => 'type_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Тип',
+                    'label'   => 'attrs/attribute/type',
                     'options' => array_replace(['' => '--'], $typeOptions)
                 ]
             ],
@@ -50,7 +50,7 @@ class Attribute extends Form implements InputFilterProviderInterface
                 'name'    => 'precision',
                 'type'    => 'Text',
                 'options' => [
-                    'label'     => 'Точность (для float аттрибута)',
+                    'label'     => 'attrs/attribute/precision',
                     'maxlength' => 255,
                     'size'      => 80
                 ]
@@ -59,7 +59,7 @@ class Attribute extends Form implements InputFilterProviderInterface
                 'name'    => 'unit_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'     => 'Единица измерения',
+                    'label'     => 'attrs/attribute/unit',
                     'options'   => array_replace(['' => '--'], $unitOptions)
                 ]
             ],
@@ -67,20 +67,20 @@ class Attribute extends Form implements InputFilterProviderInterface
                 'name'    => 'description',
                 'type'    => 'Textarea',
                 'options' => [
-                    'label'    => 'Описание',
+                    'label'    => 'attrs/attribute/description',
                     'rows'     => 3,
                     'cols'     => 30,
                 ]
             ]
         ];
-    
+
         foreach ($elements as $element) {
             $this->add($element);
         }
-    
+
         $this->setAttribute('method', 'post');
     }
-    
+
     /**
      * Should return an array specification compatible with
      * {@link Zend\InputFilter\Factory::createInputFilter()}.

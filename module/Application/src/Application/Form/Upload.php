@@ -34,7 +34,7 @@ class Upload extends Form implements InputFilterProviderInterface
                 'name'    => 'picture',
                 'type'    => 'File',
                 'options' => [
-                    'label'       => 'Файл картинки',
+                    'label' => 'upload/image-file',
                 ],
                 'attributes' => $attributes
             ],
@@ -42,7 +42,7 @@ class Upload extends Form implements InputFilterProviderInterface
                 'name'    => 'note',
                 'type'    => 'Textarea',
                 'options' => [
-                    'label' => 'Примечание к изображению'
+                    'label' => 'upload/note'
                 ],
                 'attributes' => [
                     'rows' => 3,

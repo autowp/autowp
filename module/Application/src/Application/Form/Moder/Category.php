@@ -24,15 +24,15 @@ class Category extends Form implements InputFilterProviderInterface
                 'name'    => 'parent_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'     => 'Родитель',
-                    'options'   => array_replace(['' => ''], $this->parents)
+                    'label'   => 'category/parent',
+                    'options' => array_replace(['' => ''], $this->parents)
                 ]
             ],
             [
                 'name'    => 'name',
                 'type'    => 'Text',
                 'options' => [
-                    'label'     => 'Название',
+                    'label'     => 'category/name',
                     'maxlength' => 255,
                     'size'      => 80
                 ]

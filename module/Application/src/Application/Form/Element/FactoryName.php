@@ -18,7 +18,7 @@ class FactoryName extends Text implements InputProviderInterface
     /**
      * @var null|string
      */
-    protected $label = 'Название';
+    protected $label = 'factory/name';
 
     /**
      * Provide default input rules for this element

@@ -73,7 +73,7 @@
             <?php } else { ?>
                 <table><tbody>
                     <tr>
-                        <td><?=$this->escapeHtml($this->translate('moder/brands/meta-data/name'))?></td>
+                        <td><?=$this->escapeHtml($this->translate('brand/name'))?></td>
                         <td><?=$this->escapeHtml($this->brand->caption) ?></td>
                     </tr>
                     <tr>
@@ -106,7 +106,7 @@
             <?php } ?>
         </div>
 
-        <h3><?=$this->escapeHtml($this->translate('moder/brands/logo'))?></h3>
+        <h3><?=$this->escapeHtml($this->translate('brand/logo'))?></h3>
         <div class="well">
             <?php if ($this->canLogo) { ?>
                 <?=$this->markdown($this->translate('moder/brands/logo/description'))?>

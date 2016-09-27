@@ -16,10 +16,10 @@ class CarModelYears extends Fieldset implements InputFilterProviderInterface
                 'name'    => 'begin',
                 'type'    => \Application\Form\Element\Year::class,
                 'options' => [
-                    'label' => 'с'
+                    'label' => 'moder/vehicle/year/from'
                 ],
                 'attributes' => [
-                    'placeholder' => 'с',
+                    'placeholder' => 'moder/vehicle/year/from',
                     'style'       => 'width: 10%',
                     'min'         => 1800,
                     'max'         => date('Y') + 10
@@ -29,10 +29,10 @@ class CarModelYears extends Fieldset implements InputFilterProviderInterface
                 'name'    => 'end',
                 'type'    => \Application\Form\Element\Year::class,
                 'options' => [
-                    'label' => 'по'
+                    'label' => 'moder/vehicle/year/to'
                 ],
                 'attributes' => [
-                    'placeholder' => 'по',
+                    'placeholder' => 'moder/vehicle/year/to',
                     'style'       => 'width: 10%',
                     'min'         => 1800,
                     'max'         => date('Y') + 10

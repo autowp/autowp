@@ -28,7 +28,7 @@ class CarProduced extends Fieldset implements InputFilterProviderInterface
                 'name'    => 'exactly',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'точно?',
+                    'label'   => 'moder/vehicle/produced/precision',
                     'options' => [
                         '0' => 'moder/vehicle/produced/about',
                         '1' => 'moder/vehicle/produced/exactly'

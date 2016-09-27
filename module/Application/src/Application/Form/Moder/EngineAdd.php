@@ -36,8 +36,8 @@ class EngineAdd extends Form implements InputFilterProviderInterface
             $this->add($element);
         }
 
-        $this->setAttribute('legend', 'Двигатель');
-        $this->setAttribute('description', 'Новый двигатель');
+        $this->setAttribute('legend', 'moder/engines/add/legend');
+        $this->setAttribute('description', 'moder/engines/add');
         $this->setAttribute('method', 'post');
     }
 

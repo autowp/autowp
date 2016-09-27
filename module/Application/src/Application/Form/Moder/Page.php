@@ -24,7 +24,7 @@ class Page extends Form implements InputFilterProviderInterface
                 'name'    => 'parent_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'     => 'Родитель',
+                    'label'     => 'page/parent',
                     'options'   => array_replace(['' => ''], $this->parents)
                 ]
             ],
@@ -32,7 +32,7 @@ class Page extends Form implements InputFilterProviderInterface
                 'name'    => 'name',
                 'type'    => 'Text',
                 'options' => [
-                    'label'     => 'Название',
+                    'label'     => 'page/name',
                     'maxlength' => 255,
                     'size'      => 80
                 ]
@@ -68,28 +68,28 @@ class Page extends Form implements InputFilterProviderInterface
                 'name'    => 'is_group_node',
                 'type'    => 'Checkbox',
                 'options' => [
-                    'label'     => 'Группообразующий узел?'
+                    'label' => 'page/is_group_node'
                 ]
             ],
             [
                 'name'    => 'registered_only',
                 'type'    => 'Checkbox',
                 'options' => [
-                    'label'     => 'Только для зарегистрированных?'
+                    'label' => 'page/registered_only'
                 ]
             ],
             [
                 'name'    => 'guest_only',
                 'type'    => 'Checkbox',
                 'options' => [
-                    'label'     => 'Только для гостей?'
+                    'label' => 'page/guests_only'
                 ]
             ],
             [
                 'name'    => 'class',
                 'type'    => 'Text',
                 'options' => [
-                    'label'     => 'Класс',
+                    'label'     => 'page/class',
                     'maxlength' => 255,
                     'size'      => 80
                 ]

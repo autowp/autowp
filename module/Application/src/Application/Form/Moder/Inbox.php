@@ -88,15 +88,15 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'type_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'moder/picture/filter/type',
+                    'label'   => 'moder/pictures/filter/type',
                     'options' => [
-                        ''                        => 'любой',
-                        Picture::CAR_TYPE_ID      => 'автомобиль',
-                        Picture::LOGO_TYPE_ID     => 'логотип',
-                        Picture::MIXED_TYPE_ID    => 'разное',
-                        Picture::UNSORTED_TYPE_ID => 'несортировано',
-                        Picture::ENGINE_TYPE_ID   => 'двигатель',
-                        Picture::FACTORY_TYPE_ID  => 'завод'
+                        ''                        => 'moder/pictures/filter/type/any',
+                        Picture::CAR_TYPE_ID      => 'moder/pictures/filter/type/vehicle',
+                        Picture::LOGO_TYPE_ID     => 'moder/pictures/filter/type/logotype',
+                        Picture::MIXED_TYPE_ID    => 'moder/pictures/filter/type/mixed',
+                        Picture::UNSORTED_TYPE_ID => 'moder/pictures/filter/type/unsorted',
+                        Picture::ENGINE_TYPE_ID   => 'moder/pictures/filter/type/engine',
+                        Picture::FACTORY_TYPE_ID  => 'moder/pictures/filter/type/factory'
                     ]
                 ]
             ],
@@ -104,11 +104,11 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'comments',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'moder/picture/filter/comments',
+                    'label'   => 'moder/pictures/filter/comments',
                     'options' => [
-                        ''  => 'не важно',
-                        '1' => 'есть',
-                        '0' => 'нет',
+                        ''  => 'moder/pictures/filter/comments/not-matters',
+                        '1' => 'moder/pictures/filter/comments/has-comments',
+                        '0' => 'moder/pictures/filter/comments/has-no-comments',
                     ]
                 ]
             ],
@@ -123,11 +123,11 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'replace',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'moder/picture/filter/replace',
+                    'label'   => 'moder/pictures/filter/replace',
                     'options' => [
-                        ''  => 'не важно',
-                        '1' => 'замена',
-                        '0' => 'кроме замен',
+                        ''  => 'moder/pictures/filter/replace/not-matters',
+                        '1' => 'moder/pictures/filter/replace/replaces',
+                        '0' => 'moder/pictures/filter/replace/without-replaces'
                     ],
                 ]
             ],
@@ -135,13 +135,13 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'requests',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'moder/picture/filter/votes',
+                    'label'   => 'moder/pictures/filter/votes',
                     'options' => [
-                        ''  => 'не важно',
-                        '0' => 'нет',
-                        '1' => 'есть на принятие',
-                        '2' => 'есть на удаление',
-                        '3' => 'есть любые',
+                        ''  => 'moder/pictures/filter/votes/not-matters',
+                        '0' => 'moder/pictures/filter/votes/none',
+                        '1' => 'moder/pictures/filter/votes/accept',
+                        '2' => 'moder/pictures/filter/votes/accept',
+                        '3' => 'moder/pictures/filter/votes/any',
                     ],
                 ]
             ],
@@ -167,17 +167,17 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'options' => [
                     'label'   => 'moder/picture/filter/order',
                     'options' => [
-                        1 => 'Дата добавления (новые)',
-                        2 => 'Дата добавления (старые)',
-                        3 => 'Разрешение (большие)',
-                        4 => 'Разрешение (маленькие)',
-                        5 => 'Размер (большие)',
-                        6 => 'Размер (маленькие)',
-                        7 => 'Комментируемые',
-                        8 => 'Просмотры',
-                        9 => 'Заявки на принятие/удаление'
+                        1 => 'moder/pictures/filter/order/add-date-desc',
+                        2 => 'moder/pictures/filter/order/add-date-asc',
+                        3 => 'moder/pictures/filter/order/resolution-desc',
+                        4 => 'moder/pictures/filter/order/resolution-asc',
+                        5 => 'moder/pictures/filter/order/filesize-desc',
+                        6 => 'moder/pictures/filter/order/filesize-asc',
+                        7 => 'moder/pictures/filter/order/commented',
+                        8 => 'moder/pictures/filter/order/views',
+                        9 => 'moder/pictures/filter/order/moder-votes'
                     ],
-                    'value'        => '1',
+                    'value' => '1',
                 ]
             ],
         ];

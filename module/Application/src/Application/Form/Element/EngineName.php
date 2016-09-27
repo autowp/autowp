@@ -19,7 +19,7 @@ class EngineName extends Text implements InputProviderInterface
     /**
      * @var null|string
      */
-    protected $label = 'Название';
+    protected $label = 'engine/name';
 
     /**
      * Provide default input rules for this element

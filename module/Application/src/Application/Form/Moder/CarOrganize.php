@@ -157,7 +157,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 'name'    => 'childs',
                 'type'    => 'MultiCheckbox',
                 'options' => [
-                    'label'   => 'Автомобили',
+                    'label'   => 'moder/vehicle/catalogue/turbo-group-creator/vehicles',
                     'options' => $this->childOptions,
                     'label_attributes' => [
                         'class' => 'checkbox',

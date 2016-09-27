@@ -19,7 +19,7 @@ class BrandName extends Text implements InputProviderInterface
     /**
      * @var null|string
      */
-    protected $label = 'moder/brands/meta-data/name';
+    protected $label = 'brand/name';
 
     /**
      * Provide default input rules for this element

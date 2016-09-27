@@ -364,7 +364,7 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'Новый Бренд',
+                'legend' => 'moder/brands/new/title',
             ],
             'elements' => [
                 [
@@ -393,9 +393,6 @@ return [
                     'spec' => [
                         'type' => 'Textarea',
                         'name' => 'markdown',
-                        'options' => [
-                            'label'     => 'Описание',
-                        ],
                         'attributes' => [
                             'maxlength' => 4096,
                             'cols'      => 60,
@@ -810,7 +807,7 @@ return [
                         'type' => 'File',
                         'name' => 'logo',
                         'options' => [
-                            'label' => 'Логотип'
+                            'label' => 'brand/logo'
                         ]
                     ]
                 ]
@@ -862,10 +859,9 @@ return [
                         'type' => 'Text',
                         'name' => 'name',
                         'options' => [
-                            'label'     => 'Название',
+                            'label'     => 'museum/name',
                             'maxlength' => 255,
-                            'size'      => 80,
-                            'class'      => 'span6'
+                            'size'      => 80
                         ]
                     ]
                 ],
@@ -876,8 +872,7 @@ return [
                         'options' => [
                             'label'     => 'URL',
                             'maxlength' => 255,
-                            'size'      => 80,
-                            'class'      => 'span6'
+                            'size'      => 80
                         ]
                     ]
                 ],
@@ -886,10 +881,9 @@ return [
                         'type' => 'Text',
                         'name' => 'address',
                         'options' => [
-                            'label'     => 'Адрес',
+                            'label'     => 'museum/address',
                             'maxlength' => 255,
-                            'size'      => 80,
-                            'class'      => 'span6'
+                            'size'      => 80
                         ]
                     ]
                 ],
@@ -898,7 +892,7 @@ return [
                         'type' => 'Text',
                         'name' => 'lat',
                         'options' => [
-                            'label'     => 'Latitude',
+                            'label'     => 'latitude',
                             'maxlength' => 20,
                             'size'      => 20
                         ]
@@ -909,7 +903,7 @@ return [
                         'type' => 'Text',
                         'name' => 'lng',
                         'options' => [
-                            'label'     => 'Longtitude',
+                            'label'     => 'longtitude',
                             'maxlength' => 20,
                             'size'      => 20
                         ]
@@ -920,10 +914,9 @@ return [
                         'type' => 'Textarea',
                         'name' => 'description',
                         'options' => [
-                            'label' => 'Описание',
+                            'label' => 'museum/description',
                             'cols'  => 80,
-                            'rows'  => 8,
-                            'class' => 'span6'
+                            'rows'  => 8
                         ]
                     ]
                 ],
@@ -932,7 +925,7 @@ return [
                         'type' => 'File',
                         'name' => 'photo',
                         'options' => [
-                            'label' => 'Фотография'
+                            'label' => 'museum/photo'
                         ]
                     ]
                 ],
@@ -1022,15 +1015,15 @@ return [
                         'type'    => 'Select',
                         'name'    => 'period',
                         'options' => [
-                            'label'   => 'На время',
+                            'label'   => 'ban/period',
                             'options' => [
-                                1  => 'час',
-                                2  => '2 часа',
-                                4  => '4 часа',
-                                8  => '8 часов',
-                                16 => '16 часов',
-                                24 => 'сутки',
-                                48 => 'двое суток',
+                                1  => 'ban/period/hour',
+                                2  => 'ban/period/2-hours',
+                                4  => 'ban/period/4-hours',
+                                8  => 'ban/period/8-hours',
+                                16 => 'ban/period/16-hours',
+                                24 => 'ban/period/day',
+                                48 => 'ban/period/2-days',
                             ]
                         ]
                     ]
@@ -1040,7 +1033,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'reason',
                         'options' => [
-                            'label' => 'Причина'
+                            'label' => 'ban/reason'
                         ]
                     ]
                 ],
@@ -1049,7 +1042,7 @@ return [
                         'type'    => 'Submit',
                         'name'    => 'submit',
                         'options' => [
-                            'label' => 'Забанить',
+                            'label' => 'ban/ban',
                         ]
                     ]
                 ]
@@ -1080,7 +1073,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'user_id',
                         'options' => [
-                            'label'   => 'Пользователь'
+                            'label' => 'specifications-editor/log/filter/user-id'
                         ]
                     ]
                 ]
