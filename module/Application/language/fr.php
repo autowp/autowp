@@ -92,9 +92,9 @@ return [
     'index/brands'             => 'Marques',
     'index/factories'          => 'Usines',
     'index/specifications'     => 'Specifications',
-    'index/twins/description' => 'Вы знаете, что Daewoo Matiz имеет аж целых [шесть клонов](/twins/group87)? А знаете, что [общего у Lotus и Kia](/twins/group5)? Уверены, что вам покажется интересным этот раздел.',
-    'index/categories/description' => 'А знаете ли вы, какая техника помогала блюсти правопорядок на улицах мировых городов в разное время? А на каких автомобилях ездил Папа Римский? Нет? Тогда вам точно в этот раздел.',
-    'index/categories/mosts' => 'Хотите знать, какой автомобиль был самым быстрым? Хотите знать, сколько весит самый могучий карьерный самосвал? Заходите и узнаете.',
+    'index/twins/description' => 'Savez-vous, que la Daewoo Matiz a [six clones](/twins/group87)? Savez-vous, ce qui est commun entre [Lotus и Kia](/twins/group5)? Sûr que vous vous sentez intéressant cette section.',
+    'index/categories/description' => 'Savez-vous quelle technique a permis d'observer la loi et l'ordre dans les rues de villes du monde à des moments différents? Et pas de voitures voyagé Pape? Non? Ensuite, vous êtes exactement dans cette section.',
+    'index/categories/mosts' => 'Voulez-vous savoir quel genre de voiture est le plus rapide? Voulez-vous savoir combien pèse le plus puissant camion de l'exploitation minière',
 
     'mosts/fastest/roadster'          => 'La plupart des roadsters les plus rapides',
     'mosts/mighty/sedan/today'        => 'La plupart puissantes berlines aujourd\'hui',
@@ -231,55 +231,55 @@ return [
     'mosts/sidebar/mostly…' => 'Le plus …',
     'mosts/sidebar/between…' => 'Parmi …',
 
-    'mosts/period/before1920' => 'jusqu\'à 1920го',
-    'mosts/period/1920-29'    => '1920-29th',
-    'mosts/period/1930-39'    => '1930-39th',
-    'mosts/period/1940-49'    => '1940-49th',
-    'mosts/period/1950-59'    => '1950-59th',
-    'mosts/period/1960-69'    => '1960-69th',
-    'mosts/period/1970-79'    => '1970-79th',
-    'mosts/period/1980-89'    => '1980-89th',
-    'mosts/period/1990-99'    => '1990-99th',
-    'mosts/period/2000-09'    => '2000-09th',
-    'mosts/period/2010-15'    => '2010-15th',
+    'mosts/period/before1920' => 'jusqu\'à 1920',
+    'mosts/period/1920-29'    => '1920-29',
+    'mosts/period/1930-39'    => '1930-39',
+    'mosts/period/1940-49'    => '1940-49',
+    'mosts/period/1950-59'    => '1950-59',
+    'mosts/period/1960-69'    => '1960-69',
+    'mosts/period/1970-79'    => '1970-79',
+    'mosts/period/1980-89'    => '1980-89',
+    'mosts/period/1990-99'    => '1990-99',
+    'mosts/period/2000-09'    => '2000-09',
+    'mosts/period/2010-15'    => '2010-15',
     'mosts/period/present'    => 'au présent',
     'mosts/period/all-time'   => 'dans l\'histoire',
 
     /* upload */
-    'upload/picture/crop' => 'recadrer',
-    'upload/picture/cropped-to' => 'recadrée à %s',
-    'upload/select/unsorted' => 'unsorted',
-    'upload/select/unsorted-long' => 'unsorted (not existent vehicle or engine)',
-    'upload/select/mixed' => 'mixed',
-    'upload/select/mixed-long' => 'mixed (few vehicles on one picture)',
-    'upload/select/logo' => 'logotype',
-    'upload/select/engines' => 'Engines',
-    'upload/select/concepts' => 'Concepts & prototypes',
-    'upload/select/other-modification' => 'other modification',
+    'upload/picture/crop' => 'Recadrer',
+    'upload/picture/cropped-to' => 'Recadrée à %s',
+    'upload/select/unsorted' => 'Non triée',
+    'upload/select/unsorted-long' => 'Non triée (inexistant de véhicule ou de moteur)',
+    'upload/select/mixed' => 'Mixte',
+    'upload/select/mixed-long' => 'Mixte (peu de véhicules sur une seule image)',
+    'upload/select/logo' => 'Logotype',
+    'upload/select/engines' => 'Moteurs',
+    'upload/select/concepts' => 'Concepts et prototypes',
+    'upload/select/other-modification' => 'Autre modification',
 
-    'upload/add-picture' => 'Add picture',
-    'upload/select-another' => 'select another catalogue',
-    'upload/description' => 'Если у вас есть изображения, которых вы не нашли на этом сайте и они соответствуют тематике сайта, то вы можете добавить их в наш каталог, воспользовавшись формой, расположенной ниже.
+    'upload/add-picture' => 'Ajouter une image',
+    'upload/select-another' => 'Sélectionnez un autre catalogue',
+    'upload/description' => 'Si vous avez une image que vous ne trouvez pas sur ce site et elle correspondes au thème du site, vous pouvez les ajouter dans notre catalogue en utilisant le formulaire ci-dessous.
 
-Было бы здорово, если бы вы указали, что за автомобиль изображён на картинке, чтобы облегчить её добавление и избежать ошибки.
+Ce serait formidable si vous aviez indiqué qu'une voiture est représentée sur la photo, pour faciliter son ajout et éviter les erreurs.
 
-Требования, предъявляемые к добавляемым картинкам:
+Exigences pour les images ajoutées:
 
-* Формат [JPEG](http://ru.wikipedia.org/wiki/JPEG) или [PNG](http://ru.wikipedia.org/wiki/PNG). Разрешение от: 640×360 до 4096×4096.
-* Изображение должно по возможности быть отличного качества, не содержать различных артефактов изменения размера или компрессии (размытия, нечёткости, расплытия цветов, ребристости прямых линий и т.д.). Исключение составляют редкие фото(производителя), сканы из проспектов. Решение об оставлении такого фото на сайте принимает модераторский состав.
-* Отсутствие надписей и логотипов посторонних сайтов, нанесенных не авторами/владельцами материала.
-* Автомобиль должен иметь первоначальный вид как при выходе с завода. Не должны присутствовать признаки <em>самодельного тюнинга</em>, желательно отстутвие изменений, связанных со старением автомобиля.
-* Автомобиль должен полностью помещаться на фотографии. Исключение составляют случаи, когда изображение демонстрирует интерьер автомобиля или какую-то отличительную черту (как, например, название ограниченной серии автомобиля).
-* Основной и единственной темой изображения должен являться автомобиль, логотип автокомпании или двигатель. Наличие в кадре посторонних предметов или людей - нежелательно.
-* Любительские фотографии вашего автомобиля, автомобиля ваших друзей или любого другого, встретившегося вам на улице, а также фотографии с выставок - не будут приняты на сайт 100%. Если только вы не профессионал.
-* Для первых фотографий автомобиля возможны пониженные требования.
+* Le format [JPEG](http://ru.wikipedia.org/wiki/JPEG) ou [PNG](http://ru.wikipedia.org/wiki/PNG). Résolution: 640×360 jusqu'à 4096×4096.
+* L'image doit être d'excellente qualité, ne contient pas les différents artefacts redimensionnement ou compression (flou, la couleur propagation, nervures droites etc.). Les exceptions sont rares photos (fabricant), scans de brochures. La décision d'abandonner cette photo sur le site a fait l'équipe de modérateur.
+* L'absence d'inscriptions et les logos des sites étrangers, ne causé aucun auteurs/propriétaires des images.
+* La voiture doit avoir un premier regard à la sortie de l'usine. Il ne doit pas présenter des signes de <em>tuning maison</em>, de préférence l'absence de changements liés à la voiture de vieillissement.
+* La voiture doit être placé complètement dans l'image. L'exception est lorsque l'image montre l'intérieur de la voiture, le moteur, le coffre, ou une caractéristique distinctive (par exemple, le titre de la voiture de série limitée).
+* Le principal et l'unique thème de l'image doit être la voiture, le logo d'une marque ou d'un moteur. La présence de corps étrangèrs ou de personnes dans le cadre est indésirable.
+* Photos amateur de votre voiture, de la voiture de vos amis, ou tout autre, vous rencontrent dans la rue, ainsi que des photos des expositions ne seront pas acceptées sur le site, sauf si vous êtes un professionnel.
+* Pour les premières photos de la voiture sont possibles des exigences.
 
-**Убедительная просьба**, перед добавлением изображений, убедиться в их отсутствии в каталоге.
+**S'il vous plaît**, avant d'ajouter des images, assurez-vous qu'ils ne sont pas dans le catalogue.
 
-Обращаем ваше внимание на то, что добавление картинок модерируемое. Т.е. все картинки перед добавлением в каталог будут проверены ведущими сайта.',
-    'upload/only-registered' => 'Only registered users can upload pictures
+S'il vous plaît noter que l'ajout d'images modérés. c'est-à-dire toutes les photos avant d'ajouter au catalogue seront testés par moderateurs.',
+    'upload/only-registered' => 'Seuls les utilisateurs enregistrés peuvent télécharger des images
 
-[Login](/login/) or [register](/registration/)',
+[Login](/login/) or [Enregistrer](/registration/)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => 'Autres photos de %1$s',
@@ -307,14 +307,14 @@ return [
     'catalogue/engine-menu/vehicles' => 'Vehicles',
     'catalogue/engine-menu/pictures' => 'Pictures',
     'catalogue/specifications/contributors:' => 'Contributors:',
-    'catalogue/specifications/disclaimer' => 'Information collected by site members. Если вы нашли ошибку или желаете заполнить пробелы, вы можете сделать это, пройдя процедуру регистрации на сайте.',
+    'catalogue/specifications/disclaimer' => 'Les informations recueillies par les membres du site. Si vous trouvez une erreur ou que vous souhaitez combler les lacunes, vous pouvez le faire, en passant de la procédure d'inscription sur le site.',
     'catalogue/vehicle/inbox' => 'inbox',
     'catalogue/vehicle/comments' => 'comments',
     'catalogue/engine/add-engine' => 'add engine',
     'catalogue/engine/mounted-on:' => 'Mounted on:',
 
-    'factories/factory-cars' => 'Vehicles',
-    'factories/factory/pictures' => 'Pictures',
+    'factories/factory-cars' => 'Vehicules',
+    'factories/factory/pictures' => 'Images',
 
     /* comments */
     'comments/title' => 'Commentaires',
@@ -411,20 +411,20 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'forums/topic/text' => 'Message',
     'forums/topic/subscribe-to-new-messages' => 'Abonnez-vous à de nouveaux messages',
     'forums/notification-mail/from' => 'Robot wheelsage.org',
-    'forums/notification-mail/subject' => 'New forum message',
+    'forums/notification-mail/subject' => 'Nouveau message de forum',
     'forums/notification-mail/body' =>
-        "Hello.\n\n" .
-        "New message in topic `%1\$s`\n" .
-        "To go to the viewing messages, use the link %2\$s\n\n" .
-        "Unsubscribe from the receipt of the notification, you can in account settings\n\n" .
-        "Sincerely, robot www.wheelsage.org\n",
-    'forums/subscribe' => 'Subscribe to new replies notifications',
-    'forums/subscribed' => 'You are subscribed to new replies notifications',
-    'forums/unsubscribe' => 'Unsubscribe',
-    'forums/topic-closed-text' => 'Topic is closed by site administration',
-    'forums/need-wait-to-post' => 'Для добавления нового сообщения вам необходимо подождать некоторое время',
-    'forums/register-to-post' => 'Чтобы иметь возможность создавать топики и отвечать в них, Вам необходимо [зарегистрироваться](/registration/).',
-    'forums/register-to-create-topic' => 'Добавлять топики могут только зарегистрированные пользователи.
+        "Bonjour.\n\n" .
+        "Nouveau message dans le sujet `%1\$s`\n" .
+        "Pour aller aux messages de visualisation, utilisez le lien %2\$s\n\n" .
+        "Se désabonner de la réception de la notification, vous pouvez dans les paramètres du compte\n\n" .
+        "Sincèrement, robot www.wheelsage.org\n",
+    'forums/subscribe' => 'S'abonner à des notifications de nouvelles réponses',
+    'forums/subscribed' => 'Vous êtes abonné aux notifications de nouvelles réponses',
+    'forums/unsubscribe' => 'Se désabonner',
+    'forums/topic-closed-text' => 'Sujet est fermé par l'administration du site',
+    'forums/need-wait-to-post' => 'Pour ajouter un nouveau message, vous devez attendre un certain temps',
+    'forums/register-to-post' => 'Pour être en mesure de créer des sujets et y répondre, vous devez vous [inscrire](/registration/).',
+    'forums/register-to-create-topic' => 'Ajouter des sujets seuls les utilisateurs enregistrés.
 
 Если Вы уже зарегистрированны на сайте, то Вам необходимо осуществить вход на сайт.
 
