@@ -326,6 +326,7 @@ return [
     'comments/message/delete' => '删除',
     'comments/message/restore' => '恢复',
     'comments/message/move' => '移动',
+    'comments/vote/no-more-votes' => 'Today vote limit reached',
 
     /*perspectives*/
     'perspective/front'          => '前方',
@@ -428,8 +429,11 @@ return [
     'account/personal-message/delete-all-sent' => '清空发件箱',
     'account/personal-message/delete-all-system' => '清空系统提示',
     'account/personal-message/new' => 'new',
+    'account/personal-message/sent' => 'Message sent',
     'account/profile/personal' => '个人信息',
     'account/profile/photo' => '头像',
+    'account/profile/photo/saved' => 'Photo saved',
+    'account/profile/photo/deleted' => 'Photo deleted',
     'account/profile/use-gravatar' => '您可以上传头像或使用<a href="http://gravatar.com/">Gravatar</a>',
     'account/profile/photo/delete' => '删除头像',
     'account/profile/other' => '其它信息',
@@ -437,12 +441,16 @@ return [
     'account/profile/votes-left' => '剩余表决',
     'account/profile/timezone' => '时区',
     'account/profile/language' => '语言',
+    'account/profile/saved' => 'Data saved',
 
     'account/access/change-password' => '修改密码',
-    'account/access/self-delete' => '注销账号',
     'account/access/change-password/current' => '当前密码',
     'account/access/change-password/new' => '新密码',
     'account/access/change-password/new-confirm' => '再次确认新密码',
+    'account/access/change-password/current-password-is-incorrect' => 'Current password is incorrect',
+    'account/access/change-password/saved' => 'Password succesful changed',
+    'account/access/self-delete' => '注销账号',
+    'account/access/self-delete/password-is-incorrect' => 'Password is incorrect',
 
     'account/specs/weight' => '比重',
 
@@ -452,6 +460,7 @@ return [
     'account/specs/conflicts/filter/errors' => '警告',
 
     'account/specs/conflicts/title/object' => '目标',
+    'account/specs/conflicts/title/object/engine' => 'Engine',
     'account/specs/conflicts/title/parameter' => '参数',
     'account/specs/conflicts/title/my-value' => '我的价值',
     'account/specs/conflicts/title/other-values' => '其他价值',
@@ -466,6 +475,7 @@ return [
 
     'account/accounts/add' => '添加帐户',
     'account/accounts/remove' => '删除',
+    'account/accounts/removed' => 'Account removed',
     'account/accounts/connect-failed' => '未能关联帐户，发生错误或该帐户拒绝访问',
     'account/accounts/disconnect-failed' => '无法删除该帐户。
 
@@ -1649,6 +1659,8 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'restore-password/new-password/saved' => '新密码已保存。
 
 Don\'t forget it,',
+    'restore-password/new-password/instructions-sent' => 'Instructions sent to your e-mail',
+    'restore-password/new-password/email-not-found' => 'User with that e-mail not found',
 
     'twins/group/name' => 'Name',
     'twins/group/description' => '简介',

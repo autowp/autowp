@@ -83,10 +83,10 @@ class RestorePasswordController extends AbstractActionController
 
                     $this->transport->send($mail);
 
-                    $message = 'На ваш e-mail отправлены дальнейшие инструкции';
+                    $message = $this->translate('restore-password/new-password/instructions-sent');
                     $success = true;
                 } else {
-                    $message = 'Пользователь с таким e-mail не найден';
+                    $message = $this->translate('restore-password/new-password/email-not-found');
                 }
             }
         }

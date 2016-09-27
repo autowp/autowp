@@ -696,7 +696,7 @@ class Pic extends AbstractPlugin
 
 
 
-        // ссылки на офсайты
+        // links
         $ofLinks = [];
         $linksTable = new BrandLink();
         if (count($brandIds)) {

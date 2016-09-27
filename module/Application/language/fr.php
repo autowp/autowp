@@ -340,6 +340,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'comments/message/delete' => 'Delete',
     'comments/message/restore' => 'Restore',
     'comments/message/move' => 'Move',
+    'comments/vote/no-more-votes' => 'Today vote limit reached',
 
     /*perspectives*/
     'perspective/front'          => 'avant',
@@ -442,8 +443,11 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'account/personal-message/delete-all-sent' => 'Supprimer tous les messages envoyés',
     'account/personal-message/delete-all-system' => 'Supprimer toutes les notifications système',
     'account/personal-message/new' => 'new',
+    'account/personal-message/sent' => 'Message sent',
     'account/profile/personal' => 'Les données personnelles',
     'account/profile/photo' => 'Photo',
+    'account/profile/photo/saved' => 'Photo saved',
+    'account/profile/photo/deleted' => 'Photo deleted',
     'account/profile/use-gravatar' => 'Vous pouvez télécharger votre photo ou utiliser le service <a href="http://gravatar.com/">Gravatar</a>',
     'account/profile/photo/delete' => 'Supprimer la photo',
     'account/profile/other' => 'Autre',
@@ -451,12 +455,16 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'account/profile/votes-left' => 'Votes gauche',
     'account/profile/timezone' => 'Fuseau horaire',
     'account/profile/language' => 'Langue',
+    'account/profile/saved' => 'Data saved',
 
     'account/access/change-password' => 'Change password',
-    'account/access/self-delete' => 'Delete account',
     'account/access/change-password/current' => 'Current',
     'account/access/change-password/new' => 'New',
     'account/access/change-password/new-confirm' => 'New (confirm)',
+    'account/access/change-password/current-password-is-incorrect' => 'Current password is incorrect',
+    'account/access/change-password/saved' => 'Password succesful changed',
+    'account/access/self-delete' => 'Delete account',
+    'account/access/self-delete/password-is-incorrect' => 'Password is incorrect',
 
     'account/specs/weight' => 'Weight',
 
@@ -466,6 +474,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'account/specs/conflicts/filter/errors' => 'Errors',
 
     'account/specs/conflicts/title/object' => 'Object',
+    'account/specs/conflicts/title/object/engine' => 'Engine',
     'account/specs/conflicts/title/parameter' => 'Parameter',
     'account/specs/conflicts/title/my-value' => 'My value',
     'account/specs/conflicts/title/other-values' => 'Other values',
@@ -480,6 +489,7 @@ Message with instructions to confirm will sent to new address.',
 
     'account/accounts/add' => 'Add account',
     'account/accounts/remove' => 'Remove',
+    'account/accounts/removed' => 'Account removed',
     'account/accounts/connect-failed' => 'Failed to connect with account. Error occured or access to account denied',
     'account/accounts/disconnect-failed' => 'Не удалось удалить учетную запись.
 
@@ -1664,6 +1674,8 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'restore-password/new-password/saved' => 'New password saved.
 
 Don\'t forget it,',
+    'restore-password/new-password/instructions-sent' => 'Instructions sent to your e-mail',
+    'restore-password/new-password/email-not-found' => 'User with that e-mail not found',
 
     'twins/group/name' => 'Name',
     'twins/group/description' => 'Description',

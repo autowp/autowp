@@ -340,6 +340,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'comments/message/delete' => 'Delete',
     'comments/message/restore' => 'Restore',
     'comments/message/move' => 'Move',
+    'comments/vote/no-more-votes' => 'Today vote limit reached',
 
     /*perspectives*/
     'perspective/front'          => 'front',
@@ -442,8 +443,11 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'account/personal-message/delete-all-sent' => 'Delete all sent messages',
     'account/personal-message/delete-all-system' => 'Delete all system notifications',
     'account/personal-message/new' => 'new',
+    'account/personal-message/sent' => 'Message sent',
     'account/profile/personal' => 'Personal info',
     'account/profile/photo' => 'Photo',
+    'account/profile/photo/saved' => 'Photo saved',
+    'account/profile/photo/deleted' => 'Photo deleted',
     'account/profile/use-gravatar' => 'You can upload photo or use <a href="http://gravatar.com/">Gravatar</a>',
     'account/profile/photo/delete' => 'Delete photo',
     'account/profile/other' => 'Other',
@@ -451,12 +455,16 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'account/profile/votes-left' => 'Votes left',
     'account/profile/timezone' => 'Timezone',
     'account/profile/language' => 'Language',
+    'account/profile/saved' => 'Data saved',
 
     'account/access/change-password' => 'Change password',
-    'account/access/self-delete' => 'Delete account',
     'account/access/change-password/current' => 'Current',
     'account/access/change-password/new' => 'New',
     'account/access/change-password/new-confirm' => 'New (confirm)',
+    'account/access/change-password/current-password-is-incorrect' => 'Current password is incorrect',
+    'account/access/change-password/saved' => 'Password succesful changed',
+    'account/access/self-delete' => 'Delete account',
+    'account/access/self-delete/password-is-incorrect' => 'Password is incorrect',
 
     'account/specs/weight' => 'Weight',
 
@@ -466,6 +474,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'account/specs/conflicts/filter/errors' => 'Errors',
 
     'account/specs/conflicts/title/object' => 'Object',
+    'account/specs/conflicts/title/object/engine' => 'Engine',
     'account/specs/conflicts/title/parameter' => 'Parameter',
     'account/specs/conflicts/title/my-value' => 'My value',
     'account/specs/conflicts/title/other-values' => 'Other values',
@@ -480,6 +489,7 @@ Message with instructions to confirm will sent to new address.',
 
     'account/accounts/add' => 'Add account',
     'account/accounts/remove' => 'Remove',
+    'account/accounts/removed' => 'Account removed',
     'account/accounts/connect-failed' => 'Failed to connect with account. Error occured or access to account denied',
     'account/accounts/disconnect-failed' => 'Не удалось удалить учетную запись.
 
@@ -1664,6 +1674,8 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'restore-password/new-password/saved' => 'New password saved.
 
 Don\'t forget it,',
+    'restore-password/new-password/instructions-sent' => 'Instructions sent to your e-mail',
+    'restore-password/new-password/email-not-found' => 'User with that e-mail not found',
 
     'twins/group/name' => 'Name',
     'twins/group/description' => 'Description',

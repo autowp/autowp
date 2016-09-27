@@ -200,7 +200,7 @@ class Sidebar extends AbstractPlugin
             $groups = [];
 
             if ($conceptsSeparatly) {
-                // ссылка на страницу с концептами
+                // concepts
                 $carTable = $this->getController()->catalogue()->getCarTable();
 
                 $db = $carTable->getAdapter();
@@ -222,7 +222,7 @@ class Sidebar extends AbstractPlugin
                 }
             }
 
-            // ссылка на страницу с двигателями
+            // engines
             $engineTable = $this->getController()->catalogue()->getEngineTable();
             $db = $engineTable->getAdapter();
             $enginesCount = $db->fetchOne(
@@ -245,7 +245,7 @@ class Sidebar extends AbstractPlugin
             $picturesTable = $this->getController()->catalogue()->getPictureTable();
             $picturesAdapter = $picturesTable->getAdapter();
 
-            // ссылка на страницу с логотипами
+            // logotypes
             $logoPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
@@ -264,7 +264,7 @@ class Sidebar extends AbstractPlugin
                 ];
             }
 
-            // ссылка на страницу с разным
+            // mixed
             $mixedPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
@@ -283,7 +283,7 @@ class Sidebar extends AbstractPlugin
                 ];
             }
 
-            // ссылка на страницу с несортированным
+            // unsorted
             $unsortedPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
@@ -338,13 +338,13 @@ class Sidebar extends AbstractPlugin
     {
         $conceptsSeparatly = !in_array($brand['type_id'], [3, 4]);
 
-        // создаем массив групп
+        // create groups array
         $groups = array_merge(
             $this->carGroups($brand, $conceptsSeparatly, $carId),
             $this->subBrandGroups($brand)
         );
 
-        // сортируем группы
+        // create groups
         /*$coll = new Collator($this->_helper->language());
          usort($groups, function($a, $b) use($coll) {
          return $coll->compare($a['caption'], $b['caption']);

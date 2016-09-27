@@ -191,6 +191,10 @@ return [
                 $translator = $sm->get('translator');
                 return new Controller\Plugin\Sidebar($cache, $translator);
             },
+            'translate' => function ($sm) {
+                $translator = $sm->get('translator');
+                return new Controller\Plugin\Translate($translator);
+            },
             'user' => function($sm) {
                 $acl = $sm->get(Acl::class);
                 $config = $sm->get('Config');

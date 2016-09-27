@@ -354,6 +354,7 @@ return [
     'comments/message/delete' => 'Удалить',
     'comments/message/restore' => 'Восстановить',
     'comments/message/move' => 'Переместить',
+    'comments/vote/no-more-votes' => 'На сегодня у вас не осталось больше голосов',
 
     /*perspectives*/
     'perspective/front'          => 'спереди',
@@ -456,8 +457,11 @@ return [
     'account/personal-message/delete-all-sent' => 'Удалить все отправленные сообщения',
     'account/personal-message/delete-all-system' => 'Удалить все уведомления',
     'account/personal-message/new' => 'новое',
+    'account/personal-message/sent' => 'Сообщение отправлено',
     'account/profile/personal' => 'Личные данные',
     'account/profile/photo' => 'Фотография',
+    'account/profile/photo/saved' => 'Фотография сохранена',
+    'account/profile/photo/deleted' => 'Фотография удалена',
     'account/profile/use-gravatar' => 'Вы можете загрузить своё фото или использовать сервис <a href="http://gravatar.com/">Gravatar</a>',
     'account/profile/photo/delete' => 'Удалить фото',
     'account/profile/other' => 'Другое',
@@ -465,12 +469,16 @@ return [
     'account/profile/votes-left' => 'Голосов осталось',
     'account/profile/timezone' => 'Часовой пояс',
     'account/profile/language' => 'Язык',
+    'account/profile/saved' => 'Данные сохранены',
 
     'account/access/change-password' => 'Изменить пароль',
-    'account/access/self-delete' => 'Удалить учётную запись',
     'account/access/change-password/current' => 'Текущий',
     'account/access/change-password/new' => 'Новый',
     'account/access/change-password/new-confirm' => 'Новый (ещё раз)',
+    'account/access/change-password/current-password-is-incorrect' => 'Текущий пароль введен неверно',
+    'account/access/change-password/saved' => 'Пароль успешно изменён',
+    'account/access/self-delete' => 'Удалить учётную запись',
+    'account/access/self-delete/password-is-incorrect' => 'Пароль введён неверно',
 
     'account/specs/weight' => 'Вес',
 
@@ -480,6 +488,7 @@ return [
     'account/specs/conflicts/filter/errors' => 'Ошибки',
 
     'account/specs/conflicts/title/object' => 'Объект',
+    'account/specs/conflicts/title/object/engine' => 'Двигатель',
     'account/specs/conflicts/title/parameter' => 'Характеристика',
     'account/specs/conflicts/title/my-value' => 'Моё значение',
     'account/specs/conflicts/title/other-values' => 'Другие значения',
@@ -494,6 +503,7 @@ return [
 
     'account/accounts/add' => 'Добавить учётную запись',
     'account/accounts/remove' => 'Удалить',
+    'account/accounts/removed' => 'Учётная запись удалена',
     'account/accounts/connect-failed' => 'Не удалось привязать учетную запись. Возможно произошла ошибка или доступ к приложению запрещен пользователем.',
     'account/accounts/disconnect-failed' => 'Не удалось удалить учетную запись.
 
@@ -1679,6 +1689,8 @@ return [
     'restore-password/new-password/saved' => 'Новый пароль успешно сохранён.
 
 Не забывайте его',
+    'restore-password/new-password/instructions-sent' => 'На ваш e-mail отправлены дальнейшие инструкции',
+    'restore-password/new-password/email-not-found' => 'Пользователь с таким e-mail не найден',
 
     'twins/group/name' => 'Название',
     'twins/group/description' => 'Описание',

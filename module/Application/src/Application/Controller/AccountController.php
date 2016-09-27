@@ -170,7 +170,7 @@ class AccountController extends AbstractActionController
 
         return new JsonModel([
             'ok'      => true,
-            'message' => 'Сообщение отправлено'
+            'message' => $this->translator->translate('account/personal-message/sent')
         ]);
     }
 
@@ -333,7 +333,7 @@ class AccountController extends AbstractActionController
 
         $uaRow->delete();
 
-        $this->flashMessenger()->addSuccessMessage('Учётная запись удалена');
+        $this->flashMessenger()->addSuccessMessage($this->translator->translate('account/accounts/removed'));
 
         return $this->redirect()->toRoute('account/accounts');
     }
@@ -383,7 +383,7 @@ class AccountController extends AbstractActionController
                     ]);
                 }
 
-                $this->flashMessenger()->addSuccessMessage('Данные сохранены');
+                $this->flashMessenger()->addSuccessMessage($this->translator->translate('account/profile/saved'));
 
                 return $this->redirect()->toRoute();
             }
@@ -398,7 +398,7 @@ class AccountController extends AbstractActionController
                 $this->imageStorage()->removeImage($oldImageId);
             }
 
-            $this->flashMessenger()->addSuccessMessage('Фотография удалена');
+            $this->flashMessenger()->addSuccessMessage($this->translator->translate('account/profile/photo/deleted'));
 
             return $this->redirect()->toRoute();
         }
@@ -436,7 +436,7 @@ class AccountController extends AbstractActionController
                     $imageStorage->removeImage($oldImageId);
                 }
 
-                $this->flashMessenger()->addSuccessMessage('Фотография сохранена');
+                $this->flashMessenger()->addSuccessMessage($this->translator->translate('account/profile/photo/saved'));
 
                 return $this->redirect()->toRoute('account/profile');
             }
@@ -480,7 +480,7 @@ class AccountController extends AbstractActionController
                 $user->language = $values['language'];
                 $user->save();
 
-                $this->flashMessenger()->addSuccessMessage('Данные сохранены');
+                $this->flashMessenger()->addSuccessMessage($this->translator->translate('account/profile/saved'));
 
                 return $this->redirect()->toRoute();
             }
@@ -726,13 +726,17 @@ class AccountController extends AbstractActionController
 
                 if (!$correct) {
 
-                    $this->changePasswordForm->get('password_old')->setMessages(['Текущий пароль введен неверно']);
+                    $this->changePasswordForm->get('password_old')->setMessages([
+                        $this->translator->translate('account/access/change-password/current-password-is-incorrect')
+                    ]);
 
                 } else {
 
                     $this->service->setPassword($user, $values['password']);
 
-                    $this->flashMessenger()->addSuccessMessage('Пароль успешно изменён');
+                    $this->flashMessenger()->addSuccessMessage(
+                        $this->translator->translate('account/access/change-password/saved')
+                    );
 
                     return $this->redirect()->toRoute('account/access');
                 }
@@ -766,7 +770,9 @@ class AccountController extends AbstractActionController
 
                 if (!$valid) {
 
-                    $this->deleteUserForm->get('password')->setMessages(['Пароль введён неверно']);
+                    $this->deleteUserForm->get('password')->setMessages([
+                        $this->translator->translate('account/access/self-delete/password-is-incorrect')
+                    ]);
 
                 } else {
 
@@ -803,7 +809,7 @@ class AccountController extends AbstractActionController
         $page = (int)$this->params('page');
 
         $userId = $this->user()->get()->id;
-        
+
         $language = $this->language();
 
         $data = $service->getConflicts($userId, $filter, $page, 50, $language);
@@ -831,7 +837,7 @@ class AccountController extends AbstractActionController
                     break;
                 case SpecificationsService::ITEM_TYPE_ENGINE:
                     $engine = $engineTable->find($conflict['itemId'])->current();
-                    $conflict['object'] = $engine ? 'Двигатель ' . $engine->caption : null;
+                    $conflict['object'] = $engine ? $this->translator->translate('account/specs/conflicts/title/object/engine'). ' ' . $engine->caption : null;
                     $conflict['url'] = $this->url()->fromRoute('cars/params', [
                         'action'    => 'engine-spec-editor',
                         'engine_id' => $conflict['itemId'],

@@ -334,7 +334,7 @@ class CommentsController extends AbstractRestfulController
         if ($user->votes_left <= 0) {
             return new JsonModel([
                 'ok'    => false,
-                'error' => 'На сегодня у вас не осталось больше голосов'
+                'error' => $this->translate('comments/vote/no-more-votes')
             ]);
         }
 
