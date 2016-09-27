@@ -24,8 +24,6 @@ class BrandFullName extends Text implements InputProviderInterface
     /**
      * Provide default input rules for this element
      *
-     * Attaches a phone number validator.
-     *
      * @return array
      */
     public function getInputSpecification()

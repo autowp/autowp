@@ -14,6 +14,7 @@ return [
             Form\Element\EngineName::class => Form\Element\EngineName::class,
             Form\Element\FactoryName::class => Form\Element\FactoryName::class,
             Form\Element\Year::class => Form\Element\Year::class,
+            Form\Element\UserPassword::class => Form\Element\UserPassword::class,
         ]
     ],
     'forms' => [
@@ -173,27 +174,16 @@ return [
             'elements' => [
                 [
                     'spec' => [
-                        'type' => 'Password',
-                        'name' => 'password',
-                        'options' => [
-                            'label' => 'Пароль',
-                        ],
-                        'attributes' => [
-                            'size'      => Users::MAX_PASSWORD,
-                            'maxlength' => Users::MAX_PASSWORD
-                        ]
+                        'type' => Form\Element\UserPassword::class,
+                        'name' => 'password'
                     ],
                 ],
                 [
                     'spec' => [
-                        'type' => 'Password',
+                        'type' => Form\Element\UserPassword::class,
                         'name' => 'password_confirm',
                         'options' => [
-                            'label' => 'Пароль (еще раз)',
-                        ],
-                        'attributes' => [
-                            'size'      => Users::MAX_PASSWORD,
-                            'maxlength' => Users::MAX_PASSWORD
+                            'label' => 'user/password-confirm',
                         ]
                     ],
                 ],
@@ -209,33 +199,11 @@ return [
             ],
             'input_filter' => [
                 'password' => [
-                    'required'   => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'min' => Users::MIN_PASSWORD,
-                                'max' => Users::MAX_PASSWORD
-                            ]
-                        ]
-                    ]
+                    'required' => true
                 ],
                 'password_confirm' => [
                     'required'   => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ],
                     'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'min' => Users::MIN_PASSWORD,
-                                'max' => Users::MAX_PASSWORD
-                            ]
-                        ],
                         [
                             'name' => 'Identical',
                             'options' => [
@@ -403,23 +371,14 @@ return [
             'elements' => [
                 [
                     'spec' => [
-                        'type' => 'Text',
-                        'name' => 'name',
-                        'options' => [
-                            'label'     => 'Название',
-                        ],
-                        'attributes' => [
-                            'size'      => 60
-                        ]
+                        'type' => Form\Element\BrandName::class,
+                        'name' => 'name'
                     ],
                 ]
             ],
             'input_filter' => [
                 'name' => [
                     'required'   => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ],
                     'validators' => [
                         ['name' => Validator\Brand\NameNotExists::class]
                     ]
@@ -495,23 +454,16 @@ return [
                 ],
                 [
                     'spec' => [
-                        'type' => 'Password',
+                        'type' => Form\Element\UserPassword::class,
                         'name' => 'password',
-                        'options' => [
-                            'label'     => 'login/password',
-                            'size'      => Users::MAX_PASSWORD,
-                            'maxlength' => Users::MAX_PASSWORD,
-                        ]
                     ]
                 ],
                 [
                     'spec' => [
-                        'type' => 'Password',
+                        'type' => Form\Element\UserPassword::class,
                         'name' => 'password_confirm',
                         'options' => [
-                            'label'     => 'login/password-confirm',
-                            'size'      => Users::MAX_PASSWORD,
-                            'maxlength' => Users::MAX_PASSWORD,
+                            'label' => 'user/password-confirm',
                         ]
                     ]
                 ],
@@ -570,33 +522,11 @@ return [
                     ]
                 ],
                 'password' => [
-                    'required' => true,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        [
-                            'name'    => 'StringLength',
-                            'options' => [
-                                'min' => Users::MIN_PASSWORD,
-                                'max' => Users::MAX_PASSWORD
-                            ]
-                        ]
-                    ]
+                    'required' => true
                 ],
                 'password_confirm' => [
-                    'required' => true,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ],
+                    'required'   => true,
                     'validators' => [
-                        [
-                            'name'    => 'StringLength',
-                            'options' => [
-                                'min' => Users::MIN_PASSWORD,
-                                'max' => Users::MAX_PASSWORD
-                            ]
-                        ],
                         [
                             'name' => 'Identical',
                             'options' => [
@@ -627,11 +557,8 @@ return [
                 ],
                 [
                     'spec' => [
-                        'type' => 'Password',
-                        'name' => 'password',
-                        'options' => [
-                            'label' => 'login/password'
-                        ]
+                        'type' => Form\Element\UserPassword::class,
+                        'name' => 'password'
                     ]
                 ],
                 [
@@ -662,10 +589,7 @@ return [
                     ]
                 ],
                 'password' => [
-                    'required' => true,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ]
+                    'required' => true
                 ],
                 'remember' => [
                     'required' => false
@@ -845,81 +769,42 @@ return [
             'elements' => [
                 [
                     'spec' => [
-                        'type'    => 'Password',
+                        'type'    => Form\Element\UserPassword::class,
                         'name'    => 'password_old',
                         'options' => [
-                            'label'     => 'account/access/change-password/current',
-                            'size'      => Users::MAX_PASSWORD,
-                            'maxlength' => Users::MAX_PASSWORD
+                            'label' => 'account/access/change-password/current',
                         ]
                     ],
                 ],
                 [
                     'spec' => [
-                        'type'    => 'Password',
+                        'type'    => Form\Element\UserPassword::class,
                         'name'    => 'password',
                         'options' => [
-                            'label'     => 'account/access/change-password/new',
-                            'size'      => Users::MAX_PASSWORD,
-                            'maxlength' => Users::MAX_PASSWORD
+                            'label' => 'account/access/change-password/new',
                         ]
                     ],
                 ],
                 [
                     'spec' => [
-                        'type'    => 'Password',
+                        'type'    => Form\Element\UserPassword::class,
                         'name'    => 'password_confirm',
                         'options' => [
-                            'label'     => 'account/access/change-password/new-confirm',
-                            'size'      => Users::MAX_PASSWORD,
-                            'maxlength' => Users::MAX_PASSWORD
+                            'label' => 'account/access/change-password/new-confirm'
                         ]
                     ],
                 ]
             ],
             'input_filter' => [
                 'password_old' => [
-                    'required'   => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'max' => Users::MAX_PASSWORD
-                            ]
-                        ]
-                    ]
+                    'required' => true,
                 ],
                 'password' => [
-                    'required'   => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'min' => Users::MIN_PASSWORD,
-                                'max' => Users::MAX_PASSWORD
-                            ]
-                        ]
-                    ]
+                    'required' => true,
                 ],
                 'password_confirm' => [
                     'required'   => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ],
                     'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'min' => Users::MIN_PASSWORD,
-                                'max' => Users::MAX_PASSWORD
-                            ]
-                        ],
                         [
                             'name' => 'Identical',
                             'options' => [
@@ -938,30 +823,14 @@ return [
             'elements' => [
                 [
                     'spec' => [
-                        'type' => 'Password',
-                        'name' => 'password',
-                        'options' => [
-                            'label'        => 'login/password',
-                            'size'         => Users::MAX_PASSWORD,
-                            'maxlength'    => Users::MAX_PASSWORD
-                        ]
+                        'type' => Form\Element\UserPassword::class,
+                        'name' => 'password'
                     ],
                 ]
             ],
             'input_filter' => [
                 'password' => [
-                    'required'   => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'max' => Users::MAX_PASSWORD
-                            ]
-                        ]
-                    ]
+                    'required' => true
                 ]
             ],
         ],

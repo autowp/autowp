@@ -352,8 +352,6 @@ return [
     'login/sign-out' => '注销',
     'login/name' => '用户名',
     'login/login-or-email' => '用户名或邮箱',
-    'login/password' => '密码',
-    'login/password-confirm' => '确认密码',
     'login/captcha' => '请输入验证码',
     'login/registration' => '注册',
     'login/forgot-password?' => '忘记密码?',
@@ -508,6 +506,9 @@ return [
     'picture/on-that-factory-produced-vehicles/and' => '还有',
     'picture/on-that-factory-produced-vehicles/and-other' => '其它 ...',
     'picture/photo-is-owned-by' => '图片所有权归属于',
+
+    'user/password' => '密码',
+    'user/password-confirm' => '确认密码',
 
     'users/user/known-as:' => '用户名: ',
     'users/user/before-known-as:' => '先前用户名： ',

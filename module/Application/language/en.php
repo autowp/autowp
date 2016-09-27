@@ -366,8 +366,6 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'login/sign-out' => 'Sign out',
     'login/name' => 'name',
     'login/login-or-email' => 'login or e-mail',
-    'login/password' => 'password',
-    'login/password-confirm' => 'password (again]',
     'login/captcha' => 'enter security code',
     'login/registration' => 'Sign up',
     'login/forgot-password?' => 'Forgot your password?',
@@ -522,6 +520,9 @@ Good luck.',
     'picture/on-that-factory-produced-vehicles/and' => 'and',
     'picture/on-that-factory-produced-vehicles/and-other' => 'other ...',
     'picture/photo-is-owned-by' => 'Photo is owned by',
+
+    'user/password' => 'Password',
+    'user/password-confirm' => 'Password (again)',
 
     'users/user/known-as:' => 'Known as: ',
     'users/user/before-known-as:' => 'before known as: ',

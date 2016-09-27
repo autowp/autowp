@@ -366,8 +366,6 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'login/sign-out' => 'Sortie',
     'login/name' => 'nom',
     'login/login-or-email' => 'login ou e-mail',
-    'login/password' => 'mot de passe',
-    'login/password-confirm' => 'mot de passe (bis]',
     'login/captcha' => 'entrez le code de sécurité',
     'login/registration' => 'Enregistrement',
     'login/forgot-password?' => 'Récupérer mot de passe',
@@ -522,6 +520,9 @@ Good luck.',
     'picture/on-that-factory-produced-vehicles/and' => 'and',
     'picture/on-that-factory-produced-vehicles/and-other' => 'other ...',
     'picture/photo-is-owned-by' => 'Photo is owned by',
+
+    'user/password' => 'Mot de passe',
+    'user/password-confirm' => 'Mot de passe (bis)',
 
     'users/user/known-as:' => 'Known as: ',
     'users/user/before-known-as:' => 'before known as: ',
