@@ -47,6 +47,8 @@ return [
     ],
     'yesterday'          => 'вчера',
     'today'              => 'сегодня',
+    'year' => 'Год',
+    'month' => 'Месяц',
 
     'contributor' => 'составитель',
     'contributors' => 'составители',
@@ -260,6 +262,8 @@ return [
     'mosts/period/all-time'   => 'за всю историю',
 
     /* upload */
+    'upload/image-file' => 'Файл картинки',
+    'upload/note' => 'Примечание к изображению',
     'upload/picture/crop' => 'кадрировать',
     'upload/picture/cropped-to' => 'кадрировано %s',
     'upload/select/unsorted' => 'несортировано',
@@ -378,7 +382,6 @@ return [
 
     'login/sign-in' => 'Вход',
     'login/sign-out' => 'Выход',
-    'login/name' => 'имя',
     'login/login-or-email' => 'логин или e-mail',
     'login/captcha' => 'введите код защиты',
     'login/registration' => 'Регистрация',
@@ -535,6 +538,7 @@ return [
     'picture/on-that-factory-produced-vehicles/and-other' => 'другие ...',
     'picture/photo-is-owned-by' => 'Фотоматериал является собственностью',
 
+    'user/name' => 'Имя',
     'user/password' => 'Пароль',
     'user/password-confirm' => 'Пароль (еще раз)',
 
@@ -1268,6 +1272,7 @@ return [
     'moder/picture/comments' => 'Зафлудили',
     'moder/picture/new-votes' => 'Новые заявки',
     'moder/picture/replaces' => 'Новые замены',
+    'moder/picture/edit/special-name' => 'Особое название',
 
     'moder/picture/filter/status' => 'Статус',
     'moder/picture/filter/status/any' => 'любой',
@@ -1280,20 +1285,56 @@ return [
     'moder/picture/filter/perspective' => 'Ракурс',
     'moder/picture/filter/brand' => 'Бренд',
     'moder/picture/filter/vehicle' => 'Автомобиль (id)',
-    'moder/picture/filter/type' => 'Тип',
-    'moder/picture/filter/comments' => 'Комментарии',
     'moder/picture/filter/owner' => 'Добавил (id)',
-    'moder/picture/filter/replace' => 'Замена',
-    'moder/picture/filter/votes' => 'Заявки на принятие/удаление',
     'moder/picture/filter/special-name' => 'Только с особым названием',
     'moder/picture/filter/not-linked' => 'Без привязки',
     'moder/picture/filter/order' => 'Сортировать по',
 
     'moder/pictures/filter' => 'Фильтр',
+    'moder/pictures/filter/type' => 'Тип',
+    'moder/pictures/filter/type/any' => 'любой',
+    'moder/pictures/filter/type/vehicle' => 'автомобиль',
+    'moder/pictures/filter/type/logotype' => 'логотип',
+    'moder/pictures/filter/type/mixed' => 'разное',
+    'moder/pictures/filter/type/unsorted' => 'несортировано',
+    'moder/pictures/filter/type/engine' => 'двигатель',
+    'moder/pictures/filter/type/factory' => 'завод',
+    'moder/pictures/filter/comments' => 'Комментарии',
+    'moder/pictures/filter/comments/not-matters'  => 'не важно',
+    'moder/pictures/filter/comments/has-comments' => 'есть',
+    'moder/pictures/filter/comments/has-no-comments' => 'нет',
+    'moder/pictures/filter/replace' => 'Замена',
+    'moder/pictures/filter/replace/not-matters' => 'не важно',
+    'moder/pictures/filter/replace/replaces' => 'замена',
+    'moder/pictures/filter/replace/without-replaces' => 'кроме замен',
+    'moder/pictures/filter/votes' => 'Заявки на принятие/удаление',
+    'moder/pictures/filter/votes/not-matters' => 'не важно',
+    'moder/pictures/filter/votes/none' => 'нет',
+    'moder/pictures/filter/votes/accept' => 'есть на принятие',
+    'moder/pictures/filter/votes/delete' => 'есть на удаление',
+    'moder/pictures/filter/votes/any' => 'есть любые',
+    'moder/pictures/filter/order/add-date-desc' => 'Дата добавления (новые)',
+    'moder/pictures/filter/order/add-date-asc' => 'Дата добавления (старые)',
+    'moder/pictures/filter/order/resolution-desc' => 'Разрешение (большие)',
+    'moder/pictures/filter/order/resolution-asc' => 'Разрешение (маленькие)',
+    'moder/pictures/filter/order/filesize-desc' => 'Размер (большие)',
+    'moder/pictures/filter/order/filesize-asc' => 'Размер (маленькие)',
+    'moder/pictures/filter/order/commented' => 'Комментируемые',
+    'moder/pictures/filter/order/views' => 'Просмотры',
+    'moder/pictures/filter/order/moder-votes' => 'Заявки на принятие/удаление',
+
     'moder/pictures/acceptance/message' => 'Сообщение',
     'moder/pictures/picture/inbox-mark' => '(новое)',
 
     'moder/vehicles/filter' => 'Фильтр',
+    'moder/vehicles/filter/name' => 'Название',
+    'moder/vehicles/filter/name-exclude' => 'Название (исключить)',
+    'moder/vehicles/filter/from-year' => 'Год начала',
+    'moder/vehicles/filter/to-year' => 'Год окончания',
+    'moder/vehicles/filter/category' => 'Категория',
+    'moder/vehicles/filter/category-exclude' => 'Категория (исключить)',
+    'moder/vehicles/filter/no-parents' => 'Без родителей',
+    'moder/vehicles/filter/order' => 'Сортировка',
 
     'moder/vehicle/name' => 'Название',
     'moder/vehicle/body' => 'Номер кузова',
@@ -1304,11 +1345,14 @@ return [
     'moder/vehicle/end' => 'Окончание',
     'moder/vehicle/produced' => 'Произведено',
     'moder/vehicle/produced/number' => 'единиц',
+    'moder/vehicle/produced/precision' => 'точно?',
     'moder/vehicle/produced/about' => 'примерно',
     'moder/vehicle/produced/exactly' => 'точно',
     'moder/vehicle/concept' => 'Концепт (прототип)',
     'moder/vehicle/group' => 'Группа',
     'moder/vehicle/year' => 'год',
+    'moder/vehicle/year/from' => 'с',
+    'moder/vehicle/year/to' => 'по',
     'moder/vehicle/month' => 'месяц',
     'moder/vehicle/today' => 'наше время',
     'moder/vehicle/today/ended' => 'выпуск закончен',
@@ -1350,6 +1394,7 @@ return [
     'moder/vehicle/catalogue/parent-catname-placeholder' => 'часть URL',
     'moder/vehicle/catalogue/turbo-group-creator' => 'Турбо объединятор в группы',
     'moder/vehicle/catalogue/turbo-group-creator/text' => 'Tool for join few vehicles into sub-model',
+    'moder/vehicle/catalogue/turbo-group-creator/vehicles' => 'Автомобили',
     'moder/vehicle/catalogue/add-brand' => 'Бренд ...',
     'moder/vehicle/catalogue/add-brand-%s' => 'Бренд %s',
 
@@ -1371,21 +1416,30 @@ return [
 
     'moder/vehicle/pictures/turbo-group-creator' => 'Турбо объединятор картинок в группы',
     'moder/vehicle/pictures/turbo-group-creator/text' => 'Инструмент позволяет объединить несколько картинок в автомобиль',
+    'moder/vehicle/pictures/turbo-group-creator/pictures' => 'Изображения',
 
     'moder/vehicle/add/as-submodel' => 'В автомобиль',
+
+    'attrs/attribute/name' => 'Название',
+    'attrs/attribute/type' => 'Тип',
+    'attrs/attribute/unit' => 'Единица измерения',
+    'attrs/attribute/precision' => 'Точность (для float аттрибута)',
+    'attrs/attribute/description' => 'Описание',
+
+    'attrs/list-options/parent' => 'Родитель',
+    'attrs/list-options/name' => 'Название',
 
     'moder/attrs/zones' => 'Зоны',
     'moder/attrs/parameters' => 'Парметры аттрибута',
     'moder/attrs/parameters/options-list' => 'Список значений (для списковых типов)',
     'moder/attrs/parameters/options-list/add' => 'Добавить значение',
     'moder/attrs/attributes' => 'Аттрибуты',
-    'moder/attrs/attribute/name' => 'Название',
-    'moder/attrs/attribute/type' => 'Тип',
-    'moder/attrs/attribute/unit' => 'Единица измерения',
     'moder/attrs/attribute/add-subattribute' => 'Добавить податтрибут',
     'moder/attrs/attributes-order' => 'Порядок аттрибутов',
 
-    'moder/categories/name' => 'Название',
+    'category/name' => 'Название',
+    'category/parent' => 'Родитель',
+
     'moder/categories/add' => 'Добавить',
     'moder/categories/edit' => 'Изменить',
     'moder/categories/new' => 'Новый',
@@ -1424,6 +1478,7 @@ return [
     'moder/picture/acceptance/unaccept' => 'Сделать не принятой',
     'moder/picture/acceptance/restore' => 'Восстановить',
     'moder/picture/acceptance/removed' => 'Удалено',
+    'moder/picture/acceptance/reason' => 'Причина',
 
     'moder/picture/acceptance/want-accept' => 'Хочу принять',
     'moder/picture/acceptance/want-delete' => 'Хочу удалить',
@@ -1461,6 +1516,7 @@ return [
     'moder/pciture/move/factories' => 'Заводы',
     'moder/pciture/move/engines' => 'Двигатели',
 
+    'moder/brands/new/title' => 'Новый Бренд',
     'moder/brands/vehicles-count:' => 'Автомобилей: ',
     'moder/brands/engines-count:' => 'Двигателей: ',
     'moder/brands/vehicle-pictures-count:' => 'Картинок автомобилей: ',
@@ -1471,11 +1527,13 @@ return [
     'moder/brands/total-pictures-count:' => 'Всего картинок: ',
     'moder/brands/public-url:' => 'На сайте: ',
 
+    'brand' => 'Бренд',
+    'brand/name' => 'Название',
+    'brand/logo' => 'Логотип',
+
     'moder/brands/meta-data' => 'Мета-информация',
-    'moder/brands/meta-data/name' => 'Название',
     'moder/brands/meta-data/full-name' => 'Полное название',
     'moder/brands/description' => 'Краткое описание',
-    'moder/brands/logo' => 'Логотип',
     'moder/brands/logo/description' => '* Логотип должен быть строго в формате PNG.
 * Все прозрачные области должны быть прозрачными, а не белыми!
 * Логотип должен касаться краев изображения. Никаких полей не не надо
@@ -1518,26 +1576,59 @@ return [
     'moder/twins/name' => 'Название',
     'moder/twins/short-description' => 'Краткое описание',
     'moder/twins/vehicles' => 'Автомобили',
+    'moder/twins/add/title' => 'Создание новой группы близнецов',
+
+    'latitude' => 'Широта',
+    'longtitude' => 'Долгота',
+
+    'museum/name' => 'Название',
+    'museum/address' => 'Адрес',
+    'museum/photo' => 'Фотография',
+    'museum/description' => 'Описание',
 
     'moder/museums/add' => 'Добавить музей',
-    'moder/museums/museum/image' => 'картинка',
-    'moder/museums/museum/name' => 'название',
-    'moder/museums/museum/address' => 'адрес',
+
+    'factory/name' => 'Название',
+    'factory/year_from' => 'Год с',
+    'factory/year_to' => 'Год по',
 
     'moder/factories/title' => 'Заводы',
     'moder/factories/filter' => 'Фильтр',
     'moder/factories/add' => 'добавить завод',
+    'moder/factories/add/title' => 'Завод',
+    'moder/factories/edit/title' => 'Завод',
     'moder/factories/puclic-url:' => 'На сайте: ',
     'moder/factories/factory/short-description' => 'Краткое описание',
     'moder/factories/factory/vehicles' => 'Автомобили завода',
+    'moder/factories/filter/brand-id' => 'Бренд №',
+    'moder/factories/filter/order' => 'Сортировка',
+    'moder/factories/filter/order/name-asc' => 'Название по возрастанию',
+    'moder/factories/filter/order/name-desc' => 'Название по убыванию',
 
     'moder/comments/title' => 'Комментарии',
     'moder/comments/filter' => 'Фильтр',
+    'moder/comments/filter/user-id' => 'Пользователь №',
+    'moder/comments/filter/brand-id' => 'Бренд №',
+    'moder/comments/filter/moderator_attention' => 'Внимание модераторов',
+    'moder/comments/filter/moderator_attention/not-matters' => 'Не важно',
+    'moder/comments/filter/moderator_attention/not-required' => 'Не требуется',
+    'moder/comments/filter/moderator_attention/required' => 'Требуется',
+    'moder/comments/filter/moderator_attention/resolved' => 'Выполнено',
+    'moder/comments/filter/vehicle-id' => 'Автомобиль №',
     'moder/comments/not-readed' => 'не прочитано',
 
+    'engine/name' => 'Название',
+
     'moder/engines/add' => 'добавить двигатель',
+    'moder/engines/add/legend' => 'Двигатель',
     'moder/engines/filter' => 'Фильтр',
+    'moder/engines/filter/name' => 'Название',
+    'moder/engines/filter/brand-id' => 'Бренд №',
+    'moder/engines/filter/order' => 'Сортировка',
+    'moder/engines/filter/order/name-asc' => 'Название по возрастанию',
+    'moder/engines/filter/order/name-desc' => 'Название по убыванию',
     'moder/engines/as-subengine' => 'В двигатель',
+    'moder/engines/engine/title' => 'Двигатель',
     'moder/engines/engine/vehicles' => 'Автомобили на этом двигателе',
     'moder/engines/engine/subengines' => 'Подварианты двигателя',
     'moder/engines/engine/parent' => 'Родительский двигатель',
@@ -1552,10 +1643,26 @@ return [
     'moder/engines/engine/edit-specs' => 'Ввод ТТХ двигателя',
     'moder/engines/engine/last-edit:' => 'Последний раз редактировал информацию:',
 
-    'moder/pages/name' => 'Название',
+    'page/name' => 'Название',
+    'page/is_group_node' => 'Группообразующий узел?',
+    'page/registered_only' => 'Только для зарегистрированных?',
+    'page/guests_only' => 'Только для гостей?',
+    'page/class' => 'Класс',
+    'page/parent' => 'Родитель',
+
     'moder/pages/new' => 'Новый',
 
     'moder/index/other-tools' => 'Другие инструменты',
+
+    'moder/acl/add-role' => 'Добавить роль',
+    'moder/acl/add-rule' => 'Добавить правило',
+    'moder/acl/add-rule/action' => 'Действие',
+    'moder/acl/add-rule/action/allow' => 'разрешить',
+    'moder/acl/add-rule/action/deny' => 'запретить',
+    'moder/acl/add-parent' => 'Добавить родителя',
+    'moder/acl/role' => 'Роль',
+    'moder/acl/parent-role' => 'Родительская роль',
+    'moder/acl/privilege' => 'Привелегия',
 
     'votings/do-vote' => 'Голосовать',
     'votings/who-voted' => 'Кто проголосовал?',
@@ -1573,6 +1680,7 @@ return [
 
 Не забывайте его',
 
+    'twins/group/name' => 'Название',
     'twins/group/description' => 'Описание',
 
     'specifications-editor/description' => 'Просьба отнестить со всей ответственностью ко всем выполняемым действиям, т.к. они станут достоянием общественности.
@@ -1610,6 +1718,7 @@ return [
     'specifications-editor/log/value' => 'Значение',
     'specifications-editor/log/editor' => 'Редактор',
     'specifications-editor/log/to-editor' => 'в редактор',
+    'specifications-editor/log/filter/user-id' => 'Пользователь',
     'specifications-editor/log/low-weight-text' => 'Зарегистрировано большое количество конфликтов в данных, введеных вами. Другие люди часто опревергают информацию, предоставленную вами.
 
 Ввод данных временно приостановлен. Просьба исправить ситуацию, провести ревизию конфликтов.

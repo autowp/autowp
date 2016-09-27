@@ -18,7 +18,7 @@ class CategoryLanguage extends Form implements InputFilterProviderInterface
                 'name' => 'name',
                 'type' => 'Text',
                 'options' => [
-                    'label' => 'Название',
+                    'label' => 'category/name',
                 ],
                 'attributes' => [
                     'maxlength'  => 255,

@@ -11,7 +11,7 @@ class Brand extends Select
     /**
      * @var null|string
      */
-    protected $label = 'Производитель';
+    protected $label = 'brand';
 
     /**
      * @param  null|int|string  $name    Optional name for the element
@@ -26,7 +26,7 @@ class Brand extends Select
 
         $db = $table->getAdapter();
 
-        $values =$db->fetchPairs(
+        $values = $db->fetchPairs(
             $db->select()
                 ->from($table->info('name'), ['id', 'caption'])
                 ->order(['position', 'caption'])

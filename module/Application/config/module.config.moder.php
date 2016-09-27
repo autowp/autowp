@@ -457,7 +457,7 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'Новый Бренд',
+                'legend' => 'moder/brands/add',
             ],
             'elements' => [
                 [
@@ -465,7 +465,7 @@ return [
                         'type' => 'Text',
                         'name' => 'user',
                         'options' => [
-                            'label'     => 'Пользователь №',
+                            'label' => 'moder/comments/filter/user-id',
                         ]
                     ]
                 ],
@@ -474,7 +474,7 @@ return [
                         'type' => 'Text',
                         'name' => 'brand_id',
                         'options' => [
-                            'label'     => 'Бренд',
+                            'label' => 'moder/comments/filter/brand-id',
                         ]
                     ]
                 ],
@@ -483,12 +483,12 @@ return [
                         'type' => 'Select',
                         'name' => 'moderator_attention',
                         'options' => [
-                            'label'        => 'Внимание модераторов',
+                            'label'   => 'moder/comments/filter/moderator_attention',
                             'options' => [
-                                ''                                             => 'Не важно',
-                                Comment_Message::MODERATOR_ATTENTION_NONE      => 'Не требуется',
-                                Comment_Message::MODERATOR_ATTENTION_REQUIRED  => 'Требуется',
-                                Comment_Message::MODERATOR_ATTENTION_COMPLETED => 'Выполнено',
+                                ''                                             => 'moder/comments/filter/moderator_attention/not-matters',
+                                Comment_Message::MODERATOR_ATTENTION_NONE      => 'moder/comments/filter/moderator_attention/not-required',
+                                Comment_Message::MODERATOR_ATTENTION_REQUIRED  => 'moder/comments/filter/moderator_attention/required',
+                                Comment_Message::MODERATOR_ATTENTION_COMPLETED => 'moder/comments/filter/moderator_attention/resolved',
                             ]
                         ]
                     ]
@@ -498,7 +498,7 @@ return [
                         'type' => 'Text',
                         'name' => 'car_id',
                         'options' => [
-                            'label'     => 'Автомобиль (id)',
+                            'label' => 'moder/comments/filter/vehicle-id',
                         ]
                     ]
                 ]
@@ -538,7 +538,7 @@ return [
                         'type' => 'Text',
                         'name' => 'name',
                         'options' => [
-                            'label'     => 'Название',
+                            'label'     => 'twins/group/name',
                             'maxlength' => 255,
                             'size'      => 80,
                         ]
@@ -568,7 +568,7 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'Добавить роль',
+                'legend' => 'moder/acl/add-role'
             ],
             'elements' => [
                 [
@@ -576,7 +576,7 @@ return [
                         'type' => 'Text',
                         'name' => 'role',
                         'options' => [
-                            'label'     => 'Роль',
+                            'label' => 'moder/acl/role',
                         ],
                         'attributes' => [
                             'maxlength' => 80
@@ -588,7 +588,7 @@ return [
                         'type' => 'Select',
                         'name' => 'parent_role_id',
                         'options' => [
-                            'label'     => 'Родительская роль',
+                            'label' => 'moder/acl/parent-role',
                         ]
                     ]
                 ]
@@ -609,7 +609,7 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'Добавить правило',
+                'legend' => 'moder/acl/add-rule',
             ],
             'elements' => [
                 [
@@ -617,7 +617,7 @@ return [
                         'type' => 'Select',
                         'name' => 'role_id',
                         'options' => [
-                            'label'     => 'Роль',
+                            'label' => 'moder/acl/role',
                         ]
                     ]
                 ],
@@ -626,7 +626,7 @@ return [
                         'type' => 'Select',
                         'name' => 'privilege_id',
                         'options' => [
-                            'label'     => 'Привелегия',
+                            'label' => 'moder/acl/privilege',
                         ]
                     ]
                 ],
@@ -635,10 +635,10 @@ return [
                         'type' => 'Select',
                         'name' => 'what',
                         'options' => [
-                            'label'     => 'Действие',
+                            'label'   => 'moder/acl/add-rule/action',
                             'options' => [
-                                '0' => 'запретить',
-                                '1' => 'разрешить'
+                                '0' => 'moder/acl/add-rule/action/deny',
+                                '1' => 'moder/acl/add-rule/action/allow'
                             ]
                         ]
                     ]
@@ -660,7 +660,7 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'Добавить родителя',
+                'legend' => 'moder/acl/add-parent',
             ],
             'elements' => [
                 [
@@ -668,7 +668,7 @@ return [
                         'type' => 'Select',
                         'name' => 'role_id',
                         'options' => [
-                            'label'     => 'Роль',
+                            'label' => 'moder/acl/role',
                         ]
                     ]
                 ],
@@ -677,7 +677,7 @@ return [
                         'type' => 'Select',
                         'name' => 'parent_role_id',
                         'options' => [
-                            'label'     => 'Родительская роль',
+                            'label' => 'moder/acl/parent-role',
                         ]
                     ]
                 ]
@@ -695,7 +695,7 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'Завод',
+                'legend' => 'moder/factories/add/title'
             ],
             'elements' => [
                 [
@@ -709,10 +709,7 @@ return [
                         'type' => Form\Element\Year::class,
                         'name' => 'year_from',
                         'options' => [
-                            'label' => 'Год с'
-                        ],
-                        'attributes'  => [
-                            'placeholder' => 'с'
+                            'label' => 'factory/year_from'
                         ]
                     ],
                 ],
@@ -721,10 +718,7 @@ return [
                         'type' => Form\Element\Year::class,
                         'name' => 'year_to',
                         'options' => [
-                            'label' => 'Год по'
-                        ],
-                        'attributes'  => [
-                            'placeholder' => 'по'
+                            'label' => 'factory/year_to'
                         ]
                     ],
                 ]
@@ -745,7 +739,7 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'Завод',
+                'legend' => 'moder/factories/edit/title'
             ],
             'elements' => [
                 [
@@ -759,10 +753,7 @@ return [
                         'type' => Form\Element\Year::class,
                         'name' => 'year_from',
                         'options' => [
-                            'label' => 'Год с'
-                        ],
-                        'attributes'  => [
-                            'placeholder' => 'с'
+                            'label' => 'factory/year_from'
                         ]
                     ],
                 ],
@@ -771,10 +762,7 @@ return [
                         'type' => Form\Element\Year::class,
                         'name' => 'year_to',
                         'options' => [
-                            'label' => 'Год по'
-                        ],
-                        'attributes'  => [
-                            'placeholder' => 'по'
+                            'label' => 'factory/year_to'
                         ]
                     ],
                 ],
@@ -783,7 +771,7 @@ return [
                         'type' => 'Text',
                         'name' => 'lat',
                         'options' => [
-                            'label' => 'Latitude'
+                            'label' => 'latitude'
                         ],
                         'attributes' => [
                             'id'        => 'lat',
@@ -797,7 +785,7 @@ return [
                         'type' => 'Text',
                         'name' => 'lng',
                         'options' => [
-                            'label' => 'Longtitude'
+                            'label' => 'longtitude'
                         ],
                         'attributes' => [
                             'id'        => 'lng',
@@ -835,7 +823,7 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'Завод',
+                'legend' => 'moder/factories/filter'
             ],
             'elements' => [
                 [
@@ -843,7 +831,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'name',
                         'options' => [
-                            'label' => 'Name',
+                            'label' => 'factory/name'
                         ]
                     ],
                 ],
@@ -852,7 +840,7 @@ return [
                         'type' => 'Select',
                         'name' => 'brand_id',
                         'options' => [
-                            'label'        => 'Бренд',
+                            'label' => 'moder/factories/filter/brand-id'
                         ]
                     ],
                 ],
@@ -861,12 +849,12 @@ return [
                         'type' => 'Select',
                         'name' => 'order',
                         'options' => [
-                            'label'   => 'Сортировка',
+                            'label'   => 'moder/factories/filter/order',
                             'options' => [
                                 0 => 'id asc',
                                 1 => 'id desc',
-                                2 => 'Название asc',
-                                3 => 'Название desc',
+                                2 => 'moder/factories/filter/order/name-asc',
+                                3 => 'moder/factories/filter/order/name-desc',
                             ]
                         ]
                     ],
@@ -895,7 +883,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'name',
                         'options' => [
-                            'label' => 'Name',
+                            'label' => 'moder/engines/filter/name',
                         ]
                     ],
                 ],
@@ -904,7 +892,7 @@ return [
                         'type' => 'Select',
                         'name' => 'brand_id',
                         'options' => [
-                            'label' => 'Бренд',
+                            'label' => 'moder/engines/filter/brand-id',
                         ]
                     ],
                 ],
@@ -913,12 +901,12 @@ return [
                         'type' => 'Select',
                         'name' => 'order',
                         'options' => [
-                            'label'   => 'Сортировка',
+                            'label'   => 'moder/engines/filter/order',
                             'options' => [
                                 0 => 'id asc',
                                 1 => 'id desc',
-                                2 => 'Название asc',
-                                3 => 'Название desc',
+                                2 => 'moder/engines/filter/order/name-asc',
+                                3 => 'moder/engines/filter/order/name-desc',
                             ]
                         ]
                     ],
@@ -940,7 +928,7 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'Двигатель',
+                'legend' => 'moder/engines/engine/title'
             ],
             'elements' => [
                 [
@@ -971,7 +959,7 @@ return [
                         'type' => 'Text',
                         'name' => 'name',
                         'options' => [
-                            'label' => 'Особое название'
+                            'label' => 'moder/picture/edit/special-name'
                         ],
                         'attributes' => [
                             'size'      => 60,
@@ -990,42 +978,6 @@ return [
                 ]
             ],
         ],
-        'ModerPictureTypeForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'type',
-                        'options' => [
-                            'label' => 'Тип',
-                            'options' => [
-                                Picture::UNSORTED_TYPE_ID => 'Несортировано',
-                                Picture::CAR_TYPE_ID      => 'Автомобиль',
-                                Picture::LOGO_TYPE_ID     => 'Логотип',
-                                Picture::MIXED_TYPE_ID    => 'Разное',
-                                Picture::ENGINE_TYPE_ID   => 'Двигатель',
-                                Picture::FACTORY_TYPE_ID  => 'Завод',
-                            ]
-                        ],
-                        'attributes' => [
-                            'class' => 'form-control'
-                        ]
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'type' => [
-                    'required' => true,
-                    'filters'  => [
-                        ['name' => 'Digits']
-                    ]
-                ]
-            ],
-        ],
         'ModerPictureCopyrightsForm' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
@@ -1037,10 +989,10 @@ return [
                         'type' => 'Textarea',
                         'name' => 'text',
                         'options' => [
-                            'label'     => 'Copyrights',
+                            'label' => 'Copyrights',
                         ],
                         'attributes' => [
-                            'rows'       => 5
+                            'rows' => 5
                         ]
                     ]
                 ]
@@ -1074,7 +1026,7 @@ return [
                         'type' => 'Text',
                         'name' => 'reason',
                         'options' => [
-                            'label'     => 'Причина',
+                            'label' => 'moder/picture/acceptance/reason',
                         ],
                         'attributes' => [
                             'size'      => 60,
@@ -1089,8 +1041,8 @@ return [
                         'name'    => 'vote',
                         'options' => [
                             'options' => [
-                                '1' => 'Хочу принять',
-                                '0' => 'Хочу удалить'
+                                '1' => 'moder/picture/acceptance/want-accept',
+                                '0' => 'moder/picture/acceptance/want-delete'
                             ]
                         ]
                     ]
@@ -1112,7 +1064,7 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'Создание новой группы близнецов',
+                'legend' => 'moder/twins/add/title',
             ],
             'elements' => [
                 [
@@ -1267,7 +1219,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'name',
                         'options' => [
-                            'label' => 'Name',
+                            'label' => 'moder/vehicles/filter/name',
                         ]
                     ],
                 ],
@@ -1276,7 +1228,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'no_name',
                         'options' => [
-                            'label' => 'Name (исключить)',
+                            'label' => 'moder/vehicles/filter/name-exclude',
                         ]
                     ],
                 ],
@@ -1294,7 +1246,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'from_year',
                         'options' => [
-                            'label' => 'From year',
+                            'label' => 'moder/vehicles/filter/from-year',
                         ]
                     ],
                 ],
@@ -1303,7 +1255,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'to_year',
                         'options' => [
-                            'label' => 'To year',
+                            'label' => 'moder/vehicles/filter/to-year',
                         ]
                     ],
                 ],
@@ -1312,7 +1264,7 @@ return [
                         'type'    => 'Select',
                         'name'    => 'category',
                         'options' => [
-                            'label' => 'Category',
+                            'label' => 'moder/vehicles/filter/category',
                         ]
                     ],
                 ],
@@ -1321,7 +1273,7 @@ return [
                         'type'    => 'Select',
                         'name'    => 'no_category',
                         'options' => [
-                            'label' => 'Category (исключить)',
+                            'label' => 'moder/vehicles/filter/category-exclude',
                         ]
                     ],
                 ],
@@ -1330,7 +1282,7 @@ return [
                         'type'    => 'Checkbox',
                         'name'    => 'no_parent',
                         'options' => [
-                            'label' => 'Без родителей',
+                            'label' => 'moder/vehicles/filter/no-parents',
                         ]
                     ],
                 ],
@@ -1339,7 +1291,7 @@ return [
                         'type'    => 'Select',
                         'name'    => 'order',
                         'options' => [
-                            'label' => 'Сортировка',
+                            'label' => 'moder/vehicles/filter/order',
                             'options' => [
                                 0 => 'id asc',
                                 1 => 'id desc',

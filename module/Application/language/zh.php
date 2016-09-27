@@ -33,6 +33,8 @@ return [
     ],
     'yesterday'          => '昨天',
     'today'              => '今天',
+    'year' => 'Year',
+    'month' => 'Month',
 
     'contributor' => '贡献者',
     'contributors' => '贡献者',
@@ -232,6 +234,8 @@ return [
     'mosts/period/all-time'   => '所有年份',
 
     /* upload */
+    'upload/image-file' => 'Image file',
+    'upload/note' => 'Note',
     'upload/picture/crop' => '剪切',
     'upload/picture/cropped-to' => '剪切到 %s',
     'upload/select/unsorted' => '未分类',
@@ -350,7 +354,6 @@ return [
 
     'login/sign-in' => '登录',
     'login/sign-out' => '注销',
-    'login/name' => '用户名',
     'login/login-or-email' => '用户名或邮箱',
     'login/captcha' => '请输入验证码',
     'login/registration' => '注册',
@@ -507,6 +510,7 @@ return [
     'picture/on-that-factory-produced-vehicles/and-other' => '其它 ...',
     'picture/photo-is-owned-by' => '图片所有权归属于',
 
+    'user/name' => '用户名',
     'user/password' => '密码',
     'user/password-confirm' => '确认密码',
 
@@ -1240,6 +1244,7 @@ return [
     'moder/picture/comments' => '评论',
     'moder/picture/new-votes' => '新表决',
     'moder/picture/replaces' => '替换',
+    'moder/picture/edit/special-name' => 'Special name',
 
     'moder/picture/filter/status' => '状态',
     'moder/picture/filter/status/any' => 'any',
@@ -1252,20 +1257,56 @@ return [
     'moder/picture/filter/perspective' => '透视',
     'moder/picture/filter/brand' => '品牌',
     'moder/picture/filter/vehicle' => '车型(id)',
-    'moder/picture/filter/type' => '型号',
-    'moder/picture/filter/comments' => '评论',
     'moder/picture/filter/owner' => '由(id)上传',
-    'moder/picture/filter/replace' => '替换',
-    'moder/picture/filter/votes' => '表决',
     'moder/picture/filter/special-name' => 'Special name only',
     'moder/picture/filter/not-linked' => 'Not linked',
     'moder/picture/filter/order' => 'Order by',
 
     'moder/pictures/filter' => 'Filter',
+    'moder/pictures/filter/type' => '型号',
+    'moder/pictures/filter/type/any' => 'any',
+    'moder/pictures/filter/type/vehicle' => 'vehicle',
+    'moder/pictures/filter/type/logotype' => 'logotype',
+    'moder/pictures/filter/type/mixed' => 'mixed',
+    'moder/pictures/filter/type/unsorted' => 'unsorted',
+    'moder/pictures/filter/type/engine' => 'engine',
+    'moder/pictures/filter/type/factory' => 'factory',
+    'moder/pictures/filter/comments' => '评论',
+    'moder/pictures/filter/comments/not-matters'  => 'not matters',
+    'moder/pictures/filter/comments/has-comments' => 'has',
+    'moder/pictures/filter/comments/has-no-comments' => 'has no',
+    'moder/pictures/filter/replace' => '替换',
+    'moder/pictures/filter/replace/not-matters' => 'not matters',
+    'moder/pictures/filter/replace/replaces' => 'replaces',
+    'moder/pictures/filter/replace/without-replaces' => 'without replaces',
+    'moder/pictures/filter/votes' => '表决',
+    'moder/pictures/filter/votes/not-matters' => 'not matters',
+    'moder/pictures/filter/votes/none' => 'none',
+    'moder/pictures/filter/votes/accept' => 'has accept votes',
+    'moder/pictures/filter/votes/delete' => 'has delete votes',
+    'moder/pictures/filter/votes/any' => 'has any',
+    'moder/pictures/filter/order/add-date-desc' => 'Add date (new)',
+    'moder/pictures/filter/order/add-date-asc' => 'Add date (old)',
+    'moder/pictures/filter/order/resolution-desc' => 'Resolution (big)',
+    'moder/pictures/filter/order/resolution-asc' => 'Resolution (little)',
+    'moder/pictures/filter/order/filesize-desc' => 'Filesize (big)',
+    'moder/pictures/filter/order/filesize-asc' => 'Filesize (little)',
+    'moder/pictures/filter/order/commented' => 'Commented',
+    'moder/pictures/filter/order/views' => 'Views',
+    'moder/pictures/filter/order/moder-votes' => 'Moderator votes',
+
     'moder/pictures/acceptance/message' => '站内信',
     'moder/pictures/picture/inbox-mark' => '(new)',
 
     'moder/vehicles/filter' => 'Filter',
+    'moder/vehicles/filter/name' => 'Name',
+    'moder/vehicles/filter/name-exclude' => 'Name (exclude)',
+    'moder/vehicles/filter/from-year' => 'Year from',
+    'moder/vehicles/filter/to-year' => 'Year to',
+    'moder/vehicles/filter/category' => 'Category',
+    'moder/vehicles/filter/category-exclude' => 'Category (exclude)',
+    'moder/vehicles/filter/no-parents' => 'Without parents',
+    'moder/vehicles/filter/order' => 'Order',
 
     'moder/vehicle/name' => '车名',
     'moder/vehicle/body' => '车身代号',
@@ -1276,11 +1317,14 @@ return [
     'moder/vehicle/end' => '停产',
     'moder/vehicle/produced' => '产量',
     'moder/vehicle/produced/number' => 'number',
+    'moder/vehicle/produced/precision' => 'exactly?',
     'moder/vehicle/produced/about' => 'about',
     'moder/vehicle/produced/exactly' => 'exactly',
     'moder/vehicle/concept' => '概念车(原型车)',
     'moder/vehicle/group' => '组',
     'moder/vehicle/year' => '年',
+    'moder/vehicle/year/from' => 'from',
+    'moder/vehicle/year/to' => 'to',
     'moder/vehicle/month' => '月',
     'moder/vehicle/today' => '现在',
     'moder/vehicle/today/ended' => '截止',
@@ -1322,6 +1366,7 @@ return [
     'moder/vehicle/catalogue/parent-catname-placeholder' => '域名部分',
     'moder/vehicle/catalogue/turbo-group-creator' => '涡轮制造商',
     'moder/vehicle/catalogue/turbo-group-creator/text' => 'Tool for join few vehicles into sub-model',
+    'moder/vehicle/catalogue/turbo-group-creator/vehicles' => 'Vehicles',
     'moder/vehicle/catalogue/add-brand' => '品牌 ...',
     'moder/vehicle/catalogue/add-brand-%s' => '品牌 %s',
 
@@ -1343,21 +1388,30 @@ return [
 
     'moder/vehicle/pictures/turbo-group-creator' => 'Turbo group creator from pcitures',
     'moder/vehicle/pictures/turbo-group-creator/text' => 'Tool for join few pictures in sub-vehicle',
+    'moder/vehicle/pictures/turbo-group-creator/pictures' => 'Pictures',
 
     'moder/vehicle/add/as-submodel' => 'As submodel',
+
+    'attrs/attribute/name' => 'Name',
+    'attrs/attribute/type' => 'Type',
+    'attrs/attribute/unit' => 'Unit',
+    'attrs/attribute/precision' => 'Precision (for float attribute)',
+    'attrs/attribute/description' => 'Description',
+
+    'attrs/list-options/parent' => 'Parent',
+    'attrs/list-options/name' => 'Name',
 
     'moder/attrs/zones' => 'Zones',
     'moder/attrs/parameters' => 'Attribute parameters',
     'moder/attrs/parameters/options-list' => 'Values list (for select)',
     'moder/attrs/parameters/options-list/add' => 'Add value',
     'moder/attrs/attributes' => 'Attributes',
-    'moder/attrs/attribute/name' => 'Name',
-    'moder/attrs/attribute/type' => 'Type',
-    'moder/attrs/attribute/unit' => 'Unit',
     'moder/attrs/attribute/add-subattribute' => 'add subattribute',
     'moder/attrs/attributes-order' => 'Attributes order',
 
-    'moder/categories/name' => 'Name',
+    'category/name' => 'Name',
+    'category/parent' => 'Parent',
+
     'moder/categories/add' => 'Add',
     'moder/categories/edit' => 'Edit',
     'moder/categories/new' => 'New',
@@ -1396,6 +1450,7 @@ return [
     'moder/picture/acceptance/unaccept' => '不通过',
     'moder/picture/acceptance/restore' => '恢复',
     'moder/picture/acceptance/removed' => '已删除',
+    'moder/picture/acceptance/reason' => 'Reason',
 
     'moder/picture/acceptance/want-accept' => '求通过',
     'moder/picture/acceptance/want-delete' => '求删除',
@@ -1433,6 +1488,7 @@ return [
     'moder/pciture/move/factories' => '工厂',
     'moder/pciture/move/engines' => '发动机',
 
+    'moder/brands/new/title' => 'New brand',
     'moder/brands/vehicles-count:' => '车型: ',
     'moder/brands/engines-count:' => '发动机: ',
     'moder/brands/vehicle-pictures-count:' => '车辆图片: ',
@@ -1443,11 +1499,13 @@ return [
     'moder/brands/total-pictures-count:' => '所哟图片: ',
     'moder/brands/public-url:' => 'Public URL: ',
 
+    'brand' => 'Brand',
+    'brand/name' => '名字',
+    'brand/logo' => '商标',
+
     'moder/brands/meta-data' => '元数据',
-    'moder/brands/meta-data/name' => '名字',
     'moder/brands/meta-data/full-name' => '全名',
     'moder/brands/description' => '简介',
-    'moder/brands/logo' => '商标',
     'moder/brands/logo/description' => '* 商标必须是PNG格式。
 * 所有的透明区域必须是透明的，而不是白的！
 * 标识必须靠近边缘，不需要留白。
@@ -1488,26 +1546,59 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/twins/name' => 'Name',
     'moder/twins/short-description' => '简介',
     'moder/twins/vehicles' => '车型',
+    'moder/twins/add/title' => 'Create new twins group',
+
+    'latitude' => 'Latitude',
+    'longtitude' => 'Longtitude',
+
+    'museum/name' => '名字',
+    'museum/address' => '地址',
+    'museum/photo' => '图片',
+    'museum/description' => 'Description',
 
     'moder/museums/add' => '添加博物馆',
-    'moder/museums/museum/image' => '图片',
-    'moder/museums/museum/name' => '名字',
-    'moder/museums/museum/address' => '地址',
+
+    'factory/name' => 'Name',
+    'factory/year_from' => 'From year',
+    'factory/year_to' => 'To year',
 
     'moder/factories/title' => '工厂',
     'moder/factories/filter' => 'Filter',
     'moder/factories/add' => 'add factory',
+    'moder/factories/add/title' => 'Factory',
+    'moder/factories/edit/title' => 'Factory',
     'moder/factories/puclic-url:' => 'Public URL: ',
     'moder/factories/factory/short-description' => 'Short description',
     'moder/factories/factory/vehicles' => 'Factory vehicles',
+    'moder/factories/filter/brand-id' => 'Brand №',
+    'moder/factories/filter/order' => 'Order',
+    'moder/factories/filter/order/name-asc' => 'Name ascending',
+    'moder/factories/filter/order/name-desc' => 'Name descending',
 
     'moder/comments/title' => '评论',
     'moder/comments/filter' => 'Filter',
+    'moder/comments/filter/user-id' => 'User №',
+    'moder/comments/filter/brand-id' => 'Brand №',
+    'moder/comments/filter/moderator_attention' => 'Moderator attention',
+    'moder/comments/filter/moderator_attention/not-matters' => 'Not matters',
+    'moder/comments/filter/moderator_attention/not-required' => 'Not required',
+    'moder/comments/filter/moderator_attention/required' => 'Required',
+    'moder/comments/filter/moderator_attention/resolved' => 'Resolved',
+    'moder/comments/filter/vehicle-id' => 'Vehicle №',
     'moder/comments/not-readed' => '未读',
 
+    'engine/name' => 'Name',
+
     'moder/engines/add' => '添加发动机',
+    'moder/engines/add/legend' => 'Engine',
     'moder/engines/filter' => 'Filter',
+    'moder/engines/filter/name' => 'Name',
+    'moder/engines/filter/brand-id' => 'Brand №',
+    'moder/engines/filter/order' => 'Order',
+    'moder/engines/filter/order/name-asc' => 'Name ascending',
+    'moder/engines/filter/order/name-desc' => 'Name descending',
     'moder/engines/as-subengine' => 'As submodel',
+    'moder/engines/engine/title' => 'Engine',
     'moder/engines/engine/vehicles' => 'Vehicles with that engine',
     'moder/engines/engine/subengines' => 'Engine submodels',
     'moder/engines/engine/parent' => 'Parent engine',
@@ -1522,10 +1613,26 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/engines/engine/edit-specs' => 'Edit specs',
     'moder/engines/engine/last-edit:' => 'Last time edit:',
 
-    'moder/pages/name' => 'Name',
+    'page/name' => 'Name',
+    'page/is_group_node' => 'Is group node?',
+    'page/registered_only' => 'Only for registered?',
+    'page/guests_only' => 'Only for guests?',
+    'page/class' => 'Class',
+    'page/parent' => 'Parent',
+
     'moder/pages/new' => 'New',
 
     'moder/index/other-tools' => '其它工具',
+
+    'moder/acl/add-role' => 'Add role',
+    'moder/acl/add-rule' => 'Add rule',
+    'moder/acl/add-rule/action' => 'Action',
+    'moder/acl/add-rule/action/allow' => 'allow',
+    'moder/acl/add-rule/action/deny' => 'deny',
+    'moder/acl/add-parent' => 'Add parent',
+    'moder/acl/role' => 'Role',
+    'moder/acl/parent-role' => 'Parent role',
+    'moder/acl/privilege' => 'Privilege',
 
     'votings/do-vote' => '表决',
     'votings/who-voted' => '表决用户',
@@ -1543,6 +1650,7 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
 
 Don\'t forget it,',
 
+    'twins/group/name' => 'Name',
     'twins/group/description' => '简介',
 
     'specifications-editor/description' => '由于所有数据将公开，请您认真进行所有操作。
@@ -1580,6 +1688,7 @@ Don\'t forget it,',
     'specifications-editor/log/value' => '数据',
     'specifications-editor/log/editor' => '编辑器',
     'specifications-editor/log/to-editor' => '前往编辑器',
+    'specifications-editor/log/filter/user-id' => 'User',
     'specifications-editor/log/low-weight-text' => '您输入过大量有争议的数据，其他用户经常质疑您提供的资料。
 
 数据输入暂时被中止，请等争议经过审核后先进行更正。

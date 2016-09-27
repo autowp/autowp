@@ -6,24 +6,23 @@ use Zend\Form\Element\Text;
 use Zend\InputFilter\InputProviderInterface;
 
 use Application\Filter\SingleSpaces;
+use Users;
 
-class FactoryName extends Text implements InputProviderInterface
+class UserName extends Text implements InputProviderInterface
 {
     protected $attributes = [
         'type'      => 'text',
-        'maxlength' => 255,
-        'size'      => 255
+        'maxlength' => Users::MAX_NAME,
+        'size'      => Users::MAX_NAME
     ];
 
     /**
      * @var null|string
      */
-    protected $label = 'factory/name';
+    protected $label = 'user/name';
 
     /**
      * Provide default input rules for this element
-     *
-     * Attaches a phone number validator.
      *
      * @return array
      */
@@ -40,7 +39,8 @@ class FactoryName extends Text implements InputProviderInterface
                 [
                     'name' => 'StringLength',
                     'options' => [
-                        'max' => 255
+                        'min' => Users::MIN_NAME,
+                        'max' => Users::MAX_NAME
                     ]
                 ]
             ]

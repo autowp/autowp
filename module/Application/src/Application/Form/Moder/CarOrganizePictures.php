@@ -157,7 +157,7 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
                 'name'    => 'childs',
                 'type'    => \Application\Form\Element\PictureMultiCheckbox::class,
                 'options' => [
-                    'label'   => 'Изображения',
+                    'label'   => 'moder/vehicle/pictures/turbo-group-creator/pictures',
                     'options' => $this->childOptions,
                     'label_attributes' => [
                         'class' => 'btn btn-default',

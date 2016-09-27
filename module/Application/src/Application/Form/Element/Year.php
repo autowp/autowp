@@ -16,7 +16,7 @@ class Year extends Number implements InputProviderInterface
     /**
      * @var null|string
      */
-    protected $label = 'Год';
+    protected $label = 'year';
 
     /**
      * Provide default input rules for this element

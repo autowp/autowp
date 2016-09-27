@@ -17,7 +17,7 @@ class Month extends Select implements InputProviderInterface
     /**
      * @var null|string
      */
-    protected $label = 'Месяц';
+    protected $label = 'month';
 
     private $language = 'en';
 

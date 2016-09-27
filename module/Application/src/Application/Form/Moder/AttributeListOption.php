@@ -27,7 +27,7 @@ class AttributeListOption extends Form implements InputFilterProviderInterface
         $this->addElements([
             ['Select_Db_Table_Tree', 'parent_id', [
                 'required'    => false,
-                'label'       => 'Родитель',
+                'label'       => 'attrs/list-options/parent',
                 'table'       => $listOptions,
                 'parentField' => 'parent_id',
                 'valueField'  => 'id',
@@ -81,7 +81,7 @@ class AttributeListOption extends Form implements InputFilterProviderInterface
                 'name'    => 'parent_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'Родитель',
+                    'label'   => 'attrs/list-options/parent',
                     'options' => array_replace(['' => '--'], $this->getParents(null))
                 ]
             ],
@@ -89,7 +89,7 @@ class AttributeListOption extends Form implements InputFilterProviderInterface
                 'name'    => 'name',
                 'type'    => 'Text',
                 'options' => [
-                    'label' => 'Название'
+                    'label' => 'attrs/list-options/name'
                 ]
             ]
         ];

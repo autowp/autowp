@@ -7,6 +7,7 @@ class Users extends Table
     protected $_name = 'users';
     protected $_rowClass = 'User_Row';
 
+    const MIN_NAME = 2;
     const MAX_NAME = 50;
     const MIN_PASSWORD = 6;
     const MAX_PASSWORD = 50;
