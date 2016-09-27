@@ -81,10 +81,17 @@ class AccountController extends AbstractActionController
      */
     private $hosts = [];
 
-    public function __construct(UsersService $service, $translator,
-            Form $emailForm, Form $profileForm, Form $settingsForm,
-            Form $photoForm, Form $changePasswordForm, Form $deleteUserForm,
-            ExternalLoginServiceFactory $externalLoginFactory, array $hosts)
+    public function __construct(
+        UsersService $service, 
+        $translator,
+        Form $emailForm, 
+        Form $profileForm, 
+        Form $settingsForm,
+        Form $photoForm, 
+        Form $changePasswordForm, 
+        Form $deleteUserForm,
+        ExternalLoginServiceFactory $externalLoginFactory, 
+        array $hosts)
     {
         $this->service = $service;
         $this->translator = $translator;
@@ -374,8 +381,8 @@ class AccountController extends AbstractActionController
                 $newName = $user->getCompoundName();
 
                 if ($oldName != $newName) {
-                    $user_renames = new User_Renames();
-                    $user_renames->insert([
+                    $userRenames = new User_Renames();
+                    $userRenames->insert([
                         'user_id'  => $user->id,
                         'old_name' => $oldName,
                         'new_name' => $newName,
@@ -719,8 +726,6 @@ class AccountController extends AbstractActionController
             $this->changePasswordForm->setData($this->params()->fromPost());
             if ($this->changePasswordForm->isValid()) {
                 $values = $this->changePasswordForm->getData();
-
-                $uTable = new Users();
 
                 $correct = $this->service->checkPassword($user->id, $values['password_old']);
 
