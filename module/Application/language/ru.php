@@ -378,7 +378,6 @@ return [
 
     'login/sign-in' => 'Вход',
     'login/sign-out' => 'Выход',
-    'login/name' => 'имя',
     'login/login-or-email' => 'логин или e-mail',
     'login/captcha' => 'введите код защиты',
     'login/registration' => 'Регистрация',
@@ -535,6 +534,7 @@ return [
     'picture/on-that-factory-produced-vehicles/and-other' => 'другие ...',
     'picture/photo-is-owned-by' => 'Фотоматериал является собственностью',
 
+    'user/name' => 'Имя',
     'user/password' => 'Пароль',
     'user/password-confirm' => 'Пароль (еще раз)',
 

@@ -350,7 +350,6 @@ return [
 
     'login/sign-in' => '登录',
     'login/sign-out' => '注销',
-    'login/name' => '用户名',
     'login/login-or-email' => '用户名或邮箱',
     'login/captcha' => '请输入验证码',
     'login/registration' => '注册',
@@ -507,6 +506,7 @@ return [
     'picture/on-that-factory-produced-vehicles/and-other' => '其它 ...',
     'picture/photo-is-owned-by' => '图片所有权归属于',
 
+    'user/name' => '用户名',
     'user/password' => '密码',
     'user/password-confirm' => '确认密码',
 

@@ -2,8 +2,6 @@
 
 namespace Application;
 
-use Users;
-
 use Zend\Validator as ZendValidator;
 
 return [
@@ -443,13 +441,8 @@ return [
                 ],
                 [
                     'spec' => [
-                        'type' => 'Text',
-                        'name' => 'name',
-                        'options' => [
-                            'label'     => 'login/name',
-                            'size'       => Users::MAX_NAME,
-                            'maxlength'  => Users::MAX_NAME,
-                        ]
+                        'type' => Form\Element\UserName::class,
+                        'name' => 'name'
                     ]
                 ],
                 [
@@ -507,19 +500,7 @@ return [
                     ]
                 ],
                 'name' => [
-                    'required' => true,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        [
-                            'name'    => 'StringLength',
-                            'options' => [
-                                'min' => 1,
-                                'max' => Users::MAX_NAME
-                            ]
-                        ]
-                    ]
+                    'required' => true
                 ],
                 'password' => [
                     'required' => true
@@ -632,38 +613,21 @@ return [
             ],
         ],
         'AccountProfileForm' => [
-            'type'     => 'Zend\Form\Form',
+            'type'        => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post'
             ],
             'elements' => [
                 [
                     'spec' => [
-                        'type' => 'Text',
+                        'type' => Form\Element\UserName::class,
                         'name' => 'name',
-                        'options' => [
-                            'label'     => 'login/name',
-                            'size'       => Users::MAX_NAME,
-                            'maxlength'  => Users::MAX_NAME,
-                        ]
                     ]
                 ]
             ],
             'input_filter' => [
                 'name' => [
                     'required' => true,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ],
-                    'validators' => [
-                        [
-                            'name'    => 'StringLength',
-                            'options' => [
-                                'min' => 1,
-                                'max' => Users::MAX_NAME
-                            ]
-                        ]
-                    ]
                 ]
             ]
         ],
