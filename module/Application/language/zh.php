@@ -59,7 +59,7 @@ return [
     /* Picture preview */
     'picture-preview/no-comments' => '暂无评论',
     'picture-preview/no-ratio'    => '暂无比例',
-    'picture-preview/crop-desc'   => 'Image is cropped',
+    'picture-preview/crop-desc'   => '图像已经剪裁',
     'Resolution'                  => '分辨率',
     'Filesize'                    => '文件大小',
     'Ratio'                       => '长宽比',
@@ -109,7 +109,7 @@ return [
     'brands/more-companies'    => [
         '全部 %s 个品牌'
     ],
-    'brands/pictures:' => 'pictures: ',
+    'brands/pictures:' => '图片: ',
 
     /* BRAND PAGE*/
     'unsorted'                => '未分类',
@@ -232,8 +232,8 @@ return [
     'mosts/period/all-time'   => '所有年份',
 
     /* upload */
-    'upload/picture/crop' => 'crop',
-    'upload/picture/cropped-to' => 'cropped to %s',
+    'upload/picture/crop' => '剪切',
+    'upload/picture/cropped-to' => '剪切到 %s',
     'upload/select/unsorted' => '未分类',
     'upload/select/unsorted-long' => '未分类(无车辆或发动机)',
     'upload/select/mixed' => '其它',
@@ -263,14 +263,14 @@ return [
 **我们恳请您**, 在添加图片之前请确保它不存在于现有目录中。
 
 请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。',
-    'upload/only-registered' => 'Only registered users can upload pictures
+    'upload/only-registered' => '只有注册用户才能上传图片
 
-[Login](/login/) or [register](/registration/)',
+[注册](/login/) 或 [登录](/registration/)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => '%1$s的其它图片',
     'catalogue/all-pictures-of-%1$s' => '%1$s的所有图片',
-    'catalogue/brand/logo-of-%s' => '%s logotype',
+    'catalogue/brand/logo-of-%s' => '%s 商标',
     'catalogue/brand/links' => '链接',
     'catalogue/brand/popular-images' => '热门图片',
     'catalogue/brand/new-pictures' => '按上传时间',
@@ -499,15 +499,15 @@ return [
     'picture/if-you-found-error' => '如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。',
     'picture/where-to-talk' => '前往<a href="/forums/">论坛</a>可以讨论任何车型的任何话题。',
     'picture/other-languages' => '其它语言翻译',
-    'picture/picture-suggested-to-replace' => 'Picture suggested to replace',
-    'picture/that-engine-is-mounted-to-vehicle' => 'That engine is mounted to vehicle',
-    'picture/that-engine-is-mounted-to-vehicles:' => 'That engine is mounted to vehicles:',
-    'picture/factory-details' => 'Factory details ...',
-    'picture/on-that-factory-produced-vehicle' => 'На этом заводе производился такой автомобиль, как',
-    'picture/on-that-factory-produced-vehicles:' => 'На этом заводе производились такие автомобили, как: ',
-    'picture/on-that-factory-produced-vehicles/and' => 'and',
-    'picture/on-that-factory-produced-vehicles/and-other' => 'other ...',
-    'picture/photo-is-owned-by' => 'Photo is owned by',
+    'picture/picture-suggested-to-replace' => '图片被建议更换',
+    'picture/that-engine-is-mounted-to-vehicle' => '配备此发动机的车辆有',
+    'picture/that-engine-is-mounted-to-vehicles:' => '配备此发动机的车辆有于:',
+    'picture/factory-details' => '工厂详情 ...',
+    'picture/on-that-factory-produced-vehicle' => '该工厂生产的车辆有',
+    'picture/on-that-factory-produced-vehicles:' => '该工厂生产的车辆有: ',
+    'picture/on-that-factory-produced-vehicles/and' => '还有',
+    'picture/on-that-factory-produced-vehicles/and-other' => '其它 ...',
+    'picture/photo-is-owned-by' => '图片所有权归属于',
 
     'users/user/known-as:' => '用户名: ',
     'users/user/before-known-as:' => '先前用户名: ',
@@ -547,10 +547,10 @@ return [
     'users/user/uploaded-pictures' => '已上传图片',
     'users/user/not-upload-pictures' => '未上传图片',
 
-    'users/rating/specifications' => '备注',
+    'users/rating/specifications' => '性能参数',
     'users/rating/pictures' => '图片',
     'users/rating/specs-volume' => '数量',
-    'users/rating/weight' => '重量',
+    'users/rating/weight' => '权重',
 
     'users/registration/email-confirm-subject' => '注册于 %1$s',
     'users/registration/email-confirm-message' =>
@@ -685,7 +685,7 @@ return [
     'about/text' => '### 我们的团队
 来到这里投入时间和知识的人们是本网站存在的根基。
 
-我们当中既有人添加图片，也有人帮助修改错误。有的人钟爱某一品牌，也有人喜爱所有车型。不仅有人一步一步充实网站，更有人贡献出自己稀有的图片收藏。.
+我们当中既有人添加图片，也有人帮助修改错误。有的人钟爱某一品牌，也有人喜爱所有车型。不仅有人一步步充实网站，更有人贡献出自己稀有的图片收藏。.
 
 在这个庞大的群体中，每个人都与众不同，这里是一些主要成员:
 
@@ -707,8 +707,8 @@ return [
 
 对于庞大的图片数量我们不能免俗地产生一种自豪感，并且想把这些数字公布出来。下面是其中一部分:
 
-* 线上收录了超过%total-pictures%张图片，%total-vehicles%款车型，数据总量超过%total-size%GB。
-* 共有%total-users%名用户发表了%total-comments%条评论。
+* 线上收录了超过%total-pictures%张图片、%total-vehicles%款车型，数据总量超过%total-size%。
+* 逾%total-users%名用户发表了超过%total-comments%条评论。
 
 ### 开发
 
@@ -718,7 +718,7 @@ return [
 
 中文页面建设者: %zh-translator%
 
-技术支持 [Zend Framework](http://framework.zend.com/)、[jQuery](http://jquery.com/)、[Twitter bootstrap](http://getbootstrap.com/)，还有许多优秀的计算机语言.
+技术支持:[Zend Framework](http://framework.zend.com/)、[jQuery](http://jquery.com/)、[Twitter bootstrap](http://getbootstrap.com/)，还有许多优秀的计算机语言。
 
 网站源代码向所有人开放，每个人都有机会影响网站的性质和质量。
 
@@ -844,7 +844,7 @@ return [
     'page/144/name' => "品牌选项",
     'page/146/name' => "姊妹车型选项",
     'page/147/name' => "设计项目选项",
-    'page/148/name' => "Cropper",
+    'page/148/name' => "剪裁",
     'page/149/name' => "移动图片",
     'page/153/name' => "%BRAND_NAME%姊妹车型",
     'page/154/name' => "%MOST_NAME%",
@@ -1222,9 +1222,9 @@ return [
     'page/202/title'       => '剖视',
     'page/202/breadcrumbs' => '剖视',
 
-    'page/203/name'        => 'Users',
-    'page/203/title'       => 'Users',
-    'page/203/breadcrumbs' => 'Users',
+    'page/203/name'        => '用户',
+    'page/203/title'       => '用户',
+    'page/203/breadcrumbs' => '用户',
 
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',
@@ -1261,7 +1261,7 @@ return [
     'moder/picture/filter/order' => 'Order by',
 
     'moder/pictures/filter' => 'Filter',
-    'moder/pictures/acceptance/message' => 'Message',
+    'moder/pictures/acceptance/message' => '站内信',
     'moder/pictures/picture/inbox-mark' => '(new)',
 
     'moder/vehicles/filter' => 'Filter',
@@ -1410,7 +1410,7 @@ return [
     'moder/picture/filesize:' => 'File size: ',
     'moder/picture/upload-date:' => 'Upload date: ',
     'moder/picture/settings' => 'Settings',
-    'moder/picture/copyrights' => 'Copyrights',
+    'moder/picture/copyrights' => '版权',
 
     'moder/picture/replacement' => 'Replacement',
     'moder/picture/replacement/photo-suggested-to-replace' => 'Photo suggested to replace',
@@ -1524,73 +1524,73 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/pages/name' => 'Name',
     'moder/pages/new' => 'New',
 
-    'moder/index/other-tools' => 'Other tools',
+    'moder/index/other-tools' => '其它工具',
 
     'votings/do-vote' => '表决',
     'votings/who-voted' => '表决用户',
-    'votings/voting/voters/during-%s-%s' => 'Voting during %s to %s',
+    'votings/voting/voters/during-%s-%s' => '从%s至%s期间的表决',
     'votings/voting/voters/show-all' => '显示全部',
     'votings/voting/voters/show-contributors' => '从100张已上传图片中显示',
 
-    'museums/museum/address:' => 'Address:',
-    'museums/museum/on-the-map' => 'on the map',
-    'museums/museum/website:' => 'Web-site: ',
+    'museums/museum/address:' => '地址:',
+    'museums/museum/on-the-map' => '显示地图',
+    'museums/museum/website:' => '网站: ',
 
-    'restore-password/text' => 'If you lost your password - input your e-mail and you give instruction to create new one',
-    'restore-password/new-password/text' => 'Enter new password',
-    'restore-password/new-password/saved' => 'New password saved.
+    'restore-password/text' => '如果您忘记了密码，请输入注册时使用的电子邮件地址设置新密码',
+    'restore-password/new-password/text' => '请输入新密码',
+    'restore-password/new-password/saved' => '新密码已保存。
 
 Don\'t forget it,',
 
-    'twins/group/description' => 'Description',
+    'twins/group/description' => '简介',
 
-    'specifications-editor/description' => 'Просьба отнестить со всей ответственностью ко всем выполняемым действиям, т.к. они станут достоянием общественности.
-
-
-О структуре самих характеристик.
-
-Все характеристики организованы в виде дерева элементов "параметр - значение". Значения могут быть числовыми и текстовыми.
-
-Важной особенностью является тот факт, что каждая характеристика может быть задана одновременно несколькими пользователями. В этом случае актуальным (используемым) значением является то, которое система сочтет приоритетным по ряду признаков.
-
-Если вы столкнулись с ситуацией, когда вам не удаётся перекрыть введенное кем-то ранее значение, то вы можете просто написать об этом автору. Впрочем в процессе реализации система автоматического уведомления автором о том, что с его значением кто-то не согласен.
+    'specifications-editor/description' => '由于所有数据将公开，请您认真进行所有操作。
 
 
-Все значения, которые здесь вводятся - отображаются на сайте, в характеристиках, используются в построении разделы "самые-самые", а также отображаются в некоторых других местах сайта.',
-    'specifications-editor/not-save' => 'Data not save because of error. Details below',
-    'specifications-editor/parameter' => 'Parameter',
-    'specifications-editor/your-value' => 'Your value',
-    'specifications-editor/actual-value' => 'Current value',
-    'specifications-editor/all-values' => 'All values',
-    'specifications-editor/engine' => 'Engine from catalogue',
-    'specifications-editor/engine/inherited-from' => 'Inherited from',
-    'specifications-editor/engine/select-another' => 'Select another engine',
-    'specifications-editor/engine/cancel' => 'Cancel engine',
-    'specifications-editor/engine/inherit' => 'Inherit engine',
-    'specifications-editor/engine/not-selected' => '[not selected]',
-    'specifications-editor/engine/select' => 'Select engine',
-    'specifications-editor/engine/dont-inherit' => 'Don\'t inherit engine',
+本身的结构特征。
 
-    'specifications-editor/log' => 'Log of values',
-    'specifications-editor/log/date' => 'Date',
-    'specifications-editor/log/user' => 'User',
-    'specifications-editor/log/object' => 'Object',
-    'specifications-editor/log/attribute' => 'Attribyte',
-    'specifications-editor/log/value' => 'Value',
-    'specifications-editor/log/editor' => 'Editor',
-    'specifications-editor/log/to-editor' => 'to editor',
-    'specifications-editor/log/low-weight-text' => 'Зарегистрировано большое количество конфликтов в данных, введеных вами. Другие люди часто опревергают информацию, предоставленную вами.
+所有技术参数都组织成“选项——数据”的结构，数据可以是数字或文本。
 
-Ввод данных временно приостановлен. Просьба исправить ситуацию, провести ревизию конфликтов.
+每项技术参数可以被多个用户同时限定，在这种情况下，当前（旧）数据在系统中优先显示。
 
-Осуществить это поможет [специальный интерфейс](/account/specs-conflicts/conflict/minus-weight), в котором собраны по крайней мере те ошибки, которые обнаружили посетители сайта.',
-    'specifications-editor/errors-alert' => '**Внимание!** Вроятно, у вас накопилось существенное количество ошибок.
+如果不同意之前用户的数据，您可以联系作者，在自动系统通知中它会告知作者数据受到争议。
 
-Некоторые из них, обнаруженные другими посетителями, вы можете найти [здесь](/account/specs-conflicts)',
 
-    'specifications-editor/admin/date' => 'Date',
-    'specifications-editor/admin/user' => 'User',
-    'specifications-editor/admin/parameter' => 'Parameter',
-    'specifications-editor/admin/value' => 'Value',
-    'specifications-editor/admin/move' => 'Move',
+所有被输入的数据都会显示在网站上，如“汽车之最”中的技术参数和网站其它一些地方。',
+    'specifications-editor/not-save' => '数据保存失败， 详情如下',
+    'specifications-editor/parameter' => '参数',
+    'specifications-editor/your-value' => '您的数据',
+    'specifications-editor/actual-value' => '目前数据',
+    'specifications-editor/all-values' => '所有数据',
+    'specifications-editor/engine' => '从目录中查看发动机',
+    'specifications-editor/engine/inherited-from' => '继承自',
+    'specifications-editor/engine/select-another' => '选择其它发动机',
+    'specifications-editor/engine/cancel' => '取消发动机',
+    'specifications-editor/engine/inherit' => '继承发动机',
+    'specifications-editor/engine/not-selected' => '[未选择]',
+    'specifications-editor/engine/select' => '选择发动机',
+    'specifications-editor/engine/dont-inherit' => '不继承发动机',
+
+    'specifications-editor/log' => '输入数据',
+    'specifications-editor/log/date' => '日期',
+    'specifications-editor/log/user' => '用户',
+    'specifications-editor/log/object' => '目标',
+    'specifications-editor/log/attribute' => '属性',
+    'specifications-editor/log/value' => '数据',
+    'specifications-editor/log/editor' => '编辑器',
+    'specifications-editor/log/to-editor' => '前往编辑器',
+    'specifications-editor/log/low-weight-text' => '您输入过大量有争议的数据，其他用户经常质疑您提供的资料。
+
+数据输入暂时被中止，请等争议经过审核后先进行更正。
+
+请进入[专用接口](/account/specs-conflicts/conflict/minus-weight)，这里收集了其它用户提出的争议。',
+    'specifications-editor/errors-alert' => '**注意!** 您输入的数据已经积累大量误差。
+
+您可以到 [这里](/account/specs-conflicts)查看其它用户的数据',
+
+    'specifications-editor/admin/date' => '日期',
+    'specifications-editor/admin/user' => '用户',
+    'specifications-editor/admin/parameter' => '参数',
+    'specifications-editor/admin/value' => '数据',
+    'specifications-editor/admin/move' => '移动',
 ];
