@@ -93,8 +93,8 @@ return [
     'index/factories'          => 'Usines',
     'index/specifications'     => 'Specifications',
     'index/twins/description' => 'Savez-vous, que la Daewoo Matiz a [six clones](/twins/group87)? Savez-vous, ce qui est commun entre [Lotus и Kia](/twins/group5)? Sûr que vous vous sentez intéressant cette section.',
-    'index/categories/description' => 'Savez-vous quelle technique a permis d'observer la loi et l'ordre dans les rues de villes du monde à des moments différents? Et pas de voitures voyagé Pape? Non? Ensuite, vous êtes exactement dans cette section.',
-    'index/categories/mosts' => 'Voulez-vous savoir quel genre de voiture est le plus rapide? Voulez-vous savoir combien pèse le plus puissant camion de l'exploitation minière',
+    'index/categories/description' => "Savez-vous quelle technique a permis d'observer la loi et l'ordre dans les rues de villes du monde à des moments différents? Et pas de voitures voyagé Pape? Non? Ensuite, vous êtes exactement dans cette section.",
+    'index/categories/mosts' => "Voulez-vous savoir quel genre de voiture est le plus rapide? Voulez-vous savoir combien pèse le plus puissant camion de l'exploitation minière",
 
     'mosts/fastest/roadster'          => 'La plupart des roadsters les plus rapides',
     'mosts/mighty/sedan/today'        => 'La plupart puissantes berlines aujourd\'hui',
@@ -259,7 +259,7 @@ return [
 
     'upload/add-picture' => 'Ajouter une image',
     'upload/select-another' => 'Sélectionnez un autre catalogue',
-    'upload/description' => 'Si vous avez une image que vous ne trouvez pas sur ce site et elle correspondes au thème du site, vous pouvez les ajouter dans notre catalogue en utilisant le formulaire ci-dessous.
+    'upload/description' => "Si vous avez une image que vous ne trouvez pas sur ce site et elle correspondes au thème du site, vous pouvez les ajouter dans notre catalogue en utilisant le formulaire ci-dessous.
 
 Ce serait formidable si vous aviez indiqué qu'une voiture est représentée sur la photo, pour faciliter son ajout et éviter les erreurs.
 
@@ -276,7 +276,7 @@ Exigences pour les images ajoutées:
 
 **S'il vous plaît**, avant d'ajouter des images, assurez-vous qu'ils ne sont pas dans le catalogue.
 
-S'il vous plaît noter que l'ajout d'images modérés. c'est-à-dire toutes les photos avant d'ajouter au catalogue seront testés par moderateurs.',
+S'il vous plaît noter que l'ajout d'images modérés. c'est-à-dire toutes les photos avant d'ajouter au catalogue seront testés par moderateurs.",
     'upload/only-registered' => 'Seuls les utilisateurs enregistrés peuvent télécharger des images
 
 [Login](/login/) or [Enregistrer](/registration/)',
@@ -307,7 +307,7 @@ S'il vous plaît noter que l'ajout d'images modérés. c'est-à-dire toutes les 
     'catalogue/engine-menu/vehicles' => 'Vehicles',
     'catalogue/engine-menu/pictures' => 'Pictures',
     'catalogue/specifications/contributors:' => 'Contributors:',
-    'catalogue/specifications/disclaimer' => 'Les informations recueillies par les membres du site. Si vous trouvez une erreur ou que vous souhaitez combler les lacunes, vous pouvez le faire, en passant de la procédure d'inscription sur le site.',
+    'catalogue/specifications/disclaimer' => "Les informations recueillies par les membres du site. Si vous trouvez une erreur ou que vous souhaitez combler les lacunes, vous pouvez le faire, en passant de la procédure d'inscription sur le site.",
     'catalogue/vehicle/inbox' => 'inbox',
     'catalogue/vehicle/comments' => 'comments',
     'catalogue/engine/add-engine' => 'add engine',
@@ -418,10 +418,10 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
         "Pour aller aux messages de visualisation, utilisez le lien %2\$s\n\n" .
         "Se désabonner de la réception de la notification, vous pouvez dans les paramètres du compte\n\n" .
         "Sincèrement, robot www.wheelsage.org\n",
-    'forums/subscribe' => 'S'abonner à des notifications de nouvelles réponses',
+    'forums/subscribe' => "S'abonner à des notifications de nouvelles réponses",
     'forums/subscribed' => 'Vous êtes abonné aux notifications de nouvelles réponses',
     'forums/unsubscribe' => 'Se désabonner',
-    'forums/topic-closed-text' => 'Sujet est fermé par l'administration du site',
+    'forums/topic-closed-text' => "Sujet est fermé par l'administration du site",
     'forums/need-wait-to-post' => 'Pour ajouter un nouveau message, vous devez attendre un certain temps',
     'forums/register-to-post' => 'Pour être en mesure de créer des sujets et y répondre, vous devez vous [inscrire](/registration/).',
     'forums/register-to-create-topic' => 'Ajouter des sujets seuls les utilisateurs enregistrés.
