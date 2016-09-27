@@ -83,7 +83,7 @@ return [
     'index/brands'             => '品牌',
     'index/factories'          => '工厂',
     'index/specifications'     => '性能参数',
-    'index/twins/description' => '你或许早就知道大宇曼蒂兹有了6个[克隆车](/twins/group87)? 可是你知道 [莲花和起亚的姊妹车](/twins/group5)吗? 我们相信这是一个很有趣的版块。',
+    'index/twins/description' => '你或许早就知道大宇曼蒂兹有了6个[克隆车](/twins/group87)? 可是你知道 [莲花和起亚的姊妹车型](/twins/group5)吗? 我们相信这是一个很有趣的版块。',
     'index/categories/description' => '你知道在不同时期是哪种技术帮助了全世界的城市街道遵守法律和秩序的吗？教皇乘坐哪些车？不知道？那么你应该阅读这一版块。',
     'index/categories/mosts' => '想知道哪款车是最快的？想知道最强大的矿用卡车有多重？快来了解一下。',
 
@@ -104,10 +104,10 @@ return [
 
     'all-link'                 => '查看全部',
 
-    'brands/new-cars-of-brand' => '新品牌 %s',
+    'brands/new-cars-of-brand' => '新品牌%s',
 
     'brands/more-companies'    => [
-        '全部 %s 个品牌'
+        '全部%s个品牌'
     ],
     'brands/pictures:' => '图片: ',
 
@@ -126,10 +126,10 @@ return [
     'carlist/twins'           => '姊妹车型',
     'carlist/produced/one'    => '总产量1辆',
     'carlist/produced/%1$s'   => [
-        '总产量 %1$s 辆'
+        '总产量%1$s辆'
     ],
     'carlist/produced-about/%1$s' => [
-        '总产量约 %1$s 辆'
+        '总产量约%1$s辆'
     ],
     'carlist/specifications'  => '性能参数',
     'carlist/designed by %s'  => '设计师 %s',
@@ -249,7 +249,7 @@ return [
 
 遵循下列指示可以让添加照片更轻松，希望您仔细阅读。
 
-添加照片相关要求:
+添加照片相关要求：
 
 * [JPEG](http://ru.wikipedia.org/wiki/JPEG)或[PNG](http://ru.wikipedia.org/wiki/PNG)格式。分辨率范围: 从640×360至4096×4096。
 * 图像质量应尽可能高，且没有被调整过尺寸或压缩（模糊、模糊化、颜色失真、罗纹线等）。珍贵的扫描图片(生产商拍摄)例外。图片在网站的存留由一部分管理员决定。
@@ -265,7 +265,7 @@ return [
 请注意，添加等待审核的图片即所有图片被加入到目录之前，图片将先由网站检测。',
     'upload/only-registered' => '只有注册用户才能上传图片
 
-[注册](/login/) 或 [登录](/registration/)',
+[注册](/login/)或[登录](/registration/)',
 
     /* catalogue */
     'catalogue/other-pictures-of-%1$s' => '%1$s的其它图片',
@@ -283,8 +283,8 @@ return [
     'catalogue/related-with-%1$s' => '共有 %1$s 个相关目录',
     'catalogue/sport' => '赛事',
     'catalogue/design' => '设计',
-    'catalogue/stock-model' => 'Stock model',
-    'catalogue/sub-model' => 'Submodel',
+    'catalogue/stock-model' => '原始车型',
+    'catalogue/sub-model' => '子车型',
     'catalogue/sport-of-%1$s' => '共%1$s个赛事',
     'catalogue/specifications-of-%1$s' => '%1$s的性能参数',
     'catalogue/specifications' => '性能参数',
@@ -415,10 +415,10 @@ return [
 如果您已经注册，您必须登录才能进行操作。
 
 如果您还未注册，现在就可以到[注册页面](/registration/)注册。',
-    'forums/topic/open' => 'open',
+    'forums/topic/open' => '打开',
     'forums/topic/close' => '关闭',
     'forums/topic/delete' => '删除',
-    'forums/topic/move' => 'move',
+    'forums/topic/move' => '移动',
 
     'account/personal-message/reply' => '站内信',
     'account/personal-message/delete' => '删除',
@@ -429,7 +429,7 @@ return [
     'account/personal-message/new' => 'new',
     'account/profile/personal' => '个人信息',
     'account/profile/photo' => '头像',
-    'account/profile/use-gravatar' => '您可以上传头像或使用 <a href="http://gravatar.com/">Gravatar</a>',
+    'account/profile/use-gravatar' => '您可以上传头像或使用<a href="http://gravatar.com/">Gravatar</a>',
     'account/profile/photo/delete' => '删除头像',
     'account/profile/other' => '其它信息',
     'account/profile/votes-per-day' => '可用表决',
@@ -457,7 +457,7 @@ return [
 
     'account/specs/conflicts/my-value/none' => '暂无',
 
-    'account/email/your-current-email:' => '您当前的电子邮件地址: ',
+    'account/email/your-current-email:' => '您当前的电子邮件地址：',
     'account/email/your-dont-enter-email' => '您没有输入电子邮件地址',
     'account/email/text' => '您可以在本页修改您的电子邮件地址。
 
@@ -470,7 +470,7 @@ return [
 
 这种情况可能由捆绑账户是唯一的身份验证方法引起，即：没有指定的电子邮件或其他帐户。',
 
-    'account/delete/text' => '我们为您来到这一页面感到惋惜，但您不能否认这一点，您打算永远离开我们的网站。
+    'account/delete/text' => '我们为您来到这一页面感到惋惜，请您确认打算永远离开我们的网站。
 
 按下红色按钮，所有与你相关的数据将被匿名或删除。
 
@@ -481,7 +481,7 @@ return [
     'feedback/title' => '反馈',
     'feedback/name'  => '标题',
     'feedback/message' => '内容',
-    'feedback/donate-text' => '如果您希望表达自己的支持，您可以通过 [捐款支持](/donate)',
+    'feedback/donate-text' => '如果您希望表达自己的支持，您可以通过[捐款支持](/donate)',
     'feedback/sent' => '您的信息已发送',
 
     'map/museums-and-factories' => '工厂及博物馆',
@@ -495,22 +495,22 @@ return [
     'picture/status/removing' => '被删除',
     'picture/propose-image-replacement' => '建议替换图片',
     'picture/moderators-about-this-picture' => '相关管理员',
-    'picture/all-images-have-owners' => '任何图片都有权益人.',
+    'picture/all-images-have-owners' => '任何图片都有权益人。',
     'picture/if-you-found-error' => '如果您认为有用户存在不正确的上传行为，我们诚挚地请您撰写评论并指出错误。',
     'picture/where-to-talk' => '前往<a href="/forums/">论坛</a>可以讨论任何车型的任何话题。',
     'picture/other-languages' => '其它语言翻译',
     'picture/picture-suggested-to-replace' => '图片被建议更换',
     'picture/that-engine-is-mounted-to-vehicle' => '配备此发动机的车辆有',
     'picture/that-engine-is-mounted-to-vehicles:' => '配备此发动机的车辆有于:',
-    'picture/factory-details' => '工厂详情 ...',
+    'picture/factory-details' => '工厂详情...',
     'picture/on-that-factory-produced-vehicle' => '该工厂生产的车辆有',
-    'picture/on-that-factory-produced-vehicles:' => '该工厂生产的车辆有: ',
+    'picture/on-that-factory-produced-vehicles:' => '该工厂生产的车辆有：',
     'picture/on-that-factory-produced-vehicles/and' => '还有',
     'picture/on-that-factory-produced-vehicles/and-other' => '其它 ...',
     'picture/photo-is-owned-by' => '图片所有权归属于',
 
     'users/user/known-as:' => '用户名: ',
-    'users/user/before-known-as:' => '先前用户名: ',
+    'users/user/before-known-as:' => '先前用户名： ',
     'users/user/type:' => '身份: ',
     'users/user/type/moderator' => '管理员',
     'users/user/type/visitor' => '访客',
@@ -521,7 +521,7 @@ return [
     'users/for-moderators' => '管理员页面',
     'users/for-moderators/remove-photo' => '删除用户图片',
     'users/for-moderators/remove-user' => '删除用户',
-    'users/for-moderators/last-visit-from-ip' => '最后访问IP地址: ',
+    'users/for-moderators/last-visit-from-ip' => '最后访问IP地址：',
 
     'ban/that-address-is-banned' => '本地址已被屏蔽',
     'ban/until' => '直到',
@@ -552,7 +552,7 @@ return [
     'users/rating/specs-volume' => '数量',
     'users/rating/weight' => '权重',
 
-    'users/registration/email-confirm-subject' => '注册于 %1$s',
+    'users/registration/email-confirm-subject' => '注册于%1$s',
     'users/registration/email-confirm-message' =>
         "您好.\n" .
         "您已成功注册 %1\$s\n" .
@@ -564,7 +564,7 @@ return [
     'users/registration/email-confirm/token-not-found' => '链接已超时',
     'users/registration/email-confirm/success-text' => '您的电子邮件地址已成功确认。',
     'users/registration/success/email-sent' => '用于确认电子邮件地址的邮件已发送。',
-    'users/change-email/confirm-subject' => '电子邮件确认于 %1$s',
+    'users/change-email/confirm-subject' => '电子邮件确认于%1$s',
     'users/change-email/confirm-message' =>
         "您好.\n\n" .
         "在 %1\$s 您或他人要求修改账户联系地址为 %2\$s\n" .
@@ -592,7 +592,7 @@ return [
 
 我们尽己所能让您满意。',
 
-    'message/user-cancel-car-engine' => '%1$s为%2$s车型取消%3$s ( %4$s )发动机',
+    'message/user-cancel-car-engine' => '%1$s为%2$s车型取消%3$s( %4$s )发动机',
 
     'car-type/roadster'       => '跑车',
     'car-type/spyder'         => '敞篷跑车',
@@ -685,9 +685,9 @@ return [
     'about/text' => '### 我们的团队
 来到这里投入时间和知识的人们是本网站存在的根基。
 
-我们当中既有人添加图片，也有人帮助修改错误。有的人钟爱某一品牌，也有人喜爱所有车型。不仅有人一步步充实网站，更有人贡献出自己稀有的图片收藏。.
+我们当中既有人添加图片，也有人帮助修改错误。有的人钟爱某一品牌，也有人喜爱所有车型。不仅有人一步步充实网站，更有人贡献出自己稀有的图片收藏。
 
-在这个庞大的群体中，每个人都与众不同，这里是一些主要成员:
+在这个庞大的群体中，每个人都与众不同，这里是一些主要成员：
 
 %users%
 
@@ -695,24 +695,24 @@ return [
 
 首先，我们当中一些人被一种特殊的颜色标记着———绿色，这是一个特殊的标签，当你看到绿色用户名时，可以向他们任何一位咨询关于网站的问题，因为绿色代表着本站最重要、最热情的一群人。
 
-绿色标记往往意味着管理员身份。
+绿色用户名往往意味着管理员身份。
 
 ### 意见反馈
 
-如果您有任何意见、建议或其他的想法，可以到[论坛](/forums/)联系他们, 选择通过站内信或写 "[意见反馈](/feedback)" 为网站管理提建议。
+如果您有任何意见、建议或其他的想法，可以到[论坛](/forums/)联系他们, 选择通过站内信或写“[意见反馈](/feedback)”为网站管理提建议。
 
 如果您有关于广告、交换链接或推广产品的问题，很抱歉：我们不设置广告。
 
 ### 资源
 
-对于庞大的图片数量我们不能免俗地产生一种自豪感，并且想把这些数字公布出来。下面是其中一部分:
+对于庞大的图片数量我们不能免俗地产生一种自豪感，并且想把这些数字公布出来，下面只是其中一部分:
 
 * 线上收录了超过%total-pictures%张图片、%total-vehicles%款车型，数据总量超过%total-size%。
 * 逾%total-users%名用户发表了超过%total-comments%条评论。
 
 ### 开发
 
-网站的发展和技术支持主要来自%developer% ([首要贡献者](https://github.com/autowp/autowp/graphs/contributors))
+网站的发展和技术支持主要来自%developer%([首要贡献者](https://github.com/autowp/autowp/graphs/contributors))
 
 法语页面建设者: %fr-translator%
 
@@ -737,7 +737,7 @@ return [
     'page/19/name' => "品牌",
     'page/20/name' => "生产商类型",
     'page/21/name' => "汽车之最",
-    'page/22/name' => "分类",
+    'page/22/name' => "用途类别",
     'page/23/name' => "%CATEGORY_NAME%",
     'page/24/name' => "限量或特别版本",
     'page/25/name' => "姊妹车型",
@@ -890,7 +890,7 @@ return [
     'page/197/name' => "历史标题",
     'page/198/name' => "联系方式",
 
-    'page/1/title' => "汽车图片的百科全书. WheelsAge.org",
+    'page/1/title' => "汽车图片的百科全书。WheelsAge.org",
     'page/2/title' => "",
     'page/10/title' => "%BRAND_NAME%",
     'page/14/title' => "%BRAND_NAME%按推出时间排序",
@@ -1412,10 +1412,10 @@ return [
     'moder/picture/settings' => 'Settings',
     'moder/picture/copyrights' => '版权',
 
-    'moder/picture/replacement' => 'Replacement',
-    'moder/picture/replacement/photo-suggested-to-replace' => 'Photo suggested to replace',
+    'moder/picture/replacement' => '替换',
+    'moder/picture/replacement/photo-suggested-to-replace' => '建议替换的图片e',
     'moder/picture/replacement/accept-and-delete-double' => 'Accept and remove double',
-    'moder/picture/replacement/cancel' => 'Cancel replacement',
+    'moder/picture/replacement/cancel' => '取消替换',
 
     'moder/picture/edit-and-repair' => 'Edit and repait',
     'moder/picture/edit-and-repair/normalize' => 'Normailze',
@@ -1424,13 +1424,13 @@ return [
     'moder/picture/edit-and-repair/repair-all-files' => 'Repair all files',
     'moder/picture/edit-and-repair/rebuild-files-names' => 'Rebuild files names',
 
-    'moder/picture/uploader' => 'Uploader',
-    'moder/picture/uploader/unknown' => 'Unknown',
-    'moder/picture/uploader/id-address:' => 'IP-address of uploader: ',
+    'moder/picture/uploader' => '上传者',
+    'moder/picture/uploader/unknown' => '未知',
+    'moder/picture/uploader/id-address:' => '上传者的IP地址： ',
 
-    'moder/pciture/move/brands' => 'Brands',
-    'moder/pciture/move/factories' => 'Factories',
-    'moder/pciture/move/engines' => 'Engines',
+    'moder/pciture/move/brands' => '品牌',
+    'moder/pciture/move/factories' => '工厂',
+    'moder/pciture/move/engines' => '发动机',
 
     'moder/brands/vehicles-count:' => '车型: ',
     'moder/brands/engines-count:' => '发动机: ',
@@ -1475,42 +1475,42 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/markdown/preview' => '预览',
     'moder/markdown/history' => '历史',
 
-    'moder/users/login' => 'Login',
-    'moder/users/name' => 'Name',
-    'moder/users/role' => 'Role',
-    'moder/users/profile' => 'Profile',
-    'moder/users/last-visit' => 'Last visit',
-    'moder/users/registration' => 'Registration',
+    'moder/users/login' => '登录',
+    'moder/users/name' => '用户名',
+    'moder/users/role' => '职务',
+    'moder/users/profile' => '头像',
+    'moder/users/last-visit' => '最后访问于',
+    'moder/users/registration' => '注册',
 
     'moder/twins/public-url:' => 'Public URL: ',
     'moder/twins/meta-data' => 'Meta-data',
     'moder/twins/name' => 'Name',
-    'moder/twins/short-description' => 'Short description',
-    'moder/twins/vehicles' => 'Vehicles',
+    'moder/twins/short-description' => '简介',
+    'moder/twins/vehicles' => '车型',
 
-    'moder/museums/add' => 'Add museum',
-    'moder/museums/museum/image' => 'image',
-    'moder/museums/museum/name' => 'name',
-    'moder/museums/museum/address' => 'address',
+    'moder/museums/add' => '添加博物馆',
+    'moder/museums/museum/image' => '图片',
+    'moder/museums/museum/name' => '名字',
+    'moder/museums/museum/address' => '地址',
 
-    'moder/factories/title' => 'Factories',
+    'moder/factories/title' => '工厂',
     'moder/factories/filter' => 'Filter',
     'moder/factories/add' => 'add factory',
     'moder/factories/puclic-url:' => 'Public URL: ',
     'moder/factories/factory/short-description' => 'Short description',
     'moder/factories/factory/vehicles' => 'Factory vehicles',
 
-    'moder/comments/title' => 'Comments',
+    'moder/comments/title' => '评论',
     'moder/comments/filter' => 'Filter',
-    'moder/comments/not-readed' => 'not readed',
+    'moder/comments/not-readed' => '未读',
 
-    'moder/engines/add' => 'add engines',
+    'moder/engines/add' => '添加发动机',
     'moder/engines/filter' => 'Filter',
     'moder/engines/as-subengine' => 'As submodel',
     'moder/engines/engine/vehicles' => 'Vehicles with that engine',
     'moder/engines/engine/subengines' => 'Engine submodels',
     'moder/engines/engine/parent' => 'Parent engine',
-    'moder/engines/engine/cancel' => 'Cancel',
+    'moder/engines/engine/cancel' => '取消',
     'moder/engines/engine/select' => 'Select ...',
     'moder/engines/engine/brands' => 'Brands',
     'moder/engines/engine/brands/add' => 'Add brand',
@@ -1553,14 +1553,14 @@ Don\'t forget it,',
 
 每项技术参数可以被多个用户同时限定，在这种情况下，当前（旧）数据在系统中优先显示。
 
-如果不同意之前用户的数据，您可以联系作者，在自动系统通知中它会告知作者数据受到争议。
+如果对之前输入的数据存在异议，您可以联系作者，系统会自动通知作者数据产生了争议。
 
 
 所有被输入的数据都会显示在网站上，如“汽车之最”中的技术参数和网站其它一些地方。',
-    'specifications-editor/not-save' => '数据保存失败， 详情如下',
+    'specifications-editor/not-save' => '数据保存失败，详情如下',
     'specifications-editor/parameter' => '参数',
     'specifications-editor/your-value' => '您的数据',
-    'specifications-editor/actual-value' => '目前数据',
+    'specifications-editor/actual-value' => '当前数据',
     'specifications-editor/all-values' => '所有数据',
     'specifications-editor/engine' => '从目录中查看发动机',
     'specifications-editor/engine/inherited-from' => '继承自',
@@ -1584,9 +1584,9 @@ Don\'t forget it,',
 数据输入暂时被中止，请等争议经过审核后先进行更正。
 
 请进入[专用接口](/account/specs-conflicts/conflict/minus-weight)，这里收集了其它用户提出的争议。',
-    'specifications-editor/errors-alert' => '**注意!** 您输入的数据已经积累大量误差。
+    'specifications-editor/errors-alert' => '**注意!** 您输入的数据已经积累了大量误差。
 
-您可以到 [这里](/account/specs-conflicts)查看其它用户的数据',
+您可以到[这里](/account/specs-conflicts)查看其它用户的数据',
 
     'specifications-editor/admin/date' => '日期',
     'specifications-editor/admin/user' => '用户',
