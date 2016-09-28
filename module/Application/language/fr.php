@@ -426,11 +426,11 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'forums/topic-closed-text' => "Sujet est fermé par l'administration du site",
     'forums/need-wait-to-post' => 'Pour ajouter un nouveau message, vous devez attendre un certain temps',
     'forums/register-to-post' => 'Pour être en mesure de créer des sujets et y répondre, vous devez vous [inscrire](/registration/).',
-    'forums/register-to-create-topic' => 'Ajouter des sujets seuls les utilisateurs enregistrés.
+    'forums/register-to-create-topic' => "Ajouter des sujets seuls les utilisateurs enregistrés.
 
 Si vous êtes déjà inscrit sur le site, vous devez vous connecter sur le site.
 
-Si vous n'êtes pas enregistré sur le site, vous [pouvez le faire](/registration/) maintenant.',
+Si vous n'êtes pas enregistré sur le site, vous [pouvez le faire](/registration/) maintenant.",
     'forums/topic/open' => 'créer',
     'forums/topic/close' => 'fermer',
     'forums/topic/delete' => 'retirer',
