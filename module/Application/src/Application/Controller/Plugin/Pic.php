@@ -191,14 +191,15 @@ class Pic extends AbstractPlugin
         return $url;
     }
 
-    public function url($id, $identity, $absolute = false)
+    public function url($id, $identity, $absolute = false, $uri = null)
     {
         $controller = $this->getController();
 
         return $controller->url()->fromRoute('picture/picture', [
             'picture_id' => $identity ? $identity : $id,
         ], [
-            'force_canonical' => $absolute
+            'force_canonical' => $absolute,
+            'uri'             => $uri
         ], true);
     }
 

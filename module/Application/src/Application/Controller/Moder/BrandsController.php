@@ -364,7 +364,7 @@ class BrandsController extends AbstractActionController
                         ]);
 
                         $message = sprintf(
-                            $this->translate('pm/user-%s-edit-brand-description-%s-%s'),
+                            $this->translate('pm/user-%s-edited-brand-description-%s-%s', 'default', $userRow->language),
                             $userUrl,
                             $brand->caption, //TODO: translate brand name
                             $this->brandModerUrl($brand, true, $uri)

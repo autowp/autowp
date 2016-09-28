@@ -387,15 +387,17 @@ return [
                 return new Controller\Moder\CategoryController();
             },
             Controller\Moder\CarsController::class => function($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $translator = $sm->get('translator');
-                $descForm = clone $sm->get('DescriptionForm');
-                $textForm = clone $sm->get('DescriptionForm');
-                $twinsForm = $sm->get('ModerTwinsGroup');
-                $brandCarForm = $sm->get('ModerBrandCar');
-                $carParentForm = $sm->get('ModerCarParent');
-                $filterForm = $sm->get('ModerCarsFilter');
-                return new Controller\Moder\CarsController($textStorage, $translator, $descForm, $textForm, $twinsForm, $brandCarForm, $carParentForm, $filterForm);
+                return new Controller\Moder\CarsController(
+                    $sm->get(HostManager::class),
+                    $sm->get(TextStorage\Service::class),
+                    $sm->get('translator'),
+                    clone $sm->get('DescriptionForm'),
+                    clone $sm->get('DescriptionForm'),
+                    $sm->get('ModerTwinsGroup'),
+                    $sm->get('ModerBrandCar'),
+                    $sm->get('ModerCarParent'),
+                    $sm->get('ModerCarsFilter')
+                );
             },
             Controller\Moder\CommentsController::class => function($sm) {
                 $form = $sm->get('ModerCommentsFilterForm');
@@ -407,12 +409,14 @@ return [
                 return new Controller\Moder\EnginesController($filterForm, $editForm);
             },
             Controller\Moder\FactoryController::class => function($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $addForm = $sm->get('ModerFactoryAddForm');
-                $editForm = $sm->get('ModerFactoryEditForm');
-                $descForm = $sm->get('DescriptionForm');
-                $filterForm = $sm->get('ModerFactoryFilterForm');
-                return new Controller\Moder\FactoryController($textStorage, $addForm, $editForm, $descForm, $filterForm);
+                return new Controller\Moder\FactoryController(
+                    $sm->get(HostManager::class),
+                    $sm->get(TextStorage\Service::class),
+                    $sm->get('ModerFactoryAddForm'),
+                    $sm->get('ModerFactoryEditForm'),
+                    $sm->get('DescriptionForm'),
+                    $sm->get('ModerFactoryFilterForm')
+                );
             },
             Controller\Moder\HotlinkController::class => InvokableFactory::class,
             Controller\Moder\IndexController::class => function($sm) {
@@ -426,14 +430,16 @@ return [
             Controller\Moder\PagesController::class => InvokableFactory::class,
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
             Controller\Moder\PicturesController::class => function($sm) {
-                $table = $sm->get(Picture::class);
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $pictureForm = $sm->get('ModerPictureForm');
-                $copyrightsForm = $sm->get('ModerPictureCopyrightsForm');
-                $voteForm = $sm->get('ModerPictureVoteForm');
-                $banForm = $sm->get('BanForm');
-                $translator = $sm->get('translator');
-                return new Controller\Moder\PicturesController($table, $textStorage, $pictureForm, $copyrightsForm, $voteForm, $banForm, $translator);
+                return new Controller\Moder\PicturesController(
+                    $sm->get(HostManager::class),
+                    $sm->get(Picture::class),
+                    $sm->get(TextStorage\Service::class),
+                    $sm->get('ModerPictureForm'),
+                    $sm->get('ModerPictureCopyrightsForm'),
+                    $sm->get('ModerPictureVoteForm'),
+                    $sm->get('BanForm'),
+                    $sm->get('translator')
+                );
             },
             Controller\Moder\RightsController::class => function($sm) {
                 $acl = $sm->get(Acl::class);
@@ -458,7 +464,6 @@ return [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
-                'legend' => 'moder/brands/add',
             ],
             'elements' => [
                 [

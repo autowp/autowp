@@ -65,7 +65,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'perspective_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'moder/picture/filter/perspective',
+                    'label'   => 'moder/pictures/filter/perspective',
                     'options' => $this->perspectiveOptions
                 ]
             ],
@@ -73,7 +73,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'brand_id',
                 'type'    => 'Select',
                 'options' => [
-                    'label'   => 'moder/picture/filter/brand',
+                    'label'   => 'moder/pictures/filter/brand',
                     'options' => $this->brandOptions
                 ]
             ],

@@ -122,14 +122,14 @@ class IndexController extends AbstractActionController
 
         $data = [
             [
-                'name'    => 'Фотографий с копирайтами',
+                'name'    => 'moder/statistics/photos-with-copyrights',
                 'total'    => $totalPictures,
                 'value'    => $db->fetchOne('
                     select count(1) from pictures where length(copyrights)
                 ')
             ],
             [
-                'name'     => 'Автомобилей с 4 и более фото',
+                'name'     => 'moder/statistics/vehicles-with-4-or-more-photos',
                 'total'    => $totalCars,
                 'value'    => $db->fetchOne('
                     select count(1) from (
@@ -143,12 +143,12 @@ class IndexController extends AbstractActionController
                 ', Picture::CAR_TYPE_ID)
             ],
             [
-                'name'     => 'Заполненных значений ТТХ',
+                'name'     => 'moder/statistics/specifications-values',
                 'total'    => $totalCars * $totalCarAttrs,
                 'value'    => $carAttrsValues,
             ],
             [
-                'name'     => 'Логотипов брендов',
+                'name'     => 'moder/statistics/brand-logos',
                 'total'    => $totalBrands,
                 'value'    => $db->fetchOne('
                     select count(1)
@@ -157,7 +157,7 @@ class IndexController extends AbstractActionController
                 ')
             ],
             [
-                'name'    => 'Годы начала выпуска автомобилей',
+                'name'    => 'moder/statistics/from-years',
                 'total'    => $totalCars,
                 'value'    => $db->fetchOne('
                     select count(1)
@@ -166,7 +166,7 @@ class IndexController extends AbstractActionController
                 ')
             ],
             [
-                'name'    => 'Годы начала и окончания выпуска автомобилей',
+                'name'    => 'moder/statistics/from-and-to-years',
                 'total'    => $totalCars,
                 'value'    => $db->fetchOne('
                     select count(1)
@@ -175,7 +175,7 @@ class IndexController extends AbstractActionController
                 ')
             ],
             [
-                'name'    => 'Годы и месяцы начала и окончания выпуска автомобилей',
+                'name'    => 'moder/statistics/from-and-to-years-and-months',
                 'total'    => $totalCars,
                 'value'    => $db->fetchOne('
                     select count(1)

@@ -8,6 +8,7 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Application\Form\Moder\Inbox as InboxForm;
+use Application\HostManager;
 use Application\Model\Brand;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -72,6 +73,11 @@ class PicturesController extends AbstractActionController
     private $translator;
 
     /**
+     * @var HostManager
+     */
+    private $hostManager;
+
+    /**
      * @return Engines
      */
     private function getEngineTable()
@@ -89,8 +95,17 @@ class PicturesController extends AbstractActionController
             : $this->carParentTable = new Car_Parent();
     }
 
-    public function __construct(Picture $table, $textStorage, Form $pictureForm, Form $copyrightsForm, Form $voteForm, Form $banForm, $translator)
+    public function __construct(
+        HostManager $hostManager,
+        Picture $table,
+        $textStorage,
+        Form $pictureForm,
+        Form $copyrightsForm,
+        Form $voteForm,
+        Form $banForm,
+        $translator)
     {
+        $this->hostManager = $hostManager;
         $this->table = $table;
         $this->textStorage = $textStorage;
         $this->pictureForm = $pictureForm;
@@ -171,8 +186,8 @@ class PicturesController extends AbstractActionController
 
         $form = new InboxForm(null, [
             'perspectiveOptions' => [
-                ''     => 'любой',
-                'null' => 'не задан'
+                ''     => 'moder/pictures/filter/perspective/any',
+                'null' => 'moder/pictures/filter/perspective/empty'
             ] + $db->fetchPairs(
                 $db
                     ->select()
@@ -180,7 +195,7 @@ class PicturesController extends AbstractActionController
                     ->order('position')
             ),
             'brandOptions'       => [
-                '' => 'любой'
+                '' => 'moder/pictures/filter/brand/any'
             ] + $brandMultioptions,
         ]);
 
@@ -200,15 +215,15 @@ class PicturesController extends AbstractActionController
         $perPage = 24;
 
         $orders = [
-            1 => ['sql' => 'pictures.add_date DESC',                    'name' => 'Дата добавления (новые)'],
-            2 => ['sql' => 'pictures.add_date',                         'name' => 'Дата добавления (старые)'],
-            3 => ['sql' => ['pictures.width DESC', 'pictures.height DESC'], 'name' => 'Разрешение (большие)'],
-            4 => ['sql' => ['pictures.width', 'pictures.height'],           'name' => 'Разрешение (маленькие)'],
-            5 => ['sql' => 'pictures.filesize DESC',                    'name' => 'Размер (большие)'],
-            6 => ['sql' => 'pictures.filesize',                         'name' => 'Размер (маленькие)'],
-            7 => ['sql' => 'comment_topic.messages DESC',      'name' => 'Комментируемые'],
-            8 => ['sql' => 'picture_view.views DESC',          'name' => 'Просмотры'],
-            9 => ['sql' => 'pdr.day_date DESC',                'name' => 'Заявки на принятие/удаление'],
+            1 => ['sql' => 'pictures.add_date DESC'],
+            2 => ['sql' => 'pictures.add_date'],
+            3 => ['sql' => ['pictures.width DESC', 'pictures.height DESC']],
+            4 => ['sql' => ['pictures.width', 'pictures.height']],
+            5 => ['sql' => 'pictures.filesize DESC'],
+            6 => ['sql' => 'pictures.filesize'],
+            7 => ['sql' => 'comment_topic.messages DESC'],
+            8 => ['sql' => 'picture_view.views DESC'],
+            9 => ['sql' => 'pdr.day_date DESC'],
         ];
 
         if ($this->getRequest()->isPost()) {
@@ -586,26 +601,31 @@ class PicturesController extends AbstractActionController
         $picture->save();
 
         if ($owner = $picture->findParentUsersByOwner()) {
-            $message = sprintf(
-                "Добавленная вами картинка %s поставлена в очередь на удаление" . PHP_EOL,
-                $this->pic()->url($picture->id, $picture->identity, true)
-            );
+
+            $uri = $this->hostManager->getUriByLanguage($owner->language);
 
             $requests = new Picture_Moder_Vote();
             $deleteRequests = $requests->fetchAll(
                 $requests->select()
-                         ->where('picture_id = ?', $picture->id)
-                         ->where('vote = 0')
+                    ->where('picture_id = ?', $picture->id)
+                    ->where('vote = 0')
             );
+
+            $reasons = [];
             if (count($deleteRequests)) {
-                $message .= "Причины:" . PHP_EOL;
                 foreach ($deleteRequests as $request) {
                     if ($user = $request->findParentUsers()) {
-                        $message .= 'http://www.autowp.ru' . $user->getAboutUrl() . ' : ';
+                        $reasons[] = $this->userModerUrl($user, true, $uri) . ' : ' . $request->reason;
                     }
-                    $message .= $request->reason . PHP_EOL;
                 }
             }
+
+            $message = sprintf(
+                $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner->language),
+                $this->pic()->url($picture->id, $picture->identity, true, $uri),
+                implode("\n", $reasons)
+            );
+
             $mModel = new Message();
             $mModel->send(null, $owner->id, $message);
         }
@@ -619,6 +639,22 @@ class PicturesController extends AbstractActionController
         ), $picture);
 
         return $this->redirect()->toUrl($this->pictureUrl($picture));
+    }
+
+    /**
+     * @param Users_Row $user
+     * @param bool $full
+     * @param \Zend\Uri\Uri $uri
+     * @return string
+     */
+    private function userModerUrl(Users_Row $user, $full = false, $uri = null)
+    {
+        return $this->url()->fromRoute('users/user', [
+            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+        ], [
+            'force_canonical' => $full,
+            'uri'             => $uri
+        ]);
     }
 
     public function picturePerspectiveAction()

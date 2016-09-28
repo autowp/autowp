@@ -135,19 +135,29 @@ class CommentsController extends AbstractActionController
                 if ($picture) {
                     switch ($picture->status) {
                         case Picture::STATUS_ACCEPTED:
-                            $status = '<span class="label label-success">принято</span>';
+                            $status = '<span class="label label-success">' .
+                                    $this->translate('moder/picture/acceptance/accepted') .
+                                '</span>';
                             break;
                         case Picture::STATUS_NEW:
-                            $status = '<span class="label label-warning">новое</span>';
+                            $status = '<span class="label label-warning">' .
+                                    $this->translate('moder/picture/acceptance/new') .
+                                '</span>';
                             break;
                         case Picture::STATUS_INBOX:
-                            $status = '<span class="label label-warning">входящее</span>';
+                            $status = '<span class="label label-warning">' .
+                                    $this->translate('moder/picture/acceptance/inbox') .
+                                '</span>';
                             break;
                         case Picture::STATUS_REMOVED:
-                            $status = '<span class="label label-danger">удалено</span>';
+                            $status = '<span class="label label-danger">' .
+                                    $this->translate('moder/picture/acceptance/removed') .
+                                '</span>';
                             break;
                         case Picture::STATUS_REMOVING:
-                            $status = '<span class="label label-danger">удаляется</span>';
+                            $status = '<span class="label label-danger">' .
+                                    $this->translate('moder/picture/acceptance/removing') .
+                                '</span>';
                             break;
                     }
                 }

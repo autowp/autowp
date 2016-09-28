@@ -5,6 +5,7 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\HostManager;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
@@ -47,8 +48,20 @@ class FactoryController extends AbstractActionController
      */
     private $filterForm;
 
-    public function __construct($textStorage, Form $addForm, Form $editForm, Form $descForm, Form $filterForm)
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
+
+    public function __construct(
+        HostManager $hostManager,
+        $textStorage,
+        Form $addForm,
+        Form $editForm,
+        Form $descForm,
+        Form $filterForm)
     {
+        $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->addForm = $addForm;
         $this->editForm = $editForm;
@@ -66,13 +79,14 @@ class FactoryController extends AbstractActionController
             : $this->factoryTable = new Factory();
     }
 
-    private function factoryModerUrl($id, $canonical = false)
+    private function factoryModerUrl($id, $canonical = false, $uri = null)
     {
         return $this->url()->fromRoute('moder/factories/params', [
             'action'     => 'factory',
             'factory_id' => $id
         ], [
-            'force_canonical' => $canonical
+            'force_canonical' => $canonical,
+            'uri'             => $uri
         ]);
     }
 
@@ -296,7 +310,6 @@ class FactoryController extends AbstractActionController
         $factoryTable = $this->getFactoryTable();
 
         $this->addForm->setAttribute('action', $this->url()->fromRoute(null, [], [], true));
-        $this->addForm->setAttribute('description', 'Новый завод');
 
         $request = $this->getRequest();
 
@@ -370,21 +383,28 @@ class FactoryController extends AbstractActionController
 
             if ($factory->text_id) {
                 $userIds = $this->textStorage->getTextUserIds($factory->text_id);
-                $message = sprintf(
-                    'Пользователь %s редактировал описание группы близнецов %s ( %s )',
-                    $this->url()->fromRoute('users/user', [
-                        'action'  => 'user',
-                        'user_id' => $user->identity ? $user->identity : 'user' . $user->id
-                    ]),
-                    $factory->name,
-                    $this->factoryModerUrl($factory->id, true)
-                );
 
                 $mModel = new Message();
                 $userTable = new Users();
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {
                         foreach ($userTable->find($userId) as $userRow) {
+
+                            $uri = $this->hostManager->getUriByLanguage($notifyUser->language);
+
+                            $message = sprintf(
+                                $this->translate('pm/user-%s-edited-factory-description-%s-%s', 'default', $notifyUser->language),
+                                $this->url()->fromRoute('users/user', [
+                                    'action'  => 'user',
+                                    'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                                ], [
+                                    'force_canonical' => true,
+                                    'uri'             => $uri
+                                ]),
+                                $factory->name,
+                                $this->factoryModerUrl($factory->id, true, $uri)
+                            );
+
                             $mModel->send(null, $userRow->id, $message);
                         }
                     }

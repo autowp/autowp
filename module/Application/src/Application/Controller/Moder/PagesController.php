@@ -147,7 +147,7 @@ class PagesController extends AbstractActionController
                 if ($page->id) {
                     $position = $page->position;
 
-                    // ищем строку с таким же position
+                    // look for same position
                     $filter = [
                         'id <> ?' => $page->id
                     ];
