@@ -5,6 +5,7 @@ namespace Application\Model;
 use Application\Model\DbTable\Brand as Table;
 use Zend_Db_Expr;
 
+use Collator;
 use Transliterator;
 
 class Brand
@@ -16,13 +17,15 @@ class Brand
     const MAX_NAME = 80;
 
     const MAX_FULLNAME = 255;
-    
+
     const ICON_FORMAT = 'brandicon';
 
     /**
      * @var Table
      */
     private $table;
+
+    private $collators = [];
 
     public function __construct()
     {
@@ -57,11 +60,45 @@ class Brand
         ')');
     }
 
+    private function getCollator($language)
+    {
+        if (!isset($this->collators[$language])) {
+            $this->collators[$language] = new Collator($language);
+        }
+
+        return $this->collators[$language];
+    }
+
+    private function compareName($a, $b, $language)
+    {
+        $coll = $this->getCollator($language);
+        switch ($language) {
+            case 'zh':
+                $aIsHan = (bool)preg_match("/^\p{Han}/u", $a);
+                $bIsHan = (bool)preg_match("/^\p{Han}/u", $b);
+
+                if ($aIsHan && !$bIsHan) {
+                    return -1;
+                }
+
+                if ($bIsHan && !$aIsHan) {
+                    return 1;
+                }
+
+                return $coll->compare($a, $b);
+                break;
+
+            default:
+                return $coll->compare($a, $b);
+                break;
+        }
+    }
+
     public function getTopBrandsList($language)
     {
         $db = $this->table->getAdapter();
 
-        $items = array();
+        $items = [];
 
         $select = $db->select(true)
             ->from('brands', [
@@ -88,17 +125,17 @@ class Brand
                     ->where('cars.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)', self::NEW_DAYS)
             );
 
-            $items[] = array(
+            $items[] = [
                 'id'             => $brandRow['id'],
                 'catname'        => $brandRow['folder'],
                 'name'           => $brandRow['name'],
                 'cars_count'     => $brandRow['cars_count'],
                 'new_cars_count' => $newCarsCount
-            );
+            ];
         }
 
-        usort($items, function($a, $b) {
-            return strcoll($a['name'], $b['name']);
+        usort($items, function($a, $b) use($language) {
+            return $this->compareName($a['name'], $b['name'], $language);
         });
 
         return $items;
@@ -143,6 +180,10 @@ class Brand
 
         $tr = Transliterator::create('Any-Latin;Latin-ASCII;');
 
+        /*foreach ($rows as $row) {
+            print $row['name'] . PHP_EOL;
+        }*/
+
         foreach ($rows as $row) {
 
             $name = $row['name'];
@@ -158,9 +199,12 @@ class Brand
             }
             $char = mb_strtoupper($char);
 
+            //print $this->utfCharToNumber($char) . PHP_EOL;
+
             if (!isset($result[$char])) {
                 $result[$char] = [
                     'id'     => $this->utfCharToNumber($char),
+                    'char'   => $char,
                     'brands' => []
                 ];
             }
@@ -179,6 +223,10 @@ class Brand
                 'totalCars'      => $row['cars_count']
             ];
         }
+
+        uksort($result, function($a, $b) use($language) {
+            return $this->compareName($a, $b, $language);
+        });
 
         return $result;
     }
@@ -313,7 +361,7 @@ class Brand
         $select = $db->select()
             ->from('brands', $columns)
             ->joinLeft('brand_language', 'brands.id = brand_language.brand_id and brand_language.language = :language', null)
-            ->order(['brands.position', 'name'])
+            ->order(['brands.position'])
             ->bind([
                 'language' => (string)$options['language']
             ]);
@@ -322,9 +370,13 @@ class Brand
 
         $items = $db->fetchAll($select);
 
+        usort($items, function($a, $b) use($options) {
+            return $this->compareName($a['name'], $b['name'], $options['language']);
+        });
+
         return $items;
     }
-    
+
     public function createIconsSprite($imageStorage, $destImg, $destCss)
     {
         $list = $this->getList([
@@ -335,13 +387,13 @@ class Brand
         ], function($select) {
             $select->where('img');
         });
-        
+
         $images = [];
-        
+
         $format = $imageStorage->getFormat(self::ICON_FORMAT);
-        
+
         $background = $format->getBackground();
-        
+
         foreach ($list as $brand) {
             $img = false;
             if ($brand['img']) {
@@ -350,27 +402,27 @@ class Brand
                     $img = $imageInfo->getSrc();
                 }
             }
-        
+
             if ($img) {
                 $img = str_replace('http://i.wheelsage.org/', PUBLIC_DIR . '/', $img);
                 $images[$brand['catname']] = escapeshellarg($img);
             }
         }
-        
+
         $count = count($images);
         $width = (int)ceil(sqrt($count));
         $height = ceil($count / $width);
-        
+
         $cmd = sprintf(
             'montage ' . implode(' ' , $images) . ' -background %s -geometry +0+0 -tile %dx %s',
             escapeshellarg($background ? $background : 'none'),
             $width,
             escapeshellarg($destImg)
         );
-        
+
         //print $cmd . PHP_EOL;
         exec($cmd);
-        
+
         $css = [];
         $index = 0;
         foreach ($images as $catname => $img) {
@@ -384,7 +436,7 @@ class Brand
             );
             $index++;
         }
-        
+
         file_put_contents($destCss, implode(' ', $css));
     }
 }

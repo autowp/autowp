@@ -10,29 +10,29 @@
     $this->layout()->moduleName = 'default/brands';
 ?>
 <div><div class="btn-group">
-    <?php foreach ($this->brandList as $char => $info) { ?>
-        <?php if (preg_match('/[A-Za-z0-9]/isu', $char)) { ?>
+    <?php foreach ($this->brandList as $number => $info) { ?>
+        <?php if (preg_match('/[A-Za-z0-9]/isu', $info['char'])) { ?>
             <?=$this->htmlA([
                 'class' => 'btn btn-default',
                 'href'  => '#char' . $info['id']
-            ], $char)?>
+            ], $info['char'])?>
         <?php } ?>
     <?php } ?>
 </div></div>
 <div><div class="btn-group">
-    <?php foreach ($this->brandList as $char => $info) { ?>
-        <?php if (!preg_match('/[A-Za-z0-9]/isu', $char)) { ?>
+    <?php foreach ($this->brandList as $number => $info) { ?>
+        <?php if (!preg_match('/[A-Za-z0-9]/isu', $info['char'])) { ?>
             <?=$this->htmlA([
                 'class' => 'btn btn-default',
                 'href'  => '#char' . $info['id']
-            ], $char)?>
+            ], $info['char'])?>
         <?php } ?>
     <?php } ?>
 </div></div>
 
 
-<?php foreach ($this->brandList as $char => $info) { ?>
-    <h2 id="char<?=urlencode($info['id'])?>">→ <?=$this->escapeHtml($char)?></h2>
+<?php foreach ($this->brandList as $number => $info) { ?>
+    <h2 id="char<?=urlencode($info['id'])?>">→ <?=$this->escapeHtml($info['char'])?></h2>
     <div class="brand-icons">
         <?php foreach ($info['brands'] as $idx => $brand) {
             $newCars = $brand['newCars'];
