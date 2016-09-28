@@ -426,15 +426,15 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'forums/topic-closed-text' => "Sujet est fermé par l'administration du site",
     'forums/need-wait-to-post' => 'Pour ajouter un nouveau message, vous devez attendre un certain temps',
     'forums/register-to-post' => 'Pour être en mesure de créer des sujets et y répondre, vous devez vous [inscrire](/registration/).',
-    'forums/register-to-create-topic' => 'Ajouter des sujets seuls les utilisateurs enregistrés.
+    'forums/register-to-create-topic' => "Ajouter des sujets seuls les utilisateurs enregistrés.
 
-Если Вы уже зарегистрированны на сайте, то Вам необходимо осуществить вход на сайт.
+Si vous êtes déjà inscrit sur le site, vous devez vous connecter sur le site.
 
-Если Вы ещё не зарегистрированы, сделайте это сейчас [на странице регистрации](/registration/).',
-    'forums/topic/open' => 'open',
-    'forums/topic/close' => 'close',
-    'forums/topic/delete' => 'delete',
-    'forums/topic/move' => 'move',
+Si vous n'êtes pas enregistré sur le site, vous [pouvez le faire](/registration/) maintenant.",
+    'forums/topic/open' => 'créer',
+    'forums/topic/close' => 'fermer',
+    'forums/topic/delete' => 'retirer',
+    'forums/topic/move' => 'déplacer',
 
     'account/personal-message/reply' => 'répondre',
     'account/personal-message/delete' => 'effacer',
@@ -457,14 +457,14 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'account/profile/language' => 'Langue',
     'account/profile/saved' => 'Data saved',
 
-    'account/access/change-password' => 'Change password',
-    'account/access/change-password/current' => 'Current',
-    'account/access/change-password/new' => 'New',
-    'account/access/change-password/new-confirm' => 'New (confirm)',
-    'account/access/change-password/current-password-is-incorrect' => 'Current password is incorrect',
-    'account/access/change-password/saved' => 'Password succesful changed',
-    'account/access/self-delete' => 'Delete account',
-    'account/access/self-delete/password-is-incorrect' => 'Password is incorrect',
+    'account/access/change-password' => 'Changer le mot de passe',
+    'account/access/change-password/current' => 'Actuel',
+    'account/access/change-password/new' => 'Nouveau',
+    'account/access/change-password/new-confirm' => 'Nouveau (confirmer)',
+    'account/access/change-password/current-password-is-incorrect' => 'Le mot de passe est incorrect',
+    'account/access/change-password/saved' => 'Le mot de passe a été changé',
+    'account/access/self-delete' => 'Supprimer le compte',
+    'account/access/self-delete/password-is-incorrect' => 'Le mot de passe est incorrect',
 
     'account/specs/weight' => 'Weight',
 

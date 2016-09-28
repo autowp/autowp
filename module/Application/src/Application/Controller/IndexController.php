@@ -201,7 +201,7 @@ class IndexController extends AbstractActionController
     {
         $language = $this->language();
 
-        $cacheKey = 'INDEX_BRANDS_HTML256' . $language;
+        $cacheKey = 'INDEX_BRANDS_HTML259' . $language;
         $brands = $this->cache->getItem($cacheKey, $success);
         if (!$success) {
 

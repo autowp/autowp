@@ -13,8 +13,8 @@ class Translate extends AbstractPlugin
         $this->translator = $translator;
     }
 
-    public function __invoke($message, $textDomain = null, $locale = null)
+    public function __invoke($message, $textDomain = 'default', $locale = null)
     {
-        return $translator->translate($message, $textDomain, $locale);
+        return $this->translator->translate($message, $textDomain, $locale);
     }
 }

@@ -535,8 +535,11 @@ return [
                 ],
                 [
                     'spec' => [
-                        'type' => Form\Element\UserPassword::class,
-                        'name' => 'password'
+                        'type' => 'password',
+                        'name' => 'password',
+                        'options' => [
+                            'label' => 'user/password'
+                        ]
                     ]
                 ],
                 [

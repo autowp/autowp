@@ -9,48 +9,41 @@
 
     $this->layout()->moduleName = 'default/brands';
 ?>
-<div><div class="btn-group">
-    <?php foreach ($this->brandList as $char => $info) { ?>
-        <?php if (preg_match('/[A-Za-z0-9]/isu', $char)) { ?>
-            <?=$this->htmlA([
-                'class' => 'btn btn-default',
-                'href'  => '#char' . $info['id']
-            ], $char)?>
-        <?php } ?>
-    <?php } ?>
-</div></div>
-<div><div class="btn-group">
-    <?php foreach ($this->brandList as $char => $info) { ?>
-        <?php if (!preg_match('/[A-Za-z0-9]/isu', $char)) { ?>
-            <?=$this->htmlA([
-                'class' => 'btn btn-default',
-                'href'  => '#char' . $info['id']
-            ], $char)?>
-        <?php } ?>
-    <?php } ?>
-</div></div>
-
-
-<?php foreach ($this->brandList as $char => $info) { ?>
-    <h2 id="char<?=urlencode($info['id'])?>">→ <?=$this->escapeHtml($char)?></h2>
-    <div class="brand-icons">
-        <?php foreach ($info['brands'] as $idx => $brand) {
-            $newCars = $brand['newCars'];
-            $oldCars = $brand['totalCars'] - $newCars;
-
-            ?><div>
+<?php foreach ($this->brandList as $type => $line) { ?>
+    <?php if (count($line) > 0) { ?>
+        <div><div class="btn-group" data-type="<?=$type?>">
+            <?php foreach ($line as $info) { ?>
                 <?=$this->htmlA([
-                    'href'  => $brand['url'],
-                    'class' => 'brandicon brandicon-' . $brand['catname']
-                ], '') ?>
-                <h4>
-                    <?=$this->htmlA($brand['url'], $brand['name'])?>
-                    <small>(<?=$oldCars ?><?php if ($newCars > 0) {
-                        echo '<span data-href="'.$this->escapeHtmlAttr($brand['newCarsUrl']).'" data-toggle="popover" data-container="body" class="popover-handler" title="'.$this->escapeHtmlAttr(sprintf($this->translate('brands/new-cars-of-brand'), $brand['name'])).'">+'.$newCars.'</span>';
-                    } ?>)</small>
-                </h4>
-                <p><small><?=$this->escapeHtml($this->translate('brands/pictures:'))?> <?=$brand['totalPictures'] ?></small></p>
-            </div><?php
-        } ?>
-    </div>
+                    'class' => 'btn btn-default',
+                    'href'  => '#char' . $info['id']
+                ], $info['char'])?>
+            <?php } ?>
+        </div></div>
+    <?php } ?>
+<?php } ?>
+
+<?php foreach ($this->brandList as $line) { ?>
+    <?php foreach ($line as $number => $info) { ?>
+        <h2 id="char<?=urlencode($info['id'])?>">→ <?=$this->escapeHtml($info['char'])?></h2>
+        <div class="brand-icons">
+            <?php foreach ($info['brands'] as $idx => $brand) {
+                $newCars = $brand['newCars'];
+                $oldCars = $brand['totalCars'] - $newCars;
+
+                ?><div>
+                    <?=$this->htmlA([
+                        'href'  => $brand['url'],
+                        'class' => 'brandicon brandicon-' . $brand['catname']
+                    ], '') ?>
+                    <h4>
+                        <?=$this->htmlA($brand['url'], $brand['name'])?>
+                        <small>(<?=$oldCars ?><?php if ($newCars > 0) {
+                            echo '<span data-href="'.$this->escapeHtmlAttr($brand['newCarsUrl']).'" data-toggle="popover" data-container="body" class="popover-handler" title="'.$this->escapeHtmlAttr(sprintf($this->translate('brands/new-cars-of-brand'), $brand['name'])).'">+'.$newCars.'</span>';
+                        } ?>)</small>
+                    </h4>
+                    <p><small><?=$this->escapeHtml($this->translate('brands/pictures:'))?> <?=$brand['totalPictures'] ?></small></p>
+                </div><?php
+            } ?>
+        </div>
+    <?php } ?>
 <?php } ?>
