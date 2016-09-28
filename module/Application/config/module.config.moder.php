@@ -377,10 +377,11 @@ return [
         'factories' => [
             Controller\Moder\AttrsController::class => InvokableFactory::class,
             Controller\Moder\BrandsController::class => function($sm) {
+                $hostManager = $sm->get(HostManager::class);
                 $textStorage = $sm->get(TextStorage\Service::class);
                 $logoForm = $sm->get('BrandLogoForm');
                 $descForm = $sm->get('DescriptionForm');
-                return new Controller\Moder\BrandsController($textStorage, $logoForm, $descForm);
+                return new Controller\Moder\BrandsController($hostManager, $textStorage, $logoForm, $descForm);
             },
             Controller\Moder\CategoryController::class => function($sm) {
                 return new Controller\Moder\CategoryController();

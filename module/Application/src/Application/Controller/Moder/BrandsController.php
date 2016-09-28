@@ -5,6 +5,7 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\HostManager;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\Message;
 
@@ -27,8 +28,14 @@ class BrandsController extends AbstractActionController
      */
     private $descForm;
 
-    public function __construct($textStorage, Form $logoForm, Form $descForm)
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
+
+    public function __construct(HostManager $hostManager, $textStorage, Form $logoForm, Form $descForm)
     {
+        $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->logoForm = $logoForm;
         $this->descForm = $descForm;
@@ -347,7 +354,7 @@ class BrandsController extends AbstractActionController
                 foreach ($userTable->find($userIds) as $userRow) {
                     if ($userRow->id != $user->id) {
 
-                        $uri = $this->hostmanager->getUriByLanguage($userRow->language);
+                        $uri = $this->hostManager->getUriByLanguage($userRow->language);
 
                         $userUrl = $this->url()->fromRoute('users/user', [
                             'user_id' => $user->identity ? $user->identity : 'user' . $user->id
