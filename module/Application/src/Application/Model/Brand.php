@@ -176,7 +176,12 @@ class Brand
                 ]);
         });
 
-        $result = [];
+        $result = [
+            'numbers'  => [],
+            'cyrillic' => [],
+            'latin'    => [],
+            'other'    => []
+        ];
 
         $tr = Transliterator::create('Any-Latin;Latin-ASCII;');
 
@@ -190,19 +195,43 @@ class Brand
 
             $char = mb_substr($name, 0, 1);
 
-            if (preg_match("/^\p{Han}$/u", $char)) {
-                $char = mb_substr($tr->transliterate($char), 0, 1);
+            $isNumber = preg_match("/^[0-9]$/u", $char);
+            $isCyrillic = false;
+            $isLatin = false;
+
+            if (!$isNumber) {
+                $isHan = preg_match("/^\p{Han}$/u", $char);
+                if ($isHan) {
+                    $char = mb_substr($tr->transliterate($char), 0, 1);
+                    $isLatin = true;
+                }
+
+                if (!$isHan) {
+                    $isCyrillic = preg_match("/^\p{Cyrillic}$/u", $char);
+
+                    if (!$isCyrillic) {
+                        $char = $tr->transliterate($char);
+
+                        $isLatin = preg_match("/^[A-Za-z]$/u", $char);
+                    }
+                }
+                $char = mb_strtoupper($char);
             }
 
-            if (!preg_match("/^\p{Cyrillic}$/u", $char)) {
-                $char = $tr->transliterate($char);
+            if ($isNumber) {
+                $line = 'numbers';
+            } elseif ($isCyrillic) {
+                $line = 'cyrillic';
+            } elseif ($isLatin) {
+                $line = 'latin';
+            } else {
+                $line = 'other';
             }
-            $char = mb_strtoupper($char);
 
             //print $this->utfCharToNumber($char) . PHP_EOL;
 
-            if (!isset($result[$char])) {
-                $result[$char] = [
+            if (!isset($result[$line][$char])) {
+                $result[$line][$char] = [
                     'id'     => $this->utfCharToNumber($char),
                     'char'   => $char,
                     'brands' => []
@@ -213,7 +242,7 @@ class Brand
                 $row['logopictures_count'] + $row['mixedpictures_count'] +
                 $row['unsortedpictures_count'];
 
-            $result[$char]['brands'][] = [
+            $result[$line][$char]['brands'][] = [
                 'id'             => $row['id'],
                 'name'           => $name,
                 'catname'        => $row['catname'],
@@ -224,9 +253,12 @@ class Brand
             ];
         }
 
-        uksort($result, function($a, $b) use($language) {
-            return $this->compareName($a, $b, $language);
-        });
+        foreach ($result as &$line) {
+            uksort($line, function($a, $b) use($language) {
+                return $this->compareName($a, $b, $language);
+            });
+        }
+        unset($line);
 
         return $result;
     }

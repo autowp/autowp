@@ -28,7 +28,7 @@ class BrandsController extends AbstractActionController
 
         $language = $this->language();
 
-        $cacheKey = 'brands_list_36_' . $language . '_' . ($isHttps ? 'HTTPS' : 'HTTP');
+        $cacheKey = 'brands_list_40_' . $language . '_' . ($isHttps ? 'HTTPS' : 'HTTP');
 
         $items = $this->cache->getItem($cacheKey, $success);
         if (!$success) {
@@ -39,28 +39,30 @@ class BrandsController extends AbstractActionController
 
             $items = $brandModel->getFullBrandsList($language);
 
-            foreach ($items as &$char) {
-                foreach ($char['brands'] as &$item) {
-                    $item['url'] = $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand',
-                        'brand_catname' => $item['catname']
-                    ]);
-                    $item['newCarsUrl'] = $this->url()->fromRoute('brands/newcars', [
-                        'brand_id' => $item['id'],
-                    ]);
+            foreach ($items as &$line) {
+                foreach ($line as &$char) {
+                    foreach ($char['brands'] as &$item) {
+                        $item['url'] = $this->url()->fromRoute('catalogue', [
+                            'action'        => 'brand',
+                            'brand_catname' => $item['catname']
+                        ]);
+                        $item['newCarsUrl'] = $this->url()->fromRoute('brands/newcars', [
+                            'brand_id' => $item['id'],
+                        ]);
 
-                    $img = false;
-                    if ($item['img']) {
-                        $imageInfo = $imageStorage->getFormatedImage($item['img'], 'brandicon');
-                        if ($imageInfo) {
-                            $img = $imageInfo->getSrc();
+                        $img = false;
+                        if ($item['img']) {
+                            $imageInfo = $imageStorage->getFormatedImage($item['img'], 'brandicon');
+                            if ($imageInfo) {
+                                $img = $imageInfo->getSrc();
+                            }
                         }
-                    }
 
-                    $item['logo'] = $img;
+                        $item['logo'] = $img;
+                    }
                 }
             }
-            unset($char, $item);
+            unset($line, $char, $item);
 
             $this->cache->setItem($cacheKey, $items);
         }
