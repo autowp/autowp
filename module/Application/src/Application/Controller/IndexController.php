@@ -205,7 +205,7 @@ class IndexController extends AbstractActionController
         $brands = $this->cache->getItem($cacheKey, $success);
         if (!$success) {
 
-            // промах кэша
+            // cache missing
             $brandModel = new Brand();
 
             $items = $brandModel->getTopBrandsList($language);
@@ -236,7 +236,6 @@ class IndexController extends AbstractActionController
         $language = $this->language();
         $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
-        // автомобиль дня
         $model = new CarOfDay();
         $carId = $model->getCurrent();
 

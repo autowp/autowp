@@ -1686,7 +1686,7 @@ class SpecificationsService
     protected function _createValueDataTable($type)
     {
         switch ($type) {
-            case 1: // строка
+            case 1: // string
                 return new Attrs_Values_String();
 
             case 2: // int
@@ -1724,7 +1724,7 @@ class SpecificationsService
     protected function _createUserValueDataTable($type)
     {
         switch ($type) {
-            case 1: // строка
+            case 1: // string
                 return new Attrs_User_Values_String();
 
             case 2: // int
@@ -1759,7 +1759,7 @@ class SpecificationsService
         }
 
         switch ($attribute['typeId']) {
-            case 1: // строка
+            case 1: // string
                 return $value;
 
             case 2: // int
@@ -2445,7 +2445,7 @@ class SpecificationsService
     private function _prepareValue($typeId, $value)
     {
         switch ($typeId) {
-            case 1: // строка
+            case 1: // string
                 return $value;
 
             case 2: // int
@@ -3193,7 +3193,7 @@ class SpecificationsService
                         $userValueRow['attribute_id'],
                         $userValueRow['item_type_id'],
                         $userValueRow['item_id'],
-                        $userValueRow['user_id'], 
+                        $userValueRow['user_id'],
                         $language
                     ),
                     'userId' => $userValueRow['user_id']
@@ -3213,7 +3213,7 @@ class SpecificationsService
                     $userValueRow['attribute_id'],
                     $userValueRow['item_type_id'],
                     $userValueRow['item_id'],
-                    $userValueRow['user_id'], 
+                    $userValueRow['user_id'],
                     $language
                 );
             }

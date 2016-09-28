@@ -291,7 +291,7 @@ class UploadController extends AbstractActionController
                 throw new Exception("Height <= 0");
             }
 
-            // подбираем имя для файла
+            // generate filename
             switch ($imageType) {
                 case IMAGETYPE_JPEG:
                 case IMAGETYPE_PNG:
@@ -309,7 +309,7 @@ class UploadController extends AbstractActionController
             $image = $this->imageStorage()->getImage($imageId);
             $fileSize = $image->getFileSize();
 
-            // добавляем запись о картинке в БД
+            // add record to db
             $picture = $pictureTable->createRow([
                 'image_id'      => $imageId,
                 'width'         => $width,
@@ -333,18 +333,18 @@ class UploadController extends AbstractActionController
             $picture->save();
 
 
-            // инкрементируем счётчик добавленных картинок
+            // increment uploads counter
             if ($user) {
                 $user->pictures_added = new Zend_Db_Expr('pictures_added+1');
                 $user->save();
             }
 
-            // переименовываем файл под автомобиль
+            // rename file to new
             $this->imageStorage()->changeImageName($picture->image_id, [
                 'pattern' => $picture->getFileNamePattern(),
             ]);
 
-            // пересчитываем цифры
+            // recalculate chached counts
             switch ($picture->type) {
                 case Picture::UNSORTED_TYPE_ID:
                 case Picture::LOGO_TYPE_ID:
@@ -365,7 +365,7 @@ class UploadController extends AbstractActionController
                     break;
             }
 
-            // добавляем комментарий
+            // add comment
             if ($values['note']) {
                 $commentTable = new Comments();
                 $commentTable->add([
