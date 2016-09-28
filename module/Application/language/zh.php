@@ -1520,6 +1520,7 @@ return [
 * 所有的透明区域必须是透明的，而不是白的！
 * 标识必须靠近边缘，不需要留白。
 * 上传最大分辨率的图像——这是为了追求更好的质量和未来使用它的能力。商标在网站上自动缩放。',
+    'moder/brands/logo/saved' => 'Logotype saved',
 
     'moder/brands/vehicles' => '车型',
     'moder/brands/links' => 'Links',
@@ -1715,4 +1716,6 @@ Don\'t forget it,',
     'specifications-editor/admin/parameter' => '参数',
     'specifications-editor/admin/value' => '数据',
     'specifications-editor/admin/move' => '移动',
+
+    'pm/user-%s-edit-brand-description-%s-%s' => 'User %s edit brand description %s ( %s )',
 ];

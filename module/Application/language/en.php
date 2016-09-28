@@ -1535,6 +1535,7 @@ You can support our project by [finances](/donate) or [moral](/feedback)',
 * All transparent regions must be transparent but not white!
 * Logotype must be close to edges. Margin not required
 * Upload images in maximum resolution - thats give quality and ability to use it in future. On website logo scaled automaticaly',
+    'moder/brands/logo/saved' => 'Logotype saved',
 
     'moder/brands/vehicles' => 'Vehicles',
     'moder/brands/links' => 'Links',
@@ -1730,4 +1731,6 @@ Don\'t forget it,',
     'specifications-editor/admin/parameter' => 'Parameter',
     'specifications-editor/admin/value' => 'Value',
     'specifications-editor/admin/move' => 'Move',
+
+    'pm/user-%s-edit-brand-description-%s-%s' => 'User %s edit brand description %s ( %s )',
 ];

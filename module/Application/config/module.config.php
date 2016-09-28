@@ -333,6 +333,10 @@ return [
 
                 return $storage;
             },
+            HostManager::class => function($sm) {
+                $config = $sm->get('Config');
+                return new HostManager($config['hosts']);
+            },
             Service\UsersService::class => function($sm) {
                 $config = $sm->get('Config');
                 $translator = $sm->get('translator');

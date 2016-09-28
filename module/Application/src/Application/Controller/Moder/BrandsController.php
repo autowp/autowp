@@ -43,15 +43,18 @@ class BrandsController extends AbstractActionController
 
     /**
      * @param Brand_Row $car
+     * @param bool $forceCanonical
+     * @param \Zend\Uri\Uri
      * @return string
      */
-    private function brandModerUrl(Brand_Row $brand, $forceCanonical)
+    private function brandModerUrl(Brand_Row $brand, $forceCanonical, $uri = null)
     {
         return $this->url()->fromRoute('moder/brands/params', [
             'action'   => 'brand',
             'brand_id' => $brand->id
         ], [
-            'force_canonical' => $forceCanonical
+            'force_canonical' => $forceCanonical,
+            'uri'             => $uri
         ]);
     }
 
@@ -183,7 +186,7 @@ class BrandsController extends AbstractActionController
                         htmlspecialchars($brand->caption)
                     ), $brand);
 
-                    $this->flashMessenger()->addSuccessMessage('Логотип сохранен');
+                    $this->flashMessenger()->addSuccessMessage($this->translate('moder/brands/logo/saved'));
 
                     return $this->redirect()->toUrl($this->brandModerUrl($brand, true));
                 }
@@ -337,24 +340,30 @@ class BrandsController extends AbstractActionController
 
             if ($brand->text_id) {
                 $userIds = $textStorage->getTextUserIds($brand->text_id);
-                $message = sprintf(
-                    'Пользователь %s редактировал описание бренда %s ( %s )',
-                    $this->url()->fromRoute('users/user', [
-                        'user_id' => $user->identity ? $user->identity : 'user' . $user->id
-                    ], [
-                        'force_canonical' => true
-                    ]),
-                    $brand->caption,
-                    $this->brandModerUrl($brand, true)
-                );
 
                 $mModel = new Message();
                 $userTable = new Users();
-                foreach ($userIds as $userId) {
-                    if ($userId != $user->id) {
-                        foreach ($userTable->find($userId) as $userRow) {
-                            $mModel->send(null, $userRow->id, $message);
-                        }
+
+                foreach ($userTable->find($userIds) as $userRow) {
+                    if ($userRow->id != $user->id) {
+
+                        $uri = $this->hostmanager->getUriByLanguage($userRow->language);
+
+                        $userUrl = $this->url()->fromRoute('users/user', [
+                            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                        ], [
+                            'force_canonical' => true,
+                            'uri'             => $uri
+                        ]);
+
+                        $message = sprintf(
+                            $this->translate('pm/user-%s-edit-brand-description-%s-%s'),
+                            $userUrl,
+                            $brand->caption, //TODO: translate brand name
+                            $this->brandModerUrl($brand, true, $uri)
+                        );
+
+                        $mModel->send(null, $userRow->id, $message);
                     }
                 }
             }
