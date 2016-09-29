@@ -24,12 +24,9 @@ class UsersController extends AbstractActionController
 {
     private $cache;
 
-    private $translator;
-
-    public function __construct($cache, $translator)
+    public function __construct($cache)
     {
         $this->cache = $cache;
-        $this->translator = $translator;
     }
 
     private function getUser()
@@ -71,23 +68,25 @@ class UsersController extends AbstractActionController
                 ->where('status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
         );
 
-        $pictures = $this->catalogue()->getPictureTable();
-        $lastPictureRows = $pictures->fetchAll(
-            $pictures->select()
+        $pictureTable = $this->catalogue()->getPictureTable();
+        $lastPictureRows = $pictureTable->fetchAll(
+            $pictureTable->select()
                 ->from('pictures')
                 ->where('owner_id = ?', $user->id)
                 ->order('id DESC')
                 ->limit(12)
         );
 
+        $names = $pictureTable->getNameData($lastPictureRows, [
+            'language' => $this->language(),
+            'large'    => true
+        ]);
+
         $lastPictures = [];
         foreach ($lastPictureRows as $lastPictureRow) {
             $lastPictures[] = [
                 'url'  => $this->pic()->url($lastPictureRow->id, $lastPictureRow->identity),
-                'name' => $lastPictureRow->getCaption([
-                    'language'   => $this->language(),
-                    'translator' => $this->translator
-                ])
+                'name' => $names[$lastPictureRow->id]
             ];
         }
 

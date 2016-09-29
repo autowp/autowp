@@ -10,27 +10,13 @@ use Exception;
 
 class InlinePicture extends AbstractHelper
 {
-    private $translator;
-
-    public function __construct($translator)
-    {
-        $this->translator = $translator;
-    }
-
     public function __invoke(Picture_Row $picture)
     {
-        if (!$this->translator) {
-            throw new Exception('`translator` expected');
-        }
-
         $view = $this->view;
 
         $url = $view->pic($picture)->url();
 
-        $caption = $picture->getCaption([
-            'language'   => $this->view->language(),
-            'translator' => $this->translator
-        ]);
+        $caption = $view->pic()->name($picture, $this->view->language());
 
         $imageHtml = $view->img($picture->getFormatRequest(), [
             'format'  => 'picture-thumb',

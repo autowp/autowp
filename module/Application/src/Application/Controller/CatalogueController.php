@@ -42,13 +42,10 @@ class CatalogueController extends AbstractActionController
 
     private $cache;
 
-    private $translator;
-
-    public function __construct($textStorage, $cache, $translator)
+    public function __construct($textStorage, $cache)
     {
         $this->textStorage = $textStorage;
         $this->cache = $cache;
-        $this->translator = $translator;
     }
 
     private function _brandAction(Callable $callback)
@@ -919,10 +916,7 @@ class CatalogueController extends AbstractActionController
                 foreach ($pictureRows as $pictureRow) {
                     //$pictures[] = $pictureRow;
 
-                    $caption = $pictureRow->getCaption([
-                        'language'   => $language,
-                        'translator' => $this->translator
-                    ]);
+                    $caption = $this->pic()->name($pictureRow, $language);
 
                     $url = $this->url()->fromRoute('catalogue', [
                         'action'     => 'engine-picture',
@@ -950,11 +944,8 @@ class CatalogueController extends AbstractActionController
                             ->limit($morePictures)
                     );
                     foreach ($pictureRows as $pictureRow) {
-                        //$pictures[] = $pictureRow;
-                        $caption = $pictureRow->getCaption([
-                            'language'   => $language,
-                            'translator' => $this->translator
-                        ]);
+
+                        $caption = $this->pic()->name($pictureRow, $language);
 
                         $url = $this->pic()->href($pictureRow->toArray());
 
@@ -2171,10 +2162,7 @@ class CatalogueController extends AbstractActionController
                 $imageInfo = $imageStorage->getFormatedImage($pictureRow->getFormatRequest(), 'picture-thumb');
 
                 $currentPictures[] = [
-                    'name' => $pictureRow->getCaption([
-                        'language'   => $language,
-                        'translator' => $this->translator
-                    ]),
+                    'name' => $this->pic()->name($pictureRow, $language),
                     'src'  => $imageInfo ? $imageInfo->getSrc() : null,
                     'url'  => $this->url()->fromRoute('catalogue', [
                         'action'        => 'brand-car-picture',

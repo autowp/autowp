@@ -116,7 +116,7 @@
                         <li><?=$this->htmlA([
                             'href'  => $picture['url'],
                             'class' => 'picture-hover-preview'
-                        ], $picture['name'])?></li>
+                        ], $this->pic()->textTitle($picture['name']))?></li>
                     <?php } ?>
                 </ul>
             </div>

@@ -4,7 +4,6 @@ namespace Application\Controller\Api;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
-use Autowp\Image;
 use Application\Model\CarOfDay;
 
 use Cars;
@@ -12,13 +11,6 @@ use Picture;
 
 class PictureController extends AbstractActionController
 {
-    private $translator;
-
-    public function __construct($translator)
-    {
-        $this->translator = $translator;
-    }
-
     private function serverUrl($url)
     {
         $helper = new \Zend\View\Helper\ServerUrl();
@@ -45,10 +37,7 @@ class PictureController extends AbstractActionController
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
-                'name'   => $pictureRow->getCaption([
-                    'language'   => $this->language(),
-                    'translator' => $this->translator
-                ]),
+                'name'   => $this->pic()->name($pictureRow, $this->language()),
                 'page'   => $this->serverUrl($this->pic()->url($pictureRow->id, $pictureRow->identity))
             ];
         }
@@ -76,10 +65,7 @@ class PictureController extends AbstractActionController
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
-                'name'   => $pictureRow->getCaption([
-                    'language'   => $this->language(),
-                    'translator' => $this->translator
-                ]),
+                'name'   => $this->pic()->name($pictureRow, $this->language()),
                 'page'   => $this->serverUrl($this->pic()->url($pictureRow->id, $pictureRow->identity))
             ];
         }
@@ -142,10 +128,7 @@ class PictureController extends AbstractActionController
             $result = [
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
-                'name'   => $pictureRow->getCaption([
-                    'language'   => $this->language(),
-                    'translator' => $this->translator
-                ]),
+                'name'   => $this->pic()->name($pictureRow, $this->language()),
                 'page'   => $this->serverUrl($this->pic()->url($pictureRow->id, $pictureRow->identity))
             ];
         }

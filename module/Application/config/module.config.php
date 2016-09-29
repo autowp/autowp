@@ -50,8 +50,7 @@ return [
             Controller\CatalogueController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
                 $cache = $sm->get('longCache');
-                $translator = $sm->get('translator');
-                return new Controller\CatalogueController($textStorage, $cache, $translator);
+                return new Controller\CatalogueController($textStorage, $cache);
             },
             Controller\CategoryController::class => function($sm) {
                 $cache = $sm->get('longCache');
@@ -136,21 +135,16 @@ return [
             },
             Controller\UsersController::class => function($sm) {
                 $cache = $sm->get('longCache');
-                $translator = $sm->get('translator');
-                return new Controller\UsersController($cache, $translator);
+                return new Controller\UsersController($cache);
             },
             Controller\UploadController::class => function($sm) {
                 $partial = $sm->get('ViewHelperManager')->get('partial');
                 $telegram = $sm->get(Service\TelegramService::class);
-                $translator = $sm->get('translator');
-                return new Controller\UploadController($partial, $telegram, $translator);
+                return new Controller\UploadController($partial, $telegram);
             },
             Controller\VotingController::class       => InvokableFactory::class,
             Controller\Api\ContactsController::class => InvokableFactory::class,
-            Controller\Api\PictureController::class => function($sm) {
-                $translator = $sm->get('translator');
-                return new Controller\Api\PictureController($translator);
-            },
+            Controller\Api\PictureController::class  => InvokableFactory::class,
             Controller\Api\UsersController::class    => InvokableFactory::class,
         ],
     ],
@@ -183,10 +177,12 @@ return [
             'oauth2' => Factory\OAuth2PluginFactory::class,
             'pic' => function($sm) {
                 $viewHelperManager = $sm->get('ViewHelperManager');
-                $carHelper = $viewHelperManager->get('car');
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $translator = $sm->get('translator');
-                return new Controller\Plugin\Pic($textStorage, $carHelper, $translator);
+                return new Controller\Plugin\Pic(
+                    $sm->get(TextStorage\Service::class),
+                    $viewHelperManager->get('car'),
+                    $sm->get('translator'),
+                    $sm->get(PictureNameFormatter::class)
+                );
             },
             'sidebar' => function ($sm) {
                 $cache = $sm->get('fastCache');
@@ -237,7 +233,6 @@ return [
             'humanTime'   => View\Helper\HumanTime::class,
             'markdown'    => View\Helper\Markdown::class,
             'pastTimeIndicator' => View\Helper\PastTimeIndicator::class,
-            'pic'         => View\Helper\Pic::class,
             'img'         => View\Helper\Img::class,
             'pictures'    => View\Helper\Pictures::class,
             'moderMenu'   => View\Helper\ModerMenu::class,
@@ -250,6 +245,11 @@ return [
             'formpicturemulticheckbox' => Form\View\Helper\FormPictureMultiCheckbox::class
         ],
         'factories' => [
+            'pic' => function($sm) {
+                return new View\Helper\Pic(
+                    $sm->get(PictureNameFormatter::class)
+                );
+            },
             'pageEnv' => function($sm) {
                 $language = $sm->get(Language::class);
                 return new View\Helper\PageEnv($language);
@@ -291,7 +291,6 @@ return [
                 return new View\Helper\ImageStorage($imageStorage);
             },
             'inlinePicture' => function($sm) {
-                $translator = $sm->get('translator');
                 return new View\Helper\InlinePicture($translator);
             }
         ]
@@ -322,6 +321,15 @@ return [
     ],
     'service_manager' => [
         'factories' => [
+            CarNameFormatter::class => function($sm) {
+                return new CarNameFormatter($sm->get('translator'));
+            },
+            PictureNameFormatter::class => function($sm) {
+                return new PictureNameFormatter(
+                    $sm->get('translator'),
+                    $sm->get(CarNameFormatter::class)
+                );
+            },
             Image\Storage::class => function($sm) {
                 $config = $sm->get('Config')['imageStorage'];
                 $storage = new Image\Storage($config);

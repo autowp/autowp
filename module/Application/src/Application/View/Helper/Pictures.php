@@ -160,9 +160,7 @@ class Pictures extends AbstractHelper
 
         $isModer = $this->isPictureModer();
 
-        $caption = $picture->getCaption([
-            'language' => $view->language()->get()
-        ]);
+        $caption = $view->pic()->name($picture, $this->view->language());
         $escCaption = $view->escape($caption);
 
         $url = $view->pic($picture)->url();

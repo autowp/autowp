@@ -12,6 +12,7 @@ use Application\HostManager;
 use Application\Model\Brand;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\PictureNameFormatter;
 use Application\Service\TrafficControl;
 
 use Brands;
@@ -71,12 +72,15 @@ class PicturesController extends AbstractActionController
      */
     private $banForm;
 
-    private $translator;
-
     /**
      * @var HostManager
      */
     private $hostManager;
+
+    /**
+     * @var PictureNameFormatter
+     */
+    private $pictureNameFormatter;
 
     /**
      * @return Engines
@@ -104,7 +108,7 @@ class PicturesController extends AbstractActionController
         Form $copyrightsForm,
         Form $voteForm,
         Form $banForm,
-        $translator)
+        PictureNameFormatter $pictureNameFormatter)
     {
         $this->hostManager = $hostManager;
         $this->table = $table;
@@ -113,7 +117,7 @@ class PicturesController extends AbstractActionController
         $this->copyrightsForm = $copyrightsForm;
         $this->voteForm = $voteForm;
         $this->banForm = $banForm;
-        $this->translator = $translator;
+        $this->pictureNameFormatter = $pictureNameFormatter;
     }
 
     public function ownerTypeaheadAction()
@@ -634,10 +638,7 @@ class PicturesController extends AbstractActionController
 
         $this->log(sprintf(
             'Картинка %s поставлена в очередь на удаление',
-            htmlspecialchars($picture->getCaption([
-                'language'   => $this->language(),
-                'translator' => $this->translator
-            ]))
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), $picture);
 
         return $this->redirect()->toUrl($this->pictureUrl($picture));
@@ -683,10 +684,7 @@ class PicturesController extends AbstractActionController
 
             $this->log(sprintf(
                 'Установка ракурса картинки %s',
-                htmlspecialchars($picture->getCaption([
-                    'language'   => $this->language(),
-                    'translator' => $this->translator
-                ]))
+                htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), [$picture]);
         }
 
@@ -815,10 +813,7 @@ class PicturesController extends AbstractActionController
                         $vote
                             ? 'Подана заявка на принятие картинки %s'
                             : 'Подана заявка на удаление картинки %s',
-                        htmlspecialchars($picture->getCaption([
-                            'language'   => $this->language(),
-                            'translator' => $this->translator
-                        ]))
+                        htmlspecialchars($this->pic()->name($picture, $this->language()))
                     );
                     $this->log($message, $picture);
 
@@ -979,10 +974,7 @@ class PicturesController extends AbstractActionController
 
                 $this->log(sprintf(
                     'Редактирование текста копирайтов изображения %s',
-                    htmlspecialchars($picture->getCaption([
-                        'language'   => $this->language(),
-                        'translator' => $this->translator
-                    ]))
+                    htmlspecialchars($this->pic()->name($picture, $this->language()))
                 ), $picture);
 
                 if ($picture->copyrights_text_id) {
@@ -999,10 +991,7 @@ class PicturesController extends AbstractActionController
                                 $message = sprintf(
                                     $this->translate('pm/user-%s-edited-picture-copyrights-%s-%s', 'default', $userRow->language),
                                     $this->userModerUrl($user, true, $uri),
-                                    $picture->getCaption([
-                                        'language'   => $userRow->language,
-                                        'translator' => $this->translator
-                                    ]),
+                                    $this->pic()->name($picture, $userRow->language),
                                     $this->pictureUrl($picture, true, $uri)
                                 );
 
@@ -1106,10 +1095,7 @@ class PicturesController extends AbstractActionController
 
                 $this->log(sprintf(
                     'С картинки %s снят статус "принято"',
-                    htmlspecialchars($picture->getCaption([
-                        'language'   => $this->language(),
-                        'translator' => $this->translator
-                    ]))
+                    htmlspecialchars($this->pic()->name($picture, $this->language()))
                 ), $picture);
 
 
@@ -1359,10 +1345,7 @@ class PicturesController extends AbstractActionController
 
         $this->log(sprintf(
             'Картинки `%s` восстановлена из очереди удаления',
-            htmlspecialchars($picture->getCaption([
-                'language'   => $this->language(),
-                'translator' => $this->translator
-            ]))
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), $picture);
 
         $referer = $this->getRequest()->getServer('HTTP_REFERER');
@@ -1390,10 +1373,7 @@ class PicturesController extends AbstractActionController
 
         $this->log(sprintf(
             'К картинке %s применён flop',
-            htmlspecialchars($picture->getCaption([
-                'language'   => $this->language(),
-                'translator' => $this->translator
-            ]))
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), $picture);
 
         return new JsonModel([
@@ -1422,10 +1402,7 @@ class PicturesController extends AbstractActionController
 
         $this->log(sprintf(
             'К картинке %s применён normalize',
-            htmlspecialchars($picture->getCaption([
-                'language'   => $this->language(),
-                'translator' => $this->translator
-            ]))
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), $picture);
 
         return new JsonModel([
@@ -1532,10 +1509,7 @@ class PicturesController extends AbstractActionController
 
         $this->log(sprintf(
             'Выделение области на картинке %s',
-            htmlspecialchars($picture->getCaption([
-                'language'   => $this->language(),
-                'translator' => $this->translator
-            ]))
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), [$picture]);
 
         return new JsonModel([
@@ -1783,14 +1757,8 @@ class PicturesController extends AbstractActionController
         // log
         $this->log(sprintf(
             'Замена %s на %s отклонена',
-            htmlspecialchars($replacePicture->getCaption([
-                'language'   => $this->language(),
-                'translator' => $this->translator
-            ])),
-            htmlspecialchars($picture->getCaption([
-                'language'   => $this->language(),
-                'translator' => $this->translator
-            ]))
+            htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), [$picture, $replacePicture]);
 
         return $this->redirect()->toRoute(null, [
@@ -1898,14 +1866,8 @@ class PicturesController extends AbstractActionController
         // log
         $this->log(sprintf(
             'Замена %s на %s',
-            htmlspecialchars($replacePicture->getCaption([
-                'language'   => $this->language(),
-                'translator' => $this->translator
-            ])),
-            htmlspecialchars($picture->getCaption([
-                'language'   => $this->language(),
-                'translator' => $this->translator
-            ]))
+            htmlspecialchars($this->pic()->name($replacePicture, $this->language())),
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), [$picture, $replacePicture]);
 
         return $this->redirect()->toRoute(null, [
@@ -1961,10 +1923,7 @@ class PicturesController extends AbstractActionController
 
             $this->log(sprintf(
                 'Картинка %s принята',
-                htmlspecialchars($picture->getCaption([
-                    'language'   => $this->language(),
-                    'translator' => $this->translator
-                ]))
+                htmlspecialchars($this->pic()->name($picture, $this->language()))
             ), $picture);
         }
     }
@@ -2034,10 +1993,7 @@ class PicturesController extends AbstractActionController
                     $vote
                         ? 'Подана заявка на принятие картинки %s'
                         : 'Подана заявка на удаление картинки %s',
-                    htmlspecialchars($picture->getCaption([
-                        'language'   => $this->language(),
-                        'translator' => $this->translator
-                    ]))
+                    htmlspecialchars($this->pic()->name($picture, $this->language()))
                 );
                 $this->log($message, $picture);
 
@@ -2070,8 +2026,8 @@ class PicturesController extends AbstractActionController
                 case Picture::MIXED_TYPE_ID:
                 case Picture::UNSORTED_TYPE_ID:
                     $success = $this->table->moveToBrand($picture->id, $this->params('brand_id'), $type, $userId, [
-                        'language'   => $this->language(),
-                        'translator' => $this->translator
+                        'language'             => $this->language(),
+                        'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
                     if (!$success) {
                         return $this->notFoundAction();
@@ -2081,7 +2037,7 @@ class PicturesController extends AbstractActionController
                 case Picture::ENGINE_TYPE_ID:
                     $success = $this->table->moveToEngine($picture->id, $this->params('engine_id'), $userId, [
                         'language'   => $this->language(),
-                        'translator' => $this->translator
+                        'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
                     if (!$success) {
                         return $this->notFoundAction();
@@ -2091,7 +2047,7 @@ class PicturesController extends AbstractActionController
                 case Picture::CAR_TYPE_ID:
                     $success = $this->table->moveToCar($picture->id, $this->params('car_id'), $userId, [
                         'language'   => $this->language(),
-                        'translator' => $this->translator
+                        'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
                     if (!$success) {
                         return $this->notFoundAction();
@@ -2104,7 +2060,7 @@ class PicturesController extends AbstractActionController
                 case Picture::FACTORY_TYPE_ID:
                     $success = $this->table->moveToFactory($picture->id, $this->params('factory_id'), $userId, [
                         'language'   => $this->language(),
-                        'translator' => $this->translator
+                        'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
                     if (!$success) {
                         return $this->notFoundAction();

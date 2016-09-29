@@ -36,13 +36,10 @@ class UploadController extends AbstractActionController
      */
     private $telegram;
 
-    private $translator;
-
-    public function __construct($partial, TelegramService $telegram, $translator)
+    public function __construct($partial, TelegramService $telegram)
     {
         $this->partial = $partial;
         $this->telegram = $telegram;
-        $this->translator = $translator;
     }
 
     private function getCarParentTable()
@@ -110,13 +107,13 @@ class UploadController extends AbstractActionController
                     $selected = true;
                     switch ($type) {
                         case Picture::UNSORTED_TYPE_ID:
-                            $selectedName = $brand['name'] . ' / ' . $this->translator->translate('upload/select/unsorted');
+                            $selectedName = $brand['name'] . ' / ' . $this->translate('upload/select/unsorted');
                             break;
                         case Picture::MIXED_TYPE_ID:
-                            $selectedName = $brand['name'] . ' / ' . $this->translator->translate('upload/select/mixed');
+                            $selectedName = $brand['name'] . ' / ' . $this->translate('upload/select/mixed');
                             break;
                         case Picture::LOGO_TYPE_ID:
-                            $selectedName = $brand['name'] . ' / ' . $this->translator->translate('upload/select/logo');
+                            $selectedName = $brand['name'] . ' / ' . $this->translate('upload/select/logo');
                             break;
                     }
                 }
@@ -779,10 +776,7 @@ class UploadController extends AbstractActionController
 
         $this->log(sprintf(
             'Выделение области на картинке %s',
-            htmlspecialchars($picture->getCaption([
-                'language'   => $this->language(),
-                'translator' => $this->translator
-            ]))
+            htmlspecialchars($this->pic()->name($pictureRow, $this->language()))
         ), [$picture]);
 
         $image = $this->imageStorage()->getFormatedImage($picture->getFormatRequest(), 'picture-thumb');

@@ -4,6 +4,8 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
 
+use Application\PictureNameFormatter;
+
 use Picture;
 use Picture_Row;
 
@@ -13,6 +15,16 @@ class Pic extends AbstractHtmlElement
      * @var Picture_Row
      */
     private $picture = null;
+
+    /**
+     * @var PictureNameFormatter
+     */
+    private $pictureNameFormatter;
+
+    public function __construct(PictureNameFormatter $pictureNameFormatter)
+    {
+        $this->pictureNameFormatter = $pictureNameFormatter;
+    }
 
     public function __invoke(Picture_Row $picture = null)
     {
@@ -71,56 +83,18 @@ class Pic extends AbstractHtmlElement
 
     public function textTitle(array $picture)
     {
-        $view = $this->view;
+        return $this->pictureNameFormatter->format($picture, $this->view->language());
+    }
 
-        if (isset($picture['name']) && $picture['name']) {
-            return $picture['name'];
-        }
+    public function name($pictureRow, $language)
+    {
+        $pictureTable = new Picture();
+        $names = $pictureTable->getNameData([$pictureRow->toArray()], [
+            'language' => $language,
+            'large'    => true
+        ]);
+        $name = $names[$pictureRow->id];
 
-        switch ($picture['type']) {
-            case Picture::CAR_TYPE_ID:
-                return
-                    ($picture['perspective'] ? self::mbUcfirst($view->translate($picture['perspective'])) . ' ' : '') .
-                    ($picture['car'] ? $view->car()->textTitle($picture['car']) : 'Unsorted car');
-                break;
-
-            case Picture::ENGINE_TYPE_ID:
-                if ($picture['engine']) {
-                    return sprintf($view->translate('picturelist/engine-%s'), $picture['engine']);
-                } else {
-                    return $view->translate('picturelist/engine');
-                }
-                break;
-
-            case Picture::LOGO_TYPE_ID:
-                if ($picture['brand']) {
-                    return sprintf($view->translate('picturelist/logotype-%s'), $picture['brand']);
-                } else {
-                    return $view->translate('picturelist/logotype');
-                }
-                break;
-
-            case Picture::MIXED_TYPE_ID:
-                if ($picture['brand']) {
-                    return sprintf($view->translate('picturelist/mixed-%s'), $picture['brand']);
-                } else {
-                    return $view->translate('picturelist/mixed');
-                }
-                break;
-
-            case Picture::UNSORTED_TYPE_ID:
-                if ($picture['brand']) {
-                    return sprintf($view->translate('picturelist/unsorted-%s'), $picture['brand']);
-                } else {
-                    return $view->translate('picturelist/unsorted');
-                }
-                break;
-
-            case Picture::FACTORY_TYPE_ID:
-                return $picture['factory'];
-                break;
-        }
-
-        return 'Picture';
+        return $this->pictureNameFormatter->format($name, $language);
     }
 }

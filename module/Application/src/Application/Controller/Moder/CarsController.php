@@ -3948,9 +3948,7 @@ class CarsController extends AbstractActionController
 
             $pictures[] = [
                 'id'              => $pictureRow->id,
-                'name'            => $pictureRow->getCaption([
-                    'language' => $language
-                ]),
+                'name'            => $this->pic()->name($pictureRow, $language),
                 'url'             => $this->pic()->href($pictureRow),
                 'src'             => $imageInfo ? $imageInfo->getSrc() : null,
                 'modificationIds' => $modificationIds

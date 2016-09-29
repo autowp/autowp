@@ -9,6 +9,7 @@ use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
 
 use Exception;
@@ -49,11 +50,17 @@ class Pic extends AbstractPlugin
 
     private $translator;
 
-    public function __construct($textStorage, $carHelper, $translator)
+    /**
+     * @var PictureNameFormatter
+     */
+    private $pictureNameFormatter;
+
+    public function __construct($textStorage, $carHelper, $translator, PictureNameFormatter $pictureNameFormatter)
     {
         $this->textStorage = $textStorage;
         $this->carHelper = $carHelper;
         $this->translator = $translator;
+        $this->pictureNameFormatter = $pictureNameFormatter;
     }
 
     /**
@@ -1360,5 +1367,17 @@ class Pic extends AbstractPlugin
             'count' => $paginator->getTotalItemCount(),
             'items' => $gallery
         ];
+    }
+
+    public function name($pictureRow, $language)
+    {
+        $pictureTable = new Picture();
+        $names = $pictureTable->getNameData([$pictureRow->toArray()], [
+            'language' => $language,
+            'large'    => true
+        ]);
+        $name = $names[$pictureRow->id];
+
+        return $this->pictureNameFormatter->format($name, $language);
     }
 }

@@ -596,8 +596,8 @@ class Picture extends Table
         $log = new Log_Events();
         $log($userId, sprintf(
             'Назначение двигателя %s картинке %s',
-            $engine->caption,
-            $picture->getCaption($options)
+            htmlspecialchars($engine->caption),
+            htmlspecialchars($options['pictureNameFormatter']->format($picture, $options['language']))
         ), [$engine, $picture]);
 
         return true;
@@ -696,7 +696,7 @@ class Picture extends Table
         $log($userId, sprintf(
             'Назначение бренда %s картинке %s',
             htmlspecialchars($brand->caption),
-            htmlspecialchars($picture->getCaption($options))
+            htmlspecialchars($options['pictureNameFormatter']->format($picture, $options['language']))
         ), [$picture, $brand]);
 
         return true;
@@ -744,7 +744,7 @@ class Picture extends Table
         $log($userId, sprintf(
             'Назначение завода %s картинке %s',
             htmlspecialchars($factory->name),
-            htmlspecialchars($picture->getCaption($options))
+            htmlspecialchars($options['pictureNameFormatter']->format($picture, $options['language']))
         ), [$factory, $picture]);
 
         return true;
