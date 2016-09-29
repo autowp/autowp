@@ -451,10 +451,11 @@ return [
             },
             Controller\Moder\TrafficController::class => InvokableFactory::class,
             Controller\Moder\TwinsController::class => function($sm) {
+                $hostManager = $sm->get(HostManager::class);
                 $textStorage = $sm->get(TextStorage\Service::class);
                 $editForm = $sm->get('ModerTwinsEditForm');
                 $descForm = $sm->get('DescriptionForm');
-                return new Controller\Moder\TwinsController($textStorage, $editForm, $descForm);
+                return new Controller\Moder\TwinsController($hostManager, $textStorage, $editForm, $descForm);
             },
             Controller\Moder\UsersController::class => InvokableFactory::class,
         ]

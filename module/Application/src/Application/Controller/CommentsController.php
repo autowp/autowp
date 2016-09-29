@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Application\HostManager;
 use Application\Model\DbTable\Museum;
 use Application\Model\DbTable\Voting;
 use Application\Model\Message;
@@ -27,8 +28,14 @@ class CommentsController extends AbstractRestfulController
 
     private $form = null;
 
-    public function __construct($form)
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
+
+    public function __construct(HostManager $hostManager, $form)
     {
+        $this->hostManager = $hostManager;
         $this->form = $form;
         $this->comments = new Comments();
     }
@@ -76,12 +83,13 @@ class CommentsController extends AbstractRestfulController
         ];
     }
 
-    private function messageUrl($typeId, $object, $canonical)
+    private function messageUrl($typeId, $object, $canonical, $uri = null)
     {
         switch ($typeId) {
             case Comment_Message::PICTURES_TYPE_ID:
                 $url = $this->pic()->href($object, [
-                    'canonical' => $canonical
+                    'canonical' => $canonical,
+                    'uri'       => $uri
                 ]);
                 break;
 
@@ -89,7 +97,8 @@ class CommentsController extends AbstractRestfulController
                 $url = $this->url()->fromRoute('twins/group', [
                     'id' => $object->id
                 ], [
-                    'force_canonical' => $canonical
+                    'force_canonical' => $canonical,
+                    'uri'             => $uri
                 ]);
                 break;
 
@@ -97,7 +106,8 @@ class CommentsController extends AbstractRestfulController
                 $url = $this->url()->fromRoute('votings/voting', [
                     'id' => $object->id
                 ], [
-                    'force_canonical' => $canonical
+                    'force_canonical' => $canonical,
+                    'uri'             => $uri
                 ]);
                 break;
 
@@ -106,7 +116,8 @@ class CommentsController extends AbstractRestfulController
                     'action'          => 'article',
                     'article_catname' => $object->catname
                 ], [
-                    'force_canonical' => $canonical
+                    'force_canonical' => $canonical,
+                    'uri'             => $uri
                 ]);
                 break;
 
@@ -114,7 +125,8 @@ class CommentsController extends AbstractRestfulController
                 $url = $this->url()->fromRoute('museums/museum', [
                     'id' => $object->id
                 ], [
-                    'force_canonical' => $canonical
+                    'force_canonical' => $canonical,
+                    'uri'             => $uri
                 ]);
                 break;
 
@@ -222,14 +234,18 @@ class CommentsController extends AbstractRestfulController
                     $userTable = new Users();
                     $parentMessageAuthor = $userTable->find($authorId)->current();
                     if ($parentMessageAuthor && !$parentMessageAuthor->deleted) {
-                        $url = $this->messageUrl($typeId, $object, true) . '#msg' . $messageId;
+
+                        $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor->language);
+
+                        $url = $this->messageUrl($typeId, $object, true, $uri) . '#msg' . $messageId;
                         $moderUrl = $this->url()->fromRoute('users/user', [
                             'user_id' => $user->identity ? $user->identity : 'user' . $user->id,
                         ], [
-                            'force_canonical' => true
+                            'force_canonical' => true,
+                            'uri'             => $uri
                         ]);
                         $message = sprintf(
-                            "%s ответил на ваше сообщение\n%s",
+                            $this->translate('pm/user-%s-replies-to-you-%s', 'default', $parentMessageAuthor->language),
                             $moderUrl, $url
                         );
                         $mModel = new Message();

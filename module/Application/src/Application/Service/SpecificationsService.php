@@ -561,7 +561,7 @@ class SpecificationsService
                     }
 
                     switch ($type['id']) {
-                        case 1: // строка
+                        case 1: // string
                             $filters = [['name' => 'StringTrim']];
                             break;
 
@@ -592,9 +592,9 @@ class SpecificationsService
                         case 5: // checkbox
                             $options['options'] = [
                                 ''  => '—',
-                                '-' => 'нет значения',
-                                '0' => 'нет',
-                                '1' => 'да'
+                                '-' => 'specifications/no-value-text',
+                                '0' => 'specifications/boolean/false',
+                                '1' => 'specifications/boolean/true'
                             ];
                             break;
 
@@ -602,7 +602,7 @@ class SpecificationsService
                         case 7: // treeselect
                             $elementOptions = [
                                 ''  => '—',
-                                '-' => 'нет значения',
+                                '-' => 'specifications/no-value-text',
                             ];
                             if (isset($multioptions[$attribute['id']])) {
                                 $elementOptions = array_replace($elementOptions, $multioptions[$attribute['id']]);
@@ -827,7 +827,7 @@ class SpecificationsService
 
         if ($attribute['isMultiple']) {
 
-            // удаляем дескрипторы значений
+            // remove value descriptiors
             $userValues = $userValueTable->fetchAll([
                 'attribute_id = ?' => $attribute['id'],
                 'item_id = ?'      => $itemId,
@@ -837,7 +837,7 @@ class SpecificationsService
             foreach ($userValues as $userValue) {
                 $userValue->delete();
             }
-            // удаляем значение
+            // remove values
             $userValueDataRows = $userValueDataTable->fetchAll([
                 'attribute_id = ?' => $attribute['id'],
                 'item_id = ?'      => $itemId,
@@ -864,7 +864,7 @@ class SpecificationsService
 
                 if (!$empty) {
 
-                    // вставляем новые дексрипторы и значения
+                    // insert new descriptiors and values
                     $userValueTable->insert([
                         'attribute_id' => $attribute['id'],
                         'item_id'      => $itemId,
@@ -900,7 +900,7 @@ class SpecificationsService
         } else {
 
             if (strlen($value) > 0) {
-                // вставлям/обновляем дескриптор значения
+                // insert/update value decsriptor
                 $userValue = $userValueTable->fetchRow([
                     'attribute_id = ?' => $attribute['id'],
                     'item_id = ?'      => $itemId,
@@ -908,7 +908,7 @@ class SpecificationsService
                     'user_id = ?'      => $uid
                 ]);
 
-                // вставляем/обновляем значение
+                // insert update value
                 $userValueData = $userValueDataTable->fetchRow([
                     'attribute_id = ?' => $attribute['id'],
                     'item_id = ?'      => $itemId,
@@ -962,7 +962,7 @@ class SpecificationsService
             } else {
 
                 $needUpdate = false;
-                // удаляем дескриптор значения
+                // delete value descriptor
                 $userValue = $userValueTable->fetchRow([
                     'attribute_id = ?' => $attribute['id'],
                     'item_id = ?'      => $itemId,
@@ -973,7 +973,7 @@ class SpecificationsService
                     $userValue->delete();
                     $needUpdate = true;
                 }
-                // удаляем значение
+                // remove value
                 $userValueData = $userValueDataTable->fetchRow([
                     'attribute_id = ?' => $attribute['id'],
                     'item_id = ?'      => $itemId,
@@ -1816,7 +1816,7 @@ class SpecificationsService
         ]);
         if (count($userValueDataRows)) {
 
-            // группируем по пользователям
+            // group by users
             $data = [];
             foreach ($userValueDataRows as $userValueDataRow) {
                 $uid = $userValueDataRow->user_id;
@@ -1852,10 +1852,10 @@ class SpecificationsService
                     'user_id = ?'      => $uid
                 ]);
                 if (!$row) {
-                    throw new Exception('Строка(строки) данных без дескриптора');
+                    throw new Exception('Row(rows) without descriptors');
                 }
 
-                // ищем такое же значение
+                // look for same value
                 $matchRegIdx = null;
                 foreach ($registry as $regIdx => $regVal) {
                     if ($regVal === $value) {
@@ -1880,7 +1880,7 @@ class SpecificationsService
                 //$idx++;
             }
 
-            // выбираем наибольшее
+            // select max
             $maxValueRatio = 0;
             $maxValueIdx = null;
             foreach ($ratios as $idx => $ratio) {
@@ -2045,7 +2045,7 @@ class SpecificationsService
 
                         $value = $valueDataRow->value;
 
-                        // ищем такое же значение
+                        // look for same value
                         $matchRegIdx = null;
                         foreach ($registry as $regIdx => $regVal) {
                             if ($regVal === $value) {
@@ -2065,7 +2065,7 @@ class SpecificationsService
                         $ratios[$matchRegIdx] += 1;
                     }
 
-                    // выбираем наибольшее
+                    // select max
                     $maxValueRatio = 0;
                     $maxValueIdx = null;
                     foreach ($ratios as $idx => $ratio) {

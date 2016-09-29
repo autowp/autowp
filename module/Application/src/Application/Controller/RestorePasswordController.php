@@ -64,14 +64,19 @@ class RestorePasswordController extends AbstractActionController
 
                     $code = $this->service->createRestorePasswordToken($user->id);
 
+                    $uri = $this->hostManager->getUriByLanguage($user->language);
+
                     $url = $this->url()->fromRoute('restorepassword/new', [
                         'code' => $code
                     ], [
-                        'force_canonical' => true
+                        'force_canonical' => true,
+                        'uri'             => $uri
                     ]);
 
-                    $message = 'Для ввода нового пароля перейдите по ссылке: ' . $url . PHP_EOL . PHP_EOL .
-                               'С Уважением, робот www.autowp.ru' . PHP_EOL;
+                    $message = sprintf(
+                        $this->translate('restore-password/new-password/mail/body-%s', 'default', $user->language),
+                        $url
+                    );
 
                     $mail = new Mail\Message();
                     $mail
@@ -79,7 +84,7 @@ class RestorePasswordController extends AbstractActionController
                         ->setBody($message)
                         ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
                         ->addTo($user->e_mail, $user->getCompoundName())
-                        ->setSubject('Восстановление пароля');
+                        ->setSubject($this->translate('restore-password/new-password/mail/subject', 'default', $user->language));
 
                     $this->transport->send($mail);
 

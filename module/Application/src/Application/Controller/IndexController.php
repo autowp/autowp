@@ -379,7 +379,6 @@ class IndexController extends AbstractActionController
 
         $language = $this->language();
 
-        // группы картинок
         $select = $pictures->select(true)
             ->where('pictures.accept_datetime > DATE_SUB(CURDATE(), INTERVAL 3 DAY)')
             ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
@@ -390,11 +389,10 @@ class IndexController extends AbstractActionController
             'width' => 3
         ]);
 
-        // по назначению
+        // categories
         $cacheKey = 'INDEX_CATEGORY7_' . $language;
         $destinations = $this->cache->getItem($cacheKey, $success);
         if (!$success) {
-            // промах кэша
             $categoryTable = new Category();
             $categoryAdapter = $categoryTable->getAdapter();
             $categoryLangTable = new Category_Language();

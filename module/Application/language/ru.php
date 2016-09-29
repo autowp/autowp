@@ -78,6 +78,7 @@ return [
     'picture-preview/no-comments' => 'нет',
     'picture-preview/no-ratio'    => 'нет',
     'picture-preview/crop-desc'   => 'На картинке выделена область автомобиля',
+    'picture-preview/special-name' => 'Картинке задано особое название',
     'Resolution'                  => 'Разрешение',
     'Filesize'                    => 'Размер',
     'Ratio'                       => 'Оценка',
@@ -160,6 +161,8 @@ return [
     'carlist/specifications' => 'технические характеристики',
     'carlist/designed by %s'  => 'дизайн %s',
     'carlist/edit-specs' => 'ввод ттх',
+    'carlist/years' => 'года выпуска',
+    'carlist/model-years' => 'модельный год',
 
     'picturelist/engine' => 'Engine',
     'picturelist/engine-%s' => 'Двигатель %s',
@@ -1698,6 +1701,10 @@ return [
 Не забывайте его',
     'restore-password/new-password/instructions-sent' => 'На ваш e-mail отправлены дальнейшие инструкции',
     'restore-password/new-password/email-not-found' => 'Пользователь с таким e-mail не найден',
+    'restore-password/new-password/mail/subject' => 'Восстановление пароля',
+    'restore-password/new-password/mail/body-%s' =>
+        "Для ввода нового пароля перейдите по ссылке: %s\n\n" .
+        "С Уважением, робот www.autowp.ru\n",
 
     'twins/group/name' => 'Название',
     'twins/group/description' => 'Описание',
@@ -1720,6 +1727,11 @@ return [
     'specifications-editor/your-value' => 'Ваше значение',
     'specifications-editor/actual-value' => 'Актуальное значение',
     'specifications-editor/all-values' => 'Введеные значения',
+    'specifications-editor/tabs/info' => 'Информация',
+    'specifications-editor/tabs/engine' => 'Двигатель',
+    'specifications-editor/tabs/specs' => 'Основные ТТХ',
+    'specifications-editor/tabs/result' => 'Результат',
+    'specifications-editor/tabs/admin' => 'Admin',
     'specifications-editor/engine' => 'Двигатель из каталога',
     'specifications-editor/engine/inherited-from' => 'Унаследовано от',
     'specifications-editor/engine/select-another' => 'Выбрать другой двигатель',
@@ -1760,6 +1772,17 @@ return [
     'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s' => 'Пользователь %s отменил вашу привязку автомобиля %s ( %s ) к категориям: %s',
     'pm/user-%s-edited-factory-description-%s-%s' => 'Пользователь %s редактировал описание завода %s ( %s )',
     'pm/your-picture-%s-enqueued-to-remove-%s' => "Добавленная вами картинка %s поставлена в очередь на удаление\n%s",
+    'pm/new-picture-%s-accept-vote-%s/accept' => "Подана заявка на принятие добавленной вами картинки\n%s\nПричина: %s",
+    'pm/new-picture-%s-delete-vote-%s/delete' => "Подана заявка на удаление добавленной вами картинки\n%s\nПричина: %s",
+    'pm/user-%s-edited-picture-copyrights-%s-%s' => 'Пользователь %s редактировал текст копирайтов изображения %s ( %s )',
+    'pm/user-%s-accept-replace-%s-%s' => '%s принял замену %s на %s',
+    'pm/your-picture-accepted-%s' => "Добавленная вами картинка принята на сайт\n%s",
+    'pm/user-%s-edited-twins-description-%s-%s' => 'Пользователь %s редактировал описание группы близнецов %s ( %s )',
+    'pm/user-%s-edited-vehicle-specs-%s' => '%s внес ттх для автомобиля %s',
+    'pm/user-%s-canceled-vehicle-engine-%s-%s-%s' => '%s отменил двигатель %s для автомобиля %s ( %s )',
+    'pm/user-%s-set-inherited-vehicle-engine-%s-%s' => '%s установил наследование двигателя автомобилю %s ( %s )',
+    'pm/user-%s-set-vehicle-engine-%s-%s-%s' => '%s назначил двигатель %s автомобилю %s ( %s )',
+    'pm/user-%s-replies-to-you-%s' => "%s ответил на ваше сообщение\n%s",
 
     'moder/vehicle/changes/name-%s-%s' => 'название автомобиля с "%s" на "%s"',
     'moder/vehicle/changes/body-%s-%s' => 'номер кузова с "%s" на "%s"',
@@ -1786,4 +1809,12 @@ return [
     'moder/statistics/from-years' => 'Годы начала выпуска автомобилей',
     'moder/statistics/from-and-to-years' => 'Годы начала и окончания выпуска автомобилей',
     'moder/statistics/from-and-to-years-and-months' => 'Годы и месяцы начала и окончания выпуска автомобилей',
+
+    'specifications/no-value-text' => 'нет значения',
+    'specifications/boolean/false' => 'нет',
+    'specifications/boolean/true' => 'да',
+
+    "Brand '%value%' already exists" => "Бренд с названием '%value%' уже существует",
+    "E-mail '%value%' not registered" => "E-mail '%value%' не зарегистрирован на сайте",
+    "E-mail '%value%' already registered" => "E-mail '%value%' уже зарегистрирован на сайте",
 ];

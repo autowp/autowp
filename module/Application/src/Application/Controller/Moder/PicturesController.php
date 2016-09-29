@@ -492,13 +492,14 @@ class PicturesController extends AbstractActionController
         ];
     }
 
-    private function pictureUrl(Picture_Row $picture, $forceCanonical = false)
+    private function pictureUrl(Picture_Row $picture, $forceCanonical = false, $uri = null)
     {
         return $this->url()->fromRoute('moder/pictures/params', [
             'action'     => 'picture',
             'picture_id' => $picture->id
         ], [
-            'force_canonical' => $forceCanonical
+            'force_canonical' => $forceCanonical,
+            'uri'             => $uri
         ]);
     }
 
@@ -665,7 +666,7 @@ class PicturesController extends AbstractActionController
         }
 
         if ($picture->type != Picture::CAR_TYPE_ID) {
-            throw new Exception('Картинка несовместимого типа');
+            throw new Exception('Invalid picture type');
         }
 
         $perspectives = new Perspectives();
@@ -691,6 +692,33 @@ class PicturesController extends AbstractActionController
         return new JsonModel([
             'ok' => true
         ]);
+    }
+
+    private function notifyVote($picture, $vote, $reason)
+    {
+        $owner = $picture->findParentUsersByOwner();
+        $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
+        if ($ownerIsModer) {
+            if ($owner->id != $this->user()->get()->id) {
+
+                $uri = $this->hostManager->getUriByLanguage($owner->language);
+
+                $message = sprintf(
+                    $this->translate(
+                        $vote
+                            ? 'pm/new-picture-%s-accept-vote-%s/accept'
+                            : 'pm/new-picture-%s-accept-vote-%s/delete',
+                        'default',
+                        $owner->language
+                    ),
+                    $this->pictureUrl($picture, true, $uri),
+                    $reason
+                );
+
+                $mModel = new Message();
+                $mModel->send(null, $owner->id, $message);
+            }
+        }
     }
 
     public function pictureVoteAction()
@@ -793,21 +821,7 @@ class PicturesController extends AbstractActionController
                     );
                     $this->log($message, $picture);
 
-                    $owner = $picture->findParentUsersByOwner();
-                    $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
-                    if ($ownerIsModer) {
-                        if ($owner->id != $this->user()->get()->id) {
-                            $message = sprintf(
-                                'Подана заявка на %s добавленной вами картинки %s'.PHP_EOL.' Причина: %s',
-                                $vote ? 'удаление' : 'принятие',
-                                $this->pictureUrl($picture, true),
-                                $values['reason']
-                            );
-
-                            $mModel = new Message();
-                            $mModel->send(null, $owner->id, $message);
-                        }
-                    }
+                    $this->notifyVote($picture, $vote, $values['reason']);
 
                     $referer = $request->getServer('HTTP_REFERER');
                     if ($referer) {
@@ -972,25 +986,25 @@ class PicturesController extends AbstractActionController
 
                 if ($picture->copyrights_text_id) {
                     $userIds = $this->textStorage->getTextUserIds($picture->copyrights_text_id);
-                    $message = sprintf(
-                        'Пользователь %s редактировал текст копирайтов изображения %s ( %s )',
-                        $this->url()->fromRoute('users/user', [
-                            'user_id' => $user->identity ? $user->identity : 'user' . $user->id
-                        ], [
-                            'force_canonical' => true
-                        ]),
-                        $picture->getCaption([
-                            'language'   => $this->language(),
-                            'translator' => $this->translator
-                        ]),
-                        $this->pictureUrl($picture, true)
-                    );
 
                     $mModel = new Message();
                     $userTable = new Users();
                     foreach ($userIds as $userId) {
                         if ($userId != $user->id) {
                             foreach ($userTable->find($userId) as $userRow) {
+
+                                $uri = $this->hostManager->getUriByLanguage($userRow->language);
+
+                                $message = sprintf(
+                                    $this->translate('pm/user-%s-edited-picture-copyrights-%s-%s', 'default', $userRow->language),
+                                    $this->userModerUrl($user, true, $uri),
+                                    $picture->getCaption([
+                                        'language'   => $userRow->language,
+                                        'translator' => $this->translator
+                                    ]),
+                                    $this->pictureUrl($picture, true, $uri)
+                                );
+
                                 $mModel->send(null, $userRow->id, $message);
                             }
                         }
@@ -1029,7 +1043,7 @@ class PicturesController extends AbstractActionController
                     }
                 }
             } catch (Exception $e) {
-                $iptcStr = 'Ошибка при чтении IPTC: '.$e->getMessage();
+                $iptcStr = 'Error read IPTC: '.$e->getMessage();
             }
 
             $exifStr = '';
@@ -1054,7 +1068,7 @@ class PicturesController extends AbstractActionController
                     }
                 }
             } catch (Exception $e) {
-                $exifStr .= 'Ошибка при чтении EXIF: '.$e->getMessage();
+                $exifStr .= 'Error read EXIF: '.$e->getMessage();
             }
         }
 
@@ -1197,7 +1211,7 @@ class PicturesController extends AbstractActionController
                 'ip' => inet_ntop($picture->ip)
             ]));
             $this->banForm->populateValues([
-                'submit' => 'Забанить'
+                'submit' => 'ban/ban'
             ]);
         }
 
@@ -1285,13 +1299,6 @@ class PicturesController extends AbstractActionController
             'iptc'                          => $iptcStr,
             'exif'                          => $exifStr,
             'lastCar'                       => $lastCar,
-            'pictureTypes'                  => [
-                Picture::UNSORTED_TYPE_ID  => 'Несортировано',
-                Picture::CAR_TYPE_ID       => 'Автомобиль',
-                Picture::LOGO_TYPE_ID      => 'Логотип',
-                Picture::MIXED_TYPE_ID     => 'Разное',
-                Picture::ENGINE_TYPE_ID    => 'Двигатель',
-            ],
             'galleryFullUrl'                => $galleryFullUrl,
             'sourceUrl'                     => $sourceUrl,
             'replacePicture'                => $replacePicture,
@@ -1863,20 +1870,26 @@ class PicturesController extends AbstractActionController
         }
         unset($recepients[$user->id]);
         if ($recepients) {
-            $url = $this->pic()->url($picture->id, $picture->identity, true);
-            $replaceUrl = $this->pic()->url($replacePicture->id, $replacePicture->identity, true);
-            $moderUrl = $this->url()->fromRoute('users/user', [
-                'user_id' => $user->identity ? $user->identity : 'user' . $user->id
-            ], [
-                'force_canonical' => true
-            ]);
-
-            $message = sprintf(
-                '%s принял замену %s на %s',
-                $moderUrl, $replaceUrl, $url
-            );
             $mModel = new Message();
             foreach ($recepients as $recepient) {
+
+                $uri = $this->hostManager->getUriByLanguage($recepient->language);
+
+                $url = $this->pic()->url($picture->id, $picture->identity, true, $uri);
+                $replaceUrl = $this->pic()->url($replacePicture->id, $replacePicture->identity, true, $uri);
+
+                $moderUrl = $this->url()->fromRoute('users/user', [
+                    'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                ], [
+                    'force_canonical' => true,
+                    'uri'             => $uri
+                ]);
+
+                $message = sprintf(
+                    $this->translate('pm/user-%s-accept-replace-%s-%s', 'default', $recepient->language),
+                    $moderUrl, $replaceUrl, $url
+                );
+
                 $mModel->send(null, $recepient->id, $message);
             }
         }
@@ -1914,17 +1927,18 @@ class PicturesController extends AbstractActionController
 
             $previousStatusUserId = $picture->change_status_user_id;
 
-            $pictureUrl = $this->pic()->url($picture->id, $picture->identity, true);
-
             $pictureTable = new Picture();
 
             $success = $pictureTable->accept($picture->id, $user->id, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
                 $owner = $picture->findParentUsersByOwner();
                 if ( $owner && ($owner->id != $user->id) ) {
+
+                    $uri = $this->hostManager->getUriByLanguage($owner->language);
+
                     $message = sprintf(
-                        'Добавленная вами картинка %s принята на сайт',
-                        $pictureUrl
+                        $this->translate('pm/your-picture-accepted-%s', 'default', $owner->language),
+                        $this->pic()->url($picture->id, $picture->identity, true, $uri)
                     );
 
                     $mModel = new Message();
@@ -1938,7 +1952,7 @@ class PicturesController extends AbstractActionController
                 foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                     $message = sprintf(
                         'Принята картинка %s',
-                        $pictureUrl
+                        $this->pic()->url($picture->id, $picture->identity, true)
                     );
                     $mModel->send(null, $prevUser->id, $message);
                 }
@@ -2026,20 +2040,7 @@ class PicturesController extends AbstractActionController
                 );
                 $this->log($message, $picture);
 
-                $owner = $picture->findParentUsersByOwner();
-                $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
-                if ($ownerIsModer) {
-                    if ($owner->id != $this->user()->get()->id) {
-                        $message = sprintf(
-                            'Подана заявка на %s добавленной вами картинки %s'.PHP_EOL.' Причина: %s',
-                            $vote ? 'удаление' : 'принятие',
-                            $this->pictureUrl($picture, true),
-                            $values['reason']
-                        );
-                        $mModel = new Message();
-                        $mModel->send(null, $owner->id, $message);
-                    }
-                }
+                $this->notifyVote($picture, $vote, $values['reason']);
             }
         }
 

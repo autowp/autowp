@@ -175,7 +175,9 @@ class Pictures extends AbstractHelper
         ]);
 
         if ($isModer && $picture->name) {
-            $escCaption = '<span style="color:darkgreen" title="Картинке задано особое название">'.$escCaption.'</span>';
+            $escCaption = '<span style="color:darkgreen" title="'.$this->view->escapeHtmlAttr($this->view->translate('picture-preview/special-name')).'">' .
+                    $escCaption .
+                '</span>';
         }
 
         $moderVote = $this->getModerVote($picture);

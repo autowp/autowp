@@ -43,8 +43,9 @@ return [
                 return new Controller\BrandsController($cache);
             },
             Controller\CarsController::class => function($sm) {
+                $hostManager = $sm->get(HostManager::class);
                 $filterForm = $sm->get('AttrsLogFilterForm');
-                return new Controller\CarsController($filterForm);
+                return new Controller\CarsController($hostManager, $filterForm);
             },
             Controller\CatalogueController::class => function($sm) {
                 $textStorage = $sm->get(TextStorage\Service::class);
@@ -58,8 +59,9 @@ return [
             },
             Controller\ChartController::class        => InvokableFactory::class,
             Controller\CommentsController::class => function($sm) {
+                $hostManager = $sm->get(HostManager::class);
                 $commentForm = $sm->get('CommentForm');
-                return new Controller\CommentsController($commentForm);
+                return new Controller\CommentsController($hostManager, $commentForm);
             },
             Controller\DonateController::class       => InvokableFactory::class,
             Controller\FactoriesController::class => function($sm) {

@@ -5,6 +5,7 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\HostManager;
 use Application\Model\Message;
 
 use Twins_Groups;
@@ -24,8 +25,14 @@ class TwinsController extends AbstractActionController
 
     private $textStorage;
 
-    public function __construct($textStorage, Form $editForm, Form $descForm)
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
+
+    public function __construct(HostManager $hostManager, $textStorage, Form $editForm, Form $descForm)
     {
+        $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->editForm = $editForm;
         $this->descForm = $descForm;
@@ -35,13 +42,14 @@ class TwinsController extends AbstractActionController
      * @param Zend_Db_Table_Row $group
      * @return string
      */
-    private function twinsGroupModerUrl($group, $forceCanonical)
+    private function twinsGroupModerUrl($group, $forceCanonical, $uri = null)
     {
         return $this->url()->fromRoute('moder/twins/params', [
             'action'         => 'twins-group',
             'twins_group_id' => $group->id
         ], [
-            'force_canonical' => $forceCanonical
+            'force_canonical' => $forceCanonical,
+            'uri'             => $uri
         ]);
     }
 
@@ -157,20 +165,28 @@ class TwinsController extends AbstractActionController
 
             if ($group->text_id) {
                 $userIds = $this->textStorage->getTextUserIds($group->text_id);
-                $message = sprintf(
-                    'Пользователь %s редактировал описание группы близнецов %s ( %s )',
-                    $this->url()->fromRoute('users/user', [
-                        'user_id' => $user->identity ? $user->identity : 'user' . $user->id
-                    ]),
-                    $group->name,
-                    $this->twinsGroupModerUrl($group, true)
-                );
 
                 $userTable = new Users();
                 $mModel = new Message();
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {
+
                         foreach ($userTable->find($userId) as $userRow) {
+
+                            $uri = $this->hostManager->getUriByLanguage($userRow->language);
+
+                            $message = sprintf(
+                                $this->translate('pm/user-%s-edited-twins-description-%s-%s', 'default', $userRow->language),
+                                $this->url()->fromRoute('users/user', [
+                                    'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                                ], [
+                                    'force_canonical' => true,
+                                    'uri'             => $uri
+                                ]),
+                                $group->name,
+                                $this->twinsGroupModerUrl($group, true, $uri)
+                            );
+
                             $mModel->send(null, $userRow->id, $message);
                         }
                     }
