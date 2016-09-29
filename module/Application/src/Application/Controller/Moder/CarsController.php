@@ -40,6 +40,7 @@ use Twins_Groups;
 use Twins_Groups_Cars;
 use User_Car_Subscribe;
 use Users;
+use User_Row;
 
 use Zend_Db_Expr;
 use Zend_Session_Namespace;
@@ -331,12 +332,12 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param Users_Row $user
+     * @param User_Row $user
      * @param bool $full
      * @param \Zend\Uri\Uri $uri
      * @return string
      */
-    private function userModerUrl(Users_Row $user, $full = false, $uri = null)
+    private function userModerUrl(User_Row $user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user->identity ? $user->identity : 'user' . $user->id
@@ -970,18 +971,19 @@ class CarsController extends AbstractActionController
 
         $changes = [];
         foreach ($fields as $field => $info) {
+            $message = $this->translate($info[1], 'default', $language);
             switch ($info[0]) {
                 case 'int':
                     $old = is_null($oldData[$field]) ? null : (int)$oldData[$field];
                     $new = is_null($newData[$field]) ? null : (int)$newData[$field];
                     if ($old !== $new)
-                        $changes[] = sprintf($info[1], $old, $new);
+                        $changes[] = sprintf($message, $old, $new);
                         break;
                 case 'str':
                     $old = is_null($oldData[$field]) ? null : (string)$oldData[$field];
                     $new = is_null($newData[$field]) ? null : (string)$newData[$field];
                     if ($old !== $new) {
-                        $changes[] = sprintf($info[1], $old, $new);
+                        $changes[] = sprintf($message, $old, $new);
                     }
                     break;
                 case 'bool':
@@ -992,17 +994,18 @@ class CarsController extends AbstractActionController
                         ? null
                         : $this->translate($newData[$field] ? 'moder/vehicle/changes/boolean/true' : 'moder/vehicle/changes/boolean/false');
                     if ($old !== $new) {
-                        $changes[] = sprintf($info[1], $old, $new);
+                        $changes[] = sprintf($message, $old, $new);
                     }
                     break;
 
                 case 'spec_id':
+                    $specTable = new Spec();
                     $old = $oldData[$field];
                     $new = $newData[$field];
                     if ($old !== $new) {
                         $old = $specTable->find($old)->current();
                         $new = $specTable->find($new)->current();
-                        $changes[] = sprintf($info[1], $old ? $old->short_name : '-', $new ? $new->short_name : '-');
+                        $changes[] = sprintf($message, $old ? $old->short_name : '-', $new ? $new->short_name : '-');
                     }
                     break;
 
@@ -1013,9 +1016,9 @@ class CarsController extends AbstractActionController
                     if ($old !== $new) {
                         $old = $carTypeTable->find($old)->current();
                         $new = $carTypeTable->find($new)->current();
-                        $oldName = $old ? $this->translator->translate($old->name) : '-';
-                        $newName = $new ? $this->translator->translate($new->name) : '-';
-                        $changes[] = sprintf($info[1], $oldName, $newName);
+                        $oldName = $old ? $this->translate($old->name) : '-';
+                        $newName = $new ? $this->translate($new->name) : '-';
+                        $changes[] = sprintf($message, $oldName, $newName);
                     }
                     break;
             }

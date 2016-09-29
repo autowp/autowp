@@ -27,6 +27,7 @@ use Picture;
 use Picture_Row;
 use Picture_Moder_Vote;
 use Users;
+use User_Row;
 
 use Exception;
 
@@ -642,12 +643,12 @@ class PicturesController extends AbstractActionController
     }
 
     /**
-     * @param Users_Row $user
+     * @param User_Row $user
      * @param bool $full
      * @param \Zend\Uri\Uri $uri
      * @return string
      */
-    private function userModerUrl(Users_Row $user, $full = false, $uri = null)
+    private function userModerUrl(User_Row $user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user->identity ? $user->identity : 'user' . $user->id
