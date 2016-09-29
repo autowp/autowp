@@ -9,117 +9,6 @@ use Exception;
 
 class Picture_Row extends Row
 {
-    private $_caption_cache = [];
-
-    private $perspectiveTable;
-    private $perspectivePrefix = [];
-    private $prefixedPerspectives = [5, 6, 17, 20, 21, 22, 23];
-
-    private function getPerspectiveTable()
-    {
-        return $this->perspectiveTable
-        ? $this->perspectiveTable
-        : $this->perspectiveTable = new Perspectives();
-    }
-
-    private static function mbUcfirst($str)
-    {
-        return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
-    }
-
-    private function getPerspectivePrefix($id, $language, $translator)
-    {
-        if (in_array($id, $this->prefixedPerspectives)) {
-            if (!isset($this->perspectivePrefix[$id][$language])) {
-                $row = $this->getPerspectiveTable()->find($id)->current();
-                if ($row) {
-                    $name = $translator->translate($row->name, 'default', $language);
-                    $this->perspectivePrefix[$id][$language] = self::mbUcfirst($name) . ' ';
-                } else {
-                    $this->perspectivePrefix[$id][$language] = '';
-                }
-            }
-
-            return $this->perspectivePrefix[$id][$language];
-        }
-
-        return '';
-    }
-
-    public function getCaption(array $options = [])
-    {
-        if ($this->name) {
-            return $this->name;
-        }
-
-        if (!isset($options['translator'])) {
-            throw new Exception('`translator` expected');
-        }
-
-        $language = isset($options['language']) ? $options['language'] : 'en';
-        $translator = $options['translator'];
-
-        if (isset($this->_caption_cache[$language])) {
-            return $this->_caption_cache[$language];
-        }
-
-        $caption = null;
-
-        switch ($this->type) {
-            case Picture::CAR_TYPE_ID:
-                $car = $this->findParentCars();
-                if ($car) {
-                    $caption = $this->getPerspectivePrefix($this->perspective_id, $language, $translator) .
-                    $car->getFullName($language);
-                }
-                break;
-
-            case Picture::ENGINE_TYPE_ID:
-                $engine = $this->findParentEngines();
-                $caption = 'Двигатель '.($engine ? ' '.$engine->caption: '');
-                break;
-
-            case Picture::LOGO_TYPE_ID:
-                $brand = $this->findParentBrands();
-                $caption = 'Логотип '.($brand ? ' '.$brand->getLanguageName($language) : '');
-                break;
-
-            case Picture::MIXED_TYPE_ID:
-                $brand = $this->findParentBrands();
-                $caption = ($brand ? $brand->getLanguageName($language).' ' : '').' Разное';
-                break;
-
-            case Picture::UNSORTED_TYPE_ID:
-                $brand = $this->findParentBrands();
-                $caption = ($brand ? $brand->getLanguageName($language) : 'Несортировано');
-                break;
-
-            case Picture::FACTORY_TYPE_ID:
-                $factory = $this->findParentFactory();
-                if ($factory) {
-                    $caption = $factory->name;
-                }
-                break;
-        }
-
-        if (!$caption) {
-            $caption = 'Изображение №'.$this->id;
-        }
-
-        $this->_caption_cache[$language] = $caption;
-        return $caption;
-    }
-
-    /**
-     * @deprecated
-     * @param string $absolute
-     * @return string
-     */
-    public function getModerUrl($absolute = false)
-    {
-        return ($absolute ? HOST : '/').'moder/car/?car_id='.$this->id;
-    }
-
     private static function between($a, $min, $max)
     {
         return ($min <= $a) && ($a <= $max);
@@ -127,14 +16,13 @@ class Picture_Row extends Row
 
     public static function checkCropParameters($options)
     {
-        // проверяем установлены ли границы обрезания
-        // проверяем верные ли значения границ обрезания
+        // Check existance and correct of crop parameters
         return  !is_null($options['crop_left']) && !is_null($options['crop_top']) &&
-        !is_null($options['crop_width']) && !is_null($options['crop_height']) &&
-        self::between($options['crop_left'], 0, $options['width']) &&
-        self::between($options['crop_width'], 1, $options['width']) &&
-        self::between($options['crop_top'], 0, $options['height']) &&
-        self::between($options['crop_height'], 1, $options['height']);
+                !is_null($options['crop_width']) && !is_null($options['crop_height']) &&
+                self::between($options['crop_left'], 0, $options['width']) &&
+                self::between($options['crop_width'], 1, $options['width']) &&
+                self::between($options['crop_top'], 0, $options['height']) &&
+                self::between($options['crop_height'], 1, $options['height']);
     }
 
     public function cropParametersExists()

@@ -169,16 +169,6 @@ class Car_Row extends Row
         ]);
     }
 
-    /**
-     * @param string $absolute
-     * @return string
-     * @deprecated
-     */
-    public function getModerUrl($absolute = false)
-    {
-        return ($absolute ? HOST : '/').'moder/car/?car_id='.$this->id;
-    }
-
     public function getCaptionHtml()
     {
         $result = htmlspecialchars($this->caption);
