@@ -4,16 +4,6 @@ use Application\Db\Table\Row;
 
 class User_Row extends Row
 {
-    /**
-     * @deprecated
-     * @param bool $absolute
-     * @return string
-     */
-    public function getAboutUrl($absolute = false)
-    {
-        return ($absolute ? HOST : '/').'users/' . ($this->identity ? $this->identity : 'user'.$this->id);
-    }
-
     public function getCompoundName()
     {
         if ($this->deleted) {

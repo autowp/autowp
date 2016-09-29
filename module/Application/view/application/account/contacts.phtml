@@ -22,7 +22,9 @@
                                 <div class="media-left media-middle">
                                     <?php if (!$user->deleted) { ?>
                                         <?=$this->htmlA([
-                                            'href'  => $user->getAboutUrl(),
+                                            'href'  => $this->url('users/user', [
+                                                'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+                                            ]),
                                             'class' => 'photo'
                                         ], $this->user($user)->avatar(), false) ?>
                                     <?php } ?>

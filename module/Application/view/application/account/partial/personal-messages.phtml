@@ -10,7 +10,9 @@
             </div>
             <div class="photo">
                 <?php if ($message['author'] && !$message['author']->deleted) { ?>
-                    <?=$this->htmlA($message['authorUrl'], $this->user($message['author'])->avatar(), false)?>
+                    <?=$this->htmlA($this->url('users/user', [
+                        'user_id' => $message['author']->identity ? $message['author']->identity : 'user' . $message['author']->id
+                    ]), $this->user($message['author'])->avatar(), false)?>
                 <?php } ?>
             </div>
             <div class="content">

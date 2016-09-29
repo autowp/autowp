@@ -373,7 +373,6 @@ class Message
             $messages[] = [
                 'id'              => $message->id,
                 'author'          => $author,
-                'authorUrl'       => $author ? $author->getAboutUrl() : null,
                 'contents'        => $message->contents,
                 'isNew'           => $isNew,
                 'canDelete'       => $canDelete,
