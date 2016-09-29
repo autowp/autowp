@@ -54,7 +54,7 @@
                     'data-activate' => $tab['active'] ? '1' : null
                 ],
                 ($tab['icon'] ? '<span class="'.$tab['icon'].'"></span> ' : '') .
-                $this->escapeHtml($tab['title']) .
+                $this->escapeHtml($this->translate($tab['title'])) .
                 ($tab['count'] ? ' <span class="badge">'.$tab['count'].'</span>' : ''),
                 false
             )?>

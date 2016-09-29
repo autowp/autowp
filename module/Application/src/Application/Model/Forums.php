@@ -152,7 +152,7 @@ class Forums
     public function subscribe($topicId, $userId)
     {
         if (!$this->canSubscribe($topicId, $userId)) {
-            throw new \Exception('Пользователь уже подписан');
+            throw new \Exception('Already subscribed');
         }
 
         $this->subscriberTable->insert([
@@ -164,7 +164,7 @@ class Forums
     public function unSubscribe($topicId, $userId)
     {
         if (!$this->canUnSubscribe($topicId, $userId)) {
-            throw new \Exception('Пользователь не подписан');
+            throw new \Exception('User not subscribed');
         }
 
         $this->subscriberTable->delete([

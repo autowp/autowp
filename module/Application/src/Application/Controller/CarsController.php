@@ -6,6 +6,7 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Application\HostManager;
 use Application\Model\Message;
 use Application\Model\Brand;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -33,8 +34,14 @@ class CarsController extends AbstractActionController
      */
     private $filterForm;
 
-    public function __construct(Form $filterForm)
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
+
+    public function __construct(HostManager $hostManager, Form $filterForm)
     {
+        $this->hostManager = $hostManager;
         $this->filterForm = $filterForm;
     }
 
@@ -48,13 +55,14 @@ class CarsController extends AbstractActionController
             : $this->engineTable = new Engines();
     }
 
-    private function carModerUrl(Car_Row $car)
+    private function carModerUrl(Car_Row $car, $uri = null)
     {
         return $this->url()->fromRoute('moder/cars/params', [
             'action' => 'car',
             'car_id' => $car->id,
         ], [
-            'force_canonical' => true
+            'force_canonical' => true,
+            'uri'             => $uri
         ]);
     }
 
@@ -111,11 +119,6 @@ class CarsController extends AbstractActionController
 
                 $mModel = new Message();
 
-                $message = sprintf(
-                    '%s внес ттх для автомобиля %s',
-                    $this->userUrl($user), $car->getFullName($this->language())
-                );
-
                 $contribPairs = $service->getContributors(1, [$car->id]);
                 $contributors = [];
                 if ($contribPairs) {
@@ -129,6 +132,15 @@ class CarsController extends AbstractActionController
 
                 foreach ($contributors as $contributor) {
                     if ($contributor->id != $user->id) {
+
+                        $uri = $this->hostManager->getUriByLanguage($contributor->language);
+
+                        $message = sprintf(
+                            $this->translate('pm/user-%s-edited-vehicle-specs-%s', 'default', $contributor->language),
+                            $this->userUrl($user, $uri),
+                            $car->getFullName($contributor->language)
+                        );
+
                         $mModel->send(null, $contributor->id, $message);
                     }
                 }
@@ -164,22 +176,22 @@ class CarsController extends AbstractActionController
         $tabs = [
             'info' => [
                 'icon'  => 'fa fa-info',
-                'title' => 'Информация',
+                'title' => 'specifications-editor/tabs/info',
                 'count' => 0,
             ],
             'engine' => [
                 'icon'  => 'glyphicon glyphicon-align-left',
-                'title' => 'Двигатель',
+                'title' => 'specifications-editor/tabs/engine',
                 'count' => (bool)$engine,
             ],
             'spec' => [
                 'icon'  => 'fa fa-car',
-                'title' => 'Основные ТТХ',
+                'title' => 'specifications-editor/tabs/specs',
                 'count' => 0,
             ],
             'result' => [
                 'icon'      => 'fa fa-table',
-                'title'     => 'Результат',
+                'title'     => 'specifications-editor/tabs/result',
                 'data-load' => $this->url()->fromRoute('cars/params', [
                     'action' => 'car-specs'
                 ], [], true),
@@ -187,7 +199,7 @@ class CarsController extends AbstractActionController
             ],
             'admin' => [
                 'icon'      => 'fa fa-cog',
-                'title'     => 'Admin',
+                'title'     => 'specifications-editor/tabs/admin',
                 'count' => 0,
             ],
         ];
@@ -624,12 +636,13 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    private function userUrl(User_Row $user)
+    private function userUrl(User_Row $user, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user->identity ? $user->identity : 'user' . $user->id
         ], [
-            'force_canonical' => true
+            'force_canonical' => true,
+            'uri'             => $uri
         ]);
     }
 
@@ -669,12 +682,19 @@ class CarsController extends AbstractActionController
 
             $mModel = new Message();
 
-            $message = sprintf(
-                '%s отменил двигатель %s для автомобиля %s ( %s )',
-                $this->userUrl($user), $engine->caption, $car->getFullName('en'), $this->carModerUrl($car)
-            );
             foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
+
+                    $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+
+                    $message = sprintf(
+                        $this->translate('pm/user-%s-canceled-vehicle-engine-%s-%s-%s', 'default', $subscriber->language),
+                        $this->userUrl($user, $uri),
+                        $engine->caption,
+                        $car->getFullName($subscriber->language),
+                        $this->carModerUrl($car, $uri)
+                    );
+
                     $mModel->send(null, $subscriber->id, $message);
                 }
             }
@@ -717,12 +737,18 @@ class CarsController extends AbstractActionController
 
             $mModel = new Message();
 
-            $message = sprintf(
-                '%s установил наследование двигателя автомобилю %s ( %s )',
-                $this->userUrl($user), $car->getFullName('en'), $this->carModerUrl($car)
-            );
             foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
+
+                    $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+
+                    $message = sprintf(
+                        $this->translate('pm/user-%s-set-inherited-vehicle-engine-%s-%s', 'default', $subscriber->language),
+                        $this->userUrl($user, $uri),
+                        $car->getFullName($subscriber->language),
+                        $this->carModerUrl($car, $uri)
+                    );
+
                     $mModel->send(null, $subscriber->id, $message);
                 }
             }
@@ -831,12 +857,19 @@ class CarsController extends AbstractActionController
 
         $mModel = new Message();
 
-        $message = sprintf(
-            '%s назначил двигатель %s автомобилю %s ( %s )',
-            $this->userUrl($user), $engine->caption, $car->getFullName('en'), $this->carModerUrl($car)
-        );
         foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
             if ($subscriber && ($subscriber->id != $user->id)) {
+
+                $uri = $this->hostManager->getUriByLanguage($subscriber->language);
+
+                $message = sprintf(
+                    $this->translate('pm/user-%s-set-vehicle-engine-%s-%s-%s', 'default', $subscriber->language),
+                    $this->userUrl($user, $uri),
+                    $engine->caption,
+                    $car->getFullName($subscriber->language),
+                    $this->carModerUrl($car, $uri)
+                );
+
                 $mModel->send(null, $subscriber->id, $message);
             }
         }

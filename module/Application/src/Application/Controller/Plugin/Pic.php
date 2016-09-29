@@ -80,7 +80,8 @@ class Pic extends AbstractPlugin
     {
         $defaults = [
             'fallback'  => true,
-            'canonical' => false
+            'canonical' => false,
+            'uri'       => null
         ];
         $options = array_replace($defaults, $options);
 
@@ -98,7 +99,8 @@ class Pic extends AbstractPlugin
                         'brand_catname' => $brandRow->folder,
                         'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
                     ], [
-                        'force_canonical' => $options['canonical']
+                        'force_canonical' => $options['canonical'],
+                        'uri'             => $options['uri']
                     ]);
                 }
                 break;

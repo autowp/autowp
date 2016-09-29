@@ -122,7 +122,7 @@ class Car extends AbstractHelper
 
         if ($useModelYear) {
 
-            $mylabel = '<span title="модельный год">';
+            $mylabel = '<span title="' . $view->escapeHtmlAttr($view->translate('carlist/model-years')) . '">';
             if ($emy == $bmy) {
                 $mylabel .= $bmy;
             } elseif ($bms == $ems) {
@@ -146,7 +146,7 @@ class Car extends AbstractHelper
             $result = $mylabel . ' ' . $result;
 
             if ($by > 0 || $ey > 0) {
-                $result .= '<small> \'<span class="realyears" title="года выпуска">';
+                $result .= '<small> \'<span class="realyears" title="'.$this->view->escapeHtmlAttr($this->view->translate('carlist/years')).'">';
 
                 if ($equalM) {
                     $result .= sprintf($this->_monthFormat, $bm).$by;

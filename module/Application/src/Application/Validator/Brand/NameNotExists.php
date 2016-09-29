@@ -11,7 +11,7 @@ class NameNotExists extends AbstractValidator
     const EXISTS = 'brandNameAlreadyExists';
 
     protected $messageTemplates = [
-        self::EXISTS => "Бренд с названием '%value%' уже существует"
+        self::EXISTS => "Brand '%value%' already exists"
     ];
 
     public function isValid($value)
