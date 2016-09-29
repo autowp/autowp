@@ -13,18 +13,10 @@
         <div class="col-md-2">
             <div class="thumbnail">
                 <?php if ($picture = $category['top_picture']) { ?>
-                    <?php
-                        $caption = $picture->getCaption();
-                    ?>
                     <?=$this->htmlA(
-                        [
-                            'href'   => $category['url'],
-                            //'class'    =>    'thumbnail'
-                        ],
-                        $this->img($picture->getFormatRequest(), [
-                            'format' => 'picture-thumb',
-                            'alt'    => $caption,
-                            'title'  => $caption
+                        $category['url'],
+                        $this->htmlImg($picture['image']->getSrc(), [
+                            'format' => 'picture-thumb'
                         ]),
                         false
                     ) ?>

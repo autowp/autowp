@@ -78,10 +78,10 @@ class CategoryController extends AbstractActionController
             $this->cache->setItem($key, $categories);
         }
 
-        $pictures = $this->catalogue()->getPictureTable();
+        $pictureTable = $this->catalogue()->getPictureTable();
         foreach ($categories as &$category) {
-            $category['top_picture'] = $pictures->fetchRow(
-                $pictures->select(true)
+            $picture = $pictureTable->fetchRow(
+                $pictureTable->select(true)
                     ->join('category_car', 'pictures.car_id=category_car.car_id', null)
                     ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
                     ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
@@ -94,6 +94,12 @@ class CategoryController extends AbstractActionController
                     ])
                     ->limit(1)
             );
+
+            $image = $this->imageStorage()->getFormatedImage($picture->getFormatRequest(), 'picture-thumb');
+
+            $category['top_picture'] = [
+                'image' => $image
+            ];
         }
 
         return [

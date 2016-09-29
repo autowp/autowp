@@ -320,30 +320,6 @@ class Picture_Row extends Row
         return $options;
     }
 
-    protected function postImageFormat($imageRow, $format)
-    {
-        if ($format->id == 8) {
-
-            $image = $imageRow->getImage('image');
-
-            $caption = $this->getCaption();
-
-            $cmd = sprintf(
-                "convert %s -gravity northwest " .
-                "-pointsize 20 " .
-                "-stroke '#000C' -strokewidth 2 -size 342x caption:%s " .
-                "-stroke none -fill white -size 342x caption:%s %s",
-                escapeshellarg($image['filepath']),
-                escapeshellarg($caption),
-                escapeshellarg($caption),
-                escapeshellarg($image['filepath'])
-            );
-            $code = exec($cmd);
-
-            print $cmd;
-        }
-    }
-
     public function refreshRatio()
     {
         $votes = new Votes();

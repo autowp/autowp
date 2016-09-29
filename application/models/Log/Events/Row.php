@@ -50,7 +50,7 @@ class Log_Events_Row extends Row
                     $tableName = 'log_events_factory';
                     break;
                 default:
-                    throw new Exception('Неизвестный тип данных');
+                    throw new Exception('Unknown data type');
             }
 
             if ($col && $tableName) {
