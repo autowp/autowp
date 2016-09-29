@@ -266,14 +266,14 @@ class Comments
         if (!$message) {
             return [
                 'success' => false,
-                'error'   => 'Сообщение не найдено'
+                'error'   => 'Message not found'
             ];
         }
 
         if ($message->author_id == $userId) {
             return [
                 'success' => false,
-                'error'   => 'Нельзя оценивать собственные сообщения',
+                'error'   => 'Self-vote forbidden',
             ];
         }
 
@@ -296,7 +296,7 @@ class Comments
         if ($voteRow->vote == $vote) {
             return [
                 'success' => false,
-                'error'   => 'Вы уже поставили свою оценку'
+                'error'   => 'Alreay voted'
             ];
         }
 

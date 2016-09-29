@@ -271,6 +271,13 @@ class PictureController extends AbstractActionController
 
         $select = $this->getPicturesSelect($picture);
 
-        return new JsonModel($this->pic()->gallery($select));
+        return new JsonModel($this->pic()->gallery2($select, [
+            'page'      => $this->params()->fromQuery('page'),
+            'pictureId' => $this->params()->fromQuery('pictureId'),
+            'reuseParams' => true,
+            'urlParams' => [
+                'action' => 'picture'
+            ]
+        ]));
     }
 }

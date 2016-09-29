@@ -1032,139 +1032,6 @@ class Pic extends AbstractPlugin
         return $links;
     }
 
-    public function gallery(Zend_Db_Table_Select $picSelect)
-    {
-        $galleryStatuses = [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW];
-
-        $gallery = [];
-
-        $controller = $this->getController();
-        $catalogue = $controller->catalogue();
-        $imageStorage = $controller->imageStorage();
-
-        $language = $controller->language();
-
-        $select = clone $picSelect;
-
-        $select
-            ->reset(Zend_Db_Select::COLUMNS)
-            ->setIntegrityCheck(false)
-            ->columns([
-                'pictures.id', 'pictures.identity', 'pictures.name',
-                'pictures.width', 'pictures.height',
-                'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
-                'pictures.image_id', 'pictures.filesize',
-                'pictures.brand_id', 'pictures.car_id', 'pictures.engine_id',
-                'pictures.perspective_id', 'pictures.type', 'pictures.factory_id'
-            ])
-            ->joinLeft(['ct' => 'comment_topic'], 'ct.type_id = :type_id and ct.item_id = pictures.id', 'messages');
-
-        $rows = $select->getAdapter()->fetchAll($select, [
-            'type_id' => Comment_Message::PICTURES_TYPE_ID
-        ]);
-
-
-
-        // prefetch
-        $fullRequests = [];
-        $cropRequests = [];
-        $imageIds = [];
-        foreach ($rows as $idx => $picture) {
-            $request = Picture_Row::buildFormatRequest($picture);
-            $fullRequests[$idx] = $request;
-            if (Picture_Row::checkCropParameters($picture)) {
-                $cropRequests[$idx] = $request;
-            }
-            $ids[] = (int)$picture['id'];
-            $imageIds[] = (int)$picture['image_id'];
-        }
-
-        // images
-        $images = $imageStorage->getImages($imageIds);
-        $fullImagesInfo = $imageStorage->getFormatedImages($fullRequests, 'picture-gallery-full');
-        $cropImagesInfo = $imageStorage->getFormatedImages($cropRequests, 'picture-gallery');
-
-
-        // names
-        $pictureTable = new Picture();
-        $names = $pictureTable->getNames($rows, [
-            'language' => $language
-        ]);
-
-        // comments
-        $userId = null;
-        if ($controller->user()->logedIn()) {
-            $userId = $controller->user()->get()->id;
-        }
-
-        if ($userId) {
-            $ctTable = new Comment_Topic();
-            $newMessages = $ctTable->getNewMessages(
-                Comment_Message::PICTURES_TYPE_ID,
-                $ids,
-                $userId
-            );
-        }
-
-
-        foreach ($rows as $idx => $row) {
-
-            $imageId = (int)$row['image_id'];
-
-            if ($imageId) {
-
-                $id = (int)$row['id'];
-
-                $image = isset($images[$imageId]) ? $images[$imageId] : null;
-                if ($image) {
-                    $sUrl = $image->getSrc();
-
-                    if (Picture_Row::checkCropParameters($row)) {
-                        $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
-
-                        $crop['crop'] = [
-                            'left'   => $row['crop_left'] / $image->getWidth(),
-                            'top'    => $row['crop_top'] / $image->getHeight(),
-                            'width'  => $row['crop_width'] / $image->getWidth(),
-                            'height' => $row['crop_height'] / $image->getHeight(),
-                        ];
-
-                    } else {
-                        $crop = null;
-                    }
-
-                    $full = isset($fullImagesInfo[$idx]) ? $fullImagesInfo[$idx]->toArray() : null;
-
-                    $msgCount = $row['messages'];
-                    $newMsgCount = 0;
-                    if ($userId) {
-                        $newMsgCount = isset($newMessages[$id]) ? $newMessages[$id] : $msgCount;
-                    }
-
-                    $name = isset($names[$id]) ? $names[$id] : null;
-
-                    $url = $controller->url('picture/picture', [
-                        'picture_id' => $row['identity'] ? $row['identity'] : $id,
-                        'gallery'    => null
-                    ]);
-
-                    $gallery[] = [
-                        'id'          => $id,
-                        'url'         => $url,
-                        'sourceUrl'   => $sUrl,
-                        'crop'        => $crop,
-                        'full'        => $full,
-                        'messages'    => $msgCount,
-                        'newMessages' => $newMsgCount,
-                        'name'        => $name,
-                        'filesize'    => $controller->fileSize($row['filesize'])
-                    ];
-                }
-            }
-        }
-
-        return $gallery;
-    }
 
     public function gallery2(Zend_Db_Table_Select $picSelect, array $options = [])
     {
@@ -1333,10 +1200,10 @@ class Pic extends AbstractPlugin
 
                     $name = isset($names[$id]) ? $names[$id] : null;
                     // TODO: extract HTML to view script
-                    if (($row['type'] == Picture::CAR_TYPE_ID) && is_array($name)) {
+                    if (($row['type'] == Picture::CAR_TYPE_ID)) {
                         $name = $this->carHelper->htmlTitle($name);
                     } else {
-                        $name = htmlspecialchars($name);
+                        $name = htmlspecialchars($this->pictureNameFormatter->format($name, $language));
                     }
 
                     $reuseParams = isset($options['reuseParams']) && $options['reuseParams'];

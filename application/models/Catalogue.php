@@ -48,12 +48,6 @@ class Catalogue
      */
     private $brandEngineTable;
 
-    private $perspectiveLangTable;
-
-    private $perspectivePrefix = [];
-
-    private $prefixedPerspectives = [5, 6, 17, 20, 21, 23];
-
     /**
      * @return array
      */
@@ -312,109 +306,6 @@ class Catalogue
         }
 
         return $urls;
-    }
-
-    private function getPerspectiveLangTable()
-    {
-        return $this->perspectiveLangTable ?: $this->perspectiveLangTable = new Perspective_Language();
-    }
-
-    private static function mbUcfirst($str)
-    {
-        return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
-    }
-
-    private function getPerspectivePrefix($id, $language)
-    {
-        if (in_array($id, $this->prefixedPerspectives)) {
-            if (!isset($this->perspectivePrefix[$id][$language])) {
-                $row = $this->getPerspectiveLangTable()->fetchRow([
-                    'perspective_id = ?' => $id,
-                    'language = ?'       => $language
-                ]);
-                if ($row) {
-                    $this->perspectivePrefix[$id][$language] = self::mbUcfirst($row->name) . ' ';
-                } else {
-                    $this->perspectivePrefix[$id][$language] = '';
-                }
-            }
-
-            return $this->perspectivePrefix[$id][$language];
-        }
-
-        return '';
-    }
-
-    /**
-     * @param array $pictures
-     * @param string $language
-     * @return array
-     */
-    public function buildPicturesName(array $pictures, $language, $translator)
-    {
-        return $this->getPictureTable()->getNames($pictures, [
-            'language'   => $language,
-            'translator' => $translator
-        ]);
-    }
-
-    /**
-     * @param array $picture
-     * @param string $language
-     * @return string
-     */
-    public function buildPictureName(array $picture, $language)
-    {
-        $defaults = [
-            'id'             => null,
-            'name'           => null,
-            'type'           => null,
-            'brand_id'       => null,
-            'engine_id'      => null,
-            'car_id'         => null,
-            'perspective_id' => null,
-        ];
-        $picture = array_replace($defaults, $picture);
-
-        if ($picture['name']) {
-            return $picture['name'];
-        }
-
-        switch ($picture['type']) {
-            case Picture::CAR_TYPE_ID:
-                $car = $this->getCarTable()->find($picture['car_id'])->current();
-                if ($car) {
-                    $caption = $this->getPerspectivePrefix($picture['perspective_id'], $language) .
-                    $car->getFullName($language);
-                }
-                break;
-
-            case Picture::ENGINE_TYPE_ID:
-                $engine = $this->getEngineTable()->find($picture['engine_id'])->current();
-                $caption = 'Двигатель '.($engine ? ' '.$engine->caption: '');
-                break;
-
-            case Picture::LOGO_TYPE_ID:
-                $brand = $this->getBrandTable()->find($picture['brand_id'])->current();
-                $caption = 'Логотип '.($brand ? ' '.$brand->getLanguageName($language) : '');
-                break;
-
-            case Picture::MIXED_TYPE_ID:
-                $brand = $this->getBrandTable()->find($picture['brand_id'])->current();
-                $caption = ($brand ? $brand->getLanguageName($language).' ' : '').' Разное';
-                break;
-
-            case Picture::UNSORTED_TYPE_ID:
-                $brand = $this->getBrandTable()->find($picture['brand_id'])->current();
-                $caption = ($brand ? $brand->getLanguageName($language) : 'Несортировано');
-                break;
-        }
-
-        if (!$caption) {
-            $caption = 'Изображение №'. $picture['id'];
-        }
-
-        return $caption;
     }
 
     private static function between($a, $min, $max)
