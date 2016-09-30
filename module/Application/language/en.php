@@ -1683,7 +1683,7 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'restore-password/new-password/text' => 'Enter new password',
     'restore-password/new-password/saved' => 'New password saved.
 
-Don\'t forget it,',
+Don\'t forget it.',
     'restore-password/new-password/instructions-sent' => 'Instructions sent to your e-mail',
     'restore-password/new-password/email-not-found' => 'User with that e-mail not found',
     'restore-password/new-password/mail/subject' => 'Password restore',

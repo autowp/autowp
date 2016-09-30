@@ -69,7 +69,7 @@ return [
     /* Picture preview */
     'picture-preview/no-comments' => 'non',
     'picture-preview/no-ratio'    => 'non',
-    'picture-preview/crop-desc'   => 'L'image est recadrée',
+    'picture-preview/crop-desc'   => "L'image est recadrée",
     'picture-preview/special-name' => 'Image avec nom spécial',
     'Resolution'                  => 'Résolution',
     'Filesize'                    => 'Taille du fichier',
@@ -251,7 +251,7 @@ return [
     'mosts/period/all-time'   => 'dans l\'histoire',
 
     /* upload */
-    'upload/image-file' => 'Fichier d'image',
+    'upload/image-file' => "Fichier d'image",
     'upload/note' => 'Note',
     'upload/picture/crop' => 'Recadrer',
     'upload/picture/cropped-to' => 'Recadrée à %s',
@@ -339,7 +339,7 @@ Cela est dû à la présence d\'un seuil "messages par heure" nécessaire pour l
 Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le temps de clarifier l\'idée que vous voulez transmettre au public:',
 
     'comments/author/anonymous' => 'Anonyme',
-    'comments/message-deleted-by-admin' => 'Le message a été supprimé par l'administration du site',
+    'comments/message-deleted-by-admin' => "Le message a été supprimé par l'administration du site",
     'comments/message/delete' => 'Supprimer',
     'comments/message/restore' => 'Restaurer',
     'comments/message/move' => 'Déplacer',
@@ -469,23 +469,23 @@ Si vous n'êtes pas enregistré sur le site, vous [pouvez le faire](/registratio
     'account/access/self-delete' => 'Supprimer le compte',
     'account/access/self-delete/password-is-incorrect' => 'Le mot de passe est incorrect',
 
-    'account/specs/weight' => 'L'influence',
+    'account/specs/weight' => "L'influence",
 
     'account/specs/conflicts/filter/all' => 'Toutes',
-    'account/specs/conflicts/filter/i-disagree' => 'je ne suis pas d'accord',
-    'account/specs/conflicts/filter/do-not-agree-with-me' => 'Ne pas d'accord avec moi',
+    'account/specs/conflicts/filter/i-disagree' => "je ne suis pas d'accord",
+    'account/specs/conflicts/filter/do-not-agree-with-me' => "Ne pas d'accord avec moi",
     'account/specs/conflicts/filter/errors' => 'Les erreurs',
 
-    'account/specs/conflicts/title/object' => 'L'objet',
+    'account/specs/conflicts/title/object' => "L'objet",
     'account/specs/conflicts/title/object/engine' => 'le moteur',
     'account/specs/conflicts/title/parameter' => 'Le paramètre',
     'account/specs/conflicts/title/my-value' => 'Ma valeur',
-    'account/specs/conflicts/title/other-values' => 'D'autres valeurs',
+    'account/specs/conflicts/title/other-values' => "D'autres valeurs",
 
     'account/specs/conflicts/my-value/none' => 'non',
 
     'account/email/your-current-email:' => 'Votre adresse e-mail actuelle: ',
-    'account/email/your-dont-enter-email' => 'Vous n'avez pas entré une adresse e-mail',
+    'account/email/your-dont-enter-email' => "Vous n'avez pas entré une adresse e-mail",
     'account/email/text' => 'Sur cette page vous pouvez changer votre adresse e-mail.
 
 Message avec des instructions enverra à la nouvelle adresse e-mail pour le confirmer.',
@@ -1683,7 +1683,7 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'restore-password/new-password/text' => 'Enter new password',
     'restore-password/new-password/saved' => 'New password saved.
 
-Don\'t forget it,',
+Don\'t forget it.',
     'restore-password/new-password/instructions-sent' => 'Instructions sent to your e-mail',
     'restore-password/new-password/email-not-found' => 'User with that e-mail not found',
     'restore-password/new-password/mail/subject' => 'Password restore',
