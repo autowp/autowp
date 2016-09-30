@@ -60,7 +60,7 @@ return [
         'Vous avez %1$s nouveaux messages',
     ],
 
-    'layout/search' => 'Recherche',
+    'layout/search' => 'Rechercher',
     'layout/footer' => 'S\'il vous plaît noter que tous les documents sur ce autowp.ru, sont ajouté par  les visiteurs.<br />' .
                        'L\'administration du site ne dispose pas d\'informations de la légalité de la publication de ces matériaux.<br />' .
                        'Toutes les images sont disponibles à des fins éducatives.<br />' .
@@ -69,8 +69,8 @@ return [
     /* Picture preview */
     'picture-preview/no-comments' => 'non',
     'picture-preview/no-ratio'    => 'non',
-    'picture-preview/crop-desc'   => 'Image is cropped',
-    'picture-preview/special-name' => 'Picture with special name',
+    'picture-preview/crop-desc'   => 'L'image est recadrée',
+    'picture-preview/special-name' => 'Image avec nom spécial',
     'Resolution'                  => 'Résolution',
     'Filesize'                    => 'Taille du fichier',
     'Ratio'                       => 'Ratio',
@@ -110,7 +110,7 @@ return [
     'Picture of the day'       => 'Image du jour',
     'car-of-day'               => 'voiture de la journée',
     'day ahead'                => 'journée à l\'avance',
-    'day ago'                  => 'il ya jour',
+    'day ago'                  => 'il y a jour',
     'Cars by destination'      => 'Voitures par destination',
     'All new pictures'         => 'toutes les nouvelles images',
 
@@ -170,7 +170,7 @@ return [
     ],
     'category/%s new cars'    => [
         '%s nouvelle',
-        '%s nouvelle'
+        '%s nouvelles'
     ],
 
     /* most */
@@ -251,7 +251,7 @@ return [
     'mosts/period/all-time'   => 'dans l\'histoire',
 
     /* upload */
-    'upload/image-file' => 'Image file',
+    'upload/image-file' => 'Fichier d'image',
     'upload/note' => 'Note',
     'upload/picture/crop' => 'Recadrer',
     'upload/picture/cropped-to' => 'Recadrée à %s',
@@ -338,12 +338,12 @@ Cela est dû à la présence d\'un seuil "messages par heure" nécessaire pour l
 
 Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le temps de clarifier l\'idée que vous voulez transmettre au public:',
 
-    'comments/author/anonymous' => 'Anonymous',
-    'comments/message-deleted-by-admin' => 'Message deleted by site administration',
-    'comments/message/delete' => 'Delete',
-    'comments/message/restore' => 'Restore',
-    'comments/message/move' => 'Move',
-    'comments/vote/no-more-votes' => 'Today vote limit reached',
+    'comments/author/anonymous' => 'Anonyme',
+    'comments/message-deleted-by-admin' => 'Le message a été supprimé par l'administration du site',
+    'comments/message/delete' => 'Supprimer',
+    'comments/message/restore' => 'Restaurer',
+    'comments/message/move' => 'Déplacer',
+    'comments/vote/no-more-votes' => 'La limite de vote quotidienne est atteint.',
 
     /*perspectives*/
     'perspective/front'          => 'avant',
@@ -469,26 +469,26 @@ Si vous n'êtes pas enregistré sur le site, vous [pouvez le faire](/registratio
     'account/access/self-delete' => 'Supprimer le compte',
     'account/access/self-delete/password-is-incorrect' => 'Le mot de passe est incorrect',
 
-    'account/specs/weight' => 'Weight',
+    'account/specs/weight' => 'L'influence',
 
-    'account/specs/conflicts/filter/all' => 'All',
-    'account/specs/conflicts/filter/i-disagree' => 'I disagree',
-    'account/specs/conflicts/filter/do-not-agree-with-me' => 'Do not agree with me',
-    'account/specs/conflicts/filter/errors' => 'Errors',
+    'account/specs/conflicts/filter/all' => 'Toutes',
+    'account/specs/conflicts/filter/i-disagree' => 'je ne suis pas d'accord',
+    'account/specs/conflicts/filter/do-not-agree-with-me' => 'Ne pas d'accord avec moi',
+    'account/specs/conflicts/filter/errors' => 'Les erreurs',
 
-    'account/specs/conflicts/title/object' => 'Object',
-    'account/specs/conflicts/title/object/engine' => 'Engine',
-    'account/specs/conflicts/title/parameter' => 'Parameter',
-    'account/specs/conflicts/title/my-value' => 'My value',
-    'account/specs/conflicts/title/other-values' => 'Other values',
+    'account/specs/conflicts/title/object' => 'L'objet',
+    'account/specs/conflicts/title/object/engine' => 'le moteur',
+    'account/specs/conflicts/title/parameter' => 'Le paramètre',
+    'account/specs/conflicts/title/my-value' => 'Ma valeur',
+    'account/specs/conflicts/title/other-values' => 'D'autres valeurs',
 
-    'account/specs/conflicts/my-value/none' => 'none',
+    'account/specs/conflicts/my-value/none' => 'non',
 
-    'account/email/your-current-email:' => 'Your current e-mail address: ',
-    'account/email/your-dont-enter-email' => 'You don\'t input e-mail address',
-    'account/email/text' => 'On this page you can change your e-mail address.
+    'account/email/your-current-email:' => 'Votre adresse e-mail actuelle: ',
+    'account/email/your-dont-enter-email' => 'Vous n'avez pas entré une adresse e-mail',
+    'account/email/text' => 'Sur cette page vous pouvez changer votre adresse e-mail.
 
-Message with instructions to confirm will sent to new address.',
+Message avec des instructions enverra à la nouvelle adresse e-mail pour le confirmer.',
 
     'account/accounts/add' => 'Add account',
     'account/accounts/remove' => 'Remove',
