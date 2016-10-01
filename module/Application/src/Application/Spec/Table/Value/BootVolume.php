@@ -31,7 +31,7 @@ class BootVolume
         if ($html && isset($attribute['unit']) && $attribute['unit']) {
             $html .=
             ' <span class="unit" title="' . $view->escapeHtmlAttr($attribute['unit']['name']) . '">' .
-                $view->escapeHtml($attribute['unit']['abbr']) .
+                $view->escapeHtml($view->translate($attribute['unit']['abbr'])) .
             '</span>';
         }
 
