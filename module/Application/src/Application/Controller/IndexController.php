@@ -59,7 +59,7 @@ class IndexController extends AbstractActionController
             $select = $pTable->select(true)
                 ->joinRight(['mp' => 'perspectives_groups_perspectives'], 'pictures.perspective_id=mp.perspective_id', null)
                 ->where('mp.group_id = ?', $groupId)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id)
@@ -103,7 +103,7 @@ class IndexController extends AbstractActionController
 
         if (count($left) > 0) {
             $select = $pTable->select(true)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
@@ -131,7 +131,7 @@ class IndexController extends AbstractActionController
         $totalPictures = $db->fetchOne(
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])

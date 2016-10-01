@@ -84,7 +84,7 @@ class CategoryController extends AbstractActionController
                 $pictureTable->select(true)
                     ->join('category_car', 'pictures.car_id=category_car.car_id', null)
                     ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
-                    ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->where('category_parent.parent_id = ?', $category['id'])
                     ->order([
@@ -608,7 +608,7 @@ class CategoryController extends AbstractActionController
             $pictureTable = $this->catalogue()->getPictureTable();
 
             $select = $pictureTable->select(true)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->where('pictures.status IN (?)', [
                     Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
                 ])
@@ -676,7 +676,7 @@ class CategoryController extends AbstractActionController
             $pictureTable = $this->catalogue()->getPictureTable();
 
             $select = $pictureTable->select(true)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->where('pictures.status IN (?)', [
                     Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
                 ])
@@ -754,7 +754,7 @@ class CategoryController extends AbstractActionController
             $pictureTable = $this->catalogue()->getPictureTable();
 
             $select = $pictureTable->select(true)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->where('pictures.status IN (?)', [
                     Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
                 ])

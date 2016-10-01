@@ -37,7 +37,7 @@ class CommentsController extends AbstractActionController
                 /*->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
                 ->join('pictures', 'pictures.car_id = car_parent_cache.car_id', null)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->join('comments_messages', 'comments_messages.item_id = pictures.id', null)
                 ->where('comments_messages.type_id = ?', Comment_Message::PICTURES_TYPE_ID)
                 ->group('brands.id')*/
@@ -100,7 +100,7 @@ class CommentsController extends AbstractActionController
                 $select
                     ->where('comments_messages.type_id = ?', Comment_Message::PICTURES_TYPE_ID)
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)
-                    ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                     ->where('brands_cars.brand_id = ?', $values['brand_id']);
@@ -110,7 +110,7 @@ class CommentsController extends AbstractActionController
                 $select
                     ->where('comments_messages.type_id = ?', Comment_Message::PICTURES_TYPE_ID)
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)
-                    ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $values['car_id']);
             }

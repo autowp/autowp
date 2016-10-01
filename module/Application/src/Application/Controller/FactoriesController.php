@@ -67,7 +67,7 @@ class FactoriesController extends AbstractActionController
 
                 $select = $pictureTable->select(true)
                     ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
-                    ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                     ->join('cars', 'pictures.car_id = cars.id', null)
                     ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $car->id)

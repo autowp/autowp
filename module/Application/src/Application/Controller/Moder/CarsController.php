@@ -378,7 +378,7 @@ class CarsController extends AbstractActionController
         $table = $this->catalogue()->getPictureTable();
         $select = $table->select(true)
             ->where('pictures.car_id = ?', $car->id)
-            ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
             ->order(['pictures.status', 'pictures.id']);
 
         $picturesData = $this->pic()->listData($select, [
@@ -436,7 +436,7 @@ class CarsController extends AbstractActionController
         foreach ($statuses as $status) {
             $randomPicture = $pictures->fetchRow(
                 $pictures->select(true)
-                    ->where('type = ?', Picture::CAR_TYPE_ID)
+                    ->where('type = ?', Picture::VEHICLE_TYPE_ID)
                     ->where('car_id = ?', $car->id)
                     ->where('status = ?', $status)
                     ->order(new Zend_Db_Expr('RAND()'))
@@ -792,7 +792,7 @@ class CarsController extends AbstractActionController
         $picturesCount = $pictures->getAdapter()->fetchOne(
             $pictures->getAdapter()->select()
                 ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                ->where('type = ?', Picture::CAR_TYPE_ID)
+                ->where('type = ?', Picture::VEHICLE_TYPE_ID)
                 ->where('car_id = ?', $car->id)
         );
 
@@ -3598,7 +3598,7 @@ class CarsController extends AbstractActionController
         $rows = $pictureTable->fetchAll(
             $pictureTable->select(true)
                 ->where('pictures.car_id = ?', $car->id)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->order(['pictures.status', 'pictures.id'])
         );
         foreach ($rows as $row) {
@@ -3766,7 +3766,7 @@ class CarsController extends AbstractActionController
                     ->from('modification_picture', 'count(1)')
                     ->where('modification_picture.modification_id = ?', $mRow->id)
                     ->join('pictures', 'modification_picture.picture_id = pictures.id', null)
-                    ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $car->id)
             );
@@ -3880,7 +3880,7 @@ class CarsController extends AbstractActionController
                 $pictureRow = $pictureTable->fetchRow(
                     $pictureTable->select(true)
                         ->where('pictures.id = ?', (int)$pictureId)
-                        ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                        ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                         ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                         ->where('car_parent_cache.parent_id = ?', $car->id)
                 );
@@ -3929,7 +3929,7 @@ class CarsController extends AbstractActionController
 
         $pictureRows = $pictureTable->fetchAll(
             $pictureTable->select(true)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id)
                 ->order('pictures.id')

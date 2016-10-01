@@ -104,7 +104,7 @@ class Car extends AbstractPlugin
             $pictureTableAdapter = $pictureTable->getAdapter();
 
             $select = $pictureTableAdapter->select()
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED]);
 
             if ($onlyExactly) {
@@ -596,7 +596,7 @@ class Car extends AbstractPlugin
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
             )
-            ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
             ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
             ->limit(1);
 

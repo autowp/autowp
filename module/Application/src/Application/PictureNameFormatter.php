@@ -46,7 +46,7 @@ class PictureNameFormatter
         }
 
         switch ($picture['type']) {
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 return
                     ($picture['perspective'] ? self::mbUcfirst($this->translate($picture['perspective'], $language)) . ' ' : '') .
                     ($picture['car'] ? $this->vehicleNameFormatter->format($picture['car'], $language) : 'Unsorted car');

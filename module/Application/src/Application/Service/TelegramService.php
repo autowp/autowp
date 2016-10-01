@@ -91,7 +91,7 @@ class TelegramService
         $db = $pictureTable->getAdapter();
 
         switch ($picture->type) {
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 $brandIds = $db->fetchCol(
                     $db->select()
                         ->from('brands_cars', 'brand_id')

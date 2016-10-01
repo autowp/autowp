@@ -119,7 +119,7 @@ class UploadController extends AbstractActionController
                 }
                 break;
 
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 $cars = new Cars();
                 $car = $cars->find($carId)->current();
                 if ($car) {
@@ -240,7 +240,7 @@ class UploadController extends AbstractActionController
                 }
                 break;
 
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 $cars = new Cars();
                 $car = $cars->find($carId)->current();
                 if ($car) {
@@ -351,7 +351,7 @@ class UploadController extends AbstractActionController
                         $brand->refreshPicturesCount();
                     }
                     break;
-                case Picture::CAR_TYPE_ID:
+                case Picture::VEHICLE_TYPE_ID:
                     $car = $picture->findParentCars();
                     if ($car) {
                         $car->refreshPicturesCount();
@@ -516,7 +516,7 @@ class UploadController extends AbstractActionController
                 'today'            => $row['today'],
                 'url'  => $this->url()->fromRoute('upload/params', [
                     'action' => 'index',
-                    'type'   => Picture::CAR_TYPE_ID,
+                    'type'   => Picture::VEHICLE_TYPE_ID,
                     'car_id' => $row['id']
                 ], [], true),
                 'haveChilds' => $haveChilds,
@@ -556,7 +556,7 @@ class UploadController extends AbstractActionController
                 'today'            => $row['today'],
                 'url'  => $this->url()->fromRoute('upload/params', [
                     'action' => 'index',
-                    'type'   => Picture::CAR_TYPE_ID,
+                    'type'   => Picture::VEHICLE_TYPE_ID,
                     'car_id' => $row['id']
                 ], [], true),
                 'haveChilds' => $haveChilds,

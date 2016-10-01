@@ -149,7 +149,7 @@ class Pic extends AbstractPlugin
                 }
                 break;
 
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 if ($row['car_id']) {
                     $carParentTable = new Car_Parent();
                     $paths = $carParentTable->getPaths($row['car_id'], [
@@ -608,7 +608,7 @@ class Pic extends AbstractPlugin
                     }
                 }
                 break;
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 $car = $picture->findParentCars();
                 if ($car) {
 
@@ -891,7 +891,7 @@ class Pic extends AbstractPlugin
 
         $picturePerspective = null;
         if ($this->getController()->user()->inheritsRole('moder')) {
-            if ($picture->type == Picture::CAR_TYPE_ID) {
+            if ($picture->type == Picture::VEHICLE_TYPE_ID) {
                 $perspectives = new Perspectives();
 
                 $multioptions = $perspectives->getAdapter()->fetchPairs(
@@ -978,7 +978,7 @@ class Pic extends AbstractPlugin
         ])] = sprintf($this->translator->translate('moder/picture/edit-picture-%s'), $picture->id);
 
         switch ($picture->type) {
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 $car = $picture->findParentCars();
                 if ($car) {
                     $url = $controller->url()->fromRoute('moder/cars/params', [
@@ -1214,7 +1214,7 @@ class Pic extends AbstractPlugin
 
                     $name = isset($names[$id]) ? $names[$id] : null;
                     // TODO: extract HTML to view script
-                    if (($row['type'] == Picture::CAR_TYPE_ID)) {
+                    if (($row['type'] == Picture::VEHICLE_TYPE_ID)) {
                         $name = $this->carHelper->htmlTitle($name);
                     } else {
                         $name = htmlspecialchars($name); // this->pictureNameFormatter->format($name, $language)

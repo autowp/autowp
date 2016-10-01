@@ -269,7 +269,7 @@ class TwinsController extends AbstractActionController
                     $pictureTable->select(true)
                         ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                         ->where('car_parent_cache.parent_id = ?', (int)$car['id'])
-                        ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                        ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                         ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                         ->order([
                             new Zend_Db_Expr('pictures.perspective_id=7 DESC'),

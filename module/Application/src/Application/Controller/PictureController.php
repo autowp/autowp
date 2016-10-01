@@ -64,11 +64,11 @@ class PictureController extends AbstractActionController
 
             $galleryEnabled = false;
             switch ($picture->type) {
-                case Picture::CAR_TYPE_ID:
+                case Picture::VEHICLE_TYPE_ID:
                     if ($picture->car_id) {
                         $galleryEnabled = true;
                         $picSelect
-                            ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                             ->where('pictures.car_id = ?', $picture->car_id);
                     }
                     break;
@@ -205,7 +205,7 @@ class PictureController extends AbstractActionController
                     }
                 }
                 break;
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 if ($car = $picture->findParentCars()) {
                     $language = $this->language();
                     $brandList = $brandModel->getList($language, function($select) use ($car) {

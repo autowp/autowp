@@ -55,7 +55,7 @@ class CarOfDay
                 ORDER BY RAND()
                 LIMIT 1
             ';
-            $row = $db->fetchRow($sql, [Picture::CAR_TYPE_ID, Picture::STATUS_ACCEPTED]);
+            $row = $db->fetchRow($sql, [Picture::VEHICLE_TYPE_ID, Picture::STATUS_ACCEPTED]);
             if ($row) {
                 print $row['id']  ."\n";
 
@@ -77,7 +77,7 @@ class CarOfDay
     private function _pictureByPerspective($pictureTable, $car, $perspective)
     {
         $select = $pictureTable->select(true)
-            ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
             ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
             ->where('car_parent_cache.parent_id = ?', $car->id)

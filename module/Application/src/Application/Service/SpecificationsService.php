@@ -1230,7 +1230,7 @@ class SpecificationsService
         }
         return $pictureTable->fetchRow(
             $pictureTable->select(true)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status in (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])

@@ -23,7 +23,7 @@ class PictureVote extends AbstractPlugin
     private function isLastPicture($picture)
     {
         $result = null;
-        if ($picture->type == Picture::CAR_TYPE_ID && $picture->status == Picture::STATUS_ACCEPTED) {
+        if ($picture->type == Picture::VEHICLE_TYPE_ID && $picture->status == Picture::STATUS_ACCEPTED) {
             $car = $picture->findParentCars();
             if ($car) {
                 $db = $this->table->getAdapter();
@@ -43,7 +43,7 @@ class PictureVote extends AbstractPlugin
     private function getAcceptedCount($picture)
     {
         $result = null;
-        if ($picture->type == Picture::CAR_TYPE_ID) {
+        if ($picture->type == Picture::VEHICLE_TYPE_ID) {
             $car = $picture->findParentCars();
             if ($car) {
                 $db = $this->table->getAdapter();

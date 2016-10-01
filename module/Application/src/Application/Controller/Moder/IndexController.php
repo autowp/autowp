@@ -140,7 +140,7 @@ class IndexController extends AbstractActionController
                         group by cars.id
                         having c >= 4
                     ) as T1
-                ', Picture::CAR_TYPE_ID)
+                ', Picture::VEHICLE_TYPE_ID)
             ],
             [
                 'name'     => 'moder/statistics/specifications-values',

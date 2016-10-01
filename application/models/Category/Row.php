@@ -19,7 +19,7 @@ class Category_Row extends Row
         return $pictures->fetchRow(
             $pictures->select(true)
                 ->join('category_car', 'pictures.car_id=category_car.car_id', null)
-                ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
                 ->where('category_car.category_id = ?', $this->id)
                 ->order(array(

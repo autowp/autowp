@@ -146,7 +146,7 @@ class Twins
             ->from($pictureTable->info('name'), null)
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
             ->join(['tgc' => 'twins_groups_cars'], 'tgc.car_id = car_parent_cache.parent_id', null)
-            ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
             ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW]);
 
         if (is_array($groupId)) {
@@ -275,7 +275,7 @@ class Twins
         $ordering = $options['ordering'];
 
         $select = $this->getPictureTable()->select(true)
-            ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
+            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
             ->join(['tgc' => 'twins_groups_cars'], 'tgc.car_id = car_parent_cache.parent_id', null)
             ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])

@@ -8,7 +8,7 @@ class Picture extends Table
 {
     const
         UNSORTED_TYPE_ID = 0,
-        CAR_TYPE_ID      = 1,
+        VEHICLE_TYPE_ID  = 1,
         LOGO_TYPE_ID     = 2,
         MIXED_TYPE_ID    = 3,
         ENGINE_TYPE_ID   = 4,
@@ -149,7 +149,7 @@ class Picture extends Table
         $factoryIds = [];
         foreach ($rows as $index => $row) {
             switch ($row['type']) {
-                case Picture::CAR_TYPE_ID:
+                case Picture::VEHICLE_TYPE_ID:
                     $carIds[$row['car_id']] = true;
                     if (in_array($row['perspective_id'], $this->prefixedPerspectives)) {
                         $perspectiveIds[$row['perspective_id']] = true;
@@ -254,7 +254,7 @@ class Picture extends Table
             $caption = null;
 
             switch ($row['type']) {
-                case Picture::CAR_TYPE_ID:
+                case Picture::VEHICLE_TYPE_ID:
                     $car = isset($cars[$row['car_id']]) ? $cars[$row['car_id']] : null;
                     if ($car) {
                         //$perspective = isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : '';
@@ -315,7 +315,7 @@ class Picture extends Table
         $factoryIds = [];
         foreach ($rows as $index => $row) {
             switch ($row['type']) {
-                case Picture::CAR_TYPE_ID:
+                case Picture::VEHICLE_TYPE_ID:
                     $carIds[$row['car_id']] = true;
                     if (in_array($row['perspective_id'], $this->prefixedPerspectives)) {
                         $perspectiveIds[$row['perspective_id']] = true;
@@ -432,7 +432,7 @@ class Picture extends Table
             ];
 
             switch ($row['type']) {
-                case Picture::CAR_TYPE_ID:
+                case Picture::VEHICLE_TYPE_ID:
                     $car = isset($cars[$row['car_id']]) ? $cars[$row['car_id']] : null;
                     if ($car) {
                         $caption = [
@@ -515,7 +515,7 @@ class Picture extends Table
     private function refreshCounts($params)
     {
         switch ($params['type']) {
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 if ($params['car_id']) {
                     $carTable = new Cars();
                     $car = $carTable->find($params['car_id'])->current();
@@ -630,7 +630,7 @@ class Picture extends Table
             'factory_id' => null,
             'brand_id'   => null,
             'engine_id'  => null,
-            'type'       => Picture::CAR_TYPE_ID,
+            'type'       => Picture::VEHICLE_TYPE_ID,
         ]);
         $picture->save();
 

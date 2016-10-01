@@ -68,7 +68,7 @@ class Picture_Row extends Row
                 }
                 break;
 
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 $car = $this->findParentCars();
                 if ($car) {
                     $carCatname = $filenameFilter->filter($car->caption);

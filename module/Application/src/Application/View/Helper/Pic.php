@@ -59,7 +59,7 @@ class Pic extends AbstractHtmlElement
         }
 
         switch ($picture['type']) {
-            case Picture::CAR_TYPE_ID:
+            case Picture::VEHICLE_TYPE_ID:
                 if ($picture['car']) {
                     return
                         ($picture['perspective'] ? $view->escapeHtml(self::mbUcfirst($view->translate($picture['perspective']))) . ' ' : '') .
