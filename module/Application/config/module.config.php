@@ -242,7 +242,6 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
-            'car'         => View\Helper\Car::class,
             'page'        => View\Helper\Page::class,
             'htmlA'       => View\Helper\HtmlA::class,
             'htmlImg'     => View\Helper\HtmlImg::class,
@@ -264,6 +263,11 @@ return [
             'formpicturemulticheckbox' => Form\View\Helper\FormPictureMultiCheckbox::class
         ],
         'factories' => [
+            'car' => function ($sm) {
+                return new View\Helper\Car(
+                    $sm->get(VehicleNameFormatter::class)
+                );
+            },
             'pic' => function($sm) {
                 return new View\Helper\Pic(
                     $sm->get(PictureNameFormatter::class)
@@ -350,13 +354,13 @@ return [
     ],
     'service_manager' => [
         'factories' => [
-            CarNameFormatter::class => function($sm) {
-                return new CarNameFormatter($sm->get('MvcTranslator'));
+            VehicleNameFormatter::class => function($sm) {
+                return new VehicleNameFormatter($sm->get('translator'));
             },
             PictureNameFormatter::class => function($sm) {
                 return new PictureNameFormatter(
                     $sm->get('MvcTranslator'),
-                    $sm->get(CarNameFormatter::class)
+                    $sm->get(VehicleNameFormatter::class)
                 );
             },
             Image\Storage::class => function($sm) {

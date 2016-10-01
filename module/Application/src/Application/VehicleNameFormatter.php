@@ -2,7 +2,7 @@
 
 namespace Application;
 
-class CarNameFormatter
+class VehicleNameFormatter
 {
     private $translator;
 
