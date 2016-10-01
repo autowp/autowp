@@ -33,7 +33,7 @@ class Log_Events_Row extends Row
                     $col = 'engine_id';
                     $tableName = 'log_events_engines';
                     break;
-                case $table instanceof Articles:
+                case $table instanceof \Application\Model\DbTable\Article:
                     $col = 'article_id';
                     $tableName = 'log_events_articles';
                     break;

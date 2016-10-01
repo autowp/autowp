@@ -7,12 +7,12 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Application\HostManager;
+use Application\Model\DbTable\Article;
 use Application\Model\DbTable\Museum;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Voting;
 use Application\Model\Message;
 
-use Articles;
 use Comment_Message;
 use Comments;
 use Users;
@@ -181,7 +181,7 @@ class CommentsController extends AbstractRestfulController
                     break;
 
                 case Comment_Message::ARTICLES_TYPE_ID:
-                    $articles = new Articles();
+                    $articles = new Article();
                     $object = $articles->find($itemId)->current();
                     break;
 

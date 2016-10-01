@@ -1,14 +1,19 @@
 <?php
 
-class Articles extends Zend_Db_Table
+namespace Application\Model\DbTable;
+
+use Zend_Db_Table;
+
+class Article extends Zend_Db_Table
 {
-    const   IMAGES_CAT_PATH = 'img/articles/',
-            PREVIEW_CAT_PATH = 'img/articles/preview/',
-            PREVIEW_WIDTH = 80,
-            PREVIEW_HEIGHT = 80;
+    const IMAGES_CAT_PATH = 'img/articles/',
+          PREVIEW_CAT_PATH = 'img/articles/preview/',
+          PREVIEW_WIDTH = 80,
+          PREVIEW_HEIGHT = 80;
 
     protected $_name = 'articles';
-    protected $_rowClass = 'Articles_Row';
+    protected $_rowClass = \Application\Model\DbTable\Article\Row::class;
+
     protected $_referenceMap = [
         'Author' => [
             'columns'       => ['author_id'],

@@ -1,8 +1,11 @@
 <?php
 
-use Application\Db\Table\Row;
+namespace Application\Model\DbTable\Article;
 
-class Articles_Row extends Row
+use Application\Db\Table\Row;
+use Application\Model\DbTable\Article;
+
+class Row extends Row
 {
     public function previewExists()
     {
@@ -17,7 +20,7 @@ class Articles_Row extends Row
     public function getPreviewUrl($absolute = false)
     {
         if ($this->previewExists()) {
-            return ($absolute ? HOST : '/').Articles::PREVIEW_CAT_PATH.$this->preview_filename;
+            return ($absolute ? HOST : '/') . Article::PREVIEW_CAT_PATH . $this->preview_filename;
         }
 
         return null;

@@ -1,6 +1,7 @@
 <?php
 
 use Application\Db\Table\Row;
+use Application\Model\DbTable\Article;
 
 class Comment_Message_Row extends Row
 {
@@ -29,7 +30,7 @@ class Comment_Message_Row extends Row
                 return ($absolute ? HOST : '/').'twins/group'.(int)$this->item_id.'/';
 
             case Comment_Message::ARTICLES_TYPE_ID:
-                $articles = new Articles();
+                $articles = new Article();
                 $article = $articles->find($this->item_id)->current();
                 if ($article) {
                     return ($absolute ? HOST : '/').'articles/'.$article->catname.'/';

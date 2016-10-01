@@ -1,13 +1,17 @@
 <?php
 
-class Articles_Brands extends Zend_Db_Table
+namespace Application\Model\DbTable\Article;
+
+use Zend_Db_Table;
+
+class BrandCache extends Zend_Db_Table
 {
     protected $_primary = ['article_id', 'brand_id'];
-    protected $_name = 'articles_brands';
+    protected $_name = 'articles_brands_cache';
     protected $_referenceMap = [
         'Article' => [
             'columns'       => ['article_id'],
-            'refTableClass' => 'Articles',
+            'refTableClass' => \Application\Model\DbTable\Article::class,
             'refColumns'    => ['id']
         ],
         'Brand' => [

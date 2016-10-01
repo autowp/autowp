@@ -5,9 +5,9 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Article;
+use Application\Model\DbTable\Article\BrandCache;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
-
-use Articles;
 
 class ArticlesController extends AbstractActionController
 {
@@ -34,7 +34,7 @@ class ArticlesController extends AbstractActionController
 
         $brand = $brandModel->getBrandByCatname($this->params('brand_catname'), $this->language());
 
-        $articles = new Articles();
+        $articles = new Article();
 
         $select = $articles->select(true)
             ->where('articles.enabled')
@@ -84,7 +84,7 @@ class ArticlesController extends AbstractActionController
 
     public function articleAction()
     {
-        $articles = new Articles();
+        $articles = new Article();
 
         $article = $articles->findRowByCatname($this->params('article_catname'));
         if (!$article) {
@@ -114,7 +114,7 @@ class ArticlesController extends AbstractActionController
         }
 
         $selectedBrandIds = [];
-        foreach ($article->findArticles_Brands_Cache() as $abc) {
+        foreach ($article->findDependentRowset(BrandCache::class) as $abc) {
             $selectedBrandIds[] = $abc->brand_id;
         }
 
