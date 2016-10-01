@@ -17,16 +17,23 @@ class MostsController extends AbstractActionController
 {
     private $textStorage;
 
-    public function __construct(TextStorage\Service $textStorage)
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(
+        TextStorage\Service $textStorage,
+        SpecificationsService $specsService)
     {
         $this->textStorage = $textStorage;
+        $this->specsService = $specsService;
     }
 
     public function indexAction()
     {
-        $specService = new SpecificationsService();
         $service = new Mosts([
-            'specs' => $specService
+            'specs' => $this->specsService
         ]);
 
         $language = $this->language();

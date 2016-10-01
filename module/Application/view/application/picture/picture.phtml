@@ -157,9 +157,7 @@
                             ]), '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')), false);
                         }
 
-                        $specService = new Application\Service\SpecificationsService();
-
-                        if ($specService->hasSpecs(1, $car->id)) {
+                        if ($this->vehicleHasSpecs) {
 
                             foreach ($this->car($car)->cataloguePaths() as $path) {
                                 $url = $this->url('catalogue', [

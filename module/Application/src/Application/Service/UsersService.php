@@ -43,6 +43,11 @@ class UsersService
     private $transport;
 
     /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    /**
      * @return Users
      */
     private function getTable()
@@ -52,16 +57,20 @@ class UsersService
             : $this->table = new Users();
     }
 
-    public function __construct(array $options, array $hosts, $translator, $transport)
+    public function __construct(
+        array $options,
+        array $hosts,
+        $translator,
+        $transport,
+        SpecificationsService $specsService)
     {
         $this->salt = $options['salt'];
         $this->emailSalt = $options['emailSalt'];
 
         $this->hosts = $hosts;
-
         $this->translator = $translator;
-
         $this->transport = $transport;
+        $this->specsService = $specsService;
     }
 
     /**
@@ -134,8 +143,7 @@ class UsersService
         ]);
         $user->save();
 
-        $service = new SpecificationsService();
-        $service->refreshUserConflicts($user->id);
+        $this->specsService->refreshUserConflicts($user->id);
 
         $this->sendRegistrationConfirmEmail($user, $host['hostname']);
 
