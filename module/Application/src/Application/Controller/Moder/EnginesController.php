@@ -7,10 +7,10 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Moder\EngineAdd as EngineAddForm;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\BrandEngine;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
-use Brand_Engine;
 use Engine_Parent_Cache;
 use Engines;
 use Picture;
@@ -152,7 +152,7 @@ class EnginesController extends AbstractActionController
             ];
         }
 
-        $brandEngineTable = new Brand_Engine();
+        $brandEngineTable = new BrandEngine();
         $brandEngineRows = $brandEngineTable->fetchAll(
             $brandEngineTable->select(true)
                 ->join('brands', 'brand_engine.brand_id = brands.id', null)
@@ -359,7 +359,7 @@ class EnginesController extends AbstractActionController
                 $engine->save();
 
                 if (!$parentEngine) {
-                    $brandEngineTable = new Brand_Engine();
+                    $brandEngineTable = new BrandEngine();
                     $brandEngineRow = $brandEngineTable->createRow([
                         'brand_id'  => $values['brand_id'],
                         'engine_id' => $engine->id,
@@ -577,7 +577,7 @@ class EnginesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandEngineTable = new Brand_Engine();
+        $brandEngineTable = new BrandEngine();
 
         $brandEngineRow = $brandEngineTable->fetchRow([
             'brand_id = ?'  => $brandRow->id,
@@ -619,7 +619,7 @@ class EnginesController extends AbstractActionController
         $brandRow = $brandTable->find($this->params()->fromPost('brand_id'))->current();
         if ($brandRow) {
 
-            $brandEngineTable = new Brand_Engine();
+            $brandEngineTable = new BrandEngine();
 
             $brandEngineRow = $brandEngineTable->fetchRow([
                 'brand_id = ?'  => $brandRow->id,

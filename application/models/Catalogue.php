@@ -2,6 +2,7 @@
 
 use Autowp\Image\Storage\Request;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\BrandEngine;
 
 class Catalogue
 {
@@ -45,7 +46,7 @@ class Catalogue
     private $engineTable;
 
     /**
-     * @var Brand_Engine
+     * @var BrandEngine
      */
     private $brandEngineTable;
 
@@ -168,13 +169,13 @@ class Catalogue
     }
 
     /**
-     * @return Brand_Engine
+     * @return BrandEngine
      */
     public function getBrandEngineTable()
     {
         return $this->brandEngineTable
             ? $this->brandEngineTable
-            : $this->brandEngineTable = new Brand_Engine();
+            : $this->brandEngineTable = new BrandEngine();
     }
 
     /**

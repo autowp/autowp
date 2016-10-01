@@ -1,6 +1,10 @@
 <?php
 
-class Brand_Engine extends Zend_Db_Table
+namespace Application\Model\DbTable;
+
+use Zend_Db_Table;
+
+class BrandEngine extends Zend_Db_Table
 {
     protected $_primary = ['brand_id', 'engine_id'];
     protected $_name = 'brand_engine';
