@@ -1,6 +1,10 @@
 <?php
 
-class Brand_Alias extends Zend_Db_Table
+namespace Application\Model\DbTable;
+
+use Zend_Db_Table;
+
+class BrandAlias extends Zend_Db_Table
 {
     protected $_name = 'brand_alias';
     protected $_primary = ['name'];
