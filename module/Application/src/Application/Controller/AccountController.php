@@ -10,6 +10,7 @@ use Zend\View\Model\ViewModel;
 use Application\Auth\Adapter\Id as IdAuthAdapter;
 use Application\Controller\LoginController;
 use Application\Model\DbTable\Engine;
+use Application\Model\DbTable\LoginState;
 use Application\Model\Forums;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -18,7 +19,6 @@ use Application\Service\UsersService;
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
 use Cars;
-use LoginState;
 use Picture;
 use User_Account;
 use User_Renames;

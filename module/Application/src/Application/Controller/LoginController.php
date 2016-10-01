@@ -8,6 +8,7 @@ use Zend\Uri\Http as HttpUri;
 use Zend\View\Model\ViewModel;
 
 use Application\Auth\Adapter\Id as IdAuthAdapter;
+use Application\Model\DbTable\LoginState;
 use Application\Service\UsersService;
 
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
@@ -18,7 +19,6 @@ use Zend_Db_Expr;
 use Exception;
 use Imagick;
 
-use LoginState;
 use User_Account;
 use Users;
 
