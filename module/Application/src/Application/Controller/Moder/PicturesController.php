@@ -11,6 +11,7 @@ use Application\Form\Moder\Inbox as InboxForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -22,7 +23,6 @@ use Cars;
 use Comments;
 use Comment_Message;
 use Comment_Topic;
-use Engines;
 use Perspectives;
 use Picture;
 use Picture_Row;
@@ -46,7 +46,7 @@ class PicturesController extends AbstractActionController
     private $carParentTable;
 
     /**
-     * @var Engines
+     * @var Engine
      */
     private $engineTable = null;
 
@@ -83,13 +83,13 @@ class PicturesController extends AbstractActionController
     private $pictureNameFormatter;
 
     /**
-     * @return Engines
+     * @return Engine
      */
     private function getEngineTable()
     {
         return $this->engineTable
             ? $this->engineTable
-            : $this->engineTable = new Engines();
+            : $this->engineTable = new Engine();
     }
 
 
@@ -1662,7 +1662,7 @@ class PicturesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $engineTable = new Engines();
+        $engineTable = new Engine();
         $rows = $engineTable->fetchAll(
             $engineTable->select(true)
                 ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
@@ -2105,7 +2105,7 @@ class PicturesController extends AbstractActionController
                     ->where('cars.is_concept')
             );
 
-            $engineTable = new Engines();
+            $engineTable = new Engine();
             $haveEngines = (bool)$engineTable->fetchRow(
                 $engineTable->select(true)
                     ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)

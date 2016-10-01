@@ -10,6 +10,7 @@ use Zend\Paginator\Paginator;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -24,7 +25,6 @@ use Car_Types;
 use Cars;
 use Car_Row;
 use Comment_Message;
-use Engines;
 use Modification_Group;
 use Perspective_Group;
 use Picture;
@@ -825,7 +825,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->_brandAction(function($brand) use($callback) {
 
-            $engineTable = new Engines();
+            $engineTable = new Engine();
 
             $path = $this->params('path');
             $path = $path ? (array)$path : [];
@@ -867,7 +867,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->_enginesAction(function($brand, $engineRow, $path) {
 
-            $engineTable = new Engines();
+            $engineTable = new Engine();
 
             $select = $engineTable->select(true)
                 ->order('engines.caption');
@@ -1136,7 +1136,7 @@ class CatalogueController extends AbstractActionController
             );
             $carsCount = $paginator->getTotalItemCount();
 
-            $engineTable = new Engines();
+            $engineTable = new Engine();
             $select = $engineTable->select(true)
                 ->where('engines.parent_id = ?', $engineRow->id);
 

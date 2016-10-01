@@ -5,6 +5,7 @@ use Autowp\Image;
 use Application\Db\Table;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 
 class Picture extends Table
@@ -42,7 +43,7 @@ class Picture extends Table
         ],
         'Engine' => [
             'columns'       => ['engine_id'],
-            'refTableClass' => 'Engines',
+            'refTableClass' => Engine::class,
             'refColumns'    => ['id']
         ],
         'Factory' => [
@@ -226,7 +227,7 @@ class Picture extends Table
 
         $engines = [];
         if (count($engineIds)) {
-            $table = new Engines();
+            $table = new Engine();
             foreach ($table->find(array_keys($engineIds)) as $row) {
                 $engines[$row->id] = $row->caption;
             }
@@ -399,7 +400,7 @@ class Picture extends Table
 
         $engines = [];
         if (count($engineIds)) {
-            $table = new Engines();
+            $table = new Engine();
             foreach ($table->find(array_keys($engineIds)) as $row) {
                 $engines[$row->id] = $row->caption;
             }
@@ -561,7 +562,7 @@ class Picture extends Table
             return false;
         }
 
-        $engineTable = new Engines();
+        $engineTable = new Engine();
         $engine = $engineTable->find($id)->current();
 
         if (!$engine) {

@@ -9,13 +9,13 @@ use Zend\View\Model\ViewModel;
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Engine;
 use Application\Service\TelegramService;
 
 use Car_Parent;
 use Cars;
 use Comment_Message;
 use Comments;
-use Engines;
 use Picture;
 
 use Zend_Db_Expr;
@@ -129,7 +129,7 @@ class UploadController extends AbstractActionController
                 break;
 
             case Picture::ENGINE_TYPE_ID:
-                $engines = new Engines();
+                $engines = new Engine();
                 $engine = $engines->find($engineId)->current();
                 if ($engine) {
                     $selected = true;
@@ -249,7 +249,7 @@ class UploadController extends AbstractActionController
                 break;
 
             case Picture::ENGINE_TYPE_ID:
-                $engines = new Engines();
+                $engines = new Engine();
                 $engine = $engines->find($engineId)->current();
                 if ($engine) {
                     $engineId = $engine->id;
@@ -459,7 +459,7 @@ class UploadController extends AbstractActionController
         );
         $cars = $this->prepareCars($rows);
 
-        $engineTable = new Engines();
+        $engineTable = new Engine();
         $haveEngines = (bool)$engineTable->fetchRow(
             $engineTable->select(true)
                 ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
@@ -634,7 +634,7 @@ class UploadController extends AbstractActionController
             return $this->notfoundAction();
         }
 
-        $engineTable = new Engines();
+        $engineTable = new Engine();
         $rows = $engineTable->fetchAll(
             $engineTable->select(true)
                 ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)

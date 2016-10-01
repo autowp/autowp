@@ -25,7 +25,7 @@ class Cars extends Table
         ],
         'Engine' => [
             'columns'       => ['engine_id'],
-            'refTableClass' => 'Engines',
+            'refTableClass' => \Application\Model\DbTable\Engine::class,
             'refColumns'    => ['id']
         ]
     ];

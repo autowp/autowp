@@ -9,6 +9,7 @@ use Zend\View\Model\ViewModel;
 use Application\HostManager;
 use Application\Model\Message;
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Engine;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
@@ -17,7 +18,6 @@ use Attrs_Item_Types;
 use Attrs_User_Values;
 use Cars;
 use Car_Row;
-use Engines;
 use User_Car_Subscribe;
 use Users;
 use User_Row;
@@ -25,7 +25,7 @@ use User_Row;
 class CarsController extends AbstractActionController
 {
     /**
-     * @var Engines
+     * @var Engine
      */
     private $engineTable = null;
 
@@ -55,13 +55,13 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @return Engines
+     * @return Engine
      */
     private function getEngineTable()
     {
         return $this->engineTable
             ? $this->engineTable
-            : $this->engineTable = new Engines();
+            : $this->engineTable = new Engine();
     }
 
     private function carModerUrl(Car_Row $car, $uri = null)
@@ -156,7 +156,7 @@ class CarsController extends AbstractActionController
             }
         }
 
-        $engine = $car->findParentEngines();
+        $engine = $car->findParentRow(Engine::class);
         $engineInherited = $car->engine_inherit;
         $engineInheritedFrom = [];
         if ($engine && $car->engine_inherit) {
@@ -655,7 +655,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $engine = $car->findParentEngines();
+        $engine = $car->findParentRow(Engine::class);
         $car->engine_inherit = 0;
         $car->engine_id = null;
         $car->save();

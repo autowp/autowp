@@ -137,7 +137,7 @@ class Picture_Row extends Row
                 break;
 
             case Picture::ENGINE_TYPE_ID:
-                $engine = $this->findParentEngines();
+                $engine = $this->findParentRow(\Application\Model\DbTable\Engine::class);
                 if ($engine) {
                     $result = implode('/', [
                         'engines',

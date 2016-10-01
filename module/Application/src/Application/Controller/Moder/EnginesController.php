@@ -8,11 +8,11 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\Form\Moder\EngineAdd as EngineAddForm;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandEngine;
+use Application\Model\DbTable\Engine;
+use Application\Model\DbTable\EngineParentCache;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
-use Engine_Parent_Cache;
-use Engines;
 use Picture;
 
 use Exception;
@@ -22,7 +22,7 @@ use Zend_Db_Expr;
 class EnginesController extends AbstractActionController
 {
     /**
-     * @var Engines
+     * @var Engine
      */
     private $engineTable = null;
 
@@ -43,13 +43,13 @@ class EnginesController extends AbstractActionController
     }
 
     /**
-     * @return Engines
+     * @return Engine
      */
     private function getEngineTable()
     {
         return $this->engineTable
             ? $this->engineTable
-            : $this->engineTable = new Engines();
+            : $this->engineTable = new Engine();
     }
 
     private function engineModerUrl($id)
@@ -368,14 +368,14 @@ class EnginesController extends AbstractActionController
                     $brandEngineRow->save();
                 }
 
-                $epcTable = new Engine_Parent_Cache();
+                $epcTable = new EngineParentCache();
                 $epcTable->rebuildOnCreate($engine);
 
                 if ($parentEngine) {
                     $engine->parent_id = $parentEngine->id;
                     $engine->save();
 
-                    $epcTable = new Engine_Parent_Cache();
+                    $epcTable = new EngineParentCache();
                     $epcTable->rebuildOnAddParent($engine);
 
                     $specService = new SpecificationsService();
@@ -442,7 +442,7 @@ class EnginesController extends AbstractActionController
         $engine->parent_id = null;
         $engine->save();
 
-        $epcTable = new Engine_Parent_Cache();
+        $epcTable = new EngineParentCache();
         $epcTable->rebuildOnRemoveParent($engine);
 
         $specService = new SpecificationsService();
@@ -492,7 +492,7 @@ class EnginesController extends AbstractActionController
             $engine->parent_id = $parentEngine->id;
             $engine->save();
 
-            $epcTable = new Engine_Parent_Cache();
+            $epcTable = new EngineParentCache();
             $epcTable->rebuildOnRemoveParent($engine);
             $epcTable->rebuildOnAddParent($engine);
 
@@ -550,7 +550,7 @@ class EnginesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $epcTable = new Engine_Parent_Cache();
+        $epcTable = new EngineParentCache();
 
         $epcTable->rebuild();
 

@@ -217,7 +217,7 @@
                         ?>
                         <p>
                             <?=$this->escapeHtml($this->translate('moder/picture/catalogue/engine'))?>
-                            <?php $engine = $this->picture->findParentEngines() ?>
+                            <?php $engine = $this->picture->findParentRow(Application\Model\DbTable\Engine::class); ?>
                             <?php if ($engine) { ?>
                                 <?=$this->htmlA($this->url('moder/engines/params', [
                                     'action'    => 'engine',

@@ -1,12 +1,14 @@
 <?php
 
+namespace Application\Model\DbTable;
+
 use Application\Db\Table;
 
-class Engines extends Table
+class Engine extends Table
 {
     protected $_name = 'engines';
     protected $_primary = 'id';
-    protected $_rowClass = 'Engine_Row';
+    protected $_rowClass = \Application\Model\DbTable\EngineRow::class;
     protected $_referenceMap = [
         'Last_Editor' => [
             'columns'       => ['last_editor_id'],

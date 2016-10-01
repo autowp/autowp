@@ -174,7 +174,7 @@ class PictureController extends AbstractActionController
 
         switch ($picture->type) {
             case Picture::ENGINE_TYPE_ID:
-                if ($engine = $picture->findParentEngines()) {
+                if ($engine = $picture->findParentRow(Engine::class)) {
                     $cataloguePaths = $this->catalogue()->engineCataloguePaths($engine, [
                         'limit' => 1
                     ]);

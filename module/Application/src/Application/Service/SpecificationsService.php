@@ -3,6 +3,8 @@
 namespace Application\Service;
 
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
+use Application\Model\DbTable\Engine;
+use Application\Model\DbTable\EngineRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Spec\Table\Car as CarSpecTable;
 use Application\Spec\Table\Engine as EngineSpecTable;
@@ -26,8 +28,6 @@ use Car_Parent;
 use Car_Row;
 use Car_Types;
 use Cars;
-use Engine_Row;
-use Engines;
 use Picture;
 use Users;
 use User_Row;
@@ -122,7 +122,7 @@ class SpecificationsService
     protected $engineAttributes = null;
 
     /**
-     * @var Engines
+     * @var Engine
      */
     protected $engineTable = null;
 
@@ -210,13 +210,13 @@ class SpecificationsService
     }
 
     /**
-     * @return Engines
+     * @return Engine
      */
     protected function getEngineTable()
     {
         return $this->engineTable
             ? $this->engineTable
-            : $this->engineTable = new Engines();
+            : $this->engineTable = new Engine();
     }
 
     /**
@@ -724,12 +724,12 @@ class SpecificationsService
     }
 
     /**
-     * @param Engine_Row $engine
+     * @param EngineRow $engine
      * @param User_Row $user
      * @param array $options
      * @return array
      */
-    public function getEngineForm(Engine_Row $engine, User_Row $user, array $options, $language)
+    public function getEngineForm(EngineRow $engine, User_Row $user, array $options, $language)
     {
         $zoneId = 5;
         return [
@@ -1036,11 +1036,11 @@ class SpecificationsService
     }
 
     /**
-     * @param Engine_Row $car
+     * @param EngineRow $engine
      * @param array $values
      * @param User_Row $user
      */
-    public function saveEngineAttributes(Engine_Row $engine, array $values, User_Row $user)
+    public function saveEngineAttributes(EngineRow $engine, array $values, User_Row $user)
     {
         $zoneId = 5;
         $zone = $this->_getZone($zoneId);

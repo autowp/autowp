@@ -4,6 +4,8 @@ use Autowp\Image\Storage\Request;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandEngine;
+use Application\Model\DbTable\Engine;
+use Application\Model\DbTable\EngineRow;
 
 class Catalogue
 {
@@ -42,7 +44,7 @@ class Catalogue
     private $pictureTable;
 
     /**
-     * @var Engines
+     * @var Engine
      */
     private $engineTable;
 
@@ -160,13 +162,13 @@ class Catalogue
     }
 
     /**
-     * @return Engines
+     * @return Engine
      */
     public function getEngineTable()
     {
         return $this->engineTable
             ? $this->engineTable
-            : $this->engineTable = new Engines();
+            : $this->engineTable = new Engine();
     }
 
     /**
@@ -229,7 +231,7 @@ class Catalogue
         return $urls;
     }
 
-    public function engineCataloguePaths(Engine_Row $engine, array $options = [])
+    public function engineCataloguePaths(EngineRow $engine, array $options = [])
     {
         $defaults = [
             'brand_id' => null,

@@ -5,13 +5,13 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Log_Events;
 use Cars;
-use Engines;
 use Picture;
 
 class LogController extends AbstractActionController
@@ -27,7 +27,7 @@ class LogController extends AbstractActionController
         $logTable = new Log_Events();
         $vehicleTable = new Cars();
         $brandModel = new BrandModel();
-        $engineTable = new Engines();
+        $engineTable = new Engine();
         $picturesTable = new Picture();
         $twinsGroupsTable = new TwinsGroup();
         $factoryTable = new Factory();

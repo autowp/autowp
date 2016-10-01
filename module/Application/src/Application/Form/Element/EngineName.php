@@ -6,14 +6,14 @@ use Zend\Form\Element\Text;
 use Zend\InputFilter\InputProviderInterface;
 
 use Application\Filter\SingleSpaces;
-use Engines;
+use Application\Model\DbTable\Engine;
 
 class EngineName extends Text implements InputProviderInterface
 {
     protected $attributes = [
         'type'      => 'text',
-        'maxlength' => Engines::MAX_NAME,
-        'size'      => Engines::MAX_NAME
+        'maxlength' => Engine::MAX_NAME,
+        'size'      => Engine::MAX_NAME
     ];
 
     /**
@@ -41,7 +41,7 @@ class EngineName extends Text implements InputProviderInterface
                 [
                     'name' => 'StringLength',
                     'options' => [
-                        'max' => Engines::MAX_NAME
+                        'max' => Engine::MAX_NAME
                     ]
                 ]
             ]

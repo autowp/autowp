@@ -1,8 +1,12 @@
 <?php
 
+namespace Application\Model\DbTable;
+
 use Application\Db\Table\Row;
 
-class Engine_Row extends Row
+use Cars;
+
+class EngineRow extends Row
 {
     public function getRelatedCarGroupId(array $options = [])
     {

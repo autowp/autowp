@@ -8,6 +8,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandLink;
+use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
@@ -25,7 +26,6 @@ use Category;
 use Category_Language;
 use Comment_Message;
 use Comment_Topic;
-use Engines;
 use Perspectives;
 use Picture;
 use Picture_View;
@@ -176,7 +176,7 @@ class Pic extends AbstractPlugin
 
             case Picture::ENGINE_TYPE_ID:
                 if ($row['engine_id']) {
-                    $engineTable = new Engines();
+                    $engineTable = new Engine();
 
                     $parentId = $row['engine_id'];
                     $path = [];
@@ -510,7 +510,7 @@ class Pic extends AbstractPlugin
 
         switch ($picture->type) {
             case Picture::ENGINE_TYPE_ID:
-                if ($engine = $picture->findParentEngines()) {
+                if ($engine = $picture->findParentRow(Engine::class)) {
 
                     $brandIds = $db->fetchCol(
                         $db->select()
@@ -1030,7 +1030,7 @@ class Pic extends AbstractPlugin
                 break;
 
             case Picture::ENGINE_TYPE_ID:
-                if ($engine = $picture->findParentEngines()) {
+                if ($engine = $picture->findParentRow(Engine::class)) {
                     $url = $controller->url()->fromRoute('moder/engines/params', [
                         'action'    => 'engine',
                         'engine_id' => $engine->id

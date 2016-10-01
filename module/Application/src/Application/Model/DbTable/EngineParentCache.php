@@ -1,8 +1,12 @@
 <?php
 
-use Application\Db\Table;
+namespace Application\Model\DbTable;
 
-class Engine_Parent_Cache extends Table
+use Application\Db\Table;
+use Application\Model\DbTable\Engine;
+use Application\Model\DbTable\EngineRow;
+
+class EngineParentCache extends Table
 {
     protected $_name = 'engine_parent_cache';
     protected $_primary = ['engine_id', 'parent_id'];
@@ -10,12 +14,12 @@ class Engine_Parent_Cache extends Table
     protected $_referenceMap = [
         'Engine' => [
             'columns'       => ['engine_id'],
-            'refTableClass' => 'Engines',
+            'refTableClass' => Engine::class,
             'refColumns'    => ['id']
         ],
         'Parent' => [
             'columns'       => ['parent_id'],
-            'refTableClass' => 'Engines',
+            'refTableClass' => Engine::class,
             'refColumns'    => ['id']
         ],
     ];
@@ -24,12 +28,12 @@ class Engine_Parent_Cache extends Table
     {
         $this->delete([]);
 
-        $table = new Engines();
+        $table = new Engine();
 
         $this->_rebuild($table, [0]);
     }
 
-    protected function _rebuild(Engines $table, $id)
+    private function _rebuild(Engine $table, $id)
     {
         $select = $table->getAdapter()->select()
             ->from($table->info('name'), 'id');
@@ -60,11 +64,11 @@ class Engine_Parent_Cache extends Table
     }
 
     /**
-     * @param Engine_Row $engine
+     * @param EngineRow $engine
      */
-    public function rebuildOnRemoveParent(Engine_Row $engine)
+    public function rebuildOnRemoveParent(EngineRow $engine)
     {
-        $table = new Engines();
+        $table = new Engine();
 
         // collect child engines
         $subTreeEngines = $table->fetchAll(
@@ -84,7 +88,7 @@ class Engine_Parent_Cache extends Table
         ]);
     }
 
-    public function rebuildOnCreate(Engine_Row $engine)
+    public function rebuildOnCreate(EngineRow $engine)
     {
         // self
         $this->insert([
@@ -94,11 +98,11 @@ class Engine_Parent_Cache extends Table
     }
 
     /**
-     * @param Engine_Row $engine
+     * @param EngineRow $engine
      */
-    public function rebuildOnAddParent(Engine_Row $engine)
+    public function rebuildOnAddParent(EngineRow $engine)
     {
-        $table = new Engines();
+        $table = new Engine();
 
         // collect parent engines
         $currentEngine = $engine;
