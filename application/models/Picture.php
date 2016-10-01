@@ -7,6 +7,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
+use Application\Model\DbTable\Perspective;
 
 class Picture extends Table
 {
@@ -215,7 +216,7 @@ class Picture extends Table
 
         $perspectives = [];
         if (count($perspectiveIds)) {
-            $perspectiveTable = new Perspectives();
+            $perspectiveTable = new Perspective();
             $pRows = $perspectiveTable->find(array_keys($perspectiveIds));
 
             foreach ($pRows as $row) {
@@ -390,7 +391,7 @@ class Picture extends Table
 
         $perspectives = [];
         if (count($perspectiveIds)) {
-            $perspectiveTable = new Perspectives();
+            $perspectiveTable = new Perspective();
             $pRows = $perspectiveTable->find(array_keys($perspectiveIds));
 
             foreach ($pRows as $row) {

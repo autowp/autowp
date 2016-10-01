@@ -11,6 +11,7 @@ use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
+use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -26,7 +27,6 @@ use Category;
 use Category_Language;
 use Comment_Message;
 use Comment_Topic;
-use Perspectives;
 use Picture;
 use Picture_View;
 use Picture_Moder_Vote;
@@ -912,7 +912,7 @@ class Pic extends AbstractPlugin
         $picturePerspective = null;
         if ($this->getController()->user()->inheritsRole('moder')) {
             if ($picture->type == Picture::VEHICLE_TYPE_ID) {
-                $perspectives = new Perspectives();
+                $perspectives = new Perspective();
 
                 $multioptions = $perspectives->getAdapter()->fetchPairs(
                     $perspectives->getAdapter()->select()

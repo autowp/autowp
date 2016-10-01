@@ -1150,7 +1150,7 @@ class SpecificationsService
         return $this->engineChildsCache[$parentId];
     }
 
-    protected function _haveOwnAttributeValue($attributeId, $itemTypeId, $itemId)
+    private function haveOwnAttributeValue($attributeId, $itemTypeId, $itemId)
     {
         return (bool)$this->getUserValueTable()->fetchRow([
             'attribute_id = ?' => (int)$attributeId,
@@ -1167,7 +1167,7 @@ class SpecificationsService
 
             foreach ($childIds as $childId) {
                 // update only if row use inheritance
-                $haveValue = $this->_haveOwnAttributeValue($attribute['id'], $itemTypeId, $childId);
+                $haveValue = $this->haveOwnAttributeValue($attribute['id'], $itemTypeId, $childId);
 
                 if (!$haveValue) {
 
@@ -1185,7 +1185,7 @@ class SpecificationsService
 
             foreach ($childIds as $childId) {
                 // update only if row use inheritance
-                $haveValue = $this->_haveOwnAttributeValue($attribute['id'], $itemTypeId, $childId);
+                $haveValue = $this->haveOwnAttributeValue($attribute['id'], $itemTypeId, $childId);
 
                 if (!$haveValue) {
 
@@ -1215,7 +1215,7 @@ class SpecificationsService
         );
     }
 
-    protected function _specPicture($car, $perspectives)
+    private function specPicture($car, $perspectives)
     {
         $pictureTable = new Picture();
         $pictureTableAdapter = $pictureTable->getAdapter();
@@ -1592,8 +1592,8 @@ class SpecificationsService
                 'endYear'          => $car->end_year,
                 'produced'         => $car->produced,
                 'produced_exactly' => $car->produced_exactly,
-                'topPicture'       => $this->_specPicture($car, $topPerspectives),
-                'bottomPicture'    => $this->_specPicture($car, $bottomPerspectives),
+                'topPicture'       => $this->specPicture($car, $topPerspectives),
+                'bottomPicture'    => $this->specPicture($car, $bottomPerspectives),
                 'carType'          => $carType ? $carType->name : null,
                 'values'           => $values
             ];
@@ -2420,7 +2420,7 @@ class SpecificationsService
     {
         foreach ($this->getAttributes() as $attribute) {
             if ($attribute['typeId']) {
-                $haveValue = $this->_haveOwnAttributeValue($attribute['id'], $itemTypeId, $itemId);
+                $haveValue = $this->haveOwnAttributeValue($attribute['id'], $itemTypeId, $itemId);
                 if (!$haveValue) {
                     $this->_updateActualValue($attribute, $itemTypeId, $itemId);
                 }

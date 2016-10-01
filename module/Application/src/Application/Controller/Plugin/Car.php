@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
@@ -15,7 +16,6 @@ use Car_Language;
 use Car_Parent;
 use Category;
 use Category_Language;
-use Perspective_Group;
 use Picture;
 use Spec;
 
@@ -559,7 +559,7 @@ class Car extends AbstractPlugin
     private function getPerspectiveGroupIds($pageId)
     {
         if (!isset($this->_perspectiveCache[$pageId])) {
-            $perspectivesGroups = new Perspective_Group();
+            $perspectivesGroups = new PerspectiveGroup();
             $db = $perspectivesGroups->getAdapter();
             $this->_perspectiveCache[$pageId] = $db->fetchCol(
                 $db->select()

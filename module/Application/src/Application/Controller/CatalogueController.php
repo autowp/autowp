@@ -13,6 +13,7 @@ use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
+use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
@@ -26,7 +27,6 @@ use Cars;
 use Car_Row;
 use Comment_Message;
 use Modification_Group;
-use Perspective_Group;
 use Picture;
 use Picture_Row;
 use Users;
@@ -1967,7 +1967,7 @@ class CatalogueController extends AbstractActionController
 
     private function getPerspectiveGroupIds($pageId)
     {
-        $perspectivesGroups = new Perspective_Group();
+        $perspectivesGroups = new PerspectiveGroup();
         $db = $perspectivesGroups->getAdapter();
         return $db->fetchCol(
             $db->select()

@@ -1,18 +1,22 @@
 <?php
 
-class Perspective_Group_Perspective extends Zend_Db_Table
+namespace Application\Model\DbTable\Perspective;
+
+use Zend_Db_Table;
+
+class GroupPerspective extends Zend_Db_Table
 {
     protected $_name = 'perspectives_groups_perspectives';
     protected $_primary = ['group_id', 'perspective_id'];
     protected $_referenceMap = [
         'Group' => [
             'columns'       => ['group_id'],
-            'refTableClass' => 'Perspective_Group',
+            'refTableClass' => \Application\Model\DbTable\Perspective\Group::class,
             'refColumns'    => ['id']
         ],
         'Perspective' => [
             'columns'       => ['perspective_id'],
-            'refTableClass' => 'Perspectives',
+            'refTableClass' => \Application\Model\DbTable\Perspective:class,
             'refColumns'    => ['id']
         ]
     ];

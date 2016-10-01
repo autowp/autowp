@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\Model\CarOfDay;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Factory;
+use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
@@ -14,7 +15,6 @@ use Car_Parent;
 use Car_Row;
 use Category;
 use Category_Language;
-use Perspective_Group;
 use Picture;
 use Users;
 
@@ -37,7 +37,7 @@ class IndexController extends AbstractActionController
 
     private function getOrientedPictureList($car)
     {
-        $perspectivesGroups = new Perspective_Group();
+        $perspectivesGroups = new PerspectiveGroup();
 
         $db = $perspectivesGroups->getAdapter();
         $perspectivesGroupIds = $db->fetchCol(

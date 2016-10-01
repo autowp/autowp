@@ -4,10 +4,10 @@ namespace Application\Controller\Moder;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Perspectives;
-use Perspective_Group;
-use Perspective_Group_Perspective;
-use Perspective_Page;
+use Application\Model\DbTable\Perspective;
+use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
+use Application\Model\DbTable\Perspective\GroupPerspective as PerspectiveGroupPerspective;
+use Application\Model\DbTable\Perspective\Page as PerspectivePage;
 
 class PerspectivesController extends AbstractActionController
 {
@@ -17,10 +17,10 @@ class PerspectivesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $prspModel = new Perspectives();
-        $prspGroupsModel = new Perspective_Group();
-        $prspGroupsPrspModel = new Perspective_Group_Perspective();
-        $prspPagesModel = new Perspective_Page();
+        $prspModel = new Perspective();
+        $prspGroupsModel = new PerspectiveGroup();
+        $prspGroupsPrspModel = new PerspectiveGroupPerspective();
+        $prspPagesModel = new PerspectivePage();
 
         $data = [];
         foreach ($prspPagesModel->fetchAll(null, 'id') as $page) {

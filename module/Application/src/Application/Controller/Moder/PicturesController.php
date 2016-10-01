@@ -13,6 +13,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
+use Application\Model\DbTable\Perspective;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
@@ -23,7 +24,6 @@ use Cars;
 use Comments;
 use Comment_Message;
 use Comment_Topic;
-use Perspectives;
 use Picture;
 use Picture_Row;
 use Picture_Moder_Vote;
@@ -441,7 +441,7 @@ class PicturesController extends AbstractActionController
             'width' => 4
         ]);
 
-        $perspectives = new Perspectives();
+        $perspectives = new Perspective();
         $multioptions = $perspectives->getAdapter()->fetchPairs(
             $perspectives->getAdapter()->select()
                 ->from($perspectives->info('name'), ['id', 'name'])
@@ -456,8 +456,6 @@ class PicturesController extends AbstractActionController
             $picturePerspective = null;
             if ($item['type'] == Picture::VEHICLE_TYPE_ID) {
                 if ($this->user()->inheritsRole('moder')) {
-                    $perspectives = new Perspectives();
-
                     $item['perspective'] = [
                         'options' => $multioptions,
                         'url'     => $this->url()->fromRoute('moder/pictures/params', [
@@ -671,7 +669,7 @@ class PicturesController extends AbstractActionController
             throw new Exception('Invalid picture type');
         }
 
-        $perspectives = new Perspectives();
+        $perspectives = new Perspective();
 
         $request = $this->getRequest();
 
@@ -1204,7 +1202,7 @@ class PicturesController extends AbstractActionController
 
         $picturePerspective = null;
         if ($picture->type == Picture::VEHICLE_TYPE_ID) {
-            $perspectives = new Perspectives();
+            $perspectives = new Perspective();
 
             $multioptions = $perspectives->getAdapter()->fetchPairs(
                 $perspectives->getAdapter()->select()

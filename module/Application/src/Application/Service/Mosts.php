@@ -2,19 +2,19 @@
 
 namespace Application\Service;
 
+use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Most;
 use Application\Service\SpecificationsService;
 
 use Car_Types;
 use Cars;
 use Exception;
-use Perspective_Group;
 use Picture;
 use Zend_Db_Expr;
 
 class Mosts
 {
-    private $_ratings = [
+    private $ratings = [
         [
             'catName'   => 'fastest',
             'adapter'   => [
@@ -350,18 +350,18 @@ class Mosts
         ],
     ];
 
-    private $_years = null;
+    private $years = null;
 
-    private $_perspectiveGroups = null;
+    private $perspectiveGroups = null;
 
     /**
      * @var SpecificationsService
      */
-    private $_specs = null;
+    private $specs = null;
 
     public function __construct(array $options = [])
     {
-        $this->_specs = $options['specs'];
+        $this->specs = $options['specs'];
     }
 
     private function betweenYearsExpr($from, $to)
@@ -373,12 +373,12 @@ class Mosts
 
     public function getYears()
     {
-        if ($this->_years === null) {
+        if ($this->years === null) {
             $cy = (int)date('Y');
 
             $prevYear = $cy-1;
 
-            $this->_years = [
+            $this->years = [
                 [
                     'name'   => 'mosts/period/before1920',
                     'folder' => 'before1920',
@@ -443,19 +443,19 @@ class Mosts
             ];
         }
 
-        return $this->_years;
+        return $this->years;
     }
 
     public function getRatings()
     {
-        return $this->_ratings;
+        return $this->ratings;
     }
 
     public function getPrespectiveGroups()
     {
-        if ($this->_perspectiveGroups === null) {
+        if ($this->perspectiveGroups === null) {
 
-            $pgTable = new Perspective_Group();
+            $pgTable = new PerspectiveGroup();
             $groups = $pgTable->fetchAll(
                 $pgTable->select(true)
                     ->where('page_id = ?', 1)
@@ -466,10 +466,10 @@ class Mosts
                 $g[] = $group->id;
             }
 
-            $this->_perspectiveGroups = $g;
+            $this->perspectiveGroups = $g;
         }
 
-        return $this->_perspectiveGroups;
+        return $this->perspectiveGroups;
     }
 
     public function getCarTypes($language, $brandId)
@@ -634,7 +634,7 @@ class Mosts
         }
 
         $most = new Most([
-            'specs'      => $this->_specs,
+            'specs'      => $this->specs,
             'carsSelect' => $select,
             'adapter'    => $cMost['adapter'],
             'carsCount'  => 7,
