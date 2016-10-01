@@ -3,24 +3,19 @@
 namespace Application\Model\DbTable;
 
 use Autowp\Filter\Filename\Safe;
+
 use Application\Db\Table;
+use Application\Model\DbTable\BrandRow;
 
 class Brand extends Table
 {
     protected $_name = 'brands';
     protected $_primary = 'id';
-    protected $_rowClass = 'Brand_Row';
-    protected $_referenceMap = [
-        'Type' => [
-            'columns'       => ['type_id'],
-            'refTableClass' => 'Brand_Types',
-            'refColumns'    => ['id']
-        ]
-    ];
+    protected $_rowClass = BrandRow::class;
 
     /**
      * @param string $catname
-     * @return Brand_Row
+     * @return BrandRow
      */
     public function findRowByCatname($catname)
     {

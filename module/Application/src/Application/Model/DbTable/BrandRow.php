@@ -1,9 +1,15 @@
 <?php
 
+namespace Application\Model\DbTable;
+
 use Application\Db\Table\Row;
 use Application\Model\DbTable\BrandLanguage;
 
-class Brand_Row extends Row
+use Picture;
+
+use Zend_Db_Expr;
+
+class BrandRow extends Row
 {
     /**
      * @var BrandLanguage

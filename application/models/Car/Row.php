@@ -320,7 +320,7 @@ class Car_Row extends Row
         $brandModel->refreshPicturesCountByVehicle($this->id);
     }
 
-    public function deleteFromBrand(Brand_Row $brand)
+    public function deleteFromBrand(\Application\Model\DbTable\BrandRow $brand)
     {
         $db = $this->getTable()->getAdapter();
         $sql = 'DELETE FROM brands_cars WHERE (brand_id=?) AND (car_id=?) LIMIT 1';

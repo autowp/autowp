@@ -8,9 +8,9 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\HostManager;
 use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\BrandLink;
+use Application\Model\DbTable\BrandRow;
 use Application\Model\Message;
 
-use Brand_Row;
 use Cars;
 use Users;
 
@@ -49,12 +49,12 @@ class BrandsController extends AbstractActionController
     }
 
     /**
-     * @param Brand_Row $car
+     * @param BrandRow $car
      * @param bool $forceCanonical
      * @param \Zend\Uri\Uri
      * @return string
      */
-    private function brandModerUrl(Brand_Row $brand, $forceCanonical, $uri = null)
+    private function brandModerUrl(BrandRow $brand, $forceCanonical, $uri = null)
     {
         return $this->url()->fromRoute('moder/brands/params', [
             'action'   => 'brand',

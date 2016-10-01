@@ -149,7 +149,7 @@ class Car_Parent extends Table
         }
 
         $brandId = $brand;
-        if ($brandId instanceof Brand_Row) {
+        if ($brandId instanceof \Application\Model\DbTable\BrandRow) {
             $brandId = $brandId->id;
         }
 
