@@ -4,9 +4,9 @@ namespace Application\Controller\Moder;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\DbTable\Session as SessionTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Session;
 use Users;
 
 class UsersController extends AbstractActionController
@@ -103,7 +103,7 @@ class UsersController extends AbstractActionController
         $row->deleted = 1;
         $row->save();
 
-        $sessionTable = new Session();
+        $sessionTable = new SessionTable();
 
         $sessionTable->delete([
             'user_id = ?' => $row->id

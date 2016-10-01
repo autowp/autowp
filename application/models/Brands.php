@@ -4,6 +4,8 @@ use Application\Db\Table;
 
 use Autowp\Filter\Filename\Safe;
 
+use Exception;
+
 class Brands extends Table
 {
     protected $_name = 'brands';
@@ -25,17 +27,6 @@ class Brands extends Table
     {
         return $this->fetchRow([
             'folder = ?' => (string)$catname
-        ]);
-    }
-
-    /**
-     * @param string $caption
-     * @return Brand_Row
-     */
-    public function fetchRowByCaption($caption)
-    {
-        return $this->fetchRow([
-            'caption = ?' => (string)$caption
         ]);
     }
 

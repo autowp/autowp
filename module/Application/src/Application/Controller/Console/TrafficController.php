@@ -7,7 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Service\TrafficControl;
 
-use Referer;
+use Application\Model\Referer;
 
 class TrafficController extends AbstractActionController
 {

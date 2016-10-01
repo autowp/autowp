@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\Referer;
+
 use Application\Db\Table;
 
-class Referer_Whitelist extends Table
+class Whitelist extends Table
 {
     protected $_name = 'referer_whitelist';
     protected $_primary = ['host'];

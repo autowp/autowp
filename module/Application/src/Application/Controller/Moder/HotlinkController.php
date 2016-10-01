@@ -4,9 +4,9 @@ namespace Application\Controller\Moder;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Referer;
-use Referer_Blacklist;
-use Referer_Whitelist;
+use Application\Model\Referer;
+use Application\Model\Referer\Blacklist;
+use Application\Model\Referer\Whitelist;
 
 class HotlinkController extends AbstractActionController
 {
@@ -26,8 +26,8 @@ class HotlinkController extends AbstractActionController
                 ->limit(100)
         );
 
-        $whitelistTable = new Referer_Whitelist();
-        $blacklistTable = new Referer_Blacklist();
+        $whitelistTable = new Whitelist();
+        $blacklistTable = new Blacklist();
 
         foreach ($hosts as &$host) {
 
@@ -85,7 +85,7 @@ class HotlinkController extends AbstractActionController
         $host = $this->params()->fromPost('host');
 
         if ($host) {
-            $whitelistTable = new Referer_Whitelist();
+            $whitelistTable = new Whitelist();
 
             $whitelistTable->insert([
                 'host' => (string)$host
@@ -104,7 +104,7 @@ class HotlinkController extends AbstractActionController
         $host = (string)$this->params()->fromPost('host');
 
         if ($host) {
-            $whitelistTable = new Referer_Whitelist();
+            $whitelistTable = new Whitelist();
 
             $whitelistTable->insert([
                 'host' => $host
@@ -128,7 +128,7 @@ class HotlinkController extends AbstractActionController
         $host = $this->params()->fromPost('host');
 
         if ($host) {
-            $blacklistTable = new Referer_Blacklist();
+            $blacklistTable = new Blacklist();
 
             $blacklistTable->insert([
                 'host' => (string)$host

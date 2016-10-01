@@ -208,47 +208,6 @@ class Picture_Row extends Row
         return $options;
     }
 
-    public function refreshRatio()
-    {
-        $votes = new Votes();
-
-        $row = $votes->getAdapter()->fetchRow(
-            $votes->select()
-                ->from($votes, [
-                    'sum'   =>  new Zend_Db_Expr('SUM(summary)'),
-                    'cnt'   =>  new Zend_Db_Expr('SUM(count)')
-                ])
-                ->where('picture_id = ?', $this->id)
-        );
-
-        if ($row) {
-            $this->setFromArray([
-                'ratio' =>  $row['cnt'] > 0 ? $row['sum']/$row['cnt'] : 0,
-                'votes' =>  $row['cnt']
-            ]);
-        }
-
-        $row = $votes->getAdapter()->fetchRow(
-            $votes->select()
-                ->from($votes, [
-                    'sum'   =>  new Zend_Db_Expr('SUM(summary)'),
-                    'cnt'   =>  new Zend_Db_Expr('SUM(count)')
-                ])
-                ->where('picture_id = ?', $this->id)
-                ->where('day_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)')
-        );
-
-        if ($row) {
-            $this->setFromArray([
-                'active_ratio'  =>  $row['cnt'] > 0 ? $row['sum']/$row['cnt'] : 0,
-                'active_votes'  =>  $row['cnt']
-            ]);
-        }
-
-        $this->save();
-
-    }
-
     /**
      * @return Request
      */

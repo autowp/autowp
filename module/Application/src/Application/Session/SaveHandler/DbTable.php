@@ -141,29 +141,5 @@ class DbTable extends Zend_Session_SaveHandler_DbTable
         $stmt = $db->query($sql, $args);
 
         return $stmt->rowCount() > 0;
-
-        /*$data = [
-            $this->_userIdColumn   => $this->getUserId(),
-            $this->_modifiedColumn => time(),
-            $this->_dataColumn     => (string)$data
-        ];
-
-        $rows = call_user_func_array([&$this, 'find'], $this->_getPrimary($id));
-
-        if (count($rows)) {
-            $data[$this->_lifetimeColumn] = $this->_getLifetime($rows->current());
-
-            if ($this->update($data, $this->_getPrimary($id, self::PRIMARY_TYPE_WHERECLAUSE))) {
-                $return = true;
-            }
-        } else {
-            $data[$this->_lifetimeColumn] = $this->_lifetime;
-
-            if ($this->insert(array_merge($this->_getPrimary($id, self::PRIMARY_TYPE_ASSOC), $data))) {
-                $return = true;
-            }
-        }
-
-        return $return;*/
     }
 }

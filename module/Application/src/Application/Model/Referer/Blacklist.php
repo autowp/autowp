@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\Referer;
+
 use Application\Db\Table;
 
-class Referer_Blacklist extends Table
+class Blacklist extends Table
 {
     protected $_name = 'referer_blacklist';
     protected $_primary = ['host'];

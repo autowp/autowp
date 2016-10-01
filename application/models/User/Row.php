@@ -53,26 +53,6 @@ class User_Row extends Row
         return false;
     }
 
-    public function refreshPicturesRatio()
-    {
-        $votes = new Votes();
-
-        $value = $votes->getAdapter()->fetchOne(
-            $votes->select()
-                ->from($votes, new Zend_Db_Expr('SUM(summary)/SUM(count)'))
-                ->join('pictures', 'votes.picture_id=pictures.id', null)
-                ->where('pictures.owner_id = ?', $this->id)
-
-        );
-
-        if ($value <= 0) {
-            $value = null;
-        }
-
-        $this->pictures_ratio = $value;
-        $this->save();
-    }
-
     public function invalidateSpecsVolume()
     {
         $this->specs_volume_valid = 0;

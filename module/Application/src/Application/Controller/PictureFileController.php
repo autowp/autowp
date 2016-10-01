@@ -4,8 +4,8 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Referer;
-use Referer_Blacklist;
+use Application\Model\Referer;
+use Application\Model\Referer\Blacklist;
 
 class PictureFileController extends AbstractActionController
 {
@@ -49,7 +49,7 @@ class PictureFileController extends AbstractActionController
         $referer = (string)$request->getServer('HTTP_REFERER');
 
         if ($referer) {
-            $blacklist = new Referer_Blacklist();
+            $blacklist = new Blacklist();
             $blacklistRow = $blacklist->fetchRowByUrl($referer);
             if ($blacklistRow && $blacklistRow->hard) {
                 return $this->getResponse()

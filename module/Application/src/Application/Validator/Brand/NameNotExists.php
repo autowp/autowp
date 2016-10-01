@@ -18,8 +18,10 @@ class NameNotExists extends AbstractValidator
     {
         $this->setValue($value);
 
-        $brands = new Brands();
-        $row = $brands->fetchRowByCaption($value);
+        $brandTable = new Brands();
+        $row = $brandTable->fetchRow([
+            'caption = ?' => (string)$value
+        ]);
         if ($row) {
             $this->error(self::EXISTS);
             return false;

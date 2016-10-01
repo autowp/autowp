@@ -1,6 +1,9 @@
 <?php
 
+namespace Application\Model;
+
 use Application\Db\Table;
+use Application\Model\Referer\Whitelist;
 
 class Referer extends Table
 {
@@ -11,17 +14,17 @@ class Referer extends Table
     {
         $host = @parse_url($url, PHP_URL_HOST);
 
-        $whitelist = new Referer_Whitelist();
+        $whitelist = new Whitelist();
         $whitelisted = $whitelist->containsHost($host);
 
         if (!$whitelisted) {
 
-               $this->getAdapter()->query('
-                   insert into referer (host, url, count, last_date, accept)
-                   values (?, ?, 1, NOW(), ?)
-                   on duplicate key
-                   update count=count+1, host=VALUES(host), last_date=VALUES(last_date), accept=VALUES(accept)
-               ', [$host, $url, $accept]);
+            $this->getAdapter()->query('
+                insert into referer (host, url, count, last_date, accept)
+                values (?, ?, 1, NOW(), ?)
+                on duplicate key
+                update count=count+1, host=VALUES(host), last_date=VALUES(last_date), accept=VALUES(accept)
+            ', [$host, $url, $accept]);
         }
     }
 
