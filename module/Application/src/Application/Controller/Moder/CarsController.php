@@ -15,6 +15,8 @@ use Application\Model\Brand;
 use Application\Model\Message;
 use Application\Model\Modification;
 use Application\Model\DbTable\Modification as ModificationTable;
+use Application\Model\DbTable\Twins\Group as TwinsGroup;
+use Application\Model\DbTable\Twins\GroupVehicle as TwinsGroupVehicle;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 use Autowp\Filter\Filename\Safe;
@@ -36,8 +38,6 @@ use Modification_Group;
 use Picture;
 use Picture_Row;
 use Spec;
-use Twins_Groups;
-use Twins_Groups_Cars;
 use User_Car_Subscribe;
 use Users;
 use User_Row;
@@ -1322,12 +1322,12 @@ class CarsController extends AbstractActionController
 
         $brand = null;
 
-        $twinsGroups = new Twins_Groups();
+        $twinsGroups = new TwinsGroup();
 
         $twinsGroup = $twinsGroups->find($this->params('twins_group_id'))->current();
 
         if ($twinsGroup) {
-            $twinsGroupsCars = new Twins_Groups_Cars();
+            $twinsGroupsCars = new TwinsGroupVehicle();
             $twinsGroupsCars->insert([
                 'twins_group_id' => $twinsGroup->id,
                 'car_id' => $car->id
@@ -1412,17 +1412,16 @@ class CarsController extends AbstractActionController
         if (!$canEditTwins)
             throw new Exception('Access denied');
 
-        $twinsGroups = new Twins_Groups();
+        $twinsGroups = new TwinsGroup();
         $twinsGroup = $twinsGroups->find($this->params('twins_group_id'))->current();
 
         if (!$twinsGroup) {
             return $this->notFoundAction();
         }
 
-        $twinsGroupsCars = new Twins_Groups_Cars();
-        $twinsGroupCar = $twinsGroupsCars->fetchRow(
-            $twinsGroupsCars
-                ->select()
+        $twinsGroupVehicleTable = new TwinsGroupVehicle();
+        $twinsGroupCar = $twinsGroupVehicleTable->fetchRow(
+            $twinsGroupVehicleTable->select(true)
                 ->where('car_id = ?', $car->id)
                 ->where('twins_group_id = ?', $twinsGroup->id)
         );
@@ -1430,7 +1429,11 @@ class CarsController extends AbstractActionController
         $twinsGroupCar->delete();
 
         // remove empty group
-        if ($twinsGroup->findCarsViaTwins_Groups_Cars()->count() <= 0) {
+        $twinsGroupsCarsRow = $twinsGroupVehicleTable->fetchRow(
+            $twinsGroupVehicleTable->select(true)
+                ->where('twins_group_id = ?', $twinsGroup->id)
+        );
+        if (!$twinsGroupsCarsRow) {
             $twinsGroup->delete();
         }
 
@@ -2374,7 +2377,7 @@ class CarsController extends AbstractActionController
         }
 
 
-        $twinsGroupsTable = new Twins_Groups();
+        $twinsGroupsTable = new TwinsGroup();
 
         $twinsGroups = [];
         $canEditTwins = $this->user()->isAllowed('twins', 'edit');

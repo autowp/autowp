@@ -6,9 +6,10 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\HostManager;
+use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\Message;
 
-use Twins_Groups;
+use Cars;
 use Users;
 
 class TwinsController extends AbstractActionController
@@ -59,7 +60,7 @@ class TwinsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $table = new Twins_Groups();
+        $table = new TwinsGroup();
         $group = $table->find($this->params('twins_group_id'))->current();
         if (!$group) {
             return $this->notFoundAction();
@@ -111,13 +112,21 @@ class TwinsController extends AbstractActionController
             $description = '';
         }
 
+        $vehicleTable = new Cars();
+
+        $vehicleRows = $vehicleTable->fetchAll(
+            $vehicleTable->select(true)
+                ->join('twins_groups_cars', 'cars.id = twins_groups_cars.car_id', null)
+                ->where('twins_groups_cars.twins_group_id = ?', $group->id)
+        );
+
         return [
             'group'       => $group,
             'canEdit'     => $canEdit,
             'description' => $description,
             'descForm'    => $this->descForm,
             'editForm'    => $this->editForm,
-            'cars'        => $group->findCarsViaTwins_Groups_Cars()
+            'cars'        => $vehicleRows
         ];
     }
 
@@ -135,7 +144,7 @@ class TwinsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $table = new Twins_Groups();
+        $table = new TwinsGroup();
         $group = $table->find($this->params('twins_group_id'))->current();
         if (!$group) {
             return $this->forbiddenAction();

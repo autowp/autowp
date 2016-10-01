@@ -2,9 +2,9 @@
 
 namespace Application\Model;
 
+use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Twins_Groups;
 use Brands;
 use Picture;
 use Cars;
@@ -15,7 +15,7 @@ use Zend_Db_Select;
 class Twins
 {
     /**
-     * @var Twins_Groups
+     * @var TwinsGroup
      */
     private $groupsTable;
 
@@ -35,13 +35,13 @@ class Twins
     private $carTable;
 
     /**
-     * @return Twins_Groups
+     * @return TwinsGroup
      */
     private function getGroupsTable()
     {
         return $this->groupsTable
             ? $this->groupsTable
-            : $this->groupsTable = new Twins_Groups();
+            : $this->groupsTable = new TwinsGroup();
     }
 
     /**

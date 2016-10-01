@@ -5,6 +5,7 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\Brand;
+use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Log_Events;
@@ -12,7 +13,6 @@ use Cars;
 use Engines;
 use Factory;
 use Picture;
-use Twins_Groups;
 
 class LogController extends AbstractActionController
 {
@@ -29,7 +29,7 @@ class LogController extends AbstractActionController
         $brandModel = new Brand();
         $engineTable = new Engines();
         $picturesTable = new Picture();
-        $twinsGroupsTable = new Twins_Groups();
+        $twinsGroupsTable = new TwinsGroup();
         $factoryTable = new Factory();
 
         $select = $logTable->select(true)

@@ -186,11 +186,12 @@
                             ));
                         }
 
-                        foreach ($car->findTwins_GroupsViaTwins_Groups_Cars() as $twinsGroup) {
-                            $url = $this->url('twins/group', [
-                                'id' => $twinsGroup->id
-                            ]);
-                            $list[] = $this->htmlA($url, '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(96)->name), false);
+                        foreach ($this->vehicleTwins as $twinsGroup) {
+                            $list[] = $this->htmlA(
+                                $twinsGroup['url'],
+                                '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(96)->name),
+                                false
+                            );
                         }
 
                         if ($this->user()->logedIn()) {

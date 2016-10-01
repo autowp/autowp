@@ -8,13 +8,13 @@ use Zend\View\Model\ViewModel;
 
 use Application\HostManager;
 use Application\Model\DbTable\Museum;
+use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Voting;
 use Application\Model\Message;
 
 use Articles;
 use Comment_Message;
 use Comments;
-use Twins_Groups;
 use Users;
 
 use DateTime;
@@ -171,7 +171,7 @@ class CommentsController extends AbstractRestfulController
                     break;
 
                 case Comment_Message::TWINS_TYPE_ID:
-                    $twinsGroups = new Twins_Groups();
+                    $twinsGroups = new TwinsGroup();
                     $object = $twinsGroups->find($itemId)->current();
                     break;
 

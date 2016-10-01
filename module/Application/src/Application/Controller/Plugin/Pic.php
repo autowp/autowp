@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Application\Model\Brand;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Modification as ModificationTable;
+use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
@@ -501,6 +502,7 @@ class Pic extends AbstractPlugin
 
         $car = null;
         $vehicleHasSpecs = false;
+        $vehicleTwins = [];
         $carDetailsUrl = null;
 
         $language = $controller->language();
@@ -712,6 +714,23 @@ class Pic extends AbstractPlugin
                             ]);
                             break;
                         }
+                    }
+
+                    $vehicleTwins = [];
+                    $twinsGroupsTable = new TwinsGroup();
+
+                    $twinsGroupsRows = $twinsGroupsTable->fetchAll(
+                        $twinsGroupsTable->select(true)
+                            ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
+                            ->where('twins_groups_cars.car_id = ?', $car->id)
+                    );
+
+                    foreach ($twinsGroupsRows as $twinsGroup) {
+                        $vehicleTwins[] = [
+                            'url' => $this->url('twins/group', [
+                                'id' => $twinsGroup->id
+                            ])
+                        ];
                     }
                 }
                 break;
@@ -949,6 +968,7 @@ class Pic extends AbstractPlugin
             'designProject'     => $designProject,
             'categories'        => $categories,
             'vehicleHasSpecs'   => $vehicleHasSpecs,
+            'vehicleTwins'      => $vehicleTwins,
             'carDetailsUrl'     => $carDetailsUrl,
             'carHtml'           => $carText,
             'carDescription'    => $carDescription,
