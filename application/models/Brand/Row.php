@@ -1,27 +1,28 @@
 <?php
 
 use Application\Db\Table\Row;
+use Application\Model\DbTable\BrandLanguage;
 
 class Brand_Row extends Row
 {
     /**
-     * @var Brand_Language
+     * @var BrandLanguage
      */
-    protected $_langTable;
+    private $langTable;
 
     /**
-     * @return Brand_Language
+     * @return BrandLanguage
      */
-    protected function _getLanguageTable()
+    private function getLanguageTable()
     {
-        return $this->_langTable
-            ? $this->_langTable
-            : $this->_langTable = new Brand_Language();
+        return $this->langTable
+            ? $this->langTable
+            : $this->langTable = new BrandLanguage();
     }
 
     public function getLanguageName($language)
     {
-        $langRow = $this->_getLanguageTable()->fetchRow([
+        $langRow = $this->getLanguageTable()->fetchRow([
             'brand_id = ?' => $this->id,
             'language = ?' => $language
         ]);

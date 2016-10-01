@@ -6,10 +6,10 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\Brand as BrandTable;
 
 use Cars;
-use Brand_Language;
 
 class BrandsController extends AbstractActionController
 {
@@ -86,7 +86,7 @@ class BrandsController extends AbstractActionController
         }
 
         $language = $this->language();
-        $brandLangTable = new Brand_Language();
+        $brandLangTable = new BrandLanguage();
         $brandLang = $brandLangTable->fetchRow([
             'brand_id = ?' => $brand->id,
             'language = ?' => $language

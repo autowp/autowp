@@ -6,10 +6,10 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\HostManager;
+use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\Message;
 
-use Brand_Language;
 use Brand_Row;
 use Cars;
 use Users;
@@ -101,7 +101,7 @@ class BrandsController extends AbstractActionController
                 'full_caption' => $brand->full_caption,
             ];
 
-            $brandLangTable = new Brand_Language();
+            $brandLangTable = new BrandLanguage();
             foreach ($this->getLanguages() as $language) {
                 $brandLangRow = $brandLangTable->fetchRow([
                     'brand_id = ?' => $brand->id,

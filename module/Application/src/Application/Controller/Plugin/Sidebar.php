@@ -7,10 +7,10 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\BrandAlias;
 
 use Brand_Car;
-use Brand_Language;
 use Car_Language;
 use Picture;
 
@@ -44,7 +44,7 @@ class Sidebar extends AbstractPlugin
             $aliases[] = $brandAliasRow->name;
         }
 
-        $brandLangTable = new Brand_Language();
+        $brandLangTable = new BrandLanguage();
         $brandLangRows = $brandLangTable->fetchAll([
             'brand_id = ?' => $brand['id']
         ]);
