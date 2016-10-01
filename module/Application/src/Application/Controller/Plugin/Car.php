@@ -5,12 +5,12 @@ namespace Application\Controller\Plugin;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\BrandCar;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
 use Autowp\TextStorage\Service as TextStorage;
 
-use Brand_Car;
 use Car_Language;
 use Car_Parent;
 use Category;
@@ -165,7 +165,7 @@ class Car extends AbstractPlugin
         $carParentTable = new Car_Parent();
         $carParentAdapter = $carParentTable->getAdapter();
         $brandTable = new BrandTable();
-        $brandCarTable = new Brand_Car();
+        $brandCarTable = new BrandCar();
         $categoryTable = new Category();
 
         $carIds = [];
@@ -282,7 +282,7 @@ class Car extends AbstractPlugin
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
                     'brand_car_catname' => 'catname'
                 ])
-                ->where('brands_cars.type = ?', Brand_Car::TYPE_DESIGN)
+                ->where('brands_cars.type = ?', BrandCar::TYPE_DESIGN)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
                 ->where('car_parent_cache.car_id IN (?)', $carIds ? $carIds : 0)
                 ->group('car_parent_cache.car_id')

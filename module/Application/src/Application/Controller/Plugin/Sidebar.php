@@ -7,10 +7,10 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\BrandAlias;
 
-use Brand_Car;
 use Car_Language;
 use Picture;
 
@@ -99,7 +99,7 @@ class Sidebar extends AbstractPlugin
 
         if (!$success) {
 
-            $brandCarTable = new Brand_Car();
+            $brandCarTable = new BrandCar();
             $db = $brandCarTable->getAdapter();
 
             $select = $db->select()

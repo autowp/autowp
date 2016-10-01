@@ -7,8 +7,8 @@ use Zend\Router\Http\RouteMatch;
 use Zend\Stdlib\RequestInterface as Request;
 
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\BrandCar;
 
-use Brand_Car;
 use Car_Parent;
 use Car_Types;
 
@@ -496,7 +496,7 @@ class Catalogue implements RouteInterface
                 break;
         }
 
-        $brandCarTable = new Brand_Car();
+        $brandCarTable = new BrandCar();
         $brandCarRow = $brandCarTable->fetchRow([
             'brand_id = ?' => $brand->id,
             'catname = ?'  => $path[0]

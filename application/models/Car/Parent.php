@@ -1,6 +1,7 @@
 <?php
 
 use Application\Db\Table;
+use Application\Model\DbTable\BrandCar;
 
 class Car_Parent extends Table
 {
@@ -27,18 +28,18 @@ class Car_Parent extends Table
         TYPE_DESIGN = 3;
 
     /**
-     * @var Brand_Car
+     * @var BrandCar
      */
     private $brandCarTable;
 
     /**
-     * @return Brand_Car
+     * @return BrandCar
      */
     private function getBrandCarTable()
     {
         return $this->brandCarTable
             ? $this->brandCarTable
-            : $this->brandCarTable = new Brand_Car();
+            : $this->brandCarTable = new BrandCar();
     }
 
     public function collectChildIds($id)

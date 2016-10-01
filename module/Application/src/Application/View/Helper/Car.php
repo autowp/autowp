@@ -5,9 +5,9 @@ namespace Application\View\Helper;
 use Zend\View\Helper\AbstractHelper;
 
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\BrandCar;
 use Application\VehicleNameFormatter;
 
-use Brand_Car;
 use Car_Parent;
 use Car_Row;
 use Spec;
@@ -21,12 +21,12 @@ class Car extends AbstractHelper
      */
     private $_car = null;
 
-    private $_monthFormat = '<small class="month">%02d.</small>';
+    private $monthFormat = '<small class="month">%02d.</small>';
 
     private $textMonthFormat = '%02d.';
 
     /**
-     * @var Brand_Car
+     * @var BrandCar
      */
     private $brandCarTable;
 
@@ -161,7 +161,7 @@ class Car extends AbstractHelper
                 $result .= '<small> \'<span class="realyears" title="'.$this->view->escapeHtmlAttr($this->view->translate('carlist/years')).'">';
 
                 if ($equalM) {
-                    $result .= sprintf($this->_monthFormat, $bm).$by;
+                    $result .= sprintf($this->monthFormat, $bm).$by;
                 } else {
                     if ($equalY) {
                         if ($bm && $em)
@@ -170,14 +170,14 @@ class Car extends AbstractHelper
                             $result .= $by;
                     } else {
                         if ($equalS) {
-                            $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').$by).
+                            $result .=  (($bm ? sprintf($this->monthFormat, $bm) : '').$by).
                             '–'.
-                            ($em ? sprintf($this->_monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
+                            ($em ? sprintf($this->monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
                         } else {
-                            $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').($by ? $by : '????')).
+                            $result .=  (($bm ? sprintf($this->monthFormat, $bm) : '').($by ? $by : '????')).
                             (
                                 $ey
-                                ? '–'.($em ? sprintf($this->_monthFormat, $em) : '').$ey
+                                ? '–'.($em ? sprintf($this->monthFormat, $em) : '').$ey
                                 : (
                                     $car['today']
                                     ? ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
@@ -196,7 +196,7 @@ class Car extends AbstractHelper
                 $result .= " '";
 
                 if ($equalM) {
-                    $result .= sprintf($this->_monthFormat, $bm).$by;
+                    $result .= sprintf($this->monthFormat, $bm).$by;
                 } else {
                     if ($equalY) {
                         if ($bm && $em) {
@@ -208,14 +208,14 @@ class Car extends AbstractHelper
                         }
                     } else {
                         if ($equalS) {
-                            $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').$by).
+                            $result .=  (($bm ? sprintf($this->monthFormat, $bm) : '').$by).
                             '–'.
-                            ($em ? sprintf($this->_monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
+                            ($em ? sprintf($this->monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
                         } else {
-                            $result .=  (($bm ? sprintf($this->_monthFormat, $bm) : '').($by ? $by : '????')).
+                            $result .=  (($bm ? sprintf($this->monthFormat, $bm) : '').($by ? $by : '????')).
                             (
                                 $ey
-                                ? '–'.($em ? sprintf($this->_monthFormat, $em) : '').$ey
+                                ? '–'.($em ? sprintf($this->monthFormat, $em) : '').$ey
                                 : (
                                     $car['today']
                                     ? ($by < $cy ? '–'.$view->translate('present-time-abbr') : '')
@@ -299,13 +299,13 @@ class Car extends AbstractHelper
     }
 
     /**
-     * @return Brand_Car
+     * @return BrandCar
      */
     private function getBrandCarTable()
     {
         return $this->brandCarTable
             ? $this->brandCarTable
-            : $this->brandCarTable = new Brand_Car();
+            : $this->brandCarTable = new BrandCar();
     }
 
     /**

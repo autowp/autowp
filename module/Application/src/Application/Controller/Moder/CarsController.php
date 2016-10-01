@@ -15,6 +15,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\Message;
 use Application\Model\Modification;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Twins\GroupVehicle as TwinsGroupVehicle;
@@ -22,7 +23,6 @@ use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 use Autowp\Filter\Filename\Safe;
 
-use Brand_Car;
 use Car_Language;
 use Car_Parent;
 use Car_Parent_Cache;
@@ -58,7 +58,7 @@ class CarsController extends AbstractActionController
     private $carParentTable;
 
     /**
-     * @var Brand_Car
+     * @var BrandCar
      */
     private $brandCarTable;
 
@@ -1166,7 +1166,7 @@ class CarsController extends AbstractActionController
         $brandsCars->insert([
             'brand_id' => $brand->id,
             'car_id'   => $car->id,
-            'type'     => Brand_Car::TYPE_DEFAULT,
+            'type'     => BrandCar::TYPE_DEFAULT,
             'catname'  => $catname ? $catname : 'car' . $car->id
         ]);
 
@@ -1220,7 +1220,7 @@ class CarsController extends AbstractActionController
 
         $type = (int)$this->params()->fromPost('type');
 
-        $brandCarTable = new Brand_Car();
+        $brandCarTable = new BrandCar();
         $brandCarRow = $brandCarTable->fetchRow([
             'brand_id = ?' => $brand->id,
             'car_id = ?'   => $car->id
@@ -1266,7 +1266,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandCarTable = new Brand_Car();
+        $brandCarTable = new BrandCar();
         $brandCarRow = $brandCarTable->fetchRow([
             'brand_id = ?' => $brand->id,
             'car_id = ?'   => $car->id
@@ -2610,7 +2610,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandCarTable = new Brand_Car();
+        $brandCarTable = new BrandCar();
         $brandTable = $this->getBrandTable();
 
         $brandCarRows = $brandCarTable->fetchAll(
@@ -2718,10 +2718,10 @@ class CarsController extends AbstractActionController
             'brands'              => $brands,
             'publicUrls'          => $this->carPublicUrls($car),
             'brandCarTypeOptions' => [
-                Brand_Car::TYPE_DEFAULT => $this->translator->translate('catalogue/stock-model'),
-                Brand_Car::TYPE_TUNING  => $this->translator->translate('catalogue/related'),
-                Brand_Car::TYPE_SPORT   => $this->translator->translate('catalogue/sport'),
-                Brand_Car::TYPE_DESIGN  => $this->translator->translate('catalogue/design'),
+                BrandCar::TYPE_DEFAULT => $this->translator->translate('catalogue/stock-model'),
+                BrandCar::TYPE_TUNING  => $this->translator->translate('catalogue/related'),
+                BrandCar::TYPE_SPORT   => $this->translator->translate('catalogue/sport'),
+                BrandCar::TYPE_DESIGN  => $this->translator->translate('catalogue/design'),
             ],
             'relevantBrands'      => $relevantBrands,
             'canUseTree'          => $canUseTree,
@@ -2748,13 +2748,13 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @return Brand_Car
+     * @return BrandCar
      */
     private function getBrandCarTable()
     {
         return $this->brandCarTable
             ? $this->brandCarTable
-            : $this->brandCarTable = new Brand_Car();
+            : $this->brandCarTable = new BrandCar();
     }
 
     /**
@@ -2867,7 +2867,7 @@ class CarsController extends AbstractActionController
 
             $inheritBrands = [];
             if ($parent) {
-                $brandCarTable = new Brand_Car();
+                $brandCarTable = new BrandCar();
                 $brandTable = $this->getBrandTable();
 
                 $brandCarRows = $brandCarTable->fetchAll(

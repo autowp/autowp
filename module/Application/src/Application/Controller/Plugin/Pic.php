@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
@@ -16,7 +17,6 @@ use Application\Service\SpecificationsService;
 
 use Exception;
 
-use Brand_Car;
 use Car_Parent;
 use Car_Language;
 use Cars;
@@ -664,7 +664,7 @@ class Pic extends AbstractPlugin
                             ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
                                 'brand_car_catname' => 'catname'
                             ])
-                            ->where('brands_cars.type = ?', Brand_Car::TYPE_DESIGN)
+                            ->where('brands_cars.type = ?', BrandCar::TYPE_DESIGN)
                             ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
                             ->where('car_parent_cache.car_id = ?', $car->id)
                     );
