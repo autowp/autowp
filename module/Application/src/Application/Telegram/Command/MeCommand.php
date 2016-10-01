@@ -28,7 +28,7 @@ class MeCommand extends Command
 
         $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
 
-        $telegramChatTable = new \Telegram_Chat();
+        $telegramChatTable = new \Application\Model\DbTable\Telegram\Chat();
 
         $telegramChatRow = $telegramChatTable->fetchRow([
             'chat_id = ?' => $chatId

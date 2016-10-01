@@ -2,6 +2,7 @@
 
 namespace Application\Service;
 
+use Application\Model\DbTable\Telegram\Brand as TelegramBrand;
 use Application\Telegram\Command\InboxCommand;
 use Application\Telegram\Command\MeCommand;
 use Application\Telegram\Command\StartCommand;
@@ -9,7 +10,6 @@ use Application\Telegram\Command\StartCommand;
 use Picture;
 
 use Telegram\Bot\Api;
-use Telegram_Brand;
 
 use Zend\Router\Http\TreeRouteStack;
 
@@ -114,7 +114,7 @@ class TelegramService
         }
 
         if (count($brandIds)) {
-            $telegramBrandTable = new Telegram_Brand();
+            $telegramBrandTable = new TelegramBrand();
 
             $filter = [
                 'brand_id in (?)' => $brandIds

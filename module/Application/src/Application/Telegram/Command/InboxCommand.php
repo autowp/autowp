@@ -5,6 +5,7 @@ namespace Application\Telegram\Command;
 use Telegram\Bot\Commands\Command;
 
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Telegram\Brand as TelegramBrand;
 
 class InboxCommand extends Command
 {
@@ -34,7 +35,7 @@ class InboxCommand extends Command
 
                 $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
 
-                $telegramBrandTable = new \Telegram_Brand();
+                $telegramBrandTable = new TelegramBrand();
                 $telegramBrandRow = $telegramBrandTable->fetchRow([
                     'brand_id = ?' => $brandRow->id,
                     'chat_id  = ?' => $chatId

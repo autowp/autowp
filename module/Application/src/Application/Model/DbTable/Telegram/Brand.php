@@ -1,6 +1,10 @@
 <?php
 
-class Telegram_Brand extends Zend_Db_Table
+namespace Application\Model\DbTable\Telegram;
+
+use Zend_Db_Table;
+
+class Brand extends Zend_Db_Table
 {
     protected $_name = 'telegram_brand';
     protected $_referenceMap = [
