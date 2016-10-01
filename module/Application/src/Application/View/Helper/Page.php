@@ -4,7 +4,7 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Pages;
+use Application\Model\DbTable\Page as PageTable;
 
 use Zend_Db_Table;
 use Zend_Db_Table_Row;
@@ -33,7 +33,7 @@ class Page extends AbstractHelper
 
     public function __construct()
     {
-        $this->pageTable = new Pages();
+        $this->pageTable = new PageTable();
     }
 
     public function __invoke($value)

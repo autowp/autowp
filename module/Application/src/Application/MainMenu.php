@@ -2,6 +2,7 @@
 
 namespace Application;
 
+use Application\Model\DbTable\Page;
 use Application\Model\Message;
 use Application\Language;
 
@@ -10,13 +11,12 @@ use Zend\Router\Http\TreeRouteStack;
 
 use Category;
 use Category_Language;
-use Pages;
 use User_Row;
 
 class MainMenu
 {
     /**
-     * @var Pages
+     * @var Page
      */
     private $pageTable;
 
@@ -67,7 +67,7 @@ class MainMenu
         $this->hosts = $hosts;
         $this->cache = $cache;
 
-        $this->pageTable = new Pages();
+        $this->pageTable = new Page();
 
         $this->translator = $translator;
         $this->languagePicker = $languagePicker;

@@ -6,7 +6,7 @@ use Application\Language;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Pages;
+use Application\Model\DbTable\Page;
 
 use Zend_Db_Table;
 
@@ -29,7 +29,7 @@ class PageEnv extends AbstractHelper
 
     public function __construct(Language $language)
     {
-        $this->pageTable = new Pages();
+        $this->pageTable = new Page();
 
         $this->language = $language->getLanguage();
     }

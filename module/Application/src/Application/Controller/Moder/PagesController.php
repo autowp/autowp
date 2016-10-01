@@ -6,21 +6,20 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Moder\Page as PageForm;
-
-use Pages;
+use Application\Model\DbTable\Page;
 
 use Zend_Db_Expr;
 
 class PagesController extends AbstractActionController
 {
     /**
-     * @var Pages
+     * @var Page
      */
     private $table;
 
     public function __construct()
     {
-        $this->table = new Pages();
+        $this->table = new Page();
     }
 
     private function getPagesList($parentId)

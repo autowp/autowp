@@ -6,8 +6,7 @@ use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
 use Application\Filter\SingleSpaces;
-
-use Pages;
+use Application\Model\DbTable\Page;
 
 class Page extends Form implements InputFilterProviderInterface
 {
@@ -145,7 +144,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => Pages::MAX_NAME
+                            'max' => Page::MAX_NAME
                         ]
                     ]
                 ]
@@ -160,7 +159,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => Pages::MAX_TITLE
+                            'max' => Page::MAX_TITLE
                         ]
                     ]
                 ]
@@ -175,7 +174,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => Pages::MAX_BREADCRUMBS
+                            'max' => Page::MAX_BREADCRUMBS
                         ]
                     ]
                 ]
@@ -190,7 +189,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => Pages::MAX_URL
+                            'max' => Page::MAX_URL
                         ]
                     ]
                 ]
@@ -214,7 +213,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => Pages::MAX_CLASS
+                            'max' => Page::MAX_CLASS
                         ]
                     ]
                 ]
