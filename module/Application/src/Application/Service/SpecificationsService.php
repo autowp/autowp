@@ -418,10 +418,10 @@ class SpecificationsService
         $result = [];
         if (isset($this->listOptionsChilds[$aid][$parentId])) {
             foreach ($this->listOptionsChilds[$aid][$parentId] as $childId) {
-                $result[$childId] = $this->listOptions[$aid][$childId];
+                $result[$childId] = $this->translator->translate($this->listOptions[$aid][$childId]);
                 $childOptions = $this->_getListOptions($aid, $childId);
                 foreach ($childOptions as &$value) {
-                    $value = '…' . $value;
+                    $value = '…' . $this->translator->translate($value);
                 }
                 unset($value); // prevent future bugs
                 $result = array_replace($result, $childOptions);

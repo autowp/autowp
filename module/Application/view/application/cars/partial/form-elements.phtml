@@ -2,6 +2,11 @@
     <?php
         $classes = $this->parents;
         $attrId = str_replace('attr-', '', $element->getAttribute('id'));
+
+        $unit = false;
+        if ($unitId = $element->getAttribute('data-unit')) {
+            $unit = $this->service->getUnit($unitId);
+        }
     ?>
 
     <?php if ($element instanceof Zend\Form\Fieldset) { ?>
@@ -37,13 +42,13 @@
                 </label>
             </td>
             <td>
-                <?php if ($this->unit) { ?>
+                <?php if ($unit) { ?>
                     <div class="input-group">
                         <?=$this->partial('application/cars/partial/form-element.phtml', [
                             'element' => $element
                         ])?>
-                        <span class="input-group-addon" title="<?=$this->escapeHtmlAttr($this->unit['name'])?>" class="unit">
-                            <?=$this->escapeHtml($this->unit['abbr'])?>
+                        <span class="input-group-addon" title="<?=$this->escapeHtmlAttr($this->translate($unit['name']))?>" class="unit">
+                            <?=$this->escapeHtml($this->translate($unit['abbr']))?>
                         </span>
                     </div>
                 <?php } else { ?>
@@ -67,10 +72,10 @@
                         <em><?=$this->escapeHtml($this->translate('account/specs/conflicts/my-value/none'))?></em>
                     <?php } else { ?>
                         <?=$this->escapeHtml($value)?>
-                        <?php if ($unitId = $element->getAttribute('data-unit')) { ?>
-                            <?php if ($unit = $this->service->getUnit($unitId)) { ?>
-                                <span class="unit" title="<?=$this->escapeHtmlAttr($unit['name'])?>"><?=$this->escapeHtml($unit['abbr'])?></span>
-                            <?php } ?>
+                        <?php if ($unit) { ?>
+                            <span class="unit" title="<?=$this->escapeHtmlAttr($this->translate($unit['name']))?>">
+                                <?=$this->escapeHtml($this->translate($unit['abbr']))?>
+                            </span>
                         <?php } ?>
                     <?php } ?>
                 <?php } ?>

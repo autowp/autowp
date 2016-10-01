@@ -57,7 +57,7 @@
                     <?php } else { ?>
                         <?=$this->escapeHtml($conflict['value'])?>
                         <?php if ($conflict['unit']) { ?>
-                            <?=$this->escapeHtml($conflict['unit']['abbr'])?>
+                            <?=$this->escapeHtml($this->translate($conflict['unit']['abbr']))?>
                         <?php } ?>
                     <?php } ?>
 
@@ -69,7 +69,7 @@
                             <em><?=$this->escapeHtml($this->translate('account/specs/conflicts/my-value/none'))?></em>
                         <?php } else { ?>
                             <?=$this->escapeHtml($value['value'])?>
-                            <?=$this->escapeHtml($conflict['unit']['abbr'])?>
+                            <?=$this->escapeHtml($this->translate($conflict['unit']['abbr']))?>
                         <?php } ?>
                         <?=$this->user($value['user'])?>
                         <br />

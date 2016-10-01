@@ -233,7 +233,7 @@ class Car extends AbstractHelper
 
     public function textTitle(array $car)
     {
-        return $this->vehicleNameFormatter->format($car, $this->getController()->language);
+        return $this->vehicleNameFormatter->format($car, $this->view->language);
     }
 
     public function title()

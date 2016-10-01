@@ -15,8 +15,8 @@ class DefaultValue
         $html = $view->escapeHtml($value);
         if (isset($attribute['unit']) && $attribute['unit']) {
             $html .=
-                ' <span class="unit" title="' . $view->escapeHtmlAttr($attribute['unit']['name']) . '">' .
-                    $view->escapeHtml($attribute['unit']['abbr']) .
+                ' <span class="unit" title="' . $view->escapeHtmlAttr($view->translate($attribute['unit']['name'])) . '">' .
+                    $view->escapeHtml($view->translate($attribute['unit']['abbr'])) .
                 '</span>';
         }
 
