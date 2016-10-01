@@ -234,7 +234,7 @@
                         ?>
                         <p>
                             <?=$this->escapeHtml($this->translate('moder/picture/catalogue/factory'))?>
-                            <?php if ($factory = $this->picture->findParentFactory()) { ?>
+                            <?php if ($factory = $this->picture->findParentRow(Application\Model\DbTable\Factory::class)) { ?>
                                 <?=$this->htmlA($this->url('moder/factories/params', [
                                     'action'     => 'factory',
                                     'factory_id' => $factory->id

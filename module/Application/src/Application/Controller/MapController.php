@@ -5,6 +5,7 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
+use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Museum;
 
 use geoPHP;
@@ -12,7 +13,6 @@ use LineString;
 use Point;
 use Polygon;
 
-use Factory;
 use Picture;
 
 class MapController extends AbstractActionController

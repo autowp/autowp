@@ -5,13 +5,13 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Log_Events;
 use Cars;
 use Engines;
-use Factory;
 use Picture;
 
 class LogController extends AbstractActionController

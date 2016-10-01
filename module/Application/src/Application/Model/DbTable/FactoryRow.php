@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable;
+
 use Application\Db\Table\Row;
 
-class Factory_Row extends Row
+class FactoryRow extends Row
 {
     public function getRelatedCarGroupId()
     {

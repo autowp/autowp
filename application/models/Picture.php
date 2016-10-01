@@ -5,6 +5,7 @@ use Autowp\Image;
 use Application\Db\Table;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Factory;
 
 class Picture extends Table
 {
@@ -46,7 +47,7 @@ class Picture extends Table
         ],
         'Factory' => [
             'columns'       => ['factory_id'],
-            'refTableClass' => 'Factory',
+            'refTableClass' => Factory::class,
             'refColumns'    => ['id']
         ],
         'Owner' => [

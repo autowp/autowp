@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\CarOfDay;
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Factory;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
@@ -13,7 +14,6 @@ use Car_Parent;
 use Car_Row;
 use Category;
 use Category_Language;
-use Factory;
 use Perspective_Group;
 use Picture;
 use Users;

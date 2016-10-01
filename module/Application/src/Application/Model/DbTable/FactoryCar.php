@@ -1,8 +1,11 @@
 <?php
 
-use Application\Db\Table;
+namespace Application\Model\DbTable;
 
-class Factory_Car extends Table
+use Application\Db\Table;
+use Application\Model\DbTable\Factory;
+
+class FactoryCar extends Table
 {
     protected $_name = 'factory_car';
     protected $_primary = ['factory_id', 'car_id'];
@@ -10,7 +13,7 @@ class Factory_Car extends Table
     protected $_referenceMap = [
         'Factory' => [
             'columns'       => ['factory_id'],
-            'refTableClass' => 'Factory',
+            'refTableClass' => Factory::class,
             'refColumns'    => ['id']
         ],
         'Car' => [

@@ -16,6 +16,8 @@ use Application\Model\Message;
 use Application\Model\Modification;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\Factory;
+use Application\Model\DbTable\FactoryCar;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Twins\GroupVehicle as TwinsGroupVehicle;
@@ -32,8 +34,6 @@ use Category;
 use Category_Car;
 use Category_Language;
 use Category_Parent;
-use Factory;
-use Factory_Car;
 use Modification_Group;
 use Picture;
 use Picture_Row;
@@ -1464,7 +1464,7 @@ class CarsController extends AbstractActionController
         $factory = $factoryTable->find($this->params()->fromPost('factory_id'))->current();
 
         if ($factory) {
-            $factoryCarTable = new Factory_Car();
+            $factoryCarTable = new FactoryCar();
             $factoryCarTable->insert([
                 'factory_id' => $factory->id,
                 'car_id'     => $car->id
@@ -1514,7 +1514,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $factoryCarTable = new Factory_Car();
+        $factoryCarTable = new FactoryCar();
         $factoryCar = $factoryCarTable->fetchRow(
             $factoryCarTable->select(true)
                 ->where('car_id = ?', $car->id)

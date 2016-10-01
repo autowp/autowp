@@ -8,6 +8,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandLink;
+use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Paginator\Adapter\Zend1DbSelect;
@@ -571,7 +572,7 @@ class Pic extends AbstractPlugin
                 break;
 
             case Picture::FACTORY_TYPE_ID:
-                if ($factory = $picture->findParentFactory()) {
+                if ($factory = $picture->findParentRow(Factory::class)) {
                     $carIds = $factory->getRelatedCarGroupId();
                     if ($carIds) {
                         $carTable = $catalogue->getCarTable();
@@ -1039,7 +1040,7 @@ class Pic extends AbstractPlugin
                 break;
 
             case Picture::FACTORY_TYPE_ID:
-                if ($factory = $picture->findParentFactory()) {
+                if ($factory = $picture->findParentRow(Factory::class)) {
                     $links[$controller->url()->fromRoute('moder/factories/params', [
                         'action'     => 'factory',
                         'factory_id' => $factory->id

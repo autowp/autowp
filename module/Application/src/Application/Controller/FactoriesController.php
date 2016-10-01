@@ -4,9 +4,10 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\DbTable\Factory;
+
 use Car_Parent;
 use Cars;
-use Factory;
 use geoPHP;
 use Picture;
 

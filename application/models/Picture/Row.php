@@ -147,7 +147,7 @@ class Picture_Row extends Row
                 break;
 
             case Picture::FACTORY_TYPE_ID:
-                $factory = $this->findParentFactory();
+                $factory = $this->findParentRow(\Application\Model\DbTable\Factory::class);
                 if ($factory) {
                     $result = implode('/', [
                         'factories',

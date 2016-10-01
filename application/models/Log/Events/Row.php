@@ -45,7 +45,7 @@ class Log_Events_Row extends Row
                     $col = 'user_id';
                     $tableName = 'log_events_user';
                     break;
-                case $table instanceof Factory:
+                case $table instanceof \Application\Model\DbTable\Factory:
                     $col = 'factory_id';
                     $tableName = 'log_events_factory';
                     break;
