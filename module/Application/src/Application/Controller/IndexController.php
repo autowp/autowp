@@ -24,12 +24,15 @@ class IndexController extends AbstractActionController
 {
     private $cache;
 
-    private $translator;
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
 
-    public function __construct($cache, $translator)
+    public function __construct($cache, SpecificationsService $specsService)
     {
         $this->cache = $cache;
-        $this->translator = $translator;
+        $this->specsService = $specsService;
     }
 
     private function getOrientedPictureList($car)
@@ -147,15 +150,14 @@ class IndexController extends AbstractActionController
                 $items[] = [
                     'icon'  => 'th',
                     'url'   => $url,
-                    'text'  => $this->translator->translate('carlist/all pictures'),
+                    'text'  => $this->translate('carlist/all pictures'),
                     'count' => $totalPictures
                 ];
                 break;
             }
         }
 
-        $specService = new SpecificationsService();
-        if ($specService->hasSpecs(1, $car->id)) {
+        if ($this->specsService->hasSpecs(1, $car->id)) {
 
             foreach ($cataloguePaths as $path) {
                 $items[] =[
@@ -166,7 +168,7 @@ class IndexController extends AbstractActionController
                         'car_catname'   => $path['car_catname'],
                         'path'          => $path['path']
                     ]),
-                    'text'  => $this->translator->translate('carlist/specifications')
+                    'text'  => $this->translate('carlist/specifications')
                 ];
                 break;
             }
@@ -179,7 +181,7 @@ class IndexController extends AbstractActionController
                 'url'   => $this->url()->fromRoute('twins/group', [
                     'id' => $twinsGroup['id']
                 ]),
-                'text'  => $this->translator->translate('carlist/twins')
+                'text'  => $this->translate('carlist/twins')
             ];
         }
 
@@ -472,7 +474,7 @@ class IndexController extends AbstractActionController
 
         $userTable = new Users();
 
-        $cacheKey = 'INDEX_SPEC_CARS_9_' . $language;
+        $cacheKey = 'INDEX_SPEC_CARS_10_' . $language;
         $cars = $this->cache->getItem($cacheKey, $success);
         if (!$success) {
 
@@ -492,15 +494,13 @@ class IndexController extends AbstractActionController
             $this->cache->setItem($cacheKey, $cars);
         }
 
-        $specService = new SpecificationsService();
-
         $specsCars = $this->car()->listData($cars, [
             'disableLargePictures' => true,
             'perspectiveGroup'     => 1,
             'allowUpPictures'      => true,
             'disableDescription'   => true,
-            'callback'             => function(&$item) use ($userTable, $specService) {
-                $contribPairs = $specService->getContributors(1, [$item['id']]);
+            'callback'             => function(&$item) use ($userTable) {
+                $contribPairs = $this->specsService->getContributors(1, [$item['id']]);
                 if ($contribPairs) {
                     $item['contributors'] = $userTable->fetchAll(
                         $userTable->select(true)

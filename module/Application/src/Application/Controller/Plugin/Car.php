@@ -45,9 +45,17 @@ class Car extends AbstractPlugin
      */
     private $textStorage;
 
-    public function __construct(TextStorage $textStorage)
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(
+        TextStorage $textStorage,
+        SpecificationsService $specsService)
     {
         $this->textStorage = $textStorage;
+        $this->specsService = $specsService;
     }
 
     /**
@@ -165,11 +173,9 @@ class Car extends AbstractPlugin
             $carIds[] = (int)$car->id;
         }
 
-        $specService = new SpecificationsService();
-
         $hasSpecs = [];
         if (!$disableSpecs && !$specificationsUrl) {
-            $hasSpecs = $specService->hasSpecs(1, $carIds);
+            $hasSpecs = $this->specsService->hasSpecs(1, $carIds);
         }
 
         if ($carIds) {

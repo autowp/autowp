@@ -19,7 +19,11 @@ return [
             Controller\Console\MessageController::class  => InvokableFactory::class,
             Controller\Console\MidnightController::class => InvokableFactory::class,
             Controller\Console\PicturesController::class => InvokableFactory::class,
-            Controller\Console\SpecsController::class    => InvokableFactory::class,
+            Controller\Console\SpecsController::class => function($sm) {
+                return new Controller\Console\SpecsController(
+                    $sm->get(Service\SpecificationsService::class)
+                );
+            },
             Controller\Console\TelegramController::class => function($sm) {
                 $service = $sm->get(Service\TelegramService::class);
                 return new Controller\Console\TelegramController($service);

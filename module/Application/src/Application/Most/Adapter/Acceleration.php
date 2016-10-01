@@ -1,9 +1,10 @@
 <?php
 
-namespace Applicaton\Most\Adapter;
+namespace Application\Most\Adapter;
 
 use Zend_Db_Expr;
 use Zend_Db_Select;
+use Zend_Db_Table;
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 

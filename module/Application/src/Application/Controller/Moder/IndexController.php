@@ -17,10 +17,111 @@ class IndexController extends AbstractActionController
         $this->addBrandForm = $addBrandForm;
     }
 
+    private function step($attrTable, $attrListOptions, $parentId)
+    {
+        $select = $attrTable->select(true)
+            ->order('position');
+
+        if ($parentId) {
+            $select->where('parent_id = ?', $parentId);
+        } else {
+            $select->where('parent_id is null');
+        }
+
+        $result = [];
+        foreach ($attrTable->fetchAll($select) as $row) {
+            $result[$row->id] = $row->name;
+            if ($row->description) {
+                $result[$row->id . '/description'] = $row->description;
+            }
+
+            $options = $attrListOptions->fetchAll([
+                'attribute_id = ?' => $row->id
+            ], ['parent_id', 'position']);
+
+            foreach ($options as $option) {
+                $result[$row->id . '/options/' . $option->id] = $option->name;
+            }
+
+            foreach ($this->step($attrTable, $attrListOptions, $row->id) as $key => $value) {
+                $result[$row->id . '/' . $key] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    private function step2($attrTable, $attrListOptions, $parentId)
+    {
+        $select = $attrTable->select(true)
+            ->order('position');
+
+        if ($parentId) {
+            $select->where('parent_id = ?', $parentId);
+        } else {
+            $select->where('parent_id is null');
+        }
+
+        $result = [];
+        foreach ($attrTable->fetchAll($select) as $row) {
+            //$result[$row->id] = $row->id;
+            /*if ($row->description) {
+                $result[$row->id . '/description'] = $row->id;
+            }*/
+
+            $options = $attrListOptions->fetchAll([
+                'attribute_id = ?' => $row->id
+            ], ['parent_id', 'position']);
+
+            foreach ($options as $option) {
+                $result[$row->id . '/options/' . $option->id] = $option->id;
+            }
+
+            foreach ($this->step2($attrTable, $attrListOptions, $row->id) as $key => $value) {
+                $result[$row->id . '/' . $key] = $value;
+            }
+        }
+
+        return $result;
+    }
+
     public function indexAction()
     {
         if (!$this->user()->inheritsRole('moder') ) {
             return $this->forbiddenAction();
+        }
+        if ($_SERVER['REMOTE_ADDR'] == '46.188.125.241') {
+            $attrTable = new \Attrs_Attributes();
+            $attrListOptions = new \Attrs_List_Options;
+
+            /*$result = $this->step($attrTable, $attrListOptions, null);
+
+            $r = [];
+            foreach ($result as $key => $value) {
+                $r['specs/attrs/' . $key] = $value;
+            }
+
+            var_export($r); exit;*/
+
+            $result = $this->step2($attrTable, $attrListOptions, null);
+            $r = [];
+            foreach ($result as $key => $value) {
+                $name = 'specs/attrs/' . $key;
+
+                /*$row = $attrTable->find($value)->current();
+                $row->name = $name;
+                $row->save();*/
+
+                /*$row = $attrTable->find($value)->current();
+                $row->description = $name;
+                $row->save();*/
+
+                $row = $attrListOptions->find($value)->current();
+                $row->name = $name;
+                $row->save();
+            }
+
+            var_export($r); exit;
         }
 
         $request = $this->getRequest();

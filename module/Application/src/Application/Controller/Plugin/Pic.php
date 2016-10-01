@@ -55,12 +55,23 @@ class Pic extends AbstractPlugin
      */
     private $pictureNameFormatter;
 
-    public function __construct($textStorage, $carHelper, $translator, PictureNameFormatter $pictureNameFormatter)
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(
+        $textStorage,
+        $carHelper,
+        $translator,
+        PictureNameFormatter $pictureNameFormatter,
+        SpecificationsService $specsService)
     {
         $this->textStorage = $textStorage;
         $this->carHelper = $carHelper;
         $this->translator = $translator;
         $this->pictureNameFormatter = $pictureNameFormatter;
+        $this->specsService = $specsService;
     }
 
     /**
@@ -489,6 +500,7 @@ class Pic extends AbstractPlugin
         $categories = [];
 
         $car = null;
+        $vehicleHasSpecs = false;
         $carDetailsUrl = null;
 
         $language = $controller->language();
@@ -529,8 +541,7 @@ class Pic extends AbstractPlugin
                         }
                     }
 
-                    $specService = new SpecificationsService();
-                    $engineHasSpecs = $specService->hasSpecs(3, $engine->id);
+                    $engineHasSpecs = $this->specsService->hasSpecs(3, $engine->id);
 
                     if ($engineHasSpecs) {
 
@@ -600,6 +611,8 @@ class Pic extends AbstractPlugin
             case Picture::CAR_TYPE_ID:
                 $car = $picture->findParentCars();
                 if ($car) {
+
+                    $vehicleHasSpecs = $this->specsService->hasSpecs(1, $car->id);
 
                     $brandIds = $db->fetchCol(
                         $db->select()
@@ -935,6 +948,7 @@ class Pic extends AbstractPlugin
             'langName'          => $currentLangName,
             'designProject'     => $designProject,
             'categories'        => $categories,
+            'vehicleHasSpecs'   => $vehicleHasSpecs,
             'carDetailsUrl'     => $carDetailsUrl,
             'carHtml'           => $carText,
             'carDescription'    => $carDescription,
@@ -1203,7 +1217,7 @@ class Pic extends AbstractPlugin
                     if (($row['type'] == Picture::CAR_TYPE_ID)) {
                         $name = $this->carHelper->htmlTitle($name);
                     } else {
-                        $name = htmlspecialchars($this->pictureNameFormatter->format($name, $language));
+                        $name = htmlspecialchars($name); // this->pictureNameFormatter->format($name, $language)
                     }
 
                     $reuseParams = isset($options['reuseParams']) && $options['reuseParams'];

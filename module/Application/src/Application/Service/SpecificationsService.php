@@ -148,6 +148,13 @@ class SpecificationsService
 
     protected $valueWeights = [];
 
+    private $translator;
+
+    public function __construct($translator = null)
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * @return Users
      */
@@ -431,7 +438,7 @@ class SpecificationsService
             throw new Exception("list option `$id` not found");
         }
 
-        return $this->listOptions[$attributeId][$id];
+        return $this->translator->translate($this->listOptions[$attributeId][$id], 'default');
     }
 
     public function getFormData($itemId, $zoneId, User_Row $user, $language)
@@ -3228,7 +3235,7 @@ class SpecificationsService
             $attributeName = [];
             $cAttr = $attribute;
             do {
-                $attributeName[] = $cAttr['name'];
+                $attributeName[] = $this->translator->translate($cAttr['name']);
                 $cAttr = $this->_getAttribute($cAttr['parentId']);
             } while ($cAttr);
 

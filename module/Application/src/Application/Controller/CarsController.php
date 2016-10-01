@@ -39,10 +39,19 @@ class CarsController extends AbstractActionController
      */
     private $hostManager;
 
-    public function __construct(HostManager $hostManager, Form $filterForm)
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(
+        HostManager $hostManager,
+        Form $filterForm,
+        SpecificationsService $specsService)
     {
         $this->hostManager = $hostManager;
         $this->filterForm = $filterForm;
+        $this->specsService = $specsService;
     }
 
     /**
@@ -90,11 +99,9 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $service = new SpecificationsService();
-
         $user = $this->user()->get();
 
-        $result = $service->getCarForm($car, $user, [
+        $result = $this->specsService->getCarForm($car, $user, [
             'editOnlyMode' => $editOnlyMode,
         ], $this->language());
 
@@ -113,13 +120,13 @@ class CarsController extends AbstractActionController
             $carForm->setData($this->params()->fromPost());
             if ($carForm->isValid()) {
 
-                $service->saveCarAttributes($car, $carForm->getData(), $user);
+                $this->specsService->saveCarAttributes($car, $carForm->getData(), $user);
 
                 $user->invalidateSpecsVolume();
 
                 $mModel = new Message();
 
-                $contribPairs = $service->getContributors(1, [$car->id]);
+                $contribPairs = $this->specsService->getContributors(1, [$car->id]);
                 $contributors = [];
                 if ($contribPairs) {
                     $userTable = new Users();
@@ -224,7 +231,7 @@ class CarsController extends AbstractActionController
             'formData'            => $carFormData,
             'tabs'                => $tabs,
             'isSpecsAdmin'        => $isSpecsAdmin,
-            'service'             => $service
+            'service'             => $this->specsService
         ];
     }
 
@@ -241,10 +248,8 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $service = new SpecificationsService();
-
-        $specs = $service->specifications([$car], [
-            'language' => 'en'
+        $specs = $this->specsService->specifications([$car], [
+            'language' => $this->language()
         ]);
 
         $viewModel = new ViewModel([
@@ -274,8 +279,6 @@ class CarsController extends AbstractActionController
         if (!$toItemType) {
             return $this->notFoundAction();
         }
-
-        $service = new SpecificationsService();
 
         $userValueTable = new Attrs_User_Values();
         $attrTable = new Attrs_Attributes();
@@ -308,7 +311,7 @@ class CarsController extends AbstractActionController
                 exit;
             }
 
-            $dataTable = $service->getUserValueDataTable($attrRow->type_id);
+            $dataTable = $this->specsService->getUserValueDataTable($attrRow->type_id);
 
             $eDataRows = $dataTable->fetchAll([
                 'attribute_id = ?' => $eUserValueRow->attribute_id,
@@ -351,11 +354,11 @@ class CarsController extends AbstractActionController
                 $eDataRow->save();
             }
 
-            $service->updateActualValues(
+            $this->specsService->updateActualValues(
                 $toItemType->id,
                 $toItemId
             );
-            $service->updateActualValues(
+            $this->specsService->updateActualValues(
                 $itemType->id,
                 $itemId
             );
@@ -390,8 +393,6 @@ class CarsController extends AbstractActionController
             'item_type_id = ?' => $itemType->id
         ], 'update_date');
 
-        $specService = new SpecificationsService();
-
         $language = $this->language();
 
         $values = [];
@@ -403,8 +404,8 @@ class CarsController extends AbstractActionController
                 'attribute' => $attribute,
                 'unit'      => $unit,
                 'user'      => $user,
-                'value'     => $specService->getActualValueText($attribute->id, $itemType->id, $row->item_id, $language),
-                'userValue' => $specService->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id, $language),
+                'value'     => $this->specsService->getActualValueText($attribute->id, $itemType->id, $row->item_id, $language),
+                'userValue' => $this->specsService->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id, $language),
                 'date'      => $row->getDateTime('update_date'),
                 'deleteUrl' => $this->url()->fromRoute('cars/params', [
                     'action'       => 'delete-value',
@@ -444,8 +445,7 @@ class CarsController extends AbstractActionController
         $itemId = (int)$this->params('item_id');
         $userId = (int)$this->params('user_id');
 
-        $specService = new SpecificationsService();
-        $specService->deleteUserValue((int)$this->params('attribute_id'), $itemType->id, $itemId, $userId);
+        $this->specsService->deleteUserValue((int)$this->params('attribute_id'), $itemType->id, $itemId, $userId);
 
         return $this->redirect()->toUrl($request->getServer('HTTP_REFERER'));
     }
@@ -465,11 +465,9 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $service = new SpecificationsService();
-
         $user = $this->user()->get();
 
-        $result = $service->getEngineForm($engine, $user, [
+        $result = $this->specsService->getEngineForm($engine, $user, [
             'editOnlyMode' => $editOnlyMode,
         ], $this->language());
 
@@ -483,7 +481,7 @@ class CarsController extends AbstractActionController
             $form->setData($this->params()->fromPost());
             if ($form->isValid()) {
 
-                $service->saveEngineAttributes($engine, $form->getData(), $user);
+                $this->specsService->saveEngineAttributes($engine, $form->getData(), $user);
 
                 $user->invalidateSpecsVolume();
 
@@ -495,7 +493,7 @@ class CarsController extends AbstractActionController
             'engine'   => $engine,
             'form'     => $form,
             'formData' => $formData,
-            'service'  => $service
+            'service'  => $this->specsService
         ];
     }
 
@@ -553,8 +551,6 @@ class CarsController extends AbstractActionController
         $engines = $this->getEngineTable();
 
         $isModerator = $this->user()->inheritsRole('moder');
-
-        $service = new SpecificationsService();
 
         foreach ($paginator->getCurrentItems() as $row) {
             $objectName = null;
@@ -623,7 +619,7 @@ class CarsController extends AbstractActionController
                     'moderUrl'  => $moderUrl
                 ],
                 'path'     => $path,
-                'value'    => $service->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id, $language),
+                'value'    => $this->specsService->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id, $language),
                 'unit'     => $attribute->findParentAttrs_Units()
             ];
         }
@@ -666,8 +662,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $service = new SpecificationsService();
-        $service->updateActualValues(1, $car->id);
+        $this->specsService->updateActualValues(1, $car->id);
 
         if ($engine) {
 
@@ -723,8 +718,7 @@ class CarsController extends AbstractActionController
 
             $carTable->updateInteritance($car);
 
-            $service = new SpecificationsService();
-            $service->updateActualValues(1, $car->id);
+            $this->specsService->updateActualValues(1, $car->id);
 
             $message = sprintf(
                 'У автомобиля %s установлено наследование двигателя',
@@ -843,8 +837,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $service = new SpecificationsService();
-        $service->updateActualValues(1, $car->id);
+        $this->specsService->updateActualValues(1, $car->id);
 
         $user = $this->user()->get();
         $ucsTable = new User_Car_Subscribe();
@@ -892,9 +885,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $service = new SpecificationsService();
-
-        $service->updateActualValues(1, $car->id);
+        $this->specsService->updateActualValues(1, $car->id);
 
         return $this->redirect()->toUrl($this->editorUrl($car, 'admin'));
     }
@@ -911,8 +902,7 @@ class CarsController extends AbstractActionController
 
         $language = $this->language();
 
-        $service = new SpecificationsService();
-        $form = $service->getEditValueForm($attrId, $itemTypeId, $itemId, $language);
+        $form = $this->specsService->getEditValueForm($attrId, $itemTypeId, $itemId, $language);
         if (!$form) {
             return $this->notFoundAction();
         }

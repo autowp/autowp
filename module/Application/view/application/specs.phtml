@@ -42,7 +42,9 @@
         <?php foreach ($this->table->getAttributes() as $attribute) { ?>
             <?php if (count($attribute['childs'])) { ?>
                 <tr>
-                    <th colspan="<?=count($this->table->getCars()) + 1?>"><?=$this->escapeHtml($attribute['name'])?></th>
+                    <th colspan="<?=count($this->table->getCars()) + 1?>">
+                        <?=$this->escapeHtml($this->translate($attribute['name']))?>
+                    </th>
                 </tr>
                 <?php foreach ($attribute['childs'] as $child) { ?>
                     <?=$this->partial('application/specs-row', [

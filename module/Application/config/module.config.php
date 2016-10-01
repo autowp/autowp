@@ -24,17 +24,20 @@ return [
                 return new Controller\AboutController($acl);
             },
             Controller\AccountController::class => function($sm) {
-                $service = $sm->get(Service\UsersService::class);
-                $emailForm = $sm->get('AccountEmailForm');
-                $profileForm = $sm->get('AccountProfileForm');
-                $settingsForm = $sm->get('AccountSettingsForm');
-                $photoForm = $sm->get('AccountPhotoForm');
-                $changePasswordForm = $sm->get('ChangePasswordForm');
-                $deleteUserForm = $sm->get('DeleteUserForm');
-                $translator = $sm->get('translator');
                 $config = $sm->get('Config');
-                $externalLoginFactory = $sm->get(ExternalLoginServiceFactory::class);
-                return new Controller\AccountController($service, $translator, $emailForm, $profileForm, $settingsForm, $photoForm, $changePasswordForm, $deleteUserForm, $externalLoginFactory, $config['hosts']);
+                return new Controller\AccountController(
+                    $sm->get(Service\UsersService::class),
+                    $sm->get('MvcTranslator'),
+                    $sm->get('AccountEmailForm'),
+                    $sm->get('AccountProfileForm'),
+                    $sm->get('AccountSettingsForm'),
+                    $sm->get('AccountPhotoForm'),
+                    $sm->get('ChangePasswordForm'),
+                    $sm->get('DeleteUserForm'),
+                    $sm->get(ExternalLoginServiceFactory::class),
+                    $config['hosts'],
+                    $sm->get(Service\SpecificationsService::class)
+                );
             },
             Controller\ArticlesController::class     => InvokableFactory::class,
             Controller\BanController::class          => InvokableFactory::class,
@@ -43,20 +46,28 @@ return [
                 return new Controller\BrandsController($cache);
             },
             Controller\CarsController::class => function($sm) {
-                $hostManager = $sm->get(HostManager::class);
-                $filterForm = $sm->get('AttrsLogFilterForm');
-                return new Controller\CarsController($hostManager, $filterForm);
+                return new Controller\CarsController(
+                    $sm->get(HostManager::class),
+                    $sm->get('AttrsLogFilterForm'),
+                    $sm->get(Service\SpecificationsService::class)
+                );
             },
             Controller\CatalogueController::class => function($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $cache = $sm->get('longCache');
-                return new Controller\CatalogueController($textStorage, $cache);
+                return new Controller\CatalogueController(
+                    $sm->get(TextStorage\Service::class),
+                    $sm->get('longCache'),
+                    $sm->get(Service\SpecificationsService::class)
+                );
             },
             Controller\CategoryController::class => function($sm) {
                 $cache = $sm->get('longCache');
                 return new Controller\CategoryController($cache);
             },
-            Controller\ChartController::class        => InvokableFactory::class,
+            Controller\ChartController::class => function($sm) {
+                return new Controller\ChartController(
+                    $sm->get(Service\SpecificationsService::class)
+                );
+            },
             Controller\CommentsController::class => function($sm) {
                 $hostManager = $sm->get(HostManager::class);
                 $commentForm = $sm->get('CommentForm');
@@ -77,13 +88,14 @@ return [
                 $newTopicForm = $sm->get('ForumsTopicNewForm');
                 $commentForm = $sm->get('CommentForm');
                 $transport = $sm->get('MailTransport');
-                $translator = $sm->get('translator');
+                $translator = $sm->get('MvcTranslator');
                 return new Controller\ForumsController($newTopicForm, $commentForm, $transport, $translator);
             },
             Controller\IndexController::class => function($sm) {
-                $cache = $sm->get('fastCache');
-                $translator = $sm->get('translator');
-                return new Controller\IndexController($cache, $translator);
+                return new Controller\IndexController(
+                    $sm->get('fastCache'),
+                    $sm->get(Service\SpecificationsService::class)
+                );
             },
             Controller\InboxController::class        => InvokableFactory::class,
             Controller\InfoController::class => function($sm) {
@@ -94,7 +106,7 @@ return [
             Controller\LoginController::class => function($sm) {
                 $service = $sm->get(Service\UsersService::class);
                 $form = $sm->get('LoginForm');
-                $translator = $sm->get('translator');
+                $translator = $sm->get('MvcTranslator');
                 $externalLoginFactory = $sm->get(ExternalLoginServiceFactory::class);
                 $config = $sm->get('Config');
 
@@ -102,8 +114,10 @@ return [
             },
             Controller\MapController::class          => InvokableFactory::class,
             Controller\MostsController::class => function($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                return new Controller\MostsController($textStorage);
+                return new Controller\MostsController(
+                    $sm->get(TextStorage\Service::class),
+                    $sm->get(Service\SpecificationsService::class)
+                );
             },
             Controller\NewController::class          => InvokableFactory::class,
             Controller\MuseumsController::class      => InvokableFactory::class,
@@ -129,9 +143,11 @@ return [
                 return new Controller\TelegramController($service);
             },
             Controller\TwinsController::class => function($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $cache = $sm->get('longCache');
-                return new Controller\TwinsController($textStorage, $cache);
+                return new Controller\TwinsController(
+                    $sm->get(TextStorage\Service::class),
+                    $sm->get('longCache'),
+                    $sm->get(Service\SpecificationsService::class)
+                );
             },
             Controller\UsersController::class => function($sm) {
                 $cache = $sm->get('longCache');
@@ -157,8 +173,10 @@ return [
         ],
         'factories' => [
             'car' => function ($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                return new Controller\Plugin\Car($textStorage);
+                return new Controller\Plugin\Car(
+                    $sm->get(TextStorage\Service::class),
+                    $sm->get(Service\SpecificationsService::class)
+                );
             },
             'fileSize' => function($sm) {
                 return new Controller\Plugin\FileSize(
@@ -180,17 +198,18 @@ return [
                 return new Controller\Plugin\Pic(
                     $sm->get(TextStorage\Service::class),
                     $viewHelperManager->get('car'),
-                    $sm->get('translator'),
-                    $sm->get(PictureNameFormatter::class)
+                    $sm->get('MvcTranslator'),
+                    $sm->get(PictureNameFormatter::class),
+                    $sm->get(Service\SpecificationsService::class)
                 );
             },
             'sidebar' => function ($sm) {
                 $cache = $sm->get('fastCache');
-                $translator = $sm->get('translator');
+                $translator = $sm->get('MvcTranslator');
                 return new Controller\Plugin\Sidebar($cache, $translator);
             },
             'translate' => function ($sm) {
-                $translator = $sm->get('translator');
+                $translator = $sm->get('MvcTranslator');
                 return new Controller\Plugin\Translate($translator);
             },
             'user' => function($sm) {
@@ -303,6 +322,16 @@ return [
                 'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
                 'base_dir' => __DIR__ . '/../language',
                 'pattern'  => '%s.php'
+            ],
+            [
+                'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
+                'base_dir' => \Zend\I18n\Translator\Resources::getBasePath(),
+                'pattern'  => \Zend\I18n\Translator\Resources::getPatternForValidator()
+            ],
+            [
+                'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
+                'base_dir' => \Zend\I18n\Translator\Resources::getBasePath(),
+                'pattern'  => \Zend\I18n\Translator\Resources::getPatternForCaptcha()
             ]
         ],
     ],
@@ -322,11 +351,11 @@ return [
     'service_manager' => [
         'factories' => [
             CarNameFormatter::class => function($sm) {
-                return new CarNameFormatter($sm->get('translator'));
+                return new CarNameFormatter($sm->get('MvcTranslator'));
             },
             PictureNameFormatter::class => function($sm) {
                 return new PictureNameFormatter(
-                    $sm->get('translator'),
+                    $sm->get('MvcTranslator'),
                     $sm->get(CarNameFormatter::class)
                 );
             },
@@ -349,9 +378,12 @@ return [
             },
             Service\UsersService::class => function($sm) {
                 $config = $sm->get('Config');
-                $translator = $sm->get('translator');
-                $transport = $sm->get('MailTransport');
-                return new Service\UsersService($config['users'], $config['hosts'], $translator, $transport);
+                return new Service\UsersService(
+                    $config['users'],
+                    $config['hosts'],
+                    $sm->get('MvcTranslator'),
+                    $sm->get('MailTransport'),
+                    $sm->get(Service\SpecificationsService::class));
             },
             Zend_Db_Adapter_Abstract::class => function($sm) {
                 $config = $sm->get('Config');
@@ -381,7 +413,7 @@ return [
                 $language = $sm->get(Language::class);
                 $cache = $sm->get('longCache');
                 $config = $sm->get('Config');
-                $translator = $sm->get('translator');
+                $translator = $sm->get('MvcTranslator');
                 $languagePicker = $sm->get(LanguagePicker::class);
 
                 return new MainMenu($router, $language, $cache, $config['hosts'], $translator, $languagePicker);
@@ -420,6 +452,9 @@ return [
                 return new Picture([
                     'imageStorage' => $sm->get(Image\Storage::class)
                 ]);
+            },
+            Service\SpecificationsService::class => function($sm) {
+                return new Service\SpecificationsService($sm->get('MvcTranslator'));
             }
         ],
         'aliases' => [

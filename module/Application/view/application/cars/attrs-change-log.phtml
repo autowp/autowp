@@ -11,7 +11,7 @@
     <?=$this->partial('application/forms/bootstrap-horizontal', [
         'form' => $this->filter
     ])?>
-    <table class="specs-log">
+    <table class="specs-log table">
         <thead>
             <tr>
                <th><?=$this->escapeHtml($this->translate('specifications-editor/log/date'))?></th>
@@ -28,7 +28,7 @@
                 <td><?=$this->user($item['user']) ?></td>
                 <td>
                     <?php if ($item['itemType']) { ?>
-                        <?=$this->escapeHtml($item['itemType']['name']) ?>
+                        <?=$this->escapeHtml($item['itemType']['name']) ?><br />
                     <?php } ?>
                     <?php if ($this->isModerator) { ?>
                         <?=$this->htmlA($item['object']['moderUrl'], $item['object']['name']) ?>
@@ -39,7 +39,7 @@
                 <td class="attribute">
                     <?php foreach ($item['path'] as $j => $node) { ?>
                         <?php if ($j) { ?> / <?php } ?>
-                        <span><?=$this->escapeHtml($node)?></span>
+                        <span><?=$this->escapeHtml($this->translate($node))?></span>
                     <?php } ?>
                 </td>
                 <td style="text-align:center">

@@ -10,7 +10,7 @@
         ?>
         <tr class="<?=$this->escapeHtmlAttr(implode(' ', $classes))?>" id="subform-<?=$this->attribute['id']?>">
             <td colspan="4" style="padding-left:<?=$this->deep * 20?>px">
-                <h4><?=$this->escapeHtml($element->getLabel())?></h4>
+                <h4><?=$this->escapeHtml($this->translate($element->getLabel()))?></h4>
             </td>
         </tr>
         <?=$this->partial('application/cars/partial/form-elements', [
@@ -33,7 +33,7 @@
         <tr class="<?=$this->escapeHtmlAttr(implode(' ', $classes))?>">
             <td>
                 <label style="padding-left:<?=$this->deep * 20?>px">
-                    <?=$this->escapeHtml($element->getLabel())?>
+                    <?=$this->escapeHtml($this->translate($element->getLabel()))?>
                 </label>
             </td>
             <td>
@@ -55,7 +55,7 @@
                     <p class="help-block"><?=$this->escapeHtml($error)?></p>
                 <?php } ?>
                 <?php if ($desc = $element->getAttribute('data-desc')) { ?>
-                    <small><?=$this->escapeHtml($desc)?></small>
+                    <small><?=$this->escapeHtml($this->translate($desc))?></small>
                 <?php } ?>
             </td>
             <td class="actual">

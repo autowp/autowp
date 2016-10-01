@@ -33,10 +33,19 @@ class TwinsController extends AbstractActionController
 
     private $cache;
 
-    public function __construct(TextStorage\Service $textStorage, $cache)
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(
+        TextStorage\Service $textStorage,
+        $cache,
+        SpecificationsService $specsService)
     {
         $this->textStorage = $textStorage;
         $this->cache = $cache;
+        $this->specsService = $specsService;
     }
 
     /**
@@ -90,9 +99,8 @@ class TwinsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $service = new SpecificationsService();
-        $specs = $service->specifications($this->getTwins()->getGroupCars($group['id']), [
-            'language' => 'en'
+        $specs = $this->specsService->specifications($this->getTwins()->getGroupCars($group['id']), [
+            'language' => $this->language()
         ]);
 
         return [
@@ -156,10 +164,8 @@ class TwinsController extends AbstractActionController
 
         $hasSpecs = false;
 
-        $specService = new SpecificationsService();
-
         foreach ($carList as $car) {
-            $hasSpecs = $hasSpecs || $specService->hasSpecs(1, $car->id);
+            $hasSpecs = $hasSpecs || $this->specsService->hasSpecs(1, $car->id);
         }
 
         $picturesCount = $twins->getGroupPicturesCount($group['id']);
@@ -205,8 +211,6 @@ class TwinsController extends AbstractActionController
 
         $language = $this->language();
 
-        $specService = new SpecificationsService();
-
         $ids = [];
         foreach ($list as $group) {
             $ids[] = $group->id;
@@ -219,7 +223,7 @@ class TwinsController extends AbstractActionController
             $ids
         );
 
-        $hasSpecs = $specService->twinsGroupsHasSpecs($ids);
+        $hasSpecs = $this->specsService->twinsGroupsHasSpecs($ids);
 
         $carLists = [];
         if (count($ids)) {

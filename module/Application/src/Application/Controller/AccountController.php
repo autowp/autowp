@@ -81,17 +81,23 @@ class AccountController extends AbstractActionController
      */
     private $hosts = [];
 
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
     public function __construct(
-        UsersService $service, 
+        UsersService $service,
         $translator,
-        Form $emailForm, 
-        Form $profileForm, 
+        Form $emailForm,
+        Form $profileForm,
         Form $settingsForm,
-        Form $photoForm, 
-        Form $changePasswordForm, 
+        Form $photoForm,
+        Form $changePasswordForm,
         Form $deleteUserForm,
-        ExternalLoginServiceFactory $externalLoginFactory, 
-        array $hosts)
+        ExternalLoginServiceFactory $externalLoginFactory,
+        array $hosts,
+        SpecificationsService $specsService)
     {
         $this->service = $service;
         $this->translator = $translator;
@@ -103,6 +109,7 @@ class AccountController extends AbstractActionController
         $this->deleteUserForm = $deleteUserForm;
         $this->externalLoginFactory = $externalLoginFactory;
         $this->hosts = $hosts;
+        $this->specsService = $specsService;
     }
 
     private function forwadToLogin()
@@ -808,8 +815,6 @@ class AccountController extends AbstractActionController
             return $this->forwadToLogin();
         }
 
-        $service = new SpecificationsService();
-
         $filter = $this->params('conflict', '0');
         $page = (int)$this->params('page');
 
@@ -817,7 +822,7 @@ class AccountController extends AbstractActionController
 
         $language = $this->language();
 
-        $data = $service->getConflicts($userId, $filter, $page, 50, $language);
+        $data = $this->specsService->getConflicts($userId, $filter, $page, 50, $language);
         $conflicts = $data['conflicts'];
         $paginator = $data['paginator'];
 

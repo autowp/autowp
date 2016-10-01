@@ -21,6 +21,16 @@ class ChartController extends AbstractRestfulController
         1, 29
     ];
 
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(SpecificationsService $specsService)
+    {
+        $this->specsService = $specsService;
+    }
+
     public function yearsAction()
     {
         $attrTable = new Attrs_Attributes();
@@ -28,7 +38,7 @@ class ChartController extends AbstractRestfulController
         $params = [];
         foreach ($attrTable->find($this->parameters) as $row) {
             $params[] = [
-                'name' => $row->name,
+                'name' => $this->translate($row->name),
                 'id'   => $row->id
             ];
         }
@@ -67,8 +77,7 @@ class ChartController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $specService = new SpecificationsService();
-        $dataTable = $specService->getValueDataTable($attrRow->type_id);
+        $dataTable = $this->specsService->getValueDataTable($attrRow->type_id);
 
         $dataTableName = $dataTable->info('name');
 

@@ -11,20 +11,26 @@ use Users;
 
 class SpecsController extends AbstractActionController
 {
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(SpecificationsService $specsService)
+    {
+        $this->specsService = $specsService;
+    }
+
     public function refreshConflictFlagsAction()
     {
-        $service = new SpecificationsService();
-
-        $service->refreshConflictFlags();
+        $this->specsService->refreshConflictFlags();
 
         Console::getInstance()->writeLine("done");
     }
 
     public function refreshUsersStatAction()
     {
-        $service = new SpecificationsService();
-
-        $service->refreshUsersConflictsStat();
+        $this->specsService->refreshUsersConflictsStat();
 
         Console::getInstance()->writeLine("done");
     }
@@ -34,9 +40,7 @@ class SpecsController extends AbstractActionController
         $typeId = $this->params('type_id');
         $itemId = $this->params('item_id');
 
-        $service = new SpecificationsService();
-
-        $service->refreshItemConflictFlags($typeId, $itemId);
+        $this->specsService->refreshItemConflictFlags($typeId, $itemId);
 
         Console::getInstance()->writeLine("done");
     }
@@ -46,9 +50,7 @@ class SpecsController extends AbstractActionController
     {
         $userId = $this->params('user_id');
 
-        $service = new SpecificationsService();
-
-        $service->refreshUserConflicts($userId);
+        $this->specsService->refreshUserConflicts($userId);
 
         Console::getInstance()->writeLine("done");
     }

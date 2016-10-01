@@ -42,10 +42,19 @@ class CatalogueController extends AbstractActionController
 
     private $cache;
 
-    public function __construct($textStorage, $cache)
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(
+        $textStorage,
+        $cache,
+        SpecificationsService $specsService)
     {
         $this->textStorage = $textStorage;
         $this->cache = $cache;
+        $this->specsService = $specsService;
     }
 
     private function _brandAction(Callable $callback)
@@ -231,9 +240,7 @@ class CatalogueController extends AbstractActionController
 
             $carParentTable = new Car_Parent();
 
-            $specService = new SpecificationsService();
-
-            $this->sidebar()->brand([
+           $this->sidebar()->brand([
                 'brand_id'    => $brand['id'],
                 'is_concepts' => true
             ]);
@@ -280,9 +287,9 @@ class CatalogueController extends AbstractActionController
                             'exact'         => false
                         ]);
                     },
-                    'specificationsUrl' => function($listCar) use ($brand, $carParentTable, $specService) {
+                    'specificationsUrl' => function($listCar) use ($brand, $carParentTable) {
 
-                        $hasSpecs = $specService->hasSpecs(1, $listCar->id);
+                        $hasSpecs = $this->specsService->hasSpecs(1, $listCar->id);
 
                         if (!$hasSpecs) {
                             return false;
@@ -404,8 +411,6 @@ class CatalogueController extends AbstractActionController
 
             $carParentTable = new Car_Parent();
 
-            $specService = new SpecificationsService();
-
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
             ]);
@@ -454,9 +459,9 @@ class CatalogueController extends AbstractActionController
                             'exact'         => false
                         ]);
                     },
-                    'specificationsUrl' => function($listCar) use ($brand, $specService, $carParentTable) {
+                    'specificationsUrl' => function($listCar) use ($brand, $carParentTable) {
 
-                        $hasSpecs = $specService->hasSpecs(1, $listCar->id);
+                        $hasSpecs = $this->specsService->hasSpecs(1, $listCar->id);
 
                         if (!$hasSpecs) {
                             return false;
@@ -891,7 +896,6 @@ class CatalogueController extends AbstractActionController
             }
 
             $pictureTable = $this->catalogue()->getPictureTable();
-            $specService = new SpecificationsService();
             $carTable = $this->catalogue()->getCarTable();
 
             $language = $this->language();
@@ -977,7 +981,7 @@ class CatalogueController extends AbstractActionController
                     ]);
                 }
 
-                $hasSpecs = $specService->hasSpecs(3, $engine->id);
+                $hasSpecs = $this->specsService->hasSpecs(3, $engine->id);
 
                 if ($hasSpecs) {
                     $specsUrl = $this->url()->fromRoute('catalogue', [
@@ -1063,7 +1067,7 @@ class CatalogueController extends AbstractActionController
                 );
                 $childsCount = $paginator->getTotalItemCount();
 
-                $specsCount = $specService->getSpecsCount(3, $engineRow->id);
+                $specsCount = $this->specsService->getSpecsCount(3, $engineRow->id);
 
                 $picturesSelect = $this->enginePicturesSelect($engineRow, true);
                 $paginator = new Paginator(
@@ -1099,10 +1103,8 @@ class CatalogueController extends AbstractActionController
                 'name' => $engineRow->caption
             ];
 
-            $specService = new SpecificationsService();
-
-            $specs = $specService->engineSpecifications([$engine], [
-                'language' => 'en'
+            $specs = $this->specsService->engineSpecifications([$engine], [
+                'language' => $this->language()
             ]);
 
             $this->sidebar()->brand([
@@ -1143,8 +1145,7 @@ class CatalogueController extends AbstractActionController
             );
             $childsCount = $paginator->getTotalItemCount();
 
-            $specService = new SpecificationsService();
-            $specsCount = $specService->getSpecsCount(3, $engineRow->id);
+            $specsCount = $this->specsService->getSpecsCount(3, $engineRow->id);
 
             $picturesSelect = $this->enginePicturesSelect($engineRow, true);
             $paginator = new Paginator(
@@ -1692,8 +1693,7 @@ class CatalogueController extends AbstractActionController
                     'onlyExactlyPictures' => true,
                     'specificationsUrl' => function($listCar) use ($brand, $brandCarCatname, $path) {
 
-                        $specService = new SpecificationsService();
-                        $hasSpecs = $specService->hasSpecs(1, $listCar->id);
+                        $hasSpecs = $this->specsService->hasSpecs(1, $listCar->id);
 
                         if (!$hasSpecs) {
                             return false;
@@ -2196,8 +2196,7 @@ class CatalogueController extends AbstractActionController
             $ids[] = $car->id;
         }
 
-        $specService = new SpecificationsService();
-        $hasChildSpecs = $specService->hasChildSpecs(1, $ids);
+        $hasChildSpecs = $this->specsService->hasChildSpecs(1, $ids);
 
         $picturesSelect = $this->selectFromPictures()
             ->where('pictures.type = ?', Picture::CAR_TYPE_ID)
@@ -2317,7 +2316,7 @@ class CatalogueController extends AbstractActionController
                     return false;
                 },
                 'onlyExactlyPictures' => false,
-                'specificationsUrl' => function($listCar) use ($brand, $specService, $hasChildSpecs, $carParentTable, $brandCarCatname, $path, $currentCarId, $type) {
+                'specificationsUrl' => function($listCar) use ($brand, $hasChildSpecs, $carParentTable, $brandCarCatname, $path, $currentCarId, $type) {
                     if ($hasChildSpecs[$listCar->id]) {
                         $carParentRow = $carParentTable->fetchRow([
                             'car_id = ?'    => $listCar->id,
@@ -2337,7 +2336,7 @@ class CatalogueController extends AbstractActionController
                         }
                     }
 
-                    if (!$specService->hasSpecs(1, $listCar->id)) {
+                    if (!$this->specsService->hasSpecs(1, $listCar->id)) {
                         return false;
                     }
 
@@ -2710,11 +2709,9 @@ class CatalogueController extends AbstractActionController
                 $childCars = $carTable->fetchAll($select);
             }
 
-            $service = new SpecificationsService();
-
             $cars = [];
             foreach ($childCars as $childCar) {
-                if ($service->hasSpecs(1, $childCar->id)) {
+                if ($this->specsService->hasSpecs(1, $childCar->id)) {
                     $cars[] = $childCar;
                 }
             }
@@ -2722,8 +2719,8 @@ class CatalogueController extends AbstractActionController
             $user = $this->user()->get();
 
 
-            $specs = $service->specifications($cars, [
-                'language'     => 'en',
+            $specs = $this->specsService->specifications($cars, [
+                'language'     => $this->language(),
                 'contextCarId' => $currentCarId
             ]);
 
@@ -2732,7 +2729,7 @@ class CatalogueController extends AbstractActionController
                 $ids[] = $car->id;
             }
 
-            $contribPairs = $service->getContributors(1, $ids);
+            $contribPairs = $this->specsService->getContributors(1, $ids);
 
             $userTable = new Users();
             $contributors = $userTable->find(array_keys($contribPairs));
@@ -2768,9 +2765,8 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $specService = new SpecificationsService();
             $service = new Mosts([
-                'specs' => $specService
+                'specs' => $this->specsService
             ]);
 
             $language = $this->language();
