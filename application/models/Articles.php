@@ -9,23 +9,23 @@ class Articles extends Zend_Db_Table
 
     protected $_name = 'articles';
     protected $_rowClass = 'Articles_Row';
-    protected $_referenceMap    = array(
-        'Author' => array(
-            'columns'           => array('author_id'),
-            'refTableClass'     => 'Users',
-            'refColumns'        => array('id')
-        ),
-        'Html' => array(
-            'columns'           => array('html_id'),
-            'refTableClass'     => 'Htmls',
-            'refColumns'        => array('id')
-        )
-    );
+    protected $_referenceMap = [
+        'Author' => [
+            'columns'       => ['author_id'],
+            'refTableClass' => 'Users',
+            'refColumns'    => ['id']
+        ],
+        'Html' => [
+            'columns'       => ['html_id'],
+            'refTableClass' => \Application\Model\DbTable\Html::class,
+            'refColumns'    => ['id']
+        ]
+    ];
 
     public function findRowByCatname($catname)
     {
-        return $this->fetchRow(array(
+        return $this->fetchRow([
             'catname = ?' => $catname
-        ));
+        ]);
     }
 }

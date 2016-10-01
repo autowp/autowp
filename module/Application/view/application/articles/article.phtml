@@ -20,7 +20,9 @@
     </div>
     <div class="col-sm-8">
         <div class="well">
-            <div class="article clearfix"><?=$this->article->findParentHtmls()->html ?></div>
+            <div class="article clearfix">
+                <?=$this->article->findParentRow(Application\Model\DbTable\Html::class)->html ?>
+            </div>
         </div>
 
         <?php if (count($this->links)) { ?>
