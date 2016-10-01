@@ -10,19 +10,19 @@ class PictureNameFormatter
     private $translator;
 
     /**
-     * @var CarNameFormatter
+     * @var VehicleNameFormatter
      */
-    private $carNameFormatter;
+    private $vehicleNameFormatter;
 
     private static function mbUcfirst($str)
     {
         return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
     }
 
-    public function __construct($translator, CarNameFormatter $carNameFormatter)
+    public function __construct($translator, VehicleNameFormatter $vehicleNameFormatter)
     {
         $this->translator = $translator;
-        $this->carNameFormatter = $carNameFormatter;
+        $this->vehicleNameFormatter = $vehicleNameFormatter;
     }
 
     private function translate($string, $language)
@@ -49,7 +49,7 @@ class PictureNameFormatter
             case Picture::CAR_TYPE_ID:
                 return
                     ($picture['perspective'] ? self::mbUcfirst($this->translate($picture['perspective'], $language)) . ' ' : '') .
-                    ($picture['car'] ? $this->carNameFormatter->format($picture['car'], $language) : 'Unsorted car');
+                    ($picture['car'] ? $this->vehicleNameFormatter->format($picture['car'], $language) : 'Unsorted car');
                 break;
 
             case Picture::ENGINE_TYPE_ID:
