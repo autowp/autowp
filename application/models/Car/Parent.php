@@ -32,11 +32,6 @@ class Car_Parent extends Table
     private $brandCarTable;
 
     /**
-     * @var Brands
-     */
-    private $brandTable;
-
-    /**
      * @return Brand_Car
      */
     private function getBrandCarTable()

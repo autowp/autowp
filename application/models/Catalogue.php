@@ -1,6 +1,7 @@
 <?php
 
 use Autowp\Image\Storage\Request;
+use Application\Model\DbTable\Brand as BrandTable;
 
 class Catalogue
 {
@@ -9,7 +10,7 @@ class Catalogue
     private $carsPerPage = 7;
 
     /**
-     * @var Brands
+     * @var BrandTable
      */
     private $brandTable;
 
@@ -97,13 +98,13 @@ class Catalogue
     }
 
     /**
-     * @return Brands
+     * @return BrandTable
      */
     public function getBrandTable()
     {
         return $this->brandTable
             ? $this->brandTable
-            : $this->brandTable = new Brands();
+            : $this->brandTable = new BrandTable();
     }
 
     /**

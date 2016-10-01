@@ -5,7 +5,7 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\CarOfDay;
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
@@ -208,7 +208,7 @@ class IndexController extends AbstractActionController
         if (!$success) {
 
             // cache missing
-            $brandModel = new Brand();
+            $brandModel = new BrandModel();
 
             $items = $brandModel->getTopBrandsList($language);
             foreach ($items as &$item) {

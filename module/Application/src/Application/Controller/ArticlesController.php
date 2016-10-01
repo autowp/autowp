@@ -4,7 +4,7 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Articles;
@@ -15,7 +15,7 @@ class ArticlesController extends AbstractActionController
 
     private function getBrandsMenu()
     {
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
 
         $language = $this->language();
 
@@ -30,7 +30,7 @@ class ArticlesController extends AbstractActionController
 
     public function indexAction()
     {
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
 
         $brand = $brandModel->getBrandByCatname($this->params('brand_catname'), $this->language());
 
@@ -96,13 +96,20 @@ class ArticlesController extends AbstractActionController
         }
 
         $links = [];
-        foreach ($article->findBrandsViaArticles_Brands() as $brand) {
+
+        $brandModel = new BrandModel();
+        $brands = $brandModel->getList($this->language(), function($select) use ($article) {
+            $select
+                ->join('articles_brands', 'brands.id = articles_brands.brand_id', null)
+                ->where('articles_brands.article_id = ?', $article->id);
+        });
+        foreach ($brands as $brand) {
             $links[] = [
                 'url'  => $this->url()->fromRoute('catalogue', [
                     'action'        => 'brand',
-                    'brand_catname' => $brand->catname
+                    'brand_catname' => $brand['catname']
                 ]),
-                'name' => $brand->caption
+                'name' => $brand['name']
             ];
         }
 

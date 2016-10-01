@@ -4,6 +4,8 @@ namespace Application\Telegram\Command;
 
 use Telegram\Bot\Commands\Command;
 
+use Application\Model\DbTable\Brand as BrandTable;
+
 class InboxCommand extends Command
 {
     /**
@@ -22,7 +24,7 @@ class InboxCommand extends Command
     public function handle($arguments)
     {
         if ($arguments) {
-            $brandTable = new \Brands();
+            $brandTable = new BrandTable();
 
             $brandRow = $brandTable->fetchRow([
                 'caption = ?' => (string)$arguments

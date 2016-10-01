@@ -19,6 +19,17 @@ class Brand extends Table
     ];
 
     /**
+     * @param string $catname
+     * @return Brand_Row
+     */
+    public function findRowByCatname($catname)
+    {
+        return $this->fetchRow([
+            'folder = ?' => (string)$catname
+        ]);
+    }
+
+    /**
      * @param array $data
      * @throws Exception
      */

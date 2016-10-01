@@ -5,8 +5,8 @@ namespace Application\Controller\Moder;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Moder\Category as CategoryForm;
+use Application\Model\DbTable\Brand as BrandTable;
 
-use Brands;
 use Car_Parent;
 use Car_Parent_Cache;
 use Cars;
@@ -218,7 +218,7 @@ class CategoryController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
 
         $carParentTable = new Car_Parent();
         $carParentCacheTable = new Car_Parent_Cache();

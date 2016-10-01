@@ -4,7 +4,7 @@ namespace Application\Validator\Brand;
 
 use Zend\Validator\AbstractValidator;
 
-use Brands;
+use Application\Model\DbTable\Brand as BrandTable;
 
 class NameNotExists extends AbstractValidator
 {
@@ -18,7 +18,7 @@ class NameNotExists extends AbstractValidator
     {
         $this->setValue($value);
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
         $row = $brandTable->fetchRow([
             'caption = ?' => (string)$value
         ]);

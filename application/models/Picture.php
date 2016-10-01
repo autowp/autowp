@@ -3,6 +3,8 @@
 use Autowp\Image;
 
 use Application\Db\Table;
+use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Brand as BrandTable;
 
 class Picture extends Table
 {
@@ -34,7 +36,7 @@ class Picture extends Table
         ],
         'Brand' => [
             'columns'       => ['brand_id'],
-            'refTableClass' => 'Brands',
+            'refTableClass' => BrandTable::class,
             'refColumns'    => ['id']
         ],
         'Engine' => [
@@ -239,7 +241,7 @@ class Picture extends Table
 
         $brands = [];
         if (count($brandIds)) {
-            $table = new Brands();
+            $table = new BrandTable();
             foreach ($table->find(array_keys($brandIds)) as $row) {
                 $brands[$row->id] = $row->getLanguageName($language);
             }
@@ -412,7 +414,7 @@ class Picture extends Table
 
         $brands = [];
         if (count($brandIds)) {
-            $table = new Brands();
+            $table = new BrandTable();
             foreach ($table->find(array_keys($brandIds)) as $row) {
                 $brands[$row->id] = $row->getLanguageName($language);
             }
@@ -521,16 +523,14 @@ class Picture extends Table
                     $car = $carTable->find($params['car_id'])->current();
                     if ($car) {
                         $car->refreshPicturesCount();
-                        //TODO: brands_cars_cache
-                        foreach ($car->findBrandsViaBrand_Car() as $brand) {
-                            $brand->refreshPicturesCount();
-                        }
+                        $brandModel = new BrandModel();
+                        $brandModel->refreshPicturesCountByVehicle($car->id);
                     }
                 }
                 break;
             case Picture::ENGINE_TYPE_ID:
                 if ($params['engine_id']) {
-                    $brandTable = new Brands();
+                    $brandTable = new BrandTable();
                     $brands = $brandTable->fetchAll(
                         $brandTable->select(true)
                             ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
@@ -660,7 +660,7 @@ class Picture extends Table
             return false;
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
         $brand = $brandTable->find($id)->current();
         if (!$brand) {
             return false;

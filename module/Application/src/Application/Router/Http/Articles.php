@@ -6,7 +6,7 @@ use Zend\Router\Http\RouteInterface;
 use Zend\Router\Http\RouteMatch;
 use Zend\Stdlib\RequestInterface as Request;
 
-use Brands;
+use Application\Model\DbTable\Brand as BrandTable;
 
 class Articles implements RouteInterface
 {
@@ -62,7 +62,7 @@ class Articles implements RouteInterface
         $match = null;
 
         if ($path) {
-            $brandTable = new Brands();
+            $brandTable = new BrandTable();
 
             $isBrandFolder = (bool)$brandTable->fetchRow([
                 'folder = ?' => $path[0]

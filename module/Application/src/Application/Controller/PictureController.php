@@ -6,7 +6,8 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
+
 use Picture;
 use Picture_Row;
 
@@ -140,7 +141,7 @@ class PictureController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
 
         $url = $this->pic()->href($picture->toArray(), [
             'fallback' => false

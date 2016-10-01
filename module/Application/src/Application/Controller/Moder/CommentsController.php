@@ -5,9 +5,9 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Brands;
 use Comment_Message;
 use Picture;
 use Users;
@@ -30,7 +30,7 @@ class CommentsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
 
         $brandRows = $brandTable->fetchAll(
             $brandTable->select(true)

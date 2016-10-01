@@ -2,10 +2,10 @@
 
 namespace Application\Model;
 
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Brands;
 use Picture;
 use Cars;
 
@@ -20,7 +20,7 @@ class Twins
     private $groupsTable;
 
     /**
-     * @var Brands
+     * @var BrandTable
      */
     private $brandTable;
 
@@ -45,13 +45,13 @@ class Twins
     }
 
     /**
-     * @return Brands
+     * @return BrandTable
      */
     private function getBrandTable()
     {
         return $this->brandTable
             ? $this->brandTable
-            : $this->brandTable = new Brands();
+            : $this->brandTable = new BrandTable();
     }
 
     /**

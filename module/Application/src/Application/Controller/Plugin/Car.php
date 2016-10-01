@@ -4,12 +4,12 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
 use Autowp\TextStorage\Service as TextStorage;
 
-use Brands;
 use Brand_Car;
 use Car_Language;
 use Car_Parent;
@@ -164,7 +164,7 @@ class Car extends AbstractPlugin
         $categoryLanguageTable = new Category_Language();
         $carParentTable = new Car_Parent();
         $carParentAdapter = $carParentTable->getAdapter();
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
         $brandCarTable = new Brand_Car();
         $categoryTable = new Category();
 

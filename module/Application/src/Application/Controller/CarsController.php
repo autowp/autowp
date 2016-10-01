@@ -8,7 +8,7 @@ use Zend\View\Model\ViewModel;
 
 use Application\HostManager;
 use Application\Model\Message;
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
@@ -798,7 +798,7 @@ class CarsController extends AbstractActionController
 
         $language = $this->language();
 
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
 
         $brand = $brandModel->getBrandByCatname($this->params()->fromPost('brand'), $language);
 

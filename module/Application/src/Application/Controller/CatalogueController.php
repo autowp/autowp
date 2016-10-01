@@ -8,7 +8,7 @@ use Zend\View\Model\ViewModel;
 use Zend\Paginator\Paginator;
 
 use Application\Model\DbTable\BrandLink;
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\Mosts;
@@ -61,7 +61,7 @@ class CatalogueController extends AbstractActionController
     {
         $language = $this->language();
 
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
 
         $brand = $brandModel->getBrandByCatname($this->params('brand_catname'), $language);
 

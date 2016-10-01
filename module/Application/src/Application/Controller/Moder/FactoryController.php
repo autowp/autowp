@@ -6,10 +6,10 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\HostManager;
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Brands;
 use Cars;
 use Factory;
 use geoPHP;
@@ -197,7 +197,7 @@ class FactoryController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
 
         $db = $brandTable->getAdapter();
 

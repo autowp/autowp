@@ -5,10 +5,10 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Brand as BrandTable;
 
 use Cars;
-use Brands;
 use Brand_Language;
 
 class BrandsController extends AbstractActionController
@@ -35,7 +35,7 @@ class BrandsController extends AbstractActionController
 
             $imageStorage = $this->imageStorage();
 
-            $brandModel = new Brand();
+            $brandModel = new BrandModel();
 
             $items = $brandModel->getFullBrandsList($language);
 
@@ -78,7 +78,7 @@ class BrandsController extends AbstractActionController
             return $this->notFoundAction();
         }*/
 
-        $brands = new Brands();
+        $brands = new BrandTable();
 
         $brand = $brands->find($this->params('brand_id'))->current();
         if (!$brand) {

@@ -1,6 +1,7 @@
 <?php
 
 use Application\Db\Table\Row;
+use Application\Model\Brand as BrandModel;
 
 class Car_Row extends Row
 {
@@ -315,9 +316,8 @@ class Car_Row extends Row
         $this->pictures_count = (int)$db->fetchOne($sql, [$this->id, Picture::VEHICLE_TYPE_ID]);
         $this->save();
 
-        foreach ($this->findBrandsViaBrand_Car() as $brand) {
-            $brand->refreshPicturesCount();
-        }
+        $brandModel = new BrandModel();
+        $brandModel->refreshPicturesCountByVehicle($this->id);
     }
 
     public function deleteFromBrand(Brand_Row $brand)

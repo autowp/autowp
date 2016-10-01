@@ -5,6 +5,8 @@ use Application\Db\Table\Row;
 use Autowp\Filter\Filename\Safe;
 use Autowp\Image\Storage\Request;
 
+use Application\Model\DbTable\Brand as BrandTable;
+
 use Exception;
 
 class Picture_Row extends Row
@@ -42,7 +44,7 @@ class Picture_Row extends Row
 
         switch ($this->type) {
             case Picture::LOGO_TYPE_ID:
-                $brand = $this->findParentBrands();
+                $brand = $this->findParentRow(BrandTable::class);
                 if ($brand) {
                     $catname = $filenameFilter->filter($brand->folder);
                     $firstChar = mb_substr($catname, 0, 1);
@@ -51,7 +53,7 @@ class Picture_Row extends Row
                 break;
 
             case Picture::MIXED_TYPE_ID:
-                $brand = $this->findParentBrands();
+                $brand = $this->findParentRow(BrandTable::class);
                 if ($brand) {
                     $catname = $filenameFilter->filter($brand->folder);
                     $firstChar = mb_substr($catname, 0, 1);
@@ -60,7 +62,7 @@ class Picture_Row extends Row
                 break;
 
             case Picture::UNSORTED_TYPE_ID:
-                $brand = $this->findParentBrands();
+                $brand = $this->findParentRow(BrandTable::class);
                 if ($brand) {
                     $catname = $filenameFilter->filter($brand->folder);
                     $firstChar = mb_substr($catname, 0, 1);
@@ -73,7 +75,7 @@ class Picture_Row extends Row
                 if ($car) {
                     $carCatname = $filenameFilter->filter($car->caption);
 
-                    $brandTable = new Brands();
+                    $brandTable = new BrandTable();
 
                     $brands = $brandTable->fetchAll(
                         $brandTable->select(true)

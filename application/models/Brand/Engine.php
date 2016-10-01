@@ -7,7 +7,7 @@ class Brand_Engine extends Zend_Db_Table
     protected $_referenceMap = [
         'Brand' => [
             'columns'       => ['brand_id'],
-            'refTableClass' => 'Brand',
+            'refTableClass' => \Application\Model\DbTable\Brand::class,
             'refColumns'    => ['id']
         ],
         'Engine' => [

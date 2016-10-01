@@ -5,7 +5,7 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Service\DayPictures;
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
 
 use Picture;
 
@@ -16,7 +16,7 @@ class InboxController extends AbstractActionController
 
     private function getBrandControl($brand = null)
     {
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
         $language = $this->language();
 
         $brands = $brandModel->getList($language, function($select) use ($language) {
@@ -63,7 +63,7 @@ class InboxController extends AbstractActionController
 
     public function indexAction()
     {
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
         $language = $this->language();
 
         $brand = $brandModel->getBrandByCatname($this->params('brand'), $language);

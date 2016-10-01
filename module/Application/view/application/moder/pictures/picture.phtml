@@ -169,7 +169,7 @@
                         ?>
                         <p>
                             <?=$this->escapeHtml($this->translate('moder/picture/catalogue/logo'))?>
-                            <?php if ($brand = $this->picture->findParentBrands()) { ?>
+                            <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
                                 <?=$this->htmlA($this->url('moder/brands/params', [
                                     'action'     => 'brand',
                                     'brand_id'   => $brand->id
@@ -185,7 +185,7 @@
                         ?>
                         <p>
                             <?=$this->escapeHtml($this->translate('moder/picture/catalogue/mixed'))?>
-                            <?php if ($brand = $this->picture->findParentBrands()) { ?>
+                            <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
                                 <?=$this->htmlA($this->url('moder/brands/params', [
                                     'action'   => 'brand',
                                     'brand_id' => $brand->id
@@ -201,7 +201,7 @@
                         ?>
                         <p>
                             <?=$this->escapeHtml($this->translate('moder/picture/catalogue/unsorted'))?>
-                            <?php if ($brand = $this->picture->findParentBrands()) { ?>
+                            <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
                                 <?=$this->htmlA($this->url('moder/brands/params', [
                                     'action'   => 'brand',
                                     'brand_id' => $brand->id

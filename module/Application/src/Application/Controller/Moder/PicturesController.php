@@ -9,13 +9,13 @@ use Zend\View\Model\ViewModel;
 
 use Application\Form\Moder\Inbox as InboxForm;
 use Application\HostManager;
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\TrafficControl;
 
-use Brands;
 use Car_Parent;
 use Cars;
 use Comments;
@@ -1233,7 +1233,7 @@ class PicturesController extends AbstractActionController
         switch ($picture->type) {
             case Picture::VEHICLE_TYPE_ID:
                 if ($picture->car_id) {
-                    $brandModel = new Brand();
+                    $brandModel = new BrandModel();
                     $relatedBrands = $brandModel->getList($this->language(), function($select) use ($picture) {
                         $select
                             ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
@@ -1248,7 +1248,7 @@ class PicturesController extends AbstractActionController
             case Picture::MIXED_TYPE_ID:
             case Picture::LOGO_TYPE_ID:
                 if ($picture->brand_id) {
-                    $brandModel = new Brand();
+                    $brandModel = new BrandModel();
                     $relatedBrands = $brandModel->getList($this->language(), function($select) use ($picture) {
                         $select->where('brands.id = ?', $picture->brand_id);
                     });
@@ -1625,7 +1625,7 @@ class PicturesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
         $brand = $brandTable->find($this->params('brand_id'))->current();
         if (!$brand) {
             return $this->notFoundAction();
@@ -1656,7 +1656,7 @@ class PicturesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
         $brand = $brandTable->find($this->params('brand_id'))->current();
         if (!$brand) {
             return $this->notFoundAction();
@@ -2075,7 +2075,7 @@ class PicturesController extends AbstractActionController
             return $this->redirect()->toUrl($this->pictureUrl($picture));
         }
 
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
         $brand = $brandModel->getBrandById($this->params('brand_id'), $this->language());
         $brands = null;
         $factories = null;

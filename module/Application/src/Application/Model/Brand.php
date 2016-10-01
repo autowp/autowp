@@ -471,4 +471,17 @@ class Brand
 
         file_put_contents($destCss, implode(' ', $css));
     }
+
+    public function refreshPicturesCountByVehicle($carId)
+    {
+        $brandRows = $this->table->fetchAll(
+            $this->table->select(true)
+                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                ->where('car_parent_cache.car_id = ?', $carId)
+        );
+        foreach ($brandRows as $brand) {
+            $brand->refreshPicturesCount();
+        }
+    }
 }

@@ -7,7 +7,7 @@ class Brand_Car extends Zend_Db_Table
     protected $_referenceMap = [
         'Brand' => [
             'columns'       => ['brand_id'],
-            'refTableClass' => 'Brands',
+            'refTableClass' => \Application\Model\DbTable\Brand::class,
             'refColumns'    => ['id']
         ],
         'Car' => [

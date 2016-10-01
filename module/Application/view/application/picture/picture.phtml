@@ -206,7 +206,7 @@
 
                 case Picture::MIXED_TYPE_ID:
                     if ($this->user()->logedIn()) {
-                        if ($brand = $this->picture->findParentBrands()) {
+                        if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) {
                             $list[] = $this->htmlA($this->url('upload/params', [
                                 'action'     => 'index',
                                 'type'       => Picture::MIXED_TYPE_ID,

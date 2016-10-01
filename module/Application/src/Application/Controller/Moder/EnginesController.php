@@ -6,11 +6,11 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Moder\EngineAdd as EngineAddForm;
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
 use Brand_Engine;
-use Brands;
 use Engine_Parent_Cache;
 use Engines;
 use Picture;
@@ -112,7 +112,7 @@ class EnginesController extends AbstractActionController
             $parentEngine = $engineTable->find($engine->parent_id)->current();
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
         $brandRows = $brandTable->fetchAll(
             $brandTable->select(true)
                 ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
@@ -222,7 +222,7 @@ class EnginesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
 
         $db = $brandTable->getAdapter();
 
@@ -327,7 +327,7 @@ class EnginesController extends AbstractActionController
         $engineTable = $this->getEngineTable();
         $parentEngine = $engineTable->find($this->params('parent_id'))->current();
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
         $brandRow = $brandTable->find($this->params('brand_id'))->current();
 
         $form = new EngineAddForm(null, [
@@ -509,7 +509,7 @@ class EnginesController extends AbstractActionController
         }
 
         $brandId = (int)$this->params()->fromPost('brand_id');
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
 
         if ($brandId) {
 
@@ -570,7 +570,7 @@ class EnginesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
 
         $brandRow = $brandTable->find($this->params('brand_id'))->current();
         if (!$brandRow) {
@@ -614,7 +614,7 @@ class EnginesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
 
         $brandRow = $brandTable->find($this->params()->fromPost('brand_id'))->current();
         if ($brandRow) {

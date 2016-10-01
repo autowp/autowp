@@ -7,10 +7,10 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Application\Form\Upload as UploadForm;
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\Service\TelegramService;
 
-use Brands;
 use Car_Parent;
 use Cars;
 use Comment_Message;
@@ -101,7 +101,7 @@ class UploadController extends AbstractActionController
             case Picture::UNSORTED_TYPE_ID:
             case Picture::MIXED_TYPE_ID:
             case Picture::LOGO_TYPE_ID:
-                $brandModel = new Brand();
+                $brandModel = new BrandModel();
                 $brand = $brandModel->getBrandById($brandId, $this->language());
                 if ($brand) {
                     $selected = true;
@@ -233,7 +233,7 @@ class UploadController extends AbstractActionController
             case Picture::UNSORTED_TYPE_ID:
             case Picture::MIXED_TYPE_ID:
             case Picture::LOGO_TYPE_ID:
-                $brands = new Brands();
+                $brands = new BrandTable();
                 $brand = $brands->find($brandId)->current();
                 if ($brand) {
                     $brandId = $brand->id;
@@ -346,7 +346,7 @@ class UploadController extends AbstractActionController
                 case Picture::UNSORTED_TYPE_ID:
                 case Picture::LOGO_TYPE_ID:
                 case Picture::MIXED_TYPE_ID:
-                    $brand = $picture->findParentBrands();
+                    $brand = $picture->findParentRow(BrandTable::class);
                     if ($brand) {
                         $brand->refreshPicturesCount();
                     }
@@ -355,9 +355,8 @@ class UploadController extends AbstractActionController
                     $car = $picture->findParentCars();
                     if ($car) {
                         $car->refreshPicturesCount();
-                        foreach ($car->findBrandsViaBrand_Car() as $brand) {
-                            $brand->refreshPicturesCount();
-                        }
+                        $brandModel = new BrandModel();
+                        $brandModel->refreshPicturesCountByVehicle($car->id);
                     }
                     break;
             }
@@ -391,7 +390,7 @@ class UploadController extends AbstractActionController
 
     public function selectBrandAction()
     {
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
 
         $language = $this->language();
 
@@ -412,7 +411,7 @@ class UploadController extends AbstractActionController
 
     public function selectInBrandAction()
     {
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
 
         $language = $this->language();
 
@@ -629,7 +628,7 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
         $brand = $brandTable->find($this->params('brand_id'))->current();
         if (!$brand) {
             return $this->notfoundAction();
@@ -672,7 +671,7 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
         $brand = $brandTable->find($this->params('brand_id'))->current();
         if (!$brand) {
             return $this->notfoundAction();

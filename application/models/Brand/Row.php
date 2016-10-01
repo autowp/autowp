@@ -29,11 +29,6 @@ class Brand_Row extends Row
         return $langRow ? $langRow->name : $this->caption;
     }
 
-    public function getLogoPath()
-    {
-        return Brands::buildLogoPath($this->logo);
-    }
-
     public function getTotalPicturesCount()
     {
         return $this->carpictures_count + $this->enginepictures_count +

@@ -4,9 +4,9 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\VehicleNameFormatter;
 
-use Brands;
 use Brand_Car;
 use Car_Parent;
 use Car_Row;
@@ -36,7 +36,7 @@ class Car extends AbstractHelper
     private $carParentTable;
 
     /**
-     * @var Brands
+     * @var BrandTable
      */
     private $brandTable;
 
@@ -309,13 +309,13 @@ class Car extends AbstractHelper
     }
 
     /**
-     * @return Brands
+     * @return BrandTable
      */
     private function getBrandTable()
     {
         return $this->brandTable
             ? $this->brandTable
-            : $this->brandTable = new Brands();
+            : $this->brandTable = new BrandTable();
     }
 
     /**

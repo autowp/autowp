@@ -3,11 +3,11 @@
 class Telegram_Brand extends Zend_Db_Table
 {
     protected $_name = 'telegram_brand';
-    protected $_referenceMap    = array(
-        'Brand' => array(
-            'columns'           => array('brand_id'),
-            'refTableClass'     => 'Brands',
-            'refColumns'        => array('id')
-        ),
-    );
+    protected $_referenceMap = [
+        'Brand' => [
+            'columns'       => ['brand_id'],
+            'refTableClass' => \Application\Model\DbTable\Brand::class,
+            'refColumns'    => ['id']
+        ],
+    ];
 }

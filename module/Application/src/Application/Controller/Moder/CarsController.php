@@ -11,9 +11,10 @@ use Application\Form\Moder\Car as CarForm;
 use Application\Form\Moder\CarOrganize as CarOrganizeForm;
 use Application\Form\Moder\CarOrganizePictures as CarOrganizePicturesForm;
 use Application\HostManager;
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
 use Application\Model\Message;
 use Application\Model\Modification;
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Twins\GroupVehicle as TwinsGroupVehicle;
@@ -22,7 +23,6 @@ use Application\Service\SpecificationsService;
 use Autowp\Filter\Filename\Safe;
 
 use Brand_Car;
-use Brands;
 use Car_Language;
 use Car_Parent;
 use Car_Parent_Cache;
@@ -63,7 +63,7 @@ class CarsController extends AbstractActionController
     private $brandCarTable;
 
     /**
-     * @var Brands
+     * @var BrandTable
      */
     private $brandTable;
 
@@ -1135,16 +1135,18 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        foreach ($car->findBrandsViaBrand_Car() as $iBrand) {
-            if ($iBrand->id == $brand->id) {
-                throw new Exception('Vehicle already linked with brand '.$iBrand->caption);
-            }
+        $brandsCars = $this->getBrandCarTable();
+
+        $brandCarRow = $brandsCars->fetchRow([
+            'brand_id = ?' => $brand->id,
+            'car_id = ?'   => $car->id
+        ]);
+        if ($brandCarRow) {
+            throw new Exception('Vehicle already linked with brand '.$iBrand->caption);
         }
 
         $filter = new Safe();
         $catnameTemplate = $filter->filter(trim(str_replace($brand->caption, '', $car->caption)));
-
-        $brandsCars = $this->getBrandCarTable();
 
         $i = 0;
         do {
@@ -2214,7 +2216,7 @@ class CarsController extends AbstractActionController
         $language = $this->language();
         $imageStorage = $this->imageStorage();
 
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
         $brandRows = $brandModel->getList([
             'language' => $language,
             'columns'  => ['id', 'name', 'img']
@@ -2756,13 +2758,13 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @return Brands
+     * @return BrandTable
      */
     private function getBrandTable()
     {
         return $this->brandTable
             ? $this->brandTable
-            : $this->brandTable = new Brands();
+            : $this->brandTable = new BrandTable();
     }
 
     private function walkUpUntilBrand($id, array $path)
@@ -3711,17 +3713,15 @@ class CarsController extends AbstractActionController
                     ), [$car, $pictureRow]);
                 }
 
+                $brandModel = new BrandModel();
+
                 // old car cache
                 $car->refreshPicturesCount();
-                foreach ($car->findBrandsViaBrand_Car() as $brand) {
-                    $brand->refreshPicturesCount();
-                }
+                $brandModel->refreshPicturesCountByVehicle($car->id);
 
                 // new car cache
                 $newCar->refreshPicturesCount();
-                foreach ($newCar->findBrandsViaBrand_Car() as $brand) {
-                    $brand->refreshPicturesCount();
-                }
+                $brandModel->refreshPicturesCountByVehicle($newCar->id);
 
                 $specService = new SpecificationsService();
                 $specService->updateActualValues(1, $newCar->id);

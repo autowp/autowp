@@ -6,12 +6,12 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
 use Application\Service\TrafficControl;
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\Contact;
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Brands;
 use Comment_Message;
 use Picture;
 use User_Account;
@@ -165,7 +165,7 @@ class UsersController extends AbstractActionController
 
 
         // СПИСОК БРЕНДОВ
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
 
         $options = [
             'language' => $this->language(),
@@ -216,7 +216,7 @@ class UsersController extends AbstractActionController
 
         $language = $this->language();
 
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
         $brand = $brandModel->getBrandByCatname($this->params('brand_catname'), $language);
 
         if (!$brand) {
@@ -280,7 +280,7 @@ class UsersController extends AbstractActionController
     private function specsRating()
     {
         $userTable = new Users();
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
 
         $select = $userTable->select(true)
             ->where('not deleted')
@@ -372,7 +372,7 @@ class UsersController extends AbstractActionController
     private function picturesRating()
     {
         $userTable = new Users();
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
 
         $select = $userTable->select(true)
             ->where('not deleted')

@@ -6,7 +6,7 @@ use Zend\Cache\Storage\StorageInterface;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
 
 use Brand_Alias;
 use Brand_Car;
@@ -67,7 +67,7 @@ class Sidebar extends AbstractPlugin
 
     private function subBrandGroups(array $brand)
     {
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
 
         $language = $this->getController()->language();
 
@@ -375,7 +375,7 @@ class Sidebar extends AbstractPlugin
 
         $language = $this->getController()->language();
 
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
         $brand = $brandModel->getBrandById($params['brand_id'], $language);
         if (!$brand) {
             return;
@@ -408,7 +408,7 @@ class Sidebar extends AbstractPlugin
         ];
         $params = array_replace($defaults, $params);
 
-        $brandModel = new Brand();
+        $brandModel = new BrandModel();
 
         $namespace = $this->getNamespace();
         $selected = null;

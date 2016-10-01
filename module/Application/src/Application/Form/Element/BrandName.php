@@ -6,14 +6,14 @@ use Zend\Form\Element\Text;
 use Zend\InputFilter\InputProviderInterface;
 
 use Application\Filter\SingleSpaces;
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
 
 class BrandName extends Text implements InputProviderInterface
 {
     protected $attributes = [
         'type'      => 'text',
-        'maxlength' => Brand::MAX_NAME,
-        'size'      => Brand::MAX_NAME
+        'maxlength' => BrandModel::MAX_NAME,
+        'size'      => BrandModel::MAX_NAME
     ];
 
     /**
@@ -39,7 +39,7 @@ class BrandName extends Text implements InputProviderInterface
                 [
                     'name' => 'StringLength',
                     'options' => [
-                        'max' => Brand::MAX_NAME
+                        'max' => BrandModel::MAX_NAME
                     ]
                 ]
             ]

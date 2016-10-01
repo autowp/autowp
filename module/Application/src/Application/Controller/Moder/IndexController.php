@@ -4,7 +4,8 @@ namespace Application\Controller\Moder;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Brands;
+use Application\Model\DbTable\Brand as BrandTable;
+
 use Cars;
 use Picture;
 
@@ -36,7 +37,7 @@ class IndexController extends AbstractActionController
                 if ($this->addBrandForm->isValid()) {
                     $values = $this->addBrandForm->getData();
 
-                    $brands = new Brands();
+                    $brands = new BrandTable();
 
                     $brand = $brands->createRow([
                         'caption' => $values['name'],

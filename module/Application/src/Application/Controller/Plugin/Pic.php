@@ -4,7 +4,8 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
-use Application\Model\Brand;
+use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
@@ -15,7 +16,6 @@ use Application\Service\SpecificationsService;
 
 use Exception;
 
-use Brands;
 use Brand_Car;
 use Car_Parent;
 use Car_Language;
@@ -106,7 +106,7 @@ class Pic extends AbstractPlugin
 
         $controller = $this->getController();
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
 
         $url = null;
         switch ($row['type']) {
@@ -412,7 +412,7 @@ class Pic extends AbstractPlugin
             }
         }
 
-        $brandTable = new Brands();
+        $brandTable = new BrandTable();
         $carParentTable = new Car_Parent();
 
         $items = [];
@@ -1007,7 +1007,7 @@ class Pic extends AbstractPlugin
                     ]);
                     $links[$url] = sprintf($this->translator->translate('moder/picture/edit-vehicle-%s'), $car->getFullName($language));
 
-                    $brandModel = new Brand();
+                    $brandModel = new BrandModel();
                     $brands = $brandModel->getList(['language' => $language], function($select) use ($car) {
                         $select
                             ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
@@ -1051,7 +1051,7 @@ class Pic extends AbstractPlugin
             case Picture::LOGO_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:
 
-                $brandModel = new Brand();
+                $brandModel = new BrandModel();
                 $brand = $brandModel->getBrandById($picture->brand_id, $language);
                 if ($brand) {
                     $url = $controller->url()->fromRoute('moder/brands/params', [

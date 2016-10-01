@@ -4,7 +4,7 @@ namespace Application\Form\Element;
 
 use Zend\Form\Element\Select;
 
-use Brands;
+use Application\Model\DbTable\Brand as BrandTable;
 
 class Brand extends Select
 {
@@ -22,7 +22,7 @@ class Brand extends Select
     {
         parent::__construct($name, $options);
 
-        $table = new Brands();
+        $table = new BrandTable();
 
         $db = $table->getAdapter();
 

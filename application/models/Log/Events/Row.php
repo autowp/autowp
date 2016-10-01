@@ -25,7 +25,7 @@ class Log_Events_Row extends Row
                     $col = 'car_id';
                     $tableName = 'log_events_cars';
                     break;
-                case $table instanceof Brands:
+                case $table instanceof \Application\Model\DbTable\Brand:
                     $col = 'brand_id';
                     $tableName = 'log_events_brands';
                     break;

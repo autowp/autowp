@@ -6,8 +6,9 @@ use Zend\Router\Http\RouteInterface;
 use Zend\Router\Http\RouteMatch;
 use Zend\Stdlib\RequestInterface as Request;
 
+use Application\Model\DbTable\Brand as BrandTable;
+
 use Brand_Car;
-use Brands;
 use Car_Parent;
 use Car_Types;
 
@@ -89,7 +90,7 @@ class Catalogue implements RouteInterface
             return false;
         }
 
-        $brands = new Brands();
+        $brands = new BrandTable();
         $brand = $brands->fetchRow([
            'folder = ?' => $path[0]
         ]);
