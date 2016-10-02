@@ -93,7 +93,7 @@ class Forums
                     $lastMessage = [
                         'id'     => $lastMessageRow->id,
                         'date'   => $lastMessageRow->getDateTime('datetime'),
-                        'author' => $lastMessageRow->findParentUsersByAuthor()
+                        'author' => $lastMessageRow->findParentRow(User::class, 'Author')
                     ];
                 }
             }
@@ -310,7 +310,7 @@ class Forums
                     $lastMessage = [
                         'id'     => $lastMessageRow->id,
                         'date'   => $lastMessageRow->getDateTime('datetime'),
-                        'author' => $lastMessageRow->findParentUsersByAuthor()
+                        'author' => $lastMessageRow->findParentRow(User::class, 'Author')
                     ];
                 }
             }
@@ -729,7 +729,7 @@ class Forums
                     $lastMessage = [
                         'id'     => $lastMessageRow->id,
                         'date'   => $lastMessageRow->getDateTime('datetime'),
-                        'author' => $lastMessageRow->findParentUsersByAuthor(),
+                        'author' => $lastMessageRow->findParentRow(User::class, 'Author'),
                     ];
                 }
             }

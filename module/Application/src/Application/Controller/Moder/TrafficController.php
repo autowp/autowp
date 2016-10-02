@@ -5,9 +5,8 @@ namespace Application\Controller\Moder;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
+use Application\Model\DbTable\User;
 use Application\Service\TrafficControl;
-
-use Users;
 
 class TrafficController extends AbstractActionController
 {
@@ -21,7 +20,7 @@ class TrafficController extends AbstractActionController
 
         $data = $service->getTopData();
 
-        $users = new Users();
+        $users = new User();
 
         foreach ($data as &$row) {
             $row['users'] = $users->fetchAll([
@@ -45,7 +44,7 @@ class TrafficController extends AbstractActionController
         }
         unset($row);
 
-        $users = new Users();
+        $users = new User();
 
 
         return [
@@ -75,7 +74,7 @@ class TrafficController extends AbstractActionController
 
         $data = $service->getWhitelistData();
 
-        $users = new Users();
+        $users = new User();
 
         foreach ($data as &$row) {
             $row['users'] = []; /*$users->fetchAll([

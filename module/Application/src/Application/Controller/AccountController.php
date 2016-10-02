@@ -11,6 +11,9 @@ use Application\Auth\Adapter\Id as IdAuthAdapter;
 use Application\Controller\LoginController;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\LoginState;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\Account as UserAccount;
+use Application\Model\DbTable\User\Rename as UserRename;
 use Application\Model\Forums;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -20,9 +23,6 @@ use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
 use Cars;
 use Picture;
-use User_Account;
-use User_Renames;
-use Users;
 
 use Zend_Auth;
 use Zend_Db_Expr;
@@ -170,7 +170,7 @@ class AccountController extends AbstractActionController
             return $this->forwadToLogin();
         }
 
-        $users = new Users();
+        $users = new User();
 
         $user = $users->find($this->params()->fromPost('user_id'))->current();
         if (!$user) {
@@ -239,7 +239,7 @@ class AccountController extends AbstractActionController
             return $this->forwadToLogin();
         }
 
-        $uaTable = new User_Account();
+        $uaTable = new UserAccount();
 
         $uaRows = $uaTable->fetchAll([
             'user_id = ?' => $user->id
@@ -307,7 +307,7 @@ class AccountController extends AbstractActionController
             return true;
         }
 
-        $uaTable = new User_Account();
+        $uaTable = new UserAccount();
         $uaRow = $uaTable->fetchRow([
             'user_id = ?'     => $this->user()->get()->id,
             'service_id <> ?' => $serviceId
@@ -329,7 +329,7 @@ class AccountController extends AbstractActionController
 
         $serviceId = (string)$this->params('service');
 
-        $uaTable = new User_Account();
+        $uaTable = new UserAccount();
         $uaRow = $uaTable->fetchRow([
             'user_id = ?'    => $user->id,
             'service_id = ?' => $serviceId
@@ -388,7 +388,7 @@ class AccountController extends AbstractActionController
                 $newName = $user->getCompoundName();
 
                 if ($oldName != $newName) {
-                    $userRenames = new User_Renames();
+                    $userRenames = new UserRename();
                     $userRenames->insert([
                         'user_id'  => $user->id,
                         'old_name' => $oldName,
@@ -640,7 +640,7 @@ class AccountController extends AbstractActionController
             return $this->forwadToLogin();
         }
 
-        $users = new Users();
+        $users = new User();
 
         $user = $users->find($this->params('user_id'))->current();
         if (!$user) {
@@ -826,7 +826,7 @@ class AccountController extends AbstractActionController
         $conflicts = $data['conflicts'];
         $paginator = $data['paginator'];
 
-        $userTable = new Users();
+        $userTable = new User();
         $carTable = new Cars();
         $engineTable = new Engine();
 
@@ -875,7 +875,7 @@ class AccountController extends AbstractActionController
 
         $user = $this->user()->get();
 
-        $userTable = new Users();
+        $userTable = new User();
 
         $userRows = $userTable->fetchAll(
             $userTable->select(true)

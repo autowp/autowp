@@ -9,7 +9,7 @@ class Comment_Topic_View extends Table
     protected $_referenceMap = [
         'User' => [
             'columns'       => ['user_id'],
-            'refTableClass' => 'Users',
+            'refTableClass' => \Application\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ],
     ];

@@ -36,7 +36,7 @@
     <?php $idx = 0 ?>
     <?php foreach ($this->moderVotes as $vote) { ?>
         <?php if ($idx++ > 0) { ?>, <?php } ?>
-        <?php if ($user = $vote->findParentUsers()) { ?>
+        <?php if ($user = $vote->findParentRow(Application\Model\DbTable\User::class)) { ?>
             <?=$this->user($user) ?>
         <?php } ?>
         <span style="color:<?=$vote->vote ? 'green' : 'red' ?>">&#xa0;(<?=$this->escapeHtml($vote->reason) ?>)</span>

@@ -4,8 +4,6 @@ namespace Application\Validator\User;
 
 use Zend\Validator\AbstractValidator;
 
-use Users;
-
 class EmailNotExists extends AbstractValidator
 {
     const EXISTS = 'userEmailExists';
@@ -18,7 +16,7 @@ class EmailNotExists extends AbstractValidator
     {
         $this->setValue($value);
 
-        $table = new Users();
+        $table = new \Application\Model\DbTable\User();
         $db = $table->getAdapter();
 
         $exists = $db->fetchOne(

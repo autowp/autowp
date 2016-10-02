@@ -11,13 +11,13 @@ use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
+use Application\Model\DbTable\User;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
 use Car_Parent;
 use Car_Row;
 use Picture;
-use Users;
 
 use Zend_Db_Expr;
 
@@ -474,7 +474,7 @@ class IndexController extends AbstractActionController
             $this->cache->setItem($cacheKey, $twinsBlock);
         }
 
-        $userTable = new Users();
+        $userTable = new User();
 
         $cacheKey = 'INDEX_SPEC_CARS_10_' . $language;
         $cars = $this->cache->getItem($cacheKey, $success);

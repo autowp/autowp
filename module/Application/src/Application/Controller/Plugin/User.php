@@ -3,15 +3,14 @@
 namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-
 use Zend\Permissions\Acl\Acl;
+
+use Application\Model\DbTable\User as UserTable;
+use Application\Model\DbTable\User\Row as UserRow;
 
 use Zend_Acl_Resource_Interface;
 use Zend_Acl_Role_Interface;
 use Zend_Auth;
-
-use Users;
-use User_Row;
 
 class User extends AbstractPlugin
 {
@@ -21,7 +20,7 @@ class User extends AbstractPlugin
     private $acl;
 
     /**
-     * @var Users
+     * @var UserTable
      */
     private $userTable = null;
 
@@ -31,7 +30,7 @@ class User extends AbstractPlugin
     private $users = [];
 
     /**
-     * @var User_Row
+     * @var UserRow
      */
     private $user = null;
 
@@ -47,18 +46,18 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return Users
+     * @return UserTable
      */
     private function getUserTable()
     {
         return $this->userTable
             ? $this->userTable
-            : $this->userTable = new Users();
+            : $this->userTable = new UserTable();
     }
 
     /**
      * @param int $id
-     * @return User_Row
+     * @return UserRow
      */
     private function user($id)
     {
@@ -83,7 +82,7 @@ class User extends AbstractPlugin
             $user = $this->getLogedInUser();
         }
 
-        if (!$user instanceof User_Row) {
+        if (!$user instanceof UserRow) {
             $user = $this->user($user);
         }
 
@@ -93,7 +92,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return User_Row
+     * @return UserRow
      */
     private function getLogedInUser()
     {
@@ -115,7 +114,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @return User_Row
+     * @return UserRow
      */
     public function get()
     {

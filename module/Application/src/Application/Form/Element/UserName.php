@@ -6,14 +6,14 @@ use Zend\Form\Element\Text;
 use Zend\InputFilter\InputProviderInterface;
 
 use Application\Filter\SingleSpaces;
-use Users;
+use Application\Model\DbTable\User;
 
 class UserName extends Text implements InputProviderInterface
 {
     protected $attributes = [
         'type'      => 'text',
-        'maxlength' => Users::MAX_NAME,
-        'size'      => Users::MAX_NAME
+        'maxlength' => User::MAX_NAME,
+        'size'      => User::MAX_NAME
     ];
 
     /**
@@ -39,8 +39,8 @@ class UserName extends Text implements InputProviderInterface
                 [
                     'name' => 'StringLength',
                     'options' => [
-                        'min' => Users::MIN_NAME,
-                        'max' => Users::MAX_NAME
+                        'min' => User::MIN_NAME,
+                        'max' => User::MAX_NAME
                     ]
                 ]
             ]

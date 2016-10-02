@@ -7,7 +7,7 @@ use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
-use Users;
+use Application\Model\DbTable\User;
 
 class UsersController extends AbstractRestfulController
 {
@@ -20,7 +20,7 @@ class UsersController extends AbstractRestfulController
             }
         }
 
-        $userTable = new Users();
+        $userTable = new User();
 
         $userRow = $userTable->find($id)->current();
         if (!$userRow) {

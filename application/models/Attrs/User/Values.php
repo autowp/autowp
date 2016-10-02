@@ -13,7 +13,7 @@ class Attrs_User_Values extends Table
         ],
         'User' => [
             'columns'       => ['user_id'],
-            'refTableClass' => 'Users',
+            'refTableClass' => \Application\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ],
         'ItemType' => [

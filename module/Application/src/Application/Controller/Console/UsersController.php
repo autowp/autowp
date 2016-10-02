@@ -4,11 +4,11 @@ namespace Application\Controller\Console;
 
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
-use Application\Service\UsersService;
 
-use User_Remember;
-use User_Password_Remind;
-use User_Renames;
+use Application\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
+use Application\Model\DbTable\User\Remember as UserRemember;
+use Application\Model\DbTable\User\Rename as UserRename;
+use Application\Service\UsersService;
 
 class UsersController extends AbstractActionController
 {
@@ -40,14 +40,14 @@ class UsersController extends AbstractActionController
 
     public function clearHashesAction()
     {
-        $urTable = new User_Remember();
+        $urTable = new UserRemember();
         $count = $urTable->delete([
             'date < DATE_SUB(NOW(), INTERVAL 60 DAY)'
         ]);
 
         printf("%d user remember rows was deleted\n", $count);
 
-        $uprTable = new User_Password_Remind();
+        $uprTable = new UserPasswordRemind();
         $count = $uprTable->delete([
             'created < DATE_SUB(NOW(), INTERVAL 10 DAY)'
         ]);
@@ -57,7 +57,7 @@ class UsersController extends AbstractActionController
 
     public function clearRenamesAction()
     {
-        $urTable = new User_Renames();
+        $urTable = new UserRename();
         $count = $urTable->delete([
             'date < DATE_SUB(NOW(), INTERVAL 3 MONTH)'
         ]);

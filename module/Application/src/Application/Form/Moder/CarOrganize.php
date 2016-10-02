@@ -39,7 +39,6 @@ class CarOrganize extends Form implements InputFilterProviderInterface
         $carTypeOptions = ['' => '-'] + $carTypeOptions;
 
         if (!is_null($this->inheritedCarType)) {
-
             $carType = $this->getCarTypeTable()->find($this->inheritedCarType)->current();
             $carTypeName = $carType ? $this->translator->translate($carType->name) : '-';
 
@@ -60,7 +59,9 @@ class CarOrganize extends Form implements InputFilterProviderInterface
         ];
         if (!is_null($this->inheritedIsConcept)) {
             $isConceptOptions = array_merge([
-                'inherited' => $this->inheritedIsConcept ? 'moder/vehicle/is-concept/inherited-yes': 'moder/vehicle/is-concept/inherited-no'
+                'inherited' => $this->inheritedIsConcept
+                    ? 'moder/vehicle/is-concept/inherited-yes'
+                    : 'moder/vehicle/is-concept/inherited-no'
             ], $isConceptOptions);
         } else {
             $isConceptOptions = array_merge([

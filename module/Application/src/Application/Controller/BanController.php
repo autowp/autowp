@@ -4,9 +4,8 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\DbTable\User;
 use Application\Service\TrafficControl;
-
-use Users;
 
 class BanController extends AbstractActionController
 {
@@ -64,7 +63,7 @@ class BanController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $users = new Users();
+        $users = new User();
         $user = $users->find($this->params('user_id'))->current();
 
         if (!$user) {
@@ -98,7 +97,7 @@ class BanController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $users = new Users();
+        $users = new User();
         $user = $users->find($this->params('user_id'))->current();
 
         if (!$user) {

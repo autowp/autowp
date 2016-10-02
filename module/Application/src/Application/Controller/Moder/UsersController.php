@@ -5,20 +5,19 @@ namespace Application\Controller\Moder;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Session as SessionTable;
+use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
-
-use Users;
 
 class UsersController extends AbstractActionController
 {
     /**
-     * @var Users
+     * @var User
      */
     private $table;
 
     public function __construct()
     {
-        $this->table = new Users();
+        $this->table = new User();
     }
 
     public function indexAction()

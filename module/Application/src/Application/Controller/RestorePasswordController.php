@@ -7,10 +7,9 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Form\Form;
 
 use Application\Auth\Adapter\Id as IdAuthAdapter;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
 use Application\Service\UsersService;
-
-use User_Password_Remind;
-use Users;
 
 use Zend_Auth;
 
@@ -54,7 +53,7 @@ class RestorePasswordController extends AbstractActionController
             if ($this->restorePasswordForm->isValid()) {
                 $values = $this->restorePasswordForm->getData();
 
-                $users = new Users();
+                $users = new User();
                 $user = $users->fetchRow([
                     'e_mail = ?' => (string)$values['email'],
                     'not deleted'
@@ -107,7 +106,7 @@ class RestorePasswordController extends AbstractActionController
     {
         $code = (string)$this->params('code');
 
-        $uprTable = new User_Password_Remind();
+        $uprTable = new UserPasswordRemind();
 
         $uprRow = $uprTable->fetchRow([
             'hash = ?' => $code,
@@ -118,7 +117,7 @@ class RestorePasswordController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $user = $uprRow->findParentUsers();
+        $user = $uprRow->findParentRow(User::class);
 
         if (!$user) {
             return $this->notFoundAction();

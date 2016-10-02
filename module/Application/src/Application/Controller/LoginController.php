@@ -9,6 +9,8 @@ use Zend\View\Model\ViewModel;
 
 use Application\Auth\Adapter\Id as IdAuthAdapter;
 use Application\Model\DbTable\LoginState;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Service\UsersService;
 
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
@@ -18,9 +20,6 @@ use Zend_Db_Expr;
 
 use Exception;
 use Imagick;
-
-use User_Account;
-use Users;
 
 class LoginController extends AbstractActionController
 {
@@ -251,7 +250,7 @@ class LoginController extends AbstractActionController
             throw new Exception('name not found');
         }
 
-        $uaTable = new User_Account();
+        $uaTable = new UserAccount();
 
         $uaRow = $uaTable->fetchRow([
             'service_id = ?'  => $stateRow->service,
@@ -260,7 +259,7 @@ class LoginController extends AbstractActionController
 
         if (!$uaRow) {
 
-            $uTable = new Users();
+            $uTable = new User();
 
             if ($stateRow->user_id) {
                 $uRow = $uTable->find($stateRow->user_id)->current();
@@ -318,7 +317,7 @@ class LoginController extends AbstractActionController
 
         } else {
 
-            $uRow = $uaRow->findParentUsers();
+            $uRow = $uaRow->findParentRow(User::class);
             if (!$uRow) {
                 throw new Exception('Not linked account row');
             }

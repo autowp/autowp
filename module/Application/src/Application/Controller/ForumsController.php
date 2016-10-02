@@ -6,11 +6,11 @@ use Zend\Mail;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
+use Application\Model\DbTable\User;
 use Application\Model\Forums;
 use Application\Model\Message;
 
 use Comments;
-use Users;
 
 use DateTime;
 
@@ -74,7 +74,7 @@ class ForumsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $userTable = new Users();
+        $userTable = new User();
 
         foreach ($data['topics'] as &$topic) {
             $topic['author'] = $userTable->find($topic['authorId'])->current();
@@ -183,7 +183,7 @@ class ForumsController extends AbstractActionController
 
                         $messageUrl = $this->topicMessageUrl($messageId, true);
 
-                        $userTable = new Users();
+                        $userTable = new User();
 
                         if ($values['parent_id']) {
                             $comments = new Comments();
@@ -493,7 +493,7 @@ class ForumsController extends AbstractActionController
 
         $topics = $moder->getSubscribedTopics($user->id);
 
-        $userTable = new Users();
+        $userTable = new User();
 
         foreach ($topics as &$topic) {
             $author = $userTable->find($topic['authorId'])->current();

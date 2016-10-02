@@ -11,11 +11,11 @@ use Application\Model\DbTable\Article;
 use Application\Model\DbTable\Museum;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Voting;
+use Application\Model\DbTable\User;
 use Application\Model\Message;
 
 use Comment_Message;
 use Comments;
-use Users;
 
 use DateTime;
 use Exception;
@@ -231,7 +231,7 @@ class CommentsController extends AbstractRestfulController
             if ($values['parent_id']) {
                 $authorId = $this->comments->getMessageAuthorId($values['parent_id']);
                 if ($authorId && ($authorId != $user->id)) {
-                    $userTable = new Users();
+                    $userTable = new User();
                     $parentMessageAuthor = $userTable->find($authorId)->current();
                     if ($parentMessageAuthor && !$parentMessageAuthor->deleted) {
 

@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Article;
 use Application\Model\DbTable\Article\BrandCache;
+use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class ArticlesController extends AbstractActionController
@@ -60,7 +61,7 @@ class ArticlesController extends AbstractActionController
                 'previewUrl'  => $row->getPreviewUrl(),
                 'name'        => $row->name,
                 'description' => $row->description,
-                'author'      => $row->findParentUsers(),
+                'author'      => $row->findParentRow(User::class),
                 'date'        => $row->getDateTime('first_enabled_datetime'),
                 'url'         => $this->url()->fromRoute('articles', [
                     'action'          => 'article',

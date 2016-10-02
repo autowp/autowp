@@ -189,7 +189,7 @@ class LogController extends AbstractActionController
             }
 
             $events[] = [
-                'user'        => $event->findParentUsers(),
+                'user'        => $event->findParentRow(User::class),
                 'date'        => $event->getDateTime('add_datetime'),
                 'desc'        => $event->description,
                 'vehicles'    => $vehicles,

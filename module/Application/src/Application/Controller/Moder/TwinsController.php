@@ -7,10 +7,10 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\HostManager;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
+use Application\Model\DbTable\User;
 use Application\Model\Message;
 
 use Cars;
-use Users;
 
 class TwinsController extends AbstractActionController
 {
@@ -175,7 +175,7 @@ class TwinsController extends AbstractActionController
             if ($group->text_id) {
                 $userIds = $this->textStorage->getTextUserIds($group->text_id);
 
-                $userTable = new Users();
+                $userTable = new User();
                 $mModel = new Message();
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {

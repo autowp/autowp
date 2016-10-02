@@ -15,6 +15,7 @@ use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
+use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
@@ -31,7 +32,6 @@ use Picture;
 use Picture_View;
 use Picture_Moder_Vote;
 use Picture_Row;
-use Users;
 
 use Zend_Db_Expr;
 use Zend_Db_Select;
@@ -771,7 +771,7 @@ class Pic extends AbstractPlugin
             $moderLinks = $this->getModerLinks($picture);
         }
 
-        $userTable = new Users();
+        $userTable = new User();
 
         $moderVotes = [];
         foreach ($picture->findPicture_Moder_Vote() as $moderVote) {
@@ -924,7 +924,7 @@ class Pic extends AbstractPlugin
                     '' => '--'
                 ], $multioptions);
 
-                $user = $picture->findParentUsersByChange_Perspective_User();
+                $user = $picture->findParentRow(User::class, 'Change_Perspective_User');
 
                 $picturePerspective = [
                     'options' => $multioptions,
@@ -944,7 +944,7 @@ class Pic extends AbstractPlugin
             'identity'          => $picture['identity'],
             'name'              => $name,
             'picture'           => $picture,
-            'owner'             => $picture->findParentUsersByOwner(),
+            'owner'             => $picture->findParentRow(User::class, 'Owner'),
             'addDate'           => $picture->getDateTime('add_date'),
             'ofLinks'           => $ofLinks,
             'moderVotes'        => $moderVotes,

@@ -2,9 +2,8 @@
 
 namespace Application\Model;
 
-use Users;
-
 use Application\Db\Table;
+use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend\Paginator\Paginator;
@@ -346,7 +345,7 @@ class Message
 
         $cache = [];
 
-        $userTable = new Users();
+        $userTable = new User();
 
         $messages = [];
         foreach ($rows as $message) {

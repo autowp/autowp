@@ -1,6 +1,8 @@
 <?php
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\Row as UserRow;
 
 class Comments
 {
@@ -117,7 +119,7 @@ class Comments
      */
     private function _get($type, $item, $parentId, $userId, $perPage = 0, $page = 0)
     {
-        if ($userId instanceof User_Row) {
+        if ($userId instanceof UserRow) {
             $userId = $userId->id;
         }
 
@@ -142,7 +144,7 @@ class Comments
         $comments = [];
         foreach ($rows as $row) {
 
-            $author = $row->findParentUsersByAuthor();
+            $author = $row->findParentRow(User::class, 'Author');
 
             $vote = null;
             if ($userId) {
@@ -155,7 +157,7 @@ class Comments
 
             $deletedBy = null;
             if ($row->deleted) {
-                $deletedBy = $row->findParentUsersByDeletedBy();
+                $deletedBy = $row->findParentRow(User::class, 'DeletedBy');
             }
 
             if ($row->replies_count > 0) {
@@ -330,9 +332,9 @@ class Comments
         $positiveVotes = $negativeVotes = [];
         foreach ($voteRows as $voteRow) {
             if ($voteRow->vote > 0) {
-                $positiveVotes[] = $voteRow->findParentUsers();
+                $positiveVotes[] = $voteRow->findParentRow(User::class);
             } elseif ($voteRow->vote < 0) {
-                $negativeVotes[] = $voteRow->findParentUsers();
+                $negativeVotes[] = $voteRow->findParentRow(User::class);
             }
         }
 

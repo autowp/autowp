@@ -4,8 +4,6 @@ namespace Application\Validator\User;
 
 use Zend\Validator\AbstractValidator;
 
-use Users;
-
 class Login extends AbstractValidator
 {
     const USER_NOT_FOUND = 'userNotFound';
@@ -18,7 +16,7 @@ class Login extends AbstractValidator
     {
         $this->setValue($value);
 
-        $users = new Users();
+        $users = new \Application\Model\DbTable\User();
         $user = $users->fetchRow(
             $users->select(true)
                   ->where('login = ?', (string)$value)

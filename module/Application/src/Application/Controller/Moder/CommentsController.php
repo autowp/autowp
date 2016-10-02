@@ -6,11 +6,11 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Comment_Message;
 use Picture;
-use Users;
 
 class CommentsController extends AbstractActionController
 {
@@ -74,7 +74,7 @@ class CommentsController extends AbstractActionController
             if ($values['user']) {
 
                 if (!is_numeric($values['user'])) {
-                    $userTable = new Users();
+                    $userTable = new User();
                     $userRow = $userTable->fetchRow([
                         'identity = ?' => $values['user']
                     ]);
@@ -166,7 +166,7 @@ class CommentsController extends AbstractActionController
             $comments[] = [
                 'url'     => $commentRow->getUrl(),
                 'message' => $commentRow->getMessagePreview(),
-                'user'    => $commentRow->findParentUsers(),
+                'user'    => $commentRow->findParentRow(User::class),
                 'status'  => $status,
                 'new'     => $commentRow->isNew($this->user()->get()->id)
             ];

@@ -5,14 +5,14 @@ namespace Application\Form\Element;
 use Zend\Form\Element\Password;
 use Zend\InputFilter\InputProviderInterface;
 
-use Users;
+use Application\Model\DbTable\User;
 
 class UserPassword extends Password implements InputProviderInterface
 {
     protected $attributes = [
         'type'      => 'password',
-        'size'      => Users::MAX_PASSWORD,
-        'maxlength' => Users::MAX_PASSWORD
+        'size'      => User::MAX_PASSWORD,
+        'maxlength' => User::MAX_PASSWORD
     ];
 
     /**
@@ -34,8 +34,8 @@ class UserPassword extends Password implements InputProviderInterface
                 [
                     'name' => 'StringLength',
                     'options' => [
-                        'min' => Users::MIN_PASSWORD,
-                        'max' => Users::MAX_PASSWORD
+                        'min' => User::MIN_PASSWORD,
+                        'max' => User::MAX_PASSWORD
                     ]
                 ]
             ]

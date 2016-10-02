@@ -5,6 +5,7 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Application\Model\DbTable\User;
 use Application\Model\DbTable\Voting;
 use Application\Model\DbTable\Voting\Variant as VotingVariant;
 use Application\Model\DbTable\Voting\VariantVote as VotingVariantVote;
@@ -12,8 +13,6 @@ use Application\Model\DbTable\Voting\VariantVote as VotingVariantVote;
 use DateTime;
 
 use Zend_Db_Expr;
-
-use Users;
 
 class VotingController extends AbstractActionController
 {
@@ -137,7 +136,7 @@ class VotingController extends AbstractActionController
 
         $vvvTable = new VotingVariantVote();
 
-        $uTable = new Users();
+        $uTable = new User();
         $users = $uTable->fetchAll(
             $uTable->select(true)
                 ->join('voting_variant_vote', 'users.id = voting_variant_vote.user_id', null)

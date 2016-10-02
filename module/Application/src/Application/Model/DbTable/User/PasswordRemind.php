@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable\User;
+
 use Application\Db\Table;
 
-class User_Password_Remind extends Table
+class PasswordRemind extends Table
 {
     protected $_name = 'user_password_remind';
     protected $_primary = 'hash';
@@ -10,7 +12,7 @@ class User_Password_Remind extends Table
     protected $_referenceMap = [
         'User' => [
             'columns'       => ['user_id'],
-            'refTableClass' => 'Users',
+            'refTableClass' => \Application\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ],
     ];

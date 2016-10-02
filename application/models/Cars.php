@@ -15,12 +15,12 @@ class Cars extends Table
         ],
         'Meta_Last_Editor' => [
             'columns'       => ['meta_last_editor_id'],
-            'refTableClass' => 'Users',
+            'refTableClass' => \Application\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ],
         'Tech_Last_Editor' => [
             'columns'       => ['tech_last_editor_id'],
-            'refTableClass' => 'Users',
+            'refTableClass' => \Application\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ],
         'Engine' => [

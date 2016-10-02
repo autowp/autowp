@@ -6,7 +6,7 @@ use Zend_Auth_Adapter_Exception;
 use Zend_Auth_Adapter_Interface;
 use Zend_Auth_Result;
 
-use Users;
+use Application\Model\DbTable\User;
 
 class Login implements Zend_Auth_Adapter_Interface
 {
@@ -41,7 +41,7 @@ class Login implements Zend_Auth_Adapter_Interface
     {
         $this->_authenticateSetup();
 
-        $userTable = new Users();
+        $userTable = new User();
         $filter = [
             'not deleted',
             'password = ' . $this->_credentialExpr

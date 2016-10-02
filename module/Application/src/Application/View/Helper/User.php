@@ -6,15 +6,14 @@ use Zend\View\Helper\AbstractHelper;
 use Zend\View\Exception\InvalidArgumentException;
 use Zend\Permissions\Acl\Acl;
 
+use Application\Model\DbTable\User\Row as UserRow;
+
 use Zend_Auth;
 use Zend_Acl_Role_Interface;
 
 use DateInterval;
 use DateTime;
 use DateTimeZone;
-
-use Users;
-use User_Row;
 
 use Exception;
 
@@ -44,7 +43,7 @@ class User extends AbstractHelper
 
         if (!isset($this->users[$id])) {
             if (!$this->userModel) {
-                $this->userModel = new Users();
+                $this->userModel = new \Application\Model\DbTable\User();
             }
             $this->users[$id] = $this->userModel->find($id)->current();
         }
@@ -58,7 +57,7 @@ class User extends AbstractHelper
             $user = $this->getLogedInUser();
         }
 
-        if (!$user instanceof User_Row) {
+        if (!$user instanceof UserRow) {
             $user = $this->user($user);
         }
 
@@ -68,7 +67,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return User_Row|bool
+     * @return UserRow|bool
      */
     private function getLogedInUser()
     {
@@ -90,7 +89,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @return User_Row
+     * @return UserRow
      */
     public function get()
     {

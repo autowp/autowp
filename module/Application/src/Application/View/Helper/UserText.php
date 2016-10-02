@@ -8,8 +8,9 @@ use Zend\Router\Http\TreeRouteStack;
 use Zend\Uri;
 use Zend\View\Helper\AbstractHtmlElement;
 
+use Application\Model\DbTable\User;
+
 use Picture;
-use Users;
 
 use Exception;
 
@@ -168,7 +169,7 @@ class UserText extends AbstractHtmlElement
         }
 
         if ($userId) {
-            $userTable = new Users();
+            $userTable = new User();
             $user = $userTable->find($userId)->current();
 
             if ($user) {
@@ -177,7 +178,7 @@ class UserText extends AbstractHtmlElement
         }
 
         if ($userIdentity) {
-            $userTable = new Users();
+            $userTable = new User();
             $user = $userTable->fetchRow([
                 'identity = ?' => $userIdentity
             ]);

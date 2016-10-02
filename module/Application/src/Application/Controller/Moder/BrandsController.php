@@ -9,10 +9,10 @@ use Application\HostManager;
 use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\BrandRow;
+use Application\Model\DbTable\User;
 use Application\Model\Message;
 
 use Cars;
-use Users;
 
 class BrandsController extends AbstractActionController
 {
@@ -349,7 +349,7 @@ class BrandsController extends AbstractActionController
                 $userIds = $textStorage->getTextUserIds($brand->text_id);
 
                 $mModel = new Message();
-                $userTable = new Users();
+                $userTable = new User();
 
                 foreach ($userTable->find($userIds) as $userRow) {
                     if ($userRow->id != $user->id) {

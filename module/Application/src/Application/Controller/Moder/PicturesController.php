@@ -14,6 +14,8 @@ use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\Row as UserRow;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
@@ -27,8 +29,6 @@ use Comment_Topic;
 use Picture;
 use Picture_Row;
 use Picture_Moder_Vote;
-use Users;
-use User_Row;
 
 use Exception;
 
@@ -124,7 +124,7 @@ class PicturesController extends AbstractActionController
     {
         $q = $this->params()->fromQuery('query');
 
-        $users = new Users();
+        $users = new User();
 
         $selects = [];
 
@@ -604,7 +604,7 @@ class PicturesController extends AbstractActionController
         ]);
         $picture->save();
 
-        if ($owner = $picture->findParentUsersByOwner()) {
+        if ($owner = $picture->findParentRow(User::class, 'Owner')) {
 
             $uri = $this->hostManager->getUriByLanguage($owner->language);
 
@@ -618,7 +618,7 @@ class PicturesController extends AbstractActionController
             $reasons = [];
             if (count($deleteRequests)) {
                 foreach ($deleteRequests as $request) {
-                    if ($user = $request->findParentUsers()) {
+                    if ($user = $request->findParentRow(User::class)) {
                         $reasons[] = $this->userModerUrl($user, true, $uri) . ' : ' . $request->reason;
                     }
                 }
@@ -643,12 +643,12 @@ class PicturesController extends AbstractActionController
     }
 
     /**
-     * @param User_Row $user
+     * @param UserRow $user
      * @param bool $full
      * @param \Zend\Uri\Uri $uri
      * @return string
      */
-    private function userModerUrl(User_Row $user, $full = false, $uri = null)
+    private function userModerUrl(UserRow $user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user->identity ? $user->identity : 'user' . $user->id
@@ -693,7 +693,7 @@ class PicturesController extends AbstractActionController
 
     private function notifyVote($picture, $vote, $reason)
     {
-        $owner = $picture->findParentUsersByOwner();
+        $owner = $picture->findParentRow(User::class, 'Owner');
         $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
         if ($ownerIsModer) {
             if ($owner->id != $this->user()->get()->id) {
@@ -918,7 +918,7 @@ class PicturesController extends AbstractActionController
             $service = new TrafficControl();
             $ban = $service->getBanInfo(inet_ntop($picture->ip));
             if ($ban) {
-                $userTable = new Users();
+                $userTable = new User();
                 $ban['user'] = $userTable->find($ban['user_id'])->current();
             }
         }
@@ -979,7 +979,7 @@ class PicturesController extends AbstractActionController
                     $userIds = $this->textStorage->getTextUserIds($picture->copyrights_text_id);
 
                     $mModel = new Message();
-                    $userTable = new Users();
+                    $userTable = new User();
                     foreach ($userIds as $userId) {
                         if ($userId != $user->id) {
                             foreach ($userTable->find($userId) as $userRow) {
@@ -1101,7 +1101,7 @@ class PicturesController extends AbstractActionController
 
                 $pictureUrl = $this->pic()->url($picture->id, $picture->identity, true);
                 if ($previousStatusUserId != $user->id) {
-                    $userTable = new Users();
+                    $userTable = new User();
                     foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                         $message = sprintf(
                             'С картинки %s снят статус "принято"',
@@ -1214,7 +1214,7 @@ class PicturesController extends AbstractActionController
                 '' => '--'
             ], $multioptions);
 
-            $user = $picture->findParentUsersByChange_Perspective_User();
+            $user = $picture->findParentRow(User::class, 'Change_Perspective_User');
 
             $picturePerspective = [
                 'options' => $multioptions,
@@ -1826,8 +1826,8 @@ class PicturesController extends AbstractActionController
         $ctTable->updateTopicStat(Comment_Message::PICTURES_TYPE_ID, $picture->id);
 
         // pms
-        $owner = $picture->findParentUsersByOwner();
-        $replaceOwner = $replacePicture->findParentUsersByOwner();
+        $owner = $picture->findParentRow(User::class, 'Owner');
+        $replaceOwner = $replacePicture->findParentRow(User::class, 'Owner');
         $recepients = [];
         if ($owner) {
             $recepients[$owner->id] = $owner;
@@ -1892,7 +1892,7 @@ class PicturesController extends AbstractActionController
 
             $success = $pictureTable->accept($picture->id, $user->id, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
-                $owner = $picture->findParentUsersByOwner();
+                $owner = $picture->findParentRow(User::class, 'Owner');
                 if ( $owner && ($owner->id != $user->id) ) {
 
                     $uri = $this->hostManager->getUriByLanguage($owner->language);
@@ -1908,7 +1908,7 @@ class PicturesController extends AbstractActionController
             }
 
             if ($previousStatusUserId != $user->id) {
-                $userTable = new Users();
+                $userTable = new User();
                 $mModel = new Message();
                 foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                     $message = sprintf(
