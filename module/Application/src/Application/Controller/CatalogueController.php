@@ -14,6 +14,7 @@ use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
+use Application\Model\DbTable\Modification\Group as ModificationGroup;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -27,7 +28,6 @@ use Car_Parent;
 use Car_Types;
 use Cars;
 use Car_Row;
-use Modification_Group;
 use Picture;
 use Picture_Row;
 
@@ -1589,7 +1589,7 @@ class CatalogueController extends AbstractActionController
 
             $modgroupId = (int)$this->params('modgroup');
             if ($modgroupId) {
-                $mgTable = new Modification_Group();
+                $mgTable = new ModificationGroup();
 
                 $modgroup = $mgTable->find($modgroupId)->current();
                 if (!$modgroup) {
@@ -1800,7 +1800,7 @@ class CatalogueController extends AbstractActionController
     {
         // modifications
         $mTable = new ModificationTable();
-        $mgTable = new Modification_Group();
+        $mgTable = new ModificationGroup();
 
         $modificationGroups = [];
 

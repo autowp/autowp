@@ -23,6 +23,8 @@ use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\FactoryCar;
 use Application\Model\DbTable\Modification as ModificationTable;
+use Application\Model\DbTable\Modification\Group as ModificationGroup;
+use Application\Model\DbTable\Modification\Picture as ModificationPicture;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Twins\GroupVehicle as TwinsGroupVehicle;
 use Application\Model\DbTable\User;
@@ -37,7 +39,6 @@ use Car_Parent;
 use Car_Parent_Cache;
 use Car_Types;
 use Car_Row;
-use Modification_Group;
 use Picture;
 use Picture_Row;
 use Spec;
@@ -3827,7 +3828,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $mgTable = new Modification_Group();
+        $mgTable = new ModificationGroup();
 
         $mgRows = $mgTable->fetchAll(
             $mgTable->select(true)
@@ -3866,8 +3867,8 @@ class CarsController extends AbstractActionController
         }
 
         $mTable = new ModificationTable();
-        $mpTable = new Modification_Picture();
-        $mgTable = new Modification_Group();
+        $mpTable = new ModificationPicture();
+        $mgTable = new ModificationGroup();
         $pictureTable = new Picture();
         $db = $mpTable->getAdapter();
         $imageStorage = $this->imageStorage();
