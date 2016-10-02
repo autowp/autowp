@@ -4,6 +4,7 @@ use Application\Form\Modification as ModificationForm;
 use Application\Model\DbTable\CombinationModification;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Modification\Group as ModificationGroup;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Modification;
 
 class Moder_ModificationController extends Zend_Controller_Action
@@ -18,7 +19,7 @@ class Moder_ModificationController extends Zend_Controller_Action
     }
 
     /**
-     * @param Car_Row $car
+     * @param VehicleRow $car
      * @return string
      */
     private function carModerUrl($carId, $full = false, $tab = null)
@@ -35,7 +36,7 @@ class Moder_ModificationController extends Zend_Controller_Action
     }
 
     /**
-     * @param Car_Row $car
+     * @param VehicleRow $car
      * @return void
      */
     private function redirectToCar($carId, $tab = null)

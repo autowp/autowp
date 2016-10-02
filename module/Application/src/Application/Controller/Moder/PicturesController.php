@@ -19,12 +19,12 @@ use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Row as UserRow;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\TrafficControl;
 
-use Car_Parent;
 use Cars;
 use Picture;
 use Picture_Row;
@@ -41,7 +41,7 @@ class PicturesController extends AbstractActionController
     private $table;
 
     /**
-     * @var Car_Parent
+     * @var VehicleParent
      */
     private $carParentTable;
 
@@ -97,7 +97,7 @@ class PicturesController extends AbstractActionController
     {
         return $this->carParentTable
             ? $this->carParentTable
-            : $this->carParentTable = new Car_Parent();
+            : $this->carParentTable = new VehicleParent();
     }
 
     public function __construct(

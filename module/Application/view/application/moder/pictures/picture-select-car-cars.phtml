@@ -9,8 +9,8 @@
         <div class="text-muted">
             <?php
                 switch ($car['type']) {
-                    case Car_Parent::TYPE_TUNING: print $this->escapeHtml($this->translate('catalogue/related')); break;
-                    case Car_Parent::TYPE_SPORT:  print 'Sport'; break;
+                    case Application\Model\DbTable\Vehicle\ParentTable::TYPE_TUNING: print $this->escapeHtml($this->translate('catalogue/related')); break;
+                    case Application\Model\DbTable\Vehicle\ParentTable::TYPE_SPORT:  print 'Sport'; break;
                 }
             ?>
         </div>

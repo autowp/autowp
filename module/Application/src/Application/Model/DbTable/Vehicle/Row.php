@@ -1,9 +1,20 @@
 <?php
 
-use Application\Db\Table\Row;
-use Application\Model\Brand as BrandModel;
+namespace Application\Model\DbTable\Vehicle;
 
-class Car_Row extends Row
+use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
+
+use Attrs_Zones;
+use Picture;
+use Spec;
+
+use DateTime;
+use Exception;
+
+use Zend_Db_Expr;
+
+class Row extends \Application\Db\Table\Row
 {
     /**
      * @var Spec
@@ -125,7 +136,7 @@ class Car_Row extends Row
             throw new Exception('`language` is not string');
         }
 
-        $carLangTable = new Car_Language();
+        $carLangTable = new VehicleLanguage();
         $carLangRow = $carLangTable->fetchRow([
             'car_id = ?'   => $this->id,
             'language = ?' => (string)$language
@@ -259,7 +270,7 @@ class Car_Row extends Row
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->order([
                         'mp.position',
-                        new Zend_Db_expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
+                        new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
                         'pictures.width DESC', 'pictures.height DESC'
                     ])
                     ->limit(1)

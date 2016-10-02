@@ -12,9 +12,9 @@ use Application\Model\Comments;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Engine;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Service\TelegramService;
 
-use Car_Parent;
 use Cars;
 use Picture;
 
@@ -25,7 +25,7 @@ use Exception;
 class UploadController extends AbstractActionController
 {
     /**
-     * @var Car_Parent
+     * @var VehicleParent
      */
     private $carParentTable;
 
@@ -46,7 +46,7 @@ class UploadController extends AbstractActionController
     {
         return $this->carParentTable
             ? $this->carParentTable
-            : $this->carParentTable = new Car_Parent();
+            : $this->carParentTable = new VehicleParent();
     }
 
     public function onlyRegisteredAction()

@@ -8,6 +8,7 @@ use Zend\View\Model\ViewModel;
 
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Twins;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
@@ -15,7 +16,6 @@ use Application\Service\SpecificationsService;
 use Autowp\TextStorage;
 
 use Cars;
-use Car_Row;
 use Picture;
 
 use Zend_Db_Expr;
@@ -299,7 +299,7 @@ class TwinsController extends AbstractActionController
                     ];
                 }
 
-                $name = Car_Row::buildFullName([
+                $name = VehicleRow::buildFullName([
                     'begin_model_year' => $car['begin_model_year'],
                     'end_model_year'   => $car['end_model_year'],
                     'spec'             => $car['spec'],

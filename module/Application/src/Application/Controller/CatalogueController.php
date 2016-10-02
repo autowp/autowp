@@ -17,17 +17,17 @@ use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Modification\Group as ModificationGroup;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\DbTable\User;
+use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
+use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
 
 use Exception;
 
-use Car_Language;
-use Car_Parent;
-use Car_Types;
 use Cars;
-use Car_Row;
 use Picture;
 use Picture_Row;
 
@@ -238,7 +238,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $carParentTable = new Car_Parent();
+            $carParentTable = new VehicleParent();
 
            $this->sidebar()->brand([
                 'brand_id'    => $brand['id'],
@@ -341,7 +341,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->_brandAction(function($brand) {
 
-            $carTypeTable = new Car_Types();
+            $carTypeTable = new VehicleType();
 
             $cartype = false;
             if ($this->params('cartype_catname')) {
@@ -409,7 +409,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $carParentTable = new Car_Parent();
+            $carParentTable = new VehicleParent();
 
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
@@ -581,7 +581,7 @@ class CatalogueController extends AbstractActionController
                     ->group('pictures.id')
                     ->limit(12);
 
-                $carParentTable = new Car_Parent();
+                $carParentTable = new VehicleParent();
 
                 $topPictures = $this->pic()->listData($select, [
                     'width' => 4,
@@ -1291,7 +1291,7 @@ class CatalogueController extends AbstractActionController
                 ], $this->catalogue()->carsOrdering());
             }
 
-            $carParentTable = new Car_Parent();
+            $carParentTable = new VehicleParent();
 
             $this->sidebar()->brand([
                 'brand_id'   => $brand['id'],
@@ -1367,7 +1367,7 @@ class CatalogueController extends AbstractActionController
             );
 
             foreach ($rows as $row) {
-                $result[$row['id']] = Car_Row::buildFullName($row);
+                $result[$row['id']] = VehicleRow::buildFullName($row);
             }
         }
 
@@ -1437,7 +1437,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $carFullName = Car_Row::buildFullName($currentCar);
+            $carFullName = VehicleRow::buildFullName($currentCar);
 
             // prefetch car names
             $ids = [];
@@ -1566,9 +1566,9 @@ class CatalogueController extends AbstractActionController
         $pairs = $db->fetchPairs($select);
 
         return [
-            'stock'  => isset($pairs[Car_Parent::TYPE_DEFAULT]) ? $pairs[Car_Parent::TYPE_DEFAULT] : 0,
-            'tuning' => isset($pairs[Car_Parent::TYPE_TUNING]) ? $pairs[Car_Parent::TYPE_TUNING] : 0,
-            'sport'  => isset($pairs[Car_Parent::TYPE_SPORT]) ? $pairs[Car_Parent::TYPE_SPORT] : 0
+            'stock'  => isset($pairs[VehicleParent::TYPE_DEFAULT]) ? $pairs[VehicleParent::TYPE_DEFAULT] : 0,
+            'tuning' => isset($pairs[VehicleParent::TYPE_TUNING]) ? $pairs[VehicleParent::TYPE_TUNING] : 0,
+            'sport'  => isset($pairs[VehicleParent::TYPE_SPORT]) ? $pairs[VehicleParent::TYPE_SPORT] : 0
         ];
     }
 
@@ -1608,18 +1608,18 @@ class CatalogueController extends AbstractActionController
             $type = $this->params('type');
             switch ($type) {
                 case 'tuning':
-                    $type = Car_Parent::TYPE_TUNING;
+                    $type = VehicleParent::TYPE_TUNING;
                     break;
                 case 'sport':
-                    $type = Car_Parent::TYPE_SPORT;
+                    $type = VehicleParent::TYPE_SPORT;
                     break;
                 default:
-                    $type = Car_Parent::TYPE_DEFAULT;
+                    $type = VehicleParent::TYPE_DEFAULT;
                     break;
             }
 
             $carTable = $this->catalogue()->getCarTable();
-            $carParentTable = new Car_Parent();
+            $carParentTable = new VehicleParent();
 
             $currentCarId = $currentCar['id'];
 
@@ -1679,7 +1679,7 @@ class CatalogueController extends AbstractActionController
                 ], [], true),
                 'childListData' => $this->car()->listData($listCars, [
                     'disableDescription' => true,
-                    'type'       => $type == Car_Parent::TYPE_DEFAULT ? $type : null,
+                    'type'       => $type == VehicleParent::TYPE_DEFAULT ? $type : null,
                     'detailsUrl' => false,
                     'allPicturesUrl' => function($listCar) use ($brand, $brandCarCatname, $path) {
                         return $this->url()->fromRoute('catalogue', [
@@ -1709,10 +1709,10 @@ class CatalogueController extends AbstractActionController
                     'typeUrl' => function($listCar, $type) use($carParentTable, $currentCarId, $path) {
 
                         switch ($type) {
-                            case Car_Parent::TYPE_TUNING:
+                            case VehicleParent::TYPE_TUNING:
                                 $catname = 'tuning';
                                 break;
-                            case Car_Parent::TYPE_SPORT:
+                            case VehicleParent::TYPE_SPORT:
                                 $catname = 'sport';
                                 break;
                             default:
@@ -1887,12 +1887,12 @@ class CatalogueController extends AbstractActionController
             /*
             if (isset($options['type'])) {
                 switch ($options['type']) {
-                    case Car_Parent::TYPE_DEFAULT:
+                    case VehicleParent::TYPE_DEFAULT:
                         break;
-                    case Car_Parent::TYPE_TUNING:
+                    case VehicleParent::TYPE_TUNING:
                         $select->where('car_parent_cache.tuning');
                         break;
-                    case Car_Parent::TYPE_SPORT:
+                    case VehicleParent::TYPE_SPORT:
                         $select->where('car_parent_cache.sport');
                         break;
                 }
@@ -2106,18 +2106,18 @@ class CatalogueController extends AbstractActionController
         $type = $this->params('type');
         switch ($type) {
             case 'tuning':
-                $type = Car_Parent::TYPE_TUNING;
+                $type = VehicleParent::TYPE_TUNING;
                 break;
             case 'sport':
-                $type = Car_Parent::TYPE_SPORT;
+                $type = VehicleParent::TYPE_SPORT;
                 break;
             default:
-                $type = Car_Parent::TYPE_DEFAULT;
+                $type = VehicleParent::TYPE_DEFAULT;
                 break;
         }
 
         $carTable = $this->catalogue()->getCarTable();
-        $carParentTable = new Car_Parent();
+        $carParentTable = new VehicleParent();
         $db = $carParentTable->getAdapter();
 
         $listCars = [];
@@ -2143,7 +2143,7 @@ class CatalogueController extends AbstractActionController
 
         $currentPictures = [];
         $currentPicturesCount = 0;
-        if ($isLastPage && $type == Car_Parent::TYPE_DEFAULT) {
+        if ($isLastPage && $type == VehicleParent::TYPE_DEFAULT) {
             $pictureTable = $this->catalogue()->getPictureTable();
             $select = $this->selectOrderFromPictures()
                 ->where('pictures.car_id = ?', $currentCarId)
@@ -2219,7 +2219,7 @@ class CatalogueController extends AbstractActionController
         $currentCar['text'] = $text;
         $hasHtml = (bool)$currentCar['text'];
 
-        $carLangTable = new Car_Language();
+        $carLangTable = new VehicleLanguage();
         $carLangRows = $carLangTable->fetchAll([
             'car_id = ?' => $currentCar['id'],
             'length(name) > 0'
@@ -2257,7 +2257,7 @@ class CatalogueController extends AbstractActionController
             ], [], true),
             'childListData' => $this->car()->listData($listCars, [
                 'disableDescription' => false,
-                'type'       => $type == Car_Parent::TYPE_DEFAULT ? $type : null,
+                'type'       => $type == VehicleParent::TYPE_DEFAULT ? $type : null,
                 'detailsUrl' => function($listCar) use ($brand, $currentCarId, $brandCarCatname, $path, $carParentTable) {
 
                     $carParentAdapter = $carParentTable->getAdapter();
@@ -2341,11 +2341,11 @@ class CatalogueController extends AbstractActionController
                     }
 
                     switch($type) {
-                        case Car_Parent::TYPE_TUNING:
+                        case VehicleParent::TYPE_TUNING:
                             $typeStr = 'tuning';
                             break;
 
-                        case Car_Parent::TYPE_SPORT:
+                        case VehicleParent::TYPE_SPORT:
                             $typeStr = 'sport';
                             break;
 
@@ -2365,10 +2365,10 @@ class CatalogueController extends AbstractActionController
                 'typeUrl' => function($listCar, $type) use($carParentTable, $currentCarId, $path) {
 
                     switch ($type) {
-                        case Car_Parent::TYPE_TUNING:
+                        case VehicleParent::TYPE_TUNING:
                             $catname = 'tuning';
                             break;
-                        case Car_Parent::TYPE_SPORT:
+                        case VehicleParent::TYPE_SPORT:
                             $catname = 'sport';
                             break;
                         default:
@@ -2661,13 +2661,13 @@ class CatalogueController extends AbstractActionController
             $type = $this->params('type');
             switch ($type) {
                 case 'tuning':
-                    $type = Car_Parent::TYPE_TUNING;
+                    $type = VehicleParent::TYPE_TUNING;
                     break;
                 case 'sport':
-                    $type = Car_Parent::TYPE_SPORT;
+                    $type = VehicleParent::TYPE_SPORT;
                     break;
                 default:
-                    $type = Car_Parent::TYPE_DEFAULT;
+                    $type = VehicleParent::TYPE_DEFAULT;
                     break;
             }
 
@@ -2844,7 +2844,7 @@ class CatalogueController extends AbstractActionController
                 'language' => $language
             ]);
 
-            $carParentTable = new Car_Parent();
+            $carParentTable = new VehicleParent();
 
             $idx = 0;
             foreach ($data['carList']['cars'] as &$car) {

@@ -4,6 +4,7 @@ namespace Application\Model;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Picture;
@@ -247,7 +248,7 @@ class Twins
 
     /**
      * @param int $groupId
-     * @return Car_Row[]
+     * @return VehicleRow[]
      */
     public function getGroupCars($groupId)
     {

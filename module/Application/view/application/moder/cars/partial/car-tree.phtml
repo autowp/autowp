@@ -3,8 +3,8 @@
     <ul>
         <?php foreach ($this->car['childs'] as $car) { ?>
             <?php
-                $isTuning = $car['type'] == Car_Parent::TYPE_TUNING;
-                $isSport  = $car['type'] == Car_Parent::TYPE_SPORT;
+                $isTuning = $car['type'] == Application\Model\DbTable\Vehicle\ParentTable::TYPE_TUNING;
+                $isSport  = $car['type'] == Application\Model\DbTable\Vehicle\ParentTable::TYPE_SPORT;
             ?>
             <li class="<?=$isTuning ? 'tuning' : ''?><?=$isSport ? 'sport' : ''?>">
                 <?php if ($isTuning) { ?><?=$this->escapeHtml($this->translate('catalogue/related'))?>: <?php } ?>

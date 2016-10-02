@@ -4,8 +4,8 @@ namespace Application\Model\DbTable\User;
 
 use Application\Db\Table;
 use Application\Model\DbTable\User\Row as UserRow;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 
-use Car_Row;
 use Application\Model\DbTable\User;
 
 class CarSubscribe extends Table
@@ -26,7 +26,7 @@ class CarSubscribe extends Table
         ]
     ];
 
-    public function subscribe(UserRow $user, Car_Row $car)
+    public function subscribe(UserRow $user, VehicleRow $car)
     {
         $row = $this->fetchRow([
            'user_id = ?' => $user->id,
@@ -40,7 +40,7 @@ class CarSubscribe extends Table
         }
     }
 
-    public function unsubscribe(UserRow $user, Car_Row $car)
+    public function unsubscribe(UserRow $user, VehicleRow $car)
     {
         $row = $this->fetchRow([
             'user_id = ?' => $user->id,
@@ -51,7 +51,7 @@ class CarSubscribe extends Table
         }
     }
 
-    public function getCarSubscribers(Car_Row $car)
+    public function getCarSubscribers(VehicleRow $car)
     {
         $uTable = new User();
 

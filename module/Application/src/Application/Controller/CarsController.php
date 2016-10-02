@@ -13,6 +13,7 @@ use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
 use Application\Model\DbTable\User\Row as UserRow;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
@@ -20,7 +21,6 @@ use Attrs_Attributes;
 use Attrs_Item_Types;
 use Attrs_User_Values;
 use Cars;
-use Car_Row;
 
 class CarsController extends AbstractActionController
 {
@@ -64,7 +64,7 @@ class CarsController extends AbstractActionController
             : $this->engineTable = new Engine();
     }
 
-    private function carModerUrl(Car_Row $car, $uri = null)
+    private function carModerUrl(VehicleRow $car, $uri = null)
     {
         return $this->url()->fromRoute('moder/cars/params', [
             'action' => 'car',

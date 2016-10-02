@@ -5,7 +5,7 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-use Car_Types;
+use Application\Model\DbTable\Vehicle\Type as VehicleType;
 
 class CarOrganizePictures extends Form implements InputFilterProviderInterface
 {
@@ -24,7 +24,7 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
     private $language = 'en';
 
     /**
-     * @var Car_Types
+     * @var VehicleType
      */
     private $carTypeTable = null;
 
@@ -262,13 +262,13 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
     }
 
     /**
-     * @return Car_Types
+     * @return VehicleType
      */
     private function getCarTypeTable()
     {
         return $this->carTypeTable
             ? $this->carTypeTable
-            : $this->carTypeTable = new Car_Types();
+            : $this->carTypeTable = new VehicleType();
     }
 
     private function getCarTypeOptions($parentId = null)

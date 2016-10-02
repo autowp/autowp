@@ -9,13 +9,13 @@ use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
+use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
 use Autowp\TextStorage\Service as TextStorage;
 
-use Car_Language;
-use Car_Parent;
 use Picture;
 use Spec;
 
@@ -26,7 +26,7 @@ class Car extends AbstractPlugin
     private $_perspectiveCache = [];
 
     /**
-     * @var Car_Language
+     * @var VehicleLanguage
      */
     private $carLangTable;
 
@@ -72,7 +72,7 @@ class Car extends AbstractPlugin
     {
         return $this->carLangTable
             ? $this->carLangTable
-            : $this->carLangTable = new Car_Language();
+            : $this->carLangTable = new VehicleLanguage();
     }
 
     /**
@@ -162,7 +162,7 @@ class Car extends AbstractPlugin
 
         $pictureTable = $this->getPictureTable();
         $categoryLanguageTable = new CategoryLanguage();
-        $carParentTable = new Car_Parent();
+        $carParentTable = new VehicleParent();
         $carParentAdapter = $carParentTable->getAdapter();
         $brandTable = new BrandTable();
         $brandCarTable = new BrandCar();
@@ -244,7 +244,7 @@ class Car extends AbstractPlugin
                 $carParentAdapter->select()
                     ->from($carParentTable->info('name'), ['parent_id', 'type', 'count' => 'count(1)'])
                     ->where('parent_id IN (?)', $carIds)
-                    ->where('type IN (?)', [Car_Parent::TYPE_TUNING, Car_Parent::TYPE_SPORT])
+                    ->where('type IN (?)', [VehicleParent::TYPE_TUNING, VehicleParent::TYPE_SPORT])
                     ->group(['parent_id', 'type'])
             );
 
@@ -477,19 +477,19 @@ class Car extends AbstractPlugin
 
             if ($typeUrl) {
 
-                $tuningCount = isset($carsTypeCounts[$car->id][Car_Parent::TYPE_TUNING]) ? $carsTypeCounts[$car->id][Car_Parent::TYPE_TUNING] : 0;
+                $tuningCount = isset($carsTypeCounts[$car->id][VehicleParent::TYPE_TUNING]) ? $carsTypeCounts[$car->id][VehicleParent::TYPE_TUNING] : 0;
                 if ($tuningCount) {
                     $item['tuning'] = [
                         'count' => $tuningCount,
-                        'url'   => $typeUrl($car, Car_Parent::TYPE_TUNING)
+                        'url'   => $typeUrl($car, VehicleParent::TYPE_TUNING)
                     ];
                 }
 
-                $sportCount = isset($carsTypeCounts[$car->id][Car_Parent::TYPE_SPORT]) ? $carsTypeCounts[$car->id][Car_Parent::TYPE_SPORT] : 0;
+                $sportCount = isset($carsTypeCounts[$car->id][VehicleParent::TYPE_SPORT]) ? $carsTypeCounts[$car->id][VehicleParent::TYPE_SPORT] : 0;
                 if ($sportCount) {
                     $item['sport'] = [
                         'count' => $sportCount,
-                        'url'   => $typeUrl($car, Car_Parent::TYPE_SPORT)
+                        'url'   => $typeUrl($car, VehicleParent::TYPE_SPORT)
                     ];
                 }
             }
@@ -619,12 +619,12 @@ class Car extends AbstractPlugin
 
             if (isset($options['type'])) {
                 switch ($options['type']) {
-                    case Car_Parent::TYPE_DEFAULT:
+                    case VehicleParent::TYPE_DEFAULT:
                         break;
-                    case Car_Parent::TYPE_TUNING:
+                    case VehicleParent::TYPE_TUNING:
                         $select->where('car_parent_cache.tuning');
                         break;
-                    case Car_Parent::TYPE_SPORT:
+                    case VehicleParent::TYPE_SPORT:
                         $select->where('car_parent_cache.sport');
                         break;
                 }

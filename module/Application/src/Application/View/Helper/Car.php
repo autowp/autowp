@@ -6,10 +6,10 @@ use Zend\View\Helper\AbstractHelper;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\VehicleNameFormatter;
 
-use Car_Parent;
-use Car_Row;
 use Spec;
 
 use Exception;
@@ -17,7 +17,7 @@ use Exception;
 class Car extends AbstractHelper
 {
     /**
-     * @var Car_Row
+     * @var VehicleRow
      */
     private $_car = null;
 
@@ -31,7 +31,7 @@ class Car extends AbstractHelper
     private $brandCarTable;
 
     /**
-     * @var Car_Parent
+     * @var VehicleParent
      */
     private $carParentTable;
 
@@ -65,7 +65,7 @@ class Car extends AbstractHelper
             : $this->specTable = new Spec();
         }
 
-    public function __invoke(Car_Row $car = null)
+    public function __invoke(VehicleRow $car = null)
     {
         $this->_car = $car;
 
@@ -319,16 +319,16 @@ class Car extends AbstractHelper
     }
 
     /**
-     * @return Car_Parent
+     * @return VehicleParent
      */
     private function _getCarParentTable()
     {
         return $this->carParentTable
             ? $this->carParentTable
-            : $this->carParentTable = new Car_Parent();
+            : $this->carParentTable = new VehicleParent();
     }
 
-    private function _carPublicUrls(Car_Row $car)
+    private function _carPublicUrls(VehicleRow $car)
     {
         return $this->_walkUpUntilBrand($car->id, []);
     }
