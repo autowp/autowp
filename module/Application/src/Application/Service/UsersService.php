@@ -5,13 +5,13 @@ namespace Application\Service;
 use Zend\Mail;
 
 use Application\Auth\Adapter\Login as LoginAuthAdapter;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
 use Application\Model\DbTable\User\Remember as UserRemember;
 use Application\Model\DbTable\User\Row as UserRow;
 use Application\Service\SpecificationsService;
 
-use Comment_Message;
 use Picture;
 
 use DateTime;
@@ -317,7 +317,7 @@ class UsersService
 
         $default = 10;
 
-        $commentTable = new Comment_Message();
+        $commentTable = new CommentMessage();
         $db = $commentTable->getAdapter();
 
         $avgVote = $db->fetchOne(

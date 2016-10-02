@@ -10,6 +10,7 @@ use Zend\Paginator\Paginator;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
@@ -26,7 +27,6 @@ use Car_Parent;
 use Car_Types;
 use Cars;
 use Car_Row;
-use Comment_Message;
 use Modification_Group;
 use Picture;
 use Picture_Row;
@@ -2426,11 +2426,11 @@ class CatalogueController extends AbstractActionController
 
     private function getCarModerAttentionCount($carId)
     {
-        $commentTable = new Comment_Message();
+        $commentTable = new CommentMessage();
 
         $select = $commentTable->select(true)
-            ->where('comments_messages.moderator_attention = ?', Comment_Message::MODERATOR_ATTENTION_REQUIRED)
-            ->where('comments_messages.type_id = ?', Comment_Message::PICTURES_TYPE_ID)
+            ->where('comments_messages.moderator_attention = ?', CommentMessage::MODERATOR_ATTENTION_REQUIRED)
+            ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
             ->join('pictures', 'comments_messages.item_id = pictures.id', null)
             ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)

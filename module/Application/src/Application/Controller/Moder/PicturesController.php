@@ -11,6 +11,8 @@ use Application\Form\Moder\Inbox as InboxForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective;
@@ -24,8 +26,6 @@ use Application\Service\TrafficControl;
 use Car_Parent;
 use Cars;
 use Comments;
-use Comment_Message;
-use Comment_Topic;
 use Picture;
 use Picture_Row;
 use Picture_Moder_Vote;
@@ -418,13 +418,13 @@ class PicturesController extends AbstractActionController
             $expr = 'pictures.id = comment_topic.item_id and ' .
                     $this->table->getAdapter()->quoteInto(
                         'comment_topic.type_id = ?',
-                        Comment_Message::PICTURES_TYPE_ID
+                        CommentMessage::PICTURES_TYPE_ID
                     );
             $select->joinLeft('comment_topic', $expr, null);
         } elseif ($joinComments) {
             $select
                 ->join('comment_topic', 'pictures.id = comment_topic.item_id', null)
-                ->where('comment_topic.type_id = ?', Comment_Message::PICTURES_TYPE_ID);
+                ->where('comment_topic.type_id = ?', CommentMessage::PICTURES_TYPE_ID);
         }
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -1818,12 +1818,12 @@ class PicturesController extends AbstractActionController
         // comments
         $comments = new Comments();
         $comments->moveMessages(
-            Comment_Message::PICTURES_TYPE_ID, $replacePicture->id,
-            Comment_Message::PICTURES_TYPE_ID, $picture->id
+            CommentMessage::PICTURES_TYPE_ID, $replacePicture->id,
+            CommentMessage::PICTURES_TYPE_ID, $picture->id
         );
-        $ctTable = new Comment_Topic();
-        $ctTable->updateTopicStat(Comment_Message::PICTURES_TYPE_ID, $replacePicture->id);
-        $ctTable->updateTopicStat(Comment_Message::PICTURES_TYPE_ID, $picture->id);
+        $ctTable = new CommentTopic();
+        $ctTable->updateTopicStat(CommentMessage::PICTURES_TYPE_ID, $replacePicture->id);
+        $ctTable->updateTopicStat(CommentMessage::PICTURES_TYPE_ID, $picture->id);
 
         // pms
         $owner = $picture->findParentRow(User::class, 'Owner');

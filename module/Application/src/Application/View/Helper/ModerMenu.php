@@ -4,7 +4,8 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
 
-use Comment_Message;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+
 use Picture;
 
 class ModerMenu extends AbstractHtmlElement
@@ -29,17 +30,17 @@ class ModerMenu extends AbstractHtmlElement
                 'icon'  => 'fa fa-th'
             ];
 
-            $cmTable = new Comment_Message();
+            $cmTable = new CommentMessage();
             $attentionCount = $cmTable->getAdapter()->fetchOne(
                 $cmTable->getAdapter()->select()
                     ->from($cmTable->info('name'), 'count(1)')
-                    ->where('moderator_attention = ?', Comment_Message::MODERATOR_ATTENTION_REQUIRED)
+                    ->where('moderator_attention = ?', CommentMessage::MODERATOR_ATTENTION_REQUIRED)
             );
 
             $items[] = [
                 'href'  => $this->view->url('moder/comments/params', [
                     'action'              => 'index',
-                    'moderator_attention' => Comment_Message::MODERATOR_ATTENTION_REQUIRED
+                    'moderator_attention' => CommentMessage::MODERATOR_ATTENTION_REQUIRED
                 ]),
                 'label' => $this->view->page(110)->name,
                 'count' => $attentionCount,

@@ -6,16 +6,16 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\Twins;
-use Autowp\TextStorage;
-
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
+use Autowp\TextStorage;
+
 use Cars;
 use Car_Row;
-use Comment_Message;
-use Comment_Topic;
 use Picture;
 
 use Zend_Db_Expr;
@@ -204,7 +204,7 @@ class TwinsController extends AbstractActionController
 
     private function prepareList($list)
     {
-        $ctTable = new Comment_Topic();
+        $ctTable = new CommentTopic();
         $pictureTable = new Picture();
 
         $imageStorage = $this->imageStorage();
@@ -219,7 +219,7 @@ class TwinsController extends AbstractActionController
         $picturesCounts = $this->getTwins()->getGroupPicturesCount($ids);
 
         $commentsStats = $ctTable->getTopicStat(
-            Comment_Message::TWINS_TYPE_ID,
+            CommentMessage::TWINS_TYPE_ID,
             $ids
         );
 

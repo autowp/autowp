@@ -9,12 +9,12 @@ use Zend\View\Model\ViewModel;
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Engine;
 use Application\Service\TelegramService;
 
 use Car_Parent;
 use Cars;
-use Comment_Message;
 use Comments;
 use Picture;
 
@@ -365,13 +365,13 @@ class UploadController extends AbstractActionController
             if ($values['note']) {
                 $commentTable = new Comments();
                 $commentTable->add([
-                    'typeId'             => Comment_Message::PICTURES_TYPE_ID,
+                    'typeId'             => CommentMessage::PICTURES_TYPE_ID,
                     'itemId'             => $picture->id,
                     'parentId'           => null,
                     'authorId'           => $user->id,
                     'message'            => $values['note'],
                     'ip'                 => $this->getRequest()->getServer('REMOTE_ADDR'),
-                    'moderatorAttention' => Comment_Message::MODERATOR_ATTENTION_NONE
+                    'moderatorAttention' => CommentMessage::MODERATOR_ATTENTION_NONE
                 ]);
             }
 

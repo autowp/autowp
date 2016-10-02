@@ -4,8 +4,9 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Comment_Message;
-use Comment_Topic;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Comment\Topic as CommentTopic;
+
 use Picture_View;
 use Picture_Moder_Vote;
 use Picture_Row;
@@ -24,7 +25,7 @@ class Pictures extends AbstractHelper
     private $pictureViewTable = null;
 
     /**
-     * @var Comment_Topic
+     * @var CommentTopic
      */
     private $commentTopicTable = null;
 
@@ -51,13 +52,13 @@ class Pictures extends AbstractHelper
     }
 
     /**
-     * @return Comment_Topic
+     * @return CommentTopic
      */
     private function getCommentTopicTable()
     {
         return $this->commentTopicTable
             ? $this->commentTopicTable
-            : $this->commentTopicTable = new Comment_Topic();
+            : $this->commentTopicTable = new CommentTopic();
     }
 
     private function isPictureModer()
@@ -98,7 +99,7 @@ class Pictures extends AbstractHelper
         $ctTable = $this->getCommentTopicTable();
         if ($this->view->user()->logedIn()) {
             $commentsStat = $ctTable->getTopicStatForUser(
-                Comment_Message::PICTURES_TYPE_ID,
+                CommentMessage::PICTURES_TYPE_ID,
                 $picture->id,
                 $this->view->user()->get()->id
             );
@@ -106,7 +107,7 @@ class Pictures extends AbstractHelper
             $newMsgCount = $commentsStat['newMessages'];
         } else {
             $commentsStat = $ctTable->getTopicStat(
-                Comment_Message::PICTURES_TYPE_ID,
+                CommentMessage::PICTURES_TYPE_ID,
                 $picture->id
             );
             $msgCount = $commentsStat['messages'];

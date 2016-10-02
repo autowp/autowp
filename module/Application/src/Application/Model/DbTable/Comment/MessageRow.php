@@ -1,9 +1,17 @@
 <?php
 
+namespace Application\Model\DbTable\Comment;
+
 use Application\Db\Table\Row;
 use Application\Model\DbTable\Article;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Comment\Vote as CommentVote;
 
-class Comment_Message_Row extends Row
+use Zend_Db_Expr;
+
+use Picture;
+
+class MessageRow extends Row
 {
     /**
      * @deprecated
@@ -14,7 +22,7 @@ class Comment_Message_Row extends Row
     {
         switch ($this->type_id)
         {
-            case Comment_Message::PICTURES_TYPE_ID:
+            case CommentMessage::PICTURES_TYPE_ID:
                 $pictures = new Picture();
                 $picture = $pictures->find($this->item_id)->current();
                 if ($picture) {
@@ -23,13 +31,13 @@ class Comment_Message_Row extends Row
                     return false;
                 }
 
-            case Comment_Message::VOTINGS_TYPE_ID:
+            case CommentMessage::VOTINGS_TYPE_ID:
                 return ($absolute ? HOST : '/').'voting/voting/id/'.(int)$this->item_id.'/';
 
-            case Comment_Message::TWINS_TYPE_ID:
+            case CommentMessage::TWINS_TYPE_ID:
                 return ($absolute ? HOST : '/').'twins/group'.(int)$this->item_id.'/';
 
-            case Comment_Message::ARTICLES_TYPE_ID:
+            case CommentMessage::ARTICLES_TYPE_ID:
                 $articles = new Article();
                 $article = $articles->find($this->item_id)->current();
                 if ($article) {
@@ -38,10 +46,10 @@ class Comment_Message_Row extends Row
                     return false;
                 }
 
-            case Comment_Message::FORUMS_TYPE_ID:
+            case CommentMessage::FORUMS_TYPE_ID:
                 return ($absolute ? HOST : '/').'forums/topic-message/message_id/'.(int)$this->id;
 
-            case Comment_Message::MUSEUMS_TYPE_ID:
+            case CommentMessage::MUSEUMS_TYPE_ID:
                 return ($absolute ? HOST : '/').'museums/museum/id/'.(int)$this->item_id;
         }
         return null;
@@ -59,7 +67,7 @@ class Comment_Message_Row extends Row
 
     public function updateVote()
     {
-        $voteTable = new Comment_Vote();
+        $voteTable = new CommentVote();
 
         $this->vote = $voteTable->getAdapter()->fetchOne(
             $voteTable->getAdapter()->select()

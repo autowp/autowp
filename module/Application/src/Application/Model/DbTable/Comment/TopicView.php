@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable\Comment;
+
 use Application\Db\Table;
 
-class Comment_Topic_View extends Table
+class TopicView extends Table
 {
     protected $_name = 'comment_topic_view';
     protected $_primary = ['type_id', 'item_id', 'user_id'];

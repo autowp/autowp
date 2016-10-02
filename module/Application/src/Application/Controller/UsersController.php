@@ -8,6 +8,7 @@ use Zend\View\Model\ViewModel;
 use Application\Service\TrafficControl;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Model\DbTable\User\Rename as UserRename;
@@ -15,7 +16,6 @@ use Application\Model\Contact;
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Comment_Message;
 use Picture;
 
 use Zend_Db_Expr;
@@ -90,11 +90,11 @@ class UsersController extends AbstractActionController
             ];
         }
 
-        $comments = new Comment_Message();
+        $comments = new CommentMessage();
         $lastComments = $comments->fetchAll(
             $comments->select()
                 ->where('author_id = ?', $user->id)
-                ->where('type_id <> ?', Comment_Message::FORUMS_TYPE_ID)
+                ->where('type_id <> ?', CommentMessage::FORUMS_TYPE_ID)
                 ->where('not deleted')
                 ->order(['datetime DESC'])
                 ->limit(15)
