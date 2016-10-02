@@ -1,15 +1,17 @@
 <?php
 
+namespace Application\Model\DbTable\User;
+
 use Application\Db\Table;
 
-class Comment_Topic_View extends Table
+class Account extends Table
 {
-    protected $_name = 'comment_topic_view';
-    protected $_primary = ['type_id', 'item_id', 'user_id'];
+    protected $_name = 'user_account';
+
     protected $_referenceMap = [
         'User' => [
             'columns'       => ['user_id'],
-            'refTableClass' => 'Users',
+            'refTableClass' => \Application\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ],
     ];

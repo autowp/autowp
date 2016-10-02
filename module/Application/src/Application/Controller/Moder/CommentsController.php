@@ -6,11 +6,11 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Comment_Message;
 use Picture;
-use Users;
 
 class CommentsController extends AbstractActionController
 {
@@ -39,7 +39,7 @@ class CommentsController extends AbstractActionController
                 ->join('pictures', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->join('comments_messages', 'comments_messages.item_id = pictures.id', null)
-                ->where('comments_messages.type_id = ?', Comment_Message::PICTURES_TYPE_ID)
+                ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
                 ->group('brands.id')*/
                 ->order(['brands.position', 'brands.caption'])
         );
@@ -61,7 +61,7 @@ class CommentsController extends AbstractActionController
             return $this->redirect()->toUrl($this->url()->fromRoute('moder/comments/params', $params));
         }
 
-        $commentTable = new Comment_Message();
+        $commentTable = new CommentMessage();
 
         $select = $commentTable->select(true)
             ->order(['comments_messages.datetime DESC']);
@@ -74,7 +74,7 @@ class CommentsController extends AbstractActionController
             if ($values['user']) {
 
                 if (!is_numeric($values['user'])) {
-                    $userTable = new Users();
+                    $userTable = new User();
                     $userRow = $userTable->fetchRow([
                         'identity = ?' => $values['user']
                     ]);
@@ -88,9 +88,9 @@ class CommentsController extends AbstractActionController
 
             if (strlen($values['moderator_attention'])) {
                 switch ($values['moderator_attention']) {
-                    case Comment_Message::MODERATOR_ATTENTION_NONE:
-                    case Comment_Message::MODERATOR_ATTENTION_REQUIRED:
-                    case Comment_Message::MODERATOR_ATTENTION_COMPLETED:
+                    case CommentMessage::MODERATOR_ATTENTION_NONE:
+                    case CommentMessage::MODERATOR_ATTENTION_REQUIRED:
+                    case CommentMessage::MODERATOR_ATTENTION_COMPLETED:
                         $select->where('comments_messages.moderator_attention = ?', $values['moderator_attention']);
                         break;
                 }
@@ -98,7 +98,7 @@ class CommentsController extends AbstractActionController
 
             if ($values['brand_id']) {
                 $select
-                    ->where('comments_messages.type_id = ?', Comment_Message::PICTURES_TYPE_ID)
+                    ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)
                     ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
@@ -108,7 +108,7 @@ class CommentsController extends AbstractActionController
 
             if ($values['car_id']) {
                 $select
-                    ->where('comments_messages.type_id = ?', Comment_Message::PICTURES_TYPE_ID)
+                    ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)
                     ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
@@ -129,7 +129,7 @@ class CommentsController extends AbstractActionController
         $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $status = '';
-            if ($commentRow->type_id == Comment_Message::PICTURES_TYPE_ID) {
+            if ($commentRow->type_id == CommentMessage::PICTURES_TYPE_ID) {
                 $pictures = $this->catalogue()->getPictureTable();
                 $picture = $pictures->find($commentRow->item_id)->current();
                 if ($picture) {
@@ -166,7 +166,7 @@ class CommentsController extends AbstractActionController
             $comments[] = [
                 'url'     => $commentRow->getUrl(),
                 'message' => $commentRow->getMessagePreview(),
-                'user'    => $commentRow->findParentUsers(),
+                'user'    => $commentRow->findParentRow(User::class),
                 'status'  => $status,
                 'new'     => $commentRow->isNew($this->user()->get()->id)
             ];

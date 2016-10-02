@@ -1,8 +1,14 @@
 <?php
 
-use Application\Db\Table;
+namespace Application\Model\DbTable\User;
 
-class User_Car_Subscribe extends Table
+use Application\Db\Table;
+use Application\Model\DbTable\User\Row as UserRow;
+
+use Car_Row;
+use Application\Model\DbTable\User;
+
+class CarSubscribe extends Table
 {
     protected $_name = 'user_car_subscribe';
     protected $_primary = ['user_id', 'car_id'];
@@ -10,7 +16,7 @@ class User_Car_Subscribe extends Table
     protected $_referenceMap = [
         'User' => [
             'columns'       => ['user_id'],
-            'refTableClass' => 'Users',
+            'refTableClass' => User::class,
             'refColumns'    => ['id']
         ],
         'Car' => [
@@ -20,7 +26,7 @@ class User_Car_Subscribe extends Table
         ]
     ];
 
-    public function subscribe(User_Row $user, Car_Row $car)
+    public function subscribe(UserRow $user, Car_Row $car)
     {
         $row = $this->fetchRow([
            'user_id = ?' => $user->id,
@@ -34,7 +40,7 @@ class User_Car_Subscribe extends Table
         }
     }
 
-    public function unsubscribe(User_Row $user, Car_Row $car)
+    public function unsubscribe(UserRow $user, Car_Row $car)
     {
         $row = $this->fetchRow([
             'user_id = ?' => $user->id,
@@ -47,7 +53,7 @@ class User_Car_Subscribe extends Table
 
     public function getCarSubscribers(Car_Row $car)
     {
-        $uTable = new Users();
+        $uTable = new User();
 
         return $uTable->fetchAll(
             $uTable->select(true)

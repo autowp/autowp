@@ -10,11 +10,11 @@ use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Category\ParentTable as CategoryParent;
 use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
+use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
 
 use Car_Parent;
 use Car_Parent_Cache;
 use Cars;
-use User_Car_Subscribe;
 
 use Zend_Db_Expr;
 
@@ -379,7 +379,7 @@ class CategoryController extends AbstractActionController
             }
 
             $user = $this->user()->get();
-            $ucsTable = new User_Car_Subscribe();
+            $ucsTable = new UserCarSubscribe();
             $ucsTable->subscribe($user, $newCar);
 
             return $this->redirect()->toRoute(null, [

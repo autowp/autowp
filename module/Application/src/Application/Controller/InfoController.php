@@ -4,8 +4,9 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\DbTable\User;
+
 use Spec;
-use Users;
 
 use Autowp\TextStorage;
 
@@ -87,7 +88,7 @@ class InfoController extends AbstractActionController
             ]);
         }
 
-        $userTable = new Users();
+        $userTable = new User();
         $currentUser = $userTable->find($current['user_id'])->current();
         $prevUser = $userTable->find($prevText['user_id'])->current();
 

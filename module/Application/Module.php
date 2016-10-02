@@ -14,7 +14,8 @@ use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 
 use Application\Auth\Adapter\Remember as RememberAuthAdapter;
-use Users;
+use Application\Model\DbTable\User;
+
 use Zend_Auth;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Expr;
@@ -232,7 +233,7 @@ class Module implements ConsoleUsageProviderInterface,
 
         if ($auth->hasIdentity()) {
 
-            $userTable = new Users();
+            $userTable = new User();
 
             $user = $userTable->find($auth->getIdentity())->current();
 
@@ -373,7 +374,7 @@ class Module implements ConsoleUsageProviderInterface,
             $unlimitedTraffic = false;
             if ($auth->hasIdentity()) {
                 $userId = $auth->getIdentity();
-                $userTable = new Users();
+                $userTable = new User();
                 $user = $userTable->find($userId)->current();
 
                 if ($user) {
@@ -411,7 +412,7 @@ class Module implements ConsoleUsageProviderInterface,
             $auth = Zend_Auth::getInstance();
             if ($auth->hasIdentity()) {
 
-                $userTable = new Users();
+                $userTable = new User();
 
                 $user = $userTable->find($auth->getIdentity())->current();
 

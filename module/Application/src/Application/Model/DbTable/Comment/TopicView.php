@@ -1,12 +1,13 @@
 <?php
 
-namespace Application\Model\DbTable\Telegram;
+namespace Application\Model\DbTable\Comment;
 
-use Zend_Db_Table;
+use Application\Db\Table;
 
-class Chat extends Zend_Db_Table
+class TopicView extends Table
 {
-    protected $_name = 'telegram_chat';
+    protected $_name = 'comment_topic_view';
+    protected $_primary = ['type_id', 'item_id', 'user_id'];
     protected $_referenceMap = [
         'User' => [
             'columns'       => ['user_id'],

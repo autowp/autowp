@@ -1,11 +1,13 @@
 <?php
 
+namespace Application\Model\DbTable;
+
 use Application\Db\Table;
 
-class Users extends Table
+class User extends Table
 {
     protected $_name = 'users';
-    protected $_rowClass = 'User_Row';
+    protected $_rowClass = \Application\Model\DbTable\User\Row::class;
 
     const MIN_NAME = 2;
     const MAX_NAME = 50;

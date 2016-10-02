@@ -4,6 +4,8 @@ namespace Application\Telegram\Command;
 
 use Telegram\Bot\Commands\Command;
 
+use Application\Model\DbTable\User;
+
 class MeCommand extends Command
 {
     /**
@@ -43,7 +45,7 @@ class MeCommand extends Command
                 ]);
             } else {
 
-                $userTable = new \Users();
+                $userTable = new User();
                 $userRow = $userTable->find($telegramChatRow->user_id)->current();
 
                 $this->replyWithMessage([
@@ -55,7 +57,7 @@ class MeCommand extends Command
 
             $userId = (int)$args[0];
 
-            $userTable = new \Users();
+            $userTable = new User();
 
             $userRow = $userTable->find($userId)->current();
 

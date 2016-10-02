@@ -357,7 +357,7 @@
 
 <div id="comments">
     <?=$this->comments([
-        'type'    => Comment_Message::PICTURES_TYPE_ID,
+        'type'    => Application\Model\DbTable\Comment\Message::PICTURES_TYPE_ID,
         'item_id' => $this->picture->id
     ]) ?>
 </div>

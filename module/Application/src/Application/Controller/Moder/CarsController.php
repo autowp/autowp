@@ -25,6 +25,9 @@ use Application\Model\DbTable\FactoryCar;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Twins\GroupVehicle as TwinsGroupVehicle;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
+use Application\Model\DbTable\User\Row as UserRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 use Autowp\Filter\Filename\Safe;
@@ -38,9 +41,6 @@ use Modification_Group;
 use Picture;
 use Picture_Row;
 use Spec;
-use User_Car_Subscribe;
-use Users;
-use User_Row;
 
 use Zend_Db_Expr;
 use Zend_Session_Namespace;
@@ -332,12 +332,12 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param User_Row $user
+     * @param UserRow $user
      * @param bool $full
      * @param \Zend\Uri\Uri $uri
      * @return string
      */
-    private function userModerUrl(User_Row $user, $full = false, $uri = null)
+    private function userModerUrl(UserRow $user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user->identity ? $user->identity : 'user' . $user->id
@@ -499,7 +499,7 @@ class CarsController extends AbstractActionController
                     $userIds = $this->textStorage->getTextUserIds($car->full_text_id);
 
                     $mModel = new Message();
-                    $userTable = new Users();
+                    $userTable = new User();
                     foreach ($userIds as $userId) {
                         if ($userId != $user->id) {
                             foreach ($userTable->find($userId) as $userRow) {
@@ -664,7 +664,7 @@ class CarsController extends AbstractActionController
                     $values = $formModerCarEditMeta->getData();
 
                     $user = $this->user()->get();
-                    $ucsTable = new User_Car_Subscribe();
+                    $ucsTable = new UserCarSubscribe();
                     $ucsTable->subscribe($user, $car);
 
                     if ($haveChilds) {
@@ -754,7 +754,7 @@ class CarsController extends AbstractActionController
                         $userIds = $this->textStorage->getTextUserIds($car->text_id);
 
                         $mModel = new Message();
-                        $userTable = new Users();
+                        $userTable = new User();
                         foreach ($userIds as $userId) {
                             if ($userId != $user->id) {
                                 foreach ($userTable->find($userId) as $userRow) {
@@ -796,7 +796,7 @@ class CarsController extends AbstractActionController
                 ->where('car_id = ?', $car->id)
         );
 
-        $ucsTable = new User_Car_Subscribe();
+        $ucsTable = new UserCarSubscribe();
 
         $user = $this->user()->get();
         $ucsRow = $ucsTable->fetchRow([
@@ -1056,7 +1056,7 @@ class CarsController extends AbstractActionController
         $brands->getAdapter()->query($sql, [$brand->id, $car->id]);
 
         $user = $this->user()->get();
-        $ucsTable = new User_Car_Subscribe();
+        $ucsTable = new UserCarSubscribe();
         $ucsTable->subscribe($user, $car);
 
         $brand->RefreshPicturesCount();
@@ -1171,7 +1171,7 @@ class CarsController extends AbstractActionController
         ]);
 
         $user = $this->user()->get();
-        $ucsTable = new User_Car_Subscribe();
+        $ucsTable = new UserCarSubscribe();
         $ucsTable->subscribe($user, $car);
 
         $brand->refreshPicturesCount();
@@ -1649,7 +1649,7 @@ class CarsController extends AbstractActionController
             if ($oldCategory) {
                 $deletedNames[] = $oldCategory->name;
 
-                if ($oldUser = $oldCc->findParentUsers()) {
+                if ($oldUser = $oldCc->findParentRow(User::class)) {
                     $user = $this->user()->get();
                     if ($oldUser->id != $user->id) {
                         $notify[$oldUser->id][] = $oldCategory;
@@ -1669,7 +1669,7 @@ class CarsController extends AbstractActionController
 
         $mModel = new Message();
 
-        $users = new Users();
+        $users = new User();
         foreach ($notify as $userId => $categories) {
             $notifyUser = $users->find($userId)->current();
             if (count($categories) && $notifyUser) {
@@ -1719,7 +1719,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $users = new Users();
+        $users = new User();
 
 
         $canEditMeta = $this->canEditMeta($car);
@@ -1810,7 +1810,7 @@ class CarsController extends AbstractActionController
         }
 
         $user = $this->user()->get();
-        $ucsTable = new User_Car_Subscribe();
+        $ucsTable = new UserCarSubscribe();
         $ucsTable->subscribe($user, $car);
 
         return new JsonModel([
@@ -1836,7 +1836,7 @@ class CarsController extends AbstractActionController
         }
 
         $user = $this->user()->get();
-        $ucsTable = new User_Car_Subscribe();
+        $ucsTable = new UserCarSubscribe();
         $ucsTable->unsubscribe($user, $car);
 
         return new JsonModel([
@@ -3387,7 +3387,7 @@ class CarsController extends AbstractActionController
                 $specService->updateActualValues(1, $newCar->id);
 
                 $user = $this->user()->get();
-                $ucsTable = new User_Car_Subscribe();
+                $ucsTable = new UserCarSubscribe();
                 $ucsTable->subscribe($user, $newCar);
 
                 return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
@@ -3539,7 +3539,7 @@ class CarsController extends AbstractActionController
                 ), $car);
 
                 $user = $this->user()->get();
-                $ucsTable = new User_Car_Subscribe();
+                $ucsTable = new UserCarSubscribe();
                 $ucsTable->subscribe($user, $car);
 
                 if ($parentCar) {
@@ -3727,7 +3727,7 @@ class CarsController extends AbstractActionController
                 $specService->updateActualValues(1, $newCar->id);
 
                 $user = $this->user()->get();
-                $ucsTable = new User_Car_Subscribe();
+                $ucsTable = new UserCarSubscribe();
                 $ucsTable->subscribe($user, $newCar);
 
                 return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));

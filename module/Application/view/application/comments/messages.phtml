@@ -5,7 +5,7 @@
 ?>
 <?php foreach ($this->messages as $comment) { ?>
     <?php
-        $moderAttention = $comment['moderator_attention'] == Comment_Message::MODERATOR_ATTENTION_REQUIRED;
+        $moderAttention = $comment['moderator_attention'] == Application\Model\DbTable\Comment\Message::MODERATOR_ATTENTION_REQUIRED;
         $classes = ['message'];
         if ($moderAttention) {
             $classes[] = 'moderator-attention';

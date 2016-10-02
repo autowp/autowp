@@ -5,13 +5,12 @@ namespace Application;
 use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Page;
+use Application\Model\DbTable\User\Row as UserRow;
 use Application\Model\Message;
 use Application\Language;
 
 use Zend\Cache\Storage\StorageInterface;
 use Zend\Router\Http\TreeRouteStack;
-
-use User_Row;
 
 class MainMenu
 {
@@ -213,10 +212,10 @@ class MainMenu
     }
 
     /**
-     * @param User_Row $user
+     * @param UserRow $user
      * @return array
      */
-    public function getMenu(User_Row $user = null)
+    public function getMenu(UserRow $user = null)
     {
         $newMessages = 0;
         if ($user) {

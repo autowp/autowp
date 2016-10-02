@@ -8,15 +8,15 @@ use Zend\View\Model\ViewModel;
 use Application\Service\TrafficControl;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\Account as UserAccount;
+use Application\Model\DbTable\User\Rename as UserRename;
 use Application\Model\Contact;
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Comment_Message;
 use Picture;
-use User_Account;
-use User_Renames;
-use Users;
 
 use Zend_Db_Expr;
 
@@ -31,7 +31,7 @@ class UsersController extends AbstractActionController
 
     private function getUser()
     {
-        $users = new Users();
+        $users = new User();
 
         $identity = $this->params('user_id');
 
@@ -51,7 +51,7 @@ class UsersController extends AbstractActionController
 
     public function userAction()
     {
-        $users = new Users();
+        $users = new User();
 
         $user = $this->getUser();
 
@@ -90,17 +90,17 @@ class UsersController extends AbstractActionController
             ];
         }
 
-        $comments = new Comment_Message();
+        $comments = new CommentMessage();
         $lastComments = $comments->fetchAll(
             $comments->select()
                 ->where('author_id = ?', $user->id)
-                ->where('type_id <> ?', Comment_Message::FORUMS_TYPE_ID)
+                ->where('type_id <> ?', CommentMessage::FORUMS_TYPE_ID)
                 ->where('not deleted')
                 ->order(['datetime DESC'])
                 ->limit(15)
         );
 
-        $userRenames = new User_Renames();
+        $userRenames = new UserRename();
         $renames = $userRenames->fetchAll(
             $userRenames->select(true)
                 ->where('user_id = ?', $user->id)
@@ -124,7 +124,7 @@ class UsersController extends AbstractActionController
             }
         }
 
-        $uaTable = new User_Account();
+        $uaTable = new UserAccount();
 
         $uaRows = $uaTable->fetchAll([
             'user_id = ?' => $user->id
@@ -262,7 +262,7 @@ class UsersController extends AbstractActionController
 
     public function onlineAction()
     {
-        $userTable = new Users();
+        $userTable = new User();
 
         $viewModel = new ViewModel([
             'users' => $userTable->fetchAll(
@@ -279,7 +279,7 @@ class UsersController extends AbstractActionController
 
     private function specsRating()
     {
-        $userTable = new Users();
+        $userTable = new User();
         $brandTable = new BrandTable();
 
         $select = $userTable->select(true)
@@ -371,7 +371,7 @@ class UsersController extends AbstractActionController
 
     private function picturesRating()
     {
-        $userTable = new Users();
+        $userTable = new User();
         $brandTable = new BrandTable();
 
         $select = $userTable->select(true)

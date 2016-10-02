@@ -1,37 +1,42 @@
 <?php
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Comment\Topic as CommentTopic;
+use Application\Model\DbTable\Comment\Vote as CommentVote;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\Row as UserRow;
 
 class Comments
 {
     /**
-     * @var Comment_Message
+     * @var CommentMessage
      */
     private $messageTable;
 
     /**
-     * @var Comment_Vote
+     * @var CommentVote
      */
     private $voteTable;
 
     /**
-     * @return Comment_Message
+     * @return CommentMessage
      */
     protected function getMessageTable()
     {
         return $this->messageTable
             ? $this->messageTable
-            : $this->messageTable = new Comment_Message();
+            : $this->messageTable = new CommentMessage();
     }
 
     /**
-     * @return Comment_Vote
+     * @return CommentVote
      */
     protected function getVoteTable()
     {
         return $this->voteTable
             ? $this->voteTable
-            : $this->voteTable = new Comment_Vote();
+            : $this->voteTable = new CommentVote();
     }
 
     /**
@@ -73,8 +78,8 @@ class Comments
             'message'             => (string)$data['message'],
             'ip'                  => new Zend_Db_Expr($db->quoteInto('INET6_ATON(?)', $data['ip'])),
             'moderator_attention' => $data['moderatorAttention']
-                ? Comment_Message::MODERATOR_ATTENTION_REQUIRED
-                : Comment_Message::MODERATOR_ATTENTION_NONE
+                ? CommentMessage::MODERATOR_ATTENTION_REQUIRED
+                : CommentMessage::MODERATOR_ATTENTION_NONE
         ];
 
         $messageId = $messageTable->insert($data);
@@ -92,7 +97,7 @@ class Comments
             $parentMessage->save();
         }
 
-        $commentTopicTable = new Comment_Topic();
+        $commentTopicTable = new CommentTopic();
         $commentTopicTable->updateTopicStat($typeId, $itemId);
         $commentTopicTable->updateTopicView($typeId, $itemId, $authorId);
 
@@ -117,7 +122,7 @@ class Comments
      */
     private function _get($type, $item, $parentId, $userId, $perPage = 0, $page = 0)
     {
-        if ($userId instanceof User_Row) {
+        if ($userId instanceof UserRow) {
             $userId = $userId->id;
         }
 
@@ -142,7 +147,7 @@ class Comments
         $comments = [];
         foreach ($rows as $row) {
 
-            $author = $row->findParentUsersByAuthor();
+            $author = $row->findParentRow(User::class, 'Author');
 
             $vote = null;
             if ($userId) {
@@ -155,7 +160,7 @@ class Comments
 
             $deletedBy = null;
             if ($row->deleted) {
-                $deletedBy = $row->findParentUsersByDeletedBy();
+                $deletedBy = $row->findParentRow(User::class, 'DeletedBy');
             }
 
             if ($row->replies_count > 0) {
@@ -199,7 +204,7 @@ class Comments
      */
     public function updateTopicView($type, $item, $userId)
     {
-        $commentTopicTable = new Comment_Topic();
+        $commentTopicTable = new CommentTopic();
         $commentTopicTable->updateTopicView($type, $item, $userId);
     }
 
@@ -211,7 +216,7 @@ class Comments
     {
         $comment = $this->getMessageTable()->find($id)->current();
 
-        if ($comment->moderator_attention == Comment_Message::MODERATOR_ATTENTION_REQUIRED) {
+        if ($comment->moderator_attention == CommentMessage::MODERATOR_ATTENTION_REQUIRED) {
             return false;
         }
 
@@ -245,11 +250,11 @@ class Comments
     {
         $comment = $this->getMessageTable()->fetchRow([
             'id = ?'                  => (int)$id,
-            'moderator_attention = ?' => Comment_Message::MODERATOR_ATTENTION_REQUIRED
+            'moderator_attention = ?' => CommentMessage::MODERATOR_ATTENTION_REQUIRED
         ]);
 
         if ($comment) {
-            $comment->moderator_attention = Comment_Message::MODERATOR_ATTENTION_COMPLETED;
+            $comment->moderator_attention = CommentMessage::MODERATOR_ATTENTION_COMPLETED;
             $comment->save();
         }
     }
@@ -330,9 +335,9 @@ class Comments
         $positiveVotes = $negativeVotes = [];
         foreach ($voteRows as $voteRow) {
             if ($voteRow->vote > 0) {
-                $positiveVotes[] = $voteRow->findParentUsers();
+                $positiveVotes[] = $voteRow->findParentRow(User::class);
             } elseif ($voteRow->vote < 0) {
-                $negativeVotes[] = $voteRow->findParentUsers();
+                $negativeVotes[] = $voteRow->findParentRow(User::class);
             }
         }
 
@@ -399,7 +404,7 @@ class Comments
         return (bool)$this->getMessageTable()->fetchRow([
             'item_id = ?'             => (int)$item,
             'type_id = ?'             => (int)$type,
-            'moderator_attention = ?' => Comment_Message::MODERATOR_ATTENTION_REQUIRED
+            'moderator_attention = ?' => CommentMessage::MODERATOR_ATTENTION_REQUIRED
         ]);
     }
 
@@ -541,7 +546,7 @@ class Comments
 
         $this->moveMessageRecursive($messageRow->id, $newTypeId, $newItemId);
 
-        $commentTopicTable = new Comment_Topic();
+        $commentTopicTable = new CommentTopic();
         $commentTopicTable->updateTopicStat($oldTypeId, $oldItemId);
         $commentTopicTable->updateTopicStat($newTypeId, $newItemId);
 

@@ -5,6 +5,8 @@ namespace Application\Service;
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineRow;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\Row as UserRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Spec\Table\Car as CarSpecTable;
 use Application\Spec\Table\Engine as EngineSpecTable;
@@ -29,8 +31,6 @@ use Car_Row;
 use Car_Types;
 use Cars;
 use Picture;
-use Users;
-use User_Row;
 
 use Exception;
 use NumberFormatter;
@@ -137,7 +137,7 @@ class SpecificationsService
     protected $types = null;
 
     /**
-     * @var Users
+     * @var User
      */
     protected $userTable;
 
@@ -156,13 +156,13 @@ class SpecificationsService
     }
 
     /**
-     * @return Users
+     * @return User
      */
     private function getUserTable()
     {
         return $this->userTable
             ? $this->userTable
-            : $this->userTable = new Users();
+            : $this->userTable = new User();
     }
 
     /**
@@ -441,7 +441,7 @@ class SpecificationsService
         return $this->translator->translate($this->listOptions[$attributeId][$id], 'default');
     }
 
-    public function getFormData($itemId, $zoneId, User_Row $user, $language)
+    public function getFormData($itemId, $zoneId, UserRow $user, $language)
     {
         $zone = $this->_getZone($zoneId);
         $itemTypeId = $zone->item_type_id;
@@ -651,7 +651,7 @@ class SpecificationsService
     /**
      * @param int $itemId
      * @param int $zoneId
-     * @param User_Row $user
+     * @param UserRow $user
      * @param array $options
      * @return AttrsZoneAttributesForm
      */
@@ -710,11 +710,11 @@ class SpecificationsService
 
     /**
      * @param Car_Row $car
-     * @param User_Row $user
+     * @param UserRow $user
      * @param array $options
      * @return array
      */
-    public function getCarForm(Car_Row $car, User_Row $user, array $options, $language)
+    public function getCarForm(Car_Row $car, UserRow $user, array $options, $language)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         return [
@@ -725,11 +725,11 @@ class SpecificationsService
 
     /**
      * @param EngineRow $engine
-     * @param User_Row $user
+     * @param UserRow $user
      * @param array $options
      * @return array
      */
-    public function getEngineForm(EngineRow $engine, User_Row $user, array $options, $language)
+    public function getEngineForm(EngineRow $engine, UserRow $user, array $options, $language)
     {
         $zoneId = 5;
         return [
@@ -1009,9 +1009,9 @@ class SpecificationsService
     /**
      * @param Car_Row $car
      * @param array $values
-     * @param User_Row $user
+     * @param UserRow $user
      */
-    public function saveCarAttributes(Car_Row $car, array $values, User_Row $user)
+    public function saveCarAttributes(Car_Row $car, array $values, UserRow $user)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         $zone = $this->_getZone($zoneId);
@@ -1038,9 +1038,9 @@ class SpecificationsService
     /**
      * @param EngineRow $engine
      * @param array $values
-     * @param User_Row $user
+     * @param UserRow $user
      */
-    public function saveEngineAttributes(EngineRow $engine, array $values, User_Row $user)
+    public function saveEngineAttributes(EngineRow $engine, array $values, UserRow $user)
     {
         $zoneId = 5;
         $zone = $this->_getZone($zoneId);

@@ -2,7 +2,7 @@
 
 namespace AutowpTest;
 
-use User_Row;
+use Application\Model\DbTable\User\Row as UserRow;
 
 use Zend_Controller_Front;
 
@@ -23,6 +23,6 @@ class RegistrationTest extends \PHPUnit_Framework_TestCase
             'ip'       => '127.0.0.1'
         ], 'en');
 
-        $this->assertInstanceOf(User_Row::class, $user);
+        $this->assertInstanceOf(UserRow::class, $user);
     }
 }

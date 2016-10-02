@@ -1,8 +1,11 @@
 <?php
 
-use Application\Db\Table\Row;
+namespace Application\Model\DbTable\User;
 
-class User_Row extends Row
+use DateInterval;
+use DateTime;
+
+class Row extends \Application\Db\Table\Row
 {
     public function getCompoundName()
     {
@@ -18,7 +21,7 @@ class User_Row extends Row
             return $this->login;
         }
 
-        return 'user'.$this->id;
+        return 'user' . $this->id;
     }
 
     public function getMessagingInterval()

@@ -17,7 +17,7 @@ class Article extends Zend_Db_Table
     protected $_referenceMap = [
         'Author' => [
             'columns'       => ['author_id'],
-            'refTableClass' => 'Users',
+            'refTableClass' => \Application\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ],
         'Html' => [

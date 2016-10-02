@@ -10,6 +10,9 @@ use Application\HostManager;
 use Application\Model\Message;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Engine;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
+use Application\Model\DbTable\User\Row as UserRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
@@ -18,9 +21,6 @@ use Attrs_Item_Types;
 use Attrs_User_Values;
 use Cars;
 use Car_Row;
-use User_Car_Subscribe;
-use Users;
-use User_Row;
 
 class CarsController extends AbstractActionController
 {
@@ -129,7 +129,7 @@ class CarsController extends AbstractActionController
                 $contribPairs = $this->specsService->getContributors(1, [$car->id]);
                 $contributors = [];
                 if ($contribPairs) {
-                    $userTable = new Users();
+                    $userTable = new User();
                     $contributors = $userTable->fetchAll(
                         $userTable->select(true)
                             ->where('id IN (?)', array_keys($contribPairs))
@@ -398,7 +398,7 @@ class CarsController extends AbstractActionController
         $values = [];
         foreach ($rows as $row) {
             $attribute = $row->findParentAttrs_Attributes();
-            $user = $row->findParentUsers();
+            $user = $row->findParentRow(User::class);
             $unit = $attribute->findParentAttrs_Units();
             $values[] = [
                 'attribute' => $attribute,
@@ -604,7 +604,7 @@ class CarsController extends AbstractActionController
                 $path = array_reverse($parents);
             }
 
-            $user = $row->findParentUsers();
+            $user = $row->findParentRow(User::class);
 
             $items[] = [
                 'date'     => $row->getDateTime('update_date'),
@@ -632,7 +632,7 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    private function userUrl(User_Row $user, $uri = null)
+    private function userUrl(UserRow $user, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user->identity ? $user->identity : 'user' . $user->id
@@ -673,7 +673,7 @@ class CarsController extends AbstractActionController
             $this->log($message, $car);
 
             $user = $this->user()->get();
-            $ucsTable = new User_Car_Subscribe();
+            $ucsTable = new UserCarSubscribe();
 
             $mModel = new Message();
 
@@ -727,7 +727,7 @@ class CarsController extends AbstractActionController
             $this->log($message, $car);
 
             $user = $this->user()->get();
-            $ucsTable = new User_Car_Subscribe();
+            $ucsTable = new UserCarSubscribe();
 
             $mModel = new Message();
 
@@ -840,7 +840,7 @@ class CarsController extends AbstractActionController
         $this->specsService->updateActualValues(1, $car->id);
 
         $user = $this->user()->get();
-        $ucsTable = new User_Car_Subscribe();
+        $ucsTable = new UserCarSubscribe();
 
         $message = sprintf(
             'Автомобилю %s назначен двигатель %s',

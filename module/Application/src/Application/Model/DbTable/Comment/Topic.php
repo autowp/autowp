@@ -1,8 +1,13 @@
 <?php
 
+namespace Application\Model\DbTable\Comment;
+
 use Application\Db\Table;
 
-class Comment_Topic extends Table
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Comment\Topic as CommentTopic;
+
+class Topic extends Table
 {
     protected $_name = 'comment_topic';
     protected $_primary = ['type_id', 'item_id'];
@@ -10,7 +15,7 @@ class Comment_Topic extends Table
     /**
      * @param int $typeId
      * @param int $itemId
-     * @return Comment_Topic_Row
+     * @return CommentTopic
      */
     public function getTopic($typeId, $itemId)
     {
@@ -20,7 +25,7 @@ class Comment_Topic extends Table
         ]);
         if (!$topic) {
 
-            $cmTable = new Comment_Message();
+            $cmTable = new CommentMessage();
 
             $lastUpdate = $cmTable->getLastUpdate($typeId, $itemId);
             $messagesCount = $cmTable->getMessagesCount($typeId, $itemId);
@@ -43,7 +48,7 @@ class Comment_Topic extends Table
      */
     public function updateTopicStat($typeId, $itemId)
     {
-        $cmTable = new Comment_Message();
+        $cmTable = new CommentMessage();
 
         $messagesCount = $cmTable->getMessagesCount($typeId, $itemId);
 

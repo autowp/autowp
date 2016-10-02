@@ -8,6 +8,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\HostManager;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Factory;
+use Application\Model\DbTable\User;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
@@ -15,7 +16,6 @@ use Cars;
 use geoPHP;
 use Picture;
 use Point;
-use Users;
 
 use Zend_Db_Expr;
 
@@ -385,7 +385,7 @@ class FactoryController extends AbstractActionController
                 $userIds = $this->textStorage->getTextUserIds($factory->text_id);
 
                 $mModel = new Message();
-                $userTable = new Users();
+                $userTable = new User();
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {
                         foreach ($userTable->find($userId) as $userRow) {

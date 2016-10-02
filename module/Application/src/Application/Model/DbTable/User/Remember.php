@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable\User;
+
 use Application\Db\Table;
 
-class User_Remember extends Table
+class Remember extends Table
 {
     protected $_name = 'user_remember';
 
@@ -11,9 +13,8 @@ class User_Remember extends Table
     protected $_referenceMap = [
         'User' => [
             'columns'       => ['user_id'],
-            'refTableClass' => 'Users',
+            'refTableClass' => \Application\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ]
     ];
-
 }

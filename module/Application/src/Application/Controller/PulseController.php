@@ -4,11 +4,11 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\DbTable\Log\Event as LogEvent;
+use Application\Model\DbTable\User;
+
 use DateInterval;
 use DateTime;
-
-use Log_Events;
-use Users;
 
 class PulseController extends AbstractActionController
 {
@@ -36,8 +36,8 @@ class PulseController extends AbstractActionController
 
     public function indexAction()
     {
-        $userTable = new Users();
-        $logTable = new Log_Events();
+        $userTable = new User();
+        $logTable = new LogEvent();
         $logAdapter = $logTable->getAdapter();
 
         $now = new DateTime();

@@ -1,6 +1,10 @@
 <?php
 
-class Comment_Message extends Zend_Db_Table
+namespace Application\Model\DbTable\Comment;
+
+use Zend_Db_Table;
+
+class Message extends Zend_Db_Table
 {
     const PICTURES_TYPE_ID = 1;
     const TWINS_TYPE_ID = 2;
@@ -15,19 +19,19 @@ class Comment_Message extends Zend_Db_Table
         MODERATOR_ATTENTION_COMPLETED = 2;
 
     protected $_name = 'comments_messages';
-    protected $_rowClass = 'Comment_Message_Row';
-    protected $_referenceMap = array(
-        'Author' => array(
-            'columns'       => array('author_id'),
-            'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        ),
-        'DeletedBy' => array(
-            'columns'       => array('deleted_by'),
-            'refTableClass' => 'Users',
-            'refColumns'    => array('id')
-        )
-    );
+    protected $_rowClass = MessageRow::class;
+    protected $_referenceMap = [
+        'Author' => [
+            'columns'       => ['author_id'],
+            'refTableClass' => \Application\Model\DbTable\User::class,
+            'refColumns'    => ['id']
+        ],
+        'DeletedBy' => [
+            'columns'       => ['deleted_by'],
+            'refTableClass' => \Application\Model\DbTable\User::class,
+            'refColumns'    => ['id']
+        ]
+    ];
 
     public function getMessagesCount($typeId, $itemId)
     {
@@ -53,10 +57,10 @@ class Comment_Message extends Zend_Db_Table
 
     public function getLastMessage($typeId, $itemId)
     {
-        return $this->fetchRow(array(
+        return $this->fetchRow([
             'item_id = ?' => $itemId,
             'type_id = ?' => $typeId
-        ), 'datetime DESC');
+        ], 'datetime DESC');
     }
 
 

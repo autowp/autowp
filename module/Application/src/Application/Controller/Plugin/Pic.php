@@ -10,11 +10,14 @@ use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
+use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
@@ -25,13 +28,10 @@ use Exception;
 use Car_Parent;
 use Car_Language;
 use Cars;
-use Comment_Message;
-use Comment_Topic;
 use Picture;
 use Picture_View;
 use Picture_Moder_Vote;
 use Picture_Row;
-use Users;
 
 use Zend_Db_Expr;
 use Zend_Db_Select;
@@ -302,13 +302,13 @@ class Pic extends AbstractPlugin
             // messages
             $messages = [];
             if (!$options['disableBehaviour'] && count($ids)) {
-                $ctTable = new Comment_Topic();
+                $ctTable = new CommentTopic();
                 $db = $ctTable->getAdapter();
                 $messages = $db->fetchPairs(
                     $ctTable->select()
                         ->from($ctTable->info('name'), ['item_id', 'messages'])
                         ->where('item_id in (?)', $ids)
-                        ->where('type_id = ?', Comment_Message::PICTURES_TYPE_ID)
+                        ->where('type_id = ?', CommentMessage::PICTURES_TYPE_ID)
                 );
             }
 
@@ -371,7 +371,7 @@ class Pic extends AbstractPlugin
                     ->joinLeft(['pv' => 'picture_view'], 'pictures.id = pv.picture_id', 'views')
                     ->joinLeft(['ct' => 'comment_topic'], 'ct.type_id = :type_id and ct.item_id = pictures.id', 'messages');
 
-                $bind['type_id'] = Comment_Message::PICTURES_TYPE_ID;
+                $bind['type_id'] = CommentMessage::PICTURES_TYPE_ID;
             }
 
             $rows = $db->fetchAll($select, $bind);
@@ -404,9 +404,9 @@ class Pic extends AbstractPlugin
         // comments
         if (!$options['disableBehaviour']) {
             if ($userId) {
-                $ctTable = new Comment_Topic();
+                $ctTable = new CommentTopic();
                 $newMessages = $ctTable->getNewMessages(
-                    Comment_Message::PICTURES_TYPE_ID,
+                    CommentMessage::PICTURES_TYPE_ID,
                     $ids,
                     $userId
                 );
@@ -771,7 +771,7 @@ class Pic extends AbstractPlugin
             $moderLinks = $this->getModerLinks($picture);
         }
 
-        $userTable = new Users();
+        $userTable = new User();
 
         $moderVotes = [];
         foreach ($picture->findPicture_Moder_Vote() as $moderVote) {
@@ -924,7 +924,7 @@ class Pic extends AbstractPlugin
                     '' => '--'
                 ], $multioptions);
 
-                $user = $picture->findParentUsersByChange_Perspective_User();
+                $user = $picture->findParentRow(User::class, 'Change_Perspective_User');
 
                 $picturePerspective = [
                     'options' => $multioptions,
@@ -944,7 +944,7 @@ class Pic extends AbstractPlugin
             'identity'          => $picture['identity'],
             'name'              => $name,
             'picture'           => $picture,
-            'owner'             => $picture->findParentUsersByOwner(),
+            'owner'             => $picture->findParentRow(User::class, 'Owner'),
             'addDate'           => $picture->getDateTime('add_date'),
             'ofLinks'           => $ofLinks,
             'moderVotes'        => $moderVotes,
@@ -1130,7 +1130,7 @@ class Pic extends AbstractPlugin
                 'messages'
             )
             ->bind([
-                'type_id' => Comment_Message::PICTURES_TYPE_ID
+                'type_id' => CommentMessage::PICTURES_TYPE_ID
             ]);
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -1188,9 +1188,9 @@ class Pic extends AbstractPlugin
         }
 
         if ($userId) {
-            $ctTable = new Comment_Topic();
+            $ctTable = new CommentTopic();
             $newMessages = $ctTable->getNewMessages(
-                Comment_Message::PICTURES_TYPE_ID,
+                CommentMessage::PICTURES_TYPE_ID,
                 $ids,
                 $userId
             );

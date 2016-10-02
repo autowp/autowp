@@ -6,6 +6,7 @@ use Autowp\Filter\Filename\Safe;
 use Autowp\Image\Storage\Request;
 
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
 
 use Exception;
 
@@ -177,9 +178,9 @@ class Picture_Row extends Row
 
     protected function _delete()
     {
-        $comments = new Comment_Message();
+        $comments = new CommentMessage();
         $comments->delete([
-            'type_id = ?' => Comment_Message::PICTURES_TYPE_ID,
+            'type_id = ?' => CommentMessage::PICTURES_TYPE_ID,
             'item_id = ?' => $this->id,
         ]);
 

@@ -10,7 +10,7 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Autowp\TextStorage;
 
-use Comment_Message;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
 
 use Picture;
 
@@ -492,10 +492,10 @@ return [
                         'options' => [
                             'label'   => 'moder/comments/filter/moderator_attention',
                             'options' => [
-                                ''                                             => 'moder/comments/filter/moderator_attention/not-matters',
-                                Comment_Message::MODERATOR_ATTENTION_NONE      => 'moder/comments/filter/moderator_attention/not-required',
-                                Comment_Message::MODERATOR_ATTENTION_REQUIRED  => 'moder/comments/filter/moderator_attention/required',
-                                Comment_Message::MODERATOR_ATTENTION_COMPLETED => 'moder/comments/filter/moderator_attention/resolved',
+                                ''                                            => 'moder/comments/filter/moderator_attention/not-matters',
+                                CommentMessage::MODERATOR_ATTENTION_NONE      => 'moder/comments/filter/moderator_attention/not-required',
+                                CommentMessage::MODERATOR_ATTENTION_REQUIRED  => 'moder/comments/filter/moderator_attention/required',
+                                CommentMessage::MODERATOR_ATTENTION_COMPLETED => 'moder/comments/filter/moderator_attention/resolved',
                             ]
                         ]
                     ]

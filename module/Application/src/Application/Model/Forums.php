@@ -3,13 +3,13 @@
 namespace Application\Model;
 
 use Application\Db\Table;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend_Db_Expr;
 
 use Comments;
-use Comment_Message;
-use Comment_Topic;
 
 class Forums
 {
@@ -79,7 +79,7 @@ class Forums
                     ->where('forums_topics.status IN (?)', [self::STATUS_NORMAL, self::STATUS_CLOSED])
                     ->where('forums_theme_parent.parent_id = ?', $row->id)
                     ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', null)
-                    ->where('comment_topic.type_id = ?', Comment_Message::FORUMS_TYPE_ID)
+                    ->where('comment_topic.type_id = ?', CommentMessage::FORUMS_TYPE_ID)
                     ->order('comment_topic.last_update DESC')
             );
             if ($lastTopicRow) {
@@ -88,12 +88,12 @@ class Forums
                     'name' => $lastTopicRow->caption
                 ];
 
-                $lastMessageRow = $comments->getLastMessageRow(Comment_Message::FORUMS_TYPE_ID, $lastTopicRow->id);
+                $lastMessageRow = $comments->getLastMessageRow(CommentMessage::FORUMS_TYPE_ID, $lastTopicRow->id);
                 if ($lastMessageRow) {
                     $lastMessage = [
                         'id'     => $lastMessageRow->id,
                         'date'   => $lastMessageRow->getDateTime('datetime'),
-                        'author' => $lastMessageRow->findParentUsersByAuthor()
+                        'author' => $lastMessageRow->findParentRow(User::class, 'Author')
                     ];
                 }
             }
@@ -204,7 +204,7 @@ class Forums
         }
 
         $comments = new Comments();
-        $needAttention = $comments->topicHaveModeratorAttention(Comment_Message::FORUMS_TYPE_ID, $topic->id);
+        $needAttention = $comments->topicHaveModeratorAttention(CommentMessage::FORUMS_TYPE_ID, $topic->id);
 
         if ($needAttention) {
             throw new \Exception("Cannot delete row when moderator attention not closed");
@@ -233,7 +233,7 @@ class Forums
                 ->where('forums_topics.status IN (?)', [self::STATUS_NORMAL, self::STATUS_CLOSED])
         );
 
-        $messages = new Comment_Message();
+        $messages = new CommentMessage();
 
         $db = $messages->getAdapter();
 
@@ -241,7 +241,7 @@ class Forums
             $db->select()
                 ->from($messages->info('name'), new Zend_Db_Expr('COUNT(1)'))
                 ->join('forums_topics', 'comments_messages.item_id = forums_topics.id', null)
-                ->where('comments_messages.type_id = ?', Comment_Message::FORUMS_TYPE_ID)
+                ->where('comments_messages.type_id = ?', CommentMessage::FORUMS_TYPE_ID)
                 ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', null)
                 ->where('forums_theme_parent.parent_id = ?', $theme->id)
                 ->where('forums_topics.status IN (?)', [self::STATUS_NORMAL, self::STATUS_CLOSED])
@@ -255,7 +255,7 @@ class Forums
         $select = $this->topicTable->select(true)
             ->where('forums_topics.status IN (?)', [self::STATUS_CLOSED, self::STATUS_NORMAL])
             ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', null)
-            ->where('comment_topic.type_id = ?', Comment_Message::FORUMS_TYPE_ID)
+            ->where('comment_topic.type_id = ?', CommentMessage::FORUMS_TYPE_ID)
             ->order('comment_topic.last_update DESC');
 
         if ($themeId) {
@@ -273,12 +273,12 @@ class Forums
             ->setCurrentPageNumber($page);
 
         $comments = new Comments();
-        $commentTopicTable = new Comment_Topic();
+        $commentTopicTable = new CommentTopic();
 
         $topics = [];
 
         foreach ($paginator->getCurrentItems() as $topicRow) {
-            $topicPaginator = $comments->getMessagePaginator(Comment_Message::FORUMS_TYPE_ID, $topicRow->id)
+            $topicPaginator = $comments->getMessagePaginator(CommentMessage::FORUMS_TYPE_ID, $topicRow->id)
                 ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
                 ->setPageRange(10);
 
@@ -286,7 +286,7 @@ class Forums
 
             if ($userId) {
                 $stat = $commentTopicTable->getTopicStatForUser(
-                    Comment_Message::FORUMS_TYPE_ID,
+                    CommentMessage::FORUMS_TYPE_ID,
                     $topicRow->id,
                     $userId
                 );
@@ -294,7 +294,7 @@ class Forums
                 $newMessages = $stat['newMessages'];
             } else {
                 $stat = $commentTopicTable->getTopicStat(
-                    Comment_Message::FORUMS_TYPE_ID,
+                    CommentMessage::FORUMS_TYPE_ID,
                     $topicRow->id
                 );
                 $messages = $stat['messages'];
@@ -305,12 +305,12 @@ class Forums
 
             $lastMessage = false;
             if ($messages > 0) {
-                $lastMessageRow = $comments->getLastMessageRow(Comment_Message::FORUMS_TYPE_ID, $topicRow->id);
+                $lastMessageRow = $comments->getLastMessageRow(CommentMessage::FORUMS_TYPE_ID, $topicRow->id);
                 if ($lastMessageRow) {
                     $lastMessage = [
                         'id'     => $lastMessageRow->id,
                         'date'   => $lastMessageRow->getDateTime('datetime'),
-                        'author' => $lastMessageRow->findParentUsersByAuthor()
+                        'author' => $lastMessageRow->findParentRow(User::class, 'Author')
                     ];
                 }
             }
@@ -406,7 +406,7 @@ class Forums
         $comments = new Comments();
 
         $comments->add([
-            'typeId'             => Comment_Message::FORUMS_TYPE_ID,
+            'typeId'             => CommentMessage::FORUMS_TYPE_ID,
             'itemId'             => $topic->id,
             'authorId'           => $userId,
             'datetime'           => new Zend_Db_Expr('NOW()'),
@@ -463,7 +463,7 @@ class Forums
             ->joinLeft('comment_topic', 'forums_topics.id = comment_topic.item_id and comment_topic.type_id = :type_id', null)
             ->order('comment_topic.last_update DESC')
             ->bind([
-                'type_id' => Comment_Message::FORUMS_TYPE_ID
+                'type_id' => CommentMessage::FORUMS_TYPE_ID
             ]);
 
         if ($themeId) {
@@ -491,7 +491,7 @@ class Forums
         }
 
         $comments = new Comments();
-        $comments->moveMessage($messageId, Comment_Message::FORUMS_TYPE_ID, $topic->id);
+        $comments->moveMessage($messageId, CommentMessage::FORUMS_TYPE_ID, $topic->id);
 
         return true;
     }
@@ -564,7 +564,7 @@ class Forums
             return false;
         }
 
-        if ($message->type_id != Comment_Message::FORUMS_TYPE_ID) {
+        if ($message->type_id != CommentMessage::FORUMS_TYPE_ID) {
             return false;
         }
 
@@ -590,9 +590,9 @@ class Forums
         ]);
 
         if ($userId) {
-            $commentTopicTable = new Comment_Topic();
+            $commentTopicTable = new CommentTopic();
             $commentTopicTable->updateTopicView(
-                    Comment_Message::FORUMS_TYPE_ID,
+                    CommentMessage::FORUMS_TYPE_ID,
                     $topicId,
                     $userId
             );
@@ -619,7 +619,7 @@ class Forums
         $comments = new Comments();
 
         $messages = $comments->get(
-            Comment_Message::FORUMS_TYPE_ID,
+            CommentMessage::FORUMS_TYPE_ID,
             $topic['id'],
             $userId,
             self::TOPICS_PER_PAGE,
@@ -627,7 +627,7 @@ class Forums
         );
 
         $paginator = $comments->getPaginator(
-            Comment_Message::FORUMS_TYPE_ID,
+            CommentMessage::FORUMS_TYPE_ID,
             $topic['id'],
             self::TOPICS_PER_PAGE,
             $page
@@ -655,7 +655,7 @@ class Forums
         $comments = new Comments();
 
         $messageId = $comments->add([
-            'typeId'             => Comment_Message::FORUMS_TYPE_ID,
+            'typeId'             => CommentMessage::FORUMS_TYPE_ID,
             'itemId'             => $values['topic_id'],
             'parentId'           => $values['parent_id'] ? $values['parent_id'] : null,
             'authorId'           => $values['user_id'],
@@ -697,18 +697,18 @@ class Forums
                 )
                 ->where('forums_topics_subscribers.user_id = ?', (int)$userId)
                 ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', null)
-                ->where('comment_topic.type_id = ?', Comment_Message::FORUMS_TYPE_ID)
+                ->where('comment_topic.type_id = ?', CommentMessage::FORUMS_TYPE_ID)
                 ->order('comment_topic.last_update DESC')
         );
 
         $comments = new Comments();
-        $commentTopicTable = new Comment_Topic();
+        $commentTopicTable = new CommentTopic();
 
         $topics = [];
         foreach ($rows as $row) {
 
             $stat = $commentTopicTable->getTopicStatForUser(
-                    Comment_Message::FORUMS_TYPE_ID,
+                    CommentMessage::FORUMS_TYPE_ID,
                     $row->id,
                     $userId
             );
@@ -722,14 +722,14 @@ class Forums
             $lastMessage = false;
             if ($messages > 0) {
                 $lastMessageRow = $comments->getLastMessageRow(
-                        Comment_Message::FORUMS_TYPE_ID,
+                        CommentMessage::FORUMS_TYPE_ID,
                         $row->id
                 );
                 if ($lastMessageRow) {
                     $lastMessage = [
                         'id'     => $lastMessageRow->id,
                         'date'   => $lastMessageRow->getDateTime('datetime'),
-                        'author' => $lastMessageRow->findParentUsersByAuthor(),
+                        'author' => $lastMessageRow->findParentRow(User::class, 'Author'),
                     ];
                 }
             }

@@ -8,14 +8,14 @@ use Zend\View\Model\ViewModel;
 
 use Application\HostManager;
 use Application\Model\DbTable\Article;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Museum;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Voting;
+use Application\Model\DbTable\User;
 use Application\Model\Message;
 
-use Comment_Message;
 use Comments;
-use Users;
 
 use DateTime;
 use Exception;
@@ -86,14 +86,14 @@ class CommentsController extends AbstractRestfulController
     private function messageUrl($typeId, $object, $canonical, $uri = null)
     {
         switch ($typeId) {
-            case Comment_Message::PICTURES_TYPE_ID:
+            case CommentMessage::PICTURES_TYPE_ID:
                 $url = $this->pic()->href($object, [
                     'canonical' => $canonical,
                     'uri'       => $uri
                 ]);
                 break;
 
-            case Comment_Message::TWINS_TYPE_ID:
+            case CommentMessage::TWINS_TYPE_ID:
                 $url = $this->url()->fromRoute('twins/group', [
                     'id' => $object->id
                 ], [
@@ -102,7 +102,7 @@ class CommentsController extends AbstractRestfulController
                 ]);
                 break;
 
-            case Comment_Message::VOTINGS_TYPE_ID:
+            case CommentMessage::VOTINGS_TYPE_ID:
                 $url = $this->url()->fromRoute('votings/voting', [
                     'id' => $object->id
                 ], [
@@ -111,7 +111,7 @@ class CommentsController extends AbstractRestfulController
                 ]);
                 break;
 
-            case Comment_Message::ARTICLES_TYPE_ID:
+            case CommentMessage::ARTICLES_TYPE_ID:
                 $url = $this->url()->fromRoute('articles', [
                     'action'          => 'article',
                     'article_catname' => $object->catname
@@ -121,7 +121,7 @@ class CommentsController extends AbstractRestfulController
                 ]);
                 break;
 
-            case Comment_Message::MUSEUMS_TYPE_ID:
+            case CommentMessage::MUSEUMS_TYPE_ID:
                 $url = $this->url()->fromRoute('museums/museum', [
                     'id' => $object->id
                 ], [
@@ -165,27 +165,27 @@ class CommentsController extends AbstractRestfulController
 
             $object = null;
             switch ($typeId) {
-                case Comment_Message::PICTURES_TYPE_ID:
+                case CommentMessage::PICTURES_TYPE_ID:
                     $pictures = $this->catalogue()->getPictureTable();
                     $object = $pictures->find($itemId)->current();
                     break;
 
-                case Comment_Message::TWINS_TYPE_ID:
+                case CommentMessage::TWINS_TYPE_ID:
                     $twinsGroups = new TwinsGroup();
                     $object = $twinsGroups->find($itemId)->current();
                     break;
 
-                case Comment_Message::VOTINGS_TYPE_ID:
+                case CommentMessage::VOTINGS_TYPE_ID:
                     $vTable = new Voting();
                     $object = $vTable->find($itemId)->current();
                     break;
 
-                case Comment_Message::ARTICLES_TYPE_ID:
+                case CommentMessage::ARTICLES_TYPE_ID:
                     $articles = new Article();
                     $object = $articles->find($itemId)->current();
                     break;
 
-                case Comment_Message::MUSEUMS_TYPE_ID:
+                case CommentMessage::MUSEUMS_TYPE_ID:
                     $museums = new Museum();
                     $object = $museums->find($itemId)->current();
                     break;
@@ -231,7 +231,7 @@ class CommentsController extends AbstractRestfulController
             if ($values['parent_id']) {
                 $authorId = $this->comments->getMessageAuthorId($values['parent_id']);
                 if ($authorId && ($authorId != $user->id)) {
-                    $userTable = new Users();
+                    $userTable = new User();
                     $parentMessageAuthor = $userTable->find($authorId)->current();
                     if ($parentMessageAuthor && !$parentMessageAuthor->deleted) {
 

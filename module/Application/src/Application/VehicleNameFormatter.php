@@ -50,7 +50,6 @@ class VehicleNameFormatter
         $ey = $car['end_year'];
         $em = $car['end_month'];
         $cy = (int)date('Y');
-        $cm = (int)date('m');
 
         $bmy = $car['begin_model_year'];
         $emy = $car['end_model_year'];

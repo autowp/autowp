@@ -3,13 +3,13 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-
 use Zend\Permissions\Acl\Acl;
 
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\User;
+
 use Cars;
-use Comment_Message;
 use Picture;
-use Users;
 
 class AboutController extends AbstractActionController
 {
@@ -25,7 +25,7 @@ class AboutController extends AbstractActionController
 
     public function indexAction()
     {
-        $userTable = new Users();
+        $userTable = new User();
         $userTableAdapter = $userTable->getAdapter();
         $totalUsers = $userTableAdapter->fetchOne(
             $userTableAdapter->select()
@@ -81,7 +81,7 @@ class AboutController extends AbstractActionController
         );
         $totalCars = round($totalCars, -3);
 
-        $commentMessageTable = new Comment_Message();
+        $commentMessageTable = new CommentMessage();
         $commentMessageTableAdapter = $commentMessageTable->getAdapter();
         $totalComments = $commentMessageTableAdapter->fetchOne(
             $commentMessageTableAdapter->select()

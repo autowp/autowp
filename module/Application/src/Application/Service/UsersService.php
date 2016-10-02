@@ -5,14 +5,14 @@ namespace Application\Service;
 use Zend\Mail;
 
 use Application\Auth\Adapter\Login as LoginAuthAdapter;
+use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\User;
+use Application\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
+use Application\Model\DbTable\User\Remember as UserRemember;
+use Application\Model\DbTable\User\Row as UserRow;
 use Application\Service\SpecificationsService;
 
-use Comment_Message;
 use Picture;
-use User_Password_Remind;
-use User_Remember;
-use Users;
-use User_Row;
 
 use DateTime;
 use Exception;
@@ -22,7 +22,7 @@ use Zend_Db_Expr;
 class UsersService
 {
     /**
-     * @var Users
+     * @var User
      */
     private $table;
 
@@ -48,13 +48,13 @@ class UsersService
     private $specsService = null;
 
     /**
-     * @return Users
+     * @return User
      */
     private function getTable()
     {
         return $this->table
             ? $this->table
-            : $this->table = new Users();
+            : $this->table = new User();
     }
 
     public function __construct(
@@ -153,11 +153,11 @@ class UsersService
     }
 
     /**
-     * @param User_Row $user
+     * @param UserRow $user
      * @param string $email
      * @param string $language
      */
-    public function changeEmailStart(User_Row $user, $email, $language)
+    public function changeEmailStart(UserRow $user, $email, $language)
     {
         $host = $this->getHostOptions($language);
 
@@ -172,7 +172,7 @@ class UsersService
 
     /**
      * @param string $code
-     * @return boolean|User_Row
+     * @return boolean|UserRow
      */
     public function emailChangeFinish($code)
     {
@@ -200,10 +200,10 @@ class UsersService
     }
 
     /**
-     * @param User_Row $user
+     * @param UserRow $user
      * @param string $hostname
      */
-    public function sendRegistrationConfirmEmail(User_Row $user, $hostname)
+    public function sendRegistrationConfirmEmail(UserRow $user, $hostname)
     {
         if ($user->email_to_check && $user->email_check_code) {
 
@@ -238,10 +238,10 @@ class UsersService
     }
 
     /**
-     * @param User_Row $user
+     * @param UserRow $user
      * @param string $hostname
      */
-    public function sendChangeConfirmEmail(User_Row $user, $hostname)
+    public function sendChangeConfirmEmail(UserRow $user, $hostname)
     {
         if ($user->email_to_check && $user->email_check_code) {
 
@@ -317,7 +317,7 @@ class UsersService
 
         $default = 10;
 
-        $commentTable = new Comment_Message();
+        $commentTable = new CommentMessage();
         $db = $commentTable->getAdapter();
 
         $avgVote = $db->fetchOne(
@@ -363,7 +363,7 @@ class UsersService
         ]);
     }
 
-    public function setPassword(User_Row $user, $password)
+    public function setPassword(UserRow $user, $password)
     {
         $uTable = $this->getTable();
         $passwordExpr = $this->passwordHashExpr($password);
@@ -374,7 +374,7 @@ class UsersService
 
     public function createRememberToken($userId)
     {
-        $table = new User_Remember();
+        $table = new UserRemember();
 
         do {
             $token = md5($this->salt . microtime());
@@ -394,7 +394,7 @@ class UsersService
 
     public function createRestorePasswordToken($userId)
     {
-        $uprTable = new User_Password_Remind();
+        $uprTable = new UserPasswordRemind();
 
         do {
             $code = md5($this->salt . uniqid());

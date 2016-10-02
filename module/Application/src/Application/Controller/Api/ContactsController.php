@@ -6,8 +6,7 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Application\Model\Contact;
-
-use Users;
+use Application\Model\DbTable\User;
 
 class ContactsController extends AbstractRestfulController
 {
@@ -31,7 +30,7 @@ class ContactsController extends AbstractRestfulController
 
         $contact = new Contact();
 
-        $userTable = new Users();
+        $userTable = new User();
         $user = $userTable->fetchRow([
             'id = ?' => (int)$id,
             'not deleted'
@@ -68,7 +67,7 @@ class ContactsController extends AbstractRestfulController
 
         $contact = new Contact();
 
-        $userTable = new Users();
+        $userTable = new User();
         $user = $userTable->fetchRow([
             'id = ?' => (int)$id,
             'not deleted'

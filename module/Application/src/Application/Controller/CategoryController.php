@@ -8,11 +8,11 @@ use Zend\View\Model\ViewModel;
 
 use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
+use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Car_Parent;
 use Picture;
-use Users;
 
 use Zend_Db_Expr;
 
@@ -400,7 +400,7 @@ class CategoryController extends AbstractActionController
                 ->setItemCountPerPage($this->catalogue()->getCarsPerPage())
                 ->setCurrentPageNumber($this->params('page'));
 
-            $users = new Users();
+            $users = new User();
             $contributors = $users->fetchAll(
                 $users->select(true)
                     ->join('category_car', 'users.id = category_car.user_id', null)

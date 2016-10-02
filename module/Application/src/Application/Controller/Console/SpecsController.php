@@ -5,9 +5,8 @@ namespace Application\Controller\Console;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\DbTable\User;
 use Application\Service\SpecificationsService;
-
-use Users;
 
 class SpecsController extends AbstractActionController
 {
@@ -57,7 +56,7 @@ class SpecsController extends AbstractActionController
 
     public function updateSpecsVolumesAction()
     {
-        $userTable = new Users();
+        $userTable = new User();
 
         $userTable->updateSpecsVolumes();
 
