@@ -1,12 +1,21 @@
 <?php
 
+namespace Application\Model\DbTable\Log;
+
 use Application\Db\Table\Row;
 
-class Log_Events_Row extends Row
+use Cars;
+use Picture;
+
+use Zend_Db_Table_Row_Abstract;
+
+use Exception;
+
+class EventRow extends Row
 {
     public function assign($items)
     {
-        $items = is_array($items) ? $items : array($items);
+        $items = is_array($items) ? $items : [$items];
 
         foreach ($items as $item) {
             if (!($item instanceof Zend_Db_Table_Row_Abstract)) {
@@ -54,10 +63,10 @@ class Log_Events_Row extends Row
             }
 
             if ($col && $tableName) {
-                $this->getTable()->getAdapter()->insert($tableName, array(
+                $this->getTable()->getAdapter()->insert($tableName, [
                     'log_event_id' => $this->id,
                     $col           => $item->id
-                ));
+                ]);
             }
         }
         return $this;

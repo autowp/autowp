@@ -7,10 +7,10 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
+use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Log_Events;
 use Cars;
 use Picture;
 
@@ -24,7 +24,7 @@ class LogController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $logTable = new Log_Events();
+        $logTable = new LogEvent();
         $vehicleTable = new Cars();
         $brandModel = new BrandModel();
         $engineTable = new Engine();

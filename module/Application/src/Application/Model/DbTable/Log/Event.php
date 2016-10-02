@@ -1,11 +1,15 @@
 <?php
 
+namespace Application\Model\DbTable\Log;
+
 use Application\Db\Table;
 
-class Log_Events extends Table
+use Zend_Db_Expr;
+
+class Event extends Table
 {
     protected $_name = 'log_events';
-    protected $_rowClass = 'Log_Events_Row';
+    protected $_rowClass = EventRow::class;
     protected $_referenceMap = [
         'User' => [
             'columns'       => ['user_id'],

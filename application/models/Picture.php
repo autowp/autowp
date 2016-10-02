@@ -7,6 +7,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
+use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Perspective;
 
 class Picture extends Table
@@ -596,7 +597,7 @@ class Picture extends Table
         $this->refreshCounts($oldParams);
         $this->refreshCounts($picture->toArray());
 
-        $log = new Log_Events();
+        $log = new LogEvent();
         $log($userId, sprintf(
             'Назначение двигателя %s картинке %s',
             htmlspecialchars($engine->caption),
@@ -646,7 +647,7 @@ class Picture extends Table
         $this->refreshCounts($oldParams);
         $this->refreshCounts($picture->toArray());
 
-        $log = new Log_Events();
+        $log = new LogEvent();
         $log($userId, sprintf(
             'Картинка %s связана с автомобилем %s',
             htmlspecialchars($picture->id),
@@ -695,7 +696,7 @@ class Picture extends Table
         $this->refreshCounts($oldParams);
         $this->refreshCounts($picture->toArray());
 
-        $log = new Log_Events();
+        $log = new LogEvent();
         $log($userId, sprintf(
             'Назначение бренда %s картинке %s',
             htmlspecialchars($brand->caption),
@@ -743,7 +744,7 @@ class Picture extends Table
         $this->refreshCounts($oldParams);
         $this->refreshCounts($picture->toArray());
 
-        $log = new Log_Events();
+        $log = new LogEvent();
         $log($userId, sprintf(
             'Назначение завода %s картинке %s',
             htmlspecialchars($factory->name),
