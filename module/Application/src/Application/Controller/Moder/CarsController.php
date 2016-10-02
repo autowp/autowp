@@ -1645,7 +1645,7 @@ class CarsController extends AbstractActionController
             $filter['category_id NOT IN (?)'] = $ids;
         }
         foreach ($ccTable->fetchAll($filter) as $oldCc) {
-            $oldCategory = $oldCc->findParentCategory();
+            $oldCategory = $oldCc->findParentRow(Category::class);
             if ($oldCategory) {
                 $deletedNames[] = $oldCategory->name;
 

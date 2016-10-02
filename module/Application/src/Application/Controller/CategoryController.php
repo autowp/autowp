@@ -230,7 +230,7 @@ class CategoryController extends AbstractActionController
 
         $topCategory = $currentCategory;
 
-        while ($parentCategory = $topCategory->findParentCategory()) {
+        while ($parentCategory = $topCategory->findParentRow(Category::class)) {
             $topCategory = $parentCategory;
 
             $categoryLang = $this->categoryLanguageTable->fetchRow([
