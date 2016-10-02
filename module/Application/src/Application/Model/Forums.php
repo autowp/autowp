@@ -5,6 +5,7 @@ namespace Application\Model;
 use Application\Db\Table;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
+use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend_Db_Expr;
