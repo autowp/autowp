@@ -5,8 +5,8 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Factory;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 
-use Car_Parent;
 use Cars;
 use geoPHP;
 use Picture;
@@ -62,7 +62,7 @@ class FactoriesController extends AbstractActionController
             ], $this->catalogue()->carsOrdering());
 
             $catalogue = $this->catalogue();
-            $carParentTable = new Car_Parent();
+            $carParentTable = new VehicleParent();
 
             foreach ($cars as $car) {
 

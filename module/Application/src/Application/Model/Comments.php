@@ -1,11 +1,15 @@
 <?php
 
+namespace Application\Model;
+
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\DbTable\Comment\Vote as CommentVote;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Row as UserRow;
+
+use Zend_Db_Expr;
 
 class Comments
 {
@@ -22,7 +26,7 @@ class Comments
     /**
      * @return CommentMessage
      */
-    protected function getMessageTable()
+    private function getMessageTable()
     {
         return $this->messageTable
             ? $this->messageTable
@@ -32,7 +36,7 @@ class Comments
     /**
      * @return CommentVote
      */
-    protected function getVoteTable()
+    private function getVoteTable()
     {
         return $this->voteTable
             ? $this->voteTable

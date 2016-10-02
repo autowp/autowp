@@ -12,11 +12,11 @@ use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\DbTable\User;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 
-use Car_Parent;
-use Car_Row;
 use Picture;
 
 use Zend_Db_Expr;
@@ -124,7 +124,7 @@ class IndexController extends AbstractActionController
         return $pictures;
     }
 
-    private function carLinks(Car_Row $car)
+    private function carLinks(VehicleRow $car)
     {
         $items = [];
 
@@ -287,7 +287,7 @@ class IndexController extends AbstractActionController
                         'language' => $language
                     ]);
 
-                    $carParentTable = new Car_Parent();
+                    $carParentTable = new VehicleParent();
 
                     $paths = $carParentTable->getPaths($carOfDay->id, [
                         'breakOnFirst' => true

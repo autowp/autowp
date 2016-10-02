@@ -10,8 +10,8 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\BrandAlias;
+use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 
-use Car_Language;
 use Picture;
 
 use Zend_Db_Expr;
@@ -117,7 +117,7 @@ class Sidebar extends AbstractPlugin
 
             $aliases = $this->getBrandAliases($brand);
 
-            $carLanguageTable = new Car_Language();
+            $carLanguageTable = new VehicleLanguage();
 
             $groups = [];
             foreach ($db->fetchAll($select) as $brandCarRow) {

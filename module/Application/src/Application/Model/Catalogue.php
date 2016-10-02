@@ -8,10 +8,10 @@ use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandEngine;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineRow;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
+use Application\Model\DbTable\Vehicle\Type as VehicleType;
 
-use Car_Parent;
-use Car_Row;
-use Car_Types;
 use Cars;
 use Picture;
 
@@ -39,12 +39,12 @@ class Catalogue
     private $carTable;
 
     /**
-     * @var Car_Parent
+     * @var VehicleParent
      */
     private $carParentTable;
 
     /**
-     * @var Car_Types
+     * @var VehicleType
      */
     private $carTypeTable;
 
@@ -142,23 +142,23 @@ class Catalogue
     }
 
     /**
-     * @return Car_Parent
+     * @return VehicleParent
      */
     public function getCarParentTable()
     {
         return $this->carParentTable
             ? $this->carParentTable
-            : $this->carParentTable = new Car_Parent();
+            : $this->carParentTable = new VehicleParent();
     }
 
     /**
-     * @return Car_Types
+     * @return VehicleType
      */
     public function getCarTypeTable()
     {
         return $this->carTypeTable
         ? $this->carTypeTable
-        : $this->carTypeTable = new Car_Types();
+        : $this->carTypeTable = new VehicleType();
     }
 
     /**
@@ -192,10 +192,10 @@ class Catalogue
     }
 
     /**
-     * @param Car_Row $car
+     * @param VehicleRow $car
      * @return array
      */
-    public function cataloguePaths(Car_Row $car)
+    public function cataloguePaths(VehicleRow $car)
     {
         return $this->walkUpUntilBrand($car->id, []);
     }

@@ -1,8 +1,14 @@
 <?php
 
-use Application\Db\Table;
+namespace Application\Model\DbTable\Vehicle;
 
-class Car_Parent_Cache extends Table
+use Application\Db\Table;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
+
+use Cars;
+
+class ParentCache extends Table
 {
     protected $_name = 'car_parent_cache';
     protected $_primary = ['car_id', 'parent_id'];
@@ -21,18 +27,18 @@ class Car_Parent_Cache extends Table
     ];
 
     /**
-     * @var Car_Parent
+     * @var VehicleParent
      */
     private $carParentTable;
 
     /**
-     * @return Car_Parent
+     * @return VehicleParent
      */
     private function getCarParentTable()
     {
         return $this->carParentTable
             ? $this->carParentTable
-            : $this->carParentTable = new Car_Parent();
+            : $this->carParentTable = new VehicleParent();
     }
 
     private function collectParentInfo($id, $diff = 1)
@@ -51,9 +57,9 @@ class Car_Parent_Cache extends Table
         $result = [];
         foreach ($rows as $row) {
             $parentId = $row['parent_id'];
-            $isTuning = $row['type'] == Car_Parent::TYPE_TUNING;
-            $isSport  = $row['type'] == Car_Parent::TYPE_SPORT;
-            $isDesign = $row['type'] == Car_Parent::TYPE_DESIGN;
+            $isTuning = $row['type'] == VehicleParent::TYPE_TUNING;
+            $isSport  = $row['type'] == VehicleParent::TYPE_SPORT;
+            $isDesign = $row['type'] == VehicleParent::TYPE_DESIGN;
             $result[$parentId] = [
                 'diff'   => $diff,
                 'tuning' => $isTuning,
@@ -76,7 +82,7 @@ class Car_Parent_Cache extends Table
 
     /*protected function _collectParentIds($id)
     {
-        $cpTable = new Car_Parent();
+        $cpTable = new VehicleParent();
 
         $cpTableName = $cpTable->info('name');
         $adapter = $cpTable->getAdapter();
@@ -105,7 +111,7 @@ class Car_Parent_Cache extends Table
         return $ids;
     }*/
 
-    /*public function rebuildCache(Car_Row $car)
+    /*public function rebuildCache(VehicleRow $car)
     {
         $id = (int)$car->id;
 
@@ -152,7 +158,7 @@ class Car_Parent_Cache extends Table
         }
     }*/
 
-    public function rebuildCache(Car_Row $car)
+    public function rebuildCache(VehicleRow $car)
     {
         $id = (int)$car->id;
 

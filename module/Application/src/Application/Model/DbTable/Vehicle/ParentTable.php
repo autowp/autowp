@@ -1,9 +1,17 @@
 <?php
 
+namespace Application\Model\DbTable\Vehicle;
+
 use Application\Db\Table;
 use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\Vehicle\ParentCache;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 
-class Car_Parent extends Table
+use Exception;
+
+use Zend_Db_Expr;
+
+class ParentTable extends Table
 {
     protected $_name = 'car_parent';
     protected $_primary = ['car_id', 'parent_id'];
@@ -84,7 +92,7 @@ class Car_Parent extends Table
         return array_unique($ids);
     }
 
-    public function addParent(Car_Row $car, Car_Row $parent, array $options = [])
+    public function addParent(VehicleRow $car, VehicleRow $parent, array $options = [])
     {
         if (!$parent->is_group) {
             throw new Exception("Only groups can have childs");
@@ -121,11 +129,11 @@ class Car_Parent extends Table
             $row->save();
         }
 
-        $cpcTable = new Car_Parent_Cache();
+        $cpcTable = new ParentCache();
         $cpcTable->rebuildCache($car);
     }
 
-    public function removeParent(Car_Row $car, Car_Row $parent)
+    public function removeParent(VehicleRow $car, VehicleRow $parent)
     {
         $id = (int)$car->id;
         $parentId = (int)$parent->id;
@@ -138,7 +146,7 @@ class Car_Parent extends Table
             $row->delete();
         }
 
-        $cpcTable = new Car_Parent_Cache();
+        $cpcTable = new ParentCache();
         $cpcTable->rebuildCache($car);
     }
 

@@ -18,6 +18,8 @@ use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\User;
+use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
@@ -25,8 +27,6 @@ use Application\Service\SpecificationsService;
 
 use Exception;
 
-use Car_Parent;
-use Car_Language;
 use Cars;
 use Picture;
 use Picture_View;
@@ -153,7 +153,7 @@ class Pic extends AbstractPlugin
 
             case Picture::VEHICLE_TYPE_ID:
                 if ($row['car_id']) {
-                    $carParentTable = new Car_Parent();
+                    $carParentTable = new VehicleParent();
                     $paths = $carParentTable->getPaths($row['car_id'], [
                         'breakOnFirst' => true
                     ]);
@@ -414,7 +414,7 @@ class Pic extends AbstractPlugin
         }
 
         $brandTable = new BrandTable();
-        $carParentTable = new Car_Parent();
+        $carParentTable = new VehicleParent();
 
         $items = [];
         foreach ($rows as $idx => $row) {
@@ -627,7 +627,7 @@ class Pic extends AbstractPlugin
                     // alt names
                     $altNames = [];
 
-                    $carLangTable = new Car_Language();
+                    $carLangTable = new VehicleLanguage();
                     $carLangRows = $carLangTable->fetchAll([
                         'car_id = ?' => $car->id
                     ]);
@@ -871,7 +871,7 @@ class Pic extends AbstractPlugin
             $carTable = new Cars();
             $carRow = $carTable->find($mRow->car_id)->current();
             if ($carRow) {
-                $carParentTable = new Car_Parent();
+                $carParentTable = new VehicleParent();
                 $paths = $carParentTable->getPaths($carRow->id, [
                     'breakOnFirst' => true
                 ]);

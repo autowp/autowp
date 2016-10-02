@@ -2,7 +2,7 @@
 
 namespace Application\View\Helper;
 
-use Comments as CommentsModel;
+use Application\Model\Comments as CommentsModel;
 
 use Zend\View\Helper\AbstractHelper;
 

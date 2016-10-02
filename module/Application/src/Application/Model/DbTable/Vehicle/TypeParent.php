@@ -1,8 +1,11 @@
 <?php
 
-use Application\Db\Table;
+namespace Application\Model\DbTable\Vehicle;
 
-class Car_Types_Parents extends Table
+use Application\Db\Table;
+use Application\Model\DbTable\Vehicle\Type as VehicleType;
+
+class TypeParent extends Table
 {
     protected $_name = 'car_types_parents';
 
@@ -10,12 +13,12 @@ class Car_Types_Parents extends Table
     {
         $this->delete([]);
 
-        $table = new Car_Types();
+        $table = new VehicleType();
 
         $this->rebuildStep($table, [0], 0);
     }
 
-    private function rebuildStep(Car_Types $table, $id, $level)
+    private function rebuildStep(VehicleType $table, $id, $level)
     {
         $select = $table->select()
             ->from($table, 'id');

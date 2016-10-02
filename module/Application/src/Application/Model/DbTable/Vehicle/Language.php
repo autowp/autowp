@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable\Vehicle;
+
 use Application\Db\Table;
 
-class Car_Language extends Table
+class Language extends Table
 {
     protected $_name = 'car_language';
     protected $_primary = ['car_id', 'language'];

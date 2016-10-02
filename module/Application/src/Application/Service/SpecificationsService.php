@@ -7,6 +7,9 @@ use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineRow;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Row as UserRow;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
+use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Spec\Table\Car as CarSpecTable;
 use Application\Spec\Table\Engine as EngineSpecTable;
@@ -26,9 +29,6 @@ use Attrs_User_Values_Float;
 use Attrs_User_Values_List;
 use Attrs_User_Values_String;
 use Attrs_Zones;
-use Car_Parent;
-use Car_Row;
-use Car_Types;
 use Cars;
 use Picture;
 
@@ -97,7 +97,7 @@ class SpecificationsService
     protected $carTable = null;
 
     /**
-     * @var Car_Parent
+     * @var VehicleParent
      */
     protected $carParentTable = null;
 
@@ -200,13 +200,13 @@ class SpecificationsService
     }
 
     /**
-     * @return Car_Parent
+     * @return VehicleParent
      */
     protected function getCarParentTable()
     {
         return $this->carParentTable
             ? $this->carParentTable
-            : $this->carParentTable = new Car_Parent();
+            : $this->carParentTable = new VehicleParent();
     }
 
     /**
@@ -709,12 +709,12 @@ class SpecificationsService
     }
 
     /**
-     * @param Car_Row $car
+     * @param VehicleRow $car
      * @param UserRow $user
      * @param array $options
      * @return array
      */
-    public function getCarForm(Car_Row $car, UserRow $user, array $options, $language)
+    public function getCarForm(VehicleRow $car, UserRow $user, array $options, $language)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         return [
@@ -1007,11 +1007,11 @@ class SpecificationsService
     }
 
     /**
-     * @param Car_Row $car
+     * @param VehicleRow $car
      * @param array $values
      * @param UserRow $user
      */
-    public function saveCarAttributes(Car_Row $car, array $values, UserRow $user)
+    public function saveCarAttributes(VehicleRow $car, array $values, UserRow $user)
     {
         $zoneId = $this->_zoneIdByCarTypeId($car->car_type_id);
         $zone = $this->_getZone($zoneId);
@@ -1496,9 +1496,9 @@ class SpecificationsService
         $topPerspectives = [10, 1, 7, 8, 11, 12, 2, 4, 13, 5];
         $bottomPerspectives = [13, 2, 9, 6, 5];
 
-        $carTypeTable = new Car_Types();
+        $carTypeTable = new VehicleType();
         $attributeTable = $this->getAttributeTable();
-        $carParentTable = new Car_Parent();
+        $carParentTable = new VehicleParent();
 
         $ids = [];
         foreach ($cars as $car) {

@@ -9,9 +9,9 @@ use Zend\View\Model\ViewModel;
 use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\User;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Car_Parent;
 use Picture;
 
 use Zend_Db_Expr;
@@ -257,7 +257,7 @@ class CategoryController extends AbstractActionController
         ]);
 
         $carTable = $this->catalogue()->getCarTable();
-        $carParentTable = new Car_Parent();
+        $carParentTable = new VehicleParent();
 
         $carId = $this->params('car_id');
         $topCar = false;
@@ -423,7 +423,7 @@ class CategoryController extends AbstractActionController
                 }
             }
 
-            $carParentTable = new Car_Parent();
+            $carParentTable = new VehicleParent();
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [
                 'picturesDateSort' => true,

@@ -5,12 +5,12 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
 
 use Autowp\TextStorage;
 
-use Car_Parent;
 use Picture;
 
 class MostsController extends AbstractActionController
@@ -83,7 +83,7 @@ class MostsController extends AbstractActionController
             'language' => $language
         ]);
 
-        $carParentTable = new Car_Parent();
+        $carParentTable = new VehicleParent();
 
         $idx = 0;
         foreach ($data['carList']['cars'] as &$car) {

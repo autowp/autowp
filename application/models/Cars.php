@@ -2,15 +2,17 @@
 
 use Application\Db\Table;
 
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
+
 class Cars extends Table
 {
     protected $_name = 'cars';
     protected $_use_selects_cache = true;
-    protected $_rowClass = 'Car_Row';
+    protected $_rowClass = \Application\Model\DbTable\Vehicle\Row::class;
     protected $_referenceMap = [
         'Type' => [
             'columns'       => ['car_type_id'],
-            'refTableClass' => 'Car_Types',
+            'refTableClass' => \Application\Model\DbTable\Vehicle\Type::class,
             'refColumns'    => ['id']
         ],
         'Meta_Last_Editor' => [
@@ -40,7 +42,7 @@ class Cars extends Table
         return parent::insert($data);
     }
 
-    public function updateInteritance(Car_Row $car)
+    public function updateInteritance(VehicleRow $car)
     {
         $parents = $this->fetchAll(
             $this->select(true)
@@ -110,7 +112,7 @@ class Cars extends Table
                 }
             }
 
-            $carTypeParentTable = new Car_Types_Parents();
+            $carTypeParentTable = new \Application\Model\DbTable\Vehicle\TypeParent();
             $carTypeParentTableName = $carTypeParentTable->info('name');
             $db = $carTypeParentTable->getAdapter();
             foreach ($map as $id => $count) {

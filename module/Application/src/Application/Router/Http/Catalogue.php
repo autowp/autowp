@@ -8,9 +8,8 @@ use Zend\Stdlib\RequestInterface as Request;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
-
-use Car_Parent;
-use Car_Types;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\DbTable\Vehicle\Type as VehicleType;
 
 use Exception;
 
@@ -19,7 +18,7 @@ class Catalogue implements RouteInterface
     const DELIMETER = '/';
 
     /**
-     * @var Car_Types
+     * @var VehicleType
      */
     private $carTypeTable;
 
@@ -42,13 +41,13 @@ class Catalogue implements RouteInterface
     }
 
     /**
-     * @return Car_Types
+     * @return VehicleType
      */
     private function _getCarTypeTable()
     {
         return $this->carTypeTable
             ? $this->carTypeTable
-            : $this->carTypeTable = new Car_Types();
+            : $this->carTypeTable = new VehicleType();
     }
 
     private function assembleMatch(array $data, $length)
@@ -517,7 +516,7 @@ class Catalogue implements RouteInterface
                 ], $length);
             }
 
-            $carParentTable = new Car_Parent();
+            $carParentTable = new VehicleParent();
 
             $currentCarId = $brandCarRow->car_id;
             while($path) {

@@ -11,9 +11,10 @@ use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Category\ParentTable as CategoryParent;
 use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
 use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
+use Application\Model\DbTable\Vehicle\ParentCache as VehicleParentCache;
+use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 
-use Car_Parent;
-use Car_Parent_Cache;
 use Cars;
 
 use Zend_Db_Expr;
@@ -220,8 +221,8 @@ class CategoryController extends AbstractActionController
 
         $brandTable = new BrandTable();
 
-        $carParentTable = new Car_Parent();
-        $carParentCacheTable = new Car_Parent_Cache();
+        $carParentTable = new VehicleParent();
+        $carParentCacheTable = new VehicleParentCache();
         $carTable = $this->catalogue()->getCarTable();
 
         $order = array_merge(['car_parent.type'], $this->catalogue()->carsOrdering());
@@ -331,7 +332,7 @@ class CategoryController extends AbstractActionController
             ]);
             $newCar->save();
 
-            $cpcTable = new Car_Parent_Cache();
+            $cpcTable = new VehicleParentCache();
             $cpcTable->rebuildCache($newCar);
 
             $url = $this->url()->fromRoute('moder/cars/params', [
@@ -394,10 +395,10 @@ class CategoryController extends AbstractActionController
     }
 
     /**
-     * @param Car_Row $car
+     * @param VehicleRow $car
      * @return string
      */
-    private function carModerUrl(Car_Row $car, $full = false, $tab = null)
+    private function carModerUrl(VehicleRow $car, $full = false, $tab = null)
     {
         return $this->url()->fromRoute('moder/cars/params', [
             'action' => 'car',

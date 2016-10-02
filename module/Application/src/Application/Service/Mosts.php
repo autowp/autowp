@@ -3,10 +3,10 @@
 namespace Application\Service;
 
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
+use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Most;
 use Application\Service\SpecificationsService;
 
-use Car_Types;
 use Cars;
 use Exception;
 use Picture;
@@ -474,7 +474,7 @@ class Mosts
 
     public function getCarTypes($language, $brandId)
     {
-        $carTypesTable = new Car_Types();
+        $carTypesTable = new VehicleType();
         $carTypes = [];
         $select = $carTypesTable->select(true)
             ->where('car_types.parent_id IS NULL')
@@ -653,7 +653,7 @@ class Mosts
     private function getCarTypesIds($carType)
     {
         $result = [$carType->id];
-        foreach ($carType->findCar_Types() as $child) {
+        foreach ($carType->findDependentRowset(VehicleType::class) as $child) {
             $result[] = $child->id;
             $result = array_merge($result, $this->getCarTypesIds($child));
         }
@@ -692,7 +692,7 @@ class Mosts
             }
         }
 
-        $carTypesTable = new Car_Types();
+        $carTypesTable = new VehicleType();
         $carType = $carTypesTable->fetchRow([
             'catname = ?' => (string)$carTypeCatname
         ]);
