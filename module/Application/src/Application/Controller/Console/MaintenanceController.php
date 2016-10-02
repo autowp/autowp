@@ -5,6 +5,7 @@ namespace Application\Controller\Console;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\Comments;
 use Application\Model\DbTable\Category\ParentTable as CategoryParent;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
@@ -14,7 +15,6 @@ use Zend_Db_Adapter_Abstract;
 use Zend_Session;
 
 use Cars;
-use Comments;
 
 class MaintenanceController extends AbstractActionController
 {

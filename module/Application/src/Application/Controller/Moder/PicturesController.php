@@ -10,6 +10,7 @@ use Zend\View\Model\ViewModel;
 use Application\Form\Moder\Inbox as InboxForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
+use Application\Model\Comments;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
@@ -25,7 +26,6 @@ use Application\Service\TrafficControl;
 
 use Car_Parent;
 use Cars;
-use Comments;
 use Picture;
 use Picture_Row;
 use Picture_Moder_Vote;

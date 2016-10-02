@@ -8,6 +8,7 @@ use Zend\View\Model\ViewModel;
 
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
+use Application\Model\Comments;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Engine;
@@ -15,7 +16,6 @@ use Application\Service\TelegramService;
 
 use Car_Parent;
 use Cars;
-use Comments;
 use Picture;
 
 use Zend_Db_Expr;
