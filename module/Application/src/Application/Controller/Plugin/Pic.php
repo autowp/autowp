@@ -8,6 +8,8 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandLink;
+use Application\Model\DbTable\Category;
+use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
@@ -23,8 +25,6 @@ use Exception;
 use Car_Parent;
 use Car_Language;
 use Cars;
-use Category;
-use Category_Language;
 use Comment_Message;
 use Comment_Topic;
 use Picture;
@@ -682,7 +682,7 @@ class Pic extends AbstractPlugin
 
 
                     $cdTable = new Category();
-                    $cdlTable = new Category_Language();
+                    $cdlTable = new CategoryLanguage();
 
                     $categoryRows = $cdTable->fetchAll(
                         $cdTable->select(true)

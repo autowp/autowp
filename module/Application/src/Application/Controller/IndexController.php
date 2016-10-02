@@ -6,6 +6,9 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\CarOfDay;
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Category;
+use Application\Model\DbTable\Category\Language as CategoryLanguage;
+use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\Twins;
@@ -13,8 +16,6 @@ use Application\Service\SpecificationsService;
 
 use Car_Parent;
 use Car_Row;
-use Category;
-use Category_Language;
 use Picture;
 use Users;
 
@@ -185,7 +186,8 @@ class IndexController extends AbstractActionController
             ];
         }
 
-        foreach ($car->findCategoryViaCategory_Car() as $category) {
+
+        foreach ($car->findManyToManyRowset(Category::class, CategoryVehicle::class) as $category) {
             $items[] =[
                 'icon'  => 'tag',
                 'url'   => $this->url()->fromRoute('categories', [
@@ -397,7 +399,7 @@ class IndexController extends AbstractActionController
         if (!$success) {
             $categoryTable = new Category();
             $categoryAdapter = $categoryTable->getAdapter();
-            $categoryLangTable = new Category_Language();
+            $categoryLangTable = new CategoryLanguage();
 
             $items = $categoryAdapter->fetchAll(
                 $categoryAdapter->select()

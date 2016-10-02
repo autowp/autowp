@@ -16,6 +16,10 @@ use Application\Model\Message;
 use Application\Model\Modification;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\Category;
+use Application\Model\DbTable\Category\Language as CategoryLanguage;
+use Application\Model\DbTable\Category\ParentTable as CategoryParent;
+use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\FactoryCar;
 use Application\Model\DbTable\Modification as ModificationTable;
@@ -30,10 +34,6 @@ use Car_Parent;
 use Car_Parent_Cache;
 use Car_Types;
 use Car_Row;
-use Category;
-use Category_Car;
-use Category_Language;
-use Category_Parent;
 use Modification_Group;
 use Picture;
 use Picture_Row;
@@ -206,7 +206,7 @@ class CarsController extends AbstractActionController
 
             if ($values['no_category']) {
 
-                $cpTable = new Category_Parent();
+                $cpTable = new CategoryParent();
 
                 $ids = $cpTable->getAdapter()->fetchCol(
                     $cpTable->getAdapter()->select()
@@ -395,7 +395,7 @@ class CarsController extends AbstractActionController
     private function getCategoriesOptions($parent, $deep = 0)
     {
         $cdTable = new Category();
-        $cdlTable = new Category_Language();
+        $cdlTable = new CategoryLanguage();
 
         $language = $this->language();
 
@@ -1531,7 +1531,7 @@ class CarsController extends AbstractActionController
     private function getCategoriesArray($parent, $selection, $deep = 0)
     {
         $cdTable = new Category();
-        $cdlTable = new Category_Language();
+        $cdlTable = new CategoryLanguage();
 
         $language = $this->language();
 
@@ -1606,7 +1606,7 @@ class CarsController extends AbstractActionController
         }
 
         $cTable = new Category();
-        $ccTable = new Category_Car();
+        $ccTable = new CategoryVehicle();
 
         $categories = $cTable->find($this->params()->fromPost('category'));
 

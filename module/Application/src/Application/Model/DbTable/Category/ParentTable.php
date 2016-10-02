@@ -1,8 +1,11 @@
 <?php
 
-use Application\Db\Table;
+namespace Application\Model\DbTable\Category;
 
-class Category_Parent extends Table
+use Application\Db\Table;
+use Application\Model\DbTable\Category;
+
+class ParentTable extends Table
 {
     protected $_name = 'category_parent';
     protected $_primary = ['category_id', 'parent_id'];
@@ -16,7 +19,7 @@ class Category_Parent extends Table
         $this->_rebuild($table, [0], 0);
     }
 
-    protected function _rebuild(Category $table, $id, $level)
+    private function _rebuild(Category $table, $id, $level)
     {
         $select = $table->select()
             ->from($table, 'id');

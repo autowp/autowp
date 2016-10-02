@@ -6,11 +6,11 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Application\Model\DbTable\Category;
+use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Car_Parent;
-use Category;
-use Category_Language;
 use Picture;
 use Users;
 
@@ -26,7 +26,7 @@ class CategoryController extends AbstractActionController
     private $categoryTable;
 
     /**
-     * @var Category_Language
+     * @var CategoryLanguage
      */
     private $categoryLanguageTable;
 
@@ -37,7 +37,7 @@ class CategoryController extends AbstractActionController
         $this->cache = $cache;
 
         $this->categoryTable = new Category();
-        $this->categoryLanguageTable = new Category_Language();
+        $this->categoryLanguageTable = new CategoryLanguage();
     }
 
     public function indexAction()

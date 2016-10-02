@@ -2,10 +2,9 @@
 
 namespace Application\Model\DbTable\Article;
 
-use Application\Db\Table\Row;
 use Application\Model\DbTable\Article;
 
-class Row extends Row
+class Row extends \Application\Db\Table\Row
 {
     public function previewExists()
     {

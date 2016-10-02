@@ -6,6 +6,8 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\Category;
+use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
@@ -14,8 +16,6 @@ use Autowp\TextStorage\Service as TextStorage;
 
 use Car_Language;
 use Car_Parent;
-use Category;
-use Category_Language;
 use Picture;
 use Spec;
 
@@ -161,7 +161,7 @@ class Car extends AbstractPlugin
         $catalogue = $controller->catalogue();
 
         $pictureTable = $this->getPictureTable();
-        $categoryLanguageTable = new Category_Language();
+        $categoryLanguageTable = new CategoryLanguage();
         $carParentTable = new Car_Parent();
         $carParentAdapter = $carParentTable->getAdapter();
         $brandTable = new BrandTable();

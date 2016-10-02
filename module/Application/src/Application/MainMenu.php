@@ -2,6 +2,8 @@
 
 namespace Application;
 
+use Application\Model\DbTable\Category;
+use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Page;
 use Application\Model\Message;
 use Application\Language;
@@ -9,8 +11,6 @@ use Application\Language;
 use Zend\Cache\Storage\StorageInterface;
 use Zend\Router\Http\TreeRouteStack;
 
-use Category;
-use Category_Language;
 use User_Row;
 
 class MainMenu
@@ -131,7 +131,7 @@ class MainMenu
             $categories = [];
 
             $categoryTable = new Category();
-            $categoryLangTable = new Category_Language();
+            $categoryLangTable = new CategoryLanguage();
 
             $rows = $categoryTable->fetchAll([
                 'parent_id is null',

@@ -6,14 +6,14 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Moder\Category as CategoryForm;
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Category;
+use Application\Model\DbTable\Category\Language as CategoryLanguage;
+use Application\Model\DbTable\Category\ParentTable as CategoryParent;
+use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
 
 use Car_Parent;
 use Car_Parent_Cache;
 use Cars;
-use Category;
-use Category_Car;
-use Category_Language;
-use Category_Parent;
 use User_Car_Subscribe;
 
 use Zend_Db_Expr;
@@ -26,14 +26,14 @@ class CategoryController extends AbstractActionController
     private $table;
 
     /**
-     * @var Category_Language
+     * @var CategoryLanguage
      */
     private $langTable;
 
     public function __construct()
     {
         $this->table = new Category();
-        $this->langTable = new Category_Language();
+        $this->langTable = new CategoryLanguage();
     }
 
     private function getCategories($parentId = null)
@@ -190,7 +190,7 @@ class CategoryController extends AbstractActionController
                     $langCategory->save();
                 }
 
-                $cpTable = new Category_Parent();
+                $cpTable = new CategoryParent();
                 $cpTable->rebuild();
 
                 return $this->redirect()->toRoute('moder/category/params', [
@@ -343,7 +343,7 @@ class CategoryController extends AbstractActionController
                 $newCar->getFullName('en')
             ), $newCar);
 
-            $ccTable = new Category_Car();
+            $ccTable = new CategoryVehicle();
 
             $user = $this->user()->get();
 

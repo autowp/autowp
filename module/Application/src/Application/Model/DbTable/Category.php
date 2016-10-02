@@ -1,13 +1,17 @@
 <?php
 
+namespace Application\Model\DbTable;
+
+use Zend_Db_Table;
+
 class Category extends Zend_Db_Table
 {
     protected $_name = 'category';
-    protected $_rowClass = 'Category_Row';
+    protected $_rowClass = \Application\Model\DbTable\Category\Row::class;
     protected $_referenceMap = [
         'Parent' => [
             'columns'       => ['parent_id'],
-            'refTableClass' => 'Category',
+            'refTableClass' => self::class,
             'refColumns'    => ['id']
         ]
     ];

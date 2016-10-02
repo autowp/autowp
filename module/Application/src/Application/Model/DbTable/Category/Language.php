@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable\Category;
+
 use Application\Db\Table;
 
-class Category_Language extends Table
+class Language extends Table
 {
     protected $_name = 'category_language';
     protected $_primary = ['category_id', 'language'];
@@ -10,7 +12,7 @@ class Category_Language extends Table
     protected $_referenceMap = [
         'Category' => [
             'columns'       => ['category_id'],
-            'refTableClass' => 'Category',
+            'refTableClass' => \Application\Model\DbTable\Category::class,
             'refColumns'    => ['id']
         ]
     ];

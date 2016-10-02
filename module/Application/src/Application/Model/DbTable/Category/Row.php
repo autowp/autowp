@@ -1,8 +1,14 @@
 <?php
 
-use Application\Db\Table\Row;
+namespace Application\Model\DbTable\Category;
 
-class Category_Row extends Row
+use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
+
+use Picture;
+
+use Zend_Db_Expr;
+
+class Row extends \Application\Db\Table\Row
 {
     private static $categoryCarTable;
 
@@ -10,7 +16,7 @@ class Category_Row extends Row
     {
         return self::$categoryCarTable
             ? self::$categoryCarTable
-            : self::$categoryCarTable = new Category_Car();
+            : self::$categoryCarTable = new CategoryVehicle();
     }
 
     public function findTopPicture()
@@ -20,24 +26,24 @@ class Category_Row extends Row
             $pictures->select(true)
                 ->join('category_car', 'pictures.car_id=category_car.car_id', null)
                 ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                ->where('pictures.status IN (?)', array(Picture::STATUS_ACCEPTED, Picture::STATUS_NEW))
+                ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 ->where('category_car.category_id = ?', $this->id)
-                ->order(array(
+                ->order([
                     new Zend_Db_Expr('pictures.perspective_id = 7 DESC'),
                     new Zend_Db_Expr('pictures.perspective_id = 8 DESC'),
                     new Zend_Db_Expr('pictures.perspective_id = 1 DESC'),
                     'pictures.ratio DESC',
                     'pictures.views DESC'
-                ))
+                ])
                 ->limit(1)
         );
     }
 
-    public function getCarsCount(array $options = array())
+    public function getCarsCount(array $options = [])
     {
-        $options = array_merge(array(
+        $options = array_merge([
             'brand' => false
-        ), $options);
+        ], $options);
 
         $categoryCarTable = self::getCategoryCarTable();
         $db = $categoryCarTable->getAdapter();
@@ -53,11 +59,11 @@ class Category_Row extends Row
         return $db->fetchOne($select);
     }
 
-    public function getWeekCarsCount(array $options = array())
+    public function getWeekCarsCount(array $options = [])
     {
-        $options = array_merge(array(
+        $options = array_merge([
             'brand' => false
-        ), $options);
+        ], $options);
 
         $categoryCarTable = self::getCategoryCarTable();
         $db = $categoryCarTable->getAdapter();

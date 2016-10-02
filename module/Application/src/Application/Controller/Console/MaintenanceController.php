@@ -5,6 +5,7 @@ namespace Application\Controller\Console;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\DbTable\Category\ParentTable as CategoryParent;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Exception;
@@ -13,7 +14,6 @@ use Zend_Db_Adapter_Abstract;
 use Zend_Session;
 
 use Cars;
-use Category_Parent;
 use Comments;
 
 class MaintenanceController extends AbstractActionController
@@ -86,7 +86,7 @@ class MaintenanceController extends AbstractActionController
 
     public function rebuildCategoryParentAction()
     {
-        $cpTable = new Category_Parent();
+        $cpTable = new CategoryParent();
 
         $cpTable->rebuild();
 
@@ -98,10 +98,10 @@ class MaintenanceController extends AbstractActionController
         $console = Console::getInstance();
 
         $carTable = new Cars();
-        
+
         $select = $carTable->select(true)
             ->order('id');
-        
+
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)
         );
