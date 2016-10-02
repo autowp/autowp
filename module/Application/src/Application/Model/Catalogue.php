@@ -1,5 +1,7 @@
 <?php
 
+namespace Application\Model;
+
 use Autowp\Image\Storage\Request;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
@@ -7,9 +9,17 @@ use Application\Model\DbTable\BrandEngine;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineRow;
 
+use Car_Parent;
+use Car_Row;
+use Car_Types;
+use Cars;
+use Picture;
+
+use Exception;
+
 class Catalogue
 {
-    private $_picturesPerPage = 20;
+    private $picturesPerPage = 20;
 
     private $carsPerPage = 7;
 
@@ -98,7 +108,7 @@ class Catalogue
 
     public function getPicturesPerPage()
     {
-        return $this->_picturesPerPage;
+        return $this->picturesPerPage;
     }
 
     /**
