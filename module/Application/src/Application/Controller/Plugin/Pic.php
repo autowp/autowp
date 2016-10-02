@@ -728,7 +728,7 @@ class Pic extends AbstractPlugin
 
                     foreach ($twinsGroupsRows as $twinsGroup) {
                         $vehicleTwins[] = [
-                            'url' => $this->url('twins/group', [
+                            'url' => $controller->url()->fromRoute('twins/group', [
                                 'id' => $twinsGroup->id
                             ])
                         ];
