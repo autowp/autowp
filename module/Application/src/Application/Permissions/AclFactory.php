@@ -9,12 +9,13 @@ use Zend\Permissions\Acl\Role\GenericRole;
 use Zend\Permissions\Acl\Resource\GenericResource;
 use Interop\Container\ContainerInterface;
 
-use Exception;
+use Application\Model\DbTable\Acl\Resource;
+use Application\Model\DbTable\Acl\ResourcePrivilege;
+use Application\Model\DbTable\Acl\Role;
+use Application\Model\DbTable\Acl\RolePrivilegeAllowed;
+use Application\Model\DbTable\Acl\RolePrivilegeDenied;
 
-use Acl_Resources;
-use Acl_Roles;
-use Acl_Roles_Privileges_Allowed;
-use Acl_Roles_Privileges_Denied;
+use Exception;
 
 class AclFactory implements FactoryInterface
 {
@@ -55,34 +56,34 @@ class AclFactory implements FactoryInterface
 
     private function load(Acl $acl)
     {
-        $roles = new Acl_Roles();
+        $roles = new Role();
         $loaded = [];
         foreach ($roles->fetchAll() as $role) {
             $this->addRole($acl, $roles, $role, $loaded, 1);
         }
 
-        $resources = new Acl_Resources();
+        $resources = new Resource();
         foreach ($resources->fetchAll() as $resource) {
             $acl->addResource(new GenericResource($resource->name));
         }
 
-        $allowed = new Acl_Roles_Privileges_Allowed();
+        $allowed = new RolePrivilegeAllowed();
         foreach ($allowed->fetchAll() as $allow) {
-            $privilege = $allow->findParentAcl_Resources_Privileges();
+            $privilege = $allow->findParentRow(ResourcePrivilege::class);
 
             $acl->allow(
-                $allow->findParentAcl_Roles()->name,
-                $privilege->findParentAcl_Resources()->name,
+                $allow->findParentRow(Role::class)->name,
+                $privilege->findParentRow(Resource::class)->name,
                 $privilege->name
             );
         }
 
-        $denied = new Acl_Roles_Privileges_Denied();
+        $denied = new RolePrivilegeDenied();
         foreach ($denied->fetchAll() as $deny) {
-            $privilege = $deny->findParentAcl_Resources_Privileges();
+            $privilege = $deny->findParentRow(ResourcePrivilege::class);
             $acl->deny(
-                $deny->findParentAcl_Roles()->name,
-                $privilege->findParentAcl_Resources()->name,
+                $deny->findParentRow(Role::class)->name,
+                $privilege->findParentRow(Resource::class)->name,
                 $privilege->name
             );
         }

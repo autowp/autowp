@@ -5,12 +5,12 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Acl_Resources;
-use Acl_Resources_Privileges;
-use Acl_Roles;
-use Acl_Roles_Parents;
-use Acl_Roles_Privileges_Allowed;
-use Acl_Roles_Privileges_Denied;
+use Application\Model\DbTable\Acl\Role;
+use Application\Model\DbTable\Acl\Resource;
+use Application\Model\DbTable\Acl\ResourcePrivilege;
+use Application\Model\DbTable\Acl\RoleParent;
+use Application\Model\DbTable\Acl\RolePrivilegeAllowed;
+use Application\Model\DbTable\Acl\RolePrivilegeDenied;
 
 class RightsController extends AbstractActionController
 {
@@ -72,9 +72,9 @@ class RightsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $roles = new Acl_Roles();
+        $roles = new Role();
 
-        $resources = new Acl_Resources();
+        $resources = new Resource();
 
         $db = $roles->getAdapter();
         $roleOptions = $db->fetchPairs(
@@ -85,7 +85,7 @@ class RightsController extends AbstractActionController
 
         $resourceOptions = [];
         foreach ($resources->fetchAll() as $resource) {
-            foreach ($resource->findAcl_Resources_Privileges() as $privilege) {
+            foreach ($resource->findfindDependentRowset(ResourcePrivilege::class) as $privilege) {
                 $resourceOptions[$privilege->id] = $resource->name . ' / ' . $privilege->name;
             }
         }
@@ -131,7 +131,7 @@ class RightsController extends AbstractActionController
                         $parent_role = $roles->find($data['parent_role_id'])->current();
 
                         if ($parent_role) {
-                            $roles_parents = new Acl_Roles_Parents();
+                            $roles_parents = new RoleParent();
 
                             $roles_parents->insert([
                                 'role_id'        => $id,
@@ -153,7 +153,7 @@ class RightsController extends AbstractActionController
                         $data = $this->roleParentForm->getData();
 
                         if ($data['role_id'] != $data['parent_role_id']) {
-                            $roles_parents = new Acl_Roles_Parents();
+                            $roles_parents = new RoleParent();
 
                             $roles_parents->insert([
                                 'role_id' => $data['role_id'],
@@ -174,8 +174,8 @@ class RightsController extends AbstractActionController
                     if ($this->ruleForm->isValid()) {
                         $data = $this->ruleForm->getData();
 
-                        $allowed = new Acl_Roles_Privileges_Allowed();
-                        $denied = new Acl_Roles_Privileges_Denied();
+                        $allowed = new RolePrivilegeAllowed();
+                        $denied = new RolePrivilegeDenied();
 
                         $db = $allowed->getAdapter();
                         $where = [
@@ -207,25 +207,25 @@ class RightsController extends AbstractActionController
 
         $rules = [];
 
-        $arpaTable = new Acl_Roles_Privileges_Allowed();
+        $arpaTable = new RolePrivilegeAllowed();
         foreach ($arpaTable->fetchAll() as $row) {
-            $privilege = $row->findParentAcl_Resources_Privileges();
+            $privilege = $row->findParentRow(ResourcePrivilege::class);
             $rules[] = [
                 'allowed'   => true,
-                'role'      => $row->findParentAcl_Roles()->name,
+                'role'      => $row->findParentRow(Role::class)->name,
                 'privilege' => $privilege->name,
-                'resource'  => $privilege->findParentAcl_Resources()->name
+                'resource'  => $privilege->findParentRow(Resource::class)->name
             ];
         }
 
-        $arpdTable = new Acl_Roles_Privileges_Denied();
+        $arpdTable = new RolePrivilegeDenied();
         foreach ($arpdTable->fetchAll() as $row) {
-            $privilege = $row->findParentAcl_Resources_Privileges();
+            $privilege = $row->findParentRow(ResourcePrivilege::class);
             $rules[] = [
                 'allowed'   => false,
-                'role'      => $row->findParentAcl_Roles()->name,
+                'role'      => $row->findParentRow(Role::class)->name,
                 'privilege' => $privilege->name,
-                'resource'  => $privilege->findParentAcl_Resources()->name
+                'resource'  => $privilege->findParentRow(Resource::class)->name
             ];
         }
 
@@ -235,7 +235,7 @@ class RightsController extends AbstractActionController
             'addRoleForm'       => $this->roleForm,
             'addRoleParentForm' => $this->roleParentForm,
             'resources'         => $resources->fetchAll(),
-            'privileges'        => new Acl_Resources_Privileges(),
+            'privileges'        => new ResourcePrivilege(),
             'roles'             => $roles->fetchAll(),
             'rules'             => $rules
         ];

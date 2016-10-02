@@ -8,7 +8,7 @@
         'pageId' => 71,
     ]);
 
-    $roles = new Acl_Roles();
+    $roles = new Application\Model\DbTable\Acl\Role();
 
     function printRolesRecuirsive($roles, $role) {
         $select = $roles->select()
@@ -50,7 +50,7 @@
         <tr>
             <td><?=$resource->name ?></td>
         </tr>
-        <?php foreach ($resource->findAcl_Resources_Privileges() as $privilege) { ?>
+        <?php foreach ($resource->findfindDependentRowset(Application\Model\DbTable\Acl\ResourcePrivilege::class) as $privilege) { ?>
             <tr>
                 <td><?=$resource->name ?> / <?=$privilege->name ?></td>
                 <?php foreach ($this->roles as $role) { ?>
