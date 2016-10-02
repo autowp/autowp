@@ -2,9 +2,14 @@
 
 namespace Application\Most\Adapter;
 
-use Application\Wheelsize as WheelsizeObject;
+use Application\WheelSize as WheelsizeObject;
 
+use Zend_Db_Expr;
+use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
+
+use Attrs_Attributes;
+use Attrs_Item_Types;
 
 class Wheelsize extends AbstractAdapter
 {

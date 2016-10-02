@@ -205,7 +205,7 @@ class IndexController extends AbstractActionController
     {
         $language = $this->language();
 
-        $cacheKey = 'INDEX_BRANDS_HTML259' . $language;
+        $cacheKey = 'INDEX_BRANDS_HTML260' . $language;
         $brands = $this->cache->getItem($cacheKey, $success);
         if (!$success) {
 
@@ -252,7 +252,7 @@ class IndexController extends AbstractActionController
             $carOfDay = $carTable->find($carId)->current();
             if ($carOfDay) {
 
-                $key = 'CAR_OF_DAY_78_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
+                $key = 'CAR_OF_DAY_79_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
 
                 $carOfDayInfo = $this->cache->getItem($key, $success);
                 if (!$success) {
@@ -394,7 +394,7 @@ class IndexController extends AbstractActionController
         ]);
 
         // categories
-        $cacheKey = 'INDEX_CATEGORY7_' . $language;
+        $cacheKey = 'INDEX_CATEGORY8_' . $language;
         $destinations = $this->cache->getItem($cacheKey, $success);
         if (!$success) {
             $categoryTable = new Category();
@@ -449,7 +449,7 @@ class IndexController extends AbstractActionController
         }
 
         // БЛИЗНЕЦЫ
-        $cacheKey = 'INDEX_INTERESTS_TWINS_BLOCK_25_' . $language;
+        $cacheKey = 'INDEX_INTERESTS_TWINS_BLOCK_26_' . $language;
         $twinsBlock = $this->cache->getItem($cacheKey, $success);
         if (!$success) {
             $twins = new Twins();
@@ -476,7 +476,7 @@ class IndexController extends AbstractActionController
 
         $userTable = new User();
 
-        $cacheKey = 'INDEX_SPEC_CARS_10_' . $language;
+        $cacheKey = 'INDEX_SPEC_CARS_11_' . $language;
         $cars = $this->cache->getItem($cacheKey, $success);
         if (!$success) {
 
