@@ -50,7 +50,7 @@
         <tr>
             <td><?=$resource->name ?></td>
         </tr>
-        <?php foreach ($resource->findfindDependentRowset(Application\Model\DbTable\Acl\ResourcePrivilege::class) as $privilege) { ?>
+        <?php foreach ($resource->findDependentRowset(Application\Model\DbTable\Acl\ResourcePrivilege::class) as $privilege) { ?>
             <tr>
                 <td><?=$resource->name ?> / <?=$privilege->name ?></td>
                 <?php foreach ($this->roles as $role) { ?>

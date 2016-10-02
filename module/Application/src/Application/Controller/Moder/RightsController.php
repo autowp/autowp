@@ -85,7 +85,7 @@ class RightsController extends AbstractActionController
 
         $resourceOptions = [];
         foreach ($resources->fetchAll() as $resource) {
-            foreach ($resource->findfindDependentRowset(ResourcePrivilege::class) as $privilege) {
+            foreach ($resource->findDependentRowset(ResourcePrivilege::class) as $privilege) {
                 $resourceOptions[$privilege->id] = $resource->name . ' / ' . $privilege->name;
             }
         }

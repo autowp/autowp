@@ -12,7 +12,7 @@ class ResourcePrivilege extends Zend_Db_Table
     protected $_referenceMap = [
         'Resource' => [
             'columns'       => ['resource_id'],
-            'refTableClass' => Resources::class,
+            'refTableClass' => Resource::class,
             'refColumns'    => ['id']
         ]
     ];
