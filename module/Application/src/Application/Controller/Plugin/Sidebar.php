@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable;
 use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\BrandAlias;
@@ -92,22 +93,24 @@ class Sidebar extends AbstractPlugin
     {
         $language = $this->getController()->language();
 
-        $cacheKey = 'SIDEBAR_' . $brand['id'] . '_' . $language . '_5';
+        $cacheKey = 'SIDEBAR_' . $brand['id'] . '_' . $language . '_6';
 
         $groups = $this->cache->getItem($cacheKey, $success);
 
         if (!$success) {
 
             $brandCarTable = new BrandCar();
+            $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
             $db = $brandCarTable->getAdapter();
 
             $select = $db->select()
                 ->from($brandCarTable->info('name'), [
-                    'brand_car_catname' => 'catname'
+                    'brand_car_catname' => 'catname',
+                    'brand_id'
                 ])
                 ->join('cars', 'cars.id = brands_cars.car_id', [
                     'car_id'   => 'id',
-                    'car_name' => 'cars.caption'
+                    'car_name' => 'cars.caption',
                 ])
                 ->where('brands_cars.brand_id = ?', $brand['id']);
             if ($conceptsSeparatly) {
@@ -135,28 +138,40 @@ class Sidebar extends AbstractPlugin
                     ]);
                 }
 
-                $carLangRow = $carLanguageTable->fetchRow([
-                    'car_id = ?'   => (int)$brandCarRow['car_id'],
-                    'language = ?' => (string)$language
+                $bvlRow = $brandVehicleLangaugeTable->fetchRow([
+                    'vehicle_id = ?' => $brandCarRow['car_id'],
+                    'brand_id = ?'   => $brandCarRow['brand_id'],
+                    'language = ?'   => $language
                 ]);
 
-                $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
-                foreach ($aliases as $alias) {
-                    $caption = str_ireplace('by The ' . $alias . ' Company', '', $caption);
-                    $caption = str_ireplace('by '.$alias, '', $caption);
-                    $caption = str_ireplace('di '.$alias, '', $caption);
-                    $caption = str_ireplace('par '.$alias, '', $caption);
-                    $caption = str_ireplace($alias.'-', '', $caption);
-                    $caption = str_ireplace('-'.$alias, '', $caption);
+                if ($bvlRow) {
+                    $caption = $bvlRow->name;
+                } else {
+                    $carLangRow = $carLanguageTable->fetchRow([
+                        'car_id = ?'   => (int)$brandCarRow['car_id'],
+                        'language = ?' => (string)$language
+                    ]);
 
-                    $caption = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $caption);
-                }
-
-                $caption = trim(preg_replace("|[[:space:]]+|", ' ', $caption));
-                $caption = ltrim($caption, '/');
-                if (!$caption) {
                     $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
+                    foreach ($aliases as $alias) {
+                        $caption = str_ireplace('by The ' . $alias . ' Company', '', $caption);
+                        $caption = str_ireplace('by '.$alias, '', $caption);
+                        $caption = str_ireplace('di '.$alias, '', $caption);
+                        $caption = str_ireplace('par '.$alias, '', $caption);
+                        $caption = str_ireplace($alias.'-', '', $caption);
+                        $caption = str_ireplace('-'.$alias, '', $caption);
+
+                        $caption = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $caption);
+                    }
+
+                    $caption = trim(preg_replace("|[[:space:]]+|", ' ', $caption));
+                    $caption = ltrim($caption, '/');
+                    if (!$caption) {
+                        $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
+                    }
+
                 }
+
                 $groups[] = [
                     'car_id'  => $brandCarRow['car_id'],
                     'url'     => $url,

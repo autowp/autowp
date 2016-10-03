@@ -59,6 +59,22 @@ return [
                             ]
                         ]
                     ],
+                    'brand-vehicle' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/brand-vehicle[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\BrandVehicleController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => Router\Http\WildcardSafe::class
+                            ]
+                        ]
+                    ],
                     'cars' => [
                         'type' => Segment::class,
                         'options' => [
@@ -384,6 +400,9 @@ return [
             },
             Controller\Moder\CategoryController::class => function($sm) {
                 return new Controller\Moder\CategoryController();
+            },
+            Controller\Moder\BrandVehicleController::class => function($sm) {
+                return new Controller\Moder\BrandVehicleController();
             },
             Controller\Moder\CarsController::class => function($sm) {
                 return new Controller\Moder\CarsController(

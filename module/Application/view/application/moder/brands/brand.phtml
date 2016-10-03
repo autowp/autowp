@@ -132,9 +132,10 @@
                     <div class="well">
                         <?php foreach ($this->cars as $car) { ?>
                             <p>
-                                <?=$this->htmlA($this->url('moder/cars/params', [
-                                    'action' => 'car',
-                                    'car_id' => $car->id
+                                <?=$this->htmlA($this->url('moder/brand-vehicle/params', [
+                                    'action'     => 'item',
+                                    'brand_id'   => $this->brand->id,
+                                    'vehicle_id' => $car->id
                                 ]), $car->getFullName($this->language())) ?>
                             </p>
                         <?php } ?>

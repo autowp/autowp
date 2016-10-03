@@ -14,7 +14,7 @@
 ?>
 <div class="well">
     <?php
-        $columns = 6;
+        $columns = 4;
         $count = count($this->brands);
         $perOne = ceil($count / $columns);
         $width = round(100*$perOne/$count);
@@ -26,9 +26,13 @@
                 <?php if ($idx && ($idx%$perOne == 0)) { ?>
                     </td><td valign="top" style="width:<?=$width ?>%">
                 <?php } ?>
-                <?=$this->htmlA($this->url(null, [
-                    'brand_id' => $brand->id
-                ], [], true), $brand->caption) ?><br />
+                <form action="<?=$this->escapeHtmlAttr($this->url('moder/brand-vehicle/params', [
+                    'action'     => 'add',
+                    'brand_id'   => $brand->id,
+                    'vehicle_id' => $this->car->id
+                ]))?>" method="post">
+                    <button type="submit" class="btn btn-link"><?=$this->escapeHtml($brand->caption)?></button>
+                </form>
                 <?php $idx++ ?>
             <?php } ?>
         </td>

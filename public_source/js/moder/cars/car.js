@@ -182,9 +182,7 @@ define(
                                 }
                             })
                             .on('typeahead:select', function(ev, car) {
-                                $.post(car.url, {}, function(json) {
-                                    window.location = json.url;
-                                });
+                                $('<form method="post"></form>').attr('action', car.url).submit();
                             });
                     });
                 });

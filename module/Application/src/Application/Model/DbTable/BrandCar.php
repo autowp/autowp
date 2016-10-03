@@ -26,4 +26,6 @@ class BrandCar extends Zend_Db_Table
         TYPE_TUNING = 1,
         TYPE_SPORT = 2,
         TYPE_DESIGN = 3;
+
+    const MAX_CATNAME = 70;
 }

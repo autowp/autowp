@@ -39,8 +39,8 @@
                                 ], $this->translate('moder/vehicle/catalogue/select'))?>
                             </span>
                             <input type="text" name="parent" class="form-control" placeholder="<?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/select-placeholder'))?>" data-autocomplete="<?=$this->escapeHtmlAttr($this->url(null, [
-                                'action'        => 'car-autocomplete',
-                                'exclude-child' => $this->car['id']
+                                'action' => 'car-autocomplete',
+                                'car_id' => $this->car['id']
                             ], [], true))?>" />
                         </div>
                     </form>
@@ -56,40 +56,10 @@
                 <tr>
                     <td>
                         <i class="fa fa-arrow-up"></i>
-                        <?=$this->htmlA($brand['moderUrl'], $brand['name']) ?>
+                        <?=$this->htmlA($brand['brand']['moderUrl'], $brand['brand']['name']) ?>
                     </td>
-                    <td>
-                        <?php if ($this->canMove) { ?>
-                            <form action="<?=$this->escapeHtmlAttr($brand['setBrandCarTypeUrl']) ?>" method="post" class="inline brand-car-type">
-                                <?=$this->formElement(
-                                    (new Zend\Form\Element\Select('type', [
-                                        'value_options' => $this->brandCarTypeOptions
-                                    ]))
-                                        ->setAttribute('class', 'form-control input-sm')
-                                        ->setValue($brand['type'])
-                                )?>
-                            </form>
-                        <?php } else { ?>
-                            <?=$this->escapeHtml($this->brandCarTypeOptions[$brand['type']])?>
-                        <?php } ?>
-                    </td>
-                    <td>
-                        <?php if ($this->canMove) { ?>
-                            <form action="<?=$this->escapeHtmlAttr($brand['setBrandCarCatnameUrl']) ?>" method="post" class="inline brand-car-catname">
-                                <div class="input-group" style="max-width:200px">
-                                    <?=$this->formElement(
-                                        (new Zend\Form\Element\Text('catname'))
-                                            ->setAttribute('class', 'form-control input-sm')
-                                            ->setValue($brand['catname'])
-                                    )?>
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default btn-sm" type="submit">Ok</button>
-                                    </span>
-                                </div>
-                            </form>
-                        <?php } else { ?>
-                            <?=$this->escapeHtml($brand['catname'])?>
-                        <?php } ?>
+                    <td colspan="2">
+                        <?=$this->htmlA($brand['editUrl'], $this->escapeHtml($brand['name']) . ' <span class="fa fa-pencil"></span>', false)?>
                     </td>
                     <td>
                         <?=$this->htmlA($brand['url'], $brand['url']) ?>
@@ -110,12 +80,7 @@
                             <i class="fa fa-arrow-up"></i>
                             <?=$this->htmlA($brand['moderUrl'], $brand['name']) ?>
                         </td>
-                        <td>
-                            <?=$this->escapeHtml($this->brandCarTypeOptions[$brand['type']])?>
-                        </td>
-                        <td>
-                            <?=$this->escapeHtml($brand['catname'])?>
-                        </td>
+                        <td colspan="2"></td>
                         <td>
                             <?=$this->htmlA($brand['url'], $brand['url']) ?>
                         </td>
@@ -325,11 +290,11 @@
         </button>
     </div></form>
     <?php foreach ($this->relevantBrands as $brand) { ?>
-        <form action="<?=$this->escapeHtmlAttr($this->url('moder/cars/params', [
-            'action'   => 'car-select-brand',
-            'car_id'   => $this->car->id,
-            'brand_id' => $brand->id
-        ], [], true)) ?>" method="post">
+        <form action="<?=$this->escapeHtmlAttr($this->url('moder/brand-vehicle/params', [
+            'action'     => 'add',
+            'brand_id'   => $brand->id,
+            'vehicle_id' => $this->car->id
+        ])) ?>" method="post">
             <button type="submit" class="btn btn-xs btn-success">
                 <i class="fa fa-plus"></i>
                 <?=$this->escapeHtml(sprintf($this->translate('moder/vehicle/catalogue/add-brand-%s'), $brand->caption))?>
