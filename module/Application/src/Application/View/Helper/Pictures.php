@@ -50,7 +50,7 @@ class Pictures extends AbstractHelper
     {
         return $this->pictureViewTable
             ? $this->pictureViewTable
-            : $this->pictureViewTable = new PicturView();
+            : $this->pictureViewTable = new PictureView();
     }
 
     /**

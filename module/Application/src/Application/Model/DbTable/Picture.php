@@ -75,7 +75,7 @@ class Picture extends Table
         ],
         'Source' => [
             'columns'       => ['source_id'],
-            'refTableClass' => Application\Model\DbTable\Sources::class,
+            'refTableClass' => \Application\Model\DbTable\Sources::class,
             'refColumns'    => ['id']
         ],
     ];

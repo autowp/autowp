@@ -326,7 +326,7 @@
                     <p><strong class="label label-warning">
                         <?=$this->escapeHtml($this->translate('moder/picture/acceptance/not-accepted'))?>
                         <?=$changeStatusUserHtml?>
-                        <?=(Picture::STATUS_INBOX == $this->picture->status ? ' ' . $this->translate('moder/pictures/picture/inbox-mark') : '')?>
+                        <?=(Application\Model\DbTable\Picture::STATUS_INBOX == $this->picture->status ? ' ' . $this->translate('moder/pictures/picture/inbox-mark') : '')?>
                     </strong></p>
                     <?php if ($this->canAccept) { ?>
                         <form action="<?=$this->escapeHtmlAttr($this->acceptUrl)?>" method="post">

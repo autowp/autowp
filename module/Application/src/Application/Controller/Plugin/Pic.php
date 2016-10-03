@@ -1234,7 +1234,7 @@ class Pic extends AbstractPlugin
 
                     $name = isset($names[$id]) ? $names[$id] : null;
                     // TODO: extract HTML to view script
-                    if (($row['type'] == Picture::VEHICLE_TYPE_ID)) {
+                    if (($row['type'] == Picture::VEHICLE_TYPE_ID) && is_array($name)) {
                         $name = $this->carHelper->htmlTitle($name);
                     } else {
                         $name = htmlspecialchars($name); // this->pictureNameFormatter->format($name, $language)

@@ -123,7 +123,7 @@
                 ?>
             </li>
         </ul>
-        <?php if ($source = $this->picture->findParentRow('Application\\Model\\DbTable\\Sources')) { ?>
+        <?php if ($source = $this->picture->findParentRow(Application\Model\DbTable\Sources::class)) { ?>
             <p>
                 <?=$this->escapeHtml($this->translate('picture/photo-is-owned-by'))?>
                 <?=$this->htmlA($source->url, $source->name) ?>
