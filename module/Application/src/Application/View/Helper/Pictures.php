@@ -7,9 +7,8 @@ use Zend\View\Helper\AbstractHelper;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
-
-use Picture_View;
-use Picture_Row;
+use Application\Model\DbTable\Picture\Row as PictureRow;
+use Application\Model\DbTable\Picture\View as PictureView;
 
 use Zend_Db_Expr;
 
@@ -20,7 +19,7 @@ class Pictures extends AbstractHelper
         SCHEME_422 = '422';
 
     /**
-     * @var Picture_View
+     * @var PictureView
      */
     private $pictureViewTable = null;
 
@@ -45,13 +44,13 @@ class Pictures extends AbstractHelper
     }
 
     /**
-     * @return Picture_View
+     * @return PictureView
      */
     private function getPictureViewTable()
     {
         return $this->pictureViewTable
             ? $this->pictureViewTable
-            : $this->pictureViewTable = new Picture_View();
+            : $this->pictureViewTable = new PicturView();
     }
 
     /**
@@ -70,7 +69,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function behaviour(Picture_Row $picture)
+    public function behaviour(PictureRow $picture)
     {
         return $this->_behaviour($picture, $this->isPictureModer());
     }
@@ -97,7 +96,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    private function _behaviour(Picture_Row $picture, $isModer)
+    private function _behaviour(PictureRow $picture, $isModer)
     {
         $ctTable = $this->getCommentTopicTable();
         if ($this->view->user()->logedIn()) {
@@ -134,7 +133,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    private function getModerVote(Picture_Row $picture)
+    private function getModerVote(PictureRow $picture)
     {
         $moderVoteTable = $this->getModerVoteTable();
         $db = $moderVoteTable->getAdapter();
@@ -158,7 +157,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    public function picture(Picture_Row $picture)
+    public function picture(PictureRow $picture)
     {
         $view = $this->view;
 

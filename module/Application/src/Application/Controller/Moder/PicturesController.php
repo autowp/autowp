@@ -18,6 +18,7 @@ use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
+use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Row as UserRow;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
@@ -28,7 +29,6 @@ use Application\Service\TrafficControl;
 
 use Cars;
 use Picture;
-use Picture_Row;
 
 use Exception;
 
@@ -495,7 +495,7 @@ class PicturesController extends AbstractActionController
         ];
     }
 
-    private function pictureUrl(Picture_Row $picture, $forceCanonical = false, $uri = null)
+    private function pictureUrl(PictureRow $picture, $forceCanonical = false, $uri = null)
     {
         return $this->url()->fromRoute('moder/pictures/params', [
             'action'     => 'picture',
@@ -1300,19 +1300,19 @@ class PicturesController extends AbstractActionController
         return $this->user()->isAllowed('picture', 'crop');
     }
 
-    private function canNormalize(Picture_Row $picture)
+    private function canNormalize(PictureRow $picture)
     {
         return in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])
             && $this->user()->isAllowed('picture', 'normalize');
     }
 
-    private function canFlop(Picture_Row $picture)
+    private function canFlop(PictureRow $picture)
     {
         return in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX, Picture::STATUS_REMOVING])
             && $this->user()->isAllowed('picture', 'flop');
     }
 
-    private function canRestore(Picture_Row $picture)
+    private function canRestore(PictureRow $picture)
     {
         return $picture->status == Picture::STATUS_REMOVING
             && $this->user()->isAllowed('picture', 'restore');
@@ -1873,12 +1873,12 @@ class PicturesController extends AbstractActionController
         ], [], true);
     }
 
-    private function canAccept(Picture_Row $picture)
+    private function canAccept(PictureRow $picture)
     {
         return $picture->canAccept() && $this->user()->isAllowed('picture', 'accept');
     }
 
-    private function accept(Picture_Row $picture)
+    private function accept(PictureRow $picture)
     {
         $canAccept = $this->canAccept($picture);
 

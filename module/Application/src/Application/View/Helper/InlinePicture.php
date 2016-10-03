@@ -4,13 +4,13 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Picture_Row;
+use Application\Model\DbTable\Picture\Row as PictureRow;
 
 use Exception;
 
 class InlinePicture extends AbstractHelper
 {
-    public function __invoke(Picture_Row $picture)
+    public function __invoke(PictureRow $picture)
     {
         $view = $this->view;
 

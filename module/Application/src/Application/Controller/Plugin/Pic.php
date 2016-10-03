@@ -17,6 +17,8 @@ use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
+use Application\Model\DbTable\Picture\Row as PictureRow;
+use Application\Model\DbTable\Picture\View as PictureView;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
@@ -30,9 +32,6 @@ use Exception;
 
 use Cars;
 use Picture;
-use Picture_View;
-use Picture_Row;
-
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;
@@ -40,7 +39,7 @@ use Zend_Db_Table_Select;
 class Pic extends AbstractPlugin
 {
     /**
-     * @var Picture_View
+     * @var PictureView
      */
     private $pictureViewTable = null;
 
@@ -87,13 +86,13 @@ class Pic extends AbstractPlugin
     }
 
     /**
-     * @return Picture_View
+     * @return PictureView
      */
     private function getPictureViewTable()
     {
         return $this->pictureViewTable
             ? $this->pictureViewTable
-            : $this->pictureViewTable = new Picture_View();
+            : $this->pictureViewTable = new PictureView();
     }
 
     public function href($row, array $options = [])
@@ -390,7 +389,7 @@ class Pic extends AbstractPlugin
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = Picture_Row::buildFormatRequest($picture);
+            $requests[$idx] = PictureRow::buildFormatRequest($picture);
         }
 
         $imagesInfo = $imageStorage->getFormatedImages($requests, 'picture-thumb');
@@ -448,7 +447,7 @@ class Pic extends AbstractPlugin
 
                 $item = array_replace($item, [
                     'resolution'     => (int)$row['width'] . '×' . (int)$row['height'],
-                    'cropped'        => Picture_Row::checkCropParameters($row),
+                    'cropped'        => PictureRow::checkCropParameters($row),
                     'cropResolution' => $row['crop_width'] . '×' . $row['crop_height'],
                     'status'         => $row['status'],
                     'views'          => (int)$row['views'],
@@ -980,8 +979,8 @@ class Pic extends AbstractPlugin
             'picturePerspective' => $picturePerspective
         ];
 
-        // Обвновляем количество просмотров
-        $views = new Picture_View();
+        // refresh views count
+        $views = new PictureView();
         $views->inc($picture);
 
         return $data;
@@ -1159,9 +1158,9 @@ class Pic extends AbstractPlugin
         $cropRequests = [];
         $imageIds = [];
         foreach ($rows as $idx => $picture) {
-            $request = Picture_Row::buildFormatRequest($picture);
+            $request = PictureRow::buildFormatRequest($picture);
             $fullRequests[$idx] = $request;
-            if (Picture_Row::checkCropParameters($picture)) {
+            if (PictureRow::checkCropParameters($picture)) {
                 $cropRequests[$idx] = $request;
             }
             $ids[] = (int)$picture['id'];
@@ -1211,7 +1210,7 @@ class Pic extends AbstractPlugin
                 if ($image) {
                     $sUrl = $image->getSrc();
 
-                    if (Picture_Row::checkCropParameters($row)) {
+                    if (PictureRow::checkCropParameters($row)) {
                         $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
 
                         $crop['crop'] = [

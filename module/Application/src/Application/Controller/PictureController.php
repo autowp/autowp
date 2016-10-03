@@ -7,9 +7,9 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Picture\Row as PictureRow;
 
 use Picture;
-use Picture_Row;
 
 class PictureController extends AbstractActionController
 {
@@ -50,7 +50,7 @@ class PictureController extends AbstractActionController
         return $viewModel;
     }
 
-    private function getPicturesSelect(Picture_Row $picture)
+    private function getPicturesSelect(PictureRow $picture)
     {
         $pictureTable = $this->catalogue()->getPictureTable();
 

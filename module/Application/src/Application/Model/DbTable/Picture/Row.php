@@ -1,6 +1,6 @@
 <?php
 
-use Application\Db\Table\Row;
+namespace Application\Model\DbTable\Picture;
 
 use Autowp\Filter\Filename\Safe;
 use Autowp\Image\Storage\Request;
@@ -11,7 +11,9 @@ use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 
 use Exception;
 
-class Picture_Row extends Row
+use Picture;
+
+class Row extends \Application\Db\Table\Row
 {
     private static function between($a, $min, $max)
     {

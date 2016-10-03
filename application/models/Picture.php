@@ -30,7 +30,7 @@ class Picture extends Table
 
     protected $_name = 'pictures';
 
-    protected $_rowClass = 'Picture_Row';
+    protected $_rowClass = \Application\Model\DbTable\Picture\Row::class;
 
     protected $_referenceMap = [
         'Car' => [

@@ -1,8 +1,11 @@
 <?php
 
-use Application\Db\Table;
+namespace Application\Model\DbTable\Picture;
 
-class Picture_View extends Table
+use Application\Db\Table;
+use Application\Model\DbTable\Picture\Row as PictureRow;
+
+class View extends Table
 {
     protected $_name = 'picture_view';
     protected $_primary = 'picture_id';
@@ -14,7 +17,7 @@ class Picture_View extends Table
         ]
     ];
 
-    public function inc(Picture_Row $picture)
+    public function inc(PictureRow $picture)
     {
         $sql = '
             INSERT INTO picture_view (picture_id, views)
@@ -42,10 +45,10 @@ class Picture_View extends Table
     }
 
     /**
-     * @param Picture_Row $picture
+     * @param PictureRow $picture
      * @return int
      */
-    public function get(Picture_Row $picture)
+    public function get(PictureRow $picture)
     {
         $view = $this->fetchRow([
             'picture_id = ?' => $picture->id

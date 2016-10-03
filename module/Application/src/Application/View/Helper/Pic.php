@@ -4,15 +4,15 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
 
+use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\PictureNameFormatter;
 
 use Picture;
-use Picture_Row;
 
 class Pic extends AbstractHtmlElement
 {
     /**
-     * @var Picture_Row
+     * @var PictureRow
      */
     private $picture = null;
 
@@ -26,7 +26,7 @@ class Pic extends AbstractHtmlElement
         $this->pictureNameFormatter = $pictureNameFormatter;
     }
 
-    public function __invoke(Picture_Row $picture = null)
+    public function __invoke(PictureRow $picture = null)
     {
         $this->picture = $picture;
 

@@ -25,6 +25,7 @@ use Application\Model\DbTable\FactoryCar;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Modification\Group as ModificationGroup;
 use Application\Model\DbTable\Modification\Picture as ModificationPicture;
+use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Twins\GroupVehicle as TwinsGroupVehicle;
 use Application\Model\DbTable\User;
@@ -40,7 +41,6 @@ use Application\Service\SpecificationsService;
 use Autowp\Filter\Filename\Safe;
 
 use Picture;
-use Picture_Row;
 use Spec;
 
 use Zend_Db_Expr;
@@ -3569,7 +3569,7 @@ class CarsController extends AbstractActionController
         ];
     }
 
-    private function pictureUrl(Picture_Row $picture)
+    private function pictureUrl(PictureRow $picture)
     {
         return $this->url()->fromRoute('moder/pictures/params', [
             'action'     => 'picture',
@@ -3608,7 +3608,7 @@ class CarsController extends AbstractActionController
                 ->order(['pictures.status', 'pictures.id'])
         );
         foreach ($rows as $row) {
-            $request = Picture_Row::buildFormatRequest($row->toArray());
+            $request = PictureRow::buildFormatRequest($row->toArray());
             $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
             if ($imageInfo) {
                 $childs[$row->id] = $imageInfo->getSrc();
@@ -3941,7 +3941,7 @@ class CarsController extends AbstractActionController
 
         foreach ($pictureRows as $pictureRow) {
 
-            $request = Picture_Row::buildFormatRequest($pictureRow->toArray());
+            $request = PictureRow::buildFormatRequest($pictureRow->toArray());
             $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
 
             $modificationIds = $db->fetchCol(

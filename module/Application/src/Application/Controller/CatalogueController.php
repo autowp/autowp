@@ -16,6 +16,7 @@ use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Modification\Group as ModificationGroup;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
+use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
@@ -29,7 +30,6 @@ use Exception;
 
 use Cars;
 use Picture;
-use Picture_Row;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Select;
@@ -82,7 +82,7 @@ class CatalogueController extends AbstractActionController
     /**
      * @param Zend_Db_Table_Select $select
      * @param string $pictureId
-     * @return Picture_Row
+     * @return PictureRow
      */
     private function fetchSelectPicture(Zend_Db_Table_Select $select, $pictureId)
     {
@@ -537,7 +537,7 @@ class CatalogueController extends AbstractActionController
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = Picture_Row::buildFormatRequest($picture);
+            $requests[$idx] = PictureRow::buildFormatRequest($picture);
         }
 
         $imagesInfo = $this->imageStorage()->getFormatedImages($requests, 'picture-thumb');

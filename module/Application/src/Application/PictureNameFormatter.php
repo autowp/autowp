@@ -2,8 +2,9 @@
 
 namespace Application;
 
+use Application\Model\DbTable\Picture\Row as PictureRow;
+
 use Picture;
-use Picture_Row;
 
 class PictureNameFormatter
 {
@@ -32,7 +33,7 @@ class PictureNameFormatter
 
     public function format($picture, $language)
     {
-        if ($picture instanceof Picture_Row) {
+        if ($picture instanceof PictureRow) {
             $pictureTable = new Picture();
             $names = $pictureTable->getNameData([$picture->toArray()], [
                 'language' => $language,
