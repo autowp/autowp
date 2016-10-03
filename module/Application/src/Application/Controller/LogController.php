@@ -9,6 +9,7 @@ use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
+use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Cars;
