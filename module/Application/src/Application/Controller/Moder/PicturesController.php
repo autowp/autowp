@@ -474,6 +474,7 @@ class PicturesController extends AbstractActionController
             'дубль',
             'любительское фото',
             'не по теме сайта',
+            'не сток',
             'другая',
             'своя'
         ];

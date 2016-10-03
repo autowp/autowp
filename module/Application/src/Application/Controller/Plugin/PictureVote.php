@@ -69,6 +69,7 @@ class PictureVote extends AbstractPlugin
             'не по теме сайта',
             'другая',
             'единственное фото',
+            'не сток',
             'своя',
         ];
 
