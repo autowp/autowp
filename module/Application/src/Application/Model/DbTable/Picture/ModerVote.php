@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable\Picture;
+
 use Application\Db\Table;
 
-class Picture_Moder_Vote extends Table
+class ModerVote extends Table
 {
     protected $_name = 'pictures_moder_votes';
     protected $_primary = ['picture_id', 'user_id'];

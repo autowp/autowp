@@ -17,6 +17,7 @@ use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective;
+use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Row as UserRow;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
@@ -28,7 +29,6 @@ use Application\Service\TrafficControl;
 use Cars;
 use Picture;
 use Picture_Row;
-use Picture_Moder_Vote;
 
 use Exception;
 
@@ -608,7 +608,7 @@ class PicturesController extends AbstractActionController
 
             $uri = $this->hostManager->getUriByLanguage($owner->language);
 
-            $requests = new Picture_Moder_Vote();
+            $requests = new PictureModerVote();
             $deleteRequests = $requests->fetchAll(
                 $requests->select()
                     ->where('picture_id = ?', $picture->id)
@@ -793,7 +793,7 @@ class PicturesController extends AbstractActionController
                     $vote = (bool)($values['vote']);
 
                     $user = $this->user()->get();
-                    $moderVotes = new Picture_Moder_Vote();
+                    $moderVotes = new PictureModerVote();
                     $moderVotes->insert([
                         'user_id'    => $user->id,
                         'picture_id' => $picture->id,
@@ -829,7 +829,7 @@ class PicturesController extends AbstractActionController
 
         if ($voteExists) {
             if ($request->isPost() && $this->params('form') == 'picture-unvote') {
-                $moderVotes = new Picture_Moder_Vote();
+                $moderVotes = new PictureModerVote();
 
                 $user = $this->user()->get();
                 $moderVotes->delete([
@@ -845,7 +845,7 @@ class PicturesController extends AbstractActionController
 
         $moderVotes = null;
         if (!$hideVote) {
-            $moderVotes = $picture->findPicture_Moder_Vote();
+            $moderVotes = $picture->findDependentRowset(PictureModerVote::class);
         }
 
         return [
@@ -1967,7 +1967,7 @@ class PicturesController extends AbstractActionController
 
         $reason = trim($this->params()->fromPost('reason'));
 
-        $moderVotes = new Picture_Moder_Vote();
+        $moderVotes = new PictureModerVote();
 
         foreach ($pictureRows as $picture) {
 

@@ -4,6 +4,8 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
+
 use Picture;
 
 use Zend_Db_Expr;
@@ -109,7 +111,7 @@ class PictureVote extends AbstractPlugin
             'canDelete'         => $this->pictureCanDelete($picture),
             'canVote'           => !$voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
             'voteExists'        => $voteExists,
-            'moderVotes'        => $options['hideVote'] ? null : $picture->findPicture_Moder_Vote(),
+            'moderVotes'        => $options['hideVote'] ? null : $picture->findDependentRowset(PictureModerVote::class),
             'pictureDeleteUrl'  => $controller->url()->fromRoute('moder/pictures/params', [
                 'action'     => 'delete-picture',
                 'picture_id' => $picture->id

@@ -7,6 +7,7 @@ use Autowp\Image\Storage\Request;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 
 use Exception;
 
@@ -255,7 +256,7 @@ class Picture_Row extends Row
             return false;
         }
 
-        $moderVoteTable = new Picture_Moder_Vote();
+        $moderVoteTable = new PictureModerVote();
         $deleteVote = $moderVoteTable->fetchRow([
             'picture_id = ?' => $this->id,
             'vote = 0'
@@ -273,7 +274,7 @@ class Picture_Row extends Row
             return false;
         }
 
-        $moderVoteTable = new Picture_Moder_Vote();
+        $moderVoteTable = new PictureModerVote();
         $acceptVote = $moderVoteTable->fetchRow([
             'picture_id = ?' => $this->id,
             'vote > 0'

@@ -16,6 +16,7 @@ use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Perspective;
+use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
@@ -30,7 +31,6 @@ use Exception;
 use Cars;
 use Picture;
 use Picture_View;
-use Picture_Moder_Vote;
 use Picture_Row;
 
 use Zend_Db_Expr;
@@ -77,13 +77,13 @@ class Pic extends AbstractPlugin
     }
 
     /**
-     * @return Picture_Moder_Vote
+     * @return PictureModerVote
      */
     private function getModerVoteTable()
     {
         return $this->moderVoteTable
             ? $this->moderVoteTable
-            : $this->moderVoteTable = new Picture_Moder_Vote();
+            : $this->moderVoteTable = new PictureModerVote();
     }
 
     /**
@@ -774,7 +774,7 @@ class Pic extends AbstractPlugin
         $userTable = new User();
 
         $moderVotes = [];
-        foreach ($picture->findPicture_Moder_Vote() as $moderVote) {
+        foreach ($picture->findDependentRowset(PictureModerVote::class) as $moderVote) {
             $moderVotes[] = [
                 'vote'   => $moderVote->vote,
                 'reason' => $moderVote->reason,
