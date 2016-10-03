@@ -493,8 +493,8 @@ Message avec des instructions enverra à la nouvelle adresse e-mail pour le conf
     'account/accounts/add' => 'Ajouter un compte',
     'account/accounts/remove' => 'Supprimer',
     'account/accounts/removed' => 'Compte supprimé',
-    'account/accounts/connect-failed' => 'Impossible de se connecter avec un compte. Une erreur est survenue ou l'accès à compte refusé',
-    'account/accounts/disconnect-failed' => 'Impossible de supprimer le compte.
+    'account/accounts/connect-failed' => "Impossible de se connecter avec un compte. Une erreur est survenue ou l'accès à compte refusé",
+    'account/accounts/disconnect-failed' => "Impossible de supprimer le compte.
 
 Cela se produit si le compte lié est la seule méthode d'authentification, à savoir, non spécifiée e-mail ou d'autres comptes.',
 
@@ -502,7 +502,7 @@ Cela se produit si le compte lié est la seule méthode d'authentification, à s
 
 En cliquant sur le bouton rouge, toutes les données vous concernant seront anonymisées ou supprimés.
 
-Ce processus est irréversible, alors réfléchissez bien et ne prenez pas de décisions hâtives.',
+Ce processus est irréversible, alors réfléchissez bien et ne prenez pas de décisions hâtives.",
     'account/deleted/text' => 'Compte supprimé.
 Bonne chance.',
 
@@ -551,12 +551,12 @@ Bonne chance.',
     'users/user/pictures-left-on-site:' => 'laissés sur le site: ',
 
     'users/for-moderators' => 'Pour les modérateurs',
-    'users/for-moderators/remove-photo' => 'Supprimer photo de l'utilisateur',
-    'users/for-moderators/remove-user' => 'Supprimer l'utilisateur',
-    'users/for-moderators/last-visit-from-ip' => 'Dernière visite de l'adresse IP: ',
+    'users/for-moderators/remove-photo' => "Supprimer photo de l'utilisateur",
+    'users/for-moderators/remove-user' => "Supprimer l'utilisateur",
+    'users/for-moderators/last-visit-from-ip' => "Dernière visite de l'adresse IP: ",
 
     'ban/that-address-is-banned' => 'Cette adresse est interdit',
-    'ban/until' => 'jusqu'à',
+    'ban/until' => "jusqu'à",
     'ban/unban' => 'débannir',
     'ban/ban' => 'Interdire',
     'ban/reason' => 'Raison',
@@ -572,10 +572,10 @@ Bonne chance.',
     'users/user/recent-activity' => 'Activité récente',
     'users/user/recent-uploads' => 'Uploads récents',
     'users/user/recent-comments' => 'Commentaires récents',
-    'users/user/registration-date' => 'Date d'inscription',
+    'users/user/registration-date' => "Date d'inscription",
     'users/user/last-visited' => 'Dernière visite',
     'users/user/send-personal-message' => 'Envoyer un message personnel',
-    'users/user/log' => 'Journal de l'utilisateur',
+    'users/user/log' => "Journal de l'utilisateur",
     'users/user/uploaded-pictures' => 'Images téléchargées',
     'users/user/not-upload-pictures' => 'Pas télécharger des images',
 
