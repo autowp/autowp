@@ -6,11 +6,10 @@ use Zend\View\Helper\AbstractHelper;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\Spec;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\VehicleNameFormatter;
-
-use Spec;
 
 use Exception;
 

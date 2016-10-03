@@ -6,11 +6,10 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 use Application\Model\DbTable\Attr;
+use Application\Model\DbTable\Spec;
 use Application\Service\SpecificationsService;
 
-
 use Cars;
-use Spec;
 
 class ChartController extends AbstractRestfulController
 {

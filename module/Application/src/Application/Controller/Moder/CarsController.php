@@ -27,6 +27,7 @@ use Application\Model\DbTable\Modification\Group as ModificationGroup;
 use Application\Model\DbTable\Modification\Picture as ModificationPicture;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\Row as PictureRow;
+use Application\Model\DbTable\Spec;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Twins\GroupVehicle as TwinsGroupVehicle;
 use Application\Model\DbTable\User;
@@ -40,8 +41,6 @@ use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 use Autowp\Filter\Filename\Safe;
-
-use Spec;
 
 use Zend_Db_Expr;
 use Zend_Session_Namespace;

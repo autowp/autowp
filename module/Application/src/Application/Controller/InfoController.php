@@ -4,9 +4,8 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\DbTable\Spec;
 use Application\Model\DbTable\User;
-
-use Spec;
 
 use Autowp\TextStorage;
 
