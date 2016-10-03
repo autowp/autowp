@@ -7,14 +7,14 @@
             ], [], true), $attribute->name) ?>
         </td>
         <td>
-            <?php if ($type = $attribute->findParentAttrs_Types()) { ?>
+            <?php if ($type = $attribute->findParentRow(Application\Model\DbTable\Attr\Type::class)) { ?>
                 <?=$this->escapeHtml($type->name) ?>
             <?php } else { ?>
                 —
             <?php } ?>
         </td>
         <td>
-            <?php if ($unit = $attribute->findParentAttrs_Units()) { ?>
+            <?php if ($unit = $attribute->findParentRow(Application\Model\DbTable\Attr\Unit::class)) { ?>
                 <?=$this->escapeHtml($unit->name) ?>
             <?php } else { ?>
                 —

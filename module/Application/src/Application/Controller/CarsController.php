@@ -9,6 +9,7 @@ use Zend\View\Model\ViewModel;
 use Application\HostManager;
 use Application\Model\Message;
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Attr;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
@@ -17,9 +18,6 @@ use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
-use Attrs_Attributes;
-use Attrs_Item_Types;
-use Attrs_User_Values;
 use Cars;
 
 class CarsController extends AbstractActionController
@@ -266,7 +264,7 @@ class CarsController extends AbstractActionController
         }
 
         //$carTable = new Cars();
-        $aitTable = new Attrs_Item_Types();
+        $aitTable = new Attr\ItemType();
 
         $itemId = (int)$this->params('item_id');
         $itemType = $aitTable->find($this->params('item_type_id'))->current();
@@ -280,8 +278,8 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $userValueTable = new Attrs_User_Values();
-        $attrTable = new Attrs_Attributes();
+        $userValueTable = new Attr\UserValue();
+        $attrTable = new Attr\Attribute();
 
         $eUserValueRows = $userValueTable->fetchAll([
             'item_id = ?'      => $itemId,
@@ -378,7 +376,7 @@ class CarsController extends AbstractActionController
             return $this->forward('forbidden', 'error');
         }
 
-        $aitTable = new Attrs_Item_Types();
+        $aitTable = new Attr\ItemType();
 
         $itemId = (int)$this->params('item_id');
         $itemType = $aitTable->find($this->params('item_type_id'))->current();
@@ -386,7 +384,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $auvTable = new Attrs_User_Values();
+        $auvTable = new Attr\UserValue();
 
         $rows = $auvTable->fetchAll([
             'item_id = ?'      => $itemId,
@@ -397,9 +395,9 @@ class CarsController extends AbstractActionController
 
         $values = [];
         foreach ($rows as $row) {
-            $attribute = $row->findParentAttrs_Attributes();
+            $attribute = $row->findParentRow(Attr\Attribute::class);
             $user = $row->findParentRow(User::class);
-            $unit = $attribute->findParentAttrs_Units();
+            $unit = $attribute->findParentRow(Attr\Unit::class);
             $values[] = [
                 'attribute' => $attribute,
                 'unit'      => $unit,
@@ -435,7 +433,7 @@ class CarsController extends AbstractActionController
             return $this->forward('forbidden', 'error');
         }
 
-        $aitTable = new Attrs_Item_Types();
+        $aitTable = new Attr\ItemType();
 
         $itemType = $aitTable->find($this->params('item_type_id'))->current();
         if (!$itemType) {
@@ -521,7 +519,7 @@ class CarsController extends AbstractActionController
 
         $language = $this->language();
 
-        $userValues = new Attrs_User_Values();
+        $userValues = new Attr\UserValue();
 
         $select = $userValues->select()
             ->order('update_date DESC');
@@ -558,7 +556,7 @@ class CarsController extends AbstractActionController
             $moderUrl = null;
             $path = [];
 
-            $itemType = $row->findParentAttrs_Item_Types();
+            $itemType = $row->findParentRow(Attr\ItemType::class);
             if ($itemType->id == 1) {
                 $car = $cars->find($row->item_id)->current();
                 if ($car) {
@@ -593,13 +591,13 @@ class CarsController extends AbstractActionController
                 }
             }
 
-            $attribute = $row->findParentAttrs_Attributes();
+            $attribute = $row->findParentRow(Attr\Attribute::class);
             if ($attribute) {
                 $parents = [];
                 $parent = $attribute;
                 do {
                     $parents[] = $parent->name;
-                } while ($parent = $parent->findParentAttrs_Attributes());
+                } while ($parent = $parent->findParentRow(Attr\Attribute::class));
 
                 $path = array_reverse($parents);
             }
@@ -620,7 +618,7 @@ class CarsController extends AbstractActionController
                 ],
                 'path'     => $path,
                 'value'    => $this->specsService->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id, $language),
-                'unit'     => $attribute->findParentAttrs_Units()
+                'unit'     => $attribute->findParentRow(Attr\Unit::class)
             ];
         }
 

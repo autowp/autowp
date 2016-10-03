@@ -5,9 +5,10 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
+use Application\Model\DbTable\Attr;
 use Application\Service\SpecificationsService;
 
-use Attrs_Attributes;
+
 use Cars;
 use Spec;
 
@@ -33,7 +34,7 @@ class ChartController extends AbstractRestfulController
 
     public function yearsAction()
     {
-        $attrTable = new Attrs_Attributes();
+        $attrTable = new Attr\Attribute();
 
         $params = [];
         foreach ($attrTable->find($this->parameters) as $row) {
@@ -71,7 +72,7 @@ class ChartController extends AbstractRestfulController
             return $this->notFoundAction();
         }
 
-        $attrTable = new Attrs_Attributes();
+        $attrTable = new Attr\Attribute();
         $attrRow = $attrTable->find($id)->current();
         if (!$attrRow) {
             return $this->notFoundAction();

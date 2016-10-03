@@ -17,7 +17,7 @@
                     <li>
                         <?=$this->htmlA($this->url(), $itemType->name) ?>
                         <ul>
-                            <?php foreach ($itemType->findAttrs_Zones() as $zone) { ?>
+                            <?php foreach ($itemType->findDependentRowset(Application\Model\DbTable\Attr\Zone::class) as $zone) { ?>
                                 <li><?=$this->htmlA($this->url('moder/attrs/params', [
                                     'action'  => 'zone',
                                     'zone_id' => $zone->id

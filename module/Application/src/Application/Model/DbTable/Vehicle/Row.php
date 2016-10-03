@@ -5,8 +5,8 @@ namespace Application\Model\DbTable\Vehicle;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
+use Application\Model\DbTable\Attr;
 
-use Attrs_Zones;
 use Spec;
 
 use DateTime;
@@ -353,7 +353,7 @@ class Row extends \Application\Db\Table\Row
                 $id = 2;
                 break;
         }
-        $zones = new Attrs_Zones();
+        $zones = new Attr\Zone();
         return $zones->find($id)->current();
     }
 

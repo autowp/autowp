@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable\Attr;
+
 use Application\Db\Table;
 
-class Attrs_Item_Types extends Table
+class ItemType extends Table
 {
     protected $_name = 'attrs_item_types';
 }

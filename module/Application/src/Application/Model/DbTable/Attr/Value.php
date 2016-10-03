@@ -1,19 +1,21 @@
 <?php
 
+namespace Application\Model\DbTable\Attr;
+
 use Application\Db\Table;
 
-class Attrs_Values extends Table
+class Value extends Table
 {
     protected $_name = 'attrs_values';
     protected $_referenceMap = [
         'Attribute' => [
             'columns'       => ['attribut_id'],
-            'refTableClass' => 'Attrs_Attributes',
+            'refTableClass' => Attribute::class,
             'refColumns'    => ['id']
         ],
         'ItemType' => [
             'columns'       => ['item_type_id'],
-            'refTableClass' => 'Attrs_Item_Types',
+            'refTableClass' => ItemType::class,
             'refColumns'    => ['id']
         ],
     ];

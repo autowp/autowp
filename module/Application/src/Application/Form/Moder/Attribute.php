@@ -6,9 +6,7 @@ use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
 use Application\Filter\SingleSpaces;
-
-use Attrs_Types;
-use Attrs_Units;
+use Application\Model\DbTable\Attr;
 
 class Attribute extends Form implements InputFilterProviderInterface
 {
@@ -16,14 +14,14 @@ class Attribute extends Form implements InputFilterProviderInterface
     {
         parent::__construct($name, $options);
 
-        $typesTable = new Attrs_Types();
+        $typesTable = new Attr\Type();
         $db = $typesTable->getAdapter();
         $typeOptions = $db->fetchPairs(
             $db->select()
                 ->from($typesTable->info('name'), ['id', 'name'])
         );
 
-        $unitTable = new Attrs_Units();
+        $unitTable = new Attr\Unit();
         $db = $unitTable->getAdapter();
         $unitOptions = $db->fetchPairs(
             $db->select()

@@ -6,15 +6,14 @@ use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
 use Application\Filter\SingleSpaces;
-
-use Attrs_List_Options;
+use Application\Model\DbTable\Attr;
 
 use Exception;
 
 class AttributeListOption extends Form implements InputFilterProviderInterface
 {
     /**
-     * @var Attrs_List_Options
+     * @var Attr\ListOption
      */
     private $listOptionsTable;
 
@@ -68,7 +67,7 @@ class AttributeListOption extends Form implements InputFilterProviderInterface
 
     public function __construct($name = null, $options = [])
     {
-        $this->listOptionsTable = new Attrs_List_Options();
+        $this->listOptionsTable = new Attr\ListOption();
 
         parent::__construct($name, $options);
 

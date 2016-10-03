@@ -1,15 +1,16 @@
 <?php
 
+namespace Application\Model\DbTable\Attr;
+
 use Application\Db\Table\Row;
 
-class Attrs_Zone_Row extends Row
+class ZoneRow extends Row
 {
     public function hasAttribute(Row $attribute)
     {
-        $attributes = new Attrs_Zone_Attributes();
+        $attributes = new ZoneAttribute();
         return (bool)$attributes->getAdapter()->fetchOne(
-            $attributes
-                ->select()
+            $attributes->select()
                 ->from($attributes, 'COUNT(*)')
                 ->where('zone_id = ?', $this->id)
                 ->where('attribute_id = ?', $attribute->id)
@@ -18,7 +19,7 @@ class Attrs_Zone_Row extends Row
 
     public function findAttributes(Row $parent = null)
     {
-        $table = new Attrs_Attributes();
+        $table = new Attribute();
         $select = $table->select()
             ->from($table)
             ->join('attrs_zone_attributes', 'attrs_zone_attributes.attribute_id=attrs_attributes.id', null)

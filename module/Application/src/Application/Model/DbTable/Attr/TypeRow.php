@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable\Attr;
+
 use Application\Db\Table\Row;
 
-class Attrs_Types_Row extends Row
+class TypeRow extends Row
 {
 
 }

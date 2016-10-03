@@ -1,14 +1,16 @@
 <?php
 
+namespace Application\Model\DbTable\Attr;
+
 use Application\Db\Table;
 
-class Attrs_List_Options extends Table
+class ListOption extends Table
 {
     protected $_name = 'attrs_list_options';
     protected $_referenceMap = [
         'Attribute' => [
             'columns'       => ['attribute_id'],
-            'refTableClass' => 'Attrs_Attributes',
+            'refTableClass' => Attribute::class,
             'refColumns'    => ['id']
         ]
     ];

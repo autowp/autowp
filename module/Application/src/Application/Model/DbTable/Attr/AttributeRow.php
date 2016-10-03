@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable\Attr;
+
 use Application\Db\Table\Row;
 
-class Attrs_Attributes_Row extends Row
+class AttributeRow extends Row
 {
     public function isMayBeMultiple()
     {

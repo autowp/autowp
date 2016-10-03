@@ -7,12 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Moder\Attribute as AttributeForm;
 use Application\Form\Moder\AttributeListOption as AttributeListOptionForm;
-
-use Attrs_Attributes;
-use Attrs_Item_Types;
-use Attrs_List_Options;
-use Attrs_Zone_Attributes;
-use Attrs_Zones;
+use Application\Model\DbTable\Attr;
 
 class AttrsController extends AbstractActionController
 {
@@ -22,8 +17,8 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
         
-        $itemTypes = new Attrs_Item_Types();
-        $attributes = new Attrs_Attributes();
+        $itemTypes = new Attr\ItemType();
+        $attributes = new Attr\Attribute();
 
         return [
             'itemTypes'  => $itemTypes->fetchAll(),
@@ -45,7 +40,7 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
         
-        $attributes = new Attrs_Attributes();
+        $attributes = new Attr\Attribute();
 
         $attribute = $attributes->find($this->params('attribute_id'))->current();
         if (!$attribute) {
@@ -70,7 +65,7 @@ class AttrsController extends AbstractActionController
             'form' => 'option'
         ], [], true));
 
-        $options = new Attrs_List_Options();
+        $options = new Attr\ListOption();
 
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -176,23 +171,23 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
         
-        $zones = new Attrs_Zones();
+        $zones = new Attr\Zone();
 
         $zone = $zones->find($this->params('zone_id'))->current();
         if (!$zone) {
             return $this->notFoundAction();
         }
 
-        $itemType = $zone->findParentAttrs_Item_Types();
+        $itemType = $zone->findParentRow(Attr\ItemType::class);
 
-        $attributes = new Attrs_Attributes();
+        $attributes = new Attr\Attribute();
 
         $request = $this->getRequest();
         if ($request->isPost()) {
             switch($this->params('form')) {
                 case 'attributes':
 
-                    $zoneAttributes = new Attrs_Zone_Attributes();
+                    $zoneAttributes = new Attr\ZoneAttribute();
                     $ids = (array)$request->getPost('attribute_id');
                     if (count($ids)) {
                         $select = $attributes->select()
@@ -246,7 +241,7 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
         
-        $attributes = new Attrs_Attributes();
+        $attributes = new Attr\Attribute();
 
         $attribute = $attributes->find($this->params('attribute_id'))->current();
         if (!$attribute) {
@@ -290,7 +285,7 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
         
-        $attributes = new Attrs_Attributes();
+        $attributes = new Attr\Attribute();
 
         $attribute = $attributes->find($this->params('attribute_id'))->current();
         if (!$attribute) {
@@ -334,21 +329,21 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
         
-        $attributes = new Attrs_Attributes();
+        $attributes = new Attr\Attribute();
 
         $attribute = $attributes->find($this->params('attribute_id'))->current();
         if (!$attribute) {
             return $this->notFoundAction();
         }
 
-        $zones = new Attrs_Zones();
+        $zones = new Attr\Zone();
 
         $zone = $zones->find($this->params('zone_id'))->current();
         if (!$zone) {
             return $this->notFoundAction();
         }
 
-        $zoneAttributes = new Attrs_Zone_Attributes();
+        $zoneAttributes = new Attr\ZoneAttribute();
         $zoneAttribute = $zoneAttributes->fetchRow(
             $zoneAttributes->select()
                 ->where('zone_id = ?', $zone->id)
@@ -396,21 +391,21 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
         
-        $attributes = new Attrs_Attributes();
+        $attributes = new Attr\Attribute();
 
         $attribute = $attributes->find($this->params('attribute_id'))->current();
         if (!$attribute) {
             return $this->notFoundAction();
         }
 
-        $zones = new Attrs_Zones();
+        $zones = new Attr\Zone();
 
         $zone = $zones->find($this->params('zone_id'))->current();
         if (!$zone) {
             return $this->notFoundAction();
         }
 
-        $zoneAttributes = new Attrs_Zone_Attributes();
+        $zoneAttributes = new Attr\ZoneAttribute();
         $zoneAttribute = $zoneAttributes->fetchRow(
             $zoneAttributes->select()
                 ->where('zone_id = ?', $zone->id)

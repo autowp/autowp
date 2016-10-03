@@ -3,6 +3,7 @@
 namespace Application\Service;
 
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
+use Application\Model\DbTable\Attr;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineRow;
 use Application\Model\DbTable\Picture;
@@ -15,21 +16,6 @@ use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Spec\Table\Car as CarSpecTable;
 use Application\Spec\Table\Engine as EngineSpecTable;
 
-use Attrs_Attributes;
-use Attrs_List_Options;
-use Attrs_Types;
-use Attrs_Values;
-use Attrs_Values_Float;
-use Attrs_Values_Int;
-use Attrs_Values_List;
-use Attrs_Values_String;
-use Attrs_Units;
-use Attrs_User_Values;
-use Attrs_User_Values_Int;
-use Attrs_User_Values_Float;
-use Attrs_User_Values_List;
-use Attrs_User_Values_String;
-use Attrs_Zones;
 use Cars;
 
 use Exception;
@@ -55,12 +41,12 @@ class SpecificationsService
     protected $zones = null;
 
     /**
-     * @var Attrs_Attributes
+     * @var Attr\Attribute
      */
     protected $attributeTable = null;
 
     /**
-     * @var Attrs_List_Options
+     * @var Attr\ListOption
      */
     protected $listOptionsTable = null;
 
@@ -72,7 +58,7 @@ class SpecificationsService
     private $listOptionsChilds = [];
 
     /**
-     * @var Attrs_Units
+     * @var Attr\Unit
      */
     protected $unitTable = null;
 
@@ -81,7 +67,7 @@ class SpecificationsService
     protected $units = null;
 
     /**
-     * @var Attrs_User_Values
+     * @var Attr\UserValue
      */
     protected $userValueTable = null;
 
@@ -112,7 +98,7 @@ class SpecificationsService
     protected $engineChildsCache = [];
 
     /**
-     * @var Attrs_Values
+     * @var Attr\Value
      */
     protected $valueTable = null;
 
@@ -127,7 +113,7 @@ class SpecificationsService
     protected $engineTable = null;
 
     /**
-     * @var Attrs_Types
+     * @var Attr\Type
      */
     protected $typeTable;
 
@@ -180,23 +166,23 @@ class SpecificationsService
     }
 
     /**
-     * @return Attrs_Types
+     * @return Attr\Type
      */
     private function getTypeTable()
     {
         return $this->typeTable
             ? $this->typeTable
-            : $this->typeTable = new Attrs_Types();
+            : $this->typeTable = new Attr\Type();
     }
 
     /**
-     * @return Attrs_Values
+     * @return Attr\Value
      */
     protected function getValueTable()
     {
         return $this->valueTable
             ? $this->valueTable
-            : $this->valueTable = new Attrs_Values();
+            : $this->valueTable = new Attr\Value();
     }
 
     /**
@@ -233,34 +219,34 @@ class SpecificationsService
     {
         return $this->attributeTable
             ? $this->attributeTable
-            : $this->attributeTable = new Attrs_Attributes();
+            : $this->attributeTable = new Attr\Attribute();
     }
 
     protected function getUserValueTable()
     {
         return $this->userValueTable
             ? $this->userValueTable
-            : $this->userValueTable = new Attrs_User_Values();
+            : $this->userValueTable = new Attr\UserValue();
     }
 
     protected function getListOptionsTable()
     {
         return $this->listOptionsTable
             ? $this->listOptionsTable
-            : $this->listOptionsTable = new Attrs_List_Options();
+            : $this->listOptionsTable = new Attr\ListOption();
     }
 
     protected function getUnitTable()
     {
         return $this->unitTable
             ? $this->unitTable
-            : $this->unitTable = new Attrs_Units();
+            : $this->unitTable = new Attr\Unit();
     }
 
     protected function _getZone($id)
     {
         if ($this->zones === null) {
-            $zoneTable = new Attrs_Zones();
+            $zoneTable = new Attr\Zone();
             $this->zones = [];
             foreach ($zoneTable->fetchAll() as $zone) {
                 $this->zones[$zone->id] = $zone;
@@ -1375,7 +1361,7 @@ class SpecificationsService
             throw new Exception("Item_id not set");
         }
 
-        if ($attribute instanceof Attrs_Attributes_Row) {
+        if ($attribute instanceof Attr\AttributeRow) {
             $attribute = $this->_getAttribute($attribute->id);
         } elseif (is_numeric($attribute)) {
             $attribute = $this->_getAttribute($attribute);
@@ -1694,26 +1680,26 @@ class SpecificationsService
     {
         switch ($type) {
             case 1: // string
-                return new Attrs_Values_String();
+                return new Attr\ValueString();
 
             case 2: // int
-                return new Attrs_Values_Int();
+                return new Attr\ValueInt();
 
             case 3: // float
-                return new Attrs_Values_Float();
+                return new Attr\ValueFloat();
 
             case 4: // textarea
                 throw new Exception("Unexpected type 4");
                 //return new Attrs_Values_Text();
 
             case 5: // checkbox
-                return new Attrs_Values_Int();
+                return new Attr\ValueInt();
 
             case 6: // select
-                return new Attrs_Values_List();
+                return new Attr\ValueList();
 
             case 7: // select
-                return new Attrs_Values_List();
+                return new Attr\ValueList();
         }
         return null;
     }
@@ -1732,26 +1718,26 @@ class SpecificationsService
     {
         switch ($type) {
             case 1: // string
-                return new Attrs_User_Values_String();
+                return new Attr\UserValueString();
 
             case 2: // int
-                return new Attrs_User_Values_Int();
+                return new Attr\UserValueInt();
 
             case 3: // float
-                return new Attrs_User_Values_Float();
+                return new Attr\UserValueFloat();
 
             case 4: // textarea
                 throw new Exception("Unexpected type 4");
                 //return new Attrs_User_Values_Text();
 
             case 5: // checkbox
-                return new Attrs_User_Values_Int();
+                return new Attr\UserValueInt();
 
             case 6: // select
-                return new Attrs_User_Values_List();
+                return new Attr\UserValueList();
 
             case 7: // select
-                return new Attrs_User_Values_List();
+                return new Attr\UserValueList();
 
             default:
                 throw new Exception("Unexpected type `$type`");

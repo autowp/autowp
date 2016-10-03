@@ -1,20 +1,22 @@
 <?php
 
+namespace Application\Model\DbTable\Attr;
+
 use Application\Db\Table;
 
-class Attrs_Zone_Attributes extends Table
+class ZoneAttribute extends Table
 {
     protected $_name = 'attrs_zone_attributes';
     protected $_primary = ['zone_id', 'attribute_id'];
     protected $_referenceMap = [
         'Zone' => [
             'columns'       => ['zone_id'],
-            'refTableClass' => 'Attrs_Zones',
+            'refTableClass' => Zone::class,
             'refColumns'    => ['id']
         ],
         'Attribute' => [
             'columns'       => ['attribute_id'],
-            'refTableClass' => 'Attrs_Attributes',
+            'refTableClass' => Attribute::class,
             'refColumns'    => ['id']
         ],
     ];

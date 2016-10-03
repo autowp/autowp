@@ -1,8 +1,10 @@
 <?php
 
+namespace Application\Model\DbTable\Attr;
+
 use Application\Db\Table;
 
-class Attrs_Units extends Table
+class Unit extends Table
 {
     protected $_name = 'attrs_units';
 }

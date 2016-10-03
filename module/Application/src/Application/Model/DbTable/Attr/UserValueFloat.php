@@ -1,6 +1,8 @@
 <?php
 
-class Attrs_User_Values_Float extends Attrs_User_Values_Abstract
+namespace Application\Model\DbTable\Attr;
+
+class UserValueFloat extends UserValueAbstract
 {
     protected $_name = 'attrs_user_values_float';
 }

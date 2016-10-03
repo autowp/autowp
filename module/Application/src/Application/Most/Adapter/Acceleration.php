@@ -2,13 +2,13 @@
 
 namespace Application\Most\Adapter;
 
+use Application\Model\DbTable\Attr;
+
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table;
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
-
-use Attrs_Attributes;
 
 class Acceleration extends AbstractAdapter
 {
@@ -22,7 +22,7 @@ class Acceleration extends AbstractAdapter
 
     public function __construct(array $options)
     {
-        $this->attributesTable = new Attrs_Attributes();
+        $this->attributesTable = new Attr\Attribute();
 
         parent::__construct($options);
     }

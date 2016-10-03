@@ -1,6 +1,8 @@
 <?php
 
-class Attrs_User_Values_Int extends Attrs_User_Values_Abstract
+namespace Application\Model\DbTable\Attr;
+
+class UserValueInt extends UserValueAbstract
 {
     protected $_name = 'attrs_user_values_int';
 }
