@@ -8,12 +8,12 @@ use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandEngine;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineRow;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\DbTable\Vehicle\Type as VehicleType;
 
 use Cars;
-use Picture;
 
 use Exception;
 

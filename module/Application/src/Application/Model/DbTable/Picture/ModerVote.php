@@ -17,7 +17,7 @@ class ModerVote extends Table
         ],
         'Picture' => [
             'columns'       => ['picture_id'],
-            'refTableClass' => 'Picture',
+            'refTableClass' => \Application\Model\DbTable\Picture::class,
             'refColumns'    => ['id']
         ]
     ];

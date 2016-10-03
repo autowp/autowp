@@ -3,13 +3,15 @@
 namespace Application\Service;
 
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Most;
 use Application\Service\SpecificationsService;
 
 use Cars;
+
 use Exception;
-use Picture;
+
 use Zend_Db_Expr;
 
 class Mosts

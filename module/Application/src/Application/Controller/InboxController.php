@@ -6,8 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Service\DayPictures;
 use Application\Model\Brand as BrandModel;
-
-use Picture;
+use Application\Model\DbTable\Picture;
 
 class InboxController extends AbstractActionController
 {

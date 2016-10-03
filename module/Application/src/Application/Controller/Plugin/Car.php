@@ -9,6 +9,7 @@ use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\Twins;
@@ -16,7 +17,6 @@ use Application\Service\SpecificationsService;
 
 use Autowp\TextStorage\Service as TextStorage;
 
-use Picture;
 use Spec;
 
 use Zend_Db_Expr;

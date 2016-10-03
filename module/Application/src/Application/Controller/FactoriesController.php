@@ -5,11 +5,11 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Factory;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 
 use Cars;
 use geoPHP;
-use Picture;
 
 use Zend_Db_Expr;
 

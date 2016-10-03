@@ -3,8 +3,7 @@
 namespace Application\Model\DbTable\Category;
 
 use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
-
-use Picture;
+use Application\Model\DbTable\Picture;
 
 use Zend_Db_Expr;
 

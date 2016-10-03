@@ -12,11 +12,11 @@ use Application\Model\Comments;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Engine;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Service\TelegramService;
 
 use Cars;
-use Picture;
 
 use Zend_Db_Expr;
 

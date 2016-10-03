@@ -4,8 +4,7 @@ namespace Application\Model\DbTable;
 
 use Application\Db\Table\Row;
 use Application\Model\DbTable\BrandLanguage;
-
-use Picture;
+use Application\Model\DbTable\Picture;
 
 use Zend_Db_Expr;
 

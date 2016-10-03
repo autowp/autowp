@@ -11,13 +11,12 @@ use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
-
-use Picture;
 
 use Zend_Db_Expr;
 

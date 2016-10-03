@@ -1,5 +1,7 @@
 <?php
 
+namespace Application\Model\DbTable;
+
 use Autowp\Image;
 
 use Application\Db\Table;
@@ -9,6 +11,8 @@ use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Perspective;
+
+use Zend_Db_Expr;
 
 class Picture extends Table
 {

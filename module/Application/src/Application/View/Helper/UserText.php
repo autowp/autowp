@@ -8,9 +8,8 @@ use Zend\Router\Http\TreeRouteStack;
 use Zend\Uri;
 use Zend\View\Helper\AbstractHtmlElement;
 
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
-
-use Picture;
 
 use Exception;
 

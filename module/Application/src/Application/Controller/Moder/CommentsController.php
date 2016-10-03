@@ -7,10 +7,9 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
-
-use Picture;
 
 class CommentsController extends AbstractActionController
 {

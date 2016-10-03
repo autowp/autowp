@@ -6,13 +6,12 @@ use Zend\Mail;
 
 use Application\Auth\Adapter\Login as LoginAuthAdapter;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
 use Application\Model\DbTable\User\Remember as UserRemember;
 use Application\Model\DbTable\User\Row as UserRow;
 use Application\Service\SpecificationsService;
-
-use Picture;
 
 use DateTime;
 use Exception;

@@ -4,10 +4,11 @@ namespace Application\Controller\Api;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
+
 use Application\Model\CarOfDay;
+use Application\Model\DbTable\Picture;
 
 use Cars;
-use Picture;
 
 class PictureController extends AbstractActionController
 {

@@ -7,13 +7,12 @@ use Zend\View\Model\JsonModel;
 
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Museum;
+use Application\Model\DbTable\Picture;
 
 use geoPHP;
 use LineString;
 use Point;
 use Polygon;
-
-use Picture;
 
 class MapController extends AbstractActionController
 {

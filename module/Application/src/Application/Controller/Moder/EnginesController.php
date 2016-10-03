@@ -10,10 +10,9 @@ use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandEngine;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineParentCache;
+use Application\Model\DbTable\Picture;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
-
-use Picture;
 
 use Exception;
 

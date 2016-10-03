@@ -8,6 +8,7 @@ use Zend\View\Model\ViewModel;
 
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Twins;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -16,7 +17,6 @@ use Application\Service\SpecificationsService;
 use Autowp\TextStorage;
 
 use Cars;
-use Picture;
 
 use Zend_Db_Expr;
 

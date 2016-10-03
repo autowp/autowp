@@ -3,10 +3,10 @@
 namespace Application\Model\DbTable\Vehicle;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 
 use Attrs_Zones;
-use Picture;
 use Spec;
 
 use DateTime;

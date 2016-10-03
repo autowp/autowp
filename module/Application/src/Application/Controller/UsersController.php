@@ -9,14 +9,13 @@ use Application\Service\TrafficControl;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Model\DbTable\User\Rename as UserRename;
 use Application\Model\Contact;
 
 use Application\Paginator\Adapter\Zend1DbTableSelect;
-
-use Picture;
 
 use Zend_Db_Expr;
 

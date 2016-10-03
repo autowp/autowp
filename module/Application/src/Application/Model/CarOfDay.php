@@ -3,9 +3,9 @@
 namespace Application\Model;
 
 use Application\Db\Table;
+use Application\Model\DbTable\Picture;
 
 use Cars;
-use Picture;
 
 use Zend_Db_Expr;
 use Zend_Oauth_Token_Access;

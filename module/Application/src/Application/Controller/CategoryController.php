@@ -8,11 +8,10 @@ use Zend\View\Model\ViewModel;
 
 use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
-
-use Picture;
 
 use Zend_Db_Expr;
 

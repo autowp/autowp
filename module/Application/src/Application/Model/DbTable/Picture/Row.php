@@ -7,11 +7,10 @@ use Autowp\Image\Storage\Request;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 
 use Exception;
-
-use Picture;
 
 class Row extends \Application\Db\Table\Row
 {

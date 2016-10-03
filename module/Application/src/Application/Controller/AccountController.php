@@ -11,6 +11,7 @@ use Application\Auth\Adapter\Id as IdAuthAdapter;
 use Application\Controller\LoginController;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\LoginState;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Model\DbTable\User\Rename as UserRename;
@@ -22,7 +23,6 @@ use Application\Service\UsersService;
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
 use Cars;
-use Picture;
 
 use Zend_Auth;
 use Zend_Db_Expr;

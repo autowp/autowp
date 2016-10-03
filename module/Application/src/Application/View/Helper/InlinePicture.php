@@ -6,8 +6,6 @@ use Zend\View\Helper\AbstractHelper;
 
 use Application\Model\DbTable\Picture\Row as PictureRow;
 
-use Exception;
-
 class InlinePicture extends AbstractHelper
 {
     public function __invoke(PictureRow $picture)

@@ -2,12 +2,11 @@
 
 namespace Application\Service;
 
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Telegram\Brand as TelegramBrand;
 use Application\Telegram\Command\InboxCommand;
 use Application\Telegram\Command\MeCommand;
 use Application\Telegram\Command\StartCommand;
-
-use Picture;
 
 use Telegram\Bot\Api;
 

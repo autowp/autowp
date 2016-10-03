@@ -5,8 +5,7 @@ namespace Application\View\Helper;
 use Zend\View\Helper\AbstractHtmlElement;
 
 use Application\Model\DbTable\Comment\Message as CommentMessage;
-
-use Picture;
+use Application\Model\DbTable\Picture;
 
 class ModerMenu extends AbstractHtmlElement
 {

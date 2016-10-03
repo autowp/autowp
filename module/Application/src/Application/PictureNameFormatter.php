@@ -2,9 +2,8 @@
 
 namespace Application;
 
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\Row as PictureRow;
-
-use Picture;
 
 class PictureNameFormatter
 {

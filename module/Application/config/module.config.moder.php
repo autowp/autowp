@@ -11,8 +11,7 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 use Autowp\TextStorage;
 
 use Application\Model\DbTable\Comment\Message as CommentMessage;
-
-use Picture;
+use Application\Model\DbTable\Picture;
 
 return [
     'router' => [

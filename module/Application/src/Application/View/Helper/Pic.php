@@ -4,10 +4,9 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
 
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\PictureNameFormatter;
-
-use Picture;
 
 class Pic extends AbstractHtmlElement
 {

@@ -37,7 +37,7 @@
                 'title'   => $this->pic()->textTitle($this->name),
                 'shuffle' => true
             ]), false)?>
-            <?php if ($this->picture->type == Picture::VEHICLE_TYPE_ID) { ?>
+            <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
                 <?php if (isset($this->altNames) && count($this->altNames)) { ?>
                     <div class="languages">
                         <p><?=$this->escapeHtml($this->translate('picture/other-languages'))?></p>
@@ -61,7 +61,7 @@
             </div>
         <?php } ?>
 
-        <?php if ($this->picture->type == Picture::VEHICLE_TYPE_ID) { ?>
+        <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
 
             <?php if (count($this->modifications) > 0) { ?>
                 <p>
@@ -115,10 +115,10 @@
                 <?=$this->escapeHtml($this->translate('picture/status:'))?>
                 <?php
                     switch ($this->picture->status) {
-                        case Picture::STATUS_NEW:      echo $this->escapeHtml($this->translate('picture/status/new')); break;
-                        case Picture::STATUS_INBOX:    echo $this->escapeHtml($this->translate('picture/status/inbox')); break;
-                        case Picture::STATUS_ACCEPTED: echo $this->escapeHtml($this->translate('picture/status/accepted')); break;
-                        case Picture::STATUS_REMOVING: echo '<span class="text-danger">'.$this->escapeHtml($this->translate('picture/status/removing')).'</span>'; break;
+                        case Application\Model\DbTable\Picture::STATUS_NEW:      echo $this->escapeHtml($this->translate('picture/status/new')); break;
+                        case Application\Model\DbTable\Picture::STATUS_INBOX:    echo $this->escapeHtml($this->translate('picture/status/inbox')); break;
+                        case Application\Model\DbTable\Picture::STATUS_ACCEPTED: echo $this->escapeHtml($this->translate('picture/status/accepted')); break;
+                        case Application\Model\DbTable\Picture::STATUS_REMOVING: echo '<span class="text-danger">'.$this->escapeHtml($this->translate('picture/status/removing')).'</span>'; break;
                     }
                 ?>
             </li>
@@ -142,7 +142,7 @@
         ?>
         <?php
             switch ($this->picture->type) {
-                case Picture::VEHICLE_TYPE_ID:
+                case Application\Model\DbTable\Picture::VEHICLE_TYPE_ID:
                     $car = $this->picture->findParentCars();
                     if ($car) {
 
@@ -204,19 +204,19 @@
                     }
                     break;
 
-                case Picture::MIXED_TYPE_ID:
+                case Application\Model\DbTable\Picture::MIXED_TYPE_ID:
                     if ($this->user()->logedIn()) {
                         if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) {
                             $list[] = $this->htmlA($this->url('upload/params', [
                                 'action'     => 'index',
-                                'type'       => Picture::MIXED_TYPE_ID,
+                                'type'       => Application\Model\DbTable\Picture::MIXED_TYPE_ID,
                                 'brand_id'   => $brand->id
                             ]), '<i class="fa fa-upload"></i> ' . $this->escapeHtml($this->page(29)->name) . ' ' . $this->pic()->htmlTitle($this->name), false);
                         }
                     }
                     break;
 
-                case Picture::ENGINE_TYPE_ID:
+                case Application\Model\DbTable\Picture::ENGINE_TYPE_ID:
                     if (count($this->engineCars) > 0) {
                         if (count($this->engineCars) == 1)
                             foreach ($this->engineCars as $car) {
@@ -251,7 +251,7 @@
                     }
                     break;
 
-                case Picture::FACTORY_TYPE_ID:
+                case Application\Model\DbTable\Picture::FACTORY_TYPE_ID:
                     if ($this->factory) {
                         $list[] = $this->htmlA($this->url('factories/factory', [
                             'id' => $this->factory->id
@@ -346,7 +346,7 @@
                     <p><i class="fa fa-cog"></i> <?=$this->htmlA($url, $name)?></p>
                 <?php } ?>
             </div>
-            <?php if ($this->picture->type == Picture::VEHICLE_TYPE_ID) { ?>
+            <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
                 <div class="col-md-6">
                     <?=$this->partial('application/moder/pictures/picture-perspective', $this->picturePerspective)?>
                 </div>

@@ -16,6 +16,7 @@ use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Modification\Group as ModificationGroup;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
@@ -29,7 +30,6 @@ use Application\Service\SpecificationsService;
 use Exception;
 
 use Cars;
-use Picture;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Select;

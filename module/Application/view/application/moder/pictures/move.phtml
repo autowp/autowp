@@ -30,7 +30,7 @@
     <?php foreach ($this->factories as $factory) { ?>
         <?=$this->htmlA($this->url(null, [
             'factory_id' => $factory['id'],
-            'type'       => Picture::FACTORY_TYPE_ID
+            'type'       => Application\Model\DbTable\Picture::FACTORY_TYPE_ID
         ], [], true), $factory['name']) ?><br />
     <?php } ?>
 <?php } else { ?>
@@ -100,15 +100,15 @@
             <div style="margin: 5px 0">
                 <?=$this->htmlA($this->url(null, [
                     'action' => 'move',
-                    'type'   => Picture::LOGO_TYPE_ID
+                    'type'   => Application\Model\DbTable\Picture::LOGO_TYPE_ID
                 ], [], true), $this->translate('upload/select/logo')) ?><br />
                 <?=$this->htmlA($this->url(null, [
                     'action' => 'move',
-                    'type'   => Picture::MIXED_TYPE_ID
+                    'type'   => Application\Model\DbTable\Picture::MIXED_TYPE_ID
                 ], [], true), $this->translate('upload/select/mixed-long')) ?><br />
                 <?=$this->htmlA($this->url(null, [
                     'action' => 'move',
-                    'type'   => Picture::UNSORTED_TYPE_ID
+                    'type'   => Application\Model\DbTable\Picture::UNSORTED_TYPE_ID
                 ], [], true), $this->translate('upload/select/unsorted-long')) ?>
             </div>
 

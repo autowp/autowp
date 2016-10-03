@@ -10,9 +10,8 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\BrandAlias;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
-
-use Picture;
 
 use Zend_Db_Expr;
 use Zend_Session_Namespace;

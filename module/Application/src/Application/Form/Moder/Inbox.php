@@ -5,9 +5,8 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\Type as VehicleType;
-
-use Picture;
 
 class Inbox extends Form implements InputFilterProviderInterface
 {

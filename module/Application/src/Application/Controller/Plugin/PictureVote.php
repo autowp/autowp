@@ -4,9 +4,8 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
-
-use Picture;
 
 use Zend_Db_Expr;
 

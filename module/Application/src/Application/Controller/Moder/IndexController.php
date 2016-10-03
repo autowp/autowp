@@ -5,9 +5,9 @@ namespace Application\Controller\Moder;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Picture;
 
 use Cars;
-use Picture;
 
 class IndexController extends AbstractActionController
 {

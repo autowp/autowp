@@ -9,7 +9,7 @@ use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 use Autowp\Image;
 use Autowp\TextStorage;
 
-use Picture;
+use Application\Model\DbTable\Picture;
 
 use Zend_Application_Resource_Db;
 use Zend_Application_Resource_Session;

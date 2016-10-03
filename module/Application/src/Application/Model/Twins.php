@@ -3,11 +3,11 @@
 namespace Application\Model;
 
 use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Picture;
 use Cars;
 
 use Zend_Db_Expr;

@@ -3,9 +3,9 @@
 namespace Application\Model\DbTable\Log;
 
 use Application\Db\Table\Row;
+use Application\Model\DbTable\Picture;
 
 use Cars;
-use Picture;
 
 use Zend_Db_Table_Row_Abstract;
 

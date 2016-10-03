@@ -4,9 +4,8 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\Model\DbTable\Picture;
 use Application\Service\DayPictures;
-
-use Picture;
 
 class NewController extends AbstractActionController
 {

@@ -16,6 +16,7 @@ use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Perspective;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\Picture\View as PictureView;
@@ -31,7 +32,6 @@ use Application\Service\SpecificationsService;
 use Exception;
 
 use Cars;
-use Picture;
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;

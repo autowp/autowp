@@ -17,6 +17,7 @@ use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\User;
@@ -28,7 +29,6 @@ use Application\PictureNameFormatter;
 use Application\Service\TrafficControl;
 
 use Cars;
-use Picture;
 
 use Exception;
 

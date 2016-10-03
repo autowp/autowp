@@ -6,10 +6,10 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Permissions\Acl\Acl;
 
 use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
 
 use Cars;
-use Picture;
 
 class AboutController extends AbstractActionController
 {

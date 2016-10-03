@@ -12,7 +12,7 @@ class View extends Table
     protected $_referenceMap = [
         'Picture' => [
             'columns'       => ['picture_id'],
-            'refTableClass' => 'Picture',
+            'refTableClass' => \Application\Model\DbTable\Picture::class,
             'refColumns'    => ['id']
         ]
     ];

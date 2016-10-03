@@ -6,10 +6,9 @@ use Application\Db\Table\Row;
 use Application\Model\DbTable\Article;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Vote as CommentVote;
+use Application\Model\DbTable\Picture;
 
 use Zend_Db_Expr;
-
-use Picture;
 
 class MessageRow extends Row
 {

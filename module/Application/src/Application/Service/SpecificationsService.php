@@ -5,6 +5,7 @@ namespace Application\Service;
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineRow;
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Row as UserRow;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
@@ -30,7 +31,6 @@ use Attrs_User_Values_List;
 use Attrs_User_Values_String;
 use Attrs_Zones;
 use Cars;
-use Picture;
 
 use Exception;
 use NumberFormatter;

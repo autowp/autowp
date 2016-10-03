@@ -5,7 +5,7 @@ namespace Application\Controller\Console;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Picture;
+use Application\Model\DbTable\Picture;
 
 use Zend_ProgressBar;
 use Zend_ProgressBar_Adapter_Console;

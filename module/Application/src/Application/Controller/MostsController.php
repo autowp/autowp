@@ -5,13 +5,12 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
 
 use Autowp\TextStorage;
-
-use Picture;
 
 class MostsController extends AbstractActionController
 {
