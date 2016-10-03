@@ -11,8 +11,10 @@ use Autowp\TextStorage;
 
 use Application\Model\DbTable\Picture;
 
+use Zend_Application_Resource_Cachemanager;
 use Zend_Application_Resource_Db;
 use Zend_Application_Resource_Session;
+use Zend_Cache_Manager;
 use Zend_Db_Adapter_Abstract;
 
 return [
@@ -459,7 +461,12 @@ return [
             },
             Service\SpecificationsService::class => function($sm) {
                 return new Service\SpecificationsService($sm->get('MvcTranslator'));
-            }
+            },
+            Zend_Cache_Manager::class => function($sm) {
+                $config = $sm->get('Config');
+                $resource = new Zend_Application_Resource_Cachemanager($config['cachemanager']);
+                return $resource->init();
+            },
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class

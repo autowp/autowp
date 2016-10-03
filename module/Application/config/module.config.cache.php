@@ -3,6 +3,27 @@
 namespace Application;
 
 return [
+    'cachemanager' => [
+        'fast' => [
+            'frontend' => [
+                'name' => 'Core',
+                'customFrontendNaming' => 0,
+                'options' => [
+                    'lifetime' => 1800,
+                    'automatic_serialization' => true
+                ]
+            ],
+            'backend' => [
+                'name' => 'Memcached',
+                'options' => [
+                    'servers' => [
+                        'host' => 'localhost',
+                        'port' => 11211
+                    ]
+                ]
+            ]
+        ],
+    ],
     'caches' => [
         'fastCache' => [
             'adapter' => [

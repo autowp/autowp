@@ -17,8 +17,10 @@ use Application\Auth\Adapter\Remember as RememberAuthAdapter;
 use Application\Model\DbTable\User;
 
 use Zend_Auth;
+use Zend_Cache_Manager;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Expr;
+use Zend_Db_Table;
 
 use DateInterval;
 use DateTime;
@@ -139,6 +141,10 @@ class Module implements ConsoleUsageProviderInterface,
 
         $serviceManager->get(Zend_Db_Adapter_Abstract::class);
         $serviceManager->get('session');
+
+        $cacheManager = $serviceManager->get(Zend_Cache_Manager::class);
+        $metadataCache = $cacheManager->getCache('long');
+        Zend_Db_Table::setDefaultMetadataCache($metadataCache);
 
         error_reporting(E_ALL);
         ini_set('display_errors', true);
