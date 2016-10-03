@@ -11,6 +11,7 @@ use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Perspective;
+use Application\Model\DbTable\Vehicle;
 
 use Zend_Db_Expr;
 
@@ -39,7 +40,7 @@ class Picture extends Table
     protected $_referenceMap = [
         'Car' => [
             'columns'       => ['car_id'],
-            'refTableClass' => 'Cars',
+            'refTableClass' => Vehicle::class,
             'refColumns'    => ['id']
         ],
         'Brand' => [
@@ -184,7 +185,7 @@ class Picture extends Table
 
         $cars = [];
         if (count($carIds)) {
-            $table = new Cars();
+            $table = new Vehicle();
 
             $db = $table->getAdapter();
 
@@ -350,7 +351,7 @@ class Picture extends Table
 
         $cars = [];
         if (count($carIds)) {
-            $table = new Cars();
+            $table = new Vehicle();
 
             $db = $table->getAdapter();
 
@@ -527,7 +528,7 @@ class Picture extends Table
         switch ($params['type']) {
             case Picture::VEHICLE_TYPE_ID:
                 if ($params['car_id']) {
-                    $carTable = new Cars();
+                    $carTable = new Vehicle();
                     $car = $carTable->find($params['car_id'])->current();
                     if ($car) {
                         $car->refreshPicturesCount();
@@ -618,7 +619,7 @@ class Picture extends Table
             return false;
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
         $car = $carTable->find($id)->current();
 
         if (!$car) {

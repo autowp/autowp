@@ -16,7 +16,7 @@ class BrandCar extends Zend_Db_Table
         ],
         'Car' => [
             'columns'       => ['car_id'],
-            'refTableClass' => 'Cars',
+            'refTableClass' => \Application\Model\DbTable\Vehicle::class,
             'refColumns'    => ['id']
         ]
     ];

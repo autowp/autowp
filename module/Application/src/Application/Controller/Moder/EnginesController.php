@@ -11,6 +11,7 @@ use Application\Model\DbTable\BrandEngine;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineParentCache;
 use Application\Model\DbTable\Picture;
+use Application\Model\DbTable\Vehicle;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
@@ -208,7 +209,7 @@ class EnginesController extends AbstractActionController
             'parentEngine' => $parentEngine,
             'childEngines' => $childEngines,
             'canEdit'      => $canEdit,
-            'cars'         => $engine->findCars(),
+            'cars'         => $engine->findDependentRowset(Vehicle::class),
             'brands'       => $brands,
             'specsCount'   => $specsCount,
             'formModerEngineEdit' => $this->editForm

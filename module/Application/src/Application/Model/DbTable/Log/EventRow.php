@@ -3,9 +3,6 @@
 namespace Application\Model\DbTable\Log;
 
 use Application\Db\Table\Row;
-use Application\Model\DbTable\Picture;
-
-use Cars;
 
 use Zend_Db_Table_Row_Abstract;
 
@@ -26,11 +23,11 @@ class EventRow extends Row
 
             $col = $tableName = null;
             switch (true) {
-                case $table instanceof Picture:
+                case $table instanceof \Application\Model\DbTable\Picture:
                     $col = 'picture_id';
                     $tableName = 'log_events_pictures';
                     break;
-                case $table instanceof Cars:
+                case $table instanceof \Application\Model\DbTable\Vehicle:
                     $col = 'car_id';
                     $tableName = 'log_events_cars';
                     break;

@@ -9,11 +9,10 @@ use Application\Model\DbTable\BrandEngine;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineRow;
 use Application\Model\DbTable\Picture;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\DbTable\Vehicle\Type as VehicleType;
-
-use Cars;
 
 use Exception;
 
@@ -34,7 +33,7 @@ class Catalogue
     private $brandCarTable;
 
     /**
-     * @var Cars
+     * @var Vehicle
      */
     private $carTable;
 
@@ -132,13 +131,13 @@ class Catalogue
     }
 
     /**
-     * @return Cars
+     * @return Vehicle
      */
     public function getCarTable()
     {
         return $this->carTable
             ? $this->carTable
-            : $this->carTable = new Cars();
+            : $this->carTable = new Vehicle();
     }
 
     /**

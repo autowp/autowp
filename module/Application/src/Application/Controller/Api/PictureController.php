@@ -7,8 +7,7 @@ use Zend\View\Model\JsonModel;
 
 use Application\Model\CarOfDay;
 use Application\Model\DbTable\Picture;
-
-use Cars;
+use Application\Model\DbTable\Vehicle;
 
 class PictureController extends AbstractActionController
 {
@@ -83,7 +82,7 @@ class PictureController extends AbstractActionController
         $pictureRow = null;
 
         if ($carId) {
-            $carTable = new Cars();
+            $carTable = new Vehicle();
             $pictureTable = new Picture();
 
             $carRow = $carTable->find($carId)->current();

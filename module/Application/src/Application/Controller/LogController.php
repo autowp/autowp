@@ -11,9 +11,8 @@ use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\User;
+use Application\Model\DbTable\Vehicle;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
-
-use Cars;
 
 class LogController extends AbstractActionController
 {
@@ -26,7 +25,7 @@ class LogController extends AbstractActionController
         }
 
         $logTable = new LogEvent();
-        $vehicleTable = new Cars();
+        $vehicleTable = new Vehicle();
         $brandModel = new BrandModel();
         $engineTable = new Engine();
         $picturesTable = new Picture();

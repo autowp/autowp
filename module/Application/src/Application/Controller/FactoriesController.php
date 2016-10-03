@@ -6,9 +6,9 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Picture;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 
-use Cars;
 use geoPHP;
 
 use Zend_Db_Expr;
@@ -55,7 +55,7 @@ class FactoriesController extends AbstractActionController
         $carPictures = [];
         $groups = $factory->getRelatedCarGroups();
         if (count($groups) > 0) {
-            $carTable = new Cars();
+            $carTable = new Vehicle();
 
             $cars = $carTable->fetchAll([
                 'id in (?)' => array_keys($groups)

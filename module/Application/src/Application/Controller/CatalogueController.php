@@ -19,6 +19,7 @@ use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\User;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
@@ -28,8 +29,6 @@ use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
 
 use Exception;
-
-use Cars;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Select;
@@ -1126,7 +1125,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $carTable = new Cars();
+            $carTable = new Vehicle();
             $select = $carTable->select(true)
                 ->join('engine_parent_cache', 'cars.engine_id = engine_parent_cache.engine_id', null)
                 ->where('engine_parent_cache.parent_id = ?', $engineRow->id);
@@ -2744,7 +2743,7 @@ class CatalogueController extends AbstractActionController
 
     private function mostsActive($brandId)
     {
-        $carTable = new Cars();
+        $carTable = new Vehicle();
         $db = $carTable->getAdapter();
         $carsCount = $db->fetchOne(
             $db->select()

@@ -12,8 +12,6 @@ use Application\Model\DbTable\BrandRow;
 use Application\Model\DbTable\User;
 use Application\Model\Message;
 
-use Cars;
-
 class BrandsController extends AbstractActionController
 {
     private $textStorage;
@@ -200,7 +198,7 @@ class BrandsController extends AbstractActionController
             }
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
         $cars = $carTable->fetchAll(
             $carTable->select(true)
                 ->join('brands_cars', 'cars.id=brands_cars.car_id', null)

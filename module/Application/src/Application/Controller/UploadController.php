@@ -13,10 +13,9 @@ use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Picture;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Service\TelegramService;
-
-use Cars;
 
 use Zend_Db_Expr;
 
@@ -120,7 +119,7 @@ class UploadController extends AbstractActionController
                 break;
 
             case Picture::VEHICLE_TYPE_ID:
-                $cars = new Cars();
+                $cars = new Vehicle();
                 $car = $cars->find($carId)->current();
                 if ($car) {
                     $selected = true;
@@ -241,7 +240,7 @@ class UploadController extends AbstractActionController
                 break;
 
             case Picture::VEHICLE_TYPE_ID:
-                $cars = new Cars();
+                $cars = new Vehicle();
                 $car = $cars->find($carId)->current();
                 if ($car) {
                     $carId = $car->id;
@@ -352,7 +351,7 @@ class UploadController extends AbstractActionController
                     }
                     break;
                 case Picture::VEHICLE_TYPE_ID:
-                    $car = $picture->findParentCars();
+                    $car = $picture->findParentRow(Vehicle::class);
                     if ($car) {
                         $car->refreshPicturesCount();
                         $brandModel = new BrandModel();
@@ -423,7 +422,7 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $haveConcepts = (bool)$carTable->fetchRow(
             $carTable->select(true)
@@ -580,7 +579,7 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
@@ -677,7 +676,7 @@ class UploadController extends AbstractActionController
             return $this->notfoundAction();
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $db = $carTable->getAdapter();
 

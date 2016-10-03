@@ -10,10 +10,10 @@ use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
-use Cars;
 use geoPHP;
 use Point;
 
@@ -173,7 +173,7 @@ class FactoryController extends AbstractActionController
             $description = '';
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $cars = $carTable->fetchAll(
             $carTable->select(true)

@@ -9,6 +9,7 @@ use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
+use Application\Model\DbTable\Vehicle;
 
 use Exception;
 
@@ -74,7 +75,7 @@ class Row extends \Application\Db\Table\Row
                 break;
 
             case Picture::VEHICLE_TYPE_ID:
-                $car = $this->findParentCars();
+                $car = $this->findParentRow(Vehicle::class);
                 if ($car) {
                     $carCatname = $filenameFilter->filter($car->caption);
 

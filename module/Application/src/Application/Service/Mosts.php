@@ -4,11 +4,10 @@ namespace Application\Service;
 
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\DbTable\Picture;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Most;
 use Application\Service\SpecificationsService;
-
-use Cars;
 
 use Exception;
 
@@ -609,7 +608,7 @@ class Mosts
 
     public function getCarsData($cMost, $carType, $cYear, $brandId, $language)
     {
-        $carsTable = new Cars();
+        $carsTable = new Vehicle();
 
         $select = $carsTable->select(true);
 
@@ -702,7 +701,7 @@ class Mosts
         $years = $this->getYears();
 
         if ($brandId) {
-            $carsTable = new Cars();
+            $carsTable = new Vehicle();
             $select = $carsTable->select(true)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)

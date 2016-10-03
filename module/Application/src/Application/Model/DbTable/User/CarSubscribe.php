@@ -21,7 +21,7 @@ class CarSubscribe extends Table
         ],
         'Car' => [
             'columns'       => ['car_id'],
-            'refTableClass' => 'Cars',
+            'refTableClass' => Application\Model\DbTable\Vehicle::class,
             'refColumns'    => ['id']
         ]
     ];

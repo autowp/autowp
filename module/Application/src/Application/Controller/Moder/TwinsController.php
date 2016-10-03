@@ -8,9 +8,8 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\HostManager;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\User;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\Message;
-
-use Cars;
 
 class TwinsController extends AbstractActionController
 {
@@ -112,7 +111,7 @@ class TwinsController extends AbstractActionController
             $description = '';
         }
 
-        $vehicleTable = new Cars();
+        $vehicleTable = new Vehicle();
 
         $vehicleRows = $vehicleTable->fetchAll(
             $vehicleTable->select(true)

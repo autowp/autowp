@@ -22,13 +22,12 @@ use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Row as UserRow;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\TrafficControl;
-
-use Cars;
 
 use Exception;
 
@@ -735,7 +734,7 @@ class PicturesController extends AbstractActionController
 
         $isLastPicture = null;
         if ($picture->type == Picture::VEHICLE_TYPE_ID && $picture->status == Picture::STATUS_ACCEPTED) {
-            $car = $picture->findParentCars();
+            $car = $picture->findParentRow(Vehicle::class);
             if ($car) {
                 $db = $this->table->getAdapter();
                 $isLastPicture = !$db->fetchOne(
@@ -750,7 +749,7 @@ class PicturesController extends AbstractActionController
 
         $acceptedCount = null;
         if ($picture->type == Picture::VEHICLE_TYPE_ID) {
-            $car = $picture->findParentCars();
+            $car = $picture->findParentRow(Vehicle::class);
             if ($car) {
                 $db = $this->table->getAdapter();
                 $acceptedCount = $db->fetchOne(
@@ -1067,7 +1066,7 @@ class PicturesController extends AbstractActionController
         $lastCar = null;
         $namespace = new Zend_Session_Namespace('Moder_Car');
         if (isset($namespace->lastCarId)) {
-            $cars = new Cars();
+            $cars = new Vehicle();
             $car = $cars->find($namespace->lastCarId)->current();
             if ($car->id != $picture->car_id) {
                 $lastCar = $car;
@@ -1551,7 +1550,7 @@ class PicturesController extends AbstractActionController
     {
         $carParentTable = $this->getCarParentTable();
         $carParentAdapter = $carParentTable->getAdapter();
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $items = [];
         foreach ($rows as $carParentRow) {
@@ -1594,7 +1593,7 @@ class PicturesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
         $carParentTable = $this->getCarParentTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
@@ -1629,7 +1628,7 @@ class PicturesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $rows = $carTable->fetchAll(
             $carTable->select(true)
@@ -2084,7 +2083,7 @@ class PicturesController extends AbstractActionController
         $showFactories = false;
 
         if ($brand) {
-            $carTable = new Cars();
+            $carTable = new Vehicle();
 
             $rows = $carTable->fetchAll(
                 $carTable->select(true)

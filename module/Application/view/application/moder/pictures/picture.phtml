@@ -152,7 +152,7 @@
                         ?>
                         <p>
                             <?=$this->escapeHtml($this->translate('moder/picture/catalogue/vehicle'))?>
-                            <?php $car = $this->picture->findParentCars() ?>
+                            <?php $car = $this->picture->findParentRow(Application\Model\DbTable\Vehicle::class) ?>
                             <?php if ($car) { ?>
                                 <?=$this->htmlA($this->url('moder/cars/params', [
                                     'action'     => 'car',

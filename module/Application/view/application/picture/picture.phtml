@@ -143,7 +143,7 @@
         <?php
             switch ($this->picture->type) {
                 case Application\Model\DbTable\Picture::VEHICLE_TYPE_ID:
-                    $car = $this->picture->findParentCars();
+                    $car = $this->picture->findParentRow(Application\Model\DbTable\Vehicle::class);
                     if ($car) {
 
                         foreach ($this->categories as $category) {

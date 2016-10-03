@@ -4,8 +4,6 @@ namespace Application\Model\DbTable\Twins;
 
 use Zend_Db_Table;
 
-use Cars;
-
 class GroupVehicle extends Zend_Db_Table
 {
     protected $_primary = ['twins_group_id', 'car_id'];
@@ -18,7 +16,7 @@ class GroupVehicle extends Zend_Db_Table
         ],
         'Car' => [
             'columns'       => ['car_id'],
-            'refTableClass' => Cars::class,
+            'refTableClass' => \Application\Model\DbTable\Vehicle::class,
             'refColumns'    => ['id']
         ]
     ];

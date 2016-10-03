@@ -4,7 +4,7 @@ namespace Application\Model\DbTable;
 
 use Application\Db\Table\Row;
 
-use Cars;
+use Application\Model\DbTable\Vehicle;
 
 class EngineRow extends Row
 {
@@ -15,7 +15,7 @@ class EngineRow extends Row
         ];
         $options = array_merge($defaults, $options);
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $db = $this->getTable()->getAdapter();
 

@@ -15,14 +15,13 @@ use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Model\DbTable\User\Rename as UserRename;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\Forums;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
-
-use Cars;
 
 use Zend_Auth;
 use Zend_Db_Expr;
@@ -827,7 +826,7 @@ class AccountController extends AbstractActionController
         $paginator = $data['paginator'];
 
         $userTable = new User();
-        $carTable = new Cars();
+        $carTable = new Vehicle();
         $engineTable = new Engine();
 
         foreach ($conflicts as &$conflict) {

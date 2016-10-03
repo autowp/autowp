@@ -4,8 +4,7 @@ namespace Application\Model;
 
 use Application\Db\Table;
 use Application\Model\DbTable\Picture;
-
-use Cars;
+use Application\Model\DbTable\Vehicle;
 
 use Zend_Db_Expr;
 use Zend_Oauth_Token_Access;
@@ -103,7 +102,7 @@ class CarOfDay
             return;
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $car = $carTable->fetchRow([
             'id = ?' => (int)$dayRow->car_id

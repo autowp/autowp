@@ -8,8 +8,7 @@ use Zend\Permissions\Acl\Acl;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
-
-use Cars;
+use Application\Model\DbTable\Vehicle;
 
 class AboutController extends AbstractActionController
 {
@@ -73,7 +72,7 @@ class AboutController extends AbstractActionController
         );
         $totalPictures = round($totalPictures, -4);
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
         $carTableAdapter = $carTable->getAdapter();
         $totalCars = $carTableAdapter->fetchOne(
             $carTableAdapter->select()

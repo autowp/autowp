@@ -50,15 +50,10 @@
     ],
     "autoload": {
         "psr-4": {
-            "Application\\Model\\": "application/models",
-            "Application\\Model\\DbTable\\": "application/models/DbTable",
             "ZF\\OAuth2\\": "vendor/autowp/zf-oauth2/src/",
             "ZF\\ContentNegotiation\\": "vendor/autowp/zf-content-negotiation/src/",
             "ZF\\ApiProblem\\": "vendor/autowp/zf-api-problem/src/"
-        },
-        "classmap": [
-            "application/models/"
-        ]
+        }
     },
     "require-dev": {
         "phpunit/PHPUnit": "~4.0"

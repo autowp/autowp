@@ -9,6 +9,7 @@ use Zend\View\Model\ViewModel;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\Row as PictureRow;
+use Application\Model\DbTable\Vehicle;
 
 class PictureController extends AbstractActionController
 {
@@ -206,7 +207,7 @@ class PictureController extends AbstractActionController
                 }
                 break;
             case Picture::VEHICLE_TYPE_ID:
-                if ($car = $picture->findParentCars()) {
+                if ($car = $picture->findParentRow(Vehicle::class)) {
                     $language = $this->language();
                     $brandList = $brandModel->getList($language, function($select) use ($car) {
                         $select

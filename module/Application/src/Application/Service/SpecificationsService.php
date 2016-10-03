@@ -9,14 +9,13 @@ use Application\Model\DbTable\EngineRow;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Row as UserRow;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Spec\Table\Car as CarSpecTable;
 use Application\Spec\Table\Engine as EngineSpecTable;
-
-use Cars;
 
 use Exception;
 use NumberFormatter;
@@ -78,7 +77,7 @@ class SpecificationsService
     protected $zoneAttrs = [];
 
     /**
-     * @var Cars
+     * @var Vehicle
      */
     protected $carTable = null;
 
@@ -206,13 +205,13 @@ class SpecificationsService
     }
 
     /**
-     * @return Cars
+     * @return Vehicle
      */
     protected function getCarTable()
     {
         return $this->carTable
             ? $this->carTable
-            : $this->carTable = new Cars();
+            : $this->carTable = new Vehicle();
     }
 
     protected function getAttributeTable()

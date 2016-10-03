@@ -3,10 +3,9 @@
 namespace Application\Model\DbTable\Vehicle;
 
 use Application\Db\Table;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
-
-use Cars;
 
 class ParentCache extends Table
 {
@@ -145,7 +144,7 @@ class ParentCache extends Table
 
         $this->delete($filter);
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $childCars = $carTable->fetchAll(
             $carTable->select(true)
@@ -225,7 +224,7 @@ class ParentCache extends Table
 
         $this->delete($filter);
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $childCars = $carTable->fetchAll(
             $carTable->select(true)

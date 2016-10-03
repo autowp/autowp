@@ -14,11 +14,10 @@ use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
 use Application\Model\DbTable\User\Row as UserRow;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
-
-use Cars;
 
 class CarsController extends AbstractActionController
 {
@@ -90,7 +89,7 @@ class CarsController extends AbstractActionController
 
         $editOnlyMode = $this->user()->get()->specs_weight < 0.10;
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
@@ -239,7 +238,7 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
@@ -263,7 +262,7 @@ class CarsController extends AbstractActionController
             return $this->forward('forbidden', 'error');
         }
 
-        //$carTable = new Cars();
+        //$carTable = new Vehicle();
         $aitTable = new Attr\ItemType();
 
         $itemId = (int)$this->params('item_id');
@@ -370,7 +369,7 @@ class CarsController extends AbstractActionController
 
     public function specsAdminAction()
     {
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         if (!$this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
@@ -545,7 +544,7 @@ class CarsController extends AbstractActionController
 
         $items = [];
 
-        $cars = new Cars();
+        $cars = new Vehicle();
         $engines = $this->getEngineTable();
 
         $isModerator = $this->user()->inheritsRole('moder');
@@ -646,7 +645,7 @@ class CarsController extends AbstractActionController
             return $this->forward('forbidden', 'error');
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
@@ -702,7 +701,7 @@ class CarsController extends AbstractActionController
             return $this->forward('forbidden', 'error');
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
@@ -787,7 +786,7 @@ class CarsController extends AbstractActionController
             return $this->forward('index', 'login', 'default');
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {
@@ -874,7 +873,7 @@ class CarsController extends AbstractActionController
             return $this->forward('forbidden', 'error');
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
         if (!$car) {

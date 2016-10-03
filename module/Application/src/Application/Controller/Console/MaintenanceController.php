@@ -7,14 +7,13 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\Comments;
 use Application\Model\DbTable\Category\ParentTable as CategoryParent;
+use Application\Model\DbTable\Vehicle;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Exception;
 
 use Zend_Db_Adapter_Abstract;
 use Zend_Session;
-
-use Cars;
 
 class MaintenanceController extends AbstractActionController
 {
@@ -97,7 +96,7 @@ class MaintenanceController extends AbstractActionController
     {
         $console = Console::getInstance();
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $select = $carTable->select(true)
             ->order('id');

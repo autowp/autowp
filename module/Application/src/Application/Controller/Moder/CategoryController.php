@@ -11,11 +11,10 @@ use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Category\ParentTable as CategoryParent;
 use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
 use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentCache as VehicleParentCache;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
-
-use Cars;
 
 use Zend_Db_Expr;
 
@@ -320,7 +319,7 @@ class CategoryController extends AbstractActionController
                     break;
             }
 
-            $cars = new Cars();
+            $cars = new Vehicle();
             $newCar = $cars->createRow([
                 'caption'     => $values['caption'],
                 'body'        => $values['body'],

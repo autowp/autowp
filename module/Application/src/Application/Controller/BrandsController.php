@@ -8,8 +8,7 @@ use Zend\View\Model\ViewModel;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\Brand as BrandTable;
-
-use Cars;
+use Application\Model\DbTable\Vehicle;
 
 class BrandsController extends AbstractActionController
 {
@@ -92,7 +91,7 @@ class BrandsController extends AbstractActionController
             'language = ?' => $language
         ]);
 
-        $cars = new Cars();
+        $cars = new Vehicle();
         $carList = $cars->fetchAll(
             $cars->select(true)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)

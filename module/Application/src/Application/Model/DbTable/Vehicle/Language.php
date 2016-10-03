@@ -12,7 +12,7 @@ class Language extends Table
     protected $_referenceMap = [
         'Car' => [
             'columns'       => ['car_id'],
-            'refTableClass' => 'Cars',
+            'refTableClass' => \Application\Model\DbTable\Vehicle::class,
             'refColumns'    => ['id']
         ],
     ];

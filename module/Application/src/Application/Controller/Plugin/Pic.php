@@ -22,6 +22,7 @@ use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\Picture\View as PictureView;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\User;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Paginator\Adapter\Zend1DbSelect;
@@ -31,7 +32,6 @@ use Application\Service\SpecificationsService;
 
 use Exception;
 
-use Cars;
 use Zend_Db_Expr;
 use Zend_Db_Select;
 use Zend_Db_Table_Select;
@@ -611,7 +611,7 @@ class Pic extends AbstractPlugin
                 }
                 break;
             case Picture::VEHICLE_TYPE_ID:
-                $car = $picture->findParentCars();
+                $car = $picture->findParentRow(Vehicle::class);
                 if ($car) {
 
                     $vehicleHasSpecs = $this->specsService->hasSpecs(1, $car->id);
@@ -867,7 +867,7 @@ class Pic extends AbstractPlugin
         foreach ($mRows as $mRow) {
 
             $url = null;
-            $carTable = new Cars();
+            $carTable = new Vehicle();
             $carRow = $carTable->find($mRow->car_id)->current();
             if ($carRow) {
                 $carParentTable = new VehicleParent();
@@ -999,7 +999,7 @@ class Pic extends AbstractPlugin
 
         switch ($picture->type) {
             case Picture::VEHICLE_TYPE_ID:
-                $car = $picture->findParentCars();
+                $car = $picture->findParentRow(Vehicle::class);
                 if ($car) {
                     $url = $controller->url()->fromRoute('moder/cars/params', [
                         'action' => 'car',

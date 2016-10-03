@@ -6,8 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Picture;
-
-use Cars;
+use Application\Model\DbTable\Vehicle;
 
 class IndexController extends AbstractActionController
 {
@@ -92,7 +91,7 @@ class IndexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = new Cars();
+        $cars = new Vehicle();
 
         $db = $cars->getAdapter();
 
@@ -197,7 +196,7 @@ class IndexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
 
         $rows = $carTable->getAdapter()->fetchAll("
             SELECT cars.id, cars.caption, cars.body, (case car_parent.type when 0 then 'Stock' when 1 then 'Tuning' when 2 then 'Sport' else car_parent.type end) as t, count(1) as c

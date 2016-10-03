@@ -7,9 +7,8 @@ use Zend\View\Model\JsonModel;
 
 use Application\Model\DbTable\Attr;
 use Application\Model\DbTable\Spec;
+use Application\Model\DbTable\Vehicle;
 use Application\Service\SpecificationsService;
-
-use Cars;
 
 class ChartController extends AbstractRestfulController
 {
@@ -81,7 +80,7 @@ class ChartController extends AbstractRestfulController
 
         $dataTableName = $dataTable->info('name');
 
-        $carTable = new Cars();
+        $carTable = new Vehicle();
         $db = $carTable->getAdapter();
         $specTable = new Spec();
 

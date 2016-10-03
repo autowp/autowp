@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
+use Application\Model\DbTable\Vehicle;
 
 use Zend_Db_Expr;
 
@@ -25,7 +26,7 @@ class PictureVote extends AbstractPlugin
     {
         $result = null;
         if ($picture->type == Picture::VEHICLE_TYPE_ID && $picture->status == Picture::STATUS_ACCEPTED) {
-            $car = $picture->findParentCars();
+            $car = $picture->findParentRow(Vehicle::class);
             if ($car) {
                 $db = $this->table->getAdapter();
                 $result = !$db->fetchOne(
@@ -45,7 +46,7 @@ class PictureVote extends AbstractPlugin
     {
         $result = null;
         if ($picture->type == Picture::VEHICLE_TYPE_ID) {
-            $car = $picture->findParentCars();
+            $car = $picture->findParentRow(Vehicle::class);
             if ($car) {
                 $db = $this->table->getAdapter();
                 $result = $db->fetchOne(

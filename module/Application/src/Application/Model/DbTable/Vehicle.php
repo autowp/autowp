@@ -1,33 +1,32 @@
 <?php
 
+namespace Application\Model\DbTable;
+
 use Application\Db\Table;
 
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
-
-class Cars extends Table
+class Vehicle extends Table
 {
     protected $_name = 'cars';
-    protected $_use_selects_cache = true;
-    protected $_rowClass = \Application\Model\DbTable\Vehicle\Row::class;
+    protected $_rowClass = Vehicle\Row::class;
     protected $_referenceMap = [
         'Type' => [
             'columns'       => ['car_type_id'],
-            'refTableClass' => \Application\Model\DbTable\Vehicle\Type::class,
+            'refTableClass' => Vehicle\Type::class,
             'refColumns'    => ['id']
         ],
         'Meta_Last_Editor' => [
             'columns'       => ['meta_last_editor_id'],
-            'refTableClass' => \Application\Model\DbTable\User::class,
+            'refTableClass' => User::class,
             'refColumns'    => ['id']
         ],
         'Tech_Last_Editor' => [
             'columns'       => ['tech_last_editor_id'],
-            'refTableClass' => \Application\Model\DbTable\User::class,
+            'refTableClass' => User::class,
             'refColumns'    => ['id']
         ],
         'Engine' => [
             'columns'       => ['engine_id'],
-            'refTableClass' => \Application\Model\DbTable\Engine::class,
+            'refTableClass' => Engine::class,
             'refColumns'    => ['id']
         ]
     ];
@@ -42,7 +41,7 @@ class Cars extends Table
         return parent::insert($data);
     }
 
-    public function updateInteritance(VehicleRow $car)
+    public function updateInteritance(Vehicle\Row $car)
     {
         $parents = $this->fetchAll(
             $this->select(true)

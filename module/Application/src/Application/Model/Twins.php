@@ -5,10 +5,9 @@ namespace Application\Model;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
+use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
-
-use Cars;
 
 use Zend_Db_Expr;
 use Zend_Db_Select;
@@ -31,7 +30,7 @@ class Twins
     private $pictureTable;
 
     /**
-     * @var Cars
+     * @var Vehicle
      */
     private $carTable;
 
@@ -72,7 +71,7 @@ class Twins
     {
         return $this->carTable
             ? $this->carTable
-            : $this->carTable = new Cars();
+            : $this->carTable = new Vehicle();
     }
 
     /**
