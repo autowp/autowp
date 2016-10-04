@@ -222,7 +222,7 @@ class Catalogue
 
             $urls[] = [
                 'brand_catname' => $brand->folder,
-                'car_catname'   => $brandCarRow->catname ? $brandCarRow->catname : 'car' . $brandCarRow->car_id,
+                'car_catname'   => $brandCarRow->catname,
                 'path'          => $path
             ];
         }
