@@ -402,7 +402,9 @@ return [
                 return new Controller\Moder\CategoryController();
             },
             Controller\Moder\BrandVehicleController::class => function($sm) {
-                return new Controller\Moder\BrandVehicleController();
+                return new Controller\Moder\BrandVehicleController(
+                    $sm->get(Model\BrandVehicle::class)
+                );
             },
             Controller\Moder\CarsController::class => function($sm) {
                 return new Controller\Moder\CarsController(
@@ -414,7 +416,8 @@ return [
                     $sm->get('ModerTwinsGroup'),
                     $sm->get('ModerBrandCar'),
                     $sm->get('ModerCarParent'),
-                    $sm->get('ModerCarsFilter')
+                    $sm->get('ModerCarsFilter'),
+                    $sm->get(Model\BrandVehicle::class)
                 );
             },
             Controller\Moder\CommentsController::class => function($sm) {

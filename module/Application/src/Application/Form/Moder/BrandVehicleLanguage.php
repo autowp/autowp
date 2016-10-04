@@ -60,7 +60,7 @@ class BrandVehicleLanguage extends Form implements InputFilterProviderInterface
     {
         return [
             'name' => [
-                'required' => true,
+                'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim'],
                     ['name' => SingleSpaces::class]

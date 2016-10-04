@@ -6,10 +6,7 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable;
-
-use Autowp\Filter\Filename\Safe;
-
-use Zend_Db_Expr;
+use Application\Model\BrandVehicle;
 
 class BrandVehicleController extends AbstractActionController
 {
@@ -19,6 +16,16 @@ class BrandVehicleController extends AbstractActionController
      * @var BrandTable
      */
     private $brandTable;
+
+    /**
+     * @var BrandVehicle
+     */
+    private $model;
+
+    public function __construct(BrandVehicle $model)
+    {
+        $this->model = $model;
+    }
 
     /**
      * @param Vehicle\Row $car
@@ -99,15 +106,7 @@ class BrandVehicleController extends AbstractActionController
             if ($form->isValid()) {
                 $values = $form->getData();
 
-                $brandCarRow->setFromArray([
-                    'catname' => $values['catname'],
-                    'type'    => $values['type'],
-                ]);
-                $brandCarRow->save();
-
-                //var_dump($values['catname'], $filter->filter($values['catname']), $brandCarRow->catname); exit;
-
-                $this->setBrandVehicleLanguages($brandRow, $vehicleRow, $values);
+                $this->model->setBrandVehicle($brandRow->id, $vehicleRow->id, $values, false);
 
                 return $this->redirect()->toRoute(null, [], [], true);
             }
@@ -120,107 +119,6 @@ class BrandVehicleController extends AbstractActionController
         ];
     }
 
-    private function setBrandVehicleLanguages(DbTable\BrandRow $brandRow, DbTable\Vehicle\Row $vehicleRow, array $values)
-    {
-        $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
-
-        foreach ($this->languages as $language) {
-            $bvlRow = $brandVehicleLangaugeTable->fetchRow([
-                'vehicle_id = ?' => $vehicleRow->id,
-                'brand_id = ?'   => $brandRow->id,
-                'language = ?'   => $language
-            ]);
-            if (!$bvlRow) {
-                $bvlRow = $brandVehicleLangaugeTable->createRow([
-                    'vehicle_id' => $vehicleRow->id,
-                    'brand_id'   => $brandRow->id,
-                    'language'   => $language
-                ]);
-            }
-
-            $bvlRow->setFromArray([
-                'name' => $values[$language]['name']
-            ]);
-            $bvlRow->save();
-        }
-    }
-
-    private function getBrandAliases(DbTable\BrandRow $brandRow)
-    {
-        $aliases = [$brandRow['caption']];
-
-        $brandAliasTable = new DbTable\BrandAlias();
-        $brandAliasRows = $brandAliasTable->fetchAll([
-            'brand_id = ?' => $brandRow['id']
-        ]);
-        foreach ($brandAliasRows as $brandAliasRow) {
-            $aliases[] = $brandAliasRow->name;
-        }
-
-        $brandLangTable = new DbTable\BrandLanguage();
-        $brandLangRows = $brandLangTable->fetchAll([
-            'brand_id = ?' => $brandRow['id']
-        ]);
-        foreach ($brandLangRows as $brandLangRow) {
-            $aliases[] = $brandLangRow->name;
-        }
-
-        usort($aliases, function($a, $b) {
-            $la = mb_strlen($a);
-            $lb = mb_strlen($b);
-
-            if ($la == $lb) {
-                return 0;
-            }
-            return ($la > $lb) ? -1 : 1;
-        });
-
-        return $aliases;
-    }
-
-    private function getVehicleName(DbTable\Vehicle\Row $vehicleRow, $language)
-    {
-        $languageTable = new DbTable\Vehicle\Language;
-
-        $db = $languageTable->getAdapter();
-
-        $order = new Zend_Db_Expr($db->quoteInto('language = ? DESC', $language));
-
-        $languageRow = $languageTable->fetchRow([
-            'car_id = ?' => $vehicleRow->id
-        ], $order);
-
-        return $languageRow ? $languageRow->name : $vehicleRow->caption;
-    }
-
-    private function extractName(DbTable\BrandRow $brandRow, DbTable\Vehicle\Row $vehicleRow, $language)
-    {
-        $carLanguageTable = new DbTable\Vehicle\Language();
-
-        $vehicleName = $this->getVehicleName($vehicleRow, $language);
-        $aliases = $this->getBrandAliases($brandRow);
-
-        $name = $vehicleName;
-        foreach ($aliases as $alias) {
-            $name = str_ireplace('by The ' . $alias . ' Company', '', $name);
-            $name = str_ireplace('by '.$alias, '', $name);
-            $name = str_ireplace('di '.$alias, '', $name);
-            $name = str_ireplace('par '.$alias, '', $name);
-            $name = str_ireplace($alias.'-', '', $name);
-            $name = str_ireplace('-'.$alias, '', $name);
-
-            $name = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $name);
-        }
-
-        $name = trim(preg_replace("|[[:space:]]+|", ' ', $name));
-        $name = ltrim($name, '/');
-        if (!$name) {
-            $name = $vehicleName;
-        }
-
-        return $name;
-    }
-
     public function addAction()
     {
         if (!$this->user()->isAllowed('car', 'move')) {
@@ -228,8 +126,6 @@ class BrandVehicleController extends AbstractActionController
         }
 
         $brandTable = $this->getBrandTable();
-        $brandVehicleTable = new DbTable\BrandCar();
-        $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
         $vehicleTable = $this->catalogue()->getCarTable();
 
         $brandRow = $brandTable->find($this->params('brand_id'))->current();
@@ -238,55 +134,11 @@ class BrandVehicleController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandCarRow = $brandVehicleTable->fetchRow([
-            'brand_id = ?' => $brandRow->id,
-            'car_id = ?'   => $vehicleRow->id
-        ]);
-
-        if ($brandCarRow) {
-            return $this->forbiddenAction();
-        }
-
-        $filter = new Safe();
-        $catnameTemplate = $filter->filter($this->extractName($brandRow, $vehicleRow, 'en'));
-
-        $i = 0;
-        do {
-
-            $catname = $catnameTemplate . ($i ? '_' . $i : '');
-
-            $exists = (bool)$brandVehicleTable->fetchRow([
-                'brand_id = ?' => $brandRow->id,
-                'catname = ?'  => $catname
-            ]);
-
-            $i++;
-
-        } while ($exists);
-
-        $brandCarRow = $brandVehicleTable->createRow([
-            'brand_id' => $brandRow->id,
-            'car_id'   => $vehicleRow->id,
-            'type'     => DbTable\BrandCar::TYPE_DEFAULT,
-            'catname'  => $catname ? $catname : 'vehicle' . $vehicleRow->id
-        ]);
-        $brandCarRow->save();
-
-        $values = [];
-        foreach ($this->languages as $language) {
-            $values[$language] = [
-                'name' => $this->extractName($brandRow, $vehicleRow, $language)
-            ];
-        }
-
-        $this->setBrandVehicleLanguages($brandRow, $vehicleRow, $values);
-
+        $this->model->create($brandRow->id, $vehicleRow->id);
 
         $user = $this->user()->get();
         $ucsTable = new DbTable\User\CarSubscribe();
         $ucsTable->subscribe($user, $vehicleRow);
-
-        $brandRow->refreshPicturesCount();
 
         $message = sprintf(
             'Автомобиль %s добавлен к бренду %s',
@@ -306,8 +158,6 @@ class BrandVehicleController extends AbstractActionController
 
         $brandTable = $this->getBrandTable();
         $vehicleTable = $this->catalogue()->getCarTable();
-        $brandVehicleTable = new DbTable\BrandCar();
-        $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
 
         $brandRow = $brandTable->find($this->params('brand_id'))->current();
         $vehicleRow = $vehicleTable->find($this->params('vehicle_id'))->current();
@@ -316,28 +166,20 @@ class BrandVehicleController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandVehicleLangaugeTable->delete([
-            'brand_id = ?'   => $brandRow->id,
-            'vehicle_id = ?' => $vehicleRow->id
-        ]);
+        $success = $this->model->delete($brandRow->id, $vehicleRow->id);
 
-        $brandVehicleTable->delete([
-            'brand_id = ?' => $brandRow->id,
-            'car_id = ?'   => $vehicleRow->id
-        ]);
+        if ($success) {
+            $user = $this->user()->get();
+            $ucsTable = new DbTable\User\CarSubscribe();
+            $ucsTable->subscribe($user, $vehicleRow);
 
-        $user = $this->user()->get();
-        $ucsTable = new DbTable\User\CarSubscribe();
-        $ucsTable->subscribe($user, $vehicleRow);
-
-        $brandRow->refreshPicturesCount();
-
-        $message = sprintf(
-            'Автомобиль %s отсоединен от бренда %s',
-            htmlspecialchars($vehicleRow->getFullName('en')),
-            $brandRow->caption
-        );
-        $this->log($message, [$brandRow, $vehicleRow]);
+            $message = sprintf(
+                'Автомобиль %s отсоединен от бренда %s',
+                htmlspecialchars($vehicleRow->getFullName('en')),
+                $brandRow->caption
+            );
+            $this->log($message, [$brandRow, $vehicleRow]);
+        }
 
         return $this->redirectToCar($vehicleRow, 'catalogue');
     }

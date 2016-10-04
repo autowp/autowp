@@ -9,6 +9,7 @@ use Zend\Paginator\Paginator;
 
 use Application\Model\DbTable\BrandLink;
 use Application\Model\Brand as BrandModel;
+use Application\Model\BrandVehicle;
 use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Engine;
@@ -46,14 +47,21 @@ class CatalogueController extends AbstractActionController
      */
     private $specsService = null;
 
+    /**
+     * @var BrandVehicle
+     */
+    private $brandVehicle;
+
     public function __construct(
         $textStorage,
         $cache,
-        SpecificationsService $specsService)
+        SpecificationsService $specsService,
+        BrandVehicle $brandVehicle)
     {
         $this->textStorage = $textStorage;
         $this->cache = $cache;
         $this->specsService = $specsService;
+        $this->brandVehicle = $brandVehicle;
     }
 
     private function _brandAction(Callable $callback)
@@ -1468,9 +1476,14 @@ class CatalogueController extends AbstractActionController
                 $topCarName = $carFullName;
             }
 
+            $bvName = $this->brandVehicle->getName($brand['id'], $currentCar['top_car_id'], $language);
+            if (!$bvName) {
+                $bvName = $this->stripName($brand, $topCarName);
+            }
+
 
             $breadcrumbs[] = [
-                'name' => $this->stripName($brand, $topCarName),
+                'name' => $bvName,
                 'url'  => $this->url()->fromRoute('catalogue', [
                     'action'        => 'brand-car',
                     'brand_catname' => $brand['catname'],

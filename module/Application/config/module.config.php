@@ -58,7 +58,8 @@ return [
                 return new Controller\CatalogueController(
                     $sm->get(TextStorage\Service::class),
                     $sm->get('longCache'),
-                    $sm->get(Service\SpecificationsService::class)
+                    $sm->get(Service\SpecificationsService::class),
+                    $sm->get(Model\BrandVehicle::class)
                 );
             },
             Controller\CategoryController::class => function($sm) {
@@ -356,6 +357,10 @@ return [
     ],
     'service_manager' => [
         'factories' => [
+            Model\BrandVehicle::class => function($sm) {
+                $config = $sm->get('Config');
+                return new Model\BrandVehicle(array_keys($config['hosts']));
+            },
             VehicleNameFormatter::class => function($sm) {
                 return new VehicleNameFormatter($sm->get('translator'));
             },
@@ -616,5 +621,16 @@ return [
             'message_close_string'     => '</li></ul></div>',
             'message_separator_string' => '</li><li>'
         ]
-    ]
+    ],
+
+    /*'session_config' => [
+        'use_cookies'         => true,
+        'gc_maxlifetime'      => 864000,
+        'remember_me_seconds' => 864000,
+        'cookie_httponly'     => false,
+        'cookie_domain'       => '.localhost',
+    ],
+    'session_storage' => [
+        'type' => 'SessionArrayStorage'
+    ]*/
 ];

@@ -9,5 +9,5 @@ class VehicleLanguage extends Zend_Db_Table
     protected $_name = 'brand_vehicle_language';
     protected $_primary = ['brand_id', 'vehicle_id', 'language'];
 
-    const MAX_NAME = 50;
+    const MAX_NAME = 70;
 }

@@ -12,6 +12,7 @@ use Application\Form\Moder\CarOrganize as CarOrganizeForm;
 use Application\Form\Moder\CarOrganizePictures as CarOrganizePicturesForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
+use Application\Model\BrandVehicle;
 use Application\Model\Message;
 use Application\Model\Modification;
 use Application\Model\DbTable;
@@ -30,8 +31,6 @@ use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
-
-use Autowp\Filter\Filename\Safe;
 
 use Zend_Db_Expr;
 use Zend_Session_Namespace;
@@ -97,6 +96,11 @@ class CarsController extends AbstractActionController
      */
     private $hostManager;
 
+    /**
+     * @var BrandVehicle
+     */
+    private $brandVehicle;
+
     public function __construct(
         HostManager $hostManager,
         $textStorage,
@@ -106,7 +110,8 @@ class CarsController extends AbstractActionController
         Form $twinsForm,
         Form $brandCarForm,
         Form $carParentForm,
-        Form $filterForm)
+        Form $filterForm,
+        BrandVehicle $brandVehicle)
     {
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
@@ -117,6 +122,7 @@ class CarsController extends AbstractActionController
         $this->brandCarForm = $brandCarForm;
         $this->carParentForm = $carParentForm;
         $this->filterForm = $filterForm;
+        $this->brandVehicle = $brandVehicle;
     }
 
     private function canMove(Vehicle\Row $car)
@@ -669,6 +675,8 @@ class CarsController extends AbstractActionController
                     $newData = $car->toArray();
 
                     $car->updateOrderCache();
+
+                    $this->brandVehicle->refreshAutoByVehicle($car->id);
 
                     $htmlChanges = [];
                     foreach ($this->buildChangesMessage($oldData, $newData, 'en') as $line) {
@@ -1769,6 +1777,8 @@ class CarsController extends AbstractActionController
             }
         }
 
+        $this->brandVehicle->refreshAutoByVehicle($car->id);
+
         if ($changes) {
             foreach ($changes as &$change) {
                 $change = htmlspecialchars($change);
@@ -2613,6 +2623,7 @@ class CarsController extends AbstractActionController
                 Vehicle\ParentTable::TYPE_DEFAULT => $this->translator->translate('catalogue/sub-model'),
                 Vehicle\ParentTable::TYPE_TUNING  => $this->translator->translate('catalogue/related'),
                 Vehicle\ParentTable::TYPE_SPORT   => $this->translator->translate('catalogue/sport'),
+                Vehicle\ParentTable::TYPE_DESIGN  => $this->translator->translate('catalogue/design'),
             ]
         ]);
 
