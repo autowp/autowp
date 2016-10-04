@@ -33,7 +33,6 @@ use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
 use Zend_Db_Expr;
-use Zend_Session_Namespace;
 
 use Exception;
 use Locale;
@@ -3419,7 +3418,7 @@ class CarsController extends AbstractActionController
                 $cpcTable = new Vehicle\ParentCache();
                 $cpcTable->rebuildCache($car);
 
-                $namespace = new Zend_Session_Namespace('Moder_Car');
+                $namespace = new \Zend\Session\Container('Moder_Car');
                 $namespace->lastCarId = $car->id;
 
                 $url = $this->url()->fromRoute('moder/cars/params', [

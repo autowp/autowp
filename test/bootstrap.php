@@ -42,8 +42,6 @@ $application = new Zend_Application(
 );
 $application->bootstrap();
 
-Zend_Session::$_unitTestEnabled = true;
-
 // Locale
 $locale = new Zend_Locale('en_GB');
 

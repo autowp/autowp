@@ -13,7 +13,6 @@ use Application\Model\DbTable\Picture;
 
 use Zend_Application_Resource_Cachemanager;
 use Zend_Application_Resource_Db;
-use Zend_Application_Resource_Session;
 use Zend_Cache_Manager;
 use Zend_Db_Adapter_Abstract;
 
@@ -401,11 +400,6 @@ return [
                 $resource = new Zend_Application_Resource_Db($config['db']);
                 return $resource->init();
             },
-            'session' => function($sm) {
-                $config = $sm->get('Config');
-                $resource = new Zend_Application_Resource_Session($config['session']);
-                return $resource->init();
-            },
             Service\TelegramService::class => function($sm) {
                 $config = $sm->get('Config');
                 $router  = $sm->get('HttpRouter');
@@ -486,24 +480,6 @@ return [
         'delegators' => [),
         'shared' => [)*/
 
-    ],
-
-
-    'session' => [
-        'use_only_cookies'    => true,
-        'gc_maxlifetime'      => 1440,
-        'remember_me_seconds' => 86400,
-        'saveHandler' => [
-            'class' => Session\SaveHandler\DbTable::class,
-            'options' => [
-                'name'           => "session",
-                'primary'        => "id",
-                'modifiedColumn' => "modified",
-                'dataColumn'     => "data",
-                'lifetimeColumn' => "lifetime",
-                'userIdColumn'   => "user_id"
-            ]
-        ]
     ],
 
     'telegram' => [
@@ -623,14 +599,14 @@ return [
         ]
     ],
 
-    /*'session_config' => [
+    'session_config' => [
         'use_cookies'         => true,
         'gc_maxlifetime'      => 864000,
         'remember_me_seconds' => 864000,
         'cookie_httponly'     => false,
-        'cookie_domain'       => '.localhost',
+        'cookie_domain'       => '.wheelsage.org',
     ],
     'session_storage' => [
         'type' => 'SessionArrayStorage'
-    ]*/
+    ]
 ];

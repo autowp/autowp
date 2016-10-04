@@ -15,7 +15,6 @@ use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 
 use Zend_Db_Expr;
-use Zend_Session_Namespace;
 
 class Sidebar extends AbstractPlugin
 {
@@ -345,7 +344,7 @@ class Sidebar extends AbstractPlugin
 
     private function getNamespace()
     {
-        return new Zend_Session_Namespace(__CLASS__);
+        return new \Zend\Session\Container(__CLASS__);
     }
 
     private function brandGroups($brand, $type, $carId, $isConcepts, $isEngines)

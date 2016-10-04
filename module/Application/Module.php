@@ -7,18 +7,18 @@
 
 namespace Application;
 
-use Zend\EventManager\EventInterface as Event;
-use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
-use Zend\ModuleManager\Feature\ConsoleBannerProviderInterface;
 use Zend\Console\Adapter\AdapterInterface as Console;
+use Zend\EventManager\EventInterface as Event;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\ModuleManager\Feature\ConsoleBannerProviderInterface;
+use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
+use Zend\Session\SessionManager;
 
 use Application\Auth\Adapter\Remember as RememberAuthAdapter;
 use Application\Model\DbTable\User;
 
 use Zend_Auth;
 use Zend_Cache_Manager;
-use Zend_Db_Adapter_Abstract;
 use Zend_Db_Expr;
 use Zend_Db_Table;
 
@@ -139,8 +139,8 @@ class Module implements ConsoleUsageProviderInterface,
 
         $serviceManager = $e->getApplication()->getServiceManager();
 
-        $serviceManager->get(Zend_Db_Adapter_Abstract::class);
-        $serviceManager->get('session');
+        $session = $serviceManager->get(SessionManager::class);
+        $session->start();
 
         $cacheManager = $serviceManager->get(Zend_Cache_Manager::class);
         $metadataCache = $cacheManager->getCache('long');

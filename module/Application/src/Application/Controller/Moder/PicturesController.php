@@ -33,7 +33,6 @@ use Exception;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Rowset;
-use Zend_Session_Namespace;
 
 class PicturesController extends AbstractActionController
 {
@@ -1065,7 +1064,7 @@ class PicturesController extends AbstractActionController
         $canMove =  $this->user()->isAllowed('picture', 'move');
 
         $lastCar = null;
-        $namespace = new Zend_Session_Namespace('Moder_Car');
+        $namespace = new \Zend\Session\Container('Moder_Car');
         if (isset($namespace->lastCarId)) {
             $cars = new Vehicle();
             $car = $cars->find($namespace->lastCarId)->current();
@@ -2051,7 +2050,7 @@ class PicturesController extends AbstractActionController
                         return $this->notFoundAction();
                     }
 
-                    $namespace = new Zend_Session_Namespace('Moder_Car');
+                    $namespace = new \Zend\Session\Container('Moder_Car');
                     $namespace->lastCarId = $this->params('car_id');
                     break;
 
