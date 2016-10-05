@@ -2,14 +2,12 @@
 
 namespace Application\View\Helper;
 
+use Zend\Authentication\AuthenticationService;
 use Zend\View\Helper\AbstractHelper;
 use Zend\View\Exception\InvalidArgumentException;
 use Zend\Permissions\Acl\Acl;
 
 use Application\Model\DbTable\User\Row as UserRow;
-
-use Zend_Auth;
-use Zend_Acl_Role_Interface;
 
 use DateInterval;
 use DateTime;
@@ -71,7 +69,7 @@ class User extends AbstractHelper
      */
     private function getLogedInUser()
     {
-        $auth = Zend_Auth::getInstance();
+        $auth = new AuthenticationService();
 
         if (!$auth->hasIdentity()) {
             return false;
@@ -189,7 +187,7 @@ class User extends AbstractHelper
     }
 
     /**
-     * @param  Zend_Acl_Role_Interface|string $inherit
+     * @param  string $inherit
      * @return boolean
      */
     public function inheritsRole($inherit)

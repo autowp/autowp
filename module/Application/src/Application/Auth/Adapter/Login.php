@@ -2,39 +2,37 @@
 
 namespace Application\Auth\Adapter;
 
-use Zend_Auth_Adapter_Exception;
-use Zend_Auth_Adapter_Interface;
-use Zend_Auth_Result;
+use Zend\Authentication\Adapter\AdapterInterface;
+use Zend\Authentication\Result;
+use Zend\Authentication\Adapter\Exception\InvalidArgumentException;
 
 use Application\Model\DbTable\User;
 
-class Login implements Zend_Auth_Adapter_Interface
+class Login implements AdapterInterface
 {
     /**
-     * $_identity - Identity value
+     * Identity value
      *
      * @var string
      */
-    protected $_identity = null;
+    private $identity = null;
 
     /**
      * $_credential - Credential values
      *
      * @var string
      */
-    protected $_credentialExpr = null;
+    private $credentialExpr = null;
 
     /**
-     * $_authenticateResultInfo
-     *
      * @var array
      */
-    protected $_authenticateResultInfo = null;
+    private $authenticateResultInfo = null;
 
     public function __construct($identity, $credentialExpr)
     {
-        $this->_identity = (string)$identity;
-        $this->_credentialExpr = (string)$credentialExpr;
+        $this->identity = (string)$identity;
+        $this->credentialExpr = (string)$credentialExpr;
     }
 
     public function authenticate()
@@ -44,23 +42,23 @@ class Login implements Zend_Auth_Adapter_Interface
         $userTable = new User();
         $filter = [
             'not deleted',
-            'password = ' . $this->_credentialExpr
+            'password = ' . $this->credentialExpr
         ];
-        if (mb_strpos($this->_identity, '@') !== false) {
-            $filter['e_mail = ?'] = (string)$this->_identity;
+        if (mb_strpos($this->identity, '@') !== false) {
+            $filter['e_mail = ?'] = (string)$this->identity;
         } else {
-            $filter['login = ?'] = (string)$this->_identity;
+            $filter['login = ?'] = (string)$this->identity;
         }
 
         $userRow = $userTable->fetchRow($filter);
 
         if (!$userRow) {
-            $this->_authenticateResultInfo['code'] = Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND;
-            $this->_authenticateResultInfo['messages'][] = 'A record with the supplied identity could not be found.';
+            $this->authenticateResultInfo['code'] = Result::FAILURE_IDENTITY_NOT_FOUND;
+            $this->authenticateResultInfo['messages'][] = 'A record with the supplied identity could not be found.';
         } else {
-            $this->_authenticateResultInfo['code'] = Zend_Auth_Result::SUCCESS;
-            $this->_authenticateResultInfo['identity'] = (int)$userRow->id;
-            $this->_authenticateResultInfo['messages'][] = 'Authentication successful.';
+            $this->authenticateResultInfo['code'] = Result::SUCCESS;
+            $this->authenticateResultInfo['identity'] = (int)$userRow->id;
+            $this->authenticateResultInfo['messages'][] = 'Authentication successful.';
         }
 
         return $this->_authenticateCreateAuthResult();
@@ -71,25 +69,25 @@ class Login implements Zend_Auth_Adapter_Interface
      * making sure that this adapter was indeed setup properly with all
      * required pieces of information.
      *
-     * @throws Zend_Auth_Adapter_Exception - in the event that setup was not done properly
+     * @throws InvalidArgumentException - in the event that setup was not done properly
      * @return true
      */
-    protected function _authenticateSetup()
+    private function _authenticateSetup()
     {
         $exception = null;
 
-        if ($this->_identity == '') {
-            $exception = 'A value for the identity was not provided prior to authentication with Zend_Auth_Adapter_DbTable.';
-        } elseif ($this->_credentialExpr === null) {
-            $exception = 'A credential value was not provided prior to authentication with Zend_Auth_Adapter_DbTable.';
+        if ($this->identity == '') {
+            $exception = 'A value for the identity was not provided prior to authentication.';
+        } elseif ($this->credentialExpr === null) {
+            $exception = 'A credential value was not provided prior to authentication.';
         }
 
         if (null !== $exception) {
-            throw new Zend_Auth_Adapter_Exception($exception);
+            throw new InvalidArgumentException($exception);
         }
 
-        $this->_authenticateResultInfo = [
-            'code'     => Zend_Auth_Result::FAILURE,
+        $this->authenticateResultInfo = [
+            'code'     => Result::FAILURE,
             'identity' => null,
             'messages' => []
         ];
@@ -98,17 +96,17 @@ class Login implements Zend_Auth_Adapter_Interface
     }
 
     /**
-     * _authenticateCreateAuthResult() - Creates a Zend_Auth_Result object from
+     * _authenticateCreateAuthResult() - Creates a Result object from
      * the information that has been collected during the authenticate() attempt.
      *
-     * @return Zend_Auth_Result
+     * @return Result
      */
-    protected function _authenticateCreateAuthResult()
+    private function _authenticateCreateAuthResult()
     {
-        return new Zend_Auth_Result(
-            $this->_authenticateResultInfo['code'],
-            $this->_authenticateResultInfo['identity'],
-            $this->_authenticateResultInfo['messages']
+        return new Result(
+            $this->authenticateResultInfo['code'],
+            $this->authenticateResultInfo['identity'],
+            $this->authenticateResultInfo['messages']
         );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Authentication\AuthenticationService;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Uri\Http as HttpUri;
@@ -15,7 +16,6 @@ use Application\Service\UsersService;
 
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
-use Zend_Auth;
 use Zend_Db_Expr;
 
 use Exception;
@@ -75,7 +75,8 @@ class LoginController extends AbstractActionController
 
                 $adapter = $this->service->getAuthAdapterLogin($values['login'], $values['password']);
 
-                $result = Zend_Auth::getInstance()->authenticate($adapter);
+                $auth = new AuthenticationService();
+                $result = $auth->authenticate($adapter);
 
                 if ($result->isValid()) {
                     if ($values['remember']) {
@@ -144,7 +145,8 @@ class LoginController extends AbstractActionController
 
     public function logoutAction()
     {
-        Zend_Auth::getInstance()->clearIdentity();
+        $auth = new AuthenticationService();
+        $auth->clearIdentity();
         $this->user()->clearRememberCookie();
         return $this->redirect()->toUrl(
             $this->url()->fromRoute('login')
@@ -336,7 +338,8 @@ class LoginController extends AbstractActionController
 
         $adapter = new IdAuthAdapter();
         $adapter->setIdentity($uRow->id);
-        $authResult = Zend_Auth::getInstance()->authenticate($adapter);
+        $auth = new AuthenticationService();
+        $authResult = $auth->authenticate($adapter);
         if ($authResult->isValid()) {
             return $this->redirect()->toUrl($url);
         } else {

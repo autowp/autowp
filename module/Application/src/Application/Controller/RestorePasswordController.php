@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Authentication\AuthenticationService;
 use Zend\Mail;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Form\Form;
@@ -10,8 +11,6 @@ use Application\Auth\Adapter\Id as IdAuthAdapter;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
 use Application\Service\UsersService;
-
-use Zend_Auth;
 
 class RestorePasswordController extends AbstractActionController
 {
@@ -136,7 +135,8 @@ class RestorePasswordController extends AbstractActionController
                 $adapter = new IdAuthAdapter();
                 $adapter->setIdentity($user->id);
 
-                $result = Zend_Auth::getInstance()->authenticate($adapter);
+                $auth = new AuthenticationService();
+                $result = $auth->authenticate($adapter);
 
                 if ($result->isValid()) {
                     return $this->redirect()->toUrl(

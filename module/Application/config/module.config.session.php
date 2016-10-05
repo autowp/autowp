@@ -25,6 +25,6 @@ return [
         'cookie_domain'       => '.wheelsage.org',
     ],
     'session_storage' => [
-        'type' => 'SessionArrayStorage'
+        'type' => \Zend\Session\Storage\SessionArrayStorage::class
     ]
 ];

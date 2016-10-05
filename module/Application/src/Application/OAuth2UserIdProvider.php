@@ -4,12 +4,10 @@ namespace Application;
 
 use Zend\Stdlib\RequestInterface;
 
-use Zend_Auth;
-
 class OAuth2UserIdProvider implements UserIdProviderInterface
 {
     /**
-     * @var Zend_Auth
+     * @var
      */
     private $authenticationService;
 
@@ -21,12 +19,11 @@ class OAuth2UserIdProvider implements UserIdProviderInterface
     /**
      *  Set authentication service
      *
-     * @param Zend_Auth $service
      * @param array $config
      */
-    public function __construct(Zend_Auth $service = null, $config = [])
+    public function __construct($config = [])
     {
-        $this->authenticationService = $service;
+        //$this->authenticationService = $service;
 
         if (isset($config['zf-oauth2']['user_id'])) {
             $this->userId = $config['zf-oauth2']['user_id'];
@@ -34,8 +31,6 @@ class OAuth2UserIdProvider implements UserIdProviderInterface
     }
 
     /**
-     * Use Zend_Auth to fetch the identity.
-     *
      * @param  RequestInterface $request
      * @return mixed
      */

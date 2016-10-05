@@ -1,23 +1,18 @@
 <?php
-/**
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
 
 namespace Application;
 
+use Zend\Authentication\AuthenticationService;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\EventManager\EventInterface as Event;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleBannerProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
-use Zend\Session\SessionManager;
+use Zend\Session\ManagerInterface;
 
 use Application\Auth\Adapter\Remember as RememberAuthAdapter;
 use Application\Model\DbTable\User;
 
-use Zend_Auth;
 use Zend_Cache_Manager;
 use Zend_Db_Expr;
 use Zend_Db_Table;
@@ -44,11 +39,6 @@ class Module implements ConsoleUsageProviderInterface,
      * @var string
      */
     private $defaultHostname = 'www.autowp.ru';
-
-    /**
-     * @var array
-     */
-    private $languageWhitelist = ['ru', 'en', 'fr', 'zh'];
 
     /**
      * @var array
@@ -140,8 +130,8 @@ class Module implements ConsoleUsageProviderInterface,
 
         $serviceManager = $e->getApplication()->getServiceManager();
 
-        $session = $serviceManager->get(SessionManager::class);
-        $session->start();
+        $sessionManager = $serviceManager->get(ManagerInterface::class);
+        $sessionManager->start();
 
         $cacheManager = $serviceManager->get(Zend_Cache_Manager::class);
         $metadataCache = $cacheManager->getCache('long');
@@ -202,7 +192,10 @@ class Module implements ConsoleUsageProviderInterface,
             }
 
             if (in_array($hostname, $this->userDetectable)) {
-                $userLanguage = $this->detectUserLanguage($request);
+
+                $languageWhitelist = array_keys($serviceManager->get('Config')['hosts']);
+
+                $userLanguage = $this->detectUserLanguage($request, $languageWhitelist);
 
                 $hosts = $this->getConfig()['hosts'];
 
@@ -228,15 +221,15 @@ class Module implements ConsoleUsageProviderInterface,
                 $language = $this->whitelist[$hostname];
             }
 
-            $this->initLocaleAndTranslate2($serviceManager, $language);
+            $this->initLocaleAndTranslate($serviceManager, $language);
         }
     }
 
-    private function detectUserLanguage($request)
+    private function detectUserLanguage($request, $whitelist)
     {
         $result = null;
 
-        $auth = Zend_Auth::getInstance();
+        $auth = new AuthenticationService();
 
         if ($auth->hasIdentity()) {
 
@@ -245,7 +238,7 @@ class Module implements ConsoleUsageProviderInterface,
             $user = $userTable->find($auth->getIdentity())->current();
 
             if ($user) {
-                $isAllowed = in_array($user->language, $this->languageWhitelist);
+                $isAllowed = in_array($user->language, $whitelist);
                 if ($isAllowed) {
                     $result = $user->language;
                 }
@@ -258,7 +251,7 @@ class Module implements ConsoleUsageProviderInterface,
                 $locale = Locale::acceptFromHttp($acceptLanguage);
                 if ($locale) {
                     $localeLanguage = Locale::getPrimaryLanguage($locale);
-                    $isAllowed = in_array($localeLanguage, $this->languageWhitelist);
+                    $isAllowed = in_array($localeLanguage, $whitelist);
                     if ($isAllowed) {
                         $result = $localeLanguage;
                     }
@@ -272,10 +265,14 @@ class Module implements ConsoleUsageProviderInterface,
     /**
      * @param string $language
      */
-    private function initLocaleAndTranslate2($serviceManager, $language)
+    private function initLocaleAndTranslate($serviceManager, $language)
     {
         $translator = $serviceManager->get('MvcTranslator');
         $translator->setLocale($language);
+
+        $sessionManager = $serviceManager->get(ManagerInterface::class);
+        $hosts = $serviceManager->get('Config')['hosts'];
+        $sessionManager->getConfig()->setStorageOption('session.cookie_domain', $hosts[$language]['cookie']);
     }
 
     private function hostnameCheck($e)
@@ -318,7 +315,7 @@ class Module implements ConsoleUsageProviderInterface,
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
 
-            $auth = Zend_Auth::getInstance();
+            $auth = new AuthenticationService();
             if (!$auth->hasIdentity()) {
                 $cookies = $request->getCookie();
                 if ($cookies && isset($cookies['remember'])) {
@@ -376,7 +373,7 @@ class Module implements ConsoleUsageProviderInterface,
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
 
-            $auth = Zend_Auth::getInstance();
+            $auth = new AuthenticationService();
 
             $unlimitedTraffic = false;
             if ($auth->hasIdentity()) {
@@ -416,7 +413,7 @@ class Module implements ConsoleUsageProviderInterface,
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
 
-            $auth = Zend_Auth::getInstance();
+            $auth = new AuthenticationService();
             if ($auth->hasIdentity()) {
 
                 $userTable = new User();

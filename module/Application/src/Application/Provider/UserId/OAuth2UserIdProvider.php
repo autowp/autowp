@@ -2,9 +2,8 @@
 
 namespace Application\Provider\UserId;
 
+use Zend\Authentication\AuthenticationService;
 use Zend\Stdlib\RequestInterface;
-
-use Zend_Auth;
 
 use ZF\OAuth2\Provider\UserId\UserIdProviderInterface;
 
@@ -18,7 +17,6 @@ class OAuth2UserIdProvider implements UserIdProviderInterface
     /**
      *  Set authentication service
      *
-     * @param Zend_Auth $service
      * @param array $config
      */
     public function __construct($config = [])
@@ -29,13 +27,12 @@ class OAuth2UserIdProvider implements UserIdProviderInterface
     }
 
     /**
-     * Use Zend_Auth to fetch the identity.
-     *
      * @param  RequestInterface $request
      * @return mixed
      */
     public function __invoke(RequestInterface $request)
     {
-        return Zend_Auth::getInstance()->getIdentity();
+        $auth = new AuthenticationService();
+        return $auth->getIdentity();
     }
 }

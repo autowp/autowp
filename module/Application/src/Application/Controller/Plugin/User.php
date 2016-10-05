@@ -2,15 +2,12 @@
 
 namespace Application\Controller\Plugin;
 
+use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Permissions\Acl\Acl;
 
 use Application\Model\DbTable\User as UserTable;
 use Application\Model\DbTable\User\Row as UserRow;
-
-use Zend_Acl_Resource_Interface;
-use Zend_Acl_Role_Interface;
-use Zend_Auth;
 
 use Exception;
 
@@ -98,7 +95,7 @@ class User extends AbstractPlugin
      */
     private function getLogedInUser()
     {
-        $auth = Zend_Auth::getInstance();
+        $auth = new AuthenticationService();
 
         if (!$auth->hasIdentity()) {
             return false;
@@ -124,8 +121,8 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @param  Zend_Acl_Resource_Interface|string $resource
-     * @param  string                             $privilege
+     * @param  string $resource
+     * @param  string $privilege
      * @return boolean
      */
     public function isAllowed($resource = null, $privilege = null)
@@ -136,7 +133,7 @@ class User extends AbstractPlugin
     }
 
     /**
-     * @param  Zend_Acl_Role_Interface|string $inherit
+     * @param  string $inherit
      * @return boolean
      */
     public function inheritsRole($inherit)

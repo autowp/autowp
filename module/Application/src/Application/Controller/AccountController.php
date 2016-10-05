@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Authentication\AuthenticationService;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -23,7 +24,6 @@ use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
-use Zend_Auth;
 use Zend_Db_Expr;
 
 use DateTimeZone;
@@ -550,7 +550,8 @@ class AccountController extends AbstractActionController
             if (!$this->user()->logedIn()) {
                 $adapter = new IdAuthAdapter();
                 $adapter->setIdentity($user->id);
-                $result = Zend_Auth::getInstance()->authenticate($adapter);
+                $auth = new AuthenticationService();
+                $result = $auth->authenticate($adapter);
 
                 if ($result->isValid()) {
                     // hmmm...
@@ -790,7 +791,8 @@ class AccountController extends AbstractActionController
                     $user->deleted = true;
                     $user->save();
 
-                    Zend_Auth::getInstance()->clearIdentity();
+                    $auth = new AuthenticationService();
+                    $auth->clearIdentity();
                     $this->user()->clearRememberCookie();
 
                     $viewModel = new ViewModel();
