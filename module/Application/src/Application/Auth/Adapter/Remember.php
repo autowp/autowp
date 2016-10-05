@@ -44,7 +44,7 @@ class Remember implements AdapterInterface
             $this->authenticateResultInfo['messages'][] = 'Authentication successful.';
         }
 
-        return $this->_authenticateCreateAuthResult();
+        return $this->authenticateCreateAuthResult();
     }
 
     /**
@@ -77,12 +77,12 @@ class Remember implements AdapterInterface
     }
 
     /**
-     * _authenticateCreateAuthResult() - Creates a Result object from
+     * authenticateCreateAuthResult() - Creates a Result object from
      * the information that has been collected during the authenticate() attempt.
      *
      * @return Result
      */
-    private function _authenticateCreateAuthResult()
+    private function authenticateCreateAuthResult()
     {
         return new Result(
             $this->authenticateResultInfo['code'],

@@ -37,7 +37,7 @@ class Login implements AdapterInterface
 
     public function authenticate()
     {
-        $this->_authenticateSetup();
+        $this->authenticateSetup();
 
         $userTable = new User();
         $filter = [
@@ -61,18 +61,18 @@ class Login implements AdapterInterface
             $this->authenticateResultInfo['messages'][] = 'Authentication successful.';
         }
 
-        return $this->_authenticateCreateAuthResult();
+        return $this->authenticateCreateAuthResult();
     }
 
     /**
-     * _authenticateSetup() - This method abstracts the steps involved with
+     * authenticateSetup() - This method abstracts the steps involved with
      * making sure that this adapter was indeed setup properly with all
      * required pieces of information.
      *
      * @throws InvalidArgumentException - in the event that setup was not done properly
      * @return true
      */
-    private function _authenticateSetup()
+    private function authenticateSetup()
     {
         $exception = null;
 
@@ -96,12 +96,12 @@ class Login implements AdapterInterface
     }
 
     /**
-     * _authenticateCreateAuthResult() - Creates a Result object from
+     * authenticateCreateAuthResult() - Creates a Result object from
      * the information that has been collected during the authenticate() attempt.
      *
      * @return Result
      */
-    private function _authenticateCreateAuthResult()
+    private function authenticateCreateAuthResult()
     {
         return new Result(
             $this->authenticateResultInfo['code'],

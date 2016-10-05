@@ -8,7 +8,7 @@ use Zend\View\Model\ViewModel;
 use Application\Model\DbTable\User;
 use Application\Model\DbTable\Voting;
 use Application\Model\DbTable\Voting\Variant as VotingVariant;
-use Application\Model\DbTable\Voting\VariantVote as VotingVariantVote;
+use Application\Model\DbTable\Voting\Variant\Vote as VotingVariantVote;
 
 use DateTime;
 

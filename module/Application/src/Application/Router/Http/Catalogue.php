@@ -721,7 +721,7 @@ class Catalogue implements RouteInterface
                         'car_catname'   => $brandCarRow->catname,
                         'path'          => $treePath,
                         'modgroup'      => $modgroup
-                    ]);
+                    ], $length);
                     break;
 
             }

@@ -130,12 +130,16 @@ class Module implements ConsoleUsageProviderInterface,
 
         $serviceManager = $e->getApplication()->getServiceManager();
 
-        $sessionManager = $serviceManager->get(ManagerInterface::class);
-        $sessionManager->start();
-
         $cacheManager = $serviceManager->get(Zend_Cache_Manager::class);
         $metadataCache = $cacheManager->getCache('long');
         Zend_Db_Table::setDefaultMetadataCache($metadataCache);
+
+        $sessionManager = $serviceManager->get(ManagerInterface::class);
+        $cookieDomain = $this->getHostCookieDomain($serviceManager);
+        if ($cookieDomain) {
+            $sessionManager->getConfig()->setStorageOption('cookie_domain', $cookieDomain);
+            $sessionManager->start();
+        }
 
         error_reporting(E_ALL);
         ini_set('display_errors', true);
@@ -144,6 +148,24 @@ class Module implements ConsoleUsageProviderInterface,
         $eventManager->attach( \Zend\Mvc\MvcEvent::EVENT_DISPATCH, [$this, 'preDispatch'], 100 );
 
         \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
+    }
+
+    public function getHostCookieDomain($serviceManager)
+    {
+        $request = $serviceManager->get('Request');
+        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+            $hostname = $request->getServer('HTTP_HOST');
+
+            switch ($hostname) {
+                case 'www.autowp.ru':
+                case 'autowp.ru':
+                    return '.autowp.ru';
+                default:
+                    return '.wheelsage.org';
+            }
+        }
+
+        return null;
     }
 
     public function getConsoleBanner(Console $console)
@@ -269,10 +291,6 @@ class Module implements ConsoleUsageProviderInterface,
     {
         $translator = $serviceManager->get('MvcTranslator');
         $translator->setLocale($language);
-
-        $sessionManager = $serviceManager->get(ManagerInterface::class);
-        $hosts = $serviceManager->get('Config')['hosts'];
-        $sessionManager->getConfig()->setStorageOption('session.cookie_domain', $hosts[$language]['cookie']);
     }
 
     private function hostnameCheck($e)
@@ -344,8 +362,9 @@ class Module implements ConsoleUsageProviderInterface,
                 $filteredUri = preg_replace('|^/index\.php|isu', '', $uri);
 
                 if ($filteredUri != $uri) {
-                    $redirectUrl = $request->getUri()->getScheme() . '://' .
-                            $request->getHttpHost() . $filteredUri;
+                    $requestUri = $request->getUri();
+                    $redirectUrl = $requestUri->getScheme() . '://' .
+                            $requestUri->getHost() . $filteredUri;
 
                     $this->redirect($app, $redirectUrl);
                 }

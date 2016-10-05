@@ -4,12 +4,18 @@ namespace Application;
 
 use Zend\Session\SaveHandler\SaveHandlerInterface;
 
+use Zend_Db_Adapter_Abstract;
+
 return [
     'service_manager' => [
         'factories' => [
             SaveHandlerInterface::class => function($sm) {
+
+                $db = $sm->get(Zend_Db_Adapter_Abstract::class);
+
                 return new Session\SaveHandler\DbTable([
                     'table' => [
+                        'db'      => $db,
                         'name'    => 'session',
                         'primary' => ['id']
                     ]

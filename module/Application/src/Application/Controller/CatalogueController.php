@@ -574,8 +574,10 @@ class CatalogueController extends AbstractActionController
 
             $language = $this->language();
 
+            $httpsFlag = $this->getRequest()->getUri()->getScheme();
+
             $pictures = $this->catalogue()->getPictureTable();
-            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_6_' . $language;
+            $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_6_' . $language . '_' . $httpsFlag;
             $topPictures = $this->cache->getItem($key, $success);
             if (!$success) {
 

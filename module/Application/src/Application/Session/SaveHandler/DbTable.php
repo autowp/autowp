@@ -106,8 +106,8 @@ class DbTable implements SaveHandlerInterface
         $db = $this->table->getAdapter();
 
         $sql =  'insert into ' . $db->quoteIdentifier($this->table->info('name')) .
-                    ' (id, user_id, modified, data) ' .
-                'values (?, ?, ?, ?) ' .
+                    ' (id, user_id, modified, lifetime, data) ' .
+                'values (?, ?, ?, ?, ?) ' .
                 'on duplicate key update '.
                     'user_id = values(user_id), ' .
                     'modified = values(modified), ' .
@@ -117,6 +117,7 @@ class DbTable implements SaveHandlerInterface
             $id,
             $this->getUserId(),
             time(),
+            $this->lifetime,
             (string)$data
         ]);
 
