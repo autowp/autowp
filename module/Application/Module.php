@@ -97,6 +97,7 @@ class Module implements ConsoleUsageProviderInterface,
 
         $configFiles = [
             __DIR__ . '/config/module.config.php',
+            __DIR__ . '/config/module.config.session.php',
             __DIR__ . '/config/module.config.cache.php',
             __DIR__ . '/config/module.config.console.php',
             __DIR__ . '/config/module.config.forms.php',

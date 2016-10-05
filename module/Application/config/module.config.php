@@ -598,15 +598,4 @@ return [
             'message_separator_string' => '</li><li>'
         ]
     ],
-
-    'session_config' => [
-        'use_cookies'         => true,
-        'gc_maxlifetime'      => 864000,
-        'remember_me_seconds' => 864000,
-        'cookie_httponly'     => false,
-        'cookie_domain'       => '.wheelsage.org',
-    ],
-    'session_storage' => [
-        'type' => 'SessionArrayStorage'
-    ]
 ];

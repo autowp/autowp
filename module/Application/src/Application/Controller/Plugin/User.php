@@ -12,6 +12,8 @@ use Zend_Acl_Resource_Interface;
 use Zend_Acl_Role_Interface;
 use Zend_Auth;
 
+use Exception;
+
 class User extends AbstractPlugin
 {
     /**
