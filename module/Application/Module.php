@@ -312,10 +312,6 @@ class Module implements ConsoleUsageProviderInterface,
 
     private function redirect($app, $url)
     {
-        if (getenv('UNITTEST')) {
-            throw new \Exception("redirect");
-        }
-
         $app->getEventManager()->getSharedManager()->attach('Zend\Mvc\Controller\AbstractActionController', 'dispatch', function($e) use ($url) {
             $controller = $e->getTarget();
             $controller->plugin('redirect')->toUrl($url);

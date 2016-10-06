@@ -16,7 +16,7 @@ install:
 before_script: 
   - sudo apt-get install php5-imagick
   - phpenv config-add module/Application/test/ApplicationTest/_files/travis.php.ini
-  - composer install
+  - composer install --ignore-platform-reqs
   - mysql -u root -e 'create database autowp_test;'
   - mysql -u root < module/Application/test/ApplicationTest/_files/dump.sql
 script: ./vendor/bin/phpunit module/Application/test/
