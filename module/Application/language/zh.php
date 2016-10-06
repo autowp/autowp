@@ -4,6 +4,9 @@ return [
     '' => [
         'plural_forms' => 'nplurals=1; plural=0'
     ],
+
+    'test' => '测试是确定',
+
     /* Common words */
     'and' => '还有',
     '%1$s picures'       => [

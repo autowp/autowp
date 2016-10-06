@@ -244,6 +244,7 @@ class IndexController extends AbstractActionController
 
         $carOfDayName = null;
         $carOfDayPicturesData = null;
+        $carOfDayLinks = [];
 
         if ($carId) {
 

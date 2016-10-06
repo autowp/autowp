@@ -9,7 +9,7 @@ use Zend\Uri;
 use Zend\View\Helper\AbstractHtmlElement;
 
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User;
+use Application\Model\DbTable\User as UserTable;
 
 use Exception;
 
@@ -168,7 +168,7 @@ class UserText extends AbstractHtmlElement
         }
 
         if ($userId) {
-            $userTable = new User();
+            $userTable = new UserTable();
             $user = $userTable->find($userId)->current();
 
             if ($user) {
@@ -177,7 +177,7 @@ class UserText extends AbstractHtmlElement
         }
 
         if ($userIdentity) {
-            $userTable = new User();
+            $userTable = new UserTable();
             $user = $userTable->fetchRow([
                 'identity = ?' => $userIdentity
             ]);

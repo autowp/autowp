@@ -117,7 +117,7 @@ class Module implements ConsoleUsageProviderInterface,
 
     public function onBootstrap(Event $e)
     {
-        defined('PUBLIC_DIR') || define('PUBLIC_DIR', realpath(__DIR__ . '/../../../public_html'));
+        defined('PUBLIC_DIR') || define('PUBLIC_DIR', realpath(__DIR__ . '/../../public_html'));
 
         defined('MYSQL_TIMEZONE') || define('MYSQL_TIMEZONE', 'UTC');
         defined('MYSQL_DATETIME_FORMAT') || define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
@@ -148,7 +148,7 @@ class Module implements ConsoleUsageProviderInterface,
     {
         $request = $serviceManager->get('Request');
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-            $hostname = $request->getServer('HTTP_HOST');
+            $hostname = $request->getUri()->getHost();
 
             switch ($hostname) {
                 case 'www.autowp.ru':
@@ -180,9 +180,9 @@ class Module implements ConsoleUsageProviderInterface,
     public function preDispatch($e)
     {
         $this->hostnameCheck($e);
+        $this->authRemember($e);
         $this->languagePreDispatch($e);
         $this->urlCorrection($e);
-        $this->authRemember($e);
         $this->traffic($e);
         $this->lastOnline($e);
     }
@@ -198,7 +198,7 @@ class Module implements ConsoleUsageProviderInterface,
 
             $language = $this->defaultLanguage;
 
-            $hostname = $request->getServer('HTTP_HOST');
+            $hostname = $request->getUri()->getHost();
 
             if (in_array($hostname, $this->skipHostname)) {
                 $uri = $request->getUriString();
@@ -295,7 +295,7 @@ class Module implements ConsoleUsageProviderInterface,
         $request = $serviceManager->get('Request');
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-            $hostname = $request->getServer('HTTP_HOST');
+            $hostname = $request->getUri()->getHost();
 
             $isAllowed = in_array($hostname, $this->hostnameWhitelist);
 
@@ -312,6 +312,10 @@ class Module implements ConsoleUsageProviderInterface,
 
     private function redirect($app, $url)
     {
+        if (getenv('UNITTEST')) {
+            throw new \Exception("redirect");
+        }
+
         $app->getEventManager()->getSharedManager()->attach('Zend\Mvc\Controller\AbstractActionController', 'dispatch', function($e) use ($url) {
             $controller = $e->getTarget();
             $controller->plugin('redirect')->toUrl($url);

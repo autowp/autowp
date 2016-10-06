@@ -225,7 +225,7 @@ class TrafficControl
         $table = $this->getWhitelistTable();
 
         return (bool)$table->fetchRow([
-            'ip = INET6_ATON(?)' => $ip
+            'ip = INET6_ATON(?)' => (string)$ip
         ]);
     }
 
@@ -334,7 +334,7 @@ class TrafficControl
         $table = $this->getBannedTable();
 
         $row = $table->fetchRow([
-            'ip = INET6_ATON(?)' => $ip,
+            'ip = INET6_ATON(?)' => (string)$ip,
             'up_to >= NOW()'
         ]);
 
@@ -358,14 +358,16 @@ class TrafficControl
      */
     public function pushHit($ip)
     {
-        $table = $this->getBannedTable();
+        if ($ip) {
+            $table = $this->getBannedTable();
 
-        $sql = '
-            INSERT INTO ip_monitoring4 (ip, day_date, hour, tenminute, minute, count)
-            VALUES (INET6_ATON(?), CURDATE(), HOUR(NOW()), FLOOR(MINUTE(NOW())/10), MINUTE(NOW()), 1)
-            ON DUPLICATE KEY UPDATE count=count+1
-        ';
-        $table->getAdapter()->query($sql, [$ip]);
+            $sql = '
+                INSERT INTO ip_monitoring4 (ip, day_date, hour, tenminute, minute, count)
+                VALUES (INET6_ATON(?), CURDATE(), HOUR(NOW()), FLOOR(MINUTE(NOW())/10), MINUTE(NOW()), 1)
+                ON DUPLICATE KEY UPDATE count=count+1
+            ';
+            $table->getAdapter()->query($sql, [$ip]);
+        }
     }
 
     public function autoWhitelist()

@@ -15,7 +15,8 @@ install:
   - printf "\n" | pecl install imagick
 before_script: 
   - sudo apt-get install php5-imagick
-  - phpenv config-add test/_files/travis.php.ini
-  - composer install --dev
+  - phpenv config-add module/Application/test/ApplicationTest/_files/travis.php.ini
+  - composer install
   - mysql -u root -e 'create database autowp_test;'
-  - mysql -u root < test/_files/dump.sql
+  - mysql -u root < module/Application/test/ApplicationTest/_files/dump.sql
+script: ./vendor/bin/phpunit module/Application/test/
