@@ -74,7 +74,7 @@ return [
                             'captcha' => [
                                 'class'   => 'Image',
                                 'font'    => __DIR__ . '/../assets/fonts/arial.ttf',
-                                'imgDir'  => APPLICATION_PATH . '/../public_html/img/captcha/',
+                                'imgDir'  => __DIR__ . '/../../../public_html/img/captcha/',
                                 'imgUrl'  => '/img/captcha/',
                                 'wordLen' => 4,
                                 'timeout' => 300,
@@ -466,7 +466,7 @@ return [
                             'captcha' => [
                                 'class'   => 'Image',
                                 'font'    => __DIR__ . '/../assets/fonts/arial.ttf',
-                                'imgDir'  => APPLICATION_PATH . '/../public_html/img/captcha/',
+                                'imgDir'  => __DIR__ . '/../../../public_html/img/captcha/',
                                 'imgUrl'  => '/img/captcha/',
                                 'wordLen' => 4,
                                 'timeout' => 300,

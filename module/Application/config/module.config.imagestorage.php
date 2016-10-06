@@ -2,7 +2,7 @@
 
 namespace Application;
 
-$imageDir = APPLICATION_PATH . "/../public_html/image/";
+$imageDir = __DIR__ . '/../../../public_html/image/';
 
 return [
     'imageStorage' => [
@@ -47,7 +47,7 @@ return [
                 ]
             ],
             'picture' => [
-                'path' => APPLICATION_PATH . "/../public_html/pictures/",
+                'path' => __DIR__ . '/../../../public_html/pictures/',
                 'url'  => 'http://i.wheelsage.org/pictures/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'

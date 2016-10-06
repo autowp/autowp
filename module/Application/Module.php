@@ -117,14 +117,8 @@ class Module implements ConsoleUsageProviderInterface,
 
     public function onBootstrap(Event $e)
     {
-        defined('PUBLIC_DIR') || define('PUBLIC_DIR', realpath(APPLICATION_PATH . '/../public_html'));
-        defined('RESOURCES_DIR') || define('RESOURCES_DIR', APPLICATION_PATH . '/resources');
-        defined('IMAGES_DIR') || define('IMAGES_DIR', PUBLIC_DIR . '/img');
-        defined('IMAGES_URL') || define('IMAGES_URL', '/img');
+        defined('PUBLIC_DIR') || define('PUBLIC_DIR', realpath(__DIR__ . '/../../../public_html'));
 
-        defined('MYSQL_DATE') || define('MYSQL_DATE', 'yyyy-MM-dd');
-        defined('MYSQL_TIME') || define('MYSQL_TIME', 'HH:mm:ss');
-        defined('MYSQL_DATETIME') || define('MYSQL_DATETIME', MYSQL_DATE . ' ' . MYSQL_TIME);
         defined('MYSQL_TIMEZONE') || define('MYSQL_TIMEZONE', 'UTC');
         defined('MYSQL_DATETIME_FORMAT') || define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
 

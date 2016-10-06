@@ -36,7 +36,7 @@ class MaintenanceController extends AbstractActionController
 
         $config = $this->db->getConfig();
 
-        $destFile = APPLICATION_PATH . '/data/dump/' . date('Y-m-d_H.i.s') . '.dump.sql';
+        $destFile = __DIR__ . '/../../../application/data/dump/' . date('Y-m-d_H.i.s') . '.dump.sql';
 
         $console->write('Dumping ... ');
 

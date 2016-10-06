@@ -26,9 +26,5 @@ if (! class_exists(Application::class)) {
     );
 }
 
-// Define path to application directory
-defined('APPLICATION_PATH')
-    || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));
-
 // Run the application!
 Application::init(require __DIR__ . '/../config/application.config.php')->run();
