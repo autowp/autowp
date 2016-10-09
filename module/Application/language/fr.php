@@ -1728,6 +1728,7 @@ Don\'t forget it.',
     'specifications-editor/engine/not-selected' => '[not selected]',
     'specifications-editor/engine/select' => 'Select engine',
     'specifications-editor/engine/dont-inherit' => 'Don\'t inherit engine',
+    'specifications-editor/save' => 'Envoyer',
 
     'specifications-editor/log' => 'Log of values',
     'specifications-editor/log/date' => 'Date',

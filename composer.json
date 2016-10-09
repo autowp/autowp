@@ -3,9 +3,8 @@
     "description": "AutoWP.ru, the website",
     "license": "MIT",
     "require": {
-        "php": "^5.6.0",
+        "php": "^7.0",
         "zendframework/zendframework1": "1.*",
-        "phpmyadmin/phpmyadmin": "4.*",
         "irazasyed/telegram-bot-sdk": "dev-master",
         "zendframework/zend-mail": ">=2.5",
         "phayes/geophp": "^1.2",

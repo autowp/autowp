@@ -2,8 +2,10 @@
 
 namespace Application\Controller\Console;
 
+use Zend\Console\ColorInterface;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Session\SessionManager;
 
 use Application\Model\Comments;
 use Application\Model\DbTable\Category\ParentTable as CategoryParent;
@@ -13,7 +15,6 @@ use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Exception;
 
 use Zend_Db_Adapter_Abstract;
-use Zend_Session;
 
 class MaintenanceController extends AbstractActionController
 {
@@ -22,12 +23,15 @@ class MaintenanceController extends AbstractActionController
      */
     private $db;
 
-    private $sessionConfig;
+    /**
+     * @var SessionManager
+     */
+    private $sessionManager;
 
-    public function __construct(Zend_Db_Adapter_Abstract $db, array $sessionConfig)
+    public function __construct(Zend_Db_Adapter_Abstract $db, SessionManager $sessionManager)
     {
         $this->db = $db;
-        $this->sessionConfig = $sessionConfig;
+        $this->sessionManager = $sessionManager;
     }
 
     public function dumpAction()
@@ -71,16 +75,14 @@ class MaintenanceController extends AbstractActionController
 
     public function clearSessionsAction()
     {
-        $console = Console::getInstance();
-
-        $maxlifetime = $this->sessionConfig['gc_maxlifetime'];
-        if (!$maxlifetime) {
+        $gcMaxLifetime = $this->sessionManager->getConfig()->getOptions('options')['gc_maxlifetime'];
+        if (!$gcMaxLifetime) {
             throw new Exception('Option session.gc_maxlifetime not found');
         }
-
-        Zend_Session::getSaveHandler()->gc($maxlifetime);
-
-        $console->writeLine("Sessions garabage collected");
+        
+        $this->sessionManager->getSaveHandler()->gc($gcMaxLifetime);
+        
+        Console::getInstance()->writeLine("Garabage collected", ColorInterface::GREEN);
     }
 
     public function rebuildCategoryParentAction()

@@ -1713,6 +1713,7 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'specifications-editor/engine/not-selected' => '[未选择]',
     'specifications-editor/engine/select' => '选择发动机',
     'specifications-editor/engine/dont-inherit' => '不继承发动机',
+    'specifications-editor/save' => '上传',
 
     'specifications-editor/log' => '输入数据',
     'specifications-editor/log/date' => '日期',

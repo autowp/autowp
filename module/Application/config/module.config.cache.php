@@ -22,7 +22,7 @@ return [
                     ]
                 ]
             ]
-        ],
+        ]
     ],
     'caches' => [
         'fastCache' => [
@@ -43,11 +43,6 @@ return [
                     ]
                 ]
             ],
-            /*'plugins' => [
-             'exception_handler' => [
-                 'throw_exceptions' => false
-             ],
-            ],*/
         ],
         'longCache' => [
             'adapter' => [

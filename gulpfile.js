@@ -16,6 +16,8 @@ var gulp = require("gulp")
   , urlAdjuster = require('gulp-css-url-adjuster')
   , embed = require('gulp-image-embed')
   , packageJSON = require("./package")
+  , favicons = require("gulp-favicons")
+  , gutil = require("gulp-util")
 ;
 
 gulp.task("build.css", ["copy.jcrop", 'copy.flags'], function () {
@@ -92,6 +94,29 @@ gulp.task("copy.flags", function () {
         './node_modules/flag-icon-css/flags/4x3/fr.svg'
     ])
         .pipe(gulpCopy("./public_html/img/vendor/flag-icon-css", {prefix: 4}));
+});
+
+gulp.task("favicon", function () {
+    return gulp.src("./module/Application/assets/logo.svg").pipe(favicons({
+        appName: "WheelsAge.org",
+        appDescription: "WheelsAge.org - encyclopedia of cars in the pictures",
+        developerName: "Dmitry P.",
+        developerURL: "https://github.com/autowp/autowp",
+        background: "#ede9de",
+        path: "/",
+        url: "https://wheelsage.org/",
+        display: "standalone",
+        orientation: "portrait",
+        start_url: "/",
+        version: 1.0,
+        logging: false,
+        online: false,
+        html: "favicons.html",
+        pipeHTML: true,
+        replace: true
+    }))
+    .on("error", gutil.log)
+    .pipe(gulp.dest("./public_html"));
 });
 
 /*gulp.task("minify.brands.png", function () {

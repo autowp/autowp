@@ -1743,6 +1743,7 @@ return [
     'specifications-editor/engine/not-selected' => '[не выбран]',
     'specifications-editor/engine/select' => 'Выбрать двигатель',
     'specifications-editor/engine/dont-inherit' => 'Не наследовать двигатель',
+    'specifications-editor/save' => 'Сохранить',
 
     'specifications-editor/log' => 'Журнал ТТХ',
     'specifications-editor/log/date' => 'Дата',

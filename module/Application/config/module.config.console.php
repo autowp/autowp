@@ -3,6 +3,7 @@
 namespace Application;
 
 use Zend\ServiceManager\Factory\InvokableFactory;
+use Zend\Session\SessionManager;
 
 use Zend_Db_Adapter_Abstract;
 
@@ -17,9 +18,10 @@ return [
             },
             Controller\Console\ImageStorageController::class => InvokableFactory::class,
             Controller\Console\MaintenanceController::class => function($sm) {
-                $db = $sm->get(Zend_Db_Adapter_Abstract::class);
-                $sessionConfig = $sm->get('Config')['session'];
-                return new Controller\Console\MaintenanceController($db, $sessionConfig);
+                return new Controller\Console\MaintenanceController(
+                    $sm->get(Zend_Db_Adapter_Abstract::class), 
+                    $sm->get(SessionManager::class)
+                );
             },
             Controller\Console\MessageController::class  => InvokableFactory::class,
             Controller\Console\MidnightController::class => InvokableFactory::class,

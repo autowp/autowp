@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="520"
+   height="520"
+   viewBox="0 0 520.00001 520.00001"
+   id="svg2"
+   version="1.1"
+   sodipodi:docname="logo.svg"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"
+   inkscape:version="0.91 r13725">
+  <title
+     id="title8192">WheelsAge logo</title>
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7071068"
+     inkscape:cx="121.67975"
+     inkscape:cy="83.371191"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1137"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     units="px" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>WheelsAge logo</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Dmitry P.</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Copyright</dc:title>
+          </cc:Agent>
+        </dc:rights>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#008080;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 260.76953,96.41422 A 210.87364,207.07907 0 0 0 55.25,258.29899 l 42.087891,6.28515 a 168.44294,163.89209 0 0 1 19.990239,-47.13671 l 73.40625,53.0332 a 79.38965,74.336534 0 0 0 -6.5,16.00586 c 30.59395,13.29228 54.1902,30.50882 77.02734,48.15234 19.19989,-14.7011 37.20108,-33.17472 76.79883,-48.76562 a 79.38965,74.336534 0 0 0 -6.50391,-15.81055 l 73.00391,-52.74414 a 168.44294,163.89209 0 0 1 20.17383,47.42578 l 41.83203,-5.75195 A 210.87364,207.07907 0 0 0 260.76953,96.41422 Z m 0.25196,42.17578 a 168.44294,163.89209 0 0 1 118.70312,47.96875 l -76.32812,54.83399 a 79.38965,74.336534 0 0 0 -42.1211,-11.47852 79.38965,74.336534 0 0 0 -42.56054,11.75977 L 142.25196,186.74235 A 168.44294,163.89209 0 0 1 261.02149,138.59 Z M 35,270.41227 36.009766,331.01774 C 140.32365,333.77658 207.8677,374.26128 260.54688,429.9943 l 0,-0.008 0.008,0.0137 0.004,-0.0117 0,0.006 c 52.67916,-55.73302 120.22323,-96.21577 224.53711,-98.97461 l 1.00976,-60.60742 -0.32422,0.56836 C 342.25458,285.3498 300.37039,318.89447 260.55497,355.72868 l -0.004,0 C 220.73536,318.89447 178.85117,285.3498 35.324219,270.98063 L 35,270.41227 Z"
+       id="logo"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

@@ -122,7 +122,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_CATEGORY_MENU_3_' . $language;
+        $key = 'ZF2_CATEGORY_MENU_5_' . $language;
 
         $categories = $this->cache->getItem($key, $success);
         if (!$success) {
@@ -146,10 +146,10 @@ class MainMenu
                 $categories[] = [
                     'id'             => $row->id,
                     'url'            => $this->router->assemble([
+                        'action'           => 'category',
                         'category_catname' => $row->catname
                     ], [
-                        'action' => 'category',
-                        'name'   => 'categories'
+                        'name' => 'categories'
                     ]),
                     'name'           => $langRow ? $langRow->name : $row->name,
                     'short_name'     => $langRow ? $langRow->short_name : $row->short_name,

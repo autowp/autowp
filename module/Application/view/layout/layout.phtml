@@ -24,9 +24,7 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="theme-color" content="#ede9de">
-        <meta name="msapplication-navbutton-color" content="#ede9de">
-        <meta name="apple-mobile-web-app-status-bar-style" content="#ede9de">
+        <?=$this->render('layout/favicons')?>
         <?php
             echo $this->headMeta()
                 ->appendName('keywords', $this->translate('layout/meta/keywords'))
@@ -34,7 +32,7 @@
             echo $this->headTitle();
             echo $this
                 ->headLink(['rel' => 'shortcut icon', 'href' => '/favicon.ico', 'type' => 'image/x-icon'], 'PREPEND')
-                ->appendStylesheet('/css/styles.css', 'screen');
+                ->appendStylesheet('/css/styles.css?2016-10-09.2', 'screen');
             echo $this->headScript()
                 ->appendFile(
                     'http://html5shim.googlecode.com/svn/trunk/html5.js',

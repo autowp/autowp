@@ -2,6 +2,23 @@ body {
     padding-top: 60px;
 }
 
+.navbar-brand svg {
+    width: 50px;
+    height: 50px;
+    margin:-15px -15px -15px 0;
+    
+    path {
+        fill: #9d9d9d;
+    }
+    
+    &:hover {
+        path {
+            fill: #fff;
+            .transition(fill .2s);
+        }
+    }
+}
+
 .page-header, legend {
     border-bottom-color: #FFF;
 }
