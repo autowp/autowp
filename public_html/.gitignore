@@ -11,3 +11,13 @@
 /fonts/*
 /css/*
 /image
+/android-chrome-*
+/apple-touch-*
+/browserconfig
+/coast*
+/favicon*
+/firefox*
+/mstile*
+/manifest.json
+/manifest.webapp
+/yandex-browser*
