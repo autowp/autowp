@@ -3,6 +3,8 @@ dist: trusty
 language: php
 php:
   - '7.0'
+git:
+  submodules: false
 services:
   - mysql
 addons:
@@ -14,7 +16,6 @@ addons:
 install:
   - printf "\n" | pecl install imagick
 before_script: 
-  - sudo apt-get install php5-imagick
   - phpenv config-add module/Application/test/ApplicationTest/_files/travis.php.ini
   - composer install --ignore-platform-reqs
   - mysql -u root -e 'create database autowp_test;'

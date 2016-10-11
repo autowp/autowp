@@ -121,7 +121,7 @@ class DbTable implements SaveHandlerInterface
             (string)$data
         ]);
 
-        return $stmt->rowCount() > 0;
+        return true;//$stmt->rowCount() > 0;
     }
 
     /**
