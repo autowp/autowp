@@ -19,8 +19,8 @@ return [
         'Zend\Mvc\Console',
         'Zend\Session',
         'Application',
-        'ZF\ContentNegotiation',
-        'ZF\OAuth2',
+        //'ZF\ContentNegotiation',
+        //'ZF\OAuth2',
         'Zend\Mvc\Plugin\FlashMessenger'
     ],
 
