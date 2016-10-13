@@ -1673,86 +1673,85 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'moder/acl/privilege' => 'Privilege',
 
     'votings/do-vote' => 'Vote',
-    'votings/who-voted' => 'Who voted?',
-    'votings/voting/voters/during-%s-%s' => 'Voting during %s to %s',
-    'votings/voting/voters/show-all' => 'show all',
-    'votings/voting/voters/show-contributors' => 'show from 100 uploaded pictures',
+    'votings/who-voted' => 'Qui a voté?',
+    'votings/voting/voters/during-%s-%s' => 'Vote au cours de %s à %s',
+    'votings/voting/voters/show-all' => 'montre tout',
+    'votings/voting/voters/show-contributors' => 'montrer à partir de 100 images téléchargées',
 
-    'museums/museum/address:' => 'Address:',
-    'museums/museum/on-the-map' => 'on the map',
-    'museums/museum/website:' => 'Web-site: ',
+    'museums/museum/address:' => 'Adresse:',
+    'museums/museum/on-the-map' => 'Sur la carte',
+    'museums/museum/website:' => 'site Web: ',
 
-    'restore-password/text' => 'If you lost your password - input your e-mail and you give instruction to create new one',
-    'restore-password/new-password/text' => 'Enter new password',
-    'restore-password/new-password/saved' => 'New password saved.
+    'restore-password/text' => 'Si vous avez perdu votre mot de passe - entrez votre e-mail et nous vous donner des instructions pour créer une nouvelle',
+    'restore-password/new-password/text' => 'Entrez un nouveau mot de passe',
+    'restore-password/new-password/saved' => 'Nouveau mot de passe ont été enregistrés.
 
-Don\'t forget it.',
-    'restore-password/new-password/instructions-sent' => 'Instructions sent to your e-mail',
-    'restore-password/new-password/email-not-found' => 'User with that e-mail not found',
-    'restore-password/new-password/mail/subject' => 'Password restore',
+Ne l'oubliez pas.',
+    'restore-password/new-password/instructions-sent' => 'Instructions envoyées à votre e-mail',
+    'restore-password/new-password/email-not-found' => 'Utilisateur avec cette e-mail ne trouve pas',
+    'restore-password/new-password/mail/subject' => 'Mot de passe restauré',
     'restore-password/new-password/mail/body-%s' =>
-        "Follow link to enter new password: %s\n\n" .
-        "Sincerely, robot www.wheelsage.org\n",
+        "Suivez le lien pour entrer un nouveau mot de passe: %s\n\n" .
+        "Sincèrement, robot www.wheelsage.org\n",
 
-    'twins/group/name' => 'Name',
+    'twins/group/name' => 'Nom',
     'twins/group/description' => 'Description',
 
-    'specifications-editor/description' => 'Просьба отнестить со всей ответственностью ко всем выполняемым действиям, т.к. они станут достоянием общественности.
+    'specifications-editor/description' => 'S'il vous plaît prendre avec toute la responsabilité à toutes les actions effectuées depuis ils deviennent publics.
 
 
-О структуре самих характеристик.
+Sur la structure des mêmes spécifications.
 
-Все характеристики организованы в виде дерева элементов "параметр - значение". Значения могут быть числовыми и текстовыми.
+Toutes les spécifications sont organisées comme un arbre d'éléments "l'option - valeur". Les valeurs peuvent être numériques ou texte.
 
-Важной особенностью является тот факт, что каждая характеристика может быть задана одновременно несколькими пользователями. В этом случае актуальным (используемым) значением является то, которое система сочтет приоритетным по ряду признаков.
+Une caractéristique importante est le fait que chaque spécification peut être définie par plusieurs utilisateurs simultanément. Dans ce cas, la valeur (utilisée) actuelle est que le système juge une priorité pour un certain nombre de motifs.
 
-Если вы столкнулись с ситуацией, когда вам не удаётся перекрыть введенное кем-то ранее значение, то вы можете просто написать об этом автору. Впрочем в процессе реализации система автоматического уведомления автором о том, что с его значением кто-то не согласен.
+Si vous êtes confronté à une situation où vous ne pouvez pas bloquer l'entrée de quelqu'un de la valeur précédemment, vous pouvez simplement écrire sur cet auteur. D'ailleurs dans le processus de mise en œuvre de système automatique notifie à l'auteur que de la valeur de quelqu'un n'est pas d'accord.
 
 
-Все значения, которые здесь вводятся - отображаются на сайте, в характеристиках, используются в построении разделы "самые-самые", а также отображаются в некоторых других местах сайта.',
-    'specifications-editor/not-save' => 'Data not save because of error. Details below',
-    'specifications-editor/parameter' => 'Parameter',
-    'specifications-editor/your-value' => 'Your value',
-    'specifications-editor/actual-value' => 'Current value',
-    'specifications-editor/all-values' => 'All values',
+Toutes les valeurs qui sont entrées ici - apparaissent sur le site, dans les spécifications, utilisés dans la construction des sections de "plus-plus", et apparaissent dans plusieurs autres zones du site.',
+    'specifications-editor/not-save' => 'Les données enregistrez pas à cause de l'erreur. Les détails ci-dessous',
+    'specifications-editor/parameter' => 'Paramètre',
+    'specifications-editor/your-value' => 'Votre valeur',
+    'specifications-editor/actual-value' => 'Valeur actuelle',
+    'specifications-editor/all-values' => 'Toutes les valeurs',
     'specifications-editor/tabs/info' => 'Info',
-    'specifications-editor/tabs/engine' => 'Engine',
-    'specifications-editor/tabs/specs' => 'Specs',
-    'specifications-editor/tabs/result' => 'Result',
-    'specifications-editor/tabs/admin' => 'Admin',
-    'specifications-editor/engine' => 'Engine from catalogue',
-    'specifications-editor/engine/inherited-from' => 'Inherited from',
-    'specifications-editor/engine/select-another' => 'Select another engine',
-    'specifications-editor/engine/cancel' => 'Cancel engine',
-    'specifications-editor/engine/inherit' => 'Inherit engine',
+    'specifications-editor/tabs/engine' => 'Moteur',
+    'specifications-editor/tabs/specs' => 'Spécifications',
+    'specifications-editor/tabs/result' => 'Résultat',
+    'specifications-editor/tabs/admin' => 'Administrateur',
+    'specifications-editor/engine' => 'Moteur à partir du catalogue',
+    'specifications-editor/engine/inherited-from' => 'Hérité de',
+    'specifications-editor/engine/select-another' => 'Sélectionnez un autre moteur',
+    'specifications-editor/engine/cancel' => 'Annuler la sélection du moteur',
+    'specifications-editor/engine/inherit' => 'Hériter moteur',
     'specifications-editor/engine/not-selected' => '[not selected]',
-    'specifications-editor/engine/select' => 'Select engine',
-    'specifications-editor/engine/dont-inherit' => 'Don\'t inherit engine',
+    'specifications-editor/engine/select' => 'Sélectionnez un moteur',
+    'specifications-editor/engine/dont-inherit' => 'Ne pas hériter moteur',
     'specifications-editor/save' => 'Envoyer',
 
-    'specifications-editor/log' => 'Log of values',
+    'specifications-editor/log' => 'Journal de valeurs',
     'specifications-editor/log/date' => 'Date',
-    'specifications-editor/log/user' => 'User',
-    'specifications-editor/log/object' => 'Object',
-    'specifications-editor/log/attribute' => 'Attribyte',
-    'specifications-editor/log/value' => 'Value',
-    'specifications-editor/log/editor' => 'Editor',
-    'specifications-editor/log/to-editor' => 'to editor',
-    'specifications-editor/log/filter/user-id' => 'User',
-    'specifications-editor/log/low-weight-text' => 'Зарегистрировано большое количество конфликтов в данных, введеных вами. Другие люди часто опревергают информацию, предоставленную вами.
+    'specifications-editor/log/user' => 'Utilisateur',
+    'specifications-editor/log/object' => 'Objet',
+    'specifications-editor/log/attribute' => 'Attribut',
+    'specifications-editor/log/value' => 'Valueur',
+    'specifications-editor/log/editor' => 'Editeur',
+    'specifications-editor/log/to-editor' => 'Éditer',
+    'specifications-editor/log/filter/user-id' => 'Utilisateur',
+    'specifications-editor/log/low-weight-text' => 'Enregistré un grand nombre de conflits dans les données que vous avez entré. D'autres personnes sont souvent démentent les informations que vous nous fournissez.
+La saisie des données est temporairement suspendu. S'il vous plaît corriger la situation, procéder à un audit des conflits.
 
-Ввод данных временно приостановлен. Просьба исправить ситуацию, провести ревизию конфликтов.
+Réaliser cela aidera à [une interface spéciale](/account/specs-conflicts/conflict/minus-weight), qui contient au moins les erreurs qui ont trouvé les visiteurs.',
+    'specifications-editor/errors-alert' => '**Attention!** Probablement, vous avez accumulé un grand nombre d'erreurs.
 
-Осуществить это поможет [специальный интерфейс](/account/specs-conflicts/conflict/minus-weight), в котором собраны по крайней мере те ошибки, которые обнаружили посетители сайта.',
-    'specifications-editor/errors-alert' => '**Внимание!** Вроятно, у вас накопилось существенное количество ошибок.
-
-Некоторые из них, обнаруженные другими посетителями, вы можете найти [здесь](/account/specs-conflicts)',
+Certains d'entre eux, trouvés par d'autres utilisateurs, vous pouvez trouver [ici](/account/specs-conflicts)',
 
     'specifications-editor/admin/date' => 'Date',
-    'specifications-editor/admin/user' => 'User',
-    'specifications-editor/admin/parameter' => 'Parameter',
-    'specifications-editor/admin/value' => 'Value',
-    'specifications-editor/admin/move' => 'Move',
+    'specifications-editor/admin/user' => 'Utilisateur',
+    'specifications-editor/admin/parameter' => 'Paramètre',
+    'specifications-editor/admin/value' => 'Valueur',
+    'specifications-editor/admin/move' => 'Déplacer',
 
     'pm/user-%s-edited-brand-description-%s-%s' => 'User %s edited brand description %s ( %s )',
     'pm/user-%s-edited-vehicle-full-description-%s-%s' => 'User %s edited vehicle full description %s ( %s )',
