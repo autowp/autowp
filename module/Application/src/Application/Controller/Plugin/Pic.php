@@ -47,8 +47,6 @@ class Pic extends AbstractPlugin
 
     private $textStorage;
 
-    private $carHelper;
-
     private $translator;
 
     /**
@@ -63,13 +61,11 @@ class Pic extends AbstractPlugin
 
     public function __construct(
         $textStorage,
-        $carHelper,
         $translator,
         PictureNameFormatter $pictureNameFormatter,
         SpecificationsService $specsService)
     {
         $this->textStorage = $textStorage;
-        $this->carHelper = $carHelper;
         $this->translator = $translator;
         $this->pictureNameFormatter = $pictureNameFormatter;
         $this->specsService = $specsService;
@@ -1235,7 +1231,7 @@ class Pic extends AbstractPlugin
                     $name = isset($names[$id]) ? $names[$id] : null;
                     // TODO: extract HTML to view script
                     if (($row['type'] == Picture::VEHICLE_TYPE_ID) && is_array($name)) {
-                        $name = $this->carHelper->htmlTitle($name);
+                        $name = $this->pictureNameFormatter->format($name, $language);
                     } else {
                         $name = htmlspecialchars($name); // this->pictureNameFormatter->format($name, $language)
                     }
