@@ -774,7 +774,7 @@ class UploadController extends AbstractActionController
 
         $this->log(sprintf(
             'Выделение области на картинке %s',
-            htmlspecialchars($this->pic()->name($pictureRow, $this->language()))
+            htmlspecialchars($this->pic()->name($picture, $this->language()))
         ), [$picture]);
 
         $image = $this->imageStorage()->getFormatedImage($picture->getFormatRequest(), 'picture-thumb');
