@@ -1684,9 +1684,9 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
 
     'restore-password/text' => 'Si vous avez perdu votre mot de passe - entrez votre e-mail et nous vous donner des instructions pour créer une nouvelle',
     'restore-password/new-password/text' => 'Entrez un nouveau mot de passe',
-    'restore-password/new-password/saved' => 'Nouveau mot de passe ont été enregistrés.
+    'restore-password/new-password/saved' => "Nouveau mot de passe ont été enregistrés.
 
-Ne l'oubliez pas.',
+Ne l'oubliez pas.",
     'restore-password/new-password/instructions-sent' => 'Instructions envoyées à votre e-mail',
     'restore-password/new-password/email-not-found' => 'Utilisateur avec cette e-mail ne trouve pas',
     'restore-password/new-password/mail/subject' => 'Mot de passe restauré',
@@ -1697,20 +1697,20 @@ Ne l'oubliez pas.',
     'twins/group/name' => 'Nom',
     'twins/group/description' => 'Description',
 
-    'specifications-editor/description' => 'S'il vous plaît prendre avec toute la responsabilité à toutes les actions effectuées depuis ils deviennent publics.
+    'specifications-editor/description' => "S'il vous plaît prendre avec toute la responsabilité à toutes les actions effectuées depuis ils deviennent publics.
 
 
 Sur la structure des mêmes spécifications.
 
-Toutes les spécifications sont organisées comme un arbre d'éléments "l'option - valeur". Les valeurs peuvent être numériques ou texte.
+Toutes les spécifications sont organisées comme un arbre d'éléments \"l'option - valeur\". Les valeurs peuvent être numériques ou texte.
 
 Une caractéristique importante est le fait que chaque spécification peut être définie par plusieurs utilisateurs simultanément. Dans ce cas, la valeur (utilisée) actuelle est que le système juge une priorité pour un certain nombre de motifs.
 
 Si vous êtes confronté à une situation où vous ne pouvez pas bloquer l'entrée de quelqu'un de la valeur précédemment, vous pouvez simplement écrire sur cet auteur. D'ailleurs dans le processus de mise en œuvre de système automatique notifie à l'auteur que de la valeur de quelqu'un n'est pas d'accord.
 
 
-Toutes les valeurs qui sont entrées ici - apparaissent sur le site, dans les spécifications, utilisés dans la construction des sections de "plus-plus", et apparaissent dans plusieurs autres zones du site.',
-    'specifications-editor/not-save' => 'Les données enregistrez pas à cause de l'erreur. Les détails ci-dessous',
+Toutes les valeurs qui sont entrées ici - apparaissent sur le site, dans les spécifications, utilisés dans la construction des sections de \"plus-plus\", et apparaissent dans plusieurs autres zones du site.",
+    'specifications-editor/not-save' => "Les données enregistrez pas à cause de l'erreur. Les détails ci-dessous",
     'specifications-editor/parameter' => 'Paramètre',
     'specifications-editor/your-value' => 'Votre valeur',
     'specifications-editor/actual-value' => 'Valeur actuelle',
@@ -1739,13 +1739,13 @@ Toutes les valeurs qui sont entrées ici - apparaissent sur le site, dans les sp
     'specifications-editor/log/editor' => 'Editeur',
     'specifications-editor/log/to-editor' => 'Éditer',
     'specifications-editor/log/filter/user-id' => 'Utilisateur',
-    'specifications-editor/log/low-weight-text' => 'Enregistré un grand nombre de conflits dans les données que vous avez entré. D'autres personnes sont souvent démentent les informations que vous nous fournissez.
+    'specifications-editor/log/low-weight-text' => "Enregistré un grand nombre de conflits dans les données que vous avez entré. D'autres personnes sont souvent démentent les informations que vous nous fournissez.
 La saisie des données est temporairement suspendu. S'il vous plaît corriger la situation, procéder à un audit des conflits.
 
-Réaliser cela aidera à [une interface spéciale](/account/specs-conflicts/conflict/minus-weight), qui contient au moins les erreurs qui ont trouvé les visiteurs.',
-    'specifications-editor/errors-alert' => '**Attention!** Probablement, vous avez accumulé un grand nombre d'erreurs.
+Réaliser cela aidera à [une interface spéciale](/account/specs-conflicts/conflict/minus-weight), qui contient au moins les erreurs qui ont trouvé les visiteurs.",
+    'specifications-editor/errors-alert' => "**Attention!** Probablement, vous avez accumulé un grand nombre d'erreurs.
 
-Certains d'entre eux, trouvés par d'autres utilisateurs, vous pouvez trouver [ici](/account/specs-conflicts)',
+Certains d'entre eux, trouvés par d'autres utilisateurs, vous pouvez trouver [ici](/account/specs-conflicts)",
 
     'specifications-editor/admin/date' => 'Date',
     'specifications-editor/admin/user' => 'Utilisateur',
@@ -1974,7 +1974,7 @@ La transmission n'est pas pris en compte.",
     'specs/attrs/22/206/options/91' => 'Distribution sans arbre à cames',
     'specs/attrs/22/206/options/92' => 'Moteur sans soupapes',
     'specs/attrs/22/206/options/93' => 'Moteur à soupapes latérales',
-    'specs/attrs/22/206/options/94' => 'Moteur avec un mélange de l'emplacement des soupapes',
+    'specs/attrs/22/206/options/94' => "Moteur avec un mélange de l'emplacement des soupapes",
     'specs/attrs/22/206/options/95' => 'Moteur à soupapes en tête',
     'specs/attrs/22/206/options/100' => 'Moteur à soupapes en tête avec un système de calage variable des soupapes',
     'specs/attrs/22/206/options/96' => 'ACT',
@@ -2013,7 +2013,7 @@ La transmission n'est pas pris en compte.",
     'specs/attrs/40/83' => 'embrayage',
     'specs/attrs/15' => 'Suspension et direction',
     'specs/attrs/15/208' => 'suspension avant',
-    'specs/attrs/15/208/209' => 'types d'amortissement',
+    'specs/attrs/15/208/209' => "types d'amortissement",
     'specs/attrs/15/208/209/options/108' => 'ressorts hélicoïdaux',
     'specs/attrs/15/208/209/options/109' => 'ressorts à lames',
     'specs/attrs/15/208/209/options/110' => 'pneumatique',
