@@ -196,10 +196,8 @@ return [
             },
             'oauth2' => Factory\OAuth2PluginFactory::class,
             'pic' => function($sm) {
-                $viewHelperManager = $sm->get('ViewHelperManager');
                 return new Controller\Plugin\Pic(
                     $sm->get(TextStorage\Service::class),
-                    $viewHelperManager->get('car'),
                     $sm->get('MvcTranslator'),
                     $sm->get(PictureNameFormatter::class),
                     $sm->get(Service\SpecificationsService::class)
@@ -361,7 +359,10 @@ return [
                 return new Model\BrandVehicle(array_keys($config['hosts']));
             },
             VehicleNameFormatter::class => function($sm) {
-                return new VehicleNameFormatter($sm->get('translator'));
+                return new VehicleNameFormatter(
+                    $sm->get('translator'),
+                    $sm->get('ViewRenderer')
+                );
             },
             PictureNameFormatter::class => function($sm) {
                 return new PictureNameFormatter(
