@@ -19,11 +19,15 @@ return [
             Controller\Console\ImageStorageController::class => InvokableFactory::class,
             Controller\Console\MaintenanceController::class => function($sm) {
                 return new Controller\Console\MaintenanceController(
-                    $sm->get(Zend_Db_Adapter_Abstract::class), 
+                    $sm->get(Zend_Db_Adapter_Abstract::class),
                     $sm->get(SessionManager::class)
                 );
             },
-            Controller\Console\MessageController::class  => InvokableFactory::class,
+            Controller\Console\MessageController::class => function($sm) {
+                return new Controller\Console\MessageController(
+                    $sm->get(Model\Message::class)
+                );
+            },
             Controller\Console\MidnightController::class => InvokableFactory::class,
             Controller\Console\PicturesController::class => InvokableFactory::class,
             Controller\Console\SpecsController::class => function($sm) {

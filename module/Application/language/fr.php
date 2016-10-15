@@ -2306,6 +2306,7 @@ In short, bot is a kind of telegram user, which can send you notifications from 
 Learn more about telegram bots: <https://core.telegram.org/bots/faq>
 
 Currently supported features:
+* Notifications about newly personal messages. [Details ...](#messages)
 * Notifications about newly accepted pictures. [Details ...](#new)
 * Notifications about newly uploaded (but still waiting for accept) pictures (this feature works only authorized users). [Details ...](#inbox)
 
@@ -2315,12 +2316,17 @@ Currently supported features:
 
 By sending this command you will receive list of currently supported commands.
 
+### <a name="messages"></a> Personal messages: `/messages`
+
+Send `/messages on` for subscribe to notifications about new personal messages.
+
+Send `/messages off` to unsubscribe.
+
 ### <a name="new"></a> New pictures: `/new`
 
 Send `/new BMW` for subscribe to new photos of BMW.
 
 Send `/new BMW` again to unsubscribe.
-
 
 ### <a name="inbox"></a> Inbox: `/inbox`
 

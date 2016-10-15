@@ -19,6 +19,11 @@ class MeCommand extends Command
      */
     protected $description = "Command to identify you as autowp.ru user";
 
+    public function __construct($message)
+    {
+        $this->message = $message;
+    }
+
     /**
      * @inheritdoc
      */
@@ -86,8 +91,7 @@ class MeCommand extends Command
                     $command = '/me ' . $userRow->id . ' ' . $token;
                     $message = "To complete identifications type `$command` to @autowp_bot";
 
-                    $mModel = new Message();
-                    $mModel->send(null, $userRow->id, $message);
+                    $this->message->send(null, $userRow->id, $message);
 
                     $this->replyWithMessage([
                         'text' => 'Check your personal messages / system notifications'

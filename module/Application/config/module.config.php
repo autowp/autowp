@@ -210,9 +210,10 @@ return [
                 );
             },
             'sidebar' => function ($sm) {
-                $cache = $sm->get('fastCache');
-                $translator = $sm->get('MvcTranslator');
-                return new Controller\Plugin\Sidebar($cache, $translator);
+                return new Controller\Plugin\Sidebar(
+                    $sm->get('fastCache'),
+                    $sm->get('MvcTranslator')
+                );
             },
             'translate' => function ($sm) {
                 $translator = $sm->get('MvcTranslator');
@@ -251,7 +252,6 @@ return [
             'page'        => View\Helper\Page::class,
             'htmlA'       => View\Helper\HtmlA::class,
             'htmlImg'     => View\Helper\HtmlImg::class,
-            'sidebar'     => View\Helper\Sidebar::class,
             'pageTitle'   => View\Helper\PageTitle::class,
             'breadcrumbs' => View\Helper\Breadcrumbs::class,
             'humanTime'   => View\Helper\HumanTime::class,
@@ -321,6 +321,11 @@ return [
             },
             'inlinePicture' => function($sm) {
                 return new View\Helper\InlinePicture($translator);
+            },
+            'sidebar' => function($sm) {
+                return new View\Helper\Sidebar(
+                    $sm->get(Model\Message::class)
+                );
             }
         ]
     ],
@@ -418,7 +423,8 @@ return [
                 return new Service\TelegramService(
                     $config['telegram'],
                     $sm->get('HttpRouter'),
-                    $sm->get(HostManager::class)
+                    $sm->get(HostManager::class),
+                    $sm
                 );
             },
             'translator' => \Zend\Mvc\I18n\TranslatorFactory::class,

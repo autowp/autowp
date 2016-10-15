@@ -35,7 +35,11 @@ class TelegramService
      */
     private $hostManager;
 
-    public function __construct(array $options = [], TreeRouteStack $router, HostManager $hostManager)
+    public function __construct(
+        array $options = [],
+        TreeRouteStack $router,
+        HostManager $hostManager,
+        $serviceManager)
     {
         $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
         $this->webhook = isset($options['webhook']) ? $options['webhook'] : null;
@@ -43,6 +47,7 @@ class TelegramService
 
         $this->router = $router;
         $this->hostManager = $hostManager;
+        $this->serviceManager = $serviceManager;
     }
 
     /**
@@ -54,7 +59,7 @@ class TelegramService
 
         $api->addCommands([
             StartCommand::class,
-            MeCommand::class,
+            new MeCommand($this->serviceManager->get(\Application\Model\Message::class)),
             NewCommand::class,
             InboxCommand::class,
             MessagesCommand::class

@@ -9,18 +9,26 @@ use Application\Model\Message;
 
 class MessageController extends AbstractActionController
 {
+    /**
+     * @var Message
+     */
+    private $message;
+
+    public function __construct(Message $message)
+    {
+        $this->message = $message;
+    }
+
     public function clearOldSystemPMAction()
     {
-        $mModel = new Message();
-        $count = $mModel->recycleSystem();
+        $count = $this->message->recycleSystem();
 
         Console::getInstance()->writeLine(sprintf("%d messages was deleted", $count));
     }
 
     public function clearDeletedPMAction()
     {
-        $mModel = new Message();
-        $count = $mModel->recycle();
+        $count = $this->message->recycle();
 
         Console::getInstance()->writeLine(sprintf("%d messages was deleted", $count));
     }
