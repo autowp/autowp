@@ -5,11 +5,13 @@ namespace Application\Service;
 use Application\HostManager;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Telegram\Brand as TelegramBrand;
+use Application\Model\DbTable\Telegram\Chat as TelegramChat;
 use Application\Model\DbTable\User;
 use Application\Telegram\Command\InboxCommand;
 use Application\Telegram\Command\MeCommand;
 use Application\Telegram\Command\NewCommand;
 use Application\Telegram\Command\StartCommand;
+use Application\Telegram\Command\MessagesCommand;
 
 use Telegram\Bot\Api;
 
@@ -55,6 +57,7 @@ class TelegramService
             MeCommand::class,
             NewCommand::class,
             InboxCommand::class,
+            MessagesCommand::class
         ]);
 
         return $api;
@@ -206,6 +209,19 @@ class TelegramService
 
     private function getPictureUrl($chatId, $picture)
     {
+        $uri = $this->getUriByChatId($chatId);
+
+        return $this->router->assemble([
+            'picture_id' => $picture->identity ? $picture->identity : $picture->id,
+        ], [
+            'name'            => 'picture/picture',
+            'force_canonical' => true,
+            'uri'             => $uri
+        ]);
+    }
+
+    private function getUriByChatId($chatId)
+    {
         $userTable = new User();
 
         $userRow = $userTable->fetchRow(
@@ -215,17 +231,49 @@ class TelegramService
         );
 
         if ($userRow && $userRow->language) {
-            $uri = $this->hostManager->getUriByLanguage($userRow->language);
-        } else {
-            $uri = \Zend\Uri\UriFactory::factory('http://wheelsage.org');
+            return $this->hostManager->getUriByLanguage($userRow->language);
         }
 
-        return $this->router->assemble([
-            'picture_id' => $picture->identity ? $picture->identity : $picture->id,
-        ], [
-            'name'            => 'picture/picture',
-            'force_canonical' => true,
-            'uri'             => $uri
+        return \Zend\Uri\UriFactory::factory('http://wheelsage.org');
+    }
+
+    public function notifyMessage($fromId, $userId, $text)
+    {
+        $fromName = "New personal message";
+
+        if ($fromId) {
+            $userTable = new User();
+            $userRow = $userTable->find($fromId)->current();
+            if ($userRow) {
+                $fromName = $userRow->name;
+            }
+        }
+
+        $chatTable = new TelegramChat();
+
+        $chatRows = $chatTable->fetchAll([
+            'user_id = ?' => (int)$userId
         ]);
+
+        foreach ($chatRows as $chatRow) {
+
+            $url = $this->router->assemble([], [
+                'name'            => $fromId ? 'account/personal-messages' : 'account/personal-messages/system',
+                'force_canonical' => true,
+                'uri'             => $this->getUriByChatId($chatRow->chat_id)
+            ]);
+
+            $telegramMessage = sprintf(
+                "%s: \n%s\n\n%s",
+                $fromName,
+                $text,
+                $url
+            );
+
+            $this->sendMessage([
+                'text'    => $telegramMessage,
+                'chat_id' => $chatRow->chat_id
+            ]);
+        }
     }
 }

@@ -87,6 +87,11 @@ class PicturesController extends AbstractActionController
     private $telegram;
 
     /**
+     * @var Message
+     */
+    private $message;
+
+    /**
      * @return Engine
      */
     private function getEngineTable()
@@ -113,7 +118,8 @@ class PicturesController extends AbstractActionController
         Form $voteForm,
         Form $banForm,
         PictureNameFormatter $pictureNameFormatter,
-        TelegramService $telegram)
+        TelegramService $telegram,
+        Message $message)
     {
         $this->hostManager = $hostManager;
         $this->table = $table;
@@ -124,6 +130,7 @@ class PicturesController extends AbstractActionController
         $this->banForm = $banForm;
         $this->pictureNameFormatter = $pictureNameFormatter;
         $this->telegram = $telegram;
+        $this->message = $message;
     }
 
     public function ownerTypeaheadAction()
@@ -637,8 +644,7 @@ class PicturesController extends AbstractActionController
                 implode("\n", $reasons)
             );
 
-            $mModel = new Message();
-            $mModel->send(null, $owner->id, $message);
+            $this->message->send(null, $owner->id, $message);
         }
 
         $this->log(sprintf(
@@ -719,8 +725,7 @@ class PicturesController extends AbstractActionController
                     $reason
                 );
 
-                $mModel = new Message();
-                $mModel->send(null, $owner->id, $message);
+                $this->message->send(null, $owner->id, $message);
             }
         }
     }
@@ -985,7 +990,6 @@ class PicturesController extends AbstractActionController
                 if ($picture->copyrights_text_id) {
                     $userIds = $this->textStorage->getTextUserIds($picture->copyrights_text_id);
 
-                    $mModel = new Message();
                     $userTable = new User();
                     foreach ($userIds as $userId) {
                         if ($userId != $user->id) {
@@ -1000,7 +1004,7 @@ class PicturesController extends AbstractActionController
                                     $this->pictureUrl($picture, true, $uri)
                                 );
 
-                                $mModel->send(null, $userRow->id, $message);
+                                $this->message->send(null, $userRow->id, $message);
                             }
                         }
                     }
@@ -1104,8 +1108,6 @@ class PicturesController extends AbstractActionController
                 ), $picture);
 
 
-                $mModel = new Message();
-
                 $pictureUrl = $this->pic()->url($picture->id, $picture->identity, true);
                 if ($previousStatusUserId != $user->id) {
                     $userTable = new User();
@@ -1114,7 +1116,7 @@ class PicturesController extends AbstractActionController
                             'С картинки %s снят статус "принято"',
                             $pictureUrl
                         );
-                        $mModel->send(null, $prevUser->id, $message);
+                        $this->message->send(null, $prevUser->id, $message);
                     }
                 }
 
@@ -1844,7 +1846,6 @@ class PicturesController extends AbstractActionController
         }
         unset($recepients[$user->id]);
         if ($recepients) {
-            $mModel = new Message();
             foreach ($recepients as $recepient) {
 
                 $uri = $this->hostManager->getUriByLanguage($recepient->language);
@@ -1864,7 +1865,7 @@ class PicturesController extends AbstractActionController
                     $moderUrl, $replaceUrl, $url
                 );
 
-                $mModel->send(null, $recepient->id, $message);
+                $this->message->send(null, $recepient->id, $message);
             }
         }
 
@@ -1909,8 +1910,7 @@ class PicturesController extends AbstractActionController
                         $this->pic()->url($picture->id, $picture->identity, true, $uri)
                     );
 
-                    $mModel = new Message();
-                    $mModel->send(null, $owner->id, $message);
+                    $this->message->send(null, $owner->id, $message);
                 }
 
                 $this->telegram->notifyPicture($picture->id);
@@ -1918,13 +1918,12 @@ class PicturesController extends AbstractActionController
 
             if ($previousStatusUserId != $user->id) {
                 $userTable = new User();
-                $mModel = new Message();
                 foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                     $message = sprintf(
                         'Принята картинка %s',
                         $this->pic()->url($picture->id, $picture->identity, true)
                     );
-                    $mModel->send(null, $prevUser->id, $message);
+                    $this->message->send(null, $prevUser->id, $message);
                 }
             }
 

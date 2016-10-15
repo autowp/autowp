@@ -13,6 +13,8 @@ class VehicleNameFormatter
      */
     private $renderer;
 
+    private $monthFormat = '<small class="month">%02d.</small>';
+
     private $textMonthFormat = '%02d.';
 
     public function __construct($translator, PhpRenderer $renderer)
@@ -42,8 +44,6 @@ class VehicleNameFormatter
             'end_month'        => null
         ];
         $car = array_replace($defaults, $car);
-
-        $view = $this->view;
 
         $result = $this->renderer->escapeHtml($car['name']);
 
@@ -115,14 +115,14 @@ class VehicleNameFormatter
                 $result .=
                     '<small>'.
                         ' \'<span class="realyears" title="'.$this->renderer->escapeHtmlAttr($this->translate('carlist/years', $language)).'">' .
-                            $this->renderYearsHtml($by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language) .
+                            $this->renderYearsHtml($car['today'], $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language) .
                         '</span>' .
                     '</small>';
             }
         } else {
 
             if ($by > 0 || $ey > 0) {
-                $result .= " '" . $this->renderYearsHtml($by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language);
+                $result .= " '" . $this->renderYearsHtml($car['today'], $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language);
             }
         }
 
@@ -208,13 +208,13 @@ class VehicleNameFormatter
         }
 
         if ($by > 0 || $ey > 0) {
-            $result .= " '" . $this->renderYears($by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language);
+            $result .= " '" . $this->renderYears($car['today'], $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language);
         }
 
         return $result;
     }
 
-    private function renderYears($by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language)
+    private function renderYears($today, $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language)
     {
         if ($equalM) {
             return sprintf($this->textMonthFormat, $bm) . $by;
@@ -236,19 +236,21 @@ class VehicleNameFormatter
                    ($em ? sprintf($this->textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
         }
 
+        $cy = (int)date('Y');
+
         return  (($bm ? sprintf($this->textMonthFormat, $bm) : '').($by ? $by : '????')).
                 (
                     $ey
                         ? '–'.($em ? sprintf($this->textMonthFormat, $em) : '').$ey
                         : (
-                            $car['today']
+                            $today
                                 ? ($by < $cy ? '–'.$this->translate('present-time-abbr', $language) : '')
                                 : ($by < $cy ? '–????' : '')
                         )
                 );
     }
 
-    private function renderYearsHtml($by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language)
+    private function renderYearsHtml($today, $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language)
     {
         if ($equalM) {
             return sprintf($this->monthFormat, $bm).$by;
@@ -270,12 +272,14 @@ class VehicleNameFormatter
                     ($em ? sprintf($this->monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
         }
 
+        $cy = (int)date('Y');
+
         return  (($bm ? sprintf($this->monthFormat, $bm) : '').($by ? $by : '????')).
                 (
                     $ey
                         ? '–'.($em ? sprintf($this->monthFormat, $em) : '').$ey
                         : (
-                            $car['today']
+                            $today
                                 ? ($by < $cy ? '–'.$this->translate('present-time-abbr', $language) : '')
                                 : ($by < $cy ? '–????' : '')
                         )

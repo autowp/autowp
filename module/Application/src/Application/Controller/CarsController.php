@@ -41,14 +41,21 @@ class CarsController extends AbstractActionController
      */
     private $specsService = null;
 
+    /**
+     * @var Message
+     */
+    private $message;
+
     public function __construct(
         HostManager $hostManager,
         Form $filterForm,
-        SpecificationsService $specsService)
+        SpecificationsService $specsService,
+        Message $message)
     {
         $this->hostManager = $hostManager;
         $this->filterForm = $filterForm;
         $this->specsService = $specsService;
+        $this->message = $message;
     }
 
     /**
@@ -121,8 +128,6 @@ class CarsController extends AbstractActionController
 
                 $user->invalidateSpecsVolume();
 
-                $mModel = new Message();
-
                 $contribPairs = $this->specsService->getContributors(1, [$car->id]);
                 $contributors = [];
                 if ($contribPairs) {
@@ -145,7 +150,7 @@ class CarsController extends AbstractActionController
                             $car->getFullName($contributor->language)
                         );
 
-                        $mModel->send(null, $contributor->id, $message);
+                        $this->message->send(null, $contributor->id, $message);
                     }
                 }
 
@@ -672,8 +677,6 @@ class CarsController extends AbstractActionController
             $user = $this->user()->get();
             $ucsTable = new UserCarSubscribe();
 
-            $mModel = new Message();
-
             foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
 
@@ -687,7 +690,7 @@ class CarsController extends AbstractActionController
                         $this->carModerUrl($car, $uri)
                     );
 
-                    $mModel->send(null, $subscriber->id, $message);
+                    $this->message->send(null, $subscriber->id, $message);
                 }
             }
         }
@@ -726,8 +729,6 @@ class CarsController extends AbstractActionController
             $user = $this->user()->get();
             $ucsTable = new UserCarSubscribe();
 
-            $mModel = new Message();
-
             foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
 
@@ -740,7 +741,7 @@ class CarsController extends AbstractActionController
                         $this->carModerUrl($car, $uri)
                     );
 
-                    $mModel->send(null, $subscriber->id, $message);
+                    $this->message->send(null, $subscriber->id, $message);
                 }
             }
         }
@@ -845,8 +846,6 @@ class CarsController extends AbstractActionController
         );
         $this->log($message, $car);
 
-        $mModel = new Message();
-
         foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
             if ($subscriber && ($subscriber->id != $user->id)) {
 
@@ -860,7 +859,7 @@ class CarsController extends AbstractActionController
                     $this->carModerUrl($car, $uri)
                 );
 
-                $mModel->send(null, $subscriber->id, $message);
+                $this->message->send(null, $subscriber->id, $message);
             }
         }
 

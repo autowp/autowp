@@ -1247,6 +1247,10 @@ return [
     'page/203/title'       => '用户',
     'page/203/breadcrumbs' => '用户',
 
+    'page/204/name'        => 'Telegram',
+    'page/204/title'       => 'Telegram',
+    'page/204/breadcrumbs' => 'Telegram',
+
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',
 
@@ -2278,4 +2282,53 @@ Internal hyperlinks must be relative: <del>http://autowp.ru/bmw/</del> <ins>/bmw
     'specs/unit/19/name' => 'v伏',
     'specs/unit/20/abbr' => 'm³',
     'specs/unit/20/name' => '立方米',
+
+    'telegram/info' => 'To make you WheelsAge surfing more convenient we just created a "bot" for [telegram](https://telegram.org/) app. We hope it could be useful and easy to use.
+
+The bot name: [@autowp_bot](tg:msg).
+
+In short, bot is a kind of telegram user, which can send you notifications from site as a messages.
+
+Learn more about telegram bots: <https://core.telegram.org/bots/faq>
+
+Currently supported features:
+* Notifications about newly accepted pictures. [Details ...](#new)
+* Notifications about newly uploaded (but still waiting for accept) pictures (this feature works only authorized users). [Details ...](#inbox)
+
+## Bot commands
+
+### Start: `/start`
+
+By sending this command you will receive list of currently supported commands.
+
+### <a name="new"></a> New pictures: `/new`
+
+Send `/new BMW` for subscribe to new photos of BMW.
+
+Send `/new BMW` again to unsubscribe.
+
+
+### <a name="inbox"></a> Inbox: `/inbox`
+
+Authorization by `/me` is requried.
+
+Send `/inbox BMW` for subscribe to notifications about new uploads to BMW.
+
+Send `/inbox BMW` again to unsubscribe.
+
+### Me (authorization): `/me`
+
+This command allows you to associate themselves (telegram user) with an account on our site.
+
+Send `/me` to receive instructions for autorization.
+
+Send `/me 123456789` to recevice confirmation code.
+
+Where 123456789 - is your account number, which you can find on your profile page. For example, [Juliano Scotini](/users/juliano-scotini) has number 17322
+
+Confirmation code will be sent to you via [the private messaging system](/account/pm/system)
+
+Send `/me 123456789 ХХХХХХХХХХХХХХХХ` to finish process of association your telegram account with out website user.
+
+Where `ХХХХХХХХХХХХХХХХ` - code that will be sent to you via [the private messaging system](/account/pm/system)',
 ];

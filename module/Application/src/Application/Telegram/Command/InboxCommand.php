@@ -29,7 +29,7 @@ class InboxCommand extends Command
 
         $chatTable = new TelegramChat();
 
-        $chatRow = $chatTable->fetchAll(
+        $chatRow = $chatTable->fetchRow(
             $chatTable->select(true)
                 ->where('chat_id = ?', $chatId)
                 ->join('users', 'telegram_chat.user_id = users.id', null)

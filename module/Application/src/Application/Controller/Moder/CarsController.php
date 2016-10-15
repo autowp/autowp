@@ -100,6 +100,11 @@ class CarsController extends AbstractActionController
      */
     private $brandVehicle;
 
+    /**
+     * @var Message
+     */
+    private $message;
+
     public function __construct(
         HostManager $hostManager,
         $textStorage,
@@ -110,7 +115,8 @@ class CarsController extends AbstractActionController
         Form $brandCarForm,
         Form $carParentForm,
         Form $filterForm,
-        BrandVehicle $brandVehicle)
+        BrandVehicle $brandVehicle,
+        Message $message)
     {
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
@@ -122,6 +128,7 @@ class CarsController extends AbstractActionController
         $this->carParentForm = $carParentForm;
         $this->filterForm = $filterForm;
         $this->brandVehicle = $brandVehicle;
+        $this->message = $message;
     }
 
     private function canMove(Vehicle\Row $car)
@@ -495,7 +502,6 @@ class CarsController extends AbstractActionController
                 if ($car->full_text_id) {
                     $userIds = $this->textStorage->getTextUserIds($car->full_text_id);
 
-                    $mModel = new Message();
                     $userTable = new User();
                     foreach ($userIds as $userId) {
                         if ($userId != $user->id) {
@@ -510,7 +516,7 @@ class CarsController extends AbstractActionController
                                     $this->carModerUrl($car, true, null, $uri)
                                 );
 
-                                $mModel->send(null, $userRow->id, $message);
+                                $this->message->send(null, $userRow->id, $message);
                             }
                         }
                     }
@@ -690,8 +696,6 @@ class CarsController extends AbstractActionController
                     );
                     $this->log($message, $car);
 
-                    $mModel = new Message();
-
                     $user = $this->user()->get();
                     foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                         if ($subscriber && ($subscriber->id != $user->id)) {
@@ -708,7 +712,7 @@ class CarsController extends AbstractActionController
                                 ( count($changes) ? implode("\n", $changes) : '')
                             );
 
-                            $mModel->send(null, $subscriber->id, $message);
+                            $this->message->send(null, $subscriber->id, $message);
                         }
                     }
 
@@ -752,7 +756,6 @@ class CarsController extends AbstractActionController
                     if ($car->text_id) {
                         $userIds = $this->textStorage->getTextUserIds($car->text_id);
 
-                        $mModel = new Message();
                         $userTable = new User();
                         foreach ($userIds as $userId) {
                             if ($userId != $user->id) {
@@ -767,7 +770,7 @@ class CarsController extends AbstractActionController
                                         $this->carModerUrl($car, true, null, $uri)
                                     );
 
-                                    $mModel->send(null, $userRow->id, $message);
+                                    $this->message->send(null, $userRow->id, $message);
                                 }
                             }
                         }
@@ -1539,8 +1542,6 @@ class CarsController extends AbstractActionController
             $this->log(htmlspecialchars($logText), $car);
         }
 
-        $mModel = new Message();
-
         $users = new User();
         foreach ($notify as $userId => $categories) {
             $notifyUser = $users->find($userId)->current();
@@ -1569,7 +1570,7 @@ class CarsController extends AbstractActionController
                     implode(', ', $categoryNames)
                 );
 
-                $mModel->send(null, $notifyUser->id, $message);
+                $this->message->send(null, $notifyUser->id, $message);
             }
         }
 

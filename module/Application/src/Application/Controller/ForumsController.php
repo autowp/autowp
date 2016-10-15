@@ -25,12 +25,23 @@ class ForumsController extends AbstractActionController
 
     private $translator;
 
-    public function __construct($newTopicForm, $commentForm, $transport, $translator)
+    /**
+     * @var Message
+     */
+    private $message;
+
+    public function __construct(
+        $newTopicForm,
+        $commentForm,
+        $transport,
+        $translator,
+        Message $message)
     {
         $this->newTopicForm = $newTopicForm;
         $this->commentForm = $commentForm;
         $this->transport = $transport;
         $this->translator = $translator;
+        $this->message = $message;
     }
 
     private function prepareThemeList(&$themes)
@@ -203,8 +214,7 @@ class ForumsController extends AbstractActionController
                                         $moderUrl, $messageUrl
                                     );
 
-                                    $mModel = new Message();
-                                    $mModel->send(null, $parentMessageAuthor->id, $message);
+                                    $this->message->send(null, $parentMessageAuthor->id, $message);
                                 }
                             }
                         }

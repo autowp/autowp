@@ -37,7 +37,8 @@ return [
                     $sm->get('DeleteUserForm'),
                     $sm->get(ExternalLoginServiceFactory::class),
                     $config['hosts'],
-                    $sm->get(Service\SpecificationsService::class)
+                    $sm->get(Service\SpecificationsService::class),
+                    $sm->get(Model\Message::class)
                 );
             },
             Controller\ArticlesController::class     => InvokableFactory::class,
@@ -50,7 +51,8 @@ return [
                 return new Controller\CarsController(
                     $sm->get(HostManager::class),
                     $sm->get('AttrsLogFilterForm'),
-                    $sm->get(Service\SpecificationsService::class)
+                    $sm->get(Service\SpecificationsService::class),
+                    $sm->get(Model\Message::class)
                 );
             },
             Controller\CatalogueController::class => function($sm) {
@@ -71,9 +73,11 @@ return [
                 );
             },
             Controller\CommentsController::class => function($sm) {
-                $hostManager = $sm->get(HostManager::class);
-                $commentForm = $sm->get('CommentForm');
-                return new Controller\CommentsController($hostManager, $commentForm);
+                return new Controller\CommentsController(
+                    $sm->get(HostManager::class),
+                    $sm->get('CommentForm'),
+                    $sm->get(Model\Message::class)
+                );
             },
             Controller\DonateController::class       => InvokableFactory::class,
             Controller\FactoriesController::class => function($sm) {
@@ -87,11 +91,13 @@ return [
                 return new Controller\FeedbackController($form, $transport, $options);
             },
             Controller\ForumsController::class => function($sm) {
-                $newTopicForm = $sm->get('ForumsTopicNewForm');
-                $commentForm = $sm->get('CommentForm');
-                $transport = $sm->get('MailTransport');
-                $translator = $sm->get('MvcTranslator');
-                return new Controller\ForumsController($newTopicForm, $commentForm, $transport, $translator);
+                return new Controller\ForumsController(
+                    $sm->get('ForumsTopicNewForm'),
+                    $sm->get('CommentForm'),
+                    $sm->get('MailTransport'),
+                    $sm->get('MvcTranslator'),
+                    $sm->get(Model\Message::class)
+                );
             },
             Controller\IndexController::class => function($sm) {
                 return new Controller\IndexController(
@@ -354,6 +360,11 @@ return [
     ],
     'service_manager' => [
         'factories' => [
+            Model\Message::class => function($sm) {
+                return new Model\Message(
+                    $sm->get(Service\TelegramService::class)
+                );
+            },
             Model\BrandVehicle::class => function($sm) {
                 $config = $sm->get('Config');
                 return new Model\BrandVehicle(array_keys($config['hosts']));
@@ -367,6 +378,7 @@ return [
             PictureNameFormatter::class => function($sm) {
                 return new PictureNameFormatter(
                     $sm->get('MvcTranslator'),
+                    $sm->get('ViewRenderer'),
                     $sm->get(VehicleNameFormatter::class)
                 );
             },
@@ -418,14 +430,17 @@ return [
             },
             MainMenu::class => function($sm) {
 
-                $router = $sm->get('HttpRouter');
-                $language = $sm->get(Language::class);
-                $cache = $sm->get('longCache');
                 $config = $sm->get('Config');
-                $translator = $sm->get('MvcTranslator');
-                $languagePicker = $sm->get(LanguagePicker::class);
 
-                return new MainMenu($router, $language, $cache, $config['hosts'], $translator, $languagePicker);
+                return new MainMenu(
+                    $sm->get('HttpRouter'),
+                    $sm->get(Language::class),
+                    $sm->get('longCache'),
+                    $config['hosts'],
+                    $sm->get('MvcTranslator'),
+                    $sm->get(LanguagePicker::class),
+                    $sm->get(Model\Message::class)
+                );
             },
             Language::class => function($sm) {
 

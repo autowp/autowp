@@ -30,12 +30,23 @@ class TwinsController extends AbstractActionController
      */
     private $hostManager;
 
-    public function __construct(HostManager $hostManager, $textStorage, Form $editForm, Form $descForm)
+    /**
+     * @var Message
+     */
+    private $message;
+
+    public function __construct(
+        HostManager $hostManager,
+        $textStorage,
+        Form $editForm,
+        Form $descForm,
+        Message $message)
     {
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->editForm = $editForm;
         $this->descForm = $descForm;
+        $this->message = $message;
     }
 
     /**
@@ -175,7 +186,6 @@ class TwinsController extends AbstractActionController
                 $userIds = $this->textStorage->getTextUserIds($group->text_id);
 
                 $userTable = new User();
-                $mModel = new Message();
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {
 
@@ -195,7 +205,7 @@ class TwinsController extends AbstractActionController
                                 $this->twinsGroupModerUrl($group, true, $uri)
                             );
 
-                            $mModel->send(null, $userRow->id, $message);
+                            $this->message->send(null, $userRow->id, $message);
                         }
                     }
                 }

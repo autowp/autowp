@@ -392,11 +392,13 @@ return [
         'factories' => [
             Controller\Moder\AttrsController::class => InvokableFactory::class,
             Controller\Moder\BrandsController::class => function($sm) {
-                $hostManager = $sm->get(HostManager::class);
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $logoForm = $sm->get('BrandLogoForm');
-                $descForm = $sm->get('DescriptionForm');
-                return new Controller\Moder\BrandsController($hostManager, $textStorage, $logoForm, $descForm);
+                return new Controller\Moder\BrandsController(
+                    $sm->get(HostManager::class),
+                    $sm->get(TextStorage\Service::class),
+                    $sm->get('BrandLogoForm'),
+                    $sm->get('DescriptionForm'),
+                    $sm->get(Model\Message::class)
+                );
             },
             Controller\Moder\CategoryController::class => function($sm) {
                 return new Controller\Moder\CategoryController();
@@ -417,7 +419,8 @@ return [
                     $sm->get('ModerBrandCar'),
                     $sm->get('ModerCarParent'),
                     $sm->get('ModerCarsFilter'),
-                    $sm->get(Model\BrandVehicle::class)
+                    $sm->get(Model\BrandVehicle::class),
+                    $sm->get(Model\Message::class)
                 );
             },
             Controller\Moder\CommentsController::class => function($sm) {
@@ -436,7 +439,8 @@ return [
                     $sm->get('ModerFactoryAddForm'),
                     $sm->get('ModerFactoryEditForm'),
                     $sm->get('DescriptionForm'),
-                    $sm->get('ModerFactoryFilterForm')
+                    $sm->get('ModerFactoryFilterForm'),
+                    $sm->get(Model\Message::class)
                 );
             },
             Controller\Moder\HotlinkController::class => InvokableFactory::class,
@@ -460,7 +464,8 @@ return [
                     $sm->get('ModerPictureVoteForm'),
                     $sm->get('BanForm'),
                     $sm->get(PictureNameFormatter::class),
-                    $sm->get(Service\TelegramService::class)
+                    $sm->get(Service\TelegramService::class),
+                    $sm->get(Model\Message::class)
                 );
             },
             Controller\Moder\RightsController::class => function($sm) {
@@ -473,11 +478,13 @@ return [
             },
             Controller\Moder\TrafficController::class => InvokableFactory::class,
             Controller\Moder\TwinsController::class => function($sm) {
-                $hostManager = $sm->get(HostManager::class);
-                $textStorage = $sm->get(TextStorage\Service::class);
-                $editForm = $sm->get('ModerTwinsEditForm');
-                $descForm = $sm->get('DescriptionForm');
-                return new Controller\Moder\TwinsController($hostManager, $textStorage, $editForm, $descForm);
+                return new Controller\Moder\TwinsController(
+                    $sm->get(HostManager::class),
+                    $sm->get(TextStorage\Service::class),
+                    $sm->get('ModerTwinsEditForm'),
+                    $sm->get('DescriptionForm'),
+                    $sm->get(Model\Message::class)
+                );
             },
             Controller\Moder\UsersController::class => InvokableFactory::class,
         ]

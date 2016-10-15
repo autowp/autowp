@@ -32,11 +32,20 @@ class CommentsController extends AbstractRestfulController
      */
     private $hostManager;
 
-    public function __construct(HostManager $hostManager, $form)
+    /**
+     * @var Message
+     */
+    private $message;
+
+    public function __construct(
+        HostManager $hostManager,
+        $form,
+        Message $message)
     {
         $this->hostManager = $hostManager;
         $this->form = $form;
         $this->comments = new Comments();
+        $this->message = $message;
     }
 
     private function canAddComments()
@@ -247,8 +256,7 @@ class CommentsController extends AbstractRestfulController
                             $this->translate('pm/user-%s-replies-to-you-%s', 'default', $parentMessageAuthor->language),
                             $moderUrl, $url
                         );
-                        $mModel = new Message();
-                        $mModel->send(null, $parentMessageAuthor->id, $message);
+                        $this->message->send(null, $parentMessageAuthor->id, $message);
                     }
                 }
             }

@@ -53,13 +53,19 @@ class FactoryController extends AbstractActionController
      */
     private $hostManager;
 
+    /**
+     * @var Message
+     */
+    private $message;
+
     public function __construct(
         HostManager $hostManager,
         $textStorage,
         Form $addForm,
         Form $editForm,
         Form $descForm,
-        Form $filterForm)
+        Form $filterForm,
+        Message $message)
     {
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
@@ -67,6 +73,7 @@ class FactoryController extends AbstractActionController
         $this->editForm = $editForm;
         $this->descForm = $descForm;
         $this->filterForm = $filterForm;
+        $this->message = $message;
     }
 
     /**
@@ -384,7 +391,6 @@ class FactoryController extends AbstractActionController
             if ($factory->text_id) {
                 $userIds = $this->textStorage->getTextUserIds($factory->text_id);
 
-                $mModel = new Message();
                 $userTable = new User();
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {
@@ -405,7 +411,7 @@ class FactoryController extends AbstractActionController
                                 $this->factoryModerUrl($factory->id, true, $uri)
                             );
 
-                            $mModel->send(null, $userRow->id, $message);
+                            $this->message->send(null, $userRow->id, $message);
                         }
                     }
                 }

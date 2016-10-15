@@ -85,6 +85,11 @@ class AccountController extends AbstractActionController
      */
     private $specsService = null;
 
+    /**
+     * @var Message
+     */
+    private $message;
+
     public function __construct(
         UsersService $service,
         $translator,
@@ -96,7 +101,8 @@ class AccountController extends AbstractActionController
         Form $deleteUserForm,
         ExternalLoginServiceFactory $externalLoginFactory,
         array $hosts,
-        SpecificationsService $specsService)
+        SpecificationsService $specsService,
+        Message $message)
     {
         $this->service = $service;
         $this->translator = $translator;
@@ -109,6 +115,7 @@ class AccountController extends AbstractActionController
         $this->externalLoginFactory = $externalLoginFactory;
         $this->hosts = $hosts;
         $this->specsService = $specsService;
+        $this->message = $message;
     }
 
     private function forwadToLogin()
@@ -120,8 +127,6 @@ class AccountController extends AbstractActionController
 
     public function sidebar()
     {
-        $mModel = new Message();
-
         $user = $this->user()->get();
 
         $pictures = $this->catalogue()->getPictureTable();
@@ -151,11 +156,11 @@ class AccountController extends AbstractActionController
         );
 
         return [
-            'smCount'    => $mModel->getSystemCount($user->id),
-            'newSmCount' => $mModel->getNewSystemCount($user->id),
-            'pmCount'    => $mModel->getInboxCount($user->id),
-            'newPmCount' => $mModel->getInboxNewCount($user->id),
-            'omCount'    => $mModel->getSentCount($user->id),
+            'smCount'    => $this->message->getSystemCount($user->id),
+            'newSmCount' => $this->message->getNewSystemCount($user->id),
+            'pmCount'    => $this->message->getInboxCount($user->id),
+            'newPmCount' => $this->message->getInboxNewCount($user->id),
+            'omCount'    => $this->message->getSentCount($user->id),
             'notTakenPicturesCount' => $notTakenPicturesCount,
             'subscribesCount'       => $subscribesCount,
             'picsCount'             => $picsCount
@@ -178,8 +183,7 @@ class AccountController extends AbstractActionController
 
         $message = $this->params()->fromPost('message');
 
-        $mModel = new Message();
-        $mModel->send($currentUser->id, $user->id, $message);
+        $this->message->send($currentUser->id, $user->id, $message);
 
         return new JsonModel([
             'ok'      => true,
@@ -195,8 +199,7 @@ class AccountController extends AbstractActionController
 
         $user = $this->user()->get();
 
-        $mModel = new Message();
-        $mModel->delete($user->id, $this->params()->fromPost('id'));
+        $this->message->delete($user->id, $this->params()->fromPost('id'));
 
         return new JsonModel([
             'ok' => true
@@ -588,8 +591,7 @@ class AccountController extends AbstractActionController
 
         $user = $this->user()->get();
 
-        $mModel = new Message();
-        $inbox = $mModel->getInbox($user->id, $this->params('page'));
+        $inbox = $this->message->getInbox($user->id, $this->params('page'));
 
         return [
             'paginator' => $inbox['paginator'],
@@ -606,8 +608,7 @@ class AccountController extends AbstractActionController
 
         $user = $this->user()->get();
 
-        $mModel = new Message();
-        $sentbox = $mModel->getSentbox($user->id, $this->params('page'));
+        $sentbox = $this->message->getSentbox($user->id, $this->params('page'));
 
         return [
             'paginator' => $sentbox['paginator'],
@@ -624,8 +625,7 @@ class AccountController extends AbstractActionController
 
         $user = $this->user()->get();
 
-        $mModel = new Message();
-        $systembox = $mModel->getSystembox($user->id, $this->params('page'));
+        $systembox = $this->message->getSystembox($user->id, $this->params('page'));
 
         return [
             'paginator' => $systembox['paginator'],
@@ -649,8 +649,7 @@ class AccountController extends AbstractActionController
 
         $logedInUser = $this->user()->get();
 
-        $mModel = new Message();
-        $dialogbox = $mModel->getDialogbox($logedInUser->id, $user->id, $this->params('page'));
+        $dialogbox = $this->message->getDialogbox($logedInUser->id, $user->id, $this->params('page'));
 
         return [
             'paginator' => $dialogbox['paginator'],
@@ -702,8 +701,7 @@ class AccountController extends AbstractActionController
             return $this->forwadToLogin();
         }
 
-        $mModel = new Message();
-        $mModel->deleteAllSystem($this->user()->get()->id);
+        $this->message->deleteAllSystem($this->user()->get()->id);
 
         return $this->redirect()->toRoute('account/personal-messages/system');
     }
@@ -714,8 +712,7 @@ class AccountController extends AbstractActionController
             return $this->forwadToLogin();
         }
 
-        $mModel = new Message();
-        $mModel->deleteAllSent($this->user()->get()->id);
+        $this->message->deleteAllSent($this->user()->get()->id);
 
         return $this->redirect()->toRoute('account/personal-messages/sent');
     }

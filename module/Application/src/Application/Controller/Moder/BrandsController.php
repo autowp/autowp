@@ -32,12 +32,23 @@ class BrandsController extends AbstractActionController
      */
     private $hostManager;
 
-    public function __construct(HostManager $hostManager, $textStorage, Form $logoForm, Form $descForm)
+    /**
+     * @var Message
+     */
+    private $message;
+
+    public function __construct(
+        HostManager $hostManager,
+        $textStorage,
+        Form $logoForm,
+        Form $descForm,
+        Message $message)
     {
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->logoForm = $logoForm;
         $this->descForm = $descForm;
+        $this->message = $message;
     }
 
     private function getLanguages()
@@ -347,7 +358,6 @@ class BrandsController extends AbstractActionController
             if ($brand->text_id) {
                 $userIds = $textStorage->getTextUserIds($brand->text_id);
 
-                $mModel = new Message();
                 $userTable = new User();
 
                 foreach ($userTable->find($userIds) as $userRow) {
@@ -369,7 +379,7 @@ class BrandsController extends AbstractActionController
                             $this->brandModerUrl($brand, true, $uri)
                         );
 
-                        $mModel->send(null, $userRow->id, $message);
+                        $this->message->send(null, $userRow->id, $message);
                     }
                 }
             }

@@ -59,7 +59,19 @@ class MainMenu
      */
     private $languagePicker;
 
-    public function __construct(TreeRouteStack $router, Language $language, StorageInterface $cache, $hosts, $translator, LanguagePicker $languagePicker)
+    /**
+     * @var Message
+     */
+    private $message;
+
+    public function __construct(
+        TreeRouteStack $router,
+        Language $language,
+        StorageInterface $cache,
+        $hosts,
+        $translator,
+        LanguagePicker $languagePicker,
+        Message $message)
     {
         $this->router = $router;
         $this->language = $language;
@@ -70,6 +82,7 @@ class MainMenu
 
         $this->translator = $translator;
         $this->languagePicker = $languagePicker;
+        $this->message = $message;
     }
 
     /**
@@ -219,8 +232,7 @@ class MainMenu
     {
         $newMessages = 0;
         if ($user) {
-            $mModel = new Message();
-            $newMessages = $mModel->getNewCount($user->id);
+            $newMessages = $this->message->getNewCount($user->id);
         }
 
         $language = $this->language->getLanguage();

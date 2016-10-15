@@ -5,6 +5,7 @@ namespace Application\Model;
 use Application\Db\Table;
 use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Application\Service\TelegramService;
 
 use Zend\Paginator\Paginator;
 
@@ -19,12 +20,18 @@ class Message
 
     const MESSAGES_PER_PAGE = 20;
 
-    public function __construct()
+    /**
+     * @var TelegramService
+     */
+    private $telegram;
+
+    public function __construct(TelegramService $telegram)
     {
         $this->table = new Table([
             'name'    => 'personal_messages',
             'primary' => 'id'
         ]);
+        $this->telegram = $telegram;
     }
 
     public function send($fromId = null, $toId, $message)
@@ -33,11 +40,11 @@ class Message
         $msgLength = mb_strlen($message);
 
         if ($msgLength <= 0) {
-            throw new \Exception('Сообщение пустое');
+            throw new \Exception('Message is empty');
         }
 
         if ($msgLength > 2000) {
-            throw new \Exception('Сообщение слишком длинное');
+            throw new \Exception('Message is too long');
         }
 
         $this->table->insert([
@@ -47,6 +54,10 @@ class Message
             'add_datetime' => new Zend_Db_Expr('NOW()'),
             'readen'       => 0
         ]);
+
+        if ($this->telegram) {
+            $this->telegram->notifyMessage($fromId, $toId, $message);
+        }
     }
 
     public function getNewCount($userId)
