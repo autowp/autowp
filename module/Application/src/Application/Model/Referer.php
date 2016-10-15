@@ -10,6 +10,8 @@ class Referer extends Table
     protected $_name = 'referer';
     protected $_primary = ['url'];
 
+    const MAX_URL = 1000;
+
     public function addUrl($url, $accept)
     {
         $host = @parse_url($url, PHP_URL_HOST);
@@ -18,6 +20,10 @@ class Referer extends Table
         $whitelisted = $whitelist->containsHost($host);
 
         if (!$whitelisted) {
+
+            if (mb_strlen($url) > self::MAX_URL) {
+                $url = mb_substr($url, 0, self::MAX_URL);
+            }
 
             $this->getAdapter()->query('
                 insert into referer (host, url, count, last_date, accept)

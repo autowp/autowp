@@ -40,6 +40,7 @@ class StartCommand extends Command
 
         // Reply with the commands list
         $this->replyWithMessage([
+            'disable_web_page_preview' => true,
             'text' => $response
         ]);
 

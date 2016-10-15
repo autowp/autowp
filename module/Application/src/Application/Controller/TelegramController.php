@@ -35,4 +35,9 @@ class TelegramController extends AbstractActionController
             'status' => true
         ]);
     }
+
+    public function indexAction()
+    {
+
+    }
 }

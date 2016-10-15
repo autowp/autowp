@@ -53,7 +53,7 @@ class PictureFileController extends AbstractActionController
             $blacklistRow = $blacklist->fetchRowByUrl($referer);
             if ($blacklistRow && $blacklistRow->hard) {
                 return $this->getResponse()
-                    ->setStatusCode(509)
+                    ->setStatusCode(429)
                     ->getHeaders()
                     ->addHeaders([
                         'Content-Type' => 'image/gif',
@@ -65,7 +65,7 @@ class PictureFileController extends AbstractActionController
 
             $refererTable = new Referer();
             if ($accept && $refererTable->isImageRequest($accept) && $blacklistRow) {
-                return $this->getResponse()->setStatusCode(509);
+                return $this->getResponse()->setStatusCode(429);
             }
 
             $refererTable->addUrl($referer, $accept);

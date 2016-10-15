@@ -139,7 +139,7 @@ return [
                 $transport = $sm->get('MailTransport');
                 return new Controller\RestorePasswordController($service, $restoreForm, $newPasswordForm, $transport);
             },
-            Controller\RulesController::class        => InvokableFactory::class,
+            Controller\DocController::class => InvokableFactory::class,
             Controller\TelegramController::class => function($sm) {
                 $service = $sm->get(Service\TelegramService::class);
                 return new Controller\TelegramController($service);
@@ -402,8 +402,11 @@ return [
             },
             Service\TelegramService::class => function($sm) {
                 $config = $sm->get('Config');
-                $router  = $sm->get('HttpRouter');
-                return new Service\TelegramService($config['telegram'], $router);
+                return new Service\TelegramService(
+                    $config['telegram'],
+                    $sm->get('HttpRouter'),
+                    $sm->get(HostManager::class)
+                );
             },
             'translator' => \Zend\Mvc\I18n\TranslatorFactory::class,
             LanguagePicker::class => function($sm) {

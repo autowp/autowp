@@ -27,6 +27,7 @@ use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
+use Application\Service\TelegramService;
 use Application\Service\TrafficControl;
 
 use Exception;
@@ -81,6 +82,11 @@ class PicturesController extends AbstractActionController
     private $pictureNameFormatter;
 
     /**
+     * @var TelegramService
+     */
+    private $telegram;
+
+    /**
      * @return Engine
      */
     private function getEngineTable()
@@ -106,7 +112,8 @@ class PicturesController extends AbstractActionController
         Form $copyrightsForm,
         Form $voteForm,
         Form $banForm,
-        PictureNameFormatter $pictureNameFormatter)
+        PictureNameFormatter $pictureNameFormatter,
+        TelegramService $telegram)
     {
         $this->hostManager = $hostManager;
         $this->table = $table;
@@ -116,6 +123,7 @@ class PicturesController extends AbstractActionController
         $this->voteForm = $voteForm;
         $this->banForm = $banForm;
         $this->pictureNameFormatter = $pictureNameFormatter;
+        $this->telegram = $telegram;
     }
 
     public function ownerTypeaheadAction()
@@ -1904,6 +1912,8 @@ class PicturesController extends AbstractActionController
                     $mModel = new Message();
                     $mModel->send(null, $owner->id, $message);
                 }
+
+                $this->telegram->notifyPicture($picture->id);
             }
 
             if ($previousStatusUserId != $user->id) {

@@ -164,7 +164,7 @@ class CarsController extends AbstractActionController
             }
         }
 
-        $this->filterForm->setData($this->params()->fromRoute());
+        $this->filterForm->setData(array_replace(['order' => '1'], $this->params()->fromRoute()));
 
         $cars = $this->catalogue()->getCarTable();
 
@@ -230,11 +230,12 @@ class CarsController extends AbstractActionController
             }
 
             switch ($values['order']) {
-                case 0:
+                case '0':
                     $select->order('id asc');
                     break;
 
-                case 1:
+                default:
+                case '1':
                     $select->order('id desc');
                     break;
             }

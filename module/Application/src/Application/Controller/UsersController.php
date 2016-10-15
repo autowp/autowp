@@ -117,9 +117,11 @@ class UsersController extends AbstractActionController
 
         if ($canBan && $user->last_ip !== null) {
             $service = new TrafficControl();
-            $ban = $service->getBanInfo(inet_ntop($user->last_ip));
-            if ($ban) {
-                $ban['user'] = $users->find($ban['user_id'])->current();
+            if ($user->last_ip) {
+                $ban = $service->getBanInfo(inet_ntop($user->last_ip));
+                if ($ban) {
+                    $ban['user'] = $users->find($ban['user_id'])->current();
+                }
             }
         }
 

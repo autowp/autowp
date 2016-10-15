@@ -18,6 +18,7 @@ return [
         'Zend\Validator',
         'Zend\Mvc\Console',
         'Zend\Session',
+        'Zend\Log',
         'Application',
         //'ZF\ContentNegotiation',
         //'ZF\OAuth2',

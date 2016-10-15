@@ -60,6 +60,9 @@
             <?=$this->escapeHtml($this->translate('users/user/last-visited'))?>:
             <strong><?=$this->escapeHtml($this->user()->humanTime($this->currentUser->getDateTime('last_online')))?></strong>
         </p>
+
+        <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->currentUser->id))?></p>
+
         <?php if ($this->user()->logedIn()) { ?>
             <p>
                 <i class="fa fa-reply"></i>

@@ -6,7 +6,7 @@ use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
 use Application\Filter\SingleSpaces;
-use Application\Model\DbTable\Page;
+use Application\Model\DbTable\Page as PageTable;
 
 class Page extends Form implements InputFilterProviderInterface
 {
@@ -144,7 +144,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => Page::MAX_NAME
+                            'max' => PageTable::MAX_NAME
                         ]
                     ]
                 ]
@@ -159,7 +159,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => Page::MAX_TITLE
+                            'max' => PageTable::MAX_TITLE
                         ]
                     ]
                 ]
@@ -174,7 +174,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => Page::MAX_BREADCRUMBS
+                            'max' => PageTable::MAX_BREADCRUMBS
                         ]
                     ]
                 ]
@@ -189,7 +189,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => Page::MAX_URL
+                            'max' => PageTable::MAX_URL
                         ]
                     ]
                 ]
@@ -213,7 +213,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => Page::MAX_CLASS
+                            'max' => PageTable::MAX_CLASS
                         ]
                     ]
                 ]

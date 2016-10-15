@@ -459,7 +459,8 @@ return [
                     $sm->get('ModerPictureCopyrightsForm'),
                     $sm->get('ModerPictureVoteForm'),
                     $sm->get('BanForm'),
-                    $sm->get(PictureNameFormatter::class)
+                    $sm->get(PictureNameFormatter::class),
+                    $sm->get(Service\TelegramService::class)
                 );
             },
             Controller\Moder\RightsController::class => function($sm) {

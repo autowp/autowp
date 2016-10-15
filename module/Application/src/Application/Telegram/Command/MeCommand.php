@@ -5,6 +5,7 @@ namespace Application\Telegram\Command;
 use Telegram\Bot\Commands\Command;
 
 use Application\Model\DbTable\User;
+use Application\Model\Message;
 
 class MeCommand extends Command
 {
@@ -23,7 +24,7 @@ class MeCommand extends Command
      */
     public function handle($arguments)
     {
-        $args = split('[[:space:]]', trim($arguments));
+        $args = preg_split('|[[:space:]]+|', trim($arguments));
         if ($args[0] == '') {
             $args = [];
         }
@@ -83,10 +84,13 @@ class MeCommand extends Command
                     $telegramChatRow->save();
 
                     $command = '/me ' . $userRow->id . ' ' . $token;
-                    $userRow->sendPersonalMessage(null, "To complete identifications type `$command` to @autowp_bot");
+                    $message = "To complete identifications type `$command` to @autowp_bot";
+
+                    $mModel = new Message();
+                    $mModel->send(null, $userRow->id, $message);
 
                     $this->replyWithMessage([
-                        'text' => 'Check you personal messages / system notifications'
+                        'text' => 'Check your personal messages / system notifications'
                     ]);
 
                 } else {

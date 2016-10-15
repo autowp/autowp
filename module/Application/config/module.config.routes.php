@@ -951,7 +951,17 @@ return [
                 'options' => [
                     'route'    => '/rules',
                     'defaults' => [
-                        'controller' => Controller\RulesController::class,
+                        'controller' => Controller\DocController::class,
+                        'action'     => 'rules',
+                    ],
+                ],
+            ],
+            'telegram' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/telegram',
+                    'defaults' => [
+                        'controller' => Controller\TelegramController::class,
                         'action'     => 'index',
                     ],
                 ],

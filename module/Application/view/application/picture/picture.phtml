@@ -3,7 +3,8 @@
         $this->headMeta()
             ->appendName('photo',                              'twitter:card'  )
             ->appendName($this->pic()->textTitle($this->name), 'twitter:title' )
-            ->appendName($this->previewUrl,  'twitter:image' );
+            ->appendName('twitter:image', $this->previewUrl)
+            ->appendName('og:image', $this->previewUrl);
             /*->headMeta('twitter:image:width',  $image->width() )
             ->headMeta('twitter:image:height', $image->height());*/
     }

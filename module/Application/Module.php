@@ -8,6 +8,7 @@ use Zend\EventManager\EventInterface as Event;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleBannerProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
+use Zend\Mvc\MvcEvent;
 use Zend\Session\ManagerInterface;
 
 use Application\Auth\Adapter\Remember as RememberAuthAdapter;
@@ -94,6 +95,7 @@ class Module implements ConsoleUsageProviderInterface,
             __DIR__ . '/config/module.config.imagestorage.php',
             __DIR__ . '/config/module.config.routes.php',
             __DIR__ . '/config/module.config.moder.php',
+            __DIR__ . '/config/module.config.log.php',
         ];
 
         // Merge all module config options
@@ -122,7 +124,15 @@ class Module implements ConsoleUsageProviderInterface,
         defined('MYSQL_TIMEZONE') || define('MYSQL_TIMEZONE', 'UTC');
         defined('MYSQL_DATETIME_FORMAT') || define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
 
-        $serviceManager = $e->getApplication()->getServiceManager();
+        $application = $e->getApplication();
+        $serviceManager = $application->getServiceManager();
+        $eventManager = $application->getEventManager();
+
+        //handle the dispatch error (exception)
+        $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'handleError']);
+        //handle the view render error (exception)
+        $eventManager->attach(MvcEvent::EVENT_RENDER_ERROR, [$this, 'handleError']);
+
 
         $cacheManager = $serviceManager->get(Zend_Cache_Manager::class);
         $metadataCache = $cacheManager->getCache('fast');
@@ -138,10 +148,18 @@ class Module implements ConsoleUsageProviderInterface,
         error_reporting(E_ALL);
         ini_set('display_errors', true);
 
-        $eventManager = $e->getApplication()->getEventManager();
-        $eventManager->attach( \Zend\Mvc\MvcEvent::EVENT_DISPATCH, [$this, 'preDispatch'], 100 );
+        $eventManager->attach(MvcEvent::EVENT_DISPATCH, [$this, 'preDispatch'], 100 );
 
         \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
+    }
+
+    public function handleError(MvcEvent $e)
+    {
+        $exception = $e->getParam('exception');
+        if ($exception) {
+            $sm = $e->getApplication()->getServiceManager();
+            $sm->get('ErrorLog')->crit($exception);
+        }
     }
 
     public function getHostCookieDomain($serviceManager)

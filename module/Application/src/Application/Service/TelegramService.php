@@ -2,10 +2,13 @@
 
 namespace Application\Service;
 
+use Application\HostManager;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Telegram\Brand as TelegramBrand;
+use Application\Model\DbTable\User;
 use Application\Telegram\Command\InboxCommand;
 use Application\Telegram\Command\MeCommand;
+use Application\Telegram\Command\NewCommand;
 use Application\Telegram\Command\StartCommand;
 
 use Telegram\Bot\Api;
@@ -25,13 +28,19 @@ class TelegramService
      */
     private $router;
 
-    public function __construct(array $options = [], TreeRouteStack $router)
+    /**
+     * @var HostManager
+     */
+    private $hostManager;
+
+    public function __construct(array $options = [], TreeRouteStack $router, HostManager $hostManager)
     {
         $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
         $this->webhook = isset($options['webhook']) ? $options['webhook'] : null;
         $this->token = isset($options['token']) ? $options['token'] : null;
 
         $this->router = $router;
+        $this->hostManager = $hostManager;
     }
 
     /**
@@ -44,6 +53,7 @@ class TelegramService
         $api->addCommands([
             StartCommand::class,
             MeCommand::class,
+            NewCommand::class,
             InboxCommand::class,
         ]);
 
@@ -87,7 +97,86 @@ class TelegramService
             return;
         }
 
-        $db = $pictureTable->getAdapter();
+        $brandIds = $this->getPictureBrandIds($picture);
+
+        if (count($brandIds)) {
+            $telegramBrandTable = new TelegramBrand();
+
+            $db = $telegramBrandTable->getAdapter();
+
+            $rows = $db->fetchAll(
+                $db->select()
+                    ->from($telegramBrandTable->info('name'), ['chat_id'])
+                    ->where('telegram_brand.brand_id in (?)', $brandIds)
+                    ->where('telegram_brand.inbox')
+                    ->join('telegram_chat', 'telegram_brand.chat_id = telegram_chat.chat_id', null)
+                    ->join('users', 'telegram_chat.user_id = users.id', null)
+                    ->where('users.id <> ?', (int)$picture->owner_id)
+                    ->where('not users.deleted')
+            );
+
+            foreach ($rows as $row) {
+
+                $url = $this->getPictureUrl($row['chat_id'], $picture);
+
+                $this->sendMessage([
+                    'text'    => $url,
+                    'chat_id' => $row['chat_id']
+                ]);
+            }
+        }
+    }
+
+    public function notifyPicture($pictureId)
+    {
+        $pictureTable = new Picture();
+
+        $picture = $pictureTable->find($pictureId)->current();
+        if (!$picture) {
+            return;
+        }
+
+        $brandIds = $this->getPictureBrandIds($picture);
+
+        if (count($brandIds)) {
+            $telegramBrandTable = new TelegramBrand();
+
+            $db = $telegramBrandTable->getAdapter();
+
+            $authorChatId = $db->fetchOne(
+                $db->select()
+                    ->from('telegram_chat', 'chat_id')
+                    ->where('user_id = ?', (int)$picture->owner_id)
+            );
+
+            $select = $db->select()
+                ->distinct()
+                ->from('telegram_brand', ['chat_id'])
+                ->where('telegram_brand.brand_id in (?)', $brandIds)
+                ->where('telegram_brand.new');
+
+            if ($authorChatId) {
+                $select->where('telegram_brand.chat_id <> ?', $authorChatId);
+            }
+
+            $rows = $db->fetchAll($select);
+
+            foreach ($rows as $row) {
+                $url = $this->getPictureUrl($row['chat_id'], $picture);
+
+                $this->sendMessage([
+                    'text'    => $url,
+                    'chat_id' => $row['chat_id']
+                ]);
+            }
+        }
+    }
+
+    private function getPictureBrandIds($picture)
+    {
+        $db = $picture->getTable()->getAdapter();
+
+        $brandIds = [];
 
         switch ($picture->type) {
             case Picture::VEHICLE_TYPE_ID:
@@ -112,39 +201,31 @@ class TelegramService
                 break;
         }
 
-        if (count($brandIds)) {
-            $telegramBrandTable = new TelegramBrand();
+        return $brandIds;
+    }
 
-            $filter = [
-                'brand_id in (?)' => $brandIds
-            ];
+    private function getPictureUrl($chatId, $picture)
+    {
+        $userTable = new User();
 
-            $authorChatId = $db->fetchOne(
-                $db->select()
-                    ->from('telegram_chat', 'chat_id')
-                    ->where('user_id = ?', (int)$picture->owner_id)
-            );
+        $userRow = $userTable->fetchRow(
+            $userTable->select(true)
+                ->join('telegram_chat', 'users.id = telegram_chat.user_id', null)
+                ->where('telegram_chat.chat_id = ?', $chatId)
+        );
 
-            if ($authorChatId) {
-                $filter['chat_id <> ?'] = $authorChatId;
-            }
-
-            $rows = $telegramBrandTable->fetchAll($filter);
-
-            foreach ($rows as $row) {
-                $url = $this->router->assemble([
-                    'picture_id' => $picture->identity ? $picture->identity : $picture->id,
-                ], [
-                    'name'            => 'picture/picture',
-                    'force_canonical' => true,
-                    'uri'             => \Zend\Uri\UriFactory::factory('http://wheelsage.org')
-                ]);
-
-                $this->sendMessage([
-                    'text'    => $url,
-                    'chat_id' => $row['chat_id']
-                ]);
-            }
+        if ($userRow && $userRow->language) {
+            $uri = $this->hostManager->getUriByLanguage($userRow->language);
+        } else {
+            $uri = \Zend\Uri\UriFactory::factory('http://wheelsage.org');
         }
+
+        return $this->router->assemble([
+            'picture_id' => $picture->identity ? $picture->identity : $picture->id,
+        ], [
+            'name'            => 'picture/picture',
+            'force_canonical' => true,
+            'uri'             => $uri
+        ]);
     }
 }
