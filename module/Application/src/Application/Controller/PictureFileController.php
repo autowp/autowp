@@ -20,6 +20,8 @@ class PictureFileController extends AbstractActionController
             $sourceUrl = $this->url()->fromRoute('picture-file', [
                 'hostname' => 'i.wheelsage.org',
                 'file'     => $file
+            ], [
+                'force_canonical' => true
             ]);
 
             return $this->redirect()->toUrl($sourceUrl);

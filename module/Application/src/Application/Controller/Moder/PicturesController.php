@@ -307,7 +307,11 @@ class PicturesController extends AbstractActionController
         }
 
         if (strlen($formdata['type_id'])) {
-            $select->where('pictures.type = ?', $formdata['type_id']);
+            if ($formdata['type_id'] == 'unsorted+mixed+logo') {
+                $select->where('pictures.type IN (?)', [Picture::MIXED_TYPE_ID, Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID]);
+            } else {
+                $select->where('pictures.type = ?', $formdata['type_id']);
+            }
         }
 
         if ($formdata['brand_id']) {

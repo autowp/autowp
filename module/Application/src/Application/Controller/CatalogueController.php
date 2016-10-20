@@ -664,6 +664,43 @@ class CatalogueController extends AbstractActionController
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
             ]);
+            
+            $inboxBrandPictures = null;
+            $inboxVehiclePictures = null;
+            $inboxEnginePictures = null;
+            
+            if ($this->user()->isAllowed('picture', 'move')) {
+                
+                $pictureTable = new Picture();
+                $db = $pictureTable->getAdapter();
+                
+                $inboxBrandPictures = $db->fetchOne(
+                    $db->select()
+                        ->from('pictures', 'count(1)')
+                        ->where('pictures.type in (?)', [Picture::MIXED_TYPE_ID, Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID])
+                        ->where('pictures.status = ?', Picture::STATUS_INBOX)
+                        ->where('pictures.brand_id = ?', $brand['id'])
+                );
+                $inboxVehiclePictures = $db->fetchOne(
+                    $db->select()
+                        ->from('pictures', 'count(distinct pictures.id)')
+                        ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
+                        ->where('pictures.status = ?', Picture::STATUS_INBOX)
+                        ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                        ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                        ->where('brands_cars.brand_id = ?', $brand['id'])
+                );
+                $inboxEnginePictures = $db->fetchOne(
+                    $db->select()
+                        ->from('pictures', 'count(distinct pictures.id)')
+                        ->where('pictures.type = ?', Picture::ENGINE_TYPE_ID)
+                        ->where('pictures.status = ?', Picture::STATUS_INBOX)
+                        ->join('engine_parent_cache', 'pictures.engine_id = engine_parent_cache.engine_id', null)
+                        ->join('engines', 'engine_parent_cache.parent_id = engines.id', null)
+                        ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
+                        ->where('brand_engine.brand_id = ?', $brand['id'])
+                );
+            }
 
             return [
                 'topPictures' => $topPictures,
@@ -671,7 +708,10 @@ class CatalogueController extends AbstractActionController
                 'haveTwins'   => $haveTwins,
                 'mostsActive' => $this->mostsActive($brand['id']),
                 'description' => $description,
-                'factories'   => $this->getBrandFactories($brand['id'])
+                'factories'   => $this->getBrandFactories($brand['id']),
+                'inboxBrandPictures'   => $inboxBrandPictures,
+                'inboxVehiclePictures' => $inboxVehiclePictures,
+                'inboxEnginePictures'  => $inboxEnginePictures,
             ];
         });
     }

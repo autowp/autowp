@@ -692,7 +692,7 @@ class CarsController extends AbstractActionController
                     $message = sprintf(
                         'Редактирование мета-информации автомобиля %s',
                         htmlspecialchars($car->getFullName('en')).
-                        ( count($changes) ? '<p>'.implode('<br />', $htmlChanges).'</p>' : '')
+                        ( count($htmlChanges) ? '<p>'.implode('<br />', $htmlChanges).'</p>' : '')
                     );
                     $this->log($message, $car);
 

@@ -83,7 +83,7 @@ class PictureFile implements RouteInterface
             $options['uri']->setHost($data['hostname']);
         }
 
-        return implode(self::URI_DELIMITER, $encoded);
+        return self::URI_DELIMITER . implode(self::URI_DELIMITER, $encoded);
     }
 
     /**

@@ -74,7 +74,8 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'type'    => 'Select',
                 'options' => [
                     'label'   => 'moder/pictures/filter/brand',
-                    'options' => $this->brandOptions
+                    'options' => $this->brandOptions,
+                    'disable_inarray_validator' => true
                 ]
             ],
             [
@@ -96,7 +97,8 @@ class Inbox extends Form implements InputFilterProviderInterface
                         Picture::MIXED_TYPE_ID    => 'moder/pictures/filter/type/mixed',
                         Picture::UNSORTED_TYPE_ID => 'moder/pictures/filter/type/unsorted',
                         Picture::ENGINE_TYPE_ID   => 'moder/pictures/filter/type/engine',
-                        Picture::FACTORY_TYPE_ID  => 'moder/pictures/filter/type/factory'
+                        Picture::FACTORY_TYPE_ID  => 'moder/pictures/filter/type/factory',
+                        'unsorted+mixed+logo'     => 'moder/pictures/filter/type/unsorted+mixed+logo',
                     ]
                 ]
             ],

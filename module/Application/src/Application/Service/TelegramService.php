@@ -257,7 +257,8 @@ class TelegramService
         $chatTable = new TelegramChat();
 
         $chatRows = $chatTable->fetchAll([
-            'user_id = ?' => (int)$userId
+            'user_id = ?' => (int)$userId,
+            'messages'
         ]);
 
         foreach ($chatRows as $chatRow) {
