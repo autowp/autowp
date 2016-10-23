@@ -161,7 +161,7 @@
         <?php if ($this->canViewIp) { ?>
             <h2><?=$this->escapeHtml($this->translate('users/for-moderators'))?></h2>
             <div class="well">
-                <?php if ($this->canRemovePhoto && $this->currentUser->photo) { ?>
+                <?php if ($this->canRemovePhoto && $this->currentUser->img) { ?>
                     <form action="<?=$this->escapeHtmlAttr($this->url('moder/users/params', [
                         'action' => 'remove-user-photo',
                         'id'     => $this->currentUser->id

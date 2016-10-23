@@ -259,8 +259,8 @@ class CategoryController extends AbstractActionController
         $carParentTable = new VehicleParent();
 
         $carId = $this->params('car_id');
-        $topCar = false;
-        $currentCar = false;
+        $topCar = null;
+        $currentCar = null;
         if ($carId) {
             $topCar = $carTable->fetchRow(
                 $carTable->select(true)

@@ -18,6 +18,7 @@ var gulp = require("gulp")
   , packageJSON = require("./package")
   , favicons = require("gulp-favicons")
   , gutil = require("gulp-util")
+  , rev = require('gulp-rev');
 ;
 
 gulp.task("build.css", ["copy.jcrop", 'copy.flags'], function () {
@@ -43,7 +44,13 @@ gulp.task("build.css", ["copy.jcrop", 'copy.flags'], function () {
         .pipe(gulpif(!argv.fast, cleanCSS({
             keepSpecialComments: 1
         })))
-        .pipe(gulp.dest('./public_html/css'))
+        .pipe(gulp.dest('./public_html/css'));
+});
+
+gulp.task('build.css.gz', ['build.css', 'rev'], function() {
+    return gulp.src([
+            './public_html/css/*.css'
+        ])
         .pipe(gulpif(!argv.fast, gzip({
             append: true,
             gzipOptions: { level: 9 } 
@@ -57,7 +64,7 @@ gulp.task('build.js', shell.task([
 
 gulp.task('build.js.gz', ['build.js'], function () {
     return gulp.src([
-        './public_html/js/**/*'
+        './public_html/js/**/*.js'
     ])
         .pipe(gulpif(!argv.fast, gzip({
             append: true,
@@ -70,6 +77,16 @@ gulp.task("build.js.fast", shell.task([
     'r.js -o ./public_source/build.js preserveLicenseComments=false optimize=none'
     //generateSourceMaps=1
 ]));
+
+gulp.task('rev', ['build.css'], function() {
+    return gulp.src([
+        './public_html/css/styles.css'
+    ], {base: 'public_html/css'})
+        .pipe(rev())
+        .pipe(gulp.dest('./public_html/css'))
+        .pipe(rev.manifest())
+        .pipe(gulp.dest('./public_html'));
+})
 
 gulp.task("copy.fonts", function () {
     return gulp.src([
@@ -174,4 +191,4 @@ gulp.task('favicon', ['favicon-1', 'favicon-2'], function () {
       .pipe('./public_html/img/');
   });*/
 
-gulp.task("build", ['build.css', 'build.js.gz', 'copy.fonts']);
+gulp.task("build", ['build.css.gz', 'build.js.gz', 'copy.fonts']);

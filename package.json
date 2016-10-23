@@ -56,6 +56,7 @@
     "gulp-imagemin": "^3.0.3",
     "gulp-jshint": ">=2.0.0",
     "gulp-less": ">=3.0.5",
+    "gulp-rev": "^7.1.2",
     "gulp-shell": ">=0.5.2",
     "gulp-uglify": ">=2.0.0",
     "gulp-util": "^3.0.7",

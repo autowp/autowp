@@ -300,10 +300,10 @@ class LoginController extends AbstractActionController
                         if (!$imagick->readImageBlob($photo)) {
                             throw new Exception("Error loading image");
                         }
-                        $format = $imageStorage->getFormat('photo');
+                        $format = $this->imageStorage()->getFormat('photo');
                         $imageSampler->convertImagick($imagick, $format);
 
-                        $newImageId = $imageStorage->addImageFromImagick($imagick, 'user');
+                        $newImageId = $this->imageStorage()->addImageFromImagick($imagick, 'user');
 
                         $imagick->clear();
 
@@ -311,7 +311,7 @@ class LoginController extends AbstractActionController
                         $uRow->img = $newImageId;
                         $uRow->save();
                         if ($oldImageId) {
-                            $imageStorage->removeImage($oldImageId);
+                            $this->imageStorage()->removeImage($oldImageId);
                         }
                     }
                 }

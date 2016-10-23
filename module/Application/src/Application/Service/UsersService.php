@@ -18,6 +18,8 @@ use Exception;
 
 use Zend_Db_Expr;
 
+use Autowp\Image;
+
 class UsersService
 {
     /**
@@ -45,6 +47,11 @@ class UsersService
      * @var SpecificationsService
      */
     private $specsService = null;
+    
+    /**
+     * @var Image\Storage
+     */
+    private $imageStorage;
 
     /**
      * @return User
@@ -61,7 +68,8 @@ class UsersService
         array $hosts,
         $translator,
         $transport,
-        SpecificationsService $specsService)
+        SpecificationsService $specsService,
+        Image\Storage $imageStorage)
     {
         $this->salt = $options['salt'];
         $this->emailSalt = $options['emailSalt'];
@@ -70,6 +78,7 @@ class UsersService
         $this->translator = $translator;
         $this->transport = $transport;
         $this->specsService = $specsService;
+        $this->imageStorage = $imageStorage;
     }
 
     /**
@@ -417,5 +426,64 @@ class UsersService
             'id = ?'       => (int)$userId,
             'password = ?' => new Zend_Db_Expr($passwordExpr)
         ]);
+    }
+    
+    public function deleteUnused()
+    {
+        $table = $this->getTable();
+        $db = $table->getAdapter();
+        
+        $rows = $table->fetchAll(
+            $table->select(true)
+                ->where('users.last_online < DATE_SUB(NOW(), INTERVAL 2 YEAR)')
+                ->where('users.role = ?', 'user')
+                ->order('users.id')
+                ->joinLeft('attrs_user_values', 'users.id = attrs_user_values.user_id', null)
+                ->where('attrs_user_values.user_id is null')
+                ->joinLeft('comments_messages', 'users.id = comments_messages.author_id', null)
+                ->where('comments_messages.author_id is null')
+                ->joinLeft('forums_topics', 'users.id = forums_topics.author_id', null)
+                ->where('forums_topics.author_id is null')
+                ->joinLeft('pictures', 'users.id = pictures.owner_id', null)
+                ->where('pictures.owner_id is null')
+                ->joinLeft('voting_variant_vote', 'users.id = voting_variant_vote.user_id', null)
+                ->where('voting_variant_vote.user_id is null')
+                ->joinLeft(['pmf' => 'personal_messages'], 'users.id = pmf.from_user_id', null)
+                ->where('pmf.from_user_id is null')
+                ->joinLeft(['pmt' => 'personal_messages'], 'users.id = pmt.to_user_id', null)
+                ->where('pmt.to_user_id is null')
+                ->limit(1000)
+        );
+        
+        foreach ($rows as $row) {
+            print 'Delete ' . $row->id . ' ' . $row->name . ' ' . PHP_EOL;
+            
+            $this->delete($row->id);
+        }
+    }
+    
+    private function delete($userId)
+    {
+        $table = $this->getTable();
+        $db = $table->getAdapter();
+        
+        $row = $table->find($userId)->current();
+        if (!$row) {
+            return;
+        }
+        
+        if ($row->img) {
+            $imageId = $row->img;
+            $row->img = null;
+            $row->save();
+            
+            $this->imageStorage->removeImage($imageId);
+        }
+        
+        $db->delete('log_events_user', [
+            'user_id = ?' => $row->id
+        ]);
+        
+        $row->delete();
     }
 }

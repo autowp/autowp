@@ -1,4 +1,3 @@
-/components
 /mysql
 /composer.lock
 /composer.phar
@@ -7,3 +6,4 @@
 /vendor
 /logs
 /.buildpath
+/data

@@ -249,6 +249,7 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            'gulpRevFiles' => View\Helper\GulpRevFiles::class,
             'page'        => View\Helper\Page::class,
             'htmlA'       => View\Helper\HtmlA::class,
             'htmlImg'     => View\Helper\HtmlImg::class,
@@ -411,7 +412,8 @@ return [
                     $config['hosts'],
                     $sm->get('MvcTranslator'),
                     $sm->get('MailTransport'),
-                    $sm->get(Service\SpecificationsService::class));
+                    $sm->get(Service\SpecificationsService::class),
+                    $sm->get(Image\Storage::class));
             },
             Zend_Db_Adapter_Abstract::class => function($sm) {
                 $config = $sm->get('Config');

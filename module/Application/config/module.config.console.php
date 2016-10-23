@@ -79,7 +79,7 @@ return [
                 ],
                 'users' => [
                     'options' => [
-                        'route'    => 'users (refresh-vote-limits|restore-votes|clear-hashes|clear-renames):action',
+                        'route'    => 'users (refresh-vote-limits|restore-votes|clear-hashes|clear-renames|delete-unused):action',
                         'defaults' => [
                             'controller' => Controller\Console\UsersController::class,
                         ]

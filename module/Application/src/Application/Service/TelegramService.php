@@ -14,6 +14,7 @@ use Application\Telegram\Command\StartCommand;
 use Application\Telegram\Command\MessagesCommand;
 
 use Telegram\Bot\Api;
+use Telegram\Bot\Exceptions\TelegramResponseException;
 
 use Zend\Router\Http\TreeRouteStack;
 
@@ -88,7 +89,32 @@ class TelegramService
 
     public function sendMessage(array $params)
     {
-        return $this->getApi()->sendMessage($params);
+        try {
+            $this->getApi()->sendMessage($params);
+        } catch (TelegramResponseException $e) {
+            if ($e->getMessage() == 'Bot was blocked by the user') {
+                if (isset($params['chat_id'])) {
+                    $this->unsubscribeChat($params['chat_id']);
+                    return;
+                }
+            } 
+            
+            throw $e;
+            
+        }
+    }
+    
+    private function unsubscribeChat($chatId)
+    {
+        $telegramBrandTable = new TelegramBrand();
+        $telegramBrandTable->delete([
+            'chat_id = ?' => (int)$chatId
+        ]);
+        
+        $telegramChatTable = new TelegramChat();
+        $telegramChatTable->delete([
+            'chat_id = ?' => (int)$chatId
+        ]);
     }
 
     public function commandsHandler($webhook = false)

@@ -40,19 +40,21 @@ class UsersController extends AbstractActionController
 
     public function clearHashesAction()
     {
+        $console = Console::getInstance();
+        
         $urTable = new UserRemember();
         $count = $urTable->delete([
             'date < DATE_SUB(NOW(), INTERVAL 60 DAY)'
         ]);
 
-        printf("%d user remember rows was deleted\n", $count);
+        $console->writeLine(sprintf("%d user remember rows was deleted\n", $count));
 
         $uprTable = new UserPasswordRemind();
         $count = $uprTable->delete([
             'created < DATE_SUB(NOW(), INTERVAL 10 DAY)'
         ]);
 
-        printf("%d password remind rows was deleted\n", $count);
+        $console->writeLine(sprintf("%d password remind rows was deleted\n", $count));
     }
 
     public function clearRenamesAction()
@@ -62,6 +64,14 @@ class UsersController extends AbstractActionController
             'date < DATE_SUB(NOW(), INTERVAL 3 MONTH)'
         ]);
 
-        printf("%d user rename rows was deleted\n", $count);
+        $console = Console::getInstance();
+        $console->writeLine(sprintf("%d user rename rows was deleted\n", $count));
+    }
+    
+    public function deleteUnusedAction()
+    {
+        $console = Console::getInstance();
+        
+        $this->usersService->deleteUnused();
     }
 }
