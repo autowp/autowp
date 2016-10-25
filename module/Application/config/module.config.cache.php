@@ -14,7 +14,7 @@ return [
                 ]
             ],
             'backend' => [
-                'name' => 'blackHole'
+                'name' => 'black-hole'
             ]
         ]
     ],
