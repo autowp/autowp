@@ -20,7 +20,7 @@ before_script:
   - composer install --ignore-platform-reqs
   - mysql -u root -e 'create database autowp_test;'
   - mysql -u root < module/Application/test/ApplicationTest/_files/dump.sql
-script: ./vendor/bin/phpunit --coverage-clover ./logs/clover.xml
+script: ./vendor/bin/phpunit module/Application/test/ --coverage-clover ./logs/clover.xml
 
 after_script:
 - ./vendor/bin/coveralls -v
