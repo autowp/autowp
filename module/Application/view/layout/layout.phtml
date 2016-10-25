@@ -20,7 +20,11 @@
         ->setMessageSeparatorString('</li><li>')
         ->setMessageCloseString('</li></ul></div>');
     
-    $this->gulpRevFiles();
+    $this->gulpRev([
+        'stylesheets' => [
+            'css/styles.css'
+        ]
+    ]);
 ?>
 <?=$this->doctype() . PHP_EOL ?>
 <html dir="ltr" lang="<?=$this->language()?>">

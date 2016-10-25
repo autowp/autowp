@@ -87,95 +87,127 @@ class Sidebar extends AbstractPlugin
 
         return $groups;
     }
+    
+    private function carSectionGroups(array $brand, array $section, $conceptsSeparatly, $carId)
+    {
+        $language = $this->getController()->language();
+        
+        $brandCarTable = new BrandCar();
+        $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
+        $db = $brandCarTable->getAdapter();
+        
+        $select = $db->select()
+            ->from($brandCarTable->info('name'), [
+                'brand_car_catname' => 'catname',
+                'brand_id'
+            ])
+            ->join('cars', 'cars.id = brands_cars.car_id', [
+                'car_id'   => 'id',
+                'car_name' => 'cars.caption',
+            ])
+            ->where('brands_cars.brand_id = ?', $brand['id']);
+        if ($conceptsSeparatly) {
+            $select->where('NOT cars.is_concept');
+        }
+        
+        if ($section['car_type_id']) {
+            $select->where('cars.car_type_id = ?', $section['car_type_id']);
+        } else {
+            $select->where('cars.car_type_id not in (?) or cars.car_type_id is null', [43, 44]);
+        }
+        
+        $aliases = $this->getBrandAliases($brand);
+        
+        $carLanguageTable = new VehicleLanguage();
+        
+        $groups = [];
+        foreach ($db->fetchAll($select) as $brandCarRow) {
+        
+            $url = $this->getController()->url()->fromRoute('catalogue', [
+                'action'        => 'brand-car',
+                'brand_catname' => $brand['catname'],
+                'car_catname'   => $brandCarRow['brand_car_catname']
+            ]);
+        
+            $bvlRow = $brandVehicleLangaugeTable->fetchRow([
+                'vehicle_id = ?' => $brandCarRow['car_id'],
+                'brand_id = ?'   => $brandCarRow['brand_id'],
+                'language = ?'   => $language
+            ]);
+        
+            if ($bvlRow) {
+                $caption = $bvlRow->name;
+            } else {
+                $carLangRow = $carLanguageTable->fetchRow([
+                    'car_id = ?'   => (int)$brandCarRow['car_id'],
+                    'language = ?' => (string)$language
+                ]);
+        
+                $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
+                foreach ($aliases as $alias) {
+                    $caption = str_ireplace('by The ' . $alias . ' Company', '', $caption);
+                    $caption = str_ireplace('by '.$alias, '', $caption);
+                    $caption = str_ireplace('di '.$alias, '', $caption);
+                    $caption = str_ireplace('par '.$alias, '', $caption);
+                    $caption = str_ireplace($alias.'-', '', $caption);
+                    $caption = str_ireplace('-'.$alias, '', $caption);
+        
+                    $caption = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $caption);
+                }
+        
+                $caption = trim(preg_replace("|[[:space:]]+|", ' ', $caption));
+                $caption = ltrim($caption, '/');
+                if (!$caption) {
+                    $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
+                }
+        
+            }
+        
+            $groups[] = [
+                'car_id'  => $brandCarRow['car_id'],
+                'url'     => $url,
+                'caption' => $caption,
+            ];
+        }
+        
+        return $groups;
+    }
 
     private function carGroups(array $brand, $conceptsSeparatly, $carId)
     {
         $language = $this->getController()->language();
 
-        $cacheKey = 'SIDEBAR_' . $brand['id'] . '_' . $language . '_6';
+        $cacheKey = 'SIDEBAR_' . $brand['id'] . '_' . $language . '_13';
 
         $groups = $this->cache->getItem($cacheKey, $success);
 
         if (!$success) {
 
-            $brandCarTable = new BrandCar();
-            $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
-            $db = $brandCarTable->getAdapter();
-
-            $select = $db->select()
-                ->from($brandCarTable->info('name'), [
-                    'brand_car_catname' => 'catname',
-                    'brand_id'
-                ])
-                ->join('cars', 'cars.id = brands_cars.car_id', [
-                    'car_id'   => 'id',
-                    'car_name' => 'cars.caption',
-                ])
-                ->where('brands_cars.brand_id = ?', $brand['id']);
-            if ($conceptsSeparatly) {
-                $select->where('NOT cars.is_concept');
-            }
-
-            $aliases = $this->getBrandAliases($brand);
-
-            $carLanguageTable = new VehicleLanguage();
+            $sections = [
+                'other' => [
+                    'name'        => null,
+                    'car_type_id' => null
+                ],
+                'moto' => [
+                    'name'        => 'moto',
+                    'car_type_id' => 43
+                ],
+                'tractor' => [
+                    'name'        => 'tractor',
+                    'car_type_id' => 44
+                ]
+            ];
 
             $groups = [];
-            foreach ($db->fetchAll($select) as $brandCarRow) {
-
-                if ($brandCarRow['brand_car_catname']) {
-                    $url = $this->getController()->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car',
-                        'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandCarRow['brand_car_catname']
-                    ]);
-                } else {
-                    $url = $this->getController()->url()->fromRoute('catalogue', [
-                        'action'        => 'car',
-                        'brand_catname' => $brand['catname'],
-                        'car_id'        => $brandCarRow['car_id']
-                    ]);
-                }
-
-                $bvlRow = $brandVehicleLangaugeTable->fetchRow([
-                    'vehicle_id = ?' => $brandCarRow['car_id'],
-                    'brand_id = ?'   => $brandCarRow['brand_id'],
-                    'language = ?'   => $language
-                ]);
-
-                if ($bvlRow) {
-                    $caption = $bvlRow->name;
-                } else {
-                    $carLangRow = $carLanguageTable->fetchRow([
-                        'car_id = ?'   => (int)$brandCarRow['car_id'],
-                        'language = ?' => (string)$language
-                    ]);
-
-                    $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
-                    foreach ($aliases as $alias) {
-                        $caption = str_ireplace('by The ' . $alias . ' Company', '', $caption);
-                        $caption = str_ireplace('by '.$alias, '', $caption);
-                        $caption = str_ireplace('di '.$alias, '', $caption);
-                        $caption = str_ireplace('par '.$alias, '', $caption);
-                        $caption = str_ireplace($alias.'-', '', $caption);
-                        $caption = str_ireplace('-'.$alias, '', $caption);
-
-                        $caption = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $caption);
-                    }
-
-                    $caption = trim(preg_replace("|[[:space:]]+|", ' ', $caption));
-                    $caption = ltrim($caption, '/');
-                    if (!$caption) {
-                        $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
-                    }
-
-                }
-
-                $groups[] = [
-                    'car_id'  => $brandCarRow['car_id'],
-                    'url'     => $url,
-                    'caption' => $caption,
-                ];
+            foreach ($sections as $section) {
+                
+                $sectionGroups = $this->carSectionGroups($brand, $section, $conceptsSeparatly, $carId);
+                
+                usort($sectionGroups, function($a, $b) {
+                    return strnatcasecmp($a['caption'], $b['caption']);
+                });
+                
+                $groups = array_merge($groups, $sectionGroups);
             }
 
             $this->cache->setItem($cacheKey, $groups);
@@ -362,10 +394,6 @@ class Sidebar extends AbstractPlugin
          usort($groups, function($a, $b) use($coll) {
          return $coll->compare($a['caption'], $b['caption']);
          });*/
-
-        usort($groups, function($a, $b) {
-            return strnatcasecmp($a['caption'], $b['caption']);
-        });
 
         $groups = array_merge(
             $groups,

@@ -96,6 +96,7 @@ class Module implements ConsoleUsageProviderInterface,
             __DIR__ . '/config/module.config.routes.php',
             __DIR__ . '/config/module.config.moder.php',
             __DIR__ . '/config/module.config.log.php',
+            __DIR__ . '/config/module.config.view.php',
         ];
 
         // Merge all module config options

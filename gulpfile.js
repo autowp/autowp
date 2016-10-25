@@ -81,9 +81,9 @@ gulp.task("build.js.fast", shell.task([
 gulp.task('rev', ['build.css'], function() {
     return gulp.src([
         './public_html/css/styles.css'
-    ], {base: 'public_html/css'})
+    ], {base: 'public_html'})
         .pipe(rev())
-        .pipe(gulp.dest('./public_html/css'))
+        .pipe(gulp.dest('./public_html'))
         .pipe(rev.manifest())
         .pipe(gulp.dest('./public_html'));
 })

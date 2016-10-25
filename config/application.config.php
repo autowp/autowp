@@ -8,21 +8,22 @@
 return [
     // This should be an array of module namespaces used in the application.
     'modules' => [
-        'Zend\Router',
-        'Zend\Validator',
-        'Zend\I18n',
-        'Zend\Mvc\I18n',
-        'Zend\Form',
-        'Zend\Filter',
-        'Zend\Mail',
-        'Zend\Validator',
-        'Zend\Mvc\Console',
-        'Zend\Session',
-        'Zend\Log',
+        'Zend\\Router',
+        'Zend\\Validator',
+        'Zend\\I18n',
+        'Zend\\Mvc\I18n',
+        'Zend\\Mvc\\Plugin\\FlashMessenger',
+        'Zend\\Form',
+        'Zend\\Filter',
+        'Zend\\Mail',
+        'Zend\\Validator',
+        'Zend\\Mvc\Console',
+        'Zend\\Session',
+        'Zend\\Log',
+        'Autowp\\ZFComponents',
         'Application',
         //'ZF\ContentNegotiation',
         //'ZF\OAuth2',
-        'Zend\Mvc\Plugin\FlashMessenger'
     ],
 
     // These are various options for the listeners attached to the ModuleManager

@@ -1,3 +1,5 @@
+@color-white: #fff;
+
 body {
     padding-top: 60px;
 }
@@ -5,7 +7,7 @@ body {
 .navbar-brand svg {
     width: 50px;
     height: 50px;
-    margin:-15px 0;
+    margin: -15px 0;
     
     path {
         fill: #9d9d9d;
@@ -13,14 +15,14 @@ body {
     
     &:hover {
         path {
-            fill: #fff;
+            fill: @color-white;
             .transition(fill .2s);
         }
     }
 }
 
 .page-header, legend {
-    border-bottom-color: #FFF;
+    border-bottom-color: @color-white;
 }
 
 .label {
@@ -28,11 +30,11 @@ body {
 }
 
 a.label:visited {
-    color: #fff;
+    color: @color-white;
 }
 
 .page-header-small {
-    border-bottom: 1px solid #FFF;
+    border-bottom: 1px solid @color-white;
     margin: 18px 0;
     padding-bottom: 8px;
     
@@ -412,7 +414,7 @@ span.count {
 
 .brands-switch.nav-tabs > .active {
     > a, > a:hover, > a:focus {
-        background: #fff;
+        background: @color-white;
     }
 }
 
@@ -584,7 +586,7 @@ body.gallery-shown {
             padding: 0;
             list-style: none;
             text-align: center;
-            color: #fff;
+            color: @color-white;
             transform: translate(-50%, 0);
             -webkit-transform: translate(-50%, 0);
             -o-transform: translate(-50%, 0); 
@@ -646,7 +648,7 @@ body.gallery-shown {
                 margin-top: -20px;
                 margin-left: -20px;
                 font-size: 40px;
-                color: #fff;
+                color: @color-white;
                 line-height: 0.7;
             }
         }
@@ -708,32 +710,32 @@ body.gallery-shown {
         }
         
         &:visited {
-            color: #fff;
+            color: @color-white;
         }
-    }
-    
-    .carousel-control.download {
-        left: 50% - @controlWidth * 1.5;
-    }
-    
-    .carousel-control.details {
-        left: 50% - @controlWidth * 0.5;
-    }
-    
-    .carousel-control.comments {
-        left: 50% + @controlWidth * 0.5;
-    }
-    
-    .carousel-control.full {
-        display: none;
-        left: 50%;
-        top: 50%;
-        right: auto;
-        bottom: auto;
-        width: 20px;
-        margin-left: -10px;
-        margin-top: -10px;
-        .opacity(1);
+        
+        &.download {
+            left: 50% - @controlWidth * 1.5;
+        }
+        
+        &.details {
+            left: 50% - @controlWidth * 0.5;
+        }
+        
+        &.comments {
+            left: 50% + @controlWidth * 0.5;
+        }
+        
+        &.full {
+            display: none;
+            left: 50%;
+            top: 50%;
+            right: auto;
+            bottom: auto;
+            width: 20px;
+            margin-left: -10px;
+            margin-top: -10px;
+            .opacity(1);
+        }
     }
     
     .carousel-caption {
@@ -829,7 +831,7 @@ footer .links {
 }
 
 .tt-menu {
-    background: #fff;
+    background: @color-white;
     min-width: 160px;
     padding: 5px 0;
     text-align: left;
