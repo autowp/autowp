@@ -4,8 +4,8 @@ return [
     'db' => [
         'params' => [
             'host'     => 'localhost',
-            'username' => 'autowp_test',
-            'password' => 'test',
+            'username' => 'root',
+            'password' => '',
             'dbname'   => 'autowp_test',
         ],
     ],
