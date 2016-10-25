@@ -13,5 +13,4 @@ return [
         'salt'      => 'users-salt',
         'emailSalt' => 'email-salt'
     ],
-
 ];

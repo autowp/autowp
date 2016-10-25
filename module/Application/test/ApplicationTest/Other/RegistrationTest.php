@@ -18,7 +18,7 @@ class RegistrationTest extends AbstractControllerTestCase
         parent::setUp();
     }
 
-    /*public function testRegistration()
+    public function testRegistration()
     {
         $serviceManager = $this->getApplicationServiceLocator();
         $usersService = $serviceManager->get(\Application\Service\UsersService::class);
@@ -31,5 +31,5 @@ class RegistrationTest extends AbstractControllerTestCase
         ], 'en');
 
         $this->assertInstanceOf(UserRow::class, $user);
-    }*/
+    }
 }

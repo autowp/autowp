@@ -5,7 +5,7 @@ use Zend\Stdlib\ArrayUtils;
 $configOverrides = [
     'module_listener_options' => [
         'config_glob_paths' => [
-            'config/autoload/{{,*.}global,{,*.}local}.php',
+            //'config/autoload/{{,*.}global,{,*.}local}.php',
             'module/Application/test/ApplicationTest/_files/local.php',
         ]
     ]

@@ -14,82 +14,28 @@ return [
                 ]
             ],
             'backend' => [
-                'name' => 'Memcached',
-                'options' => [
-                    'servers' => [
-                        'host' => 'localhost',
-                        'port' => 11211
-                    ]
-                ]
+                'name' => 'blackHole'
             ]
         ]
     ],
     'caches' => [
         'fastCache' => [
             'adapter' => [
-                'name'     =>'memcached',
+                'name'     =>'blackHole',
                 'lifetime' => 180,
-                'options'  => [
-                    'ttl' => 180,
-                    'servers'   => [
-                        ['localhost', 11211]
-                    ],
-                    'namespace'  => 'FAST',
-                    'liboptions' => [
-                        'COMPRESSION'     => false,
-                        'binary_protocol' => true,
-                        'no_block'        => true,
-                        'connect_timeout' => 100
-                    ]
-                ]
             ],
         ],
         'longCache' => [
             'adapter' => [
-                'name'     =>'memcached',
-                'lifetime' => 600,
-                'options'  => [
-                    'ttl' => 600,
-                    'servers'   => [
-                        ['localhost', 11211]
-                    ],
-                    'namespace'  => 'LONG',
-                    'liboptions' => [
-                        'COMPRESSION'     => false,
-                        'binary_protocol' => true,
-                        'no_block'        => true,
-                        'connect_timeout' => 100
-                    ]
-                ]
+                'name'     =>'blackHole',
+                'lifetime' => 600
             ],
-            /*'plugins' => [
-             'exception_handler' => [
-                 'throw_exceptions' => false
-             ],
-            ],*/
         ],
         'localeCache' => [
             'adapter' => [
-                'name'     =>'memcached',
-                'lifetime' => 600,
-                'options'  => [
-                    'servers'   => [
-                        ['localhost', 11211]
-                    ],
-                    'namespace'  => 'LOCALE',
-                    'liboptions' => [
-                        'COMPRESSION'     => false,
-                        'binary_protocol' => true,
-                        'no_block'        => true,
-                        'connect_timeout' => 100
-                    ]
-                ]
+                'name'     =>'blackHole',
+                'lifetime' => 600
             ],
-            /*'plugins' => [
-             'exception_handler' => [
-                 'throw_exceptions' => false
-             ],
-            ],*/
         ],
     ],
 ];

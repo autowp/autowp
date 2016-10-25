@@ -52,7 +52,8 @@
     ],
     "require-dev": {
         "phpunit/PHPUnit": "~4.0",
-        "zendframework/zend-test": "^3.0"
+        "zendframework/zend-test": "^3.0",
+        "satooshi/php-coveralls": "^1.0"
     },
     "autoload-dev": {
         "psr-4": {

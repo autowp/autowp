@@ -16,10 +16,12 @@ addons:
 install:
   - sudo apt-get install php7.0-dev -y
   - printf "\n" | pecl install imagick
-  - printf "\n" | pecl install memcache
 before_script: 
   - phpenv config-add module/Application/test/ApplicationTest/_files/travis.php.ini
   - composer install --ignore-platform-reqs
   - mysql -u root -e 'create database autowp_test;'
   - mysql -u root < module/Application/test/ApplicationTest/_files/dump.sql
-script: ./vendor/bin/phpunit module/Application/test/
+script: ./vendor/bin/phpunit --coverage-clover ./logs/clover.xml
+
+after_script:
+- ./vendor/bin/coveralls -v
