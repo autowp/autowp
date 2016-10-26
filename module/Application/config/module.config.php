@@ -2,6 +2,7 @@
 
 namespace Application;
 
+use Zend\Mail\Transport\TransportInterface as MailTransport;
 use Zend\Permissions\Acl\Acl;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
@@ -85,7 +86,7 @@ return [
             },
             Controller\FeedbackController::class     => function($sm) {
                 $form = $sm->get('FeedbackForm');
-                $transport = $sm->get('MailTransport');
+                $transport = $sm->get(MailTransport::class);
                 $options = $sm->get('Config')['feedback'];
                 return new Controller\FeedbackController($form, $transport, $options);
             },
@@ -93,7 +94,7 @@ return [
                 return new Controller\ForumsController(
                     $sm->get('ForumsTopicNewForm'),
                     $sm->get('CommentForm'),
-                    $sm->get('MailTransport'),
+                    $sm->get(MailTransport::class),
                     $sm->get('MvcTranslator'),
                     $sm->get(Model\Message::class)
                 );
@@ -141,7 +142,7 @@ return [
                 $service = $sm->get(Service\UsersService::class);
                 $restoreForm = $sm->get('RestorePasswordForm');
                 $newPasswordForm = $sm->get('NewPasswordForm');
-                $transport = $sm->get('MailTransport');
+                $transport = $sm->get(MailTransport::class);
                 return new Controller\RestorePasswordController($service, $restoreForm, $newPasswordForm, $transport);
             },
             Controller\DocController::class => InvokableFactory::class,
@@ -306,7 +307,7 @@ return [
                     $config['users'],
                     $config['hosts'],
                     $sm->get('MvcTranslator'),
-                    $sm->get('MailTransport'),
+                    $sm->get(MailTransport::class),
                     $sm->get(Service\SpecificationsService::class),
                     $sm->get(Image\Storage::class));
             },
@@ -355,17 +356,6 @@ return [
                 $options = $sm->get('Config')['textstorage'];
                 $options['dbAdapter'] = $sm->get(Zend_Db_Adapter_Abstract::class);
                 return new TextStorage\Service($options);
-            },
-            'MailTransport' => function($sm) {
-                $config = $sm->get('Config');
-                $transport = new \Zend\Mail\Transport\Smtp();
-                $transport->setOptions(
-                    new \Zend\Mail\Transport\SmtpOptions(
-                        $config['mail']['transport']['options']
-                    )
-                );
-
-                return $transport;
             },
             Acl::class => Permissions\AclFactory::class,
             ExternalLoginServiceFactory::class => function($sm) {
