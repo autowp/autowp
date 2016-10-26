@@ -21,6 +21,8 @@ return [
     ],
     'cachemanager' => [
         'fast' => [
+            /*'caching' => false,
+            'write_control' => false,*/
             'frontend' => [
                 'name' => 'Core',
                 'customFrontendNaming' => 0,

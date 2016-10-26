@@ -137,6 +137,7 @@ class Module implements ConsoleUsageProviderInterface,
 
         $cacheManager = $serviceManager->get(Zend_Cache_Manager::class);
         $metadataCache = $cacheManager->getCache('fast');
+        $metadataCache->setOption('write_control', false);
         Zend_Db_Table::setDefaultMetadataCache($metadataCache);
 
         $sessionManager = $serviceManager->get(ManagerInterface::class);
