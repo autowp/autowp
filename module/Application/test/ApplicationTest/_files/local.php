@@ -8,9 +8,15 @@ return [
             'password' => 'test',
             'dbname'   => 'autowp_test',
         ],
+        'defaultMetadataCache' => null,
     ],
     'users' => [
         'salt'      => 'users-salt',
         'emailSalt' => 'email-salt'
+    ],
+    'mail' => [
+        'transport' => [
+            'type' => 'in-memory'
+        ],
     ],
 ];
