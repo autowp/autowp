@@ -126,7 +126,10 @@
         <?php } ?>
 
         <?php if (count($this->last_comments)) { ?>
-            <h2><?=$this->escapeHtml($this->translate('users/user/recent-comments'))?></h2>
+            <h2>
+                <?=$this->escapeHtml($this->translate('users/user/recent-comments'))?>
+                <small><?=$this->htmlA($this->url('users/user/comments', [], [], true), $this->translate('all-link'))?></small>
+            </h2>
             <div class="well">
                 <ul class="comments">
                     <?php foreach ($this->last_comments as $comment) { ?>

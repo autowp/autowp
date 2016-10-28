@@ -379,6 +379,29 @@ class Comments
             'item_id = ?' => (int)$item
         ], 'datetime DESC');
     }
+    
+    public function getSelectByUser($userId, $order)
+    {
+        $select = $this->getMessageTable()->select(true)
+            ->where('author_id = ?', (int)$userId);
+        
+        switch ($order) {
+            case 'positive':
+                $select->order('vote desc');
+                break;
+            case 'negative':
+                $select->order('vote asc');
+                break;
+            case 'old':
+                $select->order('datetime asc');
+            case 'new':
+            default:
+                $select->order('datetime desc');
+                break;
+        }
+        
+        return $select;
+    }
 
     /**
      * @param int $type

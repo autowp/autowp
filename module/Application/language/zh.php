@@ -542,6 +542,11 @@ return [
 
     'users/user/upload-pictures:' => '已上传图片: ',
     'users/user/pictures-left-on-site:' => '被采纳图片: ',
+    
+    'users/comments/order/new' => 'New',
+    'users/comments/order/old' => 'Old',
+    'users/comments/order/positive' => 'Positive',
+    'users/comments/order/negative' => 'Negative',
 
     'users/for-moderators' => '管理员页面',
     'users/for-moderators/remove-photo' => '删除用户图片',
@@ -1254,6 +1259,10 @@ return [
     'page/204/name'        => 'Telegram',
     'page/204/title'       => 'Telegram',
     'page/204/breadcrumbs' => 'Telegram',
+    
+    'page/205/name'        => '评论',
+    'page/205/title'       => '评论',
+    'page/205/breadcrumbs' => '评论',
 
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',

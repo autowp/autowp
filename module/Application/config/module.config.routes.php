@@ -1106,6 +1106,21 @@ return [
                                     ]
                                 ]
                             ],
+                            'comments' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/comments',
+                                    'defaults' => [
+                                        'action' => 'comments',
+                                    ],
+                                ],
+                                'may_terminate' => true,
+                                'child_routes'  => [
+                                    'params' => [
+                                        'type' => Router\Http\WildcardSafe::class
+                                    ]
+                                ]
+                            ]
                         ]
                     ],
                     'online' => [

@@ -446,4 +446,59 @@ class UsersController extends AbstractActionController
 
         return $this->notFoundAction();
     }
+    
+    public function commentsAction()
+    {
+        $user = $this->getUser();
+        
+        if (!$user) {
+            return $this->notFoundAction();
+        }
+        
+        $order = $this->params('order');
+        
+        $model = new \Application\Model\Comments();
+        
+        $select = $model->getSelectByUser($user->id, $order);
+        
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+        
+        $paginator
+            ->setItemCountPerPage(30)
+            ->setCurrentPageNumber($this->params('page'));
+        
+        $comments = [];
+        foreach ($paginator->getCurrentItems() as $commentRow) {
+            $comments[] = [
+                'url'     => $commentRow->getUrl(),
+                'message' => $commentRow->getMessagePreview(),
+                'vote'    => $commentRow->vote
+            ];
+        }
+        
+        $orders = [
+            'new'      => 'users/comments/order/new',
+            'old'      => 'users/comments/order/old',
+            'positive' => 'users/comments/order/positive',
+            'negative' => 'users/comments/order/negative'
+        ];
+        
+        $currentOrder = 'new';
+        foreach ($orders as $key => $name) {
+            if ($key == $order) {
+                $currentOrder = $key;
+                break;
+            }
+        }
+        
+        return [
+            'user'      => $user,
+            'comments'  => $comments,
+            'paginator' => $paginator,
+            'orders'    => $orders,
+            'order'     => $currentOrder
+        ];
+    }
 }

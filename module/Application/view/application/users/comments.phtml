@@ -1,0 +1,49 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'blankPage' => false,
+            'needRight' => false
+        ],
+        'pageId' => 205,
+        'args'   => [
+            'USER_NAME'     => $this->user->name,
+            'USER_IDENTITY' => $this->user->identity ? $this->user->identity : 'user' . $this->user->id,
+        ]
+    ]);
+?>
+
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <?php foreach ($this->orders as $key => $name) { ?>
+        <li<?=$key == $this->order ? ' class="active"' : ''?>>
+            <?=$this->htmlA($this->url('users/user/comments/params', [
+                'order' => $key
+            ], [], true), $this->translate($name))?>
+        </li>
+    <?php } ?>
+</ul>
+
+<ul>
+    <?php foreach ($this->comments as $comment) { ?>
+        <li>
+            <?php if ($comment['vote']) { ?>
+                <strong>
+                    <?php if ($comment['vote'] > 0) { ?>
+                        +<?=$comment['vote']?>
+                        <span class="fa fa-thumbs-o-up"></span>
+                    <?php } else { ?>
+                        <?=$comment['vote']?>
+                        <span class="fa fa-thumbs-o-down"></span>
+                    <?php } ?>
+                </strong>
+            <?php } ?>
+            <?=$this->htmlA($comment['url'], $comment['message'])?>
+        </li>
+    <?php } ?>
+</ul>
+
+<?=$this->paginationControl($this->paginator, null, null, [
+    'route'     => 'users/user/comments/params',
+    'urlParams' => [
+        'user_id' => $this->user->identity ? $this->user->identity : 'user' . $this->user->id
+    ]
+]) ?>

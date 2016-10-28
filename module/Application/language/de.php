@@ -556,6 +556,11 @@ Good luck.',
 
     'users/user/upload-pictures:' => 'Images uploaded: ',
     'users/user/pictures-left-on-site:' => 'left on site: ',
+    
+    'users/comments/order/new' => 'New',
+    'users/comments/order/old' => 'Old',
+    'users/comments/order/positive' => 'Positive',
+    'users/comments/order/negative' => 'Negative',
 
     'users/for-moderators' => 'For moderators',
     'users/for-moderators/remove-photo' => 'Delete user photo',
@@ -1269,6 +1274,10 @@ You can support our project by [finances](/donate) or [moral](/feedback)',
     'page/204/name'        => 'Telegram',
     'page/204/title'       => 'Telegram',
     'page/204/breadcrumbs' => 'Telegram',
+    
+    'page/205/name'        => 'Comments',
+    'page/205/title'       => 'Comments',
+    'page/205/breadcrumbs' => 'Comments',
 
     'moder-menu/title' => 'Moderator menu',
     'moder-menu/inbox' => 'Inbox',

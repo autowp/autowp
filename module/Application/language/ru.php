@@ -570,6 +570,11 @@ return [
 
     'users/user/upload-pictures:' => 'Добавил изображений: ',
     'users/user/pictures-left-on-site:' => 'из них на сайте осталось: ',
+    
+    'users/comments/order/new' => 'Новые',
+    'users/comments/order/old' => 'Старые',
+    'users/comments/order/positive' => 'Положительные',
+    'users/comments/order/negative' => 'Отрицательные',
 
     'users/for-moderators' => 'Для модераторов',
     'users/for-moderators/remove-photo' => 'Удалить фотографию пользователя',
@@ -1282,6 +1287,10 @@ return [
     'page/204/name'        => 'Telegram',
     'page/204/title'       => 'Telegram',
     'page/204/breadcrumbs' => 'Telegram',
+    
+    'page/205/name'        => 'Комментарии',
+    'page/205/title'       => 'Комментарии',
+    'page/205/breadcrumbs' => 'Комментарии',
 
     'moder-menu/title' => 'Меню модератора',
     'moder-menu/inbox' => 'Инбокс',
@@ -2368,7 +2377,7 @@ return [
 
 Здесь 123456789 - номер вашей учётной записи на нашем сайте, который вы можете найти на странице своего профиля. Например, номер [Juliano Scotini](/users/juliano-scotini): 17322
 
-Код водтверждения будет отправлен вам через [систему личных сообщений](/account/pm/system)
+Код подтверждения будет отправлен вам через [систему личных сообщений](/account/pm/system)
 
 Отправьте `/me 123456789 ХХХХХХХХХХХХХХХХ`, чтобы завершить процесс ассоциации вашей учётной записи telegram с пользователем найшего сайта.
 

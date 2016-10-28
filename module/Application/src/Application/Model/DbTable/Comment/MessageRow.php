@@ -34,7 +34,7 @@ class MessageRow extends Row
                 return ($absolute ? HOST : '/').'voting/voting/id/'.(int)$this->item_id.'/';
 
             case CommentMessage::TWINS_TYPE_ID:
-                return ($absolute ? HOST : '/').'twins/group'.(int)$this->item_id.'/';
+                return ($absolute ? HOST : '/').'twins/group'.(int)$this->item_id;
 
             case CommentMessage::ARTICLES_TYPE_ID:
                 $articles = new Article();
