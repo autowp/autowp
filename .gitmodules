@@ -1,5 +1,0 @@
-[submodule "vendor/artpolikarpov/Flags"]
-	path = vendor/artpolikarpov/Flags
-	url = git://github.com/artpolikarpov/Flags.git
-	
-
