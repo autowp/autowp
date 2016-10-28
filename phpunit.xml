@@ -6,7 +6,7 @@
         </testsuite>
     </testsuites>
     <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+        <whitelist>
             <directory suffix=".php">./module/Application</directory>
         </whitelist>
         <blacklist>
