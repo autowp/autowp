@@ -747,6 +747,9 @@ CREATE TABLE IF NOT EXISTS `brands` (
   KEY `text_id` (`text_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1893 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB; (`parent_brand_id`)';
 
+insert into brands (id, folder, caption, position)
+values (1, 'bmw', 'BMW', 0);
+
 -- --------------------------------------------------------
 
 --
@@ -762,6 +765,9 @@ CREATE TABLE IF NOT EXISTS `brands_cars` (
   UNIQUE KEY `brand_id` (`brand_id`,`catname`),
   KEY `car_id` (`car_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB; (`car_id`)';
+
+insert into brands_cars (brand_id, car_id, type, catname)
+values (1, 1, 0, "first-car");
 
 -- --------------------------------------------------------
 
@@ -922,8 +928,8 @@ CREATE TABLE IF NOT EXISTS `cars` (
   KEY `full_text_id` (`full_text_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=99781 AVG_ROW_LENGTH=152 DEFAULT CHARSET=utf8;
 
-insert into cars (id, caption, body, produced_exactly, description)
-values (1, 'test car', '', 0, '');
+insert into cars (id, caption, body, produced_exactly, description, begin_year)
+values (1, 'test car', '', 0, '', 1999);
 
 -- --------------------------------------------------------
 
@@ -3314,3 +3320,46 @@ ALTER TABLE `voting_variant`
 ALTER TABLE `voting_variant_vote`
   ADD CONSTRAINT `voting_variant_votes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `voting_variant_votes_ibfk_2` FOREIGN KEY (`voting_variant_id`) REFERENCES `voting_variant` (`id`);
+  
+-- phpMyAdmin SQL Dump
+-- version 4.7.0-dev
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Generation Time: Oct 31, 2016 at 01:13 AM
+-- Server version: 5.7.15
+-- PHP Version: 7.0.12-1
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `autowp`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `brand_vehicle_language`
+--
+
+CREATE TABLE `brand_vehicle_language` (
+  `brand_id` int(10) UNSIGNED NOT NULL,
+  `vehicle_id` int(10) UNSIGNED NOT NULL,
+  `language` varchar(2) NOT NULL,
+  `name` varchar(70) NOT NULL,
+  `is_auto` tinyint(1) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `brand_vehicle_language`
+  ADD PRIMARY KEY (`brand_id`,`vehicle_id`,`language`);
+
+INSERT INTO `brand_vehicle_language` (`brand_id`, `vehicle_id`, `language`, `name`, `is_auto`) VALUES
+(1, 1, 'en', 'BMW 335i', 1);
+  
