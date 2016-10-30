@@ -4,7 +4,8 @@ namespace Application\Most\Adapter;
 
 use Zend_Db_Table_Select;
 
-use Application\Model\DbTable\Attr;
+use Application\Model\DbTable\Attr\ItemType;
+use Application\Model\DbTable\Attr\Attribute;
 
 use Zend_Db_Expr;
 use Zend_Db_Select;
@@ -15,7 +16,7 @@ class Brakes extends AbstractAdapter
 {
     protected $attributes;
 
-    protected $order; 
+    protected $order;
 
     protected $attributesTable;
 
@@ -25,9 +26,9 @@ class Brakes extends AbstractAdapter
     {
         parent::__construct($options);
 
-        $this->attributesTable = new Attr\Attribute();
+        $this->attributesTable = new Attribute();
 
-        $itemTypes = new Attr\ItemType();
+        $itemTypes = new ItemType();
         $this->carItemType = $itemTypes->find(1)->current();
     }
 

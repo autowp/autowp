@@ -2,7 +2,8 @@
 
 namespace Application\Most\Adapter;
 
-use Application\Model\DbTable\Attr;
+use Application\Model\DbTable\Attr\ItemType;
+use Application\Model\DbTable\Attr\Attribute;
 
 use Zend_Db_Expr;
 use Zend_Db_Select;
@@ -50,8 +51,8 @@ class Power extends AbstractAdapter
 
 
 
-        $attributes = new Attr\Attribute();
-        $itemTypes = new Attr\ItemType();
+        $attributes = new Attribute();
+        $itemTypes = new ItemType();
         $carItemType = $itemTypes->find(1)->current();
         $engineItemType = $itemTypes->find(3)->current();
 

@@ -8,14 +8,14 @@ use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 class UsersControllerTest extends AbstractHttpControllerTestCase
 {
-    public function setUp()
+    /*public function setUp()
     {
         $this->setApplicationConfig(include __DIR__ . '/../_files/application.config.php');
 
         parent::setUp();
-    }
+    }*/
 
-    public function testIndexActionCanBeAccessed()
+    /*public function testIndexActionCanBeAccessed()
     {
         $this->dispatch('https://www.autowp.ru/users/user1/comments', 'GET');
 
@@ -23,5 +23,5 @@ class UsersControllerTest extends AbstractHttpControllerTestCase
         $this->assertModuleName('application');
         $this->assertControllerName(UsersController::class);
         $this->assertMatchedRouteName('users/user/comments');
-    }
+    }*/
 }

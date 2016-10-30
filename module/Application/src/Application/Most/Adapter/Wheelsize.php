@@ -2,7 +2,9 @@
 
 namespace Application\Most\Adapter;
 
-use Application\Model\DbTable\Attr;
+use Application\Model\DbTable\Attr\ItemType;
+use Application\Model\DbTable\Attr\Attribute;
+use Application\Model\DbTable\Attr\Unit;
 use Application\WheelSize as WheelsizeObject;
 
 use Zend_Db_Expr;
@@ -23,9 +25,9 @@ class Wheelsize extends AbstractAdapter
     {
         parent::__construct($options);
 
-        $this->_attributesTable = new Attr\Attribute();
+        $this->_attributesTable = new Attribute();
 
-        $itemTypes = new Attr\ItemType();
+        $itemTypes = new ItemType();
         $this->_carItemType = $itemTypes->find(1)->current();
     }
 

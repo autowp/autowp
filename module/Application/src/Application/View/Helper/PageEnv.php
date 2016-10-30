@@ -2,11 +2,11 @@
 
 namespace Application\View\Helper;
 
-use Application\Language;
+use Application\Language as AppLanguage;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Application\Model\DbTable\Page;
+use Application\Model\DbTable\Page as PageTable;
 
 use Zend_Db_Table;
 
@@ -27,9 +27,9 @@ class PageEnv extends AbstractHelper
      */
     private $language = 'en';
 
-    public function __construct(Language $language)
+    public function __construct(AppLanguage $language)
     {
-        $this->pageTable = new Page();
+        $this->pageTable = new PageTable();
 
         $this->language = $language->getLanguage();
     }
