@@ -79,15 +79,17 @@
             <?php } ?>
         </tr>
         <?php if ($this->user()->isAllowed('specifications', 'edit')) { ?>
-            <td></td>
-            <?php foreach ($this->table->getCars() as $car) { ?>
-                <td>
-                    <?=$this->htmlA($this->url('cars/params', [
-                        'action' => 'car-specifications-editor',
-                        'car_id' => $car['id']
-                    ]), $this->translate('carlist/edit-specs'))?>
-                </td>
-            <?php } ?>
+            <tr>
+                <td></td>
+                <?php foreach ($this->table->getCars() as $car) { ?>
+                    <td>
+                        <?=$this->htmlA($this->url('cars/params', [
+                            'action' => 'car-specifications-editor',
+                            'car_id' => $car['id']
+                        ]), $this->translate('carlist/edit-specs'))?>
+                    </td>
+                <?php } ?>
+            </tr>
         <?php } ?>
     </tbody>
 </table>

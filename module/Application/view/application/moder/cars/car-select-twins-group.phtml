@@ -32,7 +32,7 @@
             $width = round(100*$perOne/$count);
             $idx = 0;
         ?>
-        <table width="100%" class="brand-selector"><tbody><tr>
+        <table style="width:100%" class="brand-selector"><tbody><tr>
             <td valign="top" style="width:<?=(100-$width*($columns-1)) ?>%">
                 <?php foreach ($this->brands as $brand) { ?>
                     <?php if ($idx && ($idx%$perOne == 0)) { ?>

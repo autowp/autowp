@@ -279,181 +279,182 @@
         </div>
 
 
-    <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
-        <h3><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></h3>
-        <div class="well">
-            <?=$this->partial('application/moder/pictures/picture-perspective', $this->picturePerspective)?>
-        </div>
-    <?php } ?>
-
-    <?php if ($this->replacePicture) { ?>
-        <h3><?=$this->escapeHtml($this->translate('moder/picture/replacement'))?></h3>
-        <div class="well">
-            <p>
-                <?=$this->escapeHtml($this->translate('moder/picture/replacement/photo-suggested-to-replace'))?>
-                <?=$this->htmlA($this->replacePicture['url'], $this->serverUrl($this->replacePicture['url']))?>
-            </p>
-            <?php if ($this->replacePicture['canAccept']) { ?>
-                <form action="<?=$this->escapeHtmlAttr($this->replacePicture['acceptUrl'])?>" method="post">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-exchange"></i>
-                        <?=$this->escapeHtml($this->translate('moder/picture/replacement/accept-and-delete-double'))?>
-                    </button>
-                </form>
-                <form action="<?=$this->escapeHtmlAttr($this->replacePicture['cancelUrl'])?>" method="post">
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fa fa-times"></i>
-                        <?=$this->escapeHtml($this->translate('moder/picture/replacement/cancel'))?>
-                    </button>
-                </form>
-            <?php } ?>
-        </div>
-    <?php } ?>
-
-
-    <h3><?=$this->escapeHtml($this->translate('moder/picture/acceptance'))?></h3>
-    <div class="well">
-        <div style="margin-bottom:15px"><?php
-            $changeStatusUserHtml = '';
-            if ($this->picture->change_status_user_id) {
-                $changeStatusUserHtml = ' '.$this->user($this->picture->findParentRow(Application\Model\DbTable\User::class, 'Change_Status_User'));
-            }
-
-            switch ($this->picture->status) {
-                case Application\Model\DbTable\Picture::STATUS_NEW:
-                case Application\Model\DbTable\Picture::STATUS_INBOX:
-                    ?>
-                    <p><strong class="label label-warning">
-                        <?=$this->escapeHtml($this->translate('moder/picture/acceptance/not-accepted'))?>
-                        <?=$changeStatusUserHtml?>
-                        <?=(Application\Model\DbTable\Picture::STATUS_INBOX == $this->picture->status ? ' ' . $this->translate('moder/pictures/picture/inbox-mark') : '')?>
-                    </strong></p>
-                    <?php if ($this->canAccept) { ?>
-                        <form action="<?=$this->escapeHtmlAttr($this->acceptUrl)?>" method="post">
-                            <button type="submit" class="btn btn-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/accept'))?></button>
-                        </form>
-                    <?php } ?>
-                    <?php
-                    break;
-
-                case Application\Model\DbTable\Picture::STATUS_ACCEPTED:
-                    ?>
-                    <p><strong class="label label-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/accepted'))?></strong></p>
-                    <?=$changeStatusUserHtml?>
-                    <?php if ($this->canUnaccept) { ?>
-                        <form action="<?=$this->escapeHtmlAttr($this->unacceptUrl)?>" method="post">
-                            <button type="submit" class="btn btn-warning"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/unaccept'))?></button>
-                        </form>
-                    <?php } ?>
-                    <?php
-                    break;
-
-                case Application\Model\DbTable\Picture::STATUS_REMOVING:
-                    ?><p>
-                        <strong class="label label-danger">
-                            <?=$this->escapeHtml($this->translate('moder/picture/acceptance/in-delete-queue'))?>
-                        </strong>
-                        &nbsp;
-                        <?=$changeStatusUserHtml?>
-                    </p>
-                    <?php if ($this->canRestore) { ?>
-                        <form action="<?=$this->escapeHtmlAttr($this->restoreUrl)?>" method="post">
-                            <button type="submit" class="btn btn-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/restore'))?></button>
-                        </form>
-                    <?php }
-                    break;
-
-                case Application\Model\DbTable\Picture::STATUS_REMOVED:
-                    ?><p><strong style="color:red">
-                        <?=$this->escapeHtml($this->translate('moder/picture/acceptance/removed'))?>
-                        <?=$changeStatusUserHtml?>
-                    </strong></p><?php
-                    break;
-            }
-        ?></div>
-
-        <?=$this->partial('application/moder/pictures/picture-vote', $this->pictureVote)?>
-    </div>
-
-    <?php if ($this->canNormalize || $this->canFlop || $this->canCrop) { ?>
-        <h3><?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair'))?></h3>
-        <div class="well">
-
-            <div class="btn-group">
-
-                <?php if ($this->canNormalize) { ?>
-                    <button class="btn btn-danger normalize">
-                        <i class="fa fa-signal"></i>
-                        <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/normalize'))?>
-                    </button>
-                <?php } ?>
-                <?php if ($this->canFlop) { ?>
-                    <button class="btn btn-danger flop">
-                        <i class="fa fa-arrows-h"></i>
-                        <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/flop'))?>
-                    </button>
-                <?php } ?>
-                <?php if ($this->canCrop) { ?>
-                    <button class="btn btn-success crop">
-                        <i class="fa fa-crop"></i>
-                        <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/crop'))?>
-                    </button>
-                <?php } ?>
+        <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
+            <h3><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></h3>
+            <div class="well">
+                <?=$this->partial('application/moder/pictures/picture-perspective', $this->picturePerspective)?>
             </div>
-
-            <div class="btn-group">
-                <button class="btn btn-default files-repair">
-                    <i class="fa fa-wrench"></i>
-                    <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/repair-all-files'))?>
-                </button>
-                <button class="btn btn-default files-correct-names">
-                    <i class="fa fa-wrench"></i>
-                    <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/rebuild-files-names'))?>
-                </button>
-            </div>
-
-        </div>
-    <?php } ?>
-
-    <h3><?=$this->escapeHtml($this->translate('moder/picture/uploader'))?></h3>
-    <div class="well">
-        <?php if ($user = $this->picture->findParentRow(Application\Model\DbTable\User::class, 'Owner')) { ?>
-            <?=$this->user($user) ?>
-        <?php } else { ?>
-            <?=$this->escapeHtml($this->translate('moder/picture/uploader/unknown'))?>
         <?php } ?>
-        <?php if ($this->picture->ip) { ?>
-            <?=$this->escapeHtml($this->translate('moder/picture/uploader/id-address:'))?>
-            <b><?=$this->escapeHtml(inet_ntop($this->picture->ip))?></b><br />
-            <?php if ($this->ban) { ?>
-                <p>
-                    <?=$this->escapeHtml($this->translate('ban/that-address-is-banned'))?>
-                    <?php if ($this->ban['user']) { ?>
-                        <?=$this->user($this->ban['user']) ?>
-                    <?php } ?>
-                    <?php if ($this->ban['up_to']) { ?>
-                        <?=$this->escapeHtml($this->translate('ban/until'))?>
-                        <?=$this->ban['up_to']->format(MYSQL_DATETIME_FORMAT) ?>
-                        <?php if ($this->ban['reason']) { ?>
-                            (<?=$this->escapeHtml($this->ban['reason'])?>)
-                        <?php } ?>
-                    <?php } ?>
-                </p>
 
-                <?php if ($this->canBan) { ?>
-                    <form action="<?=$this->url('ban/unban-ip', [
-                        'ip' => inet_ntop($this->picture->ip)
-                    ]) ?>" method="post" style="margin:10px 0">
-                        <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('ban/unban'))?>" />
+        <?php if ($this->replacePicture) { ?>
+            <h3><?=$this->escapeHtml($this->translate('moder/picture/replacement'))?></h3>
+            <div class="well">
+                <p>
+                    <?=$this->escapeHtml($this->translate('moder/picture/replacement/photo-suggested-to-replace'))?>
+                    <?=$this->htmlA($this->replacePicture['url'], $this->serverUrl($this->replacePicture['url']))?>
+                </p>
+                <?php if ($this->replacePicture['canAccept']) { ?>
+                    <form action="<?=$this->escapeHtmlAttr($this->replacePicture['acceptUrl'])?>" method="post">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-exchange"></i>
+                            <?=$this->escapeHtml($this->translate('moder/picture/replacement/accept-and-delete-double'))?>
+                        </button>
+                    </form>
+                    <form action="<?=$this->escapeHtmlAttr($this->replacePicture['cancelUrl'])?>" method="post">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fa fa-times"></i>
+                            <?=$this->escapeHtml($this->translate('moder/picture/replacement/cancel'))?>
+                        </button>
                     </form>
                 <?php } ?>
-            <?php } ?>
-
-            <?php if ($this->canBan) { ?>
-                <?=$this->partial('application/forms/bootstrap-horizontal', [
-                    'form' => $this->banForm
-                ])?>
-            <?php } ?>
+            </div>
         <?php } ?>
+
+
+        <h3><?=$this->escapeHtml($this->translate('moder/picture/acceptance'))?></h3>
+        <div class="well">
+            <div style="margin-bottom:15px"><?php
+                $changeStatusUserHtml = '';
+                if ($this->picture->change_status_user_id) {
+                    $changeStatusUserHtml = ' '.$this->user($this->picture->findParentRow(Application\Model\DbTable\User::class, 'Change_Status_User'));
+                }
+
+                switch ($this->picture->status) {
+                    case Application\Model\DbTable\Picture::STATUS_NEW:
+                    case Application\Model\DbTable\Picture::STATUS_INBOX:
+                        ?>
+                        <p><strong class="label label-warning">
+                            <?=$this->escapeHtml($this->translate('moder/picture/acceptance/not-accepted'))?>
+                            <?=$changeStatusUserHtml?>
+                            <?=(Application\Model\DbTable\Picture::STATUS_INBOX == $this->picture->status ? ' ' . $this->translate('moder/pictures/picture/inbox-mark') : '')?>
+                        </strong></p>
+                        <?php if ($this->canAccept) { ?>
+                            <form action="<?=$this->escapeHtmlAttr($this->acceptUrl)?>" method="post">
+                                <button type="submit" class="btn btn-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/accept'))?></button>
+                            </form>
+                        <?php } ?>
+                        <?php
+                        break;
+
+                    case Application\Model\DbTable\Picture::STATUS_ACCEPTED:
+                        ?>
+                        <p><strong class="label label-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/accepted'))?></strong></p>
+                        <?=$changeStatusUserHtml?>
+                        <?php if ($this->canUnaccept) { ?>
+                            <form action="<?=$this->escapeHtmlAttr($this->unacceptUrl)?>" method="post">
+                                <button type="submit" class="btn btn-warning"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/unaccept'))?></button>
+                            </form>
+                        <?php } ?>
+                        <?php
+                        break;
+
+                    case Application\Model\DbTable\Picture::STATUS_REMOVING:
+                        ?><p>
+                            <strong class="label label-danger">
+                                <?=$this->escapeHtml($this->translate('moder/picture/acceptance/in-delete-queue'))?>
+                            </strong>
+                            &nbsp;
+                            <?=$changeStatusUserHtml?>
+                        </p>
+                        <?php if ($this->canRestore) { ?>
+                            <form action="<?=$this->escapeHtmlAttr($this->restoreUrl)?>" method="post">
+                                <button type="submit" class="btn btn-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/restore'))?></button>
+                            </form>
+                        <?php }
+                        break;
+
+                    case Application\Model\DbTable\Picture::STATUS_REMOVED:
+                        ?><p><strong style="color:red">
+                            <?=$this->escapeHtml($this->translate('moder/picture/acceptance/removed'))?>
+                            <?=$changeStatusUserHtml?>
+                        </strong></p><?php
+                        break;
+                }
+            ?></div>
+
+            <?=$this->partial('application/moder/pictures/picture-vote', $this->pictureVote)?>
+        </div>
+
+        <?php if ($this->canNormalize || $this->canFlop || $this->canCrop) { ?>
+            <h3><?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair'))?></h3>
+            <div class="well">
+
+                <div class="btn-group">
+
+                    <?php if ($this->canNormalize) { ?>
+                        <button class="btn btn-danger normalize">
+                            <i class="fa fa-signal"></i>
+                            <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/normalize'))?>
+                        </button>
+                    <?php } ?>
+                    <?php if ($this->canFlop) { ?>
+                        <button class="btn btn-danger flop">
+                            <i class="fa fa-arrows-h"></i>
+                            <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/flop'))?>
+                        </button>
+                    <?php } ?>
+                    <?php if ($this->canCrop) { ?>
+                        <button class="btn btn-success crop">
+                            <i class="fa fa-crop"></i>
+                            <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/crop'))?>
+                        </button>
+                    <?php } ?>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-default files-repair">
+                        <i class="fa fa-wrench"></i>
+                        <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/repair-all-files'))?>
+                    </button>
+                    <button class="btn btn-default files-correct-names">
+                        <i class="fa fa-wrench"></i>
+                        <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/rebuild-files-names'))?>
+                    </button>
+                </div>
+
+            </div>
+        <?php } ?>
+
+        <h3><?=$this->escapeHtml($this->translate('moder/picture/uploader'))?></h3>
+        <div class="well">
+            <?php if ($user = $this->picture->findParentRow(Application\Model\DbTable\User::class, 'Owner')) { ?>
+                <?=$this->user($user) ?>
+            <?php } else { ?>
+                <?=$this->escapeHtml($this->translate('moder/picture/uploader/unknown'))?>
+            <?php } ?>
+            <?php if ($this->picture->ip) { ?>
+                <?=$this->escapeHtml($this->translate('moder/picture/uploader/id-address:'))?>
+                <b><?=$this->escapeHtml(inet_ntop($this->picture->ip))?></b><br />
+                <?php if ($this->ban) { ?>
+                    <p>
+                        <?=$this->escapeHtml($this->translate('ban/that-address-is-banned'))?>
+                        <?php if ($this->ban['user']) { ?>
+                            <?=$this->user($this->ban['user']) ?>
+                        <?php } ?>
+                        <?php if ($this->ban['up_to']) { ?>
+                            <?=$this->escapeHtml($this->translate('ban/until'))?>
+                            <?=$this->ban['up_to']->format(MYSQL_DATETIME_FORMAT) ?>
+                            <?php if ($this->ban['reason']) { ?>
+                                (<?=$this->escapeHtml($this->ban['reason'])?>)
+                            <?php } ?>
+                        <?php } ?>
+                    </p>
+
+                    <?php if ($this->canBan) { ?>
+                        <form action="<?=$this->url('ban/unban-ip', [
+                            'ip' => inet_ntop($this->picture->ip)
+                        ]) ?>" method="post" style="margin:10px 0">
+                            <input type="submit" value="<?=$this->escapeHtmlAttr($this->translate('ban/unban'))?>" />
+                        </form>
+                    <?php } ?>
+                <?php } ?>
+
+                <?php if ($this->canBan) { ?>
+                    <?=$this->partial('application/forms/bootstrap-horizontal', [
+                        'form' => $this->banForm
+                    ])?>
+                <?php } ?>
+            <?php } ?>
+        </div>
     </div>
 </div>

@@ -48,15 +48,17 @@
             <?php } ?>
         <?php } ?>
         <?php if ($this->user()->isAllowed('specifications', 'edit')) { ?>
-            <td></td>
-            <?php foreach ($this->table->getEngines() as $engine) { ?>
-                <td>
-                    <?=$this->htmlA($this->url('cars/params', [
-                        'action'     => 'engine-spec-editor',
-                        'engine_id'  => $engine['id']
-                    ]), $this->translate('carlist/edit-specs'))?>
-                </td>
-            <?php } ?>
+            <tr>
+                <td></td>
+                <?php foreach ($this->table->getEngines() as $engine) { ?>
+                    <td>
+                        <?=$this->htmlA($this->url('cars/params', [
+                            'action'     => 'engine-spec-editor',
+                            'engine_id'  => $engine['id']
+                        ]), $this->translate('carlist/edit-specs'))?>
+                    </td>
+                <?php } ?>
+            </tr>
         <?php } ?>
     </tbody>
 </table>

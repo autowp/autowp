@@ -36,13 +36,13 @@
         <p>
             <?=$this->escapeHtml($this->translate('users/user/known-as:'))?>
             <strong>«<?=$this->escapeHtml($this->currentUser->getCompoundName()) ?>»</strong>
-            <?php foreach ($this->renames as $rename) { ?>
-                <div style="color:#666666;margin-left:40px;cursor:help" title="<?=$this->escapeHtmlAttr($this->user()->humanTime($rename->getDateTime('date')))?>">
-                    <?=$this->escapeHtml($this->translate('users/user/before-known-as:'))?>
-                    <strong style="color:#666666">«<?=$this->escapeHtml($rename->old_name) ?>»</strong>
-                </div>
-            <?php } ?>
         </p>
+        <?php foreach ($this->renames as $rename) { ?>
+            <div style="color:#666666;margin-left:40px;cursor:help" title="<?=$this->escapeHtmlAttr($this->user()->humanTime($rename->getDateTime('date')))?>">
+                <?=$this->escapeHtml($this->translate('users/user/before-known-as:'))?>
+                <strong style="color:#666666">«<?=$this->escapeHtml($rename->old_name) ?>»</strong>
+            </div>
+        <?php } ?>
 
         <p><?=$this->escapeHtml($this->translate('users/user/type:'))?> <strong>
         <?php if ($this->user($this->currentUser)->inheritsRole('moder')) { ?>

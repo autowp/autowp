@@ -12,29 +12,29 @@
         <?php if (count($this->accounts)) { ?>
             <div class="well">
                 <?php foreach ($this->accounts as $account) { ?>
-                    <p>
-                        <?php if ($account['canRemove']) { ?>
-                            <form action="<?=$this->escapeHtmlAttr($account['removeUrl'])?>" method="post">
-                                <button type="submit" class="btn btn-xs btn-danger" title="<?=$this->escapeHtml($this->translate('account/accounts/remove'))?>">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                                &#xa0;
-                                <i class="fa-fw <?=$account['icon']?>"></i>
-                                <?php if ($account['link']) { ?>
-                                    <?=$this->htmlA($account['link'], $account['name'])?>
-                                <?php } else { ?>
-                                    <?=$this->escapeHtml($account['name'])?>
-                                <?php } ?>
-                            </form>
-                        <?php } else { ?>
+                    <?php if ($account['canRemove']) { ?>
+                        <form action="<?=$this->escapeHtmlAttr($account['removeUrl'])?>" method="post">
+                            <button type="submit" class="btn btn-xs btn-danger" title="<?=$this->escapeHtml($this->translate('account/accounts/remove'))?>">
+                                <i class="fa fa-times"></i>
+                            </button>
+                            &#xa0;
                             <i class="fa-fw <?=$account['icon']?>"></i>
                             <?php if ($account['link']) { ?>
                                 <?=$this->htmlA($account['link'], $account['name'])?>
                             <?php } else { ?>
                                 <?=$this->escapeHtml($account['name'])?>
                             <?php } ?>
-                        <?php } ?>
-                    </p>
+                        </form>
+                    <?php } else { ?>
+                        <p>
+                            <i class="fa-fw <?=$account['icon']?>"></i>
+                            <?php if ($account['link']) { ?>
+                                <?=$this->htmlA($account['link'], $account['name'])?>
+                            <?php } else { ?>
+                                <?=$this->escapeHtml($account['name'])?>
+                            <?php } ?>
+                        </p>
+                    <?php } ?>
                 <?php } ?>
             </div>
         <?php } ?>
