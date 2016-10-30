@@ -824,6 +824,9 @@ CREATE TABLE IF NOT EXISTS `car_parent_cache` (
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+insert into car_parent_cache (car_id, parent_id, diff, tuning, sport)
+values (1, 1, 0, 0, 0);
+
 -- --------------------------------------------------------
 
 --
@@ -1325,6 +1328,9 @@ CREATE TABLE IF NOT EXISTS `image` (
   KEY `image_dir_id` (`dir`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3617343 DEFAULT CHARSET=utf8;
 
+insert into image (id, filepath, filesize, width, height, date_add, dir)
+values (1, "1.jpg", 242405, 1200, 800, NOW(), "picture");
+
 -- --------------------------------------------------------
 
 --
@@ -1657,6 +1663,9 @@ CREATE TABLE IF NOT EXISTS `of_day` (
   KEY `FK_of_day_cars_id` (`car_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB; (`picture_id`)';
 
+INSERT INTO of_day (day_date, car_id, twitter_sent)
+VALUES (CURDATE(), 1, 0);
+
 -- --------------------------------------------------------
 
 --
@@ -1871,8 +1880,8 @@ CREATE TABLE IF NOT EXISTS `pictures` (
   KEY `copyrights_text_id` (`copyrights_text_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=917309 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB; (`owner_id`)';
 
-insert into pictures (id, car_id, width, height, status, ip, owner_id, type) 
-values (1, 1, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 1);
+insert into pictures (id, car_id, width, height, status, ip, owner_id, type, image_id) 
+values (1, 1, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 1, 1);
 
 -- --------------------------------------------------------
 

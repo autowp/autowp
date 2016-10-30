@@ -106,7 +106,6 @@ class PictureController extends AbstractActionController
                     } else {
                         $select
                             ->order([
-                                'mp.position',
                                 'pictures.width DESC', 'pictures.height DESC'
                             ]);
                     }

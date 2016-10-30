@@ -1,5 +1,9 @@
 <?php
 
+namespace Application;
+
+$imageDir = __DIR__ . '/image/';
+
 return [
     'db' => [
         'params' => [
@@ -56,4 +60,23 @@ return [
             ],
         ],
     ],
+    'imageStorage' => [
+        'dirs' => [
+            'format' => [
+                'path' => $imageDir . "format",
+            ],
+            'museum' => [
+                'path' => $imageDir . "museum",
+            ],
+            'user' => [
+                'path' => $imageDir . "user",
+            ],
+            'brand' => [
+                'path' => $imageDir . "brand",
+            ],
+            'picture' => [
+                'path' => __DIR__ . '/pictures/',
+            ]
+        ],
+    ]
 ];
