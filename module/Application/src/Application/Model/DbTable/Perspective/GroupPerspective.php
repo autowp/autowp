@@ -16,7 +16,7 @@ class GroupPerspective extends Zend_Db_Table
         ],
         'Perspective' => [
             'columns'       => ['perspective_id'],
-            'refTableClass' => \Application\Model\DbTable\Perspective:class,
+            'refTableClass' => \Application\Model\DbTable\Perspective::class,
             'refColumns'    => ['id']
         ]
     ];
