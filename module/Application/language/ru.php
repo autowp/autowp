@@ -537,6 +537,7 @@ return [
 
     'picture/image-specifications' => 'Характеристики изображения',
     'picture/added-by:' => 'Добавил:',
+    'picture/location' => 'Координаты',
     'picture/status:' => 'Статус изображения:',
     'picture/status/inbox' => 'Решение не вынесено',
     'picture/status/new' => 'Новое',
@@ -1319,6 +1320,7 @@ return [
     'moder/picture/filter/owner' => 'Добавил (id)',
     'moder/picture/filter/special-name' => 'Только с особым названием',
     'moder/picture/filter/not-linked' => 'Без привязки',
+    'moder/picture/filter/gps' => 'С координатами',
     'moder/picture/filter/order' => 'Сортировать по',
 
     'moder/pictures/filter' => 'Фильтр',

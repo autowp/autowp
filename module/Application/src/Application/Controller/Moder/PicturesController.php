@@ -425,6 +425,10 @@ class PicturesController extends AbstractActionController
                     break;
             }
         }
+        
+        if ($formdata['gps']) {
+            $select->where('pictures.point IS NOT NULL');
+        }
 
         if ($joinPdr) {
             $select
@@ -1018,64 +1022,32 @@ class PicturesController extends AbstractActionController
             }
         }
 
-        if ($picture->image_id) {
-            $imageStorage = $this->imageStorage();
-            $iptcStr = $imageStorage->getImageIPTC($picture->image_id);
+        $imageStorage = $this->imageStorage();
+        $iptcStr = $imageStorage->getImageIPTC($picture->image_id);
 
-            $exifStr = $imageStorage->getImageEXIF($picture->image_id);
-        } else {
-
-            $iptcStr = '';
-            try {
-                getimagesize($picture->getSourceFilePath(), $info);
-                if (is_array($info) && array_key_exists('APP13', $info)) {
-                    $IPTC = iptcparse($info['APP13']);
-                    if (is_array($IPTC)) {
-                        foreach ($IPTC as $key => $value) {
-                            $iptcStr .= "<b>IPTC Key:</b> ".htmlspecialchars($key)." <b>Contents:</b> ";
-                            foreach ($value as $innerkey => $innervalue) {
-                                if ( ($innerkey+1) != count($value) )
-                                    $iptcStr .= htmlspecialchars($innervalue) . ", ";
-                                else
-                                    $iptcStr .= htmlspecialchars($innervalue);
-                            }
-                            $iptcStr .= '<br />';
-                        }
+        $exif = $imageStorage->getImageEXIF($picture->image_id);
+        
+        $exifStr = '';
+        $notSections = ['FILE', 'COMPUTED'];
+        if ($exif !== false) {
+            foreach ($exif as $key => $section) {
+                if (array_search($key, $notSections) !== false) {
+                    continue;
+                }
+        
+                $exifStr .= '<p>['.htmlspecialchars($key).']';
+                foreach ($section as $name => $val) {
+                    $exifStr .= "<br />".htmlspecialchars($name).": ";
+                    if (is_array($val)) {
+                        $exifStr .= htmlspecialchars(implode(', ', $val));
                     } else {
-                        $iptcStr .= $IPTC;
+                        $exifStr .= htmlspecialchars($val);
                     }
                 }
-            } catch (Exception $e) {
-                $iptcStr = 'Error read IPTC: '.$e->getMessage();
-            }
-
-            $exifStr = '';
-            try {
-                $NotSections = ['FILE', 'COMPUTED'];
-                $exif = @exif_read_data($picture->getSourceFilePath(), 0, True);
-                if ($exif !== false) {
-                    foreach ($exif as $key => $section) {
-                        if (array_search($key, $NotSections) !== false)
-                            continue;
-
-                        $exifStr .= '<p>['.htmlspecialchars($key).']';
-                        foreach ($section as $name => $val) {
-                            $exifStr .= "<br />".htmlspecialchars($name).": ";
-                            if (is_array($val))
-                                $exifStr .= htmlspecialchars(implode(', ', $val));
-                            else
-                                $exifStr .= htmlspecialchars($val);
-                        }
-
-                        $exifStr .= '</p>';
-                    }
-                }
-            } catch (Exception $e) {
-                $exifStr .= 'Error read EXIF: '.$e->getMessage();
+    
+                $exifStr .= '</p>';
             }
         }
-
-
 
         $canMove =  $this->user()->isAllowed('picture', 'move');
 

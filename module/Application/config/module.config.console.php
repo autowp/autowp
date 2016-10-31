@@ -119,7 +119,7 @@ return [
                 ],
                 'pictures' => [
                     'options' => [
-                        'route'    => 'pictures (clear-queue):action',
+                        'route'    => 'pictures (clear-queue|fill-point):action',
                         'defaults' => [
                             'controller' => Controller\Console\PicturesController::class,
                         ]

@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Application\ExifGPSExtractor;
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
 use Application\Model\Comments;
@@ -16,6 +17,9 @@ use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Service\TelegramService;
+
+use geoPHP;
+use Point;
 
 use Zend_Db_Expr;
 
@@ -372,6 +376,19 @@ class UploadController extends AbstractActionController
                     'ip'                 => $this->getRequest()->getServer('REMOTE_ADDR'),
                     'moderatorAttention' => CommentMessage::MODERATOR_ATTENTION_NONE
                 ]);
+            }
+            
+            // read gps
+            $exif = $this->imageStorage()->getImageEXIF($picture->image_id);
+            $extractor = new ExifGPSExtractor();
+            $gps = $extractor->extract($exif);
+            if ($gps !== false) {
+                geoPHP::version();
+                $point = new Point($gps['lng'], $gps['lat']);
+                $pointExpr = new Zend_Db_Expr($pictureTable->getAdapter()->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
+            
+                $picture->point = $pointExpr;
+                $picture->save();
             }
 
             $formatRequest = $picture->getFormatRequest();

@@ -932,9 +932,15 @@ class Pic extends AbstractPlugin
                 ];
             }
         }
+        
+        $point = null;
+        if ($picture->point) {
+            $point = \geoPHP::load(substr($picture->point, 4), 'wkb');
+        }
 
         $data = [
             'id'                => $picture['id'],
+            'point'             => $point,
             'copyrights'        => $copyrights,
             'identity'          => $picture['identity'],
             'name'              => $name,

@@ -509,6 +509,7 @@ return [
 
     'picture/image-specifications' => '图像参数',
     'picture/added-by:' => '贡献者:',
+    'picture/location' => 'Coordinates',
     'picture/status:' => '图片状态:',
     'picture/status/inbox' => '尚未审核',
     'picture/status/new' => '新图片',
@@ -1291,6 +1292,7 @@ return [
     'moder/picture/filter/owner' => '由(id)上传',
     'moder/picture/filter/special-name' => 'Special name only',
     'moder/picture/filter/not-linked' => 'Not linked',
+    'moder/picture/filter/gps' => 'With coordinates',
     'moder/picture/filter/order' => 'Order by',
 
     'moder/pictures/filter' => 'Filter',

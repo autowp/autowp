@@ -164,6 +164,14 @@ class Inbox extends Form implements InputFilterProviderInterface
                 ]
             ],
             [
+                'name'    => 'gps',
+                'type'    => 'Checkbox',
+                'options' => [
+                    'label' => 'moder/picture/filter/gps',
+                    'value' => '1',
+                ]
+            ],
+            [
                 'name'    => 'order',
                 'type'    => 'Select',
                 'options' => [
@@ -304,6 +312,9 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'required' => false
             ],
             'lost' => [
+                'required' => false
+            ],
+            'gps' => [
                 'required' => false
             ],
             'order' => [

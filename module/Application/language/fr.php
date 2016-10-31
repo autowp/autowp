@@ -523,6 +523,7 @@ Bonne chance.',
 
     'picture/image-specifications' => 'Caractéristiques de l\'image',
     'picture/added-by:' => 'Ajouté:',
+    'picture/location' => 'Coordinates',
     'picture/status:' => 'Titre de l\'image:',
     'picture/status/inbox' => 'Une décision ne se fait pas',
     'picture/status/new' => 'Nouveau',
@@ -1306,6 +1307,7 @@ Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/fe
     'moder/picture/filter/owner' => 'Telechargé par (id)',
     'moder/picture/filter/special-name' => 'Seulement avec le nom spécial',
     'moder/picture/filter/not-linked' => 'Non lié',
+    'moder/picture/filter/gps' => 'With coordinates',
     'moder/picture/filter/order' => 'Commandé par',
 
     'moder/pictures/filter' => 'Filtre',

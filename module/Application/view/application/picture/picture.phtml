@@ -112,6 +112,15 @@
                     <?=$this->escapeHtml($this->user()->humanTime($this->addDate)) ?>
                 </li>
             <?php } ?>
+            <?php if ($this->point) { ?>
+                <li>
+                    <span class="fa fa-map-pin"></span>
+                    <?=$this->htmlA(
+                        'https://www.openstreetmap.org/?mlat='.$this->point->y().'&mlon='.$this->point->x().'#map=6/'.$this->point->y().'/'.$this->point->x(), 
+                        $this->translate('picture/location')
+                    )?>
+                </li>
+            <?php } ?>
             <li>
                 <?=$this->escapeHtml($this->translate('picture/status:'))?>
                 <?php
