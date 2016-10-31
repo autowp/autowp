@@ -20,6 +20,7 @@ return [
         'Zend\\Mvc\\Console',
         'Zend\\Session',
         'Zend\\Log',
+        'Autowp\\Image',
         'Autowp\\ZFComponents',
         'Application',
         //'ZF\ContentNegotiation',

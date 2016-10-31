@@ -192,10 +192,6 @@ return [
                     $sm->get(FileSize::class)
                 );
             },
-            'imageStorage' => function($sm) {
-                $storage = $sm->get(Image\Storage::class);
-                return new Controller\Plugin\ImageStorage($storage);
-            },
             'language' => function($sm) {
                 $language = $sm->get(Language::class);
                 return new Controller\Plugin\Language($language);
@@ -283,19 +279,6 @@ return [
                     $sm->get('ViewRenderer'),
                     $sm->get(VehicleNameFormatter::class)
                 );
-            },
-            Image\Storage::class => function($sm) {
-                $config = $sm->get('Config')['imageStorage'];
-                $storage = new Image\Storage($config);
-
-                $request = $sm->get('Request');
-                if ($request instanceof \Zend\Http\Request) {
-                    if ($request->getServer('HTTPS')) {
-                        $storage->setForceHttps(true);
-                    }
-                }
-
-                return $storage;
             },
             HostManager::class => function($sm) {
                 $config = $sm->get('Config');

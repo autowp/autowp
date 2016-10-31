@@ -4,8 +4,6 @@ namespace Application;
 
 use Zend\Permissions\Acl\Acl;
 
-use Autowp\Image;
-
 return [
     'view_manager' => [
         'display_not_found_reason' => true,
@@ -94,11 +92,7 @@ return [
                 $router = $sm->get('Router');
                 return new View\Helper\UserText($router);
             },
-            'imageStorage' => function($sm) {
-                $imageStorage = $sm->get(Image\Storage::class);
-                return new View\Helper\ImageStorage($imageStorage);
-            },
-                'inlinePicture' => function($sm) {
+            'inlinePicture' => function($sm) {
                 return new View\Helper\InlinePicture($translator);
             },
             'sidebar' => function($sm) {

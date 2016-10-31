@@ -19,7 +19,7 @@
         "michelf/php-markdown": "^1.6",
         "league/html-to-markdown": "^4.1",
         "autowp/textstorage": "^1.0",
-        "autowp/image": "^1.0",
+        "autowp/image": "^1.1",
         "autowp/filters": "^1.1",
         "autowp/external-login-service": "^1.0",
         "zendframework/zend-uri": ">=2.5",
