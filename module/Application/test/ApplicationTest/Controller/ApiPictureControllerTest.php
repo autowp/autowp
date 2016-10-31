@@ -3,10 +3,9 @@
 namespace ApplicationTest\Controller;
 
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use Zend\Json\Json;
 
 use Application\Controller\Api\PictureController;
-use Zend\Http\Response;
-use Zend\Json\Json;
 
 class ApiPictureControllerTest extends AbstractHttpControllerTestCase
 {
