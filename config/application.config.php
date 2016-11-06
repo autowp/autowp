@@ -21,6 +21,7 @@ return [
         'Zend\\Session',
         'Zend\\Validator',
         'Autowp\\Image',
+        'Autowp\\TextStorage',
         'Autowp\\ZFComponents',
         'Application',
         //'ZF\ContentNegotiation',

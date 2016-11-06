@@ -335,11 +335,6 @@ return [
 
                 return new Language($request);
             },
-            TextStorage\Service::class => function($sm) {
-                $options = $sm->get('Config')['textstorage'];
-                $options['dbAdapter'] = $sm->get(Zend_Db_Adapter_Abstract::class);
-                return new TextStorage\Service($options);
-            },
             Acl::class => Permissions\AclFactory::class,
             ExternalLoginServiceFactory::class => function($sm) {
                 $config = $sm->get('Config');
@@ -433,7 +428,8 @@ return [
 
     'textstorage' => [
         'textTableName'     => 'textstorage_text',
-        'revisionTableName' => 'textstorage_revision'
+        'revisionTableName' => 'textstorage_revision',
+        'dbAdapter'         => Zend_Db_Adapter_Abstract::class
     ],
 
     'feedback' => [

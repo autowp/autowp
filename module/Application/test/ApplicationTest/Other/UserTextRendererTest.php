@@ -2,8 +2,6 @@
 
 namespace ApplicationTest\Other;
 
-use Autowp\UserText\Renderer;
-
 use Zend\Test\PHPUnit\Controller\AbstractControllerTestCase;
 
 /**
