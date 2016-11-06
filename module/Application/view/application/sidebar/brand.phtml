@@ -1,9 +1,16 @@
 <div class="well">
-    <ul class="nav nav-pills nav-stacked">
-        <?php foreach ($this->groups as $group) { ?>
-            <li<?=isset($group['active']) && $group['active'] ? ' class="active"' : ''?>>
-                <?=$this->htmlA($group['url'], $this->escapeHtml($group['caption']) . (isset($group['count']) ? ' ' .$this->count($group['count']) : ''), false) ?>
-            </li>
+    <?php foreach ($this->sections as $sectoin) { ?>
+        <?php if (count($sectoin['groups'])) { ?>
+            <?php if ($sectoin['name']) { ?>
+                <h5><?=$this->escapeHtml($this->translate($sectoin['name']))?></h5>
+            <?php } ?>
+            <ul class="nav nav-pills nav-stacked">
+                <?php foreach ($sectoin['groups'] as $group) { ?>
+                    <li<?=isset($group['active']) && $group['active'] ? ' class="active"' : ''?>>
+                        <?=$this->htmlA($group['url'], $this->escapeHtml($group['caption']) . (isset($group['count']) ? ' ' .$this->count($group['count']) : ''), false) ?>
+                    </li>
+                <?php } ?>
+            </ul>
         <?php } ?>
-    </ul>
+    <?php } ?>
 </div>

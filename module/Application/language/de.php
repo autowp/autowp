@@ -317,6 +317,10 @@ return [
     'catalogue/specifications-of-%1$s' => 'Specifications of %1$s',
     'catalogue/specifications' => 'Specifications',
     'catalogue/other-photos' => 'Other photos',
+    'catalogue/section/moto' => 'Moto',
+    'catalogue/section/tractors' => 'Tractors',
+    'catalogue/section/buses' => 'Buses',
+    'catalogue/section/trucks' => 'Trucks',
 
     'catalogue/engine-menu/vehicles' => 'Vehicles',
     'catalogue/engine-menu/pictures' => 'Pictures',

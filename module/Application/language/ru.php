@@ -331,6 +331,10 @@ return [
     'catalogue/specifications-of-%1$s' => 'Технические характеристики %1$s',
     'catalogue/specifications' => 'Технические характеристики',
     'catalogue/other-photos' => 'Другие фото',
+    'catalogue/section/moto' => 'Мото',
+    'catalogue/section/tractors' => 'Тракторы',
+    'catalogue/section/buses' => 'Автобусы',
+    'catalogue/section/trucks' => 'Грузовые',
 
     'catalogue/engine-menu/vehicles' => 'Автомобили',
     'catalogue/engine-menu/pictures' => 'Изображения',

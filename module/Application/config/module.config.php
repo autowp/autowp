@@ -207,8 +207,7 @@ return [
             },
             'sidebar' => function ($sm) {
                 return new Controller\Plugin\Sidebar(
-                    $sm->get('fastCache'),
-                    $sm->get('MvcTranslator')
+                    $sm->get(Model\BrandNav::class)
                 );
             },
             'translate' => function ($sm) {
@@ -258,6 +257,13 @@ return [
     ],
     'service_manager' => [
         'factories' => [
+            Model\BrandNav::class => function($container) {
+                return new Model\BrandNav(
+                    $container->get('fastCache'),
+                    $container->get('MvcTranslator'),
+                    $container->get('HttpRouter')
+                );
+            },
             Model\Message::class => function($sm) {
                 return new Model\Message(
                     $sm->get(Service\TelegramService::class)

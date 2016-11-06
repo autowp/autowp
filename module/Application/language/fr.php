@@ -317,6 +317,10 @@ S'il vous plaît noter que l'ajout d'images modérés. c'est-à-dire toutes les 
     'catalogue/specifications-of-%1$s' => 'Caractéristiques de %1$s',
     'catalogue/specifications' => 'Caractéristiques',
     'catalogue/other-photos' => 'Plus d\'images',
+    'catalogue/section/moto' => 'Moto',
+    'catalogue/section/tractors' => 'Tractors',
+    'catalogue/section/buses' => 'Buses',
+    'catalogue/section/trucks' => 'Trucks',
 
     'catalogue/engine-menu/vehicles' => 'Vehicles',
     'catalogue/engine-menu/pictures' => 'Pictures',

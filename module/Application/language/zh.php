@@ -303,6 +303,10 @@ return [
     'catalogue/specifications-of-%1$s' => '%1$s的性能参数',
     'catalogue/specifications' => '性能参数',
     'catalogue/other-photos' => '其它图片',
+    'catalogue/section/moto' => 'Moto',
+    'catalogue/section/tractors' => 'Tractors',
+    'catalogue/section/buses' => 'Buses',
+    'catalogue/section/trucks' => 'Trucks',
 
     'catalogue/engine-menu/vehicles' => '车型',
     'catalogue/engine-menu/pictures' => '图片',
