@@ -28,3 +28,4 @@ script: ./vendor/bin/phpunit --coverage-clover ./logs/clover.xml
 
 after_script:
 - ./vendor/bin/coveralls -v
+- ./vendor/bin/test-reporter -v --coverage-report=./test/logs/clover.xml
