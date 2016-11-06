@@ -2,7 +2,7 @@
 
 namespace Application;
 
-$imageDir = __DIR__ . '/image/';
+$imageDir = __DIR__ . DIRECTORY_SEPARATOR . 'image' . DIRECTORY_SEPARATOR;
 
 return [
     'db' => [

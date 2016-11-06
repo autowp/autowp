@@ -60,8 +60,8 @@ class CarOrganize extends Form implements InputFilterProviderInterface
         if (!is_null($this->inheritedIsConcept)) {
             $isConceptOptions = array_merge([
                 'inherited' => $this->inheritedIsConcept
-                    ? 'moder/vehicle/is-concept/inherited-yes'
-                    : 'moder/vehicle/is-concept/inherited-no'
+                ? 'moder/vehicle/is-concept/inherited-yes'
+                : 'moder/vehicle/is-concept/inherited-no'
             ], $isConceptOptions);
         } else {
             $isConceptOptions = array_merge([
@@ -268,8 +268,8 @@ class CarOrganize extends Form implements InputFilterProviderInterface
     private function getCarTypeTable()
     {
         return $this->carTypeTable
-            ? $this->carTypeTable
-            : $this->carTypeTable = new VehicleType();
+        ? $this->carTypeTable
+        : $this->carTypeTable = new VehicleType();
     }
 
     private function getCarTypeOptions($parentId = null)

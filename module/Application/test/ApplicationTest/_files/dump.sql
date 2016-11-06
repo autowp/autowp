@@ -47,6 +47,9 @@ CREATE TABLE IF NOT EXISTS `acl_resources_privileges` (
   UNIQUE KEY `unique` (`resource_id`,`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8;
 
+insert into acl_resources_privileges (id, resource_id, name)
+values (1, 4, "edit_meta"), (2, 11, "edit");
+
 -- --------------------------------------------------------
 
 --
@@ -94,6 +97,11 @@ CREATE TABLE IF NOT EXISTS `acl_roles_parents` (
   KEY `parent_role_id` (`parent_role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `acl_roles_parents` (`role_id`, `parent_role_id`) VALUES
+(5, 14),
+(10, 14),
+(5, 10);
+
 -- --------------------------------------------------------
 
 --
@@ -106,6 +114,9 @@ CREATE TABLE IF NOT EXISTS `acl_roles_privileges_allowed` (
   PRIMARY KEY (`role_id`,`privilege_id`),
   KEY `privilege_id` (`privilege_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+insert into acl_roles_privileges_allowed (role_id, privilege_id)
+values (10, 1), (10, 2);
 
 -- --------------------------------------------------------
 
@@ -300,6 +311,9 @@ CREATE TABLE IF NOT EXISTS `attrs_attributes` (
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=208 DEFAULT CHARSET=utf8;
 
+insert into attrs_attributes (id, name, type_id, parent_id, unit_id, description, `precision`, position, multiple)
+values (1, "list", 6, null, null, "", 1, 1, 0);
+
 -- --------------------------------------------------------
 
 --
@@ -331,6 +345,9 @@ CREATE TABLE IF NOT EXISTS `attrs_list_options` (
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8;
 
+insert into attrs_list_options (id, attribute_id, name, position, parent_id)
+values (1, 1, "test option", 1, null);
+
 -- --------------------------------------------------------
 
 --
@@ -346,6 +363,15 @@ CREATE TABLE IF NOT EXISTS `attrs_types` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+
+INSERT INTO `attrs_types` (`id`, `name`, `element`, `maxlength`, `size`) VALUES
+(000001, 'Строка', 'text', 255, 60),
+(000002, 'Целое число', 'text', 15, 5),
+(000003, 'Число с плавающей точкой', 'text', 20, 5),
+(000004, 'Текст', 'textarea', 0, NULL),
+(000005, 'Флаг', 'select', 0, NULL),
+(000006, 'Список значений', 'select', 0, NULL),
+(000007, 'Дерево значений', 'select', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -748,7 +774,7 @@ CREATE TABLE IF NOT EXISTS `brands` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1893 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB; (`parent_brand_id`)';
 
 insert into brands (id, folder, caption, position)
-values (1, 'bmw', 'BMW', 0);
+values (1, 'bmw', 'BMW', 0), (2, 'test-brand', 'Test brand', 0);
 
 -- --------------------------------------------------------
 
@@ -2411,12 +2437,14 @@ CREATE TABLE IF NOT EXISTS `textstorage_text` (
 CREATE TABLE IF NOT EXISTS `twins_groups` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(80) NOT NULL,
-  `_description` mediumtext,
   `add_datetime` timestamp NULL DEFAULT NULL,
   `text_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `text_id` (`text_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2020 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 122880 kB';
+
+insert into twins_groups (id, name, add_datetime, text_id)
+values (1, "test twins", NOW(), null);
 
 -- --------------------------------------------------------
 
@@ -2430,6 +2458,9 @@ CREATE TABLE IF NOT EXISTS `twins_groups_cars` (
   PRIMARY KEY (`twins_group_id`,`car_id`),
   KEY `car_id` (`car_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 122880 kB; (`twins_group_id`)';
+
+insert into twins_groups_cars (twins_group_id, car_id)
+values (1, 1);
 
 -- --------------------------------------------------------
 
@@ -2504,6 +2535,9 @@ CREATE TABLE IF NOT EXISTS `user_remember` (
   PRIMARY KEY (`token`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+insert into user_remember (user_id, token, date)
+values (3, "admin-token", NOW());
 
 -- --------------------------------------------------------
 
@@ -2583,6 +2617,9 @@ values (1, 'tester', now(), 'user', inet6_aton('127.0.0.1'));
 
 INSERT INTO users (id, name, last_online, role, last_ip, identity)
 values (2, 'tester2', now(), 'user', inet6_aton('127.0.0.1'), 'identity');
+
+INSERT INTO users (id, name, last_online, role, last_ip, identity)
+values (3, 'admin', now(), 'admin', inet6_aton('127.0.0.1'), 'admin');
 
 -- --------------------------------------------------------
 

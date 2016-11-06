@@ -21,7 +21,7 @@ use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\Picture\View as PictureView;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
-use Application\Model\DbTable\User;
+use Application\Model\DbTable\User as UserTable;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
@@ -766,7 +766,7 @@ class Pic extends AbstractPlugin
             $moderLinks = $this->getModerLinks($picture);
         }
 
-        $userTable = new User();
+        $userTable = new UserTable();
 
         $moderVotes = [];
         foreach ($picture->findDependentRowset(PictureModerVote::class) as $moderVote) {
@@ -919,7 +919,7 @@ class Pic extends AbstractPlugin
                     '' => '--'
                 ], $multioptions);
 
-                $user = $picture->findParentRow(User::class, 'Change_Perspective_User');
+                $user = $picture->findParentRow(UserTable::class, 'Change_Perspective_User');
 
                 $picturePerspective = [
                     'options' => $multioptions,
@@ -932,7 +932,7 @@ class Pic extends AbstractPlugin
                 ];
             }
         }
-        
+
         $point = null;
         if ($picture->point) {
             $point = \geoPHP::load(substr($picture->point, 4), 'wkb');
@@ -945,7 +945,7 @@ class Pic extends AbstractPlugin
             'identity'          => $picture['identity'],
             'name'              => $name,
             'picture'           => $picture,
-            'owner'             => $picture->findParentRow(User::class, 'Owner'),
+            'owner'             => $picture->findParentRow(UserTable::class, 'Owner'),
             'addDate'           => $picture->getDateTime('add_date'),
             'ofLinks'           => $ofLinks,
             'moderVotes'        => $moderVotes,

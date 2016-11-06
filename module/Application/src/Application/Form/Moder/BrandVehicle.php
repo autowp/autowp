@@ -5,8 +5,9 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-use Application\Filter\SingleSpaces;
 use Application\Model\DbTable;
+
+use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class BrandVehicle extends Form implements InputFilterProviderInterface
 {
@@ -122,7 +123,7 @@ class BrandVehicle extends Form implements InputFilterProviderInterface
                 'filters' => [
                     ['name' => 'StringTrim'],
                     ['name' => SingleSpaces::class],
-                    ['name' => \Autowp\Filter\Filename\Safe::class]
+                    ['name' => \Autowp\ZFComponents\Filter\FilenameSafe::class]
                 ],
                 'validators' => [
                     [

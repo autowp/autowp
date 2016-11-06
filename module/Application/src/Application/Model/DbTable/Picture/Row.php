@@ -2,8 +2,8 @@
 
 namespace Application\Model\DbTable\Picture;
 
-use Autowp\Filter\Filename\Safe;
 use Autowp\Image\Storage\Request;
+use Autowp\ZFComponents\Filter\FilenameSafe;
 
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
@@ -44,7 +44,7 @@ class Row extends \Application\Db\Table\Row
     {
         $result = rand(1, 9999);
 
-        $filenameFilter = new Safe();
+        $filenameFilter = new FilenameSafe();
 
         switch ($this->type) {
             case Picture::LOGO_TYPE_ID:

@@ -2,10 +2,11 @@
 
 namespace Application\Model\DbTable;
 
-use Autowp\Filter\Filename\Safe;
+use Autowp\ZFComponents\Filter\FilenameSafe;
 
 use Application\Db\Table;
 use Application\Model\DbTable\BrandRow;
+use Application\Model\Brand as BrandModel;
 
 class Brand extends Table
 {
@@ -35,11 +36,11 @@ class Brand extends Table
         $data['type_id'] = $data['type_id'];
 
         // generate folder name
-        $filenameFilter = new Safe();
+        $filenameFilter = new FilenameSafe();
         $data['folder'] = $filenameFilter->filter($data['caption']);
         $data['position'] = 0;
 
-        if (mb_strlen($data['caption']) > 50) {
+        if (mb_strlen($data['caption']) > BrandModel::MAX_NAME) {
             throw new Exception('Name is too long');
         }
 

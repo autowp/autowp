@@ -268,7 +268,6 @@ class Moder_ModificationController extends Zend_Controller_Action
         }
 
         $combinations = $this->groupCombinations($map);
-        //var_dump(count($combinations)); exit;
 
         // get selected combinations
         $combModTable = new CombinationModification();

@@ -2,22 +2,49 @@
 
 namespace Application;
 
+use Zend\Form\ElementFactory;
 use Zend\Validator as ZendValidator;
 
 return [
     'form_elements' => [
-        'invokables' => [
-            Form\Element\BrandName::class => Form\Element\BrandName::class,
-            Form\Element\BrandFullName::class => Form\Element\BrandFullName::class,
-            Form\Element\EngineName::class => Form\Element\EngineName::class,
-            Form\Element\FactoryName::class => Form\Element\FactoryName::class,
-            Form\Element\Year::class => Form\Element\Year::class,
-            Form\Element\UserPassword::class => Form\Element\UserPassword::class,
+        'aliases' => [
+            'brandname' => Form\Element\BrandName::class,
+            'brandName' => Form\Element\BrandName::class,
+            'BrandName' => Form\Element\BrandName::class,
+            'brandfullname' => Form\Element\BrandFullName::class,
+            'brandFullName' => Form\Element\BrandFullName::class,
+            'BrandFullName' => Form\Element\BrandFullName::class,
+            'carbody' => Form\Element\CarBody::class,
+            'carBody' => Form\Element\CarBody::class,
+            'CarBody' => Form\Element\CarBody::class,
+            'carname' => Form\Element\CarName::class,
+            'carName' => Form\Element\CarName::class,
+            'CarName' => Form\Element\CarName::class,
+            'enginename' => Form\Element\EngineName::class,
+            'engineName' => Form\Element\EngineName::class,
+            'EngineName' => Form\Element\EngineName::class,
+            'factoryname' => Form\Element\FactoryName::class,
+            'factoryName' => Form\Element\FactoryName::class,
+            'FactoryName' => Form\Element\FactoryName::class,
+            'year' => Form\Element\Year::class,
+            'Year' => Form\Element\Year::class,
+            'userpassword' => Form\Element\UserPassword::class,
+            'userPassword' => Form\Element\UserPassword::class,
+            'UserPassword' => Form\Element\UserPassword::class,
+        ],
+        'factories' => [
+            Form\Element\BrandName::class     => ElementFactory::class,
+            Form\Element\BrandFullName::class => ElementFactory::class,
+            Form\Element\CarBody::class       => ElementFactory::class,
+            Form\Element\CarName::class       => ElementFactory::class,
+            Form\Element\EngineName::class    => ElementFactory::class,
+            Form\Element\FactoryName::class   => ElementFactory::class,
+            Form\Element\Year::class          => ElementFactory::class,
+            Form\Element\UserPassword::class  => ElementFactory::class,
         ]
     ],
     'forms' => [
         'FeedbackForm' => [
-            //'hydrator' => 'ObjectProperty',
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
@@ -369,7 +396,7 @@ return [
             'elements' => [
                 [
                     'spec' => [
-                        'type' => Form\Element\BrandName::class,
+                        'type' => 'BrandName',
                         'name' => 'name'
                     ],
                 ]

@@ -5,7 +5,7 @@ namespace Application\Form\Element;
 use Zend\Form\Element\Text;
 use Zend\InputFilter\InputProviderInterface;
 
-use Application\Filter\SingleSpaces;
+use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class CarName extends Text implements InputProviderInterface
 {

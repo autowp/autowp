@@ -462,14 +462,17 @@ class Module implements ConsoleUsageProviderInterface,
                         $changes = true;
                     }
 
-                    $ip = inet_pton($request->getServer('REMOTE_ADDR'));
-                    if ($ip != $user->last_ip) {
-                        $user->last_ip = $ip;
-                        $changes = true;
-                    }
+                    $remoteAddr = $request->getServer('REMOTE_ADDR');
+                    if ($remoteAddr) {
+                        $ip = inet_pton($remoteAddr);
+                        if ($ip != $user->last_ip) {
+                            $user->last_ip = $ip;
+                            $changes = true;
+                        }
 
-                    if ($changes) {
-                        $user->save();
+                        if ($changes) {
+                            $user->save();
+                        }
                     }
                 }
             }

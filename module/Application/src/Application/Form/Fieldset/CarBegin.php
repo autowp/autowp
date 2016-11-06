@@ -33,8 +33,6 @@ class CarBegin extends Fieldset implements InputFilterProviderInterface
     {
         parent::__construct($name, $options);
 
-        //var_dump($this->language, '2'); exit;
-
         $elements = [
             [
                 'name'    => 'year',

@@ -451,12 +451,6 @@ return [
             Validator\User\Login::class => InvokableFactory::class,
         ],
     ],
-    'filters' => [
-        'factories' => [
-            Filter\SingleSpaces::class => InvokableFactory::class,
-            \Autowp\Filter\Filename\Safe::class => InvokableFactory::class,
-        ],
-    ],
 
     'externalloginservice' => [
         'vk' => [

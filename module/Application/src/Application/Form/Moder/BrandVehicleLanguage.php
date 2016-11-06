@@ -5,8 +5,9 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-use Application\Filter\SingleSpaces;
 use Application\Model\DbTable;
+
+use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class BrandVehicleLanguage extends Form implements InputFilterProviderInterface
 {

@@ -5,8 +5,9 @@ namespace Application\Form\Element;
 use Zend\Form\Element\Text;
 use Zend\InputFilter\InputProviderInterface;
 
-use Application\Filter\SingleSpaces;
 use Application\Model\Brand as BrandModel;
+
+use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class BrandName extends Text implements InputProviderInterface
 {
@@ -29,9 +30,9 @@ class BrandName extends Text implements InputProviderInterface
     public function getInputSpecification()
     {
         return [
-            'name' => $this->getName(),
+            'name'     => $this->getName(),
             'required' => true,
-            'filters' => [
+            'filters'  => [
                 ['name' => 'StringTrim'],
                 ['name' => SingleSpaces::class]
             ],

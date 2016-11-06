@@ -28,6 +28,11 @@ class BrandsController extends AbstractActionController
     private $descForm;
 
     /**
+     * @var Form
+     */
+    private $editForm;
+
+    /**
      * @var HostManager
      */
     private $hostManager;
@@ -42,12 +47,14 @@ class BrandsController extends AbstractActionController
         $textStorage,
         Form $logoForm,
         Form $descForm,
+        Form $editForm,
         Message $message)
     {
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->logoForm = $logoForm;
         $this->descForm = $descForm;
+        $this->editForm = $editForm;
         $this->message = $message;
     }
 

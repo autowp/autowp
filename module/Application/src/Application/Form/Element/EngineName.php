@@ -5,7 +5,6 @@ namespace Application\Form\Element;
 use Zend\Form\Element\Text;
 use Zend\InputFilter\InputProviderInterface;
 
-use Application\Filter\SingleSpaces;
 use Application\Model\DbTable\Engine;
 
 class EngineName extends Text implements InputProviderInterface
@@ -35,7 +34,7 @@ class EngineName extends Text implements InputProviderInterface
             'required' => true,
             'filters' => [
                 ['name' => 'StringTrim'],
-                ['name' => SingleSpaces::class]
+                ['name' => 'SingleSpaces']
             ],
             'validators' => [
                 [

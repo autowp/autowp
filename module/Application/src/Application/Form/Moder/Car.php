@@ -254,8 +254,8 @@ class Car extends Form implements InputFilterProviderInterface
     private function getCarTypeTable()
     {
         return $this->carTypeTable
-            ? $this->carTypeTable
-            : $this->carTypeTable = new VehicleType();
+        ? $this->carTypeTable
+        : $this->carTypeTable = new VehicleType();
     }
 
     private function getCarTypeOptions($parentId = null)

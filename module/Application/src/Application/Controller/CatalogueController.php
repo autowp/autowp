@@ -664,16 +664,16 @@ class CatalogueController extends AbstractActionController
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
             ]);
-            
+
             $inboxBrandPictures = null;
             $inboxVehiclePictures = null;
             $inboxEnginePictures = null;
-            
+
             if ($this->user()->isAllowed('picture', 'move')) {
-                
+
                 $pictureTable = new Picture();
                 $db = $pictureTable->getAdapter();
-                
+
                 $inboxBrandPictures = $db->fetchOne(
                     $db->select()
                         ->from('pictures', 'count(1)')

@@ -5,7 +5,7 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-use Application\Filter\SingleSpaces;
+use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class CategoryLanguage extends Form implements InputFilterProviderInterface
 {

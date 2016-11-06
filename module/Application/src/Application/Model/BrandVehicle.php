@@ -4,7 +4,7 @@ namespace Application\Model;
 
 use Application\Model\DbTable;
 
-use Autowp\Filter\Filename\Safe;
+use Autowp\ZFComponents\Filter\FilenameSafe;
 
 use Zend_Db_Expr;
 
@@ -138,7 +138,7 @@ class BrandVehicle
 
     private function extractCatname(DbTable\BrandRow $brandRow, DbTable\Vehicle\Row $vehicleRow)
     {
-        $filter = new Safe();
+        $filter = new FilenameSafe();
         $catnameTemplate = $filter->filter($this->extractName($brandRow, $vehicleRow, 'en'));
 
         $i = 0;

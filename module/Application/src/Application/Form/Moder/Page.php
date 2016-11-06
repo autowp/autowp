@@ -5,8 +5,9 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-use Application\Filter\SingleSpaces;
 use Application\Model\DbTable\Page as PageTable;
+
+use Autowp\ZFComponents\Filter\SingleSpaces;
 
 class Page extends Form implements InputFilterProviderInterface
 {

@@ -21,8 +21,6 @@ class BrandsController extends AbstractActionController
 
     public function indexAction()
     {
-        //var_dump(preg_match("/^\p{Han}/u", "E33 mototrs"));
-
         $isHttps = (bool)$this->getRequest()->getServer('HTTPS');
 
         $language = $this->language();

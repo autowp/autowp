@@ -361,7 +361,7 @@ return [
                                 'action'     => 'index'
                             ],
                         ],
-                        'may_terminate' => true,
+                        'may_terminate' => false,
                         'child_routes'  => [
                             'params' => [
                                 'type' => Router\Http\WildcardSafe::class
@@ -397,6 +397,7 @@ return [
                     $sm->get(TextStorage\Service::class),
                     $sm->get('BrandLogoForm'),
                     $sm->get('DescriptionForm'),
+                    $sm->get('ModerBrandEdit'),
                     $sm->get(Model\Message::class)
                 );
             },
@@ -424,8 +425,9 @@ return [
                 );
             },
             Controller\Moder\CommentsController::class => function($sm) {
-                $form = $sm->get('ModerCommentsFilterForm');
-                return new Controller\Moder\CommentsController($form);
+                return new Controller\Moder\CommentsController(
+                    $sm->get('ModerCommentsFilterForm')
+                );
             },
             Controller\Moder\EnginesController::class => function($sm) {
                 $filterForm = $sm->get('ModerFactoryFilterForm');
@@ -490,6 +492,24 @@ return [
         ]
     ],
     'forms' => [
+        'ModerCarForm' => [
+            'type' => Form\Moder\Car::class,
+            'attributes'  => [
+                'method' => 'post',
+            ],
+        ],
+        'ModerCarOrganizeForm' => [
+            'type' => Form\Moder\CarOrganize::class,
+            'attributes'  => [
+                'method' => 'post',
+            ],
+        ],
+        'ModerCarOrganizePicturesForm' => [
+            'type' => Form\Moder\CarOrganizePictures::class,
+            'attributes'  => [
+                'method' => 'post',
+            ],
+        ],
         'ModerCommentsFilterForm' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
@@ -586,7 +606,7 @@ return [
                     'required' => true,
                     'filters'  => [
                         ['name' => 'StringTrim'],
-                        ['name' => Filter\SingleSpaces::class]
+                        ['name' => 'SingleSpaces']
                     ],
                     'validators' => [
                         [
@@ -969,7 +989,7 @@ return [
             'elements' => [
                 [
                     'spec' => [
-                        'type' => Form\Element\EngineName::class,
+                        'type' => 'EngineName',
                         'name' => 'caption'
                     ],
                 ]
@@ -979,7 +999,15 @@ return [
                     'required' => true,
                     'filters'  => [
                         ['name' => 'StringTrim'],
-                        ['name' => Filter\SingleSpaces::class]
+                        ['name' => 'SingleSpaces']
+                    ],
+                    'validators' => [
+                        [
+                            'name' => 'StringLength',
+                            'options' => [
+                                'max' => Model\DbTable\Engine::MAX_NAME
+                            ]
+                        ]
                     ]
                 ]
             ],
@@ -1009,7 +1037,7 @@ return [
                     'required' => false,
                     'filters'  => [
                         ['name' => 'StringTrim'],
-                        ['name' => Filter\SingleSpaces::class]
+                        ['name' => 'SingleSpaces']
                     ]
                 ]
             ],
@@ -1122,7 +1150,7 @@ return [
                     'required' => true,
                     'filters'  => [
                         ['name' => 'StringTrim'],
-                        ['name' => Filter\SingleSpaces::class]
+                        ['name' => 'SingleSpaces']
                     ],
                     'validators' => [
                         [
@@ -1134,6 +1162,12 @@ return [
                         ]
                     ]
                 ]
+            ],
+        ],
+        'ModerBrandEdit' => [
+            'type' => Form\Moder\Brand\Edit::class,
+            'attributes'  => [
+                'method' => 'post',
             ],
         ],
         'ModerBrandCar' => [
@@ -1160,9 +1194,9 @@ return [
                     'required' => true,
                     'filters'  => [
                         ['name' => 'StringTrim'],
-                        ['name' => Filter\SingleSpaces::class],
+                        ['name' => 'SingleSpaces'],
                         ['name' => 'StringToLower'],
-                        ['name' => \Autowp\Filter\Filename\Safe::class]
+                        ['name' => 'FilenameSafe']
                     ],
                     'validators' => [
                         [
@@ -1212,7 +1246,7 @@ return [
                     'required'   => false,
                     'filters'    => [
                         ['name' => 'StringTrim'],
-                        ['name' => Filter\SingleSpaces::class],
+                        ['name' => 'SingleSpaces'],
                     ],
                     'validators' => [
                         [
@@ -1228,9 +1262,9 @@ return [
                     'required' => true,
                     'filters'  => [
                         ['name' => 'StringTrim'],
-                        ['name' => Filter\SingleSpaces::class],
+                        ['name' => 'SingleSpaces'],
                         ['name' => 'StringToLower'],
-                        ['name' => \Autowp\Filter\Filename\Safe::class]
+                        ['name' => 'FilenameSafe']
                     ],
                     'validators' => [
                         [

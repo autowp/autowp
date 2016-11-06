@@ -51,8 +51,6 @@ class Month extends Select implements InputProviderInterface
             /*if (isset($this->options['value_options'])) {
                 $this->setValueOptions($this->options['value_options']);
             }*/
-
-            //var_dump($options); exit;
         }
 
         parent::setOptions($options);

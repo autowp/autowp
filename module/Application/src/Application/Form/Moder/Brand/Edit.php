@@ -4,42 +4,50 @@ namespace Application\Form\Moder\Brand;
 
 use Zend\Form\Form;
 
-use Application\Form\Element\BrandName;
-use Application\Form\Element\BrandFullName;
-
 class Edit extends Form
 {
     private $languages = [];
 
-    public function __construct($name = null, $options = [])
+    private $elementsAdded = false;
+
+    /**
+     * Retrieve all attached elements
+     *
+     * Storage is an implementation detail of the concrete class.
+     *
+     * @return array|Traversable
+     */
+    public function getElements()
     {
-        parent::__construct($name, $options);
+        if (!$this->elementsAdded) {
+            $this->elementsAdded = true;
 
-        $this->add([
-            'name' => 'caption',
-            'type' => BrandName::class,
-            'options' => [
-                'readonly' => 'readonly'
-            ]
-        ]);
-
-        foreach ($this->languages as $language) {
             $this->add([
-                'name' => 'name'.$language,
-                'type' => BrandName::class,
+                'name' => 'caption',
+                'type' => 'BrandName',
                 'options' => [
-                    'label' => 'Name ('.$language.')',
+                    'readonly' => 'readonly'
                 ]
+            ]);
+
+            foreach ($this->languages as $language) {
+                $this->add([
+                    'name' => 'name' . $language,
+                    'type' => 'BrandName',
+                    'options' => [
+                        'label' => 'Name ('.$language.')',
+                    ]
+                ]);
+            }
+
+            $this->add([
+                'name'    => 'full_caption',
+                'type'    => 'BrandFullName',
+                'options' => []
             ]);
         }
 
-        $this->add([
-            'name' => 'full_caption',
-            'type' => BrandFullName::class,
-            'options' => []
-        ]);
-
-        $this->setAttribute('method', 'post');
+        return parent::getElements();
     }
 
     /**
@@ -57,8 +65,6 @@ class Edit extends Form
             unset($options['languages']);
         }
 
-        parent::setOptions($options);
-
-        return $this;
+        return parent::setOptions($options);
     }
 }
