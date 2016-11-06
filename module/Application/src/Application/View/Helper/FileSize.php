@@ -4,7 +4,7 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Application\Language;
+use Application\Language as AppLanguage;
 use Application\FileSize as AppFileSize;
 
 class FileSize extends AbstractHelper
@@ -15,11 +15,11 @@ class FileSize extends AbstractHelper
     private $filesize;
 
     /**
-     * @var Language
+     * @var AppLanguage
      */
     private $language;
 
-    public function __construct(Language $language, AppFileSize $filesize)
+    public function __construct(AppLanguage $language, AppFileSize $filesize)
     {
         $this->language = $language;
         $this->filesize = $filesize;

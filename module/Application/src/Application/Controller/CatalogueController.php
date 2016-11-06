@@ -247,7 +247,7 @@ class CatalogueController extends AbstractActionController
 
             $carParentTable = new VehicleParent();
 
-           $this->sidebar()->brand([
+            $this->sidebar()->brand([
                 'brand_id'    => $brand['id'],
                 'is_concepts' => true
             ]);
