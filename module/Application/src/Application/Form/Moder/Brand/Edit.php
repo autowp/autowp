@@ -7,47 +7,32 @@ use Zend\Form\Form;
 class Edit extends Form
 {
     private $languages = [];
-
-    private $elementsAdded = false;
-
-    /**
-     * Retrieve all attached elements
-     *
-     * Storage is an implementation detail of the concrete class.
-     *
-     * @return array|Traversable
-     */
-    public function getElements()
+    
+    public function init()
     {
-        if (!$this->elementsAdded) {
-            $this->elementsAdded = true;
-
+        $this->add([
+            'name' => 'caption',
+            'type' => \Application\Form\Element\BrandName::class,
+            'options' => [
+                'readonly' => 'readonly'
+            ]
+        ]);
+        
+        foreach ($this->languages as $language) {
             $this->add([
-                'name' => 'caption',
-                'type' => 'BrandName',
+                'name' => 'name' . $language,
+                'type' => \Application\Form\Element\BrandName::class,
                 'options' => [
-                    'readonly' => 'readonly'
+                    'label' => 'Name ('.$language.')',
                 ]
             ]);
-
-            foreach ($this->languages as $language) {
-                $this->add([
-                    'name' => 'name' . $language,
-                    'type' => 'BrandName',
-                    'options' => [
-                        'label' => 'Name ('.$language.')',
-                    ]
-                ]);
-            }
-
-            $this->add([
-                'name'    => 'full_caption',
-                'type'    => 'BrandFullName',
-                'options' => []
-            ]);
         }
-
-        return parent::getElements();
+        
+        $this->add([
+            'name'    => 'full_caption',
+            'type'    => \Application\Form\Element\BrandFullName::class,
+            'options' => []
+        ]);
     }
 
     /**

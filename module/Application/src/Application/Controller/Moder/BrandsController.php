@@ -16,6 +16,11 @@ use Application\Model\Message;
 class BrandsController extends AbstractActionController
 {
     private $textStorage;
+    
+    /**
+     * @var Form
+     */
+    private $brandForm;
 
     /**
      * @var Form
@@ -45,6 +50,7 @@ class BrandsController extends AbstractActionController
     public function __construct(
         HostManager $hostManager,
         $textStorage,
+        Form $brandForm,
         Form $logoForm,
         Form $descForm,
         Form $editForm,
@@ -52,6 +58,7 @@ class BrandsController extends AbstractActionController
     {
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
+        $this->brandForm = $brandForm;
         $this->logoForm = $logoForm;
         $this->descForm = $descForm;
         $this->editForm = $editForm;
@@ -112,6 +119,8 @@ class BrandsController extends AbstractActionController
                 'brand_id' => $brand->id,
                 'form'     => 'edit'
             ]));
+            
+            
 
             $values = [
                 'caption'      => $brand->caption,

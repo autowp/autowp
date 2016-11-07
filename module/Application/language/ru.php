@@ -2007,6 +2007,7 @@ return [
     'specs/attrs/22/179' => 'охлаждение',
     'specs/attrs/22/179/options/81' => 'воздушное',
     'specs/attrs/22/179/options/82' => 'жидкостное',
+    'specs/attrs/22/179/options/liquid-air' => 'жидкостно-воздушное',
     'specs/attrs/22/206' => 'Газораспределительный механизм',
     'specs/attrs/22/206/options/88' => 'Распредвал в блоке цилиндров',
     'specs/attrs/22/206/options/89' => 'Распредвал в головке цилиндров',

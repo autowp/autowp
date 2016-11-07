@@ -395,6 +395,7 @@ return [
                 return new Controller\Moder\BrandsController(
                     $sm->get(HostManager::class),
                     $sm->get(TextStorage\Service::class),
+                    $sm->get('ModerBrandEdit'),
                     $sm->get('BrandLogoForm'),
                     $sm->get('DescriptionForm'),
                     $sm->get('ModerBrandEdit'),

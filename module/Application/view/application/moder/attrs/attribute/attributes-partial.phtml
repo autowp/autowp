@@ -21,7 +21,7 @@
                 <?=$this->htmlA($this->url('moder/attrs/params', [
                     'action'       => 'attribute',
                     'attribute_id' => $attribute->id
-                ]), $attribute->name) ?>
+                ]), $this->translate($attribute->name)) ?>
                 <?=$this->partial('application/moder/attrs/attribute/attributes-partial', [
                     'attributes' => $attribute->getTable()->fetchAll(
                         $attribute->getTable()->select()
