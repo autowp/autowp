@@ -924,7 +924,6 @@ CREATE TABLE IF NOT EXISTS `cars` (
   `produced` int(10) UNSIGNED DEFAULT NULL,
   `produced_exactly` tinyint(3) UNSIGNED NOT NULL,
   `is_concept` tinyint(4) UNSIGNED NOT NULL DEFAULT '0',
-  `car_type_id` int(10) UNSIGNED DEFAULT NULL,
   `pictures_count` int(10) UNSIGNED NOT NULL DEFAULT '0',
   `description` mediumtext NOT NULL COMMENT 'РљСЂР°С‚РєРѕРµ РѕРїРёСЃР°РЅРёРµ',
   `today` tinyint(3) UNSIGNED DEFAULT NULL,
@@ -946,7 +945,6 @@ CREATE TABLE IF NOT EXISTS `cars` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `caption` (`caption`,`begin_year`,`body`,`end_year`,`begin_model_year`,`end_model_year`,`is_group`),
   KEY `fullCaptionOrder` (`caption`,`body`,`begin_year`,`end_year`),
-  KEY `car_type_id` (`car_type_id`),
   KEY `primary_and_sorting` (`id`,`begin_order_cache`),
   KEY `engine_id` (`engine_id`),
   KEY `spec_id` (`spec_id`),
@@ -2863,9 +2861,25 @@ CREATE TABLE IF NOT EXISTS `voting_variant_vote` (
   KEY `voting_variant_id` (`voting_variant_id`)
 ) ENGINE=InnoDB AVG_ROW_LENGTH=30 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 124928 kB; (`user_id`)';
 
+
+CREATE TABLE `vehicle_vehicle_type` (
+  `vehicle_id` int(10) UNSIGNED NOT NULL,
+  `vehicle_type_id` int(10) UNSIGNED NOT NULL,
+  `inherited` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `vehicle_vehicle_type`
+  ADD PRIMARY KEY (`vehicle_id`,`vehicle_type_id`),
+  ADD KEY `vehicle_type_id` (`vehicle_type_id`);
+
+
 --
 -- Constraints for dumped tables
 --
+
+ALTER TABLE `vehicle_vehicle_type`
+  ADD CONSTRAINT `vehicle_vehicle_type_ibfk_1` FOREIGN KEY (`vehicle_id`) REFERENCES `cars` (`id`),
+  ADD CONSTRAINT `vehicle_vehicle_type_ibfk_2` FOREIGN KEY (`vehicle_type_id`) REFERENCES `car_types` (`id`);
 
 --
 -- Constraints for table `acl_resources_privileges`
@@ -3166,7 +3180,6 @@ ALTER TABLE `car_types_parents`
 -- Constraints for table `cars`
 --
 ALTER TABLE `cars`
-  ADD CONSTRAINT `cars_fk` FOREIGN KEY (`car_type_id`) REFERENCES `car_types` (`id`),
   ADD CONSTRAINT `cars_ibfk_2` FOREIGN KEY (`engine_id`) REFERENCES `engines` (`id`),
   ADD CONSTRAINT `cars_ibfk_3` FOREIGN KEY (`spec_id`) REFERENCES `spec` (`id`),
   ADD CONSTRAINT `cars_ibfk_4` FOREIGN KEY (`text_id`) REFERENCES `textstorage_text` (`id`),

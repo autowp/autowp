@@ -484,8 +484,8 @@ class Mosts
         if ($brandId) {
             $select
                 ->join('car_types_parents', 'car_types.id = car_types_parents.parent_id', null)
-                ->join('cars', 'car_types_parents.id = cars.car_type_id', null)
-                ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
+                ->join('vehicle_vehicle_type', 'car_types_parents.id = vehicle_vehicle_type.vehicle_type_id', null)
+                ->join('car_parent_cache', 'vehicle_vehicle_type.vehicle_id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brandId)
                 ->group('car_types.id');
@@ -503,8 +503,8 @@ class Mosts
             if ($brandId) {
                 $select
                     ->join('car_types_parents', 'car_types.id = car_types_parents.parent_id', null)
-                    ->join('cars', 'car_types_parents.id = cars.car_type_id', null)
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
+                    ->join('vehicle_vehicle_type', 'car_types_parents.id = vehicle_vehicle_type.vehicle_type_id', null)
+                    ->join('car_parent_cache', 'vehicle_vehicle_type.vehicle_id = car_parent_cache.car_id', null)
                     ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                     ->where('brands_cars.brand_id = ?', $brandId)
                     ->group('car_types.id');
@@ -614,10 +614,13 @@ class Mosts
 
         if ($carType) {
             $ids = $this->getCarTypesIds($carType);
+            
+            $select->join('vehicle_vehicle_type', 'cars.id = vehicle_vehicle_type.vehicle_id', null);
+            
             if (count($ids) == 1) {
-                $select->where('cars.car_type_id = ?', $ids[0]);
+                $select->where('vehicle_vehicle_type.vehicle_type_id = ?', $ids[0]);
             } else {
-                $select->where('cars.car_type_id IN (?)', $ids);
+                $select->where('vehicle_vehicle_type.vehicle_type_id IN (?)', $ids);
             }
         }
 

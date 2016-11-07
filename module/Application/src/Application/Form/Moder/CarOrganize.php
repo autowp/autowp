@@ -9,8 +9,6 @@ use Application\Model\DbTable\Vehicle\Type as VehicleType;
 
 class CarOrganize extends Form implements InputFilterProviderInterface
 {
-    private $inheritedCarType = null;
-
     private $inheritedSpec = null;
 
     private $inheritedIsConcept = null;
@@ -31,21 +29,6 @@ class CarOrganize extends Form implements InputFilterProviderInterface
     public function __construct($name = null, $options = [])
     {
         parent::__construct($name, $options);
-
-        //$this->setWrapElements(true);
-
-        $carTypeOptions = $this->getCarTypeOptions();
-
-        $carTypeOptions = ['' => '-'] + $carTypeOptions;
-
-        if (!is_null($this->inheritedCarType)) {
-            $carType = $this->getCarTypeTable()->find($this->inheritedCarType)->current();
-            $carTypeName = $carType ? $this->translator->translate($carType->name) : '-';
-
-            $carTypeOptions = ['inherited' => 'inherited (' . $carTypeName . ')'] + $carTypeOptions;
-        } else {
-            $carTypeOptions = ['inherited' => 'inherited'] + $carTypeOptions;
-        }
 
         if (!is_null($this->inheritedSpec)) {
             $specOptions = ['inherited' => 'inherited (' . $this->inheritedSpec . ')'] + $this->specOptions;
@@ -93,14 +76,16 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 ]
             ],
             [
-                'name'    => 'car_type_id',
+                'name'    => 'vehicle_type_id',
                 'type'    => 'Select',
                 'options' => [
                     'label'   => 'moder/vehicle/type',
-                    'options' => $carTypeOptions
+                    'options' => $this->getCarTypeOptions()
                 ],
                 'attributes' => [
-                    'style' => 'width: 30%'
+                    'style'    => 'width: 30%',
+                    'multiple' => true,
+                    'size'     => 5
                 ]
             ],
             [
@@ -196,11 +181,6 @@ class CarOrganize extends Form implements InputFilterProviderInterface
      */
     public function setOptions($options)
     {
-        if (isset($options['inheritedCarType'])) {
-            $this->inheritedCarType = $options['inheritedCarType'];
-            unset($options['inheritedCarType']);
-        }
-
         if (isset($options['inheritedSpec'])) {
             $this->inheritedSpec = $options['inheritedSpec'];
             unset($options['inheritedSpec']);

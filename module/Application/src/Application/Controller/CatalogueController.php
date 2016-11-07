@@ -369,7 +369,8 @@ class CatalogueController extends AbstractActionController
                     'id',
                     'cars_count' => new Zend_Db_Expr('COUNT(1)')
                 ])
-                ->join('cars', 'car_types.id = cars.car_type_id', null)
+                ->join('vehicle_vehicle_type', 'car_types.id = vehicle_vehicle_type.vehicle_type_id', null)
+                ->join('cars', 'vehicle_vehicle_type.vehicle_id = cars.id', null)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brand['id'])
@@ -403,7 +404,9 @@ class CatalogueController extends AbstractActionController
                 ->group('cars.id')
                 ->order($this->carsOrder());
             if ($cartype) {
-                $select->where('cars.car_type_id = ?', $cartype->id);
+                $select
+                    ->join('vehicle_vehicle_type', 'cars.id = vehicle_vehicle_type.vehicle_id', null)
+                    ->where('vehicle_vehicle_type.vehicle_type_id = ?', $cartype->id);
             }
 
             $paginator = $this->carsPaginator($select, $this->params('page'));

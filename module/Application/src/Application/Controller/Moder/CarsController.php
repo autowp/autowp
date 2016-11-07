@@ -15,6 +15,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
 use Application\Model\Message;
 use Application\Model\Modification;
+use Application\Model\VehicleType;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
@@ -556,7 +557,6 @@ class CarsController extends AbstractActionController
         return [
             'name'        => $car->caption,
             'body'        => $car->body,
-            'car_type_id' => $car->car_type_inherit ? 'inherited' : ($car->car_type_id ? $car->car_type_id : ''),
             'spec_id'     => $car->spec_inherit ? 'inherited' : ($car->spec_id ? $car->spec_id : ''),
             'is_concept'  => $car->is_concept_inherit ? 'inherited' : (bool)$car->is_concept,
             'is_group'    => $car->is_group,
@@ -637,7 +637,6 @@ class CarsController extends AbstractActionController
             $formModerCarEditMeta = new CarForm(null, [
                 'language'           => $this->language(),
                 'translator'         => $this->translator,
-                'inheritedCarType'   => $car->car_type_inherit ? $car->car_type_id : null,
                 'inheritedIsConcept' => $car->is_concept_inherit ? $car->is_concept : null,
                 'isGroupDisabled'    => $isGroupDisabled,
                 'specOptions'        => array_replace(['' => '-'], $specOptions),
@@ -650,6 +649,9 @@ class CarsController extends AbstractActionController
             ], [], true));
 
             $data = $this->carToForm($car);
+            
+            $vehicleType = new VehicleType();
+            $data['vehicle_type_id'] = $vehicleType->getVehicleTypes($car->id);
 
             $oldData = $car->toArray();
 
@@ -675,6 +677,8 @@ class CarsController extends AbstractActionController
                     }
 
                     $car->setFromArray($this->prepareCarMetaToSave($values))->save();
+                    
+                    $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
 
                     $carTable->updateInteritance($car);
 
@@ -693,7 +697,7 @@ class CarsController extends AbstractActionController
                         'Редактирование мета-информации автомобиля %s',
                         htmlspecialchars($car->getFullName('en')).
                         ( count($htmlChanges) ? '<p>'.implode('<br />', $htmlChanges).'</p>' : '')
-                        );
+                    );
                     $this->log($message, $car);
 
                     $user = $this->user()->get();
@@ -710,7 +714,7 @@ class CarsController extends AbstractActionController
                                 $car->getFullName($subscriber->language),
                                 $this->carModerUrl($car, true, null, $uri),
                                 ( count($changes) ? implode("\n", $changes) : '')
-                                );
+                            );
 
                             $this->message->send(null, $subscriber->id, $message);
                         }
@@ -965,7 +969,6 @@ class CarsController extends AbstractActionController
             'produced_exactly' => ['bool', 'moder/vehicle/changes/produced/exactly-%s-%s'],
             'is_concept'       => ['bool', 'moder/vehicle/changes/is-concept-%s-%s'],
             'is_group'         => ['bool', 'moder/vehicle/changes/is-group-%s-%s'],
-            'car_type_id'      => ['car_type_id', 'moder/vehicle/changes/car-type-%s-%s'],
             'begin_model_year' => ['int', 'moder/vehicle/changes/model-years/from-%s-%s'],
             'end_model_year'   => ['int', 'moder/vehicle/changes/model-years/to-%s-%s'],
             'spec_id'          => ['spec_id', 'moder/vehicle/changes/spec-%s-%s'],
@@ -1008,19 +1011,6 @@ class CarsController extends AbstractActionController
                         $old = $specTable->find($old)->current();
                         $new = $specTable->find($new)->current();
                         $changes[] = sprintf($message, $old ? $old->short_name : '-', $new ? $new->short_name : '-');
-                    }
-                    break;
-
-                case 'car_type_id':
-                    $carTypeTable = new Vehicle\Type();
-                    $old = $oldData[$field];
-                    $new = $newData[$field];
-                    if ($old !== $new) {
-                        $old = $carTypeTable->find($old)->current();
-                        $new = $carTypeTable->find($new)->current();
-                        $oldName = $old ? $this->translate($old->name) : '-';
-                        $newName = $new ? $this->translate($new->name) : '-';
-                        $changes[] = sprintf($message, $oldName, $newName);
                     }
                     break;
             }
@@ -3201,7 +3191,6 @@ class CarsController extends AbstractActionController
         $form = new CarOrganizeForm(null, [
             'language'           => $this->language(),
             'childOptions'       => $childs,
-            'inheritedCarType'   => $car->car_type_id,
             'inheritedIsConcept' => $car->is_concept,
             'specOptions'        => array_replace(['' => '-'], $specOptions),
             'inheritedSpec'      => $inheritedSpec,
@@ -3212,6 +3201,9 @@ class CarsController extends AbstractActionController
 
         $data = $this->carToForm($car);
         $data['is_group'] = true;
+        
+        $vehicleType = new VehicleType();
+        $data['vehicle_type_id'] = $vehicleType->getVehicleTypes($car->id);
 
         $form->populateValues($data);
 
@@ -3224,8 +3216,10 @@ class CarsController extends AbstractActionController
 
                 $newCar = $carTable->createRow(
                     $this->prepareCarMetaToSave($values)
-                    );
+                );
                 $newCar->save();
+                
+                $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
 
                 $newCar->updateOrderCache();
 
@@ -3322,22 +3316,9 @@ class CarsController extends AbstractActionController
             $isConcept = (bool)$values['is_concept'];
         }
 
-        $carTypeId = null;
-        $carTypeInherit = false;
-        if ($values['car_type_id'] == 'inherited') {
-            $carTypeInherit = true;
-        } else {
-            $carTypeId = (int)$values['car_type_id'];
-            if (!$carTypeId) {
-                $carTypeId = null;
-            }
-        }
-
         $result = [
             'caption'            => $values['name'],
             'body'               => $values['body'],
-            'car_type_id'        => $carTypeId,
-            'car_type_inherit'   => $carTypeInherit ? 1 : 0,
             'begin_model_year'   => $values['model_year']['begin'] ? $values['model_year']['begin'] : null,
             'end_model_year'     => $values['model_year']['end'] ? $values['model_year']['end'] : null,
             'begin_year'         => $values['begin']['year'] ? $values['begin']['year'] : null,
@@ -3398,7 +3379,6 @@ class CarsController extends AbstractActionController
         }
 
         $form = new CarForm(null, [
-            'inheritedCarType'   => $parentCar ? $parentCar->car_type_id : null,
             'inheritedIsConcept' => $parentCar ? $parentCar->is_concept : null,
             'specOptions'        => array_replace(['' => '-'], $specOptions),
             'inheritedSpec'      => $inheritedSpec,
@@ -3414,6 +3394,9 @@ class CarsController extends AbstractActionController
 
                 $car = $carTable->createRow($values);
                 $car->save();
+                
+                $vehicleType = new VehicleType();
+                $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
 
                 $car->updateOrderCache();
 
@@ -3529,7 +3512,6 @@ class CarsController extends AbstractActionController
         $form = new CarOrganizePicturesForm(null, [
             'language'           => $this->language(),
             'childOptions'       => $childs,
-            'inheritedCarType'   => $car->car_type_id,
             'inheritedIsConcept' => $car->is_concept,
             'specOptions'        => array_replace(['' => '-'], $specOptions),
             'inheritedSpec'      => $inheritedSpec,
@@ -3540,6 +3522,9 @@ class CarsController extends AbstractActionController
 
         $data = $this->carToForm($car);
         $data['is_group'] = false;
+        
+        $vehicleType = new VehicleType();
+        $data['vehicle_type_id'] = $vehicleType->getVehicleTypes($car->id);
 
         $form->populateValues($data);
 
@@ -3554,8 +3539,10 @@ class CarsController extends AbstractActionController
 
                 $newCar = $carTable->createRow(
                     $this->prepareCarMetaToSave($values)
-                    );
+                );
                 $newCar->save();
+                
+                $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
 
                 $newCar->updateOrderCache();
 
@@ -3569,7 +3556,7 @@ class CarsController extends AbstractActionController
                 $this->log(sprintf(
                     'Создан новый автомобиль %s',
                     htmlspecialchars($newCar->getFullName('en'))
-                    ), $newCar);
+                ), $newCar);
 
                 $car->is_group = 1;
                 $car->save();
@@ -3580,7 +3567,7 @@ class CarsController extends AbstractActionController
                     '%s выбран как родительский автомобиль для %s',
                     htmlspecialchars($car->getFullName('en')),
                     htmlspecialchars($newCar->getFullName('en'))
-                    );
+                );
                 $this->log($message, [$car, $newCar]);
 
                 $carTable->updateInteritance($newCar);
@@ -3604,7 +3591,7 @@ class CarsController extends AbstractActionController
                         'Картинка %s связана с автомобилем %s',
                         htmlspecialchars($pictureRow->id),
                         htmlspecialchars($car->getFullName('en'))
-                        ), [$car, $pictureRow]);
+                    ), [$car, $pictureRow]);
                 }
 
                 $brandModel = new BrandModel();

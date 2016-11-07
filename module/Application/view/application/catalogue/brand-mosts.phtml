@@ -99,7 +99,9 @@
                     <?=$this->escapeHtml($car['valueText']) ?>
                 <?php } ?>
                 <?php if ($this->carList['unit']) { ?>
-                    <small class="unit" title="<?=$this->escapeHtmlAttr($this->carList['unit']->name) ?>"><?=$this->escapeHtml($this->carList['unit']->abbr) ?></small>
+                    <small class="unit" title="<?=$this->escapeHtmlAttr($this->translate($this->carList['unit']->name)) ?>">
+                        <?=$this->escapeHtml($this->translate($this->carList['unit']->abbr)) ?>
+                    </small>
                 <?php } ?>
             </h3>
         </div>
