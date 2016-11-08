@@ -1,9 +1,11 @@
 <?php foreach ($this->form->getIterator() as $element) { ?>
-    <?php
-        $element->setLabelAttributes(array_replace([
-            'class' => 'col-md-2 control-label'
-        ], $element->getLabelAttributes()))
-    ?>
+    <?php if (!$element instanceof Zend\Form\Element\Multicheckbox) { ?>
+        <?php
+            $element->setLabelAttributes(array_replace([
+                'class' => 'col-md-2 control-label'
+            ], $element->getLabelAttributes()))
+        ?>
+    <?php } ?>
     <?php if ($element instanceof Zend\Form\Element\File) { ?>
         <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
             <?=$this->formLabel($element)?>
@@ -18,8 +20,15 @@
             </div>
         </div>
     <?php } elseif ($element instanceof Zend\Form\Element\Multicheckbox) { ?>
+        <?php
+            $element->setLabelAttributes(array_replace([
+                'class' => 'checkbox'
+            ], $element->getLabelAttributes()))
+        ?>
         <div class="form-group<?=$element->getMessages() ? ' has-error' : ''?>">
-            <?=$this->formLabel($element)?>
+            <label class="col-md-2 control-label">
+                <?=$this->escapeHtml($this->translate($element->getLabel()))?>
+            </label>
             <div class="col-md-10">
                 <?=$this->formElement($element)?>
                 <?php foreach ($element->getMessages() as $error) { ?>

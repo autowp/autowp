@@ -3329,6 +3329,7 @@ class CarsController extends AbstractActionController
             'is_concept'         => $isConcept ? 1 : 0,
             'is_concept_inherit' => $isConceptInherit ? 1 : 0,
             'is_group'           => $values['is_group'] ? 1 : 0,
+            'vehicle_type_id'    => $values['vehicle_type_id']
         ];
 
         if (array_key_exists('spec_id', $values)) {

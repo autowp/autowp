@@ -27,9 +27,7 @@ gulp.task("build.css", ["copy.jcrop", 'copy.flags'], function () {
     ])
         .pipe(less())
         .pipe(addsrc.append([
-            './node_modules/jcrop-0.9.12/css/jquery.Jcrop.css'
-        ]))
-        .pipe(addsrc.append([
+            './node_modules/jcrop-0.9.12/css/jquery.Jcrop.css',
             './public_html/css/brands.css'
         ]))
         .pipe(concat("styles.css"))

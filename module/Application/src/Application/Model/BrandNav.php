@@ -299,13 +299,12 @@ class BrandNav
 
         return $groups;
     }
-
-    private function carSectionGroups($language, array $brand, array $section, $conceptsSeparatly, $carId)
+    
+    private function carSectionGroupsSelect($brandId, $carTypeId, $nullType, $conceptsSeparatly)
     {
         $brandCarTable = new DbTable\BrandCar();
-        $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
         $db = $brandCarTable->getAdapter();
-
+        
         $select = $db->select()
             ->from($brandCarTable->info('name'), [
                 'brand_car_catname' => 'catname',
@@ -315,27 +314,70 @@ class BrandNav
                 'car_id'   => 'id',
                 'car_name' => 'cars.caption',
             ])
-            ->where('brands_cars.brand_id = ?', $brand['id']);
+            ->where('brands_cars.brand_id = ?', $brandId)
+            ->group('cars.id');
         if ($conceptsSeparatly) {
             $select->where('NOT cars.is_concept');
         }
-
-        if ($section['car_type_id']) {
+        
+        if ($carTypeId) {
             $select
-                ->joinLeft('car_types_parents', 'cars.car_type_id = car_types_parents.id', null)
-                ->where('car_types_parents.parent_id = ?', $section['car_type_id']);
+                ->join('vehicle_vehicle_type', 'cars.id = vehicle_vehicle_type.vehicle_id', null)
+                ->join('car_types_parents', 'vehicle_vehicle_type.vehicle_type_id = car_types_parents.id', null)
+                ->where('car_types_parents.parent_id = ?', $carTypeId);
         } else {
-
-            $otherTypesIds = $db->fetchCol(
-                $db->select()
-                    ->from('car_types_parents', 'id')
-                    ->where('parent_id IN (?)', [43, 44, 17, 19])
-            );
-
-            if ($otherTypesIds) {
-                $select->where('cars.car_type_id not in (?) or cars.car_type_id is null', $otherTypesIds);
+            
+            if ($nullType) {
+                
+                $select
+                    ->joinLeft(
+                        'vehicle_vehicle_type',
+                        'cars.id = vehicle_vehicle_type.vehicle_id',
+                        null
+                    )
+                    ->where('vehicle_vehicle_type.vehicle_id is null');
+                
             } else {
-                $select->where('cars.car_type_id is null');
+                $otherTypesIds = $db->fetchCol(
+                    $db->select()
+                        ->from('car_types_parents', 'id')
+                        ->where('parent_id IN (?)', [43, 44, 17, 19])
+                );
+                
+                $select->join(
+                    'vehicle_vehicle_type',
+                    'cars.id = vehicle_vehicle_type.vehicle_id',
+                    null
+                );
+                
+                if ($otherTypesIds) {
+                    $select->where('vehicle_vehicle_type.vehicle_type_id not in (?)', $otherTypesIds);
+                }
+            }
+        }
+        
+        return $select;
+    }
+
+    private function carSectionGroups($language, array $brand, array $section, $conceptsSeparatly, $carId)
+    {
+        $brandCarTable = new DbTable\BrandCar();
+        $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
+        $db = $brandCarTable->getAdapter();
+
+        $rows = [];
+        if ($section['car_type_id']) {
+            $select = $this->carSectionGroupsSelect($brand['id'], $section['car_type_id'], null, $conceptsSeparatly);
+            $rows = $db->fetchAll($select);
+        } else {
+            $rows = [];
+            $select = $this->carSectionGroupsSelect($brand['id'], null, false, $conceptsSeparatly);
+            foreach ($db->fetchAll($select) as $row) {
+                $rows[$row['car_id']] = $row;
+            }
+            $select = $this->carSectionGroupsSelect($brand['id'], null, true, $conceptsSeparatly);
+            foreach ($db->fetchAll($select) as $row) {
+                $rows[$row['car_id']] = $row;
             }
         }
 
@@ -344,7 +386,7 @@ class BrandNav
         $carLanguageTable = new DbTable\Vehicle\Language();
 
         $groups = [];
-        foreach ($db->fetchAll($select) as $brandCarRow) {
+        foreach ($rows as $brandCarRow) {
 
             $url = $this->url('catalogue', [
                 'action'        => 'brand-car',
@@ -402,7 +444,7 @@ class BrandNav
             'SIDEBAR',
             $brand['id'],
             $language,
-            '21'
+            '28'
         ]);
 
         $sections = $this->cache->getItem($cacheKey, $success);

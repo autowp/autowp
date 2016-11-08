@@ -1,6 +1,6 @@
 define(
-    ['jquery', 'bootstrap', 'typeahead'],
-    function($) {
+    ['jquery', './car-type-picker', 'bootstrap', 'typeahead'],
+    function($, CarTypePicker) {
         return {
             init: function(options) {
                 $('.subscription').each(function() {
@@ -47,6 +47,10 @@ define(
                     });
 
                     $(this).removeData('load').removeAttr('data-load');
+                });
+                
+                $('#meta').each(function() {
+                    CarTypePicker.init($(this).find('select[multiple]'));
                 });
                 
                 $('#categories').on('tabload', function() {

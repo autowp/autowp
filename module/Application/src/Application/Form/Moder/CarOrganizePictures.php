@@ -83,7 +83,7 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
                 'attributes' => [
                     'style'    => 'width: 30%',
                     'multiple' => true,
-                    'size'     => 5
+                    'size'     => 1
                 ]
             ],
             [
@@ -225,7 +225,7 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
             'spec_id' => [
                 'required' => false
             ],
-            'car_type_id' => [
+            'vehicle_type_id' => [
                 'required' => false
             ],
             'is_concept' => [
