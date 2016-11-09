@@ -1306,9 +1306,18 @@ return [
                 [
                     'spec' => [
                         'type'    => 'Select',
+                        'name'    => 'vehicle_type_id',
+                        'options' => [
+                            'label' => 'moder/vehicles/filter/vehicle-type',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type'    => 'Select',
                         'name'    => 'spec',
                         'options' => [
-                            'label' => 'Spec',
+                            'label' => 'moder/vehicles/filter/spec',
                         ]
                     ],
                 ],
@@ -1383,6 +1392,9 @@ return [
                     'filters'    => [
                         ['name' => 'StringTrim'],
                     ]
+                ],
+                'vehicle_type_id' => [
+                    'required'   => false,
                 ],
                 'spec' => [
                     'required'   => false,

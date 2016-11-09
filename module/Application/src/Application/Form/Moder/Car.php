@@ -73,6 +73,19 @@ class Car extends Form implements InputFilterProviderInterface
                     'style' => 'width: 30%'
                 ]
             ],
+            /*[
+                'name'    => 'spec_ids',
+                'type'    => 'Select',
+                'options' => [
+                    'label'   => 'moder/vehicle/spec',
+                    'options' => $this->specOptions
+                ],
+                'attributes' => [
+                    'style'    => 'width: 30%',
+                    'multiple' => true,
+                    'size'     => 1
+                ]
+            ],*/
             [
                 'name'    => 'vehicle_type_id',
                 'type'    => 'Select',
@@ -233,8 +246,8 @@ class Car extends Form implements InputFilterProviderInterface
     private function getCarTypeTable()
     {
         return $this->carTypeTable
-        ? $this->carTypeTable
-        : $this->carTypeTable = new VehicleType();
+            ? $this->carTypeTable
+            : $this->carTypeTable = new VehicleType();
     }
 
     private function getCarTypeOptions($parentId = null)

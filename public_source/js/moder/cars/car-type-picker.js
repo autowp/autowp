@@ -46,6 +46,10 @@ define(
                 $.map(selected, function(item) {
                     $select.tagsinput('add', item);
                 });
+                
+                if (selected.length <= 0) {
+                    $select.val([]);
+                }
             }
         }
     }

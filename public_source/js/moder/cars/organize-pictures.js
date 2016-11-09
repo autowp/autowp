@@ -3,7 +3,8 @@ define(
     function($, CarTypePicker) {
         return {
             init: function(options) {
-                CarTypePicker.init($('select[multiple]'));
+                CarTypePicker.init($('select[name=vehicle_type_id\\[\\]]'));
+                CarTypePicker.init($('select[name=spec_ids\\[\\]]'));
             }
         }
     }

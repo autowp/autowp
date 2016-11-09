@@ -50,7 +50,8 @@ define(
                 });
                 
                 $('#meta').each(function() {
-                    CarTypePicker.init($(this).find('select[multiple]'));
+                    CarTypePicker.init($(this).find('select[name=vehicle_type_id\\[\\]]'));
+                    CarTypePicker.init($(this).find('select[name=spec_ids\\[\\]]'));
                 });
                 
                 $('#categories').on('tabload', function() {
