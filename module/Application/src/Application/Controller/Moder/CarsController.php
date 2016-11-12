@@ -409,9 +409,9 @@ class CarsController extends AbstractActionController
         // all pictures
         $table = $this->catalogue()->getPictureTable();
         $select = $table->select(true)
-        ->where('pictures.car_id = ?', $car->id)
-        ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
-        ->order(['pictures.status', 'pictures.id']);
+            ->where('pictures.car_id = ?', $car->id)
+            ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
+            ->order(['pictures.status', 'pictures.id']);
 
         $picturesData = $this->pic()->listData($select, [
             'width' => 6
@@ -681,6 +681,7 @@ class CarsController extends AbstractActionController
             $data['vehicle_type_id'] = $vehicleType->getVehicleTypes($car->id);
 
             $oldData = $car->toArray();
+            $oldData['vehicle_type_id'] = $vehicleType->getVehicleTypes($car->id);
 
             $formModerCarEditMeta->populateValues($data);
 
@@ -710,6 +711,7 @@ class CarsController extends AbstractActionController
                     $carTable->updateInteritance($car);
 
                     $newData = $car->toArray();
+                    $newData['vehicle_type_id'] = $vehicleType->getVehicleTypes($car->id);
 
                     $car->updateOrderCache();
 
@@ -782,7 +784,7 @@ class CarsController extends AbstractActionController
                     $this->log(sprintf(
                         'Редактирование описания автомобиля %s',
                         htmlspecialchars($car->getFullName('en'))
-                        ), $car);
+                    ), $car);
 
                     if ($car->text_id) {
                         $userIds = $this->textStorage->getTextUserIds($car->text_id);
@@ -799,7 +801,7 @@ class CarsController extends AbstractActionController
                                         $this->userModerUrl($user, true, $uri),
                                         $car->getFullName($userRow->language),
                                         $this->carModerUrl($car, true, null, $uri)
-                                        );
+                                    );
 
                                     $this->message->send(null, $userRow->id, $message);
                                 }
@@ -824,10 +826,10 @@ class CarsController extends AbstractActionController
 
         $picturesCount = $pictures->getAdapter()->fetchOne(
             $pictures->getAdapter()->select()
-            ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-            ->where('type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
-            ->where('car_id = ?', $car->id)
-            );
+                ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
+                ->where('type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
+                ->where('car_id = ?', $car->id)
+        );
 
         $ucsTable = new DbTable\User\CarSubscribe();
 
@@ -848,37 +850,37 @@ class CarsController extends AbstractActionController
         $carLangTable = new DbTable\Vehicle\Language();
         $langNameCount = $carLangTable->getAdapter()->fetchOne(
             $carLangTable->getAdapter()->select()
-            ->from('car_language', 'count(1)')
-            ->where('car_id = ?', $car->id)
-            );
+                ->from('car_language', 'count(1)')
+                ->where('car_id = ?', $car->id)
+        );
 
         $twinsGroupsCount = $db->fetchOne(
             $db->select()
-            ->from('twins_groups_cars', 'count(1)')
-            ->where('car_id = ?', $car->id)
-            );
+                ->from('twins_groups_cars', 'count(1)')
+                ->where('car_id = ?', $car->id)
+        );
 
         $catalogueLinksCount = $db->fetchOne(
             $db->select()
-            ->from('car_parent', 'count(1)')
-            ->where('car_id = ?', $car->id)
-            );
+                ->from('car_parent', 'count(1)')
+                ->where('car_id = ?', $car->id)
+        );
         $catalogueLinksCount += $db->fetchOne(
             $db->select()
-            ->from('car_parent', 'count(1)')
-            ->where('parent_id = ?', $car->id)
-            );
+                ->from('car_parent', 'count(1)')
+                ->where('parent_id = ?', $car->id)
+        );
         $catalogueLinksCount += $db->fetchOne(
             $db->select()
-            ->from('brands_cars', 'count(1)')
-            ->where('car_id = ?', $car->id)
-            );
+                ->from('brands_cars', 'count(1)')
+                ->where('car_id = ?', $car->id)
+        );
 
         $factoriesCount = $db->fetchOne(
             $db->select()
-            ->from('factory_car', 'count(1)')
-            ->where('car_id = ?', $car->id)
-            );
+                ->from('factory_car', 'count(1)')
+                ->where('car_id = ?', $car->id)
+        );
 
         $tabs = [
             'meta' => [
@@ -999,6 +1001,7 @@ class CarsController extends AbstractActionController
             'begin_model_year' => ['int', 'moder/vehicle/changes/model-years/from-%s-%s'],
             'end_model_year'   => ['int', 'moder/vehicle/changes/model-years/to-%s-%s'],
             'spec_id'          => ['spec_id', 'moder/vehicle/changes/spec-%s-%s'],
+            'vehicle_type_id'  => ['vehicle_type_id', 'moder/vehicle/changes/car-type-%s-%s']
         ];
 
         $changes = [];
@@ -1008,9 +1011,10 @@ class CarsController extends AbstractActionController
                 case 'int':
                     $old = is_null($oldData[$field]) ? null : (int)$oldData[$field];
                     $new = is_null($newData[$field]) ? null : (int)$newData[$field];
-                    if ($old !== $new)
+                    if ($old !== $new) {
                         $changes[] = sprintf($message, $old, $new);
-                        break;
+                    }
+                    break;
                 case 'str':
                     $old = is_null($oldData[$field]) ? null : (string)$oldData[$field];
                     $new = is_null($newData[$field]) ? null : (string)$newData[$field];
@@ -1020,11 +1024,11 @@ class CarsController extends AbstractActionController
                     break;
                 case 'bool':
                     $old = is_null($oldData[$field])
-                    ? null
-                    : $this->translate($oldData[$field] ? 'moder/vehicle/changes/boolean/true' : 'moder/vehicle/changes/boolean/false');
+                        ? null
+                        : $this->translate($oldData[$field] ? 'moder/vehicle/changes/boolean/true' : 'moder/vehicle/changes/boolean/false');
                     $new = is_null($newData[$field])
-                    ? null
-                    : $this->translate($newData[$field] ? 'moder/vehicle/changes/boolean/true' : 'moder/vehicle/changes/boolean/false');
+                        ? null
+                        : $this->translate($newData[$field] ? 'moder/vehicle/changes/boolean/true' : 'moder/vehicle/changes/boolean/false');
                     if ($old !== $new) {
                         $changes[] = sprintf($message, $old, $new);
                     }
@@ -1038,6 +1042,29 @@ class CarsController extends AbstractActionController
                         $old = $specTable->find($old)->current();
                         $new = $specTable->find($new)->current();
                         $changes[] = sprintf($message, $old ? $old->short_name : '-', $new ? $new->short_name : '-');
+                    }
+                    break;
+                    
+                case 'vehicle_type_id':
+                    $vehicleTypeTable = new DbTable\Vehicle\Type();
+                    $old = $oldData[$field];
+                    $new = $newData[$field];
+                    $old = $old ? (array)$old : [];
+                    $new = $new ? (array)$new : [];
+                    if (array_diff($old, $new) !== array_diff($new, $old)) {
+                        $oldNames = [];
+                        foreach ($vehicleTypeTable->find($old) as $row) {
+                            $oldNames[] = $this->translate($row->name);
+                        }
+                        $newNames = [];
+                        foreach ($vehicleTypeTable->find($new) as $row) {
+                            $newNames[] = $this->translate($row->name);
+                        }
+                        $changes[] = sprintf(
+                            $message, 
+                            $oldNames ? implode(', ', $oldNames) : '-',
+                            $newNames ? implode(', ', $newNames) : '-'
+                        );
                     }
                     break;
             }
@@ -2021,6 +2048,9 @@ class CarsController extends AbstractActionController
         $carParentTable->removeParent($car, $parentCar);
 
         $carTable->updateInteritance($car);
+        
+        $vehicleType = new VehicleType();
+        $vehicleType->refreshInheritanceFromParents($car->id);
 
         $specService = new SpecificationsService();
         $specService->updateActualValues(1, $car->id);
@@ -2070,6 +2100,9 @@ class CarsController extends AbstractActionController
         $this->getCarParentTable()->addParent($car, $parentCar);
 
         $carTable->updateInteritance($car);
+        
+        $vehicleType = new VehicleType();
+        $vehicleType->refreshInheritanceFromParents($car->id);
 
         $specService = new SpecificationsService();
         $specService->updateActualValues(1, $car->id);
@@ -2078,7 +2111,7 @@ class CarsController extends AbstractActionController
             '%s выбран как родительский автомобиль для %s',
             htmlspecialchars($parentCar->getFullName('en')),
             htmlspecialchars($car->getFullName('en'))
-            );
+        );
         $this->log($message, [$car, $parentCar]);
 
         $url = $this->url()->fromRoute('moder/cars/params', [
@@ -3185,11 +3218,11 @@ class CarsController extends AbstractActionController
 
         $carParentRows = $carParentTable->fetchAll(
             $carParentTable->select(true)
-            ->join('cars', 'car_parent.car_id = cars.id', null)
-            ->where('car_parent.parent_id = ?', $car->id)
-            ->where('car_parent.type = ?', DbTable\Vehicle\ParentTable::TYPE_DEFAULT)
-            ->order($order)
-            );
+                ->join('cars', 'car_parent.car_id = cars.id', null)
+                ->where('car_parent.parent_id = ?', $car->id)
+                ->where('car_parent.type = ?', DbTable\Vehicle\ParentTable::TYPE_DEFAULT)
+                ->order($order)
+        );
 
         $childs = [];
         foreach ($carParentRows as $childRow) {
@@ -3246,7 +3279,7 @@ class CarsController extends AbstractActionController
                 );
                 $newCar->save();
                 
-                $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
+                $vehicleType->setVehicleTypes($newCar->id, (array)$values['vehicle_type_id']);
 
                 $newCar->updateOrderCache();
 
@@ -3570,7 +3603,7 @@ class CarsController extends AbstractActionController
                 );
                 $newCar->save();
                 
-                $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
+                $vehicleType->setVehicleTypes($newCar->id, (array)$values['vehicle_type_id']);
 
                 $newCar->updateOrderCache();
 

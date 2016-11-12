@@ -1994,6 +1994,7 @@ return [
     'specs/attrs/22/99/options/48' => '×2',
     'specs/attrs/22/99/options/54' => '×3',
     'specs/attrs/22/99/options/49' => '×4',
+    'specs/attrs/engine/turbo/options/x6' => '×6',
     'specs/attrs/22/156' => 'материал блока',
     'specs/attrs/22/156/options/68' => 'чугун',
     'specs/attrs/22/156/options/69' => 'алюминиевый сплав',

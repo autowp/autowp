@@ -112,10 +112,17 @@ class VehicleType
                 ->distinct()
                 ->from('vehicle_vehicle_type', ['vehicle_type_id'])
                 ->join('car_parent', 'vehicle_vehicle_type.vehicle_id = car_parent.parent_id', null)
-                ->where('car_parent.car_id = ?', $vehicleId)
+                ->where('car_parent.car_id = ?', (int)$vehicleId)
         );
         
         return $ids;
+    }
+    
+    public function refreshInheritanceFromParents($vehicleId)
+    {
+        $typeIds = $this->getVehicleTypes($vehicleId);
+        
+        $this->setVehicleTypes($vehicleId, $typeIds);
     }
     
     public function refreshInheritance($vehicleId)
@@ -131,9 +138,7 @@ class VehicleType
         );
         
         foreach ($ids as $id) {
-            $typeIds = $this->getVehicleTypes($id);
-
-            $this->setVehicleTypes($id, $typeIds);
+            $this->refreshInheritanceFromParents($id);
         }
     }
     

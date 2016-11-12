@@ -31,6 +31,11 @@ class CatalogueController extends AbstractActionController
         $vehicleTable = new \Application\Model\DbTable\Vehicle();
         $vehicleType = new \Application\Model\VehicleType();
         
+        /*$rows = $vehicleTable->fetchAll([], 'id desc', 200);
+        foreach ($rows as $vehicle) {
+            $vehicleType->refreshInheritanceFromParents($vehicle->id);
+        }*/
+        
         /*$rows = $vehicleTable->fetchAll([
             'car_type_id',
             'not car_type_inherit'
