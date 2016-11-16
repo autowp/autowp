@@ -148,11 +148,16 @@ class Power extends AbstractAdapter
                     break;
             }
             $volume = $specService->getActualValue($this->attributes['volume'], $car->id, 1);
-            $cylindersLayout = $specService->getActualValueText($this->attributes['cylindersLayout'], 1, $car->id, $language);
+            $cylindersLayout = $specService->getActualValueText(
+                $this->attributes['cylindersLayout'],
+                1,
+                $car->id,
+                $language
+            );
             $cylindersCount = $specService->getActualValue($this->attributes['cylindersCount'], $car->id, 1);
             $valvePerCylinder = $specService->getActualValue($this->attributes['valvePerCylinder'], $car->id, 1);
 
-            $cyl = $this->_cylinders($cylindersLayout, $cylindersCount, $valvePerCylinder);
+            $cyl = $this->cylinders($cylindersLayout, $cylindersCount, $valvePerCylinder);
 
 
             $html .= $value;
@@ -190,7 +195,7 @@ class Power extends AbstractAdapter
         ];
     }
 
-    protected function _cylinders($layout, $cylinders, $valve_per_cylinder = null)
+    protected function cylinders($layout, $cylinders, $valve_per_cylinder = null)
     {
         if ($layout) {
             if ($cylinders) {

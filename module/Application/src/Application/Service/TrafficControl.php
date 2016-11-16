@@ -207,7 +207,7 @@ class TrafficControl
      * @param string $ip
      * @return bool
      */
-    private function _inWhiteList($ip)
+    private function inWhiteListBin($ip)
     {
         $table = $this->getWhitelistTable();
 
@@ -253,7 +253,7 @@ class TrafficControl
                 'ip'        => $row['ip_text'],
                 'count'     => $row['count'],
                 'ban'       => $banRow ? $banRow->toArray() : null,
-                'whitelist' => $this->_inWhiteList($row['ip'])
+                'whitelist' => $this->inWhiteListBin($row['ip'])
             ];
         }
         unset($row);

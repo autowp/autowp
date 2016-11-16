@@ -192,7 +192,11 @@ class TwinsController extends AbstractActionController
                             $uri = $this->hostManager->getUriByLanguage($userRow->language);
 
                             $message = sprintf(
-                                $this->translate('pm/user-%s-edited-twins-description-%s-%s', 'default', $userRow->language),
+                                $this->translate(
+                                    'pm/user-%s-edited-twins-description-%s-%s',
+                                    'default',
+                                    $userRow->language
+                                ),
                                 $this->url()->fromRoute('users/user', [
                                     'user_id' => $user->identity ? $user->identity : 'user' . $user->id
                                 ], [

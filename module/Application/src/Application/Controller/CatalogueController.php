@@ -526,7 +526,14 @@ class CatalogueController extends AbstractActionController
         $db = $factoryTable->getAdapter();
         $rows = $db->fetchAll(
             $db->select()
-                ->from('factory', ['factory_id' => 'id', 'factory_name' => 'name', 'cars_count' => 'count(car_parent_cache.car_id)'])
+                ->from(
+                    'factory',
+                    [
+                        'factory_id'   => 'id',
+                        'factory_name' => 'name',
+                        'cars_count'   => 'count(car_parent_cache.car_id)'
+                    ]
+                )
                 ->join('factory_car', 'factory.id = factory_car.factory_id', null)
                 ->join('car_parent_cache', 'factory_car.car_id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
@@ -675,10 +682,16 @@ class CatalogueController extends AbstractActionController
                 $pictureTable = new Picture();
                 $db = $pictureTable->getAdapter();
 
+                $brandReplatedTypes = [
+                    Picture::MIXED_TYPE_ID,
+                    Picture::UNSORTED_TYPE_ID,
+                    Picture::LOGO_TYPE_ID
+                ];
+
                 $inboxBrandPictures = $db->fetchOne(
                     $db->select()
                         ->from('pictures', 'count(1)')
-                        ->where('pictures.type in (?)', [Picture::MIXED_TYPE_ID, Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID])
+                        ->where('pictures.type in (?)', $brandRelatedTypes)
                         ->where('pictures.status = ?', Picture::STATUS_INBOX)
                         ->where('pictures.brand_id = ?', $brand['id'])
                 );
@@ -1648,11 +1661,27 @@ class CatalogueController extends AbstractActionController
             }
 
             if ($modgroupId) {
-                return $this->brandCarModgroup($brand, $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs);
+                return $this->brandCarModgroup(
+                    $brand,
+                    $currentCar,
+                    $brandCarCatname,
+                    $path,
+                    $modgroupId,
+                    $modId,
+                    $breadcrumbs
+                );
             }
 
             if ($currentCar['is_group']) {
-                return $this->brandCarGroup($brand, $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs);
+                return $this->brandCarGroup(
+                    $brand,
+                    $currentCar,
+                    $brandCarCatname,
+                    $path,
+                    $modgroupId,
+                    $modId,
+                    $breadcrumbs
+                );
             }
 
             $type = $this->params('type');
@@ -1788,7 +1817,16 @@ class CatalogueController extends AbstractActionController
                             'page' => null,
                         ], [], true);
                     },
-                    'pictureUrl' => function ($listCar, $picture) use ($brand, $currentCarId, $brandCarCatname, $path, $carParentTable) {
+                    'pictureUrl' => function (
+                        $listCar,
+                        $picture
+                    ) use (
+                        $brand,
+                        $currentCarId,
+                        $brandCarCatname,
+                        $path,
+                        $carParentTable
+                    ) {
 
                         return $this->url()->fromRoute('catalogue', [
                             'action'        => 'brand-car-picture',
@@ -1923,7 +1961,11 @@ class CatalogueController extends AbstractActionController
 
         foreach ($perspectiveGroupIds as $groupId) {
             $select = $this->getModgroupPicturesSelect($carId, $modId)
-                ->join(['mp' => 'perspectives_groups_perspectives'], 'pictures.perspective_id = mp.perspective_id', null)
+                ->join(
+                    ['mp' => 'perspectives_groups_perspectives'],
+                    'pictures.perspective_id = mp.perspective_id',
+                    null
+                )
                 ->where('mp.group_id = ?', $groupId)
                 ->order([
                     //'cars.is_concept asc',
@@ -2026,8 +2068,15 @@ class CatalogueController extends AbstractActionController
         );
     }
 
-    private function brandCarModgroup($brand, array $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs)
-    {
+    private function brandCarModgroup(
+        $brand,
+        array $currentCar,
+        $brandCarCatname,
+        $path,
+        $modgroupId,
+        $modId,
+        $breadcrumbs
+    ) {
         $currentCarId = $currentCar['id'];
 
         $mTable = new ModificationTable();
@@ -2070,7 +2119,9 @@ class CatalogueController extends AbstractActionController
                             'car_catname'   => $brandCarCatname,
                             'path'          => $path,
                             'exact'         => false,
-                            'picture_id'    => $pictureRow['row']['identity'] ? $pictureRow['row']['identity'] : $pictureRow['row']['id']
+                            'picture_id'    => $pictureRow['row']['identity']
+                                ? $pictureRow['row']['identity']
+                                : $pictureRow['row']['id']
                         ], [], true)
                     ];
                 } else {
@@ -2147,8 +2198,15 @@ class CatalogueController extends AbstractActionController
         ];
     }
 
-    private function brandCarGroup($brand, array $currentCar, $brandCarCatname, $path, $modgroupId, $modId, $breadcrumbs)
-    {
+    private function brandCarGroup(
+        $brand,
+        array $currentCar,
+        $brandCarCatname,
+        $path,
+        $modgroupId,
+        $modId,
+        $breadcrumbs
+    ) {
         $currentCarId = $currentCar['id'];
 
         $type = $this->params('type');
@@ -2306,7 +2364,13 @@ class CatalogueController extends AbstractActionController
             'childListData' => $this->car()->listData($listCars, [
                 'disableDescription' => false,
                 'type'       => $type == VehicleParent::TYPE_DEFAULT ? $type : null,
-                'detailsUrl' => function ($listCar) use ($brand, $currentCarId, $brandCarCatname, $path, $carParentTable) {
+                'detailsUrl' => function ($listCar) use (
+                    $brand,
+                    $currentCarId,
+                    $brandCarCatname,
+                    $path,
+                    $carParentTable
+                ) {
 
                     $carParentAdapter = $carParentTable->getAdapter();
                     $hasChilds = (bool)$carParentAdapter->fetchOne(
@@ -2341,7 +2405,13 @@ class CatalogueController extends AbstractActionController
                         'path'          => $currentPath
                     ]);
                 },
-                'allPicturesUrl' => function ($listCar) use ($brand, $brandCarCatname, $path, $currentCarId, $carParentTable) {
+                'allPicturesUrl' => function ($listCar) use (
+                    $brand,
+                    $brandCarCatname,
+                    $path,
+                    $currentCarId,
+                    $carParentTable
+                ) {
 
                     //TODO: more than 1 levels diff fails here
                     $carParentRow = $carParentTable->fetchRow([
@@ -2364,7 +2434,15 @@ class CatalogueController extends AbstractActionController
                     return false;
                 },
                 'onlyExactlyPictures' => false,
-                'specificationsUrl' => function ($listCar) use ($brand, $hasChildSpecs, $carParentTable, $brandCarCatname, $path, $currentCarId, $type) {
+                'specificationsUrl' => function ($listCar) use (
+                    $brand,
+                    $hasChildSpecs,
+                    $carParentTable,
+                    $brandCarCatname,
+                    $path,
+                    $currentCarId,
+                    $type
+                ) {
                     if ($hasChildSpecs[$listCar->id]) {
                         $carParentRow = $carParentTable->fetchRow([
                             'car_id = ?'    => $listCar->id,
@@ -2442,7 +2520,16 @@ class CatalogueController extends AbstractActionController
                         'page' => null,
                     ], [], true);
                 },
-                'pictureUrl' => function ($listCar, $picture) use ($brand, $currentCarId, $brandCarCatname, $path, $carParentTable) {
+                'pictureUrl' => function (
+                    $listCar,
+                    $picture
+                ) use (
+                    $brand,
+                    $currentCarId,
+                    $brandCarCatname,
+                    $path,
+                    $carParentTable
+                ) {
 
                     // found parent row
                     $carParentRow = $carParentTable->fetchRow([

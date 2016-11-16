@@ -60,12 +60,13 @@ class Pic extends AbstractHtmlElement
         switch ($picture['type']) {
             case Picture::VEHICLE_TYPE_ID:
                 if ($picture['car']) {
-                    return
-                        ($picture['perspective'] ? $view->escapeHtml(self::mbUcfirst($view->translate($picture['perspective']))) . ' ' : '') .
-                        $view->car()->htmlTitle($picture['car']);
-                } else {
-                    return 'Unsorted car';
+                    if ($picture['perspective']) {
+                        return $view->escapeHtml(self::mbUcfirst($view->translate($picture['perspective']))) .
+                               ' ' . $view->car()->htmlTitle($picture['car']);
+                    }
+                    return $view->car()->htmlTitle($picture['car']);
                 }
+                return 'Unsorted car';
                 break;
 
             case Picture::ENGINE_TYPE_ID:

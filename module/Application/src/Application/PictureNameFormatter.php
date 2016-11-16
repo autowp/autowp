@@ -59,10 +59,16 @@ class PictureNameFormatter
 
         switch ($picture['type']) {
             case Picture::VEHICLE_TYPE_ID:
-                return
-                    ($picture['perspective'] ? self::mbUcfirst($this->translate($picture['perspective'], $language)) . ' ' : '') .
-                    ($picture['car'] ? $this->vehicleNameFormatter->format($picture['car'], $language) : 'Unsorted car');
-                break;
+                $result = [];
+                if ($picture['perspective']) {
+                    $result[] = self::mbUcfirst($this->translate($picture['perspective'], $language));
+                }
+                if ($picture['car']) {
+                    $result[] = $this->vehicleNameFormatter->format($picture['car'], $language);
+                } else {
+                    $result[] = 'Unsorted car';
+                }
+                return implode(' ', $result);
 
             case Picture::ENGINE_TYPE_ID:
                 if ($picture['engine']) {
@@ -115,17 +121,19 @@ class PictureNameFormatter
         switch ($picture['type']) {
             case Picture::VEHICLE_TYPE_ID:
                 if ($picture['car']) {
-                    return
-                        (
-                            $picture['perspective']
-                                ? $this->renderer->escapeHtml(self::mbUcfirst($this->translate($picture['perspective'], $language))) . ' '
-                                : ''
-                        ) .
-                        ($picture['car'] ? $this->vehicleNameFormatter->formatHtml($picture['car'], $language) : 'Unsorted car');
-                } else {
-                    return 'Unsorted car';
+                    $result = [];
+                    if ($picture['perspective']) {
+                        $perspective = $this->translate($picture['perspective'], $language);
+                        $result[] = $this->renderer->escapeHtml(self::mbUcfirst($perspective));
+                    }
+                    if ($picture['car']) {
+                        $result[] = $this->vehicleNameFormatter->formatHtml($picture['car'], $language);
+                    } else {
+                        $result[] = 'Unsorted car';
+                    }
+                    return implode(' ', $result);
                 }
-                break;
+                return 'Unsorted car';
 
             case Picture::ENGINE_TYPE_ID:
             case Picture::LOGO_TYPE_ID:

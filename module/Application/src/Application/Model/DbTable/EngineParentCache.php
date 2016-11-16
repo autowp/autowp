@@ -30,10 +30,10 @@ class EngineParentCache extends Table
 
         $table = new Engine();
 
-        $this->_rebuild($table, [0]);
+        $this->doRebuild($table, [0]);
     }
 
-    private function _rebuild(Engine $table, $id)
+    private function doRebuild(Engine $table, $id)
     {
         $select = $table->getAdapter()->select()
             ->from($table->info('name'), 'id');
@@ -49,7 +49,7 @@ class EngineParentCache extends Table
                 'parent_id' => intval($cat_id),
             ]);
 
-            $this->_rebuild($table, array_merge([$cat_id], $id));
+            $this->doRebuild($table, array_merge([$cat_id], $id));
         }
 
         foreach ($id as $tid) {

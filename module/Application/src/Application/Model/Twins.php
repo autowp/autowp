@@ -100,7 +100,9 @@ class Twins
                 'name'      => 'IFNULL(brand_language.name, brands.caption)',
                 'folder'    => 'folder',
                 'count'     => new Zend_Db_Expr('count(distinct tg.id)'),
-                'new_count' => new Zend_Db_Expr('count(distinct if(tg.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), tg.id, null))'),
+                'new_count' => new Zend_Db_Expr(
+                    'count(distinct if(tg.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), tg.id, null))'
+                ),
             ])
             ->joinLeft('brand_language', $langExpr, null)
             ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)

@@ -18,8 +18,12 @@ class FormPictureMultiCheckbox extends FormMultiCheckbox
      * @param  array                $attributes
      * @return string
      */
-    protected function renderOptions(MultiCheckboxElement $element, array $options, array $selectedOptions, array $attributes)
-    {
+    protected function renderOptions(
+        MultiCheckboxElement $element,
+        array $options,
+        array $selectedOptions,
+        array $attributes
+    ) {
         $escapeHtmlHelper = $this->getEscapeHtmlHelper();
         $labelHelper      = $this->getLabelHelper();
         $labelClose       = $labelHelper->closeTag();
@@ -48,8 +52,11 @@ class FormPictureMultiCheckbox extends FormMultiCheckbox
             $label           = '';
             $inputAttributes = $attributes;
             $labelAttributes = $globalLabelAttributes;
-            $selected        = (isset($inputAttributes['selected']) && $inputAttributes['type'] != 'radio' && $inputAttributes['selected']);
-            $disabled        = (isset($inputAttributes['disabled']) && $inputAttributes['disabled']);
+            $selected        = (isset($inputAttributes['selected'])
+                            && $inputAttributes['type'] != 'radio'
+                            && $inputAttributes['selected']);
+            $disabled        = (isset($inputAttributes['disabled'])
+                            && $inputAttributes['disabled']);
 
             if (is_scalar($optionSpec)) {
                 $optionSpec = [

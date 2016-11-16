@@ -12,22 +12,22 @@ use Exception;
 
 class Most
 {
-    protected $_carsCount = 10;
+    protected $carsCount = 10;
 
     /**
      * @var Zend_Db_Table_Select
      */
-    protected $_carsSelect;
+    protected $carsSelect;
 
     /**
      * @var AbstractAdapter
      */
-    protected $_adapter = null;
+    protected $adapter = null;
 
     /**
      * @var SpecificationsService
      */
-    protected $_specs;
+    protected $specs;
 
     public function __construct(array $options)
     {
@@ -50,14 +50,14 @@ class Most
 
     public function setCarsCount($value)
     {
-        $this->_carsCount = (int)$value;
+        $this->carsCount = (int)$value;
 
         return $this;
     }
 
     public function getCarsCount()
     {
-        return $this->_carsCount;
+        return $this->carsCount;
     }
 
     /**
@@ -66,7 +66,7 @@ class Most
      */
     public function setSpecs(SpecificationsService $value)
     {
-        $this->_specs = $value;
+        $this->specs = $value;
 
         return $this;
     }
@@ -76,7 +76,7 @@ class Most
      */
     public function getSpecs()
     {
-        return $this->_specs;
+        return $this->specs;
     }
 
     public function setAdapter($options)
@@ -116,18 +116,18 @@ class Most
             );
         }
 
-        $this->_adapter = $mostAdapter;
+        $this->adapter = $mostAdapter;
 
         return $this;
     }
 
     public function getData($language)
     {
-        $select = clone $this->_carsSelect;
+        $select = clone $this->carsSelect;
 
-        $select->limit($this->_carsCount);
+        $select->limit($this->carsCount);
 
-        return $this->_adapter->getCars($select, $language);
+        return $this->adapter->getCars($select, $language);
     }
 
     /**
@@ -136,7 +136,7 @@ class Most
      */
     public function setCarsSelect(Zend_Db_Table_Select $select)
     {
-        $this->_carsSelect = $select;
+        $this->carsSelect = $select;
 
         return $this;
     }

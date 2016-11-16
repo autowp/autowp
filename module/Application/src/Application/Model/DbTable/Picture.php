@@ -271,7 +271,9 @@ class Picture extends Table
                         //$perspective = isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : '';
                         //$caption = $perspective . $car;
                         $caption = array_replace($car, [
-                            'perspective' => isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : null
+                            'perspective' => isset($perspectives[$row['perspective_id']])
+                                ? $perspectives[$row['perspective_id']]
+                                : null
                         ]);
                     }
                     break;
@@ -449,13 +451,17 @@ class Picture extends Table
                         $caption = [
                             'type' => $row['type'],
                             'car' => $car,
-                            'perspective' => isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : null
+                            'perspective' => isset($perspectives[$row['perspective_id']])
+                                ? $perspectives[$row['perspective_id']]
+                                : null
                         ];
                     } else {
                         $caption = [
                             'type' => $row['type'],
                             'car' => null,
-                            'perspective' => isset($perspectives[$row['perspective_id']]) ? $perspectives[$row['perspective_id']] : null
+                            'perspective' => isset($perspectives[$row['perspective_id']])
+                                ? $perspectives[$row['perspective_id']]
+                                : null
                         ];
                     }
                     break;
@@ -543,7 +549,11 @@ class Picture extends Table
                     $brands = $brandTable->fetchAll(
                         $brandTable->select(true)
                             ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
-                            ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
+                            ->join(
+                                'engine_parent_cache',
+                                'brand_engine.engine_id = engine_parent_cache.parent_id',
+                                null
+                            )
                             ->where('engine_parent_cache.engine_id = ?', $params['engine_id'])
                             ->group('brands.id')
                     );

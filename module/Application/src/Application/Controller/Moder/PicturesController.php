@@ -307,16 +307,18 @@ class PicturesController extends AbstractActionController
             }
         }
 
+        $brandRelatedTypes = [Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID, Picture::MIXED_TYPE_ID];
+
         if (strlen($formdata['type_id'])) {
             if ($formdata['type_id'] == 'unsorted+mixed+logo') {
-                $select->where('pictures.type IN (?)', [Picture::MIXED_TYPE_ID, Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID]);
+                $select->where('pictures.type IN (?)', $brandRelatedTypes);
             } else {
                 $select->where('pictures.type = ?', $formdata['type_id']);
             }
         }
 
         if ($formdata['brand_id']) {
-            if (strlen($formdata['type_id']) && in_array($formdata['type_id'], [Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID, Picture::MIXED_TYPE_ID])) {
+            if (strlen($formdata['type_id']) && in_array($formdata['type_id'], $brandRelatedTypes)) {
                 $select->where('pictures.brand_id = ?', $formdata['brand_id']);
             } elseif ($formdata['type_id'] == Picture::ENGINE_TYPE_ID) {
                 $select
@@ -1003,7 +1005,11 @@ class PicturesController extends AbstractActionController
                                 $uri = $this->hostManager->getUriByLanguage($userRow->language);
 
                                 $message = sprintf(
-                                    $this->translate('pm/user-%s-edited-picture-copyrights-%s-%s', 'default', $userRow->language),
+                                    $this->translate(
+                                        'pm/user-%s-edited-picture-copyrights-%s-%s',
+                                        'default',
+                                        $userRow->language
+                                    ),
                                     $this->userModerUrl($user, true, $uri),
                                     $this->pic()->name($picture, $userRow->language),
                                     $this->pictureUrl($picture, true, $uri)
@@ -2068,7 +2074,13 @@ class PicturesController extends AbstractActionController
                     ->join('brands_cars', 'cars.id=brands_cars.car_id', null)
                     ->where('brands_cars.brand_id = ?', $brand['id'])
                     ->where('NOT cars.is_concept')
-                    ->order(['cars.caption', 'cars.begin_year', 'cars.end_year', 'cars.begin_model_year', 'cars.end_model_year'])
+                    ->order([
+                        'cars.caption',
+                        'cars.begin_year',
+                        'cars.end_year',
+                        'cars.begin_model_year',
+                        'cars.end_model_year'
+                    ])
             );
             $cars = $this->prepareCars($rows);
 

@@ -439,7 +439,8 @@ class Mosts
                 [
                     'name'   => 'mosts/period/present',
                     'folder' => 'today',
-                    'where'  => 'cars.end_order_cache >="'.$cy.'-01-01" and cars.end_order_cache<"2100-01-01" or cars.end_order_cache is null and cars.today'
+                    'where'  => 'cars.end_order_cache >="'.$cy.'-01-01" and cars.end_order_cache<"2100-01-01" ' .
+                                'or cars.end_order_cache is null and cars.today'
                 ]
             ];
         }
@@ -548,7 +549,11 @@ class Mosts
                 $pictureTable->select(true)
                     ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                    ->join(['mp' => 'perspectives_groups_perspectives'], 'pictures.perspective_id=mp.perspective_id', null)
+                    ->join(
+                        ['mp' => 'perspectives_groups_perspectives'],
+                        'pictures.perspective_id=mp.perspective_id',
+                        null
+                    )
                     ->where('mp.group_id = ?', $groupId)
                     ->where('car_parent_cache.parent_id = ?', $carId)
                     ->where('not car_parent_cache.sport and not car_parent_cache.tuning')

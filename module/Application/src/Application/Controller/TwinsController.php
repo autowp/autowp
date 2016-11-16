@@ -397,7 +397,7 @@ class TwinsController extends AbstractActionController
         ];
     }
 
-    private function _pictureAction($callback)
+    private function doPictureAction($callback)
     {
         $twins = $this->getTwins();
 
@@ -430,7 +430,7 @@ class TwinsController extends AbstractActionController
 
     public function pictureAction()
     {
-        return $this->_pictureAction(function ($group, $picture) {
+        return $this->doPictureAction(function ($group, $picture) {
 
             $twins = $this->getTwins();
 
@@ -462,7 +462,7 @@ class TwinsController extends AbstractActionController
 
     public function pictureGalleryAction()
     {
-        return $this->_pictureAction(function ($group, $picture) {
+        return $this->doPictureAction(function ($group, $picture) {
 
             $select = $this->getTwins()->getGroupPicturesSelect($group['id'], [
                 'ordering' => $this->catalogue()->picturesOrdering()

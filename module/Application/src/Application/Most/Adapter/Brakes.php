@@ -76,10 +76,12 @@ class Brakes extends AbstractAdapter
             $axisSelect->reset(Zend_Db_Table::COLUMNS);
 
             $diameter  = $this->attributesTable->find($axis['diameter'])->current();
-            $diameterValuesTable = $specService->getValueDataTable($diameter->type_id)->info(Zend_Db_Table_Abstract::NAME);
+            $diameterValuesTable = $specService->getValueDataTable($diameter->type_id)
+                ->info(Zend_Db_Table_Abstract::NAME);
 
             $thickness = $this->attributesTable->find($axis['thickness'])->current();
-            $thicknessValuesTable = $specService->getValueDataTable($thickness->type_id)->info(Zend_Db_Table_Abstract::NAME);
+            $thicknessValuesTable = $specService->getValueDataTable($thickness->type_id)
+                ->info(Zend_Db_Table_Abstract::NAME);
 
             $axisSelect
                 ->columns(['car_id' => 'cars.id', 'size_value' => new Zend_Db_Expr('diameter.value*thickness.value')])
@@ -122,7 +124,7 @@ class Brakes extends AbstractAdapter
         foreach ($cars as $car) {
             $result[] = [
                 'car'       => $car,
-                'valueHtml' => $this->_getBrakesText($car),
+                'valueHtml' => $this->getBrakesText($car),
             ];
         }
 
@@ -132,7 +134,7 @@ class Brakes extends AbstractAdapter
         ];
     }
 
-    protected function _getBrakesText($car)
+    protected function getBrakesText($car)
     {
         $text = [];
 

@@ -527,7 +527,9 @@ class AccountController extends AbstractActionController
 
                 $this->service->changeEmailStart($user, $values['email'], $this->language());
 
-                $this->flashMessenger()->addSuccessMessage($this->translator->translate('users/change-email/confirmation-message-sent'));
+                $this->flashMessenger()->addSuccessMessage(
+                    $this->translator->translate('users/change-email/confirmation-message-sent')
+                );
 
                 return $this->redirect()->toRoute();
             }
@@ -836,7 +838,9 @@ class AccountController extends AbstractActionController
                     break;
                 case SpecificationsService::ITEM_TYPE_ENGINE:
                     $engine = $engineTable->find($conflict['itemId'])->current();
-                    $conflict['object'] = $engine ? $this->translator->translate('account/specs/conflicts/title/object/engine'). ' ' . $engine->caption : null;
+                    $conflict['object'] = $engine
+                        ? $this->translate('account/specs/conflicts/title/object/engine') . ' ' . $engine->caption
+                        : null;
                     $conflict['url'] = $this->url()->fromRoute('cars/params', [
                         'action'    => 'engine-spec-editor',
                         'engine_id' => $conflict['itemId'],

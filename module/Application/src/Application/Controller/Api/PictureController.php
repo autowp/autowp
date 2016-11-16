@@ -97,7 +97,11 @@ class PictureController extends AbstractActionController
 
                     if ($groupId) {
                         $select
-                            ->join(['mp' => 'perspectives_groups_perspectives'], 'pictures.perspective_id=mp.perspective_id', null)
+                            ->join(
+                                ['mp' => 'perspectives_groups_perspectives'],
+                                'pictures.perspective_id=mp.perspective_id',
+                                null
+                            )
                             ->where('mp.group_id = ?', $groupId)
                             ->order([
                                 'mp.position',

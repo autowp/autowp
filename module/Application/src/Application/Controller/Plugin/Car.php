@@ -133,9 +133,13 @@ class Car extends AbstractPlugin
         $disableDescription   = isset($options['disableDescription']) && $options['disableDescription'];
         $disableDetailsLink   = isset($options['disableDetailsLink']) && $options['disableDetailsLink'];
         $detailsUrl           = isset($options['detailsUrl']) ? $options['detailsUrl'] : null;
-        $allPicturesUrl       = isset($options['allPicturesUrl']) && $options['allPicturesUrl'] ? $options['allPicturesUrl'] : null;
+        $allPicturesUrl       = isset($options['allPicturesUrl']) && $options['allPicturesUrl']
+            ? $options['allPicturesUrl']
+            : null;
         $typeUrl              = isset($options['typeUrl']) && $options['typeUrl'] ? $options['typeUrl'] : null;
-        $specificationsUrl    = isset($options['specificationsUrl']) && $options['specificationsUrl'] ? $options['specificationsUrl'] : null;
+        $specificationsUrl    = isset($options['specificationsUrl']) && $options['specificationsUrl']
+            ? $options['specificationsUrl']
+            : null;
         $onlyExactlyPictures  = isset($options['onlyExactlyPictures']) ? $options['onlyExactlyPictures'] : null;
         $hideEmpty            = isset($options['hideEmpty']) && $options['hideEmpty'];
         $disableTwins         = isset($options['disableTwins']) && $options['disableTwins'];
@@ -146,7 +150,9 @@ class Car extends AbstractPlugin
         $perspectiveGroup     = isset($options['perspectiveGroup']) ? (int)$options['perspectiveGroup'] : null;
         $callback             = isset($options['callback']) && $options['callback'] ? $options['callback'] : null;
         $allowUpPictures      = isset($options['allowUpPictures']) && $options['allowUpPictures'];
-        $onlyChilds           = isset($options['onlyChilds']) && is_array($options['onlyChilds']) ? $options['onlyChilds'] : [];
+        $onlyChilds           = isset($options['onlyChilds']) && is_array($options['onlyChilds'])
+            ? $options['onlyChilds']
+            : [];
         $pictureUrlCallback   = isset($options['pictureUrl']) ? $options['pictureUrl'] : false;
 
         $controller = $this->getController();
@@ -194,7 +200,10 @@ class Car extends AbstractPlugin
         $carsCategories = [];
         if ($carIds && ! $disableCategories) {
             $db = $categoryTable->getAdapter();
-            $langExpr = $db->quoteInto('category.id = category_language.category_id and category_language.language = ?', $language);
+            $langExpr = $db->quoteInto(
+                'category.id = category_language.category_id and category_language.language = ?',
+                $language
+            );
             $categoryRows = $db->fetchAll(
                 $db->select()
                     ->from($categoryTable->info('name'), ['name', 'catname'])
@@ -477,7 +486,9 @@ class Car extends AbstractPlugin
             }
 
             if ($typeUrl) {
-                $tuningCount = isset($carsTypeCounts[$car->id][VehicleParent::TYPE_TUNING]) ? $carsTypeCounts[$car->id][VehicleParent::TYPE_TUNING] : 0;
+                $tuningCount = isset($carsTypeCounts[$car->id][VehicleParent::TYPE_TUNING])
+                    ? $carsTypeCounts[$car->id][VehicleParent::TYPE_TUNING]
+                    : 0;
                 if ($tuningCount) {
                     $item['tuning'] = [
                         'count' => $tuningCount,
@@ -485,7 +496,9 @@ class Car extends AbstractPlugin
                     ];
                 }
 
-                $sportCount = isset($carsTypeCounts[$car->id][VehicleParent::TYPE_SPORT]) ? $carsTypeCounts[$car->id][VehicleParent::TYPE_SPORT] : 0;
+                $sportCount = isset($carsTypeCounts[$car->id][VehicleParent::TYPE_SPORT])
+                    ? $carsTypeCounts[$car->id][VehicleParent::TYPE_SPORT]
+                    : 0;
                 if ($sportCount) {
                     $item['sport'] = [
                         'count' => $sportCount,
@@ -630,7 +643,11 @@ class Car extends AbstractPlugin
 
         if ($options['perspectiveGroup']) {
             $select
-                ->join(['mp' => 'perspectives_groups_perspectives'], 'pictures.perspective_id = mp.perspective_id', null)
+                ->join(
+                    ['mp' => 'perspectives_groups_perspectives'],
+                    'pictures.perspective_id = mp.perspective_id',
+                    null
+                )
                 ->where('mp.group_id = ?', $options['perspectiveGroup']);
 
             $order[] = 'mp.position';

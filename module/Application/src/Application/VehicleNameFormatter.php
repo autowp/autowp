@@ -48,11 +48,16 @@ class VehicleNameFormatter
         $result = $this->renderer->escapeHtml($car['name']);
 
         if ($car['spec']) {
+            $attrs = ['class="label label-primary"'];
             if ($car['spec_full']) {
-                $result .= ' <span class="label label-primary" title="'.$this->renderer->escapeHtmlAttr($car['spec_full']).'" data-toggle="tooltip" data-placement="top">' . $this->renderer->escapeHtml($car['spec']) . '</span>';
-            } else {
-                $result .= ' <span class="label label-primary">' . $this->renderer->escapeHtml($car['spec']) . '</span>';
+                $attrs = array_merge($attrs, [
+                    'title="' . $this->renderer->escapeHtmlAttr($car['spec_full']).'"',
+                    'data-toggle="tooltip"',
+                    'data-placement="top"'
+                ]);
             }
+            $escapedSpec = $this->renderer->escapeHtml($car['spec']);
+            $result .= ' <span '.implode(' ', $attrs).'>' . $escapedSpec . '</span>';
         }
 
         if (strlen($car['body']) > 0) {
@@ -87,7 +92,8 @@ class VehicleNameFormatter
         $equalM = $equalY && $bm && $em && ($bm == $em);
 
         if ($useModelYear) {
-            $mylabel = '<span title="' . $this->renderer->escapeHtmlAttr($this->translate('carlist/model-years', $language)) . '">';
+            $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/model-years', $language));
+            $mylabel = '<span title="' . $title . '">';
             if ($emy == $bmy) {
                 $mylabel .= $bmy;
             } elseif ($bms == $ems) {
@@ -111,16 +117,37 @@ class VehicleNameFormatter
             $result = $mylabel . ' ' . $result;
 
             if ($by > 0 || $ey > 0) {
+                $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/years', $language));
                 $result .=
                     '<small>'.
-                        ' \'<span class="realyears" title="'.$this->renderer->escapeHtmlAttr($this->translate('carlist/years', $language)).'">' .
-                            $this->renderYearsHtml($car['today'], $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language) .
+                        ' \'<span class="realyears" title="'.$title.'">' .
+                            $this->renderYearsHtml(
+                                $car['today'],
+                                $by,
+                                $bm,
+                                $ey,
+                                $em,
+                                $equalS,
+                                $equalY,
+                                $equalM,
+                                $language
+                            ) .
                         '</span>' .
                     '</small>';
             }
         } else {
             if ($by > 0 || $ey > 0) {
-                $result .= " '" . $this->renderYearsHtml($car['today'], $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language);
+                $result .= " '" . $this->renderYearsHtml(
+                    $car['today'],
+                    $by,
+                    $bm,
+                    $ey,
+                    $em,
+                    $equalS,
+                    $equalY,
+                    $equalM,
+                    $language
+                );
             }
         }
 
@@ -205,7 +232,17 @@ class VehicleNameFormatter
         }
 
         if ($by > 0 || $ey > 0) {
-            $result .= " '" . $this->renderYears($car['today'], $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language);
+            $result .= " '" . $this->renderYears(
+                $car['today'],
+                $by,
+                $bm,
+                $ey,
+                $em,
+                $equalS,
+                $equalY,
+                $equalM,
+                $language
+            );
         }
 
         return $result;

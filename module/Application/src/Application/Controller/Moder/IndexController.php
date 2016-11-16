@@ -200,7 +200,17 @@ class IndexController extends AbstractActionController
         $carTable = new Vehicle();
 
         $rows = $carTable->getAdapter()->fetchAll("
-            SELECT cars.id, cars.caption, cars.body, (case car_parent.type when 0 then 'Stock' when 1 then 'Tuning' when 2 then 'Sport' else car_parent.type end) as t, count(1) as c
+            SELECT
+                cars.id, cars.caption, cars.body,
+                (
+                    case car_parent.type
+                        when 0 then 'Stock'
+                        when 1 then 'Related'
+                        when 2 then 'Sport'
+                        else car_parent.type
+                    end
+                ) as t,
+                count(1) as c
             from car_parent
             join cars on car_parent.parent_id=cars.id
             group by cars.id, car_parent.type

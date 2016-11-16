@@ -124,7 +124,7 @@ class Comments
      * @param int $page
      * @return array
      */
-    private function _get($type, $item, $parentId, $userId, $perPage = 0, $page = 0)
+    private function getRecursive($type, $item, $parentId, $userId, $perPage = 0, $page = 0)
     {
         if ($userId instanceof UserRow) {
             $userId = $userId->id;
@@ -166,7 +166,7 @@ class Comments
             }
 
             if ($row->replies_count > 0) {
-                $submessages = $this->_get($type, $item, $row->id, $userId);
+                $submessages = $this->getRecursive($type, $item, $row->id, $userId);
             } else {
                 $submessages = [];
             }
@@ -196,7 +196,7 @@ class Comments
      */
     public function get($type, $item, $userId, $perPage = 0, $page = 0)
     {
-        return $this->_get($type, $item, null, $userId, $perPage, $page);
+        return $this->getRecursive($type, $item, null, $userId, $perPage, $page);
     }
 
     /**

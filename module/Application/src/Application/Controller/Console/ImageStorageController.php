@@ -19,12 +19,12 @@ class ImageStorageController extends AbstractActionController
             throw new Exception("Dir '$dirname' not found");
         }
 
-        $this->_recursiveDirectory(realpath($dir->getPath()));
+        $this->recursiveDirectory(realpath($dir->getPath()));
 
         Console::getInstance()->writeLine("done");
     }
 
-    private function _recursiveDirectory($dir)
+    private function recursiveDirectory($dir)
     {
         $stack[] = $dir;
 

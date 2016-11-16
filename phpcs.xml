@@ -4,5 +4,4 @@
 
     <!-- Paths to check -->
     <file>module/Application/src</file>
-    <file>module/Application/test</file>
 </ruleset>

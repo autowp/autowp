@@ -208,15 +208,27 @@ class Row extends \Application\Db\Table\Row
             } else {
                 if ($equalY) {
                     if ($bm && $em) {
-                        $result .= '<span class="month">'.($bm ? sprintf('%02d', $bm) : '??').'–'.($em ? sprintf('%02d', $em) : '??').'.</span>'.$by;
+                        $result .= '<span class="month">' .
+                                       ($bm ? sprintf('%02d', $bm) : '??') .
+                                       '–' .
+                                       ($em ? sprintf('%02d', $em) : '??').
+                                   '.</span>' . $by;
                     } else {
                         $result .= $by;
                     }
                 } else {
                     if ($equalS) {
                         $result .= (($bm ? sprintf('<span class="month">%02d.</span>', $bm) : '').$by).
-                           '–'.
-                           ($em ? sprintf('<span class="month">%02d.</span>', $em) : '').($em ? $ey : sprintf('%02d', $ey % 100));
+                            '–'.
+                            (
+                                $em
+                                    ? sprintf('<span class="month">%02d.</span>', $em)
+                                    : ''
+                            ) . (
+                                $em
+                                    ? $ey
+                                    : sprintf('%02d', $ey % 100)
+                            );
                     } else {
                         $result .= (($bm ? sprintf('<span class="month">%02d.</span>', $bm) : '').($by ? $by : '????')).
                            (
@@ -251,7 +263,11 @@ class Row extends \Application\Db\Table\Row
                 $pictureTable->select(true)
                     ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                    ->join(['mp' => 'perspectives_groups_perspectives'], 'pictures.perspective_id=mp.perspective_id', null)
+                    ->join(
+                        ['mp' => 'perspectives_groups_perspectives'],
+                        'pictures.perspective_id=mp.perspective_id',
+                        null
+                    )
                     ->where('mp.group_id=?', $groupId)
                     ->where('car_parent_cache.parent_id = ?', $this->id)
                     ->where('not car_parent_cache.sport and not car_parent_cache.tuning')

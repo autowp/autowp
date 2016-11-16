@@ -402,8 +402,19 @@ class CarsController extends AbstractActionController
                 'attribute' => $attribute,
                 'unit'      => $unit,
                 'user'      => $user,
-                'value'     => $this->specsService->getActualValueText($attribute->id, $itemType->id, $row->item_id, $language),
-                'userValue' => $this->specsService->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id, $language),
+                'value'     => $this->specsService->getActualValueText(
+                    $attribute->id,
+                    $itemType->id,
+                    $row->item_id,
+                    $language
+                ),
+                'userValue' => $this->specsService->getUserValueText(
+                    $attribute->id,
+                    $itemType->id,
+                    $row->item_id,
+                    $user->id,
+                    $language
+                ),
                 'date'      => $row->getDateTime('update_date'),
                 'deleteUrl' => $this->url()->fromRoute('cars/params', [
                     'action'       => 'delete-value',
@@ -616,7 +627,13 @@ class CarsController extends AbstractActionController
                     'moderUrl'  => $moderUrl
                 ],
                 'path'     => $path,
-                'value'    => $this->specsService->getUserValueText($attribute->id, $itemType->id, $row->item_id, $user->id, $language),
+                'value'    => $this->specsService->getUserValueText(
+                    $attribute->id,
+                    $itemType->id,
+                    $row->item_id,
+                    $user->id,
+                    $language
+                ),
                 'unit'     => $attribute->findParentRow(Attr\Unit::class)
             ];
         }
@@ -677,7 +694,11 @@ class CarsController extends AbstractActionController
                     $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
                     $message = sprintf(
-                        $this->translate('pm/user-%s-canceled-vehicle-engine-%s-%s-%s', 'default', $subscriber->language),
+                        $this->translate(
+                            'pm/user-%s-canceled-vehicle-engine-%s-%s-%s',
+                            'default',
+                            $subscriber->language
+                        ),
                         $this->userUrl($user, $uri),
                         $engine->caption,
                         $car->getFullName($subscriber->language),
@@ -728,7 +749,11 @@ class CarsController extends AbstractActionController
                     $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
                     $message = sprintf(
-                        $this->translate('pm/user-%s-set-inherited-vehicle-engine-%s-%s', 'default', $subscriber->language),
+                        $this->translate(
+                            'pm/user-%s-set-inherited-vehicle-engine-%s-%s',
+                            'default',
+                            $subscriber->language
+                        ),
                         $this->userUrl($user, $uri),
                         $car->getFullName($subscriber->language),
                         $this->carModerUrl($car, $uri)

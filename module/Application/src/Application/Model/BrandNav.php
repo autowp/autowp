@@ -83,7 +83,14 @@ class BrandNav
                 ],
                 [
                     'name'   => null,
-                    'groups' => $this->otherGroups($language, $brand, $conceptsSeparatly, $type, $isConcepts, $isEngines)
+                    'groups' => $this->otherGroups(
+                        $language,
+                        $brand,
+                        $conceptsSeparatly,
+                        $type,
+                        $isConcepts,
+                        $isEngines
+                    )
                 ]
             ]
         );
@@ -471,7 +478,13 @@ class BrandNav
 
             $sections = [];
             foreach ($sectionsPresets as $sectionsPreset) {
-                $sectionGroups = $this->carSectionGroups($language, $brand, $sectionsPreset, $conceptsSeparatly, $carId);
+                $sectionGroups = $this->carSectionGroups(
+                    $language,
+                    $brand,
+                    $sectionsPreset,
+                    $conceptsSeparatly,
+                    $carId
+                );
 
                 usort($sectionGroups, function ($a, $b) {
                     return strnatcasecmp($a['caption'], $b['caption']);

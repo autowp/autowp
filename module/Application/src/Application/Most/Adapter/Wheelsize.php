@@ -54,13 +54,16 @@ class Wheelsize extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         $tyrewidth  = $this->attributesTable->find($wheel['tyrewidth'])->current();
-        $tyrewidthValuesTable = $specService->getValueDataTable($tyrewidth->type_id)->info(Zend_Db_Table_Abstract::NAME);
+        $tyrewidthValuesTable = $specService->getValueDataTable($tyrewidth->type_id)
+            ->info(Zend_Db_Table_Abstract::NAME);
 
         $tyreseries = $this->attributesTable->find($wheel['tyreseries'])->current();
-        $tyreseriesValuesTable = $specService->getValueDataTable($tyreseries->type_id)->info(Zend_Db_Table_Abstract::NAME);
+        $tyreseriesValuesTable = $specService->getValueDataTable($tyreseries->type_id)
+            ->info(Zend_Db_Table_Abstract::NAME);
 
         $radius     = $this->attributesTable->find($wheel['radius'])->current();
-        $radiusValuesTable = $specService->getValueDataTable($radius->type_id)->info(Zend_Db_Table_Abstract::NAME);
+        $radiusValuesTable = $specService->getValueDataTable($radius->type_id)
+            ->info(Zend_Db_Table_Abstract::NAME);
 
         $select
             ->join(['tyrewidth' => $tyrewidthValuesTable], 'cars.id = tyrewidth.item_id', null)
@@ -85,7 +88,7 @@ class Wheelsize extends AbstractAdapter
         foreach ($cars as $car) {
             $result[] = [
                 'car'       => $car,
-                'valueText' => $this->_getWheelSizeText($car),
+                'valueText' => $this->getWheelSizeText($car),
             ];
         }
 
@@ -95,7 +98,7 @@ class Wheelsize extends AbstractAdapter
         ];
     }
 
-    protected function _getWheelSizeText($car)
+    protected function getWheelSizeText($car)
     {
         $text = [];
 

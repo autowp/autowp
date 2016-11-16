@@ -57,7 +57,11 @@ class IndexController extends AbstractActionController
             $picture = null;
 
             $select = $pTable->select(true)
-                ->joinRight(['mp' => 'perspectives_groups_perspectives'], 'pictures.perspective_id=mp.perspective_id', null)
+                ->joinRight(
+                    ['mp' => 'perspectives_groups_perspectives'],
+                    'pictures.perspective_id=mp.perspective_id',
+                    null
+                )
                 ->where('mp.group_id = ?', $groupId)
                 ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
@@ -305,7 +309,9 @@ class IndexController extends AbstractActionController
                             }
 
                             $carOfDayPicturesData[] = [
-                                'src'  => isset($imagesInfo[$format][$idx]) ? $imagesInfo[$format][$idx]->getSrc() : null,
+                                'src'  => isset($imagesInfo[$format][$idx])
+                                    ? $imagesInfo[$format][$idx]->getSrc()
+                                    : null,
                                 'name' => isset($names[$row['id']]) ? $names[$row['id']] : null,
                                 'url'  => $url
                             ];
@@ -395,6 +401,8 @@ class IndexController extends AbstractActionController
             $categoryAdapter = $categoryTable->getAdapter();
             $categoryLangTable = new CategoryLanguage();
 
+            $expr = 'COUNT(IF(category_car.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
+
             $items = $categoryAdapter->fetchAll(
                 $categoryAdapter->select()
                     ->from(
@@ -402,7 +410,7 @@ class IndexController extends AbstractActionController
                         [
                             'id',
                             'cars_count'     => 'COUNT(1)',
-                            'new_cars_count' => new Zend_Db_Expr('COUNT(IF(category_car.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))')
+                            'new_cars_count' => new Zend_Db_Expr($expr)
                         ]
                     )
                     ->join(['cp' => 'category_parent'], 'category.id = cp.parent_id', null)

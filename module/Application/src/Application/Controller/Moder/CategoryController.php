@@ -284,7 +284,9 @@ class CategoryController extends AbstractActionController
                 );
 
                 if ($categoryLinksCount < count($brandNames)) {
-                    $childs[$carRow->id] = str_repeat('...', $carParentRow->diff) . ' ' . implode(', ', $brandNames) . ': ' . $carRow->getFullName($this->language());
+                    $childs[$carRow->id] = str_repeat('...', $carParentRow->diff) . ' ' .
+                                           implode(', ', $brandNames) . ': ' .
+                                           $carRow->getFullName($this->language());
                 }
             }
         }

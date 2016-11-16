@@ -258,7 +258,11 @@ class CarsController extends AbstractActionController
 
             if ($values['no_parent']) {
                 $select
-                    ->joinLeft('car_parent_cache', 'cars.id = car_parent_cache.car_id and cars.id <> car_parent_cache.parent_id', null)
+                    ->joinLeft(
+                        'car_parent_cache',
+                        'cars.id = car_parent_cache.car_id and cars.id <> car_parent_cache.parent_id',
+                        null
+                    )
                     ->joinLeft('brands_cars', 'cars.id = brands_cars.car_id', null)
                     ->where('car_parent_cache.car_id IS NULL')
                     ->where('brands_cars.car_id IS NULL');
@@ -538,7 +542,11 @@ class CarsController extends AbstractActionController
                                 $uri = $this->hostManager->getUriByLanguage($userRow->language);
 
                                 $message = sprintf(
-                                    $this->translate('pm/user-%s-edited-vehicle-full-description-%s-%s', 'default', $userRow->language),
+                                    $this->translate(
+                                        'pm/user-%s-edited-vehicle-full-description-%s-%s',
+                                        'default',
+                                        $userRow->language
+                                    ),
                                     $this->userModerUrl($user, true, $uri),
                                     $car->getFullName($userRow->language),
                                     $this->carModerUrl($car, true, null, $uri)
@@ -735,7 +743,11 @@ class CarsController extends AbstractActionController
                             $changes = $this->buildChangesMessage($oldData, $newData, $subscriber->language);
 
                             $message = sprintf(
-                                $this->translate('pm/user-%s-edited-vehicle-meta-data-%s-%s-%s', 'default', $subscriber->language),
+                                $this->translate(
+                                    'pm/user-%s-edited-vehicle-meta-data-%s-%s-%s',
+                                    'default',
+                                    $subscriber->language
+                                ),
                                 $this->userModerUrl($user, true, $uri),
                                 $car->getFullName($subscriber->language),
                                 $this->carModerUrl($car, true, null, $uri),
@@ -793,7 +805,11 @@ class CarsController extends AbstractActionController
                                     $uri = $this->hostManager->getUriByLanguage($userRow->language);
 
                                     $message = sprintf(
-                                        $this->translate('pm/user-%s-edited-vehicle-description-%s-%s', 'default', $userRow->language),
+                                        $this->translate(
+                                            'pm/user-%s-edited-vehicle-description-%s-%s',
+                                            'default',
+                                            $userRow->language
+                                        ),
                                         $this->userModerUrl($user, true, $uri),
                                         $car->getFullName($userRow->language),
                                         $this->carModerUrl($car, true, null, $uri)
@@ -1021,10 +1037,14 @@ class CarsController extends AbstractActionController
                 case 'bool':
                     $old = is_null($oldData[$field])
                         ? null
-                        : $this->translate($oldData[$field] ? 'moder/vehicle/changes/boolean/true' : 'moder/vehicle/changes/boolean/false');
+                        : $this->translate($oldData[$field]
+                            ? 'moder/vehicle/changes/boolean/true'
+                            : 'moder/vehicle/changes/boolean/false');
                     $new = is_null($newData[$field])
                         ? null
-                        : $this->translate($newData[$field] ? 'moder/vehicle/changes/boolean/true' : 'moder/vehicle/changes/boolean/false');
+                        : $this->translate($newData[$field]
+                            ? 'moder/vehicle/changes/boolean/true'
+                            : 'moder/vehicle/changes/boolean/false');
                     if ($old !== $new) {
                         $changes[] = sprintf($message, $old, $new);
                     }
@@ -1576,7 +1596,10 @@ class CarsController extends AbstractActionController
             }
 
             if ($deletedNames || $insertedNames) {
-                $logText = 'Изменение категорий автомобиля ' . $car->getFullName('en') . '. ' .
+                $logText = sprintf(
+                    'Изменение категорий автомобиля %s. ',
+                    $car->getFullName('en')
+                ) .
                     ($deletedNames ? 'Удалено: ' . implode(', ', $deletedNames) . '. ' : '') .
                     ($insertedNames ? 'Добавлено: ' . implode(', ', $insertedNames) . '. ' : '');
                     $this->log(htmlspecialchars($logText), $car);
@@ -1603,7 +1626,11 @@ class CarsController extends AbstractActionController
                     }
 
                     $message = sprintf(
-                        $this->translate('pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s', 'default', $notifyUser->language),
+                        $this->translate(
+                            'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s',
+                            'default',
+                            $notifyUser->language
+                        ),
                         $this->userModerUrl($user, true, $uri),
                         $car->getFullName($notifyUser->language),
                         $this->carModerUrl($car, true, null, $uri),
@@ -2174,7 +2201,11 @@ class CarsController extends AbstractActionController
         $today = false;
         $body = false;
 
-        if (preg_match("|^(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?$|isu", $query, $match)) {
+        $pattern = "|^" .
+                "(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?" .
+            "$|isu";
+
+        if (preg_match($pattern, $query, $match)) {
             $query = trim($match[5]);
             $body = isset($match[7]) ? trim($match[7]) : null;
             $beginYear = isset($match[9]) ? (int)$match[9] : null;
@@ -3001,10 +3032,11 @@ class CarsController extends AbstractActionController
         $messages = [];
 
         $data = $this->params()->fromPost();
-        if (! isset($data['catname']) || ! strlen($data['catname']) || (! $carParentRow->manual_catname && ($data['catname'] == $carParentRow->car_id))) {
-            if (isset($data['name'])) {
-                $data['catname'] = $data['name'];
-            }
+        $takeCatnameFromName = ! isset($data['catname'])
+                            || ! strlen($data['catname'])
+                            || (! $carParentRow->manual_catname && ($data['catname'] == $carParentRow->car_id));
+        if ($takeCatnameFromName && isset($data['name'])) {
+            $data['catname'] = $data['name'];
         }
 
         $this->carParentForm->setData($data);

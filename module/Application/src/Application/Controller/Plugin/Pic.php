@@ -362,7 +362,11 @@ class Pic extends AbstractPlugin
             if (! $options['disableBehaviour']) {
                 $select
                     ->joinLeft(['pv' => 'picture_view'], 'pictures.id = pv.picture_id', 'views')
-                    ->joinLeft(['ct' => 'comment_topic'], 'ct.type_id = :type_id and ct.item_id = pictures.id', 'messages');
+                    ->joinLeft(
+                        ['ct' => 'comment_topic'],
+                        'ct.type_id = :type_id and ct.item_id = pictures.id',
+                        'messages'
+                    );
 
                 $bind['type_id'] = CommentMessage::PICTURES_TYPE_ID;
             }
@@ -824,9 +828,12 @@ class Pic extends AbstractPlugin
 
                 foreach ($pageNumbers as $page => &$val) {
                     $pic = $paginatorPictures[$page - 1];
-                    $val = $controller->url()->fromRoute($options['paginator']['route'], array_replace($options['paginator']['urlParams'], [
-                        'picture_id' => $pic['identity'] ? $pic['identity'] : $pic['id']
-                    ]));
+                    $val = $controller->url()->fromRoute(
+                        $options['paginator']['route'],
+                        array_replace($options['paginator']['urlParams'], [
+                            'picture_id' => $pic['identity'] ? $pic['identity'] : $pic['id']
+                        ])
+                    );
                 }
                 unset($val);
             } else {
@@ -995,7 +1002,10 @@ class Pic extends AbstractPlugin
                         'action' => 'car',
                         'car_id' => $car->id
                     ]);
-                    $links[$url] = sprintf($this->translator->translate('moder/picture/edit-vehicle-%s'), $car->getFullName($language));
+                    $links[$url] = sprintf(
+                        $this->translator->translate('moder/picture/edit-vehicle-%s'),
+                        $car->getFullName($language)
+                    );
 
                     $brandModel = new BrandModel();
                     $brands = $brandModel->getList(['language' => $language], function ($select) use ($car) {
@@ -1011,7 +1021,10 @@ class Pic extends AbstractPlugin
                         'action'   => 'brand',
                         'brand_id' => $brand['id']
                         ]);
-                        $links[$url] = sprintf($this->translator->translate('moder/picture/edit-brand-%s'), $brand['name']);
+                        $links[$url] = sprintf(
+                            $this->translator->translate('moder/picture/edit-brand-%s'),
+                            $brand['name']
+                        );
                     }
                 }
 
@@ -1023,7 +1036,10 @@ class Pic extends AbstractPlugin
                         'action'    => 'engine',
                         'engine_id' => $engine->id
                     ]);
-                    $links[$url] = sprintf($this->translator->translate('moder/picture/edit-engine-%s'), $engine->caption);
+                    $links[$url] = sprintf(
+                        $this->translator->translate('moder/picture/edit-engine-%s'),
+                        $engine->caption
+                    );
                 }
                 break;
 

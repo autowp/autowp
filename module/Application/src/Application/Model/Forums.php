@@ -460,7 +460,11 @@ class Forums
     {
         $select = $this->topicTable->select(true)
             ->where('forums_topics.status IN (?)', [self::STATUS_CLOSED, self::STATUS_NORMAL])
-            ->joinLeft('comment_topic', 'forums_topics.id = comment_topic.item_id and comment_topic.type_id = :type_id', null)
+            ->joinLeft(
+                'comment_topic',
+                'forums_topics.id = comment_topic.item_id and comment_topic.type_id = :type_id',
+                null
+            )
             ->order('comment_topic.last_update DESC')
             ->bind([
                 'type_id' => CommentMessage::FORUMS_TYPE_ID

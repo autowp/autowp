@@ -42,7 +42,9 @@ class Car extends Form implements InputFilterProviderInterface
         ];
         if (! is_null($this->inheritedIsConcept)) {
             $isConceptOptions = array_merge([
-                'inherited' => $this->inheritedIsConcept ? 'moder/vehicle/is-concept/inherited-yes' : 'moder/vehicle/is-concept/inherited-no'
+                'inherited' => $this->inheritedIsConcept
+                    ? 'moder/vehicle/is-concept/inherited-yes'
+                    : 'moder/vehicle/is-concept/inherited-no'
             ], $isConceptOptions);
         } else {
             $isConceptOptions = array_merge([

@@ -26,7 +26,9 @@ class FuelTank
         }
 
         if ($html) {
-            $html .= ' <span class="unit" title="">'.$view->escapeHtml($view->translate('specs/unit/12/abbr')).'</span>';
+            $html .= ' <span class="unit" title="">' .
+                         $view->escapeHtml($view->translate('specs/unit/12/abbr')) .
+                     '</span>';
         }
 
         return $html;

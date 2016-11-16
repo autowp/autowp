@@ -139,7 +139,8 @@ class FactoryController extends AbstractActionController
                     if (strlen($values['lat']) && strlen($values['lng'])) {
                         $point = new Point($values['lng'], $values['lat']);
 
-                        $point = new Zend_Db_Expr($factoryTable->getAdapter()->quoteInto('GeomFromText(?)', $point->out('wkt')));
+                        $db = $factoryTable->getAdapter();
+                        $point = new Zend_Db_Expr($db->quoteInto('GeomFromText(?)', $point->out('wkt')));
                     } else {
                         $point = null;
                     }
@@ -397,7 +398,11 @@ class FactoryController extends AbstractActionController
                             $uri = $this->hostManager->getUriByLanguage($notifyUser->language);
 
                             $message = sprintf(
-                                $this->translate('pm/user-%s-edited-factory-description-%s-%s', 'default', $notifyUser->language),
+                                $this->translate(
+                                    'pm/user-%s-edited-factory-description-%s-%s',
+                                    'default',
+                                    $notifyUser->language
+                                ),
                                 $this->url()->fromRoute('users/user', [
                                     'action'  => 'user',
                                     'user_id' => $user->identity ? $user->identity : 'user' . $user->id

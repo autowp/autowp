@@ -106,7 +106,11 @@ class Brand
                 'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.caption)',
                 'cars_count' => $this->countExpr()
             ])
-            ->joinLeft('brand_language', 'brands.id = brand_language.brand_id and brand_language.language = :language', null)
+            ->joinLeft(
+                'brand_language',
+                'brands.id = brand_language.brand_id and brand_language.language = :language',
+                null
+            )
             ->where('brands.id <> 58') // exclude "other"
             ->group('brands.id')
             ->order('cars_count DESC')
@@ -159,7 +163,9 @@ class Brand
             'columns'  => [
                 'img',
                 'cars_count' => $this->countExpr(),
-                'new_cars_count' => new Zend_Db_Expr('COUNT(IF(cars.add_datetime > DATE_SUB(NOW(), INTERVAL :new_days DAY), 1, NULL))'),
+                'new_cars_count' => new Zend_Db_Expr(
+                    'COUNT(IF(cars.add_datetime > DATE_SUB(NOW(), INTERVAL :new_days DAY), 1, NULL))'
+                ),
                 'carpictures_count', 'enginepictures_count',
                 'logopictures_count', 'mixedpictures_count',
                 'unsortedpictures_count'
@@ -283,7 +289,11 @@ class Brand
                 'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.caption)',
                 'full_caption', 'img', 'text_id'
             ])
-            ->joinLeft('brand_language', 'brands.id = brand_language.brand_id and brand_language.language = :language', null)
+            ->joinLeft(
+                'brand_language',
+                'brands.id = brand_language.brand_id and brand_language.language = :language',
+                null
+            )
             ->bind([
                 'language' => (string)$language
             ]);
@@ -369,7 +379,11 @@ class Brand
             'id',
             'type_id',
             'catname' => 'folder',
-            'name'    => 'IF(brand_language.name IS NOT NULL and LENGTH(brand_language.name)>0, brand_language.name, brands.caption)'
+            'name'    => 'IF(' .
+                'brand_language.name IS NOT NULL and LENGTH(brand_language.name)>0,' .
+                'brand_language.name,' .
+                'brands.caption' .
+            ')'
         ];
         foreach ($options['columns'] as $column => $expr) {
             switch ($expr) {
@@ -391,7 +405,11 @@ class Brand
 
         $select = $db->select()
             ->from('brands', $columns)
-            ->joinLeft('brand_language', 'brands.id = brand_language.brand_id and brand_language.language = :language', null)
+            ->joinLeft(
+                'brand_language',
+                'brands.id = brand_language.brand_id and brand_language.language = :language',
+                null
+            )
             ->order(['brands.position'])
             ->bind([
                 'language' => (string)$options['language']

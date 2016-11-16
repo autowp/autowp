@@ -171,7 +171,10 @@ class UploadController extends AbstractActionController
 
                         $result = [];
                         foreach ($pictures as $picture) {
-                            $image = $this->imageStorage()->getFormatedImage($picture->getFormatRequest(), 'picture-gallery-full');
+                            $image = $this->imageStorage()->getFormatedImage(
+                                $picture->getFormatRequest(),
+                                'picture-gallery-full'
+                            );
 
                             if ($image) {
                                 $picturesData = $this->pic()->listData([$picture]);
@@ -376,7 +379,8 @@ class UploadController extends AbstractActionController
             if ($gps !== false) {
                 geoPHP::version();
                 $point = new Point($gps['lng'], $gps['lat']);
-                $pointExpr = new Zend_Db_Expr($pictureTable->getAdapter()->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
+                $db = $pictureTable->getAdapter();
+                $pointExpr = new Zend_Db_Expr($db->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
 
                 $picture->point = $pointExpr;
                 $picture->save();

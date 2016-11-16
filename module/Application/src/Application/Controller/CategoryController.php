@@ -195,7 +195,7 @@ class CategoryController extends AbstractActionController
         return $categories;
     }
 
-    private function _categoryAction($callback)
+    private function doCategoryAction($callback)
     {
         $language = $this->language();
 
@@ -235,8 +235,12 @@ class CategoryController extends AbstractActionController
                 'category_id = ?' => $parentCategory->id
             ]);
 
+            $name = $categoryLang && $categoryLang->short_name
+                ? $categoryLang->short_name
+                : $parentCategory->short_name;
+
             array_unshift($breadcrumbs, [
-                'name' => $categoryLang && $categoryLang->short_name ? $categoryLang->short_name : $parentCategory->short_name,
+                'name' => $name,
                 'url'  => $this->url()->fromRoute('categories', [
                     'action'           => 'category',
                     'category_catname' => $parentCategory->catname,
@@ -360,7 +364,7 @@ class CategoryController extends AbstractActionController
 
     public function categoryAction()
     {
-        return $this->_categoryAction(function (
+        return $this->doCategoryAction(function (
             $language,
             $topCategory,
             $currentCategory,
@@ -370,7 +374,7 @@ class CategoryController extends AbstractActionController
             $path,
             $currentCar,
             $breadcrumbs
-) {
+        ) {
 
             $carTable = $this->catalogue()->getCarTable();
 
@@ -429,7 +433,14 @@ class CategoryController extends AbstractActionController
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [
                 'picturesDateSort' => true,
-                'detailsUrl' => function ($listCar) use ($topCar, $currentCar, $carParentTable, $currentCategory, $isOther, $path) {
+                'detailsUrl' => function ($listCar) use (
+                    $topCar,
+                    $currentCar,
+                    $carParentTable,
+                    $currentCategory,
+                    $isOther,
+                    $path
+                ) {
 
                     $carParentAdapter = $carParentTable->getAdapter();
                     $hasChilds = (bool)$carParentAdapter->fetchOne(
@@ -488,7 +499,14 @@ class CategoryController extends AbstractActionController
 
                     return $url;
                 },
-                'allPicturesUrl' => function ($listCar) use ($topCar, $currentCar, $carParentTable, $currentCategory, $isOther, $path) {
+                'allPicturesUrl' => function ($listCar) use (
+                    $topCar,
+                    $currentCar,
+                    $carParentTable,
+                    $currentCategory,
+                    $isOther,
+                    $path
+                ) {
 
                     // found parent row
                     if ($currentCar) {
@@ -536,7 +554,17 @@ class CategoryController extends AbstractActionController
 
                     return $url;
                 },
-                'pictureUrl'           => function ($listCar, $picture) use ($currentCategory, $isOther, $topCar, $currentCar, $carParentTable, $path) {
+                'pictureUrl'           => function (
+                    $listCar,
+                    $picture
+                ) use (
+                    $currentCategory,
+                    $isOther,
+                    $topCar,
+                    $currentCar,
+                    $carParentTable,
+                    $path
+                ) {
 
                     // found parent row
                     if ($currentCar) {
@@ -603,7 +631,7 @@ class CategoryController extends AbstractActionController
 
     public function categoryPicturesAction()
     {
-        return $this->_categoryAction(function (
+        return $this->doCategoryAction(function (
             $language,
             $topCategory,
             $currentCategory,
@@ -613,7 +641,7 @@ class CategoryController extends AbstractActionController
             $path,
             $currentCar,
             $breadcrumbs
-) {
+        ) {
 
             $pictureTable = $this->catalogue()->getPictureTable();
 
@@ -677,7 +705,7 @@ class CategoryController extends AbstractActionController
 
     public function categoryPictureAction()
     {
-        return $this->_categoryAction(function (
+        return $this->doCategoryAction(function (
             $language,
             $topCategory,
             $currentCategory,
@@ -687,7 +715,7 @@ class CategoryController extends AbstractActionController
             $path,
             $currentCar,
             $breadcrumbs
-) {
+        ) {
 
             $pictureTable = $this->catalogue()->getPictureTable();
 
@@ -761,7 +789,7 @@ class CategoryController extends AbstractActionController
 
     public function categoryPictureGalleryAction()
     {
-        return $this->_categoryAction(function (
+        return $this->doCategoryAction(function (
             $language,
             $topCategory,
             $currentCategory,
@@ -771,7 +799,7 @@ class CategoryController extends AbstractActionController
             $path,
             $currentCar,
             $breadcrumbs
-) {
+        ) {
 
             $pictureTable = $this->catalogue()->getPictureTable();
 

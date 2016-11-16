@@ -81,7 +81,11 @@ class RestorePasswordController extends AbstractActionController
                         ->setBody($message)
                         ->setFrom('no-reply@autowp.ru', 'robot autowp.ru')
                         ->addTo($user->e_mail, $user->getCompoundName())
-                        ->setSubject($this->translate('restore-password/new-password/mail/subject', 'default', $user->language));
+                        ->setSubject($this->translate(
+                            'restore-password/new-password/mail/subject',
+                            'default',
+                            $user->language
+                        ));
 
                     $this->transport->send($mail);
 

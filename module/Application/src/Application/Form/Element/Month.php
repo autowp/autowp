@@ -37,7 +37,14 @@ class Month extends Select implements InputProviderInterface
                 '' => '--'
             ];
 
-            $dateFormatter = new IntlDateFormatter($this->language, IntlDateFormatter::LONG, IntlDateFormatter::NONE, null, null, 'MM - MMMM');
+            $dateFormatter = new IntlDateFormatter(
+                $this->language,
+                IntlDateFormatter::LONG,
+                IntlDateFormatter::NONE,
+                null,
+                null,
+                'MM - MMMM'
+            );
 
             $date = new DateTime();
             for ($i = 1; $i <= 12; $i++) {

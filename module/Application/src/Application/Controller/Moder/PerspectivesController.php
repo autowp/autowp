@@ -34,7 +34,11 @@ class PerspectivesController extends AbstractActionController
 
                 $perspectiveRows = $prspModel->fetchAll(
                     $prspModel->select(true)
-                        ->join('perspectives_groups_perspectives', 'perspectives.id=perspectives_groups_perspectives.perspective_id', null)
+                        ->join(
+                            'perspectives_groups_perspectives',
+                            'perspectives.id = perspectives_groups_perspectives.perspective_id',
+                            null
+                        )
                         ->where('perspectives_groups_perspectives.group_id = ?', $groupRow->id)
                         ->order('perspectives_groups_perspectives.position')
                 );
