@@ -43,19 +43,19 @@ return [
     'caches' => [
         'fastCache' => [
             'adapter' => [
-                'name'     =>'blackHole',
+                'name'     => 'blackHole',
                 'lifetime' => 180,
             ],
         ],
         'longCache' => [
             'adapter' => [
-                'name'     =>'blackHole',
+                'name'     => 'blackHole',
                 'lifetime' => 600
             ],
         ],
         'localeCache' => [
             'adapter' => [
-                'name'     =>'blackHole',
+                'name'     => 'blackHole',
                 'lifetime' => 600
             ],
         ],

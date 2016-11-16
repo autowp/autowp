@@ -30,9 +30,9 @@ class TypeParent extends Table
 
         foreach ($table->getAdapter()->fetchCol($select) as $cat_id) {
             $this->insert([
-                'id'        =>  intval($cat_id),
-                'parent_id' =>  intval($cat_id),
-                'level'     =>  $level
+                'id'        => intval($cat_id),
+                'parent_id' => intval($cat_id),
+                'level'     => $level
             ]);
 
             $this->rebuildStep($table, array_merge([$cat_id], $id), $level + 1);
@@ -40,12 +40,11 @@ class TypeParent extends Table
 
         --$level;
         foreach ($id as $tid) {
-            if ( $tid && ( $id[0] != $tid ) ) {
-
+            if ($tid && ( $id[0] != $tid )) {
                 $this->insert([
-                    'id'        =>  $id[0],
-                    'parent_id' =>  $tid,
-                    'level'     =>  --$level
+                    'id'        => $id[0],
+                    'parent_id' => $tid,
+                    'level'     => --$level
                 ]);
             }
         }

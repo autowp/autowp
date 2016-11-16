@@ -15,7 +15,7 @@ class EventRow extends Row
         $items = is_array($items) ? $items : [$items];
 
         foreach ($items as $item) {
-            if (!($item instanceof Zend_Db_Table_Row_Abstract)) {
+            if (! ($item instanceof Zend_Db_Table_Row_Abstract)) {
                 throw new Exception('Not a table row');
             }
 

@@ -26,10 +26,11 @@ class ZoneRow extends Row
             ->where('attrs_zone_attributes.zone_id = ?', $this->id)
             ->order('attrs_zone_attributes.position');
 
-        if ($parent)
+        if ($parent) {
             $select->where('attrs_attributes.parent_id = ?', $parent->id);
-        else
+        } else {
             $select->where('attrs_attributes.parent_id IS NULL');
+        }
 
         return $table->fetchAll($select);
     }

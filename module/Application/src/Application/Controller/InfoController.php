@@ -69,7 +69,7 @@ class InfoController extends AbstractActionController
             return;
         }
 
-        $prevText = $this->textStorage->getRevisionInfo($textId, $current['revision']-1);
+        $prevText = $this->textStorage->getRevisionInfo($textId, $current['revision'] - 1);
 
         $nextUrl = null;
         if ($current['revision'] + 1 <= $text['revision']) {

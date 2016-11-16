@@ -54,14 +54,13 @@ class UploadController extends AbstractActionController
 
     public function onlyRegisteredAction()
     {
-
     }
 
     public function indexAction()
     {
         $user = $this->user()->get();
 
-        if (!$user || $user->deleted) {
+        if (! $user || $user->deleted) {
             return $this->forward()->dispatch(self::class, [
                 'action' => 'only-registered'
             ]);
@@ -75,7 +74,7 @@ class UploadController extends AbstractActionController
             $replacePicture = $pictureTable->fetchRow([
                 'identity = ?' => $replace
             ]);
-            if (!$replacePicture) {
+            if (! $replacePicture) {
                 $replacePicture = $pictureTable->fetchRow([
                     'id = ?' => $replace
                 ]);
@@ -83,19 +82,15 @@ class UploadController extends AbstractActionController
         }
 
         if ($replacePicture) {
-
-            $type =  $replacePicture->type;
+            $type = $replacePicture->type;
             $brandId = $replacePicture->brand_id;
             $carId = $replacePicture->car_id;
             $engineId = $replacePicture->engine_id;
-
         } else {
-
             $type = (int)$this->params('type');
             $brandId = (int)$this->params('brand_id');
             $carId = (int)$this->params('car_id');
             $engineId = (int)$this->params('engine_id');
-
         }
 
         $selected = false;
@@ -144,9 +139,8 @@ class UploadController extends AbstractActionController
         $form = null;
 
         if ($selected) {
-
             $form = new UploadForm(null, [
-                'multipleFiles' => !$replacePicture,
+                'multipleFiles' => ! $replacePicture,
             ]);
 
             $form->setAttribute('action', $this->url()->fromRoute('upload/params', [], [], true));
@@ -160,7 +154,6 @@ class UploadController extends AbstractActionController
                 );
                 $form->setData($data);
                 if ($form->isValid()) {
-
                     $pictures = $this->saveUpload($form, $type, $brandId, $engineId, $carId, $replacePicture);
 
                     if ($request->isXmlHttpRequest()) {
@@ -178,11 +171,9 @@ class UploadController extends AbstractActionController
 
                         $result = [];
                         foreach ($pictures as $picture) {
-
                             $image = $this->imageStorage()->getFormatedImage($picture->getFormatRequest(), 'picture-gallery-full');
 
                             if ($image) {
-
                                 $picturesData = $this->pic()->listData([$picture]);
 
                                 $html = $this->partial->__invoke('application/picture', array_replace(
@@ -377,7 +368,7 @@ class UploadController extends AbstractActionController
                     'moderatorAttention' => CommentMessage::MODERATOR_ATTENTION_NONE
                 ]);
             }
-            
+
             // read gps
             $exif = $this->imageStorage()->getImageEXIF($picture->image_id);
             $extractor = new ExifGPSExtractor();
@@ -386,7 +377,7 @@ class UploadController extends AbstractActionController
                 geoPHP::version();
                 $point = new Point($gps['lng'], $gps['lat']);
                 $pointExpr = new Zend_Db_Expr($pictureTable->getAdapter()->quoteInto('GeomFromWKB(?)', $point->out('wkb')));
-            
+
                 $picture->point = $pointExpr;
                 $picture->save();
             }
@@ -418,7 +409,8 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $rows = $brandModel->getList($language, function($select) { });
+        $rows = $brandModel->getList($language, function ($select) {
+        });
 
         return [
             'brands' => $rows
@@ -433,7 +425,7 @@ class UploadController extends AbstractActionController
 
         $brand = $brandModel->getBrandById($this->params('brand_id'), $language);
 
-        if (!$brand) {
+        if (! $brand) {
             return $this->forward()->dispatch(self::class, [
                 'action' => 'select-brand'
             ]);
@@ -590,7 +582,7 @@ class UploadController extends AbstractActionController
     public function carChildsAction()
     {
         $user = $this->user()->get();
-        if (!$user) {
+        if (! $user) {
             return $this->forward()->dispatch(self::class, [
                 'action' => 'only-registered'
             ]);
@@ -599,7 +591,7 @@ class UploadController extends AbstractActionController
         $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notfoundAction();
         }
 
@@ -638,7 +630,7 @@ class UploadController extends AbstractActionController
     public function enginesAction()
     {
         $user = $this->user()->get();
-        if (!$user) {
+        if (! $user) {
             return $this->forward()->dispatch(self::class, [
                 'action' => 'only-registered'
             ]);
@@ -646,7 +638,7 @@ class UploadController extends AbstractActionController
 
         $brandTable = new BrandTable();
         $brand = $brandTable->find($this->params('brand_id'))->current();
-        if (!$brand) {
+        if (! $brand) {
             return $this->notfoundAction();
         }
 
@@ -681,7 +673,7 @@ class UploadController extends AbstractActionController
     public function conceptsAction()
     {
         $user = $this->user()->get();
-        if (!$user) {
+        if (! $user) {
             return $this->forward()->dispatch(self::class, [
                 'action' => 'only-registered'
             ]);
@@ -689,7 +681,7 @@ class UploadController extends AbstractActionController
 
         $brandTable = new BrandTable();
         $brand = $brandTable->find($this->params('brand_id'))->current();
-        if (!$brand) {
+        if (! $brand) {
             return $this->notfoundAction();
         }
 
@@ -736,12 +728,12 @@ class UploadController extends AbstractActionController
         $pictureTable = $this->catalogue()->getPictureTable();
 
         $picture = $pictureTable->find($this->params()->fromPost('id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notfoundAction();
         }
 
         $user = $this->user()->get();
-        if (!$user) {
+        if (! $user) {
             return $this->forbiddenAction();
         }
 

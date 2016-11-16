@@ -23,7 +23,7 @@ class Login extends AbstractValidator
                   ->orWhere('e_mail = ?', (string)$value)
         );
 
-        if (!$user) {
+        if (! $user) {
             $this->error(self::USER_NOT_FOUND);
             return false;
         }

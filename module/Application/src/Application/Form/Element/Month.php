@@ -32,8 +32,7 @@ class Month extends Select implements InputProviderInterface
             $this->language = $options['language'];
         }
 
-        if (!isset($options['options']) && !isset($options['value_options'])) {
-
+        if (! isset($options['options']) && ! isset($options['value_options'])) {
             $multioptions = [
                 '' => '--'
             ];
@@ -41,7 +40,7 @@ class Month extends Select implements InputProviderInterface
             $dateFormatter = new IntlDateFormatter($this->language, IntlDateFormatter::LONG, IntlDateFormatter::NONE, null, null, 'MM - MMMM');
 
             $date = new DateTime();
-            for ($i=1; $i<=12; $i++) {
+            for ($i = 1; $i <= 12; $i++) {
                 $date->setDate(2000, $i, 1);
                 $multioptions[$i] = $dateFormatter->format($date);
             }

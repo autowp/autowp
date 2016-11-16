@@ -29,8 +29,7 @@ class AclFactory implements FactoryInterface
 
         $acl = $cache->getItem($key, $success);
 
-        if (!$success) {
-
+        if (! $success) {
             $acl = new Acl();
 
             $this->load($acl);
@@ -38,7 +37,7 @@ class AclFactory implements FactoryInterface
             $cache->setItem($key, $acl);
         }
 
-        if (!$acl) {
+        if (! $acl) {
             throw new Exception('NULL');
         }
 
@@ -109,7 +108,7 @@ class AclFactory implements FactoryInterface
         foreach ($roles->fetchAll($select) as $parentRole) {
             $parents[] = $parentRole->name;
 
-            $this->addRole($acl, $roles, $parentRole, $loaded, $deep+1);
+            $this->addRole($acl, $roles, $parentRole, $loaded, $deep + 1);
         }
 
         $acl->addRole(new GenericRole($role->name), $parents);

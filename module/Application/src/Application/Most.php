@@ -46,7 +46,6 @@ class Most
                 throw new Exception("Option '$key' not found");
             }
         }
-
     }
 
     public function setCarsCount($value)
@@ -90,7 +89,7 @@ class Most
             unset($options['name']);
         }
 
-        if (!is_string($adapter) || empty($adapter)) {
+        if (! is_string($adapter) || empty($adapter)) {
             throw new Exception('Adapter name must be specified in a string');
         }
 
@@ -110,8 +109,9 @@ class Most
         if (! $mostAdapter instanceof AbstractAdapter) {
             throw new Exception(
                 sprintf(
-                    "Adapter class %s does not extend %s", 
-                    $adapterName, AbstractAdapter::class
+                    "Adapter class %s does not extend %s",
+                    $adapterName,
+                    AbstractAdapter::class
                 )
             );
         }

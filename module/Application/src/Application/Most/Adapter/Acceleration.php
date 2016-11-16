@@ -31,8 +31,8 @@ class Acceleration extends AbstractAdapter
     {
         $this->attributes = $value;
 
-        $this->kmhAttribute =  $this->attributesTable->find($this->attributes['to100kmh'])->current();
-        $this->mphAttribute =  $this->attributesTable->find($this->attributes['to60mph'])->current();
+        $this->kmhAttribute = $this->attributesTable->find($this->attributes['to100kmh'])->current();
+        $this->mphAttribute = $this->attributesTable->find($this->attributes['to60mph'])->current();
     }
 
     public function setOrder($value)
@@ -53,8 +53,8 @@ class Acceleration extends AbstractAdapter
             ]
         ];
 
-        $wheres = implode($select->getPart( Zend_Db_Select::WHERE ));
-        $joins = $select->getPart( Zend_Db_Select::FROM );
+        $wheres = implode($select->getPart(Zend_Db_Select::WHERE));
+        $joins = $select->getPart(Zend_Db_Select::FROM);
         unset($joins['cars']);
 
         $limit = $this->most->getCarsCount();
@@ -115,7 +115,6 @@ class Acceleration extends AbstractAdapter
         $result = [];
 
         foreach ($cars as $car) {
-
             $result[] = [
                 'car'       => $car,
                 'valueHtml' => $this->getText($car, $language),
@@ -146,7 +145,6 @@ class Acceleration extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         foreach ($axises as $axis) {
-
             $value = $specService->getActualValueText($axis['attr']->id, 1, $car->id, $language);
 
             if ($value > 0) {

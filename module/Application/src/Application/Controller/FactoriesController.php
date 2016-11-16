@@ -34,7 +34,7 @@ class FactoriesController extends AbstractActionController
         $table = new Factory();
 
         $factory = $table->find($this->params()->fromRoute('id'))->current();
-        if (!$factory) {
+        if (! $factory) {
             return $this->notFoundAction();
         }
 
@@ -65,7 +65,6 @@ class FactoriesController extends AbstractActionController
             $carParentTable = new VehicleParent();
 
             foreach ($cars as $car) {
-
                 $select = $pictureTable->select(true)
                     ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
                     ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
@@ -153,7 +152,7 @@ class FactoriesController extends AbstractActionController
         $table = new Factory();
 
         $factory = $table->find($this->params()->fromRoute('id'))->current();
-        if (!$factory) {
+        if (! $factory) {
             return $this->_forward('notfound', 'error');
         }
 

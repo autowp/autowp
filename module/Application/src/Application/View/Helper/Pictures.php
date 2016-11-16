@@ -228,12 +228,12 @@ class Pictures extends AbstractHelper
         $itemsCount = count($items);
         $lineCount = ceil($itemsCount / $perLine);
         $superColCount = $perLine / $perSuperCol;
-        for ($line=0; $line<$lineCount; $line++) {
+        for ($line = 0; $line < $lineCount; $line++) {
             $html[] = '<div class="row">';
-            for ($superCol=0; $superCol<$superColCount; $superCol++) {
+            for ($superCol = 0; $superCol < $superColCount; $superCol++) {
                 $html[] = '<div class="col-lg-6 col-md-6 col-sm-12 col-12">';
                 $html[] = '<div class="row">';
-                for ($col=0; $col<$perSuperCol; $col++) {
+                for ($col = 0; $col < $perSuperCol; $col++) {
                     $index = $line * $perLine + $superCol * $perSuperCol + $col;
                     if ($index < $itemsCount) {
                         $html[] = $items[$index];

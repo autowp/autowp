@@ -10,7 +10,6 @@ use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Twins;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
@@ -40,8 +39,9 @@ class TwinsController extends AbstractActionController
     public function __construct(
         TextStorage\Service $textStorage,
         $cache,
-        SpecificationsService $specsService)
-    {
+        SpecificationsService $specsService
+    ) {
+
         $this->textStorage = $textStorage;
         $this->cache = $cache;
         $this->specsService = $specsService;
@@ -64,8 +64,7 @@ class TwinsController extends AbstractActionController
         $key = 'TWINS_SIDEBAR_4_' . $language;
 
         $arr = $this->cache->getItem($key, $success);
-        if (!$success) {
-
+        if (! $success) {
             $arr = $this->getTwins()->getBrands([
                 'language' => $language
             ]);
@@ -94,7 +93,7 @@ class TwinsController extends AbstractActionController
     public function specificationsAction()
     {
         $group = $this->getTwins()->getGroup($this->params('id'));
-        if (!$group) {
+        if (! $group) {
             return $this->notFoundAction();
         }
 
@@ -113,7 +112,7 @@ class TwinsController extends AbstractActionController
         $twins = $this->getTwins();
 
         $group = $twins->getGroup($this->params('id'));
-        if (!$group) {
+        if (! $group) {
             return $this->notFoundAction();
         }
 
@@ -133,7 +132,7 @@ class TwinsController extends AbstractActionController
 
         $picturesData = $this->pic()->listData($select, [
             'width' => 4,
-            'url'   => function($row) use ($group) {
+            'url'   => function ($row) use ($group) {
                 return $this->url()->fromRoute('twins/group/pictures/picture', [
                     'id'         => $group['id'],
                     'picture_id' => $row['identity'] ? $row['identity'] : $row['id']
@@ -155,7 +154,7 @@ class TwinsController extends AbstractActionController
         $twins = $this->getTwins();
 
         $group = $twins->getGroup($this->params('id'));
-        if (!$group) {
+        if (! $group) {
             return $this->notFoundAction();
         }
 
@@ -183,7 +182,7 @@ class TwinsController extends AbstractActionController
                 'disableTwins'         => true,
                 'disableLargePictures' => true,
                 'disableSpecs'         => true,
-                'pictureUrl'           => function($car, $picture) use ($group) {
+                'pictureUrl'           => function ($car, $picture) use ($group) {
                     return $this->url()->fromRoute('twins/group/pictures/picture', [
                         'id'         => $group['id'],
                         'picture_id' => $picture['identity'] ? $picture['identity'] : $picture['id']
@@ -226,7 +225,6 @@ class TwinsController extends AbstractActionController
 
         $carLists = [];
         if (count($ids)) {
-
             $carTable = new Vehicle();
 
             $db = $carTable->getAdapter();
@@ -258,7 +256,6 @@ class TwinsController extends AbstractActionController
         $groups = [];
         $requests = [];
         foreach ($list as $group) {
-
             $carList = isset($carLists[$group->id]) ? $carLists[$group->id] : [];
 
             $picturesShown = 0;
@@ -298,7 +295,7 @@ class TwinsController extends AbstractActionController
                         'src' => null
                     ];
                 }
-                
+
                 $cars[] = [
                     'name'    => $car,
                     'picture' => $picture
@@ -357,7 +354,7 @@ class TwinsController extends AbstractActionController
     {
         $brand = $this->catalogue()->getBrandTable()->findRowByCatname($this->params('brand_catname'));
 
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFoundAction();
         }
 
@@ -405,7 +402,7 @@ class TwinsController extends AbstractActionController
         $twins = $this->getTwins();
 
         $group = $twins->getGroup($this->params('id'));
-        if (!$group) {
+        if (! $group) {
             return $this->notFoundAction();
         }
 
@@ -417,14 +414,14 @@ class TwinsController extends AbstractActionController
 
         $picture = $select->getTable()->fetchRow($select);
 
-        if (!$picture) {
+        if (! $picture) {
             $select = $twins->getGroupPicturesSelect($group['id'])
                 ->where('pictures.identity = ?', $pictureId);
 
             $picture = $select->getTable()->fetchRow($select);
         }
 
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
@@ -433,7 +430,7 @@ class TwinsController extends AbstractActionController
 
     public function pictureAction()
     {
-        return $this->_pictureAction(function($group, $picture) {
+        return $this->_pictureAction(function ($group, $picture) {
 
             $twins = $this->getTwins();
 
@@ -465,7 +462,7 @@ class TwinsController extends AbstractActionController
 
     public function pictureGalleryAction()
     {
-        return $this->_pictureAction(function($group, $picture) {
+        return $this->_pictureAction(function ($group, $picture) {
 
             $select = $this->getTwins()->getGroupPicturesSelect($group['id'], [
                 'ordering' => $this->catalogue()->picturesOrdering()
@@ -480,7 +477,6 @@ class TwinsController extends AbstractActionController
                     'picture_id' => $picture['identity'] ? $picture['identity'] : $picture['id']
                 ]
             ]));
-
         });
     }
 }

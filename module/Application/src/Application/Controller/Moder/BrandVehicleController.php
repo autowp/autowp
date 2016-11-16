@@ -55,7 +55,7 @@ class BrandVehicleController extends AbstractActionController
 
     public function itemAction()
     {
-        if (!$this->user()->isAllowed('car', 'move')) {
+        if (! $this->user()->isAllowed('car', 'move')) {
             return $this->forbiddenAction();
         }
 
@@ -69,13 +69,13 @@ class BrandVehicleController extends AbstractActionController
             'car_id = ?'   => $this->params('vehicle_id')
         ]);
 
-        if (!$brandCarRow) {
+        if (! $brandCarRow) {
             return $this->notFoundAction();
         }
 
         $brandRow = $brandTable->find($brandCarRow->brand_id)->current();
         $vehicleRow = $vehicleTable->find($brandCarRow->car_id)->current();
-        if (!$brandRow || !$vehicleRow) {
+        if (! $brandRow || ! $vehicleRow) {
             return $this->notFoundAction();
         }
 
@@ -121,7 +121,7 @@ class BrandVehicleController extends AbstractActionController
 
     public function addAction()
     {
-        if (!$this->user()->isAllowed('car', 'move')) {
+        if (! $this->user()->isAllowed('car', 'move')) {
             return $this->forbiddenAction();
         }
 
@@ -130,7 +130,7 @@ class BrandVehicleController extends AbstractActionController
 
         $brandRow = $brandTable->find($this->params('brand_id'))->current();
         $vehicleRow = $vehicleTable->find($this->params('vehicle_id'))->current();
-        if (!$brandRow || !$vehicleRow) {
+        if (! $brandRow || ! $vehicleRow) {
             return $this->notFoundAction();
         }
 
@@ -152,7 +152,7 @@ class BrandVehicleController extends AbstractActionController
 
     public function deleteAction()
     {
-        if (!$this->user()->isAllowed('car', 'move')) {
+        if (! $this->user()->isAllowed('car', 'move')) {
             return $this->forbiddenAction();
         }
 
@@ -162,7 +162,7 @@ class BrandVehicleController extends AbstractActionController
         $brandRow = $brandTable->find($this->params('brand_id'))->current();
         $vehicleRow = $vehicleTable->find($this->params('vehicle_id'))->current();
 
-        if (!$brandRow || !$vehicleRow) {
+        if (! $brandRow || ! $vehicleRow) {
             return $this->notFoundAction();
         }
 

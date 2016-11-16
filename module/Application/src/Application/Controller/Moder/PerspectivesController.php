@@ -13,7 +13,7 @@ class PerspectivesController extends AbstractActionController
 {
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -55,7 +55,7 @@ class PerspectivesController extends AbstractActionController
             $data[] = [
                 'id'    => $page->id,
                 'name'  => $page->name,
-                'groups'=> $groups
+                'groups' => $groups
             ];
         }
 
@@ -63,5 +63,4 @@ class PerspectivesController extends AbstractActionController
             'pages' => $data
         ];
     }
-
 }

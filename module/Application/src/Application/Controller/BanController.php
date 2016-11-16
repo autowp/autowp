@@ -11,7 +11,7 @@ class BanController extends AbstractActionController
 {
     public function unbanIpAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
@@ -19,7 +19,7 @@ class BanController extends AbstractActionController
 
         $ip = $this->params('ip');
 
-        if (!$canBan || $ip === null) {
+        if (! $canBan || $ip === null) {
             return $this->notFoundAction();
         }
 
@@ -33,7 +33,7 @@ class BanController extends AbstractActionController
 
     public function banIpAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
@@ -41,7 +41,7 @@ class BanController extends AbstractActionController
 
         $ip = $this->params('ip');
 
-        if (!$canBan || $ip === null) {
+        if (! $canBan || $ip === null) {
             return $this->notFoundAction();
         }
 
@@ -59,21 +59,21 @@ class BanController extends AbstractActionController
 
     public function banUserAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $users = new User();
         $user = $users->find($this->params('user_id'))->current();
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFoundAction();
         }
 
         $canBan = $this->user()->isAllowed('user', 'ban')
               && ($this->user()->get()->id != $user->id);
 
-        if (!$canBan || $user->last_ip === null) {
+        if (! $canBan || $user->last_ip === null) {
             return $this->notFoundAction();
         }
 
@@ -93,21 +93,21 @@ class BanController extends AbstractActionController
 
     public function unbanUserAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $users = new User();
         $user = $users->find($this->params('user_id'))->current();
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFoundAction();
         }
 
         $canBan = $this->user()->isAllowed('user', 'ban')
               && ($this->user()->get()->id != $user->id);
 
-        if (!$canBan || $user->last_ip === null) {
+        if (! $canBan || $user->last_ip === null) {
             return $this->notFoundAction();
         }
 

@@ -8,11 +8,9 @@ class DonateController extends AbstractActionController
 {
     public function indexAction()
     {
-
     }
 
     public function successAction()
     {
-
     }
 }

@@ -54,7 +54,7 @@ class UsersController extends AbstractActionController
 
         $user = $this->getUser();
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFoundAction();
         }
 
@@ -135,8 +135,8 @@ class UsersController extends AbstractActionController
 
         $currentUser = $this->user()->get();
         $isMe = $currentUser && ($currentUser->id == $user->id);
-        $inContacts = $currentUser && !$isMe && $contact->exists($currentUser->id, $user->id);
-        $canBeInContacts = $currentUser && !$currentUser->deleted && !$isMe ;
+        $inContacts = $currentUser && ! $isMe && $contact->exists($currentUser->id, $user->id);
+        $canBeInContacts = $currentUser && ! $currentUser->deleted && ! $isMe ;
 
         return [
             'currentUser'     => $user,
@@ -160,7 +160,7 @@ class UsersController extends AbstractActionController
     {
         $user = $this->getUser();
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFoundAction();
         }
 
@@ -176,7 +176,7 @@ class UsersController extends AbstractActionController
             ]
         ];
 
-        $rows = $brandModel->getList($options, function($select) use ($user) {
+        $rows = $brandModel->getList($options, function ($select) use ($user) {
             $select
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
@@ -211,7 +211,7 @@ class UsersController extends AbstractActionController
     {
         $user = $this->getUser();
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFoundAction();
         }
 
@@ -220,7 +220,7 @@ class UsersController extends AbstractActionController
         $brandModel = new BrandModel();
         $brand = $brandModel->getBrandByCatname($this->params('brand_catname'), $language);
 
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFoundAction();
         }
 
@@ -269,7 +269,7 @@ class UsersController extends AbstractActionController
             'users' => $userTable->fetchAll(
                 $userTable->select(true)
                     ->join('session', 'users.id = session.user_id', null)
-                    ->where('session.modified >= ?', time() - 5*60)
+                    ->where('session.modified >= ?', time() - 5 * 60)
                     ->group('users.id')
             )
         ]);
@@ -299,11 +299,9 @@ class UsersController extends AbstractActionController
         foreach ($userTable->fetchAll($select) as $idx => $user) {
             $brands = [];
             if ($idx < 5) {
-
                 $cacheKey = 'RATING_USER_BRAND_5_'.$precisionLimit.'_' . $user->id;
                 $brands = $this->cache->getItem($cacheKey, $success);
-                if (!$success) {
-
+                if (! $success) {
                     $carSelect = $db->select()
                         ->from('brands_cars', ['brand_id', 'count(1)'])
                         ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
@@ -328,7 +326,7 @@ class UsersController extends AbstractActionController
                     foreach ([$carSelect, $engineSelect] as $select) {
                         $pairs = $db->fetchPairs($select);
                         foreach ($pairs as $brandId => $value) {
-                            if (!isset($data[$brandId])) {
+                            if (! isset($data[$brandId])) {
                                 $data[$brandId] = $value;
                             } else {
                                 $data[$brandId] += $value;
@@ -387,11 +385,9 @@ class UsersController extends AbstractActionController
         foreach ($userTable->fetchAll($select) as $idx => $user) {
             $brands = [];
             if ($idx < 10) {
-
                 $cacheKey = 'RATING_USER_PICTURES_BRAND_6_' . $user->id;
                 $brands = $this->cache->getItem($cacheKey, $success);
-                if (!$success) {
-
+                if (! $success) {
                     $select = $brandTable->select(true)
                         ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                         ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
@@ -446,29 +442,29 @@ class UsersController extends AbstractActionController
 
         return $this->notFoundAction();
     }
-    
+
     public function commentsAction()
     {
         $user = $this->getUser();
-        
-        if (!$user) {
+
+        if (! $user) {
             return $this->notFoundAction();
         }
-        
+
         $order = $this->params('order');
-        
+
         $model = new \Application\Model\Comments();
-        
+
         $select = $model->getSelectByUser($user->id, $order);
-        
+
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)
         );
-        
+
         $paginator
             ->setItemCountPerPage(30)
             ->setCurrentPageNumber($this->params('page'));
-        
+
         $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $comments[] = [
@@ -477,14 +473,14 @@ class UsersController extends AbstractActionController
                 'vote'    => $commentRow->vote
             ];
         }
-        
+
         $orders = [
             'new'      => 'users/comments/order/new',
             'old'      => 'users/comments/order/old',
             'positive' => 'users/comments/order/positive',
             'negative' => 'users/comments/order/negative'
         ];
-        
+
         $currentOrder = 'new';
         foreach ($orders as $key => $name) {
             if ($key == $order) {
@@ -492,7 +488,7 @@ class UsersController extends AbstractActionController
                 break;
             }
         }
-        
+
         return [
             'user'      => $user,
             'comments'  => $comments,

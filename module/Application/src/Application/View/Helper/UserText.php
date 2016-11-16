@@ -2,7 +2,6 @@
 
 namespace Application\View\Helper;
 
-
 use Zend\Http\Request;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Uri;
@@ -100,7 +99,6 @@ class UserText extends AbstractHtmlElement
         }
 
         if ($hostAllowed) {
-
             try {
                 $request = new Request();
                 $request->setUri($url);
@@ -122,9 +120,7 @@ class UserText extends AbstractHtmlElement
                     }
                 }
             } catch (Zend_Uri_Exception $e) {
-
             }
-
         }
 
         return '<a href="'.$this->view->escapeHtmlAttr($url).'">' . $this->view->escapeHtml($url) . '</a>';
@@ -148,7 +144,7 @@ class UserText extends AbstractHtmlElement
         foreach ($map as $pattern) {
             $match = true;
             foreach ($pattern as $key => $value) {
-                if (!isset($params[$key]) || $params[$key] != $pattern[$key]) {
+                if (! isset($params[$key]) || $params[$key] != $pattern[$key]) {
                     $match = false;
                     break;
                 }
@@ -211,7 +207,7 @@ class UserText extends AbstractHtmlElement
         foreach ($map as $pattern) {
             $match = true;
             foreach ($pattern as $key => $value) {
-                if (!isset($params[$key]) || $params[$key] != $pattern[$key]) {
+                if (! isset($params[$key]) || $params[$key] != $pattern[$key]) {
                     $match = false;
                     break;
                 }
@@ -229,7 +225,7 @@ class UserText extends AbstractHtmlElement
                 'identity IS NULL'
             ]);
 
-            if (!$picture) {
+            if (! $picture) {
                 $picture = $pictureTable->fetchRow([
                     'identity = ?' => $pictureId
                 ]);

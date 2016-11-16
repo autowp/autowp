@@ -15,7 +15,7 @@ class ImageStorageController extends AbstractActionController
 
         Console::getInstance()->writeLine("Clear `$dirname`");
         $dir = $this->imageStorage()->getDir($dirname);
-        if (!$dir) {
+        if (! $dir) {
             throw new Exception("Dir '$dirname' not found");
         }
 
@@ -31,10 +31,10 @@ class ImageStorageController extends AbstractActionController
         while ($stack) {
             $currentDir = array_pop($stack);
 
-            if ($dh = opendir($currentDir)){
+            if ($dh = opendir($currentDir)) {
                 $count = 0;
                 while (($file = readdir($dh)) !== false) {
-                    if ($file !== '.' AND $file !== '..') {
+                    if ($file !== '.' and $file !== '..') {
                         $count++;
                         $currentFile = $currentDir . DIRECTORY_SEPARATOR . $file;
                         if (is_dir($currentFile)) {

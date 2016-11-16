@@ -40,8 +40,9 @@ class CommentsController extends AbstractRestfulController
     public function __construct(
         HostManager $hostManager,
         $form,
-        Message $message)
-    {
+        Message $message
+    ) {
+
         $this->hostManager = $hostManager;
         $this->form = $form;
         $this->comments = new Comments();
@@ -69,7 +70,7 @@ class CommentsController extends AbstractRestfulController
 
     public function confirmAction()
     {
-        if (!$this->canAddComments()) {
+        if (! $this->canAddComments()) {
             return $this->forbiddenAction();
         }
 
@@ -147,7 +148,7 @@ class CommentsController extends AbstractRestfulController
 
     public function addAction()
     {
-        if (!$this->canAddComments()) {
+        if (! $this->canAddComments()) {
             return $this->forbiddenAction();
         }
 
@@ -168,7 +169,6 @@ class CommentsController extends AbstractRestfulController
 
         $form->setData($this->params()->fromPost());
         if ($form->isValid()) {
-
             $values = $form->getData();
 
             $object = null;
@@ -202,7 +202,7 @@ class CommentsController extends AbstractRestfulController
                     throw new Exception('Unknown type_id');
             }
 
-            if (!$object) {
+            if (! $object) {
                 return $this->notFoundAction();
             }
 
@@ -223,7 +223,7 @@ class CommentsController extends AbstractRestfulController
                 'moderatorAttention' => $moderatorAttention
             ]);
 
-            if (!$messageId) {
+            if (! $messageId) {
                 throw new Exception("Message add fails");
             }
 
@@ -241,8 +241,7 @@ class CommentsController extends AbstractRestfulController
                 if ($authorId && ($authorId != $user->id)) {
                     $userTable = new User();
                     $parentMessageAuthor = $userTable->find($authorId)->current();
-                    if ($parentMessageAuthor && !$parentMessageAuthor->deleted) {
-
+                    if ($parentMessageAuthor && ! $parentMessageAuthor->deleted) {
                         $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor->language);
 
                         $url = $this->messageUrl($typeId, $object, true, $uri) . '#msg' . $messageId;
@@ -254,7 +253,8 @@ class CommentsController extends AbstractRestfulController
                         ]);
                         $message = sprintf(
                             $this->translate('pm/user-%s-replies-to-you-%s', 'default', $parentMessageAuthor->language),
-                            $moderUrl, $url
+                            $moderUrl,
+                            $url
                         );
                         $this->message->send(null, $parentMessageAuthor->id, $message);
                     }
@@ -310,7 +310,7 @@ class CommentsController extends AbstractRestfulController
 
     public function deleteAction()
     {
-        if (!$this->user()->isAllowed('comment', 'remove')) {
+        if (! $this->user()->isAllowed('comment', 'remove')) {
             return $this->forbiddenAction();
         }
 
@@ -329,7 +329,7 @@ class CommentsController extends AbstractRestfulController
 
     public function restoreAction()
     {
-        if (!$this->user()->isAllowed('comment', 'remove')) {
+        if (! $this->user()->isAllowed('comment', 'remove')) {
             return $this->forbiddenAction();
         }
 
@@ -345,12 +345,12 @@ class CommentsController extends AbstractRestfulController
 
     public function voteAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $user = $this->user()->get();
-        if (!$user) {
+        if (! $user) {
             return $this->forbiddenAction();
         }
 
@@ -366,7 +366,7 @@ class CommentsController extends AbstractRestfulController
             $user->id,
             $this->params()->fromPost('vote')
         );
-        if (!$result['success']) {
+        if (! $result['success']) {
             return new JsonModel([
                 'ok'    => false,
                 'error' => $result['error']
@@ -385,7 +385,7 @@ class CommentsController extends AbstractRestfulController
     public function votesAction()
     {
         $result = $this->comments->getVotes($this->params()->fromQuery('id'));
-        if (!$result) {
+        if (! $result) {
             return $this->notFoundAction();
         }
 

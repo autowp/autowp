@@ -377,7 +377,7 @@ class Mosts
         if ($this->years === null) {
             $cy = (int)date('Y');
 
-            $prevYear = $cy-1;
+            $prevYear = $cy - 1;
 
             $this->years = [
                 [
@@ -432,8 +432,8 @@ class Mosts
                     'where'  => $this->betweenYearsExpr(2000, 2009)
                 ],
                 [
-                    'name'   => 'mosts/period/2010-'.($prevYear%100),
-                    'folder' => '2010-'.($prevYear%100),
+                    'name'   => 'mosts/period/2010-'.($prevYear % 100),
+                    'folder' => '2010-'.($prevYear % 100),
                     'where'  => $this->betweenYearsExpr(2010, $prevYear)
                 ],
                 [
@@ -455,7 +455,6 @@ class Mosts
     public function getPrespectiveGroups()
     {
         if ($this->perspectiveGroups === null) {
-
             $pgTable = new PerspectiveGroup();
             $groups = $pgTable->fetchAll(
                 $pgTable->select(true)
@@ -493,7 +492,6 @@ class Mosts
 
 
         foreach ($carTypesTable->fetchAll($select) as $row) {
-
             $childs = [];
 
             $select = $select = $carTypesTable->select(true)
@@ -511,7 +509,6 @@ class Mosts
             }
 
             foreach ($carTypesTable->fetchAll($select) as $srow) {
-
                 $childs[] = [
                     'id'      => $srow->id,
                     'catname' => $srow->catname,
@@ -579,7 +576,7 @@ class Mosts
         }
 
         foreach ($pictures as $key => $picture) {
-            if (!$picture) {
+            if (! $picture) {
                 $select = $pictureTable->select(true)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->where('pictures.type=?', Picture::VEHICLE_TYPE_ID)
@@ -614,9 +611,9 @@ class Mosts
 
         if ($carType) {
             $ids = $this->getCarTypesIds($carType);
-            
+
             $select->join('vehicle_vehicle_type', 'cars.id = vehicle_vehicle_type.vehicle_id', null);
-            
+
             if (count($ids) == 1) {
                 $select->where('vehicle_vehicle_type.vehicle_type_id = ?', $ids[0]);
             } else {
@@ -624,7 +621,7 @@ class Mosts
             }
         }
 
-        if (!is_null($cYear)) {
+        if (! is_null($cYear)) {
             $select->where($cYear['where']);
         }
 
@@ -677,7 +674,7 @@ class Mosts
         $options = array_merge($defaults, $options);
 
         $language = $options['language'];
-        if (!$language) {
+        if (! $language) {
             throw new Exception('Language not provided');
         }
 
@@ -716,7 +713,7 @@ class Mosts
                 $cSelect = clone $select;
                 $cSelect->where($year['where']);
                 $rowExists = (bool)$carsTable->fetchRow($cSelect);
-                if (!$rowExists) {
+                if (! $rowExists) {
                     unset($years[$idx]);
                 }
             }
@@ -804,7 +801,7 @@ class Mosts
         $yearsMenu = [];
         foreach ($years as $id => $year) {
             $yearsMenu[] = [
-                'active' => !is_null($yearId) && ($id == $yearId),
+                'active' => ! is_null($yearId) && ($id == $yearId),
                 'name'   => $year['name'],
                 'params' => [
                     'most_catname'  => $cMost['catName'],

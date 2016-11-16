@@ -13,7 +13,7 @@ class Moder_ModificationController extends Zend_Controller_Action
     {
         parent::preDispatch();
 
-        if (!$this->_helper->user()->inheritsRole('moder') ) {
+        if (! $this->_helper->user()->inheritsRole('moder')) {
             return $this->_forward('forbidden', 'error', 'default');
         }
     }
@@ -49,7 +49,7 @@ class Moder_ModificationController extends Zend_Controller_Action
         $cars = $this->_helper->catalogue()->getCarTable();
 
         $car = $cars->find($this->_getParam('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->_forward('notfound', 'error', 'default');
         }
 
@@ -71,7 +71,6 @@ class Moder_ModificationController extends Zend_Controller_Action
 
         $request = $this->getRequest();
         if ($request->isPost() && $form->isValid($request->getPost())) {
-
             $values = $form->getValues();
 
             $endYear = (int)$values['end_year'];
@@ -129,14 +128,14 @@ class Moder_ModificationController extends Zend_Controller_Action
         $cars = $this->_helper->catalogue()->getCarTable();
 
         $car = $cars->find($this->_getParam('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->_forward('notfound', 'error', 'default');
         }
 
         $mTable = new ModificationTable();
 
         $mRow = $mTable->find($this->getParam('modification_id'))->current();
-        if (!$mRow) {
+        if (! $mRow) {
             return $this->_forward('notfound', 'error', 'default');
         }
 
@@ -171,7 +170,6 @@ class Moder_ModificationController extends Zend_Controller_Action
 
         $request = $this->getRequest();
         if ($request->isPost() && $form->isValid($request->getPost())) {
-
             $values = $form->getValues();
 
             $endYear = (int)$values['end_year'];
@@ -228,7 +226,7 @@ class Moder_ModificationController extends Zend_Controller_Action
         $cars = $this->_helper->catalogue()->getCarTable();
 
         $car = $cars->find($this->_getParam('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->_forward('notfound', 'error', 'default');
         }
 
@@ -256,7 +254,6 @@ class Moder_ModificationController extends Zend_Controller_Action
         $map = [];
 
         foreach ($mgRows as $mgRow) {
-
             $map[] = $db->fetchCol(
                 $db->select()
                     ->from($mTable->info('name'), 'id')
@@ -331,7 +328,7 @@ class Moder_ModificationController extends Zend_Controller_Action
 
         $modModel = new Modification();
 
-        if (!$modModel->canDelete($id)) {
+        if (! $modModel->canDelete($id)) {
             return $this->forward('forbidden', 'error');
         }
 

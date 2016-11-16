@@ -62,14 +62,14 @@ class EnginesController extends AbstractActionController
 
     public function engineAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $engineTable = $this->getEngineTable();
 
         $engine = $engineTable->find($this->params('engine_id'))->current();
-        if (!$engine) {
+        if (! $engine) {
             return $this->notFoundAction();
         }
 
@@ -122,7 +122,6 @@ class EnginesController extends AbstractActionController
 
         $brands = [];
         foreach ($brandRows as $brandRow) {
-
             $cataloguePaths = $this->catalogue()->engineCataloguePaths($engine, [
                 'brand_id' => $brandRow->id
             ]);
@@ -162,14 +161,13 @@ class EnginesController extends AbstractActionController
                 ->order(['brands.position', 'brands.caption'])
         );
         foreach ($brandEngineRows as $brandEngineRow) {
-
             $brandRow = $brandTable->find($brandEngineRow->brand_id)->current();
-            if (!$brandRow) {
+            if (! $brandRow) {
                 throw new Exception("Broken brand_engine link");
             }
 
             $parentEngineRow = $this->getEngineTable()->find($brandEngineRow->engine_id)->current();
-            if (!$parentEngineRow) {
+            if (! $parentEngineRow) {
                 throw new Exception("Broken brand_engine link");
             }
 
@@ -218,7 +216,7 @@ class EnginesController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -294,7 +292,6 @@ class EnginesController extends AbstractActionController
 
         $engines = [];
         foreach ($paginator->getCurrentItems() as $engine) {
-
             $pictures = $pictureTable->fetchAll([
                 'engine_id = ?' => $engine->id,
                 'type = ?'      => Picture::ENGINE_TYPE_ID
@@ -320,7 +317,7 @@ class EnginesController extends AbstractActionController
 
     public function addAction()
     {
-        if (!$this->user()->isAllowed('engine', 'add')) {
+        if (! $this->user()->isAllowed('engine', 'add')) {
             return $this->forbiddenAction();
         }
 
@@ -358,7 +355,7 @@ class EnginesController extends AbstractActionController
                 ]);
                 $engine->save();
 
-                if (!$parentEngine) {
+                if (! $parentEngine) {
                     $brandEngineTable = new BrandEngine();
                     $brandEngineRow = $brandEngineTable->createRow([
                         'brand_id'  => $values['brand_id'],
@@ -429,13 +426,13 @@ class EnginesController extends AbstractActionController
 
     public function cancelParentAction()
     {
-        if (!$this->user()->isAllowed('engine', 'edit')) {
+        if (! $this->user()->isAllowed('engine', 'edit')) {
             return $this->forbiddenAction();
         }
         $engineTable = $this->getEngineTable();
 
         $engine = $engineTable->find($this->params('engine_id'))->current();
-        if (!$engine) {
+        if (! $engine) {
             return $this->notFoundAction();
         }
 
@@ -458,22 +455,21 @@ class EnginesController extends AbstractActionController
 
     public function selectParentAction()
     {
-        if (!$this->user()->isAllowed('engine', 'edit')) {
+        if (! $this->user()->isAllowed('engine', 'edit')) {
             return $this->forbiddenAction();
         }
         $engineTable = $this->getEngineTable();
 
         $engine = $engineTable->find($this->params('engine_id'))->current();
-        if (!$engine) {
+        if (! $engine) {
             return $this->notFoundAction();
         }
 
         $parentId = (int)$this->params()->fromPost('parent_id');
 
         if ($parentId) {
-
             $parentEngine = $engineTable->find($parentId)->current();
-            if (!$parentEngine) {
+            if (! $parentEngine) {
                 return $this->notFoundAction();
             }
 
@@ -512,17 +508,15 @@ class EnginesController extends AbstractActionController
         $brandTable = new BrandTable();
 
         if ($brandId) {
-
             $brand = $brandTable->find($brandId)->current();
 
-            if (!$brand) {
+            if (! $brand) {
                 return $this->notFoundAction();
             }
 
             $brands = [];
 
             $engines = $this->enginesWalkTree(null, $brand->id, $engine->id);
-
         } else {
             $brands = $brandTable->fetchAll(
                 $brandTable->select(true)
@@ -546,7 +540,7 @@ class EnginesController extends AbstractActionController
 
     public function rebuildAction()
     {
-        if (!$this->user()->isAllowed('engine', 'edit')) {
+        if (! $this->user()->isAllowed('engine', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -559,21 +553,21 @@ class EnginesController extends AbstractActionController
 
     public function removeBrandAction()
     {
-        if (!$this->user()->isAllowed('engine', 'edit')) {
+        if (! $this->user()->isAllowed('engine', 'edit')) {
             return $this->forbiddenAction();
         }
 
         $engineTable = $this->getEngineTable();
         $engineRow = $engineTable->find($this->params('engine_id'))->current();
 
-        if (!$engineRow) {
+        if (! $engineRow) {
             return $this->notFoundAction();
         }
 
         $brandTable = new BrandTable();
 
         $brandRow = $brandTable->find($this->params('brand_id'))->current();
-        if (!$brandRow) {
+        if (! $brandRow) {
             return $this->notFoundAction();
         }
 
@@ -587,7 +581,6 @@ class EnginesController extends AbstractActionController
         $engineUrl = $this->engineModerUrl($engineRow->id);
 
         if ($brandEngineRow) {
-
             $message = sprintf(
                 'Двигатель %s отвязан от бренда %s',
                 $engineRow->caption,
@@ -603,14 +596,14 @@ class EnginesController extends AbstractActionController
 
     public function addBrandAction()
     {
-        if (!$this->user()->isAllowed('engine', 'edit')) {
+        if (! $this->user()->isAllowed('engine', 'edit')) {
             return $this->forbiddenAction();
         }
 
         $engineTable = $this->getEngineTable();
         $engineRow = $engineTable->find($this->params('engine_id'))->current();
 
-        if (!$engineRow) {
+        if (! $engineRow) {
             return $this->notFoundAction();
         }
 
@@ -618,7 +611,6 @@ class EnginesController extends AbstractActionController
 
         $brandRow = $brandTable->find($this->params()->fromPost('brand_id'))->current();
         if ($brandRow) {
-
             $brandEngineTable = new BrandEngine();
 
             $brandEngineRow = $brandEngineTable->fetchRow([
@@ -626,7 +618,7 @@ class EnginesController extends AbstractActionController
                 'engine_id = ?' => $engineRow->id
             ]);
 
-            if (!$brandEngineRow) {
+            if (! $brandEngineRow) {
                 $brandEngineRow = $brandEngineTable->createRow([
                     'brand_id'  => $brandRow->id,
                     'engine_id' => $engineRow->id,

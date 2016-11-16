@@ -55,7 +55,7 @@ class MaintenanceController extends AbstractActionController
 
         exec($cmd);
 
-        if (!file_exists($destFile)) {
+        if (! file_exists($destFile)) {
             throw new Exception('Error creating dump');
         }
 
@@ -76,12 +76,12 @@ class MaintenanceController extends AbstractActionController
     public function clearSessionsAction()
     {
         $gcMaxLifetime = $this->sessionManager->getConfig()->getOptions('options')['gc_maxlifetime'];
-        if (!$gcMaxLifetime) {
+        if (! $gcMaxLifetime) {
             throw new Exception('Option session.gc_maxlifetime not found');
         }
-        
+
         $this->sessionManager->getSaveHandler()->gc($gcMaxLifetime);
-        
+
         Console::getInstance()->writeLine("Garabage collected", ColorInterface::GREEN);
     }
 
@@ -109,7 +109,7 @@ class MaintenanceController extends AbstractActionController
         $paginator->setItemCountPerPage(100);
 
         $pagesCount = $paginator->count();
-        for ($i=1; $i<=$pagesCount; $i++) {
+        for ($i = 1; $i <= $pagesCount; $i++) {
             $paginator->setCurrentPageNumber($i);
             foreach ($paginator->getCurrentItems() as $carRow) {
                 $console->writeLine($carRow->id);
@@ -128,5 +128,4 @@ class MaintenanceController extends AbstractActionController
 
         Console::getInstance()->writeLine("ok $affected");
     }
-
 }

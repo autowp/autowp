@@ -28,7 +28,7 @@ class WildcardSafe extends Wildcard
      */
     public function match(Request $request, $pathOffset = null)
     {
-        if (!method_exists($request, 'getUri')) {
+        if (! method_exists($request, 'getUri')) {
             return;
         }
 

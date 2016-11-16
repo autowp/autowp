@@ -29,7 +29,7 @@ class PictureVote extends AbstractPlugin
             $car = $picture->findParentRow(Vehicle::class);
             if ($car) {
                 $db = $this->table->getAdapter();
-                $result = !$db->fetchOne(
+                $result = ! $db->fetchOne(
                     $db->select()
                         ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
                         ->where('car_id = ?', $car->id)
@@ -77,7 +77,7 @@ class PictureVote extends AbstractPlugin
 
         if (isset($cookies['customReason'])) {
             foreach ((array)unserialize($cookies['customReason']) as $reason) {
-                if (strlen($reason) && !in_array($reason, $voteOptions)) {
+                if (strlen($reason) && ! in_array($reason, $voteOptions)) {
                     $voteOptions[] = $reason;
                 }
             }
@@ -93,13 +93,13 @@ class PictureVote extends AbstractPlugin
         ], $options);
 
         $picture = $this->table->find($pictureId)->current();
-        if (!$picture) {
+        if (! $picture) {
             return false;
         }
 
         $controller = $this->getController();
 
-        if (!$controller->user()->inheritsRole('moder')) {
+        if (! $controller->user()->inheritsRole('moder')) {
             return false;
         }
 
@@ -110,7 +110,7 @@ class PictureVote extends AbstractPlugin
             'isLastPicture'     => $this->isLastPicture($picture),
             'acceptedCount'     => $this->getAcceptedCount($picture),
             'canDelete'         => $this->pictureCanDelete($picture),
-            'canVote'           => !$voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
+            'canVote'           => ! $voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
             'voteExists'        => $voteExists,
             'moderVotes'        => $options['hideVote'] ? null : $picture->findDependentRowset(PictureModerVote::class),
             'pictureDeleteUrl'  => $controller->url()->fromRoute('moder/pictures/params', [

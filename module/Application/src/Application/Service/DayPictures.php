@@ -196,7 +196,7 @@ class DayPictures
     {
         $dateObj = null;
 
-        if (!empty($date)) {
+        if (! empty($date)) {
             if (is_string($date)) {
                 $dateObj = DateTime::createFromFormat($this->externalDateFormat, $date, $this->timezone);
             } elseif ($date instanceof DateTime) {
@@ -217,7 +217,7 @@ class DayPictures
      */
     public function haveCurrentDayPictures()
     {
-        if (!$this->currentDate) {
+        if (! $this->currentDate) {
             return false;
         }
 
@@ -236,12 +236,12 @@ class DayPictures
             ->order($this->orderColumn . ' desc');
 
         $lastPicture = $select->getTable()->fetchRow($select);
-        if (!$lastPicture) {
+        if (! $lastPicture) {
             return null;
         }
 
         $lastDate = $lastPicture->getDateTime($this->orderColumn);
-        if (!$lastDate) {
+        if (! $lastDate) {
             return null;
         }
 
@@ -255,12 +255,11 @@ class DayPictures
      */
     private function calcPrevDate()
     {
-        if (!$this->currentDate) {
+        if (! $this->currentDate) {
             return $this;
         }
 
         if ($this->prevDate === null) {
-
             $column = $this->quotedOrderColumn();
 
             $select = $this->selectClone()
@@ -328,12 +327,11 @@ class DayPictures
      */
     private function calcNextDate()
     {
-        if (!$this->currentDate) {
+        if (! $this->currentDate) {
             return $this;
         }
 
         if ($this->nextDate === null) {
-
             $column = $this->quotedOrderColumn();
 
             $select = $this->selectClone()
@@ -397,12 +395,11 @@ class DayPictures
      */
     public function getPaginator()
     {
-        if (!$this->currentDate) {
+        if (! $this->currentDate) {
             return false;
         }
 
         if ($this->paginator === null) {
-
             $select = $this->getCurrentDateSelect();
 
             $this->paginator = new \Zend\Paginator\Paginator(
@@ -517,7 +514,7 @@ class DayPictures
      */
     private function quotedOrderColumn()
     {
-        if (!$this->orderColumn) {
+        if (! $this->orderColumn) {
             throw new Exception('Order column not configured');
         }
 

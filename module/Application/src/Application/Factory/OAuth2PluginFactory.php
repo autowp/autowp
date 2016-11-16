@@ -29,8 +29,8 @@ class OAuth2PluginFactory implements FactoryInterface
         }
 
         return new OAuth2Plugin(
-                $oauth2ServerFactory,
-                $services->get('ZF\OAuth2\Provider\UserId')
+            $oauth2ServerFactory,
+            $services->get('ZF\OAuth2\Provider\UserId')
         );
     }
 

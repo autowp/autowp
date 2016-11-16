@@ -24,7 +24,6 @@ class VotingController extends AbstractActionController
 
         if ($voting->getDateTime('begin_date') < $now) {
             if ($voting->getDateTime('end_date') > $now) {
-
                 $user = $this->user()->get();
                 if ($user) {
                     $vvvTable = new VotingVariantVote();
@@ -35,7 +34,7 @@ class VotingController extends AbstractActionController
                             ->where('voting_variant_vote.user_id = ?', $user->id)
                     );
 
-                    if (!$voted) {
+                    if (! $voted) {
                         $canVote = true;
                     }
                 }
@@ -52,7 +51,7 @@ class VotingController extends AbstractActionController
 
         $voting = $vTable->find($this->params('id'))->current();
 
-        if (!$voting) {
+        if (! $voting) {
             return $this->notFoundAction();
         }
 
@@ -65,7 +64,6 @@ class VotingController extends AbstractActionController
         ], 'position');
         $maxVotes = $minVotes = null;
         foreach ($vvRows as $vvRow) {
-
             switch ($filter) {
                 case 1:
                     $votes = $vvvTable->getAdapter()->fetchOne(
@@ -105,7 +103,7 @@ class VotingController extends AbstractActionController
 
         foreach ($variants as &$variant) {
             if ($maxVotes > 0) {
-                $variant['percent'] = round(100*$variant['votes'] / $maxVotes, 2);
+                $variant['percent'] = round(100 * $variant['votes'] / $maxVotes, 2);
                 $variant['isMax'] = $variant['percent'] >= 99;
                 $variant['isMin'] = $variant['percent'] <= $minVotesPercent;
             } else {
@@ -130,7 +128,7 @@ class VotingController extends AbstractActionController
         $vvTable = new VotingVariant();
         $variant = $vvTable->find($this->params('id'))->current();
 
-        if (!$variant) {
+        if (! $variant) {
             return $this->notFoundAction();
         }
 
@@ -154,7 +152,7 @@ class VotingController extends AbstractActionController
 
     public function voteAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->notFoundAction();
         }
 
@@ -162,18 +160,18 @@ class VotingController extends AbstractActionController
 
         $voting = $vTable->find($this->params('id'))->current();
 
-        if (!$voting) {
+        if (! $voting) {
             return $this->notFoundAction();
         }
 
-        if (!$this->canVote($voting)) {
+        if (! $this->canVote($voting)) {
             return $this->forbiddenAction();
         }
 
         $vvTable = new VotingVariant();
         $vvRows = $vvTable->find($this->params()->fromPost('variant'));
 
-        if (!$voting->multivariant) {
+        if (! $voting->multivariant) {
             if (count($vvRows) > 1) {
                 return $this->forbiddenAction();
             }
@@ -193,7 +191,7 @@ class VotingController extends AbstractActionController
                 'voting_variant_id = ?' => $vvRow->id,
                 'user_id = ?'           => $user->id
             ]);
-            if (!$vvvRow) {
+            if (! $vvvRow) {
                 $vvvTable->insert([
                     'voting_variant_id' => $vvRow->id,
                     'user_id'           => $user->id,

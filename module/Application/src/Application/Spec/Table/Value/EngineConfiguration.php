@@ -15,7 +15,6 @@ class EngineConfiguration
         $this->cylindersCount = $options['cylindersCount'];
         $this->cylindersLayout = $options['cylindersLayout'];
         $this->valvesCount = $options['valvesCount'];
-
     }
 
     public function render(PhpRenderer $view, $attribute, $value, $values)
@@ -25,10 +24,11 @@ class EngineConfiguration
         $valves = isset($values[$this->valvesCount]) ? $values[$this->valvesCount] : null;
 
         if ($layout) {
-            if ($cylinders)
+            if ($cylinders) {
                 $result = $layout.$cylinders;
-                else
-                    $result = $layout.'?';
+            } else {
+                $result = $layout.'?';
+            }
         } else {
             if ($cylinders) {
                 $result = $cylinders;

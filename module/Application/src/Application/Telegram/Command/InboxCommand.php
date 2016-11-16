@@ -36,7 +36,7 @@ class InboxCommand extends Command
                 ->where('not users.deleted')
         );
 
-        if (!$chatRow) {
+        if (! $chatRow) {
             $this->replyWithMessage([
                 'text' => 'You need to identify your account with /me command to use that service'
             ]);
@@ -51,7 +51,6 @@ class InboxCommand extends Command
             ]);
 
             if ($brandRow) {
-
                 $telegramBrandTable = new TelegramBrand();
                 $telegramBrandRow = $telegramBrandTable->fetchRow([
                     'brand_id = ?' => $brandRow->id,
@@ -65,7 +64,7 @@ class InboxCommand extends Command
                         'text' => 'Successful unsubscribed from ' . $brandRow->caption
                     ]);
                 } else {
-                    if (!$telegramBrandRow) {
+                    if (! $telegramBrandRow) {
                         $telegramBrandRow = $telegramBrandTable->createRow([
                             'brand_id' => $brandRow->id,
                             'chat_id'  => $chatId
@@ -77,13 +76,11 @@ class InboxCommand extends Command
                         'text' => 'Successful subscribed to ' . $brandRow->caption
                     ]);
                 }
-
             } else {
                 $this->replyWithMessage([
                     'text' => 'Brand "' . $arguments . '" not found'
                 ]);
             }
-
         } else {
             $this->replyWithMessage([
                 'text' => "Plase, type brand name. For Example /inbox BMW"

@@ -6,8 +6,7 @@ use Zend\Paginator\Adapter\AdapterInterface;
 
 use Zend_Paginator_Adapter_DbTableSelect;
 
-class Zend1DbTableSelect extends Zend_Paginator_Adapter_DbTableSelect
-    implements AdapterInterface
+class Zend1DbTableSelect extends Zend_Paginator_Adapter_DbTableSelect implements AdapterInterface
 {
 
 }

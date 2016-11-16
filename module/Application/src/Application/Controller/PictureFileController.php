@@ -33,11 +33,11 @@ class PictureFileController extends AbstractActionController
 
         $filepath = realpath(implode(DIRECTORY_SEPARATOR, [PUBLIC_DIR, $file]));
 
-        if (!file_exists($filepath)) {
+        if (! file_exists($filepath)) {
             return $this->notFoundAction();
         }
 
-        if (!is_file($filepath)) {
+        if (! is_file($filepath)) {
             return $this->notFoundAction();
         }
 
@@ -73,7 +73,7 @@ class PictureFileController extends AbstractActionController
             $refererTable->addUrl($referer, $accept);
         }
 
-        $expiresTime = 86400*60;
+        $expiresTime = 86400 * 60;
 
         if ($contentType) {
             $this->getResponse()->getHeaders()

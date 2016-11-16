@@ -69,7 +69,6 @@ class PulseController extends AbstractActionController
         $hour = new DateInterval('PT1H');
 
         foreach ($data as $uid => $dates) {
-
             $line = [];
 
             $cDate = clone $from;

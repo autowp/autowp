@@ -23,8 +23,8 @@ class Row extends \Application\Db\Table\Row
     public static function checkCropParameters($options)
     {
         // Check existance and correct of crop parameters
-        return  !is_null($options['crop_left']) && !is_null($options['crop_top']) &&
-                !is_null($options['crop_width']) && !is_null($options['crop_height']) &&
+        return  ! is_null($options['crop_left']) && ! is_null($options['crop_top']) &&
+                ! is_null($options['crop_width']) && ! is_null($options['crop_height']) &&
                 self::between($options['crop_left'], 0, $options['width']) &&
                 self::between($options['crop_width'], 1, $options['width']) &&
                 self::between($options['crop_top'], 0, $options['height']) &&
@@ -114,7 +114,6 @@ class Row extends \Application\Db\Table\Row
 
                         $result = $firstChar . '/' . $brandsFolder .'/'.$carFolder.'/'.$carCatname;
                     } else {
-
                         if (count($sBrands) == 1) {
                             $sBrandsA = array_values($sBrands);
                             $brand = $sBrandsA[0];
@@ -194,8 +193,6 @@ class Row extends \Application\Db\Table\Row
         //$this->removeThumb();
         //$this->removePod();
         //$this->removeSource();
-
-
     }
 
     public function getImageOptions($col)
@@ -254,7 +251,7 @@ class Row extends \Application\Db\Table\Row
 
     public function canAccept()
     {
-        if (!in_array($this->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])) {
+        if (! in_array($this->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])) {
             return false;
         }
 
@@ -272,7 +269,7 @@ class Row extends \Application\Db\Table\Row
 
     public function canDelete()
     {
-        if (!in_array($this->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])) {
+        if (! in_array($this->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])) {
             return false;
         }
 

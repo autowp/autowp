@@ -19,8 +19,7 @@ class MessageRow extends Row
      */
     public function getUrl($absolute = false)
     {
-        switch ($this->type_id)
-        {
+        switch ($this->type_id) {
             case CommentMessage::PICTURES_TYPE_ID:
                 $pictures = new Picture();
                 $picture = $pictures->find($this->item_id)->current();
@@ -59,8 +58,9 @@ class MessageRow extends Row
         $Msg = str_replace("\r", '', $this->message);
         $Msg = explode("\n", $Msg);
         $Msg = trim($Msg[0]);
-        if (mb_strlen($Msg) > 60)
+        if (mb_strlen($Msg) > 60) {
             $Msg = mb_substr($Msg, 0, 60).'...';
+        }
         return $Msg;
     }
 

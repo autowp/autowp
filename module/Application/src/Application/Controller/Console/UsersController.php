@@ -41,7 +41,7 @@ class UsersController extends AbstractActionController
     public function clearHashesAction()
     {
         $console = Console::getInstance();
-        
+
         $urTable = new UserRemember();
         $count = $urTable->delete([
             'date < DATE_SUB(NOW(), INTERVAL 60 DAY)'
@@ -67,11 +67,11 @@ class UsersController extends AbstractActionController
         $console = Console::getInstance();
         $console->writeLine(sprintf("%d user rename rows was deleted\n", $count));
     }
-    
+
     public function deleteUnusedAction()
     {
         $console = Console::getInstance();
-        
+
         $this->usersService->deleteUnused();
     }
 }

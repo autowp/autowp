@@ -35,7 +35,7 @@ class HumanDate extends AbstractHelper
             throw new \Zend\View\Exception\InvalidArgumentException('Expected parameter $time was not provided.');
         }
 
-        if (!$time instanceof DateTime) {
+        if (! $time instanceof DateTime) {
             $dateTime = new DateTime();
             $dateTime->setTimestamp($time->getTimestamp());
             $timezone = new DateTimeZone($time->getTimezone());

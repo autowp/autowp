@@ -30,7 +30,7 @@ class PictureFile implements RouteInterface
 
     public function match(Request $request)
     {
-        if (!method_exists($request, 'getUri')) {
+        if (! method_exists($request, 'getUri')) {
             return;
         }
 
@@ -45,7 +45,7 @@ class PictureFile implements RouteInterface
             $node = urldecode($node);
         }
 
-        if (!count($path)) {
+        if (! count($path)) {
             return false;
         }
         if ($path[0] != 'pictures') {
@@ -64,7 +64,7 @@ class PictureFile implements RouteInterface
     {
         $data = array_replace($this->defaults, $params);
 
-        if (!isset($data['file'])) {
+        if (! isset($data['file'])) {
             throw new Exception("`file` not specified");
         }
 
@@ -75,8 +75,7 @@ class PictureFile implements RouteInterface
         unset($value);
 
         if (isset($options['uri'])) {
-
-            if (!isset($data['hostname'])) {
+            if (! isset($data['hostname'])) {
                 throw new Exception("`hostname` not specified");
             }
 
@@ -91,5 +90,7 @@ class PictureFile implements RouteInterface
      *
      * @return array
      */
-    public function getAssembledParams() {}
+    public function getAssembledParams()
+    {
+    }
 }

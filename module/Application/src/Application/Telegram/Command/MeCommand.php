@@ -43,14 +43,13 @@ class MeCommand extends Command
         ]);
 
         if (count($args) <= 0) {
-            if (!$telegramChatRow || !$telegramChatRow->user_id) {
+            if (! $telegramChatRow || ! $telegramChatRow->user_id) {
                 $this->replyWithMessage([
                     'disable_web_page_preview' => true,
                     'text' => 'Use this command to identify you as autowp.ru user.' . PHP_EOL .
                               'For example type "/me 12345" to identify you as user number 12345'
                 ]);
             } else {
-
                 $userTable = new User();
                 $userRow = $userTable->find($telegramChatRow->user_id)->current();
 
@@ -60,22 +59,18 @@ class MeCommand extends Command
                 ]);
             }
         } else {
-
             $userId = (int)$args[0];
 
             $userTable = new User();
 
             $userRow = $userTable->find($userId)->current();
 
-            if (!$userRow) {
-
+            if (! $userRow) {
                 $this->replyWithMessage([
                     'text' => 'User "' . $args[0] . '" not found'
                 ]);
-
             } else {
-
-                if (!$telegramChatRow) {
+                if (! $telegramChatRow) {
                     $telegramChatRow = $telegramChatTable->createRow([
                         'chat_id' => $chatId
                     ]);
@@ -96,9 +91,7 @@ class MeCommand extends Command
                     $this->replyWithMessage([
                         'text' => 'Check your personal messages / system notifications'
                     ]);
-
                 } else {
-
                     $token = (string)$args[1];
 
                     if (strcmp($telegramChatRow->token, $token) != 0) {
@@ -107,7 +100,6 @@ class MeCommand extends Command
                             'text' => "Token not matched. Try again with `$command`"
                         ]);
                     } else {
-
                         $telegramChatRow->user_id = $userRow->id;
                         $telegramChatRow->token = null;
                         $telegramChatRow->save();
@@ -115,12 +107,9 @@ class MeCommand extends Command
                         $this->replyWithMessage([
                             'text' => "Complete. Nice to see you, `{$userRow->name}`"
                         ]);
-
                     }
                 }
             }
         }
-
-
     }
 }

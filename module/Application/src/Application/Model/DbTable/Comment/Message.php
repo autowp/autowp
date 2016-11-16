@@ -62,6 +62,4 @@ class Message extends Zend_Db_Table
             'type_id = ?' => $typeId
         ], 'datetime DESC');
     }
-
-
 }

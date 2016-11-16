@@ -24,7 +24,7 @@ class PictureController extends AbstractActionController
             'identity IS NULL'
         ]);
 
-        if (!$picture) {
+        if (! $picture) {
             $picture = $pTable->fetchRow([
                 'identity = ?' => $identity
             ]);
@@ -37,7 +37,7 @@ class PictureController extends AbstractActionController
     {
         $picture = $this->picture();
 
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
@@ -57,8 +57,6 @@ class PictureController extends AbstractActionController
         $galleryStatuses = [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW];
 
         if (in_array($picture->status, $galleryStatuses)) {
-
-
             $picSelect = $pictureTable->select(true)
                 ->where('pictures.status IN (?)', $galleryStatuses)
                 ->order($this->catalogue()->picturesOrdering());
@@ -104,10 +102,9 @@ class PictureController extends AbstractActionController
                             ->where('pictures.engine_id = ?', $picture->engine_id);
                     }
                     break;
-
             }
 
-            if (!$galleryEnabled) {
+            if (! $galleryEnabled) {
                 $picSelect
                     ->where('pictures.id = ?', $picture->id);
             }
@@ -137,7 +134,7 @@ class PictureController extends AbstractActionController
 
         $picture = $this->picture();
 
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
@@ -155,11 +152,11 @@ class PictureController extends AbstractActionController
 
         if ($picture->status == Picture::STATUS_REMOVING) {
             $user = $this->user()->get();
-            if (!$user) {
+            if (! $user) {
                 return $this->notFoundAction();
             }
 
-            if (!$isModer && ($user->id != $picture->owner_id)) {
+            if (! $isModer && ($user->id != $picture->owner_id)) {
                 return $this->notFoundAction();
             }
 
@@ -209,7 +206,7 @@ class PictureController extends AbstractActionController
             case Picture::VEHICLE_TYPE_ID:
                 if ($car = $picture->findParentRow(Vehicle::class)) {
                     $language = $this->language();
-                    $brandList = $brandModel->getList($language, function($select) use ($car) {
+                    $brandList = $brandModel->getList($language, function ($select) use ($car) {
                         $select
                             ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                             ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
@@ -219,7 +216,6 @@ class PictureController extends AbstractActionController
                     foreach ($brandList as $brand) {
                         $brands[] = $brand['id'];
                     }
-
                 }
                 break;
         }
@@ -253,7 +249,7 @@ class PictureController extends AbstractActionController
     {
         $picture = $this->picture();
 
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
@@ -261,11 +257,11 @@ class PictureController extends AbstractActionController
 
         if ($picture->status == Picture::STATUS_REMOVING) {
             $user = $this->user()->get();
-            if (!$user) {
+            if (! $user) {
                 return $this->notFoundAction();
             }
 
-            if (!$isModer && ($user->id != $picture->owner_id)) {
+            if (! $isModer && ($user->id != $picture->owner_id)) {
                 return $this->notFoundAction();
             }
         }

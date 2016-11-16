@@ -19,8 +19,7 @@ class Referer extends Table
         $whitelist = new Whitelist();
         $whitelisted = $whitelist->containsHost($host);
 
-        if (!$whitelisted) {
-
+        if (! $whitelisted) {
             if (mb_strlen($url) > self::MAX_URL) {
                 $url = mb_substr($url, 0, self::MAX_URL);
             }

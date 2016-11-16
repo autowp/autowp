@@ -35,21 +35,21 @@ class Breadcrumbs extends AbstractHelper
     public function __toString()
     {
         try {
-            $items = array();
+            $items = [];
             foreach ($this->data as $node) {
-
                 $name = $node['name'];
                 $url = $node['url'];
 
-                if ($url)
+                if ($url) {
                     $items[] = '<li>'.$this->view->htmlA(['href' => $url], $name).'</li>';
-                else
+                } else {
                     $items[] = '<li>'.$this->view->escapeHtml($name).'</li>';
+                }
             }
 
             array_pop($items);
 
-            if (!$items) {
+            if (! $items) {
                 return '';
             }
 
@@ -58,5 +58,4 @@ class Breadcrumbs extends AbstractHelper
             print $e->getMessage();
         }
     }
-
 }

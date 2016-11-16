@@ -41,9 +41,9 @@ class Page extends AbstractHelper
         if ($value) {
             $doc = null;
 
-            if ($value instanceof Zend_Db_Table_Row)
+            if ($value instanceof Zend_Db_Table_Row) {
                 $doc = $value;
-            elseif (is_numeric($value)) {
+            } elseif (is_numeric($value)) {
                 $doc = $this->getPageById($value);
             }
 
@@ -55,7 +55,7 @@ class Page extends AbstractHelper
 
     public function __get($name)
     {
-        if (!$this->doc) {
+        if (! $this->doc) {
             return '';
         }
         switch ($name) {
@@ -65,15 +65,15 @@ class Page extends AbstractHelper
                 $key = 'page/' . $this->doc->id. '/' . $name;
 
                 $result = $this->view->translate($key);
-                if (!$result || $result == $key) {
+                if (! $result || $result == $key) {
                     $result = $this->view->translate($key, null, 'en');
                 }
 
-                if ((!$result || $result == $key) && ($name != 'name')) {
+                if ((! $result || $result == $key) && ($name != 'name')) {
                     $key = 'page/' . $this->doc->id. '/name';
 
                     $result = $this->view->translate($key);
-                    if (!$result || $result == $key) {
+                    if (! $result || $result == $key) {
                         $result = $this->view->translate($key, null, 'en');
                     }
                 }
@@ -99,7 +99,7 @@ class Page extends AbstractHelper
 
     private function isParentOrSelf($child, $parent)
     {
-        if (!$parent || !$child) {
+        if (! $parent || ! $child) {
             return false;
         }
 
@@ -122,5 +122,4 @@ class Page extends AbstractHelper
 
         return $result;
     }
-
 }

@@ -94,7 +94,7 @@ class ParentTable extends Table
 
     public function addParent(VehicleRow $car, VehicleRow $parent, array $options = [])
     {
-        if (!$parent->is_group) {
+        if (! $parent->is_group) {
             throw new Exception("Only groups can have childs");
         }
 
@@ -117,7 +117,7 @@ class ParentTable extends Table
             'car_id = ?'    => $id,
             'parent_id = ?' => $parentId
         ]);
-        if (!$row) {
+        if (! $row) {
             $row = $this->createRow([
                 'car_id'    => $id,
                 'parent_id' => $parentId,
@@ -153,7 +153,7 @@ class ParentTable extends Table
     public function getPathsToBrand($carId, $brand, array $options = [])
     {
         $carId = (int)$carId;
-        if (!$carId) {
+        if (! $carId) {
             throw new Exception("carId not provided");
         }
 
@@ -208,7 +208,7 @@ class ParentTable extends Table
     public function getPaths($carId, array $options = [])
     {
         $carId = (int)$carId;
-        if (!$carId) {
+        if (! $carId) {
             throw new Exception("carId not provided");
         }
 

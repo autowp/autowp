@@ -40,8 +40,9 @@ class TelegramService
         array $options = [],
         TreeRouteStack $router,
         HostManager $hostManager,
-        $serviceManager)
-    {
+        $serviceManager
+    ) {
+
         $this->accessToken = isset($options['accessToken']) ? $options['accessToken'] : null;
         $this->webhook = isset($options['webhook']) ? $options['webhook'] : null;
         $this->token = isset($options['token']) ? $options['token'] : null;
@@ -97,20 +98,19 @@ class TelegramService
                     $this->unsubscribeChat($params['chat_id']);
                     return;
                 }
-            } 
-            
+            }
+
             throw $e;
-            
         }
     }
-    
+
     private function unsubscribeChat($chatId)
     {
         $telegramBrandTable = new TelegramBrand();
         $telegramBrandTable->delete([
             'chat_id = ?' => (int)$chatId
         ]);
-        
+
         $telegramChatTable = new TelegramChat();
         $telegramChatTable->delete([
             'chat_id = ?' => (int)$chatId
@@ -127,7 +127,7 @@ class TelegramService
         $pictureTable = new Picture();
 
         $picture = $pictureTable->find($pictureId)->current();
-        if (!$picture) {
+        if (! $picture) {
             return;
         }
 
@@ -150,7 +150,6 @@ class TelegramService
             );
 
             foreach ($rows as $row) {
-
                 $url = $this->getPictureUrl($row['chat_id'], $picture);
 
                 $this->sendMessage([
@@ -166,7 +165,7 @@ class TelegramService
         $pictureTable = new Picture();
 
         $picture = $pictureTable->find($pictureId)->current();
-        if (!$picture) {
+        if (! $picture) {
             return;
         }
 
@@ -288,7 +287,6 @@ class TelegramService
         ]);
 
         foreach ($chatRows as $chatRow) {
-
             $url = $this->router->assemble([], [
                 'name'            => $fromId ? 'account/personal-messages' : 'account/personal-messages/system',
                 'force_canonical' => true,

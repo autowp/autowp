@@ -214,9 +214,8 @@ class Catalogue
         ]);
 
         foreach ($brandCarRows as $brandCarRow) {
-
             $brand = $this->getBrandTable()->find($brandCarRow->brand_id)->current();
-            if (!$brand) {
+            if (! $brand) {
                 throw new Exception("Broken link `{$brandCarRow->brand_id}`");
             }
 
@@ -264,7 +263,7 @@ class Catalogue
         $engineTable = $this->getEngineTable();
 
         $engineRow = $engineTable->find($id)->current();
-        if (!$engineRow) {
+        if (! $engineRow) {
             return $urls;
         }
 
@@ -275,7 +274,6 @@ class Catalogue
         $path = [];
 
         while ($engineRow) {
-
             array_unshift($path, $engineRow->id);
 
             $brandEngineRows = $this->getBrandEngineTable()->fetchAll([
@@ -283,13 +281,12 @@ class Catalogue
             ]);
 
             foreach ($brandEngineRows as $brandEngineRow) {
-
                 if ($options['brand_id'] && $options['brand_id'] != $brandEngineRow->brand_id) {
                     continue;
                 }
 
                 $brand = $brandTable->find($brandEngineRow->brand_id)->current();
-                if (!$brand) {
+                if (! $brand) {
                     throw new Exception("Broken link `{$brandCarRow->brand_id}`");
                 }
 
@@ -331,8 +328,8 @@ class Catalogue
     {
         // проверяем установлены ли границы обрезания
         // проверяем верные ли значения границ обрезания
-        $canCrop =  !is_null($picture['crop_left']) && !is_null($picture['crop_top']) &&
-            !is_null($picture['crop_width']) && !is_null($picture['crop_height']) &&
+        $canCrop = ! is_null($picture['crop_left']) && ! is_null($picture['crop_top']) &&
+            ! is_null($picture['crop_width']) && ! is_null($picture['crop_height']) &&
             self::between($picture['crop_left'], 0, $picture['width']) &&
             self::between($picture['crop_width'], 1, $picture['width']) &&
             self::between($picture['crop_top'], 0, $picture['height']) &&

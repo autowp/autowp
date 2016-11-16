@@ -61,7 +61,7 @@ class Comments
                 'item_id = ?' => $itemId,
                 'id = ?'      => $parentId
             ]);
-            if (!$parentMessage) {
+            if (! $parentMessage) {
                 return false;
             }
 
@@ -131,7 +131,6 @@ class Comments
         }
 
         if ($perPage) {
-
             $paginator = $this->getPaginator($type, $item, $perPage, $page);
 
             $rows = $paginator->getCurrentItems();
@@ -150,7 +149,6 @@ class Comments
 
         $comments = [];
         foreach ($rows as $row) {
-
             $author = $row->findParentRow(User::class, 'Author');
 
             $vote = null;
@@ -224,7 +222,7 @@ class Comments
             return false;
         }
 
-        if (!$comment) {
+        if (! $comment) {
             return false;
         }
 
@@ -272,7 +270,7 @@ class Comments
     public function voteMessage($id, $userId, $vote)
     {
         $message = $this->getMessageTable()->find($id)->current();
-        if (!$message) {
+        if (! $message) {
             return [
                 'success' => false,
                 'error'   => 'Message not found'
@@ -294,7 +292,7 @@ class Comments
 
         $vote = (int)$vote > 0 ? 1 : -1;
 
-        if (!$voteRow) {
+        if (! $voteRow) {
             $voteRow = $voteTable->createRow([
                 'comment_id' => $message->id,
                 'user_id'    => $userId,
@@ -327,7 +325,7 @@ class Comments
     public function getVotes($id)
     {
         $message = $this->getMessageTable()->find($id)->current();
-        if (!$message) {
+        if (! $message) {
             return false;
         }
 
@@ -379,12 +377,12 @@ class Comments
             'item_id = ?' => (int)$item
         ], 'datetime DESC');
     }
-    
+
     public function getSelectByUser($userId, $order)
     {
         $select = $this->getMessageTable()->select(true)
             ->where('author_id = ?', (int)$userId);
-        
+
         switch ($order) {
             case 'positive':
                 $select->order('vote desc');
@@ -399,7 +397,7 @@ class Comments
                 $select->order('datetime desc');
                 break;
         }
-        
+
         return $select;
     }
 
@@ -487,7 +485,7 @@ class Comments
                 ->where('datetime < ?', $root->datetime)
                 ->where('parent_id is null')
         );
-        return ceil(($count+1) / $perPage);
+        return ceil(($count + 1) / $perPage);
     }
 
     /**
@@ -550,7 +548,7 @@ class Comments
     public function moveMessage($id, $newTypeId, $newItemId)
     {
         $messageRow = $this->getMessageRow($id);
-        if (!$messageRow) {
+        if (! $messageRow) {
             return false;
         }
 

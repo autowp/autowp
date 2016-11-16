@@ -33,8 +33,8 @@ class Power extends AbstractAdapter
         $carsTable = $select->getTable();
         $db = $carsTable->getAdapter();
 
-        $wheres = implode($select->getPart( Zend_Db_Select::WHERE ));
-        $joins = $select->getPart( Zend_Db_Select::FROM );
+        $wheres = implode($select->getPart(Zend_Db_Select::WHERE));
+        $joins = $select->getPart(Zend_Db_Select::FROM);
         unset($joins['cars']);
 
         $tableNameQuoted = $db->quoteIdentifier(self::TEMP_TABLE_NAME);
@@ -131,13 +131,16 @@ class Power extends AbstractAdapter
 
         $result = [];
         foreach ($cars as $car) {
-
             $html = '';
             $value = $specService->getActualValue($powerAttr->id, $car->id, 1);
             $turbo = $specService->getActualValueText($this->_attributes['turbo'], 1, $car->id, $language);
             switch ($turbo) {
-                case 'нет': $turbo = null; break;
-                case 'есть': $turbo = 'турбонаддув'; break;
+                case 'нет':
+                    $turbo = null;
+                    break;
+                case 'есть':
+                    $turbo = 'турбонаддув';
+                    break;
                 default:
                     if ($turbo) {
                         $turbo = 'турбонаддув ' . $turbo;
@@ -164,8 +167,9 @@ class Power extends AbstractAdapter
                     $a[] = htmlspecialchars($cyl);
                 }
 
-                if ($volume > 0)
-                    $a[] = sprintf('%0.1f <span class="unit">л</span>', $volume/1000);
+                if ($volume > 0) {
+                    $a[] = sprintf('%0.1f <span class="unit">л</span>', $volume / 1000);
+                }
 
                 if ($turbo) {
                     $a[] = $turbo;
@@ -175,7 +179,7 @@ class Power extends AbstractAdapter
             }
 
             $result[] = [
-                'car'         =>  $car,
+                'car'         => $car,
                 'valueHtml'    => $html,
             ];
         }
@@ -189,19 +193,22 @@ class Power extends AbstractAdapter
     protected function _cylinders($layout, $cylinders, $valve_per_cylinder = null)
     {
         if ($layout) {
-            if ($cylinders)
+            if ($cylinders) {
                 $result = $layout.$cylinders;
-            else
+            } else {
                 $result = $layout.'?';
+            }
         } else {
-            if ($cylinders)
+            if ($cylinders) {
                 $result = $cylinders;
-            else
+            } else {
                 $result = '';
+            }
         }
 
-        if ($valve_per_cylinder)
+        if ($valve_per_cylinder) {
             $result .= '/' . $valve_per_cylinder;
+        }
 
         return $result;
     }

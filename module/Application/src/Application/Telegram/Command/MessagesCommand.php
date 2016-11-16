@@ -34,7 +34,7 @@ class MessagesCommand extends Command
                 ->where('not users.deleted')
         );
 
-        if (!$chatRow) {
+        if (! $chatRow) {
             $this->replyWithMessage([
                 'text' => 'You need to identify your account with /me command to use that service'
             ]);
@@ -44,7 +44,6 @@ class MessagesCommand extends Command
         if ($arguments == 'on') {
             $chatRow->messages = 1;
             $chatRow->save();
-
         } elseif ($arguments == 'off') {
             $chatRow->messages = 0;
             $chatRow->save();

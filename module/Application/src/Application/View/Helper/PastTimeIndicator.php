@@ -28,7 +28,7 @@ class PastTimeIndicator extends AbstractHtmlElement
      */
     public function __invoke($time)
     {
-        if (!$time instanceof DateTime) {
+        if (! $time instanceof DateTime) {
             $dt = new DateTime();
             $dt->setTimestamp($time->getTimestamp());
             $tz = new DateTimeZone($time->getTimezone());

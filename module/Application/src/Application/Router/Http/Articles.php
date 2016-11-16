@@ -32,7 +32,7 @@ class Articles implements RouteInterface
 
     public function match(Request $request)
     {
-        if (!method_exists($request, 'getUri')) {
+        if (! method_exists($request, 'getUri')) {
             return;
         }
 
@@ -49,7 +49,7 @@ class Articles implements RouteInterface
             $node = urldecode($node);
         }
 
-        if (!count($path)) {
+        if (! count($path)) {
             return false;
         }
 
@@ -132,5 +132,7 @@ class Articles implements RouteInterface
      *
      * @return array
      */
-    public function getAssembledParams() {}
+    public function getAssembledParams()
+    {
+    }
 }

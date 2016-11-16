@@ -60,11 +60,11 @@ class User extends AbstractPlugin
      */
     private function user($id)
     {
-        if (!$id) {
+        if (! $id) {
             return null;
         }
 
-        if (!array_key_exists($id, $this->users)) {
+        if (! array_key_exists($id, $this->users)) {
             $this->users[$id] = $this->getUserTable()->find($id)->current();
         }
 
@@ -81,7 +81,7 @@ class User extends AbstractPlugin
             $user = $this->getLogedInUser();
         }
 
-        if (!$user instanceof UserRow) {
+        if (! $user instanceof UserRow) {
             $user = $this->user($user);
         }
 
@@ -97,7 +97,7 @@ class User extends AbstractPlugin
     {
         $auth = new AuthenticationService();
 
-        if (!$auth->hasIdentity()) {
+        if (! $auth->hasIdentity()) {
             return false;
         }
 
@@ -147,22 +147,22 @@ class User extends AbstractPlugin
     {
         $language = $this->getController()->language();
 
-        if (!isset($this->hosts[$language])) {
+        if (! isset($this->hosts[$language])) {
             throw new Exception("Host `$language` not found");
         }
         $domain = $this->hosts[$language]['cookie'];
-        setcookie('remember', '', time() - 3600*24*30, '/', $domain);
+        setcookie('remember', '', time() - 3600 * 24 * 30, '/', $domain);
     }
 
     public function setRememberCookie($hash)
     {
         $language = $this->getController()->language();
 
-        if (!isset($this->hosts[$language])) {
+        if (! isset($this->hosts[$language])) {
             throw new Exception("Host `$language` not found");
         }
         $domain = $this->hosts[$language]['cookie'];
-        setcookie('remember', $hash, time() + 3600*24*30, '/', $domain);
+        setcookie('remember', $hash, time() + 3600 * 24 * 30, '/', $domain);
     }
 
     public function timezone()

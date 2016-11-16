@@ -66,13 +66,13 @@ class ChartController extends AbstractRestfulController
     {
         $id = $this->params()->fromQuery('id');
 
-        if (!in_array($id, $this->parameters)) {
+        if (! in_array($id, $this->parameters)) {
             return $this->notFoundAction();
         }
 
         $attrTable = new Attr\Attribute();
         $attrRow = $attrTable->find($id)->current();
-        if (!$attrRow) {
+        if (! $attrRow) {
             return $this->notFoundAction();
         }
 
@@ -86,7 +86,6 @@ class ChartController extends AbstractRestfulController
 
         $datasets = [];
         foreach ($this->specs as $specId) {
-
             $specRow = $specTable->find($specId)->current();
             $specIds = $this->specIds($specTable->getAdapter(), $specId);
 
@@ -120,7 +119,7 @@ class ChartController extends AbstractRestfulController
 
         foreach ($datasets as &$dataset) {
             foreach ($years as $year) {
-                if (!isset($dataset['pairs'][$year])) {
+                if (! isset($dataset['pairs'][$year])) {
                     $dataset['pairs'][$year] = null;
                 }
             }

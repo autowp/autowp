@@ -12,7 +12,7 @@ class HotlinkController extends AbstractActionController
 {
     public function indexAction()
     {
-        if (!$this->user()->isAllowed('hotlinks', 'view')) {
+        if (! $this->user()->isAllowed('hotlinks', 'view')) {
             return $this->forbiddenAction();
         }
 
@@ -30,7 +30,6 @@ class HotlinkController extends AbstractActionController
         $blacklistTable = new Blacklist();
 
         foreach ($hosts as &$host) {
-
             $host['whitelisted'] = $whitelistTable->containsHost($host['host']);
             $host['blacklisted'] = $blacklistTable->containsHost($host['host']);
             $host['links'] = $refererTable->fetchAll(
@@ -50,7 +49,7 @@ class HotlinkController extends AbstractActionController
 
     public function clearAllAction()
     {
-        if (!$this->user()->isAllowed('hotlinks', 'manage')) {
+        if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
 
@@ -63,7 +62,7 @@ class HotlinkController extends AbstractActionController
 
     public function clearHostAction()
     {
-        if (!$this->user()->isAllowed('hotlinks', 'manage')) {
+        if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
 
@@ -78,7 +77,7 @@ class HotlinkController extends AbstractActionController
 
     public function whitelistHostAction()
     {
-        if (!$this->user()->isAllowed('hotlinks', 'manage')) {
+        if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
 
@@ -97,7 +96,7 @@ class HotlinkController extends AbstractActionController
 
     public function whitelistAndClearHostAction()
     {
-        if (!$this->user()->isAllowed('hotlinks', 'manage')) {
+        if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
 
@@ -121,7 +120,7 @@ class HotlinkController extends AbstractActionController
 
     public function blacklistHostAction()
     {
-        if (!$this->user()->isAllowed('hotlinks', 'manage')) {
+        if (! $this->user()->isAllowed('hotlinks', 'manage')) {
             return $this->forbiddenAction();
         }
 

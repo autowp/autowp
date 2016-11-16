@@ -71,8 +71,9 @@ class MainMenu
         $hosts,
         $translator,
         LanguagePicker $languagePicker,
-        Message $message)
-    {
+        Message $message
+    ) {
+
         $this->router = $router;
         $this->language = $language;
         $this->hosts = $hosts;
@@ -109,11 +110,10 @@ class MainMenu
 
         $result = [];
         foreach ($db->fetchAll($select) as $row) {
-
             $key = 'page/' . $row['id'] . '/name';
 
             $name = $this->translator->translate($key);
-            if (!$name) {
+            if (! $name) {
                 $name = $this->translator->translate($key, null, 'en');
             }
 
@@ -138,8 +138,7 @@ class MainMenu
         $key = 'ZF2_CATEGORY_MENU_5_' . $language;
 
         $categories = $this->cache->getItem($key, $success);
-        if (!$success) {
-
+        if (! $success) {
             $categories = [];
 
             $categoryTable = new Category();
@@ -150,7 +149,6 @@ class MainMenu
             ], 'short_name');
 
             foreach ($rows as $row) {
-
                 $langRow = $categoryLangTable->fetchRow([
                     'language = ?'    => $language,
                     'category_id = ?' => $row->id
@@ -188,7 +186,7 @@ class MainMenu
         $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '12_' . $language;
 
         $secondMenu = $this->cache->getItem($key, $success);
-        if (!$success) {
+        if (! $success) {
             $secondMenu = $this->getMenuData(87, $logedIn, $language);
 
             foreach ($secondMenu as &$item) {
@@ -215,7 +213,7 @@ class MainMenu
         $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '_7_' . $language;
 
         $pages = $this->cache->getItem($key, $success);
-        if (!$success) {
+        if (! $success) {
             $pages = $this->getMenuData(2, $logedIn, $language);
 
             $this->cache->setItem($key, $pages);

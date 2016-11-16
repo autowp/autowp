@@ -20,7 +20,7 @@ class ContactsController extends AbstractRestfulController
     public function update($id, $data)
     {
         $currentUser = $this->user()->get();
-        if (!$currentUser) {
+        if (! $currentUser) {
             return $this->notFoundAction();
         }
 
@@ -36,7 +36,7 @@ class ContactsController extends AbstractRestfulController
             'not deleted'
         ]);
 
-        if (!$user) {
+        if (! $user) {
             return $this->forbiddenAction();
         }
 
@@ -57,7 +57,7 @@ class ContactsController extends AbstractRestfulController
     public function delete($id)
     {
         $currentUser = $this->user()->get();
-        if (!$currentUser) {
+        if (! $currentUser) {
             return $this->notFoundAction();
         }
 
@@ -73,7 +73,7 @@ class ContactsController extends AbstractRestfulController
             'not deleted'
         ]);
 
-        if (!$user) {
+        if (! $user) {
             return $this->forbiddenAction();
         }
 

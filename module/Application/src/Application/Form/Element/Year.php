@@ -39,7 +39,7 @@ class Year extends Number implements InputProviderInterface
                     'name'    => 'Between',
                     'options' => [
                         'min'       => 1700,
-                        'max'       => date('Y')+3,
+                        'max'       => date('Y') + 3,
                         'inclusive' => true
                     ]
                 ]

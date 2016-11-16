@@ -25,12 +25,12 @@ class Modification
                 ->where('modification_picture.modification_id = ?', (int)$id)
         );
 
-        return !$picturesCount;
+        return ! $picturesCount;
     }
 
     public function delete($id)
     {
-        if (!$this->canDelete($id)) {
+        if (! $this->canDelete($id)) {
             throw new Exception("Modification can not be deleted");
         }
 

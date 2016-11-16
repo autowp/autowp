@@ -24,7 +24,7 @@ class Img extends AbstractHtmlElement
             unset($attribs['format']);
         }
 
-        if (!$imageId) {
+        if (! $imageId) {
             return $this;
         }
 
@@ -52,15 +52,11 @@ class Img extends AbstractHtmlElement
     public function __toString()
     {
         try {
-
             if (isset($this->attribs['src'])) {
                 return $this->view->htmlImg($this->attribs);
             }
-
         } catch (\Exception $e) {
-
             print $e->getMessage();
-
         }
 
         return '';
@@ -71,4 +67,3 @@ class Img extends AbstractHtmlElement
         return isset($this->attribs['src']) && $this->attribs['src'];
     }
 }
-

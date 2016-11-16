@@ -55,7 +55,7 @@ class RightsController extends AbstractActionController
 
     public function resetAction()
     {
-        if (!$this->user()->isAllowed('rights', 'edit')) {
+        if (! $this->user()->isAllowed('rights', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -68,7 +68,7 @@ class RightsController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->isAllowed('rights', 'edit')) {
+        if (! $this->user()->isAllowed('rights', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -117,8 +117,7 @@ class RightsController extends AbstractActionController
         $this->roleParentForm->get('parent_role_id')->setValueOptions($roleOptions);
 
         if ($this->getRequest()->isPost()) {
-            switch ($this->params('form'))
-            {
+            switch ($this->params('form')) {
                 case 'add-role':
                     $this->roleForm->setData($this->params()->fromPost());
                     if ($this->roleForm->isValid()) {
@@ -189,7 +188,6 @@ class RightsController extends AbstractActionController
                         if ($data['what']) {
                             unset($data['what']);
                             $allowed->insert($data);
-
                         } else {
                             unset($data['what']);
                             $denied->insert($data);

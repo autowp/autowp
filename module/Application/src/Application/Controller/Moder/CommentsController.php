@@ -25,7 +25,7 @@ class CommentsController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -71,8 +71,7 @@ class CommentsController extends AbstractActionController
             $values = $this->form->getData();
 
             if ($values['user']) {
-
-                if (!is_numeric($values['user'])) {
+                if (! is_numeric($values['user'])) {
                     $userTable = new User();
                     $userRow = $userTable->fetchRow([
                         'identity = ?' => $values['user']

@@ -32,6 +32,5 @@ class InlinePicture extends AbstractHelper
                 '<h5>' . $view->htmlA($url, $caption) . '</h5>' .
                 $view->pictures()->behaviour($picture) .
             '</div>';
-
     }
 }

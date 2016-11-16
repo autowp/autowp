@@ -25,7 +25,7 @@ class HostManager
      */
     public function getUriByLanguage($language)
     {
-        if (!isset($this->hosts[$language])) {
+        if (! isset($this->hosts[$language])) {
             throw new Exception("Host for language `$language` not found");
         }
 

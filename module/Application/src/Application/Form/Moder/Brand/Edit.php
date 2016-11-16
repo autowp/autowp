@@ -7,7 +7,7 @@ use Zend\Form\Form;
 class Edit extends Form
 {
     private $languages = [];
-    
+
     public function init()
     {
         $this->add([
@@ -17,7 +17,7 @@ class Edit extends Form
                 'readonly' => 'readonly'
             ]
         ]);
-        
+
         foreach ($this->languages as $language) {
             $this->add([
                 'name' => 'name' . $language,
@@ -27,7 +27,7 @@ class Edit extends Form
                 ]
             ]);
         }
-        
+
         $this->add([
             'name'    => 'full_caption',
             'type'    => \Application\Form\Element\BrandFullName::class,

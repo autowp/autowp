@@ -69,7 +69,7 @@ class PagesController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -107,14 +107,14 @@ class PagesController extends AbstractActionController
 
     public function itemAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $id = (int)$this->params('page_id');
         if ($id) {
             $page = $this->table->find($id)->current();
-            if (!$page) {
+            if (! $page) {
                 return $this->notFoundAction();
             }
         } else {
@@ -131,7 +131,7 @@ class PagesController extends AbstractActionController
         ]));
 
         $values = $page->toArray();
-        if (!$page->id) {
+        if (! $page->id) {
             $values['parent_id'] = $this->params('parent_id');
         }
 
@@ -203,12 +203,12 @@ class PagesController extends AbstractActionController
 
     public function moveUpPageAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $page = $this->table->find($this->params('page_id'))->current();
-        if (!$page) {
+        if (! $page) {
             return $this->notFoundAction();
         }
 
@@ -239,12 +239,12 @@ class PagesController extends AbstractActionController
 
     public function moveDownPageAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $page = $this->table->find($this->params('page_id'))->current();
-        if (!$page) {
+        if (! $page) {
             return $this->notFoundAction();
         }
 
@@ -275,12 +275,12 @@ class PagesController extends AbstractActionController
 
     public function removePageAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $page = $this->table->find($this->params('page_id'))->current();
-        if (!$page) {
+        if (! $page) {
             return $this->notFoundAction();
         }
 

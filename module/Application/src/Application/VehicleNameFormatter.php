@@ -69,11 +69,11 @@ class VehicleNameFormatter
         $bmy = $car['begin_model_year'];
         $emy = $car['end_model_year'];
 
-        $bs = (int)($by/100);
-        $es = (int)($ey/100);
+        $bs = (int)($by / 100);
+        $es = (int)($ey / 100);
 
-        $bms = (int)($bmy/100);
-        $ems = (int)($emy/100);
+        $bms = (int)($bmy / 100);
+        $ems = (int)($emy / 100);
 
         $useModelYear = (bool)$bmy;
         /*if ($useModelYear) {
@@ -87,13 +87,12 @@ class VehicleNameFormatter
         $equalM = $equalY && $bm && $em && ($bm == $em);
 
         if ($useModelYear) {
-
             $mylabel = '<span title="' . $this->renderer->escapeHtmlAttr($this->translate('carlist/model-years', $language)) . '">';
             if ($emy == $bmy) {
                 $mylabel .= $bmy;
             } elseif ($bms == $ems) {
-                $mylabel .= $bmy.'–'.sprintf('%02d', $emy%100);
-            } elseif (!$emy) {
+                $mylabel .= $bmy.'–'.sprintf('%02d', $emy % 100);
+            } elseif (! $emy) {
                 if ($car['today']) {
                     if ($bmy >= $cy) {
                         $mylabel .= $bmy;
@@ -120,7 +119,6 @@ class VehicleNameFormatter
                     '</small>';
             }
         } else {
-
             if ($by > 0 || $ey > 0) {
                 $result .= " '" . $this->renderYearsHtml($car['today'], $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language);
             }
@@ -165,11 +163,11 @@ class VehicleNameFormatter
         $bmy = $car['begin_model_year'];
         $emy = $car['end_model_year'];
 
-        $bs = (int)($by/100);
-        $es = (int)($ey/100);
+        $bs = (int)($by / 100);
+        $es = (int)($ey / 100);
 
-        $bms = (int)($bmy/100);
-        $ems = (int)($emy/100);
+        $bms = (int)($bmy / 100);
+        $ems = (int)($emy / 100);
 
         $useModelYear = (bool)$bmy;
         /*if ($useModelYear) {
@@ -183,14 +181,13 @@ class VehicleNameFormatter
         $equalM = $equalY && $bm && $em && ($bm == $em);
 
         if ($useModelYear) {
-
             $mylabel = '';
 
             if ($emy == $bmy) {
                 $mylabel .= $bmy;
             } elseif ($bms == $ems) {
-                $mylabel .= $bmy.'–'.sprintf('%02d', $emy%100);
-            } elseif (!$emy) {
+                $mylabel .= $bmy.'–'.sprintf('%02d', $emy % 100);
+            } elseif (! $emy) {
                 if ($car['today']) {
                     if ($bmy >= $cy) {
                         $mylabel .= $bmy;
@@ -233,7 +230,7 @@ class VehicleNameFormatter
         if ($equalS) {
             return (($bm ? sprintf($this->textMonthFormat, $bm) : '') . $by).
                    '–'.
-                   ($em ? sprintf($this->textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
+                   ($em ? sprintf($this->textMonthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey % 100));
         }
 
         $cy = (int)date('Y');
@@ -269,7 +266,7 @@ class VehicleNameFormatter
         if ($equalS) {
             return  (($bm ? sprintf($this->monthFormat, $bm) : '').$by).
                     '–'.
-                    ($em ? sprintf($this->monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
+                    ($em ? sprintf($this->monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey % 100));
         }
 
         $cy = (int)date('Y');

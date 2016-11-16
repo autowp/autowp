@@ -35,25 +35,25 @@ class TrafficControl
             'limit'  => 3000,
             'reason' => 'daily limit',
             'group'  => [],
-            'time'   => 10*24*3600
+            'time'   => 10 * 24 * 3600
         ],
         [
             'limit'  => 1000,
             'reason' => 'hourly limit',
             'group'  => ['hour'],
-            'time'   => 5*24*3600
+            'time'   => 5 * 24 * 3600
         ],
         [
             'limit'  => 300,
             'reason' => 'ten limit',
             'group'  => ['hour', 'tenminute'],
-            'time'   => 24*3600
+            'time'   => 24 * 3600
         ],
         [
             'limit'  => 80,
             'reason' => 'min limit',
             'group'  => ['hour', 'tenminute', 'minute'],
-            'time'   => 12*3600
+            'time'   => 12 * 3600
         ],
     ];
 
@@ -62,7 +62,7 @@ class TrafficControl
      */
     private function getBannedTable()
     {
-        if (!$this->bannedTable) {
+        if (! $this->bannedTable) {
             $this->bannedTable = new Table([
                 'name'    => 'banned_ip',
                 'primary' => 'ip'
@@ -77,7 +77,7 @@ class TrafficControl
      */
     private function getWhitelistTable()
     {
-        if (!$this->whitelistTable) {
+        if (! $this->whitelistTable) {
             $this->whitelistTable = new Table([
                 'name'    => 'ip_whitelist',
                 'primary' => 'ip'
@@ -92,7 +92,7 @@ class TrafficControl
      */
     private function getMonitoringTable()
     {
-        if (!$this->monitoringTable) {
+        if (! $this->monitoringTable) {
             $this->monitoringTable = new Table([
                 'name'    => 'ip_monitoring4',
                 'primary' => ['ip', 'day_date', 'hour', 'tenminute', 'minute']
@@ -138,7 +138,7 @@ class TrafficControl
             'reason'     => $reason
         ];
 
-        if (!$row) {
+        if (! $row) {
             $expr = $table->getAdapter()->quoteInto('INET6_ATON(?)', $ip);
 
             $table->insert(array_replace($data, [
@@ -179,7 +179,7 @@ class TrafficControl
                 ->where('day_date = CURDATE()')
                 ->group($group)
                 ->having('c > ?', $profile['limit'])
-                );
+        );
         foreach ($rows as $row) {
             $ip = inet_ntop($row['ip']);
 
@@ -316,7 +316,7 @@ class TrafficControl
             'ip = inet6_aton(?)' => $ip
         ]);
 
-        if (!$row) {
+        if (! $row) {
             $expr = $whitelistTable->getAdapter()->quoteInto('inet6_aton(?)', $ip);
             $whitelistTable->insert([
                 'ip'          => new Zend_Db_Expr($expr),
@@ -338,7 +338,7 @@ class TrafficControl
             'up_to >= NOW()'
         ]);
 
-        if (!$row) {
+        if (! $row) {
             return false;
         }
 
@@ -397,7 +397,6 @@ class TrafficControl
             if ($this->inWhitelist($ipText)) {
                 print 'whitelist, skip';
             } else {
-
                 $whitelist = false;
                 $whitelistDesc = '';
 

@@ -33,15 +33,15 @@ class CarOfDay
 
         $db = $this->_table->getAdapter();
 
-        if (!$dayRow) {
+        if (! $dayRow) {
             $dayRow = $this->_table->createRow([
                 'day_date' => new Zend_Db_Expr('CURDATE()')
             ]);
         }
 
-        if (!$dayRow['car_id']) {
+        if (! $dayRow['car_id']) {
             $db = $this->_table->getAdapter();
-            $sql =  '
+            $sql = '
                 SELECT c.id, count(p.id) AS p_count
                 FROM cars AS c
                     INNER JOIN car_parent_cache AS cpc ON c.id=cpc.parent_id
@@ -66,9 +66,9 @@ class CarOfDay
 
     public function getCurrent()
     {
-        $row = $this->_table->fetchRow(array(
+        $row = $this->_table->fetchRow([
             'day_date <= CURDATE()'
-        ), 'day_date DESC');
+        ], 'day_date DESC');
 
         return $row ? $row->car_id : null;
     }
@@ -92,12 +92,12 @@ class CarOfDay
 
     public function putCurrentToTwitter(array $twOptions)
     {
-        $dayRow = $this->_table->fetchRow(array(
+        $dayRow = $this->_table->fetchRow([
             'day_date = CURDATE()',
             'not twitter_sent'
-        ));
+        ]);
 
-        if (!$dayRow) {
+        if (! $dayRow) {
             print 'Day row not found or already sent' . PHP_EOL;
             return;
         }
@@ -108,7 +108,7 @@ class CarOfDay
             'id = ?' => (int)$dayRow->car_id
         ]);
 
-        if (!$car) {
+        if (! $car) {
             print 'Car of day not found' . PHP_EOL;
             return;
         }
@@ -116,7 +116,7 @@ class CarOfDay
         $pictureTable = new Picture();
 
         /* Hardcoded perspective priority list */
-        $perspectives = array(10, 1, 7, 8, 11, 3, 7, 12, 4, 8);
+        $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
         foreach ($perspectives as $perspective) {
             $picture = $this->_pictureByPerspective($pictureTable, $car, $perspective);
@@ -125,11 +125,11 @@ class CarOfDay
             }
         }
 
-        if (!$picture) {
+        if (! $picture) {
             $picture = $this->_pictureByPerspective($pictureTable, $car, false);
         }
 
-        if (!$picture) {
+        if (! $picture) {
             print 'Picture not found' . PHP_EOL;
             return;
         }
@@ -141,11 +141,11 @@ class CarOfDay
         $token = new Zend_Oauth_Token_Access();
         $token->setParams($twOptions['token']);
 
-        $twitter = new Zend_Service_Twitter(array(
+        $twitter = new Zend_Service_Twitter([
             'username'     => $twOptions['username'],
             'accessToken'  => $token,
             'oauthOptions' => $twOptions['oauthOptions']
-        ));
+        ]);
 
         $response = $twitter->statusesUpdate($text);
 

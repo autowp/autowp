@@ -13,10 +13,10 @@ class AttrsController extends AbstractActionController
 {
     public function indexAction()
     {
-        if (!$this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
-        
+
         $itemTypes = new Attr\ItemType();
         $attributes = new Attr\Attribute();
 
@@ -36,14 +36,14 @@ class AttrsController extends AbstractActionController
 
     public function attributeAction()
     {
-        if (!$this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
-        
+
         $attributes = new Attr\Attribute();
 
         $attribute = $attributes->find($this->params('attribute_id'))->current();
-        if (!$attribute) {
+        if (! $attribute) {
             return $this->notFoundAction();
         }
 
@@ -124,7 +124,7 @@ class AttrsController extends AbstractActionController
                             'name'          => $values['name'],
                             'attribute_id'  => $attribute->id,
                             'parent_id'     => $values['parent_id'] ? $values['parent_id'] : null,
-                            'position'      =>  1 + (int)$options->getAdapter()->fetchOne(
+                            'position'      => 1 + (int)$options->getAdapter()->fetchOne(
                                 $options->select()
                                     ->from($options, ['MAX(position)'])
                                     ->where('attribute_id = ?', $attribute->id)
@@ -136,7 +136,6 @@ class AttrsController extends AbstractActionController
                     }
                     break;
             }
-
         }
 
         return [
@@ -167,14 +166,14 @@ class AttrsController extends AbstractActionController
 
     public function zoneAction()
     {
-        if (!$this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
-        
+
         $zones = new Attr\Zone();
 
         $zone = $zones->find($this->params('zone_id'))->current();
-        if (!$zone) {
+        if (! $zone) {
             return $this->notFoundAction();
         }
 
@@ -184,9 +183,8 @@ class AttrsController extends AbstractActionController
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            switch($this->params('form')) {
+            switch ($this->params('form')) {
                 case 'attributes':
-
                     $zoneAttributes = new Attr\ZoneAttribute();
                     $ids = (array)$request->getPost('attribute_id');
                     if (count($ids)) {
@@ -198,15 +196,15 @@ class AttrsController extends AbstractActionController
                                     ->where('zone_id = ?', $zone->id)
                                     ->where('attribute_id = ?', $attribute->id)
                             );
-                            if (!$exists) {
+                            if (! $exists) {
                                 $zoneAttributes->insert([
                                     'zone_id'       => $zone->id,
                                     'attribute_id'  => $attribute->id,
-                                    'position'      =>  1 + $zoneAttributes->getAdapter()->fetchOne(
+                                    'position'      => 1 + $zoneAttributes->getAdapter()->fetchOne(
                                         $zoneAttributes->select()
                                             ->from($zoneAttributes, ['MAX(position)'])
                                             ->where('zone_id = ?', $zone->id)
-                                        )
+                                    )
                                 ]);
                             }
                         }
@@ -237,14 +235,14 @@ class AttrsController extends AbstractActionController
 
     public function attributeUpAction()
     {
-        if (!$this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
-        
+
         $attributes = new Attr\Attribute();
 
         $attribute = $attributes->find($this->params('attribute_id'))->current();
-        if (!$attribute) {
+        if (! $attribute) {
             return $this->notFoundAction();
         }
 
@@ -281,14 +279,14 @@ class AttrsController extends AbstractActionController
 
     public function attributeDownAction()
     {
-        if (!$this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
-        
+
         $attributes = new Attr\Attribute();
 
         $attribute = $attributes->find($this->params('attribute_id'))->current();
-        if (!$attribute) {
+        if (! $attribute) {
             return $this->notFoundAction();
         }
 
@@ -325,21 +323,21 @@ class AttrsController extends AbstractActionController
 
     public function moveUpAttributeAction()
     {
-        if (!$this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
-        
+
         $attributes = new Attr\Attribute();
 
         $attribute = $attributes->find($this->params('attribute_id'))->current();
-        if (!$attribute) {
+        if (! $attribute) {
             return $this->notFoundAction();
         }
 
         $zones = new Attr\Zone();
 
         $zone = $zones->find($this->params('zone_id'))->current();
-        if (!$zone) {
+        if (! $zone) {
             return $this->notFoundAction();
         }
 
@@ -350,7 +348,7 @@ class AttrsController extends AbstractActionController
                 ->where('attribute_id = ?', $attribute->id)
         );
 
-        if (!$zoneAttribute) {
+        if (! $zoneAttribute) {
             return $this->notFoundAction();
         }
 
@@ -387,21 +385,21 @@ class AttrsController extends AbstractActionController
 
     public function moveDownAttributeAction()
     {
-        if (!$this->user()->isAllowed('attrs', 'edit')) {
+        if (! $this->user()->isAllowed('attrs', 'edit')) {
             return $this->forbiddenAction();
         }
-        
+
         $attributes = new Attr\Attribute();
 
         $attribute = $attributes->find($this->params('attribute_id'))->current();
-        if (!$attribute) {
+        if (! $attribute) {
             return $this->notFoundAction();
         }
 
         $zones = new Attr\Zone();
 
         $zone = $zones->find($this->params('zone_id'))->current();
-        if (!$zone) {
+        if (! $zone) {
             return $this->notFoundAction();
         }
 
@@ -412,7 +410,7 @@ class AttrsController extends AbstractActionController
                 ->where('attribute_id = ?', $attribute->id)
         );
 
-        if (!$zoneAttribute) {
+        if (! $zoneAttribute) {
             return $this->notFoundAction();
         }
 

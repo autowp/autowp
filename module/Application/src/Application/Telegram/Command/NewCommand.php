@@ -32,7 +32,6 @@ class NewCommand extends Command
             ]);
 
             if ($brandRow) {
-
                 $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
 
                 $telegramBrandTable = new TelegramBrand();
@@ -48,7 +47,7 @@ class NewCommand extends Command
                         'text' => 'Successful unsubscribed from ' . $brandRow->caption
                     ]);
                 } else {
-                    if (!$telegramBrandRow) {
+                    if (! $telegramBrandRow) {
                         $telegramBrandRow = $telegramBrandTable->createRow([
                             'brand_id' => $brandRow->id,
                             'chat_id'  => $chatId
@@ -60,13 +59,11 @@ class NewCommand extends Command
                         'text' => 'Successful subscribed to ' . $brandRow->caption
                     ]);
                 }
-
             } else {
                 $this->replyWithMessage([
                     'text' => 'Brand "' . $arguments . '" not found'
                 ]);
             }
-
         } else {
             $this->replyWithMessage([
                 'text' => "Plase, type brand name. For Example /new BMW"

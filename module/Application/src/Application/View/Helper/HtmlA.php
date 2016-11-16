@@ -12,8 +12,9 @@ class HtmlA extends AbstractHtmlElement
             $content = $this->view->escapeHtml($content);
         }
 
-        if (!is_array($attribs))
+        if (! is_array($attribs)) {
             $attribs = ['href' => $attribs];
+        }
 
         if (isset($attribs['shuffle']) && $attribs['shuffle']) {
             unset($attribs['shuffle']);
@@ -21,7 +22,7 @@ class HtmlA extends AbstractHtmlElement
         }
 
         foreach ($attribs as $key => $value) {
-            if (!isset($value)) {
+            if (! isset($value)) {
                 unset($attribs[$key]);
             }
         }
@@ -31,7 +32,7 @@ class HtmlA extends AbstractHtmlElement
 
     public function url($attribs)
     {
-        if (!is_array($attribs)) {
+        if (! is_array($attribs)) {
             $attribs = ['href' => $attribs];
         }
 

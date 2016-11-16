@@ -16,7 +16,7 @@ class FactoryRow extends Row
                 ->where('factory_car.factory_id = ?', $this->id)
         );
 
-        $vectors = array();
+        $vectors = [];
         foreach ($carIds as $carId) {
             $parentIds = $db->fetchCol(
                 $db->select()
@@ -44,14 +44,14 @@ class FactoryRow extends Row
             // look for same root
 
             $matched = false;
-            for ($i=0; ($i<count($vectors)-1) && !$matched; $i++) {
-                for ($j=$i+1; $j<count($vectors) && !$matched; $j++) {
+            for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
+                for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
                     if ($vectors[$i][0] == $vectors[$j][0]) {
                         $matched = true;
                         // matched root
-                        $newVector = array();
+                        $newVector = [];
                         $length = min(count($vectors[$i]), count($vectors[$j]));
-                        for ($k=0; $k<$length && $vectors[$i][$k] == $vectors[$j][$k]; $k++) {
+                        for ($k = 0; $k < $length && $vectors[$i][$k] == $vectors[$j][$k]; $k++) {
                             $newVector[] = $vectors[$i][$k];
                         }
                         $vectors[$i] = $newVector;
@@ -59,12 +59,11 @@ class FactoryRow extends Row
                     }
                 }
             }
+        } while ($matched);
 
-        } while($matched);
-
-        $resultIds = array();
+        $resultIds = [];
         foreach ($vectors as $vector) {
-            $resultIds[] = $vector[count($vector)-1];
+            $resultIds[] = $vector[count($vector) - 1];
         }
 
         return $resultIds;
@@ -80,7 +79,7 @@ class FactoryRow extends Row
                 ->where('factory_car.factory_id = ?', $this->id)
         );
 
-        $vectors = array();
+        $vectors = [];
         foreach ($carIds as $carId) {
             $parentIds = $db->fetchCol(
                 $db->select()
@@ -101,40 +100,39 @@ class FactoryRow extends Row
             $vector = $parentIds;
             $vector[] = $carId;
 
-            $vectors[] = array(
+            $vectors[] = [
                 'parents' => $vector,
-                'childs'  => array($carId)
-            );
+                'childs'  => [$carId]
+            ];
         }
 
         do {
             // look for same root
 
             $matched = false;
-            for ($i=0; ($i<count($vectors)-1) && !$matched; $i++) {
-                for ($j=$i+1; $j<count($vectors) && !$matched; $j++) {
+            for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
+                for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
                     if ($vectors[$i]['parents'][0] == $vectors[$j]['parents'][0]) {
                         $matched = true;
                         // matched root
-                        $newVector = array();
+                        $newVector = [];
                         $length = min(count($vectors[$i]['parents']), count($vectors[$j]['parents']));
-                        for ($k=0; $k<$length && $vectors[$i]['parents'][$k] == $vectors[$j]['parents'][$k]; $k++) {
+                        for ($k = 0; $k < $length && $vectors[$i]['parents'][$k] == $vectors[$j]['parents'][$k]; $k++) {
                             $newVector[] = $vectors[$i]['parents'][$k];
                         }
-                        $vectors[$i] = array(
+                        $vectors[$i] = [
                             'parents' => $newVector,
                             'childs'  => array_merge($vectors[$i]['childs'], $vectors[$j]['childs'])
-                        );
+                        ];
                         array_splice($vectors, $j, 1);
                     }
                 }
             }
+        } while ($matched);
 
-        } while($matched);
-
-        $result = array();
+        $result = [];
         foreach ($vectors as $vector) {
-            $carId = $vector['parents'][count($vector['parents'])-1];
+            $carId = $vector['parents'][count($vector['parents']) - 1];
             $result[$carId] = $vector['childs'];
         }
 

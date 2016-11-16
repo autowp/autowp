@@ -16,7 +16,7 @@ use Application\Model\Message;
 class BrandsController extends AbstractActionController
 {
     private $textStorage;
-    
+
     /**
      * @var Form
      */
@@ -54,8 +54,9 @@ class BrandsController extends AbstractActionController
         Form $logoForm,
         Form $descForm,
         Form $editForm,
-        Message $message)
-    {
+        Message $message
+    ) {
+
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->brandForm = $brandForm;
@@ -91,12 +92,12 @@ class BrandsController extends AbstractActionController
 
     public function brandAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $brand = $this->catalogue()->getBrandTable()->find($this->params('brand_id'))->current();
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFoundAction();
         }
 
@@ -119,8 +120,8 @@ class BrandsController extends AbstractActionController
                 'brand_id' => $brand->id,
                 'form'     => 'edit'
             ]));
-            
-            
+
+
 
             $values = [
                 'caption'      => $brand->caption,
@@ -158,7 +159,7 @@ class BrandsController extends AbstractActionController
                             'language = ?' => $language
                         ]);
                         if ($value) {
-                            if (!$brandLangRow) {
+                            if (! $brandLangRow) {
                                 $brandLangRow = $brandLangTable->fetchNew();
                                 $brandLangRow->setFromArray([
                                     'brand_id' => $brand->id,
@@ -282,12 +283,12 @@ class BrandsController extends AbstractActionController
 
     public function saveLinksAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $brand = $this->catalogue()->getBrandTable()->find($this->params('brand_id'))->current();
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFoundAction();
         }
 
@@ -327,30 +328,29 @@ class BrandsController extends AbstractActionController
 
     public function saveDescriptionAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $canEdit = $this->user()->isAllowed('brand', 'edit');
-        if (!$canEdit) {
+        if (! $canEdit) {
             return $this->forbiddenAction();
         }
 
         $user = $this->user()->get();
 
         $request = $this->getRequest();
-        if (!$request->isPost()) {
+        if (! $request->isPost()) {
             return $this->forbiddenAction();
         }
 
         $brand = $this->catalogue()->getBrandTable()->find($this->params('brand_id'))->current();
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFoundAction();
         }
 
         $this->descForm->setData($this->params()->fromPost());
         if ($this->descForm->isValid()) {
-
             $values = $this->descForm->getData();
 
             $text = $values['markdown'];
@@ -378,7 +378,6 @@ class BrandsController extends AbstractActionController
 
                 foreach ($userTable->find($userIds) as $userRow) {
                     if ($userRow->id != $user->id) {
-
                         $uri = $this->hostManager->getUriByLanguage($userRow->language);
 
                         $userUrl = $this->url()->fromRoute('users/user', [

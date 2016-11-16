@@ -80,7 +80,7 @@ class PageEnv extends AbstractHelper
             $title = $title ? $title : $name;
 
             $view->headTitle($title, 'SET');
-            if (!isset($pageTitle)) {
+            if (! isset($pageTitle)) {
                 $view->pageTitle($name, 'SET');
             }
 
@@ -94,16 +94,14 @@ class PageEnv extends AbstractHelper
 
             $currentDoc = $page;
             do {
-
                 $this->onPath[] = $currentDoc->id;
 
-                if (!$currentDoc->is_group_node) {
+                if (! $currentDoc->is_group_node) {
                     if ($replace && ($replace['pageId'] == $currentDoc->id)) {
                         foreach (array_reverse($replace['breadcrumbs']) as $breadcrumb) {
                             $view->breadcrumbs($breadcrumb['url'], $breadcrumb['name'], 'prepend');
                         }
                     } else {
-
                         $currentUrl = $this->replaceArgs(
                             $currentDoc->url,
                             $preparedUrlArgs
@@ -120,7 +118,7 @@ class PageEnv extends AbstractHelper
                     }
                 }
                 $currentDoc = $this->pageTable->find($currentDoc->parent_id)->current();
-            } while($currentDoc);
+            } while ($currentDoc);
         }
 
         if (isset($pageTitle)) {
@@ -140,5 +138,4 @@ class PageEnv extends AbstractHelper
     {
         return in_array($id, $this->onPath);
     }
-
 }

@@ -14,7 +14,7 @@ class Row extends Zend_Db_Table_Row
     public function getDateTime($col)
     {
         $metadata = $this->getTable()->info(Zend_Db_Table_Abstract::METADATA);
-        if (!isset($metadata[$col])) {
+        if (! isset($metadata[$col])) {
             throw new Exception('Column '.$col.' not found');
         }
 
@@ -36,7 +36,7 @@ class Row extends Zend_Db_Table_Row
                 throw new Exception('Column type not a date type');
         }
 
-        if (!$str) {
+        if (! $str) {
             return null;
         }
 

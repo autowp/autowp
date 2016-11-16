@@ -66,8 +66,8 @@ class ParentCache extends Table
                 'design' => $isDesign
             ];
 
-            foreach ($this->collectParentInfo($parentId, $diff+1) as $pid => $info) {
-                if (!isset($result[$pid]) || $info['diff'] < $result[$pid]['diff']) {
+            foreach ($this->collectParentInfo($parentId, $diff + 1) as $pid => $info) {
+                if (! isset($result[$pid]) || $info['diff'] < $result[$pid]['diff']) {
                     $result[$pid] = $info;
                     $result[$pid]['tuning'] = $result[$pid]['tuning'] || $isTuning;
                     $result[$pid]['sport']  = $result[$pid]['sport']  || $isSport;
@@ -176,13 +176,13 @@ class ParentCache extends Table
                 'car_id = ?'    => $id,
                 'parent_id = ?' => $parentId
             ]);
-            if (!$row) {
+            if (! $row) {
                 $row = $this->createRow([
                     'car_id'    => $id,
                     'parent_id' => $parentId,
                     'diff'      => $info['diff'],
                     'tuning'    => $info['tuning'] ? 1 : 0,
-                    'sport'     => $info['sport']  ? 1 : 0,
+                    'sport'     => $info['sport'] ? 1 : 0,
                     'design'    => $info['design'] ? 1 : 0
                 ]);
                 $updates++;

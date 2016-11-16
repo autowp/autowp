@@ -105,7 +105,7 @@ class DbTable implements SaveHandlerInterface
     {
         $db = $this->table->getAdapter();
 
-        $sql =  'insert into ' . $db->quoteIdentifier($this->table->info('name')) .
+        $sql = 'insert into ' . $db->quoteIdentifier($this->table->info('name')) .
                     ' (id, user_id, modified, lifetime, data) ' .
                 'values (?, ?, ?, ?, ?) ' .
                 'on duplicate key update '.

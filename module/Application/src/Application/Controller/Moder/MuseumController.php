@@ -30,7 +30,7 @@ class MuseumController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->isAllowed('museums', 'manage')) {
+        if (! $this->user()->isAllowed('museums', 'manage')) {
             return $this->forbiddenAction();
         }
 
@@ -53,7 +53,7 @@ class MuseumController extends AbstractActionController
 
     public function itemAction()
     {
-        if (!$this->user()->isAllowed('museums', 'manage')) {
+        if (! $this->user()->isAllowed('museums', 'manage')) {
             return $this->forbiddenAction();
         }
 
@@ -61,7 +61,7 @@ class MuseumController extends AbstractActionController
         $id = (int)$this->params('museum_id');
         if ($id) {
             $museum = $table->find($id)->current();
-            if (!$museum) {
+            if (! $museum) {
                 return $this->notFoundAction();
             }
         } else {
@@ -149,7 +149,7 @@ class MuseumController extends AbstractActionController
 
     public function addressToLatLngAction()
     {
-        if (!$this->user()->isAllowed('museums', 'manage')) {
+        if (! $this->user()->isAllowed('museums', 'manage')) {
             return $this->forbiddenAction();
         }
 

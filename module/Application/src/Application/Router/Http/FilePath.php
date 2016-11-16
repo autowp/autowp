@@ -30,7 +30,7 @@ class FilePath implements RouteInterface
 
     public function match(Request $request)
     {
-        if (!method_exists($request, 'getUri')) {
+        if (! method_exists($request, 'getUri')) {
             return;
         }
 
@@ -45,7 +45,7 @@ class FilePath implements RouteInterface
             $node = urldecode($node);
         }
 
-        if (!count($path)) {
+        if (! count($path)) {
             return false;
         }
 
@@ -60,7 +60,7 @@ class FilePath implements RouteInterface
     {
         $data = array_merge($this->defaults, $params);
 
-        if (!isset($data['file'])) {
+        if (! isset($data['file'])) {
             throw new Exception("`file` not specified");
         }
 
@@ -78,5 +78,7 @@ class FilePath implements RouteInterface
      *
      * @return array
      */
-    public function getAssembledParams() {}
+    public function getAssembledParams()
+    {
+    }
 }

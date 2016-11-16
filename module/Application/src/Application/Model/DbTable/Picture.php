@@ -93,7 +93,7 @@ class Picture extends Table
      * @param array $options
      * @return Zend_Db_Table_Abstract
      */
-    public function setOptions(Array $options)
+    public function setOptions(array $options)
     {
         if (isset($options['imageStorage'])) {
             $this->imageStorage = $options['imageStorage'];
@@ -131,7 +131,7 @@ class Picture extends Table
 
         $result = '';
 
-        for ($i=0; $i<$length; $i++) {
+        for ($i = 0; $i < $length; $i++) {
             $index = rand(0, strlen($dict) - 1);
             $result .= $dict{$index};
 
@@ -301,7 +301,7 @@ class Picture extends Table
                     break;
             }
 
-            if (!$caption) {
+            if (! $caption) {
                 $caption = 'Изображение №' . $row['id'];
             }
 
@@ -503,7 +503,7 @@ class Picture extends Table
         $isFirstTimeAccepted = false;
 
         $picture = $this->find($pictureId)->current();
-        if (!$picture) {
+        if (! $picture) {
             return false;
         }
 
@@ -511,7 +511,7 @@ class Picture extends Table
             'status' => Picture::STATUS_ACCEPTED,
             'change_status_user_id' => $userId
         ]);
-        if (!$picture->accept_datetime) {
+        if (! $picture->accept_datetime) {
             $picture->accept_datetime = new Zend_Db_Expr('NOW()');
 
             $isFirstTimeAccepted = true;
@@ -565,14 +565,14 @@ class Picture extends Table
     public function moveToEngine($pictureId, $id, $userId, array $options)
     {
         $picture = $this->find($pictureId)->current();
-        if (!$picture) {
+        if (! $picture) {
             return false;
         }
 
         $engineTable = new Engine();
         $engine = $engineTable->find($id)->current();
 
-        if (!$engine) {
+        if (! $engine) {
             return false;
         }
 
@@ -615,14 +615,14 @@ class Picture extends Table
     public function moveToCar($pictureId, $id, $userId, array $options)
     {
         $picture = $this->find($pictureId)->current();
-        if (!$picture) {
+        if (! $picture) {
             return false;
         }
 
         $carTable = new Vehicle();
         $car = $carTable->find($id)->current();
 
-        if (!$car) {
+        if (! $car) {
             return false;
         }
 
@@ -665,13 +665,13 @@ class Picture extends Table
     public function moveToBrand($pictureId, $id, $type, $userId, array $options)
     {
         $picture = $this->find($pictureId)->current();
-        if (!$picture) {
+        if (! $picture) {
             return false;
         }
 
         $brandTable = new BrandTable();
         $brand = $brandTable->find($id)->current();
-        if (!$brand) {
+        if (! $brand) {
             return false;
         }
 
@@ -714,14 +714,14 @@ class Picture extends Table
     public function moveToFactory($pictureId, $id, $userId, array $options)
     {
         $picture = $this->find($pictureId)->current();
-        if (!$picture) {
+        if (! $picture) {
             return false;
         }
 
         $factoryTable = new Factory();
         $factory = $factoryTable->find($id)->current();
 
-        if (!$factory) {
+        if (! $factory) {
             return false;
         }
 

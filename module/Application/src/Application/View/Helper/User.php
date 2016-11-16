@@ -35,12 +35,12 @@ class User extends AbstractHelper
 
     private function user($id)
     {
-        if (!$id) {
+        if (! $id) {
             return null;
         }
 
-        if (!isset($this->users[$id])) {
-            if (!$this->userModel) {
+        if (! isset($this->users[$id])) {
+            if (! $this->userModel) {
                 $this->userModel = new \Application\Model\DbTable\User();
             }
             $this->users[$id] = $this->userModel->find($id)->current();
@@ -55,7 +55,7 @@ class User extends AbstractHelper
             $user = $this->getLogedInUser();
         }
 
-        if (!$user instanceof UserRow) {
+        if (! $user instanceof UserRow) {
             $user = $this->user($user);
         }
 
@@ -71,7 +71,7 @@ class User extends AbstractHelper
     {
         $auth = new AuthenticationService();
 
-        if (!$auth->hasIdentity()) {
+        if (! $auth->hasIdentity()) {
             return false;
         }
 
@@ -99,11 +99,9 @@ class User extends AbstractHelper
         $result = '';
 
         try {
-
             $user = $this->user;
 
             if ($user) {
-
                 if ($user->deleted) {
                     return '<span class="muted"><i class="fa fa-user"></i> ' .
                                $this->view->escapeHtml($this->view->translate('deleted-user')).
@@ -135,13 +133,10 @@ class User extends AbstractHelper
                         $this->view->htmlA($url, $user->getCompoundName()) .
                     '</span>';
             }
-
         } catch (Exception $e) {
-
             $result = $e->getMessage();
 
             print $e->getTraceAsString();
-
         }
 
         return $result;

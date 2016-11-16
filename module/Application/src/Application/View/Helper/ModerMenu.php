@@ -14,7 +14,6 @@ class ModerMenu extends AbstractHtmlElement
         $items = [];
 
         if ($this->view->user()->inheritsRole('moder')) {
-
             $pTable = new Picture();
             $inboxCount = $pTable->getAdapter()->fetchOne(
                 $pTable->getAdapter()->select()

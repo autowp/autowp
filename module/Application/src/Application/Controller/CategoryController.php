@@ -46,8 +46,7 @@ class CategoryController extends AbstractActionController
         $key = 'CATEGORY_INDEX46_' . $language;
 
         $categories = $this->cache->getItem($key, $success);
-        if (!$success) {
-
+        if (! $success) {
             $categories = [];
 
             $rows = $this->categoryTable->fetchAll([
@@ -55,7 +54,6 @@ class CategoryController extends AbstractActionController
             ], 'short_name');
 
             foreach ($rows as $row) {
-
                 $langRow = $this->categoryLanguageTable->fetchRow([
                     'language = ?'    => $language,
                     'category_id = ?' => $row->id
@@ -112,7 +110,7 @@ class CategoryController extends AbstractActionController
         foreach ($menu as &$item) {
             $item['active'] = false;
 
-            if (($item['isOther'] ? $isOther : !$isOther) && ($item['id'] == $currentCategory->id)) {
+            if (($item['isOther'] ? $isOther : ! $isOther) && ($item['id'] == $currentCategory->id)) {
                 $activeFound = true;
                 $item['active'] = true;
             }
@@ -155,7 +153,7 @@ class CategoryController extends AbstractActionController
                     'short_name'     => $langRow ? $langRow->short_name : $row->short_name,
                     'cars_count'     => $row->getCarsCount(),
                     'new_cars_count' => $row->getWeekCarsCount(),
-                    'categories'     => $this->categoriesMenu($row, $language, $maxDeep-1),
+                    'categories'     => $this->categoriesMenu($row, $language, $maxDeep - 1),
                     'isOther'        => false
                 ];
 
@@ -206,7 +204,7 @@ class CategoryController extends AbstractActionController
         ]);
         $isOther = (bool)$this->params('other');
 
-        if (!$currentCategory) {
+        if (! $currentCategory) {
             return $this->notFoundAction();
         }
 
@@ -302,7 +300,7 @@ class CategoryController extends AbstractActionController
                         ->where('car_parent.catname = ?', $pathNode)
                 );
 
-                if (!$childCar) {
+                if (! $childCar) {
                     return $this->notFoundAction();
                 }
 
@@ -327,8 +325,7 @@ class CategoryController extends AbstractActionController
         $key = 'CATEGORY_MENU325_' . $topCategory->id . '_' . $language;
 
         $menu = $this->cache->getItem($key, $success);
-        if (!$success) {
-
+        if (! $success) {
             $menu = $this->categoriesMenu($topCategory, $language, 3);
 
             $this->cache->setItem($key, $menu);
@@ -351,7 +348,7 @@ class CategoryController extends AbstractActionController
             'isOther'      => $isOther,
         ];
 
-        $result =  $callback($language, $topCategory, $currentCategory,
+        $result = $callback($language, $topCategory, $currentCategory,
             $categoryLang, $isOther, $topCar, $path, $currentCar, $breadcrumbs);
 
         if (is_array($result)) {
@@ -363,9 +360,17 @@ class CategoryController extends AbstractActionController
 
     public function categoryAction()
     {
-        return $this->_categoryAction(function($language, $topCategory,
-                $currentCategory, $categoryLang, $isOther, $topCar, $path,
-                $currentCar, $breadcrumbs) {
+        return $this->_categoryAction(function (
+            $language,
+            $topCategory,
+            $currentCategory,
+            $categoryLang,
+            $isOther,
+            $topCar,
+            $path,
+            $currentCar,
+            $breadcrumbs
+) {
 
             $carTable = $this->catalogue()->getCarTable();
 
@@ -374,9 +379,7 @@ class CategoryController extends AbstractActionController
                     ->join('car_parent', 'cars.id = car_parent.car_id', null)
                     ->where('car_parent.parent_id = ?', $currentCar->id)
                     ->order($this->catalogue()->carsOrdering());
-
             } else {
-
                 $select = $carTable->select(true)
                     ->join('category_car', 'cars.id = category_car.car_id', null)
                     ->order($this->catalogue()->carsOrdering());
@@ -426,7 +429,7 @@ class CategoryController extends AbstractActionController
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [
                 'picturesDateSort' => true,
-                'detailsUrl' => function($listCar) use ($topCar, $currentCar, $carParentTable, $currentCategory, $isOther, $path) {
+                'detailsUrl' => function ($listCar) use ($topCar, $currentCar, $carParentTable, $currentCategory, $isOther, $path) {
 
                     $carParentAdapter = $carParentTable->getAdapter();
                     $hasChilds = (bool)$carParentAdapter->fetchOne(
@@ -435,7 +438,7 @@ class CategoryController extends AbstractActionController
                             ->where('parent_id = ?', $listCar->id)
                     );
 
-                    if (!$hasChilds) {
+                    if (! $hasChilds) {
                         return false;
                     }
 
@@ -467,7 +470,7 @@ class CategoryController extends AbstractActionController
                             }
                         }
 
-                        if (!$currentPath) {
+                        if (! $currentPath) {
                             return false;
                         }
                     } else {
@@ -485,7 +488,7 @@ class CategoryController extends AbstractActionController
 
                     return $url;
                 },
-                'allPicturesUrl' => function($listCar) use ($topCar, $currentCar, $carParentTable, $currentCategory, $isOther, $path) {
+                'allPicturesUrl' => function ($listCar) use ($topCar, $currentCar, $carParentTable, $currentCategory, $isOther, $path) {
 
                     // found parent row
                     if ($currentCar) {
@@ -515,7 +518,7 @@ class CategoryController extends AbstractActionController
                             }
                         }
 
-                        if (!$currentPath) {
+                        if (! $currentPath) {
                             return false;
                         }
                     } else {
@@ -533,7 +536,7 @@ class CategoryController extends AbstractActionController
 
                     return $url;
                 },
-                'pictureUrl'           => function($listCar, $picture) use ($currentCategory, $isOther, $topCar, $currentCar, $carParentTable, $path) {
+                'pictureUrl'           => function ($listCar, $picture) use ($currentCategory, $isOther, $topCar, $currentCar, $carParentTable, $path) {
 
                     // found parent row
                     if ($currentCar) {
@@ -563,7 +566,7 @@ class CategoryController extends AbstractActionController
                             }
                         }
 
-                        if (!$currentPath) {
+                        if (! $currentPath) {
                             return false;
                         }
                     } else {
@@ -600,9 +603,17 @@ class CategoryController extends AbstractActionController
 
     public function categoryPicturesAction()
     {
-        return $this->_categoryAction(function($language, $topCategory,
-                $currentCategory, $categoryLang, $isOther, $topCar, $path,
-                $currentCar, $breadcrumbs) {
+        return $this->_categoryAction(function (
+            $language,
+            $topCategory,
+            $currentCategory,
+            $categoryLang,
+            $isOther,
+            $topCar,
+            $path,
+            $currentCar,
+            $breadcrumbs
+) {
 
             $pictureTable = $this->catalogue()->getPictureTable();
 
@@ -617,9 +628,7 @@ class CategoryController extends AbstractActionController
                 $select
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $currentCar->id);
-
             } else {
-
                 $select
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
@@ -635,7 +644,7 @@ class CategoryController extends AbstractActionController
             }
 
             $paginator = new \Zend\Paginator\Paginator(
-                    new Zend1DbTableSelect($select)
+                new Zend1DbTableSelect($select)
             );
 
             $paginator
@@ -646,7 +655,7 @@ class CategoryController extends AbstractActionController
 
             $picturesData = $this->pic()->listData($select, [
                 'width' => 4,
-                'url'   => function($picture) use ($currentCategory, $isOther, $topCar, $path) {
+                'url'   => function ($picture) use ($currentCategory, $isOther, $topCar, $path) {
                     return $this->url()->fromRoute('categories', [
                         'action'           => 'category-picture',
                         'category_catname' => $currentCategory->catname,
@@ -668,9 +677,17 @@ class CategoryController extends AbstractActionController
 
     public function categoryPictureAction()
     {
-        return $this->_categoryAction(function($language, $topCategory,
-                $currentCategory, $categoryLang, $isOther, $topCar, $path,
-                $currentCar, $breadcrumbs) {
+        return $this->_categoryAction(function (
+            $language,
+            $topCategory,
+            $currentCategory,
+            $categoryLang,
+            $isOther,
+            $topCar,
+            $path,
+            $currentCar,
+            $breadcrumbs
+) {
 
             $pictureTable = $this->catalogue()->getPictureTable();
 
@@ -685,9 +702,7 @@ class CategoryController extends AbstractActionController
                 $select
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $currentCar->id);
-
             } else {
-
                 $select
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
@@ -712,7 +727,7 @@ class CategoryController extends AbstractActionController
 
             $picture = $selectRow->getTable()->fetchRow($selectRow);
 
-            if (!$picture) {
+            if (! $picture) {
                 $selectRow = clone $select;
 
                 $selectRow->where('pictures.identity = ?', $pictureId);
@@ -720,7 +735,7 @@ class CategoryController extends AbstractActionController
                 $picture = $selectRow->getTable()->fetchRow($selectRow);
             }
 
-            if (!$picture) {
+            if (! $picture) {
                 return $this->notFoundAction();
             }
 
@@ -746,9 +761,17 @@ class CategoryController extends AbstractActionController
 
     public function categoryPictureGalleryAction()
     {
-        return $this->_categoryAction(function($language, $topCategory,
-                $currentCategory, $categoryLang, $isOther, $topCar, $path,
-                $currentCar, $breadcrumbs) {
+        return $this->_categoryAction(function (
+            $language,
+            $topCategory,
+            $currentCategory,
+            $categoryLang,
+            $isOther,
+            $topCar,
+            $path,
+            $currentCar,
+            $breadcrumbs
+) {
 
             $pictureTable = $this->catalogue()->getPictureTable();
 
@@ -763,9 +786,7 @@ class CategoryController extends AbstractActionController
                 $select
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $currentCar->id);
-
             } else {
-
                 $select
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
@@ -790,7 +811,7 @@ class CategoryController extends AbstractActionController
 
             $picture = $selectRow->getTable()->fetchRow($selectRow);
 
-            if (!$picture) {
+            if (! $picture) {
                 $selectRow = clone $select;
 
                 $selectRow->where('pictures.identity = ?', $pictureId);
@@ -798,7 +819,7 @@ class CategoryController extends AbstractActionController
                 $picture = $selectRow->getTable()->fetchRow($selectRow);
             }
 
-            if (!$picture) {
+            if (! $picture) {
                 return $this->notFoundAction();
             }
 

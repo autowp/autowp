@@ -36,7 +36,7 @@ class Category implements RouteInterface
 
     public function match(Request $request)
     {
-        if (!method_exists($request, 'getUri')) {
+        if (! method_exists($request, 'getUri')) {
             return;
         }
 
@@ -47,7 +47,7 @@ class Category implements RouteInterface
         $path = trim($path, self::DELIMETER);
         $path = explode(self::DELIMETER, $path);
 
-        if (!count($path)) {
+        if (! count($path)) {
             return false;
         }
 
@@ -57,7 +57,7 @@ class Category implements RouteInterface
 
         array_shift($path);
 
-        if (!count($path)) {
+        if (! count($path)) {
             // category
             return $this->assembleMatch([
                 'action' => 'index',
@@ -67,7 +67,7 @@ class Category implements RouteInterface
         $categoryCatname = $path[0];
         array_shift($path);
 
-        if (!count($path)) {
+        if (! count($path)) {
             // category/:category_catname
             return $this->assembleMatch([
                 'action'           => 'category',
@@ -81,7 +81,7 @@ class Category implements RouteInterface
             $isOther = true;
         }
 
-        if (!count($path)) {
+        if (! count($path)) {
             // category/:category_catname/[:other/]
             return $this->assembleMatch([
                 'action'           => 'category',
@@ -94,7 +94,7 @@ class Category implements RouteInterface
             $page = intval($match[1]);
             array_shift($path);
 
-            if (!count($path)) {
+            if (! count($path)) {
                 // category/:category_catname/[:other/]pageX
                 return $this->assembleMatch([
                     'action'           => 'category',
@@ -110,7 +110,7 @@ class Category implements RouteInterface
         if ($path[0] == 'pictures') {
             array_shift($path);
 
-            if (!count($path)) {
+            if (! count($path)) {
                 // category/:category_catname/[:other/]pictures
                 return $this->assembleMatch([
                     'action'           => 'category-pictures',
@@ -123,7 +123,7 @@ class Category implements RouteInterface
                 $page = intval($match[1]);
                 array_shift($path);
 
-                if (!count($path)) {
+                if (! count($path)) {
                     // category/:category_catname/[:other/]pageX
                     return $this->assembleMatch([
                         'action'           => 'category-pictures',
@@ -139,7 +139,7 @@ class Category implements RouteInterface
             $pictureId = $path[0];
             array_shift($path);
 
-            if (!count($path)) {
+            if (! count($path)) {
                 // category/:category_catname/[:other/]:picture
                 return $this->assembleMatch([
                     'action'           => 'category-picture',
@@ -152,7 +152,7 @@ class Category implements RouteInterface
             if ($path[0] == 'gallery') {
                 array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // category/:category_catname/[:other/]:picture/gallery
                     return $this->assembleMatch([
                         'action'           => 'category-picture-gallery',
@@ -177,8 +177,7 @@ class Category implements RouteInterface
                 $node = array_shift($path);
 
                 if ($node == 'pictures') {
-
-                    if (!count($path)) {
+                    if (! count($path)) {
                         // category/:category_catname/[:other/]:car_id/:path/pictures
                         return $this->assembleMatch([
                             'action'           => 'category-pictures',
@@ -193,7 +192,7 @@ class Category implements RouteInterface
                         array_shift($path);
                         $page = intval($match[1]);
 
-                        if (!count($path)) {
+                        if (! count($path)) {
                             // category/:category_catname/[:other/]:car_id/:path/pictures/pageX
                             return $this->assembleMatch([
                                 'action'           => 'category-pictures',
@@ -211,7 +210,7 @@ class Category implements RouteInterface
                     $pictureId = $path[0];
                     array_shift($path);
 
-                    if (!count($path)) {
+                    if (! count($path)) {
                         // category/:category_catname/[:other/]:picture
                         return $this->assembleMatch([
                             'action'           => 'category-picture',
@@ -226,7 +225,7 @@ class Category implements RouteInterface
                     if ($path[0] == 'gallery') {
                         array_shift($path);
 
-                        if (!$path) {
+                        if (! $path) {
                             // category/:category_catname/[:other/]:picture/gallery
                             return $this->assembleMatch([
                                 'action'           => 'category-picture-gallery',
@@ -247,7 +246,7 @@ class Category implements RouteInterface
                 if (preg_match('|^page([0-9]+)$|', $node, $match)) {
                     $page = intval($match[1]);
 
-                    if (!count($path)) {
+                    if (! count($path)) {
                         // category/:category_catname/[:other/]:car_id/:path/pageX
                         return $this->assembleMatch([
                             'action'           => 'category',
@@ -363,7 +362,6 @@ class Category implements RouteInterface
 
                     $url[] = 'pictures';
                     $url[] = $data['picture_id'];
-
                 }
                 break;
 
@@ -388,7 +386,6 @@ class Category implements RouteInterface
                     $url[] = 'pictures';
                     $url[] = $data['picture_id'];
                     $url[] = 'gallery';
-
                 }
                 break;
         }
@@ -401,5 +398,7 @@ class Category implements RouteInterface
      *
      * @return array
      */
-    public function getAssembledParams() {}
+    public function getAssembledParams()
+    {
+    }
 }

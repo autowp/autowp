@@ -28,8 +28,7 @@ class BrandsController extends AbstractActionController
         $cacheKey = 'brands_list_40_' . $language . '_' . ($isHttps ? 'HTTPS' : 'HTTP');
 
         $items = $this->cache->getItem($cacheKey, $success);
-        if (!$success) {
-
+        if (! $success) {
             $imageStorage = $this->imageStorage();
 
             $brandModel = new BrandModel();
@@ -78,7 +77,7 @@ class BrandsController extends AbstractActionController
         $brands = new BrandTable();
 
         $brand = $brands->find($this->params('brand_id'))->current();
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFoundAction();
         }
 
@@ -110,5 +109,4 @@ class BrandsController extends AbstractActionController
 
         return $viewModel;
     }
-
 }

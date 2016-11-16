@@ -45,9 +45,14 @@ class LoginController extends AbstractActionController
      */
     private $hosts = [];
 
-    public function __construct(UsersService $service, Form $form, $translator,
-            ExternalLoginServiceFactory $externalLoginFactory, array $hosts)
-    {
+    public function __construct(
+        UsersService $service,
+        Form $form,
+        $translator,
+        ExternalLoginServiceFactory $externalLoginFactory,
+        array $hosts
+    ) {
+
         $this->service = $service;
         $this->form = $form;
         $this->translator = $translator;
@@ -80,7 +85,6 @@ class LoginController extends AbstractActionController
 
                 if ($result->isValid()) {
                     if ($values['remember']) {
-
                         $token = $this->service->createRememberToken($this->user()->get()->id);
 
                         $this->user()->setRememberCookie($token);
@@ -165,7 +169,7 @@ class LoginController extends AbstractActionController
             'redirect_uri' => 'http://en.wheelsage.org/login/callback'
         ]);
 
-        if (!$service) {
+        if (! $service) {
             throw new Exception("Service `$serviceId` not found");
         }
         return $service;
@@ -203,7 +207,7 @@ class LoginController extends AbstractActionController
         $table = new LoginState();
 
         $state = (string)$this->params()->fromQuery('state');
-        if (!$state) { // twitter workaround
+        if (! $state) { // twitter workaround
             $state = (string)$this->params()->fromQuery('oauth_token');
         }
 
@@ -211,15 +215,14 @@ class LoginController extends AbstractActionController
             'state = ?' => $state
         ]);
 
-        if (!$stateRow) {
+        if (! $stateRow) {
             return $this->notFoundAction();
         }
 
         $params = $this->params()->fromQuery();
 
         if ($stateRow->language != $this->language()) {
-
-            if (!isset($this->hosts[$stateRow->language])) {
+            if (! isset($this->hosts[$stateRow->language])) {
                 throw new Exception("Host {$stateRow->language} not found");
             }
 
@@ -233,7 +236,7 @@ class LoginController extends AbstractActionController
 
         $service = $this->getExternalLoginService($stateRow->service);
         $success = $service->callback($params);
-        if (!$success) {
+        if (! $success) {
             throw new Exception("Error processing callback");
         }
 
@@ -241,14 +244,14 @@ class LoginController extends AbstractActionController
             'language' => $stateRow->language
         ]);
 
-        if (!$data) {
+        if (! $data) {
             throw new Exception("Error requesting data");
         }
 
-        if (!$data->getExternalId()) {
+        if (! $data->getExternalId()) {
             throw new Exception('external_id not found');
         }
-        if (!$data->getName()) {
+        if (! $data->getName()) {
             throw new Exception('name not found');
         }
 
@@ -259,13 +262,12 @@ class LoginController extends AbstractActionController
             'external_id = ?' => $data->getExternalId(),
         ]);
 
-        if (!$uaRow) {
-
+        if (! $uaRow) {
             $uTable = new User();
 
             if ($stateRow->user_id) {
                 $uRow = $uTable->find($stateRow->user_id)->current();
-                if (!$uRow) {
+                if (! $uRow) {
                     throw new Exception("Account `{$stateRow->user_id}` not found");
                 }
             } else {
@@ -277,7 +279,7 @@ class LoginController extends AbstractActionController
                 ], $this->language());
             }
 
-            if (!$uRow) {
+            if (! $uRow) {
                 return $this->notFoundAction();
             }
 
@@ -289,7 +291,7 @@ class LoginController extends AbstractActionController
                 'used_for_reg' => $stateRow->user_id ? 0 : 1
             ]);
 
-            if (!$stateRow->user_id) { // first login
+            if (! $stateRow->user_id) { // first login
                 if ($photoUrl = $data->getPhotoUrl()) {
                     $photo = file_get_contents($photoUrl);
 
@@ -297,7 +299,7 @@ class LoginController extends AbstractActionController
                         $imageSampler = $this->imageStorage()->getImageSampler();
 
                         $imagick = new Imagick();
-                        if (!$imagick->readImageBlob($photo)) {
+                        if (! $imagick->readImageBlob($photo)) {
                             throw new Exception("Error loading image");
                         }
                         $format = $this->imageStorage()->getFormat('photo');
@@ -316,14 +318,11 @@ class LoginController extends AbstractActionController
                     }
                 }
             }
-
         } else {
-
             $uRow = $uaRow->findParentRow(User::class);
-            if (!$uRow) {
+            if (! $uRow) {
                 throw new Exception('Not linked account row');
             }
-
         }
 
         $uaRow->setFromArray([
@@ -346,6 +345,5 @@ class LoginController extends AbstractActionController
             // Invalid credentials
             throw new Exception('Error during login');
         }
-
     }
 }

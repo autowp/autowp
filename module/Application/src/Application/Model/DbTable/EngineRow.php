@@ -26,7 +26,7 @@ class EngineRow extends Row
                 ->where('engine_parent_cache.parent_id = ?', $this->id)
         );
 
-        $vectors = array();
+        $vectors = [];
         foreach ($carIds as $carId) {
             $parentIds = $db->fetchCol(
                 $db->select()
@@ -59,14 +59,14 @@ class EngineRow extends Row
             // look for same root
 
             $matched = false;
-            for ($i=0; ($i<count($vectors)-1) && !$matched; $i++) {
-                for ($j=$i+1; $j<count($vectors) && !$matched; $j++) {
+            for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
+                for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
                     if ($vectors[$i][0] == $vectors[$j][0]) {
                         $matched = true;
                         // matched root
-                        $newVector = array();
+                        $newVector = [];
                         $length = min(count($vectors[$i]), count($vectors[$j]));
-                        for ($k=0; $k<$length && $vectors[$i][$k] == $vectors[$j][$k]; $k++) {
+                        for ($k = 0; $k < $length && $vectors[$i][$k] == $vectors[$j][$k]; $k++) {
                             $newVector[] = $vectors[$i][$k];
                         }
                         $vectors[$i] = $newVector;
@@ -74,12 +74,11 @@ class EngineRow extends Row
                     }
                 }
             }
+        } while ($matched);
 
-        } while($matched);
-
-        $resultIds = array();
+        $resultIds = [];
         foreach ($vectors as $vector) {
-            $resultIds[] = $vector[count($vector)-1];
+            $resultIds[] = $vector[count($vector) - 1];
         }
 
         return $resultIds;

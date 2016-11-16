@@ -8,11 +8,11 @@ class HtmlImg extends AbstractHtmlElement
 {
     public function __invoke($attribs)
     {
-        if (!is_array($attribs)) {
+        if (! is_array($attribs)) {
             $attribs = ['src' => $attribs];
         }
 
-        if (!isset($attribs['alt'])) {
+        if (! isset($attribs['alt'])) {
             $attribs['alt'] = '';
         }
 

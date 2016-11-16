@@ -29,7 +29,7 @@ class Row extends \Application\Db\Table\Row
         $date = $this->getDateTime('reg_date');
         $defaultInterval = 300;
 
-        if (!$date) {
+        if (! $date) {
             return $defaultInterval;
         }
 

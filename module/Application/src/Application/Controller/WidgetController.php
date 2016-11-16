@@ -12,13 +12,13 @@ class WidgetController extends AbstractActionController
         $pictures = $this->catalogue()->getPictureTable();
         $picture = $pictures->find($this->params('picture_id'))->current();
 
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
         return new JsonModel([
-            'ok'    =>  true,
-            'html'  =>  $this->view->picture($picture, [
+            'ok'    => true,
+            'html'  => $this->view->picture($picture, [
                 'behaviour' => true
             ])
         ]);

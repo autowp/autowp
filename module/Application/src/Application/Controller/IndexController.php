@@ -88,7 +88,7 @@ class IndexController extends AbstractActionController
             }
         }
         foreach ($pictures as $picture) {
-            if (!$picture) {
+            if (! $picture) {
                 $resorted[] = null;
             }
         }
@@ -96,7 +96,7 @@ class IndexController extends AbstractActionController
 
         $left = [];
         foreach ($pictures as $key => $picture) {
-            if (!$picture) {
+            if (! $picture) {
                 $left[] = $key;
             }
         }
@@ -158,9 +158,8 @@ class IndexController extends AbstractActionController
         }
 
         if ($this->specsService->hasSpecs(1, $car->id)) {
-
             foreach ($cataloguePaths as $path) {
-                $items[] =[
+                $items[] = [
                     'icon'  => 'list-alt',
                     'url'   => $this->url()->fromRoute('catalogue', [
                         'action'        => 'brand-car-specifications',
@@ -176,7 +175,7 @@ class IndexController extends AbstractActionController
 
         $twins = new Twins();
         foreach ($twins->getCarGroups($car->id) as $twinsGroup) {
-            $items[] =[
+            $items[] = [
                 'icon'  => 'adjust',
                 'url'   => $this->url()->fromRoute('twins/group', [
                     'id' => $twinsGroup['id']
@@ -187,7 +186,7 @@ class IndexController extends AbstractActionController
 
 
         foreach ($car->findManyToManyRowset(Category::class, CategoryVehicle::class) as $category) {
-            $items[] =[
+            $items[] = [
                 'icon'  => 'tag',
                 'url'   => $this->url()->fromRoute('categories', [
                     'action'           => 'category',
@@ -206,8 +205,7 @@ class IndexController extends AbstractActionController
 
         $cacheKey = 'INDEX_BRANDS_HTML260' . $language;
         $brands = $this->cache->getItem($cacheKey, $success);
-        if (!$success) {
-
+        if (! $success) {
             // cache missing
             $brandModel = new BrandModel();
 
@@ -247,16 +245,13 @@ class IndexController extends AbstractActionController
         $carOfDayLinks = [];
 
         if ($carId) {
-
             $carTable = $this->catalogue()->getCarTable();
             $carOfDay = $carTable->find($carId)->current();
             if ($carOfDay) {
-
                 $key = 'CAR_OF_DAY_79_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
 
                 $carOfDayInfo = $this->cache->getItem($key, $success);
-                if (!$success) {
-
+                if (! $success) {
                     $carOfDayPictures = $this->getOrientedPictureList($carOfDay);
 
                     // images
@@ -325,7 +320,6 @@ class IndexController extends AbstractActionController
                     ];
 
                     $this->cache->setItem($key, $carOfDayInfo);
-
                 } else {
                     $carOfDayName = $carOfDayInfo['name'];
                     $carOfDayPicturesData = $carOfDayInfo['pictures'];
@@ -346,7 +340,7 @@ class IndexController extends AbstractActionController
     {
         $cacheKey = 'INDEX_FACTORIES_1';
         $factories = $this->cache->getItem($cacheKey, $success);
-        if (!$success) {
+        if (! $success) {
             $table = new Factory();
 
             $db = $table->getAdapter();
@@ -396,7 +390,7 @@ class IndexController extends AbstractActionController
         // categories
         $cacheKey = 'INDEX_CATEGORY8_' . $language;
         $destinations = $this->cache->getItem($cacheKey, $success);
-        if (!$success) {
+        if (! $success) {
             $categoryTable = new Category();
             $categoryAdapter = $categoryTable->getAdapter();
             $categoryLangTable = new CategoryLanguage();
@@ -425,7 +419,7 @@ class IndexController extends AbstractActionController
             $destinations = [];
             foreach ($items as $item) {
                 $row = $categoryTable->find($item['id'])->current();
-                if (!$row) {
+                if (! $row) {
                     continue;
                 }
 
@@ -451,7 +445,7 @@ class IndexController extends AbstractActionController
         // БЛИЗНЕЦЫ
         $cacheKey = 'INDEX_INTERESTS_TWINS_BLOCK_26_' . $language;
         $twinsBlock = $this->cache->getItem($cacheKey, $success);
-        if (!$success) {
+        if (! $success) {
             $twins = new Twins();
 
             $twinsBrands = $twins->getBrands([
@@ -478,8 +472,7 @@ class IndexController extends AbstractActionController
 
         $cacheKey = 'INDEX_SPEC_CARS_11_' . $language;
         $cars = $this->cache->getItem($cacheKey, $success);
-        if (!$success) {
-
+        if (! $success) {
             $carTable = $this->catalogue()->getCarTable();
 
             $cars = $carTable->fetchAll(
@@ -501,7 +494,7 @@ class IndexController extends AbstractActionController
             'perspectiveGroup'     => 1,
             'allowUpPictures'      => true,
             'disableDescription'   => true,
-            'callback'             => function(&$item) use ($userTable) {
+            'callback'             => function (&$item) use ($userTable) {
                 $contribPairs = $this->specsService->getContributors(1, [$item['id']]);
                 if ($contribPairs) {
                     $item['contributors'] = $userTable->fetchAll(
@@ -513,7 +506,7 @@ class IndexController extends AbstractActionController
                     $item['contributors'] = [];
                 }
             },
-            'pictureUrl' => function($listCar, $picture) {
+            'pictureUrl' => function ($listCar, $picture) {
                 return $this->pic()->href($picture);
             }
         ]);

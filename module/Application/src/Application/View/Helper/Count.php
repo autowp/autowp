@@ -11,7 +11,7 @@ class Count extends AbstractHelper
         if ($count == 0) {
             $result = $this->view->translate('count 0');
         } else {
-            $result = $count-$new;
+            $result = $count - $new;
             if ($new) {
                 $result .= '+<span>'.$new.'</span>';
             }

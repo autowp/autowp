@@ -62,7 +62,7 @@ class Car extends AbstractHelper
         return $this->specTable
             ? $this->specTable
             : $this->specTable = new Spec();
-        }
+    }
 
     public function __invoke(VehicleRow $car = null)
     {
@@ -83,7 +83,7 @@ class Car extends AbstractHelper
 
     public function title()
     {
-        if (!$this->_car) {
+        if (! $this->_car) {
             return false;
         }
 
@@ -116,7 +116,7 @@ class Car extends AbstractHelper
 
     public function catalogueLinks()
     {
-        if (!$this->_car) {
+        if (! $this->_car) {
             return [];
         }
 
@@ -187,9 +187,8 @@ class Car extends AbstractHelper
         ]);
 
         foreach ($brandCarRows as $brandCarRow) {
-
             $brand = $this->getBrandTable()->find($brandCarRow->brand_id)->current();
-            if (!$brand) {
+            if (! $brand) {
                 throw new Exception("Broken link `{$brandCarRow->brand_id}`");
             }
 

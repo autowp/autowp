@@ -41,8 +41,7 @@ class ParentTable extends Table
 
         --$level;
         foreach ($id as $tid) {
-            if ( $tid && ( $id[0] != $tid ) ) {
-
+            if ($tid && ( $id[0] != $tid )) {
                 $this->insert([
                     'category_id' => $id[0],
                     'parent_id'   => $tid,

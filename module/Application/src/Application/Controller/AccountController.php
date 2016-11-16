@@ -102,8 +102,9 @@ class AccountController extends AbstractActionController
         ExternalLoginServiceFactory $externalLoginFactory,
         array $hosts,
         SpecificationsService $specsService,
-        Message $message)
-    {
+        Message $message
+    ) {
+
         $this->service = $service;
         $this->translator = $translator;
         $this->emailForm = $emailForm;
@@ -170,14 +171,14 @@ class AccountController extends AbstractActionController
     public function sendPersonalMessageAction()
     {
         $currentUser = $this->user()->get();
-        if (!$currentUser) {
+        if (! $currentUser) {
             return $this->forwadToLogin();
         }
 
         $users = new User();
 
         $user = $users->find($this->params()->fromPost('user_id'))->current();
-        if (!$user) {
+        if (! $user) {
             return $this->notFoundAction();
         }
 
@@ -193,7 +194,7 @@ class AccountController extends AbstractActionController
 
     public function deletePersonalMessageAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
@@ -208,7 +209,7 @@ class AccountController extends AbstractActionController
 
     public function addAccountFailedAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
@@ -227,7 +228,7 @@ class AccountController extends AbstractActionController
             'redirect_uri' => 'http://en.wheelsage.org/login/callback'
         ]);
 
-        if (!$service) {
+        if (! $service) {
             throw new Exception("Service `$serviceId` not found");
         }
         return $service;
@@ -237,7 +238,7 @@ class AccountController extends AbstractActionController
     {
         $user = $this->user()->get();
 
-        if (!$user) {
+        if (! $user) {
             return $this->forwadToLogin();
         }
 
@@ -301,7 +302,7 @@ class AccountController extends AbstractActionController
 
     private function canRemoveAccount($serviceId)
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return false;
         }
 
@@ -325,7 +326,7 @@ class AccountController extends AbstractActionController
     public function removeAccountAction()
     {
         $user = $this->user()->get();
-        if (!$user) {
+        if (! $user) {
             return $this->forwadToLogin();
         }
 
@@ -337,11 +338,11 @@ class AccountController extends AbstractActionController
             'service_id = ?' => $serviceId
         ]);
 
-        if (!$uaRow) {
+        if (! $uaRow) {
             return $this->notFoundAction();
         }
 
-        if (!$this->canRemoveAccount($serviceId)) {
+        if (! $this->canRemoveAccount($serviceId)) {
             return $this->forward()->dispatch(self::class, [
                 'action' => 'remove-account-failed'
             ]);
@@ -356,14 +357,13 @@ class AccountController extends AbstractActionController
 
     public function removeAccountFailedAction()
     {
-
     }
 
     public function profileAction()
     {
         $user = $this->user()->get();
 
-        if (!$user) {
+        if (! $user) {
             return $this->forwadToLogin();
         }
 
@@ -406,7 +406,6 @@ class AccountController extends AbstractActionController
         }
 
         if ($request->isPost() && $this->params('form') == 'reset-photo') {
-
             $oldImageId = $user->img;
             if ($oldImageId) {
                 $user->img = null;
@@ -430,12 +429,11 @@ class AccountController extends AbstractActionController
             );
             $this->photoForm->setData($data);
             if ($this->photoForm->isValid()) {
-
                 $imageStorage = $this->imageStorage();
                 $imageSampler = $imageStorage->getImageSampler();
 
                 $imagick = new Imagick();
-                if (!$imagick->readImage($data['photo']['tmp_name'])) {
+                if (! $imagick->readImage($data['photo']['tmp_name'])) {
                     throw new Exception("Error loading image");
                 }
                 $format = $imageStorage->getFormat('photo');
@@ -489,7 +487,6 @@ class AccountController extends AbstractActionController
         if ($request->isPost() && $this->params('form') == 'settings') {
             $this->settingsForm->setData($this->params()->fromPost());
             if ($this->settingsForm->isValid()) {
-
                 $values = $this->settingsForm->getData();
 
                 $user->timezone = $values['timezone'];
@@ -513,7 +510,7 @@ class AccountController extends AbstractActionController
     public function emailAction()
     {
         $user = $this->user()->get();
-        if (!$user) {
+        if (! $user) {
             return $this->forwadToLogin();
         }
 
@@ -550,7 +547,7 @@ class AccountController extends AbstractActionController
         $template = 'application/account/emailcheck-fail';
 
         if ($user) {
-            if (!$this->user()->logedIn()) {
+            if (! $this->user()->logedIn()) {
                 $adapter = new IdAuthAdapter();
                 $adapter->setIdentity($user->id);
                 $auth = new AuthenticationService();
@@ -585,7 +582,7 @@ class AccountController extends AbstractActionController
 
     public function personalMessagesInboxAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
@@ -602,7 +599,7 @@ class AccountController extends AbstractActionController
 
     public function personalMessagesSentAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
@@ -619,7 +616,7 @@ class AccountController extends AbstractActionController
 
     public function personalMessagesSystemAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
@@ -636,14 +633,14 @@ class AccountController extends AbstractActionController
 
     public function personalMessagesUserAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
         $users = new User();
 
         $user = $users->find($this->params('user_id'))->current();
-        if (!$user) {
+        if (! $user) {
             return $this->notFoundAction();
         }
 
@@ -663,7 +660,7 @@ class AccountController extends AbstractActionController
 
     public function notTakenPicturesAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
@@ -697,7 +694,7 @@ class AccountController extends AbstractActionController
 
     public function clearSystemMessagesAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
@@ -708,7 +705,7 @@ class AccountController extends AbstractActionController
 
     public function clearSentMessagesAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
@@ -720,7 +717,7 @@ class AccountController extends AbstractActionController
     public function accessAction()
     {
         $user = $this->user()->get();
-        if (!$user) {
+        if (! $user) {
             return $this->forwadToLogin();
         }
 
@@ -733,14 +730,11 @@ class AccountController extends AbstractActionController
 
                 $correct = $this->service->checkPassword($user->id, $values['password_old']);
 
-                if (!$correct) {
-
+                if (! $correct) {
                     $this->changePasswordForm->get('password_old')->setMessages([
                         $this->translator->translate('account/access/change-password/current-password-is-incorrect')
                     ]);
-
                 } else {
-
                     $this->service->setPassword($user, $values['password']);
 
                     $this->flashMessenger()->addSuccessMessage(
@@ -760,7 +754,7 @@ class AccountController extends AbstractActionController
 
     public function deleteAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
@@ -777,14 +771,11 @@ class AccountController extends AbstractActionController
 
                 $valid = $this->service->checkPassword($user->id, $values['password']);
 
-                if (!$valid) {
-
+                if (! $valid) {
                     $this->deleteUserForm->get('password')->setMessages([
                         $this->translator->translate('account/access/self-delete/password-is-incorrect')
                     ]);
-
                 } else {
-
                     $user->deleted = true;
                     $user->save();
 
@@ -809,7 +800,7 @@ class AccountController extends AbstractActionController
 
     public function specsConflictsAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 
@@ -867,7 +858,7 @@ class AccountController extends AbstractActionController
 
     public function contactsAction()
     {
-        if (!$this->user()->logedIn()) {
+        if (! $this->user()->logedIn()) {
             return $this->forwadToLogin();
         }
 

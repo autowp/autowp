@@ -20,7 +20,7 @@ class LogController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -110,7 +110,7 @@ class LogController extends AbstractActionController
                 ];
             }
 
-            $brands = $brandModel->getList($language, function($select) use ($event) {
+            $brands = $brandModel->getList($language, function ($select) use ($event) {
                 $select
                     ->join('log_events_brands', 'brands.id = log_events_brands.brand_id', null)
                     ->where('log_events_brands.log_event_id = ?', $event->id);

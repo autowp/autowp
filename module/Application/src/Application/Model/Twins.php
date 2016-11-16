@@ -125,7 +125,7 @@ class Twins
 
         $brandList = $db->fetchAll($select);
 
-        usort($brandList, function($a, $b) {
+        usort($brandList, function ($a, $b) {
             return strcoll($a['name'], $b['name']);
         });
 
@@ -150,21 +150,16 @@ class Twins
             ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW]);
 
         if (is_array($groupId)) {
-
             if ($groupId) {
-
                 $select
                     ->columns(['tgc.twins_group_id', 'COUNT(1)'])
                     ->group('tgc.twins_group_id')
                     ->where('tgc.twins_group_id in (?)', $groupId);
 
                 $result = $db->fetchPairs($select);
-
             } else {
-
                 $result = [];
             }
-
         } else {
             $select
                 ->columns('COUNT(1)')
@@ -295,7 +290,7 @@ class Twins
     public function getGroup($groupId)
     {
         $row = $this->getGroupsTable()->find($groupId)->current();
-        if (!$row) {
+        if (! $row) {
             return null;
         }
 

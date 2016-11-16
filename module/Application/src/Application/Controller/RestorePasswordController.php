@@ -59,7 +59,6 @@ class RestorePasswordController extends AbstractActionController
                 ]);
 
                 if ($user) {
-
                     $code = $this->service->createRestorePasswordToken($user->id);
 
                     $uri = $this->hostManager->getUriByLanguage($user->language);
@@ -112,13 +111,13 @@ class RestorePasswordController extends AbstractActionController
             'created > DATE_SUB(NOW(), INTERVAL 10 DAY)'
         ]);
 
-        if (!$uprRow) {
+        if (! $uprRow) {
             return $this->notFoundAction();
         }
 
         $user = $uprRow->findParentRow(User::class);
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFoundAction();
         }
 

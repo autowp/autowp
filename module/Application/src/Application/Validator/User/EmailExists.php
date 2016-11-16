@@ -24,7 +24,7 @@ class EmailExists extends AbstractValidator
                 ->from($table->info('name'), 'id')
                 ->where('e_mail = ?', $value)
         );
-        if (!$exists) {
+        if (! $exists) {
             $this->error(self::NOT_EXISTS);
             return false;
         }

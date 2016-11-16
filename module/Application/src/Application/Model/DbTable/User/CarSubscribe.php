@@ -32,7 +32,7 @@ class CarSubscribe extends Table
            'user_id = ?' => $user->id,
            'car_id = ?'  => $car->id
         ]);
-        if (!$row) {
+        if (! $row) {
             $this->insert([
                 'user_id' => $user->id,
                 'car_id'  => $car->id

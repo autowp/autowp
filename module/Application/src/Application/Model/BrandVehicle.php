@@ -43,7 +43,7 @@ class BrandVehicle
         $vehicleId = (int)$vehicleId;
 
         $brandRow = $this->brandTable->find($brandId)->current();
-        if (!$brandRow) {
+        if (! $brandRow) {
             return false;
         }
 
@@ -82,7 +82,7 @@ class BrandVehicle
             $aliases[] = $brandLangRow->name;
         }
 
-        usort($aliases, function($a, $b) {
+        usort($aliases, function ($a, $b) {
             $la = mb_strlen($a);
             $lb = mb_strlen($b);
 
@@ -129,7 +129,7 @@ class BrandVehicle
 
         $name = trim(preg_replace("|[[:space:]]+|", ' ', $name));
         $name = ltrim($name, '/');
-        if (!$name) {
+        if (! $name) {
             $name = $vehicleName;
         }
 
@@ -143,7 +143,6 @@ class BrandVehicle
 
         $i = 0;
         do {
-
             $catname = $catnameTemplate . ($i ? '_' . $i : '');
 
             $exists = (bool)$this->brandVehicleTable->fetchRow([
@@ -153,7 +152,6 @@ class BrandVehicle
             ]);
 
             $i++;
-
         } while ($exists);
 
         return $catname;
@@ -163,7 +161,7 @@ class BrandVehicle
     {
         $brandRow = $this->brandTable->find($brandId)->current();
         $vehicleRow = $this->vehicleTable->find($vehicleId)->current();
-        if (!$brandRow || !$vehicleRow) {
+        if (! $brandRow || ! $vehicleRow) {
             return false;
         }
 
@@ -177,7 +175,7 @@ class BrandVehicle
         }
 
         $catname = $this->extractCatname($brandRow, $vehicleRow);
-        if (!$catname) {
+        if (! $catname) {
             return false;
         }
 
@@ -214,7 +212,7 @@ class BrandVehicle
             'brand_id = ?'   => $brandId,
             'language = ?'   => $language
         ]);
-        if (!$bvlRow) {
+        if (! $bvlRow) {
             $bvlRow = $this->brandVehicleLanguageTable->createRow([
                 'vehicle_id' => $vehicleId,
                 'brand_id'   => $brandId,
@@ -233,7 +231,7 @@ class BrandVehicle
             }
         }
 
-        if (!$values['name']) {
+        if (! $values['name']) {
             $brandRow = $this->brandTable->find($brandId)->current();
             $vehicleRow = $this->vehicleTable->find($vehicleId)->current();
             $values['name'] = $this->extractName($brandRow, $vehicleRow, $language);
@@ -257,7 +255,7 @@ class BrandVehicle
             if (isset($values[$language])) {
                 $languageValues = $values[$language];
             }
-            if (!$this->setBrandVehicleLanguage($brandId, $vehicleId, $language, $languageValues, $forceIsAuto)) {
+            if (! $this->setBrandVehicleLanguage($brandId, $vehicleId, $language, $languageValues, $forceIsAuto)) {
                 $success = false;
             }
         }
@@ -275,7 +273,7 @@ class BrandVehicle
             'car_id = ?'   => $vehicleId
         ]);
 
-        if (!$brandVehicleRow) {
+        if (! $brandVehicleRow) {
             return false;
         }
 
@@ -290,7 +288,7 @@ class BrandVehicle
             }
         }
 
-        if (!$newCatname || $newCatname == '_') {
+        if (! $newCatname || $newCatname == '_') {
             $brandRow = $this->brandTable->find($brandId)->current();
             $vehicleRow = $this->vehicleTable->find($vehicleId)->current();
             $newCatname = $this->extractCatname($brandRow, $vehicleRow);
@@ -317,7 +315,7 @@ class BrandVehicle
             'brand_id = ?' => $brandId
         ]);
 
-        if (!$bvRow) {
+        if (! $bvRow) {
             return false;
         }
         if ($bvRow->is_auto) {
@@ -325,7 +323,7 @@ class BrandVehicle
             $vehicleRow = $this->vehicleTable->find($vehicleId)->current();
 
             $catname = $this->extractCatname($brandRow, $vehicleRow);
-            if (!$catname) {
+            if (! $catname) {
                 return false;
             }
 
@@ -383,7 +381,7 @@ class BrandVehicle
             'language = ?'   => (string)$language
         ]);
 
-        if (!$bvlRow) {
+        if (! $bvlRow) {
             return null;
         }
 

@@ -30,10 +30,9 @@ class FeedbackController extends AbstractActionController
             $this->form->setData($this->params()->fromPost());
 
             if ($this->form->isValid()) {
-
                 $values = $this->form->getData();
 
-                $message =  'Имя: ' . $values['name'] . PHP_EOL .
+                $message = 'Имя: ' . $values['name'] . PHP_EOL .
                             'E-mail: ' . $values['email'] . PHP_EOL .
                             'Сообщение: ' . PHP_EOL . $values['message'] . PHP_EOL;
 

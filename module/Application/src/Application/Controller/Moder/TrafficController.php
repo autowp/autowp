@@ -12,7 +12,7 @@ class TrafficController extends AbstractActionController
 {
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -55,7 +55,7 @@ class TrafficController extends AbstractActionController
 
     public function hostByAddrAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -66,7 +66,7 @@ class TrafficController extends AbstractActionController
 
     public function whitelistAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -91,7 +91,7 @@ class TrafficController extends AbstractActionController
 
     public function whitelistRemoveAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -103,7 +103,7 @@ class TrafficController extends AbstractActionController
 
     public function whitelistAddAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 

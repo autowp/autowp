@@ -100,7 +100,7 @@ class AboutController extends AbstractActionController
             ),
             'totalUsers'    => $totalUsers,
             'totalCars'     => $totalCars,
-            'totalComments' =>  $totalComments
+            'totalComments' => $totalComments
         ];
     }
 }

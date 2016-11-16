@@ -53,8 +53,8 @@ class Brakes extends AbstractAdapter
         $rear = $this->attributes['rear'];
         $front = $this->attributes['front'];
 
-        $wheres = implode($select->getPart( Zend_Db_Select::WHERE ));
-        $joins = $select->getPart( Zend_Db_Select::FROM );
+        $wheres = implode($select->getPart(Zend_Db_Select::WHERE));
+        $joins = $select->getPart(Zend_Db_Select::FROM);
         unset($joins['cars']);
 
         $limit = $this->most->getCarsCount();
@@ -120,7 +120,6 @@ class Brakes extends AbstractAdapter
         $result = [];
 
         foreach ($cars as $car) {
-
             $result[] = [
                 'car'       => $car,
                 'valueHtml' => $this->_getBrakesText($car),
@@ -143,7 +142,6 @@ class Brakes extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         foreach ([$front, $rear] as $axis) {
-
             $diameterValue = $specService->getActualValue($axis['diameter'], $car->id, 1);
             $thicknessValue = $specService->getActualValue($axis['thickness'], $car->id, 1);
 

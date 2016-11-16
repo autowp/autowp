@@ -59,7 +59,7 @@ class CategoryController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->isAllowed('category', 'edit')) {
+        if (! $this->user()->isAllowed('category', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -118,7 +118,7 @@ class CategoryController extends AbstractActionController
 
     public function itemAction()
     {
-        if (!$this->user()->isAllowed('category', 'edit')) {
+        if (! $this->user()->isAllowed('category', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -129,7 +129,7 @@ class CategoryController extends AbstractActionController
         $id = (int)$this->params('id');
         if ($id) {
             $category = $this->table->find($id)->current();
-            if (!$category) {
+            if (! $category) {
                 return $this->notFoundAction();
             }
         } else {
@@ -178,7 +178,7 @@ class CategoryController extends AbstractActionController
                         'language = ?'    => $lang
                     ]);
 
-                    if (!$langCategory) {
+                    if (! $langCategory) {
                         $langCategory = $this->langTable->fetchNew();
                         $langCategory->setFromArray([
                             'category_id' => $category->id,
@@ -207,14 +207,14 @@ class CategoryController extends AbstractActionController
 
     public function organizeAction()
     {
-        if (!$this->user()->isAllowed('category', 'edit')) {
+        if (! $this->user()->isAllowed('category', 'edit')) {
             return $this->forbiddenAction();
         }
 
         $form = $this->getForm();
 
         $category = $this->table->find($this->params('id'))->current();
-        if (!$category) {
+        if (! $category) {
             return $this->notFoundAction();
         }
 
@@ -238,7 +238,6 @@ class CategoryController extends AbstractActionController
 
         $childs = [];
         foreach ($carParentRows as $carParentRow) {
-
             $carRow = $carTable->find($carParentRow->car_id)->current();
 
             $brandNames = $brandAdapter->fetchPairs(
@@ -275,7 +274,6 @@ class CategoryController extends AbstractActionController
             }*/
 
             if (count($brandNames)) {
-
                 $categoryLinksCount = $brandAdapter->fetchOne(
                     $brandAdapter->select()
                         ->from('category_car', 'count(distinct category_car.car_id)')

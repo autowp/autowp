@@ -23,8 +23,7 @@ class Topic extends Table
             'item_id = ?' => $itemId,
             'type_id = ?' => $typeId
         ]);
-        if (!$topic) {
-
+        if (! $topic) {
             $cmTable = new CommentMessage();
 
             $lastUpdate = $cmTable->getLastUpdate($typeId, $itemId);
@@ -60,7 +59,7 @@ class Topic extends Table
         if ($messagesCount > 0) {
             $lastUpdate = $cmTable->getLastUpdate($typeId, $itemId);
 
-            if (!$topic) {
+            if (! $topic) {
                 $topic = $this->createRow([
                     'item_id' => $itemId,
                     'type_id' => $typeId,
@@ -102,11 +101,9 @@ class Topic extends Table
     public function getTopicStat($typeId, $itemId)
     {
         if (is_array($itemId)) {
-
             $result = [];
 
             if ($itemId) {
-
                 $db = $this->getAdapter();
 
                 $pairs = $db->fetchPairs(
@@ -121,11 +118,8 @@ class Topic extends Table
                         'messages' => $count
                     ];
                 }
-
             }
-
         } else {
-
             $messages = 0;
 
             $topic = $this->fetchRow([
@@ -162,7 +156,6 @@ class Topic extends Table
             ->where('comments_messages.datetime > :datetime');
 
         if (is_array($itemId)) {
-
             $result = [];
 
             if (count($itemId) > 0) {
@@ -193,7 +186,6 @@ class Topic extends Table
             }
 
             return $result;
-
         } else {
             $newMessages = 0;
 
@@ -212,7 +204,7 @@ class Topic extends Table
                 ]
             );
 
-            if (!$viewTime) {
+            if (! $viewTime) {
                 $newMessages = null;
             } else {
                 $newMessages = (int)$db->fetchOne($newMessagesSelect, [
@@ -243,7 +235,6 @@ class Topic extends Table
             ->where('comments_messages.datetime > :datetime');
 
         if (is_array($itemId)) {
-
             $result = [];
 
             if (count($itemId) > 0) {
@@ -272,7 +263,7 @@ class Topic extends Table
                 $viewTime = $row['timestamp'];
                 $messages = (int)$row['messages'];
 
-                if (!$viewTime) {
+                if (! $viewTime) {
                     $newMessages = $messages;
                 } else {
                     $newMessages = (int)$db->fetchOne($newMessagesSelect, [
@@ -289,7 +280,6 @@ class Topic extends Table
             }
 
             return $result;
-
         } else {
             $messages = 0;
             $newMessages = 0;
@@ -317,7 +307,7 @@ class Topic extends Table
                     ]
                 );
 
-                if (!$viewTime) {
+                if (! $viewTime) {
                     $newMessages = $messages;
                 } else {
                     $newMessages = (int)$db->fetchOne($newMessagesSelect, [

@@ -53,8 +53,7 @@ class EngineParentCache extends Table
         }
 
         foreach ($id as $tid) {
-            if ( $tid && ( $id[0] != $tid ) ) {
-
+            if ($tid && ( $id[0] != $tid )) {
                 $this->insert([
                     'engine_id' => $id[0],
                     'parent_id' => $tid,

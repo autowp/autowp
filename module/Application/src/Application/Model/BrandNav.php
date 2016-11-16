@@ -32,8 +32,9 @@ class BrandNav
     public function __construct(
         StorageInterface $cache,
         TranslatorInterface $translator,
-        TreeRouteStack $router)
-    {
+        TreeRouteStack $router
+    ) {
+
         $this->cache = $cache;
         $this->translator = $translator;
         $this->router = $router;
@@ -53,7 +54,7 @@ class BrandNav
 
         $brandModel = new BrandModel();
         $brand = $brandModel->getBrandById($params['brand_id'], $params['language']);
-        if (!$brand) {
+        if (! $brand) {
             return;
         }
 
@@ -68,7 +69,7 @@ class BrandNav
 
     private function brandSections($language, $brand, $type, $carId, $isConcepts, $isEngines)
     {
-        $conceptsSeparatly = !in_array($brand['type_id'], [3, 4]);
+        $conceptsSeparatly = ! in_array($brand['type_id'], [3, 4]);
 
         // create groups array
         $sections = $this->carSections($language, $brand, $conceptsSeparatly, $carId);
@@ -112,7 +113,7 @@ class BrandNav
         ]);
 
         $groups = $this->cache->getItem($cacheKey, $success);
-        if (!$success) {
+        if (! $success) {
             $groups = [];
 
             if ($conceptsSeparatly) {
@@ -265,7 +266,7 @@ class BrandNav
             $aliases[] = $brandLangRow->name;
         }
 
-        usort($aliases, function($a, $b) {
+        usort($aliases, function ($a, $b) {
             $la = mb_strlen($a);
             $lb = mb_strlen($b);
 
@@ -282,7 +283,7 @@ class BrandNav
     {
         $brandModel = new BrandModel();
 
-        $rows = $brandModel->getList($language, function($select) use ($brand) {
+        $rows = $brandModel->getList($language, function ($select) use ($brand) {
             $select->where('parent_brand_id = ?', $brand['id']);
         });
 
@@ -299,12 +300,12 @@ class BrandNav
 
         return $groups;
     }
-    
+
     private function carSectionGroupsSelect($brandId, $carTypeId, $nullType, $conceptsSeparatly)
     {
         $brandCarTable = new DbTable\BrandCar();
         $db = $brandCarTable->getAdapter();
-        
+
         $select = $db->select()
             ->from($brandCarTable->info('name'), [
                 'brand_car_catname' => 'catname',
@@ -319,16 +320,14 @@ class BrandNav
         if ($conceptsSeparatly) {
             $select->where('NOT cars.is_concept');
         }
-        
+
         if ($carTypeId) {
             $select
                 ->join('vehicle_vehicle_type', 'cars.id = vehicle_vehicle_type.vehicle_id', null)
                 ->join('car_types_parents', 'vehicle_vehicle_type.vehicle_type_id = car_types_parents.id', null)
                 ->where('car_types_parents.parent_id = ?', $carTypeId);
         } else {
-            
             if ($nullType) {
-                
                 $select
                     ->joinLeft(
                         'vehicle_vehicle_type',
@@ -336,26 +335,25 @@ class BrandNav
                         null
                     )
                     ->where('vehicle_vehicle_type.vehicle_id is null');
-                
             } else {
                 $otherTypesIds = $db->fetchCol(
                     $db->select()
                         ->from('car_types_parents', 'id')
                         ->where('parent_id IN (?)', [43, 44, 17, 19])
                 );
-                
+
                 $select->join(
                     'vehicle_vehicle_type',
                     'cars.id = vehicle_vehicle_type.vehicle_id',
                     null
                 );
-                
+
                 if ($otherTypesIds) {
                     $select->where('vehicle_vehicle_type.vehicle_type_id not in (?)', $otherTypesIds);
                 }
             }
         }
-        
+
         return $select;
     }
 
@@ -387,7 +385,6 @@ class BrandNav
 
         $groups = [];
         foreach ($rows as $brandCarRow) {
-
             $url = $this->url('catalogue', [
                 'action'        => 'brand-car',
                 'brand_catname' => $brand['catname'],
@@ -422,10 +419,9 @@ class BrandNav
 
                 $caption = trim(preg_replace("|[[:space:]]+|", ' ', $caption));
                 $caption = ltrim($caption, '/');
-                if (!$caption) {
+                if (! $caption) {
                     $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
                 }
-
             }
 
             $groups[] = [
@@ -449,8 +445,7 @@ class BrandNav
 
         $sections = $this->cache->getItem($cacheKey, $success);
 
-        if (!$success) {
-
+        if (! $success) {
             $sectionsPresets = [
                 'other' => [
                     'name'        => null,
@@ -476,10 +471,9 @@ class BrandNav
 
             $sections = [];
             foreach ($sectionsPresets as $sectionsPreset) {
-
                 $sectionGroups = $this->carSectionGroups($language, $brand, $sectionsPreset, $conceptsSeparatly, $carId);
 
-                usort($sectionGroups, function($a, $b) {
+                usort($sectionGroups, function ($a, $b) {
                     return strnatcasecmp($a['caption'], $b['caption']);
                 });
 

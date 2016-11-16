@@ -29,7 +29,7 @@ class Sidebar extends AbstractPlugin
             'is_engines'  => false
         ];
         $params = array_replace($defaults, $params);
-        
+
         $sideBarModel = new ViewModel([
             'sections' => $this->brandNav->getMenu(array_replace([
                 'language' => $this->getController()->language()
@@ -37,7 +37,7 @@ class Sidebar extends AbstractPlugin
         ]);
         $sideBarModel->setTemplate('application/sidebar/brand');
         $this->getController()->layout()->addChild($sideBarModel, 'sidebar');
-        
+
         return;
     }
 }

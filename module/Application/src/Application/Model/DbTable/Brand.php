@@ -50,5 +50,4 @@ class Brand extends Table
 
         return parent::insert($data);
     }
-
 }

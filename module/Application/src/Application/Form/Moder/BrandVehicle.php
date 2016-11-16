@@ -37,7 +37,7 @@ class BrandVehicle extends Form implements InputFilterProviderInterface
                 'type'    => 'Select',
                 'options' => [
                     'label'   => 'Type',
-                    'options' =>[
+                    'options' => [
                         DbTable\BrandCar::TYPE_DEFAULT => 'catalogue/stock-model',
                         DbTable\BrandCar::TYPE_TUNING  => 'catalogue/related',
                         DbTable\BrandCar::TYPE_SPORT   => 'catalogue/sport',

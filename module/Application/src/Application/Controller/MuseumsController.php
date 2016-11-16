@@ -20,7 +20,7 @@ class MuseumsController extends AbstractActionController
         $table = new Museum();
 
         $museum = $table->find($this->params()->fromRoute('id'))->current();
-        if (!$museum) {
+        if (! $museum) {
             return $this->_forward('notfound', 'error');
         }
 

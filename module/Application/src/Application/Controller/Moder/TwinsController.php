@@ -40,8 +40,9 @@ class TwinsController extends AbstractActionController
         $textStorage,
         Form $editForm,
         Form $descForm,
-        Message $message)
-    {
+        Message $message
+    ) {
+
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->editForm = $editForm;
@@ -66,13 +67,13 @@ class TwinsController extends AbstractActionController
 
     public function twinsGroupAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $table = new TwinsGroup();
         $group = $table->find($this->params('twins_group_id'))->current();
-        if (!$group) {
+        if (! $group) {
             return $this->notFoundAction();
         }
 
@@ -143,27 +144,26 @@ class TwinsController extends AbstractActionController
     public function saveDescriptionAction()
     {
         $canEdit = $this->user()->isAllowed('brand', 'edit');
-        if (!$canEdit) {
+        if (! $canEdit) {
             return $this->forbiddenAction();
         }
 
         $user = $this->user()->get();
 
         $request = $this->getRequest();
-        if (!$request->isPost()) {
+        if (! $request->isPost()) {
             return $this->forbiddenAction();
         }
 
         $table = new TwinsGroup();
         $group = $table->find($this->params('twins_group_id'))->current();
-        if (!$group) {
+        if (! $group) {
             return $this->forbiddenAction();
         }
 
         $this->descForm->setData($this->params()->fromPost());
 
         if ($this->descForm->isValid()) {
-
             $values = $this->descForm->getData();
 
             $text = $values['markdown'];
@@ -188,9 +188,7 @@ class TwinsController extends AbstractActionController
                 $userTable = new User();
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {
-
                         foreach ($userTable->find($userId) as $userRow) {
-
                             $uri = $this->hostManager->getUriByLanguage($userRow->language);
 
                             $message = sprintf(

@@ -15,7 +15,7 @@ class UsersController extends AbstractRestfulController
     {
         if ($id == 'me') {
             $id = $this->oauth2();
-            if (!$id) {
+            if (! $id) {
                 return new ApiProblemResponse(new ApiProblem(401, 'Not authorized'));
             }
         }
@@ -23,7 +23,7 @@ class UsersController extends AbstractRestfulController
         $userTable = new User();
 
         $userRow = $userTable->find($id)->current();
-        if (!$userRow) {
+        if (! $userRow) {
             return new ApiProblemResponse(new ApiProblem(404, 'Entity not found'));
         }
 

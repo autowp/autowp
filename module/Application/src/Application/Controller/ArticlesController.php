@@ -20,7 +20,7 @@ class ArticlesController extends AbstractActionController
 
         $language = $this->language();
 
-        return $brandModel->getList($language, function($select) {
+        return $brandModel->getList($language, function ($select) {
             $select
                 ->join(['abc' => 'articles_brands_cache'], 'brands.id = abc.brand_id', null)
                 ->join('articles', 'abc.article_id = articles.id', null)
@@ -88,18 +88,18 @@ class ArticlesController extends AbstractActionController
         $articles = new Article();
 
         $article = $articles->findRowByCatname($this->params('article_catname'));
-        if (!$article) {
+        if (! $article) {
             return $this->notFoundAction();
         }
 
-        if (!$article->enabled) {
+        if (! $article->enabled) {
             return $this->notFoundAction();
         }
 
         $links = [];
 
         $brandModel = new BrandModel();
-        $brands = $brandModel->getList($this->language(), function($select) use ($article) {
+        $brands = $brandModel->getList($this->language(), function ($select) use ($article) {
             $select
                 ->join('articles_brands', 'brands.id = articles_brands.brand_id', null)
                 ->where('articles_brands.article_id = ?', $article->id);

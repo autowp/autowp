@@ -115,7 +115,6 @@ class Vehicle extends Table
             $carTypeParentTableName = $carTypeParentTable->info('name');
             $db = $carTypeParentTable->getAdapter();
             foreach ($map as $id => $count) {
-
                 $otherIds = array_diff(array_keys($map), [$id]);
 
                 if (count($otherIds)) {
@@ -186,7 +185,7 @@ class Vehicle extends Table
             }
         }
 
-        if ($somethingChanged || !$car->car_type_inherit) {
+        if ($somethingChanged || ! $car->car_type_inherit) {
             $car->save();
 
             $childs = $this->fetchAll(

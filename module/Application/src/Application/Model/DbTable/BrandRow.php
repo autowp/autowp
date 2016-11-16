@@ -127,5 +127,4 @@ class BrandRow extends Row
             Picture::STATUS_ACCEPTED, Picture::STATUS_NEW]);
         $this->save();
     }
-
 }

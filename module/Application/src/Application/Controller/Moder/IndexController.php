@@ -19,7 +19,7 @@ class IndexController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -50,7 +50,8 @@ class IndexController extends AbstractActionController
                     ]);
 
                     $this->log(sprintf(
-                        'Создан новый бренд %s', $brand->caption
+                        'Создан новый бренд %s',
+                        $brand->caption
                     ), $brand);
 
                     return $this->redirect()->toUrl($url);
@@ -87,7 +88,7 @@ class IndexController extends AbstractActionController
 
     public function statAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -192,7 +193,7 @@ class IndexController extends AbstractActionController
 
     public function tooBigCarsAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 

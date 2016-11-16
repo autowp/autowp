@@ -47,7 +47,7 @@ class UsersService
      * @var SpecificationsService
      */
     private $specsService = null;
-    
+
     /**
      * @var Image\Storage
      */
@@ -69,8 +69,9 @@ class UsersService
         $translator,
         $transport,
         SpecificationsService $specsService,
-        Image\Storage $imageStorage)
-    {
+        Image\Storage $imageStorage
+    ) {
+
         $this->salt = $options['salt'];
         $this->emailSalt = $options['emailSalt'];
 
@@ -112,7 +113,7 @@ class UsersService
      */
     private function getHostOptions($language)
     {
-        if (!isset($this->hosts[$language])) {
+        if (! isset($this->hosts[$language])) {
             throw new Exception("Host with language `$language` is not supported");
         }
 
@@ -193,7 +194,7 @@ class UsersService
                 ->where('LENGTH(email_to_check)')
         );
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -214,7 +215,6 @@ class UsersService
     public function sendRegistrationConfirmEmail(UserRow $user, $hostname)
     {
         if ($user->email_to_check && $user->email_check_code) {
-
             $values = [
                 'email' => $user->email_to_check,
                 'name'  => $user->name,
@@ -252,7 +252,6 @@ class UsersService
     public function sendChangeConfirmEmail(UserRow $user, $hostname)
     {
         if ($user->email_to_check && $user->email_check_code) {
-
             $values = [
                 'email' => $user->email_to_check,
                 'name'  => $user->name,
@@ -319,7 +318,7 @@ class UsersService
     public function updateUserVoteLimit($userId)
     {
         $userRow = $this->getTable()->find($userId)->current();
-        if (!$userRow) {
+        if (! $userRow) {
             return false;
         }
 
@@ -427,12 +426,12 @@ class UsersService
             'password = ?' => new Zend_Db_Expr($passwordExpr)
         ]);
     }
-    
+
     public function deleteUnused()
     {
         $table = $this->getTable();
         $db = $table->getAdapter();
-        
+
         $rows = $table->fetchAll(
             $table->select(true)
                 ->where('users.last_online < DATE_SUB(NOW(), INTERVAL 2 YEAR)')
@@ -454,36 +453,36 @@ class UsersService
                 ->where('pmt.to_user_id is null')
                 ->limit(1000)
         );
-        
+
         foreach ($rows as $row) {
             print 'Delete ' . $row->id . ' ' . $row->name . ' ' . PHP_EOL;
-            
+
             $this->delete($row->id);
         }
     }
-    
+
     private function delete($userId)
     {
         $table = $this->getTable();
         $db = $table->getAdapter();
-        
+
         $row = $table->find($userId)->current();
-        if (!$row) {
+        if (! $row) {
             return;
         }
-        
+
         if ($row->img) {
             $imageId = $row->img;
             $row->img = null;
             $row->save();
-            
+
             $this->imageStorage->removeImage($imageId);
         }
-        
+
         $db->delete('log_events_user', [
             'user_id = ?' => $row->id
         ]);
-        
+
         $row->delete();
     }
 }

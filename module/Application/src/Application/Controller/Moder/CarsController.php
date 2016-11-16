@@ -104,8 +104,9 @@ class CarsController extends AbstractActionController
         Form $carParentForm,
         Form $filterForm,
         BrandVehicle $brandVehicle,
-        Message $message)
-    {
+        Message $message
+    ) {
+
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -123,7 +124,7 @@ class CarsController extends AbstractActionController
     {
         return $this->user()->isAllowed('car', 'move');
     }
-    
+
     private function getVehicleTypeOptions($table, $parentId = null)
     {
         if ($parentId) {
@@ -133,23 +134,23 @@ class CarsController extends AbstractActionController
         } else {
             $filter = 'parent_id is null';
         }
-    
+
         $rows = $table->fetchAll($filter, 'position');
         $result = [];
         foreach ($rows as $row) {
             $result[$row->id] = $row->name;
-    
+
             foreach ($this->getVehicleTypeOptions($table, $row->id) as $key => $value) {
                 $result[$key] = '...' . $this->translator->translate($value);
             }
         }
-    
+
         return $result;
     }
 
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -157,7 +158,7 @@ class CarsController extends AbstractActionController
 
         $specTable = new DbTable\Spec();
         $specOptions = $this->loadSpecs($specTable, null, 0);
-        
+
         $vehicleTypeTable = new DbTable\Vehicle\Type();
         $vehicleTypeOptions = $this->getVehicleTypeOptions($vehicleTypeTable, null);
 
@@ -203,7 +204,7 @@ class CarsController extends AbstractActionController
             if ($values['no_name']) {
                 $select->where('cars.caption not like ?', '%' . $values['no_name'] . '%');
             }
-            
+
             if ($values['vehicle_type_id']) {
                 if ($values['vehicle_type_id'] == 'empty') {
                     $select
@@ -236,7 +237,6 @@ class CarsController extends AbstractActionController
             }
 
             if ($values['no_category']) {
-
                 $cpTable = new DbTable\Category\ParentTable();
 
                 $ids = $cpTable->getAdapter()->fetchCol(
@@ -293,7 +293,7 @@ class CarsController extends AbstractActionController
 
     public function alphaAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -395,14 +395,14 @@ class CarsController extends AbstractActionController
 
     public function carPicturesAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -448,7 +448,7 @@ class CarsController extends AbstractActionController
             ]);
             $categories[$row->id] = str_repeat('…', $deep) . ($lRow ? $lRow->name : $row->name);
 
-            $categories = $categories + $this->getCategoriesOptions($row, $deep+1);
+            $categories = $categories + $this->getCategoriesOptions($row, $deep + 1);
         }
 
         return $categories;
@@ -474,8 +474,9 @@ class CarsController extends AbstractActionController
                     ->order(new Zend_Db_Expr('RAND()'))
                     ->limit(1)
             );
-            if ($randomPicture)
+            if ($randomPicture) {
                 break;
+            }
         }
 
         return $randomPicture;
@@ -483,14 +484,14 @@ class CarsController extends AbstractActionController
 
     public function saveDescAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -525,7 +526,7 @@ class CarsController extends AbstractActionController
                 $this->log(sprintf(
                     'Редактирование полного описания автомобиля %s',
                     htmlspecialchars($car->getFullName('en'))
-                    ), $car);
+                ), $car);
 
                 if ($car->full_text_id) {
                     $userIds = $this->textStorage->getTextUserIds($car->full_text_id);
@@ -534,7 +535,6 @@ class CarsController extends AbstractActionController
                     foreach ($userIds as $userId) {
                         if ($userId != $user->id) {
                             foreach ($userTable->find($userId) as $userRow) {
-
                                 $uri = $this->hostManager->getUriByLanguage($userRow->language);
 
                                 $message = sprintf(
@@ -542,7 +542,7 @@ class CarsController extends AbstractActionController
                                     $this->userModerUrl($user, true, $uri),
                                     $car->getFullName($userRow->language),
                                     $this->carModerUrl($car, true, null, $uri)
-                                    );
+                                );
 
                                 $this->message->send(null, $userRow->id, $message);
                             }
@@ -562,7 +562,7 @@ class CarsController extends AbstractActionController
             $this->url()->fromRoute('moder/cars/params', [
                 'form' => 'car-edit-description'
             ], [], true)
-            );
+        );
 
         return $this->descForm;
     }
@@ -574,7 +574,7 @@ class CarsController extends AbstractActionController
             $this->url()->fromRoute('moder/cars/params', [
                 'action' => 'save-desc'
             ], [], true)
-            );
+        );
 
         return $this->textForm;
     }
@@ -609,14 +609,14 @@ class CarsController extends AbstractActionController
 
     public function carAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -626,7 +626,6 @@ class CarsController extends AbstractActionController
         $canEditMeta = $this->canEditMeta($car);
 
         if ($canEditMeta) {
-
             $carParentTable = $this->getCarParentTable();
             $haveChilds = (bool)$carParentTable->fetchRow([
                 'parent_id = ?' => $car->id
@@ -676,7 +675,7 @@ class CarsController extends AbstractActionController
             ], [], true));
 
             $data = $this->carToForm($car);
-            
+
             $vehicleType = new VehicleType();
             $data['vehicle_type_id'] = $vehicleType->getVehicleTypes($car->id);
 
@@ -693,7 +692,6 @@ class CarsController extends AbstractActionController
             if ($request->isPost() && $this->params('form') == 'car-edit-meta') {
                 $formModerCarEditMeta->setData($this->params()->fromPost());
                 if ($formModerCarEditMeta->isValid()) {
-
                     $values = $formModerCarEditMeta->getData();
 
                     $user = $this->user()->get();
@@ -705,7 +703,7 @@ class CarsController extends AbstractActionController
                     }
 
                     $car->setFromArray($this->prepareCarMetaToSave($values))->save();
-                    
+
                     $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
 
                     $carTable->updateInteritance($car);
@@ -732,7 +730,6 @@ class CarsController extends AbstractActionController
                     $user = $this->user()->get();
                     foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                         if ($subscriber && ($subscriber->id != $user->id)) {
-
                             $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
                             $changes = $this->buildChangesMessage($oldData, $newData, $subscriber->language);
@@ -793,7 +790,6 @@ class CarsController extends AbstractActionController
                         foreach ($userIds as $userId) {
                             if ($userId != $user->id) {
                                 foreach ($userTable->find($userId) as $userRow) {
-
                                     $uri = $this->hostManager->getUriByLanguage($userRow->language);
 
                                     $message = sprintf(
@@ -845,7 +841,7 @@ class CarsController extends AbstractActionController
             $db->select()
             ->from('category_car', 'count(1)')
             ->where('car_id = ?', $car->id)
-            );
+        );
 
         $carLangTable = new DbTable\Vehicle\Language();
         $langNameCount = $carLangTable->getAdapter()->fetchOne(
@@ -1044,7 +1040,7 @@ class CarsController extends AbstractActionController
                         $changes[] = sprintf($message, $old ? $old->short_name : '-', $new ? $new->short_name : '-');
                     }
                     break;
-                    
+
                 case 'vehicle_type_id':
                     $vehicleTypeTable = new DbTable\Vehicle\Type();
                     $old = $oldData[$field];
@@ -1061,7 +1057,7 @@ class CarsController extends AbstractActionController
                             $newNames[] = $this->translate($row->name);
                         }
                         $changes[] = sprintf(
-                            $message, 
+                            $message,
                             $oldNames ? implode(', ', $oldNames) : '-',
                             $newNames ? implode(', ', $newNames) : '-'
                         );
@@ -1075,18 +1071,18 @@ class CarsController extends AbstractActionController
 
     public function carSelectBrandAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canMove = $this->canMove($car);
-        if (!$canMove) {
+        if (! $canMove) {
             return $this->forbiddenAction();
         }
 
@@ -1107,7 +1103,7 @@ class CarsController extends AbstractActionController
             'brands' => $brands->fetchAll(
                 $brands->select()
                 ->order(['brands.position', 'brands.caption'])
-                ),
+            ),
             'car' => $car
         ];
     }
@@ -1115,25 +1111,25 @@ class CarsController extends AbstractActionController
 
     public function setBrandCarTypeAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canMove = $this->canMove($car);
-        if (!$canMove) {
+        if (! $canMove) {
             return $this->forbiddenAction();
         }
 
         $brandTable = $this->getBrandTable();
         $brand = $brandTable->find($this->params('brand_id'))->current();
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFoundAction();
         }
 
@@ -1145,7 +1141,7 @@ class CarsController extends AbstractActionController
             'car_id = ?'   => $car->id
         ]);
 
-        if (!$brandCarRow) {
+        if (! $brandCarRow) {
             return $this->notFoundAction();
         }
 
@@ -1163,25 +1159,25 @@ class CarsController extends AbstractActionController
 
     public function setBrandCarCatnameAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canMove = $this->canMove($car);
-        if (!$canMove) {
+        if (! $canMove) {
             return $this->forbiddenAction();
         }
 
         $brandTable = $this->getBrandTable();
         $brand = $brandTable->find($this->params('brand_id'))->current();
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFoundAction();
         }
 
@@ -1191,7 +1187,7 @@ class CarsController extends AbstractActionController
             'car_id = ?'   => $car->id
         ]);
 
-        if (!$brandCarRow) {
+        if (! $brandCarRow) {
             return $this->notFoundAction();
         }
 
@@ -1206,7 +1202,7 @@ class CarsController extends AbstractActionController
                 'car_id <> ?'  => $car->id
             ]);
 
-            if (!$sameBrandCarRow) {
+            if (! $sameBrandCarRow) {
                 $brandCarRow->catname = $values['catname'] ? $values['catname'] : $car->id;
                 $brandCarRow->save();
 
@@ -1226,18 +1222,18 @@ class CarsController extends AbstractActionController
 
     public function carSelectTwinsGroupAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canEditTwins = $this->user()->isAllowed('twins', 'edit');
-        if (!$canEditTwins) {
+        if (! $canEditTwins) {
             return $this->forbiddenAction();
         }
 
@@ -1258,10 +1254,9 @@ class CarsController extends AbstractActionController
                 'Автомобиль %s добавлен в группу близнецов %s',
                 htmlspecialchars($car->getFullName('en')),
                 htmlspecialchars($twinsGroup->name)
-                ), [$twinsGroup, $car]);
+            ), [$twinsGroup, $car]);
 
             return $this->redirectToCar($car, 'twins');
-
         }
 
         $brandTable = $this->getBrandTable();
@@ -1278,8 +1273,7 @@ class CarsController extends AbstractActionController
                 ->where('brands_cars.brand_id = ?', $brand->id)
                 ->group('twins_groups.id')
                 ->order('twins_groups.name')
-                );
-
+            );
         } else {
             $brands = $brandTable->fetchAll(
                 $brandTable->select(true)
@@ -1288,7 +1282,7 @@ class CarsController extends AbstractActionController
                 ->join('twins_groups_cars', 'car_parent_cache.car_id = twins_groups_cars.car_id', null)
                 ->group('brands.id')
                 ->order(['brands.position', 'brands.caption'])
-                );
+            );
         }
 
         $this->twinsForm->setAttribute('action', $this->url()->fromRoute('moder/cars/params', [], [], true));
@@ -1320,25 +1314,27 @@ class CarsController extends AbstractActionController
 
     public function carRemoveFromTwinsGroupAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car)
+        if (! $car) {
             return $this->notFoundAction();
+        }
 
             $canEditTwins = $this->user()->isAllowed('twins', 'edit');
-            if (!$canEditTwins)
-                throw new Exception('Access denied');
+        if (! $canEditTwins) {
+            throw new Exception('Access denied');
+        }
 
                 $twinsGroups = new DbTable\Twins\Group();
                 $twinsGroup = $twinsGroups->find($this->params('twins_group_id'))->current();
 
-                if (!$twinsGroup) {
-                    return $this->notFoundAction();
-                }
+        if (! $twinsGroup) {
+            return $this->notFoundAction();
+        }
 
                 $twinsGroupVehicleTable = new DbTable\Twins\GroupVehicle();
                 $twinsGroupCar = $twinsGroupVehicleTable->fetchRow(
@@ -1354,27 +1350,27 @@ class CarsController extends AbstractActionController
                     $twinsGroupVehicleTable->select(true)
                         ->where('twins_group_id = ?', $twinsGroup->id)
                 );
-                if (!$twinsGroupsCarsRow) {
-                    $twinsGroup->delete();
-                }
+        if (! $twinsGroupsCarsRow) {
+            $twinsGroup->delete();
+        }
 
                 return $this->redirectToCar($car, 'twins');
     }
 
     public function carSelectFactoryAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canEditFactory = $this->user()->isAllowed('factory', 'edit');
-        if (!$canEditFactory) {
+        if (! $canEditFactory) {
             return $this->forbiddenAction();
         }
 
@@ -1393,17 +1389,16 @@ class CarsController extends AbstractActionController
                 'Автомобиль %s добавлен к заводу %s',
                 htmlspecialchars($car->getFullName('en')),
                 htmlspecialchars($factory->name)
-                ), [$factory, $car]);
+            ), [$factory, $car]);
 
             return $this->redirectToCar($car, 'factories');
-
         }
 
         return [
             'factories' => $factoryTable->fetchAll(
                 $factoryTable->select(true)
                 ->order('factory.name')
-                ),
+            ),
             'car' => $car
         ];
     }
@@ -1411,25 +1406,25 @@ class CarsController extends AbstractActionController
 
     public function carRemoveFromFactoryAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canEditFactory = $this->user()->isAllowed('factory', 'edit');
-        if (!$canEditFactory) {
+        if (! $canEditFactory) {
             return $this->forbiddenAction();
         }
 
         $factoryTable = new DbTable\Factory();
         $factory = $factoryTable->find($this->params('factory_id'))->current();
 
-        if (!$factory) {
+        if (! $factory) {
             return $this->notFoundAction();
         }
 
@@ -1438,7 +1433,7 @@ class CarsController extends AbstractActionController
             $factoryCarTable->select(true)
             ->where('car_id = ?', $car->id)
             ->where('factory_id = ?', $factory->id)
-            );
+        );
 
         if ($factoryCar) {
             $factoryCar->delete();
@@ -1470,7 +1465,7 @@ class CarsController extends AbstractActionController
                 'category_id = ?' => $row->id
             ]);
 
-            $childs = $this->getCategoriesArray($row, $selection, $deep+1);
+            $childs = $this->getCategoriesArray($row, $selection, $deep + 1);
 
             $inherited = false;
             $active = $checked = array_key_exists($row->id, $selection);
@@ -1504,25 +1499,26 @@ class CarsController extends AbstractActionController
 
     public function carCategoriesSaveAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car)
+        if (! $car) {
             return $this->notFoundAction();
+        }
 
             $canEditMeta = $this->canEditMeta($car);
 
-            if (!$canEditMeta) {
-                return $this->forbiddenAction();
-            }
+        if (! $canEditMeta) {
+            return $this->forbiddenAction();
+        }
 
-            if (!$this->getRequest()->isPost()) {
-                return $this->forbiddenAction();
-            }
+        if (! $this->getRequest()->isPost()) {
+            return $this->forbiddenAction();
+        }
 
             $cTable = new DbTable\Category();
             $ccTable = new DbTable\Category\Vehicle();
@@ -1532,27 +1528,27 @@ class CarsController extends AbstractActionController
             // insert new
             $insertedNames = [];
             $ids = [];
-            foreach ($categories as $category) {
-                $ids[] = $category->id;
+        foreach ($categories as $category) {
+            $ids[] = $category->id;
 
-                $ccRow = $ccTable->fetchRow([
-                    'category_id = ?' => $category->id,
-                    'car_id = ?'      => $car->id
+            $ccRow = $ccTable->fetchRow([
+            'category_id = ?' => $category->id,
+            'car_id = ?'      => $car->id
+            ]);
+            if (! $ccRow) {
+                $user = $this->user()->get();
+                $ccRow = $ccTable->fetchNew();
+                $ccRow->setFromArray([
+                    'car_id'       => $car->id,
+                    'category_id'  => $category->id,
+                    'add_datetime' => new Zend_Db_Expr('NOW()'),
+                    'user_id'      => $user->id
                 ]);
-                if (!$ccRow) {
-                    $user = $this->user()->get();
-                    $ccRow = $ccTable->fetchNew();
-                    $ccRow->setFromArray([
-                        'car_id'       => $car->id,
-                        'category_id'  => $category->id,
-                        'add_datetime' => new Zend_Db_Expr('NOW()'),
-                        'user_id'      => $user->id
-                    ]);
-                    $ccRow->save();
+                $ccRow->save();
 
-                    $insertedNames[] = $category->name;
-                }
+                $insertedNames[] = $category->name;
             }
+        }
 
             // delete old
             $deletedNames = [];
@@ -1580,7 +1576,7 @@ class CarsController extends AbstractActionController
             }
 
             if ($deletedNames || $insertedNames) {
-                $logText =  'Изменение категорий автомобиля ' . $car->getFullName('en') . '. ' .
+                $logText = 'Изменение категорий автомобиля ' . $car->getFullName('en') . '. ' .
                     ($deletedNames ? 'Удалено: ' . implode(', ', $deletedNames) . '. ' : '') .
                     ($insertedNames ? 'Добавлено: ' . implode(', ', $insertedNames) . '. ' : '');
                     $this->log(htmlspecialchars($logText), $car);
@@ -1612,7 +1608,7 @@ class CarsController extends AbstractActionController
                         $car->getFullName($notifyUser->language),
                         $this->carModerUrl($car, true, null, $uri),
                         implode(', ', $categoryNames)
-                        );
+                    );
 
                     $this->message->send(null, $notifyUser->id, $message);
                 }
@@ -1625,14 +1621,14 @@ class CarsController extends AbstractActionController
 
     public function carCategoriesAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -1641,7 +1637,7 @@ class CarsController extends AbstractActionController
 
         $canEditMeta = $this->canEditMeta($car);
 
-        if (!$canEditMeta) {
+        if (! $canEditMeta) {
             return $this->forbiddenAction();
         }
 
@@ -1651,7 +1647,7 @@ class CarsController extends AbstractActionController
             $db->select()
             ->from('category_car', ['category_id', 'user_id'])
             ->where('car_id = ?', $car->id)
-            );
+        );
 
         $inherited = $db->fetchCol(
             $db->select()
@@ -1659,7 +1655,7 @@ class CarsController extends AbstractActionController
             ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
             ->where('car_parent_cache.car_id = ?', $car->id)
             //->where('car_parent_cache.diff > 0')
-            );
+        );
 
         $selection = [];
 
@@ -1672,15 +1668,14 @@ class CarsController extends AbstractActionController
         }
 
         foreach ($inherited as $id) {
-            if (!isset($selection[$id])) {
-
+            if (! isset($selection[$id])) {
                 $carRows = $carTable->fetchAll(
                     $carTable->select(true)
                     ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
                     ->where('car_parent_cache.car_id = ?', $car->id)
                     ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null)
                     ->where('category_car.category_id = ?', $id)
-                    );
+                );
 
                 $inheritedFrom = [];
                 foreach ($carRows as $carRow) {
@@ -1711,18 +1706,18 @@ class CarsController extends AbstractActionController
 
     public function subscribeAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -1737,18 +1732,18 @@ class CarsController extends AbstractActionController
 
     public function unsubscribeAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -1763,24 +1758,24 @@ class CarsController extends AbstractActionController
 
     public function saveNameAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canEditMeta = $this->canEditMeta($car);
 
-        if (!$canEditMeta) {
+        if (! $canEditMeta) {
             return $this->forbiddenAction();
         }
 
@@ -1797,8 +1792,7 @@ class CarsController extends AbstractActionController
             ]);
 
             if ($value) {
-
-                if (!$row) {
+                if (! $row) {
                     $row = $carLangTable->createRow([
                         'car_id'   => $car->id,
                         'language' => $lang
@@ -1811,14 +1805,11 @@ class CarsController extends AbstractActionController
 
                 $row->name = $value;
                 $row->save();
-
             } else {
-
                 if ($row) {
                     $changes[] = 'Удалено ' . strtoupper($lang) . ': ' . $row->name;
                     $row->delete();
                 }
-
             }
         }
 
@@ -1833,7 +1824,7 @@ class CarsController extends AbstractActionController
                 'Редактирование названий автомобиля %s',
                 htmlspecialchars($car->getFullName('en')).
                 ( count($changes) ? '<p>'.implode('<br />', $changes).'</p>' : '')
-                );
+            );
             $this->log($message, $car);
         }
 
@@ -1842,20 +1833,20 @@ class CarsController extends AbstractActionController
 
     public function treeAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canEditMeta = $this->canEditMeta($car);
 
-        if (!$canEditMeta) {
+        if (! $canEditMeta) {
             return $this->notFoundAction();
         }
 
@@ -1864,21 +1855,21 @@ class CarsController extends AbstractActionController
             ->join('car_parent', 'cars.id = car_parent.parent_id', null)
             ->where('car_parent.car_id = ?', $car->id)
             ->order($this->catalogue()->carsOrdering())
-            );
+        );
 
         $allParents = $carTable->fetchAll(
             $carTable->select(true)
             ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
             ->where('car_parent_cache.car_id = ?', $car->id)
             ->order($this->catalogue()->carsOrdering())
-            );
+        );
 
         $allChilds = $carTable->fetchAll(
             $carTable->select(true)
             ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
             ->where('car_parent_cache.parent_id = ?', $car->id)
             ->order($this->catalogue()->carsOrdering())
-            );
+        );
 
         $graphItems = [];
         foreach ($allParents as $c) {
@@ -1896,7 +1887,7 @@ class CarsController extends AbstractActionController
             $carParentTable->select(true)
             ->where('car_id in (?)', $graphItemsIds)
             ->where('parent_id in (?)', $graphItemsIds)
-            );
+        );
         $graphLinks = [];
         foreach ($carParentRows as $carParentRow) {
             $graphLinks[] = [
@@ -1926,7 +1917,7 @@ class CarsController extends AbstractActionController
                     'action'    => 'set-is-primary',
                     'car_id'    => $childRow->id,
                     'parent_id' => $car->id,
-                    'value'     => !$carParentRow->is_primary
+                    'value'     => ! $carParentRow->is_primary
                 ], [], true)
             ];
         }
@@ -1942,20 +1933,20 @@ class CarsController extends AbstractActionController
 
     public function rebuildTreeAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canEditMeta = $this->canEditMeta($car);
 
-        if (!$canEditMeta) {
+        if (! $canEditMeta) {
             return $this->notFoundAction();
         }
 
@@ -1970,29 +1961,29 @@ class CarsController extends AbstractActionController
 
     public function setIsPrimaryAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canEditMeta = $this->canEditMeta($car);
-        if (!$canEditMeta) {
+        if (! $canEditMeta) {
             return $this->notFoundAction();
         }
 
         $parentCar = $carTable->find($this->params('parent_id'))->current();
-        if (!$parentCar) {
+        if (! $parentCar) {
             return $this->notFoundAction();
         }
 
         $canEditMeta = $this->canEditMeta($parentCar);
-        if (!$canEditMeta) {
+        if (! $canEditMeta) {
             return $this->notFoundAction();
         }
 
@@ -2002,7 +1993,7 @@ class CarsController extends AbstractActionController
             'parent_id = ?' => $parentCar->id
         ]);
 
-        if (!$carParentRow) {
+        if (! $carParentRow) {
             return $this->notFoundAction();
         }
 
@@ -2017,29 +2008,29 @@ class CarsController extends AbstractActionController
 
     public function removeParentAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->notFoundAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canEditMeta = $this->canEditMeta($car);
 
-        if (!$canEditMeta) {
+        if (! $canEditMeta) {
             return $this->notFoundAction();
         }
 
         $parentCar = $carTable->find($this->params('parent_id'))->current();
-        if (!$parentCar) {
+        if (! $parentCar) {
             return $this->notFoundAction();
         }
 
@@ -2048,7 +2039,7 @@ class CarsController extends AbstractActionController
         $carParentTable->removeParent($car, $parentCar);
 
         $carTable->updateInteritance($car);
-        
+
         $vehicleType = new VehicleType();
         $vehicleType->refreshInheritanceFromParents($car->id);
 
@@ -2067,7 +2058,7 @@ class CarsController extends AbstractActionController
 
     public function addParentAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -2078,18 +2069,18 @@ class CarsController extends AbstractActionController
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canEditMeta = $this->canEditMeta($car);
 
-        if (!$canEditMeta) {
+        if (! $canEditMeta) {
             return $this->notFoundAction();
         }
 
         $parentCar = $carTable->find($this->params('parent_id'))->current();
-        if (!$parentCar) {
+        if (! $parentCar) {
             return $this->notFoundAction();
         }
 
@@ -2100,7 +2091,7 @@ class CarsController extends AbstractActionController
         $this->getCarParentTable()->addParent($car, $parentCar);
 
         $carTable->updateInteritance($car);
-        
+
         $vehicleType = new VehicleType();
         $vehicleType->refreshInheritanceFromParents($car->id);
 
@@ -2130,14 +2121,14 @@ class CarsController extends AbstractActionController
 
     public function carAutocompleteAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
 
         $carRow = $carTable->find($this->params('car_id'))->current();
-        if (!$carRow) {
+        if (! $carRow) {
             return $this->notFoundAction();
         }
 
@@ -2152,7 +2143,7 @@ class CarsController extends AbstractActionController
         $brandRows = $brandModel->getList([
             'language' => $language,
             'columns'  => ['id', 'name', 'img']
-        ], function($select) use ($query) {
+        ], function ($select) use ($query) {
             $select->where('caption like ?', $query . '%');
         });
 
@@ -2184,7 +2175,6 @@ class CarsController extends AbstractActionController
         $body = false;
 
         if (preg_match("|^(([0-9]{4})([-–]([^[:space:]]{2,4}))?[[:space:]]+)?(.*?)( \((.+)\))?( '([0-9]{4})(–(.+))?)?$|isu", $query, $match)) {
-
             $query = trim($match[5]);
             $body = isset($match[7]) ? trim($match[7]) : null;
             $beginYear = isset($match[9]) ? (int)$match[9] : null;
@@ -2269,7 +2259,7 @@ class CarsController extends AbstractActionController
         $expr = $carTable->getAdapter()->quoteInto(
             'cars.id = car_parent_cache.car_id and car_parent_cache.parent_id = ?',
             $carRow->id
-            );
+        );
         $select
         ->joinLeft('car_parent_cache', $expr, null)
         ->where('car_parent_cache.car_id is null');
@@ -2294,14 +2284,14 @@ class CarsController extends AbstractActionController
 
     public function carTwinsAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -2315,7 +2305,7 @@ class CarsController extends AbstractActionController
             $twinsGroupsTable->select(true)
             ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
             ->where('twins_groups_cars.car_id = ?', $car->id)
-            );
+        );
         foreach ($twinsGroupRows as $twinsGroupRow) {
             $twinsGroup = [
                 'id'        => $twinsGroupRow->id,
@@ -2338,7 +2328,7 @@ class CarsController extends AbstractActionController
             ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
             ->join('car_parent_cache', 'twins_groups_cars.car_id = car_parent_cache.parent_id', null)
             ->where('car_parent_cache.car_id = ?', $car->id)
-            );
+        );
         foreach ($twinsGroupRows as $twinsGroupRow) {
             if (isset($twinsGroups[$twinsGroupRow->id])) {
                 continue;
@@ -2350,7 +2340,7 @@ class CarsController extends AbstractActionController
                 ->where('car_parent_cache.car_id = ?', $car->id)
                 ->join('twins_groups_cars', 'twins_groups_cars.car_id = car_parent_cache.parent_id', null)
                 ->where('twins_groups_cars.twins_group_id = ?', $twinsGroupRow->id)
-                );
+            );
 
             $inheritedFrom = [];
             foreach ($carRows as $carRow) {
@@ -2386,14 +2376,14 @@ class CarsController extends AbstractActionController
 
     public function carFactoriesAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -2406,7 +2396,7 @@ class CarsController extends AbstractActionController
             $factoryTable->select(true)
             ->join('factory_car', 'factory.id = factory_car.factory_id', null)
             ->where('factory_car.car_id = ?', $car->id)
-            );
+        );
         foreach ($factoriesRows as $factoriesRow) {
             $factory = [
                 'id'        => $factoriesRow->id,
@@ -2429,7 +2419,7 @@ class CarsController extends AbstractActionController
             ->join('factory_car', 'factory.id = factory_car.factory_id', null)
             ->join('car_parent_cache', 'factory_car.car_id = car_parent_cache.parent_id', null)
             ->where('car_parent_cache.car_id = ?', $car->id)
-            );
+        );
         foreach ($factoriesRows as $factoriesRow) {
             if (isset($factories[$factoriesRow->id])) {
                 continue;
@@ -2441,7 +2431,7 @@ class CarsController extends AbstractActionController
                 ->where('car_parent_cache.car_id = ?', $car->id)
                 ->join('factory_car', 'factory_car.car_id = car_parent_cache.parent_id', null)
                 ->where('factory_car.factory_id = ?', $factoriesRow->id)
-                );
+            );
 
             $inheritedFrom = [];
             foreach ($carRows as $carRow) {
@@ -2491,7 +2481,7 @@ class CarsController extends AbstractActionController
             ->join('cars', 'car_parent.car_id = cars.id', null)
             ->where('car_parent.parent_id = ?', $car['id'])
             ->order(array_merge(['car_parent.type'], $this->catalogue()->carsOrdering()))
-            );
+        );
 
         $carTable = $this->catalogue()->getCarTable();
         foreach ($carParentRows as $carParentRow) {
@@ -2506,14 +2496,14 @@ class CarsController extends AbstractActionController
 
     public function carTreeAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -2533,13 +2523,12 @@ class CarsController extends AbstractActionController
         $brandCarRows = $brandCarTable->fetchAll(
             $brandCarTable->select(true)
             ->where('car_id = ?', $vehicle->id)
-            );
+        );
 
         $brands = [];
         foreach ($brandCarRows as $brandCarRow) {
             $brandRow = $brandTable->find($brandCarRow->brand_id)->current();
             if ($brandRow) {
-
                 $bvlRow = $brandVehicleLangaugeTable->fetchRow([
                     'vehicle_id = ?' => $vehicle->id,
                     'brand_id = ?'   => $brandRow->id,
@@ -2599,14 +2588,14 @@ class CarsController extends AbstractActionController
 
     public function carCatalogueAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -2618,7 +2607,7 @@ class CarsController extends AbstractActionController
             $rows = $brandTable->fetchAll(
                 $brandTable->select(true)
                 ->where('INSTR(?, caption)', $car->caption)
-                );
+            );
 
             foreach ($rows as $row) {
                 $relevantBrands[$row->id] = $row;
@@ -2629,12 +2618,11 @@ class CarsController extends AbstractActionController
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
                 ->where('car_parent_cache.car_id = ?', $car->id)
-                );
+            );
 
             foreach ($brandRows as $brand) {
                 unset($relevantBrands[$brand->id]);
             }
-
         }
         $canUseTree = true;
 
@@ -2650,7 +2638,7 @@ class CarsController extends AbstractActionController
             ->join('cars', 'car_parent.parent_id = cars.id', null)
             ->where('car_parent.car_id = ?', $car->id)
             ->order($order)
-            );
+        );
         $parents = $this->perepareCatalogueCars($carParentRows, true);
 
         $carParentRows = $carParentTable->fetchAll(
@@ -2658,7 +2646,7 @@ class CarsController extends AbstractActionController
             ->join('cars', 'car_parent.car_id = cars.id', null)
             ->where('car_parent.parent_id = ?', $car->id)
             ->order($order)
-            );
+        );
         $childs = $this->perepareCatalogueCars($carParentRows, false);
 
         $model = new ViewModel([
@@ -2720,9 +2708,8 @@ class CarsController extends AbstractActionController
         ]);
 
         foreach ($brandCarRows as $brandCarRow) {
-
             $brand = $this->getBrandTable()->find($brandCarRow->brand_id)->current();
-            if (!$brand) {
+            if (! $brand) {
                 throw new Exception("Broken link `{$brandCarRow->brand_id}`");
             }
 
@@ -2741,7 +2728,7 @@ class CarsController extends AbstractActionController
             $urls = array_merge(
                 $urls,
                 $this->walkUpUntilBrand($parentRow->parent_id, array_merge([$parentRow->catname], $path))
-                );
+            );
         }
 
         return $urls;
@@ -2767,16 +2754,15 @@ class CarsController extends AbstractActionController
         $language = $this->language();
 
         foreach ($carParentRows as $carParentRow) {
-
             $carRow = $carTable->fetchRow([
                 'id = ?' => $parent ? $carParentRow->parent_id : $carParentRow->car_id
             ]);
-            if (!$carRow) {
+            if (! $carRow) {
                 throw new Exception("Broken car parent link");
             }
 
             $duplicateRow = null;
-            if (!$parent) {
+            if (! $parent) {
                 $select = $carTable->select(true)
                 ->join('car_parent', 'cars.id = car_parent.car_id', null)
                 ->join('car_parent_cache', 'car_parent.car_id = car_parent_cache.parent_id', null)
@@ -2787,7 +2773,6 @@ class CarsController extends AbstractActionController
 
                 $duplicateRow = $carTable->fetchRow($select);
             } else {
-
                 /*$select = $carTable->select(true)
                  ->where('cars.id IN (?)', $parentIds)
                  ->where('cars.id <> ?', $carRow->id)
@@ -2818,12 +2803,11 @@ class CarsController extends AbstractActionController
                     $brandCarTable->select(true)
                     ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
                     ->where('car_parent_cache.car_id = ?', $carRow->id)
-                    );
+                );
 
                 foreach ($brandCarRows as $brandCarRow) {
                     $brandRow = $brandTable->find($brandCarRow->brand_id)->current();
                     if ($brandRow) {
-
                         $url = $this->url()->fromRoute('catalogue', [
                             'action'        => 'brand',
                             'brand_catname' => $brandRow->folder
@@ -2831,7 +2815,6 @@ class CarsController extends AbstractActionController
 
                         $inheritedCar = null;
                         if ($brandCarRow->car_id != $carParentRow->parent_id) {
-
                             $inheritedCar = $carTable->find($brandCarRow->car_id)->current();
 
                             $paths = $carParentTable->getPathsToBrand($inheritedCar->id, $brandRow->id);
@@ -2910,13 +2893,13 @@ class CarsController extends AbstractActionController
 
     public function carNameAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -2949,19 +2932,19 @@ class CarsController extends AbstractActionController
 
     public function carParentSetTypeAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $parent = $carTable->find($this->params('parent_id'))->current();
-        if (!$parent) {
+        if (! $parent) {
             return $this->notFoundAction();
         }
 
@@ -2970,7 +2953,7 @@ class CarsController extends AbstractActionController
             'parent_id = ?' => $parent->id
         ]);
 
-        if (!$carParentRow) {
+        if (! $carParentRow) {
             return $this->notFoundAction();
         }
 
@@ -2987,19 +2970,19 @@ class CarsController extends AbstractActionController
 
     public function carParentSetCatnameAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $parent = $carTable->find($this->params('parent_id'))->current();
-        if (!$parent) {
+        if (! $parent) {
             return $this->notFoundAction();
         }
 
@@ -3010,7 +2993,7 @@ class CarsController extends AbstractActionController
             'parent_id = ?' => $parent->id
         ]);
 
-        if (!$carParentRow) {
+        if (! $carParentRow) {
             return $this->notFoundAction();
         }
 
@@ -3018,7 +3001,7 @@ class CarsController extends AbstractActionController
         $messages = [];
 
         $data = $this->params()->fromPost();
-        if (!isset($data['catname']) || !strlen($data['catname']) || (!$carParentRow->manual_catname && ($data['catname'] == $carParentRow->car_id))) {
+        if (! isset($data['catname']) || ! strlen($data['catname']) || (! $carParentRow->manual_catname && ($data['catname'] == $carParentRow->car_id))) {
             if (isset($data['name'])) {
                 $data['catname'] = $data['name'];
             }
@@ -3026,7 +3009,6 @@ class CarsController extends AbstractActionController
 
         $this->carParentForm->setData($data);
         if ($this->carParentForm->isValid()) {
-
             $values = $this->carParentForm->getData();
 
             $row = $carParentTable->fetchRow([
@@ -3035,18 +3017,17 @@ class CarsController extends AbstractActionController
                 'car_id <> ?'   => $carParentRow->car_id
             ]);
 
-            if (!$row) {
-
+            if (! $row) {
                 $nameIsEmpty = strlen($values['name']) == 0;
 
-                if (!$nameIsEmpty) {
+                if (! $nameIsEmpty) {
                     $carParentRow->name = $values['name'];
                 } else {
                     $carParentRow->name = null;
                 }
 
                 $catnameIsEmpty = strlen($values['catname']) == 0 || $values['catname'] == '_';
-                if (!$catnameIsEmpty) {
+                if (! $catnameIsEmpty) {
                     $carParentRow->catname = $values['catname'];
                     $carParentRow->manual_catname = 1;
                 } else {
@@ -3057,7 +3038,6 @@ class CarsController extends AbstractActionController
                 $carParentRow->save();
 
                 $ok = true;
-
             }
         } else {
             $messages = array_values($this->carParentForm->catname->getMessages());
@@ -3076,7 +3056,7 @@ class CarsController extends AbstractActionController
             $carRow = $carTable->fetchRow([
                 'id = ?' => $cpRow->car_id
             ]);
-            if (!$carRow) {
+            if (! $carRow) {
                 throw new Exception("Broken car parent link");
             }
 
@@ -3109,7 +3089,7 @@ class CarsController extends AbstractActionController
             ->where('car_parent.parent_id = ?', $car['id'])
             ->where('cars.is_group')
             ->order(array_merge(['car_parent.type'], $this->catalogue()->carsOrdering()))
-            );
+        );
         foreach ($childRows as $childRow) {
             $data['childs'][] = $this->carSelectParentWalk($childRow);
         }
@@ -3120,18 +3100,18 @@ class CarsController extends AbstractActionController
 
     public function carSelectParentAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canMove = $this->canMove($car);
-        if (!$canMove) {
+        if (! $canMove) {
             return $this->forbiddenAction();
         }
 
@@ -3152,18 +3132,16 @@ class CarsController extends AbstractActionController
         $cars = [];
 
         if ($brand) {
-
             $rows = $carTable->fetchAll(
                 $carTable->select(true)
                 ->join('brands_cars', 'cars.id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brand->id)
                 ->order($this->catalogue()->carsOrdering())
-                );
+            );
 
             foreach ($rows as $row) {
                 $cars[] = $this->carSelectParentWalk($row);
             }
-
         } else {
             $brands = $brandTable->fetchAll(null, ['brands.position', 'brands.caption']);
         }
@@ -3195,19 +3173,19 @@ class CarsController extends AbstractActionController
 
     public function organizeAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $carTable = $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canMove = $this->canMove($car);
-        if (!$canMove) {
+        if (! $canMove) {
             return $this->forbiddenAction();
         }
 
@@ -3261,7 +3239,7 @@ class CarsController extends AbstractActionController
 
         $data = $this->carToForm($car);
         $data['is_group'] = true;
-        
+
         $vehicleType = new VehicleType();
         $data['vehicle_type_id'] = $vehicleType->getVehicleTypes($car->id);
 
@@ -3278,7 +3256,7 @@ class CarsController extends AbstractActionController
                     $this->prepareCarMetaToSave($values)
                 );
                 $newCar->save();
-                
+
                 $vehicleType->setVehicleTypes($newCar->id, (array)$values['vehicle_type_id']);
 
                 $newCar->updateOrderCache();
@@ -3293,7 +3271,7 @@ class CarsController extends AbstractActionController
                 $this->log(sprintf(
                     'Создан новый автомобиль %s',
                     htmlspecialchars($newCar->getFullName('en'))
-                    ), $newCar);
+                ), $newCar);
 
 
                 $carParentTable->addParent($newCar, $car);
@@ -3302,7 +3280,7 @@ class CarsController extends AbstractActionController
                     '%s выбран как родительский автомобиль для %s',
                     htmlspecialchars($car->getFullName('en')),
                     htmlspecialchars($newCar->getFullName('en'))
-                    );
+                );
                 $this->log($message, [$car, $newCar]);
 
                 $carTable->updateInteritance($newCar);
@@ -3317,7 +3295,7 @@ class CarsController extends AbstractActionController
                         '%s выбран как родительский автомобиль для %s',
                         htmlspecialchars($newCar->getFullName('en')),
                         htmlspecialchars($childCarRow->getFullName('en'))
-                        );
+                    );
                     $this->log($message, [$newCar, $childCarRow]);
 
                     $carParentTable->removeParent($childCarRow, $car);
@@ -3325,7 +3303,7 @@ class CarsController extends AbstractActionController
                         '%s перестал быть родительским автомобилем для %s',
                         htmlspecialchars($car->getFullName('en')),
                         htmlspecialchars($childCarRow->getFullName('en'))
-                        );
+                    );
                     $this->log($message, [$car, $childCarRow]);
 
                     $carTable->updateInteritance($childCarRow);
@@ -3399,7 +3377,7 @@ class CarsController extends AbstractActionController
                 $specInherit = true;
             } else {
                 $specId = (int)$values['spec_id'];
-                if (!$specId) {
+                if (! $specId) {
                     $specId = null;
                 }
             }
@@ -3418,7 +3396,7 @@ class CarsController extends AbstractActionController
 
     public function newAction()
     {
-        if (!$this->user()->isAllowed('car', 'add')) {
+        if (! $this->user()->isAllowed('car', 'add')) {
             return $this->forbiddenAction();
         }
 
@@ -3450,12 +3428,11 @@ class CarsController extends AbstractActionController
         if ($this->getRequest()->isPost()) {
             $form->setData($this->params()->fromPost());
             if ($form->isValid()) {
-
                 $values = $this->prepareCarMetaToSave($form->getData());
 
                 $car = $carTable->createRow($values);
                 $car->save();
-                
+
                 $vehicleType = new VehicleType();
                 $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
 
@@ -3463,7 +3440,7 @@ class CarsController extends AbstractActionController
 
                 $cpcTable = new DbTable\Vehicle\ParentCache();
                 $cpcTable->rebuildCache($car);
-                
+
                 $vehicleType = new VehicleType();
                 $vehicleType->refreshInheritanceFromParents($car->id);
 
@@ -3490,7 +3467,7 @@ class CarsController extends AbstractActionController
                         '%s выбран как родительский автомобиль для %s',
                         htmlspecialchars($parentCar->getFullName('en')),
                         htmlspecialchars($car->getFullName('en'))
-                        );
+                    );
                     $this->log($message, [$car, $parentCar]);
                 }
 
@@ -3519,19 +3496,19 @@ class CarsController extends AbstractActionController
 
     public function organizePicturesAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
         $canMove = $this->canMove($car);
-        if (!$canMove) {
+        if (! $canMove) {
             return $this->forbiddenAction();
         }
 
@@ -3586,7 +3563,7 @@ class CarsController extends AbstractActionController
 
         $data = $this->carToForm($car);
         $data['is_group'] = false;
-        
+
         $vehicleType = new VehicleType();
         $data['vehicle_type_id'] = $vehicleType->getVehicleTypes($car->id);
 
@@ -3605,7 +3582,7 @@ class CarsController extends AbstractActionController
                     $this->prepareCarMetaToSave($values)
                 );
                 $newCar->save();
-                
+
                 $vehicleType->setVehicleTypes($newCar->id, (array)$values['vehicle_type_id']);
 
                 $newCar->updateOrderCache();
@@ -3708,7 +3685,6 @@ class CarsController extends AbstractActionController
 
         $modifications = [];
         foreach ($mTable->fetchAll($select) as $mRow) {
-
             $picturesCount = $db->fetchOne(
                 $db->select()
                 ->from('modification_picture', 'count(1)')
@@ -3717,7 +3693,7 @@ class CarsController extends AbstractActionController
                 ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id)
-                );
+            );
 
             $isInherited = $mRow->car_id != $car->id;
             $inheritedFrom = null;
@@ -3728,7 +3704,7 @@ class CarsController extends AbstractActionController
                     ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
                     ->join('modification', 'cars.id = modification.car_id', null)
                     ->where('modification.id = ?', $mRow['id'])
-                    );
+                );
 
                 if ($carRow) {
                     $inheritedFrom = [
@@ -3748,7 +3724,7 @@ class CarsController extends AbstractActionController
                     'modification_id' => $mRow->id
                 ], [], true),
                 'count'     => $picturesCount,
-                'canDelete' => !$isInherited && $modModel->canDelete($mRow->id),
+                'canDelete' => ! $isInherited && $modModel->canDelete($mRow->id),
                 'deleteUrl' => $this->url()->fromRoute('moder/modification/params', [
                     'action'     => 'delete',
                     'id'         => $mRow->id
@@ -3761,14 +3737,14 @@ class CarsController extends AbstractActionController
 
     public function carModificationsAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -3776,7 +3752,7 @@ class CarsController extends AbstractActionController
 
         $mgRows = $mgTable->fetchAll(
             $mgTable->select(true)
-            );
+        );
 
         $groups = [];
         foreach ($mgRows as $mgRow) {
@@ -3799,14 +3775,14 @@ class CarsController extends AbstractActionController
 
     public function carModificationPicturesAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $cars = $this->catalogue()->getCarTable();
 
         $car = $cars->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -3821,7 +3797,6 @@ class CarsController extends AbstractActionController
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-
             $picture = (array)$this->params('picture', []);
 
             foreach ($picture as $pictureId => $modificationIds) {
@@ -3831,7 +3806,7 @@ class CarsController extends AbstractActionController
                     ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $car->id)
-                    );
+                );
 
                 if ($pictureRow) {
                     foreach ($modificationIds as &$modificationId) {
@@ -3841,7 +3816,7 @@ class CarsController extends AbstractActionController
                             'picture_id = ?'      => $pictureRow->id,
                             'modification_id = ?' => $modificationId
                         ]);
-                        if (!$mpRow) {
+                        if (! $mpRow) {
                             $mpRow = $mpTable->createRow([
                                 'picture_id'      => $pictureRow->id,
                                 'modification_id' => $modificationId
@@ -3881,10 +3856,9 @@ class CarsController extends AbstractActionController
             ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
             ->where('car_parent_cache.parent_id = ?', $car->id)
             ->order('pictures.id')
-            );
+        );
 
         foreach ($pictureRows as $pictureRow) {
-
             $request = DbTable\Picture\Row::buildFormatRequest($pictureRow->toArray());
             $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
 
@@ -3892,7 +3866,7 @@ class CarsController extends AbstractActionController
                 $db->select()
                 ->from('modification_picture', 'modification_id')
                 ->where('picture_id = ?', $pictureRow->id)
-                );
+            );
 
             $pictures[] = [
                 'id'              => $pictureRow->id,
@@ -3906,18 +3880,17 @@ class CarsController extends AbstractActionController
 
         $mgRows = $mgTable->fetchAll(
             $mgTable->select(true)
-            );
+        );
 
         $groups = [];
         foreach ($mgRows as $mgRow) {
-
             $mRows = $mTable->fetchAll(
                 $mTable->select(true)
                 ->where('modification.group_id = ?', $mgRow->id)
                 ->join('car_parent_cache', 'modification.car_id = car_parent_cache.parent_id', null)
                 ->where('car_parent_cache.car_id = ?', $car->id)
                 ->order('modification.name')
-                );
+            );
 
             $modifications = [];
             foreach ($mRows as $mRow) {
@@ -3939,7 +3912,7 @@ class CarsController extends AbstractActionController
             ->join('car_parent_cache', 'modification.car_id = car_parent_cache.parent_id', null)
             ->where('car_parent_cache.car_id = ?', $car->id)
             ->order('modification.name')
-            );
+        );
 
         $modifications = [];
         foreach ($mRows as $mRow) {

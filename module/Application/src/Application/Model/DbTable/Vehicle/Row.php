@@ -46,11 +46,11 @@ class Row extends \Application\Db\Table\Row
 
         $cy = (int)date('Y');
 
-        if (!is_null($by)) {
+        if (! is_null($by)) {
             if ($by > 0) {
                 $result = $by;
-                if (!is_null($ey) && ($ey > $by)) {
-                    if ( ((int)($ey/1000)) == ((int)($by/1000)) ) {
+                if (! is_null($ey) && ($ey > $by)) {
+                    if (((int)($ey / 1000)) == ((int)($by / 1000))) {
                         $result .= '–'.substr($ey, 2, 2);
                     } else {
                         $result .= '–'.$ey;
@@ -60,8 +60,7 @@ class Row extends \Application\Db\Table\Row
                         if ($by < $cy) {
                             $result .= '–н.в.';
                         }
-                    }
-                    elseif ($by < $cy) {
+                    } elseif ($by < $cy) {
                         $result .= '–????';
                     }
                 }
@@ -110,7 +109,6 @@ class Row extends \Application\Db\Table\Row
             } else {
                 $result = $by . ' ' . $result;
             }
-
         }
 
         if (strlen($options['body']) > 0) {
@@ -131,7 +129,7 @@ class Row extends \Application\Db\Table\Row
 
     public function getNameData($language = 'en')
     {
-        if (!is_string($language)) {
+        if (! is_string($language)) {
             throw new Exception('`language` is not string');
         }
 
@@ -194,42 +192,33 @@ class Row extends \Application\Db\Table\Row
         $em = $this->end_month;
         $cy = (int)date('Y');
 
-        $bs = (int)($by/100);
-        $es = (int)($ey/100);
+        $bs = (int)($by / 100);
+        $es = (int)($ey / 100);
 
         $equalS = $bs && $es && ($bs == $es);
         $equalY = $equalS && $by && $ey && ($by == $ey);
         $equalM = $equalY && $bm && $em && ($bm == $em);
 
 
-        if ($by > 0 || $ey > 0)
-        {
-          $result .= " '";
+        if ($by > 0 || $ey > 0) {
+            $result .= " '";
 
-          if ($equalM)
-          {
-            $result .= sprintf('<span class="month">%02d.</span>', $bm).$by;
-          }
-          else
-          {
-            if ($equalY) {
-                if ($bm && $em) {
-                    $result .= '<span class="month">'.($bm ? sprintf('%02d', $bm) : '??').'–'.($em ? sprintf('%02d', $em) : '??').'.</span>'.$by;
+            if ($equalM) {
+                $result .= sprintf('<span class="month">%02d.</span>', $bm).$by;
+            } else {
+                if ($equalY) {
+                    if ($bm && $em) {
+                        $result .= '<span class="month">'.($bm ? sprintf('%02d', $bm) : '??').'–'.($em ? sprintf('%02d', $em) : '??').'.</span>'.$by;
+                    } else {
+                        $result .= $by;
+                    }
                 } else {
-                    $result .= $by;
-                }
-            }
-            else
-            {
-              if ($equalS)
-              {
-                $result .= (($bm ? sprintf('<span class="month">%02d.</span>', $bm) : '').$by).
+                    if ($equalS) {
+                        $result .= (($bm ? sprintf('<span class="month">%02d.</span>', $bm) : '').$by).
                            '–'.
-                           ($em ? sprintf('<span class="month">%02d.</span>', $em) : '').($em ? $ey : sprintf('%02d', $ey%100));
-              }
-              else
-              {
-                $result .= (($bm ? sprintf('<span class="month">%02d.</span>', $bm) : '').($by ? $by : '????')).
+                           ($em ? sprintf('<span class="month">%02d.</span>', $em) : '').($em ? $ey : sprintf('%02d', $ey % 100));
+                    } else {
+                        $result .= (($bm ? sprintf('<span class="month">%02d.</span>', $bm) : '').($by ? $by : '????')).
                            (
                              $ey
                              ?
@@ -242,10 +231,10 @@ class Row extends \Application\Db\Table\Row
                                  :
                                    ($by < $cy ? '–????' : '')
                                )
-                           );
-              }
+                                 );
+                    }
+                }
             }
-          }
         }
 
         return $result;
@@ -283,14 +272,14 @@ class Row extends \Application\Db\Table\Row
         }
 
         $ids = [];
-        foreach ($pictures as $picture)
-            if ($picture)
+        foreach ($pictures as $picture) {
+            if ($picture) {
                 $ids[] = $picture->id;
+            }
+        }
 
-        foreach ($pictures as $key => $picture)
-        {
-            if (!$picture)
-            {
+        foreach ($pictures as $key => $picture) {
+            if (! $picture) {
                 $select = $pictureTable->select(true)
                     ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                     ->where('pictures.type=?', Picture::VEHICLE_TYPE_ID)
@@ -378,7 +367,7 @@ class Row extends \Application\Db\Table\Row
         } elseif ($this->begin_model_year) {
             $begin = new DateTime();
             $begin->setDate( // approximation
-                $this->begin_model_year-1,
+                $this->begin_model_year - 1,
                 10,
                 1
             );
@@ -412,7 +401,7 @@ class Row extends \Application\Db\Table\Row
 
         $this->setFromArray([
             'begin_order_cache' => $begin ? $begin->format(MYSQL_DATETIME_FORMAT) : null,
-              'end_order_cache' =>   $end ?   $end->format(MYSQL_DATETIME_FORMAT) : null,
+              'end_order_cache' => $end ? $end->format(MYSQL_DATETIME_FORMAT) : null,
         ]);
         $this->save();
     }

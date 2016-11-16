@@ -18,7 +18,7 @@ class InboxController extends AbstractActionController
         $brandModel = new BrandModel();
         $language = $this->language();
 
-        $brands = $brandModel->getList($language, function($select) use ($language) {
+        $brands = $brandModel->getList($language, function ($select) use ($language) {
             $select
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
@@ -90,10 +90,10 @@ class InboxController extends AbstractActionController
             'currentDate'  => $this->params('date')
         ]);
 
-        if (!$service->haveCurrentDate() || !$service->haveCurrentDayPictures()) {
+        if (! $service->haveCurrentDate() || ! $service->haveCurrentDayPictures()) {
             $lastDate = $service->getLastDateStr();
 
-            if (!$lastDate) {
+            if (! $lastDate) {
                 return $this->notFoundAction();
             }
 
@@ -128,7 +128,8 @@ class InboxController extends AbstractActionController
 
 
         return array_replace(
-            $this->getBrandControl($brand), [
+            $this->getBrandControl($brand),
+            [
                 'picturesData' => $picturesData,
                 'paginator' => $paginator,
                 'prev'      => [

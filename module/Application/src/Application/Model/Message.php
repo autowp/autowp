@@ -254,7 +254,7 @@ class Message
 
         $markReaden = [];
         foreach ($rows as $message) {
-            if (!$message->readen && $message->to_user_id == $userId) {
+            if (! $message->readen && $message->to_user_id == $userId) {
                 $markReaden[] = $message->id;
             }
         }
@@ -303,7 +303,7 @@ class Message
 
         $markReaden = [];
         foreach ($rows as $message) {
-            if (!$message->readen && $message->to_user_id == $userId) {
+            if (! $message->readen && $message->to_user_id == $userId) {
                 $markReaden[] = $message->id;
             }
         }
@@ -332,7 +332,7 @@ class Message
 
         $markReaden = [];
         foreach ($rows as $message) {
-            if (!$message->readen && $message->to_user_id == $userId) {
+            if (! $message->readen && $message->to_user_id == $userId) {
                 $markReaden[] = $message->id;
             }
         }
@@ -362,15 +362,15 @@ class Message
         foreach ($rows as $message) {
             $author = $userTable->find($message->from_user_id)->current();
 
-            $isNew = $message->to_user_id == $userId && !$message->readen;
+            $isNew = $message->to_user_id == $userId && ! $message->readen;
             $canDelete = $message->from_user_id == $userId || $message->to_user_id == $userId;
             $authorIsMe = $author && ($author->id == $userId);
-            $canReply = $author && !$author->deleted && !$authorIsMe;
+            $canReply = $author && ! $author->deleted && ! $authorIsMe;
 
             $dialogCount = 0;
 
             if ($canReply) {
-                if ($options['allMessagesLink'] && $author && !$authorIsMe) {
+                if ($options['allMessagesLink'] && $author && ! $authorIsMe) {
                     if (isset($cache[$author->id])) {
                         $dialogCount = $cache[$author->id];
                     } else {

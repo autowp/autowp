@@ -23,8 +23,9 @@ class MostsController extends AbstractActionController
 
     public function __construct(
         TextStorage\Service $textStorage,
-        SpecificationsService $specsService)
-    {
+        SpecificationsService $specsService
+    ) {
+
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
     }
@@ -86,7 +87,6 @@ class MostsController extends AbstractActionController
 
         $idx = 0;
         foreach ($data['carList']['cars'] as &$car) {
-
             $description = null;
             if ($car['car']['text_id']) {
                 $description = $this->textStorage->getText($car['car']['text_id']);

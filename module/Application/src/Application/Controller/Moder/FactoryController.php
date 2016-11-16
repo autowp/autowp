@@ -65,8 +65,9 @@ class FactoryController extends AbstractActionController
         Form $editForm,
         Form $descForm,
         Form $filterForm,
-        Message $message)
-    {
+        Message $message
+    ) {
+
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->addForm = $addForm;
@@ -99,14 +100,14 @@ class FactoryController extends AbstractActionController
 
     public function factoryAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $factoryTable = $this->getFactoryTable();
 
         $factory = $factoryTable->find($this->params('factory_id'))->current();
-        if (!$factory) {
+        if (! $factory) {
             return $this->notfoundAction();
         }
 
@@ -200,7 +201,7 @@ class FactoryController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -288,7 +289,6 @@ class FactoryController extends AbstractActionController
 
         $factories = [];
         foreach ($paginator->getCurrentItems() as $factory) {
-
             $pictures = $pictureTable->fetchAll([
                 'factory_id = ?' => $factory->id,
                 'type = ?'       => Picture::FACTORY_TYPE_ID
@@ -310,7 +310,7 @@ class FactoryController extends AbstractActionController
 
     public function addAction()
     {
-        if (!$this->user()->isAllowed('factory', 'add')) {
+        if (! $this->user()->isAllowed('factory', 'add')) {
             return $this->forbiddenAction();
         }
 
@@ -349,27 +349,26 @@ class FactoryController extends AbstractActionController
     public function saveDescriptionAction()
     {
         $canEdit = $this->user()->isAllowed('factory', 'edit');
-        if (!$canEdit) {
+        if (! $canEdit) {
             return $this->forbiddenAction();
         }
 
         $user = $this->user()->get();
 
         $request = $this->getRequest();
-        if (!$request->isPost()) {
+        if (! $request->isPost()) {
             return $this->forbiddenAction();
         }
 
         $factoryTable = $this->getFactoryTable();
 
         $factory = $factoryTable->find($this->params('factory_id'))->current();
-        if (!$factory) {
+        if (! $factory) {
             return $this->notfoundAction();
         }
 
         $this->descForm->setData($this->params()->fromPost());
         if ($this->descForm->isValid()) {
-
             $values = $this->descForm->getData();
 
             $text = $values['markdown'];
@@ -395,7 +394,6 @@ class FactoryController extends AbstractActionController
                 foreach ($userIds as $userId) {
                     if ($userId != $user->id) {
                         foreach ($userTable->find($userId) as $userRow) {
-
                             $uri = $this->hostManager->getUriByLanguage($notifyUser->language);
 
                             $message = sprintf(

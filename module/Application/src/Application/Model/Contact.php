@@ -12,7 +12,7 @@ class Contact
      * @var Table
      */
     private $table;
-    
+
     public function __construct()
     {
         $this->table = new Table([
@@ -20,14 +20,14 @@ class Contact
             'primary' => ['user_id', 'contact_user_id']
         ]);
     }
-    
+
     public function create($userId, $contactUserId)
     {
         $row = $this->table->fetchRow([
             'user_id = ?'         => (int)$userId,
             'contact_user_id = ?' => (int)$contactUserId
         ]);
-        if (!$row) {
+        if (! $row) {
             $row = $this->table->createRow([
                 'user_id'         => (int)$userId,
                 'contact_user_id' => (int)$contactUserId,
@@ -36,7 +36,7 @@ class Contact
             $row->save();
         }
     }
-    
+
     public function delete($userId, $contactUserId)
     {
         $row = $this->table->fetchRow([
@@ -47,7 +47,7 @@ class Contact
             $row->delete();
         }
     }
-    
+
     public function exists($userId, $contactUserId)
     {
         $row = $this->table->fetchRow([

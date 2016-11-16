@@ -22,7 +22,7 @@ class UsersController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -44,18 +44,18 @@ class UsersController extends AbstractActionController
 
     public function removeUserPhotoAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $can = $this->user()->isAllowed('user', 'ban');
-        if (!$can) {
+        if (! $can) {
             return $this->forbiddenAction();
         }
 
         $row = $this->table->find($this->params('id'))->current();
 
-        if (!$row) {
+        if (! $row) {
             return $this->notFoundAction();
         }
 
@@ -78,17 +78,17 @@ class UsersController extends AbstractActionController
 
     public function deleteUserAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $can = $this->user()->isAllowed('user', 'delete');
-        if (!$can) {
+        if (! $can) {
             return $this->forbiddenAction();
         }
 
         $row = $this->table->find($this->params('id'))->current();
-        if (!$row) {
+        if (! $row) {
             return $this->notFoundAction();
         }
 

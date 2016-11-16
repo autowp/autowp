@@ -119,8 +119,9 @@ class PicturesController extends AbstractActionController
         Form $banForm,
         PictureNameFormatter $pictureNameFormatter,
         TelegramService $telegram,
-        Message $message)
-    {
+        Message $message
+    ) {
+
         $this->hostManager = $hostManager;
         $this->table = $table;
         $this->textStorage = $textStorage;
@@ -226,7 +227,7 @@ class PicturesController extends AbstractActionController
 
     public function indexAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
@@ -425,7 +426,7 @@ class PicturesController extends AbstractActionController
                     break;
             }
         }
-        
+
         if ($formdata['gps']) {
             $select->where('pictures.point IS NOT NULL');
         }
@@ -503,7 +504,7 @@ class PicturesController extends AbstractActionController
         $reasons = array_combine($reasons, $reasons);
         if (isset($_COOKIE['customReason'])) {
             foreach ((array)unserialize($_COOKIE['customReason']) as $reason) {
-                if (strlen($reason) && !in_array($reason, $reasons)) {
+                if (strlen($reason) && ! in_array($reason, $reasons)) {
                     $reasons[$reason] = $reason;
                 }
             }
@@ -604,17 +605,17 @@ class PicturesController extends AbstractActionController
 
     public function deletePictureAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
         $canDelete = $this->pictureCanDelete($picture);
-        if (!$canDelete) {
+        if (! $canDelete) {
             return $this->forbiddenAction();
         }
 
@@ -627,7 +628,6 @@ class PicturesController extends AbstractActionController
         $picture->save();
 
         if ($owner = $picture->findParentRow(User::class, 'Owner')) {
-
             $uri = $this->hostManager->getUriByLanguage($owner->language);
 
             $requests = new PictureModerVote();
@@ -682,7 +682,7 @@ class PicturesController extends AbstractActionController
     public function picturePerspectiveAction()
     {
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->forward('notfound', 'error', 'default');
         }
 
@@ -718,7 +718,6 @@ class PicturesController extends AbstractActionController
         $ownerIsModer = $owner && $this->user($owner)->inheritsRole('moder');
         if ($ownerIsModer) {
             if ($owner->id != $this->user()->get()->id) {
-
                 $uri = $this->hostManager->getUriByLanguage($owner->language);
 
                 $message = sprintf(
@@ -740,12 +739,12 @@ class PicturesController extends AbstractActionController
 
     public function pictureVoteAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
@@ -758,7 +757,7 @@ class PicturesController extends AbstractActionController
             $car = $picture->findParentRow(Vehicle::class);
             if ($car) {
                 $db = $this->table->getAdapter();
-                $isLastPicture = !$db->fetchOne(
+                $isLastPicture = ! $db->fetchOne(
                     $db->select()
                         ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
                         ->where('car_id = ?', $car->id)
@@ -787,7 +786,7 @@ class PicturesController extends AbstractActionController
 
         $request = $this->getRequest();
 
-        if (!$voteExists && $this->user()->isAllowed('picture', 'moder_vote')) {
+        if (! $voteExists && $this->user()->isAllowed('picture', 'moder_vote')) {
             $this->voteForm->setAttribute('action', $this->url()->fromRoute('moder/pictures/params', [
                 'action'     => 'picture-vote',
                 'form'       => 'picture-vote',
@@ -808,7 +807,7 @@ class PicturesController extends AbstractActionController
                     $customReason[] = $values['reason'];
                     $customReason = array_unique($customReason);
 
-                    setcookie('customReason', serialize($customReason), time()+60*60*24*30, '/');
+                    setcookie('customReason', serialize($customReason), time() + 60 * 60 * 24 * 30, '/');
 
                     $vote = (bool)($values['vote']);
 
@@ -864,7 +863,7 @@ class PicturesController extends AbstractActionController
         }
 
         $moderVotes = null;
-        if (!$hideVote) {
+        if (! $hideVote) {
             $moderVotes = $picture->findDependentRowset(PictureModerVote::class);
         }
 
@@ -889,12 +888,12 @@ class PicturesController extends AbstractActionController
 
     public function pictureAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
@@ -934,7 +933,6 @@ class PicturesController extends AbstractActionController
         $canViewIp = $this->user()->isAllowed('user', 'ip');
 
         if ($canBan) {
-
             $service = new TrafficControl();
             $ban = $service->getBanInfo(inet_ntop($picture->ip));
             if ($ban) {
@@ -1002,7 +1000,6 @@ class PicturesController extends AbstractActionController
                     foreach ($userIds as $userId) {
                         if ($userId != $user->id) {
                             foreach ($userTable->find($userId) as $userRow) {
-
                                 $uri = $this->hostManager->getUriByLanguage($userRow->language);
 
                                 $message = sprintf(
@@ -1026,7 +1023,7 @@ class PicturesController extends AbstractActionController
         $iptcStr = $imageStorage->getImageIPTC($picture->image_id);
 
         $exif = $imageStorage->getImageEXIF($picture->image_id);
-        
+
         $exifStr = '';
         $notSections = ['FILE', 'COMPUTED'];
         if ($exif !== false) {
@@ -1034,7 +1031,7 @@ class PicturesController extends AbstractActionController
                 if (array_search($key, $notSections) !== false) {
                     continue;
                 }
-        
+
                 $exifStr .= '<p>['.htmlspecialchars($key).']';
                 foreach ($section as $name => $val) {
                     $exifStr .= "<br />".htmlspecialchars($name).": ";
@@ -1044,12 +1041,12 @@ class PicturesController extends AbstractActionController
                         $exifStr .= htmlspecialchars($val);
                     }
                 }
-    
+
                 $exifStr .= '</p>';
             }
         }
 
-        $canMove =  $this->user()->isAllowed('picture', 'move');
+        $canMove = $this->user()->isAllowed('picture', 'move');
 
         $lastCar = null;
         $namespace = new \Zend\Session\Container('Moder_Car');
@@ -1067,7 +1064,6 @@ class PicturesController extends AbstractActionController
                     && $this->user()->isAllowed('picture', 'unaccept');
 
         if ($canUnaccept) {
-
             if ($request->isPost() && $this->params('form') == 'picture-unaccept') {
                 $previousStatusUserId = $picture->change_status_user_id;
 
@@ -1104,9 +1100,7 @@ class PicturesController extends AbstractActionController
         $canAccept = $this->canAccept($picture);
 
         if ($canAccept) {
-
             if ($request->isPost() && $this->params('form') == 'picture-accept') {
-
                 $this->accept($picture);
 
                 $referer = $request->getServer('HTTP_REFERER');
@@ -1121,7 +1115,6 @@ class PicturesController extends AbstractActionController
         if ($picture->replace_picture_id) {
             $row = $this->table->find($picture->replace_picture_id)->current();
             if ($row) {
-
                 $canAcceptReplace = $this->canReplace($picture, $row);
 
                 $replacePicture = [
@@ -1146,7 +1139,7 @@ class PicturesController extends AbstractActionController
 
         $image = $imageStorage->getImage($picture->image_id);
 
-        if (!$image) {
+        if (! $image) {
             return $this->notFoundAction();
         }
 
@@ -1217,7 +1210,7 @@ class PicturesController extends AbstractActionController
             case Picture::VEHICLE_TYPE_ID:
                 if ($picture->car_id) {
                     $brandModel = new BrandModel();
-                    $relatedBrands = $brandModel->getList($this->language(), function($select) use ($picture) {
+                    $relatedBrands = $brandModel->getList($this->language(), function ($select) use ($picture) {
                         $select
                             ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                             ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
@@ -1232,7 +1225,7 @@ class PicturesController extends AbstractActionController
             case Picture::LOGO_TYPE_ID:
                 if ($picture->brand_id) {
                     $brandModel = new BrandModel();
-                    $relatedBrands = $brandModel->getList($this->language(), function($select) use ($picture) {
+                    $relatedBrands = $brandModel->getList($this->language(), function ($select) use ($picture) {
                         $select->where('brands.id = ?', $picture->brand_id);
                     });
                 }
@@ -1305,17 +1298,17 @@ class PicturesController extends AbstractActionController
 
     public function restoreAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
 
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
-        if (!$this->canRestore($picture)) {
+        if (! $this->canRestore($picture)) {
             return $this->forbiddenAction();
         }
 
@@ -1337,16 +1330,16 @@ class PicturesController extends AbstractActionController
 
     public function flopAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
-        if (!$this->canFlop($picture)) {
+        if (! $this->canFlop($picture)) {
             return $this->forbiddenAction();
         }
 
@@ -1366,16 +1359,16 @@ class PicturesController extends AbstractActionController
 
     public function normalizeAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->notFoundAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
-        if (!$this->canNormalize($picture)) {
+        if (! $this->canNormalize($picture)) {
             return $this->notFoundAction();
         }
 
@@ -1395,16 +1388,16 @@ class PicturesController extends AbstractActionController
 
     public function filesRepairAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
@@ -1421,16 +1414,16 @@ class PicturesController extends AbstractActionController
 
     public function filesCorrectNamesAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->notFoundAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
@@ -1445,12 +1438,12 @@ class PicturesController extends AbstractActionController
 
     public function cropperSaveAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture || !$this->canCrop()) {
+        if (! $picture || ! $this->canCrop()) {
             return $this->notFoundAction();
         }
 
@@ -1570,12 +1563,12 @@ class PicturesController extends AbstractActionController
 
     public function carChildsAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $user = $this->user()->get();
-        if (!$user) {
+        if (! $user) {
             return $this->forbiddenAction();
         }
 
@@ -1583,7 +1576,7 @@ class PicturesController extends AbstractActionController
         $carParentTable = $this->getCarParentTable();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -1604,13 +1597,13 @@ class PicturesController extends AbstractActionController
 
     public function conceptsAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $brandTable = new BrandTable();
         $brand = $brandTable->find($this->params('brand_id'))->current();
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFoundAction();
         }
 
@@ -1635,13 +1628,13 @@ class PicturesController extends AbstractActionController
 
     public function enginesAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
         $brandTable = new BrandTable();
         $brand = $brandTable->find($this->params('brand_id'))->current();
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFoundAction();
         }
 
@@ -1708,29 +1701,29 @@ class PicturesController extends AbstractActionController
 
     public function cancelReplaceAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
-        if (!$picture->replace_picture_id) {
+        if (! $picture->replace_picture_id) {
             return $this->notFoundAction();
         }
 
         $replacePicture = $this->table->find($picture->replace_picture_id)->current();
-        if (!$replacePicture) {
+        if (! $replacePicture) {
             return $this->notFoundAction();
         }
 
-        if (!$this->user()->isAllowed('picture', 'move')) {
+        if (! $this->user()->isAllowed('picture', 'move')) {
             return $this->forbiddenAction();
         }
 
@@ -1751,29 +1744,29 @@ class PicturesController extends AbstractActionController
 
     public function acceptReplaceAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
-        if (!$picture->replace_picture_id) {
+        if (! $picture->replace_picture_id) {
             return $this->notFoundAction();
         }
 
         $replacePicture = $this->table->find($picture->replace_picture_id)->current();
-        if (!$replacePicture) {
+        if (! $replacePicture) {
             return $this->notFoundAction();
         }
 
-        if (!$this->canReplace($picture, $replacePicture)) {
+        if (! $this->canReplace($picture, $replacePicture)) {
             return $this->forbiddenAction();
         }
 
@@ -1785,13 +1778,13 @@ class PicturesController extends AbstractActionController
                 'status'                => Picture::STATUS_ACCEPTED,
                 'change_status_user_id' => $user->id
             ]);
-            if (!$picture->accept_datetime) {
+            if (! $picture->accept_datetime) {
                 $picture->accept_datetime = new Zend_Db_Expr('NOW()');
             }
             $picture->save();
         }
 
-        if (!in_array($replacePicture->status, [Picture::STATUS_REMOVING, Picture::STATUS_REMOVED])) {
+        if (! in_array($replacePicture->status, [Picture::STATUS_REMOVING, Picture::STATUS_REMOVED])) {
             $replacePicture->setFromArray([
                 'status'                => Picture::STATUS_REMOVING,
                 'removing_date'         => new Zend_Db_Expr('now()'),
@@ -1803,8 +1796,10 @@ class PicturesController extends AbstractActionController
         // comments
         $comments = new Comments();
         $comments->moveMessages(
-            CommentMessage::PICTURES_TYPE_ID, $replacePicture->id,
-            CommentMessage::PICTURES_TYPE_ID, $picture->id
+            CommentMessage::PICTURES_TYPE_ID,
+            $replacePicture->id,
+            CommentMessage::PICTURES_TYPE_ID,
+            $picture->id
         );
         $ctTable = new CommentTopic();
         $ctTable->updateTopicStat(CommentMessage::PICTURES_TYPE_ID, $replacePicture->id);
@@ -1823,7 +1818,6 @@ class PicturesController extends AbstractActionController
         unset($recepients[$user->id]);
         if ($recepients) {
             foreach ($recepients as $recepient) {
-
                 $uri = $this->hostManager->getUriByLanguage($recepient->language);
 
                 $url = $this->pic()->url($picture->id, $picture->identity, true, $uri);
@@ -1838,7 +1832,9 @@ class PicturesController extends AbstractActionController
 
                 $message = sprintf(
                     $this->translate('pm/user-%s-accept-replace-%s-%s', 'default', $recepient->language),
-                    $moderUrl, $replaceUrl, $url
+                    $moderUrl,
+                    $replaceUrl,
+                    $url
                 );
 
                 $this->message->send(null, $recepient->id, $message);
@@ -1867,7 +1863,6 @@ class PicturesController extends AbstractActionController
         $canAccept = $this->canAccept($picture);
 
         if ($canAccept) {
-
             $user = $this->user()->get();
 
             $previousStatusUserId = $picture->change_status_user_id;
@@ -1877,8 +1872,7 @@ class PicturesController extends AbstractActionController
             $success = $pictureTable->accept($picture->id, $user->id, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
                 $owner = $picture->findParentRow(User::class, 'Owner');
-                if ( $owner && ($owner->id != $user->id) ) {
-
+                if ($owner && ($owner->id != $user->id)) {
                     $uri = $this->hostManager->getUriByLanguage($owner->language);
 
                     $message = sprintf(
@@ -1912,11 +1906,11 @@ class PicturesController extends AbstractActionController
 
     public function acceptAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
@@ -1931,11 +1925,11 @@ class PicturesController extends AbstractActionController
 
     public function voteAction()
     {
-        if (!$this->user()->inheritsRole('moder') ) {
+        if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
@@ -1954,10 +1948,9 @@ class PicturesController extends AbstractActionController
         $moderVotes = new PictureModerVote();
 
         foreach ($pictureRows as $picture) {
-
             $voteExists = $this->pictureVoteExists($picture, $user);
 
-            if (!$voteExists && $hasVoteRight) {
+            if (! $voteExists && $hasVoteRight) {
                 $moderVotes->insert([
                     'user_id'    => $user->id,
                     'picture_id' => $picture->id,
@@ -1991,12 +1984,12 @@ class PicturesController extends AbstractActionController
     public function moveAction()
     {
         $canMove = $this->user()->isAllowed('picture', 'move');
-        if (!$canMove) {
+        if (! $canMove) {
             return $this->forbiddenAction();
         }
 
         $picture = $this->table->find($this->params('picture_id'))->current();
-        if (!$picture) {
+        if (! $picture) {
             return $this->notFoundAction();
         }
 
@@ -2011,7 +2004,7 @@ class PicturesController extends AbstractActionController
                         'language'             => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
-                    if (!$success) {
+                    if (! $success) {
                         return $this->notFoundAction();
                     }
                     break;
@@ -2021,7 +2014,7 @@ class PicturesController extends AbstractActionController
                         'language'   => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
-                    if (!$success) {
+                    if (! $success) {
                         return $this->notFoundAction();
                     }
                     break;
@@ -2031,7 +2024,7 @@ class PicturesController extends AbstractActionController
                         'language'   => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
-                    if (!$success) {
+                    if (! $success) {
                         return $this->notFoundAction();
                     }
 
@@ -2044,7 +2037,7 @@ class PicturesController extends AbstractActionController
                         'language'   => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
-                    if (!$success) {
+                    if (! $success) {
                         return $this->notFoundAction();
                     }
                     break;
@@ -2094,9 +2087,7 @@ class PicturesController extends AbstractActionController
                     ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
                     ->where('brand_engine.brand_id = ?', $brand['id'])
             );
-
         } elseif ($this->params('factories')) {
-
             $showFactories = true;
 
             $factoryTable = new Factory();
@@ -2104,9 +2095,9 @@ class PicturesController extends AbstractActionController
                 $factoryTable->select(true)
                     ->order('name')
             );
-
         } else {
-            $brands = $brandModel->getList($this->language(), function($select) { });
+            $brands = $brandModel->getList($this->language(), function ($select) {
+            });
         }
 
         return [

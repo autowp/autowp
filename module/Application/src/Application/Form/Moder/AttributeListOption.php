@@ -72,7 +72,7 @@ class AttributeListOption extends Form implements InputFilterProviderInterface
 
         parent::__construct($name, $options);
 
-        if (!$this->attribute) {
+        if (! $this->attribute) {
             throw new Exception('Attribute not provided');
         }
 

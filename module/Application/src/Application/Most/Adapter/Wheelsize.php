@@ -83,9 +83,8 @@ class Wheelsize extends AbstractAdapter
         $result = [];
 
         foreach ($cars as $car) {
-
             $result[] = [
-                'car'       =>  $car,
+                'car'       => $car,
                 'valueText' => $this->_getWheelSizeText($car),
             ];
         }
@@ -103,7 +102,6 @@ class Wheelsize extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         foreach ($this->_attributes as $wheel) {
-
             $wheelObj = new WheelsizeObject(
                 $specService->getActualValue($wheel['tyrewidth'], $car->id, 1),
                 $specService->getActualValue($wheel['tyreseries'], $car->id, 1),

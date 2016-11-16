@@ -52,8 +52,9 @@ class Car extends AbstractPlugin
 
     public function __construct(
         TextStorage $textStorage,
-        SpecificationsService $specsService)
-    {
+        SpecificationsService $specsService
+    ) {
+
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
     }
@@ -174,7 +175,7 @@ class Car extends AbstractPlugin
         }
 
         $hasSpecs = [];
-        if (!$disableSpecs && !$specificationsUrl) {
+        if (! $disableSpecs && ! $specificationsUrl) {
             $hasSpecs = $this->specsService->hasSpecs(1, $carIds);
         }
 
@@ -191,7 +192,7 @@ class Car extends AbstractPlugin
 
         // categories
         $carsCategories = [];
-        if ($carIds && !$disableCategories) {
+        if ($carIds && ! $disableCategories) {
             $db = $categoryTable->getAdapter();
             $langExpr = $db->quoteInto('category.id = category_language.category_id and category_language.language = ?', $language);
             $categoryRows = $db->fetchAll(
@@ -206,7 +207,7 @@ class Car extends AbstractPlugin
 
             foreach ($categoryRows as $category) {
                 $carId = (int)$category['car_id'];
-                if (!isset($carsCategories[$carId])) {
+                if (! isset($carsCategories[$carId])) {
                     $carsCategories[$carId] = [];
                 }
                 $carsCategories[$carId][] = [
@@ -221,8 +222,7 @@ class Car extends AbstractPlugin
 
         // twins
         $carsTwinsGroups = [];
-        if ($carIds && !$disableTwins) {
-
+        if ($carIds && ! $disableTwins) {
             $carsTwinsGroups = [];
 
             foreach ($this->getTwins()->getCarsGroups($carIds) as $carId => $twinsGroups) {
@@ -251,7 +251,7 @@ class Car extends AbstractPlugin
             foreach ($rows as $row) {
                 $carId = (int)$row['parent_id'];
                 $typeId = (int)$row['type'];
-                if (!isset($carsTypeCounts[$carId])) {
+                if (! isset($carsTypeCounts[$carId])) {
                     $carsTypeCounts[$carId] = [];
                 }
                 $carsTypeCounts[$carId][$typeId] = (int)$row['count'];
@@ -303,7 +303,6 @@ class Car extends AbstractPlugin
 
         $items = [];
         foreach ($cars as $car) {
-
             $totalPictures = isset($carsTotalPictures[$car->id]) ? $carsTotalPictures[$car->id] : null;
 
             $designProjectData = false;
@@ -312,7 +311,7 @@ class Car extends AbstractPlugin
             }
 
             $categories = [];
-            if (!$disableCategories) {
+            if (! $disableCategories) {
                 $categories = isset($carsCategories[$car->id]) ? $carsCategories[$car->id] : [];
             }
 
@@ -321,7 +320,7 @@ class Car extends AbstractPlugin
             if ($perspectiveGroup) {
                 $pGroupId = $perspectiveGroup;
             } else {
-                $useLargeFormat = $totalPictures > 30 && !$disableLargePictures;
+                $useLargeFormat = $totalPictures > 30 && ! $disableLargePictures;
                 $pGroupId = $useLargeFormat ? 5 : 4;
             }
 
@@ -330,9 +329,18 @@ class Car extends AbstractPlugin
             $carOnlyChilds = isset($onlyChilds[$car->id]) ? $onlyChilds[$car->id] : null;
 
             $pictures = $this->getOrientedPictureList(
-                $car, $g, $onlyExactlyPictures, $type, $picturesDateSort,
-                $allowUpPictures, $language, $picHelper, $catalogue,
-                $carOnlyChilds, $useLargeFormat, $pictureUrlCallback
+                $car,
+                $g,
+                $onlyExactlyPictures,
+                $type,
+                $picturesDateSort,
+                $allowUpPictures,
+                $language,
+                $picHelper,
+                $catalogue,
+                $carOnlyChilds,
+                $useLargeFormat,
+                $pictureUrlCallback
             );
 
             if ($hideEmpty) {
@@ -344,7 +352,7 @@ class Car extends AbstractPlugin
                     }
                 }
 
-                if (!$hasPictures) {
+                if (! $hasPictures) {
                     continue;
                 }
             }
@@ -352,7 +360,7 @@ class Car extends AbstractPlugin
             $hasHtml = (bool)$car->full_text_id;
 
             $specsLinks = [];
-            if (!$disableSpecs) {
+            if (! $disableSpecs) {
                 if ($specificationsUrl) {
                     $url = $specificationsUrl($car);
                     if ($url) {
@@ -407,30 +415,23 @@ class Car extends AbstractPlugin
                 'largeFormat'      => $useLargeFormat,
             ];
 
-            if (!$disableTwins) {
+            if (! $disableTwins) {
                 $item['twinsGroups'] = isset($carsTwinsGroups[$car->id]) ? $carsTwinsGroups[$car->id] : [];
             }
 
             if (count($item['pictures']) < $item['totalPictures']) {
-
                 if ($allPicturesUrl) {
-
                     $item['allPicturesUrl'] = $allPicturesUrl($car);
-
                 }
             }
 
-            if (!$disableDetailsLink && ($hasHtml || $childsCount > 0)) {
+            if (! $disableDetailsLink && ($hasHtml || $childsCount > 0)) {
                 $url = null;
 
                 if (is_callable($detailsUrl)) {
-
                     $url = $detailsUrl($car);
-
                 } else {
-
                     if ($detailsUrl !== false) {
-
                         $cataloguePaths = $catalogue->cataloguePaths($car);
 
                         $url = null;
@@ -453,7 +454,7 @@ class Car extends AbstractPlugin
                 }
             }
 
-            if (!$disableDescription) {
+            if (! $disableDescription) {
                 $description = null;
                 if ($car->text_id) {
                     $description = $this->textStorage->getText($car->text_id);
@@ -476,7 +477,6 @@ class Car extends AbstractPlugin
             }
 
             if ($typeUrl) {
-
                 $tuningCount = isset($carsTypeCounts[$car->id][VehicleParent::TYPE_TUNING]) ? $carsTypeCounts[$car->id][VehicleParent::TYPE_TUNING] : 0;
                 if ($tuningCount) {
                     $item['tuning'] = [
@@ -558,7 +558,7 @@ class Car extends AbstractPlugin
 
     private function getPerspectiveGroupIds($pageId)
     {
-        if (!isset($this->_perspectiveCache[$pageId])) {
+        if (! isset($this->_perspectiveCache[$pageId])) {
             $perspectivesGroups = new PerspectiveGroup();
             $db = $perspectivesGroups->getAdapter();
             $this->_perspectiveCache[$pageId] = $db->fetchCol(
@@ -603,11 +603,8 @@ class Car extends AbstractPlugin
         $order = [];
 
         if ($options['onlyExactlyPictures']) {
-
             $select->where('pictures.car_id = ?', $car->id);
-
         } else {
-
             $select
                 ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->join('cars', 'pictures.car_id = cars.id', null)
@@ -664,10 +661,21 @@ class Car extends AbstractPlugin
         return $select;
     }
 
-    private function getOrientedPictureList($car, array $perspectiveGroupIds,
-            $onlyExactlyPictures, $type, $dateSort, $allowUpPictures, $language,
-            $picHelper, $catalogue, $onlyChilds, $useLargeFormat, $urlCallback)
-    {
+    private function getOrientedPictureList(
+        $car,
+        array $perspectiveGroupIds,
+        $onlyExactlyPictures,
+        $type,
+        $dateSort,
+        $allowUpPictures,
+        $language,
+        $picHelper,
+        $catalogue,
+        $onlyChilds,
+        $useLargeFormat,
+        $urlCallback
+    ) {
+
         $pictures = [];
         $usedIds = [];
 
@@ -675,7 +683,6 @@ class Car extends AbstractPlugin
         $db = $pictureTable->getAdapter();
 
         foreach ($perspectiveGroupIds as $groupId) {
-
             $select = $this->getPictureSelect($car, [
                 'onlyExactlyPictures' => $onlyExactlyPictures,
                 'perspectiveGroup'    => $groupId,
@@ -698,7 +705,6 @@ class Car extends AbstractPlugin
         $needMore = count($perspectiveGroupIds) - count($usedIds);
 
         if ($needMore > 0) {
-
             $select = $this->getPictureSelect($car, [
                 'onlyExactlyPictures' => $onlyExactlyPictures,
                 'type'                => $type,
@@ -719,7 +725,7 @@ class Car extends AbstractPlugin
                 if (count($morePictures) <= 0) {
                     break;
                 }
-                if (!$picture) {
+                if (! $picture) {
                     $pictures[$key] = array_shift($morePictures);
                 }
             }

@@ -29,8 +29,9 @@ class PictureNameFormatter
     public function __construct(
         $translator,
         PhpRenderer $renderer,
-        VehicleNameFormatter $vehicleNameFormatter)
-    {
+        VehicleNameFormatter $vehicleNameFormatter
+    ) {
+
         $this->translator = $translator;
         $this->renderer = $renderer;
         $this->vehicleNameFormatter = $vehicleNameFormatter;

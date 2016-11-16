@@ -24,9 +24,9 @@ class NewController extends AbstractActionController
             'currentDate'  => $this->params('date'),
         ]);
 
-        if (!$service->haveCurrentDate()) {
+        if (! $service->haveCurrentDate()) {
             $lastDate = $service->getLastDateStr();
-            if (!$lastDate) {
+            if (! $lastDate) {
                 return $this->notFoundAction();
             }
 
@@ -44,7 +44,7 @@ class NewController extends AbstractActionController
             ]));
         }
 
-        if (!$service->haveCurrentDayPictures()) {
+        if (! $service->haveCurrentDayPictures()) {
             return $this->notFoundAction();
         }
 

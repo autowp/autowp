@@ -34,7 +34,7 @@ class Id implements AdapterInterface
             'id = ?' => (int)$this->identity
         ]);
 
-        if (!$userRow) {
+        if (! $userRow) {
             $this->authenticateResultInfo['code'] = Result::FAILURE_IDENTITY_NOT_FOUND;
             $this->authenticateResultInfo['messages'][] = 'A record with the supplied identity could not be found.';
         } else {

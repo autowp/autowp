@@ -20,7 +20,7 @@ class EngineAdd extends Form implements InputFilterProviderInterface
 
         $elements = [];
 
-        if (!$this->disableBrand) {
+        if (! $this->disableBrand) {
             $elements[] = [
                 'name' => 'brand_id',
                 'type' => Brand::class
@@ -74,7 +74,7 @@ class EngineAdd extends Form implements InputFilterProviderInterface
                 'required' => true
             ]
         ];
-        if (!$this->disableBrand) {
+        if (! $this->disableBrand) {
             $spec['brand_id'] = [
                 'required' => true
             ];

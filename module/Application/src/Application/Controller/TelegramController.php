@@ -21,11 +21,11 @@ class TelegramController extends AbstractActionController
 
     public function webhookAction()
     {
-        if (!$this->getRequest()->isPost()) {
+        if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
 
-        if (!$this->service->checkTokenMatch($this->params('token'))) {
+        if (! $this->service->checkTokenMatch($this->params('token'))) {
             return $this->forbiddenAction();
         }
 
@@ -38,6 +38,5 @@ class TelegramController extends AbstractActionController
 
     public function indexAction()
     {
-
     }
 }

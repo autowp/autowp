@@ -62,7 +62,7 @@ class Brand
 
     private function getCollator($language)
     {
-        if (!isset($this->collators[$language])) {
+        if (! isset($this->collators[$language])) {
             $this->collators[$language] = new Collator($language);
         }
 
@@ -77,11 +77,11 @@ class Brand
                 $aIsHan = (bool)preg_match("/^\p{Han}/u", $a);
                 $bIsHan = (bool)preg_match("/^\p{Han}/u", $b);
 
-                if ($aIsHan && !$bIsHan) {
+                if ($aIsHan && ! $bIsHan) {
                     return -1;
                 }
 
-                if ($bIsHan && !$aIsHan) {
+                if ($bIsHan && ! $aIsHan) {
                     return 1;
                 }
 
@@ -134,7 +134,7 @@ class Brand
             ];
         }
 
-        usort($items, function($a, $b) use($language) {
+        usort($items, function ($a, $b) use ($language) {
             return $this->compareName($a['name'], $b['name'], $language);
         });
 
@@ -146,7 +146,7 @@ class Brand
         $i = 0;
         $number = '';
         while (isset($char{$i})) {
-            $number.= ord($char{$i});
+            $number .= ord($char{$i});
             ++$i;
         }
         return $number;
@@ -164,7 +164,7 @@ class Brand
                 'logopictures_count', 'mixedpictures_count',
                 'unsortedpictures_count'
             ]
-        ], function($select) use ($language) {
+        ], function ($select) use ($language) {
             $select
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
@@ -190,7 +190,6 @@ class Brand
         }*/
 
         foreach ($rows as $row) {
-
             $name = $row['name'];
 
             $char = mb_substr($name, 0, 1);
@@ -199,17 +198,17 @@ class Brand
             $isCyrillic = false;
             $isLatin = false;
 
-            if (!$isNumber) {
+            if (! $isNumber) {
                 $isHan = preg_match("/^\p{Han}$/u", $char);
                 if ($isHan) {
                     $char = mb_substr($tr->transliterate($char), 0, 1);
                     $isLatin = true;
                 }
 
-                if (!$isHan) {
+                if (! $isHan) {
                     $isCyrillic = preg_match("/^\p{Cyrillic}$/u", $char);
 
-                    if (!$isCyrillic) {
+                    if (! $isCyrillic) {
                         $char = $tr->transliterate($char);
 
                         $isLatin = preg_match("/^[A-Za-z]$/u", $char);
@@ -230,7 +229,7 @@ class Brand
 
             //print $this->utfCharToNumber($char) . PHP_EOL;
 
-            if (!isset($result[$line][$char])) {
+            if (! isset($result[$line][$char])) {
                 $result[$line][$char] = [
                     'id'     => $this->utfCharToNumber($char),
                     'char'   => $char,
@@ -254,7 +253,7 @@ class Brand
         }
 
         foreach ($result as &$line) {
-            uksort($line, function($a, $b) use($language) {
+            uksort($line, function ($a, $b) use ($language) {
                 return $this->compareName($a, $b, $language);
             });
         }
@@ -293,7 +292,7 @@ class Brand
 
         $brand = $db->fetchRow($select);
 
-        if (!$brand) {
+        if (! $brand) {
             return null;
         }
 
@@ -310,14 +309,14 @@ class Brand
 
     public function getBrandById($id, $language)
     {
-        return $this->fetchBrand($language, function($select) use ($id) {
+        return $this->fetchBrand($language, function ($select) use ($id) {
             $select->where('brands.id = ?', (int)$id);
         });
     }
 
     public function getBrandByCatname($catname, $language)
     {
-        return $this->fetchBrand($language, function($select) use ($catname) {
+        return $this->fetchBrand($language, function ($select) use ($catname) {
             $select->where('brands.folder = ?', (string)$catname);
         });
     }
@@ -333,7 +332,7 @@ class Brand
                 ->group('brands.id')
                 ->order(new Zend_Db_Expr('count(1) desc'))
         );
-        if (!$brand) {
+        if (! $brand) {
             return null;
         }
 
@@ -402,7 +401,7 @@ class Brand
 
         $items = $db->fetchAll($select);
 
-        usort($items, function($a, $b) use($options) {
+        usort($items, function ($a, $b) use ($options) {
             return $this->compareName($a['name'], $b['name'], $options['language']);
         });
 
@@ -416,7 +415,7 @@ class Brand
             'columns'  => [
                 'img'
             ]
-        ], function($select) {
+        ], function ($select) {
             $select->where('img');
         });
 
@@ -446,7 +445,7 @@ class Brand
         $height = ceil($count / $width);
 
         $cmd = sprintf(
-            'montage ' . implode(' ' , $images) . ' -background %s -geometry +0+0 -tile %dx %s',
+            'montage ' . implode(' ', $images) . ' -background %s -geometry +0+0 -tile %dx %s',
             escapeshellarg($background ? $background : 'none'),
             $width,
             escapeshellarg($destImg)

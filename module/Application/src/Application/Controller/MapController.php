@@ -22,7 +22,7 @@ class MapController extends AbstractActionController
 
     private function _getGoogleClient()
     {
-        if (!$this->googleClient) {
+        if (! $this->googleClient) {
             $this->googleClient = new Zend_Http_Client();
         }
         return $this->googleClient;
@@ -30,7 +30,6 @@ class MapController extends AbstractActionController
 
     public function indexAction()
     {
-
     }
 
     public function dataAction()
@@ -72,7 +71,6 @@ class MapController extends AbstractActionController
 
         $data = [];
         foreach ($factories as $factory) {
-
             $point = null;
             if ($factory->point) {
                 $point = geoPHP::load(substr($factory->point, 4), 'wkb');
@@ -110,7 +108,6 @@ class MapController extends AbstractActionController
         $museums = $museumTable->fetchAll($coordsFilter, 'name');
 
         foreach ($museums as $museum) {
-
             $point = null;
             if ($museum->point) {
                 $point = geoPHP::load(substr($museum->point, 4), 'wkb');

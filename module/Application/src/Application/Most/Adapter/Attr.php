@@ -40,12 +40,12 @@ class Attr extends AbstractAdapter
         $attributes = new Attribute();
 
         $attribute = $attributes->find($this->attribute)->current();
-        if (!$attribute) {
+        if (! $attribute) {
             throw new Exception("Attribute '{$this->attribute}' not found");
         }
 
         $itemType = $itemTypes->find($this->itemType)->current();
-        if (!$itemType) {
+        if (! $itemType) {
             throw new Exception("Item type '{$this->itemType}' not found");
         }
 
@@ -65,7 +65,6 @@ class Attr extends AbstractAdapter
 
         $result = [];
         foreach ($cars as $car) {
-
             $valueText = $specService->getActualValueText($attribute->id, $itemType->id, $car->id, $language);
 
             $result[] = [

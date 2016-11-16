@@ -50,8 +50,9 @@ class CarsController extends AbstractActionController
         HostManager $hostManager,
         Form $filterForm,
         SpecificationsService $specsService,
-        Message $message)
-    {
+        Message $message
+    ) {
+
         $this->hostManager = $hostManager;
         $this->filterForm = $filterForm;
         $this->specsService = $specsService;
@@ -90,7 +91,7 @@ class CarsController extends AbstractActionController
 
     public function carSpecificationsEditorAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -99,7 +100,7 @@ class CarsController extends AbstractActionController
         $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -123,7 +124,6 @@ class CarsController extends AbstractActionController
         if ($request->isPost()) {
             $carForm->setData($this->params()->fromPost());
             if ($carForm->isValid()) {
-
                 $this->specsService->saveCarAttributes($car, $carForm->getData(), $user);
 
                 $user->invalidateSpecsVolume();
@@ -141,7 +141,6 @@ class CarsController extends AbstractActionController
 
                 foreach ($contributors as $contributor) {
                     if ($contributor->id != $user->id) {
-
                         $uri = $this->hostManager->getUriByLanguage($contributor->language);
 
                         $message = sprintf(
@@ -220,7 +219,7 @@ class CarsController extends AbstractActionController
 
         $isSpecsAdmin = $this->user()->isAllowed('specifications', 'admin');
 
-        if (!$isSpecsAdmin) {
+        if (! $isSpecsAdmin) {
             unset($tabs['admin']);
         }
 
@@ -239,14 +238,14 @@ class CarsController extends AbstractActionController
 
     public function carSpecsAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
         $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -263,7 +262,7 @@ class CarsController extends AbstractActionController
 
     public function moveAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'admin')) {
+        if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
         }
 
@@ -272,13 +271,13 @@ class CarsController extends AbstractActionController
 
         $itemId = (int)$this->params('item_id');
         $itemType = $aitTable->find($this->params('item_type_id'))->current();
-        if (!$itemType) {
+        if (! $itemType) {
             return $this->notFoundAction();
         }
 
         $toItemId = (int)$this->params('to_item_id');
         $toItemType = $aitTable->find($this->params('to_item_type_id'))->current();
-        if (!$toItemType) {
+        if (! $toItemType) {
             return $this->notFoundAction();
         }
 
@@ -291,7 +290,6 @@ class CarsController extends AbstractActionController
         ]);
 
         foreach ($eUserValueRows as $eUserValueRow) {
-
             // check for value in dest
 
             $cUserValueRow = $userValueTable->fetchRow([
@@ -308,7 +306,7 @@ class CarsController extends AbstractActionController
 
             $attrRow = $attrTable->find($eUserValueRow->attribute_id)->current();
 
-            if (!$attrRow) {
+            if (! $attrRow) {
                 print "Attr not found";
                 exit;
             }
@@ -323,7 +321,6 @@ class CarsController extends AbstractActionController
             ]);
 
             foreach ($eDataRows as $eDataRow) {
-
                 // check for data row existance
                 $filter = [
                     'attribute_id = ?' => $eDataRow->attribute_id,
@@ -364,7 +361,6 @@ class CarsController extends AbstractActionController
                 $itemType->id,
                 $itemId
             );
-
         }
 
         return $this->redirect()->toRoute('cars/params', [
@@ -376,7 +372,7 @@ class CarsController extends AbstractActionController
     {
         $carTable = new Vehicle();
 
-        if (!$this->user()->isAllowed('specifications', 'admin')) {
+        if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
         }
 
@@ -384,7 +380,7 @@ class CarsController extends AbstractActionController
 
         $itemId = (int)$this->params('item_id');
         $itemType = $aitTable->find($this->params('item_type_id'))->current();
-        if (!$itemType) {
+        if (! $itemType) {
             return $this->notFoundAction();
         }
 
@@ -428,19 +424,19 @@ class CarsController extends AbstractActionController
 
     public function deleteValueAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'admin')) {
+        if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
         }
 
         $request = $this->getRequest();
-        if (!$request->isPost()) {
+        if (! $request->isPost()) {
             return $this->forward('forbidden', 'error');
         }
 
         $aitTable = new Attr\ItemType();
 
         $itemType = $aitTable->find($this->params('item_type_id'))->current();
-        if (!$itemType) {
+        if (! $itemType) {
             return $this->notFoundAction();
         }
 
@@ -454,7 +450,7 @@ class CarsController extends AbstractActionController
 
     public function engineSpecEditorAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -463,7 +459,7 @@ class CarsController extends AbstractActionController
         $engines = $this->getEngineTable();
 
         $engine = $engines->find($this->params('engine_id'))->current();
-        if (!$engine) {
+        if (! $engine) {
             return $this->notFoundAction();
         }
 
@@ -482,7 +478,6 @@ class CarsController extends AbstractActionController
         if ($request->isPost()) {
             $form->setData($this->params()->fromPost());
             if ($form->isValid()) {
-
                 $this->specsService->saveEngineAttributes($engine, $form->getData(), $user);
 
                 $user->invalidateSpecsVolume();
@@ -501,7 +496,7 @@ class CarsController extends AbstractActionController
 
     public function attrsChangeLogAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 
@@ -646,14 +641,14 @@ class CarsController extends AbstractActionController
 
     public function cancelCarEngineAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'edit-engine')) {
+        if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
             return $this->forward('forbidden', 'error');
         }
 
         $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -667,10 +662,10 @@ class CarsController extends AbstractActionController
         $this->specsService->updateActualValues(1, $car->id);
 
         if ($engine) {
-
             $message = sprintf(
                 'У автомобиля %s убран двигатель (был %s)',
-                htmlspecialchars($car->getFullName('en')), htmlspecialchars($engine->caption)
+                htmlspecialchars($car->getFullName('en')),
+                htmlspecialchars($engine->caption)
             );
             $this->log($message, $car);
 
@@ -679,7 +674,6 @@ class CarsController extends AbstractActionController
 
             foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
-
                     $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
                     $message = sprintf(
@@ -700,18 +694,18 @@ class CarsController extends AbstractActionController
 
     public function inheritCarEngineAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'edit-engine')) {
+        if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
             return $this->forward('forbidden', 'error');
         }
 
         $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
-        if (!$car->engine_inherit) {
+        if (! $car->engine_inherit) {
             $car->engine_id = null;
             $car->engine_inherit = 1;
             $car->save();
@@ -731,7 +725,6 @@ class CarsController extends AbstractActionController
 
             foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
-
                     $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
                     $message = sprintf(
@@ -779,18 +772,18 @@ class CarsController extends AbstractActionController
 
     public function selectCarEngineAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'edit-engine')) {
+        if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
             return $this->forward('forbidden', 'error');
         }
 
-        if (!$this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forward('index', 'login', 'default');
         }
 
         $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -800,9 +793,8 @@ class CarsController extends AbstractActionController
 
         $brand = $brandModel->getBrandByCatname($this->params()->fromPost('brand'), $language);
 
-        if (!$brand) {
-
-            $brands = $brandModel->getList($language, function($select) {
+        if (! $brand) {
+            $brands = $brandModel->getList($language, function ($select) {
                 $select
                     ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
                     ->group('brands.id');
@@ -819,8 +811,7 @@ class CarsController extends AbstractActionController
         $engineTable = $this->getEngineTable();
 
         $engine = $engineTable->find($this->params()->fromPost('engine'))->current();
-        if (!$engine) {
-
+        if (! $engine) {
             return [
                 'car'     => $car,
                 'brand'   => $brand,
@@ -842,13 +833,13 @@ class CarsController extends AbstractActionController
 
         $message = sprintf(
             'Автомобилю %s назначен двигатель %s',
-            htmlspecialchars($car->getFullName('en')), htmlspecialchars($engine->caption)
+            htmlspecialchars($car->getFullName('en')),
+            htmlspecialchars($engine->caption)
         );
         $this->log($message, $car);
 
         foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
             if ($subscriber && ($subscriber->id != $user->id)) {
-
                 $uri = $this->hostManager->getUriByLanguage($subscriber->language);
 
                 $message = sprintf(
@@ -868,14 +859,14 @@ class CarsController extends AbstractActionController
 
     public function refreshInheritanceAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'admin')) {
+        if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
         }
 
         $carTable = new Vehicle();
 
         $car = $carTable->find($this->params('car_id'))->current();
-        if (!$car) {
+        if (! $car) {
             return $this->notFoundAction();
         }
 
@@ -888,7 +879,7 @@ class CarsController extends AbstractActionController
 
     public function editValueAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forward('forbidden', 'error');
         }
 
@@ -899,7 +890,7 @@ class CarsController extends AbstractActionController
         $language = $this->language();
 
         $form = $this->specsService->getEditValueForm($attrId, $itemTypeId, $itemId, $language);
-        if (!$form) {
+        if (! $form) {
             return $this->notFoundAction();
         }
 
@@ -914,12 +905,11 @@ class CarsController extends AbstractActionController
 
     public function lowWeightAction()
     {
-
     }
 
     public function datelessAction()
     {
-        if (!$this->user()->isAllowed('specifications', 'edit')) {
+        if (! $this->user()->isAllowed('specifications', 'edit')) {
             return $this->forbiddenAction();
         }
 

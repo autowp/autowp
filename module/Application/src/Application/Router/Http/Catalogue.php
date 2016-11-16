@@ -64,7 +64,7 @@ class Catalogue implements RouteInterface
      */
     public function match(Request $request)
     {
-        if (!method_exists($request, 'getUri')) {
+        if (! method_exists($request, 'getUri')) {
             return;
         }
 
@@ -81,7 +81,7 @@ class Catalogue implements RouteInterface
             $node = urldecode($node);
         }
 
-        if (!count($path)) {
+        if (! count($path)) {
             return false;
         }
 
@@ -94,14 +94,14 @@ class Catalogue implements RouteInterface
            'folder = ?' => $path[0]
         ]);
 
-        if (!$brand) {
+        if (! $brand) {
             return false;
         }
 
         $data['brand_catname'] = $brand->folder;
         array_shift($path);
 
-        if (!$path) {
+        if (! $path) {
             // :brand
             return $this->assembleMatch([
                 'action'        => 'brand',
@@ -115,7 +115,7 @@ class Catalogue implements RouteInterface
             case 'mosts':
                 array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // most
                     return $this->assembleMatch([
                         'action'        => 'brand-mosts',
@@ -125,7 +125,7 @@ class Catalogue implements RouteInterface
 
                 $most = array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // most/:most
                     return $this->assembleMatch([
                         'action'        => 'brand-mosts',
@@ -136,7 +136,7 @@ class Catalogue implements RouteInterface
 
                 $shape = array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // most/:most/:shape
                     return $this->assembleMatch([
                         'action'        => 'brand-mosts',
@@ -148,7 +148,7 @@ class Catalogue implements RouteInterface
 
                 $years = array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // most/:most/:shape/:years
                     return $this->assembleMatch([
                         'action'        => 'brand-mosts',
@@ -164,7 +164,7 @@ class Catalogue implements RouteInterface
             case 'cars':
                 array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // :brand/cars
                     return $this->assembleMatch([
                         'action'        => 'cars',
@@ -176,7 +176,7 @@ class Catalogue implements RouteInterface
                     $page = intval($match[1]);
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/cars/pageX
                         return $this->assembleMatch([
                             'action'        => 'cars',
@@ -190,7 +190,7 @@ class Catalogue implements RouteInterface
 
                 $cartypeCatname = array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // :brand/cars/:cartype_catname
                     return $this->assembleMatch([
                         'action'          => 'cars',
@@ -203,7 +203,7 @@ class Catalogue implements RouteInterface
                     $page = intval($match[1]);
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/cars/:cartype_catname/pageX
                         return $this->assembleMatch([
                             'action'          => 'cars',
@@ -222,7 +222,7 @@ class Catalogue implements RouteInterface
             case 'recent':
                 array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // :brand/recent
                     return $this->assembleMatch([
                         'action'        => 'recent',
@@ -234,7 +234,7 @@ class Catalogue implements RouteInterface
                     $page = intval($match[1]);
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/recent/pageX
                         return $this->assembleMatch([
                             'action'        => 'recent',
@@ -254,7 +254,7 @@ class Catalogue implements RouteInterface
             case 'logotypes':
                 $action = array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // :brand/:action
                     return $this->assembleMatch([
                         'action'        => $action,
@@ -266,7 +266,7 @@ class Catalogue implements RouteInterface
                     $page = intval($match[1]);
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/:action/pageX
                         return $this->assembleMatch([
                             'action'        => $action,
@@ -281,7 +281,7 @@ class Catalogue implements RouteInterface
                 if ($path[0] == 'gallery') {
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/:action/gallery
                         return $this->assembleMatch([
                             'action'        => $action . '-gallery',
@@ -292,7 +292,7 @@ class Catalogue implements RouteInterface
                     if (in_array($path[0], ['inbox', 'removing'])) {
                         $gallery = array_shift($path);
 
-                        if (!$path) {
+                        if (! $path) {
                             // :brand/:action/gallery/:gallery
                             return $this->assembleMatch([
                                 'action'        => $action . '-gallery',
@@ -311,7 +311,7 @@ class Catalogue implements RouteInterface
                     $pictureId = $path[0];
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/:action/:picture
                         return $this->assembleMatch([
                             'action'        => $action . '-picture',
@@ -328,7 +328,7 @@ class Catalogue implements RouteInterface
             case 'concepts':
                 $action = array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // :brand/:action
                     return $this->assembleMatch([
                         'action'        => $action,
@@ -340,7 +340,7 @@ class Catalogue implements RouteInterface
                     $page = intval($match[1]);
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/:action/pageX
                         return $this->assembleMatch([
                             'action'        => $action,
@@ -358,7 +358,7 @@ class Catalogue implements RouteInterface
             case 'engines':
                 array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // :brand/engines
                     return $this->assembleMatch([
                         'action'        => 'engines',
@@ -370,7 +370,7 @@ class Catalogue implements RouteInterface
                     $page = intval($match[1]);
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/engines/pageX
                         return $this->assembleMatch([
                             'action'        => 'engines',
@@ -384,14 +384,14 @@ class Catalogue implements RouteInterface
 
                 $enginePath = [];
                 while ($path) {
-                    if (!preg_match('|^[0-9]+$|', $path[0], $match)) {
+                    if (! preg_match('|^[0-9]+$|', $path[0], $match)) {
                         break;
                     }
                     $enginePath[] = intval($match[0]);
                     array_shift($path);
                 }
 
-                if (!$path) {
+                if (! $path) {
                     // :brand/engines/:path
                     return $this->assembleMatch([
                         'action'        => 'engines',
@@ -404,7 +404,7 @@ class Catalogue implements RouteInterface
                     case 'cars':
                         array_shift($path);
 
-                        if (!$path) {
+                        if (! $path) {
                             // :brand/engines/:path/cars
                             return $this->assembleMatch([
                                 'action'        => 'engine-cars',
@@ -419,7 +419,7 @@ class Catalogue implements RouteInterface
                     case 'specifications':
                         array_shift($path);
 
-                        if (!$path) {
+                        if (! $path) {
                             // :brand/engines/:path/specifications
                             return $this->assembleMatch([
                                 'action'        => 'engine-specs',
@@ -434,7 +434,7 @@ class Catalogue implements RouteInterface
                     case 'pictures':
                         array_shift($path);
 
-                        if (!$path) {
+                        if (! $path) {
                             // :brand/engines/:path/pictures
                             return $this->assembleMatch([
                                 'action'        => 'engine-pictures',
@@ -446,7 +446,7 @@ class Catalogue implements RouteInterface
                         $pictureId = $path[0];
                         array_shift($path);
 
-                        if (!$path) {
+                        if (! $path) {
                             // :brand/engines/:path/pictures/:picture
                             return $this->assembleMatch([
                                 'action'        => 'engine-picture',
@@ -462,7 +462,7 @@ class Catalogue implements RouteInterface
                     case 'gallery':
                         array_shift($path);
 
-                        if (!$path) {
+                        if (! $path) {
                             // :brand/engines/:path/gallery
                             return $this->assembleMatch([
                                 'action'        => 'engine-gallery',
@@ -474,7 +474,7 @@ class Catalogue implements RouteInterface
                         if (in_array($path[0], ['inbox', 'removing'])) {
                             $gallery = array_shift($path);
 
-                            if (!$path) {
+                            if (! $path) {
                                 // :brand/engines/:path/gallery/:gallery
                                 return $this->assembleMatch([
                                     'action'        => 'engine-gallery',
@@ -506,7 +506,7 @@ class Catalogue implements RouteInterface
 
             $treePath = [];
 
-            if (!$path) {
+            if (! $path) {
                 // :brand/:car_catname
                 return $this->assembleMatch([
                     'action'        => 'brand-car',
@@ -519,13 +519,13 @@ class Catalogue implements RouteInterface
             $carParentTable = new VehicleParent();
 
             $currentCarId = $brandCarRow->car_id;
-            while($path) {
+            while ($path) {
                 $carParentRow = $carParentTable->fetchRow([
                     'parent_id = ?' => $currentCarId,
                     'catname = ?'   => $path[0]
                 ]);
 
-                if (!$carParentRow) {
+                if (! $carParentRow) {
                     break;
                 }
 
@@ -535,8 +535,7 @@ class Catalogue implements RouteInterface
                 $currentCarId = $carParentRow->car_id;
             }
 
-            if (!$path) {
-
+            if (! $path) {
                 // :brand/:car_catname/:path[]
                 return $this->assembleMatch([
                     'action'        => 'brand-car',
@@ -550,7 +549,7 @@ class Catalogue implements RouteInterface
                 $page = intval($match[1]);
                 array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // :brand/:car_catname/:path[]/pageX
                     return $this->assembleMatch([
                         'action'        => 'brand-car',
@@ -569,7 +568,7 @@ class Catalogue implements RouteInterface
                 case 'sport':
                     $type = array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/:car_catname/:path[]/:type
                         return $this->assembleMatch([
                             'action'        => 'brand-car',
@@ -584,7 +583,7 @@ class Catalogue implements RouteInterface
                         $page = intval($match[1]);
                         array_shift($path);
 
-                        if (!$path) {
+                        if (! $path) {
                             // :brand/:car_catname/:path[]/:type/pageX
                             return $this->assembleMatch([
                                 'action'        => 'brand-car',
@@ -603,7 +602,7 @@ class Catalogue implements RouteInterface
                         case 'specifications':
                             array_shift($path);
 
-                            if (!$path) {
+                            if (! $path) {
                                 // :brand/:car_catname/:path[]/specifications
                                 return $this->assembleMatch([
                                     'action'        => 'brand-car-specifications',
@@ -624,7 +623,7 @@ class Catalogue implements RouteInterface
                 case 'specifications':
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/:car_catname/:path[]/specifications
                         return $this->assembleMatch([
                             'action'        => 'brand-car-specifications',
@@ -640,7 +639,7 @@ class Catalogue implements RouteInterface
                 case 'exact':
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/:car_catname/:path[]/exact
                         return $this->assembleMatch([
                             'action'        => 'brand-car',
@@ -655,7 +654,7 @@ class Catalogue implements RouteInterface
                         $page = intval($match[1]);
                         array_shift($path);
 
-                        if (!$path) {
+                        if (! $path) {
                             // :brand/:car_catname/:path[]/pageX
                             return $this->assembleMatch([
                                 'action'        => 'brand-car',
@@ -689,7 +688,7 @@ class Catalogue implements RouteInterface
                 case 'mod':
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         return false;
                     }
 
@@ -708,7 +707,7 @@ class Catalogue implements RouteInterface
                 case 'modgroup':
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         return false;
                     }
 
@@ -723,7 +722,6 @@ class Catalogue implements RouteInterface
                         'modgroup'      => $modgroup
                     ], $length);
                     break;
-
             }
 
             return false;
@@ -734,7 +732,7 @@ class Catalogue implements RouteInterface
 
     private function matchCarPictures($path, $brand, $brandCarRow, $treePath, $exact, $length)
     {
-        if (!$path) {
+        if (! $path) {
             // :brand/:car_catname/:path[]/pictures
             return $this->assembleMatch([
                 'action'        => 'brand-car-pictures',
@@ -751,7 +749,7 @@ class Catalogue implements RouteInterface
             if ($path) {
                 $mod = array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // :brand/:car_catname/:path[]/pictures/mod/:mod
                     return $this->assembleMatch([
                         'action'        => 'brand-car-pictures',
@@ -767,7 +765,7 @@ class Catalogue implements RouteInterface
                     $page = intval($match[1]);
                     array_shift($path);
 
-                    if (!$path) {
+                    if (! $path) {
                         // :brand/:car_catname/:path[]/pictures/mod/:mod/pageX
                         return $this->assembleMatch([
                             'action'        => 'brand-car-pictures',
@@ -793,7 +791,7 @@ class Catalogue implements RouteInterface
             $page = intval($match[1]);
             array_shift($path);
 
-            if (!$path) {
+            if (! $path) {
                 // :brand/:car_catname/:path[]/pictures/pageX
                 return $this->assembleMatch([
                     'action'        => 'brand-car-pictures',
@@ -811,7 +809,7 @@ class Catalogue implements RouteInterface
         if ($path[0] == 'gallery') {
             array_shift($path);
 
-            if (!$path) {
+            if (! $path) {
                 // :brand/:car_catname/:path[]/pictures/pageX
                 return $this->assembleMatch([
                     'action'        => 'brand-car-gallery',
@@ -825,7 +823,7 @@ class Catalogue implements RouteInterface
             if (in_array($path[0], ['inbox', 'removing'])) {
                 $gallery = array_shift($path);
 
-                if (!$path) {
+                if (! $path) {
                     // :brand/:car_catname/:path[]/pictures/pageX
                     return $this->assembleMatch([
                         'action'        => 'brand-car-gallery',
@@ -846,7 +844,7 @@ class Catalogue implements RouteInterface
         $pictureId = $path[0];
         array_shift($path);
 
-        if (!count($path)) {
+        if (! count($path)) {
             // :brand/:car_catname/:path[]/pictures/:picture
             return $this->assembleMatch([
                 'action'        => 'brand-car-picture',
@@ -885,14 +883,13 @@ class Catalogue implements RouteInterface
             }
         }
 
-        if (!isset($data['brand_catname'])) {
+        if (! isset($data['brand_catname'])) {
             throw new Exception('`brand_catname` expected');
         }
 
         $url = [$data['brand_catname']];
 
-        switch ($data['action'])
-        {
+        switch ($data['action']) {
             case 'engine-gallery':
                 $url[] = 'engines';
                 if (isset($data['path']) && is_array($data['path'])) {
@@ -964,8 +961,9 @@ class Catalogue implements RouteInterface
             case 'concepts':
             case 'logotypes':
                 $url[] = $data['action'];
-                if (isset($data['page']) && $data['page'] > 1)
+                if (isset($data['page']) && $data['page'] > 1) {
                     $url[] = 'page' . $data['page'];
+                }
                 break;
 
             case 'mixed-picture':
@@ -1092,16 +1090,19 @@ class Catalogue implements RouteInterface
 
             case 'cars':
                 $url[] = $data['action'];
-                if (isset($data['cartype_catname']) && $data['cartype_catname'])
+                if (isset($data['cartype_catname']) && $data['cartype_catname']) {
                     $url[] = $data['cartype_catname'];
-                if (isset($data['page']) && $data['page'] > 1)
+                }
+                if (isset($data['page']) && $data['page'] > 1) {
                     $url[] = 'page' . $data['page'];
+                }
                 break;
 
             case 'recent':
                 $url[] = $data['action'];
-                if (isset($data['page']) && $data['page'] > 1)
+                if (isset($data['page']) && $data['page'] > 1) {
                     $url[] = 'page' . $data['page'];
+                }
                 break;
 
             case 'brand-mosts':
@@ -1126,6 +1127,7 @@ class Catalogue implements RouteInterface
      *
      * @return array
      */
-    public function getAssembledParams() {}
-
+    public function getAssembledParams()
+    {
+    }
 }

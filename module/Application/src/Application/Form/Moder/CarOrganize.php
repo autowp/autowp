@@ -30,7 +30,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
     {
         parent::__construct($name, $options);
 
-        if (!is_null($this->inheritedSpec)) {
+        if (! is_null($this->inheritedSpec)) {
             $specOptions = ['inherited' => 'inherited (' . $this->inheritedSpec . ')'] + $this->specOptions;
         } else {
             $specOptions = ['inherited' => 'inherited'] + $this->specOptions;
@@ -40,7 +40,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
             '0' => 'moder/vehicle/is-concept/no',
             '1' => 'moder/vehicle/is-concept/yes',
         ];
-        if (!is_null($this->inheritedIsConcept)) {
+        if (! is_null($this->inheritedIsConcept)) {
             $isConceptOptions = array_merge([
                 'inherited' => $this->inheritedIsConcept
                 ? 'moder/vehicle/is-concept/inherited-yes'

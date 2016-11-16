@@ -64,7 +64,7 @@ class Forums
             $select->where('parent_id IS NULL');
         }
 
-        if (!$isModerator) {
+        if (! $isModerator) {
             $select->where('not is_moderator');
         }
 
@@ -104,7 +104,7 @@ class Forums
                 ->where('parent_id = ?', $row->id)
                 ->order('position');
 
-            if (!$isModerator) {
+            if (! $isModerator) {
                 $select->where('not is_moderator');
             }
 
@@ -141,7 +141,7 @@ class Forums
 
     public function canSubscribe($topicId, $userId)
     {
-        return !$this->userSubscribed($topicId, $userId);
+        return ! $this->userSubscribed($topicId, $userId);
     }
 
     public function canUnSubscribe($topicId, $userId)
@@ -151,7 +151,7 @@ class Forums
 
     public function subscribe($topicId, $userId)
     {
-        if (!$this->canSubscribe($topicId, $userId)) {
+        if (! $this->canSubscribe($topicId, $userId)) {
             throw new \Exception('Already subscribed');
         }
 
@@ -163,7 +163,7 @@ class Forums
 
     public function unSubscribe($topicId, $userId)
     {
-        if (!$this->canUnSubscribe($topicId, $userId)) {
+        if (! $this->canUnSubscribe($topicId, $userId)) {
             throw new \Exception('User not subscribed');
         }
 
@@ -194,12 +194,12 @@ class Forums
     public function delete($topicId)
     {
         $topic = $this->topicTable->find($topicId)->current();
-        if (!$topic) {
+        if (! $topic) {
             return false;
         }
 
         $theme = $this->themeTable->find($topic->theme_id)->current();
-        if (!$theme) {
+        if (! $theme) {
             return false;
         }
 
@@ -219,7 +219,7 @@ class Forums
     public function updateThemeStat($themeId)
     {
         $theme = $this->themeTable->find($themeId)->current();
-        if (!$theme) {
+        if (! $theme) {
             return false;
         }
 
@@ -340,7 +340,7 @@ class Forums
         $select = $this->themeTable->select(true)
             ->where('id = ?', (int)$themeId);
 
-        if (!$isModerator) {
+        if (! $isModerator) {
             $select->where('not is_moderator');
         }
 
@@ -350,7 +350,7 @@ class Forums
             'topics'    => [],
             'paginator' => false
         ];
-        if ($currentTheme && !$currentTheme->disable_topics) {
+        if ($currentTheme && ! $currentTheme->disable_topics) {
             $data = $this->getTopicList($currentTheme->id, $page, $userId);
         }
 
@@ -381,12 +381,12 @@ class Forums
     public function addTopic($values)
     {
         $userId = (int)$values['user_id'];
-        if (!$userId) {
+        if (! $userId) {
             throw new \Exception("User id not provided");
         }
 
         $theme = $this->getTheme($values['theme_id']);
-        if (!$theme || $theme['disable_topics']) {
+        if (! $theme || $theme['disable_topics']) {
             return false;
         }
 
@@ -425,7 +425,7 @@ class Forums
     public function getTheme($themeId)
     {
         $theme = $this->themeTable->find($themeId)->current();
-        if (!$theme) {
+        if (! $theme) {
             return false;
         }
 
@@ -486,7 +486,7 @@ class Forums
     public function moveMessage($messageId, $topicId)
     {
         $topic = $this->topicTable->find($topicId)->current();
-        if (!$topic) {
+        if (! $topic) {
             return false;
         }
 
@@ -499,12 +499,12 @@ class Forums
     public function moveTopic($topicId, $themeId)
     {
         $topic = $this->topicTable->find($topicId)->current();
-        if (!$topic) {
+        if (! $topic) {
             return false;
         }
 
         $theme = $this->themeTable->find($themeId)->current();
-        if (!$theme) {
+        if (! $theme) {
             return false;
         }
 
@@ -531,7 +531,7 @@ class Forums
                 ->where('forums_topics.id = ?', (int)$topicId);
 
         if ($options['isModerator'] !== null) {
-            if (!$options['isModerator']) {
+            if (! $options['isModerator']) {
                 $select
                     ->join('forums_themes', 'forums_topics.theme_id = forums_themes.id', null)
                     ->where('not forums_themes.is_moderator');
@@ -543,7 +543,7 @@ class Forums
         }
 
         $topic = $this->topicTable->fetchRow($select);
-        if (!$topic) {
+        if (! $topic) {
             return false;
         }
 
@@ -560,7 +560,7 @@ class Forums
         $comments = new Comments();
 
         $message = $comments->getMessageRow($messageId);
-        if (!$message) {
+        if (! $message) {
             return false;
         }
 
@@ -569,7 +569,7 @@ class Forums
         }
 
         $topic = $this->topicTable->find($message->item_id)->current();
-        if (!$topic) {
+        if (! $topic) {
             return false;
         }
 
@@ -592,9 +592,9 @@ class Forums
         if ($userId) {
             $commentTopicTable = new CommentTopic();
             $commentTopicTable->updateTopicView(
-                    CommentMessage::FORUMS_TYPE_ID,
-                    $topicId,
-                    $userId
+                CommentMessage::FORUMS_TYPE_ID,
+                $topicId,
+                $userId
             );
         }
     }
@@ -605,12 +605,12 @@ class Forums
             'status'      => [self::STATUS_NORMAL, self::STATUS_CLOSED],
             'isModerator' => $isModearator
         ]);
-        if (!$topic) {
+        if (! $topic) {
             return false;
         }
 
         $theme = $this->getTheme($topic['theme_id']);
-        if (!$theme) {
+        if (! $theme) {
             return false;
         }
 
@@ -664,7 +664,7 @@ class Forums
             'moderatorAttention' => (bool)$values['moderator_attention']
         ]);
 
-        if (!$messageId) {
+        if (! $messageId) {
             throw new \Exception("Message add fails");
         }
 
@@ -706,11 +706,10 @@ class Forums
 
         $topics = [];
         foreach ($rows as $row) {
-
             $stat = $commentTopicTable->getTopicStatForUser(
-                    CommentMessage::FORUMS_TYPE_ID,
-                    $row->id,
-                    $userId
+                CommentMessage::FORUMS_TYPE_ID,
+                $row->id,
+                $userId
             );
             $messages = $stat['messages'];
             $newMessages = $stat['newMessages'];
@@ -722,8 +721,8 @@ class Forums
             $lastMessage = false;
             if ($messages > 0) {
                 $lastMessageRow = $comments->getLastMessageRow(
-                        CommentMessage::FORUMS_TYPE_ID,
-                        $row->id
+                    CommentMessage::FORUMS_TYPE_ID,
+                    $row->id
                 );
                 if ($lastMessageRow) {
                     $lastMessage = [
