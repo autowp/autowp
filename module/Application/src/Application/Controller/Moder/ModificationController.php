@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Controller\Moder;
+
+use Zend\Mvc\Controller\AbstractActionController;
+
 use Application\Form\Modification as ModificationForm;
 use Application\Model\DbTable\CombinationModification;
 use Application\Model\DbTable\Modification as ModificationTable;
