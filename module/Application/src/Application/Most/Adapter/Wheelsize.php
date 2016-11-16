@@ -13,22 +13,22 @@ use Zend_Db_Table_Select;
 
 class Wheelsize extends AbstractAdapter
 {
-    protected $_attributes;
+    protected $attributes;
 
-    protected $_order;
+    protected $order;
 
-    protected $_attributesTable;
+    protected $attributesTable;
 
-    protected $_carItemType;
+    protected $carItemType;
 
     public function __construct(array $options)
     {
         parent::__construct($options);
 
-        $this->_attributesTable = new Attribute();
+        $this->attributesTable = new Attribute();
 
         $itemTypes = new ItemType();
-        $this->_carItemType = $itemTypes->find(1)->current();
+        $this->carItemType = $itemTypes->find(1)->current();
     }
 
     public function setAttributes(array $value)
@@ -39,27 +39,27 @@ class Wheelsize extends AbstractAdapter
             'radius'  => null,
             'rimwidth'   => null
         ];*/
-        $this->_attributes = $value;
+        $this->attributes = $value;
     }
 
     public function setOrder($value)
     {
-        $this->_order = $value;
+        $this->order = $value;
     }
 
     public function getCars(Zend_Db_Table_Select $select, $language)
     {
-        $wheel = $this->_attributes['rear'];
+        $wheel = $this->attributes['rear'];
 
         $specService = $this->most->getSpecs();
 
-        $tyrewidth  = $this->_attributesTable->find($wheel['tyrewidth'])->current();
+        $tyrewidth  = $this->attributesTable->find($wheel['tyrewidth'])->current();
         $tyrewidthValuesTable = $specService->getValueDataTable($tyrewidth->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
-        $tyreseries = $this->_attributesTable->find($wheel['tyreseries'])->current();
+        $tyreseries = $this->attributesTable->find($wheel['tyreseries'])->current();
         $tyreseriesValuesTable = $specService->getValueDataTable($tyreseries->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
-        $radius     = $this->_attributesTable->find($wheel['radius'])->current();
+        $radius     = $this->attributesTable->find($wheel['radius'])->current();
         $radiusValuesTable = $specService->getValueDataTable($radius->type_id)->info(Zend_Db_Table_Abstract::NAME);
 
         $select
@@ -76,7 +76,7 @@ class Wheelsize extends AbstractAdapter
             ->where('radius.attribute_id = ?', $radius->id)
             ->where('radius.value > 0')
             ->group('cars.id')
-            ->order(new Zend_Db_Expr('tyrewidth.value*tyreseries.value/100+radius.value*25.4 ' . $this->_order));
+            ->order(new Zend_Db_Expr('tyrewidth.value*tyreseries.value/100+radius.value*25.4 ' . $this->order));
 
         $cars = $select->getTable()->fetchAll($select);
 
@@ -101,7 +101,7 @@ class Wheelsize extends AbstractAdapter
 
         $specService = $this->most->getSpecs();
 
-        foreach ($this->_attributes as $wheel) {
+        foreach ($this->attributes as $wheel) {
             $wheelObj = new WheelsizeObject(
                 $specService->getActualValue($wheel['tyrewidth'], $car->id, 1),
                 $specService->getActualValue($wheel['tyreseries'], $car->id, 1),

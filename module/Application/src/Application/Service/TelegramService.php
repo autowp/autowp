@@ -37,7 +37,7 @@ class TelegramService
     private $hostManager;
 
     public function __construct(
-        array $options = [],
+        array $options,
         TreeRouteStack $router,
         HostManager $hostManager,
         $serviceManager

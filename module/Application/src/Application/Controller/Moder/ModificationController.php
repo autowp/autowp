@@ -7,17 +7,8 @@ use Application\Model\DbTable\Modification\Group as ModificationGroup;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Modification;
 
-class Moder_ModificationController extends Zend_Controller_Action
+class ModificationController extends AbstractActionController
 {
-    public function preDispatch()
-    {
-        parent::preDispatch();
-
-        if (! $this->_helper->user()->inheritsRole('moder')) {
-            return $this->_forward('forbidden', 'error', 'default');
-        }
-    }
-
     /**
      * @param VehicleRow $car
      * @return string
@@ -46,6 +37,10 @@ class Moder_ModificationController extends Zend_Controller_Action
 
     public function addAction()
     {
+        if (! $this->user()->inheritsRole('moder')) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->_helper->catalogue()->getCarTable();
 
         $car = $cars->find($this->_getParam('car_id'))->current();
@@ -125,6 +120,10 @@ class Moder_ModificationController extends Zend_Controller_Action
 
     public function editAction()
     {
+        if (! $this->user()->inheritsRole('moder')) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->_helper->catalogue()->getCarTable();
 
         $car = $cars->find($this->_getParam('car_id'))->current();
@@ -223,6 +222,10 @@ class Moder_ModificationController extends Zend_Controller_Action
 
     public function mapAction()
     {
+        if (! $this->user()->inheritsRole('moder')) {
+            return $this->forbiddenAction();
+        }
+
         $cars = $this->_helper->catalogue()->getCarTable();
 
         $car = $cars->find($this->_getParam('car_id'))->current();
@@ -324,6 +327,10 @@ class Moder_ModificationController extends Zend_Controller_Action
 
     public function deleteAction()
     {
+        if (! $this->user()->inheritsRole('moder')) {
+            return $this->forbiddenAction();
+        }
+
         $id = (int)$this->getParam('id');
 
         $modModel = new Modification();

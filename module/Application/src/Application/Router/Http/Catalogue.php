@@ -9,18 +9,12 @@ use Zend\Stdlib\RequestInterface as Request;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
-use Application\Model\DbTable\Vehicle\Type as VehicleType;
 
 use Exception;
 
 class Catalogue implements RouteInterface
 {
     const DELIMETER = '/';
-
-    /**
-     * @var VehicleType
-     */
-    private $carTypeTable;
 
     private $defaults = [];
 
@@ -38,16 +32,6 @@ class Catalogue implements RouteInterface
     public function __construct($options = [])
     {
         $this->defaults = $options['defaults'];
-    }
-
-    /**
-     * @return VehicleType
-     */
-    private function _getCarTypeTable()
-    {
-        return $this->carTypeTable
-            ? $this->carTypeTable
-            : $this->carTypeTable = new VehicleType();
     }
 
     private function assembleMatch(array $data, $length)

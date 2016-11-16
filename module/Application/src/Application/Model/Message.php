@@ -34,7 +34,7 @@ class Message
         $this->telegram = $telegram;
     }
 
-    public function send($fromId = null, $toId, $message)
+    public function send($fromId, $toId, $message)
     {
         $message = trim($message);
         $msgLength = mb_strlen($message);

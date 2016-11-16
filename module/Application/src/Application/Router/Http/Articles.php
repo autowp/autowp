@@ -120,7 +120,6 @@ class Articles implements RouteInterface
                 if (isset($data['page']) && $data['page'] > 1) {
                     $url[] = 'page'.$data['page'];
                 }
-            default:
                 break;
         }
 

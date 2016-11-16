@@ -18,7 +18,7 @@ class Car extends AbstractHelper
     /**
      * @var VehicleRow
      */
-    private $_car = null;
+    private $car = null;
 
     private $monthFormat = '<small class="month">%02d.</small>';
 
@@ -66,7 +66,7 @@ class Car extends AbstractHelper
 
     public function __invoke(VehicleRow $car = null)
     {
-        $this->_car = $car;
+        $this->car = $car;
 
         return $this;
     }
@@ -83,11 +83,11 @@ class Car extends AbstractHelper
 
     public function title()
     {
-        if (! $this->_car) {
+        if (! $this->car) {
             return false;
         }
 
-        $car = $this->_car;
+        $car = $this->car;
 
         $spec = null;
         $specFull = null;
@@ -116,13 +116,13 @@ class Car extends AbstractHelper
 
     public function catalogueLinks()
     {
-        if (! $this->_car) {
+        if (! $this->car) {
             return [];
         }
 
         $result = [];
 
-        foreach ($this->_carPublicUrls($this->_car) as $url) {
+        foreach ($this->carPublicUrls($this->car) as $url) {
             $result[] = [
                 'url' => $this->view->url([
                     'module'        => 'default',
@@ -140,7 +140,7 @@ class Car extends AbstractHelper
 
     public function cataloguePaths()
     {
-        return $this->_carPublicUrls($this->_car);
+        return $this->carPublicUrls($this->car);
     }
 
     /**
@@ -166,19 +166,19 @@ class Car extends AbstractHelper
     /**
      * @return VehicleParent
      */
-    private function _getCarParentTable()
+    private function getCarParentTable()
     {
         return $this->carParentTable
             ? $this->carParentTable
             : $this->carParentTable = new VehicleParent();
     }
 
-    private function _carPublicUrls(VehicleRow $car)
+    private function carPublicUrls(VehicleRow $car)
     {
-        return $this->_walkUpUntilBrand($car->id, []);
+        return $this->walkUpUntilBrand($car->id, []);
     }
 
-    private function _walkUpUntilBrand($id, array $path)
+    private function walkUpUntilBrand($id, array $path)
     {
         $urls = [];
 
@@ -199,15 +199,15 @@ class Car extends AbstractHelper
             ];
         }
 
-        $carParentTable = $this->_getCarParentTable();
+        $carParentTable = $this->getCarParentTable();
 
-        $parentRows = $this->_getCarParentTable()->fetchAll([
+        $parentRows = $this->getCarParentTable()->fetchAll([
             'car_id = ?' => $id
         ]);
         foreach ($parentRows as $parentRow) {
             $urls = array_merge(
                 $urls,
-                $this->_walkUpUntilBrand($parentRow->parent_id, array_merge([$parentRow->catname], $path))
+                $this->walkUpUntilBrand($parentRow->parent_id, array_merge([$parentRow->catname], $path))
             );
         }
 

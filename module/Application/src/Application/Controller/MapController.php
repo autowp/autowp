@@ -16,18 +16,6 @@ use Polygon;
 
 class MapController extends AbstractActionController
 {
-    private $googleClient;
-
-    const GOOGLE_URL = 'http://maps.googleapis.com/maps/api/geocode/json';
-
-    private function _getGoogleClient()
-    {
-        if (! $this->googleClient) {
-            $this->googleClient = new Zend_Http_Client();
-        }
-        return $this->googleClient;
-    }
-
     public function indexAction()
     {
     }

@@ -392,6 +392,7 @@ class Comments
                 break;
             case 'old':
                 $select->order('datetime asc');
+                break;
             case 'new':
             default:
                 $select->order('datetime desc');

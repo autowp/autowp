@@ -36,7 +36,7 @@ use Zend_Db_Table_Select;
 
 class CatalogueController extends AbstractActionController
 {
-    private $_mostsMinCarsCount = 200;
+    private $mostsMinCarsCount = 200;
 
     private $textStorage;
 
@@ -65,7 +65,7 @@ class CatalogueController extends AbstractActionController
         $this->brandVehicle = $brandVehicle;
     }
 
-    private function _brandAction(callable $callback)
+    private function doBrandAction(callable $callback)
     {
         $language = $this->language();
 
@@ -190,7 +190,7 @@ class CatalogueController extends AbstractActionController
 
     public function recentAction()
     {
-        return $this->_brandAction(function ($brand) {
+        return $this->doBrandAction(function ($brand) {
 
             $select = $this->selectFromPictures()
                 ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
@@ -229,7 +229,7 @@ class CatalogueController extends AbstractActionController
 
     public function conceptsAction()
     {
-        return $this->_brandAction(function ($brand) {
+        return $this->doBrandAction(function ($brand) {
 
             $select = $this->catalogue()->getCarTable()->select(true)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
@@ -347,7 +347,7 @@ class CatalogueController extends AbstractActionController
 
     public function carsAction()
     {
-        return $this->_brandAction(function ($brand) {
+        return $this->doBrandAction(function ($brand) {
 
             $carTypeTable = new VehicleType();
 
@@ -573,7 +573,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandAction()
     {
-        return $this->_brandAction(function ($brand) {
+        return $this->doBrandAction(function ($brand) {
 
             $language = $this->language();
 
@@ -731,7 +731,7 @@ class CatalogueController extends AbstractActionController
 
     private function typePictures($type)
     {
-        return $this->_brandAction(function ($brand) use ($type) {
+        return $this->doBrandAction(function ($brand) use ($type) {
 
             $select = $this->typePicturesSelect($brand['id'], $type);
 
@@ -783,11 +783,11 @@ class CatalogueController extends AbstractActionController
 
     private function typePicturesPicture($type)
     {
-        return $this->_brandAction(function ($brand) use ($type) {
+        return $this->doBrandAction(function ($brand) use ($type) {
 
             $select = $this->typePicturesSelect($brand['id'], $type, false);
 
-            return $this->_pictureAction($select, function ($select, $picture) use ($brand, $type) {
+            return $this->pictureAction($select, function ($select, $picture) use ($brand, $type) {
 
                 $this->sidebar()->brand([
                     'brand_id' => $brand['id'],
@@ -827,7 +827,7 @@ class CatalogueController extends AbstractActionController
 
     private function typePicturesGallery($type)
     {
-        return $this->_brandAction(function ($brand) use ($type) {
+        return $this->doBrandAction(function ($brand) use ($type) {
 
             $select = $this->typePicturesSelect($brand['id'], $type, false);
 
@@ -869,9 +869,9 @@ class CatalogueController extends AbstractActionController
         return $this->typePicturesGallery(Picture::LOGO_TYPE_ID);
     }
 
-    private function _enginesAction($callback)
+    private function doEnginesAction($callback)
     {
-        return $this->_brandAction(function ($brand) use ($callback) {
+        return $this->doBrandAction(function ($brand) use ($callback) {
 
             $engineTable = new Engine();
 
@@ -911,7 +911,7 @@ class CatalogueController extends AbstractActionController
 
     public function enginesAction()
     {
-        return $this->_enginesAction(function ($brand, $engineRow, $path) {
+        return $this->doEnginesAction(function ($brand, $engineRow, $path) {
 
             $engineTable = new Engine();
 
@@ -1141,7 +1141,7 @@ class CatalogueController extends AbstractActionController
 
     public function engineSpecsAction()
     {
-        return $this->_engineAction(function ($brand, $engineRow, $path) {
+        return $this->doEngineAction(function ($brand, $engineRow, $path) {
 
             $engine = [
                 'id'   => $engineRow->id,
@@ -1164,9 +1164,9 @@ class CatalogueController extends AbstractActionController
         });
     }
 
-    private function _engineAction(callable $callback)
+    private function doEngineAction(callable $callback)
     {
-        return $this->_enginesAction(function ($brand, $engineRow, $path) use ($callback) {
+        return $this->doEnginesAction(function ($brand, $engineRow, $path) use ($callback) {
             if (! $engineRow) {
                 return $this->notFoundAction();
             }
@@ -1228,7 +1228,7 @@ class CatalogueController extends AbstractActionController
 
     public function engineGalleryAction()
     {
-        return $this->_engineAction(function ($brand, $engineRow, $path) {
+        return $this->doEngineAction(function ($brand, $engineRow, $path) {
             $select = $this->enginePicturesSelect($engineRow, false);
 
             switch ($this->params('gallery')) {
@@ -1256,10 +1256,10 @@ class CatalogueController extends AbstractActionController
 
     public function enginePictureAction()
     {
-        return $this->_engineAction(function ($brand, $engineRow, $path) {
+        return $this->doEngineAction(function ($brand, $engineRow, $path) {
             $select = $this->enginePicturesSelect($engineRow, false);
 
-            return $this->_pictureAction($select, function ($select, $picture) use ($brand, $engineRow) {
+            return $this->pictureAction($select, function ($select, $picture) use ($brand, $engineRow) {
 
                 $this->sidebar()->brand([
                     'brand_id'   => $brand['id'],
@@ -1284,7 +1284,7 @@ class CatalogueController extends AbstractActionController
 
     public function enginePicturesAction()
     {
-        return $this->_engineAction(function ($brand, $engineRow, $path) {
+        return $this->doEngineAction(function ($brand, $engineRow, $path) {
             $select = $this->enginePicturesSelect($engineRow);
 
             $paginator = $this->picturesPaginator($select, $this->params('page'));
@@ -1319,7 +1319,7 @@ class CatalogueController extends AbstractActionController
 
     public function engineCarsAction()
     {
-        return $this->_engineAction(function ($brand, $engineRow, $path) {
+        return $this->doEngineAction(function ($brand, $engineRow, $path) {
 
             $engine = [
                 'id'   => $engineRow->id,
@@ -1419,9 +1419,9 @@ class CatalogueController extends AbstractActionController
         return $result;
     }
 
-    private function _brandCarAction(callable $callback)
+    private function doBrandCarAction(callable $callback)
     {
-        return $this->_brandAction(function ($brand) use ($callback) {
+        return $this->doBrandAction(function ($brand) use ($callback) {
 
             $carTable = $this->catalogue()->getCarTable();
 
@@ -1624,7 +1624,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandCarAction()
     {
-        return $this->_brandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
+        return $this->doBrandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
 
             $modification = null;
             $modId = (int)$this->params('mod');
@@ -1710,7 +1710,7 @@ class CatalogueController extends AbstractActionController
 
             return [
                 'car'           => $currentCar,
-                'modificationGroups' => $this->_brandCarModifications($currentCar['id'], $modId),
+                'modificationGroups' => $this->brandCarModifications($currentCar['id'], $modId),
                 'breadcrumbs'   => $breadcrumbs,
                 'type'          => $type,
                 'stockCount'    => $counts['stock'],
@@ -1846,7 +1846,7 @@ class CatalogueController extends AbstractActionController
         return $modifications;
     }
 
-    private function _brandCarModifications($carId, $modificationId)
+    private function brandCarModifications($carId, $modificationId)
     {
         // modifications
         $mTable = new ModificationTable();
@@ -2134,7 +2134,7 @@ class CatalogueController extends AbstractActionController
         $hasHtml = (bool)$currentCar['text'];
 
         return [
-            'modificationGroups' => $this->_brandCarModifications($currentCar['id'], $modId),
+            'modificationGroups' => $this->brandCarModifications($currentCar['id'], $modId),
             'modgroup'         => true,
             'breadcrumbs'      => $breadcrumbs,
             'car'              => $currentCar,
@@ -2284,7 +2284,7 @@ class CatalogueController extends AbstractActionController
         return [
             'car'           => $currentCar,
             'otherNames'    => $otherNames,
-            'modificationGroups' => $this->_brandCarModifications($currentCar['id'], $modId),
+            'modificationGroups' => $this->brandCarModifications($currentCar['id'], $modId),
             'paginator'     => $paginator,
             'breadcrumbs'   => $breadcrumbs,
             'type'          => $type,
@@ -2531,7 +2531,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandCarPicturesAction()
     {
-        return $this->_brandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
+        return $this->doBrandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
 
             $exact = (bool)$this->params('exact');
 
@@ -2586,12 +2586,12 @@ class CatalogueController extends AbstractActionController
                 'picturesCount' => $paginator->getTotalItemCount(),
                 'type'          => null,
                 'modification'  => $modification,
-                'modificationGroups' => $this->_brandCarModifications($currentCar['id'], $modId),
+                'modificationGroups' => $this->brandCarModifications($currentCar['id'], $modId),
             ];
         });
     }
 
-    private function _pictureAction($select, callable $callback)
+    private function pictureAction($select, callable $callback)
     {
         $pictureId = (string)$this->params('picture_id');
 
@@ -2641,13 +2641,13 @@ class CatalogueController extends AbstractActionController
 
     public function brandCarPictureAction()
     {
-        return $this->_brandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
+        return $this->doBrandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
 
             $exact = (bool)$this->params('exact');
 
             $select = $this->getBrandCarPicturesSelect($currentCar['id'], $exact, false);
 
-            return $this->_pictureAction($select, function ($select, $picture) use ($breadcrumbs) {
+            return $this->pictureAction($select, function ($select, $picture) use ($breadcrumbs) {
                 return [
                     'breadcrumbs' => $breadcrumbs,
                     'picture'     => array_replace(
@@ -2667,7 +2667,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandCarGalleryAction()
     {
-        return $this->_brandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
+        return $this->doBrandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
 
             $exact = (bool)$this->params('exact');
             $select = $this->getBrandCarPicturesSelect($currentCar['id'], $exact, false);
@@ -2697,7 +2697,7 @@ class CatalogueController extends AbstractActionController
 
     public function brandCarSpecificationsAction()
     {
-        return $this->_brandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
+        return $this->doBrandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
 
             $currentCarId = $currentCar['id'];
 
@@ -2795,12 +2795,12 @@ class CatalogueController extends AbstractActionController
                 ->where('brands_cars.brand_id = ?', (int)$brandId)
         );
 
-        return $carsCount >= $this->_mostsMinCarsCount;
+        return $carsCount >= $this->mostsMinCarsCount;
     }
 
     public function brandMostsAction()
     {
-        return $this->_brandAction(function ($brand) {
+        return $this->doBrandAction(function ($brand) {
 
             if (! $this->mostsActive($brand['id'])) {
                 return $this->notFoundAction();

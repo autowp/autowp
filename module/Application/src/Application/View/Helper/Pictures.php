@@ -71,7 +71,7 @@ class Pictures extends AbstractHelper
 
     public function behaviour(PictureRow $picture)
     {
-        return $this->_behaviour($picture, $this->isPictureModer());
+        return $this->userBehaviour($picture, $this->isPictureModer());
     }
 
     /**
@@ -96,7 +96,7 @@ class Pictures extends AbstractHelper
     }
 
 
-    private function _behaviour(PictureRow $picture, $isModer)
+    private function userBehaviour(PictureRow $picture, $isModer)
     {
         $ctTable = $this->getCommentTopicTable();
         if ($this->view->user()->logedIn()) {
@@ -198,7 +198,7 @@ class Pictures extends AbstractHelper
                     '<div class="thumbnail">' .
                         $view->htmlA($url, $imageHtml, false) .
                         '<p>' . $view->htmlA($url, $escCaption, false) . '</p>' .
-                        $this->_behaviour($picture, $isModer) .
+                        $this->userBehaviour($picture, $isModer) .
                     '</div>' .
                 '</div>';
     }

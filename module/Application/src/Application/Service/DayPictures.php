@@ -61,7 +61,7 @@ class DayPictures
     /**
      * @var DateTime
      */
-    private $_minDate = null;
+    private $minDate = null;
 
     /**
      * @var \Zend\Paginator\Paginator
@@ -137,7 +137,7 @@ class DayPictures
      */
     public function setMinDate(DateTime $date)
     {
-        $this->_minDate = $date;
+        $this->minDate = $date;
 
         return $this;
     }
@@ -266,8 +266,8 @@ class DayPictures
                 ->where($column . ' < ?', $this->startOfDayDbValue($this->currentDate))
                 ->order($this->orderColumn . ' DESC');
 
-            if ($this->_minDate) {
-                $select->where($column . ' >= ?', $this->startOfDayDbValue($this->_minDate));
+            if ($this->minDate) {
+                $select->where($column . ' >= ?', $this->startOfDayDbValue($this->minDate));
             }
 
             $prevDatePicture = $select->getTable()->fetchRow($select);
@@ -501,8 +501,8 @@ class DayPictures
             ->where($column . ' <= ?', $this->endOfDayDbValue($this->currentDate))
             ->order($this->orderColumn . ' DESC');
 
-        if ($this->_minDate) {
-            $select->where($column . ' >= ?', $this->startOfDayDbValue($this->_minDate));
+        if ($this->minDate) {
+            $select->where($column . ' >= ?', $this->startOfDayDbValue($this->minDate));
         }
 
         return $select;

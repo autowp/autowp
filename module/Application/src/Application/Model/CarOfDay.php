@@ -15,11 +15,11 @@ class CarOfDay
     /**
      * @var Table
      */
-    private $_table;
+    private $table;
 
     public function __construct()
     {
-        $this->_table = new Table([
+        $this->table = new Table([
             'name'    => 'of_day',
             'primary' => 'day_date'
         ]);
@@ -27,20 +27,20 @@ class CarOfDay
 
     public function pick()
     {
-        $dayRow = $this->_table->fetchRow([
+        $dayRow = $this->table->fetchRow([
             'day_date = CURDATE()'
         ]);
 
-        $db = $this->_table->getAdapter();
+        $db = $this->table->getAdapter();
 
         if (! $dayRow) {
-            $dayRow = $this->_table->createRow([
+            $dayRow = $this->table->createRow([
                 'day_date' => new Zend_Db_Expr('CURDATE()')
             ]);
         }
 
         if (! $dayRow['car_id']) {
-            $db = $this->_table->getAdapter();
+            $db = $this->table->getAdapter();
             $sql = '
                 SELECT c.id, count(p.id) AS p_count
                 FROM cars AS c
@@ -66,14 +66,14 @@ class CarOfDay
 
     public function getCurrent()
     {
-        $row = $this->_table->fetchRow([
+        $row = $this->table->fetchRow([
             'day_date <= CURDATE()'
         ], 'day_date DESC');
 
         return $row ? $row->car_id : null;
     }
 
-    private function _pictureByPerspective($pictureTable, $car, $perspective)
+    private function pictureByPerspective($pictureTable, $car, $perspective)
     {
         $select = $pictureTable->select(true)
             ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
@@ -92,7 +92,7 @@ class CarOfDay
 
     public function putCurrentToTwitter(array $twOptions)
     {
-        $dayRow = $this->_table->fetchRow([
+        $dayRow = $this->table->fetchRow([
             'day_date = CURDATE()',
             'not twitter_sent'
         ]);
@@ -119,14 +119,14 @@ class CarOfDay
         $perspectives = [10, 1, 7, 8, 11, 3, 7, 12, 4, 8];
 
         foreach ($perspectives as $perspective) {
-            $picture = $this->_pictureByPerspective($pictureTable, $car, $perspective);
+            $picture = $this->pictureByPerspective($pictureTable, $car, $perspective);
             if ($picture) {
                 break;
             }
         }
 
         if (! $picture) {
-            $picture = $this->_pictureByPerspective($pictureTable, $car, false);
+            $picture = $this->pictureByPerspective($pictureTable, $car, false);
         }
 
         if (! $picture) {

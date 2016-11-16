@@ -23,7 +23,7 @@ use Zend_Db_Expr;
 
 class Car extends AbstractPlugin
 {
-    private $_perspectiveCache = [];
+    private $perspectiveCache = [];
 
     /**
      * @var VehicleLanguage
@@ -33,7 +33,7 @@ class Car extends AbstractPlugin
     /**
      * @var Twins
      */
-    private $_twins;
+    private $twins;
 
     /**
      * @var Spec
@@ -81,9 +81,9 @@ class Car extends AbstractPlugin
      */
     private function getTwins()
     {
-        return $this->_twins
-            ? $this->_twins
-            : $this->_twins = new Twins();
+        return $this->twins
+            ? $this->twins
+            : $this->twins = new Twins();
     }
 
     /**
@@ -558,10 +558,10 @@ class Car extends AbstractPlugin
 
     private function getPerspectiveGroupIds($pageId)
     {
-        if (! isset($this->_perspectiveCache[$pageId])) {
+        if (! isset($this->perspectiveCache[$pageId])) {
             $perspectivesGroups = new PerspectiveGroup();
             $db = $perspectivesGroups->getAdapter();
-            $this->_perspectiveCache[$pageId] = $db->fetchCol(
+            $this->perspectiveCache[$pageId] = $db->fetchCol(
                 $db->select()
                     ->from($perspectivesGroups->info('name'), 'id')
                     ->where('page_id = ?', $pageId)
@@ -569,7 +569,7 @@ class Car extends AbstractPlugin
             );
         }
 
-        return $this->_perspectiveCache[$pageId];
+        return $this->perspectiveCache[$pageId];
     }
 
     private function getPictureSelect($car, array $options)

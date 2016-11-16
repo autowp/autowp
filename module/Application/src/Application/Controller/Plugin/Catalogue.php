@@ -11,7 +11,7 @@ class Catalogue extends AbstractPlugin
     /**
      * @var CatalogueModel
      */
-    private $_catalogue;
+    private $catalogue;
 
     /**
      * @return CatalogueModel
@@ -26,8 +26,8 @@ class Catalogue extends AbstractPlugin
      */
     public function getCatalogue()
     {
-        return $this->_catalogue
-            ? $this->_catalogue
-            : $this->_catalogue = new CatalogueModel();
+        return $this->catalogue
+            ? $this->catalogue
+            : $this->catalogue = new CatalogueModel();
     }
 }

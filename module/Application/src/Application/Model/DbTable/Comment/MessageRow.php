@@ -25,9 +25,8 @@ class MessageRow extends Row
                 $picture = $pictures->find($this->item_id)->current();
                 if ($picture) {
                     return ($absolute ? HOST : '/').'picture/'.($picture->identity ? $picture->identity : $picture->id);
-                } else {
-                    return false;
                 }
+                return false;
 
             case CommentMessage::VOTINGS_TYPE_ID:
                 return ($absolute ? HOST : '/').'voting/voting/id/'.(int)$this->item_id.'/';
@@ -40,9 +39,8 @@ class MessageRow extends Row
                 $article = $articles->find($this->item_id)->current();
                 if ($article) {
                     return ($absolute ? HOST : '/').'articles/'.$article->catname.'/';
-                } else {
-                    return false;
                 }
+                return false;
 
             case CommentMessage::FORUMS_TYPE_ID:
                 return ($absolute ? HOST : '/').'forums/topic-message/message_id/'.(int)$this->id;
