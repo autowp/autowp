@@ -113,8 +113,6 @@ class CarsController extends AbstractActionController
         $carForm = $result['form'];
         $carFormData = $result['data'];
 
-        //print_r($carFormData['allValues']); exit;
-
         $carForm->setAttribute('action', $this->url()->fromRoute('cars/params', [
             'form' => 'car',
             'tab'  => 'spec'
@@ -300,15 +298,13 @@ class CarsController extends AbstractActionController
             ]);
 
             if ($cUserValueRow) {
-                print "Value row already exists \n";
-                exit;
+                throw new Exception("Value row already exists");
             }
 
             $attrRow = $attrTable->find($eUserValueRow->attribute_id)->current();
 
             if (! $attrRow) {
-                print "Attr not found";
-                exit;
+                throw new Exception("Attr not found");
             }
 
             $dataTable = $this->specsService->getUserValueDataTable($attrRow->type_id);
@@ -334,8 +330,7 @@ class CarsController extends AbstractActionController
                 $cDataRow = $dataTable->fetchRow($filter);
 
                 if ($cDataRow) {
-                    print "Data row already exists \n";
-                    exit;
+                    throw new Exception("Data row already exists");
                 }
             }
 
