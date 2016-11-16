@@ -19,7 +19,7 @@
                         <?php } else { ?>
                             &#xa0;
                         <?php } ?>
-                        <p><?=$this->escapeHtml($car['name'])?></p>
+                        <p><?=$this->car()->htmlTitle($car['name'])?></p>
                     </div>
                 </div>
             <?php } ?>

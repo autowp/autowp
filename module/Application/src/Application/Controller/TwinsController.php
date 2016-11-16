@@ -241,7 +241,8 @@ class TwinsController extends AbstractActionController
                         'name' => 'if(length(car_language.name), car_language.name, cars.caption)',
                         'cars.body', 'cars.begin_model_year', 'cars.end_model_year',
                         'cars.begin_year', 'cars.end_year', 'cars.today',
-                        'spec' => 'spec.short_name'
+                        'spec' => 'spec.short_name',
+                        'spec_full' => 'spec.name',
                     ])
                     ->join('twins_groups_cars', 'cars.id = twins_groups_cars.car_id', 'twins_group_id')
                     ->joinLeft('car_language', $langJoinExpr, null)
@@ -297,20 +298,9 @@ class TwinsController extends AbstractActionController
                         'src' => null
                     ];
                 }
-
-                $name = VehicleRow::buildFullName([
-                    'begin_model_year' => $car['begin_model_year'],
-                    'end_model_year'   => $car['end_model_year'],
-                    'spec'             => $car['spec'],
-                    'body'             => $car['body'],
-                    'name'             => $car['name'],
-                    'begin_year'       => $car['begin_year'],
-                    'end_year'         => $car['end_year'],
-                    'today'            => $car['today']
-                ]);
-
+                
                 $cars[] = [
-                    'name'    => $name,
+                    'name'    => $car,
                     'picture' => $picture
                 ];
             }

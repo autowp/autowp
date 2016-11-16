@@ -2059,7 +2059,7 @@ class CarsController extends AbstractActionController
             '%s перестал быть родительским автомобилем для %s',
             htmlspecialchars($parentCar->getFullName('en')),
             htmlspecialchars($car->getFullName('en'))
-            );
+        );
         $this->log($message, [$car, $parentCar]);
 
         return $this->redirect()->toUrl($this->getRequest()->getServer('HTTP_REFERER'));
@@ -3463,6 +3463,9 @@ class CarsController extends AbstractActionController
 
                 $cpcTable = new DbTable\Vehicle\ParentCache();
                 $cpcTable->rebuildCache($car);
+                
+                $vehicleType = new VehicleType();
+                $vehicleType->refreshInheritanceFromParents($car->id);
 
                 $namespace = new \Zend\Session\Container('Moder_Car');
                 $namespace->lastCarId = $car->id;
@@ -3474,7 +3477,7 @@ class CarsController extends AbstractActionController
                 $this->log(sprintf(
                     'Создан новый автомобиль %s',
                     htmlspecialchars($car->getFullName('en'))
-                    ), $car);
+                ), $car);
 
                 $user = $this->user()->get();
                 $ucsTable = new DbTable\User\CarSubscribe();
@@ -3540,10 +3543,10 @@ class CarsController extends AbstractActionController
         $pictureTable = $this->catalogue()->getPictureTable();
         $rows = $pictureTable->fetchAll(
             $pictureTable->select(true)
-            ->where('pictures.car_id = ?', $car->id)
-            ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
-            ->order(['pictures.status', 'pictures.id'])
-            );
+                ->where('pictures.car_id = ?', $car->id)
+                ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
+                ->order(['pictures.status', 'pictures.id'])
+        );
         foreach ($rows as $row) {
             $request = DbTable\Picture\Row::buildFormatRequest($row->toArray());
             $imageInfo = $imageStorage->getFormatedImage($request, 'picture-thumb');
