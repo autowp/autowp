@@ -73,6 +73,11 @@ class BrandsController extends AbstractActionController
         ];
     }
 
+    public function indexAction()
+    {
+        return $this->notFoundAction();
+    }
+
     /**
      * @param BrandRow $car
      * @param bool $forceCanonical

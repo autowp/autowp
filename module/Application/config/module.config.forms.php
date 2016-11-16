@@ -452,7 +452,7 @@ return [
                 'method' => 'post'
             ],
             'elements' => [
-                [
+                'email' => [
                     'spec' => [
                         'type' => 'Text',
                         'name' => 'email',
@@ -463,19 +463,19 @@ return [
                         ]
                     ]
                 ],
-                [
+                'name' => [
                     'spec' => [
                         'type' => Form\Element\UserName::class,
                         'name' => 'name'
                     ]
                 ],
-                [
+                'password' => [
                     'spec' => [
                         'type' => Form\Element\UserPassword::class,
                         'name' => 'password',
                     ]
                 ],
-                [
+                'password_confirm' => [
                     'spec' => [
                         'type' => Form\Element\UserPassword::class,
                         'name' => 'password_confirm',
@@ -484,7 +484,7 @@ return [
                         ]
                     ]
                 ],
-                [
+                'captcha' => [
                     'spec' => [
                         'type' => 'Captcha',
                         'name' => 'captcha',

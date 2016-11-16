@@ -1363,7 +1363,8 @@ insert into image (id, filepath, filesize, width, height, date_add, dir)
 values (1, "1.jpg", 242405, 1200, 800, NOW(), "picture"),
 (33, "2.jpg", 242405, 1200, 800, NOW(), "picture"),
 (35, "3.jpg", 242405, 1200, 800, NOW(), "picture"),
-(37, "4.jpg", 242405, 1200, 800, NOW(), "picture");
+(37, "4.jpg", 242405, 1200, 800, NOW(), "picture"),
+(38, "5.jpg", 242405, 1200, 800, NOW(), "picture");
 
 -- --------------------------------------------------------
 
@@ -2084,11 +2085,12 @@ CREATE TABLE IF NOT EXISTS `pictures` (
   KEY `copyrights_text_id` (`copyrights_text_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=917309 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB; (`owner_id`)';
 
-insert into pictures (id, car_id, brand_id, width, height, status, ip, owner_id, type, image_id) 
-values (1, 1, null, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 1, 1), 
-(2, null, 1, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 0, 33),
-(3, null, 1, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 3, 35),
-(4, null, 1, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 2, 37);
+insert into pictures (id, car_id, brand_id, width, height, status, ip, owner_id, type, image_id, accept_datetime) 
+values (1, 1, null, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 1, 1, now()), 
+(2, null, 1, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 0, 33, now()),
+(3, null, 1, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 3, 35, now()),
+(4, null, 1, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 2, 37, now()),
+(5, null, 1, 1600, 1200, 'inbox', inet6_aton('127.0.0.1'), 1, 2, 38, now());
 
 -- --------------------------------------------------------
 

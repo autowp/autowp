@@ -65,6 +65,11 @@ class TwinsController extends AbstractActionController
         ]);
     }
 
+    public function indexAction()
+    {
+        return $this->notFoundAction();
+    }
+
     public function twinsGroupAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
