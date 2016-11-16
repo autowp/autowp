@@ -576,11 +576,11 @@ class Pic extends AbstractPlugin
                         $limit = 10;
 
                         if (count($carRows) > $limit) {
-                            $a = [];
+                            $rows = [];
                             foreach ($carRows as $carRow) {
-                                $a[] = $carRow;
+                                $rows[] = $carRow;
                             }
-                            $carRows = array_slice($a, 0, $limit);
+                            $carRows = array_slice($rows, 0, $limit);
                             $factoryCarsMore = true;
                         }
 

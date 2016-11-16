@@ -136,7 +136,7 @@ class PicturesController extends AbstractActionController
 
     public function ownerTypeaheadAction()
     {
-        $q = $this->params()->fromQuery('query');
+        $query = $this->params()->fromQuery('query');
 
         $users = new User();
 
@@ -145,25 +145,25 @@ class PicturesController extends AbstractActionController
         $selects[] = $users->select(true)
             ->join(['p' => 'pictures'], 'users.id = p.owner_id', null)
             ->group('users.id')
-            ->where('users.id like ?', $q . '%')
+            ->where('users.id like ?', $query . '%')
             ->limit(10);
 
         $selects[] = $users->select(true)
             ->join(['p' => 'pictures'], 'users.id = p.owner_id', null)
             ->group('users.id')
-            ->where('users.login like ?', $q . '%')
+            ->where('users.login like ?', $query . '%')
             ->limit(10);
 
         $selects[] = $users->select(true)
             ->join(['p' => 'pictures'], 'users.id = p.owner_id', null)
             ->group('users.id')
-            ->where('users.identity like ?', $q . '%')
+            ->where('users.identity like ?', $query . '%')
             ->limit(10);
 
         $selects[] = $users->select(true)
             ->join(['p' => 'pictures'], 'users.id = p.owner_id', null)
             ->group('users.id')
-            ->where('users.name like ?', $q . '%')
+            ->where('users.name like ?', $query . '%')
             ->limit(10);
 
 

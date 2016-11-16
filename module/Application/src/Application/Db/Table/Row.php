@@ -40,8 +40,8 @@ class Row extends Zend_Db_Table_Row
             return null;
         }
 
-        $tz = new DateTimeZone(MYSQL_TIMEZONE);
+        $timezone = new DateTimeZone(MYSQL_TIMEZONE);
 
-        return DateTime::createFromFormat($format, $str, $tz);
+        return DateTime::createFromFormat($format, $str, $timezone);
     }
 }
