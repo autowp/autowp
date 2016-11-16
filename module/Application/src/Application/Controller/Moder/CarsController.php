@@ -199,7 +199,7 @@ class CarsController extends AbstractActionController
 
         if ($this->filterForm->isValid()) {
             $values = $this->filterForm->getData();
-            
+
             $group = false;
 
             if ($values['name']) {
@@ -221,18 +221,18 @@ class CarsController extends AbstractActionController
                         ->where('vehicle_vehicle_type.vehicle_type_id = ?', $values['vehicle_type_id']);
                 }
             }
-            
+
             if ($values['vehicle_childs_type_id']) {
                 $group = true;
                 $select
                     ->join(
-                        ['cpc_childs' => 'car_parent_cache'], 
-                        'cars.id = cpc_childs.parent_id', 
+                        ['cpc_childs' => 'car_parent_cache'],
+                        'cars.id = cpc_childs.parent_id',
                         null
                     )
                     ->join(
-                        ['vvt_child' => 'vehicle_vehicle_type'], 
-                        'cpc_childs.car_id = vvt_child.vehicle_id', 
+                        ['vvt_child' => 'vehicle_vehicle_type'],
+                        'cpc_childs.car_id = vvt_child.vehicle_id',
                         null
                     )
                     ->join('car_types_parents', 'vvt_child.vehicle_type_id = car_types_parents.id', null)
@@ -300,7 +300,7 @@ class CarsController extends AbstractActionController
                     $select->order('id desc');
                     break;
             }
-            
+
             if ($group) {
                 $select->group('cars.id');
             }
