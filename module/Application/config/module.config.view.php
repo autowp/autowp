@@ -2,8 +2,6 @@
 
 namespace Application;
 
-use Zend\Permissions\Acl\Acl;
-
 return [
     'view_manager' => [
         'display_not_found_reason' => true,
@@ -46,60 +44,19 @@ return [
             'formpicturemulticheckbox'     => Form\View\Helper\FormPictureMultiCheckbox::class
         ],
         'factories' => [
-            'car' => function ($sm) {
-                return new View\Helper\Car(
-                    $sm->get(VehicleNameFormatter::class)
-                );
-            },
-            'pic' => function($sm) {
-                return new View\Helper\Pic(
-                    $sm->get(PictureNameFormatter::class)
-                );
-            },
-            'pageEnv' => function($sm) {
-                $language = $sm->get(Language::class);
-                return new View\Helper\PageEnv($language);
-            },
-            'mainMenu' => function($sm) {
-                return new View\Helper\MainMenu($sm->get(MainMenu::class));
-            },
-            'language' => function($sm) {
-                return new View\Helper\Language($sm->get(Language::class));
-            },
-            'languagePicker' => function($sm) {
-                $languagePicker = $sm->get(LanguagePicker::class);
-                return new View\Helper\LanguagePicker($languagePicker);
-            },
-            'user' => function($sm) {
-                $acl = $sm->get(Acl::class);
-                return new View\Helper\User($acl);
-            },
-            'fileSize' => function($sm) {
-                return new View\Helper\FileSize(
-                    $sm->get(Language::class),
-                    $sm->get(FileSize::class)
-                );
-            },
-            'humanDate' => function($sm) {
-                $language = $sm->get(Language::class);
-                return new View\Helper\HumanDate($language->getLanguage());
-            },
-            'comments' => function($sm) {
-                $commentForm = $sm->get('CommentForm');
-                return new View\Helper\Comments($commentForm);
-            },
-            'userText' => function($sm) {
-                $router = $sm->get('Router');
-                return new View\Helper\UserText($router);
-            },
-            'inlinePicture' => function($sm) {
-                return new View\Helper\InlinePicture($translator);
-            },
-            'sidebar' => function($sm) {
-                return new View\Helper\Sidebar(
-                    $sm->get(Model\Message::class)
-                );
-            }
+            'car'            => View\Helper\Service\CarFactory::class,
+            'comments'       => View\Helper\Service\CommentsFactory::class,
+            'fileSize'       => View\Helper\Service\FileSizeFactory::class,
+            'humanDate'      => View\Helper\Service\HumanDateFactory::class,
+            'inlinePicture'  => View\Helper\Service\InlinePictureFactory::class,
+            'language'       => View\Helper\Service\LanguageFactory::class,
+            'languagePicker' => View\Helper\Service\LanguagePickerFactory::class,
+            'mainMenu'       => View\Helper\Service\MainMenuFactory::class,
+            'pic'            => View\Helper\Service\PicFactory::class,
+            'pageEnv'        => View\Helper\Service\PageEnvFactory::class,
+            'sidebar'        => View\Helper\Service\SidebarFactory::class,
+            'user'           => View\Helper\Service\UserFactory::class,
+            'userText'       => View\Helper\Service\UserTextFactory::class,
         ]
     ],
     'view_helper_config' => [

@@ -5,6 +5,7 @@ namespace Application;
 use Zend\Authentication\AuthenticationService;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\EventManager\EventInterface as Event;
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleBannerProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
@@ -22,8 +23,9 @@ use DateInterval;
 use DateTime;
 use Locale;
 
-class Module implements ConsoleUsageProviderInterface,
-    ConsoleBannerProviderInterface, ConfigProviderInterface
+class Module implements AutoloaderProviderInterface, 
+    ConsoleUsageProviderInterface, ConsoleBannerProviderInterface, 
+    ConfigProviderInterface
 {
     const VERSION = '1.0dev';
 
@@ -82,8 +84,6 @@ class Module implements ConsoleUsageProviderInterface,
 
     public function getConfig()
     {
-        //return include __DIR__ . '/config/module.config.php';
-
         $config = [];
 
         $configFiles = [
