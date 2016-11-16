@@ -171,6 +171,9 @@ class CarsController extends AbstractActionController
             ''      => '--',
             'empty' => 'moder/vehicles/filter/vehicle-type/empty'
         ], $vehicleTypeOptions));
+        $this->filterForm->get('vehicle_childs_type_id')->setValueOptions(array_replace([
+            '' => '--'
+        ], $vehicleTypeOptions));
 
         if ($this->getRequest()->isPost()) {
             $this->filterForm->setData($this->params()->fromPost());
@@ -196,6 +199,8 @@ class CarsController extends AbstractActionController
 
         if ($this->filterForm->isValid()) {
             $values = $this->filterForm->getData();
+            
+            $group = false;
 
             if ($values['name']) {
                 $select->where('cars.caption like ?', '%' . $values['name'] . '%');
@@ -215,6 +220,23 @@ class CarsController extends AbstractActionController
                         ->join('vehicle_vehicle_type', 'cars.id = vehicle_vehicle_type.vehicle_id', null)
                         ->where('vehicle_vehicle_type.vehicle_type_id = ?', $values['vehicle_type_id']);
                 }
+            }
+            
+            if ($values['vehicle_childs_type_id']) {
+                $group = true;
+                $select
+                    ->join(
+                        ['cpc_childs' => 'car_parent_cache'], 
+                        'cars.id = cpc_childs.parent_id', 
+                        null
+                    )
+                    ->join(
+                        ['vvt_child' => 'vehicle_vehicle_type'], 
+                        'cpc_childs.car_id = vvt_child.vehicle_id', 
+                        null
+                    )
+                    ->join('car_types_parents', 'vvt_child.vehicle_type_id = car_types_parents.id', null)
+                    ->where('car_types_parents.parent_id = ?', $values['vehicle_childs_type_id']);
             }
 
             if ($values['spec']) {
@@ -277,6 +299,10 @@ class CarsController extends AbstractActionController
                 case '1':
                     $select->order('id desc');
                     break;
+            }
+            
+            if ($group) {
+                $select->group('cars.id');
             }
         }
 

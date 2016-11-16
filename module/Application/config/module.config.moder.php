@@ -1315,6 +1315,15 @@ return [
                 [
                     'spec' => [
                         'type'    => 'Select',
+                        'name'    => 'vehicle_childs_type_id',
+                        'options' => [
+                            'label' => 'Have childs with type',
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type'    => 'Select',
                         'name'    => 'spec',
                         'options' => [
                             'label' => 'moder/vehicles/filter/spec',
@@ -1394,6 +1403,9 @@ return [
                     ]
                 ],
                 'vehicle_type_id' => [
+                    'required'   => false,
+                ],
+                'vehicle_childs_type_id' => [
                     'required'   => false,
                 ],
                 'spec' => [
