@@ -51,7 +51,7 @@ return [
                 'legend' => 'feedback/title',
             ],
             'elements' => [
-                [
+                'name' => [
                     'spec' => [
                         'type' => 'Text',
                         'name' => 'name',
@@ -65,7 +65,7 @@ return [
                         ]
                     ],
                 ],
-                [
+                'email' => [
                     'spec' => [
                         'type' => 'Text',
                         'name' => 'email',
@@ -79,7 +79,7 @@ return [
                         ]
                     ],
                 ],
-                [
+                'message' => [
                     'spec' => [
                         'type' => 'Textarea',
                         'name' => 'message',
@@ -92,7 +92,7 @@ return [
                         ]
                     ],
                 ],
-                [
+                'captcha' => [
                     'spec' => [
                         'type' => 'Captcha',
                         'name' => 'captcha',
@@ -109,7 +109,7 @@ return [
                         ],
                     ],
                 ],
-                [
+                'submit' => [
                     'spec' => [
                         'type' => 'Submit',
                         'name' => 'submit',

@@ -78,5 +78,20 @@ return [
                 'path' => __DIR__ . '/pictures/',
             ]
         ],
+    ],
+    'forms' => [
+        'FeedbackForm' => [
+            'elements' => [
+                'captcha' => [
+                    'spec' => [
+                        'options' => [
+                            'captcha' => [
+                                'imgDir' => sys_get_temp_dir()
+                            ]
+                        ],
+                    ],
+                ],
+            ]
+        ]
     ]
 ];
