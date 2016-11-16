@@ -258,7 +258,6 @@ class CategoryController extends AbstractActionController
         ]);
 
         $carTable = $this->catalogue()->getCarTable();
-        $carParentTable = new VehicleParent();
 
         $carId = $this->params('car_id');
         $topCar = null;

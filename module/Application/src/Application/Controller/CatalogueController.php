@@ -564,8 +564,6 @@ class CatalogueController extends AbstractActionController
         foreach ($rows as $idx => $row) {
             $id = (int)$row['id'];
 
-            $name = isset($names[$id]) ? $names[$id] : null;
-
             $factories[] = [
                 'name' => $row['factory_name'],
                 'url'  => $this->url()->fromRoute('factories/factory', [
@@ -586,7 +584,6 @@ class CatalogueController extends AbstractActionController
 
             $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
-            $pictures = $this->catalogue()->getPictureTable();
             $key = 'BRAND_'.$brand['id'].'_TOP_PICTURES_6_' . $language . '_' . $httpsFlag;
             $topPictures = $this->cache->getItem($key, $success);
             if (! $success) {
@@ -682,7 +679,7 @@ class CatalogueController extends AbstractActionController
                 $pictureTable = new Picture();
                 $db = $pictureTable->getAdapter();
 
-                $brandReplatedTypes = [
+                $brandRelatedTypes = [
                     Picture::MIXED_TYPE_ID,
                     Picture::UNSORTED_TYPE_ID,
                     Picture::LOGO_TYPE_ID
@@ -893,9 +890,6 @@ class CatalogueController extends AbstractActionController
 
             $prevEngine = null;
             foreach ($path as $node) {
-                $filter = [
-                    'id = ?' => (int)$node,
-                ];
                 if (! $prevEngine) {
                     $currentEngine = $engineTable->fetchRow(
                         $engineTable->select(true)
@@ -1334,11 +1328,6 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doEngineAction(function ($brand, $engineRow, $path) {
 
-            $engine = [
-                'id'   => $engineRow->id,
-                'name' => $engineRow->caption
-            ];
-
             $carIds = $engineRow->getRelatedCarGroupId();
             $carRows = [];
             if ($carIds) {
@@ -1722,8 +1711,6 @@ class CatalogueController extends AbstractActionController
 
             $counts = $this->childsTypeCount($currentCarId);
 
-            $modificationGroups = [];
-
             $description = null;
             if ($currentCar['text_id']) {
                 $description = $this->textStorage->getText($currentCar['text_id']);
@@ -1887,7 +1874,6 @@ class CatalogueController extends AbstractActionController
     private function brandCarModifications($carId, $modificationId)
     {
         // modifications
-        $mTable = new ModificationTable();
         $mgTable = new ModificationGroup();
 
         $modificationGroups = [];
@@ -1901,7 +1887,6 @@ class CatalogueController extends AbstractActionController
                 ->order('modification_group.name')
         );
 
-        $groups = [];
         foreach ($mgRows as $mgRow) {
             $modifications = $this->brandCarGroupModifications($carId, $mgRow->id, $modificationId);
 
@@ -2026,13 +2011,9 @@ class CatalogueController extends AbstractActionController
         }
         unset($picture);
 
-        $needMore = count($perspectiveGroupIds) - count($usedIds);
-
         $result = [];
-        foreach ($pictures as $idx => $picture) {
+        foreach ($pictures as $picture) {
             if ($picture) {
-                $pictureId = $picture['id'];
-
                 $format = 'picture-thumb';
 
                 $url = $this->pic()->href($picture);
@@ -2080,11 +2061,7 @@ class CatalogueController extends AbstractActionController
         $currentCarId = $currentCar['id'];
 
         $mTable = new ModificationTable();
-        $pictureTable = $this->catalogue()->getPictureTable();
         $imageStorage = $this->imageStorage();
-
-        $language = $this->language();
-
         $catalogue = $this->catalogue();
 
         $g = $this->getPerspectiveGroupIds(2);
@@ -2224,7 +2201,6 @@ class CatalogueController extends AbstractActionController
 
         $carTable = $this->catalogue()->getCarTable();
         $carParentTable = new VehicleParent();
-        $db = $carParentTable->getAdapter();
 
         $listCars = [];
 
@@ -2250,7 +2226,6 @@ class CatalogueController extends AbstractActionController
         $currentPictures = [];
         $currentPicturesCount = 0;
         if ($isLastPage && $type == VehicleParent::TYPE_DEFAULT) {
-            $pictureTable = $this->catalogue()->getPictureTable();
             $select = $this->selectOrderFromPictures()
                 ->where('pictures.car_id = ?', $currentCarId)
                 ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID);
@@ -2843,9 +2818,6 @@ class CatalogueController extends AbstractActionController
                     $cars[] = $childCar;
                 }
             }
-
-            $user = $this->user()->get();
-
 
             $specs = $this->specsService->specifications($cars, [
                 'language'     => $this->language(),
