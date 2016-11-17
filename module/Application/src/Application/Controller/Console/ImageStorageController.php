@@ -9,6 +9,21 @@ use Exception;
 
 class ImageStorageController extends AbstractActionController
 {
+    public function flushImageAction()
+    {
+        $imageId = (int)$this->params('image');
+
+        if (!$imageId) {
+            throw new \InvalidArgumentException("image id not provided");
+        }
+
+        $this->imageStorage()->flush([
+            'image' => $imageId
+        ]);
+
+        Console::getInstance()->writeLine("done");
+    }
+
     public function clearEmptyDirsAction()
     {
         $dirname = $this->params('dirname');

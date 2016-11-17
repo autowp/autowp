@@ -71,7 +71,7 @@ return [
                 ],
                 'image-storage' => [
                     'options' => [
-                        'route'    => 'image-storage (clear-empty-dirs):action <dirname>',
+                        'route'    => 'image-storage (flush-image|clear-empty-dirs):action <dirname>',
                         'defaults' => [
                             'controller' => Controller\Console\ImageStorageController::class,
                         ]
