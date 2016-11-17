@@ -23,8 +23,6 @@ class ForumsController extends AbstractActionController
 
     private $commentForm;
 
-    private $translator;
-
     /**
      * @var Message
      */
@@ -34,14 +32,12 @@ class ForumsController extends AbstractActionController
         $newTopicForm,
         $commentForm,
         $transport,
-        $translator,
         Message $message
     ) {
 
         $this->newTopicForm = $newTopicForm;
         $this->commentForm = $commentForm;
         $this->transport = $transport;
-        $this->translator = $translator;
         $this->message = $message;
     }
 
@@ -124,10 +120,10 @@ class ForumsController extends AbstractActionController
 
     private function sendMessageEmailNotification($email, $topicName, $url)
     {
-        $subject = $this->translator->translate('forums/notification-mail/subject');
+        $subject = $this->translate('forums/notification-mail/subject');
 
         $message = sprintf(
-            $this->translator->translate('forums/notification-mail/body'),
+            $this->translate('forums/notification-mail/body'),
             $topicName,
             $url
         );
@@ -136,7 +132,7 @@ class ForumsController extends AbstractActionController
         $mail
             ->setEncoding('utf-8')
             ->setBody($message)
-            ->setFrom('no-reply@autowp.ru', $this->translator->translate('forums/notification-mail/from'))
+            ->setFrom('no-reply@autowp.ru', $this->translate('forums/notification-mail/from'))
             ->addTo($email)
             ->setSubject($subject);
 

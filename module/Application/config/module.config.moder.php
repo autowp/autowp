@@ -4,14 +4,9 @@ namespace Application;
 
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
-
-use Zend\Permissions\Acl\Acl;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
-use Autowp\TextStorage;
-
 use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Picture;
 
 return [
     'router' => [
@@ -390,106 +385,24 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Moder\AttrsController::class => InvokableFactory::class,
-            Controller\Moder\BrandsController::class => function($sm) {
-                return new Controller\Moder\BrandsController(
-                    $sm->get(HostManager::class),
-                    $sm->get(TextStorage\Service::class),
-                    $sm->get('ModerBrandEdit'),
-                    $sm->get('BrandLogoForm'),
-                    $sm->get('DescriptionForm'),
-                    $sm->get('ModerBrandEdit'),
-                    $sm->get(Model\Message::class)
-                );
-            },
-            Controller\Moder\CategoryController::class => function($sm) {
-                return new Controller\Moder\CategoryController();
-            },
-            Controller\Moder\BrandVehicleController::class => function($sm) {
-                return new Controller\Moder\BrandVehicleController(
-                    $sm->get(Model\BrandVehicle::class)
-                );
-            },
-            Controller\Moder\CarsController::class => function($sm) {
-                return new Controller\Moder\CarsController(
-                    $sm->get(HostManager::class),
-                    $sm->get(TextStorage\Service::class),
-                    $sm->get('translator'),
-                    clone $sm->get('DescriptionForm'),
-                    clone $sm->get('DescriptionForm'),
-                    $sm->get('ModerTwinsGroup'),
-                    $sm->get('ModerBrandCar'),
-                    $sm->get('ModerCarParent'),
-                    $sm->get('ModerCarsFilter'),
-                    $sm->get(Model\BrandVehicle::class),
-                    $sm->get(Model\Message::class)
-                );
-            },
-            Controller\Moder\CommentsController::class => function($sm) {
-                return new Controller\Moder\CommentsController(
-                    $sm->get('ModerCommentsFilterForm')
-                );
-            },
-            Controller\Moder\EnginesController::class => function($sm) {
-                $filterForm = $sm->get('ModerFactoryFilterForm');
-                $editForm = $sm->get('ModerEngineForm');
-                return new Controller\Moder\EnginesController($filterForm, $editForm);
-            },
-            Controller\Moder\FactoryController::class => function($sm) {
-                return new Controller\Moder\FactoryController(
-                    $sm->get(HostManager::class),
-                    $sm->get(TextStorage\Service::class),
-                    $sm->get('ModerFactoryAddForm'),
-                    $sm->get('ModerFactoryEditForm'),
-                    $sm->get('DescriptionForm'),
-                    $sm->get('ModerFactoryFilterForm'),
-                    $sm->get(Model\Message::class)
-                );
-            },
-            Controller\Moder\HotlinkController::class => InvokableFactory::class,
-            Controller\Moder\IndexController::class => function($sm) {
-                $form = $sm->get('AddBrandForm');
-                return new Controller\Moder\IndexController($form);
-            },
-            Controller\Moder\MuseumController::class => function($sm) {
-                $form = $sm->get('MuseumForm');
-                return new Controller\Moder\MuseumController($form);
-            },
-            Controller\Moder\PagesController::class => InvokableFactory::class,
+            Controller\Moder\AttrsController::class        => InvokableFactory::class,
+            Controller\Moder\BrandsController::class       => Controller\Moder\Service\BrandsControllerFactory::class,
+            Controller\Moder\CategoryController::class     => InvokableFactory::class,
+            Controller\Moder\BrandVehicleController::class => Controller\Moder\Service\BrandVehicleControllerFactory::class,
+            Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
+            Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
+            Controller\Moder\EnginesController::class      => Controller\Moder\Service\EnginesControllerFactory::class,
+            Controller\Moder\FactoryController::class      => Controller\Moder\Service\FactoryControllerFactory::class,
+            Controller\Moder\HotlinkController::class      => InvokableFactory::class,
+            Controller\Moder\IndexController::class        => Controller\Moder\Service\IndexControllerFactory::class,
+            Controller\Moder\MuseumController::class       => Controller\Moder\Service\MuseumControllerFactory::class,
+            Controller\Moder\PagesController::class        => InvokableFactory::class,
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
-            Controller\Moder\PicturesController::class => function($sm) {
-                return new Controller\Moder\PicturesController(
-                    $sm->get(HostManager::class),
-                    $sm->get(Picture::class),
-                    $sm->get(TextStorage\Service::class),
-                    $sm->get('ModerPictureForm'),
-                    $sm->get('ModerPictureCopyrightsForm'),
-                    $sm->get('ModerPictureVoteForm'),
-                    $sm->get('BanForm'),
-                    $sm->get(PictureNameFormatter::class),
-                    $sm->get(Service\TelegramService::class),
-                    $sm->get(Model\Message::class)
-                );
-            },
-            Controller\Moder\RightsController::class => function($sm) {
-                $acl = $sm->get(Acl::class);
-                $cache = $sm->get('longCache');
-                $roleForm = $sm->get('ModerAclRoleForm');
-                $ruleForm = $sm->get('ModerAclRuleForm');
-                $roleParentForm = $sm->get('ModerAclRoleParentForm');
-                return new Controller\Moder\RightsController($acl, $cache, $roleForm, $ruleForm, $roleParentForm);
-            },
-            Controller\Moder\TrafficController::class => InvokableFactory::class,
-            Controller\Moder\TwinsController::class => function($sm) {
-                return new Controller\Moder\TwinsController(
-                    $sm->get(HostManager::class),
-                    $sm->get(TextStorage\Service::class),
-                    $sm->get('ModerTwinsEditForm'),
-                    $sm->get('DescriptionForm'),
-                    $sm->get(Model\Message::class)
-                );
-            },
-            Controller\Moder\UsersController::class => InvokableFactory::class,
+            Controller\Moder\PicturesController::class     => Controller\Moder\Service\PicturesControllerFactory::class,
+            Controller\Moder\RightsController::class       => Controller\Moder\Service\RightsControllerFactory::class,
+            Controller\Moder\TrafficController::class      => InvokableFactory::class,
+            Controller\Moder\TwinsController::class        => Controller\Moder\Service\TwinsControllerFactory::class,
+            Controller\Moder\UsersController::class        => InvokableFactory::class,
         ]
     ],
     'forms' => [

@@ -2,174 +2,55 @@
 
 namespace Application;
 
-use Zend\Mail\Transport\TransportInterface as MailTransport;
 use Zend\Permissions\Acl\Acl;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
-use Autowp\Image;
-use Autowp\TextStorage;
 
-use Application\Model\DbTable\Picture;
-
-use Zend_Application_Resource_Cachemanager;
-use Zend_Application_Resource_Db;
 use Zend_Cache_Manager;
 use Zend_Db_Adapter_Abstract;
 
 return [
     'controllers' => [
         'factories' => [
-            Controller\AboutController::class => function($sm) {
-                $acl = $sm->get(Acl::class);
-                return new Controller\AboutController($acl);
-            },
-            Controller\AccountController::class => function($sm) {
-                $config = $sm->get('Config');
-                return new Controller\AccountController(
-                    $sm->get(Service\UsersService::class),
-                    $sm->get('MvcTranslator'),
-                    $sm->get('AccountEmailForm'),
-                    $sm->get('AccountProfileForm'),
-                    $sm->get('AccountSettingsForm'),
-                    $sm->get('AccountPhotoForm'),
-                    $sm->get('ChangePasswordForm'),
-                    $sm->get('DeleteUserForm'),
-                    $sm->get(ExternalLoginServiceFactory::class),
-                    $config['hosts'],
-                    $sm->get(Service\SpecificationsService::class),
-                    $sm->get(Model\Message::class)
-                );
-            },
-            Controller\ArticlesController::class     => InvokableFactory::class,
-            Controller\BanController::class          => InvokableFactory::class,
-            Controller\BrandsController::class => function($sm) {
-                $cache = $sm->get('longCache');
-                return new Controller\BrandsController($cache);
-            },
-            Controller\CarsController::class => function($sm) {
-                return new Controller\CarsController(
-                    $sm->get(HostManager::class),
-                    $sm->get('AttrsLogFilterForm'),
-                    $sm->get(Service\SpecificationsService::class),
-                    $sm->get(Model\Message::class)
-                );
-            },
-            Controller\CatalogueController::class => function($sm) {
-                return new Controller\CatalogueController(
-                    $sm->get(TextStorage\Service::class),
-                    $sm->get('longCache'),
-                    $sm->get(Service\SpecificationsService::class),
-                    $sm->get(Model\BrandVehicle::class)
-                );
-            },
-            Controller\CategoryController::class => function($sm) {
-                $cache = $sm->get('longCache');
-                return new Controller\CategoryController($cache);
-            },
-            Controller\ChartController::class => function($sm) {
-                return new Controller\ChartController(
-                    $sm->get(Service\SpecificationsService::class)
-                );
-            },
-            Controller\CommentsController::class => function($sm) {
-                return new Controller\CommentsController(
-                    $sm->get(HostManager::class),
-                    $sm->get('CommentForm'),
-                    $sm->get(Model\Message::class)
-                );
-            },
-            Controller\DonateController::class       => InvokableFactory::class,
-            Controller\FactoriesController::class => function($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                return new Controller\FactoriesController($textStorage);
-            },
-            Controller\FeedbackController::class     => function($sm) {
-                $form = $sm->get('FeedbackForm');
-                $transport = $sm->get(MailTransport::class);
-                $options = $sm->get('Config')['feedback'];
-                return new Controller\FeedbackController($form, $transport, $options);
-            },
-            Controller\ForumsController::class => function($sm) {
-                return new Controller\ForumsController(
-                    $sm->get('ForumsTopicNewForm'),
-                    $sm->get('CommentForm'),
-                    $sm->get(MailTransport::class),
-                    $sm->get('MvcTranslator'),
-                    $sm->get(Model\Message::class)
-                );
-            },
-            Controller\IndexController::class => function($sm) {
-                return new Controller\IndexController(
-                    $sm->get('fastCache'),
-                    $sm->get(Service\SpecificationsService::class)
-                );
-            },
-            Controller\InboxController::class        => InvokableFactory::class,
-            Controller\InfoController::class => function($sm) {
-                $textStorage = $sm->get(TextStorage\Service::class);
-                return new Controller\InfoController($textStorage);
-            },
-            Controller\LogController::class          => InvokableFactory::class,
-            Controller\LoginController::class => function($sm) {
-                $service = $sm->get(Service\UsersService::class);
-                $form = $sm->get('LoginForm');
-                $translator = $sm->get('MvcTranslator');
-                $externalLoginFactory = $sm->get(ExternalLoginServiceFactory::class);
-                $config = $sm->get('Config');
-
-                return new Controller\LoginController($service, $form, $translator, $externalLoginFactory, $config['hosts']);
-            },
-            Controller\MapController::class          => InvokableFactory::class,
-            Controller\MostsController::class => function($sm) {
-                return new Controller\MostsController(
-                    $sm->get(TextStorage\Service::class),
-                    $sm->get(Service\SpecificationsService::class)
-                );
-            },
-            Controller\NewController::class          => InvokableFactory::class,
-            Controller\MuseumsController::class      => InvokableFactory::class,
-            Controller\PerspectiveController::class  => InvokableFactory::class,
-            Controller\PictureController::class      => InvokableFactory::class,
-            Controller\PictureFileController::class  => InvokableFactory::class,
-            Controller\PulseController::class        => InvokableFactory::class,
-            Controller\RegistrationController::class => function($sm) {
-                $service = $sm->get(Service\UsersService::class);
-                $form = $sm->get('RegistrationForm');
-                return new Controller\RegistrationController($service, $form);
-            },
-            Controller\RestorePasswordController::class => function($sm) {
-                $service = $sm->get(Service\UsersService::class);
-                $restoreForm = $sm->get('RestorePasswordForm');
-                $newPasswordForm = $sm->get('NewPasswordForm');
-                $transport = $sm->get(MailTransport::class);
-                return new Controller\RestorePasswordController($service, $restoreForm, $newPasswordForm, $transport);
-            },
-            Controller\DocController::class => InvokableFactory::class,
-            Controller\TelegramController::class => function($sm) {
-                $service = $sm->get(Service\TelegramService::class);
-                return new Controller\TelegramController($service);
-            },
-            Controller\TwinsController::class => function($sm) {
-                return new Controller\TwinsController(
-                    $sm->get(TextStorage\Service::class),
-                    $sm->get('longCache'),
-                    $sm->get(Service\SpecificationsService::class)
-                );
-            },
-            Controller\UsersController::class => function($sm) {
-                $cache = $sm->get('longCache');
-                return new Controller\UsersController($cache);
-            },
-            Controller\UploadController::class => function($sm) {
-                $partial = $sm->get('ViewHelperManager')->get('partial');
-                $telegram = $sm->get(Service\TelegramService::class);
-                return new Controller\UploadController($partial, $telegram);
-            },
-            Controller\VotingController::class       => InvokableFactory::class,
-            Controller\Api\ContactsController::class => InvokableFactory::class,
-            Controller\Api\PictureController::class  => InvokableFactory::class,
-            Controller\Api\UsersController::class    => InvokableFactory::class,
+            Controller\AboutController::class           => Controller\Frontend\Service\AboutControllerFactory::class,
+            Controller\AccountController::class         => Controller\Frontend\Service\AccountControllerFactory::class,
+            Controller\ArticlesController::class        => InvokableFactory::class,
+            Controller\BanController::class             => InvokableFactory::class,
+            Controller\BrandsController::class          => Controller\Frontend\Service\BrandsControllerFactory::class,
+            Controller\CarsController::class            => Controller\Frontend\Service\CarsControllerFactory::class,
+            Controller\CatalogueController::class       => Controller\Frontend\Service\CatalogueControllerFactory::class,
+            Controller\CategoryController::class        => Controller\Frontend\Service\CategoryControllerFactory::class,
+            Controller\ChartController::class           => Controller\Frontend\Service\ChartControllerFactory::class,
+            Controller\CommentsController::class        => Controller\Frontend\Service\CommentsControllerFactory::class,
+            Controller\DonateController::class          => InvokableFactory::class,
+            Controller\FactoriesController::class       => Controller\Frontend\Service\FactoriesControllerFactory::class,
+            Controller\FeedbackController::class        => Controller\Frontend\Service\FeedbackControllerFactory::class,
+            Controller\ForumsController::class          => Controller\Frontend\Service\ForumsControllerFactory::class,
+            Controller\IndexController::class           => Controller\Frontend\Service\IndexControllerFactory::class,
+            Controller\InboxController::class           => InvokableFactory::class,
+            Controller\InfoController::class            => Controller\Frontend\Service\InfoControllerFactory::class,
+            Controller\LogController::class             => InvokableFactory::class,
+            Controller\LoginController::class           => Controller\Frontend\Service\LoginControllerFactory::class,
+            Controller\MapController::class             => InvokableFactory::class,
+            Controller\MostsController::class           => Controller\Frontend\Service\MostsControllerFactory::class,
+            Controller\NewController::class             => InvokableFactory::class,
+            Controller\MuseumsController::class         => InvokableFactory::class,
+            Controller\PerspectiveController::class     => InvokableFactory::class,
+            Controller\PictureController::class         => InvokableFactory::class,
+            Controller\PictureFileController::class     => InvokableFactory::class,
+            Controller\PulseController::class           => InvokableFactory::class,
+            Controller\RegistrationController::class    => Controller\Frontend\Service\RegistrationControllerFactory::class,
+            Controller\RestorePasswordController::class => Controller\Frontend\Service\RestorePasswordControllerFactory::class,
+            Controller\DocController::class             => InvokableFactory::class,
+            Controller\TelegramController::class        => Controller\Frontend\Service\TelegramControllerFactory::class,
+            Controller\TwinsController::class           => Controller\Frontend\Service\TwinsControllerFactory::class,
+            Controller\UsersController::class           => Controller\Frontend\Service\UsersControllerFactory::class,
+            Controller\UploadController::class          => Controller\Frontend\Service\UploadControllerFactory::class,
+            Controller\VotingController::class          => InvokableFactory::class,
+            Controller\Api\ContactsController::class    => InvokableFactory::class,
+            Controller\Api\PictureController::class     => InvokableFactory::class,
+            Controller\Api\UsersController::class       => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -180,45 +61,14 @@ return [
             'forbiddenAction' => Controller\Plugin\ForbiddenAction::class
         ],
         'factories' => [
-            'car' => function ($sm) {
-                return new Controller\Plugin\Car(
-                    $sm->get(TextStorage\Service::class),
-                    $sm->get(Service\SpecificationsService::class)
-                );
-            },
-            'fileSize' => function($sm) {
-                return new Controller\Plugin\FileSize(
-                    $sm->get(Language::class),
-                    $sm->get(FileSize::class)
-                );
-            },
-            'language' => function($sm) {
-                $language = $sm->get(Language::class);
-                return new Controller\Plugin\Language($language);
-            },
-            'oauth2' => Factory\OAuth2PluginFactory::class,
-            'pic' => function($sm) {
-                return new Controller\Plugin\Pic(
-                    $sm->get(TextStorage\Service::class),
-                    $sm->get('MvcTranslator'),
-                    $sm->get(PictureNameFormatter::class),
-                    $sm->get(Service\SpecificationsService::class)
-                );
-            },
-            'sidebar' => function ($sm) {
-                return new Controller\Plugin\Sidebar(
-                    $sm->get(Model\BrandNav::class)
-                );
-            },
-            'translate' => function ($sm) {
-                $translator = $sm->get('MvcTranslator');
-                return new Controller\Plugin\Translate($translator);
-            },
-            'user' => function($sm) {
-                $acl = $sm->get(Acl::class);
-                $config = $sm->get('Config');
-                return new Controller\Plugin\User($acl, $config['hosts']);
-            },
+            'car'       => Controller\Plugin\Service\CarFactory::class,
+            'fileSize'  => Controller\Plugin\Service\FileSizeFactory::class,
+            'language'  => Controller\Plugin\Service\LanguageFactory::class,
+            'oauth2'    => Factory\OAuth2PluginFactory::class,
+            'pic'       => Controller\Plugin\Service\PicFactory::class,
+            'sidebar'   => Controller\Plugin\Service\SidebarFactory::class,
+            'translate' => Controller\Plugin\Service\TranslateFactory::class,
+            'user'      => Controller\Plugin\Service\UserFactory::class,
         ]
     ],
     'translator' => [
@@ -257,111 +107,25 @@ return [
     ],
     'service_manager' => [
         'factories' => [
-            Model\BrandNav::class => function($container) {
-                return new Model\BrandNav(
-                    $container->get('fastCache'),
-                    $container->get('MvcTranslator'),
-                    $container->get('HttpRouter')
-                );
-            },
-            Model\Message::class => function($sm) {
-                return new Model\Message(
-                    $sm->get(Service\TelegramService::class)
-                );
-            },
-            Model\BrandVehicle::class => function($sm) {
-                $config = $sm->get('Config');
-                return new Model\BrandVehicle(array_keys($config['hosts']));
-            },
-            VehicleNameFormatter::class => function($sm) {
-                return new VehicleNameFormatter(
-                    $sm->get('translator'),
-                    $sm->get('ViewRenderer')
-                );
-            },
-            PictureNameFormatter::class => function($sm) {
-                return new PictureNameFormatter(
-                    $sm->get('MvcTranslator'),
-                    $sm->get('ViewRenderer'),
-                    $sm->get(VehicleNameFormatter::class)
-                );
-            },
-            HostManager::class => function($sm) {
-                $config = $sm->get('Config');
-                return new HostManager($config['hosts']);
-            },
-            Service\UsersService::class => function($sm) {
-                $config = $sm->get('Config');
-                return new Service\UsersService(
-                    $config['users'],
-                    $config['hosts'],
-                    $sm->get('MvcTranslator'),
-                    $sm->get(MailTransport::class),
-                    $sm->get(Service\SpecificationsService::class),
-                    $sm->get(Image\Storage::class));
-            },
-            Zend_Db_Adapter_Abstract::class => function($sm) {
-                $config = $sm->get('Config');
-                $resource = new Zend_Application_Resource_Db($config['db']);
-                return $resource->init();
-            },
-            Service\TelegramService::class => function($sm) {
-                $config = $sm->get('Config');
-                return new Service\TelegramService(
-                    $config['telegram'],
-                    $sm->get('HttpRouter'),
-                    $sm->get(HostManager::class),
-                    $sm
-                );
-            },
-            'translator' => \Zend\Mvc\I18n\TranslatorFactory::class,
-            LanguagePicker::class => function($sm) {
-                $request = $sm->get('Request');
-                $config = $sm->get('Config');
-
-                return new LanguagePicker($request, $config['hosts']);
-            },
-            MainMenu::class => function($sm) {
-
-                $config = $sm->get('Config');
-
-                return new MainMenu(
-                    $sm->get('HttpRouter'),
-                    $sm->get(Language::class),
-                    $sm->get('longCache'),
-                    $config['hosts'],
-                    $sm->get('MvcTranslator'),
-                    $sm->get(LanguagePicker::class),
-                    $sm->get(Model\Message::class)
-                );
-            },
-            Language::class => function($sm) {
-
-                $request = $sm->get('Request');
-
-                return new Language($request);
-            },
-            Acl::class => Permissions\AclFactory::class,
-            ExternalLoginServiceFactory::class => function($sm) {
-                $config = $sm->get('Config');
-                return new ExternalLoginServiceFactory($config['externalloginservice']);
-            },
-            FileSize::class => function($sm) {
-                return new FileSize();
-            },
-            Picture::class => function($sm) {
-                return new Picture([
-                    'imageStorage' => $sm->get(Image\Storage::class)
-                ]);
-            },
-            Service\SpecificationsService::class => function($sm) {
-                return new Service\SpecificationsService($sm->get('MvcTranslator'));
-            },
-            Zend_Cache_Manager::class => function($sm) {
-                $config = $sm->get('Config');
-                $resource = new Zend_Application_Resource_Cachemanager($config['cachemanager']);
-                return $resource->init();
-            },
+            Acl::class                           => Permissions\AclFactory::class,
+            ExternalLoginServiceFactory::class   => Service\ExternalLoginServiceFactory::class,
+            FileSize::class                      => InvokableFactory::class,
+            HostManager::class                   => Service\HostManagerFactory::class,
+            Language::class                      => Service\LanguageFactory::class,
+            LanguagePicker::class                => Service\LanguagePickerFactory::class,
+            MainMenu::class                      => Service\MainMenuFactory::class,
+            Model\BrandNav::class                => Model\Service\BrandNavFactory::class,
+            Model\BrandVehicle::class            => Model\Service\BrandVehicleFactory::class,
+            Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
+            Model\Message::class                 => Model\Service\MessageFactory::class,
+            PictureNameFormatter::class          => Service\PictureNameFormatterFactory::class,
+            Service\SpecificationsService::class => Service\SpecificationsServiceFactory::class,
+            Service\TelegramService::class       => Service\TelegramServiceFactory::class,
+            Service\UsersService::class          => Service\UsersServiceFactory::class,
+            VehicleNameFormatter::class          => Service\VehicleNameFormatterFactory::class,
+            Zend_Cache_Manager::class            => Service\ZF1CacheManagerFactory::class,
+            Zend_Db_Adapter_Abstract::class      => Service\ZF1DbAdapterFactory::class,
+            'translator'                         => \Zend\Mvc\I18n\TranslatorFactory::class,
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class
@@ -370,12 +134,6 @@ return [
             'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
             //'Zend\Form\FormAbstractServiceFactory',
         ],
-        /*'services' => [),
-        'factories' => [),
-        'initializators' => [),
-        'delegators' => [),
-        'shared' => [)*/
-
     ],
 
     'telegram' => [
@@ -448,9 +206,9 @@ return [
     'validators' => [
         'factories' => [
             Validator\Brand\NameNotExists::class => InvokableFactory::class,
-            Validator\User\EmailExists::class => InvokableFactory::class,
+            Validator\User\EmailExists::class    => InvokableFactory::class,
             Validator\User\EmailNotExists::class => InvokableFactory::class,
-            Validator\User\Login::class => InvokableFactory::class,
+            Validator\User\Login::class          => InvokableFactory::class,
         ],
     ],
 

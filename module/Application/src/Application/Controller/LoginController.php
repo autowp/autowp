@@ -33,8 +33,6 @@ class LoginController extends AbstractActionController
      */
     private $form;
 
-    private $translator;
-
     /**
      * @var ExternalLoginServiceFactory
      */
@@ -48,14 +46,12 @@ class LoginController extends AbstractActionController
     public function __construct(
         UsersService $service,
         Form $form,
-        $translator,
         ExternalLoginServiceFactory $externalLoginFactory,
         array $hosts
     ) {
 
         $this->service = $service;
         $this->form = $form;
-        $this->translator = $translator;
         $this->externalLoginFactory = $externalLoginFactory;
         $this->hosts = $hosts;
     }
@@ -100,7 +96,7 @@ class LoginController extends AbstractActionController
                     return $viewModel->setTemplate('application/login/loginsuccess');
                 } else {
                     // Invalid credentials
-                    $errorMessage = $this->translator->translate('login/login-or-password-is-incorrect');
+                    $errorMessage = $this->translate('login/login-or-password-is-incorrect');
                 }
             }
         }

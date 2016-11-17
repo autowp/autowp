@@ -141,7 +141,7 @@ class CarsController extends AbstractActionController
             $result[$row->id] = $row->name;
 
             foreach ($this->getVehicleTypeOptions($table, $row->id) as $key => $value) {
-                $result[$key] = '...' . $this->translator->translate($value);
+                $result[$key] = '...' . $this->translate($value);
             }
         }
 
@@ -2716,10 +2716,10 @@ class CarsController extends AbstractActionController
             'parents'             => $parents,
             'childs'              => $childs,
             'carParentTypeOptions' => [
-                DbTable\Vehicle\ParentTable::TYPE_DEFAULT => $this->translator->translate('catalogue/sub-model'),
-                DbTable\Vehicle\ParentTable::TYPE_TUNING  => $this->translator->translate('catalogue/related'),
-                DbTable\Vehicle\ParentTable::TYPE_SPORT   => $this->translator->translate('catalogue/sport'),
-                DbTable\Vehicle\ParentTable::TYPE_DESIGN  => $this->translator->translate('catalogue/design'),
+                DbTable\Vehicle\ParentTable::TYPE_DEFAULT => $this->translate('catalogue/sub-model'),
+                DbTable\Vehicle\ParentTable::TYPE_TUNING  => $this->translate('catalogue/related'),
+                DbTable\Vehicle\ParentTable::TYPE_SPORT   => $this->translate('catalogue/sport'),
+                DbTable\Vehicle\ParentTable::TYPE_DESIGN  => $this->translate('catalogue/design'),
             ]
         ]);
 

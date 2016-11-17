@@ -38,8 +38,6 @@ class AccountController extends AbstractActionController
      */
     private $service;
 
-    private $translator;
-
     /**
      * @var Form
      */
@@ -92,7 +90,6 @@ class AccountController extends AbstractActionController
 
     public function __construct(
         UsersService $service,
-        $translator,
         Form $emailForm,
         Form $profileForm,
         Form $settingsForm,
@@ -106,7 +103,6 @@ class AccountController extends AbstractActionController
     ) {
 
         $this->service = $service;
-        $this->translator = $translator;
         $this->emailForm = $emailForm;
         $this->profileForm = $profileForm;
         $this->settingsForm = $settingsForm;
@@ -188,7 +184,7 @@ class AccountController extends AbstractActionController
 
         return new JsonModel([
             'ok'      => true,
-            'message' => $this->translator->translate('account/personal-message/sent')
+            'message' => $this->translate('account/personal-message/sent')
         ]);
     }
 
@@ -350,7 +346,7 @@ class AccountController extends AbstractActionController
 
         $uaRow->delete();
 
-        $this->flashMessenger()->addSuccessMessage($this->translator->translate('account/accounts/removed'));
+        $this->flashMessenger()->addSuccessMessage($this->translate('account/accounts/removed'));
 
         return $this->redirect()->toRoute('account/accounts');
     }
@@ -399,7 +395,7 @@ class AccountController extends AbstractActionController
                     ]);
                 }
 
-                $this->flashMessenger()->addSuccessMessage($this->translator->translate('account/profile/saved'));
+                $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/saved'));
 
                 return $this->redirect()->toRoute();
             }
@@ -413,7 +409,7 @@ class AccountController extends AbstractActionController
                 $this->imageStorage()->removeImage($oldImageId);
             }
 
-            $this->flashMessenger()->addSuccessMessage($this->translator->translate('account/profile/photo/deleted'));
+            $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/photo/deleted'));
 
             return $this->redirect()->toRoute();
         }
@@ -450,7 +446,7 @@ class AccountController extends AbstractActionController
                     $imageStorage->removeImage($oldImageId);
                 }
 
-                $this->flashMessenger()->addSuccessMessage($this->translator->translate('account/profile/photo/saved'));
+                $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/photo/saved'));
 
                 return $this->redirect()->toRoute('account/profile');
             }
@@ -493,7 +489,7 @@ class AccountController extends AbstractActionController
                 $user->language = $values['language'];
                 $user->save();
 
-                $this->flashMessenger()->addSuccessMessage($this->translator->translate('account/profile/saved'));
+                $this->flashMessenger()->addSuccessMessage($this->translate('account/profile/saved'));
 
                 return $this->redirect()->toRoute();
             }
@@ -528,7 +524,7 @@ class AccountController extends AbstractActionController
                 $this->service->changeEmailStart($user, $values['email'], $this->language());
 
                 $this->flashMessenger()->addSuccessMessage(
-                    $this->translator->translate('users/change-email/confirmation-message-sent')
+                    $this->translate('users/change-email/confirmation-message-sent')
                 );
 
                 return $this->redirect()->toRoute();
@@ -734,13 +730,13 @@ class AccountController extends AbstractActionController
 
                 if (! $correct) {
                     $this->changePasswordForm->get('password_old')->setMessages([
-                        $this->translator->translate('account/access/change-password/current-password-is-incorrect')
+                        $this->translate('account/access/change-password/current-password-is-incorrect')
                     ]);
                 } else {
                     $this->service->setPassword($user, $values['password']);
 
                     $this->flashMessenger()->addSuccessMessage(
-                        $this->translator->translate('account/access/change-password/saved')
+                        $this->translate('account/access/change-password/saved')
                     );
 
                     return $this->redirect()->toRoute('account/access');
@@ -775,7 +771,7 @@ class AccountController extends AbstractActionController
 
                 if (! $valid) {
                     $this->deleteUserForm->get('password')->setMessages([
-                        $this->translator->translate('account/access/self-delete/password-is-incorrect')
+                        $this->translate('account/access/self-delete/password-is-incorrect')
                     ]);
                 } else {
                     $user->deleted = true;
