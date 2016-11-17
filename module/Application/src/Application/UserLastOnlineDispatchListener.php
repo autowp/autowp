@@ -22,7 +22,7 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
     {
         $this->listeners[] = $events->attach(MvcEvent::EVENT_DISPATCH, [$this, 'onDispatch'], 100);
     }
-    
+
     /**
      * Test if the content-type received is allowable.
      *
@@ -32,25 +32,23 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
     public function onDispatch(MvcEvent $e)
     {
         $request = $e->getRequest();
-        
+
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-        
             $auth = new AuthenticationService();
             if ($auth->hasIdentity()) {
-        
                 $userTable = new Model\DbTable\User();
-        
+
                 $user = $userTable->find($auth->getIdentity())->current();
-        
+
                 if ($user) {
                     $changes = false;
                     $nowExpiresDate = (new DateTime())->sub(new DateInterval('PT1S'));
                     $lastOnline = $user->getDateTime('last_online');
-                    if (!$lastOnline || ($lastOnline < $nowExpiresDate)) {
+                    if (! $lastOnline || ($lastOnline < $nowExpiresDate)) {
                         $user->last_online = new Zend_Db_Expr('NOW()');
                         $changes = true;
                     }
-        
+
                     $remoteAddr = $request->getServer('REMOTE_ADDR');
                     if ($remoteAddr) {
                         $ip = inet_pton($remoteAddr);
@@ -58,7 +56,7 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
                             $user->last_ip = $ip;
                             $changes = true;
                         }
-        
+
                         if ($changes) {
                             $user->save();
                         }

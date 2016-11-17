@@ -19,7 +19,7 @@ class RememberDispatchListener extends AbstractListenerAggregate
     {
         $this->listeners[] = $events->attach(MvcEvent::EVENT_DISPATCH, [$this, 'onDispatch'], 100);
     }
-    
+
     /**
      * @param  MvcEvent $e
      * @return null
@@ -27,11 +27,10 @@ class RememberDispatchListener extends AbstractListenerAggregate
     public function onDispatch(MvcEvent $e)
     {
         $request = $e->getRequest();
-        
+
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-        
             $auth = new AuthenticationService();
-            if (!$auth->hasIdentity()) {
+            if (! $auth->hasIdentity()) {
                 $cookies = $request->getCookie();
                 if ($cookies && isset($cookies['remember'])) {
                     $adapter = new RememberAuthAdapter();
