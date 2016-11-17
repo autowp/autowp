@@ -14,8 +14,10 @@ use Zend\Session\ManagerInterface;
 use Zend_Cache_Manager;
 use Zend_Db_Table;
 
-class Module implements AutoloaderProviderInterface, 
-    ConsoleUsageProviderInterface, ConsoleBannerProviderInterface, 
+class Module implements
+    AutoloaderProviderInterface,
+    ConsoleUsageProviderInterface,
+    ConsoleBannerProviderInterface,
     ConfigProviderInterface
 {
     const VERSION = '1.0dev';
@@ -38,7 +40,7 @@ class Module implements AutoloaderProviderInterface,
         ];
 
         // Merge all module config options
-        foreach($configFiles as $configFile) {
+        foreach ($configFiles as $configFile) {
             $config = \Zend\Stdlib\ArrayUtils::merge($config, include $configFile);
         }
 
@@ -87,22 +89,22 @@ class Module implements AutoloaderProviderInterface,
 
         error_reporting(E_ALL);
         ini_set('display_errors', true);
-        
+
         $lastOnlineListener = new UserLastOnlineDispatchListener();
         $lastOnlineListener->attach($eventManager);
-        
+
         $trafficListener = new TrafficRouteListener();
         $trafficListener->attach($eventManager);
-        
+
         $urlCorrectionListener = new UrlCorrectionRouteListener();
         $urlCorrectionListener->attach($eventManager);
-        
+
         $authRememberListener = new Auth\RememberDispatchListener();
         $authRememberListener->attach($eventManager);
-        
+
         $hostnameCheckListener = new HostnameCheckRouteListener();
         $hostnameCheckListener->attach($eventManager);
-        
+
         $languageListener = new LanguageRouteListener();
         $languageListener->attach($eventManager);
 

@@ -4,4 +4,5 @@
 
     <!-- Paths to check -->
     <file>module/Application/src</file>
+    <file>module/Application/Module.php</file>
 </ruleset>
