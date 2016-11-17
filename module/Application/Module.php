@@ -2,7 +2,6 @@
 
 namespace Application;
 
-use Zend\Authentication\AuthenticationService;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\EventManager\EventInterface as Event;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
@@ -12,75 +11,14 @@ use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\Session\ManagerInterface;
 
-use Application\Auth\Adapter\Remember as RememberAuthAdapter;
-use Application\Model\DbTable\User;
-
 use Zend_Cache_Manager;
-use Zend_Db_Expr;
 use Zend_Db_Table;
-
-use DateInterval;
-use DateTime;
-use Locale;
 
 class Module implements AutoloaderProviderInterface, 
     ConsoleUsageProviderInterface, ConsoleBannerProviderInterface, 
     ConfigProviderInterface
 {
     const VERSION = '1.0dev';
-
-    /**
-     * @var array
-     */
-    private $hostnameWhitelist = [
-        'www.autowp.ru', 'ru.autowp.ru', 'en.autowp.ru',
-        'i.wheelsage.org', 'en.wheelsage.org', 'fr.wheelsage.org',
-        'zh.wheelsage.org', 'www.wheelsage.org', 'wheelsage.org'
-    ];
-
-    /**
-     * @var string
-     */
-    private $defaultHostname = 'www.autowp.ru';
-
-    /**
-     * @var array
-     */
-    private $whitelist = [
-        'fr.wheelsage.org' => 'fr',
-        'en.wheelsage.org' => 'en',
-        'zh.wheelsage.org' => 'zh',
-        'autowp.ru'        => 'ru',
-        'www.autowp.ru'    => 'ru',
-        'ru.autowp.ru'     => 'ru'
-    ];
-
-    /**
-     * @var array
-     */
-    private $redirects = [
-        'www.wheelsage.org' => 'en.wheelsage.org',
-        'wheelsage.org'     => 'en.wheelsage.org',
-        'en.autowp.ru'      => 'en.wheelsage.org',
-        'ru.autowp.ru'      => 'www.autowp.ru'
-    ];
-
-    /**
-     * @var array
-     */
-    private $userDetectable = [
-        'wheelsage.org'
-    ];
-
-    /**
-     * @var array
-     */
-    private $skipHostname = ['i.wheelsage.org'];
-
-    /**
-     * @var string
-     */
-    private $defaultLanguage = 'en';
 
     public function getConfig()
     {
@@ -149,8 +87,24 @@ class Module implements AutoloaderProviderInterface,
 
         error_reporting(E_ALL);
         ini_set('display_errors', true);
-
-        $eventManager->attach(MvcEvent::EVENT_DISPATCH, [$this, 'preDispatch'], 100 );
+        
+        $lastOnlineListener = new UserLastOnlineDispatchListener();
+        $lastOnlineListener->attach($eventManager);
+        
+        $trafficListener = new TrafficRouteListener();
+        $trafficListener->attach($eventManager);
+        
+        $urlCorrectionListener = new UrlCorrectionRouteListener();
+        $urlCorrectionListener->attach($eventManager);
+        
+        $authRememberListener = new Auth\RememberDispatchListener();
+        $authRememberListener->attach($eventManager);
+        
+        $hostnameCheckListener = new HostnameCheckRouteListener();
+        $hostnameCheckListener->attach($eventManager);
+        
+        $languageListener = new LanguageRouteListener();
+        $languageListener->attach($eventManager);
 
         \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
     }
@@ -195,287 +149,5 @@ class Module implements AutoloaderProviderInterface,
             'db_migrations_migrate [<version>]' => 'Execute migrate',
             'db_migrations_generate'            => 'Generate new migration class'
         ];
-    }
-
-    public function preDispatch($e)
-    {
-        $this->hostnameCheck($e);
-        $this->authRemember($e);
-        $this->languagePreDispatch($e);
-        $this->urlCorrection($e);
-        $this->traffic($e);
-        $this->lastOnline($e);
-    }
-
-    private function languagePreDispatch($e)
-    {
-        $app = $e->getApplication();
-        $serviceManager = $app->getServiceManager();
-
-        $request = $serviceManager->get('Request');
-
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-
-            $language = $this->defaultLanguage;
-
-            $hostname = $request->getUri()->getHost();
-
-            if (in_array($hostname, $this->skipHostname)) {
-                $uri = $request->getUriString();
-                //if (substr($uri, 0, strlen($this->_skipUrl)) == $this->_skipUrl) {
-                    return;
-                //}
-            }
-
-            if (in_array($hostname, $this->userDetectable)) {
-
-                $languageWhitelist = array_keys($serviceManager->get('Config')['hosts']);
-
-                $userLanguage = $this->detectUserLanguage($request, $languageWhitelist);
-
-                $hosts = $this->getConfig()['hosts'];
-
-                if (isset($hosts[$userLanguage])) {
-                    $redirectUrl = $request->getUri()->getScheme() . '://' .
-                            $hosts[$userLanguage]['hostname'] . $request->getRequestUri();
-
-                    $this->redirect($app, $redirectUrl);
-                    return;
-                }
-            }
-
-            if (isset($this->redirects[$hostname])) {
-
-                $redirectUrl = $request->getUri()->getScheme() . '://' .
-                        $this->redirects[$hostname] . $request->getRequestUri();
-
-                $this->redirect($app, $redirectUrl);
-                return;
-            }
-
-            if (isset($this->whitelist[$hostname])) {
-                $language = $this->whitelist[$hostname];
-            }
-
-            $this->initLocaleAndTranslate($serviceManager, $language);
-        }
-    }
-
-    private function detectUserLanguage($request, $whitelist)
-    {
-        $result = null;
-
-        $auth = new AuthenticationService();
-
-        if ($auth->hasIdentity()) {
-
-            $userTable = new User();
-
-            $user = $userTable->find($auth->getIdentity())->current();
-
-            if ($user) {
-                $isAllowed = in_array($user->language, $whitelist);
-                if ($isAllowed) {
-                    $result = $user->language;
-                }
-            }
-        }
-
-        if (!$result) {
-            $acceptLanguage = $request->getServer('HTTP_ACCEPT_LANGUAGE');
-            if ($acceptLanguage) {
-                $locale = Locale::acceptFromHttp($acceptLanguage);
-                if ($locale) {
-                    $localeLanguage = Locale::getPrimaryLanguage($locale);
-                    $isAllowed = in_array($localeLanguage, $whitelist);
-                    if ($isAllowed) {
-                        $result = $localeLanguage;
-                    }
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string $language
-     */
-    private function initLocaleAndTranslate($serviceManager, $language)
-    {
-        $translator = $serviceManager->get('MvcTranslator');
-        $translator->setLocale($language);
-    }
-
-    private function hostnameCheck($e)
-    {
-        $app = $e->getApplication();
-        $serviceManager = $app->getServiceManager();
-
-        $request = $serviceManager->get('Request');
-
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-            $hostname = $request->getUri()->getHost();
-
-            $isAllowed = in_array($hostname, $this->hostnameWhitelist);
-
-            if (!$isAllowed) {
-                //$request->setDispatched(true);
-
-                $redirectUrl = $request->getUri()->getScheme() . '://' .
-                        $this->defaultHostname . $request->getRequestUri();
-
-                $this->redirect($app, $redirectUrl);
-            }
-        }
-    }
-
-    private function redirect($app, $url)
-    {
-        $app->getEventManager()->getSharedManager()->attach('Zend\Mvc\Controller\AbstractActionController', 'dispatch', function($e) use ($url) {
-            $controller = $e->getTarget();
-            $controller->plugin('redirect')->toUrl($url);
-        }, 100);
-    }
-
-    private function authRemember($e)
-    {
-        $app = $e->getApplication();
-        $serviceManager = $app->getServiceManager();
-
-        $request = $serviceManager->get('Request');
-
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-
-            $auth = new AuthenticationService();
-            if (!$auth->hasIdentity()) {
-                $cookies = $request->getCookie();
-                if ($cookies && isset($cookies['remember'])) {
-                    $adapter = new RememberAuthAdapter();
-                    $adapter->setCredential($cookies['remember']);
-                    $result = $auth->authenticate($adapter);
-                }
-            }
-        }
-    }
-
-    private function urlCorrection($e)
-    {
-        $app = $e->getApplication();
-        $serviceManager = $app->getServiceManager();
-
-        $request = $serviceManager->get('Request');
-
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-            $uri = $request->getRequestUri();
-
-            $method = $request->getMethod();
-
-            if ($method == 'GET') {
-
-                $filteredUri = preg_replace('|^/index\.php|isu', '', $uri);
-
-                if ($filteredUri != $uri) {
-                    $requestUri = $request->getUri();
-                    $redirectUrl = $requestUri->getScheme() . '://' .
-                            $requestUri->getHost() . $filteredUri;
-
-                    $this->redirect($app, $redirectUrl);
-                }
-            }
-
-            $pattern = '/pictures/';
-            $host = 'i.wheelsage.org';
-            if (strncmp($uri, $pattern, strlen($pattern)) == 0) {
-                if ($request->getUri()->getHost() != $host) {
-                    $redirectUrl = $request->getUri()->getScheme() . '://' .
-                            $host . $uri;
-
-                    $this->redirect($app, $redirectUrl);
-                }
-            }
-        }
-    }
-
-    public function traffic($e)
-    {
-        $app = $e->getApplication();
-        $serviceManager = $app->getServiceManager();
-
-        $request = $serviceManager->get('Request');
-
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-
-            $auth = new AuthenticationService();
-
-            $unlimitedTraffic = false;
-            if ($auth->hasIdentity()) {
-                $userId = $auth->getIdentity();
-                $userTable = new User();
-                $user = $userTable->find($userId)->current();
-
-                if ($user) {
-                    $acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
-                    $unlimitedTraffic = $acl->isAllowed($user->role, 'website', 'unlimited-traffic');
-                }
-            }
-
-            $ip = $request->getServer('REMOTE_ADDR');
-
-            $service = new Service\TrafficControl();
-
-            $banInfo = $service->getBanInfo($ip);
-            if ($banInfo) {
-                header('HTTP/1.1 509 Bandwidth Limit Exceeded');
-                print 'Access denied: ' . $banInfo['reason'];
-                exit;
-            }
-
-            if (!$unlimitedTraffic && !$service->inWhiteList($ip)) {
-                $service->pushHit($ip);
-            }
-        }
-    }
-
-    public function lastOnline($e)
-    {
-        $app = $e->getApplication();
-        $serviceManager = $app->getServiceManager();
-
-        $request = $serviceManager->get('Request');
-
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-
-            $auth = new AuthenticationService();
-            if ($auth->hasIdentity()) {
-
-                $userTable = new User();
-
-                $user = $userTable->find($auth->getIdentity())->current();
-
-                if ($user) {
-                    $changes = false;
-                    $nowExpiresDate = (new DateTime())->sub(new DateInterval('PT1S'));
-                    $lastOnline = $user->getDateTime('last_online');
-                    if (!$lastOnline || ($lastOnline < $nowExpiresDate)) {
-                        $user->last_online = new Zend_Db_Expr('NOW()');
-                        $changes = true;
-                    }
-
-                    $remoteAddr = $request->getServer('REMOTE_ADDR');
-                    if ($remoteAddr) {
-                        $ip = inet_pton($remoteAddr);
-                        if ($ip != $user->last_ip) {
-                            $user->last_ip = $ip;
-                            $changes = true;
-                        }
-
-                        if ($changes) {
-                            $user->save();
-                        }
-                    }
-                }
-            }
-        }
     }
 }
