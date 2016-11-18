@@ -60,6 +60,9 @@ class Module implements
 
     public function onBootstrap(Event $e)
     {
+        error_reporting(E_ALL);
+        ini_set('display_errors', true);
+
         defined('PUBLIC_DIR') || define('PUBLIC_DIR', realpath(__DIR__ . '/../../public_html'));
 
         defined('MYSQL_TIMEZONE') || define('MYSQL_TIMEZONE', 'UTC');
@@ -86,9 +89,6 @@ class Module implements
             $sessionManager->getConfig()->setStorageOption('cookie_domain', $cookieDomain);
             $sessionManager->start();
         }
-
-        error_reporting(E_ALL);
-        ini_set('display_errors', true);
 
         $lastOnlineListener = new UserLastOnlineDispatchListener();
         $lastOnlineListener->attach($eventManager);

@@ -51,7 +51,7 @@ class VehicleNameFormatter
             $attrs = ['class="label label-primary"'];
             if ($car['spec_full']) {
                 $attrs = array_merge($attrs, [
-                    'title="' . $this->renderer->escapeHtmlAttr($car['spec_full']).'"',
+                    'title="' . $this->renderer->escapeHtmlAttr($car['spec_full']) . '"',
                     'data-toggle="tooltip"',
                     'data-placement="top"'
                 ]);
