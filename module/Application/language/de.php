@@ -163,6 +163,7 @@ return [
     'picturelist/mixed-%s' => '%s miscellaneous',
     'picturelist/unsorted' => 'Unsorted',
     'picturelist/unsorted-%s' => '%s unsorted',
+    'picturelist/factory' => 'Factory',
 
     'present-time-abbr'       => 'pr.',
 
@@ -561,7 +562,7 @@ Good luck.',
 
     'users/user/upload-pictures:' => 'Images uploaded: ',
     'users/user/pictures-left-on-site:' => 'left on site: ',
-    
+
     'users/comments/order/new' => 'New',
     'users/comments/order/old' => 'Old',
     'users/comments/order/positive' => 'Positive',
@@ -1271,7 +1272,7 @@ You can support our project by [finances](/donate) or [moral](/feedback)',
     'page/204/name'        => 'Telegram',
     'page/204/title'       => 'Telegram',
     'page/204/breadcrumbs' => 'Telegram',
-    
+
     'page/205/name'        => 'Comments',
     'page/205/title'       => 'Comments',
     'page/205/breadcrumbs' => 'Comments',

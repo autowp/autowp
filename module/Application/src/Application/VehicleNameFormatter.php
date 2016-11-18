@@ -64,15 +64,15 @@ class VehicleNameFormatter
             $result .= ' ('.$this->renderer->escapeHtml($car['body']).')';
         }
 
-        $by = $car['begin_year'];
-        $bm = $car['begin_month'];
-        $ey = $car['end_year'];
-        $em = $car['end_month'];
+        $by = (int)$car['begin_year'];
+        $bm = (int)$car['begin_month'];
+        $ey = (int)$car['end_year'];
+        $em = (int)$car['end_month'];
         $cy = (int)date('Y');
         $cm = (int)date('m');
 
-        $bmy = $car['begin_model_year'];
-        $emy = $car['end_model_year'];
+        $bmy = (int)$car['begin_model_year'];
+        $emy = (int)$car['end_model_year'];
 
         $bs = (int)($by / 100);
         $es = (int)($ey / 100);
@@ -80,12 +80,7 @@ class VehicleNameFormatter
         $bms = (int)($bmy / 100);
         $ems = (int)($emy / 100);
 
-        $useModelYear = (bool)$bmy;
-        /*if ($useModelYear) {
-         if ($bmy == $by && $emy == $ey) {
-         $useModelYear = false;
-         }
-         }*/
+        $useModelYear = $bmy || $emy;
 
         $equalS = $bs && $es && ($bs == $es);
         $equalY = $equalS && $by && $ey && ($by == $ey);
@@ -93,28 +88,12 @@ class VehicleNameFormatter
 
         if ($useModelYear) {
             $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/model-years', $language));
-            $mylabel = '<span title="' . $title . '">';
-            if ($emy == $bmy) {
-                $mylabel .= $bmy;
-            } elseif ($bms == $ems) {
-                $mylabel .= $bmy.'–'.sprintf('%02d', $emy % 100);
-            } elseif (! $emy) {
-                if ($car['today']) {
-                    if ($bmy >= $cy) {
-                        $mylabel .= $bmy;
-                    } else {
-                        $mylabel .= $bmy.'–'.$this->translate('present-time-abbr', $language);
-                    }
-                } else {
-                    $mylabel .= $bmy.'–??';
-                }
-            } else {
-                $mylabel .= $bmy.'–'.$emy;
-            }
-
-            $mylabel .= '</span>';
-
-            $result = $mylabel . ' ' . $result;
+            $result = '<span title="' . $title . '">' .
+                          $this->renderer->escapeHtml(
+                              $this->getModelYearsPrefix($bmy, $emy, $car['today'], $language)
+                          ) .
+                      '</span> ' .
+                      $result;
 
             if ($by > 0 || $ey > 0) {
                 $title = $this->renderer->escapeHtmlAttr($this->translate('carlist/years', $language));
@@ -181,54 +160,26 @@ class VehicleNameFormatter
             $result .= ' ('.$car['body'].')';
         }
 
-        $by = $car['begin_year'];
-        $bm = $car['begin_month'];
-        $ey = $car['end_year'];
-        $em = $car['end_month'];
+        $by = (int)$car['begin_year'];
+        $bm = (int)$car['begin_month'];
+        $ey = (int)$car['end_year'];
+        $em = (int)$car['end_month'];
         $cy = (int)date('Y');
 
-        $bmy = $car['begin_model_year'];
-        $emy = $car['end_model_year'];
+        $bmy = (int)$car['begin_model_year'];
+        $emy = (int)$car['end_model_year'];
 
         $bs = (int)($by / 100);
         $es = (int)($ey / 100);
 
-        $bms = (int)($bmy / 100);
-        $ems = (int)($emy / 100);
-
-        $useModelYear = (bool)$bmy;
-        /*if ($useModelYear) {
-         if ($bmy == $by && $emy == $ey) {
-         $useModelYear = false;
-         }
-         }*/
+        $useModelYear = $bmy || $emy;
 
         $equalS = $bs && $es && ($bs == $es);
         $equalY = $equalS && $by && $ey && ($by == $ey);
         $equalM = $equalY && $bm && $em && ($bm == $em);
 
         if ($useModelYear) {
-            $mylabel = '';
-
-            if ($emy == $bmy) {
-                $mylabel .= $bmy;
-            } elseif ($bms == $ems) {
-                $mylabel .= $bmy.'–'.sprintf('%02d', $emy % 100);
-            } elseif (! $emy) {
-                if ($car['today']) {
-                    if ($bmy >= $cy) {
-                        $mylabel .= $bmy;
-                    } else {
-                        $mylabel .= $bmy . '–' . $this->translate('present-time-abbr', $language);
-                    }
-                } else {
-                    $mylabel .= $bmy.'–??';
-                }
-            } else {
-                $mylabel .= $bmy.'–'.$emy;
-            }
-
-            $result = $mylabel . ' ' . $result;
+            $result = $this->getModelYearsPrefix($bmy, $emy, $car['today'], $language) . ' ' . $result;
         }
 
         if ($by > 0 || $ey > 0) {
@@ -248,6 +199,58 @@ class VehicleNameFormatter
         return $result;
     }
 
+    private function getModelYearsPrefix($begin, $end, $today, $language)
+    {
+        $bms = (int)($begin / 100);
+        $ems = (int)($end / 100);
+
+        if ($end == $begin) {
+            return $begin;
+        }
+
+        if ($bms == $ems) {
+            return $begin . '–' . sprintf('%02d', $end % 100);
+        }
+
+        if (!$begin) {
+            return '????–' . $end;
+        }
+
+        if ($end) {
+            return $begin . '–' . $end;
+        }
+
+        if (! $today) {
+            return $begin . '–??';
+        }
+
+        $currentYear = (int)date('Y');
+
+        if ($begin >= $currentYear) {
+            return $begin;
+        }
+
+        return $begin . '–' . $this->translate('present-time-abbr', $language);
+    }
+
+    private function monthsRange($from, $to)
+    {
+        return ($from ? sprintf('%02d', $from) : '??') .
+               '–'.
+               ($to ? sprintf('%02d', $to) : '??');
+    }
+
+    private function missedEndYearYearsSuffix($today, $by, $language)
+    {
+        $cy = (int)date('Y');
+
+        if ($by >= $cy) {
+            return '';
+        }
+
+        return '–' . ($today ? $this->translate('present-time-abbr', $language) : '????');
+    }
+
     private function renderYears($today, $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language)
     {
         if ($equalM) {
@@ -256,9 +259,7 @@ class VehicleNameFormatter
 
         if ($equalY) {
             if ($bm && $em) {
-                return ($bm ? sprintf('%02d', $bm) : '??').
-                       '–'.
-                       ($em ? sprintf('%02d', $em) : '??') . '.' . $by;
+                return $this->monthsRange($bm, $em) . '.' . $by;
             }
 
             return $by;
@@ -276,46 +277,38 @@ class VehicleNameFormatter
                 (
                     $ey
                         ? '–'.($em ? sprintf($this->textMonthFormat, $em) : '').$ey
-                        : (
-                            $today
-                                ? ($by < $cy ? '–'.$this->translate('present-time-abbr', $language) : '')
-                                : ($by < $cy ? '–????' : '')
-                        )
+                        : $this->missedEndYearYearsSuffix($today, $by, $language)
                 );
     }
 
     private function renderYearsHtml($today, $by, $bm, $ey, $em, $equalS, $equalY, $equalM, $language)
     {
         if ($equalM) {
-            return sprintf($this->monthFormat, $bm).$by;
+            return sprintf($this->monthFormat, $bm) . $by;
         }
 
         if ($equalY) {
             if ($bm && $em) {
-                return  '<small class="month">'.($bm ? sprintf('%02d', $bm) : '??').
-                        '–'.
-                        ($em ? sprintf('%02d', $em) : '??').'.</small>'.$by;
+                return '<small class="month">' . $this->monthsRange($bm, $em) . '.</small>' . $by;
             }
 
             return $by;
         }
 
         if ($equalS) {
-            return  (($bm ? sprintf($this->monthFormat, $bm) : '').$by).
-                    '–'.
-                    ($em ? sprintf($this->monthFormat, $em) : '').($em ? $ey : sprintf('%02d', $ey % 100));
+            return (($bm ? sprintf($this->monthFormat, $bm) : '') . $by) .
+                   '–'.
+                   ($em ? sprintf($this->monthFormat, $em) : '') . ($em ? $ey : sprintf('%02d', $ey % 100));
         }
 
-        $cy = (int)date('Y');
 
-        return  (($bm ? sprintf($this->monthFormat, $bm) : '').($by ? $by : '????')).
+
+        return  (($bm ? sprintf($this->monthFormat, $bm) : '') . ($by ? $by : '????')) .
                 (
                     $ey
-                        ? '–'.($em ? sprintf($this->monthFormat, $em) : '').$ey
-                        : (
-                            $today
-                                ? ($by < $cy ? '–'.$this->translate('present-time-abbr', $language) : '')
-                                : ($by < $cy ? '–????' : '')
+                        ? '–' . ($em ? sprintf($this->monthFormat, $em) : '') . $ey
+                        : $this->renderer->escapeHtml(
+                            $this->missedEndYearYearsSuffix($today, $by, $language)
                         )
                 );
     }

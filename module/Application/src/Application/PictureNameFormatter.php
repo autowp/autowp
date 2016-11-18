@@ -73,38 +73,32 @@ class PictureNameFormatter
             case Picture::ENGINE_TYPE_ID:
                 if ($picture['engine']) {
                     return sprintf($this->translate('picturelist/engine-%s', $language), $picture['engine']);
-                } else {
-                    return $this->translate('picturelist/engine', $language);
                 }
-                break;
+                return $this->translate('picturelist/engine', $language);
 
             case Picture::LOGO_TYPE_ID:
                 if ($picture['brand']) {
                     return sprintf($this->translate('picturelist/logotype-%s', $language), $picture['brand']);
-                } else {
-                    return $this->translate('picturelist/logotype', $language);
                 }
-                break;
+                return $this->translate('picturelist/logotype', $language);
 
             case Picture::MIXED_TYPE_ID:
                 if ($picture['brand']) {
                     return sprintf($this->translate('picturelist/mixed-%s', $language), $picture['brand']);
-                } else {
-                    return $this->translate('picturelist/mixed', $language);
                 }
-                break;
+                return $this->translate('picturelist/mixed', $language);
 
             case Picture::UNSORTED_TYPE_ID:
                 if ($picture['brand']) {
                     return sprintf($this->translate('picturelist/unsorted-%s', $language), $picture['brand']);
-                } else {
-                    return $this->translate('picturelist/unsorted', $language);
                 }
-                break;
+                return $this->translate('picturelist/unsorted', $language);
 
             case Picture::FACTORY_TYPE_ID:
-                return $picture['factory'];
-                break;
+                if ($picture['factory']) {
+                    return $picture['factory'];
+                }
+                return $this->translate('picturelist/factory', $language);
         }
 
         return 'Picture';
@@ -112,8 +106,6 @@ class PictureNameFormatter
 
     public function formatHtml(array $picture, $language)
     {
-        $view = $this->view;
-
         if (isset($picture['name']) && $picture['name']) {
             return $this->renderer->escapeHtml($picture['name']);
         }
@@ -140,7 +132,7 @@ class PictureNameFormatter
             case Picture::MIXED_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:
             case Picture::FACTORY_TYPE_ID:
-                return $view->escapeHtml($this->textTitle($picture));
+                return $this->renderer->escapeHtml($this->format($picture, $language));
                 break;
         }
 

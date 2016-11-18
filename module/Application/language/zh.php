@@ -151,6 +151,7 @@ return [
     'picturelist/mixed-%s' => '%s 其它',
     'picturelist/unsorted' => '未分类',
     'picturelist/unsorted-%s' => '-%s 未分类',
+    'picturelist/factory' => 'Factory',
 
     'present-time-abbr'       => '至今',
 
@@ -547,7 +548,7 @@ return [
 
     'users/user/upload-pictures:' => '已上传图片: ',
     'users/user/pictures-left-on-site:' => '被采纳图片: ',
-    
+
     'users/comments/order/new' => 'New',
     'users/comments/order/old' => 'Old',
     'users/comments/order/positive' => 'Positive',
@@ -1256,7 +1257,7 @@ return [
     'page/204/name'        => 'Telegram',
     'page/204/title'       => 'Telegram',
     'page/204/breadcrumbs' => 'Telegram',
-    
+
     'page/205/name'        => '评论',
     'page/205/title'       => '评论',
     'page/205/breadcrumbs' => '评论',

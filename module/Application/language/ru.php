@@ -175,6 +175,7 @@ return [
     'picturelist/mixed-%s' => '%s разное',
     'picturelist/unsorted' => 'Несортировано',
     'picturelist/unsorted-%s' => '%s',
+    'picturelist/factory' => 'Завод',
 
     'present-time-abbr'      => 'н.в.',
 
@@ -575,7 +576,7 @@ return [
 
     'users/user/upload-pictures:' => 'Добавил изображений: ',
     'users/user/pictures-left-on-site:' => 'из них на сайте осталось: ',
-    
+
     'users/comments/order/new' => 'Новые',
     'users/comments/order/old' => 'Старые',
     'users/comments/order/positive' => 'Положительные',
@@ -1284,7 +1285,7 @@ return [
     'page/204/name'        => 'Telegram',
     'page/204/title'       => 'Telegram',
     'page/204/breadcrumbs' => 'Telegram',
-    
+
     'page/205/name'        => 'Комментарии',
     'page/205/title'       => 'Комментарии',
     'page/205/breadcrumbs' => 'Комментарии',
