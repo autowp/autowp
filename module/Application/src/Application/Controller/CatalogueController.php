@@ -943,8 +943,10 @@ class CatalogueController extends AbstractActionController
                 ->setCurrentPageNumber($this->params('page'));
 
             if ($paginator->getTotalItemCount() <= 0) {
-                return $this->forward()->dispatch(null, [
-                    'action' => 'engine-cars'
+                return $this->forward()->dispatch(self::class, [
+                    'action'        => 'engine-cars',
+                    'path'          => $this->params('path'),
+                    'brand_catname' => $this->params('brand_catname')
                 ]);
             }
 
