@@ -9,7 +9,7 @@ use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleBannerProviderInterface;
 use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
 use Zend\Mvc\MvcEvent;
-use Zend\Session\ManagerInterface;
+
 
 use Zend_Cache_Manager;
 use Zend_Db_Table;
@@ -68,6 +68,8 @@ class Module implements
         defined('MYSQL_TIMEZONE') || define('MYSQL_TIMEZONE', 'UTC');
         defined('MYSQL_DATETIME_FORMAT') || define('MYSQL_DATETIME_FORMAT', 'Y-m-d H:i:s');
 
+        \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
+
         $application = $e->getApplication();
         $serviceManager = $application->getServiceManager();
         $eventManager = $application->getEventManager();
@@ -83,12 +85,10 @@ class Module implements
         $metadataCache->setOption('write_control', false);
         Zend_Db_Table::setDefaultMetadataCache($metadataCache);
 
-        $sessionManager = $serviceManager->get(ManagerInterface::class);
-        $cookieDomain = $this->getHostCookieDomain($serviceManager);
-        if ($cookieDomain) {
-            $sessionManager->getConfig()->setStorageOption('cookie_domain', $cookieDomain);
-            $sessionManager->start();
-        }
+        $serviceManager->get(\Zend_Db_Adapter_Abstract::class);
+
+        $sessionListener = new SessionDispatchListener();
+        $sessionListener->attach($eventManager);
 
         $lastOnlineListener = new UserLastOnlineDispatchListener();
         $lastOnlineListener->attach($eventManager);
@@ -107,8 +107,6 @@ class Module implements
 
         $languageListener = new LanguageRouteListener();
         $languageListener->attach($eventManager);
-
-        \Zend\View\Helper\PaginationControl::setDefaultViewPartial('paginator');
     }
 
     public function handleError(MvcEvent $e)
@@ -118,24 +116,6 @@ class Module implements
             $sm = $e->getApplication()->getServiceManager();
             $sm->get('ErrorLog')->crit($exception);
         }
-    }
-
-    public function getHostCookieDomain($serviceManager)
-    {
-        $request = $serviceManager->get('Request');
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-            $hostname = $request->getUri()->getHost();
-
-            switch ($hostname) {
-                case 'www.autowp.ru':
-                case 'autowp.ru':
-                    return '.autowp.ru';
-                default:
-                    return '.wheelsage.org';
-            }
-        }
-
-        return null;
     }
 
     public function getConsoleBanner(Console $console)
