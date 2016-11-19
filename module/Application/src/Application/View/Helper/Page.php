@@ -90,6 +90,7 @@ class Page extends AbstractHelper
 
     private function getPageById($id)
     {
+        $id = (int)$id;
         if (isset($this->pages[$id])) {
             return $this->pages[$id];
         }
