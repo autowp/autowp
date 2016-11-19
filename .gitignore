@@ -4,6 +4,6 @@
 /node_modules
 /bower_components
 /vendor
-/logs
+/logs/*
 /.buildpath
 /data
