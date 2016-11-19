@@ -5,7 +5,8 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Application\Service\TrafficControl;
+use Autowp\Traffic\TrafficControl;
+
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
@@ -23,9 +24,15 @@ class UsersController extends AbstractActionController
 {
     private $cache;
 
-    public function __construct($cache)
+    /**
+     * @var TrafficControl
+     */
+    private $trafficControl;
+
+    public function __construct($cache, TrafficControl $trafficControl)
     {
         $this->cache = $cache;
+        $this->trafficControl = $trafficControl;
     }
 
     private function getUser()
@@ -116,9 +123,8 @@ class UsersController extends AbstractActionController
         }
 
         if ($canBan && $user->last_ip !== null) {
-            $service = new TrafficControl();
             if ($user->last_ip) {
-                $ban = $service->getBanInfo(inet_ntop($user->last_ip));
+                $ban = $this->trafficControl->getBanInfo(inet_ntop($user->last_ip));
                 if ($ban) {
                     $ban['user'] = $users->find($ban['user_id'])->current();
                 }

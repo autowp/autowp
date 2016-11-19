@@ -88,13 +88,10 @@ class Module implements
         $serviceManager->get(\Zend_Db_Adapter_Abstract::class);
 
         $sessionListener = new SessionDispatchListener();
-        $sessionListener->attach($eventManager);
+        $sessionListener->onBootstrap($e);
 
         $lastOnlineListener = new UserLastOnlineDispatchListener();
         $lastOnlineListener->attach($eventManager);
-
-        $trafficListener = new TrafficRouteListener();
-        $trafficListener->attach($eventManager);
 
         $urlCorrectionListener = new UrlCorrectionRouteListener();
         $urlCorrectionListener->attach($eventManager);

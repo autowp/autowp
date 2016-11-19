@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS `acl_resources_privileges` (
   UNIQUE KEY `unique` (`resource_id`,`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8;
 
-insert into acl_resources_privileges (id, resource_id, name)
-values (1, 4, "edit_meta"), (2, 11, "edit");
+replace into acl_resources_privileges (id, resource_id, name)
+values (1, 4, "edit_meta"), (2, 11, "edit"), (3, 13, "ban");
 
 -- --------------------------------------------------------
 
@@ -115,8 +115,8 @@ CREATE TABLE IF NOT EXISTS `acl_roles_privileges_allowed` (
   KEY `privilege_id` (`privilege_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-insert into acl_roles_privileges_allowed (role_id, privilege_id)
-values (10, 1), (10, 2);
+replace into acl_roles_privileges_allowed (role_id, privilege_id)
+values (10, 1), (10, 2), (10, 3);
 
 -- --------------------------------------------------------
 

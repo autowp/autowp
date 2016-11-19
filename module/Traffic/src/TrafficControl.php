@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Service;
+namespace Autowp\Traffic;
 
 use Application\Db\Table;
 
@@ -121,6 +121,14 @@ class TrafficControl
      */
     public function ban($ip, $seconds, $byUserId, $reason)
     {
+        $seconds = (int)$seconds;
+
+        if ($seconds <= 0) {
+            throw new \InvalidArgumentException("Seconds must be > 0");
+        }
+
+        $reason = trim($reason);
+
         $table = $this->getBannedTable();
 
         $row = $table->fetchRow([

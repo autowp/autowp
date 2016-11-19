@@ -1,14 +1,26 @@
 <?php
 
-namespace Application\Controller;
+namespace Autowp\Traffic\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\Traffic\TrafficControl;
+
 use Application\Model\DbTable\User;
-use Application\Service\TrafficControl;
+use Zend\Http\Request;
 
 class BanController extends AbstractActionController
 {
+    /**
+     * @var TrafficControl
+     */
+    private $service;
+
+    public function __construct(TrafficControl $service)
+    {
+        $this->service = $service;
+    }
+
     public function unbanIpAction()
     {
         if (! $this->getRequest()->isPost()) {
@@ -16,19 +28,21 @@ class BanController extends AbstractActionController
         }
 
         $canBan = $this->user()->isAllowed('user', 'ban');
+        if (! $canBan) {
+            return $this->forbiddenAction();
+        }
 
         $ip = $this->params('ip');
 
-        if (! $canBan || $ip === null) {
+        if ($ip === null) {
             return $this->notFoundAction();
         }
 
-        $service = new TrafficControl();
-        $service->unban($ip);
+        $this->service->unban($ip);
 
-        return $this->redirect()->toUrl(
-            $this->getRequest()->getServer('HTTP_REFERER')
-        );
+        $referer = $this->getRequest()->getServer('HTTP_REFERER');
+
+        return $this->redirect()->toUrl($referer ? $referer : '/');
     }
 
     public function banIpAction()
@@ -38,23 +52,26 @@ class BanController extends AbstractActionController
         }
 
         $canBan = $this->user()->isAllowed('user', 'ban');
+        if (! $canBan) {
+            return $this->forbiddenAction();
+        }
 
         $ip = $this->params('ip');
 
-        if (! $canBan || $ip === null) {
+        if ($ip === null) {
             return $this->notFoundAction();
         }
 
-        $service = new TrafficControl();
-
-        $service->ban(
+        $this->service->ban(
             $ip,
             $this->params()->fromPost('period') * 3600,
             $this->user()->get()->id,
             $this->params()->fromPost('reason')
         );
 
-        return $this->redirect()->toUrl($this->getRequest()->getServer('HTTP_REFERER'));
+        $referer = $this->getRequest()->getServer('HTTP_REFERER');
+
+        return $this->redirect()->toUrl($referer ? $referer : '/');
     }
 
     public function banUserAction()
@@ -72,14 +89,15 @@ class BanController extends AbstractActionController
 
         $canBan = $this->user()->isAllowed('user', 'ban')
               && ($this->user()->get()->id != $user->id);
+        if (! $canBan) {
+            return $this->forbiddenAction();
+        }
 
-        if (! $canBan || $user->last_ip === null) {
+        if ($user->last_ip === null) {
             return $this->notFoundAction();
         }
 
-        $service = new TrafficControl();
-
-        $service->ban(
+        $this->service->ban(
             inet_ntop($user->last_ip),
             $this->params()->fromPost('period') * 3600,
             $this->user()->get()->id,
@@ -107,12 +125,15 @@ class BanController extends AbstractActionController
         $canBan = $this->user()->isAllowed('user', 'ban')
               && ($this->user()->get()->id != $user->id);
 
-        if (! $canBan || $user->last_ip === null) {
+        if (! $canBan) {
+            return $this->forbiddenAction();
+        }
+
+        if ($user->last_ip === null) {
             return $this->notFoundAction();
         }
 
-        $service = new TrafficControl();
-        $service->unban(inet_ntop($user->last_ip));
+        $this->service->unban(inet_ntop($user->last_ip));
 
         return $this->redirect()->toUrl($this->url()->fromRoute('users/user', [
             'user_id'  => $user->identity ? $user->identity : 'user' . $user->id,

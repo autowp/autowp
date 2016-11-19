@@ -22,6 +22,7 @@ return [
         'Zend\\Validator',
         'Autowp\\Image',
         'Autowp\\TextStorage',
+        'Autowp\\Traffic',
         'Autowp\\ZFComponents',
         'Application',
         //'ZF\ContentNegotiation',

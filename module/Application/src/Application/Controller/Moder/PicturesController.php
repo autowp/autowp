@@ -7,6 +7,8 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Traffic\TrafficControl;
+
 use Application\Form\Moder\Inbox as InboxForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
@@ -28,7 +30,6 @@ use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\TelegramService;
-use Application\Service\TrafficControl;
 
 use Exception;
 
@@ -92,6 +93,11 @@ class PicturesController extends AbstractActionController
     private $message;
 
     /**
+     * @var TrafficControl
+     */
+    private $trafficControl;
+
+    /**
      * @return Engine
      */
     private function getEngineTable()
@@ -119,7 +125,8 @@ class PicturesController extends AbstractActionController
         Form $banForm,
         PictureNameFormatter $pictureNameFormatter,
         TelegramService $telegram,
-        Message $message
+        Message $message,
+        TrafficControl $trafficControl
     ) {
 
         $this->hostManager = $hostManager;
@@ -132,6 +139,7 @@ class PicturesController extends AbstractActionController
         $this->pictureNameFormatter = $pictureNameFormatter;
         $this->telegram = $telegram;
         $this->message = $message;
+        $this->trafficControl = $trafficControl;
     }
 
     public function ownerTypeaheadAction()
@@ -935,8 +943,7 @@ class PicturesController extends AbstractActionController
         $canViewIp = $this->user()->isAllowed('user', 'ip');
 
         if ($canBan) {
-            $service = new TrafficControl();
-            $ban = $service->getBanInfo(inet_ntop($picture->ip));
+            $ban = $this->trafficControl->getBanInfo(inet_ntop($picture->ip));
             if ($ban) {
                 $userTable = new User();
                 $ban['user'] = $userTable->find($ban['user_id'])->current();

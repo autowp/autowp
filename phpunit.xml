@@ -6,10 +6,14 @@
         <testsuite name="application">
             <directory>./module/Application/test/ApplicationTest</directory>
         </testsuite>
+        <testsuite name="traffic">
+            <directory>./module/Traffic/test</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./module/Application/src</directory>
+            <directory suffix=".php">./module/Traffic/src</directory>
             <exclude>
                 <directory suffix=".php">./vendor</directory>
             </exclude>

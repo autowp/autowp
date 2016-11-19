@@ -1,24 +1,33 @@
 <?php
 
-namespace Application\Controller\Moder;
+namespace Autowp\Traffic\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
-use Application\Model\DbTable\User;
-use Application\Service\TrafficControl;
+use Autowp\Traffic\TrafficControl;
 
-class TrafficController extends AbstractActionController
+use Application\Model\DbTable\User;
+
+class ModerController extends AbstractActionController
 {
+    /**
+     * @var TrafficControl
+     */
+    private $service;
+
+    public function __construct(TrafficControl $service)
+    {
+        $this->service = $service;
+    }
+
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
 
-        $service = new TrafficControl();
-
-        $data = $service->getTopData();
+        $data = $this->service->getTopData();
 
         $users = new User();
 
@@ -70,9 +79,7 @@ class TrafficController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $service = new TrafficControl();
-
-        $data = $service->getWhitelistData();
+        $data = $this->service->getWhitelistData();
 
         $users = new User();
 
@@ -95,8 +102,7 @@ class TrafficController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $service = new TrafficControl();
-        $service->deleteFromWhitelist($this->params()->fromPost('ip'));
+        $this->service->deleteFromWhitelist($this->params()->fromPost('ip'));
 
         return $this->redirect()->toUrl($this->url()->fromRoute('moder/traffic/whitelist'));
     }
@@ -110,8 +116,7 @@ class TrafficController extends AbstractActionController
         $ip = trim($this->params()->fromPost('ip'));
 
         if ($ip) {
-            $service = new TrafficControl();
-            $service->addToWhitelist($ip, 'manual click');
+            $this->service->addToWhitelist($ip, 'manual click');
         }
 
         return $this->redirect()->toUrl($this->url()->fromRoute('moder/traffic'));

@@ -298,55 +298,6 @@ return [
                             ]
                         ]
                     ],
-                    'traffic' => [
-                        'type' => Literal::class,
-                        'options' => [
-                            'route' => '/traffic',
-                            'defaults' => [
-                                'controller' => Controller\Moder\TrafficController::class,
-                                'action'     => 'index'
-                            ]
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'host-by-addr' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route' => '/host-by-addr',
-                                    'defaults' => [
-                                        'action' => 'host-by-addr'
-                                    ]
-                                ]
-                            ],
-                            'whitelist' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route' => '/whitelist',
-                                    'defaults' => [
-                                        'action' => 'whitelist'
-                                    ]
-                                ]
-                            ],
-                            'whitelist-remove' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route' => '/whitelist-remove',
-                                    'defaults' => [
-                                        'action' => 'whitelist-remove'
-                                    ]
-                                ]
-                            ],
-                            'whitelist-add' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route' => '/whitelist-add',
-                                    'defaults' => [
-                                        'action' => 'whitelist-add'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
                     'twins' => [
                         'type' => Segment::class,
                         'options' => [
@@ -400,7 +351,6 @@ return [
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
             Controller\Moder\PicturesController::class     => Controller\Moder\Service\PicturesControllerFactory::class,
             Controller\Moder\RightsController::class       => Controller\Moder\Service\RightsControllerFactory::class,
-            Controller\Moder\TrafficController::class      => InvokableFactory::class,
             Controller\Moder\TwinsController::class        => Controller\Moder\Service\TwinsControllerFactory::class,
             Controller\Moder\UsersController::class        => InvokableFactory::class,
         ]

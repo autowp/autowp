@@ -16,7 +16,6 @@ return [
             Controller\AboutController::class           => Controller\Frontend\Service\AboutControllerFactory::class,
             Controller\AccountController::class         => Controller\Frontend\Service\AccountControllerFactory::class,
             Controller\ArticlesController::class        => InvokableFactory::class,
-            Controller\BanController::class             => InvokableFactory::class,
             Controller\BrandsController::class          => Controller\Frontend\Service\BrandsControllerFactory::class,
             Controller\CarsController::class            => Controller\Frontend\Service\CarsControllerFactory::class,
             Controller\CatalogueController::class       => Controller\Frontend\Service\CatalogueControllerFactory::class,

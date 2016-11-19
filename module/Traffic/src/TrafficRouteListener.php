@@ -1,6 +1,6 @@
 <?php
 
-namespace Application;
+namespace Autowp\Traffic;
 
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
@@ -44,7 +44,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
 
             $ip = $request->getServer('REMOTE_ADDR');
 
-            $service = new Service\TrafficControl();
+            $service = new TrafficControl();
 
             $banInfo = $service->getBanInfo($ip);
             if ($banInfo) {

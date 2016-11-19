@@ -21,7 +21,8 @@ class PicturesControllerFactory implements FactoryInterface
             $container->get('BanForm'),
             $container->get(\Application\PictureNameFormatter::class),
             $container->get(\Application\Service\TelegramService::class),
-            $container->get(\Application\Model\Message::class)
+            $container->get(\Application\Model\Message::class),
+            $container->get(\Autowp\Traffic\TrafficControl::class)
         );
     }
 }

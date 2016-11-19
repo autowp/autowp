@@ -212,7 +212,7 @@ class VehicleNameFormatter
             return $begin . '–' . sprintf('%02d', $end % 100);
         }
 
-        if (!$begin) {
+        if (! $begin) {
             return '????–' . $end;
         }
 

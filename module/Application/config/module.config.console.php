@@ -15,7 +15,6 @@ return [
             Controller\Console\PicturesController::class    => InvokableFactory::class,
             Controller\Console\SpecsController::class       => Controller\Console\Service\SpecsControllerFactory::class,
             Controller\Console\TelegramController::class    => Controller\Console\Service\TelegramControllerFactory::class,
-            Controller\Console\TrafficController::class     => InvokableFactory::class,
             Controller\Console\TwitterController::class     => Controller\Console\Service\TwitterControllerFactory::class,
             Controller\Console\UsersController::class       => Controller\Console\Service\UsersControllerFactory::class,
         ]
@@ -63,14 +62,6 @@ return [
                         ]
                     ]
                 ],
-                'traffic' => [
-                    'options' => [
-                        'route'    => 'traffic (autoban|google|gc|clear-referer-monitoring):action',
-                        'defaults' => [
-                            'controller' => Controller\Console\TrafficController::class,
-                        ]
-                    ]
-                ],
                 'midnight' => [
                     'options' => [
                         'route'    => 'midnight (car-of-day):action',
@@ -84,6 +75,14 @@ return [
                         'route'    => 'pictures (clear-queue|fill-point):action',
                         'defaults' => [
                             'controller' => Controller\Console\PicturesController::class,
+                        ]
+                    ]
+                ],
+                'referer' => [
+                    'options' => [
+                        'route'    => 'traffic (clear-referer-monitoring):action',
+                        'defaults' => [
+                            'controller' => Controller\Console\RefererController::class,
                         ]
                     ]
                 ],
