@@ -4,7 +4,6 @@ language: php
 php:
   - 7.0.12
   - 7.1
-  - nightly
 git:
   submodules: false
 services:
