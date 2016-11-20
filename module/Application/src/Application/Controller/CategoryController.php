@@ -280,7 +280,7 @@ class CategoryController extends AbstractActionController
             $path = $path ? (array)$path : [];
 
             $breadcrumbs[] = [
-                'name' => $topCar->getFullName($language),
+                'name' => $this->car()->formatName($topCar, $language),
                 'url'  => $this->url()->fromRoute('categories', [
                     'action'           => 'category',
                     'category_catname' => $currentCategory->catname,
@@ -310,7 +310,7 @@ class CategoryController extends AbstractActionController
                 $breadcrumbsPath[] = $pathNode;
 
                 $breadcrumbs[] = [
-                    'name' => $childCar->getFullName($language),
+                    'name' => $this->car()->formatName($childCar, $language),
                     'url'  => $this->url()->fromRoute('categories', [
                         'action'           => 'category',
                         'category_catname' => $currentCategory->catname,
@@ -419,9 +419,9 @@ class CategoryController extends AbstractActionController
             if ($currentCategory) {
                 if ($topCar) {
                     if ($currentCar) {
-                        $title = $currentCar->getFullName($language);
+                        $title = $this->car()->formatName($currentCar, $language);
                     } else {
-                        $title = $topCar->getFullName($language);
+                        $title = $this->car()->formatName($topCar, $language);
                     }
                 } else {
                     $title = $categoryLang ? $categoryLang->name : $currentCategory->name;

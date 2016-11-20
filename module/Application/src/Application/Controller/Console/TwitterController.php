@@ -14,9 +14,15 @@ class TwitterController extends AbstractActionController
      */
     private $twitterConfig;
 
-    public function __construct(array $twitterConfig)
+    /**
+     * @var CarOfDay
+     */
+    private $carOfDay;
+
+    public function __construct(array $twitterConfig, CarOfDay $carOfDay)
     {
         $this->twitterConfig = $twitterConfig;
+        $this->carOfDay = $carOfDay;
     }
 
     public function carOfDayAction()

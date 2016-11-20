@@ -12,7 +12,8 @@ class TwitterControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(
-            $container->get('Config')['twitter']
+            $container->get('Config')['twitter'],
+            $container->get(\Application\Model\CarOfDay::class)
         );
     }
 }

@@ -142,7 +142,7 @@ class BrandVehicleController extends AbstractActionController
 
         $message = sprintf(
             'Автомобиль %s добавлен к бренду %s',
-            htmlspecialchars($vehicleRow->getFullName('en')),
+            htmlspecialchars($this->car()->formatName($vehicleRow, 'en')),
             $brandRow->caption
         );
         $this->log($message, [$brandRow, $vehicleRow]);
@@ -175,7 +175,7 @@ class BrandVehicleController extends AbstractActionController
 
             $message = sprintf(
                 'Автомобиль %s отсоединен от бренда %s',
-                htmlspecialchars($vehicleRow->getFullName('en')),
+                htmlspecialchars($this->car()->formatName($vehicleRow, 'en')),
                 $brandRow->caption
             );
             $this->log($message, [$brandRow, $vehicleRow]);

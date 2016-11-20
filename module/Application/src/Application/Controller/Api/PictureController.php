@@ -11,6 +11,16 @@ use Application\Model\DbTable\Vehicle;
 
 class PictureController extends AbstractActionController
 {
+    /**
+     * @var CarOfDay
+     */
+    private $carOfDay;
+
+    public function __construct(CarOfDay $carOfDay)
+    {
+        $this->carOfDay = $carOfDay;
+    }
+
     private function serverUrl($url)
     {
         $helper = new \Zend\View\Helper\ServerUrl();
@@ -75,9 +85,7 @@ class PictureController extends AbstractActionController
 
     public function carOfDayPictureAction()
     {
-        $ofDay = new CarOfDay();
-
-        $carId = $ofDay->getCurrent();
+        $carId = $this->carOfDay->getCurrent();
 
         $pictureRow = null;
 

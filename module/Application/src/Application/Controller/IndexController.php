@@ -39,10 +39,19 @@ class IndexController extends AbstractActionController
      */
     private $vehicleParentTable;
 
-    public function __construct($cache, SpecificationsService $specsService)
-    {
+    /**
+     * @var CarOfDay
+     */
+    private $carOfDay;
+
+    public function __construct(
+        $cache,
+        SpecificationsService $specsService,
+        CarOfDay $carOfDay
+    ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
+        $this->carOfDay = $carOfDay;
     }
 
     /**
@@ -346,8 +355,7 @@ class IndexController extends AbstractActionController
         $language = $this->language();
         $httpsFlag = $this->getRequest()->getUri()->getScheme();
 
-        $model = new CarOfDay();
-        $carId = $model->getCurrent();
+        $carId = $this->carOfDay->getCurrent();
 
         $carOfDayName = null;
         $carOfDayPicturesData = null;

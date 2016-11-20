@@ -100,10 +100,15 @@ class BrandsController extends AbstractActionController
                 ->limit(30)
         );
 
+        $cars = [];
+        foreach ($carList as $car) {
+            $cars[] = $car->getNameData($language);
+        }
+
         $viewModel = new ViewModel([
             'brand'     => $brand,
             'brandLang' => $brandLang,
-            'carList'   => $carList
+            'carList'   => $cars
         ]);
         $viewModel->setTerminal(true);
 

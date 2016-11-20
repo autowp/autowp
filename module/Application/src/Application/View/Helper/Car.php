@@ -73,12 +73,12 @@ class Car extends AbstractHelper
 
     public function htmlTitle(array $car)
     {
-        return $this->vehicleNameFormatter->formatHtml($car, $this->view->language);
+        return $this->vehicleNameFormatter->formatHtml($car, $this->view->language());
     }
 
     public function textTitle(array $car)
     {
-        return $this->vehicleNameFormatter->format($car, $this->view->language);
+        return $this->vehicleNameFormatter->format($car, $this->view->language());
     }
 
     public function title()

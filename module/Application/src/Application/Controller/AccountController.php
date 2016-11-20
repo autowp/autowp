@@ -825,7 +825,7 @@ class AccountController extends AbstractActionController
             switch ($conflict['itemTypeId']) {
                 case SpecificationsService::ITEM_TYPE_CAR:
                     $car = $carTable->find($conflict['itemId'])->current();
-                    $conflict['object'] = $car ? $car->getFullName($language) : null;
+                    $conflict['object'] = $car ? $this->car()->formatName($car, $language) : null;
                     $conflict['url'] = $this->url()->fromRoute('cars/params', [
                         'action' => 'car-specifications-editor',
                         'car_id' => $conflict['itemId'],

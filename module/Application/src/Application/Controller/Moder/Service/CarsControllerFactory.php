@@ -22,7 +22,8 @@ class CarsControllerFactory implements FactoryInterface
             $container->get('ModerCarParent'),
             $container->get('ModerCarsFilter'),
             $container->get(\Application\Model\BrandVehicle::class),
-            $container->get(\Application\Model\Message::class)
+            $container->get(\Application\Model\Message::class),
+            $container->get(\Application\Service\SpecificationsService::class)
         );
     }
 }

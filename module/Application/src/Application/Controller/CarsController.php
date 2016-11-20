@@ -144,7 +144,7 @@ class CarsController extends AbstractActionController
                         $message = sprintf(
                             $this->translate('pm/user-%s-edited-vehicle-specs-%s', 'default', $contributor->language),
                             $this->userUrl($user, $uri),
-                            $car->getFullName($contributor->language)
+                            $this->car()->formatName($car, $contributor->language)
                         );
 
                         $this->message->send(null, $contributor->id, $message);
@@ -170,7 +170,7 @@ class CarsController extends AbstractActionController
 
             foreach ($carRows as $carRow) {
                 $engineInheritedFrom[] = [
-                    'name' => $carRow->getFullName($this->language()),
+                    'name' => $this->car()->formatName($carRow, $this->language()),
                     'url'  => $this->url()->fromRoute('moder/cars/params', [
                         'action' => 'car',
                         'car_id' => $carRow->id
@@ -565,7 +565,7 @@ class CarsController extends AbstractActionController
             if ($itemType->id == 1) {
                 $car = $cars->find($row->item_id)->current();
                 if ($car) {
-                    $objectName = $car->getFullName($this->language());
+                    $objectName = $this->car()->formatName($car, $this->language());
                     $editorUrl = $this->url()->fromRoute('cars/params', [
                         'action' => 'car-specifications-editor',
                         'car_id' => $car->id
@@ -676,7 +676,7 @@ class CarsController extends AbstractActionController
         if ($engine) {
             $message = sprintf(
                 'У автомобиля %s убран двигатель (был %s)',
-                htmlspecialchars($car->getFullName('en')),
+                htmlspecialchars($this->car()->formatName($car, 'en')),
                 htmlspecialchars($engine->caption)
             );
             $this->log($message, $car);
@@ -696,7 +696,7 @@ class CarsController extends AbstractActionController
                         ),
                         $this->userUrl($user, $uri),
                         $engine->caption,
-                        $car->getFullName($subscriber->language),
+                        $this->car()->formatName($car, $subscriber->language),
                         $this->carModerUrl($car, $uri)
                     );
 
@@ -732,7 +732,7 @@ class CarsController extends AbstractActionController
 
             $message = sprintf(
                 'У автомобиля %s установлено наследование двигателя',
-                htmlspecialchars($car->getFullName('en'))
+                htmlspecialchars($this->car()->formatName($car, 'en'))
             );
             $this->log($message, $car);
 
@@ -750,7 +750,7 @@ class CarsController extends AbstractActionController
                             $subscriber->language
                         ),
                         $this->userUrl($user, $uri),
-                        $car->getFullName($subscriber->language),
+                        $this->car()->formatName($car, $subscriber->language),
                         $this->carModerUrl($car, $uri)
                     );
 
@@ -853,7 +853,7 @@ class CarsController extends AbstractActionController
 
         $message = sprintf(
             'Автомобилю %s назначен двигатель %s',
-            htmlspecialchars($car->getFullName('en')),
+            htmlspecialchars($this->car()->formatName($car, 'en')),
             htmlspecialchars($engine->caption)
         );
         $this->log($message, $car);
@@ -866,7 +866,7 @@ class CarsController extends AbstractActionController
                     $this->translate('pm/user-%s-set-vehicle-engine-%s-%s-%s', 'default', $subscriber->language),
                     $this->userUrl($user, $uri),
                     $engine->caption,
-                    $car->getFullName($subscriber->language),
+                    $this->car()->formatName($car, $subscriber->language),
                     $this->carModerUrl($car, $uri)
                 );
 

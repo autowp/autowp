@@ -666,7 +666,7 @@ class Picture extends Table
         $log($userId, sprintf(
             'Картинка %s связана с автомобилем %s',
             htmlspecialchars($picture->id),
-            htmlspecialchars($car->getFullName('en'))
+            htmlspecialchars('#' . $car->id)
         ), [$car, $picture]);
 
         return true;

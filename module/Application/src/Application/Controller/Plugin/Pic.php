@@ -526,7 +526,7 @@ class Pic extends AbstractPlugin
 
                             foreach ($cataloguePaths as $cPath) {
                                 $engineCars[] = [
-                                    'name' => $carRow->getFullName($language),
+                                    'name' => $controller->car()->formatName($carRow, $language),
                                     'url'  => $controller->url()->fromRoute('catalogue', [
                                         'action'        => 'brand-car',
                                         'brand_catname' => $cPath['brand_catname'],
@@ -590,7 +590,7 @@ class Pic extends AbstractPlugin
 
                             foreach ($cataloguePaths as $cPath) {
                                 $factoryCars[] = [
-                                    'name' => $carRow->getFullName($language),
+                                    'name' => $controller->car()->formatName($carRow, $language),
                                     'url'  => $controller->url()->fromRoute('catalogue', [
                                         'action'        => 'brand-car',
                                         'brand_catname' => $cPath['brand_catname'],
@@ -1022,7 +1022,7 @@ class Pic extends AbstractPlugin
                     ]);
                     $links[$url] = sprintf(
                         $this->translator->translate('moder/picture/edit-vehicle-%s'),
-                        $car->getFullName($language)
+                        $controller->car()->formatName($car, $language)
                     );
 
                     $brandModel = new BrandModel();

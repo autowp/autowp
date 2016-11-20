@@ -115,7 +115,7 @@ class FactoriesController extends AbstractActionController
                 }
 
                 $carPictures[] = [
-                    'name' => $car->getFullName($language),
+                    'name' => $this->car()->formatName($car, $language),
                     'src'  => $src,
                     'url'  => $url
                 ];

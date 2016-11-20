@@ -13,7 +13,8 @@ class EnginesControllerFactory implements FactoryInterface
     {
         return new Controller(
             $container->get('ModerFactoryFilterForm'),
-            $container->get('ModerEngineForm')
+            $container->get('ModerEngineForm'),
+            $container->get(\Application\Service\SpecificationsService::class)
         );
     }
 }

@@ -5,6 +5,7 @@ namespace Application\Model;
 use Application\Db\Table;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle;
+use Application\VehicleNameFormatter;
 
 use Zend_Db_Expr;
 use Zend_Oauth_Token_Access;
@@ -17,8 +18,15 @@ class CarOfDay
      */
     private $table;
 
-    public function __construct()
+    /**
+     * @var VehicleNameFormatter
+     */
+    private $vehicleNameFormatter;
+
+    public function __construct(VehicleNameFormatter $vehicleNameFormatter)
     {
+        $this->vehicleNameFormatter = $vehicleNameFormatter;
+
         $this->table = new Table([
             'name'    => 'of_day',
             'primary' => 'day_date'
@@ -136,7 +144,11 @@ class CarOfDay
 
         $url = 'http://wheelsage.org/picture/' . ($picture->identity ? $picture->identity : $picture->id);
 
-        $text = 'Vehicle of the day: ' . $car->getFullName('en') . ' ' . $url;
+        $text = sprintf(
+            'Vehicle of the day: %s %s',
+            $this->vehicleNameFormatter->format($car, 'en'),
+            $url
+        );
 
         $token = new Zend_Oauth_Token_Access();
         $token->setParams($twOptions['token']);

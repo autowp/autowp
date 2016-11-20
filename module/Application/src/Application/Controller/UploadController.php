@@ -122,7 +122,7 @@ class UploadController extends AbstractActionController
                 $car = $cars->find($carId)->current();
                 if ($car) {
                     $selected = true;
-                    $selectedName = $car->getFullName($this->language());
+                    $selectedName = $this->car()->formatName($car, $this->language());
                 }
                 break;
 

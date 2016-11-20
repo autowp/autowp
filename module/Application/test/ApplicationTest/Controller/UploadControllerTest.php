@@ -31,6 +31,22 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
         $this->assertQuery("h1");
     }
 
+    public function testSelectVehicle()
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/upload/index/type/1/car_id/1', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(UploadController::class);
+        $this->assertMatchedRouteName('upload/params');
+        $this->assertActionName('index');
+
+        $this->assertQuery("h1");
+        $this->assertXpathQuery("//*[contains(text(), 'test car')]");
+
+    }
+
     public function testUploadVehicle()
     {
         /**

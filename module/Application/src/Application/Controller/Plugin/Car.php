@@ -4,15 +4,10 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\BrandCar;
-use Application\Model\DbTable\Category;
-use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\DbTable;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
+use Application\VehicleNameFormatter;
 
 use Autowp\TextStorage\Service as TextStorage;
 
@@ -25,7 +20,7 @@ class Car extends AbstractPlugin
     private $perspectiveCache = [];
 
     /**
-     * @var VehicleLanguage
+     * @var DbTable\Vehicle\Language
      */
     private $carLangTable;
 
@@ -49,13 +44,20 @@ class Car extends AbstractPlugin
      */
     private $specsService = null;
 
+    /**
+     * @var VehicleNameFormatter
+     */
+    private $vehicleNameFormatter;
+
     public function __construct(
         TextStorage $textStorage,
-        SpecificationsService $specsService
+        SpecificationsService $specsService,
+        VehicleNameFormatter $vehicleNameFormatter
     ) {
 
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
+        $this->vehicleNameFormatter = $vehicleNameFormatter;
     }
 
     /**
@@ -72,7 +74,7 @@ class Car extends AbstractPlugin
     {
         return $this->carLangTable
             ? $this->carLangTable
-            : $this->carLangTable = new VehicleLanguage();
+            : $this->carLangTable = new DbTable\Vehicle\Language();
     }
 
     /**
@@ -104,8 +106,11 @@ class Car extends AbstractPlugin
             $pictureTableAdapter = $pictureTable->getAdapter();
 
             $select = $pictureTableAdapter->select()
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED]);
+                ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
+                ->where('pictures.status IN (?)', [
+                    DbTable\Picture::STATUS_NEW,
+                    DbTable\Picture::STATUS_ACCEPTED
+                ]);
 
             if ($onlyExactly) {
                 $select
@@ -167,11 +172,11 @@ class Car extends AbstractPlugin
         $catalogue = $controller->catalogue();
 
         $pictureTable = $this->getPictureTable();
-        $carParentTable = new VehicleParent();
+        $carParentTable = new DbTable\Vehicle\ParentTable();
         $carParentAdapter = $carParentTable->getAdapter();
-        $brandTable = new BrandTable();
-        $brandCarTable = new BrandCar();
-        $categoryTable = new Category();
+        $brandTable = new DbTable\Brand();
+        $brandCarTable = new DbTable\BrandCar();
+        $categoryTable = new DbTable\Category();
 
         $carIds = [];
         foreach ($cars as $car) {
@@ -251,7 +256,10 @@ class Car extends AbstractPlugin
                 $carParentAdapter->select()
                     ->from($carParentTable->info('name'), ['parent_id', 'type', 'count' => 'count(1)'])
                     ->where('parent_id IN (?)', $carIds)
-                    ->where('type IN (?)', [VehicleParent::TYPE_TUNING, VehicleParent::TYPE_SPORT])
+                    ->where('type IN (?)', [
+                        DbTable\Vehicle\ParentTable::TYPE_TUNING,
+                        DbTable\Vehicle\ParentTable::TYPE_SPORT
+                    ])
                     ->group(['parent_id', 'type'])
             );
 
@@ -289,7 +297,7 @@ class Car extends AbstractPlugin
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
                     'brand_car_catname' => 'catname'
                 ])
-                ->where('brands_cars.type = ?', BrandCar::TYPE_DESIGN)
+                ->where('brands_cars.type = ?', DbTable\BrandCar::TYPE_DESIGN)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
                 ->where('car_parent_cache.car_id IN (?)', $carIds ? $carIds : 0)
                 ->group('car_parent_cache.car_id')
@@ -484,23 +492,23 @@ class Car extends AbstractPlugin
             }
 
             if ($typeUrl) {
-                $tuningCount = isset($carsTypeCounts[$car->id][VehicleParent::TYPE_TUNING])
-                    ? $carsTypeCounts[$car->id][VehicleParent::TYPE_TUNING]
+                $tuningCount = isset($carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_TUNING])
+                    ? $carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_TUNING]
                     : 0;
                 if ($tuningCount) {
                     $item['tuning'] = [
                         'count' => $tuningCount,
-                        'url'   => $typeUrl($car, VehicleParent::TYPE_TUNING)
+                        'url'   => $typeUrl($car, DbTable\Vehicle\ParentTable::TYPE_TUNING)
                     ];
                 }
 
-                $sportCount = isset($carsTypeCounts[$car->id][VehicleParent::TYPE_SPORT])
-                    ? $carsTypeCounts[$car->id][VehicleParent::TYPE_SPORT]
+                $sportCount = isset($carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_SPORT])
+                    ? $carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_SPORT]
                     : 0;
                 if ($sportCount) {
                     $item['sport'] = [
                         'count' => $sportCount,
-                        'url'   => $typeUrl($car, VehicleParent::TYPE_SPORT)
+                        'url'   => $typeUrl($car, DbTable\Vehicle\ParentTable::TYPE_SPORT)
                     ];
                 }
             }
@@ -570,7 +578,7 @@ class Car extends AbstractPlugin
     private function getPerspectiveGroupIds($pageId)
     {
         if (! isset($this->perspectiveCache[$pageId])) {
-            $perspectivesGroups = new PerspectiveGroup();
+            $perspectivesGroups = new DbTable\Perspective\Group();
             $db = $perspectivesGroups->getAdapter();
             $this->perspectiveCache[$pageId] = $db->fetchCol(
                 $db->select()
@@ -607,8 +615,11 @@ class Car extends AbstractPlugin
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
             )
-            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-            ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+            ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
+            ->where('pictures.status IN (?)', [
+                DbTable\Picture::STATUS_ACCEPTED,
+                DbTable\Picture::STATUS_NEW
+            ])
             ->limit(1);
 
         $order = [];
@@ -627,12 +638,12 @@ class Car extends AbstractPlugin
 
             if (isset($options['type'])) {
                 switch ($options['type']) {
-                    case VehicleParent::TYPE_DEFAULT:
+                    case DbTable\Vehicle\ParentTable::TYPE_DEFAULT:
                         break;
-                    case VehicleParent::TYPE_TUNING:
+                    case DbTable\Vehicle\ParentTable::TYPE_TUNING:
                         $select->where('car_parent_cache.tuning');
                         break;
-                    case VehicleParent::TYPE_SPORT:
+                    case DbTable\Vehicle\ParentTable::TYPE_SPORT:
                         $select->where('car_parent_cache.sport');
                         break;
                 }
@@ -785,5 +796,13 @@ class Car extends AbstractPlugin
         }
 
         return $result;
+    }
+
+    public function formatName(DbTable\Vehicle\Row $vehicle, $language)
+    {
+        return $this->vehicleNameFormatter->format(
+            $vehicle->getNameData($language),
+            $language
+        );
     }
 }

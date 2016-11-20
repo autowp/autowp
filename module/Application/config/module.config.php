@@ -48,7 +48,7 @@ return [
             Controller\UploadController::class          => Controller\Frontend\Service\UploadControllerFactory::class,
             Controller\VotingController::class          => InvokableFactory::class,
             Controller\Api\ContactsController::class    => InvokableFactory::class,
-            Controller\Api\PictureController::class     => InvokableFactory::class,
+            Controller\Api\PictureController::class     => Controller\Api\Service\PictureControllerFactory::class,
             Controller\Api\UsersController::class       => InvokableFactory::class,
         ],
     ],
@@ -125,6 +125,7 @@ return [
             Zend_Cache_Manager::class            => Service\ZF1CacheManagerFactory::class,
             Zend_Db_Adapter_Abstract::class      => Service\ZF1DbAdapterFactory::class,
             'translator'                         => \Zend\Mvc\I18n\TranslatorFactory::class,
+            Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class

@@ -11,7 +11,7 @@
         ]), false)?>
     <?php } ?>
     <?php foreach ($this->carList as $car) {?>
-        <p><?=$this->escapeHtml($car->getFullName($this->language()))?></p>
+        <p><?=$this->car()->htmlTitle($car)?></p>
     <?php } ?>
     <br style="clear:both" />
 <?php } ?>

@@ -36,10 +36,19 @@ class EnginesController extends AbstractActionController
      */
     private $editForm;
 
-    public function __construct(Form $filterForm, Form $editForm)
+    /**
+     * @var SpecificationsService
+     */
+    private $specificationsService;
+
+    public function __construct(
+        Form $filterForm,
+        Form $editForm,
+        SpecificationsService $specificationsService)
     {
         $this->filterForm = $filterForm;
         $this->editForm = $editForm;
+        $this->specificationsService = $specificationsService;
     }
 
     /**
@@ -199,8 +208,7 @@ class EnginesController extends AbstractActionController
             ];
         }
 
-        $specService = new SpecificationsService();
-        $specsCount = $specService->getSpecsCount(3, $engine->id);
+        $specsCount = $this->specificationsService->getSpecsCount(3, $engine->id);
 
         return [
             'engine'       => $engine,
@@ -375,8 +383,7 @@ class EnginesController extends AbstractActionController
                     $epcTable = new EngineParentCache();
                     $epcTable->rebuildOnAddParent($engine);
 
-                    $specService = new SpecificationsService();
-                    $specService->updateActualValues(3, $engine->id);
+                    $this->specificationsService->updateActualValues(3, $engine->id);
                 }
 
                 $this->log(sprintf(
@@ -442,8 +449,7 @@ class EnginesController extends AbstractActionController
         $epcTable = new EngineParentCache();
         $epcTable->rebuildOnRemoveParent($engine);
 
-        $specService = new SpecificationsService();
-        $specService->updateActualValues(3, $engine->id);
+        $this->specificationsService->updateActualValues(3, $engine->id);
 
         $this->log(sprintf(
             'Двигатель %s перестал иметь родительский двигатель',
@@ -492,8 +498,7 @@ class EnginesController extends AbstractActionController
             $epcTable->rebuildOnRemoveParent($engine);
             $epcTable->rebuildOnAddParent($engine);
 
-            $specService = new SpecificationsService();
-            $specService->updateActualValues(3, $engine->id);
+            $this->specificationsService->updateActualValues(3, $engine->id);
 
             $this->log(sprintf(
                 'Двигатель %s назначен родительским для двигателя %s',

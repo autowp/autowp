@@ -21,6 +21,7 @@ use Exception;
 use NumberFormatter;
 
 use Zend_Db_Expr;
+use Application\VehicleNameFormatter;
 
 class SpecificationsService
 {
@@ -135,9 +136,15 @@ class SpecificationsService
 
     private $translator;
 
-    public function __construct($translator = null)
+    /**
+     * @var VehicleNameFormatter
+     */
+    private $vehicleNameFormatter;
+
+    public function __construct($translator = null, VehicleNameFormatter $vehicleNameFormatter)
     {
         $this->translator = $translator;
+        $this->vehicleNameFormatter = $vehicleNameFormatter;
     }
 
     /**
@@ -1551,9 +1558,14 @@ class SpecificationsService
                 }
             }
 
+            $name = $carParentName;
+            if (!$name) {
+                $name = $this->vehicleNameFormatter->format($car, $language);
+            }
+
             $result[] = [
                 'id'               => $itemId,
-                'name'             => $carParentName ? $carParentName : $car->getFullName($language),
+                'name'             => $name,
                 'beginYear'        => $car->begin_year,
                 'endYear'          => $car->end_year,
                 'produced'         => $car->produced,
