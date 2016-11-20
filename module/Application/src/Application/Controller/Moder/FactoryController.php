@@ -115,7 +115,7 @@ class FactoryController extends AbstractActionController
 
         if ($canEdit) {
             $this->editForm->setAttribute('action', $this->url()->fromRoute(null, [], [], true));
-            
+
             geoPHP::version(); // for autoload classes
 
             $point = null;

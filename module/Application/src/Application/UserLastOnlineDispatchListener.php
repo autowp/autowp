@@ -39,7 +39,7 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
                 $userTable = new Model\DbTable\User();
 
                 $user = $userTable->find($auth->getIdentity())->current();
-                
+
                 if ($user) {
                     $changes = false;
                     $nowExpiresDate = (new DateTime())->sub(new DateInterval('PT1S'));
@@ -57,7 +57,7 @@ class UserLastOnlineDispatchListener extends AbstractListenerAggregate
                             $changes = true;
                         }
                     }
-                    
+
                     if ($changes) {
                         $user->save();
                     }

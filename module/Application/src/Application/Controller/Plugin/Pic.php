@@ -725,7 +725,7 @@ class Pic extends AbstractPlugin
                             ])
                         ];
                     }
-                    
+
                     // factories
                     $factoryTable = new Factory();
                     $factoryRows = $factoryTable->fetchAll(
