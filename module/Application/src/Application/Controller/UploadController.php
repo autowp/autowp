@@ -261,6 +261,7 @@ class UploadController extends AbstractActionController
 
         $tempFilePaths = [];
         $data = $form->get('picture')->getValue();
+
         if ($form->get('picture')->getAttribute('multiple')) {
             foreach ($data as $file) {
                 $tempFilePaths[] = $file['tmp_name'];

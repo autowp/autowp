@@ -2557,6 +2557,8 @@ CREATE TABLE IF NOT EXISTS `spec` (
 CREATE TABLE IF NOT EXISTS `telegram_brand` (
   `brand_id` int(10) UNSIGNED NOT NULL,
   `chat_id` int(11) NOT NULL,
+  `inbox` tinyint(1) NOT NULL DEFAULT '0',
+  `new` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`brand_id`,`chat_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

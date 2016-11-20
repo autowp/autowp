@@ -34,7 +34,7 @@ class Upload extends Form implements InputFilterProviderInterface
                 'name'    => 'picture',
                 'type'    => 'File',
                 'options' => [
-                    'label' => 'upload/image-file',
+                    'label' => 'upload/image-file'
                 ],
                 'attributes' => $attributes
             ],
@@ -132,11 +132,17 @@ class Upload extends Form implements InputFilterProviderInterface
             ]);
         }*/
 
+        $picture = [
+            'required'   => true,
+            'validators' => $validators
+        ];
+
+        if (defined('IS_PHPUNIT')) {
+            $picture['type'] = 'Application\InputFilter\UnitTestFileInput';
+        }
+
         return [
-            'picture' => [
-                'required'   => true,
-                'validators' => $validators,
-            ],
+            'picture' => $picture,
             'note' => [
                 'required' => false,
                 'filters'  => [
