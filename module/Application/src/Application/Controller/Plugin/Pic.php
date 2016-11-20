@@ -499,6 +499,7 @@ class Pic extends AbstractPlugin
         $car = null;
         $vehicleHasSpecs = false;
         $vehicleTwins = [];
+        $vehicleFactories = [];
         $carDetailsUrl = null;
 
         $language = $controller->language();
@@ -721,6 +722,22 @@ class Pic extends AbstractPlugin
                         $vehicleTwins[] = [
                             'url' => $controller->url()->fromRoute('twins/group', [
                                 'id' => $twinsGroup->id
+                            ])
+                        ];
+                    }
+                    
+                    // factories
+                    $factoryTable = new Factory();
+                    $factoryRows = $factoryTable->fetchAll(
+                        $factoryTable->select(true)
+                            ->join('factory_car', 'factory.id = factory_car.factory_id', null)
+                            ->where('factory_car.car_id = ?', $car->id)
+                    );
+                    foreach ($factoryRows as $factoryRow) {
+                        $vehicleFactories[] = [
+                            'name' => $factoryRow->name,
+                            'url'  => $controller->url()->fromRoute('factories/factory', [
+                                'id' => $factoryRow->id
                             ])
                         ];
                     }
@@ -966,6 +983,7 @@ class Pic extends AbstractPlugin
             'categories'        => $categories,
             'vehicleHasSpecs'   => $vehicleHasSpecs,
             'vehicleTwins'      => $vehicleTwins,
+            'vehicleFactories'  => $vehicleFactories,
             'carDetailsUrl'     => $carDetailsUrl,
             'carHtml'           => $carText,
             'carDescription'    => $carDescription,
@@ -1018,8 +1036,8 @@ class Pic extends AbstractPlugin
 
                     foreach ($brands as $brand) {
                         $url = $controller->url()->fromRoute('moder/brands/params', [
-                        'action'   => 'brand',
-                        'brand_id' => $brand['id']
+                            'action'   => 'brand',
+                            'brand_id' => $brand['id']
                         ]);
                         $links[$url] = sprintf(
                             $this->translator->translate('moder/picture/edit-brand-%s'),
@@ -1179,9 +1197,8 @@ class Pic extends AbstractPlugin
 
         // names
         $pictureTable = new Picture();
-        $names = $pictureTable->getNames($rows, [
-            'language'   => $language,
-            'translator' => $this->translator
+        $names = $pictureTable->getNameData($rows, [
+            'language'   => $language
         ]);
 
         // comments
@@ -1234,12 +1251,7 @@ class Pic extends AbstractPlugin
                     }
 
                     $name = isset($names[$id]) ? $names[$id] : null;
-                    // TODO: extract HTML to view script
-                    if (($row['type'] == Picture::VEHICLE_TYPE_ID) && is_array($name)) {
-                        $name = $this->pictureNameFormatter->format($name, $language);
-                    } else {
-                        $name = htmlspecialchars($name); // this->pictureNameFormatter->format($name, $language)
-                    }
+                    $name = $this->pictureNameFormatter->format($name, $language);
 
                     $reuseParams = isset($options['reuseParams']) && $options['reuseParams'];
                     $url = $controller->url()->fromRoute($route, array_replace($options['urlParams'], [

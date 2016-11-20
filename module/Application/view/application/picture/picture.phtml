@@ -203,6 +203,14 @@
                                 false
                             );
                         }
+                        
+                        foreach ($this->vehicleFactories as $factory) {
+                            $list[] = $this->htmlA(
+                                $factory['url'],
+                                '<i class="fa fa-cogs"></i> ' . $this->escapeHtml($factory['name']),
+                                false
+                            );
+                        }
 
                         if ($this->user()->logedIn()) {
                             $list[] = $this->htmlA($this->url('upload/params', [

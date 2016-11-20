@@ -28,11 +28,41 @@ class IndexController extends AbstractActionController
      * @var SpecificationsService
      */
     private $specsService = null;
+    
+    /**
+     * @var CategoryVehicle
+     */
+    private $categoryVehicleTable;
+    
+    /**
+     * @var VehicleParent
+     */
+    private $vehicleParentTable;
 
     public function __construct($cache, SpecificationsService $specsService)
     {
         $this->cache = $cache;
         $this->specsService = $specsService;
+    }
+    
+    /**
+     * @return CategoryVehicle
+     */
+    private function getCategoryVehicleTable()
+    {
+        return $this->categoryVehicleTable
+            ? $this->categoryVehicleTable
+            : $this->categoryVehicleTable = new CategoryVehicle();
+    }
+    
+    /**
+     * @return VehicleParent
+     */
+    private function getVehicleParentTable()
+    {
+        return $this->vehicleParentTable
+            ? $this->vehicleParentTable
+            : $this->vehicleParentTable = new VehicleParent();
     }
 
     private function getOrientedPictureList($car)
@@ -252,7 +282,65 @@ class IndexController extends AbstractActionController
 
         return $brands;
     }
-
+    
+    public function getCategoryPaths($carId, array $options = [])
+    {
+        $carId = (int)$carId;
+        if (! $carId) {
+            throw new Exception("carId not provided");
+        }
+    
+        $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
+    
+        $result = [];
+    
+        $db = $this->getCategoryVehicleTable()->getAdapter();
+    
+        $select = $db->select()
+            ->from('category_car', 'car_id')
+            ->join('category', 'category_car.category_id = category.id', 'catname')
+            ->where('category_car.car_id = ?', $carId);
+    
+        if ($breakOnFirst) {
+            $select->limit(1);
+        }
+    
+        $categoryVehicleRows = $db->fetchAll($select);
+        foreach ($categoryVehicleRows as $categoryVehicleRow) {
+            $result[] = [
+                'category_catname' => $categoryVehicleRow['catname'],
+                'car_id'           => $categoryVehicleRow['car_id'],
+                'path'             => []
+            ];
+        }
+    
+        if ($breakOnFirst && count($result)) {
+            return $result;
+        }
+    
+        $parents = $this->getVehicleParentTable()->fetchAll([
+            'car_id = ?' => $carId
+        ]);
+    
+        foreach ($parents as $parent) {
+            $paths = $this->getCategoryPaths($parent->parent_id, $options);
+    
+            foreach ($paths as $path) {
+                $result[] = [
+                    'category_catname' => $path['category_catname'],
+                    'car_id'           => $path['car_id'],
+                    'path'             => array_merge($path['path'], [$parent->catname])
+                ];
+            }
+    
+            if ($breakOnFirst && count($result)) {
+                return $result;
+            }
+        }
+    
+        return $result;
+    }
+    
     private function carOfDay()
     {
         $language = $this->language();
@@ -269,7 +357,7 @@ class IndexController extends AbstractActionController
             $carTable = $this->catalogue()->getCarTable();
             $carOfDay = $carTable->find($carId)->current();
             if ($carOfDay) {
-                $key = 'CAR_OF_DAY_79_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
+                $key = 'CAR_OF_DAY_82_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
 
                 $carOfDayInfo = $this->cache->getItem($key, $success);
                 if (! $success) {
@@ -308,11 +396,20 @@ class IndexController extends AbstractActionController
                     $paths = $carParentTable->getPaths($carOfDay->id, [
                         'breakOnFirst' => true
                     ]);
+                    
+                    $categoryPath = false;
+                    if (!$paths) {
+                        $categoryPaths = $this->getCategoryPaths($carOfDay->id, [
+                            'breakOnFirst' => true
+                        ]);
+                    }
 
                     $carOfDayPicturesData = [];
                     foreach ($carOfDayPictures as $idx => $row) {
                         if ($row) {
                             $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
+                            
+                            $identity = $row['identity'] ? $row['identity'] : $row['id'];
 
                             $url = null;
                             foreach ($paths as $path) {
@@ -321,8 +418,20 @@ class IndexController extends AbstractActionController
                                     'brand_catname' => $path['brand_catname'],
                                     'car_catname'   => $path['car_catname'],
                                     'path'          => $path['path'],
-                                    'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                                    'picture_id'    => $identity
                                 ]);
+                            }
+                            
+                            if (!$url) {
+                                foreach ($categoryPaths as $path) {
+                                    $url = $this->url()->fromRoute('categories', [
+                                        'action'           => 'category-picture',
+                                        'category_catname' => $path['category_catname'],
+                                        'car_id'           => $path['car_id'],
+                                        'path'             => $path['path'],
+                                        'picture_id'       => $identity
+                                    ]);
+                                }
                             }
 
                             $carOfDayPicturesData[] = [
