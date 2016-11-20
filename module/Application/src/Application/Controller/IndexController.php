@@ -188,15 +188,32 @@ class IndexController extends AbstractActionController
             ];
         }
 
+        $categoryRows = $db->fetchAll(
+            $db->select()
+                ->from('category', ['name', 'catname'])
+                ->join('category_car', 'category.id = category_car.category_id', null)
+                ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
+                ->joinLeft(
+                    'category_language', 
+                    'category.id = category_language.category_id and category_language.language = :language', 
+                    ['lang_name' => 'name']
+                )
+                ->where('car_parent_cache.car_id = :car_id')
+                ->group(['category.id'])
+                ->bind([
+                    'language' => $this->language(),
+                    'car_id'   => $car['id']
+                ])
+        );
 
-        foreach ($car->findManyToManyRowset(Category::class, CategoryVehicle::class) as $category) {
+        foreach ($categoryRows as $category) {
             $items[] = [
                 'icon'  => 'tag',
                 'url'   => $this->url()->fromRoute('categories', [
                     'action'           => 'category',
                     'category_catname' => $category['catname'],
                 ]),
-                'text'  => $category['name']
+                'text'  => $category['lang_name'] ? $category['lang_name'] : $category['name'],
             ];
         }
 

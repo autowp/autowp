@@ -32,7 +32,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
             $unlimitedTraffic = false;
             if ($auth->hasIdentity()) {
                 $userId = $auth->getIdentity();
-                $userTable = new Model\DbTable\User();
+                $userTable = new \Application\Model\DbTable\User();
                 $user = $userTable->find($userId)->current();
 
                 if ($user) {

@@ -7,7 +7,6 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
 use Application\Model\DbTable\Category;
-use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
@@ -168,7 +167,6 @@ class Car extends AbstractPlugin
         $catalogue = $controller->catalogue();
 
         $pictureTable = $this->getPictureTable();
-        $categoryLanguageTable = new CategoryLanguage();
         $carParentTable = new VehicleParent();
         $carParentAdapter = $carParentTable->getAdapter();
         $brandTable = new BrandTable();
