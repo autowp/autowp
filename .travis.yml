@@ -18,10 +18,10 @@ install:
   - printf "\n" | pecl install imagick
   - printf "\n" | pecl install xdebug
 before_script: 
-  - phpenv config-add module/Application/test/ApplicationTest/_files/travis.php.ini
+  - phpenv config-add module/Application/test/_files/travis.php.ini
   - composer install --ignore-platform-reqs
   - mysql -u root -e 'create database autowp_test;'
-  - mysql -u root < module/Application/test/ApplicationTest/_files/dump.sql
+  - mysql -u root < module/Application/test/_files/dump.sql
   - mysql -u root -e 'GRANT ALL PRIVILEGES ON autowp_test.* TO autowp_test@localhost IDENTIFIED BY "test";'
 script: ./vendor/bin/phpunit --coverage-clover ./logs/clover.xml
 
