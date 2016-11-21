@@ -1,10 +1,12 @@
 USE autowp_test;
+SET FOREIGN_KEY_CHECKS = 0;
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `acl_resources`
 --
 
+drop table if exists acl_resources;
 CREATE TABLE IF NOT EXISTS `acl_resources` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
@@ -12,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `acl_resources` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
 
-INSERT INTO `acl_resources` (`id`, `name`) VALUES
+REPLACE INTO `acl_resources` (`id`, `name`) VALUES
 (12, 'attrs'),
 (1, 'brand'),
 (4, 'car'),
@@ -147,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `articles` (
   `catname` varchar(100) NOT NULL,
   `last_editor_id` int(10) UNSIGNED DEFAULT NULL,
   `last_edit_date` timestamp NULL DEFAULT NULL,
-  `add_date` timestamp NOT NULL,
+  `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `author_id` int(10) UNSIGNED DEFAULT NULL,
   `enabled` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `first_enabled_datetime` timestamp NULL DEFAULT NULL,
@@ -295,7 +297,7 @@ CREATE TABLE IF NOT EXISTS `articles_votings_criterias` (
 --
 -- Table structure for table `attrs_attributes`
 --
-
+drop table if exists attrs_attributes;
 CREATE TABLE IF NOT EXISTS `attrs_attributes` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
@@ -314,7 +316,7 @@ CREATE TABLE IF NOT EXISTS `attrs_attributes` (
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=208 DEFAULT CHARSET=utf8;
 
-insert into attrs_attributes (id, name, type_id, parent_id, unit_id, description, `precision`, position, multiple)
+REPLACE into attrs_attributes (id, name, type_id, parent_id, unit_id, description, `precision`, position, multiple)
 values (1, "list", 6, null, null, "", 1, 1, 0);
 
 -- --------------------------------------------------------
@@ -340,7 +342,7 @@ REPLACE INTO `attrs_item_types` (`id`, `name`) VALUES
 --
 -- Table structure for table `attrs_list_options`
 --
-
+drop table if exists attrs_list_options;
 CREATE TABLE IF NOT EXISTS `attrs_list_options` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `attribute_id` int(10) UNSIGNED NOT NULL,
@@ -353,7 +355,7 @@ CREATE TABLE IF NOT EXISTS `attrs_list_options` (
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8;
 
-insert into attrs_list_options (id, attribute_id, name, position, parent_id)
+REPLACE into attrs_list_options (id, attribute_id, name, position, parent_id)
 values (1, 1, "test option", 1, null);
 
 -- --------------------------------------------------------
@@ -407,8 +409,8 @@ CREATE TABLE IF NOT EXISTS `attrs_user_values` (
   `item_id` int(11) UNSIGNED NOT NULL,
   `item_type_id` tinyint(3) UNSIGNED NOT NULL,
   `user_id` int(10) UNSIGNED NOT NULL,
-  `add_date` timestamp NOT NULL,
-  `update_date` timestamp NOT NULL,
+  `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `conflict` tinyint(4) NOT NULL DEFAULT '0',
   `weight` double DEFAULT '0',
   PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`,`user_id`),
@@ -800,7 +802,7 @@ CREATE TABLE IF NOT EXISTS `brands` (
   KEY `text_id` (`text_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1893 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB; (`parent_brand_id`)';
 
-insert into brands (id, folder, caption, position)
+REPLACE into brands (id, folder, caption, position)
 values (1, 'bmw', 'BMW', 0), (2, 'test-brand', 'Test brand', 0);
 
 -- --------------------------------------------------------
@@ -819,7 +821,7 @@ CREATE TABLE IF NOT EXISTS `brands_cars` (
   KEY `car_id` (`car_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB; (`car_id`)';
 
-insert into brands_cars (brand_id, car_id, type, catname)
+REPLACE into brands_cars (brand_id, car_id, type, catname)
 values (1, 1, 0, "first-car"), (1, 2, 0, "second-car");
 
 -- --------------------------------------------------------
@@ -884,7 +886,7 @@ CREATE TABLE IF NOT EXISTS `car_parent_cache` (
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-REPLACE into car_parent_cache (car_id, parent_id, diff, tuning, sport)
+REPLACE into car_parent_cache (car_id, parent_id, diff, tuning, sport, design)
 values (1, 1, 0, 0, 0, 0), (2, 2, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
@@ -1392,7 +1394,7 @@ CREATE TABLE IF NOT EXISTS `image` (
   KEY `image_dir_id` (`dir`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3617343 DEFAULT CHARSET=utf8;
 
-insert into image (id, filepath, filesize, width, height, date_add, dir)
+REPLACE into image (id, filepath, filesize, width, height, date_add, dir)
 values (1, "1.jpg", 242405, 1200, 800, NOW(), "picture"),
 (33, "2.jpg", 242405, 1200, 800, NOW(), "picture"),
 (35, "3.jpg", 242405, 1200, 800, NOW(), "picture"),
@@ -2118,7 +2120,7 @@ CREATE TABLE IF NOT EXISTS `pictures` (
   KEY `copyrights_text_id` (`copyrights_text_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=917309 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB; (`owner_id`)';
 
-insert into pictures (id, car_id, brand_id, width, height, status, ip, owner_id, type, image_id, accept_datetime) 
+REPLACE into pictures (id, car_id, brand_id, width, height, status, ip, owner_id, type, image_id, accept_datetime) 
 values (1, 1, null, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 1, 1, now()), 
 (2, null, 1, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 0, 33, now()),
 (3, null, 1, 1600, 1200, 'accepted', inet6_aton('127.0.0.1'), 1, 3, 35, now()),
@@ -2655,7 +2657,7 @@ CREATE TABLE IF NOT EXISTS `twins_groups` (
   KEY `text_id` (`text_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2020 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 122880 kB';
 
-insert into twins_groups (id, name, add_datetime, text_id)
+REPLACE into twins_groups (id, name, add_datetime, text_id)
 values (1, "test twins", NOW(), null);
 
 -- --------------------------------------------------------
@@ -2671,7 +2673,7 @@ CREATE TABLE IF NOT EXISTS `twins_groups_cars` (
   KEY `car_id` (`car_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 122880 kB; (`twins_group_id`)';
 
-insert into twins_groups_cars (twins_group_id, car_id)
+REPLACE into twins_groups_cars (twins_group_id, car_id)
 values (1, 1);
 
 -- --------------------------------------------------------
@@ -2739,7 +2741,7 @@ CREATE TABLE IF NOT EXISTS `user_password_remind` (
 --
 -- Table structure for table `user_remember`
 --
-
+drop table if exists user_remember;
 CREATE TABLE IF NOT EXISTS `user_remember` (
   `user_id` int(10) UNSIGNED NOT NULL,
   `token` varchar(255) NOT NULL,
@@ -2748,7 +2750,7 @@ CREATE TABLE IF NOT EXISTS `user_remember` (
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-insert into user_remember (user_id, token, date)
+REPLACE into user_remember (user_id, token, date)
 values (3, "admin-token", NOW());
 
 -- --------------------------------------------------------
@@ -3626,4 +3628,5 @@ ALTER TABLE `brand_vehicle_language`
 
 INSERT INTO `brand_vehicle_language` (`brand_id`, `vehicle_id`, `language`, `name`, `is_auto`) VALUES
 (1, 1, 'en', 'BMW 335i', 1);
-  
+
+SET FOREIGN_KEY_CHECKS = 1;  
