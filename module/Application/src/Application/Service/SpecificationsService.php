@@ -286,18 +286,12 @@ class SpecificationsService
         return isset($this->units[$id]) ? $this->units[$id] : null;
     }
 
-    private function zoneIdByCarTypeId($carTypeId)
+    private function zoneIdByCarTypeId(array $ids)
     {
-        switch ($carTypeId) {
-            case 19: // bus
-            case 39:
-            case 28:
-            case 32:
-                $zoneId = 3;
-                break;
+        $zoneId = 1;
 
-            default:
-                $zoneId = 1;
+        if (array_intersect($ids, [19, 39, 28, 32])) {
+            $zoneId = 3;
         }
 
         return $zoneId;
@@ -708,7 +702,10 @@ class SpecificationsService
      */
     public function getCarForm(VehicleRow $car, UserRow $user, array $options, $language)
     {
-        $zoneId = $this->zoneIdByCarTypeId($car->car_type_id);
+        $vtTable = new \Application\Model\VehicleType();
+        $typeIds = $vtTable->getVehicleTypes($car->id);
+
+        $zoneId = $this->zoneIdByCarTypeId($typeIds);
         return [
             'form' => $this->getForm($car->id, $zoneId, $user, $options),
             'data' => $this->getFormData($car->id, $zoneId, $user, $language)
@@ -996,7 +993,10 @@ class SpecificationsService
      */
     public function saveCarAttributes(VehicleRow $car, array $values, UserRow $user)
     {
-        $zoneId = $this->zoneIdByCarTypeId($car->car_type_id);
+        $vtTable = new \Application\Model\VehicleType();
+        $typeIds = $vtTable->getVehicleTypes($car->id);
+
+        $zoneId = $this->zoneIdByCarTypeId($typeIds);
         $zone = $this->getZone($zoneId);
 
         $attributes = $this->getAttributes([
@@ -1482,9 +1482,11 @@ class SpecificationsService
         $result = [];
         $attributes = [];
 
+        $vtTable = new \Application\Model\VehicleType();
         $zoneIds = [];
         foreach ($cars as $car) {
-            $zoneId = $this->zoneIdByCarTypeId($car->car_type_id);
+            $typeIds = $vtTable->getVehicleTypes($car->id);
+            $zoneId = $this->zoneIdByCarTypeId($typeIds);
 
             $zoneIds[$zoneId] = true;
         }
@@ -1534,8 +1536,6 @@ class SpecificationsService
         foreach ($cars as $car) {
             $itemId = (int)$car->id;
 
-            $carType = $carTypeTable->find($car->car_type_id)->current();
-
             //$values = $this->loadValues($attributes, $itemId, self::ITEM_TYPE_CAR);
             $values = isset($actualValues[$itemId]) ? $actualValues[$itemId] : [];
 
@@ -1572,7 +1572,7 @@ class SpecificationsService
                 'produced_exactly' => $car->produced_exactly,
                 'topPicture'       => $this->specPicture($car, $topPerspectives),
                 'bottomPicture'    => $this->specPicture($car, $bottomPerspectives),
-                'carType'          => $carType ? $carType->name : null,
+                'carType'          => null,
                 'values'           => $values
             ];
         }

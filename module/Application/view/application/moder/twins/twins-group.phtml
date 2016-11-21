@@ -77,7 +77,7 @@
                         <?=$this->htmlA($this->url('moder/cars/params', [
                             'action' => 'car',
                             'car_id' => $car->id
-                        ]), $car->getFullName($this->language())) ?>
+                        ]), $this->car()->htmlTitle($car->getNameData($this->language())), false) ?>
                     </li>
                 <?php } ?>
             </ul>

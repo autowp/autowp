@@ -8,7 +8,7 @@
         'pageId' => 78,
         'args'   => [
             'CAR_ID'   => $this->car->id,
-            'CAR_NAME' => $this->car->getFullName($this->language())
+            'CAR_NAME' => $this->car()->textTitle($this->car->getNameData($this->language()))
         ]
     ]);
 
@@ -33,7 +33,7 @@
                     <li class="parent">
                         <?=$this->htmlA($this->url([
                             'car_id' => $car->id
-                        ]), $car->getFullName($this->language()))?>
+                        ]), $this->car()->htmlTitle($car->getNameData($this->language())), false)?>
                         <?=$this->htmlA($this->url([
                             'action' => 'car',
                             'car_id' => $car->id
@@ -49,7 +49,7 @@
                     <ul><li>
                         <strong><?=$this->htmlA($this->url([
                             'car_id' => $this->car->id
-                        ]), $this->car->getFullName($this->language()))?></strong>
+                        ]), $this->car()->htmlTitle($this->car->getNameData($this->language())), false)?></strong>
                         <?=$this->htmlA($this->url([
                             'action' => 'car',
                             'car_id' => $this->car->id
@@ -83,7 +83,7 @@
                 <button type="submit" class="btn btn-default">Refresh cache</button>
             </form>
             <div>
-                <p>Добавить <?=$this->escapeHtmlAttr($this->car->getFullName($this->language()))?> в</p>
+                <p>Добавить <?=$this->car()->htmlTitle($this->car->getNameData($this->language()))?> в</p>
                 <?=$this->formText('name', '', [
                     'id'           => 'add-parent-search',
                     'class'        => 'form-control',

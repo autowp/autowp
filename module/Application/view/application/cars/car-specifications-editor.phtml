@@ -6,7 +6,7 @@
         ],
         'pageId' => 102,
         'args'   => [
-            'CAR_NAME' => $this->car->getFullName($this->language())
+            'CAR_NAME' => $this->car()->textTitle($this->car->getNameData($this->language()))
         ]
     ]);
 
@@ -22,7 +22,7 @@
             ]))?>">
                 <i class="fa fa-cog"></i>
                 <?=$this->escapeHtml($this->translate('moder/edit-object'))?>
-                <?=$this->escapeHtml($this->car->getFullName($this->language()))?>
+                <?=$this->car()->htmlTitle($this->car->getNameData($this->language()))?>
             </a>
         </li>
     <?php } ?>

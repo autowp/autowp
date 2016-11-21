@@ -1,24 +1,26 @@
 <?php
 
-namespace ApplicationTest\Controller;
+namespace ApplicationTest\Fronend\Controller;
 
+use Zend\Http\Request;
+use Zend\Json\Json;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 use Application\Controller\CatalogueController;
-use Zend\Json\Json;
+
 
 class CatalogueControllerTest extends AbstractHttpControllerTestCase
 {
     public function setUp()
     {
-        $this->setApplicationConfig(include __DIR__ . '/../_files/application.config.php');
+        $this->setApplicationConfig(include __DIR__ . '/../../_files/application.config.php');
 
         parent::setUp();
     }
 
     public function testBrand()
     {
-        $this->dispatch('https://www.autowp.ru/bmw', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -31,7 +33,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testCars()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/cars', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/cars', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -44,7 +46,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testRecent()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/recent', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/recent', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -57,7 +59,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testConcepts()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/concepts', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/concepts', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -70,7 +72,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testOther()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/other', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/other', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -83,7 +85,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testMixed()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/mixed', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/mixed', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -96,7 +98,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testLogotypes()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/logotypes', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/logotypes', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -109,7 +111,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testOtherPicture()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/other/2/', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/other/2/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -122,7 +124,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testMixedPicture()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/mixed/3/', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/mixed/3/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -135,7 +137,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testLogotypesPicture()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/logotypes/4/', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/logotypes/4/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -148,7 +150,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testOtherGallery()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/other/gallery/', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/other/gallery/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -167,7 +169,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testMixedGallery()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/mixed/gallery/', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/mixed/gallery/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -186,7 +188,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testLogotypesGallery()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/logotypes/gallery/', 'GET');
+        $this->dispatch('https://www.autowp.ru/bmw/logotypes/gallery/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -201,5 +203,17 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertArrayHasKey('pages', $data);
         $this->assertArrayHasKey('count', $data);
         $this->assertArrayHasKey('items', $data);
+    }
+
+    public function testVehiclePicture()
+    {
+        $this->dispatch('https://www.autowp.ru/bmw/first-car/pictures/1', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand-car-picture');
+
     }
 }

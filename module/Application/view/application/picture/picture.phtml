@@ -116,7 +116,7 @@
                 <li>
                     <span class="fa fa-map-pin"></span>
                     <?=$this->htmlA(
-                        'https://www.openstreetmap.org/?mlat='.$this->point->y().'&mlon='.$this->point->x().'#map=6/'.$this->point->y().'/'.$this->point->x(), 
+                        'https://www.openstreetmap.org/?mlat='.$this->point->y().'&mlon='.$this->point->x().'#map=6/'.$this->point->y().'/'.$this->point->x(),
                         $this->translate('picture/location')
                     )?>
                 </li>
@@ -176,12 +176,11 @@
                                     'car_catname'   => $path['car_catname'],
                                     'path'          => $path['path']
                                 ]);
-
-                                $name = $car->getFullName($this->language());
+                                $name = $this->car()->htmlTitle($car->getNameData($this->language()));
                                 $list[] = $this->htmlA(
                                     $url,
                                     '<i class="fa fa-list-alt"></i> ' .
-                                    $this->escapeHtml(sprintf($this->translate('catalogue/specifications-of-%1$s'), $name)),
+                                    sprintf($this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')), $name),
                                     false
                                 );
 
@@ -203,7 +202,7 @@
                                 false
                             );
                         }
-                        
+
                         foreach ($this->vehicleFactories as $factory) {
                             $list[] = $this->htmlA(
                                 $factory['url'],

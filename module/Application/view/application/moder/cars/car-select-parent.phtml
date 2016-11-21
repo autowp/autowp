@@ -8,7 +8,7 @@
         'pageId' => 145,
         'args'   => [
             'CAR_ID'   => $this->car->id,
-            'CAR_NAME' => $this->car->getFullName($this->language())
+            'CAR_NAME' => $this->car()->textTitle($this->car->getNameData($this->language()))
         ]
     ]);
 

@@ -157,7 +157,7 @@
                                 <?=$this->htmlA($this->url('moder/cars/params', [
                                     'action'     => 'car',
                                     'car_id'     => $car->id
-                                ]), $car->getFullName($this->language())) ?>
+                                ]), $this->car()->htmlTitle($car->getNameData($this->language())), false) ?>
                             <?php } else { ?>
                                 <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
                             <?php } ?>
@@ -249,15 +249,21 @@
             ?>
             <?php if ($this->canMove) { ?>
                 <?php if ($this->lastCar) { ?>
-                    <p><?=$this->htmlA([
-                        'class' => 'btn btn-default',
-                        'href'  => $this->url(null, [
-                            'action'     => 'move',
-                            'picture_id' => $this->picture->id,
-                            'type'       => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
-                            'car_id'     => $this->lastCar->id
-                        ])
-                    ], '<i class="fa fa-arrow-right"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' . $this->escapeHtml($this->lastCar->getFullName($this->language())), false) ?></p>
+                    <p><?=$this->htmlA(
+                        [
+                            'class' => 'btn btn-default',
+                            'href'  => $this->url(null, [
+                                'action'     => 'move',
+                                'picture_id' => $this->picture->id,
+                                'type'       => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
+                                'car_id'     => $this->lastCar->id
+                            ])
+                        ],
+                        '<i class="fa fa-arrow-right"></i> ' .
+                        $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' .
+                        $this->car()->htmlTitle($this->lastCar->getNameData($this->language())),
+                        false
+                    ) ?></p>
                 <?php } ?>
                 <?php foreach ($this->relatedBrands as $brand) { ?>
                     <p><?=$this->htmlA([

@@ -164,11 +164,6 @@ class Row extends \Application\Db\Table\Row
         ];
     }
 
-    public function getFullName($language)
-    {
-        return self::buildFullName($this->getNameData($language));
-    }
-
     public function getYearsString()
     {
         return self::buildYearsString([
@@ -176,80 +171,6 @@ class Row extends \Application\Db\Table\Row
             'end_year'   => $this->end_year,
             'today'      => $this->today
         ]);
-    }
-
-    public function getCaptionHtml()
-    {
-        $result = htmlspecialchars($this->caption);
-
-        if (strlen($this->body) > 0) {
-            $result .= ' ('.htmlspecialchars($this->body).')';
-        }
-
-        $by = $this->begin_year;
-        $bm = $this->begin_month;
-        $ey = $this->end_year;
-        $em = $this->end_month;
-        $cy = (int)date('Y');
-
-        $bs = (int)($by / 100);
-        $es = (int)($ey / 100);
-
-        $equalS = $bs && $es && ($bs == $es);
-        $equalY = $equalS && $by && $ey && ($by == $ey);
-        $equalM = $equalY && $bm && $em && ($bm == $em);
-
-
-        if ($by > 0 || $ey > 0) {
-            $result .= " '";
-
-            if ($equalM) {
-                $result .= sprintf('<span class="month">%02d.</span>', $bm).$by;
-            } else {
-                if ($equalY) {
-                    if ($bm && $em) {
-                        $result .= '<span class="month">' .
-                                       ($bm ? sprintf('%02d', $bm) : '??') .
-                                       '–' .
-                                       ($em ? sprintf('%02d', $em) : '??').
-                                   '.</span>' . $by;
-                    } else {
-                        $result .= $by;
-                    }
-                } else {
-                    if ($equalS) {
-                        $result .= (($bm ? sprintf('<span class="month">%02d.</span>', $bm) : '').$by).
-                            '–'.
-                            (
-                                $em
-                                    ? sprintf('<span class="month">%02d.</span>', $em)
-                                    : ''
-                            ) . (
-                                $em
-                                    ? $ey
-                                    : sprintf('%02d', $ey % 100)
-                            );
-                    } else {
-                        $result .= (($bm ? sprintf('<span class="month">%02d.</span>', $bm) : '').($by ? $by : '????')).
-                           (
-                             $ey
-                             ?
-                               '–'.($em ? sprintf('<span class="month">%02d.</span>', $em) : '').$ey
-                             :
-                               (
-                                 $this->today
-                                 ?
-                                   ($by < $cy ? '–н.в.' : '')
-                                 :
-                                   ($by < $cy ? '–????' : '')
-                               )
-                                 );
-                    }
-                }
-            }
-        }
-
-        return $result;
     }
 
     public function getOrientedPictureList(array $perspectiveGroupIds)
@@ -342,32 +263,6 @@ class Row extends \Application\Db\Table\Row
         $db->query($sql, [$brand->id, $this->id]);
 
         $brand->refreshPicturesCount();
-    }
-
-    public function getAttrsZone()
-    {
-        $id = 1;
-        switch ($this->car_type_id) {
-            case 19:
-            case 28:
-            case 32:
-                $id = 3;
-                break;
-            case 17:
-                $id = 2;
-                break;
-        }
-        $zones = new Attr\Zone();
-        return $zones->find($id)->current();
-    }
-
-    public function getEquipesIds()
-    {
-        $result = [];
-        foreach ($this->findEquipes() as $equipe) {
-            $result[] = $equipe->id;
-        }
-        return $result;
     }
 
     public function updateOrderCache()

@@ -91,7 +91,7 @@
                     'form' => $this->descriptionForm
                 ])?>
             <?php } else { ?>
-                <?=$this->markup($this->description)?>
+                <?=$this->markdown($this->description)?>
             <?php } ?>
             <?php if ($this->brand->text_id) { ?>
                 <p>
@@ -136,7 +136,7 @@
                                     'action'     => 'item',
                                     'brand_id'   => $this->brand->id,
                                     'vehicle_id' => $car->id
-                                ]), $car->getFullName($this->language())) ?>
+                                ]), $this->car()->htmlTitle($car->getNameData($this->language())), false) ?>
                             </p>
                         <?php } ?>
                     </div>
@@ -223,11 +223,11 @@
                                     <th><?=$this->escapeHtml($this->translate('moder/brands/links/address'))?></th>
                                     <th><?=$this->escapeHtml($this->translate('moder/brands/links/type'))?></th>
                                 </tr>
-                                <?php foreach ($this->brand->findLinks() as $link) { ?>
+                                <?php foreach ($this->links as $link) { ?>
                                     <tr>
-                                        <td><?=$this->escapeHtml($link->caption)?></td>
-                                        <td><?=$this->escapeHtml($link->url)?></td>
-                                        <td><?=$this->escapeHtml($link->type)?></td>
+                                        <td><?=$this->escapeHtml($link['caption'])?></td>
+                                        <td><?=$this->escapeHtml($link['url'])?></td>
+                                        <td><?=$this->escapeHtml($link['type'])?></td>
                                     </tr>
                                 <?php } ?>
                             </tbody></table>

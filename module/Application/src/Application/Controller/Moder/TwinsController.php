@@ -77,7 +77,7 @@ class TwinsController extends AbstractActionController
         }
 
         $table = new TwinsGroup();
-        $group = $table->find($this->params('twins_group_id'))->current();
+        $group = $table->find((int)$this->params('twins_group_id'))->current();
         if (! $group) {
             return $this->notFoundAction();
         }

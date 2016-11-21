@@ -48,7 +48,8 @@ CREATE TABLE IF NOT EXISTS `acl_resources_privileges` (
 ) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8;
 
 replace into acl_resources_privileges (id, resource_id, name)
-values (1, 4, "edit_meta"), (2, 11, "edit"), (3, 13, "ban");
+values (1, 4, "edit_meta"), (2, 11, "edit"), (3, 13, "ban"), (4, 4, "add"), 
+(5, 4, "move"), (6, 21, "edit"), (7, 17, "edit");
 
 -- --------------------------------------------------------
 
@@ -97,10 +98,12 @@ CREATE TABLE IF NOT EXISTS `acl_roles_parents` (
   KEY `parent_role_id` (`parent_role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `acl_roles_parents` (`role_id`, `parent_role_id`) VALUES
+REPLACE INTO `acl_roles_parents` (`role_id`, `parent_role_id`) VALUES
 (5, 14),
 (10, 14),
-(5, 10);
+(5, 10),
+(5, 58),
+(14, 6);
 
 -- --------------------------------------------------------
 
@@ -116,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `acl_roles_privileges_allowed` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 replace into acl_roles_privileges_allowed (role_id, privilege_id)
-values (10, 1), (10, 2), (10, 3);
+values (10, 1), (10, 2), (10, 3), (10, 4), (10, 5), (58, 6), (6, 7);
 
 -- --------------------------------------------------------
 
@@ -327,6 +330,11 @@ CREATE TABLE IF NOT EXISTS `attrs_item_types` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
+REPLACE INTO `attrs_item_types` (`id`, `name`) VALUES
+(1, 'Автомобиль'),
+(3, 'Двигатель'),
+(2, 'Модификация автомобиля');
+
 -- --------------------------------------------------------
 
 --
@@ -410,6 +418,9 @@ CREATE TABLE IF NOT EXISTS `attrs_user_values` (
   KEY `update_date` (`update_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 19456 kB; (`attribute_id`)';
 
+replace into attrs_user_values (attribute_id, item_id, item_type_id, user_id, add_date, update_date, conflict, weight)
+values (1, 1, 1, 1, NOW(), NOW(), 0, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -465,6 +476,9 @@ CREATE TABLE IF NOT EXISTS `attrs_user_values_list` (
   KEY `FK_attrs_user_values_list_attrs_list_options_id` (`value`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+replace into attrs_user_values_list (attribute_id, item_id, item_type_id, value, user_id, ordering)
+values (1, 1, 1, 1, 1, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -518,6 +532,9 @@ CREATE TABLE IF NOT EXISTS `attrs_values` (
   KEY `item_type_id` (`item_type_id`,`item_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+replace into attrs_values (attribute_id, item_id, item_type_id, update_date, conflict)
+values (1, 1, 1, NOW(), 0);
+
 -- --------------------------------------------------------
 
 --
@@ -567,6 +584,9 @@ CREATE TABLE IF NOT EXISTS `attrs_values_list` (
   KEY `FK_attrs_values_list_attrs_item_types_id` (`item_type_id`),
   KEY `FK_attrs_values_list_attrs_list_options_id` (`value`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+replace into attrs_values_list (attribute_id, item_id, item_type_id, value, ordering)
+values (1, 1, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -628,6 +648,13 @@ CREATE TABLE IF NOT EXISTS `attrs_zones` (
   UNIQUE KEY `name` (`name`,`item_type_id`),
   KEY `item_type_id` (`item_type_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+
+INSERT INTO `attrs_zones` (`id`, `name`, `item_type_id`) VALUES
+(3, 'Автобусы', 1),
+(2, 'Грузовые автомобили', 1),
+(5, 'Двигатели', 3),
+(1, 'Легковые автомобили', 1),
+(4, 'Модификации', 2);
 
 -- --------------------------------------------------------
 
@@ -852,12 +879,13 @@ CREATE TABLE IF NOT EXISTS `car_parent_cache` (
   `diff` int(11) NOT NULL DEFAULT '0',
   `tuning` tinyint(4) NOT NULL DEFAULT '0',
   `sport` tinyint(4) NOT NULL DEFAULT '0',
+  `design` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`car_id`,`parent_id`),
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-insert into car_parent_cache (car_id, parent_id, diff, tuning, sport)
-values (1, 1, 0, 0, 0), (2, 2, 0, 0, 0);
+REPLACE into car_parent_cache (car_id, parent_id, diff, tuning, sport)
+values (1, 1, 0, 0, 0, 0), (2, 2, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -925,7 +953,6 @@ CREATE TABLE IF NOT EXISTS `cars` (
   `produced_exactly` tinyint(3) UNSIGNED NOT NULL,
   `is_concept` tinyint(4) UNSIGNED NOT NULL DEFAULT '0',
   `pictures_count` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `description` mediumtext NOT NULL COMMENT 'РљСЂР°С‚РєРѕРµ РѕРїРёСЃР°РЅРёРµ',
   `today` tinyint(3) UNSIGNED DEFAULT NULL,
   `add_datetime` timestamp NULL DEFAULT NULL COMMENT 'Р”Р°С‚Р° СЃРѕР·РґР°РЅРёСЏ Р·Р°РїРёСЃРё',
   `begin_month` tinyint(3) UNSIGNED DEFAULT NULL,
@@ -952,9 +979,9 @@ CREATE TABLE IF NOT EXISTS `cars` (
   KEY `full_text_id` (`full_text_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=99781 AVG_ROW_LENGTH=152 DEFAULT CHARSET=utf8;
 
-insert into cars (id, caption, body, produced_exactly, description, begin_year, is_concept)
-values (1, 'test car', '', 0, '', 1999, 0),
-(2, 'test concept car', '', 0, '', 1999, 1);
+REPLACE into cars (id, caption, body, produced_exactly, begin_year, is_concept, engine_id)
+values (1, 'test car', '', 0, 1999, 0, 1),
+(2, 'test concept car', '', 0, 1999, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -1207,6 +1234,9 @@ CREATE TABLE IF NOT EXISTS `engines` (
   KEY `last_editor_id` (`last_editor_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1748 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 124928 kB; (`brand_id`)';
 
+REPLACE INTO engines (id, parent_id, caption, owner_id, last_editor_id)
+VALUES (1, null, "Test engine", 1, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -1216,18 +1246,18 @@ CREATE TABLE IF NOT EXISTS `engines` (
 CREATE TABLE IF NOT EXISTS `factory` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `_lat` double DEFAULT NULL,
-  `_lng` double DEFAULT NULL,
   `year_from` smallint(5) UNSIGNED DEFAULT NULL,
   `year_to` smallint(5) UNSIGNED DEFAULT NULL,
   `point` point DEFAULT NULL,
-  `_description` text,
   `text_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `text_id` (`text_id`),
   KEY `point` (`point`)
 ) ;
+
+REPLACE INTO factory (id, name, year_from, year_to, point, text_id)
+VALUES (1, "Test factory", 1999, 2005, null, null);
 
 -- --------------------------------------------------------
 
@@ -1241,6 +1271,9 @@ CREATE TABLE IF NOT EXISTS `factory_car` (
   PRIMARY KEY (`factory_id`,`car_id`),
   KEY `car_id` (`car_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+REPLACE INTO factory_car (factory_id, car_id)
+VALUES (1, 1);
 
 -- --------------------------------------------------------
 

@@ -1138,23 +1138,12 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $brand = null;
-
-
         $brands = $this->getBrandTable();
-        $brand = $brands->find($this->params('brand_id'))->current();
-        if ($brand) {
-            return $this->forward()->dispatch(self::class, [
-                'action'   => 'add-car-to-brand',
-                'car_id'   => $car->id,
-                'brand_id' => $brand->id
-            ]);
-        }
 
         return [
             'brands' => $brands->fetchAll(
-                $brands->select()
-                ->order(['brands.position', 'brands.caption'])
+                $brands->select(true)
+                    ->order(['brands.position', 'brands.caption'])
             ),
             'car' => $car
         ];

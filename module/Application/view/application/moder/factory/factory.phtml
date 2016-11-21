@@ -49,7 +49,7 @@
                     'form' => $this->descriptionForm
                 ])?>
             <?php } else { ?>
-                <?=$this->markup($this->description)?>
+                <?=$this->markdown($this->description)?>
             <?php } ?>
             <?php if ($this->factory->text_id) { ?>
                 <p>
@@ -71,7 +71,7 @@
                 <?=$this->htmlA($this->url('moder/cars/params', [
                     'action' => 'car',
                     'car_id' => $car->id
-                ]), $car->getFullName($this->language())) ?><br />
+                ]), $this->car()->htmlTitle($car->getNameData($this->language())), false) ?><br />
             <?php } ?>
         </div>
     </div>

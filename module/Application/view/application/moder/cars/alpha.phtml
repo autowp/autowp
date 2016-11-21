@@ -28,7 +28,7 @@
             <?=$this->htmlA($this->url('moder/cars/params', [
                 'action' => 'car',
                 'car_id' => $car->id
-            ], [], true), $car->getFullName($this->language())) ?>
+            ], [], true), $this->car()->htmlTitle($car->getNameData($this->language())), false) ?>
             <br />
         <?php } ?>
     </div>
