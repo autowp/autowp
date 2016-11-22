@@ -395,6 +395,7 @@ return [
     'perspective/boot'           => 'багажник',
     'perspective/logo'           => 'логотип',
     'perspective/mascot'         => 'маскот',
+    'perspective/sketch'         => 'эскиз',
 
     'login/sign-in' => 'Вход',
     'login/sign-out' => 'Выход',

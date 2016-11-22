@@ -80,7 +80,7 @@ class Picture extends Table
         ],
     ];
 
-    private $prefixedPerspectives = [5, 6, 17, 20, 21, 22, 23];
+    private $prefixedPerspectives = [5, 6, 17, 20, 21, 22, 23, 24];
 
     /**
      * @var Image\Storage

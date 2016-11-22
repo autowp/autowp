@@ -367,6 +367,7 @@ return [
     'perspective/boot'           => '后备箱',
     'perspective/logo'           => '商标',
     'perspective/mascot'         => '立标',
+    'perspective/sketch'         => 'sketch',
 
     'login/sign-in' => '登录',
     'login/sign-out' => '注销',
