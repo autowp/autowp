@@ -17,7 +17,7 @@ class PicturesControllerTest extends AbstractHttpControllerTestCase
         parent::setUp();
     }
 
-    public function testIndex()
+    public function testIndexForbidden()
     {
         $this->dispatch('https://www.autowp.ru/moder/pictures', Request::METHOD_GET);
 
@@ -38,5 +38,17 @@ class PicturesControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(PicturesController::class);
         $this->assertMatchedRouteName('moder/pictures/params');
         $this->assertActionName('picture');
+    }
+
+    public function testIndex()
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/moder/pictures', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(PicturesController::class);
+        $this->assertMatchedRouteName('moder/pictures');
+        $this->assertActionName('index');
     }
 }
