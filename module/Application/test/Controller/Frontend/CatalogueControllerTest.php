@@ -8,7 +8,6 @@ use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 use Application\Controller\CatalogueController;
 
-
 class CatalogueControllerTest extends AbstractHttpControllerTestCase
 {
     public function setUp()
@@ -214,6 +213,5 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(CatalogueController::class);
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('brand-car-picture');
-
     }
 }

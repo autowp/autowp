@@ -141,8 +141,10 @@ class SpecificationsService
      */
     private $vehicleNameFormatter;
 
-    public function __construct($translator = null, VehicleNameFormatter $vehicleNameFormatter)
-    {
+    public function __construct(
+        $translator,
+        VehicleNameFormatter $vehicleNameFormatter
+    ) {
         $this->translator = $translator;
         $this->vehicleNameFormatter = $vehicleNameFormatter;
     }
@@ -1559,7 +1561,7 @@ class SpecificationsService
             }
 
             $name = $carParentName;
-            if (!$name) {
+            if (! $name) {
                 $name = $this->vehicleNameFormatter->format($car, $language);
             }
 

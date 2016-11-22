@@ -29,7 +29,7 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
         $headers = $this->getResponse()->getHeaders();
         $uri = $headers->get('Location')->uri();
         $parts = explode('/', $uri->getPath());
-        $carId = $parts[count($parts)-1];
+        $carId = $parts[count($parts) - 1];
 
         // add to brand
         $this->reset();

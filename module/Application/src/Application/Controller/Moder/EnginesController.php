@@ -44,8 +44,9 @@ class EnginesController extends AbstractActionController
     public function __construct(
         Form $filterForm,
         Form $editForm,
-        SpecificationsService $specificationsService)
-    {
+        SpecificationsService $specificationsService
+    ) {
+
         $this->filterForm = $filterForm;
         $this->editForm = $editForm;
         $this->specificationsService = $specificationsService;
