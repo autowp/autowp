@@ -2,15 +2,16 @@
 
 namespace Application;
 
+use Zend\Cache\Storage\StorageInterface;
+use Zend\Router\Http\TreeRouteStack;
+
+use Autowp\User\Model\DbTable\User\Row as UserRow;
+
 use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Page;
-use Application\Model\DbTable\User\Row as UserRow;
 use Application\Model\Message;
 use Application\Language;
-
-use Zend\Cache\Storage\StorageInterface;
-use Zend\Router\Http\TreeRouteStack;
 
 class MainMenu
 {

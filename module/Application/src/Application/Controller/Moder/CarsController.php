@@ -401,12 +401,12 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @param DbTable\User\Row $user
+     * @param \Autowp\User\Model\DbTable\User\Row $user
      * @param bool $full
      * @param \Zend\Uri\Uri $uri
      * @return string
      */
-    private function userModerUrl(DbTable\User\Row $user, $full = false, $uri = null)
+    private function userModerUrl(\Autowp\User\Model\DbTable\User\Row $user, $full = false, $uri = null)
     {
         return $this->url()->fromRoute('users/user', [
             'user_id' => $user->identity ? $user->identity : 'user' . $user->id
@@ -568,7 +568,7 @@ class CarsController extends AbstractActionController
                 if ($car->full_text_id) {
                     $userIds = $this->textStorage->getTextUserIds($car->full_text_id);
 
-                    $userTable = new DbTable\User();
+                    $userTable = new \Autowp\User\Model\DbTable\User();
                     foreach ($userIds as $userId) {
                         if ($userId != $user->id) {
                             foreach ($userTable->find($userId) as $userRow) {
@@ -831,7 +831,7 @@ class CarsController extends AbstractActionController
                     if ($car->text_id) {
                         $userIds = $this->textStorage->getTextUserIds($car->text_id);
 
-                        $userTable = new DbTable\User();
+                        $userTable = new \Autowp\User\Model\DbTable\User();
                         foreach ($userIds as $userId) {
                             if ($userId != $user->id) {
                                 foreach ($userTable->find($userId) as $userRow) {
@@ -1605,7 +1605,7 @@ class CarsController extends AbstractActionController
                 if ($oldCategory) {
                     $deletedNames[] = $oldCategory->name;
 
-                    if ($oldUser = $oldCc->findParentRow(DbTable\User::class)) {
+                    if ($oldUser = $oldCc->findParentRow(\Autowp\User\Model\DbTable\User::class)) {
                         $user = $this->user()->get();
                         if ($oldUser->id != $user->id) {
                             $notify[$oldUser->id][] = $oldCategory;
@@ -1626,7 +1626,7 @@ class CarsController extends AbstractActionController
                     $this->log(htmlspecialchars($logText), $car);
             }
 
-            $users = new DbTable\User();
+            $users = new \Autowp\User\Model\DbTable\User();
             foreach ($notify as $userId => $categories) {
                 $notifyUser = $users->find($userId)->current();
                 if (count($categories) && $notifyUser) {
@@ -1680,7 +1680,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $users = new DbTable\User();
+        $users = new \Autowp\User\Model\DbTable\User();
 
 
         $canEditMeta = $this->canEditMeta($car);

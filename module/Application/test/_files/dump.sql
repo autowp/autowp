@@ -2826,13 +2826,13 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `last_ip` (`last_ip`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25161 AVG_ROW_LENGTH=227 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 124928 kB; (`group_id`)';
 
-INSERT INTO users (id, name, last_online, role, last_ip)
-values (1, 'tester', now(), 'user', inet6_aton('127.0.0.1'));
+REPLACE INTO users (id, login, password, e_mail, name, last_online, role, last_ip)
+values (1, 'test', '26cc2d23a03a8f07ed1e3d000a244636', 'test@example.com', 'tester', now(), 'user', inet6_aton('127.0.0.1'));
 
-INSERT INTO users (id, name, last_online, role, last_ip, identity)
+REPLACE INTO users (id, name, last_online, role, last_ip, identity)
 values (2, 'tester2', now(), 'user', inet6_aton('127.0.0.1'), 'identity');
 
-INSERT INTO users (id, name, last_online, role, last_ip, identity)
+REPLACE INTO users (id, name, last_online, role, last_ip, identity)
 values (3, 'admin', now(), 'admin', inet6_aton('127.0.0.1'), 'admin');
 
 -- --------------------------------------------------------

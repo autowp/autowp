@@ -20,6 +20,7 @@ return [
         'Zend\\Router',
         'Zend\\Session',
         'Zend\\Validator',
+        'Autowp\\User',
         'Autowp\\Image',
         'Autowp\\TextStorage',
         'Autowp\\Traffic',

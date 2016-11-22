@@ -5,11 +5,12 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\HostManager;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;

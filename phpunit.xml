@@ -12,11 +12,15 @@
         <testsuite name="traffic">
             <directory>./module/Traffic/test</directory>
         </testsuite>
+        <testsuite name="user">
+            <directory>./module/User/test</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./module/Application/src</directory>
             <directory suffix=".php">./module/Traffic/src</directory>
+            <directory suffix=".php">./module/User/src</directory>
             <exclude>
                 <directory suffix=".php">./vendor</directory>
             </exclude>

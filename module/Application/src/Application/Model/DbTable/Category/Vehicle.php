@@ -21,7 +21,7 @@ class Vehicle extends Zend_Db_Table
         ],
         'User' => [
             'columns'       => ['user_id'],
-            'refTableClass' => \Application\Model\DbTable\User::class,
+            'refTableClass' => \Autowp\User\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ]
     ];

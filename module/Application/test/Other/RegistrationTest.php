@@ -2,7 +2,7 @@
 
 namespace ApplicationTest\Other;
 
-use Application\Model\DbTable\User\Row as UserRow;
+use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Zend\Test\PHPUnit\Controller\AbstractControllerTestCase;
 

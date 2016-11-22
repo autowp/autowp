@@ -4,13 +4,14 @@ namespace Application\Service;
 
 use Zend\Mail;
 
-use Application\Auth\Adapter\Login as LoginAuthAdapter;
+use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
+use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
+use Autowp\User\Model\DbTable\User\Remember as UserRemember;
+use Autowp\User\Model\DbTable\User\Row as UserRow;
+
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User;
-use Application\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
-use Application\Model\DbTable\User\Remember as UserRemember;
-use Application\Model\DbTable\User\Row as UserRow;
 use Application\Service\SpecificationsService;
 
 use DateTime;

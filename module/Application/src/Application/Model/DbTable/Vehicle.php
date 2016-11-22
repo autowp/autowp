@@ -2,6 +2,8 @@
 
 namespace Application\Model\DbTable;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\Db\Table;
 
 class Vehicle extends Table

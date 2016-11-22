@@ -4,6 +4,8 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\CarOfDay;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Category;
@@ -12,7 +14,6 @@ use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Twins;

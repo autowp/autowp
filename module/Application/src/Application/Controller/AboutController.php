@@ -5,9 +5,10 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Permissions\Acl\Acl;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle;
 
 class AboutController extends AbstractActionController

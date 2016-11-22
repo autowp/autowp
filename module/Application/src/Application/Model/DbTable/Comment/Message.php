@@ -23,12 +23,12 @@ class Message extends Zend_Db_Table
     protected $_referenceMap = [
         'Author' => [
             'columns'       => ['author_id'],
-            'refTableClass' => \Application\Model\DbTable\User::class,
+            'refTableClass' => \Autowp\User\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ],
         'DeletedBy' => [
             'columns'       => ['deleted_by'],
-            'refTableClass' => \Application\Model\DbTable\User::class,
+            'refTableClass' => \Autowp\User\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ]
     ];

@@ -116,7 +116,7 @@ class LanguageRouteListener extends AbstractListenerAggregate
         $auth = new AuthenticationService();
 
         if ($auth->hasIdentity()) {
-            $userTable = new Model\DbTable\User();
+            $userTable = new \Autowp\User\Model\DbTable\User();
 
             $user = $userTable->find($auth->getIdentity())->current();
 

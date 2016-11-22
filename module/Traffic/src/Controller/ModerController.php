@@ -6,8 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
 use Autowp\Traffic\TrafficControl;
-
-use Application\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User;
 
 class ModerController extends AbstractActionController
 {

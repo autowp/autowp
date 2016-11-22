@@ -7,8 +7,9 @@ use Zend\Router\Http\TreeRouteStack;
 use Zend\Uri;
 use Zend\View\Helper\AbstractHtmlElement;
 
+use Autowp\User\Model\DbTable\User as UserTable;
+
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User as UserTable;
 
 use Exception;
 

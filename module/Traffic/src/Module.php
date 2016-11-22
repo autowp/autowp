@@ -4,16 +4,15 @@ namespace Autowp\Traffic;
 
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\EventManager\EventInterface as Event;
-use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
-use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\ModuleManager\Feature\ConsoleBannerProviderInterface;
-use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
+use Zend\ModuleManager\Feature;
 
 class Module implements
-    AutoloaderProviderInterface,
-    ConsoleUsageProviderInterface,
-    ConsoleBannerProviderInterface,
-    ConfigProviderInterface
+    Feature\AutoloaderProviderInterface,
+    Feature\BootstrapListenerInterface,
+    Feature\ConsoleUsageProviderInterface,
+    Feature\ConsoleBannerProviderInterface,
+    //Feature\ControllerProviderInterface,
+    Feature\ConfigProviderInterface
 {
     /**
      * @return array
@@ -64,4 +63,10 @@ class Module implements
             'traffic autoban|google|gc|clear-referer-monitoring' => 'Usage'
         ];
     }
+
+    /*public function getControllerConfig()
+    {
+        $provider = new ConfigProvider();
+        return $provider->getControllersConfig();
+    }*/
 }

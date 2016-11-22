@@ -7,9 +7,10 @@ use Zend\Mail;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Form\Form;
 
-use Application\Auth\Adapter\Id as IdAuthAdapter;
-use Application\Model\DbTable\User;
-use Application\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
+use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
+use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
+
 use Application\Service\UsersService;
 
 class RestorePasswordController extends AbstractActionController

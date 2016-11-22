@@ -1,12 +1,12 @@
 <?php
 
-namespace Application\Auth\Adapter;
+namespace Autowp\User\Auth\Adapter;
 
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 use Zend\Authentication\Adapter\Exception\InvalidArgumentException;
 
-use Application\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User;
 
 class Login implements AdapterInterface
 {

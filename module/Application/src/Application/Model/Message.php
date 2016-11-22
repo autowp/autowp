@@ -2,12 +2,13 @@
 
 namespace Application\Model;
 
+use Zend\Paginator\Paginator;
+
+use Autowp\User\Model\DbTable\User;
+
 use Application\Db\Table;
-use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\TelegramService;
-
-use Zend\Paginator\Paginator;
 
 use Zend_Db_Expr;
 

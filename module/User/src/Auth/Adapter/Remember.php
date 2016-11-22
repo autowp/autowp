@@ -1,25 +1,23 @@
 <?php
 
-namespace Application\Auth\Adapter;
+namespace Autowp\User\Auth\Adapter;
 
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 use Zend\Authentication\Adapter\Exception\InvalidArgumentException;
 
-use Application\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User;
 
-class Id implements AdapterInterface
+class Remember implements AdapterInterface
 {
     /**
-     * Identity value
+     * Credential values
      *
      * @var string
      */
-    private $identity = null;
+    private $credential = null;
 
     /**
-     * $authenticateResultInfo
-     *
      * @var array
      */
     private $authenticateResultInfo = null;
@@ -29,10 +27,13 @@ class Id implements AdapterInterface
         $this->authenticateSetup();
 
         $userTable = new User();
-        $userRow = $userTable->fetchRow([
-            'not deleted',
-            'id = ?' => (int)$this->identity
-        ]);
+
+        $userRow = $userTable->fetchRow(
+            $userTable->select(true)
+                ->join('user_remember', 'users.id=user_remember.user_id', null)
+                ->where('user_remember.token = ?', (string)$this->credential)
+                ->where('not users.deleted')
+        );
 
         if (! $userRow) {
             $this->authenticateResultInfo['code'] = Result::FAILURE_IDENTITY_NOT_FOUND;
@@ -43,11 +44,7 @@ class Id implements AdapterInterface
             $this->authenticateResultInfo['messages'][] = 'Authentication successful.';
         }
 
-        return new Result(
-            $this->authenticateResultInfo['code'],
-            $this->authenticateResultInfo['identity'],
-            $this->authenticateResultInfo['messages']
-        );
+        return $this->authenticateCreateAuthResult();
     }
 
     /**
@@ -60,8 +57,13 @@ class Id implements AdapterInterface
      */
     private function authenticateSetup()
     {
-        if ($this->identity == '') {
-            $exception = 'A value for the identity was not provided prior to authentication.';
+        $exception = null;
+
+        if ($this->credential === null) {
+            $exception = 'A credential value was not provided prior to authentication.';
+        }
+
+        if (null !== $exception) {
             throw new InvalidArgumentException($exception);
         }
 
@@ -75,14 +77,29 @@ class Id implements AdapterInterface
     }
 
     /**
-     * setIdentity() - set the value to be used as the identity
+     * authenticateCreateAuthResult() - Creates a Result object from
+     * the information that has been collected during the authenticate() attempt.
      *
-     * @param  string $value
-     * @return Id Provides a fluent interface
+     * @return Result
      */
-    public function setIdentity($value)
+    private function authenticateCreateAuthResult()
     {
-        $this->identity = $value;
+        return new Result(
+            $this->authenticateResultInfo['code'],
+            $this->authenticateResultInfo['identity'],
+            $this->authenticateResultInfo['messages']
+        );
+    }
+
+    /**
+     * setCredential() - set the credential value to be used
+     *
+     * @param  string $credential
+     * @return Remember Provides a fluent interface
+     */
+    public function setCredential($credential)
+    {
+        $this->credential = $credential;
         return $this;
     }
 }

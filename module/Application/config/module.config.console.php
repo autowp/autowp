@@ -38,14 +38,6 @@ return [
                         ]
                     ]
                 ],
-                'users' => [
-                    'options' => [
-                        'route'    => 'users (refresh-vote-limits|restore-votes|clear-hashes|clear-renames|delete-unused):action',
-                        'defaults' => [
-                            'controller' => Controller\Console\UsersController::class,
-                        ]
-                    ]
-                ],
                 'maintenance' => [
                     'options' => [
                         'route'    => 'maintenance (dump|clear-sessions|rebuild-category-parent|rebuild-car-order-cache|comments-replies-count):action',
@@ -134,6 +126,14 @@ return [
                         'route'    => 'twitter (car-of-day):action',
                         'defaults' => [
                             'controller' => Controller\Console\TwitterController::class,
+                        ]
+                    ]
+                ],
+                'app-users' => [
+                    'options' => [
+                        'route'    => 'users (refresh-vote-limits|restore-votes|delete-unused):action',
+                        'defaults' => [
+                            'controller' => Controller\Console\UsersController::class,
                         ]
                     ]
                 ],

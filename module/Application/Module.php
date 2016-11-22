@@ -4,10 +4,7 @@ namespace Application;
 
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\EventManager\EventInterface as Event;
-use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
-use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\ModuleManager\Feature\ConsoleBannerProviderInterface;
-use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
+use Zend\ModuleManager\Feature;
 use Zend\Mvc\MvcEvent;
 
 
@@ -15,10 +12,11 @@ use Zend_Cache_Manager;
 use Zend_Db_Table;
 
 class Module implements
-    AutoloaderProviderInterface,
-    ConsoleUsageProviderInterface,
-    ConsoleBannerProviderInterface,
-    ConfigProviderInterface
+    Feature\AutoloaderProviderInterface,
+    Feature\BootstrapListenerInterface,
+    Feature\ConsoleUsageProviderInterface,
+    Feature\ConsoleBannerProviderInterface,
+    Feature\ConfigProviderInterface
 {
     const VERSION = '1.0dev';
 
@@ -95,9 +93,6 @@ class Module implements
 
         $urlCorrectionListener = new UrlCorrectionRouteListener();
         $urlCorrectionListener->attach($eventManager);
-
-        $authRememberListener = new Auth\RememberDispatchListener();
-        $authRememberListener->attach($eventManager);
 
         $hostnameCheckListener = new HostnameCheckRouteListener();
         $hostnameCheckListener->attach($eventManager);

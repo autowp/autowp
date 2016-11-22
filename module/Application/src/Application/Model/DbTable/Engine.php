@@ -12,7 +12,7 @@ class Engine extends Table
     protected $_referenceMap = [
         'Last_Editor' => [
             'columns'       => ['last_editor_id'],
-            'refTableClass' => \Application\Model\DbTable\User::class,
+            'refTableClass' => \Autowp\User\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ]
     ];

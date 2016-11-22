@@ -2,11 +2,12 @@
 
 namespace Application\Service;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\HostManager;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Telegram\Brand as TelegramBrand;
 use Application\Model\DbTable\Telegram\Chat as TelegramChat;
-use Application\Model\DbTable\User;
 use Application\Telegram\Command\InboxCommand;
 use Application\Telegram\Command\MeCommand;
 use Application\Telegram\Command\NewCommand;

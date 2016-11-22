@@ -5,11 +5,12 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\HostManager;
 use Application\Model\DbTable\BrandLanguage;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\BrandRow;
-use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\Message;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace AutowpTest\Traffic\Controller\Moder;
+namespace AutowpTest\Traffic\Controller;
 
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 

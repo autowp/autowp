@@ -5,10 +5,11 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class CommentsController extends AbstractActionController

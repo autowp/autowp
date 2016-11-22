@@ -4,6 +4,8 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+use Autowp\User\Model\DbTable\User as UserTable;
+
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandCar;
@@ -21,7 +23,6 @@ use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\Picture\View as PictureView;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
-use Application\Model\DbTable\User as UserTable;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;

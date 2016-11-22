@@ -2,11 +2,11 @@
 
 namespace Application\Model\DbTable\User;
 
-use Application\Db\Table;
-use Application\Model\DbTable\User\Row as UserRow;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
+use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User\Row as UserRow;
 
-use Application\Model\DbTable\User;
+use Application\Db\Table;
+use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 
 class CarSubscribe extends Table
 {

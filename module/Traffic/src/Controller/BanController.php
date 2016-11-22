@@ -5,9 +5,7 @@ namespace Autowp\Traffic\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\Traffic\TrafficControl;
-
-use Application\Model\DbTable\User;
-use Zend\Http\Request;
+use Autowp\User\Model\DbTable\User;
 
 class BanController extends AbstractActionController
 {

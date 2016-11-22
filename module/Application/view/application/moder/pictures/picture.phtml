@@ -322,7 +322,7 @@
             <div style="margin-bottom:15px"><?php
                 $changeStatusUserHtml = '';
                 if ($this->picture->change_status_user_id) {
-                    $changeStatusUserHtml = ' '.$this->user($this->picture->findParentRow(Application\Model\DbTable\User::class, 'Change_Status_User'));
+                    $changeStatusUserHtml = ' '.$this->user($this->picture->findParentRow(Autowp\User\Model\DbTable\User::class, 'Change_Status_User'));
                 }
 
                 switch ($this->picture->status) {
@@ -423,7 +423,7 @@
 
         <h3><?=$this->escapeHtml($this->translate('moder/picture/uploader'))?></h3>
         <div class="well">
-            <?php if ($user = $this->picture->findParentRow(Application\Model\DbTable\User::class, 'Owner')) { ?>
+            <?php if ($user = $this->picture->findParentRow(Autowp\User\Model\DbTable\User::class, 'Owner')) { ?>
                 <?=$this->user($user) ?>
             <?php } else { ?>
                 <?=$this->escapeHtml($this->translate('moder/picture/uploader/unknown'))?>

@@ -1,13 +1,11 @@
 <?php
 
-namespace Application\Auth;
+namespace Autowp\User\Auth;
 
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Mvc\MvcEvent;
-
-use Application\Auth\Adapter\Remember as RememberAuthAdapter;
 
 class RememberDispatchListener extends AbstractListenerAggregate
 {
@@ -33,7 +31,7 @@ class RememberDispatchListener extends AbstractListenerAggregate
             if (! $auth->hasIdentity()) {
                 $cookies = $request->getCookie();
                 if ($cookies && isset($cookies['remember'])) {
-                    $adapter = new RememberAuthAdapter();
+                    $adapter = new Adapter\Remember();
                     $adapter->setCredential($cookies['remember']);
                     $result = $auth->authenticate($adapter);
                 }

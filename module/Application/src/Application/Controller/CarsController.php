@@ -6,14 +6,15 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User\Row as UserRow;
+
 use Application\HostManager;
 use Application\Model\Message;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Attr;
 use Application\Model\DbTable\Engine;
-use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
-use Application\Model\DbTable\User\Row as UserRow;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;

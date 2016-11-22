@@ -1,13 +1,13 @@
 <?php
 
-namespace Application\Model\DbTable;
+namespace Autowp\User\Model\DbTable;
 
 use Application\Db\Table;
 
 class User extends Table
 {
     protected $_name = 'users';
-    protected $_rowClass = \Application\Model\DbTable\User\Row::class;
+    protected $_rowClass = User\Row::class;
 
     const MIN_NAME = 2;
     const MAX_NAME = 50;

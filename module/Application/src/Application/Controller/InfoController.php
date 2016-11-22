@@ -4,10 +4,10 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Application\Model\DbTable\Spec;
-use Application\Model\DbTable\User;
-
 use Autowp\TextStorage;
+use Autowp\User\Model\DbTable\User;
+
+use Application\Model\DbTable\Spec;
 
 class InfoController extends AbstractActionController
 {

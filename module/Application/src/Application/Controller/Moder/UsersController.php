@@ -4,8 +4,9 @@ namespace Application\Controller\Moder;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\DbTable\Session as SessionTable;
-use Application\Model\DbTable\User;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class UsersController extends AbstractActionController

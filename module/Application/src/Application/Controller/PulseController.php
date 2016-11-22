@@ -4,8 +4,9 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\DbTable\Log\Event as LogEvent;
-use Application\Model\DbTable\User;
 
 use DateInterval;
 use DateTime;

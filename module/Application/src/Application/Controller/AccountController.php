@@ -8,14 +8,15 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-use Application\Auth\Adapter\Id as IdAuthAdapter;
+use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
+use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User\Rename as UserRename;
+
 use Application\Controller\LoginController;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\LoginState;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Account as UserAccount;
-use Application\Model\DbTable\User\Rename as UserRename;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\Forums;
 use Application\Model\Message;

@@ -5,7 +5,8 @@ namespace Application\Controller\Console;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Application\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User;
+
 use Application\Service\SpecificationsService;
 
 class SpecsController extends AbstractActionController

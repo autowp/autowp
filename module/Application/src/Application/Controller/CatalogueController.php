@@ -7,6 +7,8 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Zend\Paginator\Paginator;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\DbTable\BrandLink;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
@@ -19,7 +21,6 @@ use Application\Model\DbTable\Modification\Group as ModificationGroup;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\Row as PictureRow;
-use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;

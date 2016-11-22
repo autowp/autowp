@@ -6,6 +6,8 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\HostManager;
 use Application\Model\Comments;
 use Application\Model\DbTable\Article;
@@ -13,7 +15,6 @@ use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Museum;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Voting;
-use Application\Model\DbTable\User;
 use Application\Model\Message;
 
 use DateTime;

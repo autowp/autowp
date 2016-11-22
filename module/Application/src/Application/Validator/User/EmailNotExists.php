@@ -16,7 +16,7 @@ class EmailNotExists extends AbstractValidator
     {
         $this->setValue($value);
 
-        $table = new \Application\Model\DbTable\User();
+        $table = new \Autowp\User\Model\DbTable\User();
         $db = $table->getAdapter();
 
         $exists = $db->fetchOne(

@@ -6,8 +6,9 @@ use Zend\Mail;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\Comments;
-use Application\Model\DbTable\User;
 use Application\Model\Forums;
 use Application\Model\Message;
 

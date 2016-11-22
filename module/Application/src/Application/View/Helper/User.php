@@ -7,7 +7,7 @@ use Zend\View\Helper\AbstractHelper;
 use Zend\View\Exception\InvalidArgumentException;
 use Zend\Permissions\Acl\Acl;
 
-use Application\Model\DbTable\User\Row as UserRow;
+use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use DateInterval;
 use DateTime;
@@ -41,7 +41,7 @@ class User extends AbstractHelper
 
         if (! isset($this->users[$id])) {
             if (! $this->userModel) {
-                $this->userModel = new \Application\Model\DbTable\User();
+                $this->userModel = new \Autowp\User\Model\DbTable\User();
             }
             $this->users[$id] = $this->userModel->find($id)->current();
         }

@@ -4,7 +4,8 @@ namespace Application\Telegram\Command;
 
 use Telegram\Bot\Commands\Command;
 
-use Application\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\Message;
 
 class MeCommand extends Command

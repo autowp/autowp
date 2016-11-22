@@ -6,10 +6,11 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 

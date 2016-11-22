@@ -6,8 +6,8 @@ use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Permissions\Acl\Acl;
 
-use Application\Model\DbTable\User as UserTable;
-use Application\Model\DbTable\User\Row as UserRow;
+use Autowp\User\Model\DbTable\User as UserTable;
+use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Exception;
 
@@ -150,8 +150,10 @@ class User extends AbstractPlugin
         if (! isset($this->hosts[$language])) {
             throw new Exception("Host `$language` not found");
         }
-        $domain = $this->hosts[$language]['cookie'];
-        setcookie('remember', '', time() - 3600 * 24 * 30, '/', $domain);
+        if (!headers_sent()) {
+            $domain = $this->hosts[$language]['cookie'];
+            setcookie('remember', '', time() - 3600 * 24 * 30, '/', $domain);
+        }
     }
 
     public function setRememberCookie($hash)
@@ -161,8 +163,10 @@ class User extends AbstractPlugin
         if (! isset($this->hosts[$language])) {
             throw new Exception("Host `$language` not found");
         }
-        $domain = $this->hosts[$language]['cookie'];
-        setcookie('remember', $hash, time() + 3600 * 24 * 30, '/', $domain);
+        if (!headers_sent()) {
+            $domain = $this->hosts[$language]['cookie'];
+            setcookie('remember', $hash, time() + 3600 * 24 * 30, '/', $domain);
+        }
     }
 
     public function timezone()

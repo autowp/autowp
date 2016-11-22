@@ -16,7 +16,7 @@ class Login extends AbstractValidator
     {
         $this->setValue($value);
 
-        $users = new \Application\Model\DbTable\User();
+        $users = new \Autowp\User\Model\DbTable\User();
         $user = $users->fetchRow(
             $users->select(true)
                   ->where('login = ?', (string)$value)

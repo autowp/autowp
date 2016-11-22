@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Model\DbTable\User;
+namespace Autowp\User\Model\DbTable\User;
 
 use DateInterval;
 use DateTime;

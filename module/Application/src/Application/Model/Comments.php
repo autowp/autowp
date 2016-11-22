@@ -2,12 +2,13 @@
 
 namespace Application\Model;
 
+use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User\Row as UserRow;
+
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\DbTable\Comment\Vote as CommentVote;
-use Application\Model\DbTable\User;
-use Application\Model\DbTable\User\Row as UserRow;
 
 use Zend_Db_Expr;
 

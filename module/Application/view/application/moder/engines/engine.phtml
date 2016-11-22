@@ -16,7 +16,7 @@
     <div class="col-lg-6 col-md-6">
         <div class="well">
             <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->engine->id))?></p>
-            <?php if ($lastEditor = $this->engine->findParentRow(Application\Model\DbTable\User::class, 'Last_Editor')) { ?>
+            <?php if ($lastEditor = $this->engine->findParentRow(Autowp\User\Model\DbTable\User::class, 'Last_Editor')) { ?>
                 <p>
                     <?=$this->escapeHtml($this->translate('moder/engines/engine/last-edit:'))?>
                     <?=$this->user($lastEditor) ?>

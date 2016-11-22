@@ -2,13 +2,14 @@
 
 namespace Application\Service;
 
+use Autowp\User\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User\Row as UserRow;
+
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\Model\DbTable\Attr;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineRow;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User;
-use Application\Model\DbTable\User\Row as UserRow;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;

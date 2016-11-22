@@ -8,4 +8,6 @@
     <file>module/Application/test</file>
     <file>module/Traffic/src</file>
     <file>module/Traffic/test</file>
+    <file>module/User/src</file>
+    <file>module/User/test</file>
 </ruleset>

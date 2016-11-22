@@ -7,7 +7,7 @@ use Zend\View\Model\JsonModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
 
-use Application\Model\DbTable\User;
+use Autowp\User\Model\DbTable\User;
 
 class UsersController extends AbstractRestfulController
 {

@@ -8,13 +8,13 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Uri\Http as HttpUri;
 use Zend\View\Model\ViewModel;
 
-use Application\Auth\Adapter\Id as IdAuthAdapter;
+use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
+use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
+use Autowp\User\Model\DbTable\User;
+
 use Application\Model\DbTable\LoginState;
-use Application\Model\DbTable\User;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Service\UsersService;
-
-use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
 use Zend_Db_Expr;
 
