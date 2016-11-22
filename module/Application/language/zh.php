@@ -60,6 +60,8 @@ return [
                        '站长没有这些素材的相关法律信息。<br />' .
                        '所有图片仅用于传播知识。<br />' .
                        '<a href="mailto:autowp@yandex.ru">举报侵权行为</a>',
+    
+    'layout/language-contributing' => 'Want to contribute?',
 
     /* Picture preview */
     'picture-preview/no-comments' => '暂无评论',

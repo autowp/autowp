@@ -68,6 +68,8 @@ return [
                        'L\'administration du site ne dispose pas d\'informations de la légalité de la publication de ces matériaux.<br />' .
                        'Toutes les images sont disponibles à des fins éducatives.<br />' .
                        '<a href="mailto:autowp@yandex.ru">Signaler une violation de copyright</a>.',
+    
+    'layout/language-contributing' => 'Vous souhaitez contribuer?',
 
     /* Picture preview */
     'picture-preview/no-comments' => 'non',
