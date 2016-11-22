@@ -141,8 +141,10 @@ class SpecificationsService
      */
     private $vehicleNameFormatter;
 
-    public function __construct($translator = null, VehicleNameFormatter $vehicleNameFormatter)
-    {
+    public function __construct(
+        $translator,
+        VehicleNameFormatter $vehicleNameFormatter
+    ) {
         $this->translator = $translator;
         $this->vehicleNameFormatter = $vehicleNameFormatter;
     }
