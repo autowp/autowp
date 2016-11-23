@@ -770,9 +770,14 @@ Une partie du code source du site est ouverte et un cours de communication suppl
 
 %github%
 
+[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
+[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
+[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
+
 ### Soutenir le projet
 
-Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/feedback)",
+Vous pouvez soutenir notre projet [financièrement](/donate) ou [moralement](/feedback).
+Take part in [the translation of the site](https://github.com/autowp/autowp/tree/master/module/Application/language) into other languages.",
 
     'page/1/name' => "Page d'accueil",
     'page/2/name' => "Main menu",
