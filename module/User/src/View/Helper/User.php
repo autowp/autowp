@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\View\Helper;
+namespace Autowp\User\View\Helper;
 
 use Zend\Authentication\AuthenticationService;
 use Zend\View\Helper\AbstractHelper;

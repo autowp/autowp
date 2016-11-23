@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Controller\Plugin;
+namespace Autowp\User\Controller\Plugin;
 
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
@@ -8,8 +8,6 @@ use Zend\Permissions\Acl\Acl;
 
 use Autowp\User\Model\DbTable\User as UserTable;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
-
-use Exception;
 
 class User extends AbstractPlugin
 {
@@ -33,15 +31,9 @@ class User extends AbstractPlugin
      */
     private $user = null;
 
-    /**
-     * @var array
-     */
-    private $hosts = [];
-
-    public function __construct(Acl $acl, array $hosts)
+    public function __construct(Acl $acl)
     {
         $this->acl = $acl;
-        $this->hosts = $hosts;
     }
 
     /**
@@ -141,32 +133,6 @@ class User extends AbstractPlugin
         return $this->user
             && $this->user->role
             && $this->acl->inheritsRole($this->user->role, $inherit);
-    }
-
-    public function clearRememberCookie()
-    {
-        $language = $this->getController()->language();
-
-        if (! isset($this->hosts[$language])) {
-            throw new Exception("Host `$language` not found");
-        }
-        if (!headers_sent()) {
-            $domain = $this->hosts[$language]['cookie'];
-            setcookie('remember', '', time() - 3600 * 24 * 30, '/', $domain);
-        }
-    }
-
-    public function setRememberCookie($hash)
-    {
-        $language = $this->getController()->language();
-
-        if (! isset($this->hosts[$language])) {
-            throw new Exception("Host `$language` not found");
-        }
-        if (!headers_sent()) {
-            $domain = $this->hosts[$language]['cookie'];
-            setcookie('remember', $hash, time() + 3600 * 24 * 30, '/', $domain);
-        }
     }
 
     public function timezone()

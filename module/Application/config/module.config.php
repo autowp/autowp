@@ -67,7 +67,6 @@ return [
             'pic'       => Controller\Plugin\Service\PicFactory::class,
             'sidebar'   => Controller\Plugin\Service\SidebarFactory::class,
             'translate' => Controller\Plugin\Service\TranslateFactory::class,
-            'user'      => Controller\Plugin\Service\UserFactory::class,
         ]
     ],
     'translator' => [

@@ -780,7 +780,7 @@ class AccountController extends AbstractActionController
 
                     $auth = new AuthenticationService();
                     $auth->clearIdentity();
-                    $this->user()->clearRememberCookie();
+                    $this->service->clearRememberCookie($this->language());
 
                     $viewModel = new ViewModel();
 

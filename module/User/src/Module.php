@@ -21,8 +21,10 @@ class Module implements
     {
         $provider = new ConfigProvider();
         return [
-            'console'     => $provider->getConsoleConfig(),
-            'controllers' => $provider->getControllersConfig(),
+            'console'            => $provider->getConsoleConfig(),
+            'controller_plugins' => $provider->getControllerPluginConfig(),
+            'controllers'        => $provider->getControllersConfig(),
+            'view_helpers'       => $provider->getViewHelperConfig(),
         ];
     }
 

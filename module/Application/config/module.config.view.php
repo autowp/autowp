@@ -55,7 +55,6 @@ return [
             'pic'            => View\Helper\Service\PicFactory::class,
             'pageEnv'        => View\Helper\Service\PageEnvFactory::class,
             'sidebar'        => View\Helper\Service\SidebarFactory::class,
-            'user'           => View\Helper\Service\UserFactory::class,
             'userText'       => View\Helper\Service\UserTextFactory::class,
         ]
     ],

@@ -83,9 +83,9 @@ class LoginController extends AbstractActionController
                     if ($values['remember']) {
                         $token = $this->service->createRememberToken($this->user()->get()->id);
 
-                        $this->user()->setRememberCookie($token);
+                        $this->service->setRememberCookie($token, $this->language());
                     } else {
-                        $this->user()->clearRememberCookie();
+                        $this->service->clearRememberCookie($this->language());
                     }
 
                     if ($url = $request->getServer('REQUEST_URI')) {
@@ -147,7 +147,7 @@ class LoginController extends AbstractActionController
     {
         $auth = new AuthenticationService();
         $auth->clearIdentity();
-        $this->user()->clearRememberCookie();
+        $this->service->clearRememberCookie($this->language());
         return $this->redirect()->toUrl(
             $this->url()->fromRoute('login')
         );
