@@ -783,9 +783,15 @@ return [
 
 %github%
 
+[![Build Status](https://travis-ci.org/autowp/autowp.svg?branch=master)](https://travis-ci.org/autowp/autowp)
+[![Code Climate](https://codeclimate.com/github/autowp/autowp/badges/gpa.svg)](https://codeclimate.com/github/autowp/autowp)
+[![Coverage Status](https://coveralls.io/repos/github/autowp/autowp/badge.svg?branch=master)](https://coveralls.io/github/autowp/autowp?branch=master)
+
 ### Поддержать проект
 
-Вы можете поддержать наш проект [финансово](/donate) или [морально](/feedback)',
+Вы можете поддержать наш проект [финансово](/donate) или [морально](/feedback).
+Принять участие в [переводе сайта](https://github.com/autowp/autowp/tree/master/module/Application/language) на другие языки.
+',
 
     'page/1/name' => "Главная страница",
     'page/2/name' => "Главное меню",
