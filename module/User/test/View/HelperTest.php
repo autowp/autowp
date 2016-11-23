@@ -13,6 +13,7 @@ class HelperTest extends AbstractConsoleControllerTestCase
     public function setUp()
     {
         $this->setApplicationConfig(include __DIR__ . '/../_files/application.config.php');
+        $this->getApplication(); // to initialize
 
         parent::setUp();
     }
@@ -27,8 +28,6 @@ class HelperTest extends AbstractConsoleControllerTestCase
 
     public function testLogedIn()
     {
-        $this->getApplication(); // to initialize
-
         $this->assertFalse($this->getHelper()->__invoke()->logedIn());
 
         $adapter = new Id();
@@ -42,8 +41,6 @@ class HelperTest extends AbstractConsoleControllerTestCase
 
     public function testGet()
     {
-        $this->getApplication(); // to initialize
-
         $this->assertNull($this->getHelper()->get());
 
         $adapter = new Id();
@@ -57,8 +54,6 @@ class HelperTest extends AbstractConsoleControllerTestCase
 
     public function testIsAllowed()
     {
-        $this->getApplication(); // to initialize
-
         $this->assertFalse($this->getHelper()->__invoke()->isAllowed('car', 'edit_meta'));
 
         $adapter = new Id();
@@ -72,8 +67,6 @@ class HelperTest extends AbstractConsoleControllerTestCase
 
     public function testInheritsRole()
     {
-        $this->getApplication(); // to initialize
-
         $this->assertFalse($this->getHelper()->__invoke()->inheritsRole('moder'));
 
         $adapter = new Id();
@@ -87,8 +80,6 @@ class HelperTest extends AbstractConsoleControllerTestCase
 
     public function testTimezone()
     {
-        $this->getApplication(); // to initialize
-
         $this->assertEquals('UTC', $this->getHelper()->__invoke()->timezone('moder'));
 
         $adapter = new Id();
@@ -102,13 +93,9 @@ class HelperTest extends AbstractConsoleControllerTestCase
 
     public function testHumanTime()
     {
-        $this->getApplication(); // to initialize
-
         $time = gmmktime(0, 0, 0, 1, 1, 2000);
         $dt = new \DateTime();
         $dt->setTimestamp($time);
-
-        $this->assertEquals('January 1, 2000', $this->getHelper()->__invoke()->humanTime($dt));
 
         $adapter = new Id();
         $adapter->setIdentity(1);
@@ -116,18 +103,14 @@ class HelperTest extends AbstractConsoleControllerTestCase
         $auth = new AuthenticationService();
         $auth->authenticate($adapter);
 
-        $this->assertEquals('January 1, 2000', $this->getHelper()->__invoke()->humanTime($dt));
+        $this->assertEquals('1 января 2000 г.', $this->getHelper()->__invoke()->humanTime($dt));
     }
 
     public function testHumanDate()
     {
-        $this->getApplication(); // to initialize
-
         $time = gmmktime(0, 0, 0, 1, 1, 2000);
         $dt = new \DateTime();
         $dt->setTimestamp($time);
-
-        $this->assertEquals('January 1, 2000', $this->getHelper()->__invoke()->humanDate($dt));
 
         $adapter = new Id();
         $adapter->setIdentity(1);
@@ -135,13 +118,11 @@ class HelperTest extends AbstractConsoleControllerTestCase
         $auth = new AuthenticationService();
         $auth->authenticate($adapter);
 
-        $this->assertEquals('January 1, 2000', $this->getHelper()->__invoke()->humanDate($dt));
+        $this->assertEquals('1 января 2000 г.', $this->getHelper()->__invoke()->humanDate($dt));
     }
 
     public function testAvatar()
     {
-        $this->getApplication(); // to initialize
-
         $this->assertEquals('', $this->getHelper()->__invoke()->avatar());
 
         $adapter = new Id();
@@ -155,8 +136,6 @@ class HelperTest extends AbstractConsoleControllerTestCase
 
     public function testToString()
     {
-        $this->getApplication(); // to initialize
-
         $this->assertEquals('', $this->getHelper()->__invoke()->__toString());
 
         $adapter = new Id();

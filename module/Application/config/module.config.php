@@ -87,6 +87,11 @@ return [
                 'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
                 'base_dir' => \Zend\I18n\Translator\Resources::getBasePath(),
                 'pattern'  => \Zend\I18n\Translator\Resources::getPatternForCaptcha()
+            ],
+            [
+                'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
+                'base_dir' => \Autowp\ZFComponents\Resources::getBasePath(),
+                'pattern'  => \Autowp\ZFComponents\Resources::getPatternForViewHelpers()
             ]
         ],
     ],

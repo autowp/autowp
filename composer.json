@@ -24,7 +24,7 @@
         "league/html-to-markdown": "^4.1",
         "autowp/external-login-service": ">=1.1.8",
         "autowp/textstorage": "^1.0.1",
-        "autowp/zf-components": "^1.0.5",
+        "autowp/zf-components": "^1.0.6",
         "zendframework/zend-authentication": "^2.5",
         "zendframework/zend-cache": ">=2.7",
         "zendframework/zend-captcha": "^2.6",

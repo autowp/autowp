@@ -25,17 +25,6 @@ return [
         '%1$s 个主题',
     ],
 
-    'few seconds ago'    => '几秒钟前',
-    'a minute ago'       => '1分钟前',
-    '%1$s minutes ago'   => [
-        '%1$s 分钟前',
-    ],
-    'an hour ago'        => '1小时前',
-    '%1$s hours ago'     => [
-        '%1$s 小时前',
-    ],
-    'yesterday'          => '昨天',
-    'today'              => '今天',
     'year' => 'Year',
     'month' => 'Month',
 
@@ -60,7 +49,7 @@ return [
                        '站长没有这些素材的相关法律信息。<br />' .
                        '所有图片仅用于传播知识。<br />' .
                        '<a href="mailto:autowp@yandex.ru">举报侵权行为</a>',
-    
+
     'layout/language-contributing' => 'Want to contribute?',
 
     /* Picture preview */
