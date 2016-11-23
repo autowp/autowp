@@ -49,7 +49,7 @@ class User extends AbstractHelper
         return $this->users[$id];
     }
 
-    public function __invoke($user = null, array $options = [])
+    public function __invoke($user = null)
     {
         if ($user === null) {
             $user = $this->getLogedInUser();
@@ -101,38 +101,40 @@ class User extends AbstractHelper
         try {
             $user = $this->user;
 
-            if ($user) {
-                if ($user->deleted) {
-                    return '<span class="muted"><i class="fa fa-user"></i> ' .
-                               $this->view->escapeHtml($this->view->translate('deleted-user')).
-                           '</span>';
-                }
+            if (! $user) {
+                return '';
+            }
 
-                $url = $this->view->url('users/user', [
-                    'user_id' => $user->identity ? $user->identity : 'user' . $user->id
-                ]);
+            if ($user->deleted) {
+                return '<span class="muted"><i class="fa fa-user"></i> ' .
+                           $this->view->escapeHtml($this->view->translate('deleted-user')).
+                       '</span>';
+            }
 
-                $classes = ['user'];
-                if ($lastOnline = $user->getDateTime('last_online')) {
-                    $date = new DateTime();
-                    $date->sub(new DateInterval('P6M'));
-                    if ($date > $lastOnline) {
-                        $classes[] = 'long-away';
-                    }
-                } else {
+            $url = $this->view->url('users/user', [
+                'user_id' => $user->identity ? $user->identity : 'user' . $user->id
+            ]);
+
+            $classes = ['user'];
+            if ($lastOnline = $user->getDateTime('last_online')) {
+                $date = new DateTime();
+                $date->sub(new DateInterval('P6M'));
+                if ($date > $lastOnline) {
                     $classes[] = 'long-away';
                 }
-
-                if ($this->isAllowed('status', 'be-green')) {
-                    $classes[] = 'green-man';
-                }
-
-                $result =
-                    '<span class="'.implode(' ', $classes).'">' .
-                        '<i class="fa fa-user"></i>&#xa0;' .
-                        $this->view->htmlA($url, $user->getCompoundName()) .
-                    '</span>';
+            } else {
+                $classes[] = 'long-away';
             }
+
+            if ($this->isAllowed('status', 'be-green')) {
+                $classes[] = 'green-man';
+            }
+
+            $result =
+                '<span class="'.implode(' ', $classes).'">' .
+                    '<i class="fa fa-user"></i>&#xa0;' .
+                    $this->view->htmlA($url, $user->getCompoundName()) .
+                '</span>';
         } catch (Exception $e) {
             $result = $e->getMessage();
 
@@ -146,24 +148,26 @@ class User extends AbstractHelper
     {
         $user = $this->user;
 
-        if ($user) {
-            if ($user->img) {
-                $image = $this->view->img($user->img, [
-                    'format' => 'avatar',
-                ]);
+        if (! $user) {
+            return '';
+        }
 
-                if ($image && $image->exists()) {
-                    return $image;
-                }
-            }
+        if ($user->img) {
+            $image = $this->view->img($user->img, [
+                'format' => 'avatar',
+            ])->__toString();
 
-            if ($user->e_mail) {
-                // gravatar
-                return $this->view->gravatar($user->e_mail, [
-                    'img_size'    => 70,
-                    'default_img' => 'http://www.autowp.ru/_.gif'
-                ]);
+            if ($image && $image->exists()) {
+                return $image;
             }
+        }
+
+        if ($user->e_mail) {
+            // gravatar
+            return $this->view->gravatar($user->e_mail, [
+                'img_size'    => 70,
+                'default_img' => 'http://www.autowp.ru/_.gif'
+            ])->__toString();
         }
 
         return '';
@@ -199,7 +203,7 @@ class User extends AbstractHelper
             : 'UTC';
     }
 
-    public function humanTime($time = null)
+    public function humanTime(DateTime $time = null)
     {
         if ($time === null) {
             throw new InvalidArgumentException('Expected parameter $time was not provided.');
@@ -212,7 +216,7 @@ class User extends AbstractHelper
         return $this->view->humanTime($time);
     }
 
-    public function humanDate($time = null)
+    public function humanDate(DateTime $time = null)
     {
         if ($time === null) {
             throw new InvalidArgumentException('Expected parameter $time was not provided.');
