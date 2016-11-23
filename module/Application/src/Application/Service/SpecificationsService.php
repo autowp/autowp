@@ -1562,7 +1562,7 @@ class SpecificationsService
             }
 
             $name = $carParentName;
-            if (!$name) {
+            if (! $name) {
                 $name = $this->vehicleNameFormatter->format($car->getNameData($language), $language);
             }
 

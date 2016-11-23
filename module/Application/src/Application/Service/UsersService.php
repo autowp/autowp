@@ -492,7 +492,7 @@ class UsersService
         if (! isset($this->hosts[$language])) {
             throw new Exception("Host `$language` not found");
         }
-        if (!headers_sent()) {
+        if (! headers_sent()) {
             $domain = $this->hosts[$language]['cookie'];
             setcookie('remember', '', time() - 3600 * 24 * 30, '/', $domain);
         }
@@ -503,7 +503,7 @@ class UsersService
         if (! isset($this->hosts[$language])) {
             throw new Exception("Host `$language` not found");
         }
-        if (!headers_sent()) {
+        if (! headers_sent()) {
             $domain = $this->hosts[$language]['cookie'];
             setcookie('remember', $hash, time() + 3600 * 24 * 30, '/', $domain);
         }
