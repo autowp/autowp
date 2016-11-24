@@ -214,4 +214,15 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('catalogue');
         $this->assertActionName('brand-car-picture');
     }
+
+    public function testBrandMosts()
+    {
+        $this->dispatch('https://www.autowp.ru/bmw/mosts', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CatalogueController::class);
+        $this->assertMatchedRouteName('catalogue');
+        $this->assertActionName('brand-mosts');
+    }
 }
