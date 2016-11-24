@@ -157,7 +157,7 @@ class User extends AbstractHelper
                 'format' => 'avatar',
             ])->__toString();
 
-            if ($image && $image->exists()) {
+            if ($image) {
                 return $image;
             }
         }
