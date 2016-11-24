@@ -42,15 +42,17 @@ class AboutController extends AbstractActionController
             }
         }
 
-        $greenUsers = $userTable->fetchAll([
-            'not deleted',
-            'role in (?)' => $greenUserRoles,
-            'identity is null or identity <> "autowp"',
-            'last_online > DATE_SUB(CURDATE(), INTERVAL 6 MONTH)'
-        ]);
+        if ($greenUserRoles) {
+            $greenUsers = $userTable->fetchAll([
+                'not deleted',
+                'role in (?)' => $greenUserRoles,
+                'identity is null or identity <> "autowp"',
+                'last_online > DATE_SUB(CURDATE(), INTERVAL 6 MONTH)'
+            ]);
 
-        foreach ($greenUsers as $greenUser) {
-            $contributors[$greenUser->id] = $greenUser;
+            foreach ($greenUsers as $greenUser) {
+                $contributors[$greenUser->id] = $greenUser;
+            }
         }
 
         $picturesUsers = $userTable->fetchAll([
