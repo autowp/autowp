@@ -471,7 +471,7 @@ class TwinsController extends AbstractActionController
             return new JsonModel($this->pic()->gallery2($select, [
                 'page'      => $this->params()->fromQuery('page'),
                 'pictureId' => $this->params()->fromQuery('pictureId'),
-                'route'     => 'twins/group/pictures/picture/gallery',
+                'route'     => 'twins/group/pictures/picture',
                 'urlParams' => [
                     'action'     => 'picture',
                     'id'         => $group['id'],
