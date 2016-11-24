@@ -17,21 +17,21 @@ class ModerCarsControllerTest extends AbstractHttpControllerTestCase
         parent::setUp();
     }
 
-    public function testGroupIsNotForbidden()
+    public function testVehicleIsNotForbidden()
     {
         /**
          * @var Request $request
          */
         $request = $this->getRequest();
         $request->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/car/car_id/1', 'GET');
+        $this->dispatch('http://www.autowp.ru/moder/cars/car/car_id/1', 'GET');
 
-        //$this->assertResponseStatusCode(403);
+        $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
         $this->assertControllerName(CarsController::class);
         $this->assertMatchedRouteName('moder/cars/params');
         $this->assertActionName('car');
 
-        $this->assertXpathQuery("//h1[contains(text(), 'test car')]");
+        $this->assertXpathQuery("//h1[contains(text(), 'test car')]|//*[@value='test car']");
     }
 }
