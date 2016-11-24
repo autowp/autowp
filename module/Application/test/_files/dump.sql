@@ -1328,6 +1328,9 @@ CREATE TABLE IF NOT EXISTS `forums_themes` (
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 AVG_ROW_LENGTH=1170 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB';
 
+replace into forums_themes (id, parent_id, folder, caption, position, description, topics, messages, is_moderator, disable_topics)
+values (1, null, "test", "Test", 1, "That is test theme", 1, 1, 0, 0);
+
 -- --------------------------------------------------------
 
 --
@@ -1348,6 +1351,9 @@ CREATE TABLE IF NOT EXISTS `forums_topics` (
   KEY `theme_id` (`theme_id`),
   KEY `author_id` (`author_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3077 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB; (`theme_id`)';
+
+replace into forums_topics (id, theme_id, caption, author_id, status, author_ip)
+values (1, 1, "Test topic", 1, "normal", 0);
 
 -- --------------------------------------------------------
 
