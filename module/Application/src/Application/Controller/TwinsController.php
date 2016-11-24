@@ -473,6 +473,7 @@ class TwinsController extends AbstractActionController
                 'pictureId' => $this->params()->fromQuery('pictureId'),
                 'route'     => 'twins/group/pictures/picture/gallery',
                 'urlParams' => [
+                    'action'     => 'picture',
                     'id'         => $group['id'],
                     'picture_id' => $picture['identity'] ? $picture['identity'] : $picture['id']
                 ]

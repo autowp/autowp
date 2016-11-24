@@ -852,9 +852,10 @@ class CategoryController extends AbstractActionController
             }
 
             return new JsonModel($this->pic()->gallery2($select, [
-                'page'      => $this->params()->fromQuery('page'),
-                'pictureId' => $this->params()->fromQuery('pictureId'),
-                'urlParams' => [
+                'page'        => $this->params()->fromQuery('page'),
+                'pictureId'   => $this->params()->fromQuery('pictureId'),
+                'reuseParams' => true,
+                'urlParams'   => [
                     'action' => 'category-picture'
                 ]
             ]));
