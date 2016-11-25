@@ -97,9 +97,9 @@ class PictureController extends AbstractActionController
             if ($carRow) {
                 foreach ([31, null] as $groupId) {
                     $select = $pictureTable->select(true)
-                        ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
+                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
-                        ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                        ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                         ->where('car_parent_cache.parent_id = ?', $carRow->id)
                         ->limit(1);
 

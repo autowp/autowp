@@ -129,7 +129,8 @@ return [
             Zend_Cache_Manager::class            => Service\ZF1CacheManagerFactory::class,
             Zend_Db_Adapter_Abstract::class      => Service\ZF1DbAdapterFactory::class,
             'translator'                         => \Zend\Mvc\I18n\TranslatorFactory::class,
-            Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class
+            Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
+            Model\PictureItem::class             => InvokableFactory::class,
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class

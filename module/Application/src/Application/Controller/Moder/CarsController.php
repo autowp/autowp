@@ -13,10 +13,11 @@ use Application\Form\Moder\CarOrganizePictures as CarOrganizePicturesForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
+use Application\Model\DbTable;
 use Application\Model\Message;
 use Application\Model\Modification;
+use Application\Model\PictureItem;
 use Application\Model\VehicleType;
-use Application\Model\DbTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
@@ -97,6 +98,11 @@ class CarsController extends AbstractActionController
      * @var SpecificationsService
      */
     private $specificationsService;
+    
+    /**
+     * @var PictureItem
+     */
+    private $pictureItem;
 
     public function __construct(
         HostManager $hostManager,
@@ -110,7 +116,8 @@ class CarsController extends AbstractActionController
         Form $filterForm,
         BrandVehicle $brandVehicle,
         Message $message,
-        SpecificationsService $specificationsService
+        SpecificationsService $specificationsService,
+        PictureItem $pictureItem
     ) {
 
         $this->hostManager = $hostManager;
@@ -125,6 +132,7 @@ class CarsController extends AbstractActionController
         $this->brandVehicle = $brandVehicle;
         $this->message = $message;
         $this->specificationsService = $specificationsService;
+        $this->pictureItem = $pictureItem;
     }
 
     private function canMove(DbTable\Vehicle\Row $car)
@@ -446,8 +454,8 @@ class CarsController extends AbstractActionController
         // all pictures
         $table = $this->catalogue()->getPictureTable();
         $select = $table->select(true)
-            ->where('pictures.car_id = ?', $car->id)
-            ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->where('picture_item.item_id = ?', $car->id)
             ->order(['pictures.status', 'pictures.id']);
 
         $picturesData = $this->pic()->listData($select, [
@@ -3569,8 +3577,8 @@ class CarsController extends AbstractActionController
         $pictureTable = $this->catalogue()->getPictureTable();
         $rows = $pictureTable->fetchAll(
             $pictureTable->select(true)
-                ->where('pictures.car_id = ?', $car->id)
-                ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->where('picture_item.item_id = ?', $car->id)
                 ->order(['pictures.status', 'pictures.id'])
         );
         foreach ($rows as $row) {
@@ -3668,14 +3676,12 @@ class CarsController extends AbstractActionController
                 foreach ($pictureRows as $pictureRow) {
                     $pictureRow->car_id = $newCar->id;
                     $pictureRow->save();
+                    
+                    $this->pictureItem->setPictureItems($pictureRow->id, (array)$newCar->id);
 
-                    if ($pictureRow->image_id) {
-                        $this->imageStorage()->changeImageName($pictureRow->image_id, [
-                            'pattern' => $pictureRow->getFileNamePattern(),
-                        ]);
-                    } else {
-                        $pictureRow->correctFileName();
-                    }
+                    $this->imageStorage()->changeImageName($pictureRow->image_id, [
+                        'pattern' => $pictureRow->getFileNamePattern(),
+                    ]);
 
                     $this->log(sprintf(
                         'Картинка %s связана с автомобилем %s',
@@ -3735,12 +3741,12 @@ class CarsController extends AbstractActionController
         foreach ($mTable->fetchAll($select) as $mRow) {
             $picturesCount = $db->fetchOne(
                 $db->select()
-                ->from('modification_picture', 'count(1)')
-                ->where('modification_picture.modification_id = ?', $mRow->id)
-                ->join('pictures', 'modification_picture.picture_id = pictures.id', null)
-                ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id)
+                    ->from('modification_picture', 'count(1)')
+                    ->where('modification_picture.modification_id = ?', $mRow->id)
+                    ->join('pictures', 'modification_picture.picture_id = pictures.id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
+                    ->where('car_parent_cache.parent_id = ?', $car->id)
             );
 
             $isInherited = $mRow->car_id != $car->id;
@@ -3851,8 +3857,8 @@ class CarsController extends AbstractActionController
                 $pictureRow = $pictureTable->fetchRow(
                     $pictureTable->select(true)
                     ->where('pictures.id = ?', (int)$pictureId)
-                    ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $car->id)
                 );
 
@@ -3900,10 +3906,10 @@ class CarsController extends AbstractActionController
 
         $pictureRows = $pictureTable->fetchAll(
             $pictureTable->select(true)
-            ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
-            ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-            ->where('car_parent_cache.parent_id = ?', $car->id)
-            ->order('pictures.id')
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
+                ->where('car_parent_cache.parent_id = ?', $car->id)
+                ->order('pictures.id')
         );
 
         foreach ($pictureRows as $pictureRow) {

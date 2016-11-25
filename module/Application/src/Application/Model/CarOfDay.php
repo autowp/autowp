@@ -84,9 +84,9 @@ class CarOfDay
     private function pictureByPerspective($pictureTable, $car, $perspective)
     {
         $select = $pictureTable->select(true)
-            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
             ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
-            ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
             ->where('car_parent_cache.parent_id = ?', $car->id)
             ->order([
                 'pictures.width DESC', 'pictures.height DESC'

@@ -67,8 +67,8 @@ class FactoriesController extends AbstractActionController
             foreach ($cars as $car) {
                 $select = $pictureTable->select(true)
                     ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
-                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                    ->join('cars', 'pictures.car_id = cars.id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('cars', 'picture_item.item_id = cars.id', null)
                     ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $car->id)
                     ->order([
@@ -85,7 +85,7 @@ class FactoriesController extends AbstractActionController
                     $select
                         ->join(
                             ['cpc_oc' => 'car_parent_cache'],
-                            'cpc_oc.car_id = pictures.car_id',
+                            'cpc_oc.car_id = picture_item.item_id',
                             null
                         )
                         ->where('cpc_oc.parent_id IN (?)', $groups[$car->id]);

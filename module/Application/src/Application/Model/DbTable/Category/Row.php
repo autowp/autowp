@@ -23,8 +23,8 @@ class Row extends \Application\Db\Table\Row
         $pictures = new Picture();
         return $pictures->fetchRow(
             $pictures->select(true)
-                ->join('category_car', 'pictures.car_id=category_car.car_id', null)
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('category_car', 'picture_item.item_id = category_car.car_id', null)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 ->where('category_car.category_id = ?', $this->id)
                 ->order([

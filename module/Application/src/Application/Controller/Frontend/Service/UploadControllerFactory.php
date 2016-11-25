@@ -13,7 +13,8 @@ class UploadControllerFactory implements FactoryInterface
     {
         return new Controller(
             $container->get('ViewHelperManager')->get('partial'),
-            $container->get(\Application\Service\TelegramService::class)
+            $container->get(\Application\Service\TelegramService::class),
+            $container->get(\Application\Model\PictureItem::class)
         );
     }
 }

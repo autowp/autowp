@@ -136,12 +136,12 @@ class IndexController extends AbstractActionController
                     select count(1) from (
                         select cars.id, count(pictures.id) as c
                         from cars
-                            inner join pictures on cars.id=pictures.car_id
-                        where pictures.type = ?
+                            inner join picture_item on cars.id = picture_item.item_id
+                            inner join pictures on picture_item.picture_id = pictures.id
                         group by cars.id
                         having c >= 4
                     ) as T1
-                ', Picture::VEHICLE_TYPE_ID)
+                ')
             ],
             [
                 'name'     => 'moder/statistics/specifications-values',

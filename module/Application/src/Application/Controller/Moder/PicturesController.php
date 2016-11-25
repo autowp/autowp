@@ -27,6 +27,7 @@ use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\Message;
+use Application\Model\PictureItem;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\TelegramService;
@@ -96,6 +97,11 @@ class PicturesController extends AbstractActionController
      * @var TrafficControl
      */
     private $trafficControl;
+    
+    /**
+     * @var PictureItem
+     */
+    private $pictureItem;
 
     /**
      * @return Engine
@@ -126,7 +132,8 @@ class PicturesController extends AbstractActionController
         PictureNameFormatter $pictureNameFormatter,
         TelegramService $telegram,
         Message $message,
-        TrafficControl $trafficControl
+        TrafficControl $trafficControl,
+        PictureItem $pictureItem
     ) {
 
         $this->hostManager = $hostManager;
@@ -140,6 +147,7 @@ class PicturesController extends AbstractActionController
         $this->telegram = $telegram;
         $this->message = $message;
         $this->trafficControl = $trafficControl;
+        $this->pictureItem = $pictureItem;
     }
 
     public function ownerTypeaheadAction()
@@ -205,7 +213,8 @@ class PicturesController extends AbstractActionController
                 ->from('brands', ['id', 'caption'])
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->join('pictures', 'car_parent_cache.car_id = pictures.car_id', null)
+                ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                 ->where('pictures.status = ?', Picture::STATUS_INBOX)
                 ->group('brands.id')
                 ->order(['brands.position', 'brands.caption'])
@@ -335,8 +344,8 @@ class PicturesController extends AbstractActionController
                     ->where('brand_engine.brand_id = ?', $formdata['brand_id']);
             } else {
                 $select
-                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                     ->where('brands_cars.brand_id = ?', $formdata['brand_id']);
             }
@@ -344,8 +353,8 @@ class PicturesController extends AbstractActionController
 
         if ($formdata['car_id']) {
             $select
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $formdata['car_id']);
         }
 
@@ -372,7 +381,9 @@ class PicturesController extends AbstractActionController
         }
 
         if ($formdata['car_type_id']) {
-            $select->join('cars', 'pictures.car_id=cars.id', null)
+            $select
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('cars', 'picture_item.item_id = cars.id', null)
                 ->join('car_types_parents', 'cars.car_type_id=car_types_parents.id', null)
                 ->where('car_types_parents.parent_id = ?', $formdata['car_type_id'])
                 ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID);
@@ -431,8 +442,8 @@ class PicturesController extends AbstractActionController
                     break;
                 default:
                     $select
-                        ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                        ->where('pictures.car_id IS NULL');
+                        ->joinLeft('picture_item', 'pictures.id = picture_item.picture_id', null)
+                        ->where('picture_item.car_id IS NULL');
                     break;
             }
         }
@@ -710,6 +721,10 @@ class PicturesController extends AbstractActionController
             $picture->perspective_id = $perspectiveId ? $perspectiveId : null;
             $picture->change_perspective_user_id = $user->id;
             $picture->save();
+            
+            $this->pictureItem->setProperties($picture->id, $picture->car_id, [
+                'perspective' => $perspectiveId ? $perspectiveId : null
+            ]);
 
             $this->log(sprintf(
                 'Установка ракурса картинки %s',
@@ -2017,6 +2032,9 @@ class PicturesController extends AbstractActionController
                         'language'             => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
+                    
+                    $this->pictureItem->setPictureItems($picture->id, []);
+                    
                     if (! $success) {
                         return $this->notFoundAction();
                     }
@@ -2027,6 +2045,9 @@ class PicturesController extends AbstractActionController
                         'language'   => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
+                    
+                    $this->pictureItem->setPictureItems($picture->id, []);
+                    
                     if (! $success) {
                         return $this->notFoundAction();
                     }
@@ -2034,9 +2055,12 @@ class PicturesController extends AbstractActionController
 
                 case Picture::VEHICLE_TYPE_ID:
                     $success = $this->table->moveToCar($picture->id, $this->params('car_id'), $userId, [
-                        'language'   => $this->language(),
+                        'language'             => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
+                    
+                    $this->pictureItem->setPictureItems($picture->id, (array)$this->params('car_id'));
+                    
                     if (! $success) {
                         return $this->notFoundAction();
                     }
@@ -2050,6 +2074,9 @@ class PicturesController extends AbstractActionController
                         'language'   => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
+                    
+                    $this->pictureItem->setPictureItems($picture->id, []);
+                    
                     if (! $success) {
                         return $this->notFoundAction();
                     }

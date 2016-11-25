@@ -99,8 +99,8 @@ class CommentsController extends AbstractActionController
                 $select
                     ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)
-                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                     ->where('brands_cars.brand_id = ?', $values['brand_id']);
             }
@@ -109,8 +109,8 @@ class CommentsController extends AbstractActionController
                 $select
                     ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)
-                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $values['car_id']);
             }
         }

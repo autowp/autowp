@@ -70,9 +70,9 @@ class BrandRow extends Row
         $this->carpictures_count = (int)$db->fetchOne(
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(pictures.id)'))
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $this->id)
         );

@@ -194,8 +194,8 @@ class CatalogueController extends AbstractActionController
         return $this->doBrandAction(function ($brand) {
 
             $select = $this->selectFromPictures()
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brand['id'])
                 ->group('pictures.id')
@@ -589,8 +589,8 @@ class CatalogueController extends AbstractActionController
             $topPictures = $this->cache->getItem($key, $success);
             if (! $success) {
                 $select = $this->selectOrderFromPictures()
-                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                     ->where('brands_cars.brand_id = ?', $brand['id'])
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
@@ -696,9 +696,9 @@ class CatalogueController extends AbstractActionController
                 $inboxVehiclePictures = $db->fetchOne(
                     $db->select()
                         ->from('pictures', 'count(distinct pictures.id)')
-                        ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                         ->where('pictures.status = ?', Picture::STATUS_INBOX)
-                        ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                        ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                         ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                         ->where('brands_cars.brand_id = ?', $brand['id'])
                 );
@@ -995,9 +995,9 @@ class CatalogueController extends AbstractActionController
                 if ($morePictures > 0) {
                     $pictureRows = $pictureTable->fetchAll(
                         $this->selectFromPictures()
-                            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                            ->where('pictures.perspective_id = ?', 17) // under the hood
-                            ->join('cars', 'pictures.car_id = cars.id', null)
+                            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                            ->where('picture_item.perspective_id = ?', 17) // under the hood
+                            ->join('cars', 'picture_item.item_id = cars.id', null)
                             ->join('engine_parent_cache', 'cars.engine_id = engine_parent_cache.engine_id', null)
                             ->where('engine_parent_cache.parent_id = ?', $engine->id)
                             ->order('pictures.id')
@@ -1863,8 +1863,8 @@ class CatalogueController extends AbstractActionController
                         ->from('modification_picture', 'count(1)')
                         ->where('modification_picture.modification_id = ?', $mRow->id)
                         ->join('pictures', 'modification_picture.picture_id = pictures.id', null)
-                        ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                        ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                        ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                         ->where('car_parent_cache.parent_id = ?', $carId)
                 ),
                 'active' => $mRow->id == $modificationId
@@ -1931,8 +1931,8 @@ class CatalogueController extends AbstractActionController
                 ]
             )
             ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
-            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-            ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
             ->where('car_parent_cache.parent_id = ?', $carId)
             ->join('modification_picture', 'pictures.id = modification_picture.picture_id', null)
             ->where('modification_picture.modification_id = ?', $modId)
@@ -2230,8 +2230,8 @@ class CatalogueController extends AbstractActionController
         $currentPicturesCount = 0;
         if ($isLastPage && $type == VehicleParent::TYPE_DEFAULT) {
             $select = $this->selectOrderFromPictures()
-                ->where('pictures.car_id = ?', $currentCarId)
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID);
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->where('picture_item.item_id = ?', $currentCarId);
             $pPaginator = new Paginator(
                 new Zend1DbTableSelect($select)
             );
@@ -2283,8 +2283,8 @@ class CatalogueController extends AbstractActionController
         $hasChildSpecs = $this->specsService->hasChildSpecs(1, $ids);
 
         $picturesSelect = $this->selectFromPictures()
-            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-            ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
             ->where('car_parent_cache.parent_id = ?', $currentCarId);
 
         $counts = $this->childsTypeCount($currentCarId);
@@ -2545,8 +2545,8 @@ class CatalogueController extends AbstractActionController
             ->where('comments_messages.moderator_attention = ?', CommentMessage::MODERATOR_ATTENTION_REQUIRED)
             ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
             ->join('pictures', 'comments_messages.item_id = pictures.id', null)
-            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-            ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
             ->where('car_parent_cache.parent_id = ?', $carId);
 
         $paginator = new Paginator(
@@ -2561,8 +2561,8 @@ class CatalogueController extends AbstractActionController
         $pictureTable = $this->catalogue()->getPictureTable();
         $select = $pictureTable->select(true)
             ->where('pictures.status = ?', Picture::STATUS_INBOX)
-            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-            ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
             ->where('car_parent_cache.parent_id = ?', $carId);
 
         $paginator = new Paginator(
@@ -2580,14 +2580,14 @@ class CatalogueController extends AbstractActionController
     private function getBrandCarPicturesSelect($carId, $exact, $onlyAccepted = true)
     {
         $select = $this->selectOrderFromPictures($onlyAccepted)
-            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID);
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null);
 
         if ($exact) {
             $select
-                ->where('pictures.car_id = ?', $carId);
+                ->where('picture_item.item_id = ?', $carId);
         } else {
             $select
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $carId);
         }
 

@@ -329,9 +329,17 @@ class Picture extends Table
         foreach ($rows as $index => $row) {
             switch ($row['type']) {
                 case Picture::VEHICLE_TYPE_ID:
-                    $carIds[$row['car_id']] = true;
-                    if (in_array($row['perspective_id'], $this->prefixedPerspectives)) {
-                        $perspectiveIds[$row['perspective_id']] = true;
+                    $db = $this->getAdapter();
+                    $pictureItemRow = $db->fetchRow(
+                        $db->select(true)
+                            ->from('picture_item', ['item_id', 'perspective_id'])
+                            ->where('picture_id = ?', $row['id'])
+                    );
+                    if ($pictureItemRow) {
+                        $carIds[$pictureItemRow['item_id']] = true;
+                        if (in_array($pictureItemRow['perspective_id'], $this->prefixedPerspectives)) {
+                            $perspectiveIds[$pictureItemRow['perspective_id']] = true;
+                        }
                     }
                     break;
 
@@ -446,24 +454,28 @@ class Picture extends Table
 
             switch ($row['type']) {
                 case Picture::VEHICLE_TYPE_ID:
-                    $car = isset($cars[$row['car_id']]) ? $cars[$row['car_id']] : null;
-                    if ($car) {
-                        $caption = [
-                            'type' => $row['type'],
-                            'car' => $car,
-                            'perspective' => isset($perspectives[$row['perspective_id']])
-                                ? $perspectives[$row['perspective_id']]
-                                : null
-                        ];
-                    } else {
-                        $caption = [
-                            'type' => $row['type'],
-                            'car' => null,
-                            'perspective' => isset($perspectives[$row['perspective_id']])
-                                ? $perspectives[$row['perspective_id']]
-                                : null
-                        ];
+                    $db = $this->getAdapter();
+                    $pictureItemRow = $db->fetchRow(
+                        $db->select()
+                            ->from('picture_item', ['item_id', 'perspective_id'])
+                            ->where('picture_id = ?', $row['id'])
+                    );
+                    
+                    $carId = null;
+                    $perspectiveId = null;
+                    if ($pictureItemRow) {
+                        $carId = $pictureItemRow['item_id'];
+                        $perspectiveId = $pictureItemRow['perspective_id'];
                     }
+                    
+                    $car = isset($cars[$carId]) ? $cars[$carId] : null;
+                    $caption = [
+                        'type'        => $row['type'],
+                        'car'         => $car ? $car : null,
+                        'perspective' => isset($perspectives[$perspectiveId])
+                            ? $perspectives[$perspectiveId]
+                            : null
+                    ];
                     break;
 
                 case Picture::ENGINE_TYPE_ID:

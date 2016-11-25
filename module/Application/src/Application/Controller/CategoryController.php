@@ -80,9 +80,9 @@ class CategoryController extends AbstractActionController
         foreach ($categories as &$category) {
             $picture = $pictureTable->fetchRow(
                 $pictureTable->select(true)
-                    ->join('category_car', 'pictures.car_id=category_car.car_id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('category_car', 'picture_item.item_id = category_car.car_id', null)
                     ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
-                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->where('category_parent.parent_id = ?', $category['id'])
                     ->order([
@@ -646,7 +646,7 @@ class CategoryController extends AbstractActionController
             $pictureTable = $this->catalogue()->getPictureTable();
 
             $select = $pictureTable->select(true)
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status IN (?)', [
                     Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
                 ])
@@ -654,11 +654,11 @@ class CategoryController extends AbstractActionController
 
             if ($topCar) {
                 $select
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $currentCar->id);
             } else {
                 $select
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
 
                 if ($isOther) {
@@ -720,7 +720,7 @@ class CategoryController extends AbstractActionController
             $pictureTable = $this->catalogue()->getPictureTable();
 
             $select = $pictureTable->select(true)
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status IN (?)', [
                     Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
                 ])
@@ -728,11 +728,11 @@ class CategoryController extends AbstractActionController
 
             if ($topCar) {
                 $select
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $currentCar->id);
             } else {
                 $select
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
 
                 if ($isOther) {
@@ -804,7 +804,7 @@ class CategoryController extends AbstractActionController
             $pictureTable = $this->catalogue()->getPictureTable();
 
             $select = $pictureTable->select(true)
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status IN (?)', [
                     Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
                 ])
@@ -812,11 +812,11 @@ class CategoryController extends AbstractActionController
 
             if ($topCar) {
                 $select
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $currentCar->id);
             } else {
                 $select
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
 
                 if ($isOther) {

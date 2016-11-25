@@ -16,6 +16,7 @@ use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\PictureItem;
 use Application\Service\TelegramService;
 
 use geoPHP;
@@ -38,11 +39,20 @@ class UploadController extends AbstractActionController
      * @var TelegramService
      */
     private $telegram;
+    
+    /**
+     * @var PictureItem
+     */
+    private $pictureItem;
 
-    public function __construct($partial, TelegramService $telegram)
-    {
+    public function __construct(
+        $partial,
+        TelegramService $telegram,
+        PictureItem $pictureItem
+    ) {
         $this->partial = $partial;
         $this->telegram = $telegram;
+        $this->pictureItem = $pictureItem;
     }
 
     private function getCarParentTable()
@@ -327,6 +337,9 @@ class UploadController extends AbstractActionController
             ]);
             $picture->save();
 
+            if ($carId) {
+                $this->pictureItem->add($picture->id, $carId);
+            }
 
             // increment uploads counter
             if ($user) {

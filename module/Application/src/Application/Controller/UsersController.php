@@ -186,10 +186,10 @@ class UsersController extends AbstractActionController
             $select
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->join('pictures', 'car_parent_cache.car_id = pictures.car_id', null)
+                ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                 ->where('pictures.owner_id = ?', $user->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->group('brands.id');
         });
 
@@ -232,8 +232,8 @@ class UsersController extends AbstractActionController
 
         $pictures = $this->catalogue()->getPictureTable();
         $select = $pictures->select(true)
-            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-            ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
             ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
             ->where('pictures.owner_id = ?', $user->id)
             ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
@@ -397,7 +397,8 @@ class UsersController extends AbstractActionController
                     $select = $brandTable->select(true)
                         ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                         ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                        ->join('pictures', 'car_parent_cache.car_id = pictures.car_id', null)
+                        ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                        ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                         ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                         ->group('brands_cars.brand_id')
                         ->where('pictures.owner_id = ?', $user->id)

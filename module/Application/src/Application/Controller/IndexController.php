@@ -103,9 +103,9 @@ class IndexController extends AbstractActionController
                     null
                 )
                 ->where('mp.group_id = ?', $groupId)
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id)
                 ->order([
                     'car_parent_cache.sport', 'car_parent_cache.tuning', 'mp.position',
@@ -147,8 +147,8 @@ class IndexController extends AbstractActionController
 
         if (count($left) > 0) {
             $select = $pTable->select(true)
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 //->order('ratio DESC')
@@ -175,8 +175,8 @@ class IndexController extends AbstractActionController
         $totalPictures = $db->fetchOne(
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
         );

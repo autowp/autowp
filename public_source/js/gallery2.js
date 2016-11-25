@@ -559,6 +559,9 @@ define(
                         }
                         
                     } else {
+                        if (!full) {
+                            throw "Full is undefined";
+                        }
                         bounds = self.maxBounds(self.bound(cSize, {
                             width: full.width,
                             height: full.height

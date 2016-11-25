@@ -67,8 +67,8 @@ class PictureController extends AbstractActionController
                     if ($picture->car_id) {
                         $galleryEnabled = true;
                         $picSelect
-                            ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                            ->where('pictures.car_id = ?', $picture->car_id);
+                            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                            ->where('picture_item.item_id = ?', $picture->car_id);
                     }
                     break;
 
@@ -235,6 +235,7 @@ class PictureController extends AbstractActionController
         ]);
 
         return array_replace($data, [
+            'gallery2'   => true,
             'galleryUrl' => $this->url()->fromRoute('picture/picture', [
                 'picture_id' => $picture->identity ? $picture->identity : $picture->id
             ], [

@@ -547,8 +547,8 @@ class Mosts
         foreach ($perspective_group_ids as $groupId) {
             $picture = $pictureTable->fetchRow(
                 $pictureTable->select(true)
-                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->join(
                         ['mp' => 'perspectives_groups_perspectives'],
                         'pictures.perspective_id=mp.perspective_id',
@@ -583,8 +583,8 @@ class Mosts
         foreach ($pictures as $key => $picture) {
             if (! $picture) {
                 $select = $pictureTable->select(true)
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                    ->where('pictures.type=?', Picture::VEHICLE_TYPE_ID)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id = ?', $carId)
                     ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
