@@ -120,7 +120,8 @@ class Car extends AbstractPlugin
             } else {
                 $select
                     ->from($pictureTable->info('name'), ['car_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
-                    ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->where('car_parent_cache.parent_id IN (?)', $carIds)
                     ->group('car_parent_cache.parent_id');
             }

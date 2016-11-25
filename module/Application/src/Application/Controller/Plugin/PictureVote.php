@@ -26,17 +26,20 @@ class PictureVote extends AbstractPlugin
     {
         $result = null;
         if ($picture->type == Picture::VEHICLE_TYPE_ID && $picture->status == Picture::STATUS_ACCEPTED) {
-            $car = $picture->findParentRow(Vehicle::class);
-            if ($car) {
-                $db = $this->table->getAdapter();
-                $result = ! $db->fetchOne(
-                    $db->select()
-                        ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                        ->where('car_id = ?', $car->id)
-                        ->where('status = ?', Picture::STATUS_ACCEPTED)
-                        ->where('id <> ?', $picture->id)
-                );
-            }
+            $db = $this->table->getAdapter();
+            $result = ! $db->fetchOne(
+                $db->select()
+                    ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join(
+                        ['pi2' => 'picture_item'],
+                        'picture_item.item_id = pi2.item_id',
+                        null
+                    )
+                    ->where('pi2.picture_id = ?', $picture->id)
+                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
+                    ->where('pictures.id <> ?', $picture->id)
+            );
         }
 
         return $result;
@@ -46,16 +49,19 @@ class PictureVote extends AbstractPlugin
     {
         $result = null;
         if ($picture->type == Picture::VEHICLE_TYPE_ID) {
-            $car = $picture->findParentRow(Vehicle::class);
-            if ($car) {
-                $db = $this->table->getAdapter();
-                $result = $db->fetchOne(
-                    $db->select()
-                        ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                        ->where('car_id = ?', $car->id)
-                        ->where('status = ?', Picture::STATUS_ACCEPTED)
-                );
-            }
+            $db = $this->table->getAdapter();
+            $result = $db->fetchOne(
+                $db->select()
+                    ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join(
+                        ['pi2' => 'picture_item'],
+                        'picture_item.item_id = pi2.item_id',
+                        null
+                    )
+                    ->where('pi2.picture_id = ?', $picture->id)
+                    ->where('status = ?', Picture::STATUS_ACCEPTED)
+            );
         }
         return $result;
     }

@@ -26,6 +26,7 @@ use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\PictureItem;
 use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
@@ -60,17 +61,24 @@ class Pic extends AbstractPlugin
      */
     private $specsService = null;
 
+    /**
+     * @var PictureItem
+     */
+    private $pictureItem;
+
     public function __construct(
         $textStorage,
         $translator,
         PictureNameFormatter $pictureNameFormatter,
-        SpecificationsService $specsService
+        SpecificationsService $specsService,
+        PictureItem $pictureItem
     ) {
 
         $this->textStorage = $textStorage;
         $this->translator = $translator;
         $this->pictureNameFormatter = $pictureNameFormatter;
         $this->specsService = $specsService;
+        $this->pictureItem = $pictureItem;
     }
 
     /**
@@ -149,9 +157,11 @@ class Pic extends AbstractPlugin
                 break;
 
             case Picture::VEHICLE_TYPE_ID:
-                if ($row['car_id']) {
+                $carIds = $this->pictureItem->getPictureItems($row['id']);
+                if ($carIds) {
+                    $carId = $carIds[0];
                     $carParentTable = new VehicleParent();
-                    $paths = $carParentTable->getPaths($row['car_id'], [
+                    $paths = $carParentTable->getPaths($carId, [
                         'breakOnFirst' => true
                     ]);
 
@@ -347,7 +357,7 @@ class Pic extends AbstractPlugin
                     'pictures.width', 'pictures.height',
                     'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                     'pictures.status', 'pictures.image_id',
-                    'pictures.brand_id', 'pictures.car_id', 'pictures.engine_id',
+                    'pictures.brand_id', 'pictures.engine_id',
                     'pictures.perspective_id', 'pictures.type', 'pictures.factory_id'
                 ]);
 
@@ -502,6 +512,7 @@ class Pic extends AbstractPlugin
         $vehicleTwins = [];
         $vehicleFactories = [];
         $carDetailsUrl = null;
+        $items = [];
 
         $language = $controller->language();
 
@@ -606,7 +617,10 @@ class Pic extends AbstractPlugin
                 }
                 break;
             case Picture::VEHICLE_TYPE_ID:
-                $car = $picture->findParentRow(Vehicle::class);
+                $carIds = $this->pictureItem->getPictureItems($picture['id']);
+                $carTable = $catalogue->getCarTable();
+                $items = $carTable->find($carIds);
+                $car = $items->current(); // TODO: multiple items
                 if ($car) {
                     $vehicleHasSpecs = $this->specsService->hasSpecs(1, $car->id);
 
@@ -992,7 +1006,8 @@ class Pic extends AbstractPlugin
             'pictureVote'       => $this->getController()->pictureVote($picture->id, [
                 'hideVote' => true
             ]),
-            'picturePerspective' => $picturePerspective
+            'picturePerspective' => $picturePerspective,
+            'items'             => $items
         ];
 
         // refresh views count
@@ -1142,7 +1157,7 @@ class Pic extends AbstractPlugin
                 'pictures.width', 'pictures.height',
                 'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                 'pictures.image_id', 'pictures.filesize',
-                'pictures.brand_id', 'pictures.car_id', 'pictures.engine_id',
+                'pictures.brand_id', 'pictures.engine_id',
                 'pictures.perspective_id', 'pictures.type', 'pictures.factory_id',
                 'pictures.type'
             ])
@@ -1199,7 +1214,7 @@ class Pic extends AbstractPlugin
         // names
         $pictureTable = new Picture();
         $names = $pictureTable->getNameData($rows, [
-            'language'   => $language
+            'language' => $language
         ]);
 
         // comments

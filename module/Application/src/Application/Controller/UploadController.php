@@ -39,7 +39,7 @@ class UploadController extends AbstractActionController
      * @var TelegramService
      */
     private $telegram;
-    
+
     /**
      * @var PictureItem
      */
@@ -94,12 +94,12 @@ class UploadController extends AbstractActionController
         if ($replacePicture) {
             $type = $replacePicture->type;
             $brandId = $replacePicture->brand_id;
-            $carId = $replacePicture->car_id;
+            $carIds = $this->pictureItem->getPictureItems($replacePicture->id);
             $engineId = $replacePicture->engine_id;
         } else {
             $type = (int)$this->params('type');
             $brandId = (int)$this->params('brand_id');
-            $carId = (int)$this->params('car_id');
+            $carIds = [(int)$this->params('car_id')];
             $engineId = (int)$this->params('engine_id');
         }
 
@@ -129,11 +129,13 @@ class UploadController extends AbstractActionController
 
             case Picture::VEHICLE_TYPE_ID:
                 $cars = new Vehicle();
-                $car = $cars->find($carId)->current();
-                if ($car) {
+                $cars = $cars->find($carIds);
+                $names = [];
+                foreach ($cars as $car) {
                     $selected = true;
-                    $selectedName = $this->car()->formatName($car, $this->language());
+                    $names[] = $this->car()->formatName($car, $this->language());
                 }
+                $selectedName = implode(', ', $names);
                 break;
 
             case Picture::ENGINE_TYPE_ID:
@@ -164,7 +166,7 @@ class UploadController extends AbstractActionController
                 );
                 $form->setData($data);
                 if ($form->isValid()) {
-                    $pictures = $this->saveUpload($form, $type, $brandId, $engineId, $carId, $replacePicture);
+                    $pictures = $this->saveUpload($form, $type, $brandId, $engineId, $carIds, $replacePicture);
 
                     if ($request->isXmlHttpRequest()) {
                         /*$urls = [];
@@ -230,7 +232,7 @@ class UploadController extends AbstractActionController
         ];
     }
 
-    private function saveUpload($form, $type, $brandId, $engineId, $carId, $replacePicture)
+    private function saveUpload($form, $type, $brandId, $engineId, $carIds, $replacePicture)
     {
         $user = $this->user()->get();
 
@@ -248,11 +250,6 @@ class UploadController extends AbstractActionController
                 break;
 
             case Picture::VEHICLE_TYPE_ID:
-                $cars = new Vehicle();
-                $car = $cars->find($carId)->current();
-                if ($car) {
-                    $carId = $car->id;
-                }
                 break;
 
             case Picture::ENGINE_TYPE_ID:
@@ -330,15 +327,14 @@ class UploadController extends AbstractActionController
                 'removing_date' => null,
                 'brand_id'      => $brandId ? $brandId : null,
                 'engine_id'     => $engineId ? $engineId : null,
-                'car_id'        => $carId ? $carId : null,
                 'ip'            => inet_pton($this->getRequest()->getServer('REMOTE_ADDR')),
                 'identity'      => $pictureTable->generateIdentity(),
                 'replace_picture_id' => $replacePicture ? $replacePicture->id : null,
             ]);
             $picture->save();
 
-            if ($carId) {
-                $this->pictureItem->add($picture->id, $carId);
+            if ($carIds) {
+                $this->pictureItem->setPictureItems($picture->id, $carIds);
             }
 
             // increment uploads counter
@@ -363,10 +359,12 @@ class UploadController extends AbstractActionController
                     }
                     break;
                 case Picture::VEHICLE_TYPE_ID:
-                    $car = $picture->findParentRow(Vehicle::class);
-                    if ($car) {
+                    $carIds = $this->pictureItem->getPictureItems($picture->id);
+                    $carTable = new Vehicle();
+                    $brandModel = new BrandModel();
+                    //TODO: prevent double refresh
+                    foreach ($carTable->find($carIds) as $car) {
                         $car->refreshPicturesCount();
-                        $brandModel = new BrandModel();
                         $brandModel->refreshPicturesCountByVehicle($car->id);
                     }
                     break;

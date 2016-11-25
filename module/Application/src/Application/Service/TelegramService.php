@@ -218,7 +218,8 @@ class TelegramService
                     $db->select()
                         ->from('brands_cars', 'brand_id')
                         ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                        ->where('car_parent_cache.car_id = ?', $picture->car_id)
+                        ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                        ->where('picture_item.picture_id = ?', $picture->id)
                 );
                 break;
             case Picture::LOGO_TYPE_ID:

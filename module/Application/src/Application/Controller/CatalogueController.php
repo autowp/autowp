@@ -603,11 +603,22 @@ class CatalogueController extends AbstractActionController
                     'width' => 4,
                     'url'   => function ($picture) use ($carParentTable, $brand) {
 
-                        if (! $picture['car_id']) {
+                        $db = $carParentTable->getAdapter();
+
+                        $carId = $db->fetchOne(
+                            $db->select()
+                                ->from('picture_item', 'item_id')
+                                ->where('picture_item.picture_id = ?', $picture['id'])
+                                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
+                                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                                ->where('brands_cars.brand_id = ?', $brand['id'])
+                        );
+
+                        if (! $carId) {
                             return $this->pic()->url($picture['id'], $picture['identity']);
                         }
 
-                        $paths = $carParentTable->getPathsToBrand($picture['car_id'], $brand['id'], [
+                        $paths = $carParentTable->getPathsToBrand($carId, $brand['id'], [
                             'breakOnFirst' => true
                         ]);
 

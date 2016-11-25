@@ -153,8 +153,7 @@
         <?php
             switch ($this->picture->type) {
                 case Application\Model\DbTable\Picture::VEHICLE_TYPE_ID:
-                    $car = $this->picture->findParentRow(Application\Model\DbTable\Vehicle::class);
-                    if ($car) {
+                    foreach ($this->items as $car) {
 
                         foreach ($this->categories as $category) {
                             $list[] = $this->htmlA($category['url'], '<i class="fa fa-tag"></i> ' . $this->escapeHtml($category['name']), false);
@@ -213,9 +212,9 @@
 
                         if ($this->user()->logedIn()) {
                             $list[] = $this->htmlA($this->url('upload/params', [
-                                'action'     => 'index',
-                                'type'       => '1',
-                                'car_id'     => $car->id
+                                'action' => 'index',
+                                'type'   => '1',
+                                'car_id' => $car->id
                             ]), '<i class="fa fa-upload"></i> ' . $this->escapeHtml($this->page(29)->name) . ' ' . $this->pic()->htmlTitle($this->name), false);
                         }
                     }

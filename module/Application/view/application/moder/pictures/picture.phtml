@@ -152,14 +152,14 @@
                         ?>
                         <p>
                             <?=$this->escapeHtml($this->translate('moder/picture/catalogue/vehicle'))?>
-                            <?php $car = $this->picture->findParentRow(Application\Model\DbTable\Vehicle::class) ?>
-                            <?php if ($car) { ?>
+                            <?php foreach ($this->items as $car) { ?>
                                 <?=$this->htmlA($this->url('moder/cars/params', [
                                     'action'     => 'car',
                                     'car_id'     => $car->id
                                 ]), $this->car()->htmlTitle($car->getNameData($this->language())), false) ?>
-                            <?php } else { ?>
-                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
+                            <?php } ?>
+                            <?php if (count($this->items) <= 0) { ?>
+                             <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
                             <?php } ?>
                         </p>
                         <?php

@@ -97,7 +97,7 @@ class PicturesController extends AbstractActionController
      * @var TrafficControl
      */
     private $trafficControl;
-    
+
     /**
      * @var PictureItem
      */
@@ -717,12 +717,10 @@ class PicturesController extends AbstractActionController
 
         if ($request->isPost()) {
             $user = $this->user()->get();
+            $itemId = (int)$this->params()->fromPost('item_id');
             $perspectiveId = (int)$this->params()->fromPost('perspective_id');
-            $picture->perspective_id = $perspectiveId ? $perspectiveId : null;
-            $picture->change_perspective_user_id = $user->id;
-            $picture->save();
-            
-            $this->pictureItem->setProperties($picture->id, $picture->car_id, [
+
+            $this->pictureItem->setProperties($picture->id, $itemId, [
                 'perspective' => $perspectiveId ? $perspectiveId : null
             ]);
 
@@ -1234,17 +1232,22 @@ class PicturesController extends AbstractActionController
         }
 
         $relatedBrands = [];
+        $items = [];
         switch ($picture->type) {
             case Picture::VEHICLE_TYPE_ID:
-                if ($picture->car_id) {
-                    $brandModel = new BrandModel();
-                    $relatedBrands = $brandModel->getList($this->language(), function ($select) use ($picture) {
-                        $select
-                            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                            ->where('car_parent_cache.car_id = ?', $picture->car_id)
-                            ->group('brands.id');
-                    });
+                $brandModel = new BrandModel();
+                $relatedBrands = $brandModel->getList($this->language(), function ($select) use ($picture) {
+                    $select
+                        ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+                        ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                        ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                        ->where('picture_item.picture_id = ?', $picture->id)
+                        ->group('brands.id');
+                });
+                $itemIds = $this->pictureItem->getPictureItems($picture['id']);
+                $itemTable = new Vehicle();
+                foreach ($itemTable->find($itemIds) as $item) {
+                    $items[] = $item;
                 }
                 break;
 
@@ -1297,7 +1300,8 @@ class PicturesController extends AbstractActionController
             'banForm'                       => $this->banForm,
             'picturePerspective'            => $picturePerspective,
             'pictureVote'                   => $this->pictureVote($picture->id, []),
-            'relatedBrands'                 => $relatedBrands
+            'relatedBrands'                 => $relatedBrands,
+            'items'                         => $items
         ];
     }
 
@@ -2032,9 +2036,9 @@ class PicturesController extends AbstractActionController
                         'language'             => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
-                    
+
                     $this->pictureItem->setPictureItems($picture->id, []);
-                    
+
                     if (! $success) {
                         return $this->notFoundAction();
                     }
@@ -2045,9 +2049,9 @@ class PicturesController extends AbstractActionController
                         'language'   => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
-                    
+
                     $this->pictureItem->setPictureItems($picture->id, []);
-                    
+
                     if (! $success) {
                         return $this->notFoundAction();
                     }
@@ -2058,9 +2062,9 @@ class PicturesController extends AbstractActionController
                         'language'             => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
-                    
+
                     $this->pictureItem->setPictureItems($picture->id, (array)$this->params('car_id'));
-                    
+
                     if (! $success) {
                         return $this->notFoundAction();
                     }
@@ -2074,9 +2078,9 @@ class PicturesController extends AbstractActionController
                         'language'   => $this->language(),
                         'pictureNameFormatter' => $this->pictureNameFormatter
                     ]);
-                    
+
                     $this->pictureItem->setPictureItems($picture->id, []);
-                    
+
                     if (! $success) {
                         return $this->notFoundAction();
                     }

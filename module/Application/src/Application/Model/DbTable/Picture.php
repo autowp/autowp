@@ -38,11 +38,6 @@ class Picture extends Table
     protected $_rowClass = \Application\Model\DbTable\Picture\Row::class;
 
     protected $_referenceMap = [
-        'Car' => [
-            'columns'       => ['car_id'],
-            'refTableClass' => Vehicle::class,
-            'refColumns'    => ['id']
-        ],
         'Brand' => [
             'columns'       => ['brand_id'],
             'refTableClass' => BrandTable::class,
@@ -460,14 +455,14 @@ class Picture extends Table
                             ->from('picture_item', ['item_id', 'perspective_id'])
                             ->where('picture_id = ?', $row['id'])
                     );
-                    
+
                     $carId = null;
                     $perspectiveId = null;
                     if ($pictureItemRow) {
                         $carId = $pictureItemRow['item_id'];
                         $perspectiveId = $pictureItemRow['perspective_id'];
                     }
-                    
+
                     $car = isset($cars[$carId]) ? $cars[$carId] : null;
                     $caption = [
                         'type'        => $row['type'],
