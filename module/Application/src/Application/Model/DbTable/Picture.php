@@ -58,11 +58,6 @@ class Picture extends Table
             'refTableClass' => \Autowp\User\Model\DbTable\User::class,
             'refColumns'    => ['id']
         ],
-        'Change_Perspective_User' => [
-            'columns'       => ['change_perspective_user_id'],
-            'refTableClass' => \Autowp\User\Model\DbTable\User::class,
-            'refColumns'    => ['id']
-        ],
         'Change_Status_User' => [
             'columns'       => ['change_status_user_id'],
             'refTableClass' => \Autowp\User\Model\DbTable\User::class,
