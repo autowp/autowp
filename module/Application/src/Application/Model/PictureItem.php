@@ -18,7 +18,13 @@ class PictureItem
         ]);
     }
 
-    public function add($pictureId, $itemId)
+    /**
+     * @param int $pictureId
+     * @param int $itemId
+     * @throws InvalidArgumentException
+     * @return \Zend_Db_Table_Row_Abstract|NULL
+     */
+    private function getRow($pictureId, $itemId)
     {
         $pictureId = (int)$pictureId;
         $itemId = (int)$itemId;
@@ -36,6 +42,24 @@ class PictureItem
             'item_id = ?'    => $itemId
         ]);
 
+        return $row;
+    }
+
+    public function add($pictureId, $itemId)
+    {
+        $pictureId = (int)$pictureId;
+        $itemId = (int)$itemId;
+
+        if (!$pictureId) {
+            throw new InvalidArgumentException("Picture id is invalid");
+        }
+
+        if (!$itemId) {
+            throw new InvalidArgumentException("Item id is invalid");
+        }
+
+        $row = $this->getRow($pictureId, $itemId);
+
         if (!$row) {
             $row = $this->table->createRow([
                 'picture_id' => $pictureId,
@@ -45,28 +69,20 @@ class PictureItem
         }
     }
 
+    public function isExists($pictureId, $itemId)
+    {
+        return (bool)$this->getRow($pictureId, $itemId);
+    }
+
     public function changePictureItem($pictureId, $oldItemId, $newItemId)
     {
-        $pictureId = (int)$pictureId;
-        $oldItemId = (int)$oldItemId;
         $newItemId = (int)$newItemId;
-
-        if (!$pictureId) {
-            throw new InvalidArgumentException("Picture id is invalid");
-        }
-
-        if (!$oldItemId) {
-            throw new InvalidArgumentException("Item id is invalid");
-        }
 
         if (!$newItemId) {
             throw new InvalidArgumentException("Item id is invalid");
         }
 
-        $row = $this->table->fetchRow([
-            'picture_id = ?' => $pictureId,
-            'item_id = ?'    => $oldItemId
-        ]);
+        $row = $this->getRow($pictureId, $oldItemId);
 
         if (!$row) {
             throw new \Exception("Item not found");
@@ -93,10 +109,7 @@ class PictureItem
         unset($itemId);
 
         foreach ($itemIds as $itemId) {
-            $row = $this->table->fetchRow([
-                'picture_id = ?' => $pictureId,
-                'item_id = ?'    => $itemId
-            ]);
+            $row = $this->getRow($pictureId, $itemId);
 
             if (!$row) {
                 $row = $this->table->createRow([
@@ -129,21 +142,7 @@ class PictureItem
 
     public function setProperties($pictureId, $itemId, array $properties)
     {
-        $pictureId = (int)$pictureId;
-        $itemId = (int)$itemId;
-
-        if (!$pictureId) {
-            throw new InvalidArgumentException("Picture id is invalid");
-        }
-
-        if (!$itemId) {
-            throw new InvalidArgumentException("Item id is invalid");
-        }
-
-        $row = $this->table->fetchRow([
-            'picture_id = ?' => $pictureId,
-            'item_id = ?'    => $itemId
-        ]);
+        $row = $this->getRow($pictureId, $itemId);
         if ($row) {
             if (array_key_exists('perspective', $properties)) {
                 $perspective = $properties['perspective'];
@@ -171,5 +170,15 @@ class PictureItem
 
             $row->save();
         }
+    }
+
+    public function getPerspective($pictureId, $itemId)
+    {
+        $row = $this->getRow($pictureId, $itemId);
+        if (!$row) {
+            return null;
+        }
+
+        return $row->perspective_id;
     }
 }

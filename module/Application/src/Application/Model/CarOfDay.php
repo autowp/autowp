@@ -33,6 +33,26 @@ class CarOfDay
         ]);
     }
 
+    public function getCarOfDayCadidate()
+    {
+        $db = $this->table->getAdapter();
+        $sql = '
+            SELECT c.id, count(p.id) AS p_count
+            FROM cars AS c
+                INNER JOIN car_parent_cache AS cpc ON c.id=cpc.parent_id
+                INNER JOIN picture_item ON cpc.car_id = picture_item.item_id
+                INNER JOIN pictures AS p ON picture_item.picture_id=p.id
+            WHERE p.type=? AND p.status=?
+                AND (c.begin_year AND c.end_year OR c.begin_model_year AND c.end_model_year)
+                AND c.id NOT IN (SELECT car_id FROM of_day WHERE car_id)
+            GROUP BY c.id
+            HAVING p_count >= 5
+            ORDER BY RAND()
+            LIMIT 1
+        ';
+        return $db->fetchRow($sql, [Picture::VEHICLE_TYPE_ID, Picture::STATUS_ACCEPTED]);
+    }
+
     public function pick()
     {
         $dayRow = $this->table->fetchRow([
@@ -48,21 +68,7 @@ class CarOfDay
         }
 
         if (! $dayRow['car_id']) {
-            $db = $this->table->getAdapter();
-            $sql = '
-                SELECT c.id, count(p.id) AS p_count
-                FROM cars AS c
-                    INNER JOIN car_parent_cache AS cpc ON c.id=cpc.parent_id
-                    INNER JOIN pictures AS p ON cpc.car_id=p.car_id
-                WHERE p.type=? AND p.status=?
-                    AND (c.begin_year AND c.end_year OR c.begin_model_year AND c.end_model_year)
-                    AND c.id NOT IN (SELECT car_id FROM of_day WHERE car_id)
-                GROUP BY c.id
-                HAVING p_count >= 5
-                ORDER BY RAND()
-                LIMIT 1
-            ';
-            $row = $db->fetchRow($sql, [Picture::VEHICLE_TYPE_ID, Picture::STATUS_ACCEPTED]);
+            $row = $this->getCarOfDayCadidate();
             if ($row) {
                 print $row['id']  ."\n";
 
@@ -93,7 +99,7 @@ class CarOfDay
             ])
             ->limit(1);
         if ($perspective) {
-            $select->where('pictures.perspective_id = ?', $perspective);
+            $select->where('picture_item.perspective_id = ?', $perspective);
         }
         return $pictureTable->fetchRow($select);
     }

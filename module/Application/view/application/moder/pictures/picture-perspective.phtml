@@ -3,22 +3,15 @@
 ?>
 <form method="post" action="<?=$this->escapeHtmlAttr($this->url)?>" class="tiny" data-module="perspective-selector">
     <?php if (!$tiny) { ?>
-        <label for="perspective_id"><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></label>
+        <label><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></label>
     <?php } ?>
-
+    <?=$this->car()->htmlTitle($this->name)?>
     <?=$this->formElement(
         (new Zend\Form\Element\Select('perspective_id'))
             ->setAttributes([
-                'id'    => 'perspective_id',
                 'class' => 'form-control' . ($tiny ? ' input-sm' : '')
             ])
             ->setValueOptions($this->options)
             ->setValue($this->value)
     )?>
 </form>
-<?php if ($this->user) { ?>
-    <p>
-        <?=$this->escapeHtml($this->translate('moder/picture/perspective-by'))?>
-        <?=$this->user($this->user) ?>
-    </p>
-<?php } ?>

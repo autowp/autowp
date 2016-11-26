@@ -106,7 +106,6 @@ class Car extends AbstractPlugin
             $pictureTableAdapter = $pictureTable->getAdapter();
 
             $select = $pictureTableAdapter->select()
-                ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
                 ->where('pictures.status IN (?)', [
                     DbTable\Picture::STATUS_NEW,
                     DbTable\Picture::STATUS_ACCEPTED
@@ -114,9 +113,10 @@ class Car extends AbstractPlugin
 
             if ($onlyExactly) {
                 $select
-                    ->from($pictureTable->info('name'), ['pictures.car_id', new Zend_Db_Expr('COUNT(1)')])
-                    ->where('pictures.car_id IN (?)', $carIds)
-                    ->group('pictures.car_id');
+                    ->from($pictureTable->info('name'), ['picture_item.item_id', new Zend_Db_Expr('COUNT(1)')])
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->where('picture_item.item_id IN (?)', $carIds)
+                    ->group('picture_item.item_id');
             } else {
                 $select
                     ->from($pictureTable->info('name'), ['car_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
@@ -316,7 +316,6 @@ class Car extends AbstractPlugin
 
         // total pictures
         $carsTotalPictures = $this->carsTotalPictures($carIds, $onlyExactlyPictures);
-
         $items = [];
         foreach ($cars as $car) {
             $totalPictures = isset($carsTotalPictures[$car->id]) ? $carsTotalPictures[$car->id] : null;
@@ -606,17 +605,16 @@ class Car extends AbstractPlugin
 
         $pictureTable = $this->getPictureTable();
         $db = $pictureTable->getAdapter();
-
         $select = $db->select()
             ->from(
                 $pictureTable->info('name'),
                 [
-                    'id', 'name', 'type', 'brand_id', 'engine_id', 'car_id', 'factory_id',
-                    'perspective_id', 'image_id', 'crop_left', 'crop_top',
+                    'id', 'name', 'type', 'brand_id', 'engine_id', 'factory_id',
+                    'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
             )
-            ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', 'perspective_id')
             ->where('pictures.status IN (?)', [
                 DbTable\Picture::STATUS_ACCEPTED,
                 DbTable\Picture::STATUS_NEW
@@ -626,11 +624,11 @@ class Car extends AbstractPlugin
         $order = [];
 
         if ($options['onlyExactlyPictures']) {
-            $select->where('pictures.car_id = ?', $car->id);
+            $select->where('picture_item.item_id = ?', $car->id);
         } else {
             $select
-                ->join('car_parent_cache', 'pictures.car_id = car_parent_cache.car_id', null)
-                ->join('cars', 'pictures.car_id = cars.id', null)
+                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
+                ->join('cars', 'picture_item.item_id = cars.id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id);
 
             $order[] = 'cars.is_concept asc';
@@ -655,7 +653,7 @@ class Car extends AbstractPlugin
             $select
                 ->join(
                     ['mp' => 'perspectives_groups_perspectives'],
-                    'pictures.perspective_id = mp.perspective_id',
+                    'picture_item.perspective_id = mp.perspective_id',
                     null
                 )
                 ->where('mp.group_id = ?', $options['perspectiveGroup']);
@@ -678,8 +676,12 @@ class Car extends AbstractPlugin
         if ($options['onlyChilds']) {
             $select
                 ->join(
+                    ['pi_oc' => 'picture_item'],
+                    'pi_oc.picture_id = pictures.id'
+                )
+                ->join(
                     ['cpc_oc' => 'car_parent_cache'],
-                    'cpc_oc.car_id = pictures.car_id',
+                    'cpc_oc.car_id = pi_oc.item_id',
                     null
                 )
                 ->where('cpc_oc.parent_id IN (?)', $options['onlyChilds']);

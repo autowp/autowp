@@ -1202,7 +1202,7 @@ class SpecificationsService
         $order = [];
         if ($perspectives) {
             foreach ($perspectives as $pid) {
-                $order[] = new Zend_Db_Expr($pictureTableAdapter->quoteInto('pictures.perspective_id = ? DESC', $pid));
+                $order[] = new Zend_Db_Expr($pictureTableAdapter->quoteInto('picture_item.perspective_id = ? DESC', $pid));
             }
         } else {
             $order[] = 'pictures.id desc';

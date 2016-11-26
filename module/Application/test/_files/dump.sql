@@ -37,7 +37,11 @@ CREATE TABLE `acl_resources` (
 --
 
 /*!40000 ALTER TABLE `acl_resources` DISABLE KEYS */;
-INSERT INTO `acl_resources` VALUES (12,'attrs'),(1,'brand'),(4,'car'),(14,'category'),(6,'comment'),(8,'engine'),(21,'factory'),(10,'forums'),(15,'hotlinks'),(2,'model'),(19,'museums'),(7,'page'),(5,'picture'),(9,'rights'),(17,'specifications'),(18,'status'),(11,'twins'),(13,'user'),(20,'website');
+INSERT INTO `acl_resources` VALUES 
+(12,'attrs'),(1,'brand'),(4,'car'),(14,'category'),(6,'comment'),(8,'engine'),
+(21,'factory'),(10,'forums'),(15,'hotlinks'),(2,'model'),(19,'museums'),
+(7,'page'),(5,'picture'),(9,'rights'),(17,'specifications'),(18,'status'),
+(11,'twins'),(13,'user'),(20,'website');
 /*!40000 ALTER TABLE `acl_resources` ENABLE KEYS */;
 
 --
@@ -62,7 +66,10 @@ CREATE TABLE `acl_resources_privileges` (
 --
 
 /*!40000 ALTER TABLE `acl_resources_privileges` DISABLE KEYS */;
-INSERT INTO `acl_resources_privileges` VALUES (4,4,'add'),(1,4,'edit_meta'),(5,4,'move'),(2,11,'edit'),(3,13,'ban'),(7,17,'edit'),(6,21,'edit');
+REPLACE INTO `acl_resources_privileges` VALUES 
+(4,4,'add'),(1,4,'edit_meta'),(5,4,'move'),
+(2,11,'edit'),(3,13,'ban'),(7,17,'edit'),(6,21,'edit'),
+(8,5,'move');
 /*!40000 ALTER TABLE `acl_resources_privileges` ENABLE KEYS */;
 
 --
@@ -85,7 +92,20 @@ CREATE TABLE `acl_roles` (
 --
 
 /*!40000 ALTER TABLE `acl_roles` DISABLE KEYS */;
-INSERT INTO `acl_roles` VALUES (1,'abstract-user'),(5,'admin'),(12,'articles-moder'),(11,'brands-moder'),(10,'cars-moder'),(8,'comments-writer'),(15,'engines-moder'),(23,'expert'),(58,'factory-moder'),(16,'forums-moder'),(49,'green-user'),(7,'guest'),(17,'models-moder'),(14,'moder'),(50,'museum-moder'),(13,'pages-moder'),(9,'pictures-moder'),(47,'specifications-editor'),(6,'user');
+INSERT INTO `acl_roles` VALUES 
+(1,'abstract-user'),
+(5,'admin'),
+(12,'articles-moder'),
+(11,'brands-moder'),
+(10,'cars-moder'),
+(8,'comments-writer'),
+(15,'engines-moder'),(23,'expert'),
+(58,'factory-moder'),(16,'forums-moder'),(49,'green-user'),
+(7,'guest'),(17,'models-moder'),(14,'moder'),(50,'museum-moder'),
+(13,'pages-moder'),
+(9,'pictures-moder'),
+(47,'specifications-editor'),
+(6,'user');
 /*!40000 ALTER TABLE `acl_roles` ENABLE KEYS */;
 
 --
@@ -110,7 +130,7 @@ CREATE TABLE `acl_roles_parents` (
 --
 
 /*!40000 ALTER TABLE `acl_roles_parents` DISABLE KEYS */;
-INSERT INTO `acl_roles_parents` VALUES (14,6),(5,10),(5,14),(10,14),(5,58);
+REPLACE INTO `acl_roles_parents` VALUES (14,6),(5,10),(5,14),(10,14),(5,58),(5,9);
 /*!40000 ALTER TABLE `acl_roles_parents` ENABLE KEYS */;
 
 --
@@ -135,7 +155,8 @@ CREATE TABLE `acl_roles_privileges_allowed` (
 --
 
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` DISABLE KEYS */;
-INSERT INTO `acl_roles_privileges_allowed` VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7);
+REPLACE INTO `acl_roles_privileges_allowed` VALUES 
+(10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8);
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` ENABLE KEYS */;
 
 --
@@ -2851,6 +2872,31 @@ CREATE TABLE `perspectives` (
 --
 
 /*!40000 ALTER TABLE `perspectives` DISABLE KEYS */;
+INSERT INTO `perspectives` (`id`, `name`, `position`) VALUES
+(1, 'perspective/front', 1),
+(2, 'perspective/back', 9),
+(3, 'perspective/left', 5),
+(4, 'perspective/right', 7),
+(5, 'perspective/interior', 14),
+(6, 'perspective/front-panel', 11),
+(7, 'perspective/3/4-left', 3),
+(8, 'perspective/3/4-right', 4),
+(9, 'perspective/cutaway', 21),
+(10, 'perspective/front-strict', 2),
+(11, 'perspective/left-strict', 6),
+(12, 'perspective/right-strict', 8),
+(13, 'perspective/back-strict', 10),
+(14, 'perspective/n/a', 50),
+(15, 'perspective/label', 17),
+(16, 'perspective/upper', 19),
+(17, 'perspective/under-the-hood', 16),
+(18, 'perspective/upper-strict', 20),
+(19, 'perspective/bottom', 18),
+(20, 'perspective/dashboard', 12),
+(21, 'perspective/boot', 15),
+(22, 'perspective/logo', 22),
+(23, 'perspective/mascot', 25),
+(24, 'perspective/sketch', 26);
 /*!40000 ALTER TABLE `perspectives` ENABLE KEYS */;
 
 --
@@ -2876,6 +2922,37 @@ CREATE TABLE `perspectives_groups` (
 --
 
 /*!40000 ALTER TABLE `perspectives_groups` DISABLE KEYS */;
+INSERT INTO `perspectives_groups` (`id`, `page_id`, `position`, `name`) VALUES
+(1, 1, 1, 'Спереди'),
+(2, 1, 2, 'Сзади'),
+(3, 1, 3, 'Салон'),
+(4, 2, 1, 'спереди'),
+(5, 2, 2, 'сбоку'),
+(6, 2, 3, 'сзади'),
+(7, 2, 4, 'салон'),
+(8, 3, 1, 'спереди'),
+(9, 3, 2, 'сбоку'),
+(10, 3, 3, 'сзади'),
+(11, 3, 4, 'салон'),
+(12, 5, 1, 'спереди'),
+(14, 5, 2, 'сбоку'),
+(15, 5, 4, 'под капотом, шильдик, снизу, cutaway'),
+(16, 5, 5, 'салон, интерьер'),
+(17, 5, 3, 'сзади'),
+(18, 4, 1, 'спереди'),
+(19, 4, 2, 'сбоку'),
+(20, 4, 3, 'сзади'),
+(21, 4, 4, 'салон'),
+(22, 6, 1, 'спереди'),
+(23, 6, 2, 'левый бок'),
+(24, 6, 3, 'сзади'),
+(25, 6, 4, 'правый бок'),
+(26, 6, 5, 'под капотом, шильдик, снизу, cutaway'),
+(27, 6, 6, 'салон, интерьер'),
+(28, 7, 1, 'Спереди'),
+(29, 7, 2, 'Сбоку'),
+(30, 7, 3, 'Интерьер / Сзади'),
+(31, 8, 1, 'Api');
 /*!40000 ALTER TABLE `perspectives_groups` ENABLE KEYS */;
 
 --
@@ -2902,6 +2979,123 @@ CREATE TABLE `perspectives_groups_perspectives` (
 --
 
 /*!40000 ALTER TABLE `perspectives_groups_perspectives` DISABLE KEYS */;
+INSERT INTO `perspectives_groups_perspectives` (`group_id`, `perspective_id`, `position`) VALUES
+(1, 7, 1),
+(2, 13, 1),
+(3, 6, 1),
+(4, 10, 1),
+(5, 11, 1),
+(6, 13, 1),
+(7, 6, 1),
+(8, 10, 1),
+(9, 11, 1),
+(10, 13, 1),
+(11, 6, 1),
+(12, 10, 1),
+(14, 11, 1),
+(15, 17, 1),
+(16, 6, 1),
+(17, 13, 1),
+(18, 10, 1),
+(19, 11, 1),
+(20, 13, 1),
+(21, 6, 1),
+(22, 10, 1),
+(23, 11, 1),
+(24, 13, 1),
+(25, 12, 1),
+(26, 17, 1),
+(27, 6, 1),
+(28, 10, 1),
+(29, 11, 1),
+(30, 6, 1),
+(31, 7, 1),
+(1, 8, 2),
+(2, 2, 2),
+(3, 20, 2),
+(4, 1, 2),
+(5, 12, 2),
+(6, 2, 2),
+(7, 20, 2),
+(8, 1, 2),
+(9, 12, 2),
+(10, 2, 2),
+(11, 20, 2),
+(12, 1, 2),
+(14, 12, 2),
+(15, 15, 2),
+(16, 20, 2),
+(17, 2, 2),
+(18, 1, 2),
+(19, 12, 2),
+(20, 2, 2),
+(21, 20, 2),
+(22, 1, 2),
+(23, 3, 2),
+(24, 2, 2),
+(25, 4, 2),
+(26, 15, 2),
+(27, 20, 2),
+(28, 1, 2),
+(29, 12, 2),
+(30, 20, 2),
+(31, 8, 2),
+(1, 1, 3),
+(2, 3, 3),
+(3, 5, 3),
+(4, 7, 3),
+(5, 3, 3),
+(7, 5, 3),
+(8, 7, 3),
+(9, 3, 3),
+(11, 5, 3),
+(12, 7, 3),
+(14, 3, 3),
+(15, 19, 3),
+(16, 5, 3),
+(18, 7, 3),
+(19, 3, 3),
+(21, 5, 3),
+(22, 7, 3),
+(23, 7, 3),
+(25, 8, 3),
+(26, 19, 3),
+(27, 5, 3),
+(28, 7, 3),
+(29, 3, 3),
+(30, 5, 3),
+(31, 1, 3),
+(1, 10, 4),
+(2, 4, 4),
+(3, 15, 4),
+(4, 8, 4),
+(5, 4, 4),
+(7, 15, 4),
+(8, 8, 4),
+(9, 4, 4),
+(11, 15, 4),
+(12, 8, 4),
+(14, 4, 4),
+(15, 9, 4),
+(16, 15, 4),
+(19, 4, 4),
+(21, 15, 4),
+(22, 8, 4),
+(26, 9, 4),
+(27, 15, 4),
+(28, 8, 4),
+(29, 4, 4),
+(30, 15, 4),
+(31, 2, 4),
+(29, 13, 5),
+(30, 13, 5),
+(31, 3, 5),
+(29, 2, 6),
+(30, 2, 6),
+(31, 4, 6),
+(18, 8, 7),
+(31, 11, 7),
+(31, 12, 8);
 /*!40000 ALTER TABLE `perspectives_groups_perspectives` ENABLE KEYS */;
 
 --
@@ -2923,6 +3117,15 @@ CREATE TABLE `perspectives_pages` (
 --
 
 /*!40000 ALTER TABLE `perspectives_pages` DISABLE KEYS */;
+INSERT INTO `perspectives_pages` (`id`, `name`) VALUES
+(1, ''),
+(2, ''),
+(3, ''),
+(4, ''),
+(5, ''),
+(6, ''),
+(7, ''),
+(8, '');
 /*!40000 ALTER TABLE `perspectives_pages` ENABLE KEYS */;
 
 --
@@ -3026,7 +3229,6 @@ CREATE TABLE `pictures` (
   `removing_date` date DEFAULT NULL,
   `brand_id` int(10) unsigned DEFAULT NULL,
   `engine_id` int(10) unsigned DEFAULT NULL,
-  `perspective_id` int(10) unsigned DEFAULT NULL,
   `change_status_user_id` int(10) unsigned DEFAULT NULL,
   `change_perspective_user_id` int(10) unsigned DEFAULT NULL,
   `crop_left` smallint(6) unsigned DEFAULT NULL,
@@ -3051,7 +3253,6 @@ CREATE TABLE `pictures` (
   KEY `engineIndex` (`engine_id`,`type`),
   KEY `dateAndIdOrdering` (`status`,`add_date`,`id`),
   KEY `comments` (`status`),
-  KEY `perspective_id` (`perspective_id`,`status`),
   KEY `car_id` (`type`,`status`),
   KEY `brandIndex` (`brand_id`,`type`,`status`),
   KEY `owner_id` (`owner_id`,`status`),
@@ -3077,7 +3278,8 @@ CREATE TABLE `pictures` (
 --
 
 /*!40000 ALTER TABLE `pictures` DISABLE KEYS */;
-INSERT INTO `pictures` VALUES (1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,1,NULL,'\0\0',NULL,NULL),(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',0,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,33,NULL,'\0\0',NULL,NULL),(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',3,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,35,NULL,'\0\0',NULL,NULL),(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',2,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,37,NULL,'\0\0',NULL,NULL),(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',2,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,38,NULL,'\0\0',NULL,NULL);
+INSERT INTO `pictures` VALUES 
+(1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,1,NULL,'\0\0',NULL,NULL),(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',0,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,33,NULL,'\0\0',NULL,NULL),(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',3,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,35,NULL,'\0\0',NULL,NULL),(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',2,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,37,NULL,'\0\0',NULL,NULL),(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',2,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,38,NULL,'\0\0',NULL,NULL);
 /*!40000 ALTER TABLE `pictures` ENABLE KEYS */;
 
 --

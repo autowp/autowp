@@ -14,9 +14,10 @@ class PerspectiveController extends AbstractActionController
         $pictures = new Picture();
 
         $select = $pictures->select(true)
-            ->where('status in (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
-            ->where('perspective_id = ?', (int)$this->params('perspective'))
-            ->order('accept_datetime DESC');
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->where('pictures.status in (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+            ->where('picture_item.perspective_id = ?', (int)$this->params('perspective'))
+            ->order('pictures.accept_datetime DESC');
 
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)

@@ -42,18 +42,6 @@ class BrandRow extends Row
                $this->unsortedpictures_count;
     }
 
-    public function getNewCarsCount()
-    {
-        $db = $this->getTable()->getAdapter();
-        return $db->fetchOne(
-            $db->select()
-                ->from(['bcc' => 'brands_cars_cache'], ['COUNT(1)'])
-                ->join('cars', 'bcc.car_id=cars.id', null)
-                ->where('bcc.brand_id=?', $this->id)
-                ->where('cars.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY)')
-        );
-    }
-
     public function refreshPicturesCount()
     {
         $this->refreshCarPicturesCount();

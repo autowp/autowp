@@ -64,12 +64,15 @@ class PictureController extends AbstractActionController
             $galleryEnabled = false;
             switch ($picture->type) {
                 case Picture::VEHICLE_TYPE_ID:
-                    if ($picture->car_id) {
-                        $galleryEnabled = true;
-                        $picSelect
-                            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                            ->where('picture_item.item_id = ?', $picture->car_id);
-                    }
+                    $galleryEnabled = true;
+                    $picSelect
+                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                        ->join(
+                            ['pi2' => 'picture_item'],
+                            'picture_item.item_id = pi2.item_id',
+                            null
+                        )
+                        ->where('pi2.picture_id = ?', $picture->id);
                     break;
 
                 case Picture::UNSORTED_TYPE_ID:

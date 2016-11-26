@@ -551,7 +551,7 @@ class Mosts
                     ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->join(
                         ['mp' => 'perspectives_groups_perspectives'],
-                        'pictures.perspective_id=mp.perspective_id',
+                        'picture_item.perspective_id = mp.perspective_id',
                         null
                     )
                     ->where('mp.group_id = ?', $groupId)

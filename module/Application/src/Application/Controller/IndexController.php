@@ -97,16 +97,16 @@ class IndexController extends AbstractActionController
             $picture = null;
 
             $select = $pTable->select(true)
-                ->joinRight(
-                    ['mp' => 'perspectives_groups_perspectives'],
-                    'pictures.perspective_id=mp.perspective_id',
-                    null
-                )
                 ->where('mp.group_id = ?', $groupId)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $car->id)
+                ->joinRight(
+                    ['mp' => 'perspectives_groups_perspectives'],
+                    'picture_item.perspective_id = mp.perspective_id',
+                    null
+                )
                 ->order([
                     'car_parent_cache.sport', 'car_parent_cache.tuning', 'mp.position',
                     'pictures.width DESC', 'pictures.height DESC'

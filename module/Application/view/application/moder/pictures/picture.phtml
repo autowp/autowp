@@ -288,7 +288,9 @@
         <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
             <h3><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></h3>
             <div class="well">
-                <?=$this->partial('application/moder/pictures/picture-perspective', $this->picturePerspective)?>
+                <?php foreach ($this->picturePerspectives as $picturePerspective) { ?>
+                    <?=$this->partial('application/moder/pictures/picture-perspective', $picturePerspective)?>
+                <?php } ?>
             </div>
         <?php } ?>
 

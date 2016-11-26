@@ -86,9 +86,9 @@ class CategoryController extends AbstractActionController
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->where('category_parent.parent_id = ?', $category['id'])
                     ->order([
-                        new Zend_Db_Expr('pictures.perspective_id = 7 DESC'),
-                        new Zend_Db_Expr('pictures.perspective_id = 8 DESC'),
-                        new Zend_Db_Expr('pictures.perspective_id = 1 DESC')
+                        new Zend_Db_Expr('picture_item.perspective_id = 7 DESC'),
+                        new Zend_Db_Expr('picture_item.perspective_id = 8 DESC'),
+                        new Zend_Db_Expr('picture_item.perspective_id = 1 DESC')
                     ])
                     ->limit(1)
             );

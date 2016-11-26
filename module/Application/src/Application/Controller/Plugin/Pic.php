@@ -358,7 +358,7 @@ class Pic extends AbstractPlugin
                     'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                     'pictures.status', 'pictures.image_id',
                     'pictures.brand_id', 'pictures.engine_id',
-                    'pictures.perspective_id', 'pictures.type', 'pictures.factory_id'
+                    'pictures.type', 'pictures.factory_id'
                 ]);
 
             $select
@@ -442,7 +442,7 @@ class Pic extends AbstractPlugin
                 'url'       => $url,
                 'src'       => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
                 'moderVote' => $row['moder_votes_count'] > 0 ? $row['moder_votes'] : null,
-                'perspective_id' => $row['perspective_id']
+                //'perspective_id' => $row['perspective_id']
             ];
 
             if (! $options['disableBehaviour']) {
@@ -931,7 +931,7 @@ class Pic extends AbstractPlugin
             $copyrights = $this->textStorage->getText($picture->copyrights_text_id);
         }
 
-        $picturePerspective = null;
+        $picturePerspectives = [];
         if ($this->getController()->user()->inheritsRole('moder')) {
             if ($picture->type == Picture::VEHICLE_TYPE_ID) {
                 $perspectives = new Perspective();
@@ -946,17 +946,18 @@ class Pic extends AbstractPlugin
                     '' => '--'
                 ], $multioptions);
 
-                $user = $picture->findParentRow(UserTable::class, 'Change_Perspective_User');
+                foreach ($items as $item) {
 
-                $picturePerspective = [
-                    'options' => $multioptions,
-                    'url'     => $this->getController()->url()->fromRoute('moder/pictures/params', [
-                        'action'     => 'picture-perspective',
-                        'picture_id' => $picture->id
-                    ]),
-                    'user'    => $user,
-                    'value'   => $picture->perspective_id
-                ];
+                    $picturePerspectives[] = [
+                        'options' => $multioptions,
+                        'url'     => $this->getController()->url()->fromRoute('moder/pictures/params', [
+                            'action'     => 'picture-perspective',
+                            'picture_id' => $picture->id
+                        ]),
+                        'value'   => $this->pictureItem->getPerspective($picture->id, $item['id']),
+                        'name'    => $item->getNameData($this->language())
+                    ];
+                }
             }
         }
 
@@ -1006,7 +1007,7 @@ class Pic extends AbstractPlugin
             'pictureVote'       => $this->getController()->pictureVote($picture->id, [
                 'hideVote' => true
             ]),
-            'picturePerspective' => $picturePerspective,
+            'picturePerspectives' => $picturePerspectives,
             'items'             => $items
         ];
 
@@ -1158,7 +1159,7 @@ class Pic extends AbstractPlugin
                 'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                 'pictures.image_id', 'pictures.filesize',
                 'pictures.brand_id', 'pictures.engine_id',
-                'pictures.perspective_id', 'pictures.type', 'pictures.factory_id',
+                'pictures.type', 'pictures.factory_id',
                 'pictures.type'
             ])
             ->joinLeft(

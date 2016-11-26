@@ -299,7 +299,7 @@
             }
 
             if ($this->user()->logedIn()) {
-                if ($this->picture->car_id || $this->picture->brand_id || $this->picture->engine_id) {
+                if (count($this->items) || $this->picture->brand_id || $this->picture->engine_id) {
                     $list[] = $this->htmlA($this->url('upload/params', [
                         'action'  => 'index',
                         'replace' => $this->picture->identity ? $this->picture->identity : $this->picture->id

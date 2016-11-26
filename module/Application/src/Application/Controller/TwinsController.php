@@ -269,8 +269,8 @@ class TwinsController extends AbstractActionController
                         ->where('car_parent_cache.parent_id = ?', (int)$car['id'])
                         ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                         ->order([
-                            new Zend_Db_Expr('pictures.perspective_id=7 DESC'),
-                            new Zend_Db_Expr('pictures.perspective_id=8 DESC')
+                            new Zend_Db_Expr('picture_item.perspective_id=7 DESC'),
+                            new Zend_Db_Expr('picture_item.perspective_id=8 DESC')
                         ])
                         ->limit(1)
                 );

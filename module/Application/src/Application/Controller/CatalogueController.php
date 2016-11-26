@@ -1936,8 +1936,8 @@ class CatalogueController extends AbstractActionController
             ->from(
                 $pictureTable->info('name'),
                 [
-                    'id', 'name', 'type', 'brand_id', 'engine_id', 'car_id', 'factory_id',
-                    'perspective_id', 'image_id', 'crop_left', 'crop_top',
+                    'id', 'name', 'type', 'brand_id', 'engine_id', 'factory_id',
+                    'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity', 'factory_id'
                 ]
             )
@@ -1962,7 +1962,7 @@ class CatalogueController extends AbstractActionController
             $select = $this->getModgroupPicturesSelect($carId, $modId)
                 ->join(
                     ['mp' => 'perspectives_groups_perspectives'],
-                    'pictures.perspective_id = mp.perspective_id',
+                    'picture_item.perspective_id = mp.perspective_id',
                     null
                 )
                 ->where('mp.group_id = ?', $groupId)

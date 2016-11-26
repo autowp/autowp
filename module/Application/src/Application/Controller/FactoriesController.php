@@ -75,10 +75,10 @@ class FactoriesController extends AbstractActionController
                         new Zend_Db_Expr('car_parent_cache.tuning asc'),
                         new Zend_Db_Expr('car_parent_cache.sport asc'),
                         new Zend_Db_Expr('cars.is_concept asc'),
-                        new Zend_Db_Expr('pictures.perspective_id = 10 desc'),
-                        new Zend_Db_Expr('pictures.perspective_id = 1 desc'),
-                        new Zend_Db_Expr('pictures.perspective_id = 7 desc'),
-                        new Zend_Db_Expr('pictures.perspective_id = 8 desc')
+                        new Zend_Db_Expr('picture_item.perspective_id = 10 desc'),
+                        new Zend_Db_Expr('picture_item.perspective_id = 1 desc'),
+                        new Zend_Db_Expr('picture_item.perspective_id = 7 desc'),
+                        new Zend_Db_Expr('picture_item.perspective_id = 8 desc')
                     ]);
 
                 if (count($groups[$car->id]) > 1) {

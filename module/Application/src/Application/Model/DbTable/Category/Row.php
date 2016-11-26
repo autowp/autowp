@@ -28,9 +28,9 @@ class Row extends \Application\Db\Table\Row
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 ->where('category_car.category_id = ?', $this->id)
                 ->order([
-                    new Zend_Db_Expr('pictures.perspective_id = 7 DESC'),
-                    new Zend_Db_Expr('pictures.perspective_id = 8 DESC'),
-                    new Zend_Db_Expr('pictures.perspective_id = 1 DESC'),
+                    new Zend_Db_Expr('picture_item.perspective_id = 7 DESC'),
+                    new Zend_Db_Expr('picture_item.perspective_id = 8 DESC'),
+                    new Zend_Db_Expr('picture_item.perspective_id = 1 DESC'),
                     'pictures.ratio DESC',
                     'pictures.views DESC'
                 ])
