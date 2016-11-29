@@ -126,7 +126,7 @@ class IndexController extends AbstractActionController
                 'name'    => 'moder/statistics/photos-with-copyrights',
                 'total'    => $totalPictures,
                 'value'    => $db->fetchOne('
-                    select count(1) from pictures where length(copyrights)
+                    select count(1) from pictures where copyrights_text_id
                 ')
             ],
             [

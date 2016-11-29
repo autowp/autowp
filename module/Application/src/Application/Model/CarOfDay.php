@@ -152,7 +152,7 @@ class CarOfDay
 
         $text = sprintf(
             'Vehicle of the day: %s %s',
-            $this->vehicleNameFormatter->format($car, 'en'),
+            $this->vehicleNameFormatter->format($car->getNameData('en'), 'en'),
             $url
         );
 

@@ -1,8 +1,8 @@
 <?php
     if ($this->previewUrl) {
         $this->headMeta()
-            ->appendName('photo',                              'twitter:card'  )
-            ->appendName($this->pic()->textTitle($this->name), 'twitter:title' )
+            ->appendName('photo',                              'twitter:card' )
+            ->appendName($this->pic()->textTitle($this->name), 'twitter:title')
             ->appendName('twitter:image', $this->previewUrl)
             ->appendName('og:image', $this->previewUrl);
             /*->headMeta('twitter:image:width',  $image->width() )
@@ -21,9 +21,9 @@
 
 <?php $this->pageTitle()->setAutoEscape(false)->captureStart('SET') ?>
     <?=$this->pic()->htmlTitle($this->name) ?>
-    <?php if ($this->designProject) { ?>
+    <?php /* if ($this->designProject) { ?>
         <sup class="designBrand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($this->designProject['url'], $this->designProject['brand']))?></sup>
-    <?php } ?>
+    <?php } */ ?>
 <?php $this->pageTitle()->captureEnd() ?>
 
 <div class="row">
@@ -39,20 +39,22 @@
                 'shuffle' => true
             ]), false)?>
             <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
-                <?php if (isset($this->altNames) && count($this->altNames)) { ?>
-                    <div class="languages">
-                        <p><?=$this->escapeHtml($this->translate('picture/other-languages'))?></p>
-                        <ul class="list-unstyled">
-                            <?php foreach ($this->altNames as $name => $languages) { ?>
-                                <li>
-                                    <?php foreach ($languages as $language) { ?>
-                                        <sup><?=$this->escapeHtml(strtoupper($language))?></sup>
-                                    <?php } ?>
-                                    <?=$this->escapeHtml($name) ?>
-                                </li>
-                            <?php } ?>
-                        </ul>
-                    </div>
+                <?php if (count($this->items) == 1) { ?>
+                    <?php if (count($this->items[0]['altNames'])) { ?>
+                        <div class="languages">
+                            <p><?=$this->escapeHtml($this->translate('picture/other-languages'))?></p>
+                            <ul class="list-unstyled">
+                                <?php foreach ($this->items[0]['altNames'] as $name => $languages) { ?>
+                                    <li>
+                                        <?php foreach ($languages as $language) { ?>
+                                            <sup><?=$this->escapeHtml(strtoupper($language))?></sup>
+                                        <?php } ?>
+                                        <?=$this->escapeHtml($name) ?>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                        </div>
+                    <?php } ?>
                 <?php } ?>
             <?php } ?>
         </div>
@@ -64,7 +66,7 @@
 
         <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
 
-            <?php if (count($this->modifications) > 0) { ?>
+            <?php /*if (count($this->modifications) > 0) { ?>
                 <p>
                     <?php foreach ($this->modifications as $modification) { ?>
                         <?php if ($modification['url']) { ?>
@@ -77,17 +79,19 @@
                         <?php } ?>
                     <?php } ?>
                 </p>
-            <?php } ?>
-
-            <?php if ($this->carDescription) { ?>
+            <?php } */ ?>
+        <?php } ?>
+        
+        <?php foreach ($this->items as $item) { ?>
+            <?php if ($item['description']) { ?>
                 <div style="margin-bottom:10px">
-                    <?=$this->markdown($this->carDescription) ?>
+                    <?=$this->markdown($item['description']) ?>
                 </div>
             <?php } ?>
-            <?php if ($this->carHtml) { ?>
+            <?php if ($item['detailsUrl']) { ?>
                 <p>
                     <i class="fa fa-align-left"></i>
-                    <?=$this->htmlA($this->carDetailsUrl, $this->translate('carlist/details')) ?>
+                    <?=$this->htmlA($item['detailsUrl'], $this->translate('carlist/details')) ?>
                 </p>
             <?php } ?>
         <?php } ?>
@@ -133,14 +137,7 @@
                 ?>
             </li>
         </ul>
-        <?php if ($source = $this->picture->findParentRow(Application\Model\DbTable\Sources::class)) { ?>
-            <p>
-                <?=$this->escapeHtml($this->translate('picture/photo-is-owned-by'))?>
-                <?=$this->htmlA($source->url, $source->name) ?>
-            </p>
-        <?php } else { ?>
-            <p><?=$this->escapeHtml($this->translate('picture/all-images-have-owners'))?></p>
-        <?php } ?>
+        <p><?=$this->escapeHtml($this->translate('picture/all-images-have-owners'))?></p>
         <p><?=$this->escapeHtml($this->translate('picture/if-you-found-error'))?></p>
         <p><?=$this->translate('picture/where-to-talk')?></p>
         <?php
@@ -149,76 +146,104 @@
             foreach ($this->ofLinks as $link) {
                 $list[] = $this->htmlA($link->url, '<i class="fa fa-globe"></i> ' . $this->escapeHtml($link->caption), false);
             }
-        ?>
-        <?php
-            switch ($this->picture->type) {
-                case Application\Model\DbTable\Picture::VEHICLE_TYPE_ID:
-                    foreach ($this->items as $car) {
-
-                        foreach ($this->categories as $category) {
-                            $list[] = $this->htmlA($category['url'], '<i class="fa fa-tag"></i> ' . $this->escapeHtml($category['name']), false);
+            
+            foreach ($this->items as $item) {
+            
+                foreach ($item['categories'] as $category) {
+                    $list[$category['url']] = $this->htmlA($category['url'], '<i class="fa fa-tag"></i> ' . $this->escapeHtml($category['name']), false);
+                }
+            
+                if ($item['specsEditUrl']) {
+                    $list[] = $this->htmlA(
+                        $item['specsEditUrl'], 
+                        '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')), 
+                        false
+                    );
+                }
+            
+                if ($item['hasSpecs'] && $item['specsUrl']) {
+                    $list[] = $this->htmlA(
+                        $item['specsUrl'],
+                        '<i class="fa fa-list-alt"></i> ' .
+                        sprintf(
+                            $this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')),
+                            $this->car()->htmlTitle($item['name'])
+                        ),
+                        false
+                    );
+                }
+            
+                if ($item['designProject']) {
+                    $list[] = sprintf($this->translate('carlist/designed by %s'), $this->htmlA(
+                        $item['designProject']['url'],
+                        $item['designProject']['brand']
+                    ));
+                }
+            
+                foreach ($item['twins'] as $twinsGroup) {
+                    $list[] = $this->htmlA(
+                        $twinsGroup['url'],
+                        '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(96)->name),
+                        false
+                    ); 
+                }
+            
+                foreach ($item['factories'] as $factory) {
+                    $list[] = $this->htmlA(
+                        $factory['url'],
+                        '<i class="fa fa-cogs"></i> ' . $this->escapeHtml($factory['name']),
+                        false
+                    );
+                }
+            
+            
+                if ($this->user()->logedIn()) {
+                    $list[] = $this->htmlA($this->url('upload/params', [
+                        'action' => 'index',
+                        'type'   => '1',
+                        'car_id' => $item['id']
+                    ]), '<i class="fa fa-upload"></i> ' . $this->escapeHtml($this->page(29)->name) . ' ' . $this->car()->htmlTitle($item['name']), false);
+                }
+            }
+            
+            if ($this->engine) {
+                if (count($this->engine['vehicles']) > 0) {
+                    if (count($this->engine['vehicles']) == 1)
+                        foreach ($this->engine['vehicles'] as $car) {
+                            $list[] = $this->escapeHtml($this->translate('picture/that-engine-is-mounted-to-vehicle')) . $this->htmlA($car['url'], $car['name']);
                         }
-
-                        if ($this->user()->isAllowed('specifications', 'edit')) {
-                            $list[] = $this->htmlA($this->url('cars/params', [
-                                'action' => 'car-specifications-editor',
-                                'car_id' => $car->id
-                            ]), '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')), false);
+                    else {
+                        $a = [];
+                        foreach ($this->engine['vehicles'] as $car) {
+                            $a[] = $this->htmlA($car['url'], $car['name']);
                         }
-
-                        if ($this->vehicleHasSpecs) {
-
-                            foreach ($this->car($car)->cataloguePaths() as $path) {
-                                $url = $this->url('catalogue', [
-                                    'action'        => 'brand-car-specifications',
-                                    'brand_catname' => $path['brand_catname'],
-                                    'car_catname'   => $path['car_catname'],
-                                    'path'          => $path['path']
-                                ]);
-                                $name = $this->car()->htmlTitle($car->getNameData($this->language()));
-                                $list[] = $this->htmlA(
-                                    $url,
-                                    '<i class="fa fa-list-alt"></i> ' .
-                                    sprintf($this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')), $name),
-                                    false
-                                );
-
-                                break;
-                            }
-                        }
-
-                        if ($this->designProject) {
-                            $list[] = sprintf($this->translate('carlist/designed by %s'), $this->htmlA(
-                                $this->designProject['url'],
-                                $this->designProject['brand']
-                            ));
-                        }
-
-                        foreach ($this->vehicleTwins as $twinsGroup) {
-                            $list[] = $this->htmlA(
-                                $twinsGroup['url'],
-                                '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(96)->name),
-                                false
-                            );
-                        }
-
-                        foreach ($this->vehicleFactories as $factory) {
-                            $list[] = $this->htmlA(
-                                $factory['url'],
-                                '<i class="fa fa-cogs"></i> ' . $this->escapeHtml($factory['name']),
-                                false
-                            );
-                        }
-
-                        if ($this->user()->logedIn()) {
-                            $list[] = $this->htmlA($this->url('upload/params', [
-                                'action' => 'index',
-                                'type'   => '1',
-                                'car_id' => $car->id
-                            ]), '<i class="fa fa-upload"></i> ' . $this->escapeHtml($this->page(29)->name) . ' ' . $this->pic()->htmlTitle($this->name), false);
-                        }
+                        $list[] = $this->escapeHtml($this->translate('picture/that-engine-is-mounted-to-vehicles:')) .
+                        $this->htmlList($a, false, [], false);
                     }
-                    break;
+                }
+                
+                if ($this->engine['hasSpecs']) {
+                    $list[] = $this->htmlA(
+                        $this->engine['specsUrl'],
+                        '<i class="fa fa-list-alt"></i> ' .
+                        sprintf(
+                            $this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')), 
+                            $this->escapeHtml($this->engine['name'])
+                        ),
+                        false
+                    );
+                }
+            
+                if ($engine['specsEditUrl']) {
+                    $list[] = $this->htmlA(
+                        $engine['specsEditUrl'], 
+                        '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')), 
+                        false
+                    );
+                }
+            }
+
+            switch ($this->picture->type) {
 
                 case Application\Model\DbTable\Picture::MIXED_TYPE_ID:
                     if ($this->user()->logedIn()) {
@@ -228,41 +253,6 @@
                                 'type'       => Application\Model\DbTable\Picture::MIXED_TYPE_ID,
                                 'brand_id'   => $brand->id
                             ]), '<i class="fa fa-upload"></i> ' . $this->escapeHtml($this->page(29)->name) . ' ' . $this->pic()->htmlTitle($this->name), false);
-                        }
-                    }
-                    break;
-
-                case Application\Model\DbTable\Picture::ENGINE_TYPE_ID:
-                    if (count($this->engineCars) > 0) {
-                        if (count($this->engineCars) == 1)
-                            foreach ($this->engineCars as $car) {
-                                $list[] = $this->escapeHtml($this->translate('picture/that-engine-is-mounted-to-vehicle')) . $this->htmlA($car['url'], $car['name']);
-                            }
-                        else {
-                            $a = [];
-                            foreach ($this->engineCars as $car) {
-                                $a[] = $this->htmlA($car['url'], $car['name']);
-                            }
-                            $list[] = $this->escapeHtml($this->translate('picture/that-engine-is-mounted-to-vehicles:')) .
-                                      $this->htmlList($a, false, [], false);
-                        }
-                    }
-
-                    if ($this->engine) {
-                        if ($this->engineHasSpecs) {
-                            $list[] = $this->htmlA(
-                                $this->engineSpecsUrl,
-                                '<i class="fa fa-list-alt"></i> ' .
-                                sprintf($this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')), $this->escapeHtml($this->engine->caption)),
-                                false
-                            );
-                        }
-
-                        if ($this->user()->isAllowed('specifications', 'edit')) {
-                            $list[] = $this->htmlA($this->url('cars', [
-                                'action'     => 'engine-spec-editor',
-                                'engine_id'  => $this->engine->id
-                            ]), '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')), false);
                         }
                     }
                     break;
@@ -362,9 +352,11 @@
                     <p><i class="fa fa-cog"></i> <?=$this->htmlA($url, $name)?></p>
                 <?php } ?>
             </div>
-            <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
+            <?php if (count($this->items)) { ?>
                 <div class="col-md-6">
-                    <?=$this->partial('application/moder/pictures/picture-perspective', $this->picturePerspective)?>
+                    <?php foreach ($this->items as $item) { ?>
+                        <?=$this->partial('application/moder/pictures/picture-perspective', $item['perspective'])?>
+                    <?php } ?>
                 </div>
             <?php } ?>
         </div>

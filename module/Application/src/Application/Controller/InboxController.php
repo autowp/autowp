@@ -19,16 +19,19 @@ class InboxController extends AbstractActionController
         $language = $this->language();
 
         $brands = $brandModel->getList($language, function ($select) use ($language) {
-            $select
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
-                ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                ->where('pictures.status = ?', Picture::STATUS_INBOX)
-                ->group('brands.id')
-                ->bind([
-                    'language' => $language
-                ]);
+            $db = $select->getAdapter();
+            $select->where(
+                'brands.id IN (?)',
+                $db->select()
+                    ->from('brands_cars', 'brand_id')
+                    ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                    ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                    ->join('pictures', 'picture_item.picture_id = pictures.id', null)
+                    ->where('pictures.status = ?', Picture::STATUS_INBOX)
+                    ->bind([
+                        'language' => $language
+                    ])
+            );
         });
 
         $url = $this->url()->fromRoute('inbox', [

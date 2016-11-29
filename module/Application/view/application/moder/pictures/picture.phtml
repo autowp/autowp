@@ -40,63 +40,67 @@
         ] : false
     ];
 ?>
+
 <div class="row">
     <div class="col-md-6 text-right">
-        <?php if ($this->prevPicture) { ?>
-            <?=$this->htmlA($this->url(null, [
-                'picture_id' => $this->prevPicture->id
-            ], [], true), $this->translate('moder/picture/previous')) ?>
-            <br />
-        <?php } ?>
-        <?php if ($this->prevNewPicture) { ?>
-            <?=$this->htmlA($this->url(null, [
-                'picture_id' => $this->prevNewPicture->id
-            ], [], true), $this->translate('moder/picture/previous-new')) ?>
-        <?php } ?>
+        <p>
+            <?php if ($this->prevPicture) { ?>
+                <?=$this->htmlA($this->url(null, [
+                    'picture_id' => $this->prevPicture->id
+                ], [], true), $this->translate('moder/picture/previous')) ?>
+                <br />
+            <?php } ?>
+            <?php if ($this->prevNewPicture) { ?>
+                <?=$this->htmlA($this->url(null, [
+                    'picture_id' => $this->prevNewPicture->id
+                ], [], true), $this->translate('moder/picture/previous-new')) ?>
+            <?php } ?>
+        </p>
     </div>
     <div class="col-md-6">
-        <?php if ($this->nextPicture) { ?>
-            <?=$this->htmlA($this->url(null, [
-                'picture_id' => $this->nextPicture->id
-            ], [], true), $this->translate('moder/picture/next')) ?>
-            <br />
-        <?php } ?>
-        <?php if ($this->nextNewPicture) { ?>
-            <?=$this->htmlA($this->url(null, [
-                'picture_id' => $this->nextNewPicture->id
-            ], [], true), $this->translate('moder/picture/next-new')) ?>
-        <?php } ?>
+        <p>
+            <?php if ($this->nextPicture) { ?>
+                <?=$this->htmlA($this->url(null, [
+                    'picture_id' => $this->nextPicture->id
+                ], [], true), $this->translate('moder/picture/next')) ?>
+                <br />
+            <?php } ?>
+            <?php if ($this->nextNewPicture) { ?>
+                <?=$this->htmlA($this->url(null, [
+                    'picture_id' => $this->nextNewPicture->id
+                ], [], true), $this->translate('moder/picture/next-new')) ?>
+            <?php } ?>
+        </p>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-2">
         <?php if ($this->picture->image_id) { ?>
             <?=$this->img($this->picture->getFormatRequest(), [
                 'format' => 'picture-thumb',
             ])?>
-        <?php } else { ?>
-            <?=$this->image($this->picture, 'file_name', [
-                'format' => 6,
-            ])?>
         <?php } ?>
-
-        <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->picture->id))?></p>
-        <?php $url = $this->pic($this->picture)->url() ?>
-        <p>
-            <?=$this->escapeHtml($this->translate('moder/picture/public-url:'))?>
-            <?=$this->htmlA($url, $url) ?>
-        </p>
-        <p>
-            <?=$this->escapeHtml($this->translate('moder/picture/image:'))?>
-            <?=$this->htmlA($this->sourceUrl, parse_url($this->sourceUrl, PHP_URL_PATH))?>
-        </p>
-        <?=$this->htmlA($this->url('log/params', [
-            'action'     => 'index',
-            'picture_id' => $this->picture->id
-        ]), $this->translate('moder/log-of-events')) ?>
-
-        <h3><?=$this->escapeHtml($this->translate('moder/picture/image-specs:'))?></h3>
+    </div>
+    <div class="col-md-5">
+        <div class="well">
+            <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->picture->id))?></p>
+            <?php $url = $this->pic($this->picture)->url() ?>
+            <p>
+                <?=$this->escapeHtml($this->translate('moder/picture/public-url:'))?>
+                <?=$this->htmlA($url, $url) ?>
+            </p>
+            <p>
+                <?=$this->escapeHtml($this->translate('moder/picture/image:'))?>
+                <?=$this->htmlA($this->sourceUrl, parse_url($this->sourceUrl, PHP_URL_PATH))?>
+            </p>
+            <?=$this->htmlA($this->url('log/params', [
+                'action'     => 'index',
+                'picture_id' => $this->picture->id
+            ]), $this->translate('moder/log-of-events')) ?>
+        </div>
+    </div>
+    <div class="col-md-5">
         <div class="well">
             <?=$this->escapeHtml($this->translate('moder/picture/resolution:'))?>
             <b><?=$this->picture->width ?>×<?=$this->picture->height ?></b><br />
@@ -105,7 +109,16 @@
             <?=$this->escapeHtml($this->translate('moder/picture/upload-date:'))?>
             <b><?=$this->picture->add_date ?></b>
         </div>
+    </div>
+</div>
 
+<h3><?=$this->escapeHtml($this->translate('moder/picture/catalogue'))?></h3>
+<div class="well">
+    <?=$this->render('application/moder/pictures/partial/picture-catalogue')?>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
         <h3><?=$this->escapeHtml($this->translate('moder/picture/settings'))?></h3>
         <div class="well">
             <?=$this->partial('application/forms/bootstrap-vertical', [
@@ -144,156 +157,6 @@
 
     <div class="col-md-6">
 
-        <h3><?=$this->escapeHtml($this->translate('moder/picture/catalogue'))?></h3>
-        <div class="well">
-            <?php
-                switch ($this->picture->type) {
-                    case Application\Model\DbTable\Picture::VEHICLE_TYPE_ID:
-                        ?>
-                        <p>
-                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/vehicle'))?>
-                            <?php foreach ($this->items as $car) { ?>
-                                <?=$this->htmlA($this->url('moder/cars/params', [
-                                    'action'     => 'car',
-                                    'car_id'     => $car->id
-                                ]), $this->car()->htmlTitle($car->getNameData($this->language())), false) ?>
-                            <?php } ?>
-                            <?php if (count($this->items) <= 0) { ?>
-                             <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                            <?php } ?>
-                        </p>
-                        <?php
-                        break;
-
-                    case Application\Model\DbTable\Picture::LOGO_TYPE_ID:
-                        ?>
-                        <p>
-                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/logo'))?>
-                            <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
-                                <?=$this->htmlA($this->url('moder/brands/params', [
-                                    'action'     => 'brand',
-                                    'brand_id'   => $brand->id
-                                ]), $brand->caption) ?>
-                            <?php } else { ?>
-                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                            <?php } ?>
-                        </p>
-                        <?php
-                        break;
-
-                    case Application\Model\DbTable\Picture::MIXED_TYPE_ID:
-                        ?>
-                        <p>
-                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/mixed'))?>
-                            <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
-                                <?=$this->htmlA($this->url('moder/brands/params', [
-                                    'action'   => 'brand',
-                                    'brand_id' => $brand->id
-                                ]), $brand->caption) ?>
-                            <?php } else { ?>
-                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                            <?php } ?>
-                        </p>
-                        <?php
-                        break;
-
-                    case Application\Model\DbTable\Picture::UNSORTED_TYPE_ID:
-                        ?>
-                        <p>
-                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/unsorted'))?>
-                            <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
-                                <?=$this->htmlA($this->url('moder/brands/params', [
-                                    'action'   => 'brand',
-                                    'brand_id' => $brand->id
-                                ]), $brand->caption) ?>
-                            <?php } else { ?>
-                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                            <?php } ?>
-                        </p>
-                        <?php
-                        break;
-
-                    case Application\Model\DbTable\Picture::ENGINE_TYPE_ID:
-                        ?>
-                        <p>
-                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/engine'))?>
-                            <?php $engine = $this->picture->findParentRow(Application\Model\DbTable\Engine::class); ?>
-                            <?php if ($engine) { ?>
-                                <?=$this->htmlA($this->url('moder/engines/params', [
-                                    'action'    => 'engine',
-                                    'engine_id' => $engine->id
-                                ]), $engine->caption) ?>
-                            <?php } else { ?>
-                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                            <?php } ?>
-                            </p>
-                        <?php
-                        break;
-
-                    case Application\Model\DbTable\Picture::FACTORY_TYPE_ID:
-                        ?>
-                        <p>
-                            <?=$this->escapeHtml($this->translate('moder/picture/catalogue/factory'))?>
-                            <?php if ($factory = $this->picture->findParentRow(Application\Model\DbTable\Factory::class)) { ?>
-                                <?=$this->htmlA($this->url('moder/factories/params', [
-                                    'action'     => 'factory',
-                                    'factory_id' => $factory->id
-                                ]), $factory->name) ?>
-                            <?php } else { ?>
-                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                            <?php } ?>
-                        </p>
-                        <?php
-                        break;
-                }
-            ?>
-            <?php if ($this->canMove) { ?>
-                <?php if ($this->lastCar) { ?>
-                    <p><?=$this->htmlA(
-                        [
-                            'class' => 'btn btn-default',
-                            'href'  => $this->url(null, [
-                                'action'     => 'move',
-                                'picture_id' => $this->picture->id,
-                                'type'       => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
-                                'car_id'     => $this->lastCar->id
-                            ])
-                        ],
-                        '<i class="fa fa-arrow-right"></i> ' .
-                        $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' .
-                        $this->car()->htmlTitle($this->lastCar->getNameData($this->language())),
-                        false
-                    ) ?></p>
-                <?php } ?>
-                <?php foreach ($this->relatedBrands as $brand) { ?>
-                    <p><?=$this->htmlA([
-                        'class' => 'btn btn-default',
-                        'href' => $this->url(null, [
-                            'action'     => 'move',
-                            'brand_id'   => $brand['id'],
-                            'picture_id' => $this->picture->id
-                        ])
-                    ], '<i class="fa fa-arrow-right"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' . $this->escapeHtml($brand['name']) . ' ...', false) ?></p>
-                <?php } ?>
-                <p><?=$this->htmlA([
-                    'class' => 'btn btn-default',
-                    'href' => $this->url('moder/pictures/params', [
-                        'action' => 'move'
-                    ], [], true),
-                ], '<i class="fa fa-arrow-right"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ...', false)?></p>
-            <?php } ?>
-        </div>
-
-
-        <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
-            <h3><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></h3>
-            <div class="well">
-                <?php foreach ($this->picturePerspectives as $picturePerspective) { ?>
-                    <?=$this->partial('application/moder/pictures/picture-perspective', $picturePerspective)?>
-                <?php } ?>
-            </div>
-        <?php } ?>
-
         <?php if ($this->replacePicture) { ?>
             <h3><?=$this->escapeHtml($this->translate('moder/picture/replacement'))?></h3>
             <div class="well">
@@ -321,66 +184,7 @@
 
         <h3><?=$this->escapeHtml($this->translate('moder/picture/acceptance'))?></h3>
         <div class="well">
-            <div style="margin-bottom:15px"><?php
-                $changeStatusUserHtml = '';
-                if ($this->picture->change_status_user_id) {
-                    $changeStatusUserHtml = ' '.$this->user($this->picture->findParentRow(Autowp\User\Model\DbTable\User::class, 'Change_Status_User'));
-                }
-
-                switch ($this->picture->status) {
-                    case Application\Model\DbTable\Picture::STATUS_NEW:
-                    case Application\Model\DbTable\Picture::STATUS_INBOX:
-                        ?>
-                        <p><strong class="label label-warning">
-                            <?=$this->escapeHtml($this->translate('moder/picture/acceptance/not-accepted'))?>
-                            <?=$changeStatusUserHtml?>
-                            <?=(Application\Model\DbTable\Picture::STATUS_INBOX == $this->picture->status ? ' ' . $this->translate('moder/pictures/picture/inbox-mark') : '')?>
-                        </strong></p>
-                        <?php if ($this->canAccept) { ?>
-                            <form action="<?=$this->escapeHtmlAttr($this->acceptUrl)?>" method="post">
-                                <button type="submit" class="btn btn-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/accept'))?></button>
-                            </form>
-                        <?php } ?>
-                        <?php
-                        break;
-
-                    case Application\Model\DbTable\Picture::STATUS_ACCEPTED:
-                        ?>
-                        <p><strong class="label label-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/accepted'))?></strong></p>
-                        <?=$changeStatusUserHtml?>
-                        <?php if ($this->canUnaccept) { ?>
-                            <form action="<?=$this->escapeHtmlAttr($this->unacceptUrl)?>" method="post">
-                                <button type="submit" class="btn btn-warning"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/unaccept'))?></button>
-                            </form>
-                        <?php } ?>
-                        <?php
-                        break;
-
-                    case Application\Model\DbTable\Picture::STATUS_REMOVING:
-                        ?><p>
-                            <strong class="label label-danger">
-                                <?=$this->escapeHtml($this->translate('moder/picture/acceptance/in-delete-queue'))?>
-                            </strong>
-                            &nbsp;
-                            <?=$changeStatusUserHtml?>
-                        </p>
-                        <?php if ($this->canRestore) { ?>
-                            <form action="<?=$this->escapeHtmlAttr($this->restoreUrl)?>" method="post">
-                                <button type="submit" class="btn btn-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/restore'))?></button>
-                            </form>
-                        <?php }
-                        break;
-
-                    case Application\Model\DbTable\Picture::STATUS_REMOVED:
-                        ?><p><strong style="color:red">
-                            <?=$this->escapeHtml($this->translate('moder/picture/acceptance/removed'))?>
-                            <?=$changeStatusUserHtml?>
-                        </strong></p><?php
-                        break;
-                }
-            ?></div>
-
-            <?=$this->partial('application/moder/pictures/picture-vote', $this->pictureVote)?>
+            <?=$this->render('application/moder/pictures/partial/picture-status')?>
         </div>
 
         <?php if ($this->canNormalize || $this->canFlop || $this->canCrop) { ?>

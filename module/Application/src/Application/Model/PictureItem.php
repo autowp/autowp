@@ -68,6 +68,25 @@ class PictureItem
             $row->save();
         }
     }
+    
+    public function remove($pictureId, $itemId)
+    {
+        $pictureId = (int)$pictureId;
+        $itemId = (int)$itemId;
+        
+        if (!$pictureId) {
+            throw new InvalidArgumentException("Picture id is invalid");
+        }
+        
+        if (!$itemId) {
+            throw new InvalidArgumentException("Item id is invalid");
+        }
+        
+        $row = $this->getRow($pictureId, $itemId);
+        if ($row) {
+            $row->delete();
+        }
+    }
 
     public function isExists($pictureId, $itemId)
     {

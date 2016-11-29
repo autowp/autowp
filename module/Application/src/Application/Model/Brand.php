@@ -416,7 +416,7 @@ class Brand
             ]);
 
         $callback($select);
-
+        
         $items = $db->fetchAll($select);
 
         usort($items, function ($a, $b) use ($options) {

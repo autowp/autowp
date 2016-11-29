@@ -289,7 +289,7 @@ class PicturesController extends AbstractActionController
         $joinPdr = false;
         $joinLeftComments = false;
         $joinComments = false;
-        $joinPictureItem = false;
+        $pictureItemJoined = false;
 
         if ($formdata['order']) {
             $select->order($orders[$formdata['order']]['sql']);
@@ -344,7 +344,10 @@ class PicturesController extends AbstractActionController
                     ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
                     ->where('brand_engine.brand_id = ?', $formdata['brand_id']);
             } else {
-                $joinPictureItem = true;
+                if (!$pictureItemJoined) {
+                    $pictureItemJoined = true;
+                    $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
+                }
                 $select
                     ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                     ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
@@ -353,14 +356,20 @@ class PicturesController extends AbstractActionController
         }
 
         if ($formdata['car_id']) {
-            $joinPictureItem = true;
+            if (!$pictureItemJoined) {
+                $pictureItemJoined = true;
+                $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
+            }
             $select
                 ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
                 ->where('car_parent_cache.parent_id = ?', $formdata['car_id']);
         }
 
         if ($formdata['perspective_id']) {
-            $joinPictureItem = true;
+            if (!$pictureItemJoined) {
+                $pictureItemJoined = true;
+                $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
+            }
             if ($formdata['perspective_id'] == 'null') {
                 $select->where('picture_item.perspective_id IS NULL');
             } else {
@@ -383,7 +392,10 @@ class PicturesController extends AbstractActionController
         }
 
         if ($formdata['car_type_id']) {
-            $joinPictureItem = true;
+            if (!$pictureItemJoined) {
+                $pictureItemJoined = true;
+                $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
+            }
             $select
                 ->join('cars', 'picture_item.item_id = cars.id', null)
                 ->join('car_types_parents', 'cars.car_type_id=car_types_parents.id', null)
@@ -474,10 +486,6 @@ class PicturesController extends AbstractActionController
             $select
                 ->join('comment_topic', 'pictures.id = comment_topic.item_id', null)
                 ->where('comment_topic.type_id = ?', CommentMessage::PICTURES_TYPE_ID);
-        }
-
-        if ($joinPictureItem) {
-            $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
         }
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -771,7 +779,7 @@ class PicturesController extends AbstractActionController
         }
     }
 
-    /*public function pictureVoteAction()
+    public function pictureVoteAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
@@ -806,16 +814,19 @@ class PicturesController extends AbstractActionController
 
         $acceptedCount = null;
         if ($picture->type == Picture::VEHICLE_TYPE_ID) {
-            $car = $picture->findParentRow(Vehicle::class);
-            if ($car) {
-                $db = $this->table->getAdapter();
-                $acceptedCount = $db->fetchOne(
-                    $db->select()
-                        ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                        ->where('car_id = ?', $car->id)
-                        ->where('status = ?', Picture::STATUS_ACCEPTED)
-                );
-            }
+            $db = $this->table->getAdapter();
+            $acceptedCount = $db->fetchOne(
+                $db->select()
+                    ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join(
+                        ['pi2' => 'picture_item'],
+                        'picture_item.item_id = pi2.item_id',
+                        null
+                    )
+                    ->where('pi2.picture_id = ?', $picture->id)
+                    ->where('status = ?', Picture::STATUS_ACCEPTED)
+            );
         }
 
         $user = $this->user()->get();
@@ -921,7 +932,7 @@ class PicturesController extends AbstractActionController
             ]),
             'moderVotes'        => $moderVotes
         ];
-    }*/
+    }
 
     public function pictureAction()
     {
@@ -1222,56 +1233,56 @@ class PicturesController extends AbstractActionController
                 'submit' => 'ban/ban'
             ]);
         }
-
-        $relatedBrands = [];
+        
+        $perspectives = new Perspective();
+        
+        $multioptions = $perspectives->getAdapter()->fetchPairs(
+            $perspectives->getAdapter()->select()
+                ->from($perspectives->info('name'), ['id', 'name'])
+                ->order('position')
+        );
+        
+        $multioptions = array_replace([
+            '' => '--'
+        ], $multioptions);
+        
         $items = [];
-        $picturePerspectives = [];
+        $itemIds = $this->pictureItem->getPictureItems($picture['id']);
+        $itemTable = new Vehicle();
+        foreach ($itemTable->find($itemIds) as $item) {
+            
+            $brandModel = new BrandModel();
+            $relatedBrands = $brandModel->getList($this->language(), function ($select) use ($item) {
+                $select
+                    ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+                    ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                    ->where('car_parent_cache.car_id = ?', $item['id'])
+                    ->group('brands.id');
+            });
+            
+            $items[] = [
+                'item_id'     => $item['id'],
+                'row'         => $item,
+                'perspective' => [
+                    'options' => $multioptions,
+                    'url'     => $this->url()->fromRoute('moder/pictures/params', [
+                        'action'     => 'picture-perspective',
+                        'picture_id' => $picture->id,
+                        'item_id'    => $item['id']
+                    ]),
+                    'value'   => $this->pictureItem->getPerspective($picture->id, $item['id'])
+                ],
+                'relatedBrands' => $relatedBrands,
+                'removeUrl'     => $this->url()->fromRoute('moder/pictures/params', [
+                    'action'     => 'remove-picture-item',
+                    'picture_id' => $picture->id,
+                    'item_id'    => $item['id']
+                ]),
+                'canRemove'     => count($itemIds) > 1
+            ];
+        }
+        
         switch ($picture->type) {
-            case Picture::VEHICLE_TYPE_ID:
-                $brandModel = new BrandModel();
-                $relatedBrands = $brandModel->getList($this->language(), function ($select) use ($picture) {
-                    $select
-                        ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                        ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                        ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
-                        ->where('picture_item.picture_id = ?', $picture->id)
-                        ->group('brands.id');
-                });
-                $itemIds = $this->pictureItem->getPictureItems($picture['id']);
-                $itemTable = new Vehicle();
-                foreach ($itemTable->find($itemIds) as $item) {
-                    $items[] = $item;
-                }
-
-                if ($picture->type == Picture::VEHICLE_TYPE_ID) {
-                    $perspectives = new Perspective();
-
-                    $multioptions = $perspectives->getAdapter()->fetchPairs(
-                        $perspectives->getAdapter()->select()
-                            ->from($perspectives->info('name'), ['id', 'name'])
-                            ->order('position')
-                    );
-
-                    $multioptions = array_replace([
-                        '' => '--'
-                    ], $multioptions);
-
-                    foreach ($items as $item) {
-                        $picturePerspectives[] = [
-                            'options' => $multioptions,
-                            'url'     => $this->url()->fromRoute('moder/pictures/params', [
-                                'action'     => 'picture-perspective',
-                                'picture_id' => $picture->id,
-                                'item_id'    => $item['id']
-                            ]),
-                            'value'   => $this->pictureItem->getPerspective($picture->id, $item['id']),
-                            'name'    => $item->getNameData($this->language())
-                        ];
-                    }
-                }
-
-                break;
-
             case Picture::UNSORTED_TYPE_ID:
             case Picture::MIXED_TYPE_ID:
             case Picture::LOGO_TYPE_ID:
@@ -1319,9 +1330,7 @@ class PicturesController extends AbstractActionController
             'replacePicture'                => $replacePicture,
             'crop'                          => $crop,
             'banForm'                       => $this->banForm,
-            'picturePerspectives'           => $picturePerspectives,
             'pictureVote'                   => $this->pictureVote($picture->id, []),
-            'relatedBrands'                 => $relatedBrands,
             'items'                         => $items
         ];
     }
@@ -1922,7 +1931,7 @@ class PicturesController extends AbstractActionController
 
             $pictureTable = new Picture();
 
-            $success = $pictureTable->accept($picture->id, $user->id, $isFirstTimeAccepted);
+            $success = $pictureTable->accept($this->pictureItem, $picture->id, $user->id, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
                 $owner = $picture->findParentRow(User::class, 'Owner');
                 if ($owner && ($owner->id != $user->id)) {
@@ -2033,6 +2042,28 @@ class PicturesController extends AbstractActionController
             'status' => true
         ]);
     }
+    
+    public function removePictureItemAction()
+    {
+        $canMove = $this->user()->isAllowed('picture', 'move');
+        if (! $canMove) {
+            return $this->forbiddenAction();
+        }
+        
+        $picture = $this->table->find($this->params('picture_id'))->current();
+        if (! $picture) {
+            return $this->notFoundAction();
+        }
+        
+        $itemTable = new Vehicle();
+        $item = $itemTable->find($this->params('item_id'))->current();
+        
+        $this->pictureItem->remove($picture->id, $item->id);
+        
+        $this->table->refreshPictureCounts($this->pictureItem, $picture);
+        
+        return $this->redirect()->toUrl($this->pictureUrl($picture));
+    }
 
     public function moveAction()
     {
@@ -2045,6 +2076,9 @@ class PicturesController extends AbstractActionController
         if (! $picture) {
             return $this->notFoundAction();
         }
+        
+        $carTable = new Vehicle();
+        $srcItem = $carTable->find($this->params('src_item_id'))->current();
 
         $type = trim($this->params('type'));
         if (strlen($type)) {
@@ -2079,15 +2113,24 @@ class PicturesController extends AbstractActionController
                     break;
 
                 case Picture::VEHICLE_TYPE_ID:
-                    $success = $this->table->moveToCar($this->pictureItem, $picture->id, $this->params('car_id'), $userId, [
-                        'language'             => $this->language(),
-                        'pictureNameFormatter' => $this->pictureNameFormatter
-                    ]);
-
-                    $this->pictureItem->setPictureItems($picture->id, (array)$this->params('car_id'));
-
-                    if (! $success) {
-                        return $this->notFoundAction();
+                    
+                    $carId = (int)$this->params('car_id');
+                    
+                    if ($srcItem) {
+                        
+                        $this->pictureItem->changePictureItem($picture->id, $srcItem->id, $carId);
+                        
+                    } else {
+                        $success = $this->table->addToCar($this->pictureItem, $picture->id, $this->params('car_id'), $userId, [
+                            'language'             => $this->language(),
+                            'pictureNameFormatter' => $this->pictureNameFormatter
+                        ]);
+    
+                        $this->pictureItem->add($picture->id, $carId);
+                        
+                        if (! $success) {
+                            return $this->notFoundAction();
+                        }
                     }
 
                     $namespace = new \Zend\Session\Container('Moder_Car');
@@ -2114,7 +2157,7 @@ class PicturesController extends AbstractActionController
 
             return $this->redirect()->toUrl($this->pictureUrl($picture));
         }
-
+        
         $brandModel = new BrandModel();
         $brand = $brandModel->getBrandById($this->params('brand_id'), $this->language());
         $brands = null;
@@ -2126,8 +2169,6 @@ class PicturesController extends AbstractActionController
         $showFactories = false;
 
         if ($brand) {
-            $carTable = new Vehicle();
-
             $rows = $carTable->fetchAll(
                 $carTable->select(true)
                     ->join('brands_cars', 'cars.id=brands_cars.car_id', null)
@@ -2142,22 +2183,26 @@ class PicturesController extends AbstractActionController
                     ])
             );
             $cars = $this->prepareCars($rows);
+            
+            if (!$srcItem) {
 
-            $haveConcepts = (bool)$carTable->fetchRow(
-                $carTable->select(true)
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                    ->where('brands_cars.brand_id = ?', $brand['id'])
-                    ->where('cars.is_concept')
-            );
-
-            $engineTable = new Engine();
-            $haveEngines = (bool)$engineTable->fetchRow(
-                $engineTable->select(true)
-                    ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
-                    ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
-                    ->where('brand_engine.brand_id = ?', $brand['id'])
-            );
+                $haveConcepts = (bool)$carTable->fetchRow(
+                    $carTable->select(true)
+                        ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
+                        ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                        ->where('brands_cars.brand_id = ?', $brand['id'])
+                        ->where('cars.is_concept')
+                );
+    
+                $engineTable = new Engine();
+                $haveEngines = (bool)$engineTable->fetchRow(
+                    $engineTable->select(true)
+                        ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
+                        ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
+                        ->where('brand_engine.brand_id = ?', $brand['id'])
+                );
+            }
+            
         } elseif ($this->params('factories')) {
             $showFactories = true;
 
@@ -2167,11 +2212,11 @@ class PicturesController extends AbstractActionController
                     ->order('name')
             );
         } else {
-            $brands = $brandModel->getList($this->language(), function ($select) {
-            });
+            $brands = $brandModel->getList($this->language(), function ($select) {});
         }
 
         return [
+            'srcItem'      => $srcItem,
             'picture'      => $picture,
             'brand'        => $brand,
             'brands'       => $brands,

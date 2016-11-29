@@ -43,8 +43,9 @@ class CatalogueController extends AbstractActionController
         $offset = 0;
         do { 
             $rows = $pictureTable->fetchAll([
-                'car_id is not null'
-            ], 'id', 300, $offset);
+                'car_id is not null',
+                'id > 800000'
+            ], 'id', 500, $offset);
             
             if (count($rows) <= 0) {
                 break;
@@ -70,7 +71,8 @@ class CatalogueController extends AbstractActionController
                 ]);
             }
             
-            $offset += 300;
+            $offset += 500;
+            sleep(1);
             
         } while(true);
     }

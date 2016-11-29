@@ -1,0 +1,215 @@
+<?php if (count($this->items) > 0) { ?>
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Vehicle</td>
+                <td><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></td>
+                <?php if ($this->canCrop) { ?>
+                    <td>Crop</td>
+                <?php } ?>
+                <?php if ($this->canMove) { ?>
+                    <td>Move</td>
+                    <td></td>
+                <?php } ?>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($this->items as $item) { ?>
+                <?php /*=$this->escapeHtml($this->translate('moder/picture/catalogue/vehicle'))*/ ?>
+                <tr>
+                    <td>
+                        <?=$this->htmlA($this->url('moder/cars/params', [
+                            'action'     => 'car',
+                            'car_id'     => $item['row']->id
+                        ]), $this->car()->htmlTitle($item['row']->getNameData($this->language())), false) ?>
+                    </td>
+                    <td>
+                        <form method="post" action="<?=$this->escapeHtmlAttr($item['perspective']['url'])?>" class="tiny" data-module="perspective-selector">
+                            <?=$this->formElement(
+                                (new Zend\Form\Element\Select('perspective_id'))
+                                    ->setAttributes([
+                                        'class' => 'form-control input-sm'
+                                    ])
+                                    ->setValueOptions($item['perspective']['options'])
+                                    ->setValue($item['perspective']['value'])
+                            )?>
+                        </form>
+                    </td>
+                    <?php if ($this->canCrop) { ?>
+                        <td>
+                            <button class="btn btn-success btn-sm" disabled>
+                                <i class="fa fa-crop"></i>
+                                <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/crop'))?>
+                            </button>
+                        </td>
+                    <?php } ?>
+                    <?php if ($this->canMove) { ?>
+                        <td>
+                            <div class="btn-group" style="white-space:nowrap">
+                                <?=$this->htmlA([
+                                    'class' => 'btn btn-default btn-sm',
+                                    'href' => $this->url('moder/pictures/params', [
+                                        'action'      => 'move',
+                                        'picture_id'  => $this->picture->id,
+                                        'src_item_id' => $item['item_id']
+                                    ]),
+                                ], '<i class="fa fa-arrow-right"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ...', false)?>
+                                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span> 
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <?php if ($this->lastCar) { ?>
+                                        <li><?=$this->htmlA(
+                                            $this->url(null, [
+                                                'action'      => 'move',
+                                                'picture_id'  => $this->picture->id,
+                                                'src_item_id' => $item['item_id'],
+                                                'type'        => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
+                                                'car_id'      => $this->lastCar->id
+                                            ]),
+                                            '<i class="fa fa-arrow-right"></i> ' .
+                                            $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' .
+                                            $this->car()->htmlTitle($this->lastCar->getNameData($this->language())),
+                                            false
+                                        ) ?></li>
+                                    <?php } ?>
+                                    <?php foreach ($item['relatedBrands'] as $brand) { ?>
+                                        <li><?=$this->htmlA(
+                                            $this->url(null, [
+                                                'action'      => 'move',
+                                                'brand_id'    => $brand['id'],
+                                                'picture_id'  => $this->picture->id,
+                                                'src_item_id' => $item['item_id']
+                                            ]),
+                                            '<i class="fa fa-arrow-right"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' . $this->escapeHtml($brand['name']) . ' ...', 
+                                            false
+                                        ) ?></li>
+                                    <?php } ?>
+                                </ul>
+                            </div>
+                        </td>
+                        <td>
+                            <?php if ($item['canRemove']) { ?>
+                                <form action="<?=$this->escapeHtmlAttr($item['removeUrl'])?>" method="post">
+                                    <button class="btn btn-danger btn-sm">
+                                        <span class="fa fa-times"></span>
+                                    </button>
+                                </form>
+                            <?php } ?>
+                        </td>
+                    <?php } ?>
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+<?php } ?>
+<?php
+    switch ($this->picture->type) {
+        case Application\Model\DbTable\Picture::LOGO_TYPE_ID:
+            ?>
+            <p>
+                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/logo'))?>
+                <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
+                    <?=$this->htmlA($this->url('moder/brands/params', [
+                        'action'     => 'brand',
+                        'brand_id'   => $brand->id
+                    ]), $brand->caption) ?>
+                <?php } else { ?>
+                    <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
+                <?php } ?>
+            </p>
+            <?php
+            break;
+
+        case Application\Model\DbTable\Picture::MIXED_TYPE_ID:
+            ?>
+            <p>
+                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/mixed'))?>
+                <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
+                    <?=$this->htmlA($this->url('moder/brands/params', [
+                        'action'   => 'brand',
+                        'brand_id' => $brand->id
+                    ]), $brand->caption) ?>
+                <?php } else { ?>
+                    <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
+                <?php } ?>
+            </p>
+            <?php
+            break;
+
+        case Application\Model\DbTable\Picture::UNSORTED_TYPE_ID:
+            ?>
+            <p>
+                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/unsorted'))?>
+                <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
+                    <?=$this->htmlA($this->url('moder/brands/params', [
+                        'action'   => 'brand',
+                        'brand_id' => $brand->id
+                    ]), $brand->caption) ?>
+                <?php } else { ?>
+                    <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
+                <?php } ?>
+            </p>
+            <?php
+            break;
+
+        case Application\Model\DbTable\Picture::ENGINE_TYPE_ID:
+            ?>
+            <p>
+                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/engine'))?>
+                <?php $engine = $this->picture->findParentRow(Application\Model\DbTable\Engine::class); ?>
+                <?php if ($engine) { ?>
+                    <?=$this->htmlA($this->url('moder/engines/params', [
+                        'action'    => 'engine',
+                        'engine_id' => $engine->id
+                    ]), $engine->caption) ?>
+                <?php } else { ?>
+                    <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
+                <?php } ?>
+                </p>
+            <?php
+            break;
+
+        case Application\Model\DbTable\Picture::FACTORY_TYPE_ID:
+            ?>
+            <p>
+                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/factory'))?>
+                <?php if ($factory = $this->picture->findParentRow(Application\Model\DbTable\Factory::class)) { ?>
+                    <?=$this->htmlA($this->url('moder/factories/params', [
+                        'action'     => 'factory',
+                        'factory_id' => $factory->id
+                    ]), $factory->name) ?>
+                <?php } else { ?>
+                    <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
+                <?php } ?>
+            </p>
+            <?php
+            break;
+    }
+?>
+<?php if ($this->canMove) { ?>
+    <?php if ($this->lastCar) { ?>
+        <p><?=$this->htmlA(
+            [
+                'class' => 'btn btn-default btn-sm',
+                'href'  => $this->url(null, [
+                    'action'     => 'move',
+                    'picture_id' => $this->picture->id,
+                    'type'       => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
+                    'car_id'     => $this->lastCar->id
+                ])
+            ],
+            '<i class="fa fa-plus"></i> ' .
+            $this->escapeHtml($this->translate('moder/picture/catalogue/add-to')) . ' ' .
+            $this->car()->htmlTitle($this->lastCar->getNameData($this->language())),
+            false
+        ) ?></p>
+    <?php } ?>
+    <p><?=$this->htmlA([
+        'class' => 'btn btn-default btn-sm',
+        'href' => $this->url('moder/pictures/params', [
+            'action' => 'move'
+        ], [], true),
+    ], '<i class="fa fa-plus"></i> ' . $this->escapeHtml($this->translate('moder/picture/catalogue/add-to')) . ' ...', false)?></p>
+<?php } ?>

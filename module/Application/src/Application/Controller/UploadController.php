@@ -99,7 +99,8 @@ class UploadController extends AbstractActionController
         } else {
             $type = (int)$this->params('type');
             $brandId = (int)$this->params('brand_id');
-            $carIds = [(int)$this->params('car_id')];
+            $carId = (int)$this->params('car_id');
+            $carIds = $carId ? [$carId] : [];
             $engineId = (int)$this->params('engine_id');
         }
 
@@ -318,10 +319,7 @@ class UploadController extends AbstractActionController
                 'height'        => $height,
                 'owner_id'      => $user ? $user->id : null,
                 'add_date'      => new Zend_Db_Expr('NOW()'),
-                //'note'          => $values['note'],
-                'views'         => 0,
                 'filesize'      => $fileSize,
-                'crc'           => 0,
                 'status'        => Picture::STATUS_INBOX,
                 'type'          => $type,
                 'removing_date' => null,

@@ -27,8 +27,7 @@ class TwitterController extends AbstractActionController
 
     public function carOfDayAction()
     {
-        $model = new CarOfDay();
-        $model->putCurrentToTwitter($this->twitterConfig);
+        $this->carOfDay->putCurrentToTwitter($this->twitterConfig);
 
         Console::getInstance()->writeLine("done");
     }

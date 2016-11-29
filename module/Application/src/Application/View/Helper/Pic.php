@@ -51,7 +51,8 @@ class Pic extends AbstractHtmlElement
 
     public function htmlTitle(array $picture)
     {
-        $view = $this->view;
+        return $this->pictureNameFormatter->formatHtml($picture, $this->view->language());
+        /*$view = $this->view;
 
         if (isset($picture['name']) && $picture['name']) {
             return $view->escapeHtml($picture['name']);
@@ -78,7 +79,7 @@ class Pic extends AbstractHtmlElement
                 break;
         }
 
-        return 'Picture';
+        return 'Picture';*/
     }
 
     public function textTitle(array $picture)

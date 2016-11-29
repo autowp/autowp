@@ -9,7 +9,8 @@
             'BRAND_NAME'    => $this->brand['name'],
             'BRAND_CATNAME' => $this->brand['catname'],
             'ENGINE_ID'     => $this->engine['id'],
-            'ENGINE_NAME'   => $this->engine['name']
+            'ENGINE_NAME'   => $this->engine['name'],
+            'PICTURE_NAME'  => $this->pic()->textTitle($this->picture['name']),
         ]
     ]);
 ?>

@@ -1,0 +1,60 @@
+<div style="margin-bottom:15px"><?php
+    $changeStatusUserHtml = '';
+    if ($this->picture->change_status_user_id) {
+        $changeStatusUserHtml = ' '.$this->user($this->picture->findParentRow(Autowp\User\Model\DbTable\User::class, 'Change_Status_User'));
+    }
+
+    switch ($this->picture->status) {
+        case Application\Model\DbTable\Picture::STATUS_NEW:
+        case Application\Model\DbTable\Picture::STATUS_INBOX:
+            ?>
+            <p><strong class="label label-warning">
+                <?=$this->escapeHtml($this->translate('moder/picture/acceptance/not-accepted'))?>
+                <?=$changeStatusUserHtml?>
+                <?=(Application\Model\DbTable\Picture::STATUS_INBOX == $this->picture->status ? ' ' . $this->translate('moder/pictures/picture/inbox-mark') : '')?>
+            </strong></p>
+            <?php if ($this->canAccept) { ?>
+                <form action="<?=$this->escapeHtmlAttr($this->acceptUrl)?>" method="post">
+                    <button type="submit" class="btn btn-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/accept'))?></button>
+                </form>
+            <?php } ?>
+            <?php
+            break;
+
+        case Application\Model\DbTable\Picture::STATUS_ACCEPTED:
+            ?>
+            <p><strong class="label label-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/accepted'))?></strong></p>
+            <?=$changeStatusUserHtml?>
+            <?php if ($this->canUnaccept) { ?>
+                <form action="<?=$this->escapeHtmlAttr($this->unacceptUrl)?>" method="post">
+                    <button type="submit" class="btn btn-warning"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/unaccept'))?></button>
+                </form>
+            <?php } ?>
+            <?php
+            break;
+
+        case Application\Model\DbTable\Picture::STATUS_REMOVING:
+            ?><p>
+                <strong class="label label-danger">
+                    <?=$this->escapeHtml($this->translate('moder/picture/acceptance/in-delete-queue'))?>
+                </strong>
+                &nbsp;
+                <?=$changeStatusUserHtml?>
+            </p>
+            <?php if ($this->canRestore) { ?>
+                <form action="<?=$this->escapeHtmlAttr($this->restoreUrl)?>" method="post">
+                    <button type="submit" class="btn btn-success"><?=$this->escapeHtml($this->translate('moder/picture/acceptance/restore'))?></button>
+                </form>
+            <?php }
+            break;
+
+        case Application\Model\DbTable\Picture::STATUS_REMOVED:
+            ?><p><strong style="color:red">
+                <?=$this->escapeHtml($this->translate('moder/picture/acceptance/removed'))?>
+                <?=$changeStatusUserHtml?>
+            </strong></p><?php
+            break;
+    }
+?></div>
+
+<?=$this->partial('application/moder/pictures/picture-vote', $this->pictureVote)?>

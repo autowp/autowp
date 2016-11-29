@@ -538,7 +538,6 @@ Good luck.',
     'picture/on-that-factory-produced-vehicles:' => 'На этом заводе производились такие автомобили, как: ',
     'picture/on-that-factory-produced-vehicles/and' => 'and',
     'picture/on-that-factory-produced-vehicles/and-other' => 'other ...',
-    'picture/photo-is-owned-by' => 'Photo is owned by',
 
     'user/name' => 'Name',
     'user/password' => 'Password',
@@ -1486,6 +1485,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/catalogue/factory' => 'Factory: ',
     'moder/picture/catalogue/not-set' => 'not set',
     'moder/picture/catalogue/move-to' => 'move to',
+    'moder/picture/catalogue/add-to' => 'add to',
 
     'moder/picture/perspective' => 'Perspective',
     'moder/picture/perspective-by' => 'By: ',
