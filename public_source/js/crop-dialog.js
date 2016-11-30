@@ -37,6 +37,7 @@ define(
                 this.width = options.width;
                 this.height = options.height;
                 this.sourceUrl = options.sourceUrl;
+                this.minSize = options.minSize ? options.minSize : [400, 300];
                 
                 this.$modal = $(markup);
                 
@@ -106,7 +107,7 @@ define(
                                 self.currentCrop.x + self.currentCrop.w,
                                 self.currentCrop.y + self.currentCrop.h
                             ],
-                            minSize: [400, 300],
+                            minSize: self.minSize,
                             boxWidth: width,
                             boxHeight: height,
                             trueSize: [self.width, self.height],

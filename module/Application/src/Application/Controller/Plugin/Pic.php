@@ -31,6 +31,7 @@ use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
+use Application\VehicleNameFormatter;
 
 use Exception;
 
@@ -55,6 +56,11 @@ class Pic extends AbstractPlugin
      * @var PictureNameFormatter
      */
     private $pictureNameFormatter;
+    
+    /**
+     * @var VehicleNameFormatter
+     */
+    private $vehicleNameFormatter;
 
     /**
      * @var SpecificationsService
@@ -70,6 +76,7 @@ class Pic extends AbstractPlugin
         $textStorage,
         $translator,
         PictureNameFormatter $pictureNameFormatter,
+        VehicleNameFormatter $vehicleNameFormatter,
         SpecificationsService $specsService,
         PictureItem $pictureItem
     ) {
@@ -77,6 +84,7 @@ class Pic extends AbstractPlugin
         $this->textStorage = $textStorage;
         $this->translator = $translator;
         $this->pictureNameFormatter = $pictureNameFormatter;
+        $this->vehicleNameFormatter = $vehicleNameFormatter;
         $this->specsService = $specsService;
         $this->pictureItem = $pictureItem;
     }
@@ -523,6 +531,7 @@ class Pic extends AbstractPlugin
             $description = null;
             $text = null;
             $specsEditUrl = null;
+            $uploadUrl = null;
         
             if ($itemsCount == 1) {
                 $twinsGroupsRows = $twinsGroupsTable->fetchAll(
@@ -604,6 +613,14 @@ class Pic extends AbstractPlugin
                         'car_id' => $item['id']
                     ]);
                 }
+                
+                if ($controller->user()->logedIn()) {
+                    $uploadUrl = $controller->url()->fromRoute('upload/params', [
+                        'action' => 'index',
+                        'type'   => '1',
+                        'car_id' => $item['id']
+                    ]);
+                }
             }
             
             // alt names
@@ -678,12 +695,12 @@ class Pic extends AbstractPlugin
             $hasSpecs = $this->specsService->hasSpecs(1, $item->id);
             $specsUrl = null;
             foreach ($catalogue->cataloguePaths($item) as $path) {
-                /*$specsUrl = $this->url('catalogue', [
+                $specsUrl = $this->getController()->url()->fromRoute('catalogue', [
                     'action'        => 'brand-car-specifications',
                     'brand_catname' => $path['brand_catname'],
                     'car_catname'   => $path['car_catname'],
                     'path'          => $path['path']
-                ]);*/
+                ]);
                 break;
             }
             
@@ -703,7 +720,8 @@ class Pic extends AbstractPlugin
                 'description'   => $description,
                 'text'          => $text,
                 'perspective'   => $perspective,
-                'specsEditUrl'  => $specsEditUrl
+                'specsEditUrl'  => $specsEditUrl,
+                'uploadUrl'     => $uploadUrl
             ];
         }
         
@@ -1305,58 +1323,84 @@ class Pic extends AbstractPlugin
 
         foreach ($rows as $idx => $row) {
             $imageId = (int)$row['image_id'];
-
-            if ($imageId) {
-                $id = (int)$row['id'];
-
-                $image = isset($images[$imageId]) ? $images[$imageId] : null;
-                if ($image) {
-                    $sUrl = $image->getSrc();
-
-                    if (PictureRow::checkCropParameters($row)) {
-                        $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
-
-                        $crop['crop'] = [
-                            'left'   => $row['crop_left'] / $image->getWidth(),
-                            'top'    => $row['crop_top'] / $image->getHeight(),
-                            'width'  => $row['crop_width'] / $image->getWidth(),
-                            'height' => $row['crop_height'] / $image->getHeight(),
-                        ];
-                    } else {
-                        $crop = null;
-                    }
-
-                    $full = isset($fullImagesInfo[$idx]) ? $fullImagesInfo[$idx]->toArray() : null;
-
-                    $msgCount = $row['messages'];
-                    $newMsgCount = 0;
-                    if ($userId) {
-                        $newMsgCount = isset($newMessages[$id]) ? $newMessages[$id] : $msgCount;
-                    }
-
-                    $name = isset($names[$id]) ? $names[$id] : null;
-                    $name = $this->pictureNameFormatter->format($name, $language);
-
-                    $reuseParams = isset($options['reuseParams']) && $options['reuseParams'];
-                    $url = $controller->url()->fromRoute($route, array_replace($options['urlParams'], [
-                        'picture_id' => $row['identity'] ? $row['identity'] : $id,
-                        'gallery'    => null,
-                    ]), [], $reuseParams);
-
-                    $gallery[] = [
-                        'id'          => $id,
-                        'type'        => $row['type'],
-                        'url'         => $url,
-                        'sourceUrl'   => $sUrl,
-                        'crop'        => $crop,
-                        'full'        => $full,
-                        'messages'    => $msgCount,
-                        'newMessages' => $newMsgCount,
-                        'name'        => $name,
-                        'filesize'    => $row['filesize'] //$view->fileSize($row['filesize'])
-                    ];
-                }
+            
+            if (!$imageId) {
+                continue;
             }
+
+            $image = isset($images[$imageId]) ? $images[$imageId] : null;
+            if (!$image) {
+                continue;
+            }
+            
+            $id = (int)$row['id'];
+            
+            $sUrl = $image->getSrc();
+
+            if (PictureRow::checkCropParameters($row)) {
+                $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
+
+                $crop['crop'] = [
+                    'left'   => $row['crop_left'] / $image->getWidth(),
+                    'top'    => $row['crop_top'] / $image->getHeight(),
+                    'width'  => $row['crop_width'] / $image->getWidth(),
+                    'height' => $row['crop_height'] / $image->getHeight(),
+                ];
+            } else {
+                $crop = null;
+            }
+
+            $full = isset($fullImagesInfo[$idx]) ? $fullImagesInfo[$idx]->toArray() : null;
+
+            $msgCount = $row['messages'];
+            $newMsgCount = 0;
+            if ($userId) {
+                $newMsgCount = isset($newMessages[$id]) ? $newMessages[$id] : $msgCount;
+            }
+
+            $name = isset($names[$id]) ? $names[$id] : null;
+            $name = $this->pictureNameFormatter->format($name, $language);
+
+            $reuseParams = isset($options['reuseParams']) && $options['reuseParams'];
+            $url = $controller->url()->fromRoute($route, array_replace($options['urlParams'], [
+                'picture_id' => $row['identity'] ? $row['identity'] : $id,
+                'gallery'    => null,
+            ]), [], $reuseParams);
+            
+            $itemsData = $this->pictureItem->getData([
+                'picture'      => $row['id'],
+                'onlyWithArea' => true
+            ]);
+            
+            $itemTable = new Vehicle();
+            
+            $areas = [];
+            foreach ($itemsData as $pictureItem) {
+                $item = $itemTable->find($pictureItem['item_id'])->current();
+                $areas[] = [
+                    'area' => [
+                        'left'   => $pictureItem['area'][0] / $image->getWidth(),
+                        'top'    => $pictureItem['area'][1] / $image->getHeight(),
+                        'width'  => $pictureItem['area'][2] / $image->getWidth(),
+                        'height' => $pictureItem['area'][3] / $image->getHeight(),
+                    ],
+                    'name' => $this->vehicleNameFormatter->formatHtml($item->getNameData($language), $language)
+                ];
+            }
+
+            $gallery[] = [
+                'id'          => $id,
+                'type'        => $row['type'],
+                'url'         => $url,
+                'sourceUrl'   => $sUrl,
+                'crop'        => $crop,
+                'full'        => $full,
+                'messages'    => $msgCount,
+                'newMessages' => $newMsgCount,
+                'name'        => $name,
+                'filesize'    => $row['filesize'], //$view->fileSize($row['filesize'])
+                'areas'       => $areas
+            ];
         }
 
         return [

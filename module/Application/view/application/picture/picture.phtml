@@ -197,12 +197,14 @@
                 }
             
             
-                if ($this->user()->logedIn()) {
-                    $list[] = $this->htmlA($this->url('upload/params', [
-                        'action' => 'index',
-                        'type'   => '1',
-                        'car_id' => $item['id']
-                    ]), '<i class="fa fa-upload"></i> ' . $this->escapeHtml($this->page(29)->name) . ' ' . $this->car()->htmlTitle($item['name']), false);
+                if ($item['uploadUrl']) {
+                    $list[] = $this->htmlA(
+                        $item['uploadUrl'], 
+                        '<i class="fa fa-upload"></i> ' . 
+                            $this->escapeHtml($this->page(29)->name) . ' ' . 
+                            $this->car()->htmlTitle($item['name']), 
+                        false
+                    );
                 }
             }
             

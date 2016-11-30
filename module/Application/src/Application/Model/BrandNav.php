@@ -116,7 +116,8 @@ class BrandNav
             'SIDEBAR_OTHER',
             $brand['id'],
             $language,
-            $conceptsSeparatly ? '1' : '0'
+            $conceptsSeparatly ? '1' : '0',
+            '2'
         ]);
 
         $groups = $this->cache->getItem($cacheKey, $success);
@@ -447,7 +448,7 @@ class BrandNav
             'SIDEBAR',
             $brand['id'],
             $language,
-            '28'
+            '30'
         ]);
 
         $sections = $this->cache->getItem($cacheKey, $success);

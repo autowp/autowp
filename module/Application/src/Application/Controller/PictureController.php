@@ -207,18 +207,17 @@ class PictureController extends AbstractActionController
                 }
                 break;
             case Picture::VEHICLE_TYPE_ID:
-                if ($car = $picture->findParentRow(Vehicle::class)) {
-                    $language = $this->language();
-                    $brandList = $brandModel->getList($language, function ($select) use ($car) {
-                        $select
-                            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                            ->where('car_parent_cache.car_id = ?', $car->id)
-                            ->group('brands.id');
-                    });
-                    foreach ($brandList as $brand) {
-                        $brands[] = $brand['id'];
-                    }
+                $language = $this->language();
+                $brandList = $brandModel->getList($language, function ($select) use ($picture) {
+                    $select
+                        ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+                        ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                        ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                        ->where('picture_item.picture_id = ?', $picture->id)
+                        ->group('brands.id');
+                });
+                foreach ($brandList as $brand) {
+                    $brands[] = $brand['id'];
                 }
                 break;
         }

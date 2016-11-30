@@ -6,7 +6,9 @@
         <label><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></label>
     <?php } ?>
     <div>
-        <?=$this->car()->htmlTitle($this->name)?>
+        <?php if (!$tiny) { ?>
+            <?=$this->car()->htmlTitle($this->name)?>
+        <?php } ?>
         <?=$this->formElement(
             (new Zend\Form\Element\Select('perspective_id'))
                 ->setAttributes([

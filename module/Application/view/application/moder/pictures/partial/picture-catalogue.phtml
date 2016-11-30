@@ -5,7 +5,7 @@
                 <td>Vehicle</td>
                 <td><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></td>
                 <?php if ($this->canCrop) { ?>
-                    <td>Crop</td>
+                    <td>Area</td>
                 <?php } ?>
                 <?php if ($this->canMove) { ?>
                     <td>Move</td>
@@ -37,7 +37,7 @@
                     </td>
                     <?php if ($this->canCrop) { ?>
                         <td>
-                            <button class="btn btn-success btn-sm" disabled>
+                            <button class="btn btn-success btn-sm pick-area" data-area="<?=$this->escapeHtmlAttr(Zend\Json\Json::encode($item['area']))?>">
                                 <i class="fa fa-crop"></i>
                                 <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/crop'))?>
                             </button>

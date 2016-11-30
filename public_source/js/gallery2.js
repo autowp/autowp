@@ -382,12 +382,32 @@ define(
                 $caption.find('h3').html(item.name);
                 $caption.find('[data-toggle="tooltip"]').tooltip();
                 
+                var areas = [];
+                $.map(item.areas, function(area) {
+                    var $area = $('<div class="area"></div>');
+                    $area.data('area', area.area);
+                    $area.tooltip({
+                        title: area.name,
+                        html: true,
+                        placement: function(tooptip, node) {
+                            var winCenter = $(window).height() / 2;
+                            var nodeCenter = $(node).offset().top + ($(node).height()) / 2;
+                            
+                            console.log(winCenter, nodeCenter);
+                            
+                            return winCenter > nodeCenter ? 'bottom' : 'top'
+                        }
+                    });
+                    areas.push($area);
+                });
+                
                 var $item = $('<div class="item loading"></div>')
                     .data({
                         id: item.id,
                         full: item.full,
                         crop: item.crop
                     })
+                    .append(areas)
                     .append($caption)
                     .append($source)
                     .append($comments)
@@ -512,6 +532,7 @@ define(
                     var $item = $(this);
                     var $imgFull = $item.find('img.full');
                     var $imgCrop = $item.find('img.crop');
+                    var $areas = $item.find('.area');
                     var full = $item.data('full');
                     var crop = $item.data('crop');
                     var cropMode = $item.data('cropMode');
@@ -571,6 +592,16 @@ define(
                         });
                         offsetBounds = self.boundCenter(cSize, bounds);
                         $imgFull.css(offsetBounds);
+                        
+                        $areas.each(function() {
+                            var area = $(this).data('area');
+                            $(this).css({
+                                left: offsetBounds.left + area.left * offsetBounds.width,
+                                top: offsetBounds.top + area.top * offsetBounds.height,
+                                width: area.width * offsetBounds.width,
+                                height: area.height * offsetBounds.height 
+                            });
+                        })
                     }
                 });
             },

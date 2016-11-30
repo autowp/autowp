@@ -204,21 +204,24 @@ class PicturesController extends AbstractActionController
         return new JsonModel(array_values($options));
     }
 
-    private function getFilterForm()
+    private function getFilterForm($status)
     {
         $db = $this->table->getAdapter();
+        
+        $select = $db->select()
+            ->from('brands', ['id', 'caption'])
+            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
+            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+            ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+            ->join('pictures', 'picture_item.picture_id = pictures.id', null)
+            ->group('brands.id')
+            ->order(['brands.position', 'brands.caption']);
+        
+        if ($status) {
+            $select->where('pictures.status = ?', $status);
+        }
 
-        $brandMultioptions = $db->fetchPairs(
-            $db->select()
-                ->from('brands', ['id', 'caption'])
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
-                ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                ->where('pictures.status = ?', Picture::STATUS_INBOX)
-                ->group('brands.id')
-                ->order(['brands.position', 'brands.caption'])
-        );
+        $brandMultioptions = $db->fetchPairs($select);
 
         $form = new InboxForm(null, [
             'perspectiveOptions' => [
@@ -263,7 +266,7 @@ class PicturesController extends AbstractActionController
         ];
 
         if ($this->getRequest()->isPost()) {
-            $form = $this->getFilterForm();
+            $form = $this->getFilterForm(Picture::STATUS_INBOX);
             $form->setData($this->params()->fromPost());
             if ($form->isValid()) {
                 $post = $form->getData();
@@ -276,7 +279,7 @@ class PicturesController extends AbstractActionController
                 return $this->redirect()->toRoute('moder/pictures/params', $post);
             }
         } else {
-            $form = $this->getFilterForm();
+            $form = $this->getFilterForm($this->params('status'));
             $form->setData($this->params()->fromRoute());
             $form->isValid();
         }
@@ -501,36 +504,44 @@ class PicturesController extends AbstractActionController
         $picturesData = $this->pic()->listData($select, [
             'width' => 4
         ]);
-
-        $perspectives = new Perspective();
-        $multioptions = $perspectives->getAdapter()->fetchPairs(
-            $perspectives->getAdapter()->select()
-                ->from($perspectives->info('name'), ['id', 'name'])
-                ->order('position')
-        );
-
-        $multioptions = array_replace([
-            '' => '--'
-        ], $multioptions);
-
-        /*foreach ($picturesData['items'] as &$pictureItem) {
-            $picturePerspective = null;
-            if ($pictureItem['type'] == Picture::VEHICLE_TYPE_ID) {
-                if ($this->user()->inheritsRole('moder')) {
+        
+        if ($this->user()->inheritsRole('moder')) {
+    
+            $perspectives = new Perspective();
+            $multioptions = $perspectives->getAdapter()->fetchPairs(
+                $perspectives->getAdapter()->select()
+                    ->from($perspectives->info('name'), ['id', 'name'])
+                    ->order('position')
+            );
+    
+            $multioptions = array_replace([
+                '' => '--'
+            ], $multioptions);
+    
+            foreach ($picturesData['items'] as &$pictureItem) {
+                
+                $itemIds = $this->pictureItem->getPictureItems($pictureItem['id']);
+                
+                if (count($itemIds) == 1) {
+                    
+                    $itemId = $itemIds[0];
+                    
+                    $perspective = $this->pictureItem->getPerspective($pictureItem['id'], $itemId);
+                    
                     $pictureItem['perspective'] = [
                         'options' => $multioptions,
                         'url'     => $this->url()->fromRoute('moder/pictures/params', [
                             'action'     => 'picture-perspective',
                             'picture_id' => $pictureItem['id'],
-                            'item_id'    => null
+                            'item_id'    => $itemId
                         ]),
-                        'value'   => $pictureItem['perspective_id'],
+                        'value'   => $perspective,
                         'user'    => null
                     ];
                 }
             }
         }
-        unset($pictureItem);*/
+        unset($pictureItem);
 
         $reasons = [
             'плохое качество',
@@ -1260,6 +1271,15 @@ class PicturesController extends AbstractActionController
                     ->group('brands.id');
             });
             
+            $area = $this->pictureItem->getArea($picture['id'], $item['id']);
+            
+            if (!$area) {
+                $area = [
+                    0, 0,
+                    (int)$picture->width, (int)$picture->height,
+                ];
+            }
+            
             $items[] = [
                 'item_id'     => $item['id'],
                 'row'         => $item,
@@ -1273,12 +1293,28 @@ class PicturesController extends AbstractActionController
                     'value'   => $this->pictureItem->getPerspective($picture->id, $item['id'])
                 ],
                 'relatedBrands' => $relatedBrands,
-                'removeUrl'     => $this->url()->fromRoute('moder/pictures/params', [
-                    'action'     => 'remove-picture-item',
+                'removeUrl'     => $this->url()->fromRoute('moder/picture-item/params', [
+                    'action'     => 'remove',
                     'picture_id' => $picture->id,
                     'item_id'    => $item['id']
                 ]),
-                'canRemove'     => count($itemIds) > 1
+                'canRemove'     => count($itemIds) > 1,
+                'area' => [
+                    'sourceUrl' => $sourceUrl,
+                    'crop'      => [
+                        'x' => $area[0],
+                        'y' => $area[1],
+                        'w' => $area[2],
+                        'h' => $area[3],
+                    ],
+                    'width'     => $picture->width,
+                    'height'    => $picture->height,
+                    'saveUrl'   => $this->url()->fromRoute('moder/picture-item/params', [
+                        'action'     => 'save-area',
+                        'picture_id' => $picture->id,
+                        'item_id'    => $item['id']
+                    ])
+                ]
             ];
         }
         
@@ -1646,7 +1682,14 @@ class PicturesController extends AbstractActionController
             $carParentTable->select(true)
                 ->join('cars', 'cars.id = car_parent.car_id', null)
                 ->where('car_parent.parent_id = ?', $car->id)
-                ->order(['car_parent.type', 'cars.caption', 'cars.begin_year', 'cars.end_year'])
+                ->order([
+                    'car_parent.type', 
+                    'cars.begin_order_cache',
+                    'cars.end_order_cache',
+                    'cars.caption',
+                    'cars.body',
+                    'cars.spec_id'
+                ])
         );
 
         $viewModel = new ViewModel([
@@ -2041,28 +2084,6 @@ class PicturesController extends AbstractActionController
         return new JsonModel([
             'status' => true
         ]);
-    }
-    
-    public function removePictureItemAction()
-    {
-        $canMove = $this->user()->isAllowed('picture', 'move');
-        if (! $canMove) {
-            return $this->forbiddenAction();
-        }
-        
-        $picture = $this->table->find($this->params('picture_id'))->current();
-        if (! $picture) {
-            return $this->notFoundAction();
-        }
-        
-        $itemTable = new Vehicle();
-        $item = $itemTable->find($this->params('item_id'))->current();
-        
-        $this->pictureItem->remove($picture->id, $item->id);
-        
-        $this->table->refreshPictureCounts($this->pictureItem, $picture);
-        
-        return $this->redirect()->toUrl($this->pictureUrl($picture));
     }
 
     public function moveAction()

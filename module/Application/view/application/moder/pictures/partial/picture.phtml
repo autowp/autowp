@@ -30,12 +30,12 @@
         <button type="button" class="btn btn-default btn-sm pull-left" data-toggle="button" aria-pressed="false">
             <i class="fa fa-check"></i>
         </button>
-        <?php /* if ($this->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
+        <?php if (isset($this->perspective)) { ?>
             <div style="margin-left: 35px;">
                 <?=$this->partial('application/moder/pictures/picture-perspective', array_replace([
                     'tiny' => true
                 ], $this->perspective))?>
             </div>
-        <?php }*/ ?>
+        <?php } ?>
     </div>
 </div>

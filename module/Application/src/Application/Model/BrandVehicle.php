@@ -98,13 +98,10 @@ class BrandVehicle
     private function getVehicleName(DbTable\Vehicle\Row $vehicleRow, $language)
     {
         $languageTable = new DbTable\Vehicle\Language;
-
-        $db = $languageTable->getAdapter();
-
-        $order = new Zend_Db_Expr($db->quoteInto('language = ? DESC', $language));
-
+        
         $languageRow = $languageTable->fetchRow([
-            'car_id = ?' => $vehicleRow->id
+            'car_id = ?'   => $vehicleRow->id,
+            'language = ?' => $language
         ], $order);
 
         return $languageRow ? $languageRow->name : $vehicleRow->caption;

@@ -158,6 +158,56 @@ class PictureItem
                 ->where('picture_id = ?', $pictureId)
         );
     }
+    
+    public function getData(array $options)
+    {
+        $defaults = [
+            'picture'      => null,
+            'item'         => null,
+            'onlyWithArea' => false
+        ];
+        $options = array_replace($defaults, $options);
+        
+        $db = $this->table->getAdapter();
+        
+        $select = $db->select()
+            ->from($this->table->info('name'), [
+                'picture_id', 'item_id', 
+                'crop_left', 'crop_top', 'crop_width', 'crop_height'
+            ]);
+        
+        if ($options['onlyWithArea']) {
+            $select->where('crop_left and crop_top and crop_width and crop_height');
+        }
+        
+        if ($options['picture']) {
+            $select->where('picture_id = ?', $options['picture']);
+        }
+        
+        if ($options['item']) {
+            $select->where('item_id = ?', $options['item']);
+        }
+        
+        $result = [];
+        foreach ($db->fetchAll($select) as $row) {
+            
+            $area = null;
+            if ($row['crop_left'] && $row['crop_top'] && $row['crop_width'] && $row['crop_height']) {
+                $area = [
+                    (int)$row['crop_left'],  (int)$row['crop_top'],
+                    (int)$row['crop_width'], (int)$row['crop_height'],
+                ];
+            }
+            
+            $result[] = [
+                'picture_id' => $row['picture_id'], 
+                'item_id'    => $row['item_id'],
+                'area'       => $area
+            ];
+        }
+        
+        return $result;
+    }
 
     public function setProperties($pictureId, $itemId, array $properties)
     {
@@ -168,14 +218,14 @@ class PictureItem
                 $row->perspective_id = $perspective ? (int)$perspective : null;
             }
 
-            if (array_key_exists('crop', $properties)) {
-                $crop = $properties['crop'];
-                if ($crop) {
+            if (array_key_exists('area', $properties)) {
+                $area = $properties['area'];
+                if ($area) {
                     $row->setFromArray([
-                        'crop_left'   => $crop['left'],
-                        'crop_top'    => $crop['top'],
-                        'crop_width'  => $crop['width'],
-                        'crop_height' => $crop['height'],
+                        'crop_left'   => $area['left'],
+                        'crop_top'    => $area['top'],
+                        'crop_width'  => $area['width'],
+                        'crop_height' => $area['height'],
                     ]);
                 } else {
                     $row->setFromArray([
@@ -199,5 +249,22 @@ class PictureItem
         }
 
         return $row->perspective_id;
+    }
+    
+    public function getArea($pictureId, $itemId)
+    {
+        $row = $this->getRow($pictureId, $itemId);
+        if (!$row) {
+            return null;
+        }
+        
+        if (!$row->crop_left || !$row->crop_top || !$row->crop_width || !$row->crop_height) {
+            return null;
+        }
+        
+        return [
+            (int)$row->crop_left,  (int)$row->crop_top,
+            (int)$row->crop_width, (int)$row->crop_height,
+        ];
     }
 }
