@@ -582,7 +582,7 @@ class CarsController extends AbstractActionController
             } elseif ($itemType->id == 3) {
                 $engine = $engines->find($row->item_id)->current();
                 if ($engine) {
-                    $objectName = $engine->caption;
+                    $objectName = $engine->name;
                     $editorUrl = $this->url()->fromRoute('cars/params', [
                         'action'    => 'engine-spec-editor',
                         'engine_id' => $engine->id
@@ -678,7 +678,7 @@ class CarsController extends AbstractActionController
             $message = sprintf(
                 'У автомобиля %s убран двигатель (был %s)',
                 htmlspecialchars($this->car()->formatName($car, 'en')),
-                htmlspecialchars($engine->caption)
+                htmlspecialchars($engine->name)
             );
             $this->log($message, $car);
 
@@ -696,7 +696,7 @@ class CarsController extends AbstractActionController
                             $subscriber->language
                         ),
                         $this->userUrl($user, $uri),
-                        $engine->caption,
+                        $engine->name,
                         $this->car()->formatName($car, $subscriber->language),
                         $this->carModerUrl($car, $uri)
                     );
@@ -767,7 +767,7 @@ class CarsController extends AbstractActionController
     {
         $engineTable = $this->getEngineTable();
         $select = $engineTable->select(true)
-            ->order('engines.caption');
+            ->order('engines.name');
         if ($brandId) {
             $select
                 ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
@@ -783,7 +783,7 @@ class CarsController extends AbstractActionController
         foreach ($rows as $row) {
             $engines[] = [
                 'id'     => $row->id,
-                'name'   => $row->caption,
+                'name'   => $row->name,
                 'childs' => $this->enginesWalkTree($row->id, null)
             ];
         }
@@ -855,7 +855,7 @@ class CarsController extends AbstractActionController
         $message = sprintf(
             'Автомобилю %s назначен двигатель %s',
             htmlspecialchars($this->car()->formatName($car, 'en')),
-            htmlspecialchars($engine->caption)
+            htmlspecialchars($engine->name)
         );
         $this->log($message, $car);
 
@@ -866,7 +866,7 @@ class CarsController extends AbstractActionController
                 $message = sprintf(
                     $this->translate('pm/user-%s-set-vehicle-engine-%s-%s-%s', 'default', $subscriber->language),
                     $this->userUrl($user, $uri),
-                    $engine->caption,
+                    $engine->name,
                     $this->car()->formatName($car, $subscriber->language),
                     $this->carModerUrl($car, $uri)
                 );

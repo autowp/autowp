@@ -1198,13 +1198,13 @@ DROP TABLE IF EXISTS `brands`;
 CREATE TABLE `brands` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `folder` varchar(50) NOT NULL DEFAULT '',
-  `caption` varchar(50) NOT NULL DEFAULT '',
+  `name` varchar(50) NOT NULL DEFAULT '',
   `position` smallint(5) unsigned NOT NULL DEFAULT '0',
   `group_id` int(10) unsigned DEFAULT NULL,
   `type_id` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `activepictures_count` int(10) unsigned NOT NULL DEFAULT '0',
   `_description` mediumtext,
-  `full_caption` varchar(50) DEFAULT NULL,
+  `full_name` varchar(50) DEFAULT NULL,
   `engines_count` int(10) unsigned NOT NULL DEFAULT '0',
   `carpictures_count` int(10) unsigned NOT NULL DEFAULT '0',
   `enginepictures_count` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1226,8 +1226,8 @@ CREATE TABLE `brands` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_folder` (`folder`),
   KEY `group_id` (`group_id`),
-  KEY `position` (`position`,`caption`),
-  KEY `type_id` (`type_id`,`position`,`caption`),
+  KEY `position` (`position`,`name`),
+  KEY `type_id` (`type_id`,`position`,`name`),
   KEY `parent_brand_id` (`parent_brand_id`),
   KEY `text_id` (`text_id`),
   CONSTRAINT `brands_fk` FOREIGN KEY (`parent_brand_id`) REFERENCES `brands` (`id`),
@@ -1464,7 +1464,7 @@ DROP TABLE IF EXISTS `cars`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cars` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `caption` varchar(255) NOT NULL DEFAULT '',
+  `name` varchar(255) NOT NULL DEFAULT '',
   `begin_year` smallint(5) unsigned DEFAULT NULL,
   `end_year` smallint(5) unsigned DEFAULT NULL,
   `body` varchar(15) NOT NULL,
@@ -1491,8 +1491,8 @@ CREATE TABLE `cars` (
   `text_id` int(11) DEFAULT NULL,
   `full_text_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `caption` (`caption`,`begin_year`,`body`,`end_year`,`begin_model_year`,`end_model_year`,`is_group`),
-  KEY `fullCaptionOrder` (`caption`,`body`,`begin_year`,`end_year`),
+  UNIQUE KEY `name` (`name`,`begin_year`,`body`,`end_year`,`begin_model_year`,`end_model_year`,`is_group`),
+  KEY `fullCaptionOrder` (`name`,`body`,`begin_year`,`end_year`),
   KEY `primary_and_sorting` (`id`,`begin_order_cache`),
   KEY `engine_id` (`engine_id`),
   KEY `spec_id` (`spec_id`),
@@ -1907,7 +1907,7 @@ DROP TABLE IF EXISTS `engines`;
 CREATE TABLE `engines` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned DEFAULT NULL,
-  `caption` varchar(100) NOT NULL,
+  `name` varchar(100) NOT NULL,
   `owner_id` int(10) unsigned NOT NULL DEFAULT '0',
   `last_editor_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -2040,7 +2040,7 @@ CREATE TABLE `forums_themes` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned DEFAULT NULL,
   `folder` varchar(30) NOT NULL DEFAULT '',
-  `caption` varchar(50) NOT NULL DEFAULT '',
+  `name` varchar(50) NOT NULL DEFAULT '',
   `position` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `description` tinytext NOT NULL,
   `topics` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2049,7 +2049,7 @@ CREATE TABLE `forums_themes` (
   `disable_topics` tinyint(4) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `folder` (`folder`),
-  UNIQUE KEY `caption` (`caption`),
+  UNIQUE KEY `caption` (`name`),
   KEY `parent_id` (`parent_id`),
   CONSTRAINT `FK_forums_themes_forums_themes_id` FOREIGN KEY (`parent_id`) REFERENCES `forums_themes` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=1170 COMMENT='InnoDB free: 125952 kB';
@@ -2073,7 +2073,7 @@ DROP TABLE IF EXISTS `forums_topics`;
 CREATE TABLE `forums_topics` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `theme_id` int(11) unsigned DEFAULT '0',
-  `caption` varchar(100) NOT NULL DEFAULT '',
+  `name` varchar(100) NOT NULL DEFAULT '',
   `author_id` int(10) unsigned NOT NULL DEFAULT '0',
   `add_datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `_messages` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2297,7 +2297,7 @@ CREATE TABLE `links` (
   `type` enum('default','official','helper','club') NOT NULL DEFAULT 'default' COMMENT 'Г’ГЁГЇ',
   `brandId` int(10) unsigned NOT NULL DEFAULT '0',
   `url` varchar(100) NOT NULL COMMENT 'Г Г¤Г°ГҐГ±',
-  `caption` varchar(250) NOT NULL COMMENT 'ГЌГ Г§ГўГ Г­ГЁГҐ',
+  `name` varchar(250) NOT NULL COMMENT 'ГЌГ Г§ГўГ Г­ГЁГҐ',
   PRIMARY KEY (`id`),
   KEY `brand_id` (`brandId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1040 DEFAULT CHARSET=utf8;

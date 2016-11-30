@@ -105,7 +105,7 @@ class Car extends AbstractHelper
             'spec'             => $spec,
             'spec_full'        => $specFull,
             'body'             => $car['body'],
-            'name'             => $car['caption'],
+            'name'             => $car['name'],
             'begin_year'       => $car['begin_year'],
             'end_year'         => $car['end_year'],
             'today'            => $car['today'],

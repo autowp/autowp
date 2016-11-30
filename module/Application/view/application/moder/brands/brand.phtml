@@ -8,7 +8,7 @@
         'pageId' => 85,
         'args'   => [
             'BRAND_ID'   => $this->brand->id,
-            'BRAND_NAME' => $this->brand->caption
+            'BRAND_NAME' => $this->brand->name
         ]
     ]);
     $this->layout()->moduleName = 'moder/brands/brand';
@@ -74,11 +74,11 @@
                 <table><tbody>
                     <tr>
                         <td><?=$this->escapeHtml($this->translate('brand/name'))?></td>
-                        <td><?=$this->escapeHtml($this->brand->caption) ?></td>
+                        <td><?=$this->escapeHtml($this->brand->name) ?></td>
                     </tr>
                     <tr>
                         <td><?=$this->escapeHtml($this->translate('moder/brands/meta-data/full-name'))?></td>
-                        <td><?=$this->escapeHtml($this->brand->full_caption) ?></td>
+                        <td><?=$this->escapeHtml($this->brand->full_name) ?></td>
                     </tr>
                 </tbody></table>
             <?php } ?>
@@ -159,9 +159,9 @@
                                         <?php foreach ($this->links as $link) { ?>
                                             <tr>
                                                 <td><?=$this->formText(
-                                                    (new Zend\Form\Element\Text('link['.$link['id'].'][caption]'))
+                                                    (new Zend\Form\Element\Text('link['.$link['id'].'][name]'))
                                                         ->setAttributes([
-                                                            'value' => $link['caption'],
+                                                            'value' => $link['name'],
                                                             'class' => 'form-control'
                                                         ])
                                                 ) ?></td>
@@ -189,7 +189,7 @@
                                             </tr>
                                         <?php } ?>
                                         <tr>
-                                            <td><?=$this->formText((new Zend\Form\Element\Text('new[caption]'))
+                                            <td><?=$this->formText((new Zend\Form\Element\Text('new[name]'))
                                                 ->setAttributes(['class' => 'form-control'])
                                             ) ?></td>
                                             <td><?=$this->formText((new Zend\Form\Element\Text('new[url]'))
@@ -225,7 +225,7 @@
                                 </tr>
                                 <?php foreach ($this->links as $link) { ?>
                                     <tr>
-                                        <td><?=$this->escapeHtml($link['caption'])?></td>
+                                        <td><?=$this->escapeHtml($link['name'])?></td>
                                         <td><?=$this->escapeHtml($link['url'])?></td>
                                         <td><?=$this->escapeHtml($link['type'])?></td>
                                     </tr>

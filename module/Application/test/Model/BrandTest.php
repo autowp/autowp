@@ -22,7 +22,7 @@ class BrandTest extends AbstractHttpControllerTestCase
 
         $table = new Brand();
         $row = $table->createRow([
-            'caption' => 'test-brand' . rand(),
+            'name'    => 'test-brand' . rand(),
             'type_id' => 1
         ]);
 

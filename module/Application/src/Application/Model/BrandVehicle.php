@@ -64,7 +64,7 @@ class BrandVehicle
 
     private function getBrandAliases(DbTable\BrandRow $brandRow)
     {
-        $aliases = [$brandRow['caption']];
+        $aliases = [$brandRow['name']];
 
         $brandAliasTable = new DbTable\BrandAlias();
         $brandAliasRows = $brandAliasTable->fetchAll([
@@ -98,13 +98,13 @@ class BrandVehicle
     private function getVehicleName(DbTable\Vehicle\Row $vehicleRow, $language)
     {
         $languageTable = new DbTable\Vehicle\Language;
-        
+
         $languageRow = $languageTable->fetchRow([
             'car_id = ?'   => $vehicleRow->id,
             'language = ?' => $language
-        ], $order);
+        ]);
 
-        return $languageRow ? $languageRow->name : $vehicleRow->caption;
+        return $languageRow ? $languageRow->name : $vehicleRow->name;
     }
 
     private function extractName(DbTable\BrandRow $brandRow, DbTable\Vehicle\Row $vehicleRow, $language)

@@ -292,7 +292,7 @@ class Car extends AbstractPlugin
         $designCarsRows = $carParentAdapter->fetchAll(
             $carParentAdapter->select()
                 ->from('brands', [
-                    'brand_name'    => 'caption',
+                    'brand_name'    => 'name',
                     'brand_catname' => 'folder'
                 ])
                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
@@ -415,7 +415,7 @@ class Car extends AbstractPlugin
             $item = [
                 'id'               => $car->id,
                 'row'              => $car,
-                'name'             => $car->caption,
+                'name'             => $car->name,
                 'langName'         => isset($carsLangName[$car->id]) ? $carsLangName[$car->id] : null,
                 'produced'         => $car->produced,
                 'produced_exactly' => $car->produced_exactly,

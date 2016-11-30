@@ -11,7 +11,7 @@
 <?php if ($this->parentEngine) { ?>
     <p>
         <?=$this->escapeHtml($this->translate('moder/engines/as-subengine'))?>
-        <?=$this->escapeHtml($this->parentEngine->caption)?>
+        <?=$this->escapeHtml($this->parentEngine->name)?>
     </p>
 <?php } ?>
 <?=$this->partial('application/forms/bootstrap-horizontal', [

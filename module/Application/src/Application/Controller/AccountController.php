@@ -836,7 +836,7 @@ class AccountController extends AbstractActionController
                 case SpecificationsService::ITEM_TYPE_ENGINE:
                     $engine = $engineTable->find($conflict['itemId'])->current();
                     $conflict['object'] = $engine
-                        ? $this->translate('account/specs/conflicts/title/object/engine') . ' ' . $engine->caption
+                        ? $this->translate('account/specs/conflicts/title/object/engine') . ' ' . $engine->name
                         : null;
                     $conflict['url'] = $this->url()->fromRoute('cars/params', [
                         'action'    => 'engine-spec-editor',

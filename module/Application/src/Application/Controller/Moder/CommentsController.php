@@ -41,13 +41,13 @@ class CommentsController extends AbstractActionController
                 ->join('comments_messages', 'comments_messages.item_id = pictures.id', null)
                 ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
                 ->group('brands.id')*/
-                ->order(['brands.position', 'brands.caption'])
+                ->order(['brands.position', 'brands.name'])
         );
         $brandOptions = [
             '' => '--'
         ];
         foreach ($brandRows as $brandRow) {
-            $brandOptions[$brandRow->id] = $brandRow->caption;
+            $brandOptions[$brandRow->id] = $brandRow->name;
         }
 
         if ($this->getRequest()->isPost()) {

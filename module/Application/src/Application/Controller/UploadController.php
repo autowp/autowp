@@ -144,7 +144,7 @@ class UploadController extends AbstractActionController
                 $engine = $engines->find($engineId)->current();
                 if ($engine) {
                     $selected = true;
-                    $selectedName = $engine->caption;
+                    $selectedName = $engine->name;
                 }
                 break;
         }
@@ -461,7 +461,7 @@ class UploadController extends AbstractActionController
             $db->select()
                 ->from('cars', [
                     'cars.id',
-                    'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                    'name' => 'if(car_language.name, car_language.name, cars.name)',
                     'cars.begin_model_year', 'cars.end_model_year',
                     'spec' => 'spec.short_name',
                     'spec_full' => 'spec.name',
@@ -474,7 +474,7 @@ class UploadController extends AbstractActionController
                 ->join('brands_cars', 'cars.id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brand['id'])
                 ->where('NOT cars.is_concept')
-                ->order(['cars.caption', 'cars.begin_year', 'cars.end_year'])
+                ->order(['cars.name', 'cars.begin_year', 'cars.end_year'])
                 ->bind([
                     'lang' => $this->language()
                 ])
@@ -615,7 +615,7 @@ class UploadController extends AbstractActionController
             $db->select()
                 ->from('cars', [
                     'cars.id',
-                    'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                    'name' => 'if(car_language.name, car_language.name, cars.name)',
                     'cars.begin_model_year', 'cars.end_model_year',
                     'spec' => 'spec.short_name',
                     'spec_full' => 'spec.name',
@@ -627,7 +627,7 @@ class UploadController extends AbstractActionController
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->join('car_parent', 'cars.id = car_parent.car_id', 'type')
                 ->where('car_parent.parent_id = ?', $car->id)
-                ->order(['car_parent.type', 'cars.caption', 'cars.begin_year', 'cars.end_year'])
+                ->order(['car_parent.type', 'cars.name', 'cars.begin_year', 'cars.end_year'])
                 ->bind([
                     'lang' => $this->language()
                 ])
@@ -662,12 +662,12 @@ class UploadController extends AbstractActionController
                 ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
                 ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
                 ->where('brand_engine.brand_id = ?', $brand->id)
-                ->order('engines.caption')
+                ->order('engines.name')
         );
         $engines = [];
         foreach ($rows as $row) {
             $engines[] = [
-                'name' => $row->caption,
+                'name' => $row->name,
                 'url'  => $this->url()->fromRoute('upload/params', [
                     'action'    => 'index',
                     'type'      => Picture::ENGINE_TYPE_ID,
@@ -707,7 +707,7 @@ class UploadController extends AbstractActionController
             $db->select()
                 ->from('cars', [
                     'cars.id',
-                    'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                    'name' => 'if(car_language.name, car_language.name, cars.name)',
                     'cars.begin_model_year', 'cars.end_model_year',
                     'spec' => 'spec.short_name',
                     'spec_full' => 'spec.name',
@@ -721,7 +721,7 @@ class UploadController extends AbstractActionController
                 ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brand->id)
                 ->where('cars.is_concept')
-                ->order(['cars.caption', 'cars.begin_year', 'cars.end_year'])
+                ->order(['cars.name', 'cars.begin_year', 'cars.end_year'])
                 ->group('cars.id')
                 ->bind([
                     'lang' => $this->language()

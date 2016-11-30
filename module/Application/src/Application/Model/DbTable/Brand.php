@@ -31,16 +31,16 @@ class Brand extends Table
      */
     public function insert(array $data)
     {
-        $data['caption'] = trim($data['caption']);
+        $data['name'] = trim($data['name']);
         $data['group_id'] = null;
         $data['type_id'] = $data['type_id'];
 
         // generate folder name
         $filenameFilter = new FilenameSafe();
-        $data['folder'] = $filenameFilter->filter($data['caption']);
+        $data['folder'] = $filenameFilter->filter($data['name']);
         $data['position'] = 0;
 
-        if (mb_strlen($data['caption']) > BrandModel::MAX_NAME) {
+        if (mb_strlen($data['name']) > BrandModel::MAX_NAME) {
             throw new Exception('Name is too long');
         }
 

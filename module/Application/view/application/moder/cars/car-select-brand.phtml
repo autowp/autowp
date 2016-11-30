@@ -31,7 +31,7 @@
                     'brand_id'   => $brand->id,
                     'vehicle_id' => $this->car->id
                 ]))?>" method="post">
-                    <button type="submit" class="btn btn-link"><?=$this->escapeHtml($brand->caption)?></button>
+                    <button type="submit" class="btn btn-link"><?=$this->escapeHtml($brand->name)?></button>
                 </form>
                 <?php $idx++ ?>
             <?php } ?>

@@ -139,7 +139,7 @@ class Row extends \Application\Db\Table\Row
             'language = ?' => (string)$language
         ]);
 
-        $name = $carLangRow ? $carLangRow->name : $this->caption;
+        $name = $carLangRow ? $carLangRow->name : $this->name;
 
         $spec = null;
         $specFull = null;

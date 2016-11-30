@@ -29,15 +29,15 @@ class Application_Form_Moder_Category_Organize extends Project_Form
                 array('MultiCheckbox', 'childs', array(
                     'label'      => 'Автомобили',
                     'required'   => true,
-                    'id'         => 'car_caption',
+                    'id'         => 'car_name',
                     'decorators' => array('ViewHelper'),
                     'multioptions' => $this->childOptions,
                     'label_class'  => 'checkbox',
                     'separator'    => ''
                 )),
-                array('Car_Caption', 'caption', array(
+                array('Car_Name', 'name', array(
                     'required'   => true,
-                    'id'         => 'car_caption',
+                    'id'         => 'car_name',
                     'validators' => array('Car_NameNotExists'),
                     'decorators' => array('ViewHelper')
                 )),

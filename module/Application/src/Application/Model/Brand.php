@@ -103,7 +103,7 @@ class Brand
         $select = $db->select(true)
             ->from('brands', [
                 'id', 'folder',
-                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.caption)',
+                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.name)',
                 'cars_count' => $this->countExpr()
             ])
             ->joinLeft(
@@ -286,8 +286,8 @@ class Brand
         $select = $db->select()
             ->from('brands', [
                 'id', 'folder', 'type_id',
-                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.caption)',
-                'full_caption', 'img', 'text_id'
+                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.name)',
+                'full_name', 'img', 'text_id'
             ])
             ->joinLeft(
                 'brand_language',
@@ -310,7 +310,7 @@ class Brand
             'id'        => $brand['id'],
             'name'      => $brand['name'],
             'catname'   => $brand['folder'],
-            'full_name' => $brand['full_caption'],
+            'full_name' => $brand['full_name'],
             'img'       => $brand['img'],
             'text_id'   => $brand['text_id'],
             'type_id'   => $brand['type_id']
@@ -382,7 +382,7 @@ class Brand
             'name'    => 'IF(' .
                 'brand_language.name IS NOT NULL and LENGTH(brand_language.name)>0,' .
                 'brand_language.name,' .
-                'brands.caption' .
+                'brands.name' .
             ')'
         ];
         foreach ($options['columns'] as $column => $expr) {
@@ -416,7 +416,7 @@ class Brand
             ]);
 
         $callback($select);
-        
+
         $items = $db->fetchAll($select);
 
         usort($items, function ($a, $b) use ($options) {

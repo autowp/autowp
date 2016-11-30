@@ -104,7 +104,7 @@ class EnginesController extends AbstractActionController
 
                     $message = sprintf(
                         'Редактирование двигателя %s',
-                        $engine->caption
+                        $engine->name
                     );
                     $this->log($message, $engine);
 
@@ -127,7 +127,7 @@ class EnginesController extends AbstractActionController
             $brandTable->select(true)
                 ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
                 ->where('brand_engine.engine_id = ?', $engine->id)
-                ->order(['brands.position', 'brands.caption'])
+                ->order(['brands.position', 'brands.name'])
         );
 
         $brands = [];
@@ -146,7 +146,7 @@ class EnginesController extends AbstractActionController
             }
 
             $brands[] = [
-                'name'      => $brandRow->caption,
+                'name'      => $brandRow->name,
                 'urls'      => $urls,
                 'inherited' => false,
                 'moderUrl'  => $this->url()->fromRoute('moder/brands/params', [
@@ -168,7 +168,7 @@ class EnginesController extends AbstractActionController
                 ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
                 ->where('engine_parent_cache.engine_id = ?', $engine->id)
                 ->where('engine_parent_cache.engine_id <> engine_parent_cache.parent_id')
-                ->order(['brands.position', 'brands.caption'])
+                ->order(['brands.position', 'brands.name'])
         );
         foreach ($brandEngineRows as $brandEngineRow) {
             $brandRow = $brandTable->find($brandEngineRow->brand_id)->current();
@@ -195,11 +195,11 @@ class EnginesController extends AbstractActionController
             }
 
             $brands[] = [
-                'name'      => $brandRow->caption,
+                'name'      => $brandRow->name,
                 'urls'      => $urls,
                 'inherited' => true,
                 'inheritedFrom' => [
-                    'name' => $parentEngineRow->caption,
+                    'name' => $parentEngineRow->name,
                     'url'  => $this->engineModerUrl($parentEngineRow->id)
                 ],
                 'moderUrl'  => $this->url()->fromRoute('moder/brands/params', [
@@ -235,10 +235,10 @@ class EnginesController extends AbstractActionController
 
         $brandOptions = ['' => '-'] + $db->fetchPairs(
             $db->select()
-                ->from('brands', ['id', 'caption'])
+                ->from('brands', ['id', 'name'])
                 ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
                 ->group('brands.id')
-                ->order(['brands.position', 'brands.caption'])
+                ->order(['brands.position', 'brands.name'])
         );
 
         $this->filterForm->get('brand_id')->setValueOptions($brandOptions);
@@ -260,7 +260,7 @@ class EnginesController extends AbstractActionController
             $values = $this->filterForm->getData();
 
             if ($values['name']) {
-                $select->where('engines.caption like ?', '%' . $values['name'] . '%');
+                $select->where('engines.name like ?', '%' . $values['name'] . '%');
             }
 
             if ($values['brand_id']) {
@@ -280,11 +280,11 @@ class EnginesController extends AbstractActionController
                     break;
 
                 case 2:
-                    $select->order('engines.caption asc');
+                    $select->order('engines.name asc');
                     break;
 
                 case 3:
-                    $select->order('engines.caption desc');
+                    $select->order('engines.name desc');
                     break;
             }
         }
@@ -307,7 +307,7 @@ class EnginesController extends AbstractActionController
             ], 'id', 4);
 
             $engines[] = [
-                'name'     => $engine->caption,
+                'name'     => $engine->name,
                 'pictures' => $pictures,
                 'moderUrl' => $this->engineModerUrl($engine->id),
                 'specsUrl' => $this->url()->fromRoute('cars', [
@@ -360,7 +360,7 @@ class EnginesController extends AbstractActionController
 
                 $engine = $engineTable->createRow([
                     'last_editor_id' => $this->user()->get()->id,
-                    'caption'        => $values['caption']
+                    'name'           => $values['name']
                 ]);
                 $engine->save();
 
@@ -389,7 +389,7 @@ class EnginesController extends AbstractActionController
 
                 $this->log(sprintf(
                     'Создан новый двигатель %s',
-                    $engine->caption
+                    $engine->name
                 ), $engine);
 
                 return $this->redirect()->toUrl($this->engineModerUrl($engine->id));
@@ -407,7 +407,7 @@ class EnginesController extends AbstractActionController
         $engineTable = $this->getEngineTable();
         $select = $engineTable->select(true)
             ->where('engines.id <> ?', $excludeId)
-            ->order('engines.caption');
+            ->order('engines.name');
 
         if ($brandId) {
             $select
@@ -424,7 +424,7 @@ class EnginesController extends AbstractActionController
         foreach ($rows as $row) {
             $engines[] = [
                 'id'     => $row->id,
-                'name'   => $row->caption,
+                'name'   => $row->name,
                 'childs' => $this->enginesWalkTree($row->id, null, $excludeId)
             ];
         }
@@ -454,7 +454,7 @@ class EnginesController extends AbstractActionController
 
         $this->log(sprintf(
             'Двигатель %s перестал иметь родительский двигатель',
-            $engine->caption
+            $engine->name
         ), $engine);
 
         return $this->redirect()->toUrl($this->engineModerUrl($engine->id));
@@ -503,8 +503,8 @@ class EnginesController extends AbstractActionController
 
             $this->log(sprintf(
                 'Двигатель %s назначен родительским для двигателя %s',
-                $parentEngine->caption,
-                $engine->caption
+                $parentEngine->name,
+                $engine->name
             ), [$engine, $parentEngine]);
 
             return $this->redirect()->toUrl($this->engineModerUrl($engine->id));
@@ -528,7 +528,7 @@ class EnginesController extends AbstractActionController
                 $brandTable->select(true)
                     ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
                     ->group('brands.id')
-                    ->order(['brands.position', 'brands.caption'])
+                    ->order(['brands.position', 'brands.name'])
             );
 
             $brand = false;
@@ -589,8 +589,8 @@ class EnginesController extends AbstractActionController
         if ($brandEngineRow) {
             $message = sprintf(
                 'Двигатель %s отвязан от бренда %s',
-                $engineRow->caption,
-                $brandRow->caption
+                $engineRow->name,
+                $brandRow->name
             );
             $this->log($message, $engineRow);
 
@@ -634,8 +634,8 @@ class EnginesController extends AbstractActionController
 
                 $message = sprintf(
                     'Двигатель %s добавлен к бренду %s',
-                    $engineRow->caption,
-                    $brandRow->caption
+                    $engineRow->name,
+                    $brandRow->name
                 );
                 $this->log($message, $engineRow);
             }
@@ -643,7 +643,7 @@ class EnginesController extends AbstractActionController
             return $this->redirect()->toUrl($this->engineModerUrl($engineRow->id));
         }
 
-        $brands = $brandTable->fetchAll(null, ['position', 'caption']);
+        $brands = $brandTable->fetchAll(null, ['position', 'name']);
 
         return [
             'engine' => $engineRow,

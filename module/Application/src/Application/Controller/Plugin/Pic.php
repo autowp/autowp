@@ -56,7 +56,7 @@ class Pic extends AbstractPlugin
      * @var PictureNameFormatter
      */
     private $pictureNameFormatter;
-    
+
     /**
      * @var VehicleNameFormatter
      */
@@ -484,46 +484,46 @@ class Pic extends AbstractPlugin
             'width'            => $width
         ];
     }
-    
+
     private function picPageItemsData($picture)
     {
         $controller = $this->getController();
         $catalogue = $controller->catalogue();
-        
+
         $language = $controller->language();
         $isModer = $controller->user()->inheritsRole('moder');
-        
+
         $carLangTable = new VehicleLanguage();
         $carTable = $catalogue->getCarTable();
         $cdTable = new Category();
         $cdlTable = new CategoryLanguage();
         $factoryTable = new Factory();
         $twinsGroupsTable = new TwinsGroup();
-        
+
         $pictureTable = $catalogue->getPictureTable();
         $db = $pictureTable->getAdapter();
-        
+
         if ($isModer) {
             $perspectives = new Perspective();
-            
+
             $multioptions = $perspectives->getAdapter()->fetchPairs(
                 $perspectives->getAdapter()->select()
                     ->from($perspectives->info('name'), ['id', 'name'])
                     ->order('position')
             );
-            
+
             $multioptions = array_replace([
                 '' => '--'
             ], $multioptions);
         }
-        
+
         $carIds = $this->pictureItem->getPictureItems($picture['id']);
         $itemRows = $carTable->find($carIds);
         $itemsCount = count($itemRows);
-        
+
         $items = [];
         foreach ($itemRows as $item) {
-        
+
             $twins = [];
             $designProject = null;
             $detailsUrl = null;
@@ -532,14 +532,14 @@ class Pic extends AbstractPlugin
             $text = null;
             $specsEditUrl = null;
             $uploadUrl = null;
-        
+
             if ($itemsCount == 1) {
                 $twinsGroupsRows = $twinsGroupsTable->fetchAll(
                     $twinsGroupsTable->select(true)
                         ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
                         ->where('twins_groups_cars.car_id = ?', $item->id)
                 );
-            
+
                 foreach ($twinsGroupsRows as $twinsGroup) {
                     $twins[] = [
                         'url' => $controller->url()->fromRoute('twins/group', [
@@ -547,11 +547,11 @@ class Pic extends AbstractPlugin
                         ])
                     ];
                 }
-                
+
                 $designCarsRow = $db->fetchRow(
                     $db->select()
                         ->from('brands', [
-                            'brand_name'    => 'caption',
+                            'brand_name'    => 'name',
                             'brand_catname' => 'folder'
                         ])
                         ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
@@ -561,7 +561,7 @@ class Pic extends AbstractPlugin
                         ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
                         ->where('car_parent_cache.car_id = ?', $item->id)
                 );
-                if ($designCarsRow) { 
+                if ($designCarsRow) {
                     $designProject = [
                         'brand' => $designCarsRow['brand_name'],
                         'url'   => $controller->url()->fromRoute('catalogue', [
@@ -571,7 +571,7 @@ class Pic extends AbstractPlugin
                         ])
                     ];
                 }
-                
+
                 if ($item->full_text_id) {
                     foreach ($catalogue->cataloguePaths($item) as $path) {
                         $detailsUrl = $controller->url()->fromRoute('catalogue', [
@@ -583,7 +583,7 @@ class Pic extends AbstractPlugin
                         break;
                     }
                 }
-                
+
                 // factories
                 $factoryRows = $factoryTable->fetchAll(
                     $factoryTable->select(true)
@@ -598,22 +598,22 @@ class Pic extends AbstractPlugin
                         ])
                     ];
                 }
-                
+
                 if ($item->text_id) {
                     $description = $this->textStorage->getText($item->text_id);
                 }
-                
+
                 if ($item->full_text_id) {
                     $text = $this->textStorage->getText($item->full_text_id);
                 }
-                
+
                 if ($controller->user()->isAllowed('specifications', 'edit')) {
                     $specsEditUrl = $controller->url()->fromRoute('cars/params', [
                         'action' => 'car-specifications-editor',
                         'car_id' => $item['id']
                     ]);
                 }
-                
+
                 if ($controller->user()->logedIn()) {
                     $uploadUrl = $controller->url()->fromRoute('upload/params', [
                         'action' => 'index',
@@ -622,39 +622,39 @@ class Pic extends AbstractPlugin
                     ]);
                 }
             }
-            
+
             // alt names
             $altNames = [];
             $altNames2 = [];
-            
+
             $carLangRows = $carLangTable->fetchAll([
                 'car_id = ?' => $item->id
             ]);
-            
+
             $currentLangName = null;
-            $defaultName = $item->caption;
+            $defaultName = $item->name;
             foreach ($carLangRows as $carLangRow) {
                 $name = $carLangRow->name;
                 if (! isset($altNames[$name])) {
                     $altNames[$carLangRow->name] = [];
                 }
                 $altNames[$name][] = $carLangRow->language;
-            
+
                 if ($language == $carLangRow->language) {
                     $currentLangName = $name;
                 }
             }
-            
+
             foreach ($altNames as $name => $codes) {
                 if (strcmp($name, $currentLangName) != 0) {
                     $altNames2[$name] = $codes;
                 }
             }
-            
+
             if ($currentLangName) {
                 unset($altNames2[$currentLangName]);
             }
-            
+
             // categories
             $categories = [];
             $categoryRows = $cdTable->fetchAll(
@@ -663,7 +663,7 @@ class Pic extends AbstractPlugin
                     ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
                     ->where('car_parent_cache.car_id = ?', $item->id)
             );
-            
+
             foreach ($categoryRows as $row) {
                 $lRow = $cdlTable->fetchRow([
                     'language = ?'    => $language,
@@ -677,7 +677,7 @@ class Pic extends AbstractPlugin
                     ])
                 ];
             }
-            
+
             $perspective = null;
             if ($isModer) {
                 $perspective = [
@@ -691,7 +691,7 @@ class Pic extends AbstractPlugin
                     'name'    => $item->getNameData($language)
                 ];
             }
-            
+
             $hasSpecs = $this->specsService->hasSpecs(1, $item->id);
             $specsUrl = null;
             foreach ($catalogue->cataloguePaths($item) as $path) {
@@ -703,7 +703,7 @@ class Pic extends AbstractPlugin
                 ]);
                 break;
             }
-            
+
             $items[] = [
                 'id'            => $item['id'],
                 'name'          => $item->getNameData($language),
@@ -724,35 +724,35 @@ class Pic extends AbstractPlugin
                 'uploadUrl'     => $uploadUrl
             ];
         }
-        
+
         return $items;
     }
-    
+
     private function picPageEngineData($picture)
     {
         $engineRow = $picture->findParentRow(Engine::class);
-        
+
         if (!$engineRow) {
             return null;
         }
-        
+
         $controller = $this->getController();
         $catalogue = $controller->catalogue();
-        
+
         $carTable = $catalogue->getCarTable();
         $language = $controller->language();
-        
+
         $vehicles = [];
-    
+
         $carIds = $engineRow->getRelatedCarGroupId();
         if ($carIds) {
             $carRows = $carTable->fetchAll([
                 'id in (?)' => $carIds
             ], $catalogue->carsOrdering());
-    
+
             foreach ($carRows as $carRow) {
                 $cataloguePaths = $catalogue->cataloguePaths($carRow);
-    
+
                 foreach ($cataloguePaths as $cPath) {
                     $vehicles[] = [
                         'name' => $controller->car()->formatName($carRow, $language),
@@ -767,15 +767,15 @@ class Pic extends AbstractPlugin
                 }
             }
         }
-    
+
         $specsUrl = false;
         $hasSpecs = $this->specsService->hasSpecs(3, $engineRow->id);
-    
+
         if ($hasSpecs) {
             $cataloguePaths = $catalogue->engineCataloguePaths($engineRow, [
                 'limit' => 1
             ]);
-    
+
             foreach ($cataloguePaths as $cataloguePath) {
                 $specsUrl = $controller->url()->fromRoute('catalogue', [
                     'action'        => 'engine-specs',
@@ -784,7 +784,7 @@ class Pic extends AbstractPlugin
                 ]);
             }
         }
-        
+
         $specsEditUrl = null;
         if ($controller->user()->isAllowed('specifications', 'edit')) {
             $specsEditUrl = $controller->url()->fromRoute('cars', [
@@ -792,9 +792,9 @@ class Pic extends AbstractPlugin
                 'engine_id'  => $engineRow->id
             ]);
         }
-        
+
         return [
-            'name'         => $engineRow->caption,
+            'name'         => $engineRow->name,
             'vehicles'     => $vehicles,
             'hasSpecs'     => $hasSpecs,
             'specsUrl'     => $specsUrl,
@@ -826,14 +826,14 @@ class Pic extends AbstractPlugin
         $items = [];
 
         $language = $controller->language();
-        
+
         $brandIds = $db->fetchCol(
             $db->select()
                 ->from('brands_cars', 'brand_id')
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
                 ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
                 ->where('picture_item.picture_id = ?', $picture->id)
-                
+
         );
 
         switch ($picture->type) {
@@ -846,7 +846,7 @@ class Pic extends AbstractPlugin
                     );
                 }
                 break;
-                
+
             case Picture::LOGO_TYPE_ID:
             case Picture::MIXED_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:
@@ -1053,7 +1053,7 @@ class Pic extends AbstractPlugin
         if ($picture->copyrights_text_id) {
             $copyrights = $this->textStorage->getText($picture->copyrights_text_id);
         }
-        
+
         $point = null;
         if ($picture->point) {
             $point = \geoPHP::load(substr($picture->point, 4), 'wkb');
@@ -1115,7 +1115,7 @@ class Pic extends AbstractPlugin
                 if ($carIds) {
                     $vehicleTable = new Vehicle();
                     $brandModel = new BrandModel();
-                    
+
                     foreach ($vehicleTable->find($carIds) as $car) {
                         $url = $controller->url()->fromRoute('moder/cars/params', [
                             'action' => 'car',
@@ -1125,8 +1125,8 @@ class Pic extends AbstractPlugin
                             $this->translator->translate('moder/picture/edit-vehicle-%s'),
                             $controller->car()->formatName($car, $language)
                         );
-    
-                        
+
+
                         $brands = $brandModel->getList(['language' => $language], function ($select) use ($car) {
                             $select
                                 ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
@@ -1134,7 +1134,7 @@ class Pic extends AbstractPlugin
                                 ->where('car_parent_cache.car_id = ?', $car->id)
                                 ->group('brands.id');
                         });
-    
+
                         foreach ($brands as $brand) {
                             $url = $controller->url()->fromRoute('moder/brands/params', [
                                 'action'   => 'brand',
@@ -1158,7 +1158,7 @@ class Pic extends AbstractPlugin
                     ]);
                     $links[$url] = sprintf(
                         $this->translator->translate('moder/picture/edit-engine-%s'),
-                        $engine->caption
+                        $engine->name
                     );
                 }
                 break;
@@ -1323,7 +1323,7 @@ class Pic extends AbstractPlugin
 
         foreach ($rows as $idx => $row) {
             $imageId = (int)$row['image_id'];
-            
+
             if (!$imageId) {
                 continue;
             }
@@ -1332,9 +1332,9 @@ class Pic extends AbstractPlugin
             if (!$image) {
                 continue;
             }
-            
+
             $id = (int)$row['id'];
-            
+
             $sUrl = $image->getSrc();
 
             if (PictureRow::checkCropParameters($row)) {
@@ -1366,14 +1366,14 @@ class Pic extends AbstractPlugin
                 'picture_id' => $row['identity'] ? $row['identity'] : $id,
                 'gallery'    => null,
             ]), [], $reuseParams);
-            
+
             $itemsData = $this->pictureItem->getData([
                 'picture'      => $row['id'],
                 'onlyWithArea' => true
             ]);
-            
+
             $itemTable = new Vehicle();
-            
+
             $areas = [];
             foreach ($itemsData as $pictureItem) {
                 $item = $itemTable->find($pictureItem['item_id'])->current();

@@ -6,7 +6,7 @@
         ],
         'pageId' => 171,
         'args'   => [
-            'ENGINE_NAME' => $this->engine->caption,
+            'ENGINE_NAME' => $this->engine->name,
             'ENGINE_ID'   => $this->engine->id
         ]
     ]);
@@ -24,7 +24,7 @@
             <div class="col-lg-2 col-md-2">
                 <?php foreach ($this->brands as $idx => $brand) { ?>
                     <button type="submit" name="brand_id" class="btn btn-link" value="<?=$this->escapeHtmlAttr($brand->id)?>">
-                        <?=$this->escapeHtml($brand->caption)?>
+                        <?=$this->escapeHtml($brand->name)?>
                     </button><br />
                     <?php if ($idx && ($idx % $rows == 0)) { ?></div><div class="col-lg-2 col-md-2"><?php } ?>
                 <?php } ?>

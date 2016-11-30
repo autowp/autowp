@@ -81,7 +81,7 @@
                 </p>
             <?php } */ ?>
         <?php } ?>
-        
+
         <?php foreach ($this->items as $item) { ?>
             <?php if ($item['description']) { ?>
                 <div style="margin-bottom:10px">
@@ -144,23 +144,23 @@
             $list = [];
 
             foreach ($this->ofLinks as $link) {
-                $list[] = $this->htmlA($link->url, '<i class="fa fa-globe"></i> ' . $this->escapeHtml($link->caption), false);
+                $list[] = $this->htmlA($link->url, '<i class="fa fa-globe"></i> ' . $this->escapeHtml($link->name), false);
             }
-            
+
             foreach ($this->items as $item) {
-            
+
                 foreach ($item['categories'] as $category) {
                     $list[$category['url']] = $this->htmlA($category['url'], '<i class="fa fa-tag"></i> ' . $this->escapeHtml($category['name']), false);
                 }
-            
+
                 if ($item['specsEditUrl']) {
                     $list[] = $this->htmlA(
-                        $item['specsEditUrl'], 
-                        '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')), 
+                        $item['specsEditUrl'],
+                        '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')),
                         false
                     );
                 }
-            
+
                 if ($item['hasSpecs'] && $item['specsUrl']) {
                     $list[] = $this->htmlA(
                         $item['specsUrl'],
@@ -172,22 +172,22 @@
                         false
                     );
                 }
-            
+
                 if ($item['designProject']) {
                     $list[] = sprintf($this->translate('carlist/designed by %s'), $this->htmlA(
                         $item['designProject']['url'],
                         $item['designProject']['brand']
                     ));
                 }
-            
+
                 foreach ($item['twins'] as $twinsGroup) {
                     $list[] = $this->htmlA(
                         $twinsGroup['url'],
                         '<i class="fa fa-adjust"></i> ' . $this->escapeHtml($this->page(96)->name),
                         false
-                    ); 
+                    );
                 }
-            
+
                 foreach ($item['factories'] as $factory) {
                     $list[] = $this->htmlA(
                         $factory['url'],
@@ -195,19 +195,19 @@
                         false
                     );
                 }
-            
-            
+
+
                 if ($item['uploadUrl']) {
                     $list[] = $this->htmlA(
-                        $item['uploadUrl'], 
-                        '<i class="fa fa-upload"></i> ' . 
-                            $this->escapeHtml($this->page(29)->name) . ' ' . 
-                            $this->car()->htmlTitle($item['name']), 
+                        $item['uploadUrl'],
+                        '<i class="fa fa-upload"></i> ' .
+                            $this->escapeHtml($this->page(29)->name) . ' ' .
+                            $this->car()->htmlTitle($item['name']),
                         false
                     );
                 }
             }
-            
+
             if ($this->engine) {
                 if (count($this->engine['vehicles']) > 0) {
                     if (count($this->engine['vehicles']) == 1)
@@ -223,23 +223,23 @@
                         $this->htmlList($a, false, [], false);
                     }
                 }
-                
+
                 if ($this->engine['hasSpecs']) {
                     $list[] = $this->htmlA(
                         $this->engine['specsUrl'],
                         '<i class="fa fa-list-alt"></i> ' .
                         sprintf(
-                            $this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')), 
+                            $this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')),
                             $this->escapeHtml($this->engine['name'])
                         ),
                         false
                     );
                 }
-            
+
                 if ($engine['specsEditUrl']) {
                     $list[] = $this->htmlA(
-                        $engine['specsEditUrl'], 
-                        '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')), 
+                        $engine['specsEditUrl'],
+                        '<i class="fa fa-pencil"></i> ' . $this->escapeHtml($this->translate('carlist/edit-specs')),
                         false
                     );
                 }

@@ -142,7 +142,7 @@ class BrandNav
                             'action'        => 'concepts',
                             'brand_catname' => $brand['catname']
                         ]),
-                        'caption' => $this->translator->translate('concepts and prototypes'),
+                        'name' => $this->translator->translate('concepts and prototypes'),
                     ];
                 }
             }
@@ -162,8 +162,8 @@ class BrandNav
                         'action'        => 'engines',
                         'brand_catname' => $brand['catname']
                     ]),
-                    'caption' => $this->translator->translate('engines'),
-                    'count'   => $enginesCount
+                    'name'  => $this->translator->translate('engines'),
+                    'count' => $enginesCount
                 ];
             }
 
@@ -184,8 +184,8 @@ class BrandNav
                         'action'        => 'logotypes',
                         'brand_catname' => $brand['catname']
                     ]),
-                    'caption' => $this->translator->translate('logotypes'),
-                    'count'   => $logoPicturesCount
+                    'name'  => $this->translator->translate('logotypes'),
+                    'count' => $logoPicturesCount
                 ];
             }
 
@@ -203,8 +203,8 @@ class BrandNav
                         'action' => 'mixed',
                         'brand_catname' => $brand['catname']
                     ]),
-                    'caption' => $this->translator->translate('mixed'),
-                    'count'   => $mixedPicturesCount
+                    'name'  => $this->translator->translate('mixed'),
+                    'count' => $mixedPicturesCount
                 ];
             }
 
@@ -223,8 +223,8 @@ class BrandNav
                         'action'        => 'other',
                         'brand_catname' => $brand['catname']
                     ]),
-                    'caption' => $this->translator->translate('unsorted'),
-                    'count'   => $unsortedPicturesCount
+                    'name'  => $this->translator->translate('unsorted'),
+                    'count' => $unsortedPicturesCount
                 ];
             }
 
@@ -298,11 +298,11 @@ class BrandNav
         $groups = [];
         foreach ($rows as $subBrand) {
             $groups[] = [
-                'url'     => $this->url('catalogue', [
+                'url'  => $this->url('catalogue', [
                     'action'        => 'brand',
                     'brand_catname' => $subBrand['catname']
                 ]),
-                'caption' => $subBrand['name'],
+                'name' => $subBrand['name'],
             ];
         }
 
@@ -321,7 +321,7 @@ class BrandNav
             ])
             ->join('cars', 'cars.id = brands_cars.car_id', [
                 'car_id'   => 'id',
-                'car_name' => 'cars.caption',
+                'car_name' => 'cars.name',
             ])
             ->where('brands_cars.brand_id = ?', $brandId)
             ->group('cars.id');
@@ -406,36 +406,36 @@ class BrandNav
             ]);
 
             if ($bvlRow) {
-                $caption = $bvlRow->name;
+                $name = $bvlRow->name;
             } else {
                 $carLangRow = $carLanguageTable->fetchRow([
                     'car_id = ?'   => (int)$brandCarRow['car_id'],
                     'language = ?' => (string)$language
                 ]);
 
-                $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
+                $name = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
                 foreach ($aliases as $alias) {
-                    $caption = str_ireplace('by The ' . $alias . ' Company', '', $caption);
-                    $caption = str_ireplace('by '.$alias, '', $caption);
-                    $caption = str_ireplace('di '.$alias, '', $caption);
-                    $caption = str_ireplace('par '.$alias, '', $caption);
-                    $caption = str_ireplace($alias.'-', '', $caption);
-                    $caption = str_ireplace('-'.$alias, '', $caption);
+                    $name = str_ireplace('by The ' . $alias . ' Company', '', $name);
+                    $name = str_ireplace('by '.$alias, '', $name);
+                    $name = str_ireplace('di '.$alias, '', $name);
+                    $name = str_ireplace('par '.$alias, '', $name);
+                    $name = str_ireplace($alias.'-', '', $name);
+                    $name = str_ireplace('-'.$alias, '', $name);
 
-                    $caption = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $caption);
+                    $name = preg_replace('/\b'.preg_quote($alias, '/').'\b/iu', '', $name);
                 }
 
-                $caption = trim(preg_replace("|[[:space:]]+|", ' ', $caption));
-                $caption = ltrim($caption, '/');
-                if (! $caption) {
-                    $caption = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
+                $name = trim(preg_replace("|[[:space:]]+|", ' ', $name));
+                $name = ltrim($name, '/');
+                if (! $name) {
+                    $name = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
                 }
             }
 
             $groups[] = [
-                'car_id'  => $brandCarRow['car_id'],
-                'url'     => $url,
-                'caption' => $caption,
+                'car_id' => $brandCarRow['car_id'],
+                'url'    => $url,
+                'name'   => $name,
             ];
         }
 
@@ -488,7 +488,7 @@ class BrandNav
                 );
 
                 usort($sectionGroups, function ($a, $b) {
-                    return strnatcasecmp($a['caption'], $b['caption']);
+                    return strnatcasecmp($a['name'], $b['name']);
                 });
 
                 $sections[] = [

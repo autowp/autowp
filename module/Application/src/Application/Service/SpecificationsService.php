@@ -1546,7 +1546,7 @@ class SpecificationsService
             if (! (isset($values[$engineNameAttr]) && $values[$engineNameAttr]) && $car->engine_id) {
                 $engineRow = $engineTable->find($car->engine_id)->current();
                 if ($engineRow) {
-                    $values[$engineNameAttr] = $engineRow->caption;
+                    $values[$engineNameAttr] = $engineRow->name;
                 }
             }
 

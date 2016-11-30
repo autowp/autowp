@@ -130,8 +130,8 @@ class BrandsController extends AbstractActionController
 
 
             $values = [
-                'caption'      => $brand->caption,
-                'full_caption' => $brand->full_caption,
+                'name'      => $brand->name,
+                'full_name' => $brand->full_name,
             ];
 
             $brandLangTable = new BrandLanguage();
@@ -153,7 +153,7 @@ class BrandsController extends AbstractActionController
                     $values = $form->getData();
 
                     $brand->setFromArray([
-                        'full_caption'  => $values['full_caption'],
+                        'full_name' => $values['full_name'],
                     ]);
 
                     $brand->save();
@@ -183,7 +183,7 @@ class BrandsController extends AbstractActionController
 
                     $this->log(sprintf(
                         'Редактирование информации о %s',
-                        $brand->caption
+                        $brand->name
                     ), $brand);
 
                     return $this->redirect()->toUrl($this->brandModerUrl($brand, true));
@@ -223,7 +223,7 @@ class BrandsController extends AbstractActionController
 
                     $this->log(sprintf(
                         'Закачен логотип %s',
-                        htmlspecialchars($brand->caption)
+                        htmlspecialchars($brand->name)
                     ), $brand);
 
                     $this->flashMessenger()->addSuccessMessage($this->translate('moder/brands/logo/saved'));
@@ -238,7 +238,7 @@ class BrandsController extends AbstractActionController
             $carTable->select(true)
                 ->join('brands_cars', 'cars.id=brands_cars.car_id', null)
                 ->where('brands_cars.brand_id = ?', $brand->id)
-                ->order('cars.caption')
+                ->order('cars.name')
         );
 
         $this->descForm->setAttribute('action', $this->url()->fromRoute('moder/brands/params', [
@@ -266,10 +266,10 @@ class BrandsController extends AbstractActionController
         $links = [];
         foreach ($linkRows as $link) {
             $links[] = [
-                'id'      => $link->id,
-                'caption' => $link->caption,
-                'url'     => $link->url,
-                'type'    => $link->type
+                'id'   => $link->id,
+                'name' => $link->name,
+                'url'  => $link->url,
+                'type' => $link->type
             ];
         }
 
@@ -306,7 +306,7 @@ class BrandsController extends AbstractActionController
             $row = $links->find($id)->current();
             if ($row) {
                 if (strlen($link['url'])) {
-                    $row->caption = $link['caption'];
+                    $row->name = $link['name'];
                     $row->url = $link['url'];
                     $row->type = $link['type'];
 
@@ -321,7 +321,7 @@ class BrandsController extends AbstractActionController
             if (strlen($new['url'])) {
                 $row = $links->fetchNew();
                 $row->brandId = $brand->id;
-                $row->caption = $new['caption'];
+                $row->name = $new['name'];
                 $row->url = $new['url'];
                 $row->type = $new['type'];
 
@@ -374,7 +374,7 @@ class BrandsController extends AbstractActionController
 
             $this->log(sprintf(
                 'Редактирование описания бренда %s',
-                $brand->caption
+                $brand->name
             ), $brand);
 
             if ($brand->text_id) {
@@ -400,7 +400,7 @@ class BrandsController extends AbstractActionController
                                 $userRow->language
                             ),
                             $userUrl,
-                            $brand->caption, //TODO: translate brand name
+                            $brand->name, //TODO: translate brand name
                             $this->brandModerUrl($brand, true, $uri)
                         );
 

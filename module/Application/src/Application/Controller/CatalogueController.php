@@ -174,19 +174,19 @@ class CatalogueController extends AbstractActionController
 
     private function getCarShortName($brand, $carName)
     {
-        $shortCaption = $carName;
+        $shortName = $carName;
         $patterns = [
             preg_quote($brand['name'].'-', '|') => '',
             preg_quote($brand['name'], '|') => '',
             '[[:space:]]+' => ' '
         ];
         foreach ($patterns as $pattern => $replacement) {
-            $shortCaption = preg_replace('|'.$pattern.'|isu', $replacement, $shortCaption);
+            $shortName = preg_replace('|'.$pattern.'|isu', $replacement, $shortName);
         }
 
-        $shortCaption = trim($shortCaption);
+        $shortName = trim($shortName);
 
-        return $shortCaption;
+        return $shortName;
     }
 
     public function recentAction()
@@ -935,7 +935,7 @@ class CatalogueController extends AbstractActionController
             $engineTable = new Engine();
 
             $select = $engineTable->select(true)
-                ->order('engines.caption');
+                ->order('engines.name');
 
             if ($engineRow) {
                 $select
@@ -987,7 +987,7 @@ class CatalogueController extends AbstractActionController
                 foreach ($pictureRows as $pictureRow) {
                     //$pictures[] = $pictureRow;
 
-                    $caption = $this->pic()->name($pictureRow, $language);
+                    $name = $this->pic()->name($pictureRow, $language);
 
                     $url = $this->url()->fromRoute('catalogue', [
                         'action'     => 'engine-picture',
@@ -996,7 +996,7 @@ class CatalogueController extends AbstractActionController
                     ], [], true);
 
                     $pictures[] = [
-                        'name' => $caption,
+                        'name' => $name,
                         'url'  => $url,
                         'img'  => $pictureRow->getFormatRequest()
                     ];
@@ -1015,12 +1015,12 @@ class CatalogueController extends AbstractActionController
                             ->limit($morePictures)
                     );
                     foreach ($pictureRows as $pictureRow) {
-                        $caption = $this->pic()->name($pictureRow, $language);
+                        $name = $this->pic()->name($pictureRow, $language);
 
                         $url = $this->pic()->href($pictureRow->toArray());
 
                         $pictures[] = [
-                            'name' => $caption,
+                            'name' => $name,
                             'url'  => $url,
                             'img'  => $pictureRow->getFormatRequest()
                         ];
@@ -1099,7 +1099,7 @@ class CatalogueController extends AbstractActionController
                 }
 
                 $engines[] = [
-                    'name'         => $engine->caption,
+                    'name'         => $engine->name,
                     'pictures'     => $pictures,
                     'moderUrl'     => $moderUrl,
                     'specsUrl'     => $specsUrl,
@@ -1166,7 +1166,7 @@ class CatalogueController extends AbstractActionController
 
             $engine = [
                 'id'   => $engineRow->id,
-                'name' => $engineRow->caption
+                'name' => $engineRow->name
             ];
 
             $specs = $this->specsService->engineSpecifications([$engine], [
@@ -1226,7 +1226,7 @@ class CatalogueController extends AbstractActionController
                     'brand'        => $brand,
                     'engine'       => [
                         'id'   => $engineRow->id,
-                        'name' => $engineRow->caption
+                        'name' => $engineRow->name
                     ],
                     'carsCount'    => $carsCount,
                     'childsCount'  => $childsCount,
@@ -1412,7 +1412,7 @@ class CatalogueController extends AbstractActionController
                 $db->select()
                     ->from('cars', [
                         'cars.id',
-                        'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                        'name' => 'if(car_language.name, car_language.name, cars.name)',
                         'cars.begin_model_year', 'cars.end_model_year',
                         'spec' => 'spec.short_name',
                         'spec_full' => 'spec.name',
@@ -1456,7 +1456,7 @@ class CatalogueController extends AbstractActionController
             $columns = [
                 'cars.id',
                 'cars.is_concept',
-                'name' => 'if(length(car_language.name) > 0, car_language.name, cars.caption)',
+                'name' => 'if(length(car_language.name) > 0, car_language.name, cars.name)',
                 'cars.begin_model_year', 'cars.end_model_year',
                 'spec' => 'spec.short_name',
                 'cars.body', 'cars.today', 'cars.produced', 'cars.produced_exactly',
@@ -1578,7 +1578,7 @@ class CatalogueController extends AbstractActionController
             $designCarsRow = $db->fetchRow(
                 $db->select()
                     ->from('brands', [
-                        'brand_name'    => 'caption',
+                        'brand_name'    => 'name',
                         'brand_catname' => 'folder'
                     ])
                     ->join('brands_cars', 'brands.id = brands_cars.brand_id', [

@@ -125,7 +125,7 @@ class LogController extends AbstractActionController
             $engines = [];
             foreach ($engineRows as $engineRow) {
                 $engines[] = [
-                    'name' => $engineRow['caption'],
+                    'name' => $engineRow['name'],
                     'url'  => $this->url()->fromRoute('moder/engines/params', [
                         'action'    => 'engine',
                         'engine_id' => $engineRow->id

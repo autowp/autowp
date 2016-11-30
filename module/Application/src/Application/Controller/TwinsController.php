@@ -236,7 +236,7 @@ class TwinsController extends AbstractActionController
                 $db->select()
                     ->from('cars', [
                         'cars.id',
-                        'name' => 'if(length(car_language.name), car_language.name, cars.caption)',
+                        'name' => 'if(length(car_language.name), car_language.name, cars.name)',
                         'cars.body', 'cars.begin_model_year', 'cars.end_model_year',
                         'cars.begin_year', 'cars.end_year', 'cars.today',
                         'spec' => 'spec.short_name',

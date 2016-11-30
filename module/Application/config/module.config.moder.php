@@ -871,12 +871,12 @@ return [
                 [
                     'spec' => [
                         'type' => 'EngineName',
-                        'name' => 'caption'
+                        'name' => 'name'
                     ],
                 ]
             ],
             'input_filter' => [
-                'caption' => [
+                'name' => [
                     'required' => true,
                     'filters'  => [
                         ['name' => 'StringTrim'],

@@ -111,7 +111,7 @@ class Row extends \Application\Db\Table\Row
 
                     $car = $cars[0];
 
-                    $carCatname = $filenameFilter->filter($car->caption);
+                    $carCatname = $filenameFilter->filter($car->name);
 
                     $brandTable = new BrandTable();
 
@@ -165,7 +165,7 @@ class Row extends \Application\Db\Table\Row
                                 $carCatname
                             ]);
                         } else {
-                            $carFolder = $filenameFilter->filter($car->caption);
+                            $carFolder = $filenameFilter->filter($car->name);
                             $firstChar = mb_substr($carFolder, 0, 1);
                             $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
                         }
@@ -178,7 +178,7 @@ class Row extends \Application\Db\Table\Row
                 if ($engine) {
                     $result = implode('/', [
                         'engines',
-                        $filenameFilter->filter($engine->caption)
+                        $filenameFilter->filter($engine->name)
                     ]);
                 }
                 break;

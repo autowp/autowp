@@ -8,7 +8,7 @@
         'args'   => [
             'BRAND_NAME'    => $this->brand['name'],
             'BRAND_CATNAME' => $this->brand['catname'],
-            'ENGINE_NAME'   => $this->engine ? $this->engine->caption : null
+            'ENGINE_NAME'   => $this->engine ? $this->engine->name : null
         ]
     ]);
 ?>
@@ -40,7 +40,7 @@
 
 <?php if ($this->engine) { ?>
     <?=$this->partial('application/catalogue/partial/brand-engine-menu', [
-        'title' => $this->engine->caption,
+        'title' => $this->engine->name,
         'tree'  => [
             'count'  => $this->childsCount,
             'active' => true

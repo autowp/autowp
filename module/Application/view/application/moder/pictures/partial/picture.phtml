@@ -21,7 +21,7 @@
             'title'   => $this->pic()->textTitle($this->name),
             'shuffle' => true
         ]), false) ?>
-        <div class="caption">
+        <div class="name">
             <p><?=$this->htmlA($this->url, $this->pic()->htmlTitle($this->name), false)?></p>
             <?php if (!$this->disableBehaviour) { ?>
                 <?=$this->render('application/picture-behaviour.phtml')?>

@@ -32,7 +32,7 @@ class BrandRow extends Row
             'language = ?' => $language
         ]);
 
-        return $langRow ? $langRow->name : $this->caption;
+        return $langRow ? $langRow->name : $this->name;
     }
 
     public function getTotalPicturesCount()

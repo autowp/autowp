@@ -218,11 +218,11 @@ class CarsController extends AbstractActionController
             $group = false;
 
             if ($values['name']) {
-                $select->where('cars.caption like ?', '%' . $values['name'] . '%');
+                $select->where('cars.name like ?', '%' . $values['name'] . '%');
             }
 
             if ($values['no_name']) {
-                $select->where('cars.caption not like ?', '%' . $values['no_name'] . '%');
+                $select->where('cars.name not like ?', '%' . $values['no_name'] . '%');
             }
 
             if ($values['vehicle_type_id']) {
@@ -347,7 +347,7 @@ class CarsController extends AbstractActionController
         $chars = $carAdapter->fetchCol(
             $carAdapter->select()
                 ->distinct()
-                ->from('cars', ['char' => new Zend_Db_Expr('UPPER(LEFT(caption, 1))')])
+                ->from('cars', ['char' => new Zend_Db_Expr('UPPER(LEFT(name, 1))')])
                 ->order('char')
         );
 
@@ -379,8 +379,8 @@ class CarsController extends AbstractActionController
             $char = $char;
             $cars = $carTable->fetchAll(
                 $carTable->select(true)
-                    ->where('caption LIKE ?', $char.'%')
-                    ->order(['caption', 'begin_year', 'end_year'])
+                    ->where('name LIKE ?', $char.'%')
+                    ->order(['name', 'begin_year', 'end_year'])
             );
         }
 
@@ -631,7 +631,7 @@ class CarsController extends AbstractActionController
     private function carToForm(DbTable\Vehicle\Row $car)
     {
         return [
-            'name'        => $car->caption,
+            'name'        => $car->name,
             'body'        => $car->body,
             'spec_id'     => $car->spec_inherit ? 'inherited' : ($car->spec_id ? $car->spec_id : ''),
             'is_concept'  => $car->is_concept_inherit ? 'inherited' : (bool)$car->is_concept,
@@ -1039,7 +1039,7 @@ class CarsController extends AbstractActionController
     private function buildChangesMessage($oldData, $newData, $language)
     {
         $fields = [
-            'caption'          => ['str', 'moder/vehicle/changes/name-%s-%s'],
+            'name'             => ['str', 'moder/vehicle/changes/name-%s-%s'],
             'body'             => ['str', 'moder/vehicle/changes/body-%s-%s'],
             'begin_year'       => ['int', 'moder/vehicle/changes/from/year-%s-%s'],
             'begin_month'      => ['int', 'moder/vehicle/changes/from/month-%s-%s'],
@@ -1151,7 +1151,7 @@ class CarsController extends AbstractActionController
         return [
             'brands' => $brands->fetchAll(
                 $brands->select(true)
-                    ->order(['brands.position', 'brands.caption'])
+                    ->order(['brands.position', 'brands.name'])
             ),
             'car' => $car
         ];
@@ -1330,7 +1330,7 @@ class CarsController extends AbstractActionController
                 ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
                 ->join('twins_groups_cars', 'car_parent_cache.car_id = twins_groups_cars.car_id', null)
                 ->group('brands.id')
-                ->order(['brands.position', 'brands.caption'])
+                ->order(['brands.position', 'brands.name'])
             );
         }
 
@@ -2199,7 +2199,7 @@ class CarsController extends AbstractActionController
             'language' => $language,
             'columns'  => ['id', 'name', 'img']
         ], function ($select) use ($query) {
-            $select->where('caption like ?', $query . '%');
+            $select->where('name like ?', $query . '%');
         });
 
         foreach ($brandRows as $brandRow) {
@@ -2287,8 +2287,8 @@ class CarsController extends AbstractActionController
 
         $select = $carTable->select(true)
         ->where('cars.is_group')
-        ->where('cars.caption like ?', $query . '%')
-        ->order(['length(cars.caption)', 'cars.is_group desc', 'cars.caption'])
+        ->where('cars.name like ?', $query . '%')
+        ->order(['length(cars.name)', 'cars.is_group desc', 'cars.name'])
         ->limit(15);
 
         if ($specId) {
@@ -2610,7 +2610,7 @@ class CarsController extends AbstractActionController
 
                 $brands[] = [
                     'brand' => [
-                        'name'     => $brandRow->caption,
+                        'name'     => $brandRow->name,
                         'moderUrl' => $this->url()->fromRoute('moder/brands/params', [
                             'action'     => 'brand',
                             'brand_id'   => $brandRow->id
@@ -2662,10 +2662,10 @@ class CarsController extends AbstractActionController
 
         $relevantBrands = [];
 
-        if (strlen($car->caption) > 0) {
+        if (strlen($car->name) > 0) {
             $rows = $brandTable->fetchAll(
                 $brandTable->select(true)
-                ->where('INSTR(?, caption)', $car->caption)
+                ->where('INSTR(?, name)', $car->name)
             );
 
             foreach ($rows as $row) {
@@ -2898,7 +2898,7 @@ class CarsController extends AbstractActionController
                         }
 
                         $inheritBrands[] = [
-                            'name'     => $brandRow->caption,
+                            'name'     => $brandRow->name,
                             'type'     => $brandCarRow->type,
                             'catname'  => $brandCarRow->catname,
                             'moderUrl' => $this->url()->fromRoute('moder/brands/params', [
@@ -3203,7 +3203,7 @@ class CarsController extends AbstractActionController
                 $cars[] = $this->carSelectParentWalk($row);
             }
         } else {
-            $brands = $brandTable->fetchAll(null, ['brands.position', 'brands.caption']);
+            $brands = $brandTable->fetchAll(null, ['brands.position', 'brands.name']);
         }
 
         return [
@@ -3414,7 +3414,7 @@ class CarsController extends AbstractActionController
         }
 
         $result = [
-            'caption'            => $values['name'],
+            'name'               => $values['name'],
             'body'               => $values['body'],
             'begin_model_year'   => $values['model_year']['begin'] ? $values['model_year']['begin'] : null,
             'end_model_year'     => $values['model_year']['end'] ? $values['model_year']['end'] : null,

@@ -11,7 +11,7 @@ class Edit extends Form
     public function init()
     {
         $this->add([
-            'name' => 'caption',
+            'name' => 'name',
             'type' => \Application\Form\Element\BrandName::class,
             'options' => [
                 'readonly' => 'readonly'
@@ -29,7 +29,7 @@ class Edit extends Form
         }
 
         $this->add([
-            'name'    => 'full_caption',
+            'name'    => 'full_name',
             'type'    => \Application\Form\Element\BrandFullName::class,
             'options' => []
         ]);

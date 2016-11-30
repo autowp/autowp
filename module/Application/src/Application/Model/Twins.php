@@ -97,7 +97,7 @@ class Twins
         $select = $db->select(true)
             ->from('brands', [
                 'id',
-                'name'      => 'IFNULL(brand_language.name, brands.caption)',
+                'name'      => 'IFNULL(brand_language.name, brands.name)',
                 'folder'    => 'folder',
                 'count'     => new Zend_Db_Expr('count(distinct tg.id)'),
                 'new_count' => new Zend_Db_Expr(
@@ -253,7 +253,7 @@ class Twins
             $carTable->select(true)
                 ->join('twins_groups_cars', 'cars.id = twins_groups_cars.car_id', null)
                 ->where('twins_groups_cars.twins_group_id = ?', (int)$groupId)
-                ->order('caption')
+                ->order('name')
         );
     }
 

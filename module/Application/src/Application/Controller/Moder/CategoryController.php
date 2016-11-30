@@ -242,7 +242,7 @@ class CategoryController extends AbstractActionController
 
             $brandNames = $brandAdapter->fetchPairs(
                 $brandAdapter->select()
-                    ->from($brandTable->info('name'), ['id', 'caption'])
+                    ->from($brandTable->info('name'), ['id', 'name'])
                     ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
                     ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
                     ->where('car_parent_cache.car_id = ?', $carRow->id)
@@ -321,7 +321,7 @@ class CategoryController extends AbstractActionController
 
             $cars = new Vehicle();
             $newCar = $cars->createRow([
-                'caption'     => $values['caption'],
+                'name'        => $values['name'],
                 'body'        => $values['body'],
                 'begin_year'  => $values['begin_year'],
                 'end_year'    => $values['end_year'],

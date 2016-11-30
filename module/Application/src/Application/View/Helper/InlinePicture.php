@@ -14,12 +14,12 @@ class InlinePicture extends AbstractHelper
 
         $url = $view->pic($picture)->url();
 
-        $caption = $view->pic()->name($picture, $this->view->language());
+        $name = $view->pic()->name($picture, $this->view->language());
 
         $imageHtml = $view->img($picture->getFormatRequest(), [
             'format'  => 'picture-thumb',
-            'alt'     => $caption,
-            'title'   => $caption,
+            'alt'     => $name,
+            'title'   => $name,
             'shuffle' => true
         ]);
 
@@ -29,7 +29,7 @@ class InlinePicture extends AbstractHelper
                 'class' => 'inline-picture-preview thumbnail thumbnail-inline'
             ], $imageHtml, false) .
             '<div class="inline-picture-details" style="display:none;">'.
-                '<h5>' . $view->htmlA($url, $caption) . '</h5>' .
+                '<h5>' . $view->htmlA($url, $name) . '</h5>' .
                 $view->pictures()->behaviour($picture) .
             '</div>';
     }

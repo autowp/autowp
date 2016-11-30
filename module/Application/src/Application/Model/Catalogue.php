@@ -70,7 +70,7 @@ class Catalogue
         return [
             'cars.begin_order_cache',
             'cars.end_order_cache',
-            'cars.caption',
+            'cars.name',
             'cars.body',
             'cars.spec_id'
         ];
@@ -84,7 +84,7 @@ class Catalogue
             'cars.end_year',
             new Zend_Db_Expr('cars.end_month IS NULL'),
             'cars.end_month',
-            'cars.caption',
+            'cars.name',
             'cars.body'
         ];*/
     }

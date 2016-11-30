@@ -346,7 +346,7 @@ class UsersController extends AbstractActionController
                     foreach ($data as $brandId => $value) {
                         $row = $brandTable->find($brandId)->current();
                         $brands[] = [
-                            'name' => $row->caption,
+                            'name' => $row->name,
                             'url'  => $this->url()->fromRoute('catalogue', [
                                 'action'        => 'brand',
                                 'brand_catname' => $row->folder
@@ -407,7 +407,7 @@ class UsersController extends AbstractActionController
 
                     foreach ($brandTable->fetchAll($select) as $brand) {
                         $brands[] = [
-                            'name' => $brand->caption,
+                            'name' => $brand->name,
                             'url'  => $this->url()->fromRoute('catalogue', [
                                 'action'        => 'brand',
                                 'brand_catname' => $brand->folder
