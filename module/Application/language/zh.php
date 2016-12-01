@@ -1473,6 +1473,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/catalogue/not-set' => '未设定',
     'moder/picture/catalogue/move-to' => '移动到',
     'moder/picture/catalogue/add-to' => 'add to',
+    'moder/picture/catalogue/pick-item-area' => 'Pick item area',
 
     'moder/picture/perspective' => '视角',
     'moder/picture/perspective-by' => '视角: ',

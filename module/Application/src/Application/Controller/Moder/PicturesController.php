@@ -1272,8 +1272,9 @@ class PicturesController extends AbstractActionController
             });
 
             $area = $this->pictureItem->getArea($picture['id'], $item['id']);
-
+            $hasArea = true;
             if (!$area) {
+                $hasArea = false;
                 $area = [
                     0, 0,
                     (int)$picture->width, (int)$picture->height,
@@ -1314,7 +1315,8 @@ class PicturesController extends AbstractActionController
                         'picture_id' => $picture->id,
                         'item_id'    => $item['id']
                     ])
-                ]
+                ],
+                'hasArea' => $hasArea
             ];
         }
 

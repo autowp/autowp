@@ -31,10 +31,13 @@ class CategoryController extends AbstractActionController
     private $categoryLanguageTable;
 
     private $cache;
+    
+    private $textStorage;
 
-    public function __construct($cache)
+    public function __construct($cache, $textStorage)
     {
         $this->cache = $cache;
+        $this->textStorage = $textStorage;
 
         $this->categoryTable = new Category();
         $this->categoryLanguageTable = new CategoryLanguage();
@@ -611,6 +614,11 @@ class CategoryController extends AbstractActionController
                     ]);
                 }
             ]);
+            
+            $description = null;
+            if ($categoryLang['text_id']) {
+                $description = $this->textStorage->getText($categoryLang['text_id']);
+            }
 
             return [
                 'title'            => $title,
@@ -624,7 +632,8 @@ class CategoryController extends AbstractActionController
                     'other'            => $isOther,
                     'car_id'           => $topCar ? $topCar->id : null,
                     'path'             => $path
-                ]
+                ],
+                'description'     => $description
             ];
         });
     }

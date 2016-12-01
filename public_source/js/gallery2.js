@@ -515,6 +515,17 @@ define(
                 }
                 return bounds;
             },
+            areasToBounds: function($item, offsetBounds) {
+                $item.find('.area').each(function() {
+                    var area = $(this).data('area');
+                    $(this).css({
+                        left: offsetBounds.left + area.left * offsetBounds.width,
+                        top: offsetBounds.top + area.top * offsetBounds.height,
+                        width: area.width * offsetBounds.width,
+                        height: area.height * offsetBounds.height 
+                    });
+                });
+            },
             fixSize: function($items) {
                 var w = this.$inner.width();
                 var h = this.$inner.height();
@@ -532,7 +543,6 @@ define(
                     var $item = $(this);
                     var $imgFull = $item.find('img.full');
                     var $imgCrop = $item.find('img.crop');
-                    var $areas = $item.find('.area');
                     var full = $item.data('full');
                     var crop = $item.data('crop');
                     var cropMode = $item.data('cropMode');
@@ -555,12 +565,15 @@ define(
                             $imgCrop.css(offsetBounds);
                             var fullWidth = bounds.width / crop.crop.width;
                             var fullHeight = bounds.height / crop.crop.height;
-                            $imgFull.css({
+                            var imgFullBounds = {
                                 left: offsetBounds.left - crop.crop.left * fullWidth,
                                 top: offsetBounds.top - crop.crop.top * fullHeight,
                                 width: fullWidth,
                                 height: fullHeight
-                            });
+                            };
+                            $imgFull.css(imgFullBounds);
+                            
+                            self.areasToBounds($item, imgFullBounds);
                         } else {
                             bounds = self.maxBounds(self.bound(cSize, {
                                 width: full.width,
@@ -577,6 +590,8 @@ define(
                                 width: bounds.width * crop.crop.width,
                                 height: bounds.height * crop.crop.height,
                             });
+                            
+                            self.areasToBounds($item, offsetBounds);
                         }
                         
                     } else {
@@ -593,15 +608,7 @@ define(
                         offsetBounds = self.boundCenter(cSize, bounds);
                         $imgFull.css(offsetBounds);
                         
-                        $areas.each(function() {
-                            var area = $(this).data('area');
-                            $(this).css({
-                                left: offsetBounds.left + area.left * offsetBounds.width,
-                                top: offsetBounds.top + area.top * offsetBounds.height,
-                                width: area.width * offsetBounds.width,
-                                height: area.height * offsetBounds.height 
-                            });
-                        })
+                        self.areasToBounds($item, offsetBounds);
                     }
                 });
             },

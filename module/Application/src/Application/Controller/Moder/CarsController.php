@@ -2199,7 +2199,7 @@ class CarsController extends AbstractActionController
             'language' => $language,
             'columns'  => ['id', 'name', 'img']
         ], function ($select) use ($query) {
-            $select->where('name like ?', $query . '%');
+            $select->where('brands.name like ?', $query . '%');
         });
 
         foreach ($brandRows as $brandRow) {

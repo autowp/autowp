@@ -37,9 +37,9 @@
                     </td>
                     <?php if ($this->canCrop) { ?>
                         <td>
-                            <button class="btn btn-success btn-sm pick-area" data-area="<?=$this->escapeHtmlAttr(Zend\Json\Json::encode($item['area']))?>">
+                            <button class="btn btn-sm pick-area <?=$item['hasArea'] ? 'btn-success' : 'btn-default'?>" data-area="<?=$this->escapeHtmlAttr(Zend\Json\Json::encode($item['area']))?>">
                                 <i class="fa fa-crop"></i>
-                                <?=$this->escapeHtml($this->translate('moder/picture/edit-and-repair/crop'))?>
+                                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/pick-item-area'))?>
                             </button>
                         </td>
                     <?php } ?>

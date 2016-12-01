@@ -4,13 +4,15 @@
         <td style="padding-left:<?=$this->level*20?>px"><?=$this->escapeHtmlAttr($page['name']) ?></td>
         <td>
             <div class="btn-group">
-                <?=$this->htmlA([
-                    'class' => "btn btn-xs btn-success",
-                    'href'  => $this->url('moder/category/params', [
-                        'action'    => 'item',
-                        'parent_id' => $page['id']
-                    ])
-                ], $this->translate('moder/categories/add')) ?>
+                <?php if ($this->canEdit) { ?>
+                    <?=$this->htmlA([
+                        'class' => "btn btn-xs btn-success",
+                        'href'  => $this->url('moder/category/params', [
+                            'action'    => 'item',
+                            'parent_id' => $page['id']
+                        ])
+                    ], $this->translate('moder/categories/add')) ?>
+                <?php } ?>
                 <?=$this->htmlA([
                     'class' => "btn btn-xs btn-default",
                     'href'  => $this->url('moder/category/params', [
