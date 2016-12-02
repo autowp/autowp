@@ -24,7 +24,8 @@
         </td>
     </tr>
     <?=$this->partial('application/moder/category/list', [
-        'items' => $page['childs'],
-        'level' => $this->level + 1
+        'items'   => $page['childs'],
+        'level'   => $this->level + 1,
+        'canEdit' => $this->canEdit,
     ])?>
 <?php } ?>

@@ -48,7 +48,7 @@ class CategoryController extends AbstractActionController
 
     private function canEdit()
     {
-        return false && $this->user()->isAllowed('category', 'edit');
+        return $this->user()->isAllowed('category', 'edit');
     }
 
     private function canEditText()
@@ -151,8 +151,6 @@ class CategoryController extends AbstractActionController
 
         $languages = $this->getLanguages();
 
-        $form = $this->getForm();
-
         $id = (int)$this->params('id');
         if ($id) {
             $category = $this->table->find($id)->current();
@@ -210,6 +208,9 @@ class CategoryController extends AbstractActionController
         $form = null;
 
         if ($canEdit) {
+            
+            $form = $this->getForm();
+            
             $form->populateValues($values);
 
             $request = $this->getRequest();
