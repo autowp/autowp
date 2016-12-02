@@ -61,8 +61,8 @@ class BrandRow extends Row
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $this->id)
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $this->id)
         );
         $this->save();
     }

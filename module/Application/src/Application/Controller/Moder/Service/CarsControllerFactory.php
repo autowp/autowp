@@ -18,7 +18,7 @@ class CarsControllerFactory implements FactoryInterface
             clone $container->get('DescriptionForm'),
             clone $container->get('DescriptionForm'),
             $container->get('ModerTwinsGroup'),
-            $container->get('ModerBrandCar'),
+            $container->get('ModerBrandItem'),
             $container->get('ModerCarParent'),
             $container->get('ModerCarsFilter'),
             $container->get(\Application\Model\BrandVehicle::class),

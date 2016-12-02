@@ -12,7 +12,7 @@ use Autowp\User\Model\DbTable\User;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
-use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
@@ -196,8 +196,8 @@ class CatalogueController extends AbstractActionController
             $select = $this->selectFromPictures()
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand['id'])
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
                 ->group('pictures.id')
                 ->order([
                     'pictures.accept_datetime DESC',
@@ -234,8 +234,8 @@ class CatalogueController extends AbstractActionController
 
             $select = $this->catalogue()->getCarTable()->select(true)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand['id'])
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('cars.is_concept')
                 ->where('not cars.is_concept_inherit')
                 ->group('cars.id')
@@ -270,7 +270,7 @@ class CatalogueController extends AbstractActionController
                         $path = $paths[0];
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car',
+                            'action'        => 'brand-item',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path']
@@ -289,7 +289,7 @@ class CatalogueController extends AbstractActionController
                         $path = $paths[0];
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-pictures',
+                            'action'        => 'brand-item-pictures',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
@@ -315,7 +315,7 @@ class CatalogueController extends AbstractActionController
                         $path = $paths[0];
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-specifications',
+                            'action'        => 'brand-item-specifications',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
@@ -334,7 +334,7 @@ class CatalogueController extends AbstractActionController
                         $path = $paths[0];
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-picture',
+                            'action'        => 'brand-item-picture',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
@@ -374,8 +374,8 @@ class CatalogueController extends AbstractActionController
                 ->join('vehicle_vehicle_type', 'car_types.id = vehicle_vehicle_type.vehicle_type_id', null)
                 ->join('cars', 'vehicle_vehicle_type.vehicle_id = cars.id', null)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand['id'])
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('cars.begin_year or cars.begin_model_year')
                 ->where('not cars.is_group')
                 ->group('car_types.id')
@@ -399,8 +399,8 @@ class CatalogueController extends AbstractActionController
 
             $select = $this->catalogue()->getCarTable()->select(true)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand['id'])
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('cars.begin_year or cars.begin_model_year')
                 ->where('not cars.is_group')
                 ->group('cars.id')
@@ -445,7 +445,7 @@ class CatalogueController extends AbstractActionController
                         $path = $paths[0];
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car',
+                            'action'        => 'brand-item',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path']
@@ -464,7 +464,7 @@ class CatalogueController extends AbstractActionController
                         $path = $paths[0];
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-pictures',
+                            'action'        => 'brand-item-pictures',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
@@ -490,7 +490,7 @@ class CatalogueController extends AbstractActionController
                         $path = $paths[0];
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-specifications',
+                            'action'        => 'brand-item-specifications',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
@@ -509,7 +509,7 @@ class CatalogueController extends AbstractActionController
                         $path = $paths[0];
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-picture',
+                            'action'        => 'brand-item-picture',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
@@ -537,8 +537,8 @@ class CatalogueController extends AbstractActionController
                 )
                 ->join('factory_car', 'factory.id = factory_car.factory_id', null)
                 ->join('car_parent_cache', 'factory_car.car_id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brandId)
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brandId)
                 ->group('factory.id')
                 ->join('pictures', 'factory.id = pictures.factory_id', null)
                 ->where('pictures.type = ?', Picture::FACTORY_TYPE_ID)
@@ -591,8 +591,8 @@ class CatalogueController extends AbstractActionController
                 $select = $this->selectOrderFromPictures()
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                    ->where('brands_cars.brand_id = ?', $brand['id'])
+                    ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                    ->where('brand_item.brand_id = ?', $brand['id'])
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->group('pictures.id')
                     ->limit(12);
@@ -610,8 +610,8 @@ class CatalogueController extends AbstractActionController
                                 ->from('picture_item', 'item_id')
                                 ->where('picture_item.picture_id = ?', $picture['id'])
                                 ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                                ->where('brands_cars.brand_id = ?', $brand['id'])
+                                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                                ->where('brand_item.brand_id = ?', $brand['id'])
                         );
 
                         if (! $carId) {
@@ -629,7 +629,7 @@ class CatalogueController extends AbstractActionController
                         $path = $paths[0];
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-picture',
+                            'action'        => 'brand-item-picture',
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
@@ -668,9 +668,9 @@ class CatalogueController extends AbstractActionController
                 $cars->getAdapter()->select()
                     ->from($cars->info('name'), 'id')
                     ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+                    ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
                     ->join('twins_groups_cars', 'cars.id = twins_groups_cars.car_id', null)
-                    ->where('brands_cars.brand_id = ?', $brand['id'])
+                    ->where('brand_item.brand_id = ?', $brand['id'])
                     ->limit(1)
             );
 
@@ -710,8 +710,8 @@ class CatalogueController extends AbstractActionController
                         ->where('pictures.status = ?', Picture::STATUS_INBOX)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                        ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                        ->where('brands_cars.brand_id = ?', $brand['id'])
+                        ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                        ->where('brand_item.brand_id = ?', $brand['id'])
                 );
                 $inboxEnginePictures = $db->fetchOne(
                     $db->select()
@@ -1087,7 +1087,7 @@ class CatalogueController extends AbstractActionController
                             $cars[] = [
                                 'name' => $carRow->getNameData($language),
                                 'url'  => $this->url()->fromRoute('catalogue', [
-                                    'action'        => 'brand-car',
+                                    'action'        => 'brand-item',
                                     'brand_catname' => $cPath['brand_catname'],
                                     'car_catname'   => $cPath['car_catname'],
                                     'path'          => $cPath['path']
@@ -1374,7 +1374,7 @@ class CatalogueController extends AbstractActionController
                         $path = $paths[0];
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-picture',
+                            'action'        => 'brand-item-picture',
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
@@ -1435,7 +1435,7 @@ class CatalogueController extends AbstractActionController
         return $result;
     }
 
-    private function doBrandCarAction(callable $callback)
+    private function doBrandItemAction(callable $callback)
     {
         return $this->doBrandAction(function ($brand) use ($callback) {
 
@@ -1462,7 +1462,7 @@ class CatalogueController extends AbstractActionController
                 'cars.body', 'cars.today', 'cars.produced', 'cars.produced_exactly',
                 'cars.begin_year', 'cars.end_year', 'cars.begin_month', 'cars.end_month',
                 'cars.is_group', 'cars.full_text_id', 'cars.text_id',
-                'brand_car_catname' => 'brands_cars.catname'
+                'brand_item_catname' => 'brand_item.catname'
             ];
 
             $field = 'cars.id';
@@ -1484,14 +1484,14 @@ class CatalogueController extends AbstractActionController
 
             $select
                 ->columns($columns)
-                ->join('brands_cars', $field . ' = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = :brand_id')
-                ->where('brands_cars.catname = :brand_car_catname');
+                ->join('brand_item', $field . ' = brand_item.car_id', null)
+                ->where('brand_item.brand_id = :brand_id')
+                ->where('brand_item.catname = :brand_item_catname');
 
             $currentCar = $db->fetchRow($select, [
-                'lang'              => $language,
-                'brand_id'          => (int)$brand['id'],
-                'brand_car_catname' => (string)$this->params('car_catname')
+                'lang'               => $language,
+                'brand_id'           => (int)$brand['id'],
+                'brand_item_catname' => (string)$this->params('car_catname')
             ]);
 
             if (! $currentCar) {
@@ -1539,9 +1539,9 @@ class CatalogueController extends AbstractActionController
             $breadcrumbs[] = [
                 'name' => $bvName,
                 'url'  => $this->url()->fromRoute('catalogue', [
-                    'action'        => 'brand-car',
+                    'action'        => 'brand-item',
                     'brand_catname' => $brand['catname'],
-                    'car_catname'   => $currentCar['brand_car_catname'],
+                    'car_catname'   => $currentCar['brand_item_catname'],
                     'path'          => $breadcrumbsPath
                 ])
             ];
@@ -1564,9 +1564,9 @@ class CatalogueController extends AbstractActionController
                 $breadcrumbs[] = [
                     'name' => $breadcrumbName,
                     'url'  => $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car',
+                        'action'        => 'brand-item',
                         'brand_catname' => $brand['catname'],
-                        'car_catname'   => $currentCar['brand_car_catname'],
+                        'car_catname'   => $currentCar['brand_item_catname'],
                         'path'          => $breadcrumbsPath
                     ])
                 ];
@@ -1581,20 +1581,20 @@ class CatalogueController extends AbstractActionController
                         'brand_name'    => 'name',
                         'brand_catname' => 'folder'
                     ])
-                    ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
-                        'brand_car_catname' => 'catname'
+                    ->join('brand_item', 'brands.id = brand_item.brand_id', [
+                        'brand_item_catname' => 'catname'
                     ])
-                    ->where('brands_cars.type = ?', BrandCar::TYPE_DESIGN)
-                    ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
+                    ->where('brand_item.type = ?', BrandItem::TYPE_DESIGN)
+                    ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', 'car_id')
                     ->where('car_parent_cache.car_id = ?', $currentCar['id'])
             );
             if ($designCarsRow) {
                 $design = [
                     'name' => $designCarsRow['brand_name'],
                     'url'  => $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car',
+                        'action'        => 'brand-item',
                         'brand_catname' => $designCarsRow['brand_catname'],
-                        'car_catname'   => $designCarsRow['brand_car_catname']
+                        'car_catname'   => $designCarsRow['brand_item_catname']
                     ])
                 ];
             }
@@ -1605,14 +1605,14 @@ class CatalogueController extends AbstractActionController
                 'is_concepts' => $currentCar['is_concept']
             ]);
 
-            $result = $callback($brand, $currentCar, $currentCar['brand_car_catname'], $path, $breadcrumbs);
+            $result = $callback($brand, $currentCar, $currentCar['brand_item_catname'], $path, $breadcrumbs);
 
             if (is_array($result)) {
                 $result = array_replace([
                     'design'       => $design,
                     'carFullName'  => $carFullName,
                     'carShortName' => $this->getCarShortName($brand, $carFullName),
-                    'carCatname'   => $currentCar['brand_car_catname'],
+                    'carCatname'   => $currentCar['brand_item_catname'],
                 ], $result);
             }
 
@@ -1638,9 +1638,9 @@ class CatalogueController extends AbstractActionController
         ];
     }
 
-    public function brandCarAction()
+    public function brandItemAction()
     {
-        return $this->doBrandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
+        return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
 
             $modification = null;
             $modId = (int)$this->params('mod');
@@ -1664,10 +1664,10 @@ class CatalogueController extends AbstractActionController
             }
 
             if ($modgroupId) {
-                return $this->brandCarModgroup(
+                return $this->brandItemModgroup(
                     $brand,
                     $currentCar,
-                    $brandCarCatname,
+                    $brandItemCatname,
                     $path,
                     $modgroupId,
                     $modId,
@@ -1676,10 +1676,10 @@ class CatalogueController extends AbstractActionController
             }
 
             if ($currentCar['is_group']) {
-                return $this->brandCarGroup(
+                return $this->brandItemGroup(
                     $brand,
                     $currentCar,
-                    $brandCarCatname,
+                    $brandItemCatname,
                     $path,
                     $modgroupId,
                     $modId,
@@ -1740,7 +1740,7 @@ class CatalogueController extends AbstractActionController
 
             return [
                 'car'           => $currentCar,
-                'modificationGroups' => $this->brandCarModifications($currentCar['id'], $modId),
+                'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
                 'breadcrumbs'   => $breadcrumbs,
                 'type'          => $type,
                 'stockCount'    => $counts['stock'],
@@ -1751,9 +1751,9 @@ class CatalogueController extends AbstractActionController
                 'currentPictures'      => $currentPictures,
                 'currentPicturesCount' => $currentPicturesCount,
                 'currentPicturesUrl'   => $this->url()->fromRoute('catalogue', [
-                    'action'        => 'brand-car-pictures',
+                    'action'        => 'brand-item-pictures',
                     'brand_catname' => $brand['catname'],
-                    'car_catname'   => $brandCarCatname,
+                    'car_catname'   => $brandItemCatname,
                     'path'          => $path,
                     'exact'         => true
                 ], [], true),
@@ -1761,17 +1761,17 @@ class CatalogueController extends AbstractActionController
                     'disableDescription' => true,
                     'type'       => $type == VehicleParent::TYPE_DEFAULT ? $type : null,
                     'detailsUrl' => false,
-                    'allPicturesUrl' => function ($listCar) use ($brand, $brandCarCatname, $path) {
+                    'allPicturesUrl' => function ($listCar) use ($brand, $brandItemCatname, $path) {
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-pictures',
+                            'action'        => 'brand-item-pictures',
                             'brand_catname' => $brand['catname'],
-                            'car_catname'   => $brandCarCatname,
+                            'car_catname'   => $brandItemCatname,
                             'path'          => $path,
                             'exact'         => true
                         ]);
                     },
                     'onlyExactlyPictures' => true,
-                    'specificationsUrl' => function ($listCar) use ($brand, $brandCarCatname, $path) {
+                    'specificationsUrl' => function ($listCar) use ($brand, $brandItemCatname, $path) {
 
                         $hasSpecs = $this->specsService->hasSpecs(1, $listCar->id);
 
@@ -1780,9 +1780,9 @@ class CatalogueController extends AbstractActionController
                         }
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-specifications',
+                            'action'        => 'brand-item-specifications',
                             'brand_catname' => $brand['catname'],
-                            'car_catname'   => $brandCarCatname,
+                            'car_catname'   => $brandItemCatname,
                             'path'          => $path
                         ]);
                     },
@@ -1824,15 +1824,15 @@ class CatalogueController extends AbstractActionController
                     ) use (
                         $brand,
                         $currentCarId,
-                        $brandCarCatname,
+                        $brandItemCatname,
                         $path,
                         $carParentTable
                     ) {
 
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-picture',
+                            'action'        => 'brand-item-picture',
                             'brand_catname' => $brand['catname'],
-                            'car_catname'   => $brandCarCatname,
+                            'car_catname'   => $brandItemCatname,
                             'path'          => $path,
                             'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
                         ]);
@@ -1845,7 +1845,7 @@ class CatalogueController extends AbstractActionController
         });
     }
 
-    private function brandCarGroupModifications($carId, $groupId, $modificationId)
+    private function brandItemGroupModifications($carId, $groupId, $modificationId)
     {
         $mTable = new ModificationTable();
         $db = $mTable->getAdapter();
@@ -1866,7 +1866,7 @@ class CatalogueController extends AbstractActionController
             $modifications[] = [
                 'name'      => $mRow->name,
                 'url'       => $this->url()->fromRoute('catalogue', [
-                    'action' => 'brand-car', // -pictures
+                    'action' => 'brand-item', // -pictures
                     'mod'    => $mRow->id,
                 ], [], true),
                 'count'     => $db->fetchOne(
@@ -1885,7 +1885,7 @@ class CatalogueController extends AbstractActionController
         return $modifications;
     }
 
-    private function brandCarModifications($carId, $modificationId)
+    private function brandItemModifications($carId, $modificationId)
     {
         // modifications
         $mgTable = new ModificationGroup();
@@ -1902,21 +1902,21 @@ class CatalogueController extends AbstractActionController
         );
 
         foreach ($mgRows as $mgRow) {
-            $modifications = $this->brandCarGroupModifications($carId, $mgRow->id, $modificationId);
+            $modifications = $this->brandItemGroupModifications($carId, $mgRow->id, $modificationId);
 
             if ($modifications) {
                 $modificationGroups[] = [
                     'name'          => $mgRow->name,
                     'modifications' => $modifications,
                     'url'           => $this->url()->fromRoute('catalogue', [
-                        'action'   => 'brand-car',
+                        'action'   => 'brand-item',
                         'modgroup' => $mgRow->id,
                     ], [], true)
                 ];
             }
         }
 
-        $modifications = $this->brandCarGroupModifications($carId, null, $modificationId);
+        $modifications = $this->brandItemGroupModifications($carId, null, $modificationId);
         if ($modifications) {
             $modificationGroups[] = [
                 'name'          => null,
@@ -2063,10 +2063,10 @@ class CatalogueController extends AbstractActionController
         );
     }
 
-    private function brandCarModgroup(
+    private function brandItemModgroup(
         $brand,
         array $currentCar,
-        $brandCarCatname,
+        $brandItemCatname,
         $path,
         $modgroupId,
         $modId,
@@ -2105,9 +2105,9 @@ class CatalogueController extends AbstractActionController
                     $pictures[] = [
                         'src'  => $imageInfo ? $imageInfo->getSrc() : null,
                         'url'  => $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-picture',
+                            'action'        => 'brand-item-picture',
                             'brand_catname' => $brand['catname'],
-                            'car_catname'   => $brandCarCatname,
+                            'car_catname'   => $brandItemCatname,
                             'path'          => $path,
                             'exact'         => false,
                             'picture_id'    => $pictureRow['row']['identity']
@@ -2141,7 +2141,7 @@ class CatalogueController extends AbstractActionController
                 'nameParams' => $nameParams,
                 'name'       => $modification['name'],
                 'url'        => $this->url()->fromRoute('catalogue', [
-                    'action' => 'brand-car-pictures',
+                    'action' => 'brand-item-pictures',
                     'mod'    => $modification['id']
                 ], [], true),
                 'pictures'      => $pictures,
@@ -2176,7 +2176,7 @@ class CatalogueController extends AbstractActionController
         $hasHtml = (bool)$currentCar['text'];
 
         return [
-            'modificationGroups' => $this->brandCarModifications($currentCar['id'], $modId),
+            'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
             'modgroup'         => true,
             'breadcrumbs'      => $breadcrumbs,
             'car'              => $currentCar,
@@ -2189,10 +2189,10 @@ class CatalogueController extends AbstractActionController
         ];
     }
 
-    private function brandCarGroup(
+    private function brandItemGroup(
         $brand,
         array $currentCar,
-        $brandCarCatname,
+        $brandItemCatname,
         $path,
         $modgroupId,
         $modId,
@@ -2260,9 +2260,9 @@ class CatalogueController extends AbstractActionController
                     'name' => $this->pic()->name($pictureRow, $language),
                     'src'  => $imageInfo ? $imageInfo->getSrc() : null,
                     'url'  => $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car-picture',
+                        'action'        => 'brand-item-picture',
                         'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandCarCatname,
+                        'car_catname'   => $brandItemCatname,
                         'path'          => $path,
                         'exact'         => true,
                         'picture_id'    => $pictureRow['identity'] ? $pictureRow['identity'] : $pictureRow['id']
@@ -2331,7 +2331,7 @@ class CatalogueController extends AbstractActionController
         return [
             'car'           => $currentCar,
             'otherNames'    => $otherNames,
-            'modificationGroups' => $this->brandCarModifications($currentCar['id'], $modId),
+            'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
             'paginator'     => $paginator,
             'breadcrumbs'   => $breadcrumbs,
             'type'          => $type,
@@ -2343,9 +2343,9 @@ class CatalogueController extends AbstractActionController
             'currentPictures'      => $currentPictures,
             'currentPicturesCount' => $currentPicturesCount,
             'currentPicturesUrl'   => $this->url()->fromRoute('catalogue', [
-                'action'        => 'brand-car-pictures',
+                'action'        => 'brand-item-pictures',
                 'brand_catname' => $brand['catname'],
-                'car_catname'   => $brandCarCatname,
+                'car_catname'   => $brandItemCatname,
                 'path'          => $path,
                 'exact'         => true,
                 'page'          => null
@@ -2356,7 +2356,7 @@ class CatalogueController extends AbstractActionController
                 'detailsUrl' => function ($listCar) use (
                     $brand,
                     $currentCarId,
-                    $brandCarCatname,
+                    $brandItemCatname,
                     $path,
                     $carParentTable
                 ) {
@@ -2388,15 +2388,15 @@ class CatalogueController extends AbstractActionController
                     ]);
 
                     return $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car',
+                        'action'        => 'brand-item',
                         'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandCarCatname,
+                        'car_catname'   => $brandItemCatname,
                         'path'          => $currentPath
                     ]);
                 },
                 'allPicturesUrl' => function ($listCar) use (
                     $brand,
-                    $brandCarCatname,
+                    $brandItemCatname,
                     $path,
                     $currentCarId,
                     $carParentTable
@@ -2412,9 +2412,9 @@ class CatalogueController extends AbstractActionController
                             $carParentRow->catname
                         ]);
                         return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-pictures',
+                            'action'        => 'brand-item-pictures',
                             'brand_catname' => $brand['catname'],
-                            'car_catname'   => $brandCarCatname,
+                            'car_catname'   => $brandItemCatname,
                             'path'          => $currentPath,
                             'exact'         => false
                         ]);
@@ -2427,7 +2427,7 @@ class CatalogueController extends AbstractActionController
                     $brand,
                     $hasChildSpecs,
                     $carParentTable,
-                    $brandCarCatname,
+                    $brandItemCatname,
                     $path,
                     $currentCarId,
                     $type
@@ -2443,9 +2443,9 @@ class CatalogueController extends AbstractActionController
                             ]);
 
                             return $this->url()->fromRoute('catalogue', [
-                                'action'        => 'brand-car-specifications',
+                                'action'        => 'brand-item-specifications',
                                 'brand_catname' => $brand['catname'],
-                                'car_catname'   => $brandCarCatname,
+                                'car_catname'   => $brandItemCatname,
                                 'path'          => $currentPath,
                             ]);
                         }
@@ -2470,9 +2470,9 @@ class CatalogueController extends AbstractActionController
                     }
 
                     return $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car-specifications',
+                        'action'        => 'brand-item-specifications',
                         'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandCarCatname,
+                        'car_catname'   => $brandItemCatname,
                         'path'          => $path,
                         'type'          => $typeStr
                     ]);
@@ -2515,7 +2515,7 @@ class CatalogueController extends AbstractActionController
                 ) use (
                     $brand,
                     $currentCarId,
-                    $brandCarCatname,
+                    $brandItemCatname,
                     $path,
                     $carParentTable
                 ) {
@@ -2534,9 +2534,9 @@ class CatalogueController extends AbstractActionController
                     ]);
 
                     return $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car-picture',
+                        'action'        => 'brand-item-picture',
                         'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandCarCatname,
+                        'car_catname'   => $brandItemCatname,
                         'path'          => $currentPath,
                         'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
                     ]);
@@ -2588,7 +2588,7 @@ class CatalogueController extends AbstractActionController
      * @param bool $exact
      * @return Zend_Db_Table_Select
      */
-    private function getBrandCarPicturesSelect($carId, $exact, $onlyAccepted = true)
+    private function getBrandItemPicturesSelect($carId, $exact, $onlyAccepted = true)
     {
         $select = $this->selectOrderFromPictures($onlyAccepted)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null);
@@ -2605,13 +2605,13 @@ class CatalogueController extends AbstractActionController
         return $select;
     }
 
-    public function brandCarPicturesAction()
+    public function brandItemPicturesAction()
     {
-        return $this->doBrandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
+        return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
 
             $exact = (bool)$this->params('exact');
 
-            $select = $this->getBrandCarPicturesSelect($currentCar['id'], $exact);
+            $select = $this->getBrandItemPicturesSelect($currentCar['id'], $exact);
 
             $modification = null;
             $modId = (int)$this->params('mod');
@@ -2638,11 +2638,11 @@ class CatalogueController extends AbstractActionController
 
             $picturesData = $this->pic()->listData($select, [
                 'width' => 4,
-                'url'   => function ($row) use ($brand, $brandCarCatname, $path, $exact) {
+                'url'   => function ($row) use ($brand, $brandItemCatname, $path, $exact) {
                     return $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car-picture',
+                        'action'        => 'brand-item-picture',
                         'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandCarCatname,
+                        'car_catname'   => $brandItemCatname,
                         'path'          => $path,
                         'exact'         => $exact,
                         'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
@@ -2662,7 +2662,7 @@ class CatalogueController extends AbstractActionController
                 'picturesCount' => $paginator->getTotalItemCount(),
                 'type'          => null,
                 'modification'  => $modification,
-                'modificationGroups' => $this->brandCarModifications($currentCar['id'], $modId),
+                'modificationGroups' => $this->brandItemModifications($currentCar['id'], $modId),
             ];
         });
     }
@@ -2715,13 +2715,13 @@ class CatalogueController extends AbstractActionController
         return $gallery;
     }
 
-    public function brandCarPictureAction()
+    public function brandItemPictureAction()
     {
-        return $this->doBrandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
+        return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
 
             $exact = (bool)$this->params('exact');
 
-            $select = $this->getBrandCarPicturesSelect($currentCar['id'], $exact, false);
+            $select = $this->getBrandItemPicturesSelect($currentCar['id'], $exact, false);
 
             return $this->pictureAction($select, function ($select, $picture) use ($breadcrumbs) {
                 return [
@@ -2731,7 +2731,7 @@ class CatalogueController extends AbstractActionController
                         [
                             'gallery2'   => true,
                             'galleryUrl' => $this->url()->fromRoute('catalogue', [
-                                'action'  => 'brand-car-gallery',
+                                'action'  => 'brand-item-gallery',
                                 'gallery' => $this->galleryType($picture)
                             ], [], true)
                         ]
@@ -2741,12 +2741,12 @@ class CatalogueController extends AbstractActionController
         });
     }
 
-    public function brandCarGalleryAction()
+    public function brandItemGalleryAction()
     {
-        return $this->doBrandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
+        return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
 
             $exact = (bool)$this->params('exact');
-            $select = $this->getBrandCarPicturesSelect($currentCar['id'], $exact, false);
+            $select = $this->getBrandItemPicturesSelect($currentCar['id'], $exact, false);
 
             switch ($this->params('gallery')) {
                 case 'inbox':
@@ -2765,15 +2765,15 @@ class CatalogueController extends AbstractActionController
                 'pictureId' => $this->params()->fromQuery('pictureId'),
                 'reuseParams' => true,
                 'urlParams' => [
-                    'action' => 'brand-car-picture'
+                    'action' => 'brand-item-picture'
                 ]
             ]));
         });
     }
 
-    public function brandCarSpecificationsAction()
+    public function brandItemSpecificationsAction()
     {
-        return $this->doBrandCarAction(function ($brand, array $currentCar, $brandCarCatname, $path, $breadcrumbs) {
+        return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
 
             $currentCarId = $currentCar['id'];
 
@@ -2790,7 +2790,7 @@ class CatalogueController extends AbstractActionController
                     break;
             }
 
-            //$list = $this->catalogue()->getCarTable()->find($brandCarRow->car_id);
+            //$list = $this->catalogue()->getCarTable()->find($brandItemRow->car_id);
 
             $carTable = $this->catalogue()->getCarTable();
 
@@ -2864,8 +2864,8 @@ class CatalogueController extends AbstractActionController
             $db->select()
                 ->from($carTable->info('name'), 'count(1)')
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', (int)$brandId)
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', (int)$brandId)
         );
 
         return $carsCount >= $this->mostsMinCarsCount;
@@ -2979,7 +2979,7 @@ class CatalogueController extends AbstractActionController
                         $url = null;
                         foreach ($paths as $path) {
                             $url = $this->url()->fromRoute('catalogue', [
-                                'action'        => 'brand-car-picture',
+                                'action'        => 'brand-item-picture',
                                 'brand_catname' => $path['brand_catname'],
                                 'car_catname'   => $path['car_catname'],
                                 'path'          => $path['path'],

@@ -1051,7 +1051,7 @@ return [
                 'method' => 'post',
             ],
         ],
-        'ModerBrandCar' => [
+        'ModerBrandItem' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',

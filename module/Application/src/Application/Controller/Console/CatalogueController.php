@@ -14,14 +14,14 @@ class CatalogueController extends AbstractActionController
      * @var BrandVehicle
      */
     private $brandVehicle;
-    
+
     /**
      * @var PictureItem
      */
     private $pictureItem;
 
     public function __construct(
-        BrandVehicle $brandVehicle, 
+        BrandVehicle $brandVehicle,
         PictureItem $pictureItem
     ) {
         $this->brandVehicle = $brandVehicle;
@@ -34,27 +34,27 @@ class CatalogueController extends AbstractActionController
 
         Console::getInstance()->writeLine("done");
     }
-    
+
     public function migratePictureItemAction()
     {
         $pictureTable = new \Application\Model\DbTable\Picture();
-        
-        
+
+
         $offset = 0;
-        do { 
+        do {
             $rows = $pictureTable->fetchAll([
                 'car_id is not null',
                 'id > 800000'
             ], 'id', 500, $offset);
-            
+
             if (count($rows) <= 0) {
                 break;
             }
-            
+
             foreach ($rows as $row) {
                 Console::getInstance()->writeLine($row->id);
                 $this->pictureItem->setPictureItems($row->id, $row->car_id ? [$row->car_id] : null);
-                
+
                 $crop = null;
                 if ($row->crop_left || $row->crop_top || $row->crop_width || $row->crop_height) {
                     $crop = [
@@ -64,17 +64,16 @@ class CatalogueController extends AbstractActionController
                         'height' => $row->crop_height
                     ];
                 }
-                
+
                 $this->pictureItem->setProperties($row->id, $row->car_id, [
                     'perspective' => $row->perspective_id,
                     'crop'        => $crop
                 ]);
             }
-            
+
             $offset += 500;
             sleep(1);
-            
-        } while(true);
+        } while (true);
     }
 
     public function migrateVehicleTypeAction()

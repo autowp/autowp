@@ -107,7 +107,7 @@ class FactoriesController extends AbstractActionController
                 foreach ($cataloguePaths as $cataloguePath) {
                     $url = $this->url()->fromRoute('catalogue', [
                         'controller'    => 'catalogue',
-                        'action'        => 'brand-car',
+                        'action'        => 'brand-item',
                         'brand_catname' => $cataloguePath['brand_catname'],
                         'car_catname'   => $cataloguePath['car_catname'],
                         'path'          => $cataloguePath['path']

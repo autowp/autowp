@@ -31,7 +31,7 @@ class CategoryController extends AbstractActionController
     private $categoryLanguageTable;
 
     private $cache;
-    
+
     private $textStorage;
 
     public function __construct($cache, $textStorage)
@@ -614,7 +614,7 @@ class CategoryController extends AbstractActionController
                     ]);
                 }
             ]);
-            
+
             $description = null;
             if ($categoryLang['text_id']) {
                 $description = $this->textStorage->getText($categoryLang['text_id']);

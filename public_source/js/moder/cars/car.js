@@ -83,7 +83,7 @@ define(
                     
                     $catalogueTab = $(this);
                     
-                    $catalogueTab.find('form.brand-car-type').each(function() {
+                    $catalogueTab.find('form.brand-item-type').each(function() {
                         var $form = $(this),
                             $select = $form.find('select');
                         $select.on('change', function() {

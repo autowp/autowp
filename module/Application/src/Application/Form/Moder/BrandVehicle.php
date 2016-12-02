@@ -29,7 +29,7 @@ class BrandVehicle extends Form implements InputFilterProviderInterface
                 'type'    => 'Text',
                 'options' => [
                     'label'     => 'Catname',
-                    'maxlength' => DbTable\BrandCar::MAX_CATNAME,
+                    'maxlength' => DbTable\BrandItem::MAX_CATNAME,
                 ]
             ],
             [
@@ -38,10 +38,10 @@ class BrandVehicle extends Form implements InputFilterProviderInterface
                 'options' => [
                     'label'   => 'Type',
                     'options' => [
-                        DbTable\BrandCar::TYPE_DEFAULT => 'catalogue/stock-model',
-                        DbTable\BrandCar::TYPE_TUNING  => 'catalogue/related',
-                        DbTable\BrandCar::TYPE_SPORT   => 'catalogue/sport',
-                        DbTable\BrandCar::TYPE_DESIGN  => 'catalogue/design',
+                        DbTable\BrandItem::TYPE_DEFAULT => 'catalogue/stock-model',
+                        DbTable\BrandItem::TYPE_TUNING  => 'catalogue/related',
+                        DbTable\BrandItem::TYPE_SPORT   => 'catalogue/sport',
+                        DbTable\BrandItem::TYPE_DESIGN  => 'catalogue/design',
                     ],
                 ]
             ]
@@ -130,7 +130,7 @@ class BrandVehicle extends Form implements InputFilterProviderInterface
                         'name' => 'StringLength',
                         'options' => [
                             'min' => 0,
-                            'max' => DbTable\BrandCar::MAX_CATNAME
+                            'max' => DbTable\BrandItem::MAX_CATNAME
                         ]
                     ],
                     [

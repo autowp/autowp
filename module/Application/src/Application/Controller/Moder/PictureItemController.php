@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Application\Controller\Moder;
 
@@ -43,17 +43,17 @@ class PictureItemController extends AbstractActionController
      * @var Picture
      */
     private $pictureTable;
-    
+
     /**
      * @var PictureItem
      */
     private $pictureItem;
-    
+
     /**
      * @var Vehicle
      */
     private $itemTable;
-    
+
     public function __construct(
         Picture $pictureTable,
         PictureItem $pictureItem
@@ -62,7 +62,7 @@ class PictureItemController extends AbstractActionController
         $this->pictureTable = $pictureTable;
         $this->itemTable = new Vehicle();
     }
-    
+
     private function getPictureUrl(PictureRow $picture, $forceCanonical = false, $uri = null)
     {
         return $this->url()->fromRoute('moder/pictures/params', [
@@ -73,71 +73,71 @@ class PictureItemController extends AbstractActionController
             'uri'             => $uri
         ]);
     }
-    
+
     public function removeAction()
     {
         $canMove = $this->user()->isAllowed('picture', 'move');
         if (! $canMove) {
             return $this->forbiddenAction();
         }
-    
+
         $picture = $this->pictureTable->find($this->params('picture_id'))->current();
         if (! $picture) {
             return $this->notFoundAction();
         }
-    
+
         $item = $this->itemTable->find($this->params('item_id'))->current();
         if (! $item) {
             return $this->notFoundAction();
         }
-    
+
         $this->pictureItem->remove($picture->id, $item->id);
-    
+
         $this->pictureTable->refreshPictureCounts($this->pictureItem, $picture);
-    
+
         return $this->redirect()->toUrl($this->getPictureUrl($picture));
     }
-    
+
     public function saveAreaAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-    
+
         $picture = $this->pictureTable->find($this->params('picture_id'))->current();
         if (! $picture) {
             return $this->notFoundAction();
         }
-        
+
         $item = $this->itemTable->find($this->params('item_id'))->current();
         if (! $item) {
             return $this->notFoundAction();
         }
-    
+
         $left = round($this->params()->fromPost('x'));
         $top = round($this->params()->fromPost('y'));
         $width = round($this->params()->fromPost('w'));
         $height = round($this->params()->fromPost('h'));
-    
+
         $left = max(0, $left);
         $left = min($picture->width, $left);
         $width = max(1, $width);
         $width = min($picture->width, $width);
-    
+
         $top = max(0, $top);
         $top = min($picture->height, $top);
         $height = max(1, $height);
         $height = min($picture->height, $height);
-    
+
         if ($left > 0 || $top > 0 || $width < $picture->width || $height < $picture->height) {
-            $area =  [
+            $area = [
                 'left'   => $left,
                 'top'    => $top,
                 'width'  => $width,
                 'height' => $height
             ];
         } else {
-            $area =  [
+            $area = [
                 'left'   => null,
                 'top'    => null,
                 'width'  => null,
@@ -147,12 +147,12 @@ class PictureItemController extends AbstractActionController
         $this->pictureItem->setProperties($picture->id, $item->id, [
             'area' => $area
         ]);
-    
+
         $this->log(sprintf(
             'Выделение области на картинке %s',
             htmlspecialchars($this->pic()->name($picture, $this->language()))
-            ), [$picture]);
-    
+        ), [$picture]);
+
         return new JsonModel([
             'ok' => true
         ]);

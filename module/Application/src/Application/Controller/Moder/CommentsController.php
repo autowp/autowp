@@ -34,8 +34,8 @@ class CommentsController extends AbstractActionController
 
         $brandRows = $brandTable->fetchAll(
             $brandTable->select(true)
-                /*->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                /*->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                 ->join('pictures', 'pictures.car_id = car_parent_cache.car_id', null)
                 ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->join('comments_messages', 'comments_messages.item_id = pictures.id', null)
@@ -101,8 +101,8 @@ class CommentsController extends AbstractActionController
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                    ->where('brands_cars.brand_id = ?', $values['brand_id']);
+                    ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                    ->where('brand_item.brand_id = ?', $values['brand_id']);
             }
 
             if ($values['car_id']) {

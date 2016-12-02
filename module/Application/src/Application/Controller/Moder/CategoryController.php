@@ -25,12 +25,12 @@ class CategoryController extends AbstractActionController
      * @var Category
      */
     private $table;
-    
+
     /**
      * @var Form
      */
     private $textForm;
-    
+
     private $textStorage;
 
     /**
@@ -45,12 +45,12 @@ class CategoryController extends AbstractActionController
         $this->table = new Category();
         $this->langTable = new CategoryLanguage();
     }
-    
+
     private function canEdit()
     {
         return false && $this->user()->isAllowed('category', 'edit');
     }
-    
+
     private function canEditText()
     {
         return $this->user()->isAllowed('category', 'edit-text');
@@ -144,7 +144,7 @@ class CategoryController extends AbstractActionController
     {
         $canEdit = $this->canEdit();
         $canEditText = $this->canEditText();
-        
+
         if (! $canEdit && ! $canEditText) {
             return $this->forbiddenAction();
         }
@@ -160,14 +160,14 @@ class CategoryController extends AbstractActionController
                 return $this->notFoundAction();
             }
         } else {
-            if (!$canEdit) {
+            if (! $canEdit) {
                 return $this->forbiddenAction();
             }
             $category = $this->table->createRow([
                 'parent_id' => $this->params('parent_id')
             ]);
         }
-        
+
         $tab = $this->params('tab', 'meta');
 
         $values = $category->toArray();
@@ -175,7 +175,6 @@ class CategoryController extends AbstractActionController
 
         if ($category->id) {
             foreach ($languages as $lang) {
-                
                 $langCategory = $this->langTable->fetchRow([
                     'category_id = ?' => $category->id,
                     'language = ?'    => $lang
@@ -183,23 +182,23 @@ class CategoryController extends AbstractActionController
                 if ($langCategory) {
                     $values[$lang] = $langCategory->toArray();
                 }
-                
+
                 $textForm = clone $this->textForm;
-                
+
                 $textForm->setAttribute('action', $this->url()->fromRoute('moder/category/params', [
                     'category_id' => $category['id'],
                     'action'      => 'save-text',
                     'language'    => $lang
                 ]));
-                
+
                 if ($langCategory && $langCategory->text_id) {
                     $text = $this->textStorage->getText($langCategory->text_id);
                     $textForm->populateValues([
                         'markdown' => $text
                     ]);
                 }
-                
-                $langData[$lang]= [
+
+                $langData[$lang] = [
                     'form'       => $textForm,
                     'text_id'    => $langCategory ? $langCategory->text_id : null,
                     'name'       => $langCategory ? $langCategory->name : null,
@@ -209,18 +208,18 @@ class CategoryController extends AbstractActionController
         }
 
         $form = null;
-        
+
         if ($canEdit) {
             $form->populateValues($values);
-    
+
             $request = $this->getRequest();
             if ($request->isPost()) {
                 $form->setData($this->params()->fromPost());
                 if ($form->isValid()) {
                     $values = $form->getData();
-                    
+
                     $needRebuild = ! $category->id || $category->parent_id != $values['parent_id'];
-    
+
                     $category->setFromArray([
                         'parent_id'      => $values['parent_id'] ? $values['parent_id'] : null,
                         'name'           => $values['name'],
@@ -228,16 +227,16 @@ class CategoryController extends AbstractActionController
                         'catname'        => $values['catname'],
                     ]);
                     $category->save();
-    
+
                     foreach ($languages as $lang) {
                         $langValues = $values[$lang];
                         unset($values[$lang]);
-    
+
                         $langCategory = $this->langTable->fetchRow([
                             'category_id = ?' => $category->id,
                             'language = ?'    => $lang
                         ]);
-    
+
                         if (! $langCategory) {
                             $langCategory = $this->langTable->fetchNew();
                             $langCategory->setFromArray([
@@ -245,16 +244,16 @@ class CategoryController extends AbstractActionController
                                 'language'    => $lang
                             ]);
                         }
-    
+
                         $langCategory->setFromArray($langValues);
                         $langCategory->save();
                     }
-    
+
                     if ($needRebuild) {
                         $cpTable = new CategoryParent();
                         $cpTable->rebuild();
                     }
-    
+
                     return $this->redirect()->toRoute('moder/category/params', [
                         'id' => $category->id
                     ], [], true);
@@ -311,8 +310,8 @@ class CategoryController extends AbstractActionController
             $brandNames = $brandAdapter->fetchPairs(
                 $brandAdapter->select()
                     ->from($brandTable->info('name'), ['id', 'name'])
-                    ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                    ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                    ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                    ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                     ->where('car_parent_cache.car_id = ?', $carRow->id)
                     ->group('brands.id')
             );
@@ -328,8 +327,8 @@ class CategoryController extends AbstractActionController
                         ->where('childs.diff > 0')
                         ->where('childs.car_id = ?', $carRow->id)
                         ->join(['parents' => 'car_parent_cache'], 'cars.id = parents.car_id', null)
-                        ->join('brands_cars', 'parents.parent_id = brands_cars.car_id', null)
-                        ->where('brands_cars.brand_id = ?', $brandId)
+                        ->join('brand_item', 'parents.parent_id = brand_item.car_id', null)
+                        ->where('brand_item.brand_id = ?', $brandId)
                         ->join(['parents2' => 'car_parent_cache'], 'cars.id = parents2.car_id', null)
                         ->join('category_car', 'parents2.parent_id = category_car.car_id', null)
                         ->where('category_car.category_id = ?', $category->id)
@@ -475,7 +474,7 @@ class CategoryController extends AbstractActionController
             'force_canonical' => $full
         ]);
     }
-    
+
     public function saveTextAction()
     {
         if (! $this->canEdit() && ! $this->canEditText()) {
@@ -483,27 +482,27 @@ class CategoryController extends AbstractActionController
         }
 
         $user = $this->user()->get();
-        
+
         $category = $this->table->find($this->params('category_id'))->current();
         if (! $category) {
             return $this->notFoundAction();
         }
-        
+
         $language = (string)$this->params('language');
-        
+
         $langCategory = $this->langTable->fetchRow([
             'category_id = ?' => $category->id,
             'language = ?'    => $language
         ]);
-        if (!$langCategory) {
+        if (! $langCategory) {
             $langCategory = $this->langTable->createRow([
                 'category_id' => $category->id,
                 'language'    => $language
             ]);
         }
-        
+
         $text = (string)$this->params()->fromPost('markdown');
-        
+
         if ($langCategory->text_id) {
             $this->textStorage->setText($langCategory->text_id, $text, $user->id);
         } elseif ($text) {
@@ -511,7 +510,7 @@ class CategoryController extends AbstractActionController
             $langCategory->text_id = $textId;
             $langCategory->save();
         }
-        
+
         return $this->redirect()->toRoute('moder/category/params', [
             'action' => 'item',
             'id'     => $category->id,

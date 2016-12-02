@@ -216,8 +216,8 @@ class TelegramService
             case Picture::VEHICLE_TYPE_ID:
                 $brandIds = $db->fetchCol(
                     $db->select()
-                        ->from('brands_cars', 'brand_id')
-                        ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                        ->from('brand_item', 'brand_id')
+                        ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                         ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
                         ->where('picture_item.picture_id = ?', $picture->id)
                 );

@@ -29,11 +29,11 @@ class PictureItem
         $pictureId = (int)$pictureId;
         $itemId = (int)$itemId;
 
-        if (!$pictureId) {
+        if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
         }
 
-        if (!$itemId) {
+        if (! $itemId) {
             throw new InvalidArgumentException("Item id is invalid");
         }
 
@@ -50,17 +50,17 @@ class PictureItem
         $pictureId = (int)$pictureId;
         $itemId = (int)$itemId;
 
-        if (!$pictureId) {
+        if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
         }
 
-        if (!$itemId) {
+        if (! $itemId) {
             throw new InvalidArgumentException("Item id is invalid");
         }
 
         $row = $this->getRow($pictureId, $itemId);
 
-        if (!$row) {
+        if (! $row) {
             $row = $this->table->createRow([
                 'picture_id' => $pictureId,
                 'item_id'    => $itemId
@@ -68,20 +68,20 @@ class PictureItem
             $row->save();
         }
     }
-    
+
     public function remove($pictureId, $itemId)
     {
         $pictureId = (int)$pictureId;
         $itemId = (int)$itemId;
-        
-        if (!$pictureId) {
+
+        if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
         }
-        
-        if (!$itemId) {
+
+        if (! $itemId) {
             throw new InvalidArgumentException("Item id is invalid");
         }
-        
+
         $row = $this->getRow($pictureId, $itemId);
         if ($row) {
             $row->delete();
@@ -97,13 +97,13 @@ class PictureItem
     {
         $newItemId = (int)$newItemId;
 
-        if (!$newItemId) {
+        if (! $newItemId) {
             throw new InvalidArgumentException("Item id is invalid");
         }
 
         $row = $this->getRow($pictureId, $oldItemId);
 
-        if (!$row) {
+        if (! $row) {
             throw new \Exception("Item not found");
         }
 
@@ -115,13 +115,13 @@ class PictureItem
     {
         $pictureId = (int)$pictureId;
 
-        if (!$pictureId) {
+        if (! $pictureId) {
             throw new InvalidArgumentException("Picture id is invalid");
         }
 
         foreach ($itemIds as &$itemId) {
             $itemId = (int)$itemId;
-            if (!$itemId) {
+            if (! $itemId) {
                 throw new InvalidArgumentException("Item id is invalid");
             }
         }
@@ -130,7 +130,7 @@ class PictureItem
         foreach ($itemIds as $itemId) {
             $row = $this->getRow($pictureId, $itemId);
 
-            if (!$row) {
+            if (! $row) {
                 $row = $this->table->createRow([
                     'picture_id' => $pictureId,
                     'item_id'    => $itemId
@@ -158,7 +158,7 @@ class PictureItem
                 ->where('picture_id = ?', $pictureId)
         );
     }
-    
+
     public function getData(array $options)
     {
         $defaults = [
@@ -167,30 +167,29 @@ class PictureItem
             'onlyWithArea' => false
         ];
         $options = array_replace($defaults, $options);
-        
+
         $db = $this->table->getAdapter();
-        
+
         $select = $db->select()
             ->from($this->table->info('name'), [
-                'picture_id', 'item_id', 
+                'picture_id', 'item_id',
                 'crop_left', 'crop_top', 'crop_width', 'crop_height'
             ]);
-        
+
         if ($options['onlyWithArea']) {
             $select->where('crop_left and crop_top and crop_width and crop_height');
         }
-        
+
         if ($options['picture']) {
             $select->where('picture_id = ?', $options['picture']);
         }
-        
+
         if ($options['item']) {
             $select->where('item_id = ?', $options['item']);
         }
-        
+
         $result = [];
         foreach ($db->fetchAll($select) as $row) {
-            
             $area = null;
             if ($row['crop_left'] && $row['crop_top'] && $row['crop_width'] && $row['crop_height']) {
                 $area = [
@@ -198,14 +197,14 @@ class PictureItem
                     (int)$row['crop_width'], (int)$row['crop_height'],
                 ];
             }
-            
+
             $result[] = [
-                'picture_id' => $row['picture_id'], 
+                'picture_id' => $row['picture_id'],
                 'item_id'    => $row['item_id'],
                 'area'       => $area
             ];
         }
-        
+
         return $result;
     }
 
@@ -244,24 +243,24 @@ class PictureItem
     public function getPerspective($pictureId, $itemId)
     {
         $row = $this->getRow($pictureId, $itemId);
-        if (!$row) {
+        if (! $row) {
             return null;
         }
 
         return $row->perspective_id;
     }
-    
+
     public function getArea($pictureId, $itemId)
     {
         $row = $this->getRow($pictureId, $itemId);
-        if (!$row) {
+        if (! $row) {
             return null;
         }
-        
-        if (!$row->crop_left || !$row->crop_top || !$row->crop_width || !$row->crop_height) {
+
+        if (! $row->crop_left || ! $row->crop_top || ! $row->crop_width || ! $row->crop_height) {
             return null;
         }
-        
+
         return [
             (int)$row->crop_left,  (int)$row->crop_top,
             (int)$row->crop_width, (int)$row->crop_height,
