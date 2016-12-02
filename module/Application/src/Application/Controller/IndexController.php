@@ -186,7 +186,7 @@ class IndexController extends AbstractActionController
         if ($totalPictures > 6) {
             foreach ($cataloguePaths as $path) {
                 $url = $this->url()->fromRoute('catalogue', [
-                    'action'        => 'brand-car-pictures',
+                    'action'        => 'brand-item-pictures',
                     'brand_catname' => $path['brand_catname'],
                     'car_catname'   => $path['car_catname'],
                     'path'          => $path['path']
@@ -206,7 +206,7 @@ class IndexController extends AbstractActionController
                 $items[] = [
                     'icon'  => 'list-alt',
                     'url'   => $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car-specifications',
+                        'action'        => 'brand-item-specifications',
                         'brand_catname' => $path['brand_catname'],
                         'car_catname'   => $path['car_catname'],
                         'path'          => $path['path']
@@ -423,7 +423,7 @@ class IndexController extends AbstractActionController
                             $url = null;
                             foreach ($paths as $path) {
                                 $url = $this->url()->fromRoute('catalogue', [
-                                    'action'        => 'brand-car-picture',
+                                    'action'        => 'brand-item-picture',
                                     'brand_catname' => $path['brand_catname'],
                                     'car_catname'   => $path['car_catname'],
                                     'path'          => $path['path'],

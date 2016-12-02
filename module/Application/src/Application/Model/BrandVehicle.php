@@ -16,7 +16,7 @@ class BrandVehicle
     private $brandTable;
 
     /**
-     * @var DbTable\BrandCar
+     * @var DbTable\BrandItem
      */
     private $brandVehicleTable;
 
@@ -33,7 +33,7 @@ class BrandVehicle
 
         $this->brandTable = new DbTable\Brand();
         $this->vehicleTable = new DbTable\Vehicle();
-        $this->brandVehicleTable = new DbTable\BrandCar();
+        $this->brandVehicleTable = new DbTable\BrandItem();
         $this->brandVehicleLanguageTable = new DbTable\Brand\VehicleLanguage();
     }
 
@@ -179,7 +179,7 @@ class BrandVehicle
         $brandVehicleRow = $this->brandVehicleTable->createRow([
             'brand_id' => $brandRow->id,
             'car_id'   => $vehicleRow->id,
-            'type'     => DbTable\BrandCar::TYPE_DEFAULT,
+            'type'     => DbTable\BrandItem::TYPE_DEFAULT,
             'catname'  => $catname,
             'is_auto'  => 1
         ]);

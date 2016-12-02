@@ -176,7 +176,6 @@ class Car extends AbstractPlugin
         $carParentTable = new DbTable\Vehicle\ParentTable();
         $carParentAdapter = $carParentTable->getAdapter();
         $brandTable = new DbTable\Brand();
-        $brandCarTable = new DbTable\BrandCar();
         $categoryTable = new DbTable\Category();
 
         $carIds = [];
@@ -295,11 +294,11 @@ class Car extends AbstractPlugin
                     'brand_name'    => 'name',
                     'brand_catname' => 'folder'
                 ])
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
-                    'brand_car_catname' => 'catname'
+                ->join('brand_item', 'brands.id = brand_item.brand_id', [
+                    'brand_item_catname' => 'catname'
                 ])
-                ->where('brands_cars.type = ?', DbTable\BrandCar::TYPE_DESIGN)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
+                ->where('brand_item.type = ?', DbTable\BrandItem::TYPE_DESIGN)
+                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', 'car_id')
                 ->where('car_parent_cache.car_id IN (?)', $carIds ? $carIds : 0)
                 ->group('car_parent_cache.car_id')
         );
@@ -307,9 +306,9 @@ class Car extends AbstractPlugin
             $carsDesignProject[$designCarsRow['car_id']] = [
                 'brandName' => $designCarsRow['brand_name'],
                 'url'       => $controller->url()->fromRoute('catalogue', [
-                    'action'        => 'brand-car',
+                    'action'        => 'brand-item',
                     'brand_catname' => $designCarsRow['brand_catname'],
-                    'car_catname'   => $designCarsRow['brand_car_catname']
+                    'car_catname'   => $designCarsRow['brand_item_catname']
                 ])
             ];
         }
@@ -390,7 +389,7 @@ class Car extends AbstractPlugin
                             $specsLinks[] = [
                                 'name' => null,
                                 'url'  => $controller->url()->fromRoute('catalogue', [
-                                    'action'        => 'brand-car-specifications',
+                                    'action'        => 'brand-item-specifications',
                                     'brand_catname' => $path['brand_catname'],
                                     'car_catname'   => $path['car_catname'],
                                     'path'          => $path['path']
@@ -452,7 +451,7 @@ class Car extends AbstractPlugin
                         $url = null;
                         foreach ($cataloguePaths as $cPath) {
                             $url = $controller->url()->fromRoute('catalogue', [
-                                'action'        => 'brand-car',
+                                'action'        => 'brand-item',
                                 'brand_catname' => $cPath['brand_catname'],
                                 'car_catname'   => $cPath['car_catname'],
                                 'path'          => $cPath['path']

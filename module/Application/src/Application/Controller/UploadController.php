@@ -450,8 +450,8 @@ class UploadController extends AbstractActionController
         $haveConcepts = (bool)$carTable->fetchRow(
             $carTable->select(true)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand['id'])
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('cars.is_concept')
         );
 
@@ -471,8 +471,8 @@ class UploadController extends AbstractActionController
                 ])
                 ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
-                ->join('brands_cars', 'cars.id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand['id'])
+                ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('NOT cars.is_concept')
                 ->order(['cars.name', 'cars.begin_year', 'cars.end_year'])
                 ->bind([
@@ -718,8 +718,8 @@ class UploadController extends AbstractActionController
                 ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand->id)
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand->id)
                 ->where('cars.is_concept')
                 ->order(['cars.name', 'cars.begin_year', 'cars.end_year'])
                 ->group('cars.id')

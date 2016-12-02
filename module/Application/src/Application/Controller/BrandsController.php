@@ -92,8 +92,8 @@ class BrandsController extends AbstractActionController
         $carList = $cars->fetchAll(
             $cars->select(true)
                 ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand->id)
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand->id)
                 ->where('cars.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY)')
                 ->group('cars.id')
                 ->order(['cars.add_datetime DESC'])

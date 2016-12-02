@@ -2,6 +2,7 @@
 
 namespace Application\Controller\Moder;
 
+use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Moder\Category as CategoryForm;
@@ -26,14 +27,33 @@ class CategoryController extends AbstractActionController
     private $table;
 
     /**
+     * @var Form
+     */
+    private $textForm;
+
+    private $textStorage;
+
+    /**
      * @var CategoryLanguage
      */
     private $langTable;
 
-    public function __construct()
+    public function __construct($textStorage, Form $textForm)
     {
+        $this->textStorage = $textStorage;
+        $this->textForm = $textForm;
         $this->table = new Category();
         $this->langTable = new CategoryLanguage();
+    }
+
+    private function canEdit()
+    {
+        return $this->user()->isAllowed('category', 'edit');
+    }
+
+    private function canEditText()
+    {
+        return $this->user()->isAllowed('category', 'edit-text');
     }
 
     private function getCategories($parentId = null)
@@ -48,8 +68,8 @@ class CategoryController extends AbstractActionController
         $result = [];
         foreach ($this->table->fetchAll($select) as $category) {
             $result[] = [
-                'id'   => $category->id,
-                'name' => $category->name,
+                'id'     => $category->id,
+                'name'   => $category->name,
                 'childs' => $this->getCategories($category->id)
             ];
         }
@@ -59,12 +79,16 @@ class CategoryController extends AbstractActionController
 
     public function indexAction()
     {
-        if (! $this->user()->isAllowed('category', 'edit')) {
+        $canEdit = $this->canEdit();
+        $canEditText = $this->canEditText();
+        if (! $canEdit && ! $canEditText) {
             return $this->forbiddenAction();
         }
 
         return [
-            'categories' => $this->getCategories()
+            'categories'  => $this->getCategories(),
+            'canEdit'     => $canEdit,
+            'canEditText' => $canEditText
         ];
     }
 
@@ -118,13 +142,14 @@ class CategoryController extends AbstractActionController
 
     public function itemAction()
     {
-        if (! $this->user()->isAllowed('category', 'edit')) {
+        $canEdit = $this->canEdit();
+        $canEditText = $this->canEditText();
+
+        if (! $canEdit && ! $canEditText) {
             return $this->forbiddenAction();
         }
 
         $languages = $this->getLanguages();
-
-        $form = $this->getForm();
 
         $id = (int)$this->params('id');
         if ($id) {
@@ -133,12 +158,18 @@ class CategoryController extends AbstractActionController
                 return $this->notFoundAction();
             }
         } else {
+            if (! $canEdit) {
+                return $this->forbiddenAction();
+            }
             $category = $this->table->createRow([
                 'parent_id' => $this->params('parent_id')
             ]);
         }
 
+        $tab = $this->params('tab', 'meta');
+
         $values = $category->toArray();
+        $langData = [];
 
         if ($category->id) {
             foreach ($languages as $lang) {
@@ -149,65 +180,102 @@ class CategoryController extends AbstractActionController
                 if ($langCategory) {
                     $values[$lang] = $langCategory->toArray();
                 }
+
+                $textForm = clone $this->textForm;
+
+                $textForm->setAttribute('action', $this->url()->fromRoute('moder/category/params', [
+                    'category_id' => $category['id'],
+                    'action'      => 'save-text',
+                    'language'    => $lang
+                ]));
+
+                if ($langCategory && $langCategory->text_id) {
+                    $text = $this->textStorage->getText($langCategory->text_id);
+                    $textForm->populateValues([
+                        'markdown' => $text
+                    ]);
+                }
+
+                $langData[$lang] = [
+                    'form'       => $textForm,
+                    'text_id'    => $langCategory ? $langCategory->text_id : null,
+                    'name'       => $langCategory ? $langCategory->name : null,
+                    'short_name' => $langCategory ? $langCategory->short_name : null
+                ];
             }
         }
 
-        $form->populateValues($values);
+        $form = null;
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $form->setData($this->params()->fromPost());
-            if ($form->isValid()) {
-                $values = $form->getData();
+        if ($canEdit) {
+            
+            $form = $this->getForm();
+            
+            $form->populateValues($values);
 
-                $category->setFromArray([
-                    'parent_id'      => $values['parent_id'] ? $values['parent_id'] : null,
-                    'name'           => $values['name'],
-                    'short_name'     => $values['short_name'],
-                    'catname'        => $values['catname'],
-                    'split_by_brand' => $values['split_by_brand'] ? 1 : 0,
-                ]);
-                $category->save();
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $form->setData($this->params()->fromPost());
+                if ($form->isValid()) {
+                    $values = $form->getData();
 
-                foreach ($languages as $lang) {
-                    $langValues = $values[$lang];
-                    unset($values[$lang]);
+                    $needRebuild = ! $category->id || $category->parent_id != $values['parent_id'];
 
-                    $langCategory = $this->langTable->fetchRow([
-                        'category_id = ?' => $category->id,
-                        'language = ?'    => $lang
+                    $category->setFromArray([
+                        'parent_id'      => $values['parent_id'] ? $values['parent_id'] : null,
+                        'name'           => $values['name'],
+                        'short_name'     => $values['short_name'],
+                        'catname'        => $values['catname'],
                     ]);
+                    $category->save();
 
-                    if (! $langCategory) {
-                        $langCategory = $this->langTable->fetchNew();
-                        $langCategory->setFromArray([
-                            'category_id' => $category->id,
-                            'language'    => $lang
+                    foreach ($languages as $lang) {
+                        $langValues = $values[$lang];
+                        unset($values[$lang]);
+
+                        $langCategory = $this->langTable->fetchRow([
+                            'category_id = ?' => $category->id,
+                            'language = ?'    => $lang
                         ]);
+
+                        if (! $langCategory) {
+                            $langCategory = $this->langTable->fetchNew();
+                            $langCategory->setFromArray([
+                                'category_id' => $category->id,
+                                'language'    => $lang
+                            ]);
+                        }
+
+                        $langCategory->setFromArray($langValues);
+                        $langCategory->save();
                     }
 
-                    $langCategory->setFromArray($langValues);
-                    $langCategory->save();
+                    if ($needRebuild) {
+                        $cpTable = new CategoryParent();
+                        $cpTable->rebuild();
+                    }
+
+                    return $this->redirect()->toRoute('moder/category/params', [
+                        'id' => $category->id
+                    ], [], true);
                 }
-
-                $cpTable = new CategoryParent();
-                $cpTable->rebuild();
-
-                return $this->redirect()->toRoute('moder/category/params', [
-                    'id' => $category->id
-                ], [], true);
             }
         }
 
         return [
-            'category' => $category,
-            'form'     => $form
+            'category'    => $category,
+            'form'        => $form,
+            'languages'   => $languages,
+            'langData'    => $langData,
+            'tab'         => $tab,
+            'canEdit'     => $canEdit,
+            'canEditText' => $canEditText,
         ];
     }
 
     public function organizeAction()
     {
-        if (! $this->user()->isAllowed('category', 'edit')) {
+        if (! $this->canEdit()) {
             return $this->forbiddenAction();
         }
 
@@ -243,8 +311,8 @@ class CategoryController extends AbstractActionController
             $brandNames = $brandAdapter->fetchPairs(
                 $brandAdapter->select()
                     ->from($brandTable->info('name'), ['id', 'name'])
-                    ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                    ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                    ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                    ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                     ->where('car_parent_cache.car_id = ?', $carRow->id)
                     ->group('brands.id')
             );
@@ -260,8 +328,8 @@ class CategoryController extends AbstractActionController
                         ->where('childs.diff > 0')
                         ->where('childs.car_id = ?', $carRow->id)
                         ->join(['parents' => 'car_parent_cache'], 'cars.id = parents.car_id', null)
-                        ->join('brands_cars', 'parents.parent_id = brands_cars.car_id', null)
-                        ->where('brands_cars.brand_id = ?', $brandId)
+                        ->join('brand_item', 'parents.parent_id = brand_item.car_id', null)
+                        ->where('brand_item.brand_id = ?', $brandId)
                         ->join(['parents2' => 'car_parent_cache'], 'cars.id = parents2.car_id', null)
                         ->join('category_car', 'parents2.parent_id = category_car.car_id', null)
                         ->where('category_car.category_id = ?', $category->id)
@@ -405,6 +473,49 @@ class CategoryController extends AbstractActionController
             'tab'    => $tab
         ], [
             'force_canonical' => $full
+        ]);
+    }
+
+    public function saveTextAction()
+    {
+        if (! $this->canEdit() && ! $this->canEditText()) {
+            return $this->forbiddenAction();
+        }
+
+        $user = $this->user()->get();
+
+        $category = $this->table->find($this->params('category_id'))->current();
+        if (! $category) {
+            return $this->notFoundAction();
+        }
+
+        $language = (string)$this->params('language');
+
+        $langCategory = $this->langTable->fetchRow([
+            'category_id = ?' => $category->id,
+            'language = ?'    => $language
+        ]);
+        if (! $langCategory) {
+            $langCategory = $this->langTable->createRow([
+                'category_id' => $category->id,
+                'language'    => $language
+            ]);
+        }
+
+        $text = (string)$this->params()->fromPost('markdown');
+
+        if ($langCategory->text_id) {
+            $this->textStorage->setText($langCategory->text_id, $text, $user->id);
+        } elseif ($text) {
+            $textId = $this->textStorage->createText($text, $user->id);
+            $langCategory->text_id = $textId;
+            $langCategory->save();
+        }
+
+        return $this->redirect()->toRoute('moder/category/params', [
+            'action' => 'item',
+            'id'     => $category->id,
+            'tab'    => $language
         ]);
     }
 }

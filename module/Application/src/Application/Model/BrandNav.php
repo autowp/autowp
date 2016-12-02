@@ -132,8 +132,8 @@ class BrandNav
                 $select = $db->select()
                     ->from('cars', new Zend_Db_Expr('1'))
                     ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                    ->where('brands_cars.brand_id = ?', $brand['id'])
+                    ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                    ->where('brand_item.brand_id = ?', $brand['id'])
                     ->where('cars.is_concept')
                     ->limit(1);
                 if ($db->fetchOne($select) > 0) {
@@ -311,19 +311,19 @@ class BrandNav
 
     private function carSectionGroupsSelect($brandId, $carTypeId, $nullType, $conceptsSeparatly)
     {
-        $brandCarTable = new DbTable\BrandCar();
-        $db = $brandCarTable->getAdapter();
+        $brandItemTable = new DbTable\BrandItem();
+        $db = $brandItemTable->getAdapter();
 
         $select = $db->select()
-            ->from($brandCarTable->info('name'), [
-                'brand_car_catname' => 'catname',
+            ->from($brandItemTable->info('name'), [
+                'brand_item_catname' => 'catname',
                 'brand_id'
             ])
-            ->join('cars', 'cars.id = brands_cars.car_id', [
+            ->join('cars', 'cars.id = brand_item.car_id', [
                 'car_id'   => 'id',
                 'car_name' => 'cars.name',
             ])
-            ->where('brands_cars.brand_id = ?', $brandId)
+            ->where('brand_item.brand_id = ?', $brandId)
             ->group('cars.id');
         if ($conceptsSeparatly) {
             $select->where('NOT cars.is_concept');
@@ -367,9 +367,9 @@ class BrandNav
 
     private function carSectionGroups($language, array $brand, array $section, $conceptsSeparatly, $carId)
     {
-        $brandCarTable = new DbTable\BrandCar();
+        $brandItemTable = new DbTable\BrandItem();
         $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
-        $db = $brandCarTable->getAdapter();
+        $db = $brandItemTable->getAdapter();
 
         $rows = [];
         if ($section['car_type_id']) {
@@ -392,16 +392,16 @@ class BrandNav
         $carLanguageTable = new DbTable\Vehicle\Language();
 
         $groups = [];
-        foreach ($rows as $brandCarRow) {
+        foreach ($rows as $brandItemRow) {
             $url = $this->url('catalogue', [
-                'action'        => 'brand-car',
+                'action'        => 'brand-item',
                 'brand_catname' => $brand['catname'],
-                'car_catname'   => $brandCarRow['brand_car_catname']
+                'car_catname'   => $brandItemRow['brand_item_catname']
             ]);
 
             $bvlRow = $brandVehicleLangaugeTable->fetchRow([
-                'vehicle_id = ?' => $brandCarRow['car_id'],
-                'brand_id = ?'   => $brandCarRow['brand_id'],
+                'vehicle_id = ?' => $brandItemRow['car_id'],
+                'brand_id = ?'   => $brandItemRow['brand_id'],
                 'language = ?'   => $language
             ]);
 
@@ -409,11 +409,11 @@ class BrandNav
                 $name = $bvlRow->name;
             } else {
                 $carLangRow = $carLanguageTable->fetchRow([
-                    'car_id = ?'   => (int)$brandCarRow['car_id'],
+                    'car_id = ?'   => (int)$brandItemRow['car_id'],
                     'language = ?' => (string)$language
                 ]);
 
-                $name = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
+                $name = $carLangRow ? $carLangRow->name : $brandItemRow['car_name'];
                 foreach ($aliases as $alias) {
                     $name = str_ireplace('by The ' . $alias . ' Company', '', $name);
                     $name = str_ireplace('by '.$alias, '', $name);
@@ -428,12 +428,12 @@ class BrandNav
                 $name = trim(preg_replace("|[[:space:]]+|", ' ', $name));
                 $name = ltrim($name, '/');
                 if (! $name) {
-                    $name = $carLangRow ? $carLangRow->name : $brandCarRow['car_name'];
+                    $name = $carLangRow ? $carLangRow->name : $brandItemRow['car_name'];
                 }
             }
 
             $groups[] = [
-                'car_id' => $brandCarRow['car_id'],
+                'car_id' => $brandItemRow['car_id'],
                 'url'    => $url,
                 'name'   => $name,
             ];

@@ -62,15 +62,12 @@ class PictureNameFormatter
                 $result = [];
 
                 if (count($picture['items']) > 1) {
-
                     foreach ($picture['items'] as $item) {
                         $result[] = $item['name'];
                     }
 
                     return implode(', ', $result);
-
                 } elseif (count($picture['items']) == 1) {
-
                     $item = $picture['items'][0];
 
                     $result = [];
@@ -129,14 +126,11 @@ class PictureNameFormatter
             case Picture::VEHICLE_TYPE_ID:
                 $result = [];
                 if (count($picture['items']) > 1) {
-
                     foreach ($picture['items'] as $item) {
                         $result[] = $this->renderer->escapeHtml($item['name']);
                     }
                     return implode(', ', $result);
-
                 } elseif (count($picture['items']) == 1) {
-
                     $item = $picture['items'][0];
 
                     $result = [];

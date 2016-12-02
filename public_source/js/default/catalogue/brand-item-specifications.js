@@ -1,5 +1,4 @@
 define(
-    'default/catalogue/brand-car-specifications',
     ['jquery', 'bootstrap', 'specifications'],
     function($, Bootstrap, Specs) {
         return {

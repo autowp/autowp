@@ -212,7 +212,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
         $this->assertModuleName('application');
         $this->assertControllerName(CatalogueController::class);
         $this->assertMatchedRouteName('catalogue');
-        $this->assertActionName('brand-car-picture');
+        $this->assertActionName('brand-item-picture');
     }
 
     public function testBrandMosts()

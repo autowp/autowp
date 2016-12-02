@@ -54,13 +54,6 @@ class Category extends Form implements InputFilterProviderInterface
                     'maxlength' => 255,
                     'size'      => 80
                 ]
-            ],
-            [
-                'name'    => 'split_by_brand',
-                'type'    => 'Checkbox',
-                'options' => [
-                    'label'     => 'Split by brand'
-                ]
             ]
         ];
 
@@ -139,9 +132,6 @@ class Category extends Form implements InputFilterProviderInterface
                     ['name' => 'StringTrim'],
                     ['name' => SingleSpaces::class]
                 ]
-            ],
-            'split_by_brand' => [
-                'required' => false
             ]
         ];
     }

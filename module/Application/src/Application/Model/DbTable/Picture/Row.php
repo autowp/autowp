@@ -75,7 +75,6 @@ class Row extends \Application\Db\Table\Row
                 break;
 
             case Picture::VEHICLE_TYPE_ID:
-
                 $vehicleTable = new Vehicle();
                 $cars = $vehicleTable->fetchAll(
                     $vehicleTable->select(true)
@@ -84,13 +83,12 @@ class Row extends \Application\Db\Table\Row
                 );
 
                 if (count($cars) > 1) {
-
                     $brandTable = new BrandTable();
 
                     $brands = $brandTable->fetchAll(
                         $brandTable->select(true)
-                            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                            ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                            ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                             ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
                             ->where('picture_item.picture_id = ?', $this->id)
                     );
@@ -106,9 +104,7 @@ class Row extends \Application\Db\Table\Row
                     $firstChar = mb_substr($brandsFolder, 0, 1);
 
                     $result = $firstChar . '/' . $brandsFolder .'/mixed';
-
                 } elseif (count($cars) == 1) {
-
                     $car = $cars[0];
 
                     $carCatname = $filenameFilter->filter($car->name);
@@ -117,8 +113,8 @@ class Row extends \Application\Db\Table\Row
 
                     $brands = $brandTable->fetchAll(
                         $brandTable->select(true)
-                            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                            ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                            ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                             ->where('car_parent_cache.car_id = ?', $car->id)
                     );
 

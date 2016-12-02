@@ -36,9 +36,9 @@ class CarsController extends AbstractActionController
     private $carParentTable;
 
     /**
-     * @var DbTable\BrandCar
+     * @var DbTable\BrandItem
      */
-    private $brandCarTable;
+    private $brandItemTable;
 
     /**
      * @var DbTable\Brand
@@ -67,7 +67,7 @@ class CarsController extends AbstractActionController
     /**
      * @var Form
      */
-    private $brandCarForm;
+    private $brandItemForm;
 
     /**
      * @var Form
@@ -111,7 +111,7 @@ class CarsController extends AbstractActionController
         Form $descForm,
         Form $textForm,
         Form $twinsForm,
-        Form $brandCarForm,
+        Form $brandItemForm,
         Form $carParentForm,
         Form $filterForm,
         BrandVehicle $brandVehicle,
@@ -126,7 +126,7 @@ class CarsController extends AbstractActionController
         $this->descForm = $descForm;
         $this->textForm = $textForm;
         $this->twinsForm = $twinsForm;
-        $this->brandCarForm = $brandCarForm;
+        $this->brandItemForm = $brandItemForm;
         $this->carParentForm = $carParentForm;
         $this->filterForm = $filterForm;
         $this->brandVehicle = $brandVehicle;
@@ -300,9 +300,9 @@ class CarsController extends AbstractActionController
                         'cars.id = car_parent_cache.car_id and cars.id <> car_parent_cache.parent_id',
                         null
                     )
-                    ->joinLeft('brands_cars', 'cars.id = brands_cars.car_id', null)
+                    ->joinLeft('brand_item', 'cars.id = brand_item.car_id', null)
                     ->where('car_parent_cache.car_id IS NULL')
-                    ->where('brands_cars.car_id IS NULL');
+                    ->where('brand_item.car_id IS NULL');
             }
 
             switch ($values['order']) {
@@ -925,7 +925,7 @@ class CarsController extends AbstractActionController
         );
         $catalogueLinksCount += $db->fetchOne(
             $db->select()
-                ->from('brands_cars', 'count(1)')
+                ->from('brand_item', 'count(1)')
                 ->where('car_id = ?', $car->id)
         );
 
@@ -1158,7 +1158,7 @@ class CarsController extends AbstractActionController
     }
 
 
-    public function setBrandCarTypeAction()
+    public function setBrandItemTypeAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
@@ -1184,18 +1184,18 @@ class CarsController extends AbstractActionController
 
         $type = (int)$this->params()->fromPost('type');
 
-        $brandCarTable = new DbTable\BrandCar();
-        $brandCarRow = $brandCarTable->fetchRow([
+        $brandItemTable = new DbTable\BrandItem();
+        $brandItemRow = $brandItemTable->fetchRow([
             'brand_id = ?' => $brand->id,
             'car_id = ?'   => $car->id
         ]);
 
-        if (! $brandCarRow) {
+        if (! $brandItemRow) {
             return $this->notFoundAction();
         }
 
-        $brandCarRow->type = $type;
-        $brandCarRow->save();
+        $brandItemRow->type = $type;
+        $brandItemRow->save();
 
         if ($this->getRequest()->isXmlHttpRequest()) {
             return new JsonModel([
@@ -1206,7 +1206,7 @@ class CarsController extends AbstractActionController
         }
     }
 
-    public function setBrandCarCatnameAction()
+    public function setBrandItemCatnameAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
@@ -1230,30 +1230,30 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $brandCarTable = new DbTable\BrandCar();
-        $brandCarRow = $brandCarTable->fetchRow([
+        $brandItemTable = new DbTable\BrandItem();
+        $brandItemRow = $brandItemTable->fetchRow([
             'brand_id = ?' => $brand->id,
             'car_id = ?'   => $car->id
         ]);
 
-        if (! $brandCarRow) {
+        if (! $brandItemRow) {
             return $this->notFoundAction();
         }
 
         $ok = false;
-        $this->brandCarForm->setData($this->params()->fromPost());
-        if ($this->brandCarForm->isValid()) {
-            $values = $this->brandCarForm->getData();
+        $this->brandItemForm->setData($this->params()->fromPost());
+        if ($this->brandItemForm->isValid()) {
+            $values = $this->brandItemForm->getData();
 
-            $sameBrandCarRow = $brandCarTable->fetchRow([
+            $sameBrandItemRow = $brandItemTable->fetchRow([
                 'brand_id = ?' => $brand->id,
                 'catname = ?'  => $values['catname'],
                 'car_id <> ?'  => $car->id
             ]);
 
-            if (! $sameBrandCarRow) {
-                $brandCarRow->catname = $values['catname'] ? $values['catname'] : $car->id;
-                $brandCarRow->save();
+            if (! $sameBrandItemRow) {
+                $brandItemRow->catname = $values['catname'] ? $values['catname'] : $car->id;
+                $brandItemRow->save();
 
                 $ok = true;
             }
@@ -1262,7 +1262,7 @@ class CarsController extends AbstractActionController
         if ($this->getRequest()->isXmlHttpRequest()) {
             return new JsonModel([
                 'ok' => $ok,
-                'messages' => $this->brandCarForm->getMessages()
+                'messages' => $this->brandItemForm->getMessages()
             ]);
         } else {
             return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
@@ -1318,16 +1318,16 @@ class CarsController extends AbstractActionController
                 ->select(true)
                 ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
                 ->join('car_parent_cache', 'twins_groups_cars.car_id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand->id)
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand->id)
                 ->group('twins_groups.id')
                 ->order('twins_groups.name')
             );
         } else {
             $brands = $brandTable->fetchAll(
                 $brandTable->select(true)
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                 ->join('twins_groups_cars', 'car_parent_cache.car_id = twins_groups_cars.car_id', null)
                 ->group('brands.id')
                 ->order(['brands.position', 'brands.name'])
@@ -1711,7 +1711,7 @@ class CarsController extends AbstractActionController
                 ->from('category_car', ['category_id'])
                 ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
                 ->where('car_parent_cache.car_id = ?', $car->id)
-                //->where('car_parent_cache.diff > 0')
+            //->where('car_parent_cache.diff > 0')
         );
 
         $selection = [];
@@ -2199,7 +2199,7 @@ class CarsController extends AbstractActionController
             'language' => $language,
             'columns'  => ['id', 'name', 'img']
         ], function ($select) use ($query) {
-            $select->where('name like ?', $query . '%');
+            $select->where('brands.name like ?', $query . '%');
         });
 
         foreach ($brandRows as $brandRow) {
@@ -2576,17 +2576,17 @@ class CarsController extends AbstractActionController
     private function getBrandVehicles(DbTable\Vehicle\Row $vehicle)
     {
         $brandTable = $this->getBrandTable();
-        $brandCarTable = new DbTable\BrandCar();
+        $brandItemTable = new DbTable\BrandItem();
         $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
 
-        $brandCarRows = $brandCarTable->fetchAll(
-            $brandCarTable->select(true)
+        $brandItemRows = $brandItemTable->fetchAll(
+            $brandItemTable->select(true)
                 ->where('car_id = ?', $vehicle->id)
         );
 
         $brands = [];
-        foreach ($brandCarRows as $brandCarRow) {
-            $brandRow = $brandTable->find($brandCarRow->brand_id)->current();
+        foreach ($brandItemRows as $brandItemRow) {
+            $brandRow = $brandTable->find($brandItemRow->brand_id)->current();
             if ($brandRow) {
                 $bvlRow = $brandVehicleLangaugeTable->fetchRow([
                     'vehicle_id = ?' => $vehicle->id,
@@ -2594,11 +2594,11 @@ class CarsController extends AbstractActionController
                     'language = ?'   => $this->language()
                 ]);
 
-                if ($brandCarRow->catname) {
+                if ($brandItemRow->catname) {
                     $url = $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car',
+                        'action'        => 'brand-item',
                         'brand_catname' => $brandRow->folder,
-                        'car_catname'   => $brandCarRow->catname
+                        'car_catname'   => $brandItemRow->catname
                     ]);
                 } else {
                     $url = $this->url()->fromRoute('catalogue', [
@@ -2616,9 +2616,9 @@ class CarsController extends AbstractActionController
                             'brand_id'   => $brandRow->id
                         ]),
                     ],
-                    'type'      => $brandCarRow->type,
+                    'type'      => $brandItemRow->type,
                     'name'      => $bvlRow ? $bvlRow->name : null,
-                    'catname'   => $brandCarRow->catname,
+                    'catname'   => $brandItemRow->catname,
                     'url'       => $url,
                     'editUrl'   => $this->url()->fromRoute('moder/brand-vehicle/params', [
                         'action'     => 'item',
@@ -2630,12 +2630,12 @@ class CarsController extends AbstractActionController
                         'brand_id'   => $brandRow->id,
                         'vehicle_id' => $vehicle->id,
                     ]),
-                    'setBrandCarTypeUrl' => $this->url()->fromRoute('moder/cars/params', [
-                        'action'   => 'set-brand-car-type',
+                    'setbrandItemTypeUrl' => $this->url()->fromRoute('moder/cars/params', [
+                        'action'   => 'set-brand-item-type',
                         'brand_id' => $brandRow->id,
                     ], [], true),
-                    'setBrandCarCatnameUrl' => $this->url()->fromRoute('moder/cars/params', [
-                        'action'   => 'set-brand-car-catname',
+                    'setbrandItemCatnameUrl' => $this->url()->fromRoute('moder/cars/params', [
+                        'action'   => 'set-brand-item-catname',
                         'brand_id' => $brandRow->id,
                     ], [], true),
                 ];
@@ -2674,8 +2674,8 @@ class CarsController extends AbstractActionController
 
             $brandRows = $brandTable->fetchAll(
                 $brandTable->select(true)
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                 ->where('car_parent_cache.car_id = ?', $car->id)
             );
 
@@ -2739,13 +2739,13 @@ class CarsController extends AbstractActionController
     }
 
     /**
-     * @return DbTable\BrandCar
+     * @return DbTable\BrandItem
      */
-    private function getBrandCarTable()
+    private function getBrandItemTable()
     {
-        return $this->brandCarTable
-            ? $this->brandCarTable
-            : $this->brandCarTable = new DbTable\BrandCar();
+        return $this->brandItemTable
+            ? $this->brandItemTable
+            : $this->brandItemTable = new DbTable\BrandItem();
     }
 
     /**
@@ -2762,20 +2762,20 @@ class CarsController extends AbstractActionController
     {
         $urls = [];
 
-        $brandCarRows = $this->getBrandCarTable()->fetchAll([
+        $brandItemRows = $this->getBrandItemTable()->fetchAll([
             'car_id = ?' => $id
         ]);
 
-        foreach ($brandCarRows as $brandCarRow) {
-            $brand = $this->getBrandTable()->find($brandCarRow->brand_id)->current();
+        foreach ($brandItemRows as $brandItemRow) {
+            $brand = $this->getBrandTable()->find($brandItemRow->brand_id)->current();
             if (! $brand) {
-                throw new Exception("Broken link `{$brandCarRow->brand_id}`");
+                throw new Exception("Broken link `{$brandItemRow->brand_id}`");
             }
 
             $urls[] = $this->url()->fromRoute('catalogue', [
-                'action'        => 'brand-car',
+                'action'        => 'brand-item',
                 'brand_catname' => $brand->folder,
-                'car_catname'   => $brandCarRow->catname,
+                'car_catname'   => $brandItemRow->catname,
                 'path'          => $path
             ]);
         }
@@ -2855,17 +2855,17 @@ class CarsController extends AbstractActionController
 
             $inheritBrands = [];
             if ($parent) {
-                $brandCarTable = new DbTable\BrandCar();
+                $brandItemTable = new DbTable\BrandItem();
                 $brandTable = $this->getBrandTable();
 
-                $brandCarRows = $brandCarTable->fetchAll(
-                    $brandCarTable->select(true)
-                    ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                    ->where('car_parent_cache.car_id = ?', $carRow->id)
+                $brandItemRows = $brandItemTable->fetchAll(
+                    $brandItemTable->select(true)
+                        ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
+                        ->where('car_parent_cache.car_id = ?', $carRow->id)
                 );
 
-                foreach ($brandCarRows as $brandCarRow) {
-                    $brandRow = $brandTable->find($brandCarRow->brand_id)->current();
+                foreach ($brandItemRows as $brandItemRow) {
+                    $brandRow = $brandTable->find($brandItemRow->brand_id)->current();
                     if ($brandRow) {
                         $url = $this->url()->fromRoute('catalogue', [
                             'action'        => 'brand',
@@ -2873,15 +2873,15 @@ class CarsController extends AbstractActionController
                         ]);
 
                         $inheritedCar = null;
-                        if ($brandCarRow->car_id != $carParentRow->parent_id) {
-                            $inheritedCar = $carTable->find($brandCarRow->car_id)->current();
+                        if ($brandItemRow->car_id != $carParentRow->parent_id) {
+                            $inheritedCar = $carTable->find($brandItemRow->car_id)->current();
 
                             $paths = $carParentTable->getPathsToBrand($inheritedCar->id, $brandRow->id);
 
                             $publicUrls = [];
                             foreach ($paths as $path) {
                                 $publicUrls[] = $this->url()->fromRoute('catalogue', array_replace([
-                                    'action' => 'brand-car',
+                                    'action' => 'brand-item',
                                     'brand_catname' => $brandRow->folder
                                 ], $path));
                             }
@@ -2893,14 +2893,14 @@ class CarsController extends AbstractActionController
                                     'car_id' => $inheritedCar->id,
                                 ], [], true),
                                 'publicUrls' => $publicUrls,
-                                'type' => $brandCarRow->type
+                                'type' => $brandItemRow->type
                             ];
                         }
 
                         $inheritBrands[] = [
                             'name'     => $brandRow->name,
-                            'type'     => $brandCarRow->type,
-                            'catname'  => $brandCarRow->catname,
+                            'type'     => $brandItemRow->type,
+                            'catname'  => $brandItemRow->catname,
                             'moderUrl' => $this->url()->fromRoute('moder/brands/params', [
                                 'action'   => 'brand',
                                 'brand_id' => $brandRow->id
@@ -3194,8 +3194,8 @@ class CarsController extends AbstractActionController
         if ($brand) {
             $rows = $carTable->fetchAll(
                 $carTable->select(true)
-                ->join('brands_cars', 'cars.id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand->id)
+                ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand->id)
                 ->order($this->catalogue()->carsOrdering())
             );
 

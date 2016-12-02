@@ -58,6 +58,12 @@ class ModerMenu extends AbstractHtmlElement
                 'label' => $this->view->page(131)->name,
                 'icon'  => 'fa fa-car'
             ];
+
+            $items[] = [
+                'href'  => $this->view->url('moder/category'),
+                'label' => $this->view->page(125)->name,
+                'icon'  => 'fa fa-tags'
+            ];
         }
 
         return $this->view->partial('application/moder-menu', [

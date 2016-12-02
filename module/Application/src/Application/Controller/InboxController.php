@@ -23,8 +23,8 @@ class InboxController extends AbstractActionController
             $select->where(
                 'brands.id IN (?)',
                 $db->select()
-                    ->from('brands_cars', 'brand_id')
-                    ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                    ->from('brand_item', 'brand_id')
+                    ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                     ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
                     ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                     ->where('pictures.status = ?', Picture::STATUS_INBOX)
@@ -78,8 +78,8 @@ class InboxController extends AbstractActionController
             $select
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand['id'])
+                ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
                 ->group('pictures.id');
         }
 

@@ -200,7 +200,7 @@ class UserText extends AbstractHtmlElement
             ],
             [
                 'controller' => \Application\Controller\CatalogueController::class,
-                'action'     => 'brand-car-picture'
+                'action'     => 'brand-item-picture'
             ]
         ];
 

@@ -1498,6 +1498,7 @@ return [
     'moder/picture/catalogue/not-set' => 'не задан',
     'moder/picture/catalogue/move-to' => 'переместить в',
     'moder/picture/catalogue/add-to' => 'добавить в',
+    'moder/picture/catalogue/pick-item-area' => 'Отметить область',
 
     'moder/picture/perspective' => 'Ракурс',
     'moder/picture/perspective-by' => 'Установил: ',
@@ -1540,7 +1541,7 @@ return [
     'moder/picture/edit-and-repair' => 'Редактирование и устранение проблем',
     'moder/picture/edit-and-repair/normalize' => 'Автоконтраст',
     'moder/picture/edit-and-repair/flop' => 'Отразить',
-    'moder/picture/edit-and-repair/crop' => 'Выделить область',
+    'moder/picture/edit-and-repair/crop' => 'Область обрезания',
     'moder/picture/edit-and-repair/repair-all-files' => 'Исправить все файлы',
     'moder/picture/edit-and-repair/rebuild-files-names' => 'Пересчитать имена файлов',
 

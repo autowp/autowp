@@ -354,7 +354,7 @@ return [
         'factories' => [
             Controller\Moder\AttrsController::class        => InvokableFactory::class,
             Controller\Moder\BrandsController::class       => Controller\Moder\Service\BrandsControllerFactory::class,
-            Controller\Moder\CategoryController::class     => InvokableFactory::class,
+            Controller\Moder\CategoryController::class     => Controller\Moder\Service\CategoryControllerFactory::class,
             Controller\Moder\BrandVehicleController::class => Controller\Moder\Service\BrandVehicleControllerFactory::class,
             Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
             Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
@@ -1051,7 +1051,7 @@ return [
                 'method' => 'post',
             ],
         ],
-        'ModerBrandCar' => [
+        'ModerBrandItem' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',

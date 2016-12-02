@@ -8,7 +8,7 @@ use Autowp\User\Model\DbTable\User as UserTable;
 
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
@@ -177,7 +177,7 @@ class Pic extends AbstractPlugin
                         $path = $paths[0];
 
                         $url = $controller->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-picture',
+                            'action'        => 'brand-item-picture',
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
@@ -523,7 +523,6 @@ class Pic extends AbstractPlugin
 
         $items = [];
         foreach ($itemRows as $item) {
-
             $twins = [];
             $designProject = null;
             $detailsUrl = null;
@@ -554,20 +553,20 @@ class Pic extends AbstractPlugin
                             'brand_name'    => 'name',
                             'brand_catname' => 'folder'
                         ])
-                        ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
-                            'brand_car_catname' => 'catname'
+                        ->join('brand_item', 'brands.id = brand_item.brand_id', [
+                            'brand_item_catname' => 'catname'
                         ])
-                        ->where('brands_cars.type = ?', BrandCar::TYPE_DESIGN)
-                        ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
+                        ->where('brand_item.type = ?', BrandItem::TYPE_DESIGN)
+                        ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', 'car_id')
                         ->where('car_parent_cache.car_id = ?', $item->id)
                 );
                 if ($designCarsRow) {
                     $designProject = [
                         'brand' => $designCarsRow['brand_name'],
                         'url'   => $controller->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car',
+                            'action'        => 'brand-item',
                             'brand_catname' => $designCarsRow['brand_catname'],
-                            'car_catname'   => $designCarsRow['brand_car_catname']
+                            'car_catname'   => $designCarsRow['brand_item_catname']
                         ])
                     ];
                 }
@@ -575,7 +574,7 @@ class Pic extends AbstractPlugin
                 if ($item->full_text_id) {
                     foreach ($catalogue->cataloguePaths($item) as $path) {
                         $detailsUrl = $controller->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car',
+                            'action'        => 'brand-item',
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path']
@@ -696,7 +695,7 @@ class Pic extends AbstractPlugin
             $specsUrl = null;
             foreach ($catalogue->cataloguePaths($item) as $path) {
                 $specsUrl = $this->getController()->url()->fromRoute('catalogue', [
-                    'action'        => 'brand-car-specifications',
+                    'action'        => 'brand-item-specifications',
                     'brand_catname' => $path['brand_catname'],
                     'car_catname'   => $path['car_catname'],
                     'path'          => $path['path']
@@ -732,7 +731,7 @@ class Pic extends AbstractPlugin
     {
         $engineRow = $picture->findParentRow(Engine::class);
 
-        if (!$engineRow) {
+        if (! $engineRow) {
             return null;
         }
 
@@ -757,7 +756,7 @@ class Pic extends AbstractPlugin
                     $vehicles[] = [
                         'name' => $controller->car()->formatName($carRow, $language),
                         'url'  => $controller->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car',
+                            'action'        => 'brand-item',
                             'brand_catname' => $cPath['brand_catname'],
                             'car_catname'   => $cPath['car_catname'],
                             'path'          => $cPath['path']
@@ -829,11 +828,10 @@ class Pic extends AbstractPlugin
 
         $brandIds = $db->fetchCol(
             $db->select()
-                ->from('brands_cars', 'brand_id')
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                ->from('brand_item', 'brand_id')
+                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                 ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
                 ->where('picture_item.picture_id = ?', $picture->id)
-
         );
 
         switch ($picture->type) {
@@ -881,7 +879,7 @@ class Pic extends AbstractPlugin
                                 $factoryCars[] = [
                                     'name' => $controller->car()->formatName($carRow, $language),
                                     'url'  => $controller->url()->fromRoute('catalogue', [
-                                        'action'        => 'brand-car',
+                                        'action'        => 'brand-item',
                                         'brand_catname' => $cPath['brand_catname'],
                                         'car_catname'   => $cPath['car_catname'],
                                         'path'          => $cPath['path']
@@ -1034,7 +1032,7 @@ class Pic extends AbstractPlugin
                     $path = $paths[0];
 
                     $url = $controller->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car-pictures',
+                        'action'        => 'brand-item-pictures',
                         'brand_catname' => $path['brand_catname'],
                         'car_catname'   => $path['car_catname'],
                         'path'          => $path['path'],
@@ -1129,8 +1127,8 @@ class Pic extends AbstractPlugin
 
                         $brands = $brandModel->getList(['language' => $language], function ($select) use ($car) {
                             $select
-                                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
+                                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
                                 ->where('car_parent_cache.car_id = ?', $car->id)
                                 ->group('brands.id');
                         });
@@ -1324,12 +1322,12 @@ class Pic extends AbstractPlugin
         foreach ($rows as $idx => $row) {
             $imageId = (int)$row['image_id'];
 
-            if (!$imageId) {
+            if (! $imageId) {
                 continue;
             }
 
             $image = isset($images[$imageId]) ? $images[$imageId] : null;
-            if (!$image) {
+            if (! $image) {
                 continue;
             }
 

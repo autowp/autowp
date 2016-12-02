@@ -17,6 +17,11 @@
         ]
     ]);
 ?>
+
+<?php if ($this->description) { ?>
+    <?=$this->markdown($this->description)?>
+<?php } ?>
+
 <?=$this->partial('application/cars', $this->listData)?>
 <?=$this->paginationControl($this->paginator, null, null, [
     'urlParams' => $this->urlParams

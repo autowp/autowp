@@ -1486,6 +1486,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/catalogue/not-set' => 'not set',
     'moder/picture/catalogue/move-to' => 'move to',
     'moder/picture/catalogue/add-to' => 'add to',
+    'moder/picture/catalogue/pick-item-area' => 'Pick item area',
 
     'moder/picture/perspective' => 'Perspective',
     'moder/picture/perspective-by' => 'By: ',

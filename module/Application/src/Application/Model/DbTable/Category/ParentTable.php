@@ -16,10 +16,10 @@ class ParentTable extends Table
 
         $table = new Category();
 
-        $this->_rebuild($table, [0], 0);
+        $this->doRebuild($table, [0], 0);
     }
 
-    private function _rebuild(Category $table, $id, $level)
+    private function doRebuild(Category $table, $id, $level)
     {
         $select = $table->select()
             ->from($table, 'id');
@@ -36,7 +36,7 @@ class ParentTable extends Table
                 'level'       => $level
             ]);
 
-            $this->_rebuild($table, array_merge([$cat_id], $id), $level + 1);
+            $this->doRebuild($table, array_merge([$cat_id], $id), $level + 1);
         }
 
         --$level;

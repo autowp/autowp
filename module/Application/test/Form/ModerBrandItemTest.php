@@ -5,7 +5,7 @@ namespace ApplicationTest\Form;
 use Zend\Form\Form;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
-class ModerBrandCarTest extends AbstractHttpControllerTestCase
+class ModerBrandItemTest extends AbstractHttpControllerTestCase
 {
     public function setUp()
     {
@@ -17,7 +17,7 @@ class ModerBrandCarTest extends AbstractHttpControllerTestCase
     public function testForm()
     {
         $serviceManager = $this->getApplicationServiceLocator();
-        $form = $serviceManager->get('ModerBrandCar');
+        $form = $serviceManager->get('ModerBrandItem');
 
         $form->setData([]);
         $form->isValid();

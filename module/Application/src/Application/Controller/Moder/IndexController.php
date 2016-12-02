@@ -75,6 +75,8 @@ class IndexController extends AbstractActionController
 
         $menu['/moder/pictures'] = 'page/73/name';
 
+        $menu[$this->url()->fromRoute('moder/category')] = 'page/125/name';
+
         $menu[$this->url()->fromRoute('moder/perspectives')] = 'page/202/name';
 
         $menu['/moder/index/stat'] = 'page/119/name';
