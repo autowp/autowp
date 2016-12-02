@@ -268,8 +268,8 @@ class CarsController extends AbstractActionController
 
             if ($values['category']) {
                 $select
-                    ->join('category_car', 'cars.id=category_car.car_id', null)
-                    ->join('category_parent', 'category_car.category_id=category_parent.category_id', null)
+                    ->join('category_item', 'cars.id = category_item.item_id', null)
+                    ->join('category_parent', 'category_item.category_id=category_parent.category_id', null)
                     ->where('category_parent.parent_id = ?', $values['category']);
             }
 
@@ -284,12 +284,12 @@ class CarsController extends AbstractActionController
 
                 if ($ids) {
                     $expr = $cars->getAdapter()->quoteInto(
-                        'cars.id = no_category.car_id and no_category.category_id in (?)',
+                        'cars.id = no_category.item_id and no_category.category_id in (?)',
                         $ids
                     );
                     $select
-                        ->joinLeft(['no_category' => 'category_car'], $expr, null)
-                        ->where('no_category.car_id is null');
+                        ->joinLeft(['no_category' => 'category_item'], $expr, null)
+                        ->where('no_category.item_id is null');
                 }
             }
 
@@ -896,8 +896,8 @@ class CarsController extends AbstractActionController
 
         $categoriesCount = $db->fetchOne(
             $db->select()
-            ->from('category_car', 'count(1)')
-            ->where('car_id = ?', $car->id)
+                ->from('category_item', 'count(1)')
+                ->where('item_id = ?', $car->id)
         );
 
         $carLangTable = new DbTable\Vehicle\Language();
@@ -1702,14 +1702,14 @@ class CarsController extends AbstractActionController
 
         $selected = $db->fetchPairs(
             $db->select()
-                ->from('category_car', ['category_id', 'user_id'])
-                ->where('car_id = ?', $car->id)
+                ->from('category_item', ['category_id', 'user_id'])
+                ->where('item_id = ?', $car->id)
         );
 
         $inherited = $db->fetchCol(
             $db->select()
-                ->from('category_car', ['category_id'])
-                ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id', null)
+                ->from('category_item', ['category_id'])
+                ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', null)
                 ->where('item_parent_cache.item_id = ?', $car->id)
             //->where('item_parent_cache.diff > 0')
         );
@@ -1730,8 +1730,8 @@ class CarsController extends AbstractActionController
                     $carTable->select(true)
                         ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', null)
                         ->where('item_parent_cache.item_id = ?', $car->id)
-                        ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null)
-                        ->where('category_car.category_id = ?', $id)
+                        ->join('category_item', 'item_parent_cache.parent_id = category_item.item_id', null)
+                        ->where('category_item.category_id = ?', $id)
                 );
 
                 $inheritedFrom = [];

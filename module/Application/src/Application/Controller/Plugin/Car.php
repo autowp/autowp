@@ -210,8 +210,8 @@ class Car extends AbstractPlugin
             $categoryRows = $db->fetchAll(
                 $db->select()
                     ->from($categoryTable->info('name'), ['name', 'catname'])
-                    ->join('category_car', 'category.id = category_car.category_id', null)
-                    ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id', 'item_id')
+                    ->join('category_item', 'category.id = category_item.category_id', null)
+                    ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', 'item_id')
                     ->joinLeft('category_language', $langExpr, ['lang_name' => 'name'])
                     ->where('item_parent_cache.item_id IN (?)', $carIds)
                     ->group(['item_parent_cache.item_id', 'category.id'])

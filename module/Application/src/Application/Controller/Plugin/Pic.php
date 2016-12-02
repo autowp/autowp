@@ -658,8 +658,8 @@ class Pic extends AbstractPlugin
             $categories = [];
             $categoryRows = $cdTable->fetchAll(
                 $cdTable->select(true)
-                    ->join('category_car', 'category.id = category_car.category_id', null)
-                    ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id', null)
+                    ->join('category_item', 'category.id = category_item.category_id', null)
+                    ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', null)
                     ->where('item_parent_cache.item_id = ?', $item->id)
             );
 

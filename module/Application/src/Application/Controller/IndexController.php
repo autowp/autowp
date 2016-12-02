@@ -231,8 +231,8 @@ class IndexController extends AbstractActionController
         $categoryRows = $db->fetchAll(
             $db->select()
                 ->from('category', ['name', 'catname'])
-                ->join('category_car', 'category.id = category_car.category_id', null)
-                ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id', null)
+                ->join('category_item', 'category.id = category_item.category_id', null)
+                ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', null)
                 ->joinLeft(
                     'category_language',
                     'category.id = category_language.category_id and category_language.language = :language',
@@ -307,9 +307,9 @@ class IndexController extends AbstractActionController
         $db = $this->getCategoryVehicleTable()->getAdapter();
 
         $select = $db->select()
-            ->from('category_car', 'car_id')
-            ->join('category', 'category_car.category_id = category.id', 'catname')
-            ->where('category_car.car_id = ?', $carId);
+            ->from('category_item', 'item_id')
+            ->join('category', 'category_item.category_id = category.id', 'catname')
+            ->where('category_item.item_id = ?', $carId);
 
         if ($breakOnFirst) {
             $select->limit(1);
@@ -319,7 +319,7 @@ class IndexController extends AbstractActionController
         foreach ($categoryVehicleRows as $categoryVehicleRow) {
             $result[] = [
                 'category_catname' => $categoryVehicleRow['catname'],
-                'car_id'           => $categoryVehicleRow['car_id'],
+                'car_id'           => $categoryVehicleRow['item_id'],
                 'path'             => []
             ];
         }
@@ -536,7 +536,7 @@ class IndexController extends AbstractActionController
             $categoryAdapter = $categoryTable->getAdapter();
             $categoryLangTable = new CategoryLanguage();
 
-            $expr = 'COUNT(IF(category_car.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
+            $expr = 'COUNT(IF(category_item.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
 
             $items = $categoryAdapter->fetchAll(
                 $categoryAdapter->select()
@@ -549,9 +549,9 @@ class IndexController extends AbstractActionController
                         ]
                     )
                     ->join(['cp' => 'category_parent'], 'category.id = cp.parent_id', null)
-                    ->join('category_car', 'cp.category_id = category_car.category_id', null)
+                    ->join('category_item', 'cp.category_id = category_item.category_id', null)
                     ->where('category.parent_id is null')
-                    ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id', null)
+                    ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', null)
                     ->join('cars', 'item_parent_cache.item_id = cars.id', null)
                     ->where('not cars.is_group')
                     ->group('category.id')

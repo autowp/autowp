@@ -1541,33 +1541,33 @@ CREATE TABLE `category` (
 /*!40000 ALTER TABLE `category` ENABLE KEYS */;
 
 --
--- Table structure for table `category_car`
+-- Table structure for table `category_item`
 --
 
-DROP TABLE IF EXISTS `category_car`;
+DROP TABLE IF EXISTS `category_item`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `category_car` (
+CREATE TABLE `category_item` (
   `category_id` int(10) unsigned NOT NULL,
-  `car_id` int(10) unsigned NOT NULL,
+  `item_id` int(10) unsigned NOT NULL,
   `add_datetime` timestamp NULL DEFAULT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`category_id`,`car_id`),
-  KEY `car_id` (`car_id`),
+  PRIMARY KEY (`category_id`,`item_id`),
+  KEY `car_id` (`item_id`),
   KEY `category_id` (`category_id`,`add_datetime`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `category_car_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `category_car_ibfk_2` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `category_car_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+  CONSTRAINT `category_item_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `category_item_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `category_item_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `category_car`
+-- Dumping data for table `category_item`
 --
 
-/*!40000 ALTER TABLE `category_car` DISABLE KEYS */;
-/*!40000 ALTER TABLE `category_car` ENABLE KEYS */;
+/*!40000 ALTER TABLE `category_item` DISABLE KEYS */;
+/*!40000 ALTER TABLE `category_item` ENABLE KEYS */;
 
 --
 -- Table structure for table `category_language`

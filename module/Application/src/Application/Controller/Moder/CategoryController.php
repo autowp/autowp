@@ -297,8 +297,8 @@ class CategoryController extends AbstractActionController
         $carParentRows = $carParentCacheTable->fetchAll(
             $carParentCacheTable->select(true)
                 ->join('cars', 'item_parent_cache.item_id = cars.id', null)
-                ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null)
-                ->where('category_car.category_id = ?', $category->id)
+                ->join('category_item', 'item_parent_cache.parent_id = category_item.item_id', null)
+                ->where('category_item.category_id = ?', $category->id)
                 ->order($this->catalogue()->carsOrdering())
         );
 
@@ -331,8 +331,8 @@ class CategoryController extends AbstractActionController
                         ->join('brand_item', 'parents.parent_id = brand_item.car_id', null)
                         ->where('brand_item.brand_id = ?', $brandId)
                         ->join(['parents2' => 'item_parent_cache'], 'cars.id = parents2.item_id', null)
-                        ->join('category_car', 'parents2.parent_id = category_car.car_id', null)
-                        ->where('category_car.category_id = ?', $category->id)
+                        ->join('category_item', 'parents2.parent_id = category_item.item_id', null)
+                        ->where('category_item.category_id = ?', $category->id)
                         ->limit(1)
                 );
 
@@ -344,10 +344,10 @@ class CategoryController extends AbstractActionController
             if (count($brandNames)) {
                 $categoryLinksCount = $brandAdapter->fetchOne(
                     $brandAdapter->select()
-                        ->from('category_car', 'count(distinct category_car.car_id)')
-                        ->where('category_car.category_id = ?', $category->id)
+                        ->from('category_item', 'count(distinct category_item.item_id)')
+                        ->where('category_item.category_id = ?', $category->id)
                         ->where('item_parent_cache.diff > 0')
-                        ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id')
+                        ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id')
                         ->where('item_parent_cache.item_id = ?', $carRow->id)
                 );
 
