@@ -131,8 +131,8 @@ class BrandNav
                 $db = $carTable->getAdapter();
                 $select = $db->select()
                     ->from('cars', new Zend_Db_Expr('1'))
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
                     ->where('brand_item.brand_id = ?', $brand['id'])
                     ->where('cars.is_concept')
                     ->limit(1);
@@ -508,8 +508,8 @@ class BrandNav
             $selectedIds = $db->fetchCol(
                 $db->select()
                     ->distinct()
-                    ->from('car_parent_cache', 'parent_id')
-                    ->where('car_id = ?', $carId)
+                    ->from('item_parent_cache', 'parent_id')
+                    ->where('item_id = ?', $carId)
             );
         }
 

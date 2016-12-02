@@ -557,8 +557,8 @@ class Pic extends AbstractPlugin
                             'brand_item_catname' => 'catname'
                         ])
                         ->where('brand_item.type = ?', BrandItem::TYPE_DESIGN)
-                        ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', 'car_id')
-                        ->where('car_parent_cache.car_id = ?', $item->id)
+                        ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', 'item_id')
+                        ->where('item_parent_cache.item_id = ?', $item->id)
                 );
                 if ($designCarsRow) {
                     $designProject = [
@@ -659,8 +659,8 @@ class Pic extends AbstractPlugin
             $categoryRows = $cdTable->fetchAll(
                 $cdTable->select(true)
                     ->join('category_car', 'category.id = category_car.category_id', null)
-                    ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
-                    ->where('car_parent_cache.car_id = ?', $item->id)
+                    ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id', null)
+                    ->where('item_parent_cache.item_id = ?', $item->id)
             );
 
             foreach ($categoryRows as $row) {
@@ -829,8 +829,8 @@ class Pic extends AbstractPlugin
         $brandIds = $db->fetchCol(
             $db->select()
                 ->from('brand_item', 'brand_id')
-                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->where('picture_item.picture_id = ?', $picture->id)
         );
 
@@ -1128,8 +1128,8 @@ class Pic extends AbstractPlugin
                         $brands = $brandModel->getList(['language' => $language], function ($select) use ($car) {
                             $select
                                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                                ->where('car_parent_cache.car_id = ?', $car->id)
+                                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                                ->where('item_parent_cache.item_id = ?', $car->id)
                                 ->group('brands.id');
                         });
 

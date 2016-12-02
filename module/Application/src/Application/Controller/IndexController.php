@@ -100,15 +100,15 @@ class IndexController extends AbstractActionController
                 ->where('mp.group_id = ?', $groupId)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $car->id)
                 ->joinRight(
                     ['mp' => 'perspectives_groups_perspectives'],
                     'picture_item.perspective_id = mp.perspective_id',
                     null
                 )
                 ->order([
-                    'car_parent_cache.sport', 'car_parent_cache.tuning', 'mp.position',
+                    'item_parent_cache.sport', 'item_parent_cache.tuning', 'mp.position',
                     'pictures.width DESC', 'pictures.height DESC'
                 ])
                 ->limit(1);
@@ -148,8 +148,8 @@ class IndexController extends AbstractActionController
         if (count($left) > 0) {
             $select = $pTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 //->order('ratio DESC')
                 ->limit(count($left));
@@ -176,8 +176,8 @@ class IndexController extends AbstractActionController
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
         );
 
@@ -232,13 +232,13 @@ class IndexController extends AbstractActionController
             $db->select()
                 ->from('category', ['name', 'catname'])
                 ->join('category_car', 'category.id = category_car.category_id', null)
-                ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
+                ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id', null)
                 ->joinLeft(
                     'category_language',
                     'category.id = category_language.category_id and category_language.language = :language',
                     ['lang_name' => 'name']
                 )
-                ->where('car_parent_cache.car_id = :car_id')
+                ->where('item_parent_cache.item_id = :car_id')
                 ->group(['category.id'])
                 ->bind([
                     'language' => $this->language(),
@@ -490,9 +490,9 @@ class IndexController extends AbstractActionController
                 $db->select()
                     ->from('factory', ['id', 'name', 'count' => new Zend_Db_Expr('count(1)')])
                     ->join('factory_car', 'factory.id = factory_car.factory_id', null)
-                    ->join('car_parent_cache', 'factory_car.car_id = car_parent_cache.parent_id', null)
-                    ->where('not car_parent_cache.tuning')
-                    ->where('not car_parent_cache.sport')
+                    ->join('item_parent_cache', 'factory_car.car_id = item_parent_cache.parent_id', null)
+                    ->where('not item_parent_cache.tuning')
+                    ->where('not item_parent_cache.sport')
                     ->group('factory.id')
                     ->order('count desc')
                     ->limit(8)
@@ -551,8 +551,8 @@ class IndexController extends AbstractActionController
                     ->join(['cp' => 'category_parent'], 'category.id = cp.parent_id', null)
                     ->join('category_car', 'cp.category_id = category_car.category_id', null)
                     ->where('category.parent_id is null')
-                    ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
-                    ->join('cars', 'car_parent_cache.car_id = cars.id', null)
+                    ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id', null)
+                    ->join('cars', 'item_parent_cache.item_id = cars.id', null)
                     ->where('not cars.is_group')
                     ->group('category.id')
                     ->order('new_cars_count DESC')

@@ -88,8 +88,8 @@ class Row extends \Application\Db\Table\Row
                     $brands = $brandTable->fetchAll(
                         $brandTable->select(true)
                             ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                            ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                            ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                            ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                            ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                             ->where('picture_item.picture_id = ?', $this->id)
                     );
 
@@ -114,8 +114,8 @@ class Row extends \Application\Db\Table\Row
                     $brands = $brandTable->fetchAll(
                         $brandTable->select(true)
                             ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                            ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                            ->where('car_parent_cache.car_id = ?', $car->id)
+                            ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                            ->where('item_parent_cache.item_id = ?', $car->id)
                     );
 
                     $sBrands = [];

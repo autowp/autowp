@@ -242,8 +242,8 @@ class ModificationController extends AbstractActionController
         $mgRows = $mgTable->fetchAll(
             $mgTable->select(true)
                 ->join('modification', 'modification_group.id = modification.group_id', null)
-                ->join('car_parent_cache', 'modification.car_id = car_parent_cache.parent_id', null)
-                ->where('car_parent_cache.car_id = ?', $car->id)
+                ->join('item_parent_cache', 'modification.car_id = item_parent_cache.parent_id', null)
+                ->where('item_parent_cache.item_id = ?', $car->id)
                 ->group('modification_group.id')
         );
 
@@ -253,8 +253,8 @@ class ModificationController extends AbstractActionController
         $names = $db->fetchPairs(
             $db->select()
                 ->from($mTable->info('name'), ['id', 'name'])
-                ->join('car_parent_cache', 'modification.car_id = car_parent_cache.parent_id', null)
-                ->where('car_parent_cache.car_id = ?', $car->id)
+                ->join('item_parent_cache', 'modification.car_id = item_parent_cache.parent_id', null)
+                ->where('item_parent_cache.item_id = ?', $car->id)
                 ->order(['modification.group_id', 'modification.name'])
         );
 
@@ -264,8 +264,8 @@ class ModificationController extends AbstractActionController
             $map[] = $db->fetchCol(
                 $db->select()
                     ->from($mTable->info('name'), 'id')
-                    ->join('car_parent_cache', 'modification.car_id = car_parent_cache.parent_id', null)
-                    ->where('car_parent_cache.car_id = ?', $car->id)
+                    ->join('item_parent_cache', 'modification.car_id = item_parent_cache.parent_id', null)
+                    ->where('item_parent_cache.item_id = ?', $car->id)
                     ->where('modification.group_id = ?', $mgRow->id)
                     ->order(['modification.group_id', 'modification.name'])
             );

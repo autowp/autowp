@@ -39,8 +39,8 @@ class CarOfDay
         $sql = '
             SELECT c.id, count(p.id) AS p_count
             FROM cars AS c
-                INNER JOIN car_parent_cache AS cpc ON c.id=cpc.parent_id
-                INNER JOIN picture_item ON cpc.car_id = picture_item.item_id
+                INNER JOIN item_parent_cache AS cpc ON c.id=cpc.parent_id
+                INNER JOIN picture_item ON cpc.item_id = picture_item.item_id
                 INNER JOIN pictures AS p ON picture_item.picture_id=p.id
             WHERE p.type=? AND p.status=?
                 AND (c.begin_year AND c.end_year OR c.begin_model_year AND c.end_model_year)
@@ -92,8 +92,8 @@ class CarOfDay
         $select = $pictureTable->select(true)
             ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-            ->where('car_parent_cache.parent_id = ?', $car->id)
+            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+            ->where('item_parent_cache.parent_id = ?', $car->id)
             ->order([
                 'pictures.width DESC', 'pictures.height DESC'
             ])

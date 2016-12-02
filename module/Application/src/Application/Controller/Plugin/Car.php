@@ -119,11 +119,11 @@ class Car extends AbstractPlugin
                     ->group('picture_item.item_id');
             } else {
                 $select
-                    ->from($pictureTable->info('name'), ['car_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
+                    ->from($pictureTable->info('name'), ['item_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id IN (?)', $carIds)
-                    ->group('car_parent_cache.parent_id');
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id IN (?)', $carIds)
+                    ->group('item_parent_cache.parent_id');
             }
 
             $result = array_replace($result, $pictureTableAdapter->fetchPairs($select));
@@ -211,14 +211,14 @@ class Car extends AbstractPlugin
                 $db->select()
                     ->from($categoryTable->info('name'), ['name', 'catname'])
                     ->join('category_car', 'category.id = category_car.category_id', null)
-                    ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', 'car_id')
+                    ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id', 'item_id')
                     ->joinLeft('category_language', $langExpr, ['lang_name' => 'name'])
-                    ->where('car_parent_cache.car_id IN (?)', $carIds)
-                    ->group(['car_parent_cache.car_id', 'category.id'])
+                    ->where('item_parent_cache.item_id IN (?)', $carIds)
+                    ->group(['item_parent_cache.item_id', 'category.id'])
             );
 
             foreach ($categoryRows as $category) {
-                $carId = (int)$category['car_id'];
+                $carId = (int)$category['item_id'];
                 if (! isset($carsCategories[$carId])) {
                     $carsCategories[$carId] = [];
                 }
@@ -298,12 +298,12 @@ class Car extends AbstractPlugin
                     'brand_item_catname' => 'catname'
                 ])
                 ->where('brand_item.type = ?', DbTable\BrandItem::TYPE_DESIGN)
-                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', 'car_id')
-                ->where('car_parent_cache.car_id IN (?)', $carIds ? $carIds : 0)
-                ->group('car_parent_cache.car_id')
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', 'item_id')
+                ->where('item_parent_cache.item_id IN (?)', $carIds ? $carIds : 0)
+                ->group('item_parent_cache.item_id')
         );
         foreach ($designCarsRows as $designCarsRow) {
-            $carsDesignProject[$designCarsRow['car_id']] = [
+            $carsDesignProject[$designCarsRow['item_id']] = [
                 'brandName' => $designCarsRow['brand_name'],
                 'url'       => $controller->url()->fromRoute('catalogue', [
                     'action'        => 'brand-item',
@@ -626,23 +626,23 @@ class Car extends AbstractPlugin
             $select->where('picture_item.item_id = ?', $car->id);
         } else {
             $select
-                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->join('cars', 'picture_item.item_id = cars.id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id);
+                ->where('item_parent_cache.parent_id = ?', $car->id);
 
             $order[] = 'cars.is_concept asc';
-            $order[] = 'car_parent_cache.sport asc';
-            $order[] = 'car_parent_cache.tuning asc';
+            $order[] = 'item_parent_cache.sport asc';
+            $order[] = 'item_parent_cache.tuning asc';
 
             if (isset($options['type'])) {
                 switch ($options['type']) {
                     case DbTable\Vehicle\ParentTable::TYPE_DEFAULT:
                         break;
                     case DbTable\Vehicle\ParentTable::TYPE_TUNING:
-                        $select->where('car_parent_cache.tuning');
+                        $select->where('item_parent_cache.tuning');
                         break;
                     case DbTable\Vehicle\ParentTable::TYPE_SPORT:
-                        $select->where('car_parent_cache.sport');
+                        $select->where('item_parent_cache.sport');
                         break;
                 }
             }
@@ -679,8 +679,8 @@ class Car extends AbstractPlugin
                     'pi_oc.picture_id = pictures.id'
                 )
                 ->join(
-                    ['cpc_oc' => 'car_parent_cache'],
-                    'cpc_oc.car_id = pi_oc.item_id',
+                    ['cpc_oc' => 'item_parent_cache'],
+                    'cpc_oc.item_id = pi_oc.item_id',
                     null
                 )
                 ->where('cpc_oc.parent_id IN (?)', $options['onlyChilds']);

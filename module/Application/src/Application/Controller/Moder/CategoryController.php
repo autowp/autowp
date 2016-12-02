@@ -208,9 +208,9 @@ class CategoryController extends AbstractActionController
         $form = null;
 
         if ($canEdit) {
-            
+
             $form = $this->getForm();
-            
+
             $form->populateValues($values);
 
             $request = $this->getRequest();
@@ -296,8 +296,8 @@ class CategoryController extends AbstractActionController
 
         $carParentRows = $carParentCacheTable->fetchAll(
             $carParentCacheTable->select(true)
-                ->join('cars', 'car_parent_cache.car_id = cars.id', null)
-                ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null)
+                ->join('cars', 'item_parent_cache.item_id = cars.id', null)
+                ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null)
                 ->where('category_car.category_id = ?', $category->id)
                 ->order($this->catalogue()->carsOrdering())
         );
@@ -306,14 +306,14 @@ class CategoryController extends AbstractActionController
 
         $childs = [];
         foreach ($carParentRows as $carParentRow) {
-            $carRow = $carTable->find($carParentRow->car_id)->current();
+            $carRow = $carTable->find($carParentRow->item_id)->current();
 
             $brandNames = $brandAdapter->fetchPairs(
                 $brandAdapter->select()
                     ->from($brandTable->info('name'), ['id', 'name'])
                     ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                    ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                    ->where('car_parent_cache.car_id = ?', $carRow->id)
+                    ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                    ->where('item_parent_cache.item_id = ?', $carRow->id)
                     ->group('brands.id')
             );
 
@@ -324,13 +324,13 @@ class CategoryController extends AbstractActionController
                 $skip = $brandAdapter->fetchOne(
                     $brandAdapter->select(true)
                         ->from('cars', new Zend_Db_Expr(1))
-                        ->join(['childs' => 'car_parent_cache'], 'cars.id = childs.parent_id', null)
+                        ->join(['childs' => 'item_parent_cache'], 'cars.id = childs.parent_id', null)
                         ->where('childs.diff > 0')
                         ->where('childs.car_id = ?', $carRow->id)
-                        ->join(['parents' => 'car_parent_cache'], 'cars.id = parents.car_id', null)
+                        ->join(['parents' => 'item_parent_cache'], 'cars.id = parents.item_id', null)
                         ->join('brand_item', 'parents.parent_id = brand_item.car_id', null)
                         ->where('brand_item.brand_id = ?', $brandId)
-                        ->join(['parents2' => 'car_parent_cache'], 'cars.id = parents2.car_id', null)
+                        ->join(['parents2' => 'item_parent_cache'], 'cars.id = parents2.item_id', null)
                         ->join('category_car', 'parents2.parent_id = category_car.car_id', null)
                         ->where('category_car.category_id = ?', $category->id)
                         ->limit(1)
@@ -346,9 +346,9 @@ class CategoryController extends AbstractActionController
                     $brandAdapter->select()
                         ->from('category_car', 'count(distinct category_car.car_id)')
                         ->where('category_car.category_id = ?', $category->id)
-                        ->where('car_parent_cache.diff > 0')
-                        ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id')
-                        ->where('car_parent_cache.car_id = ?', $carRow->id)
+                        ->where('item_parent_cache.diff > 0')
+                        ->join('item_parent_cache', 'category_car.car_id = item_parent_cache.parent_id')
+                        ->where('item_parent_cache.item_id = ?', $carRow->id)
                 );
 
                 if ($categoryLinksCount < count($brandNames)) {

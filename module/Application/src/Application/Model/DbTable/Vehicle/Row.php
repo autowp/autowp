@@ -183,15 +183,15 @@ class Row extends \Application\Db\Table\Row
             $picture = $pictureTable->fetchRow(
                 $pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->join(
                         ['mp' => 'perspectives_groups_perspectives'],
                         'picture_item.perspective_id = mp.perspective_id',
                         null
                     )
                     ->where('mp.group_id=?', $groupId)
-                    ->where('car_parent_cache.parent_id = ?', $this->id)
-                    ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
+                    ->where('item_parent_cache.parent_id = ?', $this->id)
+                    ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->order([
                         'mp.position',
@@ -219,9 +219,9 @@ class Row extends \Application\Db\Table\Row
             if (! $picture) {
                 $select = $pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id = ?', $this->id)
-                    ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $this->id)
+                    ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->limit(1);
 

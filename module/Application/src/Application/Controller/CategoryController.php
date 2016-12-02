@@ -270,8 +270,8 @@ class CategoryController extends AbstractActionController
             $topCar = $carTable->fetchRow(
                 $carTable->select(true)
                     ->where('cars.id = ?', $carId)
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null)
+                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null)
                     ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
                     ->where('category_parent.parent_id = ?', $currentCategory->id)
             );
@@ -663,12 +663,12 @@ class CategoryController extends AbstractActionController
 
             if ($topCar) {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id = ?', $currentCar->id);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $currentCar->id);
             } else {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null);
 
                 if ($isOther) {
                     $select->where('category_car.category_id=?', $currentCategory->id);
@@ -737,12 +737,12 @@ class CategoryController extends AbstractActionController
 
             if ($topCar) {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id = ?', $currentCar->id);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $currentCar->id);
             } else {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null);
 
                 if ($isOther) {
                     $select->where('category_car.category_id = ?', $currentCategory->id);
@@ -821,12 +821,12 @@ class CategoryController extends AbstractActionController
 
             if ($topCar) {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id = ?', $currentCar->id);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $currentCar->id);
             } else {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null);
 
                 if ($isOther) {
                     $select->where('category_car.category_id=?', $currentCategory->id);

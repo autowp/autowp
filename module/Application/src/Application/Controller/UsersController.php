@@ -185,8 +185,8 @@ class UsersController extends AbstractActionController
         $rows = $brandModel->getList($options, function ($select) use ($user) {
             $select
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                 ->where('pictures.owner_id = ?', $user->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
@@ -233,8 +233,8 @@ class UsersController extends AbstractActionController
         $pictures = $this->catalogue()->getPictureTable();
         $select = $pictures->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-            ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+            ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
             ->where('pictures.owner_id = ?', $user->id)
             ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
             ->where('brand_item.brand_id = ?', $brand['id'])
@@ -310,8 +310,8 @@ class UsersController extends AbstractActionController
                 if (! $success) {
                     $carSelect = $db->select()
                         ->from('brand_item', ['brand_id', 'count(1)'])
-                        ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                        ->join('attrs_user_values', 'car_parent_cache.car_id = attrs_user_values.item_id', null)
+                        ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                        ->join('attrs_user_values', 'item_parent_cache.item_id = attrs_user_values.item_id', null)
                         ->where('attrs_user_values.item_type_id = 1')
                         ->where('attrs_user_values.user_id = ?', $user->id)
                         ->group('brand_item.brand_id')
@@ -396,8 +396,8 @@ class UsersController extends AbstractActionController
                 if (! $success) {
                     $select = $brandTable->select(true)
                         ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                        ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                        ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                        ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                        ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                         ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                         ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                         ->group('brand_item.brand_id')

@@ -162,11 +162,11 @@ class CarsController extends AbstractActionController
         if ($engine && $car->engine_inherit) {
             $carRows = $carTable->fetchAll(
                 $carTable->select(true)
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
-                    ->where('car_parent_cache.car_id = ?', $car->id)
+                    ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', null)
+                    ->where('item_parent_cache.item_id = ?', $car->id)
                     ->where('cars.engine_id = ?', $engine->id)
                     ->where('cars.id <> ?', $car->id)
-                    ->order('car_parent_cache.diff desc')
+                    ->order('item_parent_cache.diff desc')
             );
 
             foreach ($carRows as $carRow) {

@@ -46,8 +46,8 @@ class Brand
             '(' .
                 $db->select()
                     ->from('cars', 'count(distinct cars.id)')
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
                     ->where('brand_item.brand_id = brands.id')
                     ->assemble() .
             ') + (' .
@@ -123,8 +123,8 @@ class Brand
             $newCarsCount = $db->fetchOne(
                 $db->select()
                     ->from('cars', 'count(distinct cars.id)')
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->join('brand_item', 'car_parent_cache.parent_id = brand_item.car_id', null)
+                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
                     ->where('brand_item.brand_id = ?', $brandRow['id'])
                     ->where('cars.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)', self::NEW_DAYS)
             );
@@ -173,8 +173,8 @@ class Brand
         ], function ($select) use ($language) {
             $select
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                ->join('cars', 'car_parent_cache.car_id = cars.id', null)
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('cars', 'item_parent_cache.item_id = cars.id', null)
                 ->group('brands.id')
                 ->bind([
                     'language' => $language,
@@ -336,8 +336,8 @@ class Brand
         $brand = $this->table->fetchRow(
             $this->table->select(true)
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                ->join('factory_car', 'car_parent_cache.car_id = factory_car.car_id', null)
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('factory_car', 'item_parent_cache.item_id = factory_car.car_id', null)
                 ->where('factory_car.factory_id = ?', (int)$factoryId)
                 ->group('brands.id')
                 ->order(new Zend_Db_Expr('count(1) desc'))
@@ -494,8 +494,8 @@ class Brand
         $brandRows = $this->table->fetchAll(
             $this->table->select(true)
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('car_parent_cache', 'brand_item.car_id = car_parent_cache.parent_id', null)
-                ->where('car_parent_cache.car_id = ?', $carId)
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->where('item_parent_cache.item_id = ?', $carId)
         );
         foreach ($brandRows as $brand) {
             $brand->refreshPicturesCount();

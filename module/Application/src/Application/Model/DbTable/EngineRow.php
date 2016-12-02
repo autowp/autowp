@@ -30,9 +30,9 @@ class EngineRow extends Row
         foreach ($carIds as $carId) {
             $parentIds = $db->fetchCol(
                 $db->select()
-                    ->from('car_parent_cache', 'parent_id')
-                    ->where('car_id = ?', $carId)
-                    ->where('car_id <> parent_id')
+                    ->from('item_parent_cache', 'parent_id')
+                    ->where('item_id = ?', $carId)
+                    ->where('item_id <> parent_id')
                     ->order('diff desc')
             );
 

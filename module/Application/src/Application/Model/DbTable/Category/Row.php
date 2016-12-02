@@ -50,8 +50,8 @@ class Row extends \Application\Db\Table\Row
         $select = $db->select()
             ->from('cars', new Zend_Db_Expr('COUNT(1)'))
             ->where('not cars.is_group')
-            ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-            ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null)
+            ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+            ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null)
             ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
             ->where('category_parent.parent_id = ?', $this->id);
 
@@ -71,8 +71,8 @@ class Row extends \Application\Db\Table\Row
         $select = $db->select()
             ->from('cars', new Zend_Db_Expr('COUNT(1)'))
             ->where('not cars.is_group')
-            ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-            ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null)
+            ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+            ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null)
             ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
             ->where('category_parent.parent_id = ?', $this->id)
             ->where('category_car.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY)');
@@ -89,8 +89,8 @@ class Row extends \Application\Db\Table\Row
         $select = $db->select()
             ->from('cars', new Zend_Db_Expr('COUNT(1)'))
             ->where('not cars.is_group')
-            ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-            ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null)
+            ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+            ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null)
             ->where('category_car.category_id = ?', $this->id);
 
         return $db->fetchOne($select);
@@ -105,8 +105,8 @@ class Row extends \Application\Db\Table\Row
         $select = $db->select()
             ->from('cars', new Zend_Db_Expr('COUNT(1)'))
             ->where('not cars.is_group')
-            ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-            ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null)
+            ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+            ->join('category_car', 'item_parent_cache.parent_id = category_car.car_id', null)
             ->where('category_car.category_id = ?', $this->id)
             ->where('category_car.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY)');
 
