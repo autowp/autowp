@@ -3861,29 +3861,6 @@ CREATE TABLE `referrers` (
 /*!40000 ALTER TABLE `referrers` ENABLE KEYS */;
 
 --
--- Table structure for table `see_also`
---
-
-DROP TABLE IF EXISTS `see_also`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `see_also` (
-  `from_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `from_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `to_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `to_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`from_id`,`from_type`,`to_id`,`to_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `see_also`
---
-
-/*!40000 ALTER TABLE `see_also` DISABLE KEYS */;
-/*!40000 ALTER TABLE `see_also` ENABLE KEYS */;
-
---
 -- Table structure for table `session`
 --
 
@@ -4187,28 +4164,28 @@ CREATE TABLE `user_authority` (
 /*!40000 ALTER TABLE `user_authority` ENABLE KEYS */;
 
 --
--- Table structure for table `user_car_subscribe`
+-- Table structure for table `user_item_subscribe`
 --
 
-DROP TABLE IF EXISTS `user_car_subscribe`;
+DROP TABLE IF EXISTS `user_item_subscribe`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_car_subscribe` (
+CREATE TABLE `user_item_subscribe` (
   `user_id` int(10) unsigned NOT NULL,
-  `car_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`user_id`,`car_id`),
-  KEY `car_id_index` (`car_id`),
-  CONSTRAINT `user_car_subscribe_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `user_car_subscribe_ibfk_2` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE
+  `item_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`user_id`,`item_id`),
+  KEY `item_id_index` (`item_id`),
+  CONSTRAINT `user_item_subscribe_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `user_item_subscribe_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_car_subscribe`
+-- Dumping data for table `user_item_subscribe`
 --
 
-/*!40000 ALTER TABLE `user_car_subscribe` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_car_subscribe` ENABLE KEYS */;
+/*!40000 ALTER TABLE `user_item_subscribe` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_item_subscribe` ENABLE KEYS */;
 
 --
 -- Table structure for table `user_password_remind`
