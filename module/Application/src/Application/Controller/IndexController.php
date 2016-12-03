@@ -489,8 +489,8 @@ class IndexController extends AbstractActionController
             $factories = $db->fetchAll(
                 $db->select()
                     ->from('factory', ['id', 'name', 'count' => new Zend_Db_Expr('count(1)')])
-                    ->join('factory_car', 'factory.id = factory_car.factory_id', null)
-                    ->join('item_parent_cache', 'factory_car.car_id = item_parent_cache.parent_id', null)
+                    ->join('factory_item', 'factory.id = factory_item.factory_id', null)
+                    ->join('item_parent_cache', 'factory_item.item_id = item_parent_cache.parent_id', null)
                     ->where('not item_parent_cache.tuning')
                     ->where('not item_parent_cache.sport')
                     ->group('factory.id')

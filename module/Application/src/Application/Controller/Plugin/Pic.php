@@ -586,8 +586,8 @@ class Pic extends AbstractPlugin
                 // factories
                 $factoryRows = $factoryTable->fetchAll(
                     $factoryTable->select(true)
-                        ->join('factory_car', 'factory.id = factory_car.factory_id', null)
-                        ->where('factory_car.car_id = ?', $item->id)
+                        ->join('factory_item', 'factory.id = factory_item.factory_id', null)
+                        ->where('factory_item.item_id = ?', $item->id)
                 );
                 foreach ($factoryRows as $factoryRow) {
                     $factories[] = [

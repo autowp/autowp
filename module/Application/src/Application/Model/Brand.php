@@ -337,8 +337,8 @@ class Brand
             $this->table->select(true)
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
                 ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
-                ->join('factory_car', 'item_parent_cache.item_id = factory_car.car_id', null)
-                ->where('factory_car.factory_id = ?', (int)$factoryId)
+                ->join('factory_item', 'item_parent_cache.item_id = factory_item.item_id', null)
+                ->where('factory_item.factory_id = ?', (int)$factoryId)
                 ->group('brands.id')
                 ->order(new Zend_Db_Expr('count(1) desc'))
         );

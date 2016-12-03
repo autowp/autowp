@@ -535,8 +535,8 @@ class CatalogueController extends AbstractActionController
                         'cars_count'   => 'count(item_parent_cache.item_id)'
                     ]
                 )
-                ->join('factory_car', 'factory.id = factory_car.factory_id', null)
-                ->join('item_parent_cache', 'factory_car.car_id = item_parent_cache.item_id', null)
+                ->join('factory_item', 'factory.id = factory_item.factory_id', null)
+                ->join('item_parent_cache', 'factory_item.item_id = item_parent_cache.item_id', null)
                 ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
                 ->where('brand_item.brand_id = ?', $brandId)
                 ->group('factory.id')

@@ -1934,29 +1934,29 @@ INSERT INTO `factory` VALUES (1,'Test factory',1999,2005,NULL,NULL);
 /*!40000 ALTER TABLE `factory` ENABLE KEYS */;
 
 --
--- Table structure for table `factory_car`
+-- Table structure for table `factory_item`
 --
 
-DROP TABLE IF EXISTS `factory_car`;
+DROP TABLE IF EXISTS `factory_item`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `factory_car` (
+CREATE TABLE `factory_item` (
   `factory_id` int(10) unsigned NOT NULL,
-  `car_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`factory_id`,`car_id`),
-  KEY `car_id` (`car_id`),
-  CONSTRAINT `factory_car_ibfk_1` FOREIGN KEY (`factory_id`) REFERENCES `factory` (`id`),
-  CONSTRAINT `factory_car_ibfk_2` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`)
+  `item_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`factory_id`,`item_id`),
+  KEY `item_id` (`item_id`),
+  CONSTRAINT `factory_item_ibfk_1` FOREIGN KEY (`factory_id`) REFERENCES `factory` (`id`),
+  CONSTRAINT `factory_item_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `cars` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `factory_car`
+-- Dumping data for table `factory_item`
 --
 
-/*!40000 ALTER TABLE `factory_car` DISABLE KEYS */;
-INSERT INTO `factory_car` VALUES (1,1);
-/*!40000 ALTER TABLE `factory_car` ENABLE KEYS */;
+/*!40000 ALTER TABLE `factory_item` DISABLE KEYS */;
+INSERT INTO `factory_item` VALUES (1,1);
+/*!40000 ALTER TABLE `factory_item` ENABLE KEYS */;
 
 --
 -- Table structure for table `formated_image`

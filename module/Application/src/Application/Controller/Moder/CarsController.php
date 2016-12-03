@@ -931,8 +931,8 @@ class CarsController extends AbstractActionController
 
         $factoriesCount = $db->fetchOne(
             $db->select()
-                ->from('factory_car', 'count(1)')
-                ->where('car_id = ?', $car->id)
+                ->from('factory_item', 'count(1)')
+                ->where('item_id = ?', $car->id)
         );
 
         $tabs = [
@@ -2453,8 +2453,8 @@ class CarsController extends AbstractActionController
 
         $factoriesRows = $factoryTable->fetchAll(
             $factoryTable->select(true)
-            ->join('factory_car', 'factory.id = factory_car.factory_id', null)
-            ->where('factory_car.car_id = ?', $car->id)
+            ->join('factory_item', 'factory.id = factory_item.factory_id', null)
+            ->where('factory_item.item_id = ?', $car->id)
         );
         foreach ($factoriesRows as $factoriesRow) {
             $factory = [
@@ -2475,8 +2475,8 @@ class CarsController extends AbstractActionController
         }
         $factoriesRows = $factoryTable->fetchAll(
             $factoryTable->select(true)
-            ->join('factory_car', 'factory.id = factory_car.factory_id', null)
-            ->join('item_parent_cache', 'factory_car.car_id = item_parent_cache.parent_id', null)
+            ->join('factory_item', 'factory.id = factory_item.factory_id', null)
+            ->join('item_parent_cache', 'factory_item.item_id = item_parent_cache.parent_id', null)
             ->where('item_parent_cache.item_id = ?', $car->id)
         );
         foreach ($factoriesRows as $factoriesRow) {
@@ -2488,8 +2488,8 @@ class CarsController extends AbstractActionController
                 $carTable->select(true)
                 ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', null)
                 ->where('item_parent_cache.item_id = ?', $car->id)
-                ->join('factory_car', 'factory_car.car_id = item_parent_cache.parent_id', null)
-                ->where('factory_car.factory_id = ?', $factoriesRow->id)
+                ->join('factory_item', 'factory_item.item_id = item_parent_cache.parent_id', null)
+                ->where('factory_item.factory_id = ?', $factoriesRow->id)
             );
 
             $inheritedFrom = [];
