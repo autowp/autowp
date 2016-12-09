@@ -241,7 +241,7 @@ class UploadController extends AbstractActionController
 
             case Picture::VEHICLE_TYPE_ID:
                 break;
-                
+
             default:
                 throw new Exception("Unexpected type");
         }
@@ -467,7 +467,7 @@ class UploadController extends AbstractActionController
                 ])
         );
         $vehicles = $this->prepareCars($rows);
-        
+
         $rows = $db->fetchAll(
             $db->select()
                 ->from('cars', [

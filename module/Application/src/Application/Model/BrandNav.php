@@ -324,13 +324,13 @@ class BrandNav
                             ->from('car_types_parents', 'id')
                             ->where('parent_id IN (?)', [43, 44, 17, 19])
                     );
-    
+
                     $select->join(
                         'vehicle_vehicle_type',
                         'cars.id = vehicle_vehicle_type.vehicle_id',
                         null
                     );
-    
+
                     if ($otherTypesIds) {
                         $select->where('vehicle_vehicle_type.vehicle_type_id not in (?)', $otherTypesIds);
                     }
@@ -349,15 +349,33 @@ class BrandNav
 
         $rows = [];
         if ($section['car_type_id']) {
-            $select = $this->carSectionGroupsSelect($brand['id'], $section['item_type_id'], $section['car_type_id'], null, $conceptsSeparatly);
+            $select = $this->carSectionGroupsSelect(
+                $brand['id'],
+                $section['item_type_id'],
+                $section['car_type_id'],
+                null,
+                $conceptsSeparatly
+            );
             $rows = $db->fetchAll($select);
         } else {
             $rows = [];
-            $select = $this->carSectionGroupsSelect($brand['id'], $section['item_type_id'], null, false, $conceptsSeparatly);
+            $select = $this->carSectionGroupsSelect(
+                $brand['id'],
+                $section['item_type_id'],
+                null,
+                false,
+                $conceptsSeparatly
+            );
             foreach ($db->fetchAll($select) as $row) {
                 $rows[$row['car_id']] = $row;
             }
-            $select = $this->carSectionGroupsSelect($brand['id'], $section['item_type_id'], null, true, $conceptsSeparatly);
+            $select = $this->carSectionGroupsSelect(
+                $brand['id'],
+                $section['item_type_id'],
+                null,
+                true,
+                $conceptsSeparatly
+            );
             foreach ($db->fetchAll($select) as $row) {
                 $rows[$row['car_id']] = $row;
             }

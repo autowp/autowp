@@ -2115,7 +2115,7 @@ class PicturesController extends AbstractActionController
                     ])
             );
             $vehicles = $this->prepareCars($rows);
-            
+
             $rows = $carTable->fetchAll(
                 $carTable->select(true)
                     ->join('brand_item', 'cars.id = brand_item.car_id', null)

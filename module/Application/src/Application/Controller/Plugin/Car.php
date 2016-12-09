@@ -586,7 +586,6 @@ class Car extends AbstractPlugin
         ]);
 
         if ($ids) {
-
             $controller = $this->getController();
             $language = $controller->language();
             $catalogue = $controller->catalogue();

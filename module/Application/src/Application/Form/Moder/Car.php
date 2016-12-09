@@ -21,7 +21,7 @@ class Car extends Form implements InputFilterProviderInterface
     private $translator;
 
     private $language = 'en';
-    
+
     private $itemType = null;
 
     /**
@@ -156,7 +156,7 @@ class Car extends Form implements InputFilterProviderInterface
                 ]
             ],
         ];
-        
+
         if ($this->itemType == DbTable\Item\Type::ENGINE) {
             unset($elements['vehicle_type_id']);
         }
@@ -210,7 +210,7 @@ class Car extends Form implements InputFilterProviderInterface
             $this->specOptions = $options['specOptions'];
             unset($options['specOptions']);
         }
-        
+
         if (isset($options['itemType'])) {
             $this->itemType = $options['itemType'];
             unset($options['itemType']);

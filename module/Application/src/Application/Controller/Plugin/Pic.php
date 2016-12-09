@@ -721,7 +721,6 @@ class Pic extends AbstractPlugin
 
         $engines = [];
         foreach ($engineRows as $engineRow) {
-
             $vehicles = [];
 
             $vehicleIds = $itemModel->getEngineVehiclesGroups($engineRow->id);

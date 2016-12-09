@@ -12,18 +12,18 @@ class Item
             'groupJoinLimit' => null
         ];
         $options = array_replace($defaults, $options);
-    
+
         $itemTable = new Vehicle();
-    
+
         $db = $itemTable->getAdapter();
-    
+
         $vehicleIds = $db->fetchCol(
             $db->select()
                 ->from('cars', 'id')
                 ->join('item_parent_cache', 'cars.engine_item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $engineId)
         );
-    
+
         $vectors = [];
         foreach ($vehicleIds as $vehicleId) {
             $parentIds = $db->fetchCol(
@@ -33,7 +33,7 @@ class Item
                     ->where('item_id <> parent_id')
                     ->order('diff desc')
             );
-    
+
             // remove parents
             foreach ($parentIds as $parentId) {
                 $index = array_search($parentId, $vehicleIds);
@@ -41,21 +41,21 @@ class Item
                     unset($vehicleIds[$index]);
                 }
             }
-    
+
             $vector = $parentIds;
             $vector[] = $vehicleId;
-    
+
             $vectors[] = $vector;
         }
-    
+
         if ($options['groupJoinLimit'] && count($vehicleIds) <= $options['groupJoinLimit']) {
             return $vehicleIds;
         }
-    
-    
+
+
         do {
             // look for same root
-    
+
             $matched = false;
             for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
                 for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
@@ -73,12 +73,12 @@ class Item
                 }
             }
         } while ($matched);
-    
+
         $resultIds = [];
         foreach ($vectors as $vector) {
             $resultIds[] = $vector[count($vector) - 1];
         }
-    
+
         return $resultIds;
     }
 }

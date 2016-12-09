@@ -208,7 +208,6 @@ class CategoryController extends AbstractActionController
         $form = null;
 
         if ($canEdit) {
-
             $form = $this->getForm();
 
             $form->populateValues($values);

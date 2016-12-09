@@ -97,7 +97,7 @@ class ParentTable extends Table
         if (! $parent->is_group) {
             throw new Exception("Only groups can have childs");
         }
-        
+
         if ($car->item_type_id != $parent->item_type_id) {
             throw new Exception("Parent and child must be same type");
         }
