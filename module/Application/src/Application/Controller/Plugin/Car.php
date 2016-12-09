@@ -185,7 +185,7 @@ class Car extends AbstractPlugin
 
         $hasSpecs = [];
         if (! $disableSpecs && ! $specificationsUrl) {
-            $hasSpecs = $this->specsService->hasSpecs(1, $carIds);
+            $hasSpecs = $this->specsService->hasSpecs($carIds);
         }
 
         if ($carIds) {
@@ -410,7 +410,7 @@ class Car extends AbstractPlugin
                     $spec = $specRow->short_name;
                 }
             }*/
-            
+
             $vehiclesOnEngine = [];
             if ($car->item_type_id == DbTable\Item\Type::ENGINE) {
                 $vehiclesOnEngine = $this->getVehiclesOnEngine($car);
@@ -574,7 +574,7 @@ class Car extends AbstractPlugin
             'items'              => $items,
         ];
     }
-    
+
     private function getVehiclesOnEngine($engine)
     {
         $result = [];
@@ -584,14 +584,14 @@ class Car extends AbstractPlugin
         $ids = $itemModel->getEngineVehiclesGroups($engine->id, [
             'groupJoinLimit' => 3
         ]);
-    
+
         if ($ids) {
-            
+
             $controller = $this->getController();
             $language = $controller->language();
             $catalogue = $controller->catalogue();
             $itemTable = new DbTable\Vehicle();
-            
+
             $rows = $itemTable->fetchAll([
                 'id in (?)' => $ids
             ], $catalogue->carsOrdering());
@@ -611,7 +611,7 @@ class Car extends AbstractPlugin
                 }
             }
         }
-        
+
         return $result;
     }
 
@@ -829,7 +829,7 @@ class Car extends AbstractPlugin
                 $emptyPictures++;
             }
         }
-        
+
         if ($emptyPictures > 0 && ($car['item_type_id'] == DbTable\Item\Type::ENGINE)) {
             $pictureTable = $this->getPictureTable();
             $db = $pictureTable->getAdapter();
@@ -850,9 +850,9 @@ class Car extends AbstractPlugin
                     ->where('item_parent_cache.parent_id = ?', $car['id'])
                     ->limit($emptyPictures)
             );
-            
+
             $extraPicIdx = 0;
-            
+
             foreach ($result as $idx => $picture) {
                 if (count($pictureRows) <= $extraPicIdx) {
                     break;

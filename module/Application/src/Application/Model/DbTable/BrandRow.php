@@ -48,7 +48,6 @@ class BrandRow extends Row
         $this->refreshLogoPicturesCount();
         $this->refreshMixedPicturesCount();
         $this->refreshUnsortedPicturesCount();
-        $this->refreshEnginePicturesCount();
     }
 
     public function refreshCarPicturesCount()
@@ -86,22 +85,6 @@ class BrandRow extends Row
         $this->mixedpictures_count = (int)$db->fetchOne($sql, [
             $this->id, Picture::MIXED_TYPE_ID,
             Picture::STATUS_ACCEPTED, Picture::STATUS_NEW]);
-        $this->save();
-    }
-
-    public function refreshEnginePicturesCount()
-    {
-        $db = $this->getTable()->getAdapter();
-        $this->enginepictures_count = (int)$db->fetchOne('
-            SELECT COUNT(DISTINCT pictures.id)
-            FROM pictures
-                INNER JOIN engine_parent_cache ON pictures.engine_id = engine_parent_cache.engine_id
-                INNER JOIN brand_engine ON engine_parent_cache.parent_id = brand_engine.engine_id
-            WHERE brand_engine.brand_id = ? and pictures.type = ?
-                AND pictures.status IN (?, ?)
-        ', [
-            $this->id, Picture::ENGINE_TYPE_ID, Picture::STATUS_ACCEPTED, Picture::STATUS_NEW
-        ]);
         $this->save();
     }
 

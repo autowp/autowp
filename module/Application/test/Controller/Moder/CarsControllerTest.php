@@ -20,6 +20,24 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         parent::setUp();
     }
 
+    public function testVehicleIsNotForbidden()
+    {
+        /**
+         * @var Request $request
+         */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('http://www.autowp.ru/moder/cars/car/car_id/1', 'GET');
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CarsController::class);
+        $this->assertMatchedRouteName('moder/cars/params');
+        $this->assertActionName('car');
+
+        $this->assertXpathQuery("//h1[contains(text(), 'test car')]|//*[@value='test car']");
+    }
+
     public function testIndex()
     {
         $this->dispatch('https://www.autowp.ru/moder/cars', Request::METHOD_GET);
@@ -35,14 +53,14 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     {
         //ini_set('xdebug.show_exception_trace', 1);
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/new', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/1', Request::METHOD_POST, [
             'name' => 'Test car'
         ]);
 
         $this->assertResponseStatusCode(302);
         $this->assertModuleName('application');
         $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars');
+        $this->assertMatchedRouteName('moder/cars/params');
         $this->assertActionName('new');
 
         /**

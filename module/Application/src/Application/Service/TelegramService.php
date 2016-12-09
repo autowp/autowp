@@ -227,13 +227,6 @@ class TelegramService
             case Picture::UNSORTED_TYPE_ID:
                 $brandIds = [$picture->brand_id];
                 break;
-            case Picture::ENGINE_TYPE_ID:
-                $brandIds = $db->fetchCol(
-                    $db->select()
-                        ->from('brand_engine', 'brand_id')
-                        ->where('engine_id = ?', $picture->engine_id)
-                );
-                break;
         }
 
         return $brandIds;

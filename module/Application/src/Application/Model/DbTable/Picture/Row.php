@@ -169,16 +169,6 @@ class Row extends \Application\Db\Table\Row
                 }
                 break;
 
-            case Picture::ENGINE_TYPE_ID:
-                $engine = $this->findParentRow(\Application\Model\DbTable\Engine::class);
-                if ($engine) {
-                    $result = implode('/', [
-                        'engines',
-                        $filenameFilter->filter($engine->name)
-                    ]);
-                }
-                break;
-
             case Picture::FACTORY_TYPE_ID:
                 $factory = $this->findParentRow(\Application\Model\DbTable\Factory::class);
                 if ($factory) {

@@ -154,23 +154,6 @@
             <?php
             break;
 
-        case Application\Model\DbTable\Picture::ENGINE_TYPE_ID:
-            ?>
-            <p>
-                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/engine'))?>
-                <?php $engine = $this->picture->findParentRow(Application\Model\DbTable\Engine::class); ?>
-                <?php if ($engine) { ?>
-                    <?=$this->htmlA($this->url('moder/engines/params', [
-                        'action'    => 'engine',
-                        'engine_id' => $engine->id
-                    ]), $engine->name) ?>
-                <?php } else { ?>
-                    <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                <?php } ?>
-                </p>
-            <?php
-            break;
-
         case Application\Model\DbTable\Picture::FACTORY_TYPE_ID:
             ?>
             <p>

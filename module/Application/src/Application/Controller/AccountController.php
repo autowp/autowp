@@ -13,7 +13,6 @@ use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Rename as UserRename;
 
 use Application\Controller\LoginController;
-use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\LoginState;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User\Account as UserAccount;
@@ -816,35 +815,19 @@ class AccountController extends AbstractActionController
 
         $userTable = new User();
         $carTable = new Vehicle();
-        $engineTable = new Engine();
 
         foreach ($conflicts as &$conflict) {
             foreach ($conflict['values'] as &$value) {
                 $value['user'] = $userTable->find($value['userId'])->current();
             }
 
-            switch ($conflict['itemTypeId']) {
-                case SpecificationsService::ITEM_TYPE_CAR:
-                    $car = $carTable->find($conflict['itemId'])->current();
-                    $conflict['object'] = $car ? $this->car()->formatName($car, $language) : null;
-                    $conflict['url'] = $this->url()->fromRoute('cars/params', [
-                        'action' => 'car-specifications-editor',
-                        'car_id' => $conflict['itemId'],
-                        'tab'    => 'spec'
-                    ]);
-                    break;
-                case SpecificationsService::ITEM_TYPE_ENGINE:
-                    $engine = $engineTable->find($conflict['itemId'])->current();
-                    $conflict['object'] = $engine
-                        ? $this->translate('account/specs/conflicts/title/object/engine') . ' ' . $engine->name
-                        : null;
-                    $conflict['url'] = $this->url()->fromRoute('cars/params', [
-                        'action'    => 'engine-spec-editor',
-                        'engine_id' => $conflict['itemId'],
-                        'tab'       => 'engine'
-                    ]);
-                    break;
-            }
+            $car = $carTable->find($conflict['itemId'])->current();
+            $conflict['object'] = $car ? $this->car()->formatName($car, $language) : null;
+            $conflict['url'] = $this->url()->fromRoute('cars/params', [
+                'action' => 'car-specifications-editor',
+                'car_id' => $conflict['itemId'],
+                'tab'    => 'spec'
+            ]);
         }
         unset($conflict);
 

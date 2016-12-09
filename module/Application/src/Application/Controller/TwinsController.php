@@ -163,7 +163,7 @@ class TwinsController extends AbstractActionController
         $hasSpecs = false;
 
         foreach ($carList as $car) {
-            $hasSpecs = $hasSpecs || $this->specsService->hasSpecs(1, $car->id);
+            $hasSpecs = $hasSpecs || $this->specsService->hasSpecs($car->id);
         }
 
         $picturesCount = $twins->getGroupPicturesCount($group['id']);

@@ -99,19 +99,6 @@ class PicturesControllerTest extends AbstractHttpControllerTestCase
         $this->assertResponseStatusCode(302);
         $this->assertHasResponseHeader('Location');
 
-        // move to engine
-        $this->reset();
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $url = 'https://www.autowp.ru/moder/pictures/move/' . implode('/', [
-            'picture_id/' . $pictureId,
-            'type/' . Picture::ENGINE_TYPE_ID,
-            'engine_id/1'
-        ]);
-        $this->dispatch($url, Request::METHOD_POST);
-
-        $this->assertResponseStatusCode(302);
-        $this->assertHasResponseHeader('Location');
-
         // move to brand
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

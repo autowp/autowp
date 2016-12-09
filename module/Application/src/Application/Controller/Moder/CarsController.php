@@ -224,7 +224,7 @@ class CarsController extends AbstractActionController
             if ($values['no_name']) {
                 $select->where('cars.name not like ?', '%' . $values['no_name'] . '%');
             }
-            
+
             if ($values['item_type_id']) {
                 $select->where('cars.item_type_id = ?', $values['item_type_id']);
             }
@@ -939,7 +939,7 @@ class CarsController extends AbstractActionController
                 ->from('factory_item', 'count(1)')
                 ->where('item_id = ?', $car->id)
         );
-        
+
         $engineVehiclesCount = $db->fetchOne(
             $db->select()
                 ->from('cars', 'count(1)')
@@ -1022,7 +1022,7 @@ class CarsController extends AbstractActionController
                 'count' => $picturesCount,
             ],
         ];
-        
+
         if ($car->item_type_id != DbTable\Item\Type::ENGINE) {
             unset($tabs['vehicles']);
         }
@@ -1043,7 +1043,7 @@ class CarsController extends AbstractActionController
             $tab['active'] = $id == $currentTab;
         }
 
-        $specsCount = $this->specificationsService->getSpecsCount(1, $car->id);
+        $specsCount = $this->specificationsService->getSpecsCount($car->id);
 
         return [
             'picturesCount'  => $picturesCount,
@@ -2123,7 +2123,7 @@ class CarsController extends AbstractActionController
         $vehicleType = new VehicleType();
         $vehicleType->refreshInheritanceFromParents($car->id);
 
-        $this->specificationsService->updateActualValues(1, $car->id);
+        $this->specificationsService->updateActualValues($car->id);
 
         $message = sprintf(
             '%s перестал быть родительским автомобилем для %s',
@@ -2174,7 +2174,7 @@ class CarsController extends AbstractActionController
         $vehicleType = new VehicleType();
         $vehicleType->refreshInheritanceFromParents($car->id);
 
-        $this->specificationsService->updateActualValues(1, $car->id);
+        $this->specificationsService->updateActualValues($car->id);
 
         $message = sprintf(
             '%s выбран как родительский автомобиль для %s',
@@ -2553,22 +2553,22 @@ class CarsController extends AbstractActionController
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
-        
+
         $itemTable = $this->catalogue()->getCarTable();
-        
+
         $engine = $itemTable->find($this->params('car_id'))->current();
         if (! $engine) {
             return $this->notFoundAction();
         }
-        
+
         $items = $itemTable->fetchAll([
             'engine_item_id = ?' => $engine->id
         ]);
-        
+
         $model = new ViewModel([
             'items' => $items
         ]);
-        
+
         return $model->setTerminal(true);
     }
 
@@ -3417,7 +3417,7 @@ class CarsController extends AbstractActionController
                     $carTable->updateInteritance($childCarRow);
                 }
 
-                $this->specificationsService->updateActualValues(1, $newCar->id);
+                $this->specificationsService->updateActualValues($newCar->id);
 
                 $user = $this->user()->get();
                 $ucsTable = new DbTable\User\CarSubscribe();
@@ -3475,7 +3475,7 @@ class CarsController extends AbstractActionController
             'is_concept_inherit' => $isConceptInherit ? 1 : 0,
             'is_group'           => $values['is_group'] ? 1 : 0
         ];
-        
+
         if (array_key_exists('vehicle_type_id', $values)) {
             $result['vehicle_type_id'] = $values['vehicle_type_id'];
         }
@@ -3509,7 +3509,7 @@ class CarsController extends AbstractActionController
         if (! $this->user()->isAllowed('car', 'add')) {
             return $this->forbiddenAction();
         }
-        
+
         $itemTypeId = (int)$this->params('item_type_id');
         switch ($itemTypeId) {
             case DbTable\Item\Type::VEHICLE:
@@ -3597,7 +3597,7 @@ class CarsController extends AbstractActionController
 
                 $carTable->updateInteritance($car);
 
-                $this->specificationsService->updateInheritedValues(1, $car->id);
+                $this->specificationsService->updateInheritedValues($car->id);
 
                 return $this->redirect()->toUrl($url);
             }
@@ -3764,7 +3764,7 @@ class CarsController extends AbstractActionController
                 $newCar->refreshPicturesCount();
                 $brandModel->refreshPicturesCountByVehicle($newCar->id);
 
-                $this->specificationsService->updateActualValues(1, $newCar->id);
+                $this->specificationsService->updateActualValues($newCar->id);
 
                 $user = $this->user()->get();
                 $ucsTable = new DbTable\User\CarSubscribe();

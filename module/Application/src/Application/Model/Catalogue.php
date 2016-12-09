@@ -5,9 +5,6 @@ namespace Application\Model;
 use Autowp\Image\Storage\Request;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandItem;
-use Application\Model\DbTable\BrandEngine;
-use Application\Model\DbTable\Engine;
-use Application\Model\DbTable\EngineRow;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
@@ -51,16 +48,6 @@ class Catalogue
      * @var Picture
      */
     private $pictureTable;
-
-    /**
-     * @var Engine
-     */
-    private $engineTable;
-
-    /**
-     * @var BrandEngine
-     */
-    private $brandEngineTable;
 
     /**
      * @return array
@@ -171,26 +158,6 @@ class Catalogue
     }
 
     /**
-     * @return Engine
-     */
-    public function getEngineTable()
-    {
-        return $this->engineTable
-            ? $this->engineTable
-            : $this->engineTable = new Engine();
-    }
-
-    /**
-     * @return BrandEngine
-     */
-    public function getBrandEngineTable()
-    {
-        return $this->brandEngineTable
-            ? $this->brandEngineTable
-            : $this->brandEngineTable = new BrandEngine();
-    }
-
-    /**
      * @param VehicleRow $car
      * @return array
      */
@@ -234,86 +201,6 @@ class Catalogue
                 $urls,
                 $this->walkUpUntilBrand($parentRow->parent_id, array_merge([$parentRow->catname], $path))
             );
-        }
-
-        return $urls;
-    }
-
-    public function engineCataloguePaths(EngineRow $engine, array $options = [])
-    {
-        $defaults = [
-            'brand_id' => null,
-            'limit'    => null
-        ];
-        $options = array_merge($defaults, $options);
-
-        return $this->engineWalkUpUntilBrand($engine->id, $options);
-    }
-
-    /**
-     * @param int $id
-     * @param array $path
-     * @throws Exception
-     * @return array
-     */
-    private function engineWalkUpUntilBrand($id, $options)
-    {
-        $urls = [];
-
-        $engineTable = $this->getEngineTable();
-
-        $engineRow = $engineTable->find($id)->current();
-        if (! $engineRow) {
-            return $urls;
-        }
-
-        $brandTable = $this->getBrandTable();
-
-        $limit = $options['limit'];
-
-        $path = [];
-
-        while ($engineRow) {
-            array_unshift($path, $engineRow->id);
-
-            $brandEngineRows = $this->getBrandEngineTable()->fetchAll([
-                'engine_id = ?' => $engineRow->id
-            ]);
-
-            foreach ($brandEngineRows as $brandEngineRow) {
-                if ($options['brand_id'] && $options['brand_id'] != $brandEngineRow->brand_id) {
-                    continue;
-                }
-
-                $brand = $brandTable->find($brandEngineRow->brand_id)->current();
-                if (! $brand) {
-                    throw new Exception("Broken link `{$brandItemRow->brand_id}`");
-                }
-
-                $urls[] = [
-                    'brand_catname' => $brand->folder,
-                    'path'          => $path
-                ];
-
-                if ($limit !== null) {
-                    $limit--;
-                    if ($limit <= 0) {
-                        break;
-                    }
-                }
-            }
-
-            if ($limit !== null && $limit <= 0) {
-                break;
-            }
-
-            if ($engineRow->parent_id) {
-                $engineRow = $engineTable->fetchRow([
-                    'id = ?' => $engineRow->parent_id
-                ]);
-            } else {
-                $engineRow = null;
-            }
         }
 
         return $urls;

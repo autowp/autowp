@@ -96,15 +96,6 @@ class PictureController extends AbstractActionController
                     }
 
                     break;
-
-                case Picture::ENGINE_TYPE_ID:
-                    if ($picture->engine_id) {
-                        $galleryEnabled = true;
-                        $picSelect
-                            ->where('pictures.type = ?', Picture::ENGINE_TYPE_ID)
-                            ->where('pictures.engine_id = ?', $picture->engine_id);
-                    }
-                    break;
             }
 
             if (! $galleryEnabled) {
@@ -170,7 +161,6 @@ class PictureController extends AbstractActionController
 
         $brands = [];
         $car = null;
-        $isEngines = false;
 
         switch ($picture->type) {
             case Picture::LOGO_TYPE_ID:
@@ -209,7 +199,6 @@ class PictureController extends AbstractActionController
             'brand_id'   => $brands,
             'car_id'     => $car ? $car->id : null,
             'type'       => (int)$picture->type,
-            'is_engines' => $isEngines
         ]);*/
 
         $data = $this->pic()->picPageData($picture, $picSelect, $brands, [

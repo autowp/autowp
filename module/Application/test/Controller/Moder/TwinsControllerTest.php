@@ -17,6 +17,22 @@ class TwinsControllerTest extends AbstractHttpControllerTestCase
         parent::setUp();
     }
 
+    public function testGroupIsNotForbidden()
+    {
+        /**
+         * @var Request $request
+         */
+        $request = $this->getRequest();
+        $request->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('http://www.autowp.ru/moder/twins/twins-group/twins_group_id/1', 'GET');
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(TwinsController::class);
+        $this->assertMatchedRouteName('moder/twins/params');
+        $this->assertActionName('twins-group');
+    }
+
     public function testIndex()
     {
         $this->dispatch('https://www.autowp.ru/moder/twins', Request::METHOD_GET);

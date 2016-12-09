@@ -21,7 +21,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 47,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -30,7 +29,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 47,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],
@@ -50,7 +48,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 48,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -93,7 +90,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 31,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -102,7 +98,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 31,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],
@@ -112,7 +107,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 11,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],
@@ -122,7 +116,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 81,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],
@@ -131,7 +124,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 81,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -141,7 +133,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 82,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],
@@ -150,7 +141,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 82,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -159,7 +149,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 72,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -168,7 +157,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 72,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],
@@ -178,7 +166,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 1,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -187,7 +174,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 1,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],
@@ -197,7 +183,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 2,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -206,7 +191,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 2,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],
@@ -216,7 +200,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 3,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -225,7 +208,6 @@ class Mosts
             'adapter'   => [
                 'name'     => 'attr',
                 'attribute' => 3,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],
@@ -235,7 +217,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 64,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],
@@ -244,7 +225,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 64,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -336,7 +316,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 7,
-                'itemType'  => 1,
                 'order'     => 'DESC'
             ]
         ],
@@ -345,7 +324,6 @@ class Mosts
             'adapter'   => [
                 'name'      => 'attr',
                 'attribute' => 7,
-                'itemType'  => 1,
                 'order'     => 'ASC'
             ]
         ],

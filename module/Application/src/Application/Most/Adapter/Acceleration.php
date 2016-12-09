@@ -144,7 +144,7 @@ class Acceleration extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         foreach ($axises as $axis) {
-            $value = $specService->getActualValueText($axis['attr']->id, 1, $car->id, $language);
+            $value = $specService->getActualValueText($axis['attr']->id, $car->id, $language);
 
             if ($value > 0) {
                 $text[] = $value . ' <span class="unit">' . $axis['unit'] . '</span>';

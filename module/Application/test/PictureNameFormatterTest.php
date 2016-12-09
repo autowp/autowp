@@ -103,22 +103,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'   => 4,
-                    'engine' => null
-                ],
-                'Engine',
-                'Engine'
-            ],
-            [
-                [
-                    'type'   => 4,
-                    'engine' => 'Mercedes-Benz M112'
-                ],
-                'Mercedes-Benz M112 engine',
-                'Mercedes-Benz M112 engine'
-            ],
-            [
-                [
                     'type'    => 7,
                     'factory' => null
                 ],
@@ -560,13 +544,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
                     'brand' => 'B&B'
                 ],
                 'B&amp;B miscellaneous',
-            ],
-            [
-                [
-                    'type'   => 4,
-                    'engine' => 'B&B M112'
-                ],
-                'B&amp;B M112 engine',
             ],
             [
                 [

@@ -118,22 +118,6 @@ return [
                             ]
                         ]
                     ],
-                    'engines' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/engines[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\EnginesController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'factories' => [
                         'type' => Segment::class,
                         'options' => [
@@ -358,7 +342,6 @@ return [
             Controller\Moder\BrandVehicleController::class => Controller\Moder\Service\BrandVehicleControllerFactory::class,
             Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
             Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
-            Controller\Moder\EnginesController::class      => Controller\Moder\Service\EnginesControllerFactory::class,
             Controller\Moder\FactoryController::class      => Controller\Moder\Service\FactoryControllerFactory::class,
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
             Controller\Moder\IndexController::class        => Controller\Moder\Service\IndexControllerFactory::class,
@@ -807,90 +790,6 @@ return [
                 'order' => [
                     'required' => false
                 ],
-            ],
-        ],
-        'ModerEnginesFilterForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type'    => 'Text',
-                        'name'    => 'name',
-                        'options' => [
-                            'label' => 'moder/engines/filter/name',
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'brand_id',
-                        'options' => [
-                            'label' => 'moder/engines/filter/brand-id',
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'order',
-                        'options' => [
-                            'label'   => 'moder/engines/filter/order',
-                            'options' => [
-                                0 => 'id asc',
-                                1 => 'id desc',
-                                2 => 'moder/engines/filter/order/name-asc',
-                                3 => 'moder/engines/filter/order/name-desc',
-                            ]
-                        ]
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'name' => [
-                    'required' => false
-                ],
-                'brand_id' => [
-                    'required' => false
-                ],
-                'order' => [
-                    'required' => false
-                ],
-            ],
-        ],
-        'ModerEngineForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-                'legend' => 'moder/engines/engine/title'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'EngineName',
-                        'name' => 'name'
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'name' => [
-                    'required' => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim'],
-                        ['name' => 'SingleSpaces']
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'max' => Model\DbTable\Engine::MAX_NAME
-                            ]
-                        ]
-                    ]
-                ]
             ],
         ],
         'ModerPictureForm' => [

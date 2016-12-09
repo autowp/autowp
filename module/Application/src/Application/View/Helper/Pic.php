@@ -52,34 +52,6 @@ class Pic extends AbstractHtmlElement
     public function htmlTitle(array $picture)
     {
         return $this->pictureNameFormatter->formatHtml($picture, $this->view->language());
-        /*$view = $this->view;
-
-        if (isset($picture['name']) && $picture['name']) {
-            return $view->escapeHtml($picture['name']);
-        }
-
-        switch ($picture['type']) {
-            case Picture::VEHICLE_TYPE_ID:
-                if ($picture['car']) {
-                    if ($picture['perspective']) {
-                        return $view->escapeHtml(self::mbUcfirst($view->translate($picture['perspective']))) .
-                               ' ' . $view->car()->htmlTitle($picture['car']);
-                    }
-                    return $view->car()->htmlTitle($picture['car']);
-                }
-                return 'Unsorted car';
-                break;
-
-            case Picture::ENGINE_TYPE_ID:
-            case Picture::LOGO_TYPE_ID:
-            case Picture::MIXED_TYPE_ID:
-            case Picture::UNSORTED_TYPE_ID:
-            case Picture::FACTORY_TYPE_ID:
-                return $view->escapeHtml($this->textTitle($picture));
-                break;
-        }
-
-        return 'Picture';*/
     }
 
     public function textTitle(array $picture)

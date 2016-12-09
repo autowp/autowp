@@ -14,7 +14,6 @@ use Application\Model\Message;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
-use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
@@ -113,7 +112,7 @@ class CarsController extends AbstractActionController
 
                 $user->invalidateSpecsVolume();
 
-                $contribPairs = $this->specsService->getContributors(1, [$car->id]);
+                $contribPairs = $this->specsService->getContributors([$car->id]);
                 $contributors = [];
                 if ($contribPairs) {
                     $userTable = new User();
@@ -200,7 +199,7 @@ class CarsController extends AbstractActionController
         foreach ($tabs as $id => &$tab) {
             $tab['active'] = $id == $currentTab;
         }
-        
+
         if ($car->item_type_id != DbTable\Item\Type::VEHICLE) {
             unset($tabs['engine']);
         }
@@ -255,26 +254,15 @@ class CarsController extends AbstractActionController
         }
 
         //$carTable = new Vehicle();
-        $aitTable = new Attr\ItemType();
-
         $itemId = (int)$this->params('item_id');
-        $itemType = $aitTable->find($this->params('item_type_id'))->current();
-        if (! $itemType) {
-            return $this->notFoundAction();
-        }
 
         $toItemId = (int)$this->params('to_item_id');
-        $toItemType = $aitTable->find($this->params('to_item_type_id'))->current();
-        if (! $toItemType) {
-            return $this->notFoundAction();
-        }
 
         $userValueTable = new Attr\UserValue();
         $attrTable = new Attr\Attribute();
 
         $eUserValueRows = $userValueTable->fetchAll([
-            'item_id = ?'      => $itemId,
-            'item_type_id = ?' => $itemType->id
+            'item_id = ?' => $itemId
         ]);
 
         foreach ($eUserValueRows as $eUserValueRow) {
@@ -282,7 +270,6 @@ class CarsController extends AbstractActionController
 
             $cUserValueRow = $userValueTable->fetchRow([
                 'item_id = ?'      => $toItemId,
-                'item_type_id = ?' => $toItemType->id,
                 'attribute_id = ?' => $eUserValueRow->attribute_id,
                 'user_id = ?'      => $eUserValueRow->user_id
             ]);
@@ -302,7 +289,6 @@ class CarsController extends AbstractActionController
             $eDataRows = $dataTable->fetchAll([
                 'attribute_id = ?' => $eUserValueRow->attribute_id,
                 'item_id = ?'      => $eUserValueRow->item_id,
-                'item_type_id = ?' => $eUserValueRow->item_type_id,
                 'user_id = ?'      => $eUserValueRow->user_id
             ]);
 
@@ -311,7 +297,6 @@ class CarsController extends AbstractActionController
                 $filter = [
                     'attribute_id = ?' => $eDataRow->attribute_id,
                     'item_id = ?'      => $toItemId,
-                    'item_type_id = ?' => $toItemType->id,
                     'user_id = ?'      => $eDataRow->user_id
                 ];
                 if ($attrRow->isMultiple()) {
@@ -325,27 +310,19 @@ class CarsController extends AbstractActionController
             }
 
             $eUserValueRow->setFromArray([
-                'item_id'      => $toItemId,
-                'item_type_id' => $toItemType->id,
+                'item_id'      => $toItemId
             ]);
             $eUserValueRow->save();
 
             foreach ($eDataRows as $eDataRow) {
                 $eDataRow->setFromArray([
-                    'item_id'      => $toItemId,
-                    'item_type_id' => $toItemType->id,
+                    'item_id'      => $toItemId
                 ]);
                 $eDataRow->save();
             }
 
-            $this->specsService->updateActualValues(
-                $toItemType->id,
-                $toItemId
-            );
-            $this->specsService->updateActualValues(
-                $itemType->id,
-                $itemId
-            );
+            $this->specsService->updateActualValues($toItemId);
+            $this->specsService->updateActualValues($itemId);
         }
 
         return $this->redirect()->toRoute('cars/params', [
@@ -361,13 +338,7 @@ class CarsController extends AbstractActionController
             return $this->forward('forbidden', 'error');
         }
 
-        $aitTable = new Attr\ItemType();
-
         $itemId = (int)$this->params('item_id');
-        $itemType = $aitTable->find($this->params('item_type_id'))->current();
-        if (! $itemType) {
-            return $this->notFoundAction();
-        }
 
         $auvTable = new Attr\UserValue();
 
@@ -389,13 +360,11 @@ class CarsController extends AbstractActionController
                 'user'      => $user,
                 'value'     => $this->specsService->getActualValueText(
                     $attribute->id,
-                    $itemType->id,
                     $row->item_id,
                     $language
                 ),
                 'userValue' => $this->specsService->getUserValueText(
                     $attribute->id,
-                    $itemType->id,
                     $row->item_id,
                     $user->id,
                     $language
@@ -414,7 +383,6 @@ class CarsController extends AbstractActionController
         return [
             'values'     => $values,
             'itemId'     => $itemId,
-            'itemTypeId' => $itemType->id
         ];
     }
 
@@ -429,17 +397,10 @@ class CarsController extends AbstractActionController
             return $this->forward('forbidden', 'error');
         }
 
-        $aitTable = new Attr\ItemType();
-
-        $itemType = $aitTable->find($this->params('item_type_id'))->current();
-        if (! $itemType) {
-            return $this->notFoundAction();
-        }
-
         $itemId = (int)$this->params('item_id');
         $userId = (int)$this->params('user_id');
 
-        $this->specsService->deleteUserValue((int)$this->params('attribute_id'), $itemType->id, $itemId, $userId);
+        $this->specsService->deleteUserValue((int)$this->params('attribute_id'), $itemId, $userId);
 
         return $this->redirect()->toUrl($request->getServer('HTTP_REFERER'));
     }
@@ -495,7 +456,7 @@ class CarsController extends AbstractActionController
         $items = [];
 
         $cars = new Vehicle();
-        
+
         $isModerator = $this->user()->inheritsRole('moder');
 
         foreach ($paginator->getCurrentItems() as $row) {
@@ -504,7 +465,6 @@ class CarsController extends AbstractActionController
             $moderUrl = null;
             $path = [];
 
-            $itemType = $row->findParentRow(Attr\ItemType::class);
             $car = $cars->find($row->item_id)->current();
             if ($car) {
                 $objectName = $this->car()->formatName($car, $this->language());
@@ -537,10 +497,6 @@ class CarsController extends AbstractActionController
             $items[] = [
                 'date'     => $row->getDateTime('update_date'),
                 'user'     => $user,
-                'itemType' => [
-                    'id'   => $itemType->id,
-                    'name' => $itemType->name,
-                ],
                 'object'   => [
                     'name'      => $objectName,
                     'editorUrl' => $editorUrl,
@@ -549,7 +505,6 @@ class CarsController extends AbstractActionController
                 'path'     => $path,
                 'value'    => $this->specsService->getUserValueText(
                     $attribute->id,
-                    $itemType->id,
                     $row->item_id,
                     $user->id,
                     $language
@@ -589,14 +544,14 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $engine = $car->findParentRow(Engine::class);
+        $engine = $car->findParentRow(Vehicle::class, 'Engine');
         $car->engine_inherit = 0;
         $car->engine_item_id = null;
         $car->save();
 
         $carTable->updateInteritance($car);
 
-        $this->specsService->updateActualValues(1, $car->id);
+        $this->specsService->updateActualValues($car->id);
 
         if ($engine) {
             $message = sprintf(
@@ -653,7 +608,7 @@ class CarsController extends AbstractActionController
 
             $carTable->updateInteritance($car);
 
-            $this->specsService->updateActualValues(1, $car->id);
+            $this->specsService->updateActualValues($car->id);
 
             $message = sprintf(
                 'У автомобиля %s установлено наследование двигателя',
@@ -747,7 +702,9 @@ class CarsController extends AbstractActionController
         if (! $brand) {
             $brands = $brandModel->getList($language, function ($select) {
                 $select
-                    ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
+                    ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                    ->join('cars', 'brand_item.car_id = cars.id', null)
+                    ->where('cars.item_type_id = ?', DbTable\Item\Type::ENGINE)
                     ->group('brands.id');
             });
 
@@ -778,7 +735,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $this->specsService->updateActualValues(1, $car->id);
+        $this->specsService->updateActualValues($car->id);
 
         $user = $this->user()->get();
         $ucsTable = new UserCarSubscribe();
@@ -824,7 +781,7 @@ class CarsController extends AbstractActionController
 
         $carTable->updateInteritance($car);
 
-        $this->specsService->updateActualValues(1, $car->id);
+        $this->specsService->updateActualValues($car->id);
 
         return $this->redirect()->toUrl($this->editorUrl($car, 'admin'));
     }

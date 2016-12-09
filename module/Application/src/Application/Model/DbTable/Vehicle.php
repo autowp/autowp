@@ -27,8 +27,8 @@ class Vehicle extends Table
             'refColumns'    => ['id']
         ],
         'Engine' => [
-            'columns'       => ['engine_id'],
-            'refTableClass' => Engine::class,
+            'columns'       => ['engine_item_id'],
+            'refTableClass' => self::class,
             'refColumns'    => ['id']
         ]
     ];
@@ -72,7 +72,7 @@ class Vehicle extends Table
         if ($car->engine_inherit) {
             $map = [];
             foreach ($parents as $parent) {
-                $engineId = $parent->engine_id;
+                $engineId = $parent->engine_item_id;
                 if ($engineId) {
                     if (isset($map[$engineId])) {
                         $map[$engineId]++;
@@ -92,10 +92,10 @@ class Vehicle extends Table
                 }
             }
 
-            $oldEngineId = isset($car->engine_id) ? (int)$car->engine_id : null;
+            $oldEngineId = isset($car->engine_item_id) ? (int)$car->engine_item_id : null;
 
             if ($oldEngineId !== $selectedId) {
-                $car->engine_id = $selectedId;
+                $car->engine_item_id = $selectedId;
                 $somethingChanged = true;
             }
         }

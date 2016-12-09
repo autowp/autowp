@@ -254,13 +254,6 @@ class FactoryController extends AbstractActionController
                 $select->where('factory.name like ?', '%' . $values['name'] . '%');
             }
 
-            /*if ($values['brand_id']) {
-                $select
-                    ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
-                    ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
-                    ->where('brand_engine.brand_id = ?', $values['brand_id']);
-            }*/
-
             switch ($values['order']) {
                 case 0:
                     $select->order('factory.id asc');

@@ -4,7 +4,6 @@ namespace Application\Most\Adapter;
 
 use Zend_Db_Table_Select;
 
-use Application\Model\DbTable\Attr\ItemType;
 use Application\Model\DbTable\Attr\Attribute;
 
 use Zend_Db_Expr;
@@ -20,16 +19,11 @@ class Brakes extends AbstractAdapter
 
     protected $attributesTable;
 
-    protected $carItemType;
-
     public function __construct(array $options)
     {
         parent::__construct($options);
 
         $this->attributesTable = new Attribute();
-
-        $itemTypes = new ItemType();
-        $this->carItemType = $itemTypes->find(1)->current();
     }
 
     public function setAttributes(array $value)
@@ -142,8 +136,8 @@ class Brakes extends AbstractAdapter
         $specService = $this->most->getSpecs();
 
         foreach ([$front, $rear] as $axis) {
-            $diameterValue = $specService->getActualValue($axis['diameter'], $car->id, 1);
-            $thicknessValue = $specService->getActualValue($axis['thickness'], $car->id, 1);
+            $diameterValue = $specService->getActualValue($axis['diameter'], $car->id);
+            $thicknessValue = $specService->getActualValue($axis['thickness'], $car->id);
 
             if ($diameterValue || $thicknessValue) {
                 $value = $diameterValue . ' × ' . $thicknessValue . ' <span class="unit">мм</span>';

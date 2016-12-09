@@ -5,7 +5,6 @@ namespace Application\Most\Adapter;
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 
-use Application\Model\DbTable\Attr\ItemType;
 use Application\Model\DbTable\Attr\Attribute;
 use Application\Model\DbTable\Attr\Unit;
 
@@ -15,18 +14,11 @@ class Attr extends AbstractAdapter
 {
     protected $attribute;
 
-    protected $itemType;
-
     protected $order;
 
     public function setAttribute($value)
     {
         $this->attribute = (int)$value;
-    }
-
-    public function setItemType($value)
-    {
-        $this->itemType = (int)$value;
     }
 
     public function setOrder($value)
@@ -36,17 +28,11 @@ class Attr extends AbstractAdapter
 
     public function getCars(Zend_Db_Table_Select $select, $language)
     {
-        $itemTypes = new ItemType();
         $attributes = new Attribute();
 
         $attribute = $attributes->find($this->attribute)->current();
         if (! $attribute) {
             throw new Exception("Attribute '{$this->attribute}' not found");
-        }
-
-        $itemType = $itemTypes->find($this->itemType)->current();
-        if (! $itemType) {
-            throw new Exception("Item type '{$this->itemType}' not found");
         }
 
         $specService = $this->most->getSpecs();
@@ -64,7 +50,7 @@ class Attr extends AbstractAdapter
 
         $result = [];
         foreach ($cars as $car) {
-            $valueText = $specService->getActualValueText($attribute->id, $itemType->id, $car->id, $language);
+            $valueText = $specService->getActualValueText($attribute->id, $car->id, $language);
 
             $result[] = [
                 'car'       => $car,

@@ -15,7 +15,6 @@ use Application\Model\DbTable\Category;
 use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
-use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Perspective;
@@ -335,7 +334,7 @@ class Pic extends AbstractPlugin
                     'pictures.width', 'pictures.height',
                     'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                     'pictures.status', 'pictures.image_id',
-                    'pictures.brand_id', 
+                    'pictures.brand_id',
                     'pictures.type', 'pictures.factory_id'
                 ]);
 
@@ -358,7 +357,7 @@ class Pic extends AbstractPlugin
                     );
 
                 $bind['type_id'] = CommentMessage::PICTURES_TYPE_ID;
-            } 
+            }
 
             $rows = $db->fetchAll($select, $bind);
 
@@ -666,7 +665,7 @@ class Pic extends AbstractPlugin
                 ];
             }
 
-            $hasSpecs = $this->specsService->hasSpecs(1, $item->id);
+            $hasSpecs = $this->specsService->hasSpecs($item->id);
             $specsUrl = null;
             foreach ($catalogue->cataloguePaths($item) as $path) {
                 $specsUrl = $this->getController()->url()->fromRoute('catalogue', [
@@ -706,12 +705,12 @@ class Pic extends AbstractPlugin
     {
         $controller = $this->getController();
         $catalogue = $controller->catalogue();
-        
+
         $language = $controller->language();
 
         $itemTable = $catalogue->getCarTable();
         $itemModel = new \Application\Model\Item();
-        
+
         $engineRows = [];
         if ($itemIds) {
             $engineRows = $itemTable->fetchAll([
@@ -724,16 +723,16 @@ class Pic extends AbstractPlugin
         foreach ($engineRows as $engineRow) {
 
             $vehicles = [];
-    
+
             $vehicleIds = $itemModel->getEngineVehiclesGroups($engineRow->id);
             if ($vehicleIds) {
                 $carRows = $itemTable->fetchAll([
                     'id in (?)' => $vehicleIds
                 ], $catalogue->carsOrdering());
-    
+
                 foreach ($carRows as $carRow) {
                     $cataloguePaths = $catalogue->cataloguePaths($carRow);
-    
+
                     foreach ($cataloguePaths as $cPath) {
                         $vehicles[] = [
                             'name' => $controller->car()->formatName($carRow, $language),
@@ -748,13 +747,13 @@ class Pic extends AbstractPlugin
                     }
                 }
             }
-    
+
             $specsUrl = false;
-            $hasSpecs = $this->specsService->hasSpecs(3, $engineRow->id);
-    
+            $hasSpecs = $this->specsService->hasSpecs($engineRow->id);
+
             if ($hasSpecs) {
                 $cataloguePaths = $catalogue->cataloguePaths($engineRow);
-    
+
                 foreach ($cataloguePaths as $path) {
                     $specsUrl = $controller->url()->fromRoute('catalogue', [
                         'action'        => 'brand-item-specifications',
@@ -765,7 +764,7 @@ class Pic extends AbstractPlugin
                     break;
                 }
             }
-    
+
             $specsEditUrl = null;
             if ($controller->user()->isAllowed('specifications', 'edit')) {
                 $specsEditUrl = $controller->url()->fromRoute('cars/params', [
@@ -773,7 +772,7 @@ class Pic extends AbstractPlugin
                     'car_id' => $engineRow->id
                 ]);
             }
-    
+
             $engines[] = [
                 'name'         => $engineRow->name,
                 'vehicles'     => $vehicles,
@@ -782,7 +781,7 @@ class Pic extends AbstractPlugin
                 'specsEditUrl' => $specsEditUrl
             ];
         }
-        
+
         return $engines;
     }
 
@@ -820,16 +819,6 @@ class Pic extends AbstractPlugin
         );
 
         switch ($picture->type) {
-            case Picture::ENGINE_TYPE_ID:
-                if ($picture->engine_id) {
-                    $brandIds = $db->fetchCol(
-                        $db->select()
-                            ->from('brand_engine', 'brand_id')
-                            ->where('engine_id = ?', $picture->engine_id)
-                    );
-                }
-                break;
-
             case Picture::LOGO_TYPE_ID:
             case Picture::MIXED_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:
@@ -1041,7 +1030,7 @@ class Pic extends AbstractPlugin
         if ($picture->point) {
             $point = \geoPHP::load(substr($picture->point, 4), 'wkb');
         }
-        
+
         $itemIds = $this->pictureItem->getPictureItems($picture['id']);
 
         $data = [
@@ -1135,19 +1124,6 @@ class Pic extends AbstractPlugin
 
                 break;
 
-            case Picture::ENGINE_TYPE_ID:
-                if ($engine = $picture->findParentRow(Engine::class)) {
-                    $url = $controller->url()->fromRoute('moder/engines/params', [
-                        'action'    => 'engine',
-                        'engine_id' => $engine->id
-                    ]);
-                    $links[$url] = sprintf(
-                        $this->translator->translate('moder/picture/edit-engine-%s'),
-                        $engine->name
-                    );
-                }
-                break;
-
             case Picture::FACTORY_TYPE_ID:
                 if ($factory = $picture->findParentRow(Factory::class)) {
                     $links[$controller->url()->fromRoute('moder/factories/params', [
@@ -1228,9 +1204,7 @@ class Pic extends AbstractPlugin
                 'pictures.width', 'pictures.height',
                 'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                 'pictures.image_id', 'pictures.filesize',
-                'pictures.brand_id', 'pictures.engine_id',
-                'pictures.type', 'pictures.factory_id',
-                'pictures.type'
+                'pictures.brand_id', 'pictures.type', 'pictures.factory_id'
             ])
             ->joinLeft(
                 ['ct' => 'comment_topic'],

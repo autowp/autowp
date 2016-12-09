@@ -201,7 +201,7 @@ class IndexController extends AbstractActionController
             }
         }
 
-        if ($this->specsService->hasSpecs(1, $car->id)) {
+        if ($this->specsService->hasSpecs($car->id)) {
             foreach ($cataloguePaths as $path) {
                 $items[] = [
                     'icon'  => 'list-alt',
@@ -637,7 +637,7 @@ class IndexController extends AbstractActionController
             'allowUpPictures'      => true,
             'disableDescription'   => true,
             'callback'             => function (&$item) use ($userTable) {
-                $contribPairs = $this->specsService->getContributors(1, [$item['id']]);
+                $contribPairs = $this->specsService->getContributors([$item['id']]);
                 if ($contribPairs) {
                     $item['contributors'] = $userTable->fetchAll(
                         $userTable->select(true)

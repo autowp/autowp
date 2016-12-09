@@ -27,9 +27,6 @@
                 <td><?=$this->escapeHtml($this->humanTime($item['date'])) ?></td>
                 <td><?=$this->user($item['user']) ?></td>
                 <td>
-                    <?php if ($item['itemType']) { ?>
-                        <?=$this->escapeHtml($item['itemType']['name']) ?><br />
-                    <?php } ?>
                     <?php if ($this->isModerator) { ?>
                         <?=$this->htmlA($item['object']['moderUrl'], $item['object']['name']) ?>
                     <?php } else { ?>

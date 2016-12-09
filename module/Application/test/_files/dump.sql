@@ -17,6 +17,21 @@ use autowp_test;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+
+CREATE TABLE `item_type` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `item_type`
+--
+
+INSERT INTO `item_type` (`id`, `name`) VALUES
+(1, 'vehicle'),
+(2, 'engine');
+
 --
 -- Table structure for table `acl_resources`
 --
@@ -67,9 +82,15 @@ CREATE TABLE `acl_resources_privileges` (
 
 /*!40000 ALTER TABLE `acl_resources_privileges` DISABLE KEYS */;
 REPLACE INTO `acl_resources_privileges` VALUES 
-(4,4,'add'),(1,4,'edit_meta'),(5,4,'move'),
-(2,11,'edit'),(3,13,'ban'),(7,17,'edit'),(6,21,'edit'),
-(8,5,'move');
+(4,4,'add'),
+(1,4,'edit_meta'),
+(5,4,'move'),
+(2,11,'edit'),
+(3,13,'ban'),
+(7,17,'edit'),
+(6,21,'edit'),
+(8,5,'move'),
+(9,17,'edit-engine');
 /*!40000 ALTER TABLE `acl_resources_privileges` ENABLE KEYS */;
 
 --
@@ -99,7 +120,8 @@ INSERT INTO `acl_roles` VALUES
 (11,'brands-moder'),
 (10,'cars-moder'),
 (8,'comments-writer'),
-(15,'engines-moder'),(23,'expert'),
+(15,'engines-moder'),
+(23,'expert'),
 (58,'factory-moder'),(16,'forums-moder'),(49,'green-user'),
 (7,'guest'),(17,'models-moder'),(14,'moder'),(50,'museum-moder'),
 (13,'pages-moder'),
@@ -156,7 +178,7 @@ CREATE TABLE `acl_roles_privileges_allowed` (
 
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` DISABLE KEYS */;
 REPLACE INTO `acl_roles_privileges_allowed` VALUES 
-(10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8);
+(10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9);
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` ENABLE KEYS */;
 
 --
@@ -350,30 +372,6 @@ CREATE TABLE `articles_criterias_votes_ips` (
 /*!40000 ALTER TABLE `articles_criterias_votes_ips` ENABLE KEYS */;
 
 --
--- Table structure for table `articles_engines`
---
-
-DROP TABLE IF EXISTS `articles_engines`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `articles_engines` (
-  `article_id` int(10) unsigned NOT NULL,
-  `engine_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`article_id`,`engine_id`),
-  KEY `engine_id` (`engine_id`),
-  CONSTRAINT `articles_engines_fk` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`),
-  CONSTRAINT `articles_engines_fk1` FOREIGN KEY (`engine_id`) REFERENCES `engines` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB; (`article_id`)';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `articles_engines`
---
-
-/*!40000 ALTER TABLE `articles_engines` DISABLE KEYS */;
-/*!40000 ALTER TABLE `articles_engines` ENABLE KEYS */;
-
---
 -- Table structure for table `articles_sources`
 --
 
@@ -484,29 +482,6 @@ INSERT INTO `attrs_attributes` VALUES (1,'specs/attrs/14/17/1',2,17,0000000001,N
 /*!40000 ALTER TABLE `attrs_attributes` ENABLE KEYS */;
 
 --
--- Table structure for table `attrs_item_types`
---
-
-DROP TABLE IF EXISTS `attrs_item_types`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `attrs_item_types` (
-  `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `attrs_item_types`
---
-
-/*!40000 ALTER TABLE `attrs_item_types` DISABLE KEYS */;
-INSERT INTO `attrs_item_types` VALUES (1,'Автомобиль'),(3,'Двигатель'),(2,'Модификация автомобиля');
-/*!40000 ALTER TABLE `attrs_item_types` ENABLE KEYS */;
-
---
 -- Table structure for table `attrs_list_options`
 --
 
@@ -596,19 +571,16 @@ DROP TABLE IF EXISTS `attrs_user_values`;
 CREATE TABLE `attrs_user_values` (
   `attribute_id` int(10) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   `user_id` int(10) unsigned NOT NULL,
   `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `conflict` tinyint(4) NOT NULL DEFAULT '0',
   `weight` double DEFAULT '0',
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`,`user_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`,`user_id`),
   KEY `attribute_id` (`attribute_id`),
-  KEY `item_type_id` (`item_type_id`),
   KEY `user_id` (`user_id`),
   KEY `update_date` (`update_date`),
   CONSTRAINT `attrs_user_values_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `attrs_user_values_fk1` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`),
   CONSTRAINT `attrs_user_values_fk2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 19456 kB; (`attribute_id`)';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -618,7 +590,7 @@ CREATE TABLE `attrs_user_values` (
 --
 
 /*!40000 ALTER TABLE `attrs_user_values` DISABLE KEYS */;
-INSERT INTO `attrs_user_values` VALUES (20,1,1,1,'2016-11-25 18:31:46','2016-11-25 18:31:46',0,1);
+INSERT INTO `attrs_user_values` VALUES (20,1,1,'2016-11-25 18:31:46','2016-11-25 18:31:46',0,1);
 /*!40000 ALTER TABLE `attrs_user_values` ENABLE KEYS */;
 
 --
@@ -631,15 +603,12 @@ DROP TABLE IF EXISTS `attrs_user_values_float`;
 CREATE TABLE `attrs_user_values_float` (
   `attribute_id` int(10) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   `value` double DEFAULT NULL,
   `user_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`,`user_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`,`user_id`),
   KEY `attribute_id` (`attribute_id`),
-  KEY `item_type_id` (`item_type_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `attrs_user_values_float_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `attrs_user_values_float_fk1` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`),
   CONSTRAINT `attrs_user_values_float_fk2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 19456 kB; (`attribute_id`)';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -661,15 +630,12 @@ DROP TABLE IF EXISTS `attrs_user_values_int`;
 CREATE TABLE `attrs_user_values_int` (
   `attribute_id` int(10) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   `value` int(11) DEFAULT NULL,
   `user_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`,`user_id`),
-  KEY `item_type_id` (`item_type_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`,`user_id`),
   KEY `user_id` (`user_id`),
   KEY `item_id` (`item_id`),
   CONSTRAINT `attrs_user_values_int_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `attrs_user_values_int_fk1` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`),
   CONSTRAINT `attrs_user_values_int_fk2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 19456 kB; (`attribute_id`)';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -691,16 +657,13 @@ DROP TABLE IF EXISTS `attrs_user_values_list`;
 CREATE TABLE `attrs_user_values_list` (
   `attribute_id` int(11) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(4) unsigned NOT NULL,
   `user_id` int(11) unsigned NOT NULL,
   `value` int(11) unsigned DEFAULT NULL,
   `ordering` int(11) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`,`user_id`,`ordering`),
-  KEY `FK_attrs_user_values_list_attrs_item_types_id` (`item_type_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`,`user_id`,`ordering`),
   KEY `FK_attrs_user_values_list_users_id` (`user_id`),
   KEY `FK_attrs_user_values_list_attrs_list_options_id` (`value`),
   CONSTRAINT `FK_attrs_user_values_list_attrs_attributes_id` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `FK_attrs_user_values_list_attrs_item_types_id` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`),
   CONSTRAINT `FK_attrs_user_values_list_attrs_list_options_id` FOREIGN KEY (`value`) REFERENCES `attrs_list_options` (`id`),
   CONSTRAINT `FK_attrs_user_values_list_users_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -711,7 +674,7 @@ CREATE TABLE `attrs_user_values_list` (
 --
 
 /*!40000 ALTER TABLE `attrs_user_values_list` DISABLE KEYS */;
-INSERT INTO `attrs_user_values_list` VALUES (20,1,1,1,1,1);
+INSERT INTO `attrs_user_values_list` VALUES (20,1,1,1,1);
 /*!40000 ALTER TABLE `attrs_user_values_list` ENABLE KEYS */;
 
 --
@@ -724,15 +687,12 @@ DROP TABLE IF EXISTS `attrs_user_values_string`;
 CREATE TABLE `attrs_user_values_string` (
   `attribute_id` int(10) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   `value` varchar(255) DEFAULT NULL,
   `user_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`,`user_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`,`user_id`),
   KEY `attribute_id` (`attribute_id`),
-  KEY `item_type_id` (`item_type_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `attrs_user_values_string_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `attrs_user_values_string_fk1` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`),
   CONSTRAINT `attrs_user_values_string_fk2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 19456 kB; (`attribute_id`)';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -754,15 +714,12 @@ DROP TABLE IF EXISTS `attrs_user_values_text`;
 CREATE TABLE `attrs_user_values_text` (
   `attribute_id` int(10) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   `value` text,
   `user_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`,`user_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`,`user_id`),
   KEY `attribute_id` (`attribute_id`),
-  KEY `item_type_id` (`item_type_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `attrs_user_values_text_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `attrs_user_values_text_fk1` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`),
   CONSTRAINT `attrs_user_values_text_fk2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 19456 kB; (`attribute_id`)';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -784,14 +741,12 @@ DROP TABLE IF EXISTS `attrs_values`;
 CREATE TABLE `attrs_values` (
   `attribute_id` int(10) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   `conflict` tinyint(4) NOT NULL DEFAULT '0',
   `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`),
   KEY `attribute_id` (`attribute_id`),
-  KEY `item_type_id` (`item_type_id`,`item_id`) USING BTREE,
-  CONSTRAINT `attrs_values_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `attrs_values_fk1` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`)
+  KEY `item_id` (`item_id`) USING BTREE,
+  CONSTRAINT `attrs_values_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -800,7 +755,7 @@ CREATE TABLE `attrs_values` (
 --
 
 /*!40000 ALTER TABLE `attrs_values` DISABLE KEYS */;
-INSERT INTO `attrs_values` VALUES (20,1,1,0,'2016-11-25 18:31:46');
+INSERT INTO `attrs_values` VALUES (20,1,0,'2016-11-25 18:31:46');
 /*!40000 ALTER TABLE `attrs_values` ENABLE KEYS */;
 
 --
@@ -813,14 +768,11 @@ DROP TABLE IF EXISTS `attrs_values_float`;
 CREATE TABLE `attrs_values_float` (
   `attribute_id` int(10) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   `value` double DEFAULT NULL,
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`),
   KEY `attribute_id` (`attribute_id`),
-  KEY `item_type_id` (`item_type_id`),
-  KEY `IX_attrs_values_float_value` (`item_type_id`,`attribute_id`,`value`,`item_id`),
-  CONSTRAINT `attrs_values_float_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `attrs_values_float_fk1` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`)
+  KEY `IX_attrs_values_float_value` (`attribute_id`,`value`,`item_id`),
+  CONSTRAINT `attrs_values_float_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=79;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -841,13 +793,10 @@ DROP TABLE IF EXISTS `attrs_values_int`;
 CREATE TABLE `attrs_values_int` (
   `attribute_id` int(10) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   `value` int(11) DEFAULT NULL,
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`),
   KEY `attribute_id` (`attribute_id`),
-  KEY `item_type_id` (`item_type_id`),
-  CONSTRAINT `attrs_values_int_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `attrs_values_int_fk1` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`)
+  CONSTRAINT `attrs_values_int_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -868,14 +817,11 @@ DROP TABLE IF EXISTS `attrs_values_list`;
 CREATE TABLE `attrs_values_list` (
   `attribute_id` int(11) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(4) unsigned NOT NULL,
   `value` int(11) unsigned DEFAULT NULL,
   `ordering` int(11) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`,`ordering`),
-  KEY `FK_attrs_values_list_attrs_item_types_id` (`item_type_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`,`ordering`),
   KEY `FK_attrs_values_list_attrs_list_options_id` (`value`),
   CONSTRAINT `FK_attrs_values_list_attrs_attributes_id` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `FK_attrs_values_list_attrs_item_types_id` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`),
   CONSTRAINT `FK_attrs_values_list_attrs_list_options_id` FOREIGN KEY (`value`) REFERENCES `attrs_list_options` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -885,7 +831,7 @@ CREATE TABLE `attrs_values_list` (
 --
 
 /*!40000 ALTER TABLE `attrs_values_list` DISABLE KEYS */;
-INSERT INTO `attrs_values_list` VALUES (20,1,1,1,1);
+INSERT INTO `attrs_values_list` VALUES (20,1,1,1);
 /*!40000 ALTER TABLE `attrs_values_list` ENABLE KEYS */;
 
 --
@@ -898,13 +844,10 @@ DROP TABLE IF EXISTS `attrs_values_string`;
 CREATE TABLE `attrs_values_string` (
   `attribute_id` int(10) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   `value` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`),
   KEY `attribute_id` (`attribute_id`),
-  KEY `item_type_id` (`item_type_id`),
-  CONSTRAINT `attrs_values_string_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `attrs_values_string_fk1` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`)
+  CONSTRAINT `attrs_values_string_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -925,13 +868,10 @@ DROP TABLE IF EXISTS `attrs_values_text`;
 CREATE TABLE `attrs_values_text` (
   `attribute_id` int(10) unsigned NOT NULL,
   `item_id` int(11) unsigned NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   `value` text,
-  PRIMARY KEY (`attribute_id`,`item_id`,`item_type_id`),
+  PRIMARY KEY (`attribute_id`,`item_id`),
   KEY `attribute_id` (`attribute_id`),
-  KEY `item_type_id` (`item_type_id`),
-  CONSTRAINT `attrs_values_text_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`),
-  CONSTRAINT `attrs_values_text_fk1` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`)
+  CONSTRAINT `attrs_values_text_fk` FOREIGN KEY (`attribute_id`) REFERENCES `attrs_attributes` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -977,11 +917,8 @@ DROP TABLE IF EXISTS `attrs_zones`;
 CREATE TABLE `attrs_zones` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
-  `item_type_id` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`,`item_type_id`),
-  KEY `item_type_id` (`item_type_id`),
-  CONSTRAINT `attrs_zones_fk` FOREIGN KEY (`item_type_id`) REFERENCES `attrs_item_types` (`id`)
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -990,7 +927,7 @@ CREATE TABLE `attrs_zones` (
 --
 
 /*!40000 ALTER TABLE `attrs_zones` DISABLE KEYS */;
-INSERT INTO `attrs_zones` VALUES (3,'Автобусы',1),(2,'Грузовые автомобили',1),(5,'Двигатели',3),(1,'Легковые автомобили',1),(4,'Модификации',2);
+INSERT INTO `attrs_zones` VALUES (3,'Автобусы'),(2,'Грузовые автомобили'),(5,'Двигатели'),(1,'Легковые автомобили'),(4,'Модификации');
 /*!40000 ALTER TABLE `attrs_zones` ENABLE KEYS */;
 
 --
@@ -1041,31 +978,6 @@ CREATE TABLE `brand_alias` (
 
 /*!40000 ALTER TABLE `brand_alias` DISABLE KEYS */;
 /*!40000 ALTER TABLE `brand_alias` ENABLE KEYS */;
-
---
--- Table structure for table `brand_engine`
---
-
-DROP TABLE IF EXISTS `brand_engine`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `brand_engine` (
-  `brand_id` int(10) unsigned NOT NULL,
-  `engine_id` int(10) unsigned NOT NULL,
-  `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`brand_id`,`engine_id`),
-  KEY `engine_id` (`engine_id`),
-  CONSTRAINT `brand_fk` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `engine_fk2` FOREIGN KEY (`engine_id`) REFERENCES `engines` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `brand_engine`
---
-
-/*!40000 ALTER TABLE `brand_engine` DISABLE KEYS */;
-/*!40000 ALTER TABLE `brand_engine` ENABLE KEYS */;
 
 --
 -- Table structure for table `brand_language`
@@ -1464,22 +1376,25 @@ CREATE TABLE `cars` (
   `is_group` tinyint(4) NOT NULL DEFAULT '0',
   `car_type_inherit` tinyint(1) NOT NULL DEFAULT '0',
   `is_concept_inherit` tinyint(1) NOT NULL DEFAULT '0',
-  `engine_id` int(10) unsigned DEFAULT NULL,
+  `engine_item_id` int(10) unsigned DEFAULT NULL,
   `engine_inherit` tinyint(4) NOT NULL DEFAULT '1',
   `text_id` int(11) DEFAULT NULL,
   `full_text_id` int(11) DEFAULT NULL,
+  `item_type_id` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`,`begin_year`,`body`,`end_year`,`begin_model_year`,`end_model_year`,`is_group`),
   KEY `fullCaptionOrder` (`name`,`body`,`begin_year`,`end_year`),
   KEY `primary_and_sorting` (`id`,`begin_order_cache`),
-  KEY `engine_id` (`engine_id`),
+  KEY `engine_item_id` (`engine_item_id`),
   KEY `spec_id` (`spec_id`),
   KEY `text_id` (`text_id`),
   KEY `full_text_id` (`full_text_id`),
-  CONSTRAINT `cars_ibfk_2` FOREIGN KEY (`engine_id`) REFERENCES `engines` (`id`),
+  KEY `item_type_id` (`item_type_id`),
+  CONSTRAINT `cars_ibfk_2` FOREIGN KEY (`engine_item_id`) REFERENCES `cars` (`id`),
   CONSTRAINT `cars_ibfk_3` FOREIGN KEY (`spec_id`) REFERENCES `spec` (`id`),
   CONSTRAINT `cars_ibfk_4` FOREIGN KEY (`text_id`) REFERENCES `textstorage_text` (`id`),
-  CONSTRAINT `cars_ibfk_5` FOREIGN KEY (`full_text_id`) REFERENCES `textstorage_text` (`id`)
+  CONSTRAINT `cars_ibfk_5` FOREIGN KEY (`full_text_id`) REFERENCES `textstorage_text` (`id`),
+  CONSTRAINT `cars_ibfk_6` FOREIGN KEY (`item_type_id`) REFERENCES `item_type` (id)
 ) ENGINE=InnoDB AUTO_INCREMENT=99781 DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=152;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1488,7 +1403,39 @@ CREATE TABLE `cars` (
 --
 
 /*!40000 ALTER TABLE `cars` DISABLE KEYS */;
-INSERT INTO `cars` VALUES (1,'test car',1999,NULL,'',NULL,1,100,1,0,0,1,'2016-11-25 18:31:47',2,NULL,NULL,NULL,2000,NULL,NULL,0,0,0,1,1,NULL,NULL),(2,'test concept car',1999,2005,'',NULL,1,233,0,1,0,0,'2016-11-25 18:31:47',6,4,NULL,NULL,1999,2005,NULL,0,0,0,NULL,1,NULL,NULL),(3,'test car 3',1923,1927,'',NULL,1,50752,1,0,0,0,'2016-11-25 18:31:47',6,1,NULL,NULL,1923,1927,NULL,0,0,0,NULL,1,NULL,NULL),(4,'test car 4',1931,1937,'',NULL,1,51365,0,0,0,1,'2016-11-25 18:31:47',6,5,NULL,NULL,1932,1937,NULL,0,0,0,NULL,1,NULL,NULL),(5,'test car 5',1984,1984,'',NULL,1,79927,0,0,0,1,'2016-11-25 18:31:47',7,4,NULL,NULL,1985,1984,NULL,0,0,0,NULL,1,NULL,NULL),(6,'test car 6',1908,1908,'',NULL,1,73949,0,0,0,0,'2016-11-25 18:31:47',4,9,NULL,NULL,1908,1908,NULL,0,0,0,NULL,1,NULL,NULL),(7,'test car 7',1997,1997,'',NULL,1,73664,0,0,0,1,'2016-11-25 18:31:47',1,12,NULL,NULL,1997,1997,NULL,0,0,0,NULL,1,NULL,NULL),(8,'test car 8',1915,1920,'',NULL,1,90611,0,0,0,1,'2016-11-25 18:31:47',2,5,NULL,NULL,1916,1920,NULL,0,0,0,NULL,1,NULL,NULL),(9,'test car 9',2007,2017,'',NULL,1,66221,1,0,0,1,'2016-11-25 18:31:47',5,12,NULL,NULL,2008,2017,NULL,0,0,0,NULL,1,NULL,NULL),(10,'test car 10',1914,1919,'',NULL,1,39531,1,0,0,1,'2016-11-25 18:31:47',5,12,NULL,NULL,1915,1919,NULL,0,0,0,NULL,1,NULL,NULL),(11,'test car 11',1941,1946,'',NULL,1,2689,1,0,0,1,'2016-11-25 18:31:47',6,1,NULL,NULL,1942,1946,NULL,0,0,0,NULL,1,NULL,NULL),(12,'test car 12',1995,2005,'',NULL,1,3852,0,0,0,1,'2016-11-25 18:31:47',2,5,NULL,NULL,1996,2005,NULL,0,0,0,NULL,1,NULL,NULL),(13,'test car 13',1946,1947,'',NULL,1,43108,1,0,0,0,'2016-11-25 18:31:47',7,7,NULL,NULL,1946,1947,NULL,0,0,0,NULL,1,NULL,NULL),(14,'test car 14',1998,2006,'',NULL,1,50167,1,0,0,1,'2016-11-25 18:31:47',10,7,NULL,NULL,1998,2006,NULL,0,0,0,NULL,1,NULL,NULL),(15,'test car 15',1963,1966,'',NULL,1,83109,1,0,0,1,'2016-11-25 18:31:47',2,7,NULL,NULL,1963,1966,NULL,0,0,0,NULL,1,NULL,NULL),(16,'test car 16',1973,1975,'',NULL,1,629,0,0,0,1,'2016-11-25 18:31:47',11,8,NULL,NULL,1973,1975,NULL,0,0,0,NULL,1,NULL,NULL),(17,'test car 17',2001,2010,'',NULL,1,14989,1,0,0,0,'2016-11-25 18:31:47',7,3,NULL,NULL,2001,2010,NULL,0,0,0,NULL,1,NULL,NULL),(18,'test car 18',2011,2018,'',NULL,1,91731,0,0,0,1,'2016-11-25 18:31:47',4,8,NULL,NULL,2011,2018,NULL,0,0,0,NULL,1,NULL,NULL),(19,'test car 19',1931,1937,'',NULL,1,99928,1,0,0,0,'2016-11-25 18:31:47',1,11,NULL,NULL,1931,1937,NULL,0,0,0,NULL,1,NULL,NULL),(20,'test car 20',1951,1960,'',NULL,1,10416,1,0,0,0,'2016-11-25 18:31:47',9,11,NULL,NULL,1951,1960,NULL,0,0,0,NULL,1,NULL,NULL),(21,'test car 21',1908,1908,'',NULL,1,48926,0,0,0,0,'2016-11-25 18:31:47',10,5,NULL,NULL,1908,1908,NULL,0,0,0,NULL,1,NULL,NULL),(22,'test car 22',1965,1973,'',NULL,1,89032,0,0,0,1,'2016-11-25 18:31:47',7,4,NULL,NULL,1965,1973,NULL,0,0,0,NULL,1,NULL,NULL),(23,'test car 23',1970,1973,'',NULL,1,81666,0,0,0,0,'2016-11-25 18:31:47',5,1,NULL,NULL,1970,1973,NULL,0,0,0,NULL,1,NULL,NULL),(24,'test car 24',1955,1964,'',NULL,1,86179,0,0,0,0,'2016-11-25 18:31:47',9,12,NULL,NULL,1955,1964,NULL,0,0,0,NULL,1,NULL,NULL),(25,'test car 25',1970,1974,'',NULL,1,69277,1,0,0,1,'2016-11-25 18:31:47',1,12,NULL,NULL,1970,1974,NULL,0,0,0,NULL,1,NULL,NULL),(26,'test car 26',1931,1934,'',NULL,1,34539,1,0,0,1,'2016-11-25 18:31:47',11,11,NULL,NULL,1931,1934,NULL,0,0,0,NULL,1,NULL,NULL),(27,'test car 27',2005,2014,'',NULL,1,86922,1,0,0,1,'2016-11-25 18:31:47',7,11,NULL,NULL,2005,2014,NULL,0,0,0,NULL,1,NULL,NULL),(28,'test car 28',1948,1953,'',NULL,1,79648,0,0,0,1,'2016-11-25 18:31:47',10,8,NULL,NULL,1949,1953,NULL,0,0,0,NULL,1,NULL,NULL),(29,'test car 29',1985,1985,'',NULL,1,5579,0,0,0,0,'2016-11-25 18:31:47',4,10,NULL,NULL,1986,1985,NULL,0,0,0,NULL,1,NULL,NULL),(30,'test car 30',1906,1916,'',NULL,1,90636,0,0,0,1,'2016-11-25 18:31:47',12,3,NULL,NULL,1907,1916,NULL,0,0,0,NULL,1,NULL,NULL),(31,'test car 31',1985,1988,'',NULL,1,30356,1,0,0,1,'2016-11-25 18:31:47',6,9,NULL,NULL,1986,1988,NULL,0,0,0,NULL,1,NULL,NULL),(32,'test car 32',2010,2010,'',NULL,1,48412,1,0,0,1,'2016-11-25 18:31:47',2,11,NULL,NULL,2011,2010,NULL,0,0,0,NULL,1,NULL,NULL),(33,'test car 33',2003,2008,'',NULL,1,1648,1,0,0,0,'2016-11-25 18:31:47',1,10,NULL,NULL,2004,2008,NULL,0,0,0,NULL,1,NULL,NULL),(34,'test car 34',1943,1951,'',NULL,1,61029,1,0,0,0,'2016-11-25 18:31:47',12,4,NULL,NULL,1944,1951,NULL,0,0,0,NULL,1,NULL,NULL),(35,'test car 35',2005,2011,'',NULL,1,39854,0,0,0,0,'2016-11-25 18:31:47',8,8,NULL,NULL,2006,2011,NULL,0,0,0,NULL,1,NULL,NULL),(36,'test car 36',2015,2018,'',NULL,1,14150,1,0,0,1,'2016-11-25 18:31:47',10,12,NULL,NULL,2016,2018,NULL,0,0,0,NULL,1,NULL,NULL),(37,'test car 37',1972,1977,'',NULL,1,74150,0,0,0,1,'2016-11-25 18:31:47',5,8,NULL,NULL,1973,1977,NULL,0,0,0,NULL,1,NULL,NULL),(38,'test car 38',1940,1947,'',NULL,1,345,0,0,0,1,'2016-11-25 18:31:47',12,8,NULL,NULL,1940,1947,NULL,0,0,0,NULL,1,NULL,NULL),(39,'test car 39',1999,2009,'',NULL,1,39394,0,0,0,1,'2016-11-25 18:31:47',6,4,NULL,NULL,1999,2009,NULL,0,0,0,NULL,1,NULL,NULL),(40,'test car 40',1994,1994,'',NULL,1,9381,1,0,0,0,'2016-11-25 18:31:47',5,11,NULL,NULL,1995,1994,NULL,0,0,0,NULL,1,NULL,NULL),(41,'test car 41',1966,1970,'',NULL,1,19488,0,0,0,0,'2016-11-25 18:31:47',6,5,NULL,NULL,1966,1970,NULL,0,0,0,NULL,1,NULL,NULL),(42,'test car 42',1916,1916,'',NULL,1,12317,0,0,0,1,'2016-11-25 18:31:47',4,12,NULL,NULL,1916,1916,NULL,0,0,0,NULL,1,NULL,NULL),(43,'test car 43',1931,1941,'',NULL,1,33576,1,0,0,0,'2016-11-25 18:31:47',1,8,NULL,NULL,1931,1941,NULL,0,0,0,NULL,1,NULL,NULL),(44,'test car 44',2013,2022,'',NULL,1,67233,1,0,0,1,'2016-11-25 18:31:47',7,9,NULL,NULL,2013,2022,NULL,0,0,0,NULL,1,NULL,NULL),(45,'test car 45',2015,2023,'',NULL,1,31369,1,0,0,0,'2016-11-25 18:31:47',6,8,NULL,NULL,2015,2023,NULL,0,0,0,NULL,1,NULL,NULL),(46,'test car 46',1966,1972,'',NULL,1,48828,0,0,0,0,'2016-11-25 18:31:47',2,12,NULL,NULL,1967,1972,NULL,0,0,0,NULL,1,NULL,NULL),(47,'test car 47',1910,1915,'',NULL,1,12491,0,0,0,0,'2016-11-25 18:31:47',6,10,NULL,NULL,1910,1915,NULL,0,0,0,NULL,1,NULL,NULL),(48,'test car 48',1933,1934,'',NULL,1,80426,0,0,0,0,'2016-11-25 18:31:47',7,9,NULL,NULL,1933,1934,NULL,0,0,0,NULL,1,NULL,NULL),(49,'test car 49',1992,1996,'',NULL,1,81731,0,0,0,0,'2016-11-25 18:31:47',5,8,NULL,NULL,1992,1996,NULL,0,0,0,NULL,1,NULL,NULL),(50,'test car 50',1962,1971,'',NULL,1,69462,0,0,0,1,'2016-11-25 18:31:47',4,3,NULL,NULL,1963,1971,NULL,0,0,0,NULL,1,NULL,NULL),(51,'test car 51',1944,1954,'',NULL,1,98610,0,0,0,1,'2016-11-25 18:31:47',12,3,NULL,NULL,1945,1954,NULL,0,0,0,NULL,1,NULL,NULL),(52,'test car 52',2008,2016,'',NULL,1,97334,1,0,0,1,'2016-11-25 18:31:47',9,12,NULL,NULL,2009,2016,NULL,0,0,0,NULL,1,NULL,NULL),(53,'test car 53',2011,2016,'',NULL,1,71675,1,0,0,0,'2016-11-25 18:31:47',10,10,NULL,NULL,2012,2016,NULL,0,0,0,NULL,1,NULL,NULL),(54,'test car 54',1993,1994,'',NULL,1,62097,0,0,0,1,'2016-11-25 18:31:47',9,3,NULL,NULL,1993,1994,NULL,0,0,0,NULL,1,NULL,NULL),(55,'test car 55',1904,1910,'',NULL,1,7350,0,0,0,0,'2016-11-25 18:31:47',3,3,NULL,NULL,1904,1910,NULL,0,0,0,NULL,1,NULL,NULL),(56,'test car 56',1993,1993,'',NULL,1,36391,1,0,0,0,'2016-11-25 18:31:47',11,4,NULL,NULL,1993,1993,NULL,0,0,0,NULL,1,NULL,NULL),(57,'test car 57',2002,2003,'',NULL,1,85544,1,0,0,1,'2016-11-25 18:31:47',11,1,NULL,NULL,2002,2003,NULL,0,0,0,NULL,1,NULL,NULL),(58,'test car 58',1988,1997,'',NULL,1,38016,1,0,0,1,'2016-11-25 18:31:47',5,12,NULL,NULL,1989,1997,NULL,0,0,0,NULL,1,NULL,NULL),(59,'test car 59',1976,1978,'',NULL,1,97259,1,0,0,1,'2016-11-25 18:31:47',8,3,NULL,NULL,1976,1978,NULL,0,0,0,NULL,1,NULL,NULL),(60,'test car 60',2007,2016,'',NULL,1,77916,1,0,0,0,'2016-11-25 18:31:47',3,11,NULL,NULL,2007,2016,NULL,0,0,0,NULL,1,NULL,NULL),(61,'test car 61',1901,1907,'',NULL,1,48024,1,0,0,0,'2016-11-25 18:31:47',12,8,NULL,NULL,1901,1907,NULL,0,0,0,NULL,1,NULL,NULL),(62,'test car 62',1921,1922,'',NULL,1,76140,1,0,0,1,'2016-11-25 18:31:47',10,10,NULL,NULL,1921,1922,NULL,0,0,0,NULL,1,NULL,NULL),(63,'test car 63',1930,1937,'',NULL,1,17742,1,0,0,1,'2016-11-25 18:31:47',11,3,NULL,NULL,1930,1937,NULL,0,0,0,NULL,1,NULL,NULL),(64,'test car 64',1934,1936,'',NULL,1,96362,0,0,0,0,'2016-11-25 18:31:47',10,11,NULL,NULL,1935,1936,NULL,0,0,0,NULL,1,NULL,NULL),(65,'test car 65',1905,1906,'',NULL,1,64221,1,0,0,0,'2016-11-25 18:31:47',12,1,NULL,NULL,1905,1906,NULL,0,0,0,NULL,1,NULL,NULL),(66,'test car 66',2011,2020,'',NULL,1,76409,1,0,0,0,'2016-11-25 18:31:47',3,6,NULL,NULL,2012,2020,NULL,0,0,0,NULL,1,NULL,NULL),(67,'test car 67',1910,1910,'',NULL,1,34090,0,0,0,1,'2016-11-25 18:31:47',4,5,NULL,NULL,1911,1910,NULL,0,0,0,NULL,1,NULL,NULL),(68,'test car 68',1926,1930,'',NULL,1,2520,0,0,0,1,'2016-11-25 18:31:47',11,9,NULL,NULL,1927,1930,NULL,0,0,0,NULL,1,NULL,NULL),(69,'test car 69',1953,1963,'',NULL,1,27948,1,0,0,0,'2016-11-25 18:31:47',2,2,NULL,NULL,1954,1963,NULL,0,0,0,NULL,1,NULL,NULL),(70,'test car 70',1979,1983,'',NULL,1,81677,0,0,0,0,'2016-11-25 18:31:47',12,10,NULL,NULL,1980,1983,NULL,0,0,0,NULL,1,NULL,NULL),(71,'test car 71',1981,1981,'',NULL,1,78568,0,0,0,0,'2016-11-25 18:31:47',2,1,NULL,NULL,1981,1981,NULL,0,0,0,NULL,1,NULL,NULL),(72,'test car 72',1991,1993,'',NULL,1,67998,0,0,0,0,'2016-11-25 18:31:47',8,3,NULL,NULL,1991,1993,NULL,0,0,0,NULL,1,NULL,NULL),(73,'test car 73',1930,1934,'',NULL,1,16943,0,0,0,1,'2016-11-25 18:31:47',10,3,NULL,NULL,1930,1934,NULL,0,0,0,NULL,1,NULL,NULL),(74,'test car 74',1994,2003,'',NULL,1,27821,0,0,0,0,'2016-11-25 18:31:47',10,6,NULL,NULL,1994,2003,NULL,0,0,0,NULL,1,NULL,NULL),(75,'test car 75',1923,1923,'',NULL,1,5835,1,0,0,0,'2016-11-25 18:31:47',9,11,NULL,NULL,1923,1923,NULL,0,0,0,NULL,1,NULL,NULL),(76,'test car 76',1988,1991,'',NULL,1,49514,1,0,0,1,'2016-11-25 18:31:47',10,5,NULL,NULL,1989,1991,NULL,0,0,0,NULL,1,NULL,NULL),(77,'test car 77',1988,1991,'',NULL,1,65243,1,0,0,0,'2016-11-25 18:31:47',7,8,NULL,NULL,1989,1991,NULL,0,0,0,NULL,1,NULL,NULL),(78,'test car 78',1943,1952,'',NULL,1,36858,1,0,0,0,'2016-11-25 18:31:47',1,7,NULL,NULL,1944,1952,NULL,0,0,0,NULL,1,NULL,NULL),(79,'test car 79',1966,1967,'',NULL,1,27707,1,0,0,0,'2016-11-25 18:31:47',7,5,NULL,NULL,1967,1967,NULL,0,0,0,NULL,1,NULL,NULL),(80,'test car 80',1984,1984,'',NULL,1,90039,0,0,0,0,'2016-11-25 18:31:47',10,9,NULL,NULL,1984,1984,NULL,0,0,0,NULL,1,NULL,NULL),(81,'test car 81',1946,1948,'',NULL,1,32911,1,0,0,1,'2016-11-25 18:31:47',4,6,NULL,NULL,1946,1948,NULL,0,0,0,NULL,1,NULL,NULL),(82,'test car 82',1942,1951,'',NULL,1,83884,0,0,0,1,'2016-11-25 18:31:47',9,11,NULL,NULL,1942,1951,NULL,0,0,0,NULL,1,NULL,NULL),(83,'test car 83',1968,1974,'',NULL,1,51898,0,0,0,0,'2016-11-25 18:31:47',1,7,NULL,NULL,1969,1974,NULL,0,0,0,NULL,1,NULL,NULL),(84,'test car 84',1996,2006,'',NULL,1,56033,1,0,0,1,'2016-11-25 18:31:47',10,5,NULL,NULL,1996,2006,NULL,0,0,0,NULL,1,NULL,NULL),(85,'test car 85',1970,1980,'',NULL,1,78847,0,0,0,0,'2016-11-25 18:31:47',1,4,NULL,NULL,1971,1980,NULL,0,0,0,NULL,1,NULL,NULL),(86,'test car 86',1928,1932,'',NULL,1,88307,1,0,0,1,'2016-11-25 18:31:47',6,6,NULL,NULL,1928,1932,NULL,0,0,0,NULL,1,NULL,NULL),(87,'test car 87',1904,1911,'',NULL,1,96877,0,0,0,0,'2016-11-25 18:31:47',3,7,NULL,NULL,1905,1911,NULL,0,0,0,NULL,1,NULL,NULL),(88,'test car 88',1995,2001,'',NULL,1,41250,0,0,0,0,'2016-11-25 18:31:47',4,6,NULL,NULL,1995,2001,NULL,0,0,0,NULL,1,NULL,NULL),(89,'test car 89',1960,1967,'',NULL,1,35858,0,0,0,1,'2016-11-25 18:31:47',9,8,NULL,NULL,1960,1967,NULL,0,0,0,NULL,1,NULL,NULL),(90,'test car 90',1954,1958,'',NULL,1,9110,1,0,0,1,'2016-11-25 18:31:47',12,7,NULL,NULL,1954,1958,NULL,0,0,0,NULL,1,NULL,NULL),(91,'test car 91',1990,2000,'',NULL,1,66048,1,0,0,1,'2016-11-25 18:31:47',3,2,NULL,NULL,1991,2000,NULL,0,0,0,NULL,1,NULL,NULL),(92,'test car 92',1907,1909,'',NULL,1,77032,1,0,0,1,'2016-11-25 18:31:47',4,6,NULL,NULL,1908,1909,NULL,0,0,0,NULL,1,NULL,NULL),(93,'test car 93',1956,1958,'',NULL,1,96789,1,0,0,0,'2016-11-25 18:31:47',4,8,NULL,NULL,1957,1958,NULL,0,0,0,NULL,1,NULL,NULL),(94,'test car 94',1976,1984,'',NULL,1,83543,1,0,0,1,'2016-11-25 18:31:47',1,12,NULL,NULL,1977,1984,NULL,0,0,0,NULL,1,NULL,NULL),(95,'test car 95',1927,1936,'',NULL,1,20953,0,0,0,0,'2016-11-25 18:31:47',3,9,NULL,NULL,1927,1936,NULL,0,0,0,NULL,1,NULL,NULL),(96,'test car 96',1994,2001,'',NULL,1,43642,0,0,0,0,'2016-11-25 18:31:47',4,4,NULL,NULL,1994,2001,NULL,0,0,0,NULL,1,NULL,NULL),(97,'test car 97',1993,1994,'',NULL,1,29203,0,0,0,1,'2016-11-25 18:31:47',8,7,NULL,NULL,1993,1994,NULL,0,0,0,NULL,1,NULL,NULL),(98,'test car 98',1959,1964,'',NULL,1,85957,1,0,0,1,'2016-11-25 18:31:47',10,7,NULL,NULL,1959,1964,NULL,0,0,0,NULL,1,NULL,NULL),(99,'test car 99',1911,1918,'',NULL,1,92830,1,0,0,1,'2016-11-25 18:31:47',11,2,NULL,NULL,1912,1918,NULL,0,0,0,NULL,1,NULL,NULL),(100,'test car 100',1929,1937,'',NULL,1,32396,0,0,0,1,'2016-11-25 18:31:47',6,11,NULL,NULL,1929,1937,NULL,0,0,0,NULL,1,NULL,NULL),(101,'test car 101',1906,1915,'',NULL,1,28241,1,0,0,1,'2016-11-25 18:31:47',8,2,NULL,NULL,1906,1915,NULL,0,0,0,NULL,1,NULL,NULL),(102,'test car 102',1961,1965,'',NULL,1,32358,1,0,0,0,'2016-11-25 18:31:47',5,11,NULL,NULL,1961,1965,NULL,0,0,0,NULL,1,NULL,NULL),(103,'test car 103',1992,1998,'',NULL,1,47866,0,0,0,1,'2016-11-25 18:31:47',10,11,NULL,NULL,1992,1998,NULL,0,0,0,NULL,1,NULL,NULL),(104,'test car 104',2002,2007,'',NULL,1,98313,0,0,0,1,'2016-11-25 18:31:47',3,3,NULL,NULL,2003,2007,NULL,0,0,0,NULL,1,NULL,NULL),(105,'test car 105',2007,2012,'',NULL,1,31807,0,0,0,0,'2016-11-25 18:31:47',1,12,NULL,NULL,2008,2012,NULL,0,0,0,NULL,1,NULL,NULL),(106,'test car 106',1924,1925,'',NULL,1,39700,1,0,0,0,'2016-11-25 18:31:47',9,7,NULL,NULL,1925,1925,NULL,0,0,0,NULL,1,NULL,NULL),(107,'test car 107',1973,1976,'',NULL,1,29300,1,0,0,0,'2016-11-25 18:31:47',5,11,NULL,NULL,1974,1976,NULL,0,0,0,NULL,1,NULL,NULL),(108,'test car 108',1963,1965,'',NULL,1,33230,1,0,0,1,'2016-11-25 18:31:47',12,6,NULL,NULL,1963,1965,NULL,0,0,0,NULL,1,NULL,NULL),(109,'test car 109',2012,2017,'',NULL,1,84894,1,0,0,1,'2016-11-25 18:31:47',6,6,NULL,NULL,2013,2017,NULL,0,0,0,NULL,1,NULL,NULL),(110,'test car 110',1994,1999,'',NULL,1,4799,1,0,0,0,'2016-11-25 18:31:47',12,9,NULL,NULL,1994,1999,NULL,0,0,0,NULL,1,NULL,NULL),(111,'test car 111',2011,2017,'',NULL,1,72861,1,0,0,0,'2016-11-25 18:31:47',1,4,NULL,NULL,2011,2017,NULL,0,0,0,NULL,1,NULL,NULL),(112,'test car 112',1933,1940,'',NULL,1,29156,0,0,0,1,'2016-11-25 18:31:47',6,8,NULL,NULL,1933,1940,NULL,0,0,0,NULL,1,NULL,NULL),(113,'test car 113',1994,1995,'',NULL,1,18190,1,0,0,0,'2016-11-25 18:31:47',2,12,NULL,NULL,1995,1995,NULL,0,0,0,NULL,1,NULL,NULL),(114,'test car 114',1917,1918,'',NULL,1,12005,0,0,0,1,'2016-11-25 18:31:47',8,5,NULL,NULL,1917,1918,NULL,0,0,0,NULL,1,NULL,NULL),(115,'test car 115',1948,1952,'',NULL,1,23053,0,0,0,0,'2016-11-25 18:31:47',4,1,NULL,NULL,1949,1952,NULL,0,0,0,NULL,1,NULL,NULL),(116,'test car 116',1982,1982,'',NULL,1,7882,1,0,0,1,'2016-11-25 18:31:47',12,10,NULL,NULL,1983,1982,NULL,1,0,0,NULL,1,NULL,NULL),(117,'test car 117',2011,2013,'',NULL,1,40957,0,0,0,1,'2016-11-25 18:31:47',8,3,NULL,NULL,2012,2013,NULL,0,0,0,NULL,1,NULL,NULL),(118,'test car 118',1904,1913,'',NULL,1,56069,0,0,0,0,'2016-11-25 18:31:47',4,2,NULL,NULL,1905,1913,NULL,0,0,0,NULL,1,NULL,NULL),(119,'test car 119',1996,1999,'',NULL,1,36003,0,0,0,1,'2016-11-25 18:31:47',5,3,NULL,NULL,1996,1999,NULL,0,0,0,NULL,1,NULL,NULL),(120,'test car 120',1982,1985,'',NULL,1,6099,1,0,0,0,'2016-11-25 18:31:47',2,6,NULL,NULL,1983,1985,NULL,0,0,0,NULL,1,NULL,NULL),(121,'test car 121',1942,1943,'',NULL,1,57558,1,0,0,0,'2016-11-25 18:31:47',2,5,NULL,NULL,1942,1943,NULL,0,0,0,NULL,1,NULL,NULL),(122,'test car 122',1943,1947,'',NULL,1,92587,1,0,0,1,'2016-11-25 18:31:47',3,2,NULL,NULL,1944,1947,NULL,0,0,0,NULL,1,NULL,NULL),(123,'test car 123',1926,1932,'',NULL,1,79172,1,0,0,1,'2016-11-25 18:31:47',9,11,NULL,NULL,1927,1932,NULL,0,0,0,NULL,1,NULL,NULL),(124,'test car 124',1983,1984,'',NULL,1,812,0,0,0,1,'2016-11-25 18:31:47',12,6,NULL,NULL,1983,1984,NULL,0,0,0,NULL,1,NULL,NULL),(125,'test car 125',1970,1974,'',NULL,1,11369,1,0,0,0,'2016-11-25 18:31:47',3,1,NULL,NULL,1971,1974,NULL,0,0,0,NULL,1,NULL,NULL),(126,'test car 126',1997,2000,'',NULL,1,92630,0,0,0,1,'2016-11-25 18:31:47',1,5,NULL,NULL,1998,2000,NULL,0,0,0,NULL,1,NULL,NULL),(127,'test car 127',2004,2011,'',NULL,1,23922,1,0,0,1,'2016-11-25 18:31:47',8,11,NULL,NULL,2005,2011,NULL,0,0,0,NULL,1,NULL,NULL),(128,'test car 128',1968,1977,'',NULL,1,76249,0,0,0,1,'2016-11-25 18:31:47',6,3,NULL,NULL,1968,1977,NULL,0,0,0,NULL,1,NULL,NULL),(129,'test car 129',1979,1985,'',NULL,1,77277,0,0,0,1,'2016-11-25 18:31:47',10,4,NULL,NULL,1979,1985,NULL,0,0,0,NULL,1,NULL,NULL),(130,'test car 130',2003,2010,'',NULL,1,46842,0,0,0,1,'2016-11-25 18:31:47',12,11,NULL,NULL,2003,2010,NULL,0,0,0,NULL,1,NULL,NULL),(131,'test car 131',1949,1949,'',NULL,1,34967,1,0,0,0,'2016-11-25 18:31:47',8,3,NULL,NULL,1950,1949,NULL,0,0,0,NULL,1,NULL,NULL),(132,'test car 132',1982,1982,'',NULL,1,50011,1,0,0,1,'2016-11-25 18:31:47',10,3,NULL,NULL,1982,1982,NULL,0,0,0,NULL,1,NULL,NULL),(133,'test car 133',2004,2008,'',NULL,1,78284,0,0,0,0,'2016-11-25 18:31:47',4,9,NULL,NULL,2005,2008,NULL,0,0,0,NULL,1,NULL,NULL),(134,'test car 134',1965,1967,'',NULL,1,74228,0,0,0,0,'2016-11-25 18:31:47',5,2,NULL,NULL,1965,1967,NULL,0,0,0,NULL,1,NULL,NULL),(135,'test car 135',1902,1906,'',NULL,1,47874,1,0,0,0,'2016-11-25 18:31:47',10,5,NULL,NULL,1903,1906,NULL,0,0,0,NULL,1,NULL,NULL),(136,'test car 136',1907,1911,'',NULL,1,37818,1,0,0,1,'2016-11-25 18:31:47',11,12,NULL,NULL,1908,1911,NULL,0,0,0,NULL,1,NULL,NULL),(137,'test car 137',1917,1927,'',NULL,1,651,1,0,0,1,'2016-11-25 18:31:47',11,10,NULL,NULL,1917,1927,NULL,0,0,0,NULL,1,NULL,NULL),(138,'test car 138',1904,1904,'',NULL,1,95000,1,1,0,1,'2016-11-25 18:31:47',11,5,NULL,NULL,1905,1904,NULL,0,0,0,NULL,1,NULL,NULL),(139,'test car 139',1994,1994,'',NULL,1,35767,0,0,0,1,'2016-11-25 18:31:47',6,12,NULL,NULL,1994,1994,NULL,0,0,0,NULL,1,NULL,NULL),(140,'test car 140',1960,1965,'',NULL,1,30649,0,0,0,1,'2016-11-25 18:31:47',9,6,NULL,NULL,1961,1965,NULL,0,0,0,NULL,1,NULL,NULL),(141,'test car 141',1932,1935,'',NULL,1,99928,0,0,0,0,'2016-11-25 18:31:47',1,2,NULL,NULL,1932,1935,NULL,0,0,0,NULL,1,NULL,NULL),(142,'test car 142',1914,1922,'',NULL,1,60864,0,0,0,1,'2016-11-25 18:31:47',11,10,NULL,NULL,1914,1922,NULL,0,0,0,NULL,1,NULL,NULL),(143,'test car 143',1924,1925,'',NULL,1,31250,1,0,0,0,'2016-11-25 18:31:47',7,3,NULL,NULL,1925,1925,NULL,0,0,0,NULL,1,NULL,NULL),(144,'test car 144',1956,1962,'',NULL,1,5217,1,0,0,0,'2016-11-25 18:31:47',10,12,NULL,NULL,1957,1962,NULL,0,0,0,NULL,1,NULL,NULL),(145,'test car 145',1916,1917,'',NULL,1,56843,1,0,0,0,'2016-11-25 18:31:47',9,2,NULL,NULL,1916,1917,NULL,0,0,0,NULL,1,NULL,NULL),(146,'test car 146',1953,1961,'',NULL,1,57739,0,0,0,1,'2016-11-25 18:31:47',7,9,NULL,NULL,1953,1961,NULL,0,0,0,NULL,1,NULL,NULL),(147,'test car 147',1907,1907,'',NULL,1,52175,1,0,0,0,'2016-11-25 18:31:47',6,9,NULL,NULL,1908,1907,NULL,1,0,0,NULL,1,NULL,NULL),(148,'test car 148',1901,1908,'',NULL,1,83318,0,0,0,0,'2016-11-25 18:31:47',7,7,NULL,NULL,1902,1908,NULL,0,0,0,NULL,1,NULL,NULL),(149,'test car 149',1993,1996,'',NULL,1,68020,1,0,0,0,'2016-11-25 18:31:47',2,3,NULL,NULL,1994,1996,NULL,0,0,0,NULL,1,NULL,NULL),(150,'test car 150',1913,1921,'',NULL,1,87949,1,0,0,0,'2016-11-25 18:31:47',11,3,NULL,NULL,1914,1921,NULL,0,0,0,NULL,1,NULL,NULL),(151,'test car 151',1929,1938,'',NULL,1,38619,1,0,0,0,'2016-11-25 18:31:47',4,9,NULL,NULL,1929,1938,NULL,0,0,0,NULL,1,NULL,NULL),(152,'test car 152',1942,1944,'',NULL,1,38831,0,0,0,0,'2016-11-25 18:31:47',4,5,NULL,NULL,1942,1944,NULL,0,0,0,NULL,1,NULL,NULL),(153,'test car 153',1998,2003,'',NULL,1,99622,0,0,0,0,'2016-11-25 18:31:47',7,7,NULL,NULL,1999,2003,NULL,0,0,0,NULL,1,NULL,NULL),(154,'test car 154',1915,1917,'',NULL,1,30791,0,0,0,0,'2016-11-25 18:31:47',1,11,NULL,NULL,1916,1917,NULL,0,0,0,NULL,1,NULL,NULL),(155,'test car 155',1989,1996,'',NULL,1,37656,0,0,0,0,'2016-11-25 18:31:47',4,12,NULL,NULL,1990,1996,NULL,0,0,0,NULL,1,NULL,NULL),(156,'test car 156',1946,1948,'',NULL,1,44604,1,0,0,0,'2016-11-25 18:31:47',1,10,NULL,NULL,1946,1948,NULL,0,0,0,NULL,1,NULL,NULL),(157,'test car 157',2005,2011,'',NULL,1,69810,1,0,0,1,'2016-11-25 18:31:47',6,4,NULL,NULL,2005,2011,NULL,0,0,0,NULL,1,NULL,NULL),(158,'test car 158',1920,1925,'',NULL,1,49364,0,0,0,0,'2016-11-25 18:31:47',3,11,NULL,NULL,1921,1925,NULL,0,0,0,NULL,1,NULL,NULL),(159,'test car 159',1940,1949,'',NULL,1,89837,1,0,0,1,'2016-11-25 18:31:47',6,3,NULL,NULL,1940,1949,NULL,0,0,0,NULL,1,NULL,NULL),(160,'test car 160',1978,1986,'',NULL,1,27525,1,0,0,0,'2016-11-25 18:31:47',4,3,NULL,NULL,1979,1986,NULL,0,0,0,NULL,1,NULL,NULL),(161,'test car 161',2005,2010,'',NULL,1,51032,1,0,0,1,'2016-11-25 18:31:47',6,5,NULL,NULL,2005,2010,NULL,0,0,0,NULL,1,NULL,NULL),(162,'test car 162',1928,1937,'',NULL,1,77256,0,0,0,0,'2016-11-25 18:31:47',11,3,NULL,NULL,1929,1937,NULL,1,0,0,NULL,1,NULL,NULL),(163,'test car 163',1997,2001,'',NULL,1,24535,1,0,0,0,'2016-11-25 18:31:47',12,5,NULL,NULL,1997,2001,NULL,0,0,0,NULL,1,NULL,NULL),(164,'test car 164',1925,1926,'',NULL,1,13995,1,0,0,1,'2016-11-25 18:31:47',3,1,NULL,NULL,1926,1926,NULL,0,0,0,NULL,1,NULL,NULL),(165,'test car 165',1960,1964,'',NULL,1,64585,1,0,0,0,'2016-11-25 18:31:47',6,2,NULL,NULL,1960,1964,NULL,0,0,0,NULL,1,NULL,NULL),(166,'test car 166',1948,1953,'',NULL,1,83250,0,0,0,1,'2016-11-25 18:31:47',6,3,NULL,NULL,1948,1953,NULL,0,0,0,NULL,1,NULL,NULL),(167,'test car 167',1968,1968,'',NULL,1,63721,0,0,0,1,'2016-11-25 18:31:47',12,11,NULL,NULL,1969,1968,NULL,0,0,0,NULL,1,NULL,NULL),(168,'test car 168',1930,1931,'',NULL,1,88340,1,0,0,1,'2016-11-25 18:31:47',7,2,NULL,NULL,1931,1931,NULL,0,0,0,NULL,1,NULL,NULL),(169,'test car 169',1951,1954,'',NULL,1,73137,0,0,0,1,'2016-11-25 18:31:47',10,4,NULL,NULL,1952,1954,NULL,0,0,0,NULL,1,NULL,NULL),(170,'test car 170',1934,1937,'',NULL,1,50811,1,0,0,1,'2016-11-25 18:31:47',10,11,NULL,NULL,1935,1937,NULL,0,0,0,NULL,1,NULL,NULL),(171,'test car 171',2005,2013,'',NULL,1,64062,1,0,0,1,'2016-11-25 18:31:47',2,11,NULL,NULL,2005,2013,NULL,0,0,0,NULL,1,NULL,NULL),(172,'test car 172',1940,1940,'',NULL,1,47267,0,0,0,0,'2016-11-25 18:31:47',8,5,NULL,NULL,1941,1940,NULL,0,0,0,NULL,1,NULL,NULL),(173,'test car 173',1932,1940,'',NULL,1,37812,1,0,0,1,'2016-11-25 18:31:47',6,4,NULL,NULL,1932,1940,NULL,0,0,0,NULL,1,NULL,NULL),(174,'test car 174',1911,1914,'',NULL,1,58402,1,0,0,0,'2016-11-25 18:31:47',1,11,NULL,NULL,1912,1914,NULL,0,0,0,NULL,1,NULL,NULL),(175,'test car 175',1925,1935,'',NULL,1,63615,0,0,0,1,'2016-11-25 18:31:47',6,11,NULL,NULL,1925,1935,NULL,0,0,0,NULL,1,NULL,NULL),(176,'test car 176',1911,1921,'',NULL,1,43197,0,0,0,1,'2016-11-25 18:31:47',11,1,NULL,NULL,1912,1921,NULL,0,0,0,NULL,1,NULL,NULL),(177,'test car 177',1949,1954,'',NULL,1,78699,1,0,0,0,'2016-11-25 18:31:47',4,12,NULL,NULL,1950,1954,NULL,0,0,0,NULL,1,NULL,NULL),(178,'test car 178',1981,1981,'',NULL,1,391,0,0,0,0,'2016-11-25 18:31:47',1,10,NULL,NULL,1981,1981,NULL,0,0,0,NULL,1,NULL,NULL),(179,'test car 179',1967,1968,'',NULL,1,35593,0,0,0,1,'2016-11-25 18:31:47',9,8,NULL,NULL,1968,1968,NULL,0,0,0,NULL,1,NULL,NULL),(180,'test car 180',1915,1923,'',NULL,1,5430,1,0,0,1,'2016-11-25 18:31:47',11,2,NULL,NULL,1916,1923,NULL,0,0,0,NULL,1,NULL,NULL),(181,'test car 181',1936,1944,'',NULL,1,42998,1,0,0,1,'2016-11-25 18:31:47',3,11,NULL,NULL,1937,1944,NULL,0,0,0,NULL,1,NULL,NULL),(182,'test car 182',1928,1928,'',NULL,1,34945,1,0,0,0,'2016-11-25 18:31:47',8,4,NULL,NULL,1929,1928,NULL,0,0,0,NULL,1,NULL,NULL),(183,'test car 183',1943,1948,'',NULL,1,93051,1,0,0,0,'2016-11-25 18:31:47',3,10,NULL,NULL,1944,1948,NULL,0,0,0,NULL,1,NULL,NULL),(184,'test car 184',1951,1953,'',NULL,1,50497,0,0,0,1,'2016-11-25 18:31:47',9,8,NULL,NULL,1951,1953,NULL,0,0,0,NULL,1,NULL,NULL),(185,'test car 185',1991,1999,'',NULL,1,18952,1,0,0,1,'2016-11-25 18:31:47',11,5,NULL,NULL,1992,1999,NULL,0,0,0,NULL,1,NULL,NULL),(186,'test car 186',1926,1932,'',NULL,1,5821,1,0,0,0,'2016-11-25 18:31:47',7,11,NULL,NULL,1927,1932,NULL,0,0,0,NULL,1,NULL,NULL),(187,'test car 187',1920,1925,'',NULL,1,99237,1,1,0,1,'2016-11-25 18:31:47',1,6,NULL,NULL,1921,1925,NULL,0,0,0,NULL,1,NULL,NULL),(188,'test car 188',1971,1979,'',NULL,1,63271,1,0,0,1,'2016-11-25 18:31:47',1,7,NULL,NULL,1972,1979,NULL,0,0,0,NULL,1,NULL,NULL),(189,'test car 189',1979,1988,'',NULL,1,11408,1,0,0,0,'2016-11-25 18:31:47',10,6,NULL,NULL,1980,1988,NULL,0,0,0,NULL,1,NULL,NULL),(190,'test car 190',1913,1916,'',NULL,1,49593,0,0,0,1,'2016-11-25 18:31:47',12,3,NULL,NULL,1913,1916,NULL,0,0,0,NULL,1,NULL,NULL),(191,'test car 191',1959,1960,'',NULL,1,45372,1,0,0,0,'2016-11-25 18:31:47',7,4,NULL,NULL,1959,1960,NULL,0,0,0,NULL,1,NULL,NULL),(192,'test car 192',1908,1909,'',NULL,1,62856,0,0,0,1,'2016-11-25 18:31:47',4,3,NULL,NULL,1908,1909,NULL,0,0,0,NULL,1,NULL,NULL),(193,'test car 193',1908,1916,'',NULL,1,19414,1,0,0,0,'2016-11-25 18:31:47',8,1,NULL,NULL,1908,1916,NULL,0,0,0,NULL,1,NULL,NULL),(194,'test car 194',1931,1938,'',NULL,1,83551,0,0,0,0,'2016-11-25 18:31:47',6,10,NULL,NULL,1931,1938,NULL,0,0,0,NULL,1,NULL,NULL),(195,'test car 195',1909,1919,'',NULL,1,94561,1,0,0,0,'2016-11-25 18:31:47',5,2,NULL,NULL,1910,1919,NULL,0,0,0,NULL,1,NULL,NULL),(196,'test car 196',1986,1986,'',NULL,1,44962,0,0,0,0,'2016-11-25 18:31:47',5,12,NULL,NULL,1986,1986,NULL,0,0,0,NULL,1,NULL,NULL),(197,'test car 197',1988,1995,'',NULL,1,99262,1,0,0,1,'2016-11-25 18:31:47',10,12,NULL,NULL,1988,1995,NULL,0,0,0,NULL,1,NULL,NULL),(198,'test car 198',2008,2008,'',NULL,1,41663,1,0,0,0,'2016-11-25 18:31:47',12,9,NULL,NULL,2008,2008,NULL,0,0,0,NULL,1,NULL,NULL),(199,'test car 199',1990,1991,'',NULL,1,727,0,0,0,0,'2016-11-25 18:31:47',10,8,NULL,NULL,1990,1991,NULL,0,0,0,NULL,1,NULL,NULL),(200,'test car 200',1973,1981,'',NULL,1,50120,0,0,0,0,'2016-11-25 18:31:47',10,4,NULL,NULL,1974,1981,NULL,0,0,0,NULL,1,NULL,NULL),(201,'test car 201',2003,2007,'',NULL,1,32557,1,0,0,0,'2016-11-25 18:31:47',4,7,NULL,NULL,2004,2007,NULL,0,0,0,NULL,1,NULL,NULL),(202,'test car 202',1909,1910,'',NULL,1,5563,1,0,0,0,'2016-11-25 18:31:47',8,7,NULL,NULL,1910,1910,NULL,0,0,0,NULL,1,NULL,NULL),(203,'test car 203',1911,1918,'',NULL,1,67707,0,0,0,1,'2016-11-25 18:31:47',7,9,NULL,NULL,1912,1918,NULL,0,0,0,NULL,1,NULL,NULL);
+INSERT INTO `cars` VALUES 
+(1,'test car',1999,NULL,'',NULL,1,100,1,0,0,1,'2016-11-25 18:31:47',2,NULL,NULL,NULL,2000,NULL,NULL,0,0,0,1,1,NULL,NULL,1),
+(2,'test concept car',1999,2005,'',NULL,1,233,0,1,0,0,'2016-11-25 18:31:47',6,4,NULL,NULL,1999,2005,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(3,'test car 3',1923,1927,'',NULL,1,50752,1,0,0,0,'2016-11-25 18:31:47',6,1,NULL,NULL,1923,1927,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(4,'test car 4',1931,1937,'',NULL,1,51365,0,0,0,1,'2016-11-25 18:31:47',6,5,NULL,NULL,1932,1937,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(5,'test car 5',1984,1984,'',NULL,1,79927,0,0,0,1,'2016-11-25 18:31:47',7,4,NULL,NULL,1985,1984,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(6,'test car 6',1908,1908,'',NULL,1,73949,0,0,0,0,'2016-11-25 18:31:47',4,9,NULL,NULL,1908,1908,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(7,'test car 7',1997,1997,'',NULL,1,73664,0,0,0,1,'2016-11-25 18:31:47',1,12,NULL,NULL,1997,1997,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(8,'test car 8',1915,1920,'',NULL,1,90611,0,0,0,1,'2016-11-25 18:31:47',2,5,NULL,NULL,1916,1920,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(9,'test car 9',2007,2017,'',NULL,1,66221,1,0,0,1,'2016-11-25 18:31:47',5,12,NULL,NULL,2008,2017,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(10,'test car 10',1914,1919,'',NULL,1,39531,1,0,0,1,'2016-11-25 18:31:47',5,12,NULL,NULL,1915,1919,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(11,'test car 11',1941,1946,'',NULL,1,2689,1,0,0,1,'2016-11-25 18:31:47',6,1,NULL,NULL,1942,1946,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(12,'test car 12',1995,2005,'',NULL,1,3852,0,0,0,1,'2016-11-25 18:31:47',2,5,NULL,NULL,1996,2005,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(13,'test car 13',1946,1947,'',NULL,1,43108,1,0,0,0,'2016-11-25 18:31:47',7,7,NULL,NULL,1946,1947,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(14,'test car 14',1998,2006,'',NULL,1,50167,1,0,0,1,'2016-11-25 18:31:47',10,7,NULL,NULL,1998,2006,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(15,'test car 15',1963,1966,'',NULL,1,83109,1,0,0,1,'2016-11-25 18:31:47',2,7,NULL,NULL,1963,1966,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(16,'test car 16',1973,1975,'',NULL,1,629,0,0,0,1,'2016-11-25 18:31:47',11,8,NULL,NULL,1973,1975,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(17,'test car 17',2001,2010,'',NULL,1,14989,1,0,0,0,'2016-11-25 18:31:47',7,3,NULL,NULL,2001,2010,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(18,'test car 18',2011,2018,'',NULL,1,91731,0,0,0,1,'2016-11-25 18:31:47',4,8,NULL,NULL,2011,2018,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(19,'test car 19',1931,1937,'',NULL,1,99928,1,0,0,0,'2016-11-25 18:31:47',1,11,NULL,NULL,1931,1937,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(20,'test car 20',1951,1960,'',NULL,1,10416,1,0,0,0,'2016-11-25 18:31:47',9,11,NULL,NULL,1951,1960,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(21,'test car 21',1908,1908,'',NULL,1,48926,0,0,0,0,'2016-11-25 18:31:47',10,5,NULL,NULL,1908,1908,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(22,'test car 22',1965,1973,'',NULL,1,89032,0,0,0,1,'2016-11-25 18:31:47',7,4,NULL,NULL,1965,1973,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(23,'test car 23',1970,1973,'',NULL,1,81666,0,0,0,0,'2016-11-25 18:31:47',5,1,NULL,NULL,1970,1973,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(24,'test car 24',1955,1964,'',NULL,1,86179,0,0,0,0,'2016-11-25 18:31:47',9,12,NULL,NULL,1955,1964,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(25,'test car 25',1970,1974,'',NULL,1,69277,1,0,0,1,'2016-11-25 18:31:47',1,12,NULL,NULL,1970,1974,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(26,'test car 26',1931,1934,'',NULL,1,34539,1,0,0,1,'2016-11-25 18:31:47',11,11,NULL,NULL,1931,1934,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(27,'test car 27',2005,2014,'',NULL,1,86922,1,0,0,1,'2016-11-25 18:31:47',7,11,NULL,NULL,2005,2014,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(28,'test car 28',1948,1953,'',NULL,1,79648,0,0,0,1,'2016-11-25 18:31:47',10,8,NULL,NULL,1949,1953,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(29,'test car 29',1985,1985,'',NULL,1,5579,0,0,0,0,'2016-11-25 18:31:47',4,10,NULL,NULL,1986,1985,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(30,'test car 30',1906,1916,'',NULL,1,90636,0,0,0,1,'2016-11-25 18:31:47',12,3,NULL,NULL,1907,1916,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(31,'test car 31',1985,1988,'',NULL,1,30356,1,0,0,1,'2016-11-25 18:31:47',6,9,NULL,NULL,1986,1988,NULL,0,0,0,NULL,1,NULL,NULL,1),(32,'test car 32',2010,2010,'',NULL,1,48412,1,0,0,1,'2016-11-25 18:31:47',2,11,NULL,NULL,2011,2010,NULL,0,0,0,NULL,1,NULL,NULL,1),(33,'test car 33',2003,2008,'',NULL,1,1648,1,0,0,0,'2016-11-25 18:31:47',1,10,NULL,NULL,2004,2008,NULL,0,0,0,NULL,1,NULL,NULL,1),(34,'test car 34',1943,1951,'',NULL,1,61029,1,0,0,0,'2016-11-25 18:31:47',12,4,NULL,NULL,1944,1951,NULL,0,0,0,NULL,1,NULL,NULL,1),(35,'test car 35',2005,2011,'',NULL,1,39854,0,0,0,0,'2016-11-25 18:31:47',8,8,NULL,NULL,2006,2011,NULL,0,0,0,NULL,1,NULL,NULL,1),(36,'test car 36',2015,2018,'',NULL,1,14150,1,0,0,1,'2016-11-25 18:31:47',10,12,NULL,NULL,2016,2018,NULL,0,0,0,NULL,1,NULL,NULL,1),(37,'test car 37',1972,1977,'',NULL,1,74150,0,0,0,1,'2016-11-25 18:31:47',5,8,NULL,NULL,1973,1977,NULL,0,0,0,NULL,1,NULL,NULL,1),(38,'test car 38',1940,1947,'',NULL,1,345,0,0,0,1,'2016-11-25 18:31:47',12,8,NULL,NULL,1940,1947,NULL,0,0,0,NULL,1,NULL,NULL,1),(39,'test car 39',1999,2009,'',NULL,1,39394,0,0,0,1,'2016-11-25 18:31:47',6,4,NULL,NULL,1999,2009,NULL,0,0,0,NULL,1,NULL,NULL,1),(40,'test car 40',1994,1994,'',NULL,1,9381,1,0,0,0,'2016-11-25 18:31:47',5,11,NULL,NULL,1995,1994,NULL,0,0,0,NULL,1,NULL,NULL,1),(41,'test car 41',1966,1970,'',NULL,1,19488,0,0,0,0,'2016-11-25 18:31:47',6,5,NULL,NULL,1966,1970,NULL,0,0,0,NULL,1,NULL,NULL,1),(42,'test car 42',1916,1916,'',NULL,1,12317,0,0,0,1,'2016-11-25 18:31:47',4,12,NULL,NULL,1916,1916,NULL,0,0,0,NULL,1,NULL,NULL,1),(43,'test car 43',1931,1941,'',NULL,1,33576,1,0,0,0,'2016-11-25 18:31:47',1,8,NULL,NULL,1931,1941,NULL,0,0,0,NULL,1,NULL,NULL,1),(44,'test car 44',2013,2022,'',NULL,1,67233,1,0,0,1,'2016-11-25 18:31:47',7,9,NULL,NULL,2013,2022,NULL,0,0,0,NULL,1,NULL,NULL,1),(45,'test car 45',2015,2023,'',NULL,1,31369,1,0,0,0,'2016-11-25 18:31:47',6,8,NULL,NULL,2015,2023,NULL,0,0,0,NULL,1,NULL,NULL,1),(46,'test car 46',1966,1972,'',NULL,1,48828,0,0,0,0,'2016-11-25 18:31:47',2,12,NULL,NULL,1967,1972,NULL,0,0,0,NULL,1,NULL,NULL,1),(47,'test car 47',1910,1915,'',NULL,1,12491,0,0,0,0,'2016-11-25 18:31:47',6,10,NULL,NULL,1910,1915,NULL,0,0,0,NULL,1,NULL,NULL,1),(48,'test car 48',1933,1934,'',NULL,1,80426,0,0,0,0,'2016-11-25 18:31:47',7,9,NULL,NULL,1933,1934,NULL,0,0,0,NULL,1,NULL,NULL,1),(49,'test car 49',1992,1996,'',NULL,1,81731,0,0,0,0,'2016-11-25 18:31:47',5,8,NULL,NULL,1992,1996,NULL,0,0,0,NULL,1,NULL,NULL,1),(50,'test car 50',1962,1971,'',NULL,1,69462,0,0,0,1,'2016-11-25 18:31:47',4,3,NULL,NULL,1963,1971,NULL,0,0,0,NULL,1,NULL,NULL,1),(51,'test car 51',1944,1954,'',NULL,1,98610,0,0,0,1,'2016-11-25 18:31:47',12,3,NULL,NULL,1945,1954,NULL,0,0,0,NULL,1,NULL,NULL,1),(52,'test car 52',2008,2016,'',NULL,1,97334,1,0,0,1,'2016-11-25 18:31:47',9,12,NULL,NULL,2009,2016,NULL,0,0,0,NULL,1,NULL,NULL,1),(53,'test car 53',2011,2016,'',NULL,1,71675,1,0,0,0,'2016-11-25 18:31:47',10,10,NULL,NULL,2012,2016,NULL,0,0,0,NULL,1,NULL,NULL,1),(54,'test car 54',1993,1994,'',NULL,1,62097,0,0,0,1,'2016-11-25 18:31:47',9,3,NULL,NULL,1993,1994,NULL,0,0,0,NULL,1,NULL,NULL,1),(55,'test car 55',1904,1910,'',NULL,1,7350,0,0,0,0,'2016-11-25 18:31:47',3,3,NULL,NULL,1904,1910,NULL,0,0,0,NULL,1,NULL,NULL,1),(56,'test car 56',1993,1993,'',NULL,1,36391,1,0,0,0,'2016-11-25 18:31:47',11,4,NULL,NULL,1993,1993,NULL,0,0,0,NULL,1,NULL,NULL,1),(57,'test car 57',2002,2003,'',NULL,1,85544,1,0,0,1,'2016-11-25 18:31:47',11,1,NULL,NULL,2002,2003,NULL,0,0,0,NULL,1,NULL,NULL,1),(58,'test car 58',1988,1997,'',NULL,1,38016,1,0,0,1,'2016-11-25 18:31:47',5,12,NULL,NULL,1989,1997,NULL,0,0,0,NULL,1,NULL,NULL,1),(59,'test car 59',1976,1978,'',NULL,1,97259,1,0,0,1,'2016-11-25 18:31:47',8,3,NULL,NULL,1976,1978,NULL,0,0,0,NULL,1,NULL,NULL,1),(60,'test car 60',2007,2016,'',NULL,1,77916,1,0,0,0,'2016-11-25 18:31:47',3,11,NULL,NULL,2007,2016,NULL,0,0,0,NULL,1,NULL,NULL,1),(61,'test car 61',1901,1907,'',NULL,1,48024,1,0,0,0,'2016-11-25 18:31:47',12,8,NULL,NULL,1901,1907,NULL,0,0,0,NULL,1,NULL,NULL,1),(62,'test car 62',1921,1922,'',NULL,1,76140,1,0,0,1,'2016-11-25 18:31:47',10,10,NULL,NULL,1921,1922,NULL,0,0,0,NULL,1,NULL,NULL,1),(63,'test car 63',1930,1937,'',NULL,1,17742,1,0,0,1,'2016-11-25 18:31:47',11,3,NULL,NULL,1930,1937,NULL,0,0,0,NULL,1,NULL,NULL,1),(64,'test car 64',1934,1936,'',NULL,1,96362,0,0,0,0,'2016-11-25 18:31:47',10,11,NULL,NULL,1935,1936,NULL,0,0,0,NULL,1,NULL,NULL,1),(65,'test car 65',1905,1906,'',NULL,1,64221,1,0,0,0,'2016-11-25 18:31:47',12,1,NULL,NULL,1905,1906,NULL,0,0,0,NULL,1,NULL,NULL,1),(66,'test car 66',2011,2020,'',NULL,1,76409,1,0,0,0,'2016-11-25 18:31:47',3,6,NULL,NULL,2012,2020,NULL,0,0,0,NULL,1,NULL,NULL,1),(67,'test car 67',1910,1910,'',NULL,1,34090,0,0,0,1,'2016-11-25 18:31:47',4,5,NULL,NULL,1911,1910,NULL,0,0,0,NULL,1,NULL,NULL,1),(68,'test car 68',1926,1930,'',NULL,1,2520,0,0,0,1,'2016-11-25 18:31:47',11,9,NULL,NULL,1927,1930,NULL,0,0,0,NULL,1,NULL,NULL,1),(69,'test car 69',1953,1963,'',NULL,1,27948,1,0,0,0,'2016-11-25 18:31:47',2,2,NULL,NULL,1954,1963,NULL,0,0,0,NULL,1,NULL,NULL,1),(70,'test car 70',1979,1983,'',NULL,1,81677,0,0,0,0,'2016-11-25 18:31:47',12,10,NULL,NULL,1980,1983,NULL,0,0,0,NULL,1,NULL,NULL,1),(71,'test car 71',1981,1981,'',NULL,1,78568,0,0,0,0,'2016-11-25 18:31:47',2,1,NULL,NULL,1981,1981,NULL,0,0,0,NULL,1,NULL,NULL,1),(72,'test car 72',1991,1993,'',NULL,1,67998,0,0,0,0,'2016-11-25 18:31:47',8,3,NULL,NULL,1991,1993,NULL,0,0,0,NULL,1,NULL,NULL,1),(73,'test car 73',1930,1934,'',NULL,1,16943,0,0,0,1,'2016-11-25 18:31:47',10,3,NULL,NULL,1930,1934,NULL,0,0,0,NULL,1,NULL,NULL,1),(74,'test car 74',1994,2003,'',NULL,1,27821,0,0,0,0,'2016-11-25 18:31:47',10,6,NULL,NULL,1994,2003,NULL,0,0,0,NULL,1,NULL,NULL,1),(75,'test car 75',1923,1923,'',NULL,1,5835,1,0,0,0,'2016-11-25 18:31:47',9,11,NULL,NULL,1923,1923,NULL,0,0,0,NULL,1,NULL,NULL,1),(76,'test car 76',1988,1991,'',NULL,1,49514,1,0,0,1,'2016-11-25 18:31:47',10,5,NULL,NULL,1989,1991,NULL,0,0,0,NULL,1,NULL,NULL,1),(77,'test car 77',1988,1991,'',NULL,1,65243,1,0,0,0,'2016-11-25 18:31:47',7,8,NULL,NULL,1989,1991,NULL,0,0,0,NULL,1,NULL,NULL,1),(78,'test car 78',1943,1952,'',NULL,1,36858,1,0,0,0,'2016-11-25 18:31:47',1,7,NULL,NULL,1944,1952,NULL,0,0,0,NULL,1,NULL,NULL,1),(79,'test car 79',1966,1967,'',NULL,1,27707,1,0,0,0,'2016-11-25 18:31:47',7,5,NULL,NULL,1967,1967,NULL,0,0,0,NULL,1,NULL,NULL,1),(80,'test car 80',1984,1984,'',NULL,1,90039,0,0,0,0,'2016-11-25 18:31:47',10,9,NULL,NULL,1984,1984,NULL,0,0,0,NULL,1,NULL,NULL,1),(81,'test car 81',1946,1948,'',NULL,1,32911,1,0,0,1,'2016-11-25 18:31:47',4,6,NULL,NULL,1946,1948,NULL,0,0,0,NULL,1,NULL,NULL,1),(82,'test car 82',1942,1951,'',NULL,1,83884,0,0,0,1,'2016-11-25 18:31:47',9,11,NULL,NULL,1942,1951,NULL,0,0,0,NULL,1,NULL,NULL,1),(83,'test car 83',1968,1974,'',NULL,1,51898,0,0,0,0,'2016-11-25 18:31:47',1,7,NULL,NULL,1969,1974,NULL,0,0,0,NULL,1,NULL,NULL,1),(84,'test car 84',1996,2006,'',NULL,1,56033,1,0,0,1,'2016-11-25 18:31:47',10,5,NULL,NULL,1996,2006,NULL,0,0,0,NULL,1,NULL,NULL,1),(85,'test car 85',1970,1980,'',NULL,1,78847,0,0,0,0,'2016-11-25 18:31:47',1,4,NULL,NULL,1971,1980,NULL,0,0,0,NULL,1,NULL,NULL,1),(86,'test car 86',1928,1932,'',NULL,1,88307,1,0,0,1,'2016-11-25 18:31:47',6,6,NULL,NULL,1928,1932,NULL,0,0,0,NULL,1,NULL,NULL,1),(87,'test car 87',1904,1911,'',NULL,1,96877,0,0,0,0,'2016-11-25 18:31:47',3,7,NULL,NULL,1905,1911,NULL,0,0,0,NULL,1,NULL,NULL,1),(88,'test car 88',1995,2001,'',NULL,1,41250,0,0,0,0,'2016-11-25 18:31:47',4,6,NULL,NULL,1995,2001,NULL,0,0,0,NULL,1,NULL,NULL,1),(89,'test car 89',1960,1967,'',NULL,1,35858,0,0,0,1,'2016-11-25 18:31:47',9,8,NULL,NULL,1960,1967,NULL,0,0,0,NULL,1,NULL,NULL,1),(90,'test car 90',1954,1958,'',NULL,1,9110,1,0,0,1,'2016-11-25 18:31:47',12,7,NULL,NULL,1954,1958,NULL,0,0,0,NULL,1,NULL,NULL,1),(91,'test car 91',1990,2000,'',NULL,1,66048,1,0,0,1,'2016-11-25 18:31:47',3,2,NULL,NULL,1991,2000,NULL,0,0,0,NULL,1,NULL,NULL,1),(92,'test car 92',1907,1909,'',NULL,1,77032,1,0,0,1,'2016-11-25 18:31:47',4,6,NULL,NULL,1908,1909,NULL,0,0,0,NULL,1,NULL,NULL,1),(93,'test car 93',1956,1958,'',NULL,1,96789,1,0,0,0,'2016-11-25 18:31:47',4,8,NULL,NULL,1957,1958,NULL,0,0,0,NULL,1,NULL,NULL,1),(94,'test car 94',1976,1984,'',NULL,1,83543,1,0,0,1,'2016-11-25 18:31:47',1,12,NULL,NULL,1977,1984,NULL,0,0,0,NULL,1,NULL,NULL,1),(95,'test car 95',1927,1936,'',NULL,1,20953,0,0,0,0,'2016-11-25 18:31:47',3,9,NULL,NULL,1927,1936,NULL,0,0,0,NULL,1,NULL,NULL,1),(96,'test car 96',1994,2001,'',NULL,1,43642,0,0,0,0,'2016-11-25 18:31:47',4,4,NULL,NULL,1994,2001,NULL,0,0,0,NULL,1,NULL,NULL,1),(97,'test car 97',1993,1994,'',NULL,1,29203,0,0,0,1,'2016-11-25 18:31:47',8,7,NULL,NULL,1993,1994,NULL,0,0,0,NULL,1,NULL,NULL,1),(98,'test car 98',1959,1964,'',NULL,1,85957,1,0,0,1,'2016-11-25 18:31:47',10,7,NULL,NULL,1959,1964,NULL,0,0,0,NULL,1,NULL,NULL,1),(99,'test car 99',1911,1918,'',NULL,1,92830,1,0,0,1,'2016-11-25 18:31:47',11,2,NULL,NULL,1912,1918,NULL,0,0,0,NULL,1,NULL,NULL,1),(100,'test car 100',1929,1937,'',NULL,1,32396,0,0,0,1,'2016-11-25 18:31:47',6,11,NULL,NULL,1929,1937,NULL,0,0,0,NULL,1,NULL,NULL,1),(101,'test car 101',1906,1915,'',NULL,1,28241,1,0,0,1,'2016-11-25 18:31:47',8,2,NULL,NULL,1906,1915,NULL,0,0,0,NULL,1,NULL,NULL,1),(102,'test car 102',1961,1965,'',NULL,1,32358,1,0,0,0,'2016-11-25 18:31:47',5,11,NULL,NULL,1961,1965,NULL,0,0,0,NULL,1,NULL,NULL,1),(103,'test car 103',1992,1998,'',NULL,1,47866,0,0,0,1,'2016-11-25 18:31:47',10,11,NULL,NULL,1992,1998,NULL,0,0,0,NULL,1,NULL,NULL,1),(104,'test car 104',2002,2007,'',NULL,1,98313,0,0,0,1,'2016-11-25 18:31:47',3,3,NULL,NULL,2003,2007,NULL,0,0,0,NULL,1,NULL,NULL,1),(105,'test car 105',2007,2012,'',NULL,1,31807,0,0,0,0,'2016-11-25 18:31:47',1,12,NULL,NULL,2008,2012,NULL,0,0,0,NULL,1,NULL,NULL,1),(106,'test car 106',1924,1925,'',NULL,1,39700,1,0,0,0,'2016-11-25 18:31:47',9,7,NULL,NULL,1925,1925,NULL,0,0,0,NULL,1,NULL,NULL,1),(107,'test car 107',1973,1976,'',NULL,1,29300,1,0,0,0,'2016-11-25 18:31:47',5,11,NULL,NULL,1974,1976,NULL,0,0,0,NULL,1,NULL,NULL,1),(108,'test car 108',1963,1965,'',NULL,1,33230,1,0,0,1,'2016-11-25 18:31:47',12,6,NULL,NULL,1963,1965,NULL,0,0,0,NULL,1,NULL,NULL,1),(109,'test car 109',2012,2017,'',NULL,1,84894,1,0,0,1,'2016-11-25 18:31:47',6,6,NULL,NULL,2013,2017,NULL,0,0,0,NULL,1,NULL,NULL,1),(110,'test car 110',1994,1999,'',NULL,1,4799,1,0,0,0,'2016-11-25 18:31:47',12,9,NULL,NULL,1994,1999,NULL,0,0,0,NULL,1,NULL,NULL,1),(111,'test car 111',2011,2017,'',NULL,1,72861,1,0,0,0,'2016-11-25 18:31:47',1,4,NULL,NULL,2011,2017,NULL,0,0,0,NULL,1,NULL,NULL,1),(112,'test car 112',1933,1940,'',NULL,1,29156,0,0,0,1,'2016-11-25 18:31:47',6,8,NULL,NULL,1933,1940,NULL,0,0,0,NULL,1,NULL,NULL,1),(113,'test car 113',1994,1995,'',NULL,1,18190,1,0,0,0,'2016-11-25 18:31:47',2,12,NULL,NULL,1995,1995,NULL,0,0,0,NULL,1,NULL,NULL,1),(114,'test car 114',1917,1918,'',NULL,1,12005,0,0,0,1,'2016-11-25 18:31:47',8,5,NULL,NULL,1917,1918,NULL,0,0,0,NULL,1,NULL,NULL,1),(115,'test car 115',1948,1952,'',NULL,1,23053,0,0,0,0,'2016-11-25 18:31:47',4,1,NULL,NULL,1949,1952,NULL,0,0,0,NULL,1,NULL,NULL,1),(116,'test car 116',1982,1982,'',NULL,1,7882,1,0,0,1,'2016-11-25 18:31:47',12,10,NULL,NULL,1983,1982,NULL,1,0,0,NULL,1,NULL,NULL,1),(117,'test car 117',2011,2013,'',NULL,1,40957,0,0,0,1,'2016-11-25 18:31:47',8,3,NULL,NULL,2012,2013,NULL,0,0,0,NULL,1,NULL,NULL,1),(118,'test car 118',1904,1913,'',NULL,1,56069,0,0,0,0,'2016-11-25 18:31:47',4,2,NULL,NULL,1905,1913,NULL,0,0,0,NULL,1,NULL,NULL,1),(119,'test car 119',1996,1999,'',NULL,1,36003,0,0,0,1,'2016-11-25 18:31:47',5,3,NULL,NULL,1996,1999,NULL,0,0,0,NULL,1,NULL,NULL,1),(120,'test car 120',1982,1985,'',NULL,1,6099,1,0,0,0,'2016-11-25 18:31:47',2,6,NULL,NULL,1983,1985,NULL,0,0,0,NULL,1,NULL,NULL,1),(121,'test car 121',1942,1943,'',NULL,1,57558,1,0,0,0,'2016-11-25 18:31:47',2,5,NULL,NULL,1942,1943,NULL,0,0,0,NULL,1,NULL,NULL,1),(122,'test car 122',1943,1947,'',NULL,1,92587,1,0,0,1,'2016-11-25 18:31:47',3,2,NULL,NULL,1944,1947,NULL,0,0,0,NULL,1,NULL,NULL,1),(123,'test car 123',1926,1932,'',NULL,1,79172,1,0,0,1,'2016-11-25 18:31:47',9,11,NULL,NULL,1927,1932,NULL,0,0,0,NULL,1,NULL,NULL,1),(124,'test car 124',1983,1984,'',NULL,1,812,0,0,0,1,'2016-11-25 18:31:47',12,6,NULL,NULL,1983,1984,NULL,0,0,0,NULL,1,NULL,NULL,1),(125,'test car 125',1970,1974,'',NULL,1,11369,1,0,0,0,'2016-11-25 18:31:47',3,1,NULL,NULL,1971,1974,NULL,0,0,0,NULL,1,NULL,NULL,1),(126,'test car 126',1997,2000,'',NULL,1,92630,0,0,0,1,'2016-11-25 18:31:47',1,5,NULL,NULL,1998,2000,NULL,0,0,0,NULL,1,NULL,NULL,1),(127,'test car 127',2004,2011,'',NULL,1,23922,1,0,0,1,'2016-11-25 18:31:47',8,11,NULL,NULL,2005,2011,NULL,0,0,0,NULL,1,NULL,NULL,1),(128,'test car 128',1968,1977,'',NULL,1,76249,0,0,0,1,'2016-11-25 18:31:47',6,3,NULL,NULL,1968,1977,NULL,0,0,0,NULL,1,NULL,NULL,1),(129,'test car 129',1979,1985,'',NULL,1,77277,0,0,0,1,'2016-11-25 18:31:47',10,4,NULL,NULL,1979,1985,NULL,0,0,0,NULL,1,NULL,NULL,1),(130,'test car 130',2003,2010,'',NULL,1,46842,0,0,0,1,'2016-11-25 18:31:47',12,11,NULL,NULL,2003,2010,NULL,0,0,0,NULL,1,NULL,NULL,1),(131,'test car 131',1949,1949,'',NULL,1,34967,1,0,0,0,'2016-11-25 18:31:47',8,3,NULL,NULL,1950,1949,NULL,0,0,0,NULL,1,NULL,NULL,1),(132,'test car 132',1982,1982,'',NULL,1,50011,1,0,0,1,'2016-11-25 18:31:47',10,3,NULL,NULL,1982,1982,NULL,0,0,0,NULL,1,NULL,NULL,1),(133,'test car 133',2004,2008,'',NULL,1,78284,0,0,0,0,'2016-11-25 18:31:47',4,9,NULL,NULL,2005,2008,NULL,0,0,0,NULL,1,NULL,NULL,1),(134,'test car 134',1965,1967,'',NULL,1,74228,0,0,0,0,'2016-11-25 18:31:47',5,2,NULL,NULL,1965,1967,NULL,0,0,0,NULL,1,NULL,NULL,1),(135,'test car 135',1902,1906,'',NULL,1,47874,1,0,0,0,'2016-11-25 18:31:47',10,5,NULL,NULL,1903,1906,NULL,0,0,0,NULL,1,NULL,NULL,1),(136,'test car 136',1907,1911,'',NULL,1,37818,1,0,0,1,'2016-11-25 18:31:47',11,12,NULL,NULL,1908,1911,NULL,0,0,0,NULL,1,NULL,NULL,1),(137,'test car 137',1917,1927,'',NULL,1,651,1,0,0,1,'2016-11-25 18:31:47',11,10,NULL,NULL,1917,1927,NULL,0,0,0,NULL,1,NULL,NULL,1),(138,'test car 138',1904,1904,'',NULL,1,95000,1,1,0,1,'2016-11-25 18:31:47',11,5,NULL,NULL,1905,1904,NULL,0,0,0,NULL,1,NULL,NULL,1),(139,'test car 139',1994,1994,'',NULL,1,35767,0,0,0,1,'2016-11-25 18:31:47',6,12,NULL,NULL,1994,1994,NULL,0,0,0,NULL,1,NULL,NULL,1),(140,'test car 140',1960,1965,'',NULL,1,30649,0,0,0,1,'2016-11-25 18:31:47',9,6,NULL,NULL,1961,1965,NULL,0,0,0,NULL,1,NULL,NULL,1),(141,'test car 141',1932,1935,'',NULL,1,99928,0,0,0,0,'2016-11-25 18:31:47',1,2,NULL,NULL,1932,1935,NULL,0,0,0,NULL,1,NULL,NULL,1),(142,'test car 142',1914,1922,'',NULL,1,60864,0,0,0,1,'2016-11-25 18:31:47',11,10,NULL,NULL,1914,1922,NULL,0,0,0,NULL,1,NULL,NULL,1),(143,'test car 143',1924,1925,'',NULL,1,31250,1,0,0,0,'2016-11-25 18:31:47',7,3,NULL,NULL,1925,1925,NULL,0,0,0,NULL,1,NULL,NULL,1),(144,'test car 144',1956,1962,'',NULL,1,5217,1,0,0,0,'2016-11-25 18:31:47',10,12,NULL,NULL,1957,1962,NULL,0,0,0,NULL,1,NULL,NULL,1),(145,'test car 145',1916,1917,'',NULL,1,56843,1,0,0,0,'2016-11-25 18:31:47',9,2,NULL,NULL,1916,1917,NULL,0,0,0,NULL,1,NULL,NULL,1),(146,'test car 146',1953,1961,'',NULL,1,57739,0,0,0,1,'2016-11-25 18:31:47',7,9,NULL,NULL,1953,1961,NULL,0,0,0,NULL,1,NULL,NULL,1),(147,'test car 147',1907,1907,'',NULL,1,52175,1,0,0,0,'2016-11-25 18:31:47',6,9,NULL,NULL,1908,1907,NULL,1,0,0,NULL,1,NULL,NULL,1),(148,'test car 148',1901,1908,'',NULL,1,83318,0,0,0,0,'2016-11-25 18:31:47',7,7,NULL,NULL,1902,1908,NULL,0,0,0,NULL,1,NULL,NULL,1),(149,'test car 149',1993,1996,'',NULL,1,68020,1,0,0,0,'2016-11-25 18:31:47',2,3,NULL,NULL,1994,1996,NULL,0,0,0,NULL,1,NULL,NULL,1),(150,'test car 150',1913,1921,'',NULL,1,87949,1,0,0,0,'2016-11-25 18:31:47',11,3,NULL,NULL,1914,1921,NULL,0,0,0,NULL,1,NULL,NULL,1),(151,'test car 151',1929,1938,'',NULL,1,38619,1,0,0,0,'2016-11-25 18:31:47',4,9,NULL,NULL,1929,1938,NULL,0,0,0,NULL,1,NULL,NULL,1),(152,'test car 152',1942,1944,'',NULL,1,38831,0,0,0,0,'2016-11-25 18:31:47',4,5,NULL,NULL,1942,1944,NULL,0,0,0,NULL,1,NULL,NULL,1),(153,'test car 153',1998,2003,'',NULL,1,99622,0,0,0,0,'2016-11-25 18:31:47',7,7,NULL,NULL,1999,2003,NULL,0,0,0,NULL,1,NULL,NULL,1),(154,'test car 154',1915,1917,'',NULL,1,30791,0,0,0,0,'2016-11-25 18:31:47',1,11,NULL,NULL,1916,1917,NULL,0,0,0,NULL,1,NULL,NULL,1),(155,'test car 155',1989,1996,'',NULL,1,37656,0,0,0,0,'2016-11-25 18:31:47',4,12,NULL,NULL,1990,1996,NULL,0,0,0,NULL,1,NULL,NULL,1),(156,'test car 156',1946,1948,'',NULL,1,44604,1,0,0,0,'2016-11-25 18:31:47',1,10,NULL,NULL,1946,1948,NULL,0,0,0,NULL,1,NULL,NULL,1),(157,'test car 157',2005,2011,'',NULL,1,69810,1,0,0,1,'2016-11-25 18:31:47',6,4,NULL,NULL,2005,2011,NULL,0,0,0,NULL,1,NULL,NULL,1),(158,'test car 158',1920,1925,'',NULL,1,49364,0,0,0,0,'2016-11-25 18:31:47',3,11,NULL,NULL,1921,1925,NULL,0,0,0,NULL,1,NULL,NULL,1),(159,'test car 159',1940,1949,'',NULL,1,89837,1,0,0,1,'2016-11-25 18:31:47',6,3,NULL,NULL,1940,1949,NULL,0,0,0,NULL,1,NULL,NULL,1),(160,'test car 160',1978,1986,'',NULL,1,27525,1,0,0,0,'2016-11-25 18:31:47',4,3,NULL,NULL,1979,1986,NULL,0,0,0,NULL,1,NULL,NULL,1),(161,'test car 161',2005,2010,'',NULL,1,51032,1,0,0,1,'2016-11-25 18:31:47',6,5,NULL,NULL,2005,2010,NULL,0,0,0,NULL,1,NULL,NULL,1),(162,'test car 162',1928,1937,'',NULL,1,77256,0,0,0,0,'2016-11-25 18:31:47',11,3,NULL,NULL,1929,1937,NULL,1,0,0,NULL,1,NULL,NULL,1),(163,'test car 163',1997,2001,'',NULL,1,24535,1,0,0,0,'2016-11-25 18:31:47',12,5,NULL,NULL,1997,2001,NULL,0,0,0,NULL,1,NULL,NULL,1),(164,'test car 164',1925,1926,'',NULL,1,13995,1,0,0,1,'2016-11-25 18:31:47',3,1,NULL,NULL,1926,1926,NULL,0,0,0,NULL,1,NULL,NULL,1),(165,'test car 165',1960,1964,'',NULL,1,64585,1,0,0,0,'2016-11-25 18:31:47',6,2,NULL,NULL,1960,1964,NULL,0,0,0,NULL,1,NULL,NULL,1),(166,'test car 166',1948,1953,'',NULL,1,83250,0,0,0,1,'2016-11-25 18:31:47',6,3,NULL,NULL,1948,1953,NULL,0,0,0,NULL,1,NULL,NULL,1),(167,'test car 167',1968,1968,'',NULL,1,63721,0,0,0,1,'2016-11-25 18:31:47',12,11,NULL,NULL,1969,1968,NULL,0,0,0,NULL,1,NULL,NULL,1),(168,'test car 168',1930,1931,'',NULL,1,88340,1,0,0,1,'2016-11-25 18:31:47',7,2,NULL,NULL,1931,1931,NULL,0,0,0,NULL,1,NULL,NULL,1),(169,'test car 169',1951,1954,'',NULL,1,73137,0,0,0,1,'2016-11-25 18:31:47',10,4,NULL,NULL,1952,1954,NULL,0,0,0,NULL,1,NULL,NULL,1),(170,'test car 170',1934,1937,'',NULL,1,50811,1,0,0,1,'2016-11-25 18:31:47',10,11,NULL,NULL,1935,1937,NULL,0,0,0,NULL,1,NULL,NULL,1),(171,'test car 171',2005,2013,'',NULL,1,64062,1,0,0,1,'2016-11-25 18:31:47',2,11,NULL,NULL,2005,2013,NULL,0,0,0,NULL,1,NULL,NULL,1),(172,'test car 172',1940,1940,'',NULL,1,47267,0,0,0,0,'2016-11-25 18:31:47',8,5,NULL,NULL,1941,1940,NULL,0,0,0,NULL,1,NULL,NULL,1),(173,'test car 173',1932,1940,'',NULL,1,37812,1,0,0,1,'2016-11-25 18:31:47',6,4,NULL,NULL,1932,1940,NULL,0,0,0,NULL,1,NULL,NULL,1),(174,'test car 174',1911,1914,'',NULL,1,58402,1,0,0,0,'2016-11-25 18:31:47',1,11,NULL,NULL,1912,1914,NULL,0,0,0,NULL,1,NULL,NULL,1),(175,'test car 175',1925,1935,'',NULL,1,63615,0,0,0,1,'2016-11-25 18:31:47',6,11,NULL,NULL,1925,1935,NULL,0,0,0,NULL,1,NULL,NULL,1),(176,'test car 176',1911,1921,'',NULL,1,43197,0,0,0,1,'2016-11-25 18:31:47',11,1,NULL,NULL,1912,1921,NULL,0,0,0,NULL,1,NULL,NULL,1),(177,'test car 177',1949,1954,'',NULL,1,78699,1,0,0,0,'2016-11-25 18:31:47',4,12,NULL,NULL,1950,1954,NULL,0,0,0,NULL,1,NULL,NULL,1),(178,'test car 178',1981,1981,'',NULL,1,391,0,0,0,0,'2016-11-25 18:31:47',1,10,NULL,NULL,1981,1981,NULL,0,0,0,NULL,1,NULL,NULL,1),(179,'test car 179',1967,1968,'',NULL,1,35593,0,0,0,1,'2016-11-25 18:31:47',9,8,NULL,NULL,1968,1968,NULL,0,0,0,NULL,1,NULL,NULL,1),(180,'test car 180',1915,1923,'',NULL,1,5430,1,0,0,1,'2016-11-25 18:31:47',11,2,NULL,NULL,1916,1923,NULL,0,0,0,NULL,1,NULL,NULL,1),(181,'test car 181',1936,1944,'',NULL,1,42998,1,0,0,1,'2016-11-25 18:31:47',3,11,NULL,NULL,1937,1944,NULL,0,0,0,NULL,1,NULL,NULL,1),(182,'test car 182',1928,1928,'',NULL,1,34945,1,0,0,0,'2016-11-25 18:31:47',8,4,NULL,NULL,1929,1928,NULL,0,0,0,NULL,1,NULL,NULL,1),(183,'test car 183',1943,1948,'',NULL,1,93051,1,0,0,0,'2016-11-25 18:31:47',3,10,NULL,NULL,1944,1948,NULL,0,0,0,NULL,1,NULL,NULL,1),(184,'test car 184',1951,1953,'',NULL,1,50497,0,0,0,1,'2016-11-25 18:31:47',9,8,NULL,NULL,1951,1953,NULL,0,0,0,NULL,1,NULL,NULL,1),(185,'test car 185',1991,1999,'',NULL,1,18952,1,0,0,1,'2016-11-25 18:31:47',11,5,NULL,NULL,1992,1999,NULL,0,0,0,NULL,1,NULL,NULL,1),(186,'test car 186',1926,1932,'',NULL,1,5821,1,0,0,0,'2016-11-25 18:31:47',7,11,NULL,NULL,1927,1932,NULL,0,0,0,NULL,1,NULL,NULL,1),(187,'test car 187',1920,1925,'',NULL,1,99237,1,1,0,1,'2016-11-25 18:31:47',1,6,NULL,NULL,1921,1925,NULL,0,0,0,NULL,1,NULL,NULL,1),(188,'test car 188',1971,1979,'',NULL,1,63271,1,0,0,1,'2016-11-25 18:31:47',1,7,NULL,NULL,1972,1979,NULL,0,0,0,NULL,1,NULL,NULL,1),(189,'test car 189',1979,1988,'',NULL,1,11408,1,0,0,0,'2016-11-25 18:31:47',10,6,NULL,NULL,1980,1988,NULL,0,0,0,NULL,1,NULL,NULL,1),(190,'test car 190',1913,1916,'',NULL,1,49593,0,0,0,1,'2016-11-25 18:31:47',12,3,NULL,NULL,1913,1916,NULL,0,0,0,NULL,1,NULL,NULL,1),(191,'test car 191',1959,1960,'',NULL,1,45372,1,0,0,0,'2016-11-25 18:31:47',7,4,NULL,NULL,1959,1960,NULL,0,0,0,NULL,1,NULL,NULL,1),(192,'test car 192',1908,1909,'',NULL,1,62856,0,0,0,1,'2016-11-25 18:31:47',4,3,NULL,NULL,1908,1909,NULL,0,0,0,NULL,1,NULL,NULL,1),(193,'test car 193',1908,1916,'',NULL,1,19414,1,0,0,0,'2016-11-25 18:31:47',8,1,NULL,NULL,1908,1916,NULL,0,0,0,NULL,1,NULL,NULL,1),(194,'test car 194',1931,1938,'',NULL,1,83551,0,0,0,0,'2016-11-25 18:31:47',6,10,NULL,NULL,1931,1938,NULL,0,0,0,NULL,1,NULL,NULL,1),(195,'test car 195',1909,1919,'',NULL,1,94561,1,0,0,0,'2016-11-25 18:31:47',5,2,NULL,NULL,1910,1919,NULL,0,0,0,NULL,1,NULL,NULL,1),(196,'test car 196',1986,1986,'',NULL,1,44962,0,0,0,0,'2016-11-25 18:31:47',5,12,NULL,NULL,1986,1986,NULL,0,0,0,NULL,1,NULL,NULL,1),(197,'test car 197',1988,1995,'',NULL,1,99262,1,0,0,1,'2016-11-25 18:31:47',10,12,NULL,NULL,1988,1995,NULL,0,0,0,NULL,1,NULL,NULL,1),(198,'test car 198',2008,2008,'',NULL,1,41663,1,0,0,0,'2016-11-25 18:31:47',12,9,NULL,NULL,2008,2008,NULL,0,0,0,NULL,1,NULL,NULL,1),(199,'test car 199',1990,1991,'',NULL,1,727,0,0,0,0,'2016-11-25 18:31:47',10,8,NULL,NULL,1990,1991,NULL,0,0,0,NULL,1,NULL,NULL,1),(200,'test car 200',1973,1981,'',NULL,1,50120,0,0,0,0,'2016-11-25 18:31:47',10,4,NULL,NULL,1974,1981,NULL,0,0,0,NULL,1,NULL,NULL,1),(201,'test car 201',2003,2007,'',NULL,1,32557,1,0,0,0,'2016-11-25 18:31:47',4,7,NULL,NULL,2004,2007,NULL,0,0,0,NULL,1,NULL,NULL,1),(202,'test car 202',1909,1910,'',NULL,1,5563,1,0,0,0,'2016-11-25 18:31:47',8,7,NULL,NULL,1910,1910,NULL,0,0,0,NULL,1,NULL,NULL,1),
+(203,'test car 203',1911,1918,'',NULL,1,67707,0,0,0,1,'2016-11-25 18:31:47',7,9,NULL,NULL,1912,1918,NULL,0,0,0,NULL,1,NULL,NULL,1);
 /*!40000 ALTER TABLE `cars` ENABLE KEYS */;
 
 --
@@ -1849,59 +1796,6 @@ CREATE TABLE `day_stat` (
 
 /*!40000 ALTER TABLE `day_stat` DISABLE KEYS */;
 /*!40000 ALTER TABLE `day_stat` ENABLE KEYS */;
-
---
--- Table structure for table `engine_parent_cache`
---
-
-DROP TABLE IF EXISTS `engine_parent_cache`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `engine_parent_cache` (
-  `engine_id` int(10) unsigned NOT NULL,
-  `parent_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`engine_id`,`parent_id`),
-  KEY `parent_fk` (`parent_id`),
-  CONSTRAINT `engine_fk` FOREIGN KEY (`engine_id`) REFERENCES `engines` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `parent_fk` FOREIGN KEY (`parent_id`) REFERENCES `engines` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `engine_parent_cache`
---
-
-/*!40000 ALTER TABLE `engine_parent_cache` DISABLE KEYS */;
-/*!40000 ALTER TABLE `engine_parent_cache` ENABLE KEYS */;
-
---
--- Table structure for table `engines`
---
-
-DROP TABLE IF EXISTS `engines`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `engines` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` int(10) unsigned DEFAULT NULL,
-  `name` varchar(100) NOT NULL,
-  `owner_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `last_editor_id` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `parent_id` (`parent_id`),
-  KEY `last_editor_id` (`last_editor_id`),
-  CONSTRAINT `engines_ibfk_1` FOREIGN KEY (`last_editor_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `parent_id_fk` FOREIGN KEY (`parent_id`) REFERENCES `engines` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1748 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 124928 kB; (`brand_id`)';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `engines`
---
-
-/*!40000 ALTER TABLE `engines` DISABLE KEYS */;
-INSERT INTO `engines` VALUES (1,NULL,'Test engine',1,NULL);
-/*!40000 ALTER TABLE `engines` ENABLE KEYS */;
 
 --
 -- Table structure for table `factory`
@@ -2386,30 +2280,6 @@ CREATE TABLE `log_events_cars` (
 /*!40000 ALTER TABLE `log_events_cars` ENABLE KEYS */;
 
 --
--- Table structure for table `log_events_engines`
---
-
-DROP TABLE IF EXISTS `log_events_engines`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `log_events_engines` (
-  `log_event_id` int(10) unsigned NOT NULL,
-  `engine_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`log_event_id`,`engine_id`),
-  KEY `engine_id` (`engine_id`),
-  CONSTRAINT `log_events_engines_fk` FOREIGN KEY (`log_event_id`) REFERENCES `log_events` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `log_events_engines_fk1` FOREIGN KEY (`engine_id`) REFERENCES `engines` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `log_events_engines`
---
-
-/*!40000 ALTER TABLE `log_events_engines` DISABLE KEYS */;
-/*!40000 ALTER TABLE `log_events_engines` ENABLE KEYS */;
-
---
 -- Table structure for table `log_events_factory`
 --
 
@@ -2667,7 +2537,7 @@ CREATE TABLE `museum` (
   `_lat` double DEFAULT NULL,
   `_lng` double DEFAULT NULL,
   `url` varchar(255) DEFAULT NULL,
-  `description` text CHARACTER SET ucs2 NOT NULL,
+  `description` text CHARACTER SET utf8 NOT NULL,
   `address` text NOT NULL,
   `img` int(10) unsigned DEFAULT NULL,
   `point` point DEFAULT NULL,
@@ -2769,7 +2639,11 @@ CREATE TABLE `pages` (
 --
 
 /*!40000 ALTER TABLE `pages` DISABLE KEYS */;
-INSERT INTO `pages` VALUES (1,NULL,'Index page','Encyclopedia of cars in the pictures. AutoWP.ru','','/',0,0,'',0,1,0),(2,1,'Главное меню','','','',1,0,'',0,1,0),(10,1,'Brand','%BRAND_NAME%','%BRAND_NAME%','/%BRAND_CATNAME%/',0,0,'',0,1045,0),(14,10,'%BRAND_NAME% cars in chronological order','%BRAND_NAME% cars in chronological order','Cars in chronological order','/%BRAND_CATNAME%/cars/',0,0,'',0,913,1),(15,10,'Last pictures of %BRAND_NAME%','Last pictures of %BRAND_NAME%','Last pictures','/%BRAND_CATNAME%/recent/',0,0,'',0,918,1),(18,1,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/picture/%PICTURE_ID%',0,0,'',0,1021,0),(19,1,'Brands','Brands','Brands','',0,0,'',0,1035,0),(20,19,'Тип производителей','',NULL,NULL,0,0,NULL,0,1,1),(21,2,'Mostly','Mostly','','/mosts',0,0,'',0,24,0),(22,2,'Categories','Categories','','/category',0,0,'',0,25,1),(23,22,'%CATEGORY_NAME%','%CATEGORY_NAME%','%CATEGORY_SHORT_NAME%','/category/%CATEGORY_CATNAME%',0,0,'/category/%CATEGORY_CATNAME%',0,1,1),(24,1,'Лимитированные и специальные серии автомобилей','','','/limitededitions/',0,0,'',0,777,0),(25,2,'Twins','','','/twins',0,0,'',0,23,0),(26,25,'%TWINS_GROUP_NAME%','%TWINS_GROUP_NAME%','%TWINS_GROUP_NAME%','/twins/group%TWINS_GROUP_ID%',0,0,'',0,6,1),(27,26,'Specifications of %TWINS_GROUP_NAME%','Specifications of %TWINS_GROUP_NAME%','Specifications','/twins/group%TWINS_GROUP_ID%/specifications',0,0,'',0,9,1),(28,26,'All pictures of %TWINS_GROUP_NAME%','All pictures of %TWINS_GROUP_NAME%','All pictures','/twins/group%TWINS_GROUP_ID%/pictures',0,0,'',0,7,1),(29,87,'Add picture','Add picture','','/upload/',0,1,'',0,18,0),(30,29,'Select brand','Select brand','Select brand','',0,0,'',0,5,1),(31,1,'Articles','Articles','Articles','/articles/',0,0,'',0,1046,1),(32,31,'%ARTICLE_NAME%','%ARTICLE_NAME%','%ARTICLE_NAME%','',0,0,'/articles/%ARTICLE_CATNAME%/',0,1,1),(33,10,'%CAR_NAME%','%CAR_NAME%','%SHORT_CAR_NAME%','/%BRAND_CATNAME%/%CAR_CATNAME%/',0,0,'',0,909,1),(34,33,'All pictures of %CAR_NAME%','All pictures of %CAR_NAME%','All pictures','/%BRAND_CATNAME%/%CAR_CATNAME%/pictures/',0,0,'',0,13,1),(36,33,'Specifications of %CAR_NAME%','Specifications of %CAR_NAME%','Specifications','/%BRAND_CATNAME%/%CAR_CATNAME%/specifications/',0,0,'',0,14,1),(37,10,'Concepts & prototypes','Concepts & prototypes','Concepts & prototypes','/%BRAND_CATNAME%/concepts/',0,0,'',0,915,1),(38,10,'%BRAND_NAME% engines','%BRAND_NAME% engines','Engines','/%BRAND_CATNAME%/engines/',0,0,'',0,914,1),(39,10,'%BRAND_NAME% logotypes','%BRAND_NAME% logotypes','Logotypes','/%BRAND_CATNAME%/logotypes/',0,0,'',0,916,1),(40,10,'%BRAND_NAME% miscellaneous','%BRAND_NAME% miscellaneous','Miscellaneous','/%BRAND_CATNAME%/mixed/',0,0,'',0,917,1),(41,10,'Unsorted','Unsorted','Unsorted','/%BRAND_CATNAME%/other/',0,0,'',0,920,1),(42,2,'Forums','Forums','','/forums',0,0,'',0,27,0),(43,42,'%THEME_NAME%','%THEME_NAME%','%THEME_NAME%','/forums/index/%THEME_ID%',0,0,'',0,1,1),(44,43,'%TOPIC_NAME%','%TOPIC_NAME%','%TOPIC_NAME%','/forums/topic/topic/topic_id/%TOPIC_ID%',0,0,'',0,5,1),(45,43,'New topic','New topic','New topic','/forums/topic/new/theme_id/%THEME_ID%',0,0,'',0,4,1),(48,87,'Cabinet','Cabinet','','/account',0,1,'',0,27,0),(49,48,'Personal messages','Personal messages','','/account/pm',0,0,'',0,23,1),(51,1,'New pictures','','','/new',0,0,'',0,1036,0),(52,1,'Registration','Registration','','/registration',0,0,'',0,1056,0),(53,52,'ok','Успешная регистрация','','',0,0,'',0,1,1),(54,48,'Confirm the email address','Confirm the email address','','',0,0,'',0,21,1),(55,48,'My e-mail','My e-mail','','/account/email',0,1,'',0,26,1),(56,55,'Changed','Changing e-mail','','',0,1,'',0,1,1),(57,48,'Forums subscriptions','Forums subscriptions','','/account/forums',0,1,'',0,31,1),(58,10,'%BRAND_NAME% %DPBRAND_NAME%','%BRAND_NAME% %DPBRAND_NAME%','%DPBRAND_NAME%','/%BRAND_CATNAME%/%DPBRAND_CATNAME%/',0,0,'',0,901,1),(59,10,'%BRAND_NAME% %DESIGN_PROJECT_NAME%','%BRAND_NAME% %DESIGN_PROJECT_NAME%','%DESIGN_PROJECT_NAME%','/%BRAND_CATNAME%/%DESIGN_PROJECT_CATNAME%/',0,0,'',0,902,1),(60,1,'Password recovery','Password recovery','','',0,0,'',0,1038,0),(61,1,'All brands','','','/brands/',0,0,'',0,1039,0),(62,1,'%USER_NAME%','%USER_NAME%','%USER_NAME%','/users/%USER_IDENTITY%',0,0,'',0,1020,1),(63,62,'User\'s pictures','User\'s pictures','Pictures','/users/%USER_IDENTITY%',0,0,'',0,1,1),(66,59,'All pictures of %BRAND_NAME% %DESIGN_PROJECT_NAME%','All pictures of %BRAND_NAME% %DESIGN_PROJECT_NAME%','All pictures','/%BRAND_CATNAME%/%DESIGN_PROJECT_CATNAME%/pictures/',0,0,'',0,1,1),(67,1,'Moderator page','','','/moder',0,0,'',0,1040,0),(68,67,'Страницы сайта','','','/moder/pages',0,0,NULL,0,1,1),(69,68,'Добавить','','','',0,0,NULL,0,1,1),(70,68,'Изменить','','','',0,0,NULL,0,2,1),(71,67,'Права','','','/moder/rights',0,0,NULL,0,2,1),(72,73,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/moder/pictures/picture/picture_id/%PICTURE_ID%',0,1,'',0,3,1),(73,67,'Картинки','','','/moder/pictures',0,1,'',0,20,1),(74,67,'Автомобили по алфавиту','','','/moder/alpha-cars',0,0,NULL,0,5,1),(75,67,'Журнал событий','','','/log/',0,0,NULL,0,6,1),(76,1,'Немодерированное','Немодерированное','','',0,0,'',0,1053,0),(77,67,'Трафик','','','/moder/trafic',0,0,NULL,0,7,1),(78,131,'%CAR_NAME%','%CAR_NAME%','%CAR_NAME%','/moder/cars/car/car_id/%CAR_ID%',0,1,'',0,26,1),(79,1,'Sign in','Sign in','','/login',0,0,'',1,1058,0),(80,49,'Sent','Sent','','/account/pm/sent',0,0,'',0,15,1),(81,49,'System messages','System messages','','/account/pm/system',0,0,'',0,18,1),(82,67,'Engines','Engines','Engines','/moder/engines',0,1,'',0,27,1),(83,44,'Move','Move','Move','/forums/topic/move/topic_id/%TOPIC_ID%',0,0,'',0,1,1),(85,67,'%BRAND_NAME%','%BRAND_NAME%','%BRAND_NAME%','/moder/brands/brand/brand_id/%BRAND_ID%',0,1,'',0,24,1),(86,29,'Image successfully uploaded to the site','Image successfully uploaded to the site','Success','/upload/success',0,0,'',0,6,1),(87,1,'More','More','','',1,0,'',0,1043,1),(89,87,'Feedback','','','/feedback',0,0,'',0,19,0),(90,87,'Sign out','','','/login/logout',0,1,'',0,28,1),(91,87,'Registration','','','/registration',0,0,'',1,4,1),(93,89,'Message sent','','','',0,0,'',0,0,1),(94,48,'Unmoderated','Unmoderated','','/account/not-taken-pictures',0,1,'',0,25,1),(96,67,'Автомобили-близнецы','','','',0,1,'',0,11,1),(97,67,'Ракурсы','','','',0,1,'',0,12,1),(100,67,'Аттрибуты','','','/moder/attrs',0,1,'',0,14,1),(101,100,'%ATTR_NAME%','%ATTR_NAME%','%ATTR_NAME%','',0,1,'',0,1,1),(102,1,'Specs editors %CAR_NAME%','Specs editors %CAR_NAME%','Specs editors','',0,0,'',0,1047,1),(103,102,'История изменения','История изменения','','/moder/index/attrs-change-log',0,1,'',0,18,1),(104,1,'Пользовательская статистика','','','',0,0,'',0,1000,0),(105,1,'Add a comment','Add a comment','','',0,0,'',0,1041,0),(106,1,'Rules','Rules','','/rules',0,0,'',0,1042,0),(107,67,'Заявки на удаление','Заявки на удаление','','',0,0,'',0,15,1),(109,1,'Cutaway','','Cutaway','/cutaway',0,0,'',0,1003,0),(110,67,'Комментарии','Комментарии','','/moder/comments',0,1,'',0,16,1),(111,1,'Engine spec editor %ENGINE_NAME%','Engine spec editor %ENGINE_NAME%','Engine spec editor','',0,0,'',0,1048,1),(114,67,'Журнал ТТХ','Журнал ТТХ','','/moder/spec',0,1,'',0,17,1),(115,67,'Музеи','Музеи','Музеи','/moder/museum',0,1,'',0,18,1),(116,115,'Музей','Музей','%MUSEUM_NAME%','/moder/museum/edit/museum_id/%MUSEUM_ID%/',0,1,'',0,1,1),(117,2,'Map','Map','','/map',0,0,'',0,26,0),(118,115,'Новый','Новый','Новый','/moder/museum/new',0,1,'',0,2,1),(119,67,'Статистика','','','/moder/index/stat',0,1,'',0,19,1),(120,68,'Блоки','','','',0,1,'',0,3,1),(122,1,'Specifications','Specifications','Specifications','/spec/',0,0,'',0,1057,1),(123,48,'My accounts','My accounts','My accounts','/profile/accounts/',0,1,'',0,22,0),(124,87,'Who is online?','','','/users/online',0,0,'online',0,24,1),(125,67,'Categories','Categories','','/moder/category',0,1,'',0,22,1),(126,125,'Add','Add','','/moder/category/new/',0,1,'',0,1,1),(127,125,'Edit','Edit','','',0,1,'',0,3,1),(128,49,'Inbox','Inbox','','/account/pm',0,1,'',0,17,0),(129,48,'Profile','Profile','','/account/profile',0,1,'',0,12,0),(130,48,'My pictures','My pictures','','',0,1,'',0,30,0),(131,67,'Vehicles','Vehicles','Vehicles','/moder/cars',0,1,'',0,26,1),(133,48,'Access','Access Control','','/account/access',0,1,'',0,27,1),(134,60,'New password','New password','','',0,0,'',0,4,0),(135,60,'New password saved','','','',0,1,'',0,5,0),(136,87,'About us','About us','','/about',0,0,'',0,29,1),(137,48,'Account delete','','','/account/delete',0,1,'',0,28,1),(138,14,'%BRAND_NAME% %CAR_TYPE_NAME% in chronological order','%BRAND_NAME% %CAR_TYPE_NAME% in chronological order','%CAR_TYPE_NAME%','/%BRAND_CATNAME%/cars/%CAR_TYPE_CATNAME%/',0,0,'',0,1,0),(140,61,'%BRAND_TYPE_NAME%','%BRAND_TYPE_NAME%','%BRAND_TYPE_NAME%','/brands/%BRAND_TYPE_NAME%',0,0,'',0,1,1),(141,63,'%BRAND_NAME% pictures','%BRAND_NAME% pictures','%BRAND_NAME% pictures','/users/%USER_IDENTITY%/pictures/%BRAND_CATNAME%',0,0,'',0,1,1),(142,100,'%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','/moder/attrs/zone/zone_id/%ZONE_ID%',0,1,'',0,4,1),(143,96,'%TWINS_GROUP_NAME%','%TWINS_GROUP_NAME%','%TWINS_GROUP_NAME%','/moder/twins/twins-group/twins_group_id/%TWINS_GROUP_ID%',0,1,'',0,1,1),(144,78,'Brand selection','Brand selection','Brand selection','',0,1,'',0,1,1),(146,78,'Twins group selection','Twins group selection','Twins group selection','',0,1,'',0,5,1),(147,78,'Design project selection','Design project selection','Design project selection','',0,1,'',0,7,1),(148,72,'Cropper','Cropper','Cropper','',0,1,'',0,1,1),(149,72,'Move picture','Move picture','Move picture','',0,1,'',0,12,1),(153,25,'%BRAND_NAME% Twins','%BRAND_NAME% Twins','%BRAND_NAME%','/twins/%BRAND_CATNAME%',0,0,'',0,7,1),(154,21,'%MOST_NAME%','%MOST_NAME%','%MOST_NAME%','/mosts/%MOST_CATNAME%',0,0,'',0,1,1),(155,154,'Most %MOST_NAME% %CAR_TYPE_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME%','%CAR_TYPE_NAME%','/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%',0,0,'',0,1,1),(156,155,'Most %MOST_NAME% %CAR_TYPE_NAME% %YEAR_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME% %YEAR_NAME%','%YEAR_NAME%','/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%/%YEAR_CATNAME%',0,0,'',0,1,1),(157,1,'%VOTING_NAME%','%VOTING_NAME%','%VOTING_NAME%','/voting/voting/id/%VOTING_ID%',0,0,'',0,1022,0),(159,117,'Museum','%MUSEUM_NAME%','%MUSEUM_NAME%','/museums/museum/id/%MUSEUM_ID%',0,0,'',0,1,0),(161,1,'Pulse','Pulse','Pulse','/pulse/',0,0,'',0,1049,0),(162,23,'Pictures','Pictures','','/category/%CATEGORY_CATNAME%/pictures',0,0,'',0,4,0),(163,131,'New vehicle','New vehicle','New vehicle','',0,0,'',0,28,0),(164,10,'Mosts','Mosts','Mosts','/%BRAND_CATNAME%/mosts/',0,0,'',0,919,0),(165,164,'Most %MOST_NAME% %BRAND_NAME%','Most %MOST_NAME% %BRAND_NAME%','%MOST_NAME%','/%BRAND_CATNAME%/mosts/%MOST_CATNAME%',0,0,'',0,1,0),(166,165,'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME%','%CAR_TYPE_NAME%','/%BRAND_CATNAME%/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%',0,0,'',0,1,0),(167,166,'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME% %YEAR_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME% %YEAR_NAME%','%YEAR_NAME%','/%BRAND_CATNAME%/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%/%YEAR_CATNAME%',0,0,'',0,1,0),(168,38,'%ENGINE_NAME% engine','%ENGINE_NAME% engine','%ENGINE_NAME% engine','/%BRAND_CATNAME%/engines/%ENGINE_ID%/',0,0,'',0,913,0),(169,82,'Engine %ENGINE_NAME%','Engine %ENGINE_NAME%','Engine %ENGINE_NAME%','/moder/engines/engine_id/%ENGINE_ID%/',0,0,'',0,1,0),(170,82,'Add','Add','Add','/moder/engines/add',0,0,'',0,3,0),(171,169,'Select parent','Select parent','Select parent','',0,0,'',0,1,0),(172,168,'Vehicles with engine %ENGINE_NAME%','Vehicles with engine %ENGINE_NAME%','Vehicles','',0,0,'',0,4,0),(173,1,'Statistics','Statistics','Statistics','/users/rating',0,0,'',0,1050,0),(174,1,'Specs','Specs','Specs','/info/spec',0,0,'',0,1051,0),(175,67,'Factories','Factories','Factories','/moder/factory',0,0,'',0,29,0),(176,175,'Add','Add','Add','/moder/factory/add',0,0,'',0,1,0),(177,175,'%FACTORY_NAME%','%FACTORY_NAME%','%FACTORY_NAME%','',0,0,'',0,3,0),(178,78,'Factory selection','Factory selection','Factory selection','',0,0,'',0,9,0),(180,1,'Factories','Factories','Factories','/factory',0,0,'',0,1052,0),(181,117,'%FACTORY_NAME%','%FACTORY_NAME%','%FACTORY_NAME%','/factory/factory/id/%FACTORY_ID%',0,0,'',0,2,0),(182,181,'Vehicles','Vehicles','Vehicles','/factory/factory-cars/id/%FACTORY_ID%',0,0,'',0,1,0),(183,28,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/twins/group%TWINS_GROUP_ID%/pictures/%PICTURE_ID%',0,0,'',0,1,0),(184,162,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/category/%CATEGORY_CATNAME%/pictures/%PICTURE_ID%',0,0,'',0,1,0),(185,23,'%CAR_NAME%','%CAR_NAME%','%CAR_NAME%','/category/%CATEGORY_CATNAME%/%CAR_ID%',0,0,'',0,3,0),(186,185,'Pictures','Pictures','Pictures','/category/%CATEGORY_CATNAME%/%CAR_ID%/pictures',0,0,'',0,1,0),(187,186,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/category/%CATEGORY_CATNAME%/%CAR_ID%/pictures/%PICTURE_ID%',0,0,'',0,1,0),(188,48,'Conflicts','Conflicts','Conflicts','/account/specs-conflics',0,1,'',0,29,0),(189,102,'Low weight','Low weight','Low weight','',0,0,'',0,17,0),(190,40,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/%BRAND_CATNAME%/mixed/%PICTURE_ID%',0,0,'',0,1,0),(191,41,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/%BRAND_CATNAME%/other/%PICTURE_ID%',0,0,'',0,1,0),(192,39,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/%BRAND_CATNAME%/logotypes/%PICTURE_ID%',0,0,'',0,1,0),(193,66,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/%BRAND_CATNAME%/%DESIGN_PROJECT_CATNAME%/%PICTURE_ID%',0,0,'',0,1,0),(194,34,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/%BRAND_CATNAME%/%CAR_CATNAME%/pictures/%PICTURE_ID%',0,0,'',0,1,0),(195,168,'%ENGINE_NAME% pictures','%ENGINE_NAME% pictures','%ENGINE_NAME% pictures','',0,0,'',0,3,0),(196,1,'Donate','Donate','Donate','/donate',0,0,'',0,1061,0),(197,1,'Text history','Text history','Text history','/info/text',0,0,'',0,1064,0),(198,48,'Contacts','Contacts','Contacts','/account/contacts',0,1,'',0,33,0),(201,1,'Mascots','Mascots','Mascots','/mascots',0,0,'',0,1065,1),(202,67,'Perspectives','Perspectives','Perspectives','/moder/perspectives',0,0,'',0,30,1),(203,67,'Users','Users','Users','/moder/users',0,1,'',0,31,1),(204,1,'Telegram','Telegram','Telegram','/telegram',0,0,'',0,1066,1),(205,62,'User\'s comments','User\'s comments','Comments','/users/%USER_IDENTITY%/comments',0,0,'',0,2,1);
+INSERT INTO `pages` VALUES (1,NULL,'Index page','Encyclopedia of cars in the pictures. AutoWP.ru','','/',0,0,'',0,1,0),(2,1,'Главное меню','','','',1,0,'',0,1,0),(10,1,'Brand','%BRAND_NAME%','%BRAND_NAME%','/%BRAND_CATNAME%/',0,0,'',0,1045,0),(14,10,'%BRAND_NAME% cars in chronological order','%BRAND_NAME% cars in chronological order','Cars in chronological order','/%BRAND_CATNAME%/cars/',0,0,'',0,913,1),(15,10,'Last pictures of %BRAND_NAME%','Last pictures of %BRAND_NAME%','Last pictures','/%BRAND_CATNAME%/recent/',0,0,'',0,918,1),(18,1,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/picture/%PICTURE_ID%',0,0,'',0,1021,0),(19,1,'Brands','Brands','Brands','',0,0,'',0,1035,0),(20,19,'Тип производителей','',NULL,NULL,0,0,NULL,0,1,1),(21,2,'Mostly','Mostly','','/mosts',0,0,'',0,24,0),(22,2,'Categories','Categories','','/category',0,0,'',0,25,1),(23,22,'%CATEGORY_NAME%','%CATEGORY_NAME%','%CATEGORY_SHORT_NAME%','/category/%CATEGORY_CATNAME%',0,0,'/category/%CATEGORY_CATNAME%',0,1,1),(24,1,'Лимитированные и специальные серии автомобилей','','','/limitededitions/',0,0,'',0,777,0),(25,2,'Twins','','','/twins',0,0,'',0,23,0),(26,25,'%TWINS_GROUP_NAME%','%TWINS_GROUP_NAME%','%TWINS_GROUP_NAME%','/twins/group%TWINS_GROUP_ID%',0,0,'',0,6,1),(27,26,'Specifications of %TWINS_GROUP_NAME%','Specifications of %TWINS_GROUP_NAME%','Specifications','/twins/group%TWINS_GROUP_ID%/specifications',0,0,'',0,9,1),(28,26,'All pictures of %TWINS_GROUP_NAME%','All pictures of %TWINS_GROUP_NAME%','All pictures','/twins/group%TWINS_GROUP_ID%/pictures',0,0,'',0,7,1),(29,87,'Add picture','Add picture','','/upload/',0,1,'',0,18,0),(30,29,'Select brand','Select brand','Select brand','',0,0,'',0,5,1),(31,1,'Articles','Articles','Articles','/articles/',0,0,'',0,1046,1),(32,31,'%ARTICLE_NAME%','%ARTICLE_NAME%','%ARTICLE_NAME%','',0,0,'/articles/%ARTICLE_CATNAME%/',0,1,1),(33,10,'%CAR_NAME%','%CAR_NAME%','%SHORT_CAR_NAME%','/%BRAND_CATNAME%/%CAR_CATNAME%/',0,0,'',0,909,1),(34,33,'All pictures of %CAR_NAME%','All pictures of %CAR_NAME%','All pictures','/%BRAND_CATNAME%/%CAR_CATNAME%/pictures/',0,0,'',0,13,1),(36,33,'Specifications of %CAR_NAME%','Specifications of %CAR_NAME%','Specifications','/%BRAND_CATNAME%/%CAR_CATNAME%/specifications/',0,0,'',0,14,1),(37,10,'Concepts & prototypes','Concepts & prototypes','Concepts & prototypes','/%BRAND_CATNAME%/concepts/',0,0,'',0,915,1),(38,10,'%BRAND_NAME% engines','%BRAND_NAME% engines','Engines','/%BRAND_CATNAME%/engines/',0,0,'',0,914,1),(39,10,'%BRAND_NAME% logotypes','%BRAND_NAME% logotypes','Logotypes','/%BRAND_CATNAME%/logotypes/',0,0,'',0,916,1),(40,10,'%BRAND_NAME% miscellaneous','%BRAND_NAME% miscellaneous','Miscellaneous','/%BRAND_CATNAME%/mixed/',0,0,'',0,917,1),(41,10,'Unsorted','Unsorted','Unsorted','/%BRAND_CATNAME%/other/',0,0,'',0,920,1),(42,2,'Forums','Forums','','/forums',0,0,'',0,27,0),(43,42,'%THEME_NAME%','%THEME_NAME%','%THEME_NAME%','/forums/index/%THEME_ID%',0,0,'',0,1,1),(44,43,'%TOPIC_NAME%','%TOPIC_NAME%','%TOPIC_NAME%','/forums/topic/topic/topic_id/%TOPIC_ID%',0,0,'',0,5,1),(45,43,'New topic','New topic','New topic','/forums/topic/new/theme_id/%THEME_ID%',0,0,'',0,4,1),(48,87,'Cabinet','Cabinet','','/account',0,1,'',0,27,0),(49,48,'Personal messages','Personal messages','','/account/pm',0,0,'',0,23,1),(51,1,'New pictures','','','/new',0,0,'',0,1036,0),(52,1,'Registration','Registration','','/registration',0,0,'',0,1056,0),(53,52,'ok','Успешная регистрация','','',0,0,'',0,1,1),(54,48,'Confirm the email address','Confirm the email address','','',0,0,'',0,21,1),(55,48,'My e-mail','My e-mail','','/account/email',0,1,'',0,26,1),(56,55,'Changed','Changing e-mail','','',0,1,'',0,1,1),(57,48,'Forums subscriptions','Forums subscriptions','','/account/forums',0,1,'',0,31,1),(58,10,'%BRAND_NAME% %DPBRAND_NAME%','%BRAND_NAME% %DPBRAND_NAME%','%DPBRAND_NAME%','/%BRAND_CATNAME%/%DPBRAND_CATNAME%/',0,0,'',0,901,1),(59,10,'%BRAND_NAME% %DESIGN_PROJECT_NAME%','%BRAND_NAME% %DESIGN_PROJECT_NAME%','%DESIGN_PROJECT_NAME%','/%BRAND_CATNAME%/%DESIGN_PROJECT_CATNAME%/',0,0,'',0,902,1),(60,1,'Password recovery','Password recovery','','',0,0,'',0,1038,0),(61,1,'All brands','','','/brands/',0,0,'',0,1039,0),(62,1,'%USER_NAME%','%USER_NAME%','%USER_NAME%','/users/%USER_IDENTITY%',0,0,'',0,1020,1),(63,62,'User\'s pictures','User\'s pictures','Pictures','/users/%USER_IDENTITY%',0,0,'',0,1,1),(66,59,'All pictures of %BRAND_NAME% %DESIGN_PROJECT_NAME%','All pictures of %BRAND_NAME% %DESIGN_PROJECT_NAME%','All pictures','/%BRAND_CATNAME%/%DESIGN_PROJECT_CATNAME%/pictures/',0,0,'',0,1,1),(67,1,'Moderator page','','','/moder',0,0,'',0,1040,0),(68,67,'Страницы сайта','','','/moder/pages',0,0,NULL,0,1,1),(69,68,'Добавить','','','',0,0,NULL,0,1,1),(70,68,'Изменить','','','',0,0,NULL,0,2,1),(71,67,'Права','','','/moder/rights',0,0,NULL,0,2,1),(72,73,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/moder/pictures/picture/picture_id/%PICTURE_ID%',0,1,'',0,3,1),(73,67,'Картинки','','','/moder/pictures',0,1,'',0,20,1),(74,67,'Автомобили по алфавиту','','','/moder/alpha-cars',0,0,NULL,0,5,1),(75,67,'Журнал событий','','','/log/',0,0,NULL,0,6,1),(76,1,'Немодерированное','Немодерированное','','',0,0,'',0,1053,0),(77,67,'Трафик','','','/moder/trafic',0,0,NULL,0,7,1),(78,131,'%CAR_NAME%','%CAR_NAME%','%CAR_NAME%','/moder/cars/car/car_id/%CAR_ID%',0,1,'',0,26,1),(79,1,'Sign in','Sign in','','/login',0,0,'',1,1058,0),(80,49,'Sent','Sent','','/account/pm/sent',0,0,'',0,15,1),(81,49,'System messages','System messages','','/account/pm/system',0,0,'',0,18,1),(82,67,'Engines','Engines','Engines','/moder/engines',0,1,'',0,27,1),(83,44,'Move','Move','Move','/forums/topic/move/topic_id/%TOPIC_ID%',0,0,'',0,1,1),(85,67,'%BRAND_NAME%','%BRAND_NAME%','%BRAND_NAME%','/moder/brands/brand/brand_id/%BRAND_ID%',0,1,'',0,24,1),(86,29,'Image successfully uploaded to the site','Image successfully uploaded to the site','Success','/upload/success',0,0,'',0,6,1),(87,1,'More','More','','',1,0,'',0,1043,1),(89,87,'Feedback','','','/feedback',0,0,'',0,19,0),(90,87,'Sign out','','','/login/logout',0,1,'',0,28,1),(91,87,'Registration','','','/registration',0,0,'',1,4,1),(93,89,'Message sent','','','',0,0,'',0,0,1),(94,48,'Unmoderated','Unmoderated','','/account/not-taken-pictures',0,1,'',0,25,1),(96,67,'Автомобили-близнецы','','','',0,1,'',0,11,1),(97,67,'Ракурсы','','','',0,1,'',0,12,1),(100,67,'Аттрибуты','','','/moder/attrs',0,1,'',0,14,1),(101,100,'%ATTR_NAME%','%ATTR_NAME%','%ATTR_NAME%','',0,1,'',0,1,1),(102,1,'Specs editors %CAR_NAME%','Specs editors %CAR_NAME%','Specs editors','',0,0,'',0,1047,1),(103,102,'История изменения','История изменения','','/moder/index/attrs-change-log',0,1,'',0,18,1),(104,1,'Пользовательская статистика','','','',0,0,'',0,1000,0),(105,1,'Add a comment','Add a comment','','',0,0,'',0,1041,0),(106,1,'Rules','Rules','','/rules',0,0,'',0,1042,0),(107,67,'Заявки на удаление','Заявки на удаление','','',0,0,'',0,15,1),(109,1,'Cutaway','','Cutaway','/cutaway',0,0,'',0,1003,0),(110,67,'Комментарии','Комментарии','','/moder/comments',0,1,'',0,16,1),
+(114,67,'Журнал ТТХ','Журнал ТТХ','','/moder/spec',0,1,'',0,17,1),(115,67,'Музеи','Музеи','Музеи','/moder/museum',0,1,'',0,18,1),(116,115,'Музей','Музей','%MUSEUM_NAME%','/moder/museum/edit/museum_id/%MUSEUM_ID%/',0,1,'',0,1,1),(117,2,'Map','Map','','/map',0,0,'',0,26,0),(118,115,'Новый','Новый','Новый','/moder/museum/new',0,1,'',0,2,1),
+(119,67,'Статистика','','','/moder/index/stat',0,1,'',0,19,1),(120,68,'Блоки','','','',0,1,'',0,3,1),(122,1,'Specifications','Specifications','Specifications','/spec/',0,0,'',0,1057,1),(123,48,'My accounts','My accounts','My accounts','/profile/accounts/',0,1,'',0,22,0),(124,87,'Who is online?','','','/users/online',0,0,'online',0,24,1),(125,67,'Categories','Categories','','/moder/category',0,1,'',0,22,1),(126,125,'Add','Add','','/moder/category/new/',0,1,'',0,1,1),(127,125,'Edit','Edit','','',0,1,'',0,3,1),(128,49,'Inbox','Inbox','','/account/pm',0,1,'',0,17,0),(129,48,'Profile','Profile','','/account/profile',0,1,'',0,12,0),(130,48,'My pictures','My pictures','','',0,1,'',0,30,0),(131,67,'Vehicles','Vehicles','Vehicles','/moder/cars',0,1,'',0,26,1),(133,48,'Access','Access Control','','/account/access',0,1,'',0,27,1),(134,60,'New password','New password','','',0,0,'',0,4,0),(135,60,'New password saved','','','',0,1,'',0,5,0),(136,87,'About us','About us','','/about',0,0,'',0,29,1),(137,48,'Account delete','','','/account/delete',0,1,'',0,28,1),(138,14,'%BRAND_NAME% %CAR_TYPE_NAME% in chronological order','%BRAND_NAME% %CAR_TYPE_NAME% in chronological order','%CAR_TYPE_NAME%','/%BRAND_CATNAME%/cars/%CAR_TYPE_CATNAME%/',0,0,'',0,1,0),(140,61,'%BRAND_TYPE_NAME%','%BRAND_TYPE_NAME%','%BRAND_TYPE_NAME%','/brands/%BRAND_TYPE_NAME%',0,0,'',0,1,1),(141,63,'%BRAND_NAME% pictures','%BRAND_NAME% pictures','%BRAND_NAME% pictures','/users/%USER_IDENTITY%/pictures/%BRAND_CATNAME%',0,0,'',0,1,1),(142,100,'%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','%ATTR_ITEMTYPE_NAME% %ZONE_NAME%','/moder/attrs/zone/zone_id/%ZONE_ID%',0,1,'',0,4,1),(143,96,'%TWINS_GROUP_NAME%','%TWINS_GROUP_NAME%','%TWINS_GROUP_NAME%','/moder/twins/twins-group/twins_group_id/%TWINS_GROUP_ID%',0,1,'',0,1,1),(144,78,'Brand selection','Brand selection','Brand selection','',0,1,'',0,1,1),(146,78,'Twins group selection','Twins group selection','Twins group selection','',0,1,'',0,5,1),(147,78,'Design project selection','Design project selection','Design project selection','',0,1,'',0,7,1),(148,72,'Cropper','Cropper','Cropper','',0,1,'',0,1,1),(149,72,'Move picture','Move picture','Move picture','',0,1,'',0,12,1),(153,25,'%BRAND_NAME% Twins','%BRAND_NAME% Twins','%BRAND_NAME%','/twins/%BRAND_CATNAME%',0,0,'',0,7,1),(154,21,'%MOST_NAME%','%MOST_NAME%','%MOST_NAME%','/mosts/%MOST_CATNAME%',0,0,'',0,1,1),(155,154,'Most %MOST_NAME% %CAR_TYPE_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME%','%CAR_TYPE_NAME%','/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%',0,0,'',0,1,1),(156,155,'Most %MOST_NAME% %CAR_TYPE_NAME% %YEAR_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME% %YEAR_NAME%','%YEAR_NAME%','/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%/%YEAR_CATNAME%',0,0,'',0,1,1),(157,1,'%VOTING_NAME%','%VOTING_NAME%','%VOTING_NAME%','/voting/voting/id/%VOTING_ID%',0,0,'',0,1022,0),(159,117,'Museum','%MUSEUM_NAME%','%MUSEUM_NAME%','/museums/museum/id/%MUSEUM_ID%',0,0,'',0,1,0),(161,1,'Pulse','Pulse','Pulse','/pulse/',0,0,'',0,1049,0),(162,23,'Pictures','Pictures','','/category/%CATEGORY_CATNAME%/pictures',0,0,'',0,4,0),(163,131,'New vehicle','New vehicle','New vehicle','',0,0,'',0,28,0),(164,10,'Mosts','Mosts','Mosts','/%BRAND_CATNAME%/mosts/',0,0,'',0,919,0),(165,164,'Most %MOST_NAME% %BRAND_NAME%','Most %MOST_NAME% %BRAND_NAME%','%MOST_NAME%','/%BRAND_CATNAME%/mosts/%MOST_CATNAME%',0,0,'',0,1,0),(166,165,'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME%','%CAR_TYPE_NAME%','/%BRAND_CATNAME%/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%',0,0,'',0,1,0),(167,166,'Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME% %YEAR_NAME%','Most %MOST_NAME% %CAR_TYPE_NAME% %BRAND_NAME% %YEAR_NAME%','%YEAR_NAME%','/%BRAND_CATNAME%/mosts/%MOST_CATNAME%/%CAR_TYPE_CATNAME%/%YEAR_CATNAME%',0,0,'',0,1,0),
+(173,1,'Statistics','Statistics','Statistics','/users/rating',0,0,'',0,1050,0),(174,1,'Specs','Specs','Specs','/info/spec',0,0,'',0,1051,0),(175,67,'Factories','Factories','Factories','/moder/factory',0,0,'',0,29,0),(176,175,'Add','Add','Add','/moder/factory/add',0,0,'',0,1,0),(177,175,'%FACTORY_NAME%','%FACTORY_NAME%','%FACTORY_NAME%','',0,0,'',0,3,0),(178,78,'Factory selection','Factory selection','Factory selection','',0,0,'',0,9,0),(180,1,'Factories','Factories','Factories','/factory',0,0,'',0,1052,0),(181,117,'%FACTORY_NAME%','%FACTORY_NAME%','%FACTORY_NAME%','/factory/factory/id/%FACTORY_ID%',0,0,'',0,2,0),(182,181,'Vehicles','Vehicles','Vehicles','/factory/factory-cars/id/%FACTORY_ID%',0,0,'',0,1,0),(183,28,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/twins/group%TWINS_GROUP_ID%/pictures/%PICTURE_ID%',0,0,'',0,1,0),(184,162,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/category/%CATEGORY_CATNAME%/pictures/%PICTURE_ID%',0,0,'',0,1,0),(185,23,'%CAR_NAME%','%CAR_NAME%','%CAR_NAME%','/category/%CATEGORY_CATNAME%/%CAR_ID%',0,0,'',0,3,0),(186,185,'Pictures','Pictures','Pictures','/category/%CATEGORY_CATNAME%/%CAR_ID%/pictures',0,0,'',0,1,0),(187,186,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/category/%CATEGORY_CATNAME%/%CAR_ID%/pictures/%PICTURE_ID%',0,0,'',0,1,0),(188,48,'Conflicts','Conflicts','Conflicts','/account/specs-conflics',0,1,'',0,29,0),(189,102,'Low weight','Low weight','Low weight','',0,0,'',0,17,0),(190,40,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/%BRAND_CATNAME%/mixed/%PICTURE_ID%',0,0,'',0,1,0),(191,41,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/%BRAND_CATNAME%/other/%PICTURE_ID%',0,0,'',0,1,0),(192,39,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/%BRAND_CATNAME%/logotypes/%PICTURE_ID%',0,0,'',0,1,0),(193,66,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/%BRAND_CATNAME%/%DESIGN_PROJECT_CATNAME%/%PICTURE_ID%',0,0,'',0,1,0),(194,34,'%PICTURE_NAME%','%PICTURE_NAME%','%PICTURE_NAME%','/%BRAND_CATNAME%/%CAR_CATNAME%/pictures/%PICTURE_ID%',0,0,'',0,1,0),
+(196,1,'Donate','Donate','Donate','/donate',0,0,'',0,1061,0),(197,1,'Text history','Text history','Text history','/info/text',0,0,'',0,1064,0),(198,48,'Contacts','Contacts','Contacts','/account/contacts',0,1,'',0,33,0),(201,1,'Mascots','Mascots','Mascots','/mascots',0,0,'',0,1065,1),(202,67,'Perspectives','Perspectives','Perspectives','/moder/perspectives',0,0,'',0,30,1),(203,67,'Users','Users','Users','/moder/users',0,1,'',0,31,1),(204,1,'Telegram','Telegram','Telegram','/telegram',0,0,'',0,1066,1),(205,62,'User\'s comments','User\'s comments','Comments','/users/%USER_IDENTITY%/comments',0,0,'',0,2,1);
 /*!40000 ALTER TABLE `pages` ENABLE KEYS */;
 
 --
@@ -3205,7 +3079,6 @@ CREATE TABLE `pictures` (
   `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `removing_date` date DEFAULT NULL,
   `brand_id` int(10) unsigned DEFAULT NULL,
-  `engine_id` int(10) unsigned DEFAULT NULL,
   `change_status_user_id` int(10) unsigned DEFAULT NULL,
   `crop_left` smallint(6) unsigned DEFAULT NULL,
   `crop_top` smallint(11) unsigned DEFAULT NULL,
@@ -3226,7 +3099,6 @@ CREATE TABLE `pictures` (
   UNIQUE KEY `identity` (`identity`),
   UNIQUE KEY `image_id` (`image_id`),
   KEY `crc` (`crc`),
-  KEY `engineIndex` (`engine_id`,`type`),
   KEY `dateAndIdOrdering` (`status`,`add_date`,`id`),
   KEY `comments` (`status`),
   KEY `car_id` (`type`,`status`),
@@ -3239,7 +3111,6 @@ CREATE TABLE `pictures` (
   KEY `width` (`width`,`height`,`add_date`,`id`),
   KEY `copyrights_text_id` (`copyrights_text_id`),
   CONSTRAINT `pictures_fk` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `pictures_fk2` FOREIGN KEY (`engine_id`) REFERENCES `engines` (`id`),
   CONSTRAINT `pictures_fk4` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`),
   CONSTRAINT `pictures_fk5` FOREIGN KEY (`type`) REFERENCES `pictures_types` (`id`),
   CONSTRAINT `pictures_fk6` FOREIGN KEY (`replace_picture_id`) REFERENCES `pictures` (`id`) ON DELETE SET NULL,
@@ -3255,11 +3126,11 @@ CREATE TABLE `pictures` (
 
 /*!40000 ALTER TABLE `pictures` DISABLE KEYS */;
 INSERT INTO `pictures` VALUES 
-(1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,1,NULL,'\0\0',NULL,NULL),
-(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',0,NULL,1,   NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,33,NULL,'\0\0',NULL,NULL),
-(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',3,NULL,1,   NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,35,NULL,'\0\0',NULL,NULL),
-(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',2,NULL,1,   NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,37,NULL,'\0\0',NULL,NULL),
-(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',   2,NULL,1,   NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,38,NULL,'\0\0',NULL,NULL);
+(1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,1,NULL,'\0\0',NULL,NULL),
+(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',0,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,33,NULL,'\0\0',NULL,NULL),
+(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',3,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,35,NULL,'\0\0',NULL,NULL),
+(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',2,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,37,NULL,'\0\0',NULL,NULL),
+(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',   2,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,38,NULL,'\0\0',NULL,NULL);
 /*!40000 ALTER TABLE `pictures` ENABLE KEYS */;
 
 --
@@ -3311,463 +3182,6 @@ CREATE TABLE `pictures_types` (
 /*!40000 ALTER TABLE `pictures_types` DISABLE KEYS */;
 INSERT INTO `pictures_types` VALUES (1,'Автомобиль'),(4,'Двигатель'),(7,'Завод'),(6,'Интерьер'),(2,'Логотип бренда'),(5,'Модель'),(0,'Несортировано'),(3,'Разное');
 /*!40000 ALTER TABLE `pictures_types` ENABLE KEYS */;
-
---
--- Table structure for table `pma__bookmark`
---
-
-DROP TABLE IF EXISTS `pma__bookmark`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__bookmark` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `dbase` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `user` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `label` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  `query` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Bookmarks';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__bookmark`
---
-
-/*!40000 ALTER TABLE `pma__bookmark` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__bookmark` ENABLE KEYS */;
-
---
--- Table structure for table `pma__central_columns`
---
-
-DROP TABLE IF EXISTS `pma__central_columns`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__central_columns` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `col_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `col_type` varchar(64) COLLATE utf8_bin NOT NULL,
-  `col_length` text COLLATE utf8_bin,
-  `col_collation` varchar(64) COLLATE utf8_bin NOT NULL,
-  `col_isNull` tinyint(1) NOT NULL,
-  `col_extra` varchar(255) COLLATE utf8_bin DEFAULT '',
-  `col_default` text COLLATE utf8_bin,
-  PRIMARY KEY (`db_name`,`col_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Central list of columns';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__central_columns`
---
-
-/*!40000 ALTER TABLE `pma__central_columns` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__central_columns` ENABLE KEYS */;
-
---
--- Table structure for table `pma__column_info`
---
-
-DROP TABLE IF EXISTS `pma__column_info`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__column_info` (
-  `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `column_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `comment` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  `mimetype` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  `transformation` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `transformation_options` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `input_transformation` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `input_transformation_options` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `db_name` (`db_name`,`table_name`,`column_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Column information for phpMyAdmin';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__column_info`
---
-
-/*!40000 ALTER TABLE `pma__column_info` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__column_info` ENABLE KEYS */;
-
---
--- Table structure for table `pma__designer_settings`
---
-
-DROP TABLE IF EXISTS `pma__designer_settings`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__designer_settings` (
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `settings_data` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Settings related to Designer';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__designer_settings`
---
-
-/*!40000 ALTER TABLE `pma__designer_settings` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__designer_settings` ENABLE KEYS */;
-
---
--- Table structure for table `pma__export_templates`
---
-
-DROP TABLE IF EXISTS `pma__export_templates`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__export_templates` (
-  `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `export_type` varchar(10) COLLATE utf8_bin NOT NULL,
-  `template_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `template_data` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `u_user_type_template` (`username`,`export_type`,`template_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Saved export templates';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__export_templates`
---
-
-/*!40000 ALTER TABLE `pma__export_templates` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__export_templates` ENABLE KEYS */;
-
---
--- Table structure for table `pma__favorite`
---
-
-DROP TABLE IF EXISTS `pma__favorite`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__favorite` (
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `tables` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Favorite tables';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__favorite`
---
-
-/*!40000 ALTER TABLE `pma__favorite` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__favorite` ENABLE KEYS */;
-
---
--- Table structure for table `pma__history`
---
-
-DROP TABLE IF EXISTS `pma__history`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__history` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `db` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `table` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `timevalue` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `sqlquery` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `username` (`username`,`db`,`table`,`timevalue`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='SQL history for phpMyAdmin';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__history`
---
-
-/*!40000 ALTER TABLE `pma__history` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__history` ENABLE KEYS */;
-
---
--- Table structure for table `pma__navigationhiding`
---
-
-DROP TABLE IF EXISTS `pma__navigationhiding`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__navigationhiding` (
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `item_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `item_type` varchar(64) COLLATE utf8_bin NOT NULL,
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`username`,`item_name`,`item_type`,`db_name`,`table_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Hidden items of navigation tree';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__navigationhiding`
---
-
-/*!40000 ALTER TABLE `pma__navigationhiding` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__navigationhiding` ENABLE KEYS */;
-
---
--- Table structure for table `pma__pdf_pages`
---
-
-DROP TABLE IF EXISTS `pma__pdf_pages`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__pdf_pages` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `page_nr` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `page_descr` varchar(50) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  PRIMARY KEY (`page_nr`),
-  KEY `db_name` (`db_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='PDF relation pages for phpMyAdmin';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__pdf_pages`
---
-
-/*!40000 ALTER TABLE `pma__pdf_pages` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__pdf_pages` ENABLE KEYS */;
-
---
--- Table structure for table `pma__recent`
---
-
-DROP TABLE IF EXISTS `pma__recent`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__recent` (
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `tables` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Recently accessed tables';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__recent`
---
-
-/*!40000 ALTER TABLE `pma__recent` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__recent` ENABLE KEYS */;
-
---
--- Table structure for table `pma__relation`
---
-
-DROP TABLE IF EXISTS `pma__relation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__relation` (
-  `master_db` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `master_table` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `master_field` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `foreign_db` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `foreign_table` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `foreign_field` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  PRIMARY KEY (`master_db`,`master_table`,`master_field`),
-  KEY `foreign_field` (`foreign_db`,`foreign_table`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Relation table';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__relation`
---
-
-/*!40000 ALTER TABLE `pma__relation` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__relation` ENABLE KEYS */;
-
---
--- Table structure for table `pma__savedsearches`
---
-
-DROP TABLE IF EXISTS `pma__savedsearches`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__savedsearches` (
-  `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `search_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `search_data` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `u_savedsearches_username_dbname` (`username`,`db_name`,`search_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Saved searches';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__savedsearches`
---
-
-/*!40000 ALTER TABLE `pma__savedsearches` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__savedsearches` ENABLE KEYS */;
-
---
--- Table structure for table `pma__table_coords`
---
-
-DROP TABLE IF EXISTS `pma__table_coords`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__table_coords` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `pdf_page_number` int(11) NOT NULL DEFAULT '0',
-  `x` float unsigned NOT NULL DEFAULT '0',
-  `y` float unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`db_name`,`table_name`,`pdf_page_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table coordinates for phpMyAdmin PDF output';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__table_coords`
---
-
-/*!40000 ALTER TABLE `pma__table_coords` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__table_coords` ENABLE KEYS */;
-
---
--- Table structure for table `pma__table_info`
---
-
-DROP TABLE IF EXISTS `pma__table_info`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__table_info` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `display_field` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  PRIMARY KEY (`db_name`,`table_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table information for phpMyAdmin';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__table_info`
---
-
-/*!40000 ALTER TABLE `pma__table_info` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__table_info` ENABLE KEYS */;
-
---
--- Table structure for table `pma__table_uiprefs`
---
-
-DROP TABLE IF EXISTS `pma__table_uiprefs`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__table_uiprefs` (
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `prefs` text COLLATE utf8_bin NOT NULL,
-  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`username`,`db_name`,`table_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Tables'' UI preferences';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__table_uiprefs`
---
-
-/*!40000 ALTER TABLE `pma__table_uiprefs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__table_uiprefs` ENABLE KEYS */;
-
---
--- Table structure for table `pma__tracking`
---
-
-DROP TABLE IF EXISTS `pma__tracking`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__tracking` (
-  `db_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `table_name` varchar(64) COLLATE utf8_bin NOT NULL,
-  `version` int(10) unsigned NOT NULL,
-  `date_created` datetime NOT NULL,
-  `date_updated` datetime NOT NULL,
-  `schema_snapshot` text COLLATE utf8_bin NOT NULL,
-  `schema_sql` text COLLATE utf8_bin,
-  `data_sql` longtext COLLATE utf8_bin,
-  `tracking` set('UPDATE','REPLACE','INSERT','DELETE','TRUNCATE','CREATE DATABASE','ALTER DATABASE','DROP DATABASE','CREATE TABLE','ALTER TABLE','RENAME TABLE','DROP TABLE','CREATE INDEX','DROP INDEX','CREATE VIEW','ALTER VIEW','DROP VIEW') COLLATE utf8_bin DEFAULT NULL,
-  `tracking_active` int(1) unsigned NOT NULL DEFAULT '1',
-  PRIMARY KEY (`db_name`,`table_name`,`version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Database changes tracking for phpMyAdmin';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__tracking`
---
-
-/*!40000 ALTER TABLE `pma__tracking` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__tracking` ENABLE KEYS */;
-
---
--- Table structure for table `pma__userconfig`
---
-
-DROP TABLE IF EXISTS `pma__userconfig`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__userconfig` (
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `timevalue` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `config_data` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User preferences storage for phpMyAdmin';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__userconfig`
---
-
-/*!40000 ALTER TABLE `pma__userconfig` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__userconfig` ENABLE KEYS */;
-
---
--- Table structure for table `pma__usergroups`
---
-
-DROP TABLE IF EXISTS `pma__usergroups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__usergroups` (
-  `usergroup` varchar(64) COLLATE utf8_bin NOT NULL,
-  `tab` varchar(64) COLLATE utf8_bin NOT NULL,
-  `allowed` enum('Y','N') COLLATE utf8_bin NOT NULL DEFAULT 'N',
-  PRIMARY KEY (`usergroup`,`tab`,`allowed`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User groups with configured menu items';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__usergroups`
---
-
-/*!40000 ALTER TABLE `pma__usergroups` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__usergroups` ENABLE KEYS */;
-
---
--- Table structure for table `pma__users`
---
-
-DROP TABLE IF EXISTS `pma__users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pma__users` (
-  `username` varchar(64) COLLATE utf8_bin NOT NULL,
-  `usergroup` varchar(64) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`username`,`usergroup`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users and their assignments to user groups';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pma__users`
---
-
-/*!40000 ALTER TABLE `pma__users` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pma__users` ENABLE KEYS */;
 
 --
 -- Table structure for table `referer`

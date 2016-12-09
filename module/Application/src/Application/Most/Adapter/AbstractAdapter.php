@@ -5,6 +5,7 @@ namespace Application\Most\Adapter;
 use Application\Most;
 
 use Zend_Db_Table_Select;
+use Exception;
 
 abstract class AbstractAdapter
 {

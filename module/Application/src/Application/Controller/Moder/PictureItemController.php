@@ -2,40 +2,15 @@
 
 namespace Application\Controller\Moder;
 
-use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
 
-use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
-use Autowp\User\Model\DbTable\User\Row as UserRow;
 
-use Application\Form\Moder\Inbox as InboxForm;
-use Application\HostManager;
-use Application\Model\Brand as BrandModel;
-use Application\Model\Comments;
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Comment\Topic as CommentTopic;
-use Application\Model\DbTable\Engine;
-use Application\Model\DbTable\Factory;
-use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
 use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
-use Application\Model\Message;
 use Application\Model\PictureItem;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
-use Application\PictureNameFormatter;
-use Application\Service\TelegramService;
-
-use Exception;
-
-use Zend_Db_Expr;
-use Zend_Db_Table_Rowset;
 
 class PictureItemController extends AbstractActionController
 {

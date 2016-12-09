@@ -297,7 +297,7 @@ class CatalogueController extends AbstractActionController
                     },
                     'specificationsUrl' => function ($listCar) use ($brand, $carParentTable) {
 
-                        $hasSpecs = $this->specsService->hasSpecs(1, $listCar->id);
+                        $hasSpecs = $this->specsService->hasSpecs($listCar->id);
 
                         if (! $hasSpecs) {
                             return false;
@@ -472,7 +472,7 @@ class CatalogueController extends AbstractActionController
                     },
                     'specificationsUrl' => function ($listCar) use ($brand, $carParentTable) {
 
-                        $hasSpecs = $this->specsService->hasSpecs(1, $listCar->id);
+                        $hasSpecs = $this->specsService->hasSpecs($listCar->id);
 
                         if (! $hasSpecs) {
                             return false;
@@ -1266,7 +1266,7 @@ class CatalogueController extends AbstractActionController
                     'onlyExactlyPictures' => true,
                     'specificationsUrl' => function ($listCar) use ($brand, $brandItemCatname, $path) {
 
-                        $hasSpecs = $this->specsService->hasSpecs(1, $listCar->id);
+                        $hasSpecs = $this->specsService->hasSpecs($listCar->id);
 
                         if (! $hasSpecs) {
                             return false;
@@ -1784,7 +1784,7 @@ class CatalogueController extends AbstractActionController
             $ids[] = $car->id;
         }
 
-        $hasChildSpecs = $this->specsService->hasChildSpecs(1, $ids);
+        $hasChildSpecs = $this->specsService->hasChildSpecs($ids);
 
         $picturesSelect = $this->selectFromPictures()
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
@@ -1944,7 +1944,7 @@ class CatalogueController extends AbstractActionController
                         }
                     }
 
-                    if (! $this->specsService->hasSpecs(1, $listCar->id)) {
+                    if (! $this->specsService->hasSpecs($listCar->id)) {
                         return false;
                     }
 
@@ -2214,7 +2214,7 @@ class CatalogueController extends AbstractActionController
             $exact = (bool)$this->params('exact');
 
             $select = $this->getBrandItemPicturesSelect($currentCar['id'], $exact, false);
-            
+
             return $this->pictureAction($select, function ($select, $picture) use ($breadcrumbs) {
                 return [
                     'breadcrumbs' => $breadcrumbs,
@@ -2320,7 +2320,7 @@ class CatalogueController extends AbstractActionController
 
             $cars = [];
             foreach ($childCars as $childCar) {
-                if ($this->specsService->hasSpecs(1, $childCar->id)) {
+                if ($this->specsService->hasSpecs($childCar->id)) {
                     $cars[] = $childCar;
                 }
             }
@@ -2335,7 +2335,7 @@ class CatalogueController extends AbstractActionController
                 $ids[] = $car->id;
             }
 
-            $contribPairs = $this->specsService->getContributors(1, $ids);
+            $contribPairs = $this->specsService->getContributors($ids);
 
             $userTable = new User();
             $contributors = $userTable->find(array_keys($contribPairs));

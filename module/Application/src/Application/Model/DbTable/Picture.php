@@ -7,7 +7,6 @@ use Autowp\Image;
 use Application\Db\Table;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Perspective;
@@ -23,7 +22,6 @@ class Picture extends Table
         VEHICLE_TYPE_ID  = 1,
         LOGO_TYPE_ID     = 2,
         MIXED_TYPE_ID    = 3,
-        ENGINE_TYPE_ID   = 4,
         FACTORY_TYPE_ID  = 7;
 
     const
@@ -41,11 +39,6 @@ class Picture extends Table
         'Brand' => [
             'columns'       => ['brand_id'],
             'refTableClass' => BrandTable::class,
-            'refColumns'    => ['id']
-        ],
-        'Engine' => [
-            'columns'       => ['engine_id'],
-            'refTableClass' => Engine::class,
             'refColumns'    => ['id']
         ],
         'Factory' => [

@@ -17,12 +17,13 @@ class AttrsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTypes = new Attr\ItemType();
         $attributes = new Attr\Attribute();
 
+        $zoneTable = new Application\Model\DbTable\Attr\Zone();
+
         return [
-            'itemTypes'  => $itemTypes->fetchAll(),
-            'attributes' => $attributes->fetchAll('parent_id IS NULL', 'position')
+            'attributes' => $attributes->fetchAll('parent_id IS NULL', 'position'),
+            'zones'      => $zoneTable->fetchAll()
         ];
     }
 
@@ -139,7 +140,6 @@ class AttrsController extends AbstractActionController
         }
 
         return [
-            //'itemType'      => $itemType,
             'attribute'         => $attribute,
             'formAttributeEdit' => $formAttributeEdit,
             'formAttributeNew'  => $formAttributeNew,
@@ -176,8 +176,6 @@ class AttrsController extends AbstractActionController
         if (! $zone) {
             return $this->notFoundAction();
         }
-
-        $itemType = $zone->findParentRow(Attr\ItemType::class);
 
         $attributes = new Attr\Attribute();
 
@@ -223,7 +221,6 @@ class AttrsController extends AbstractActionController
         }
 
         return [
-            'itemType'   => $itemType,
             'zone'       => $zone,
             'attributes' => $attributes->fetchAll(
                 $attributes->select()->where('parent_id IS NULL')

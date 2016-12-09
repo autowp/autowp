@@ -178,7 +178,9 @@
         <?php } ?>
     </div>
     <div class="tab-pane<?=$this->tabs['catalogue']['active'] ? ' active' : ''?>" id="catalogue">Loading ...</div>
-    <div class="tab-pane<?=$this->tabs['vehicles']['active'] ? ' active' : ''?>" id="vehicles">Loading ...</div>
+    <?php if (isset($this->tabs['vehicles'])) { ?>
+        <div class="tab-pane<?=$this->tabs['vehicles']['active'] ? ' active' : ''?>" id="vehicles">Loading ...</div>
+    <?php } ?>
     <div class="tab-pane<?=$this->tabs['tree']['active'] ? ' active' : ''?>" id="tree">Loading ...</div>
     <div class="tab-pane<?=$this->tabs['categories']['active'] ? ' active' : ''?>" id="categories">Loading ...</div>
     <div class="tab-pane<?=$this->tabs['factories']['active'] ? ' active' : ''?>" id="factories">Loading ...</div>

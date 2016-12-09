@@ -13,18 +13,11 @@
         <h2><?=$this->escapeHtml($this->translate('moder/attrs/zones'))?></h2>
         <div class="well">
             <ul>
-                <?php foreach ($this->itemTypes as $itemType) { ?>
-                    <li>
-                        <?=$this->htmlA($this->url(), $itemType->name) ?>
-                        <ul>
-                            <?php foreach ($itemType->findDependentRowset(Application\Model\DbTable\Attr\Zone::class) as $zone) { ?>
-                                <li><?=$this->htmlA($this->url('moder/attrs/params', [
-                                    'action'  => 'zone',
-                                    'zone_id' => $zone->id
-                                ], [], true), $zone->name) ?></li>
-                            <?php } ?>
-                        </ul>
-                    </li>
+                <?php foreach ($this->zones as $zone) { ?>
+                    <li><?=$this->htmlA($this->url('moder/attrs/params', [
+                        'action'  => 'zone',
+                        'zone_id' => $zone->id
+                    ], [], true), $zone->name) ?></li>
                 <?php } ?>
             </ul>
         </div>

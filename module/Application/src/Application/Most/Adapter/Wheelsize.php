@@ -2,7 +2,6 @@
 
 namespace Application\Most\Adapter;
 
-use Application\Model\DbTable\Attr\ItemType;
 use Application\Model\DbTable\Attr\Attribute;
 use Application\Model\DbTable\Attr\Unit;
 use Application\WheelSize as WheelsizeObject;
@@ -19,16 +18,11 @@ class Wheelsize extends AbstractAdapter
 
     protected $attributesTable;
 
-    protected $carItemType;
-
     public function __construct(array $options)
     {
         parent::__construct($options);
 
         $this->attributesTable = new Attribute();
-
-        $itemTypes = new ItemType();
-        $this->carItemType = $itemTypes->find(1)->current();
     }
 
     public function setAttributes(array $value)
@@ -103,9 +97,9 @@ class Wheelsize extends AbstractAdapter
 
         foreach ($this->attributes as $wheel) {
             $wheelObj = new WheelsizeObject(
-                $specService->getActualValue($wheel['tyrewidth'], $car->id, 1),
-                $specService->getActualValue($wheel['tyreseries'], $car->id, 1),
-                $specService->getActualValue($wheel['radius'], $car->id, 1),
+                $specService->getActualValue($wheel['tyrewidth'], $car->id),
+                $specService->getActualValue($wheel['tyreseries'], $car->id),
+                $specService->getActualValue($wheel['radius'], $car->id),
                 null
             );
             $value = $wheelObj->getTyreName();
