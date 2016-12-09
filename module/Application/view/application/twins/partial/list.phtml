@@ -11,8 +11,8 @@
                                 $car['picture']['url'],
                                 $this->htmlImg([
                                     'src'   => $car['picture']['src'],
-                                    'alt'   => $car['name'],
-                                    'title' => $car['name'],
+                                    'alt'   => $this->car()->textTitle($car['name']),
+                                    'title' => $this->car()->textTitle($car['name']),
                                 ]),
                                 false
                             )?>

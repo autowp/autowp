@@ -86,7 +86,6 @@ class Acceleration extends AbstractAdapter
             $axisSelect
                 ->columns(['car_id' => 'cars.id', 'size_value' => $valueColumn])
                 ->join(['axis' => $attrValuesTable], 'cars.id = axis.item_id', null)
-                ->where('axis.item_type_id = ?', 1)
                 ->where('axis.attribute_id = ?', $attr->id)
                 ->where('axis.value > 0')
                 ->order('size_value ' . $this->order)

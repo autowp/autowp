@@ -29,14 +29,24 @@
                     <?php if ($this->user()->isAllowed('car', 'add')) { ?>
                         <li>
                             <i class="fa fa-plus"></i>
-                            <?=$this->htmlA($this->url('moder/cars', [
-                                'action' => 'new',
+                            <?=$this->htmlA($this->url('moder/cars/params', [
+                                'action'       => 'new',
+                                'item_type_id' => Application\Model\DbTable\Item\Type::VEHICLE
                             ]), $this->page(163)->name)?>
+                        </li>
+                        <li>
+                            <i class="fa fa-plus"></i>
+                            <?=$this->htmlA($this->url('moder/cars/params', [
+                                'action'       => 'new',
+                                'item_type_id' => Application\Model\DbTable\Item\Type::ENGINE
+                            ]), $this->page(206)->name)?>
                         </li>
                     <?php } ?>
                 </ul>
             </div>
         <?php } ?>
+        
+        <?php /*
         <h3><?=$this->escapeHtml($this->page(82)->name)?></h3>
         <div class="well">
             <ul class="list-unstyled">
@@ -54,6 +64,7 @@
                 <?php } ?>
             </ul>
         </div>
+        */?>
         <h3><?=$this->escapeHtml($this->page(175)->name)?></h3>
         <div class="well">
             <ul class="list-unstyled">

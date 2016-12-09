@@ -15,10 +15,10 @@ use Application\Form\Moder\Inbox as InboxForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\Comments;
+use Application\Model\DbTable;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
-use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture;
@@ -45,11 +45,6 @@ class PicturesController extends AbstractActionController
      * @var VehicleParent
      */
     private $carParentTable;
-
-    /**
-     * @var Engine
-     */
-    private $engineTable = null;
 
     private $textStorage;
 
@@ -102,17 +97,6 @@ class PicturesController extends AbstractActionController
      * @var PictureItem
      */
     private $pictureItem;
-
-    /**
-     * @return Engine
-     */
-    private function getEngineTable()
-    {
-        return $this->engineTable
-            ? $this->engineTable
-            : $this->engineTable = new Engine();
-    }
-
 
     private function getCarParentTable()
     {
@@ -341,11 +325,6 @@ class PicturesController extends AbstractActionController
         if ($formdata['brand_id']) {
             if (strlen($formdata['type_id']) && in_array($formdata['type_id'], $brandRelatedTypes)) {
                 $select->where('pictures.brand_id = ?', $formdata['brand_id']);
-            } elseif ($formdata['type_id'] == Picture::ENGINE_TYPE_ID) {
-                $select
-                    ->join('engine_parent_cache', 'pictures.engine_id = engine_parent_cache.engine_id', null)
-                    ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
-                    ->where('brand_engine.brand_id = ?', $formdata['brand_id']);
             } else {
                 if (! $pictureItemJoined) {
                     $pictureItemJoined = true;
@@ -450,9 +429,6 @@ class PicturesController extends AbstractActionController
                 case Picture::MIXED_TYPE_ID:
                 case Picture::UNSORTED_TYPE_ID:
                     $select->where('pictures.brand_id IS NULL');
-                    break;
-                case Picture::ENGINE_TYPE_ID:
-                    $select->where('pictures.engine_id IS NULL');
                     break;
                 case Picture::FACTORY_TYPE_ID:
                     $select->where('pictures.factory_id IS NULL');
@@ -576,35 +552,6 @@ class PicturesController extends AbstractActionController
             'uri'             => $uri
         ]);
     }
-
-    private function enginesWalkTree($parentId, $brandId)
-    {
-        $engineTable = $this->getEngineTable();
-        $select = $engineTable->select(true)
-            ->order('engines.name');
-        if ($brandId) {
-            $select
-                ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
-                ->where('brand_engine.brand_id = ?', $brandId);
-        }
-        if ($parentId) {
-            $select->where('engines.parent_id = ?', $parentId);
-        }
-
-        $rows = $engineTable->fetchAll($select);
-
-        $engines = [];
-        foreach ($rows as $row) {
-            $engines[] = [
-                'id'     => $row->id,
-                'name'   => $row->name,
-                'childs' => $this->enginesWalkTree($row->id, null)
-            ];
-        }
-
-        return $engines;
-    }
-
 
     private function pictureCanDelete($picture)
     {
@@ -1729,44 +1676,6 @@ class PicturesController extends AbstractActionController
         return $viewModel->setTerminal(true);
     }
 
-    public function enginesAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $brandTable = new BrandTable();
-        $brand = $brandTable->find($this->params('brand_id'))->current();
-        if (! $brand) {
-            return $this->notFoundAction();
-        }
-
-        $engineTable = new Engine();
-        $rows = $engineTable->fetchAll(
-            $engineTable->select(true)
-                ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
-                ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
-                ->where('brand_engine.brand_id = ?', $brand->id)
-                ->order('engines.name')
-        );
-        $engines = [];
-        foreach ($rows as $row) {
-            $engines[] = [
-                'name' => $row->name,
-                'url'  => $this->url()->fromRoute(null, [
-                    'action'    => 'move',
-                    'type'      => Picture::ENGINE_TYPE_ID,
-                    'engine_id' => $row->id
-                ], [], true)
-            ];
-        }
-
-        $viewModel = new ViewModel([
-            'engines' => $engines,
-        ]);
-        return $viewModel->setTerminal(true);
-    }
-
     private function canReplace($picture, $replacedPicture)
     {
         $can1 = false;
@@ -2125,25 +2034,6 @@ class PicturesController extends AbstractActionController
                     }
                     break;
 
-                case Picture::ENGINE_TYPE_ID:
-                    $success = $this->table->moveToEngine(
-                        $this->pictureItem,
-                        $picture->id,
-                        $this->params('engine_id'),
-                        $userId,
-                        [
-                            'language'   => $this->language(),
-                            'pictureNameFormatter' => $this->pictureNameFormatter
-                        ]
-                    );
-
-                    $this->pictureItem->setPictureItems($picture->id, []);
-
-                    if (! $success) {
-                        return $this->notFoundAction();
-                    }
-                    break;
-
                 case Picture::VEHICLE_TYPE_ID:
                     $carId = (int)$this->params('car_id');
 
@@ -2203,18 +2093,19 @@ class PicturesController extends AbstractActionController
         $brand = $brandModel->getBrandById($this->params('brand_id'), $this->language());
         $brands = null;
         $factories = null;
-        $cars = null;
+        $vehicles = [];
+        $engines = [];
         $haveConcepts = null;
-        $haveEngines = null;
 
         $showFactories = false;
 
         if ($brand) {
             $rows = $carTable->fetchAll(
                 $carTable->select(true)
-                    ->join('brand_item', 'cars.id=brand_item.car_id', null)
+                    ->join('brand_item', 'cars.id = brand_item.car_id', null)
                     ->where('brand_item.brand_id = ?', $brand['id'])
                     ->where('NOT cars.is_concept')
+                    ->where('cars.item_type_id = ?', DbTable\Item\Type::VEHICLE)
                     ->order([
                         'cars.name',
                         'cars.begin_year',
@@ -2223,7 +2114,22 @@ class PicturesController extends AbstractActionController
                         'cars.end_model_year'
                     ])
             );
-            $cars = $this->prepareCars($rows);
+            $vehicles = $this->prepareCars($rows);
+            
+            $rows = $carTable->fetchAll(
+                $carTable->select(true)
+                    ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                    ->where('brand_item.brand_id = ?', $brand['id'])
+                    ->where('cars.item_type_id = ?', DbTable\Item\Type::ENGINE)
+                    ->order([
+                        'cars.name',
+                        'cars.begin_year',
+                        'cars.end_year',
+                        'cars.begin_model_year',
+                        'cars.end_model_year'
+                    ])
+            );
+            $engines = $this->prepareCars($rows);
 
             if (! $srcItem) {
                 $haveConcepts = (bool)$carTable->fetchRow(
@@ -2232,14 +2138,6 @@ class PicturesController extends AbstractActionController
                         ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
                         ->where('brand_item.brand_id = ?', $brand['id'])
                         ->where('cars.is_concept')
-                );
-
-                $engineTable = new Engine();
-                $haveEngines = (bool)$engineTable->fetchRow(
-                    $engineTable->select(true)
-                        ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
-                        ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
-                        ->where('brand_engine.brand_id = ?', $brand['id'])
                 );
             }
         } elseif ($this->params('factories')) {
@@ -2260,15 +2158,12 @@ class PicturesController extends AbstractActionController
             'picture'      => $picture,
             'brand'        => $brand,
             'brands'       => $brands,
-            'cars'         => $cars,
+            'vehicles'     => $vehicles,
+            'engines'      => $engines,
             'factories'    => $factories,
             'haveConcepts' => $haveConcepts,
-            'haveEngines'  => $haveEngines,
             'conceptsUrl'  => $this->url()->fromRoute(null, [
                 'action' => 'concepts'
-            ], [], true),
-            'enginesUrl'   => $this->url()->fromRoute(null, [
-                'action' => 'engines'
             ], [], true),
             'showFactories' => $showFactories
         ];

@@ -65,10 +65,19 @@
 
         <div class="select-in-brand">
 
-            <?php if (count($this->cars) > 0) { ?>
+            <?php if (count($this->vehicles) > 0) { ?>
                 <div style="margin: 5px 0">
                     <?=$this->partial('application/moder/pictures/picture-select-car-cars.phtml', [
-                        'cars' => $this->cars
+                        'cars' => $this->vehicles
+                    ])?>
+                </div>
+            <?php } ?>
+            
+            <?php if (count($this->engines) > 0) { ?>
+                <h5><?=$this->escapeHtml($this->translate('item/type/2/name-plural'))?></h5>
+                <div style="margin: 5px 0">
+                    <?=$this->partial('application/moder/pictures/picture-select-car-cars.phtml', [
+                        'cars' => $this->engines
                     ])?>
                 </div>
             <?php } ?>
@@ -87,19 +96,6 @@
             <?php } ?>
 
             <?php if (!$this->srcItem) { ?>
-                <?php if ($this->haveEngines) { ?>
-                    <div style="margin: 5px 0">
-                        <?=$this->htmlA([
-                            'href'      => '#',
-                            'class'     => 'arrow',
-                            'data-load' => $this->enginesUrl
-                        ], '<i class="fa fa-plus-circle"></i> ' . $this->escapeHtml($this->translate('moder/pciture/move/engines')), false)?>
-                        <div style="margin:0 0 4px 18px;display:none">
-                            <div class="loading"><em>Loading ...</em></div>
-                        </div>
-                    </div>
-                <?php } ?>
-
                 <div style="margin: 5px 0">
                     <?=$this->htmlA($this->url(null, [
                         'action' => 'move',

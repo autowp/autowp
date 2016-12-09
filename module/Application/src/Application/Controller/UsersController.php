@@ -312,31 +312,18 @@ class UsersController extends AbstractActionController
                         ->from('brand_item', ['brand_id', 'count(1)'])
                         ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
                         ->join('attrs_user_values', 'item_parent_cache.item_id = attrs_user_values.item_id', null)
-                        ->where('attrs_user_values.item_type_id = 1')
                         ->where('attrs_user_values.user_id = ?', $user->id)
                         ->group('brand_item.brand_id')
                         ->order('count(1) desc')
                         ->limit($precisionLimit);
 
-                    $engineSelect = $db->select()
-                        ->join('brand_engine', ['brand_id', 'count(1)'])
-                        ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
-                        ->join('attrs_user_values', 'engine_parent_cache.engine_id = attrs_user_values.item_id', null)
-                        ->where('attrs_user_values.item_type_id = 3')
-                        ->where('attrs_user_values.user_id = ?', $user->id)
-                        ->group('brand_engine.brand_id')
-                        ->order('count(1) desc')
-                        ->limit($precisionLimit);
-
                     $data = [];
-                    foreach ([$carSelect, $engineSelect] as $select) {
-                        $pairs = $db->fetchPairs($select);
-                        foreach ($pairs as $brandId => $value) {
-                            if (! isset($data[$brandId])) {
-                                $data[$brandId] = $value;
-                            } else {
-                                $data[$brandId] += $value;
-                            }
+                    $pairs = $db->fetchPairs($carSelect);
+                    foreach ($pairs as $brandId => $value) {
+                        if (! isset($data[$brandId])) {
+                            $data[$brandId] = $value;
+                        } else {
+                            $data[$brandId] += $value;
                         }
                     }
 
@@ -399,7 +386,6 @@ class UsersController extends AbstractActionController
                         ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
                         ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                         ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                        ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                         ->group('brand_item.brand_id')
                         ->where('pictures.owner_id = ?', $user->id)
                         ->order('count(distinct pictures.id) desc')

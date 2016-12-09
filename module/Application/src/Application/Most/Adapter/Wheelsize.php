@@ -67,15 +67,12 @@ class Wheelsize extends AbstractAdapter
 
         $select
             ->join(['tyrewidth' => $tyrewidthValuesTable], 'cars.id = tyrewidth.item_id', null)
-            ->where('tyrewidth.item_type_id = ?', 1)
             ->where('tyrewidth.attribute_id = ?', $tyrewidth->id)
             ->where('tyrewidth.value > 0')
             ->join(['tyreseries' => $tyreseriesValuesTable], 'cars.id = tyreseries.item_id', null)
-            ->where('tyreseries.item_type_id = ?', 1)
             ->where('tyreseries.attribute_id = ?', $tyreseries->id)
             ->where('tyreseries.value > 0')
             ->join(['radius' => $radiusValuesTable], 'cars.id = radius.item_id', null)
-            ->where('radius.item_type_id = ?', 1)
             ->where('radius.attribute_id = ?', $radius->id)
             ->where('radius.value > 0')
             ->group('cars.id')

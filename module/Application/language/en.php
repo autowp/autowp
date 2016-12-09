@@ -115,6 +115,11 @@ return [
         'more %s companies'
     ],
     'brands/pictures:' => 'pictures: ',
+    
+    'item/type/1/name' => 'Vehicle',
+    'item/type/2/name' => 'Engine',
+    'item/type/1/name-plural' => 'Vehicles',
+    'item/type/2/name-plural' => 'Engines',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Unsorted',
@@ -311,6 +316,7 @@ return [
     'catalogue/section/tractors' => 'Tractors',
     'catalogue/section/buses' => 'Buses',
     'catalogue/section/trucks' => 'Trucks',
+    'catalogue/section/engines' => 'Engines',
 
     'catalogue/engine-menu/vehicles' => 'Vehicles',
     'catalogue/engine-menu/pictures' => 'Pictures',
@@ -321,7 +327,7 @@ return [
     'catalogue/engine/add-engine' => 'add engine',
     'catalogue/engine/mounted-on:' => 'Mounted on:',
 
-    'factories/factory-cars' => 'Vehicles',
+    'factories/factory-items' => 'Products',
     'factories/factory/pictures' => 'Pictures',
 
     /* comments */
@@ -867,7 +873,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/128/name' => "Inbox",
     'page/129/name' => "Profile",
     'page/130/name' => "My pictures",
-    'page/131/name' => "Vehicles",
+    'page/131/name' => "Vehicles & engines",
     'page/133/name' => "Access Control",
     'page/134/name' => "New password",
     'page/135/name' => "New password saved",
@@ -909,7 +915,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/178/name' => "Factory selection",
     'page/180/name' => "Factories",
     'page/181/name' => "%FACTORY_NAME%",
-    'page/182/name' => "Vehicles",
+    'page/182/name' => "Products",
     'page/183/name' => "%PICTURE_NAME%",
     'page/184/name' => "%PICTURE_NAME%",
     'page/185/name' => "%CAR_NAME%",
@@ -1029,7 +1035,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/128/title' => "Inbox",
     'page/129/title' => "Profile",
     'page/130/title' => "My pictures",
-    'page/131/title' => "Vehicles",
+    'page/131/title' => "Vehicles & engines",
     'page/133/title' => "Access Control",
     'page/134/title' => "New password",
     'page/135/title' => "",
@@ -1071,7 +1077,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/178/title' => "Factory selection",
     'page/180/title' => "Factories",
     'page/181/title' => "%FACTORY_NAME%",
-    'page/182/title' => "Vehicles",
+    'page/182/title' => "Products",
     'page/183/title' => "%PICTURE_NAME%",
     'page/184/title' => "%PICTURE_NAME%",
     'page/185/title' => "%CAR_NAME%",
@@ -1191,7 +1197,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/128/breadcrumbs' => "",
     'page/129/breadcrumbs' => "",
     'page/130/breadcrumbs' => "",
-    'page/131/breadcrumbs' => "Vehicles",
+    'page/131/breadcrumbs' => "Vehicles & engines",
     'page/133/breadcrumbs' => "",
     'page/134/breadcrumbs' => "",
     'page/135/breadcrumbs' => "",
@@ -1233,7 +1239,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/178/breadcrumbs' => "Factory selection",
     'page/180/breadcrumbs' => "Factories",
     'page/181/breadcrumbs' => "%FACTORY_NAME%",
-    'page/182/breadcrumbs' => "Vehicles",
+    'page/182/breadcrumbs' => "Products",
     'page/183/breadcrumbs' => "%PICTURE_NAME%",
     'page/184/breadcrumbs' => "%PICTURE_NAME%",
     'page/185/breadcrumbs' => "%CAR_NAME%",
@@ -1270,6 +1276,10 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/205/name'        => 'Comments',
     'page/205/title'       => 'Comments',
     'page/205/breadcrumbs' => 'Comments',
+    
+    'page/206/name'        => 'New engine',
+    'page/206/title'       => 'New engine',
+    'page/206/breadcrumbs' => 'New engine',
 
     'moder-menu/title' => 'Moderator menu',
     'moder-menu/inbox' => 'Inbox',
@@ -1309,7 +1319,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/pictures/filter/perspective/empty' => 'empty',
     'moder/pictures/filter/type' => 'Type',
     'moder/pictures/filter/type/any' => 'any',
-    'moder/pictures/filter/type/vehicle' => 'vehicle',
+    'moder/pictures/filter/type/item' => 'vehicle or engine',
     'moder/pictures/filter/type/logotype' => 'logotype',
     'moder/pictures/filter/type/mixed' => 'mixed',
     'moder/pictures/filter/type/unsorted' => 'unsorted',
@@ -1346,6 +1356,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicles/filter' => 'Filter',
     'moder/vehicles/filter/name' => 'Name',
     'moder/vehicles/filter/name-exclude' => 'Name (exclude)',
+    'moder/vehicles/filter/item-type' => 'Item type',
     'moder/vehicles/filter/vehicle-type' => 'Vehicle type',
     'moder/vehicles/filter/vehicle-type/empty' => 'Empty',
     'moder/vehicles/filter/spec' => 'Spec',
@@ -1393,6 +1404,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicle/tabs/factories' => 'Factories',
     'moder/vehicle/tabs/pictures' => 'Pictures',
     'moder/vehicle/tabs/modifications' => 'Modifications',
+    'moder/vehicle/tabs/vehicles' => 'Vehicles',
 
     'moder/vehicle/meta/description' => 'Short description',
 
@@ -1401,6 +1413,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicle/subscription/not-subscribed' => 'Not subscribed',
 
     'moder/vehicle/catalogue/add-vehicle' => 'add vehicle',
+    'moder/vehicle/catalogue/add-engine' => 'add engine',
     'moder/vehicle/catalogue/title/name' => 'Name',
     'moder/vehicle/catalogue/title/link' => 'Link',
     'moder/vehicle/catalogue/title/catname' => 'Catname',

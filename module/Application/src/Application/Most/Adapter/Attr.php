@@ -55,7 +55,6 @@ class Attr extends AbstractAdapter
         $tableName = $valuesTable->info(Zend_Db_Table_Abstract::NAME);
 
         $select
-            ->where($tableName.'.item_type_id = ?', $itemType->id)
             ->where($tableName.'.attribute_id = ?', $attribute->id)
             ->where($tableName.'.value IS NOT NULL')
             ->join($tableName, 'cars.id='.$tableName.'.item_id', null)

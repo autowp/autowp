@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Autowp\User\Model\DbTable\User as UserTable;
 
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\BrandLink;
@@ -188,37 +189,6 @@ class Pic extends AbstractPlugin
                     }
                 }
                 break;
-
-            case Picture::ENGINE_TYPE_ID:
-                if ($row['engine_id']) {
-                    $engineTable = new Engine();
-
-                    $parentId = $row['engine_id'];
-                    $path = [];
-                    do {
-                        $engineRow = $engineTable->find($parentId)->current();
-                        $path[] = $engineRow->id;
-
-                        $brandRow = $brandTable->fetchRow(
-                            $brandTable->select(true)
-                                ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
-                                ->where('brand_engine.engine_id = ?', $engineRow->id)
-                        );
-                        $parentId = $engineRow->parent_id;
-                    } while ($parentId && ! $brandRow);
-
-                    if ($brandRow && $path) {
-                        $url = $controller->url()->fromRoute('catalogue', [
-                            'action'        => 'engine-picture',
-                            'brand_catname' => $brandRow['folder'],
-                            'path'          => array_reverse($path),
-                            'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
-                        ], [
-                        'force_canonical' => $options['canonical']
-                        ]);
-                    }
-                }
-                break;
         }
 
         if ($options['fallback'] && ! $url) {
@@ -365,7 +335,7 @@ class Pic extends AbstractPlugin
                     'pictures.width', 'pictures.height',
                     'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                     'pictures.status', 'pictures.image_id',
-                    'pictures.brand_id', 'pictures.engine_id',
+                    'pictures.brand_id', 
                     'pictures.type', 'pictures.factory_id'
                 ]);
 
@@ -388,7 +358,7 @@ class Pic extends AbstractPlugin
                     );
 
                 $bind['type_id'] = CommentMessage::PICTURES_TYPE_ID;
-            }
+            } 
 
             $rows = $db->fetchAll($select, $bind);
 
@@ -485,7 +455,7 @@ class Pic extends AbstractPlugin
         ];
     }
 
-    private function picPageItemsData($picture)
+    private function picPageItemsData($picture, $carIds)
     {
         $controller = $this->getController();
         $catalogue = $controller->catalogue();
@@ -517,8 +487,13 @@ class Pic extends AbstractPlugin
             ], $multioptions);
         }
 
-        $carIds = $this->pictureItem->getPictureItems($picture['id']);
-        $itemRows = $carTable->find($carIds);
+        $itemRows = [];
+        if ($carIds) {
+            $itemRows = $carTable->fetchAll([
+                'id IN (?)'        => $carIds,
+                'item_type_id = ?' => DbTable\Item\Type::VEHICLE
+            ]);
+        }
         $itemsCount = count($itemRows);
 
         $items = [];
@@ -727,78 +702,88 @@ class Pic extends AbstractPlugin
         return $items;
     }
 
-    private function picPageEngineData($picture)
+    private function picPageEnginesData($picture, $itemIds)
     {
-        $engineRow = $picture->findParentRow(Engine::class);
-
-        if (! $engineRow) {
-            return null;
-        }
-
         $controller = $this->getController();
         $catalogue = $controller->catalogue();
-
-        $carTable = $catalogue->getCarTable();
+        
         $language = $controller->language();
 
-        $vehicles = [];
+        $itemTable = $catalogue->getCarTable();
+        $itemModel = new \Application\Model\Item();
+        
+        $engineRows = [];
+        if ($itemIds) {
+            $engineRows = $itemTable->fetchAll([
+                'id IN (?)'        => $itemIds,
+                'item_type_id = ?' => DbTable\Item\Type::ENGINE
+            ]);
+        }
 
-        $carIds = $engineRow->getRelatedCarGroupId();
-        if ($carIds) {
-            $carRows = $carTable->fetchAll([
-                'id in (?)' => $carIds
-            ], $catalogue->carsOrdering());
+        $engines = [];
+        foreach ($engineRows as $engineRow) {
 
-            foreach ($carRows as $carRow) {
-                $cataloguePaths = $catalogue->cataloguePaths($carRow);
-
-                foreach ($cataloguePaths as $cPath) {
-                    $vehicles[] = [
-                        'name' => $controller->car()->formatName($carRow, $language),
-                        'url'  => $controller->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item',
-                            'brand_catname' => $cPath['brand_catname'],
-                            'car_catname'   => $cPath['car_catname'],
-                            'path'          => $cPath['path']
-                        ])
-                    ];
+            $vehicles = [];
+    
+            $vehicleIds = $itemModel->getEngineVehiclesGroups($engineRow->id);
+            if ($vehicleIds) {
+                $carRows = $itemTable->fetchAll([
+                    'id in (?)' => $vehicleIds
+                ], $catalogue->carsOrdering());
+    
+                foreach ($carRows as $carRow) {
+                    $cataloguePaths = $catalogue->cataloguePaths($carRow);
+    
+                    foreach ($cataloguePaths as $cPath) {
+                        $vehicles[] = [
+                            'name' => $controller->car()->formatName($carRow, $language),
+                            'url'  => $controller->url()->fromRoute('catalogue', [
+                                'action'        => 'brand-item',
+                                'brand_catname' => $cPath['brand_catname'],
+                                'car_catname'   => $cPath['car_catname'],
+                                'path'          => $cPath['path']
+                            ])
+                        ];
+                        break;
+                    }
+                }
+            }
+    
+            $specsUrl = false;
+            $hasSpecs = $this->specsService->hasSpecs(3, $engineRow->id);
+    
+            if ($hasSpecs) {
+                $cataloguePaths = $catalogue->cataloguePaths($engineRow);
+    
+                foreach ($cataloguePaths as $path) {
+                    $specsUrl = $controller->url()->fromRoute('catalogue', [
+                        'action'        => 'brand-item-specifications',
+                        'brand_catname' => $path['brand_catname'],
+                        'car_catname'   => $path['car_catname'],
+                        'path'          => $path['path']
+                    ]);
                     break;
                 }
             }
-        }
-
-        $specsUrl = false;
-        $hasSpecs = $this->specsService->hasSpecs(3, $engineRow->id);
-
-        if ($hasSpecs) {
-            $cataloguePaths = $catalogue->engineCataloguePaths($engineRow, [
-                'limit' => 1
-            ]);
-
-            foreach ($cataloguePaths as $cataloguePath) {
-                $specsUrl = $controller->url()->fromRoute('catalogue', [
-                    'action'        => 'engine-specs',
-                    'brand_catname' => $cataloguePath['brand_catname'],
-                    'path'          => $cataloguePath['path']
+    
+            $specsEditUrl = null;
+            if ($controller->user()->isAllowed('specifications', 'edit')) {
+                $specsEditUrl = $controller->url()->fromRoute('cars/params', [
+                    'action' => 'car-specifications-editor',
+                    'car_id' => $engineRow->id
                 ]);
             }
+    
+            $engines[] = [
+                'name'         => $engineRow->name,
+                'vehicles'     => $vehicles,
+                'hasSpecs'     => $hasSpecs,
+                'specsUrl'     => $specsUrl,
+                'specsEditUrl' => $specsEditUrl
+            ];
         }
-
-        $specsEditUrl = null;
-        if ($controller->user()->isAllowed('specifications', 'edit')) {
-            $specsEditUrl = $controller->url()->fromRoute('cars', [
-                'action'     => 'engine-spec-editor',
-                'engine_id'  => $engineRow->id
-            ]);
-        }
-
-        return [
-            'name'         => $engineRow->name,
-            'vehicles'     => $vehicles,
-            'hasSpecs'     => $hasSpecs,
-            'specsUrl'     => $specsUrl,
-            'specsEditUrl' => $specsEditUrl
-        ];
+        
+        return $engines;
     }
 
     public function picPageData($picture, $picSelect, $brandIds = [], array $options = [])
@@ -1056,6 +1041,8 @@ class Pic extends AbstractPlugin
         if ($picture->point) {
             $point = \geoPHP::load(substr($picture->point, 4), 'wkb');
         }
+        
+        $itemIds = $this->pictureItem->getPictureItems($picture['id']);
 
         $data = [
             'id'                => $picture['id'],
@@ -1085,8 +1072,8 @@ class Pic extends AbstractPlugin
                 'hideVote' => true
             ]),
             //'picturePerspectives' => $picturePerspectives,
-            'items'             => $this->picPageItemsData($picture),
-            'engine'            => $this->picPageEngineData($picture)
+            'items'             => $this->picPageItemsData($picture, $itemIds),
+            'engines'           => $this->picPageEnginesData($picture, $itemIds)
         ];
 
         // refresh views count

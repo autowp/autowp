@@ -14,7 +14,6 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Modification as ModificationTable;
 use Application\Model\DbTable\Modification\Group as ModificationGroup;
@@ -685,7 +684,6 @@ class CatalogueController extends AbstractActionController
 
             $inboxBrandPictures = null;
             $inboxVehiclePictures = null;
-            $inboxEnginePictures = null;
 
             if ($this->user()->isAllowed('picture', 'move')) {
                 $pictureTable = new Picture();
@@ -713,16 +711,6 @@ class CatalogueController extends AbstractActionController
                         ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
                         ->where('brand_item.brand_id = ?', $brand['id'])
                 );
-                $inboxEnginePictures = $db->fetchOne(
-                    $db->select()
-                        ->from('pictures', 'count(distinct pictures.id)')
-                        ->where('pictures.type = ?', Picture::ENGINE_TYPE_ID)
-                        ->where('pictures.status = ?', Picture::STATUS_INBOX)
-                        ->join('engine_parent_cache', 'pictures.engine_id = engine_parent_cache.engine_id', null)
-                        ->join('engines', 'engine_parent_cache.parent_id = engines.id', null)
-                        ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
-                        ->where('brand_engine.brand_id = ?', $brand['id'])
-                );
             }
 
             return [
@@ -734,7 +722,6 @@ class CatalogueController extends AbstractActionController
                 'factories'   => $this->getBrandFactories($brand['id']),
                 'inboxBrandPictures'   => $inboxBrandPictures,
                 'inboxVehiclePictures' => $inboxVehiclePictures,
-                'inboxEnginePictures'  => $inboxEnginePictures,
             ];
         });
     }
@@ -891,501 +878,6 @@ class CatalogueController extends AbstractActionController
         return $this->typePicturesGallery(Picture::LOGO_TYPE_ID);
     }
 
-    private function doEnginesAction($callback)
-    {
-        return $this->doBrandAction(function ($brand) use ($callback) {
-
-            $engineTable = new Engine();
-
-            $path = $this->params('path');
-            $path = $path ? (array)$path : [];
-
-            $prevEngine = null;
-            foreach ($path as $node) {
-                if (! $prevEngine) {
-                    $currentEngine = $engineTable->fetchRow(
-                        $engineTable->select(true)
-                            ->where('engines.id = ?', (int)$node)
-                            ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
-                            ->where('brand_engine.brand_id = ?', $brand['id'])
-                    );
-                } else {
-                    $currentEngine = $engineTable->fetchRow([
-                        'id = ?'        => (int)$node,
-                        'parent_id = ?' => $prevEngine->id
-                    ]);
-                }
-
-                if (! $currentEngine) {
-                    return $this->notFoundAction();
-                }
-                $prevEngine = $currentEngine;
-            }
-
-            $engineRow = $prevEngine;
-
-            return $callback($brand, $engineRow, $path);
-        });
-    }
-
-    public function enginesAction()
-    {
-        return $this->doEnginesAction(function ($brand, $engineRow, $path) {
-
-            $engineTable = new Engine();
-
-            $select = $engineTable->select(true)
-                ->order('engines.name');
-
-            if ($engineRow) {
-                $select
-                    ->where('engines.parent_id = ?', $engineRow->id);
-            } else {
-                $select
-                    ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
-                    ->where('brand_engine.brand_id = ?', $brand['id']);
-            }
-
-            $paginator = new Paginator(
-                new Zend1DbTableSelect($select)
-            );
-
-            $paginator
-                ->setItemCountPerPage(20)
-                ->setCurrentPageNumber($this->params('page'));
-
-            if ($paginator->getTotalItemCount() <= 0) {
-                return $this->forward()->dispatch(self::class, [
-                    'action'        => 'engine-cars',
-                    'path'          => $this->params('path'),
-                    'brand_catname' => $this->params('brand_catname')
-                ]);
-            }
-
-            $pictureTable = $this->catalogue()->getPictureTable();
-            $carTable = $this->catalogue()->getCarTable();
-
-            $language = $this->language();
-
-            $isModer = $this->user()->inheritsRole('moder');
-            $logedIn = $this->user()->logedIn();
-
-            $picturesLimit = 4;
-
-            $engines = [];
-            foreach ($paginator->getCurrentItems() as $engine) {
-                $pictureRows = $pictureTable->fetchAll(
-                    $this->selectFromPictures()
-                        ->join('engine_parent_cache', 'pictures.engine_id = engine_parent_cache.engine_id', null)
-                        ->where('engine_parent_cache.parent_id = ?', $engine->id)
-                        ->where('pictures.type = ?', Picture::ENGINE_TYPE_ID)
-                        ->order('pictures.id')
-                        ->limit(4)
-                );
-
-                $pictures = [];
-                foreach ($pictureRows as $pictureRow) {
-                    //$pictures[] = $pictureRow;
-
-                    $name = $this->pic()->name($pictureRow, $language);
-
-                    $url = $this->url()->fromRoute('catalogue', [
-                        'action'     => 'engine-picture',
-                        'path'       => array_merge($path, [$engine->id]),
-                        'picture_id' => $pictureRow['identity'] ? $pictureRow['identity'] : $pictureRow['id']
-                    ], [], true);
-
-                    $pictures[] = [
-                        'name' => $name,
-                        'url'  => $url,
-                        'img'  => $pictureRow->getFormatRequest()
-                    ];
-                }
-
-                $morePictures = $picturesLimit - count($pictures);
-                if ($morePictures > 0) {
-                    $pictureRows = $pictureTable->fetchAll(
-                        $this->selectFromPictures()
-                            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                            ->where('picture_item.perspective_id = ?', 17) // under the hood
-                            ->join('cars', 'picture_item.item_id = cars.id', null)
-                            ->join('engine_parent_cache', 'cars.engine_id = engine_parent_cache.engine_id', null)
-                            ->where('engine_parent_cache.parent_id = ?', $engine->id)
-                            ->order('pictures.id')
-                            ->limit($morePictures)
-                    );
-                    foreach ($pictureRows as $pictureRow) {
-                        $name = $this->pic()->name($pictureRow, $language);
-
-                        $url = $this->pic()->href($pictureRow->toArray());
-
-                        $pictures[] = [
-                            'name' => $name,
-                            'url'  => $url,
-                            'img'  => $pictureRow->getFormatRequest()
-                        ];
-                    }
-                }
-
-
-                $moderUrl = null;
-                $specsUrl = null;
-                $specsEditUrl = null;
-                $detailsUrl = null;
-
-                if ($isModer) {
-                    $moderUrl = $this->url()->fromRoute('moder/engines/params', [
-                        'action'     => 'engine',
-                        'engine_id'  => $engine->id
-                    ]);
-                }
-
-                if ($logedIn) {
-                    $specsEditUrl = $this->url()->fromRoute('cars/params', [
-                        'action'     => 'engine-spec-editor',
-                        'engine_id'  => $engine->id
-                    ]);
-                }
-
-                $hasSpecs = $this->specsService->hasSpecs(3, $engine->id);
-
-                if ($hasSpecs) {
-                    $specsUrl = $this->url()->fromRoute('catalogue', [
-                        'action'        => 'engine-specs',
-                        'brand_catname' => $brand['catname'],
-                        'path'          => array_merge($path, [$engine->id])
-                    ]);
-                }
-
-                $childsCount = $engineTable->getAdapter()->fetchOne(
-                    $engineTable->getAdapter()->select()
-                        ->from($engineTable->info('name'), new Zend_Db_Expr('count(1)'))
-                        ->where('parent_id = ?', $engine->id)
-                );
-
-                if ($childsCount) {
-                    $detailsUrl = $this->url()->fromRoute('catalogue', [
-                        'action'        => 'engines',
-                        'brand_catname' => $brand['catname'],
-                        'path'          => array_merge($path, [$engine->id])
-                    ]);
-                }
-
-                $carIds = $engine->getRelatedCarGroupId([
-                    'groupJoinLimit' => 3
-                ]);
-                $cars = [];
-                if ($carIds) {
-                    $carRows = $carTable->fetchAll([
-                        'id in (?)' => $carIds
-                    ], $this->catalogue()->carsOrdering());
-
-                    foreach ($carRows as $carRow) {
-                        $cataloguePaths = $this->catalogue()->cataloguePaths($carRow);
-
-                        foreach ($cataloguePaths as $cPath) {
-                            $cars[] = [
-                                'name' => $carRow->getNameData($language),
-                                'url'  => $this->url()->fromRoute('catalogue', [
-                                    'action'        => 'brand-item',
-                                    'brand_catname' => $cPath['brand_catname'],
-                                    'car_catname'   => $cPath['car_catname'],
-                                    'path'          => $cPath['path']
-                                ])
-                            ];
-                            break;
-                        }
-                    }
-                }
-
-                $engines[] = [
-                    'name'         => $engine->name,
-                    'pictures'     => $pictures,
-                    'moderUrl'     => $moderUrl,
-                    'specsUrl'     => $specsUrl,
-                    'specsEditUrl' => $specsEditUrl,
-                    'detailsUrl'   => $detailsUrl,
-                    'childsCount'  => $childsCount,
-                    'cars'         => $cars
-                ];
-            }
-
-            $carsCount = null;
-            $childsCount = null;
-            $specsCount = null;
-            $picturesCount = null;
-
-            if ($engineRow) {
-                $select = $carTable->select(true)
-                    ->join('engine_parent_cache', 'cars.engine_id = engine_parent_cache.engine_id', null)
-                    ->where('engine_parent_cache.parent_id = ?', $engineRow->id);
-
-                $paginator = new Paginator(
-                    new Zend1DbTableSelect($select)
-                );
-                $carsCount = $paginator->getTotalItemCount();
-
-                $select = $engineTable->select(true)
-                    ->where('engines.parent_id = ?', $engineRow->id);
-
-                $paginator = new Paginator(
-                    new Zend1DbTableSelect($select)
-                );
-                $childsCount = $paginator->getTotalItemCount();
-
-                $specsCount = $this->specsService->getSpecsCount(3, $engineRow->id);
-
-                $picturesSelect = $this->enginePicturesSelect($engineRow, true);
-                $paginator = new Paginator(
-                    new Zend1DbTableSelect($picturesSelect)
-                );
-                $picturesCount = $paginator->getTotalItemCount();
-            }
-
-            $this->sidebar()->brand([
-                'brand_id'   => $brand['id'],
-                'is_engines' => true
-            ]);
-
-            return [
-                'engine'      => $engineRow,
-                'brand'       => $brand,
-                'paginator'   => $paginator,
-                'engines'     => $engines,
-                'carsCount'   => $carsCount,
-                'childsCount' => $childsCount,
-                'specsCount'  => $specsCount,
-                'picturesCount' => $picturesCount
-            ];
-        });
-    }
-
-    public function engineSpecsAction()
-    {
-        return $this->doEngineAction(function ($brand, $engineRow, $path) {
-
-            $engine = [
-                'id'   => $engineRow->id,
-                'name' => $engineRow->name
-            ];
-
-            $specs = $this->specsService->engineSpecifications([$engine], [
-                'language' => $this->language()
-            ]);
-
-            $this->sidebar()->brand([
-                'brand_id'   => $brand['id'],
-                'is_engines' => true
-            ]);
-
-            return [
-                'engine' => $engine,
-                'specs'  => $specs,
-            ];
-        });
-    }
-
-    private function doEngineAction(callable $callback)
-    {
-        return $this->doEnginesAction(function ($brand, $engineRow, $path) use ($callback) {
-            if (! $engineRow) {
-                return $this->notFoundAction();
-            }
-
-            $carTable = new Vehicle();
-            $select = $carTable->select(true)
-                ->join('engine_parent_cache', 'cars.engine_id = engine_parent_cache.engine_id', null)
-                ->where('engine_parent_cache.parent_id = ?', $engineRow->id);
-
-            $paginator = new Paginator(
-                new Zend1DbTableSelect($select)
-            );
-            $carsCount = $paginator->getTotalItemCount();
-
-            $engineTable = new Engine();
-            $select = $engineTable->select(true)
-                ->where('engines.parent_id = ?', $engineRow->id);
-
-            $paginator = new Paginator(
-                new Zend1DbTableSelect($select)
-            );
-            $childsCount = $paginator->getTotalItemCount();
-
-            $specsCount = $this->specsService->getSpecsCount(3, $engineRow->id);
-
-            $picturesSelect = $this->enginePicturesSelect($engineRow, true);
-            $paginator = new Paginator(
-                new Zend1DbTableSelect($picturesSelect)
-            );
-            $picturesCount = $paginator->getTotalItemCount();
-
-            $result = $callback($brand, $engineRow, $path);
-
-            if (is_array($result)) {
-                $result = array_replace([
-                    'brand'        => $brand,
-                    'engine'       => [
-                        'id'   => $engineRow->id,
-                        'name' => $engineRow->name
-                    ],
-                    'carsCount'    => $carsCount,
-                    'childsCount'  => $childsCount,
-                    'specsCount'   => $specsCount,
-                    'picturesCount' => $picturesCount
-                ], $result);
-            }
-
-            return $result;
-        });
-    }
-
-    private function enginePicturesSelect($engine, $onlyAccepted = true)
-    {
-        return $this->selectOrderFromPictures($onlyAccepted)
-            ->where('pictures.type = ?', Picture::ENGINE_TYPE_ID)
-            ->join('engine_parent_cache', 'pictures.engine_id = engine_parent_cache.engine_id', null)
-            ->where('engine_parent_cache.parent_id = ?', $engine->id);
-    }
-
-    public function engineGalleryAction()
-    {
-        return $this->doEngineAction(function ($brand, $engineRow, $path) {
-            $select = $this->enginePicturesSelect($engineRow, false);
-
-            switch ($this->params('gallery')) {
-                case 'inbox':
-                    $select->where('pictures.status = ?', Picture::STATUS_INBOX);
-                    break;
-                case 'removing':
-                    $select->where('pictures.status = ?', Picture::STATUS_REMOVING);
-                    break;
-                default:
-                    $select->where('pictures.status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED]);
-                    break;
-            }
-
-            return new JsonModel($this->pic()->gallery2($select, [
-                'page'      => $this->params()->fromQuery('page'),
-                'pictureId' => $this->params()->fromQuery('pictureId'),
-                'reuseParams' => true,
-                'urlParams' => [
-                    'action' => 'engine-picture'
-                ]
-            ]));
-        });
-    }
-
-    public function enginePictureAction()
-    {
-        return $this->doEngineAction(function ($brand, $engineRow, $path) {
-            $select = $this->enginePicturesSelect($engineRow, false);
-
-            return $this->pictureAction($select, function ($select, $picture) use ($brand, $engineRow) {
-
-                $this->sidebar()->brand([
-                    'brand_id'   => $brand['id'],
-                    'is_engines' => true
-                ]);
-
-                return [
-                    'picture'     => array_replace(
-                        $this->pic()->picPageData($picture, $select),
-                        [
-                            'gallery2'   => true,
-                            'galleryUrl' => $this->url()->fromRoute('catalogue', [
-                                'action'  => 'engine-gallery',
-                                'gallery' => $this->galleryType($picture)
-                            ], [], true)
-                        ]
-                    )
-                ];
-            });
-        });
-    }
-
-    public function enginePicturesAction()
-    {
-        return $this->doEngineAction(function ($brand, $engineRow, $path) {
-            $select = $this->enginePicturesSelect($engineRow);
-
-            $paginator = $this->picturesPaginator($select, $this->params('page'));
-
-            if ($paginator->getTotalItemCount() <= 0) {
-                return $this->notFoundAction();
-            }
-
-            $select->limitPage($paginator->getCurrentPageNumber(), $paginator->getItemCountPerPage());
-
-            $picturesData = $this->pic()->listData($select, [
-                'width' => 4,
-                'url'   => function ($row) {
-                    return $this->url()->fromRoute('catalogue', [
-                        'action'     => 'engine-picture',
-                        'picture_id' => $row['identity'] ? $row['identity'] : $row['id']
-                    ], [], true);
-                }
-            ]);
-
-            $this->sidebar()->brand([
-                'brand_id'   => $brand['id'],
-                'is_engines' => true
-            ]);
-
-            return [
-                'paginator'    => $paginator,
-                'picturesData' => $picturesData
-            ];
-        });
-    }
-
-    public function engineCarsAction()
-    {
-        return $this->doEngineAction(function ($brand, $engineRow, $path) {
-
-            $carIds = $engineRow->getRelatedCarGroupId();
-            $carRows = [];
-            if ($carIds) {
-                $carTable = $this->catalogue()->getCarTable();
-
-                $carRows = $carTable->fetchAll([
-                    'id in (?)' => $carIds
-                ], $this->catalogue()->carsOrdering());
-            }
-
-            $carParentTable = new VehicleParent();
-
-            $this->sidebar()->brand([
-                'brand_id'   => $brand['id'],
-                'is_engines' => true
-            ]);
-
-            return [
-                'cars'        => $this->car()->listData($carRows, [
-                    'pictureUrl' => function ($listCar, $picture) use ($brand, $carParentTable) {
-
-                        $paths = $carParentTable->getPaths($listCar->id, [
-                            'breakOnFirst' => true
-                        ]);
-
-                        if (count($paths) <= 0) {
-                            return $this->pic()->url($picture['id'], $picture['identity']);
-                        }
-
-                        $path = $paths[0];
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-picture',
-                            'brand_catname' => $path['brand_catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path'],
-                            'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ]);
-                    }
-                ]),
-            ];
-        });
-    }
-
     private function stripName($brand, $name)
     {
         $name = explode(' ', $name);
@@ -1456,6 +948,7 @@ class CatalogueController extends AbstractActionController
             $columns = [
                 'cars.id',
                 'cars.is_concept',
+                'cars.item_type_id',
                 'name' => 'if(length(car_language.name) > 0, car_language.name, cars.name)',
                 'cars.begin_model_year', 'cars.end_model_year',
                 'spec' => 'spec.short_name',
@@ -1936,7 +1429,7 @@ class CatalogueController extends AbstractActionController
             ->from(
                 $pictureTable->info('name'),
                 [
-                    'id', 'name', 'type', 'brand_id', 'engine_id', 'factory_id',
+                    'id', 'name', 'type', 'brand_id', 'engine_item_id', 'factory_id',
                     'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity', 'factory_id'
                 ]
@@ -2718,11 +2211,10 @@ class CatalogueController extends AbstractActionController
     public function brandItemPictureAction()
     {
         return $this->doBrandItemAction(function ($brand, array $currentCar, $brandItemCatname, $path, $breadcrumbs) {
-
             $exact = (bool)$this->params('exact');
 
             $select = $this->getBrandItemPicturesSelect($currentCar['id'], $exact, false);
-
+            
             return $this->pictureAction($select, function ($select, $picture) use ($breadcrumbs) {
                 return [
                     'breadcrumbs' => $breadcrumbs,

@@ -1186,6 +1186,20 @@ return [
                 [
                     'spec' => [
                         'type'    => 'Select',
+                        'name'    => 'item_type_id',
+                        'options' => [
+                            'label' => 'moder/vehicles/filter/item-type',
+                            'options' => [
+                                '' => '--',
+                                Model\DbTable\Item\Type::VEHICLE => 'item/type/1/name',
+                                Model\DbTable\Item\Type::ENGINE  => 'item/type/2/name',
+                            ]
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type'    => 'Select',
                         'name'    => 'vehicle_type_id',
                         'options' => [
                             'label' => 'moder/vehicles/filter/vehicle-type',
@@ -1281,6 +1295,9 @@ return [
                     'filters'    => [
                         ['name' => 'StringTrim'],
                     ]
+                ],
+                'item_type_id' => [
+                    'required' => false
                 ],
                 'vehicle_type_id' => [
                     'required'   => false,

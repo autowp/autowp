@@ -1,0 +1,9 @@
+<h3><?=$this->escapeHtml($this->translate('moder/engines/engine/vehicles'))?></h3>
+<div class="well">
+    <?php foreach ($this->items as $item) { ?>
+        <?=$this->htmlA($this->url('moder/cars/params', [
+            'action' => 'car',
+            'car_id' => $item->id
+        ]), $this->car()->htmlTitle($item->getNameData($this->language())), false) ?><br />
+    <?php } ?>
+</div>

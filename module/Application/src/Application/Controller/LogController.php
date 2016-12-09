@@ -7,7 +7,6 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Picture;
@@ -28,7 +27,6 @@ class LogController extends AbstractActionController
         $logTable = new LogEvent();
         $vehicleTable = new Vehicle();
         $brandModel = new BrandModel();
-        $engineTable = new Engine();
         $picturesTable = new Picture();
         $twinsGroupsTable = new TwinsGroup();
         $factoryTable = new Factory();
@@ -52,12 +50,6 @@ class LogController extends AbstractActionController
         if ($carId) {
             $select->join('log_events_cars', 'log_events.id=log_events_cars.log_event_id', null)
                    ->where('log_events_cars.car_id = ?', $carId);
-        }
-
-        $engineId = (int)$this->params()->fromRoute('engine_id');
-        if ($engineId) {
-            $select->join('log_events_engines', 'log_events.id=log_events_engines.log_event_id', null)
-                   ->where('log_events_engines.engine_id = ?', $engineId);
         }
 
         $pictureId = (int)$this->params()->fromRoute('picture_id');
@@ -116,22 +108,6 @@ class LogController extends AbstractActionController
                     ->join('log_events_brands', 'brands.id = log_events_brands.brand_id', null)
                     ->where('log_events_brands.log_event_id = ?', $event->id);
             });
-
-            $engineRows = $engineTable->fetchAll(
-                $engineTable->select(true)
-                    ->join('log_events_engines', 'engines.id = log_events_engines.engine_id', null)
-                    ->where('log_events_engines.log_event_id = ?', $event->id)
-            );
-            $engines = [];
-            foreach ($engineRows as $engineRow) {
-                $engines[] = [
-                    'name' => $engineRow['name'],
-                    'url'  => $this->url()->fromRoute('moder/engines/params', [
-                        'action'    => 'engine',
-                        'engine_id' => $engineRow->id
-                    ])
-                ];
-            }
 
             $picturesRows = $picturesTable->fetchAll(
                 $picturesTable->select(true)
@@ -195,7 +171,6 @@ class LogController extends AbstractActionController
                 'desc'        => $event->description,
                 'vehicles'    => $vehicles,
                 'brands'      => $brands,
-                'engines'     => $engines,
                 'pictures'    => $pictures,
                 'twinsGroups' => $twinsGroups,
                 'factories'   => $factories

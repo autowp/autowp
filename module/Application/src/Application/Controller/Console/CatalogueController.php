@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\BrandVehicle;
 use Application\Model\PictureItem;
+use Application\Service\SpecificationsService;
 
 class CatalogueController extends AbstractActionController
 {
@@ -22,10 +23,12 @@ class CatalogueController extends AbstractActionController
 
     public function __construct(
         BrandVehicle $brandVehicle,
-        PictureItem $pictureItem
+        PictureItem $pictureItem,
+        SpecificationsService $specService
     ) {
         $this->brandVehicle = $brandVehicle;
         $this->pictureItem = $pictureItem;
+        $this->specService = $specService;
     }
 
     public function refreshBrandVehicleAction()
@@ -34,8 +37,153 @@ class CatalogueController extends AbstractActionController
 
         Console::getInstance()->writeLine("done");
     }
+    
+    public function migrateEnginesAction()
+    {
+        $itemTable = new \Application\Model\DbTable\Vehicle();
+        
+        foreach ($itemTable->fetchAll(['item_type_id = 2']) as $itemRow) {
+            print $itemRow->id . "\n";
+            $this->specService->updateActualValues(1, $itemRow->id);
+        }
+        
+        Console::getInstance()->writeLine("done");
+        return;
+        
+        /*$itemTable = new \Application\Model\DbTable\Vehicle();
+        $itemParentCache = new \Application\Model\DbTable\Vehicle\ParentCache();
+        
+        foreach ($itemTable->fetchAll(['item_type_id = 2']) as $itemRow) {
+            print $itemRow->id . "\n";
+            $itemParentCache->rebuildCache($itemRow);
+        }*/
+        
+        // add columns to cars: migration_engine_id, migration_parent_engine_id
+        // add column type_id
+        
+        /*$engineTable = new \Application\Model\DbTable\Engine();
+        $itemTable = new \Application\Model\DbTable\Vehicle();
+        $carParentTable = new \Application\Model\DbTable\Vehicle\ParentTable();
+        $brandEngineTable  = new \Application\Model\DbTable\BrandEngine();
+        $pictureTable = new \Application\Model\DbTable\Picture;
+        
+        $db = $itemTable->getAdapter();
+        
+        $rows = $engineTable->fetchAll([
+            //'id in (1454, 1450, 1448, 1449, 1451)',
+            //'id not in (select parent_id from engines where parent_id)',
+            //'id not in (select migration_engine_id from cars where migration_engine_id)'
+        ]);
+        
+        foreach ($rows as $engineRow) {
+            
+            Console::getInstance()->writeLine($engineRow->id);
+                       
+            // create car 
+            $item = $itemTable->fetchRow([
+                'migration_engine_id = ?' => $engineRow->id,
+            ]);
+            if (!$item) {
+                $item = $itemTable->createRow([
+                    'name'                       => $engineRow->name,
+                    'body'                       => '',
+                    'item_type_id'               => 2,
+                    'produced_exactly'           => 0
+                ]);
+            }
+            $item->setFromArray([
+                'migration_engine_id'        => $engineRow->id,
+                'migration_parent_engine_id' => $engineRow->parent_id,
+            ]);
+            $item->save();
+            
+            // link moved child engines
+            $childItems = $itemTable->fetchAll([
+                'migration_parent_engine_id = ?' => $engineRow->id
+            ]);
+            foreach ($childItems as $childItem) {
+                if (!$item->is_group) {
+                    $item->is_group = 1;
+                    $item->save();
+                }
+                $carParentTable->addParent($childItem, $item);
+            }
+            
+            // link moved parent engines
+            if ($engineRow->parent_id) {
+                $parentItems = $itemTable->fetchAll([
+                    'migration_engine_id = ?' => $engineRow->parent_id
+                ]);
+                foreach ($parentItems as $parentItem) {
+                    if (!$parentItem->is_group) {
+                        $parentItem->is_group = 1;
+                        $parentItem->save();
+                    }
+                    $carParentTable->addParent($item, $parentItem);
+                }
+            }
+            
+            // move brand-links
+            $brandEngineRows = $brandEngineTable->fetchAll([
+                'engine_id = ?' => $engineRow->id
+            ]);
+            foreach ($brandEngineRows as $brandEngineRow) {
+                $this->brandVehicle->create($brandEngineRow->brand_id, $item->id);
+            }
+            
+            // move pictures
+            $pictureRows = $pictureTable->fetchAll([
+                'engine_id = ?' => $engineRow->id
+            ]);
+            foreach ($pictureRows as $pictureRow) {
+                $this->pictureItem->setPictureItems($pictureRow->id, [$item->id]);
+            }
+            
+            // move log
+            $db->query('
+                INSERT IGNORE INTO log_events_cars (log_event_id, car_id)
+                SELECT log_event_id, ? FROM log_events_engines
+                WHERE engine_id = ?
+            ', [$item->id, $engineRow->id]);
+            
+            // move specs
+            $tables = [
+                'attrs_user_values', 
+                'attrs_user_values_float',
+                'attrs_user_values_int',
+                'attrs_user_values_list',
+                'attrs_user_values_string',
+                'attrs_values',
+                'attrs_values_float',
+                'attrs_values_int',
+                'attrs_values_list',
+                'attrs_values_string',
+            ];
+            foreach ($tables as $table) {
+                $db->update($table, [
+                    'item_id'      => $item->id,
+                    'item_type_id' => 1
+                ], [
+                    'item_id = ?' => $engineRow->id,
+                    'item_type_id = 3'
+                ]);
+            }
 
-    public function migratePictureItemAction()
+            // move engine cars
+            $carsOnEngine = $itemTable->fetchAll([
+                'engine_id = ?' => $engineRow->id
+            ]);
+            
+            foreach ($carsOnEngine as $carOnEngine) {
+                $carOnEngine->engine_item_id = $item->id;
+                $carOnEngine->save();
+            }
+        }*/
+        
+        //Console::getInstance()->writeLine("done");
+    }
+
+    /*public function migratePictureItemAction()
     {
         $pictureTable = new \Application\Model\DbTable\Picture();
 
@@ -74,9 +222,9 @@ class CatalogueController extends AbstractActionController
             $offset += 500;
             sleep(1);
         } while (true);
-    }
+    }*/
 
-    public function migrateVehicleTypeAction()
+    /*public function migrateVehicleTypeAction()
     {
         $vehicleTable = new \Application\Model\DbTable\Vehicle();
         $vehicleType = new \Application\Model\VehicleType();
@@ -84,7 +232,7 @@ class CatalogueController extends AbstractActionController
         $rows = $vehicleTable->fetchAll([], 'id desc', 300);
         foreach ($rows as $vehicle) {
             $vehicleType->refreshInheritanceFromParents($vehicle->id);
-        }
+        }*/
 
         /*$rows = $vehicleTable->fetchAll([
             'car_type_id',
@@ -187,6 +335,6 @@ class CatalogueController extends AbstractActionController
             $vehicleType->setVehicleTypes($vehicle->id, [14, 10]);
         }*/
 
-        Console::getInstance()->writeLine("done");
-    }
+        /*Console::getInstance()->writeLine("done");
+    }*/
 }

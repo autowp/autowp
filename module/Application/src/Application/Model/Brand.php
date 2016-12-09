@@ -50,12 +50,6 @@ class Brand
                     ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
                     ->where('brand_item.brand_id = brands.id')
                     ->assemble() .
-            ') + (' .
-                $db->select()
-                    ->from('brand_engine', 'count(engine_parent_cache.engine_id)')
-                    ->where('brand_engine.brand_id = brands.id')
-                    ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
-                    ->assemble() .
             ')' .
         ')');
     }

@@ -82,12 +82,6 @@ class PictureNameFormatter
 
                 return 'Unsorted vehicle';
 
-            case Picture::ENGINE_TYPE_ID:
-                if ($picture['engine']) {
-                    return sprintf($this->translate('picturelist/engine-%s', $language), $picture['engine']);
-                }
-                return $this->translate('picturelist/engine', $language);
-
             case Picture::LOGO_TYPE_ID:
                 if ($picture['brand']) {
                     return sprintf($this->translate('picturelist/logotype-%s', $language), $picture['brand']);
@@ -145,7 +139,6 @@ class PictureNameFormatter
 
                 return 'Unsorted vehicle';
 
-            case Picture::ENGINE_TYPE_ID:
             case Picture::LOGO_TYPE_ID:
             case Picture::MIXED_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:

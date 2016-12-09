@@ -264,7 +264,7 @@ class IndexController extends AbstractActionController
     {
         $language = $this->language();
 
-        $cacheKey = 'INDEX_BRANDS_HTML260' . $language;
+        $cacheKey = 'INDEX_BRANDS_HTML261' . $language;
         $brands = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             // cache missing
@@ -622,7 +622,6 @@ class IndexController extends AbstractActionController
                 $select = $carTable->select(true)
                     ->join('attrs_user_values', 'cars.id = attrs_user_values.item_id', null)
                     ->where('update_date > DATE_SUB(NOW(), INTERVAL 1 DAY)')
-                    ->where('attrs_user_values.item_type_id = ?', 1)
                     ->having('count(attrs_user_values.attribute_id) > 10')
                     ->group('cars.id')
                     ->order('MAX(attrs_user_values.update_date) DESC')

@@ -21,9 +21,19 @@
 
 <?php $this->pageTitle()->setAutoEscape(false)->captureStart('SET') ?>
     <?=$this->pic()->htmlTitle($this->name) ?>
-    <?php /* if ($this->designProject) { ?>
-        <sup class="designBrand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($this->designProject['url'], $this->designProject['brand']))?></sup>
-    <?php } */ ?>
+    <?php if (count($this->items) == 1) { ?>
+        <?php if ($this->items[0]['designProject']) { ?>
+            <sup class="designBrand">
+                <?=sprintf(
+                    $this->translate('carlist/designed by %s'), 
+                    $this->htmlA(
+                        $this->items[0]['designProject']['url'], 
+                        $this->items[0]['designProject']['brand']
+                    )
+                )?>
+            </sup>
+        <?php } ?>
+    <?php } ?>
 <?php $this->pageTitle()->captureEnd() ?>
 
 <div class="row">
@@ -208,15 +218,15 @@
                 }
             }
 
-            if ($this->engine) {
-                if (count($this->engine['vehicles']) > 0) {
-                    if (count($this->engine['vehicles']) == 1)
-                        foreach ($this->engine['vehicles'] as $car) {
-                            $list[] = $this->escapeHtml($this->translate('picture/that-engine-is-mounted-to-vehicle')) . $this->htmlA($car['url'], $car['name']);
+            foreach ($this->engines as $engine) {
+                if (count($engine['vehicles']) > 0) {
+                    if (count($engine['vehicles']) == 1)
+                        foreach ($engine['vehicles'] as $car) {
+                            $list[] = $this->escapeHtml($this->translate('picture/that-engine-is-mounted-to-vehicle')) . ' ' . $this->htmlA($car['url'], $car['name']);
                         }
                     else {
                         $a = [];
-                        foreach ($this->engine['vehicles'] as $car) {
+                        foreach ($engine['vehicles'] as $car) {
                             $a[] = $this->htmlA($car['url'], $car['name']);
                         }
                         $list[] = $this->escapeHtml($this->translate('picture/that-engine-is-mounted-to-vehicles:')) .
@@ -224,13 +234,13 @@
                     }
                 }
 
-                if ($this->engine['hasSpecs']) {
+                if ($engine['hasSpecs']) {
                     $list[] = $this->htmlA(
-                        $this->engine['specsUrl'],
+                        $engine['specsUrl'],
                         '<i class="fa fa-list-alt"></i> ' .
                         sprintf(
                             $this->escapeHtml($this->translate('catalogue/specifications-of-%1$s')),
-                            $this->escapeHtml($this->engine['name'])
+                            $this->escapeHtml($engine['name'])
                         ),
                         false
                     );
@@ -291,7 +301,7 @@
             }
 
             if ($this->user()->logedIn()) {
-                if (count($this->items) || $this->picture->brand_id || $this->picture->engine_id) {
+                if (count($this->items) || $this->picture->brand_id || count($this->engines)) {
                     $list[] = $this->htmlA($this->url('upload/params', [
                         'action'  => 'index',
                         'replace' => $this->picture->identity ? $this->picture->identity : $this->picture->id

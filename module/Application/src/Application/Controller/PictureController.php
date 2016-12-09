@@ -173,23 +173,6 @@ class PictureController extends AbstractActionController
         $isEngines = false;
 
         switch ($picture->type) {
-            case Picture::ENGINE_TYPE_ID:
-                if ($engine = $picture->findParentRow(Engine::class)) {
-                    $cataloguePaths = $this->catalogue()->engineCataloguePaths($engine, [
-                        'limit' => 1
-                    ]);
-
-                    foreach ($cataloguePaths as $cataloguePath) {
-                        $brandId = $brandModel->getBrandIdByCatname($cataloguePath['brand_catname']);
-                        if ($brandId) {
-                            $brands[] = $brandId;
-                        }
-                    }
-                }
-                $isEngines = true;
-
-                break;
-
             case Picture::LOGO_TYPE_ID:
             case Picture::MIXED_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:

@@ -107,6 +107,11 @@ return [
         '全部%s个品牌'
     ],
     'brands/pictures:' => '图片: ',
+    
+    'item/type/1/name' => '车辆',
+    'item/type/2/name' => '发动机',
+    'item/type/1/name-plural' => '车辆',
+    'item/type/2/name-plural' => '发动机',
 
     /* BRAND PAGE*/
     'unsorted'                => '未分类',
@@ -299,6 +304,7 @@ return [
     'catalogue/section/tractors' => 'Tractors',
     'catalogue/section/buses' => 'Buses',
     'catalogue/section/trucks' => 'Trucks',
+    'catalogue/section/engines' => '发动机',
 
     'catalogue/engine-menu/vehicles' => '车型',
     'catalogue/engine-menu/pictures' => '图片',
@@ -309,7 +315,7 @@ return [
     'catalogue/engine/add-engine' => '添加发动机',
     'catalogue/engine/mounted-on:' => '配备于:',
 
-    'factories/factory-cars' => '车型',
+    'factories/factory-items' => '制品',
     'factories/factory/pictures' => '图片',
 
     /* comments */
@@ -854,7 +860,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/128/name' => "收件箱",
     'page/129/name' => "头像",
     'page/130/name' => "已贡献图片",
-    'page/131/name' => "车型",
+    'page/131/name' => "车型 & engines",
     'page/133/name' => "账号管理",
     'page/134/name' => "设定新密码",
     'page/135/name' => "新密码已保存",
@@ -896,7 +902,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/178/name' => "工厂选项",
     'page/180/name' => "工厂",
     'page/181/name' => "%FACTORY_NAME%",
-    'page/182/name' => "车型",
+    'page/182/name' => "制品",
     'page/183/name' => "%PICTURE_NAME%",
     'page/184/name' => "%PICTURE_NAME%",
     'page/185/name' => "%CAR_NAME%",
@@ -1016,7 +1022,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/128/title' => "收件箱",
     'page/129/title' => "头像",
     'page/130/title' => "已贡献图片",
-    'page/131/title' => "车型",
+    'page/131/title' => "车型 & engines",
     'page/133/title' => "访问控制",
     'page/134/title' => "设定新密码",
     'page/135/title' => "",
@@ -1058,7 +1064,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/178/title' => "工厂选项",
     'page/180/title' => "工厂",
     'page/181/title' => "%FACTORY_NAME%",
-    'page/182/title' => "车型",
+    'page/182/title' => "制品",
     'page/183/title' => "%PICTURE_NAME%",
     'page/184/title' => "%PICTURE_NAME%",
     'page/185/title' => "%CAR_NAME%",
@@ -1178,7 +1184,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/128/breadcrumbs' => "",
     'page/129/breadcrumbs' => "",
     'page/130/breadcrumbs' => "",
-    'page/131/breadcrumbs' => "车型",
+    'page/131/breadcrumbs' => "车型 & engines",
     'page/133/breadcrumbs' => "",
     'page/134/breadcrumbs' => "",
     'page/135/breadcrumbs' => "",
@@ -1220,7 +1226,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/178/breadcrumbs' => "工厂选项",
     'page/180/breadcrumbs' => "工厂",
     'page/181/breadcrumbs' => "%FACTORY_NAME%",
-    'page/182/breadcrumbs' => "车型",
+    'page/182/breadcrumbs' => "制品",
     'page/183/breadcrumbs' => "%PICTURE_NAME%",
     'page/184/breadcrumbs' => "%PICTURE_NAME%",
     'page/185/breadcrumbs' => "%CAR_NAME%",
@@ -1257,6 +1263,10 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/205/name'        => '评论',
     'page/205/title'       => '评论',
     'page/205/breadcrumbs' => '评论',
+    
+    'page/206/name'        => '新的引擎',
+    'page/206/title'       => '新的引擎',
+    'page/206/breadcrumbs' => '新的引擎',
 
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',
@@ -1296,11 +1306,10 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/pictures/filter/perspective/empty' => 'empty',
     'moder/pictures/filter/type' => '型号',
     'moder/pictures/filter/type/any' => 'any',
-    'moder/pictures/filter/type/vehicle' => 'vehicle',
+    'moder/pictures/filter/type/item' => 'vehicle or engine',
     'moder/pictures/filter/type/logotype' => 'logotype',
     'moder/pictures/filter/type/mixed' => 'mixed',
     'moder/pictures/filter/type/unsorted' => 'unsorted',
-    'moder/pictures/filter/type/engine' => 'engine',
     'moder/pictures/filter/type/factory' => 'factory',
     'moder/pictures/filter/type/unsorted+mixed+logo' => 'unsorted + mixed + logotype',
     'moder/pictures/filter/comments' => '评论',
@@ -1333,6 +1342,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicles/filter' => 'Filter',
     'moder/vehicles/filter/name' => 'Name',
     'moder/vehicles/filter/name-exclude' => 'Name (exclude)',
+    'moder/vehicles/filter/item-type' => 'Item type',
     'moder/vehicles/filter/vehicle-type' => 'Vehicle type',
     'moder/vehicles/filter/vehicle-type/empty' => 'Empty',
     'moder/vehicles/filter/spec' => 'Spec',
@@ -1380,6 +1390,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicle/tabs/factories' => '工厂',
     'moder/vehicle/tabs/pictures' => '图片',
     'moder/vehicle/tabs/modifications' => '改款',
+    'moder/vehicle/tabs/vehicles' => 'Vehicles',
 
     'moder/vehicle/meta/description' => '简介',
 
@@ -1388,6 +1399,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicle/subscription/not-subscribed' => '未订阅',
 
     'moder/vehicle/catalogue/add-vehicle' => '添加车型',
+    'moder/vehicle/catalogue/add-engine' => 'add engine',
     'moder/vehicle/catalogue/title/name' => '车名',
     'moder/vehicle/catalogue/title/link' => '链接',
     'moder/vehicle/catalogue/title/catname' => 'Catname',

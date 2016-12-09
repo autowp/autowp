@@ -88,16 +88,6 @@
                 ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-vehicle')) . ' <span class="badge">' . $this->inboxVehiclePictures . '</span>', false)?>
             </li>
         <?php } ?>
-        <?php if ($this->inboxEnginePictures) { ?>
-            <li>
-                <?=$this->htmlA($this->url('moder/pictures/params', [
-                    'action'   => 'index',
-                    'status'   => Application\Model\DbTable\Picture::STATUS_INBOX,
-                    'brand_id' => $this->brand['id'],
-                    'type_id'  => Application\Model\DbTable\Picture::ENGINE_TYPE_ID,
-                ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-engine')) . ' <span class="badge">' . $this->inboxEnginePictures . '</span>', false)?>
-            </li>
-        <?php } ?>
     </ul>
 </header>
 

@@ -15,6 +15,7 @@
     $this->layout()->moduleName = 'moder/cars/car';
 ?>
 <?php $this->pageTitle()->setAutoEscape(false)->captureStart('SET') ?>
+    <?=$this->escapeHtml($this->translate('item/type/'.$this->car->item_type_id.'/name'))?>:
     <?=$this->car()->htmlTitle($this->car->getNameData($this->language()))?>
 <?php $this->pageTitle()->captureEnd() ?>
 
@@ -177,6 +178,7 @@
         <?php } ?>
     </div>
     <div class="tab-pane<?=$this->tabs['catalogue']['active'] ? ' active' : ''?>" id="catalogue">Loading ...</div>
+    <div class="tab-pane<?=$this->tabs['vehicles']['active'] ? ' active' : ''?>" id="vehicles">Loading ...</div>
     <div class="tab-pane<?=$this->tabs['tree']['active'] ? ' active' : ''?>" id="tree">Loading ...</div>
     <div class="tab-pane<?=$this->tabs['categories']['active'] ? ' active' : ''?>" id="categories">Loading ...</div>
     <div class="tab-pane<?=$this->tabs['factories']['active'] ? ' active' : ''?>" id="factories">Loading ...</div>
