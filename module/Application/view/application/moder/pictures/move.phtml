@@ -13,19 +13,21 @@
     ]);
 ?>
 
-<ul class="nav nav-pills" style="margin-bottom: 30px">
-    <li<?=$this->showFactories ? '' : ' class="active"'?>><?=$this->htmlA($this->url('moder/pictures/params', [
-        'action'     => 'move',
-        'picture_id' => $this->picture->id,
-    ]), $this->translate('moder/pciture/move/brands'))?></li>
-    <li<?=$this->showFactories ? ' class="active"' : ''?>><?=$this->htmlA($this->url('moder/pictures/params', [
-        'action'     => 'move',
-        'picture_id' => $this->picture->id,
-        'factories'  => 1
-    ]), $this->translate('moder/pciture/move/factories'))?></li>
-</ul>
+<?php if (!$this->srcItem) { ?>
+    <ul class="nav nav-pills" style="margin-bottom: 30px">
+        <li<?=$this->showFactories ? '' : ' class="active"'?>><?=$this->htmlA($this->url('moder/pictures/params', [
+            'action'     => 'move',
+            'picture_id' => $this->picture->id,
+        ]), $this->translate('moder/pciture/move/brands'))?></li>
+        <li<?=$this->showFactories ? ' class="active"' : ''?>><?=$this->htmlA($this->url('moder/pictures/params', [
+            'action'     => 'move',
+            'picture_id' => $this->picture->id,
+            'factories'  => 1
+        ]), $this->translate('moder/pciture/move/factories'))?></li>
+    </ul>
+<?php } ?>
 
-<?php if ($this->showFactories) { ?>
+<?php if ($this->showFactories && !$this->srcItem) { ?>
 
     <?php foreach ($this->factories as $factory) { ?>
         <?=$this->htmlA($this->url(null, [
@@ -63,10 +65,19 @@
 
         <div class="select-in-brand">
 
-            <?php if (count($this->cars) > 0) { ?>
+            <?php if (count($this->vehicles) > 0) { ?>
                 <div style="margin: 5px 0">
                     <?=$this->partial('application/moder/pictures/picture-select-car-cars.phtml', [
-                        'cars' => $this->cars
+                        'cars' => $this->vehicles
+                    ])?>
+                </div>
+            <?php } ?>
+            
+            <?php if (count($this->engines) > 0) { ?>
+                <h5><?=$this->escapeHtml($this->translate('item/type/2/name-plural'))?></h5>
+                <div style="margin: 5px 0">
+                    <?=$this->partial('application/moder/pictures/picture-select-car-cars.phtml', [
+                        'cars' => $this->engines
                     ])?>
                 </div>
             <?php } ?>
@@ -84,33 +95,22 @@
                 </div>
             <?php } ?>
 
-            <?php if ($this->haveEngines) { ?>
+            <?php if (!$this->srcItem) { ?>
                 <div style="margin: 5px 0">
-                    <?=$this->htmlA([
-                        'href'      => '#',
-                        'class'     => 'arrow',
-                        'data-load' => $this->enginesUrl
-                    ], '<i class="fa fa-plus-circle"></i> ' . $this->escapeHtml($this->translate('moder/pciture/move/engines')), false)?>
-                    <div style="margin:0 0 4px 18px;display:none">
-                        <div class="loading"><em>Loading ...</em></div>
-                    </div>
+                    <?=$this->htmlA($this->url(null, [
+                        'action' => 'move',
+                        'type'   => Application\Model\DbTable\Picture::LOGO_TYPE_ID
+                    ], [], true), $this->translate('upload/select/logo')) ?><br />
+                    <?php /*=$this->htmlA($this->url(null, [
+                        'action' => 'move',
+                        'type'   => Application\Model\DbTable\Picture::MIXED_TYPE_ID
+                    ], [], true), $this->translate('upload/select/mixed-long')) ?><br /> */ ?>
+                    <?=$this->htmlA($this->url(null, [
+                        'action' => 'move',
+                        'type'   => Application\Model\DbTable\Picture::UNSORTED_TYPE_ID
+                    ], [], true), $this->translate('upload/select/unsorted-long')) ?>
                 </div>
             <?php } ?>
-
-            <div style="margin: 5px 0">
-                <?=$this->htmlA($this->url(null, [
-                    'action' => 'move',
-                    'type'   => Application\Model\DbTable\Picture::LOGO_TYPE_ID
-                ], [], true), $this->translate('upload/select/logo')) ?><br />
-                <?=$this->htmlA($this->url(null, [
-                    'action' => 'move',
-                    'type'   => Application\Model\DbTable\Picture::MIXED_TYPE_ID
-                ], [], true), $this->translate('upload/select/mixed-long')) ?><br />
-                <?=$this->htmlA($this->url(null, [
-                    'action' => 'move',
-                    'type'   => Application\Model\DbTable\Picture::UNSORTED_TYPE_ID
-                ], [], true), $this->translate('upload/select/unsorted-long')) ?>
-            </div>
 
         </div>
 

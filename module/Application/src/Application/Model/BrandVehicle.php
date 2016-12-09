@@ -16,7 +16,7 @@ class BrandVehicle
     private $brandTable;
 
     /**
-     * @var DbTable\BrandCar
+     * @var DbTable\BrandItem
      */
     private $brandVehicleTable;
 
@@ -33,7 +33,7 @@ class BrandVehicle
 
         $this->brandTable = new DbTable\Brand();
         $this->vehicleTable = new DbTable\Vehicle();
-        $this->brandVehicleTable = new DbTable\BrandCar();
+        $this->brandVehicleTable = new DbTable\BrandItem();
         $this->brandVehicleLanguageTable = new DbTable\Brand\VehicleLanguage();
     }
 
@@ -64,7 +64,7 @@ class BrandVehicle
 
     private function getBrandAliases(DbTable\BrandRow $brandRow)
     {
-        $aliases = [$brandRow['caption']];
+        $aliases = [$brandRow['name']];
 
         $brandAliasTable = new DbTable\BrandAlias();
         $brandAliasRows = $brandAliasTable->fetchAll([
@@ -99,15 +99,12 @@ class BrandVehicle
     {
         $languageTable = new DbTable\Vehicle\Language;
 
-        $db = $languageTable->getAdapter();
-
-        $order = new Zend_Db_Expr($db->quoteInto('language = ? DESC', $language));
-
         $languageRow = $languageTable->fetchRow([
-            'car_id = ?' => $vehicleRow->id
-        ], $order);
+            'car_id = ?'   => $vehicleRow->id,
+            'language = ?' => $language
+        ]);
 
-        return $languageRow ? $languageRow->name : $vehicleRow->caption;
+        return $languageRow ? $languageRow->name : $vehicleRow->name;
     }
 
     private function extractName(DbTable\BrandRow $brandRow, DbTable\Vehicle\Row $vehicleRow, $language)
@@ -182,7 +179,7 @@ class BrandVehicle
         $brandVehicleRow = $this->brandVehicleTable->createRow([
             'brand_id' => $brandRow->id,
             'car_id'   => $vehicleRow->id,
-            'type'     => DbTable\BrandCar::TYPE_DEFAULT,
+            'type'     => DbTable\BrandItem::TYPE_DEFAULT,
             'catname'  => $catname,
             'is_auto'  => 1
         ]);

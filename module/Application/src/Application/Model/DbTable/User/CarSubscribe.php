@@ -10,8 +10,8 @@ use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 
 class CarSubscribe extends Table
 {
-    protected $_name = 'user_car_subscribe';
-    protected $_primary = ['user_id', 'car_id'];
+    protected $_name = 'user_item_subscribe';
+    protected $_primary = ['user_id', 'item_id'];
 
     protected $_referenceMap = [
         'User' => [
@@ -20,7 +20,7 @@ class CarSubscribe extends Table
             'refColumns'    => ['id']
         ],
         'Car' => [
-            'columns'       => ['car_id'],
+            'columns'       => ['item_id'],
             'refTableClass' => Application\Model\DbTable\Vehicle::class,
             'refColumns'    => ['id']
         ]
@@ -30,12 +30,12 @@ class CarSubscribe extends Table
     {
         $row = $this->fetchRow([
            'user_id = ?' => $user->id,
-           'car_id = ?'  => $car->id
+           'item_id = ?' => $car->id
         ]);
         if (! $row) {
             $this->insert([
                 'user_id' => $user->id,
-                'car_id'  => $car->id
+                'item_id' => $car->id
             ]);
         }
     }
@@ -44,7 +44,7 @@ class CarSubscribe extends Table
     {
         $row = $this->fetchRow([
             'user_id = ?' => $user->id,
-            'car_id = ?'  => $car->id
+            'item_id = ?' => $car->id
         ]);
         if ($row) {
             $row->delete();
@@ -57,8 +57,8 @@ class CarSubscribe extends Table
 
         return $uTable->fetchAll(
             $uTable->select(true)
-                ->join('user_car_subscribe', 'users.id = user_car_subscribe.user_id', null)
-                ->where('user_car_subscribe.car_id = ?', $car->id)
+                ->join('user_item_subscribe', 'users.id = user_item_subscribe.user_id', null)
+                ->where('user_item_subscribe.item_id = ?', $car->id)
         );
     }
 }

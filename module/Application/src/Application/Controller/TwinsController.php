@@ -236,7 +236,7 @@ class TwinsController extends AbstractActionController
                 $db->select()
                     ->from('cars', [
                         'cars.id',
-                        'name' => 'if(length(car_language.name), car_language.name, cars.caption)',
+                        'name' => 'if(length(car_language.name), car_language.name, cars.name)',
                         'cars.body', 'cars.begin_model_year', 'cars.end_model_year',
                         'cars.begin_year', 'cars.end_year', 'cars.today',
                         'spec' => 'spec.short_name',
@@ -265,8 +265,8 @@ class TwinsController extends AbstractActionController
                 $pictureRow = $pictureTable->fetchRow(
                     $pictureTable->select(true)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                        ->where('car_parent_cache.parent_id = ?', (int)$car['id'])
+                        ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                        ->where('item_parent_cache.parent_id = ?', (int)$car['id'])
                         ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
                         ->order([
                             new Zend_Db_Expr('picture_item.perspective_id=7 DESC'),

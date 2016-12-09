@@ -8,12 +8,15 @@
         'pageId' => 125,
     ]);
 ?>
-<?=$this->htmlA([
-    'class' => 'btn btn-success',
-    'href' => $this->url(null, [
-        'action' => 'item'
-    ])
-], $this->translate('moder/categories/new'))?>
+
+<?php if ($this->canEdit) { ?>
+    <?=$this->htmlA([
+        'class' => 'btn btn-success',
+        'href' => $this->url(null, [
+            'action' => 'item'
+        ])
+    ], $this->translate('moder/categories/new'))?>
+<?php } ?>
 
 <table class="table table-striped table-condensed">
     <thead>
@@ -25,8 +28,9 @@
     </thead>
     <tbody>
         <?=$this->partial('application/moder/category/list', [
-            'items' => $this->categories,
-            'level' => 0
+            'canEdit' => $this->canEdit,
+            'items'   => $this->categories,
+            'level'   => 0
         ])?>
     </tbody>
 </table>

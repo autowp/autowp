@@ -75,7 +75,6 @@ class Row extends \Application\Db\Table\Row
                 break;
 
             case Picture::VEHICLE_TYPE_ID:
-
                 $vehicleTable = new Vehicle();
                 $cars = $vehicleTable->fetchAll(
                     $vehicleTable->select(true)
@@ -84,14 +83,13 @@ class Row extends \Application\Db\Table\Row
                 );
 
                 if (count($cars) > 1) {
-
                     $brandTable = new BrandTable();
 
                     $brands = $brandTable->fetchAll(
                         $brandTable->select(true)
-                            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                            ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                            ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                            ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                            ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                             ->where('picture_item.picture_id = ?', $this->id)
                     );
 
@@ -106,20 +104,18 @@ class Row extends \Application\Db\Table\Row
                     $firstChar = mb_substr($brandsFolder, 0, 1);
 
                     $result = $firstChar . '/' . $brandsFolder .'/mixed';
-
                 } elseif (count($cars) == 1) {
-
                     $car = $cars[0];
 
-                    $carCatname = $filenameFilter->filter($car->caption);
+                    $carCatname = $filenameFilter->filter($car->name);
 
                     $brandTable = new BrandTable();
 
                     $brands = $brandTable->fetchAll(
                         $brandTable->select(true)
-                            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                            ->where('car_parent_cache.car_id = ?', $car->id)
+                            ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                            ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                            ->where('item_parent_cache.item_id = ?', $car->id)
                     );
 
                     $sBrands = [];
@@ -165,7 +161,7 @@ class Row extends \Application\Db\Table\Row
                                 $carCatname
                             ]);
                         } else {
-                            $carFolder = $filenameFilter->filter($car->caption);
+                            $carFolder = $filenameFilter->filter($car->name);
                             $firstChar = mb_substr($carFolder, 0, 1);
                             $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
                         }
@@ -178,7 +174,7 @@ class Row extends \Application\Db\Table\Row
                 if ($engine) {
                     $result = implode('/', [
                         'engines',
-                        $filenameFilter->filter($engine->caption)
+                        $filenameFilter->filter($engine->name)
                     ]);
                 }
                 break;

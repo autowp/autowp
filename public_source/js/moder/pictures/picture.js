@@ -62,6 +62,26 @@ define(
                     
                     cropDialog.show();
                 });
+                
+                
+                $('.pick-area').on('click', function() {
+                    var areaDialog;
+                    var $btn = $(this);
+                    var data = $btn.data('area');
+                    if (!areaDialog) {
+                        areaDialog = new CropDialog(
+                            $.extend(data, {
+                                minSize: [100, 100],
+                                onSave: function(crop, callback) {
+                                    data.crop = crop;
+                                    $.post(data.saveUrl, crop, callback);
+                                }
+                            })
+                        );
+                    }
+                    
+                    areaDialog.show();
+                });
             }
         }
     }

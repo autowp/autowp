@@ -32,7 +32,7 @@ return [
                 ],
                 'catalogue' => [
                     'options' => [
-                        'route'    => 'catalogue (refresh-brand-vehicle|migrate-vehicle-type|migrate-picture-item):action',
+                        'route'    => 'catalogue (refresh-brand-vehicle|migrate-vehicle-type|migrate-picture-item|migrate-engines):action',
                         'defaults' => [
                             'controller' => Controller\Console\CatalogueController::class,
                         ]

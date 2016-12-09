@@ -1,6 +1,6 @@
 <?php foreach ($this->engines as $idx => $engine) { ?>
     <button name="engine" type="submit" value="<?=$engine['id']?>" class="btn btn-link">
-        <?=$this->escapeHtml($engine['name'])?>
+        <?=$this->car()->htmlTitle($engine['name'])?>
     </button><br />
     <?php if (count($engine['childs'])) { ?>
         <div style="margin-left:2em">

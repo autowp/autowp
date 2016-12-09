@@ -382,12 +382,32 @@ define(
                 $caption.find('h3').html(item.name);
                 $caption.find('[data-toggle="tooltip"]').tooltip();
                 
+                var areas = [];
+                $.map(item.areas, function(area) {
+                    var $area = $('<div class="area"></div>');
+                    $area.data('area', area.area);
+                    $area.tooltip({
+                        title: area.name,
+                        html: true,
+                        placement: function(tooptip, node) {
+                            var winCenter = $(window).height() / 2;
+                            var nodeCenter = $(node).offset().top + ($(node).height()) / 2;
+                            
+                            console.log(winCenter, nodeCenter);
+                            
+                            return winCenter > nodeCenter ? 'bottom' : 'top'
+                        }
+                    });
+                    areas.push($area);
+                });
+                
                 var $item = $('<div class="item loading"></div>')
                     .data({
                         id: item.id,
                         full: item.full,
                         crop: item.crop
                     })
+                    .append(areas)
                     .append($caption)
                     .append($source)
                     .append($comments)
@@ -495,6 +515,17 @@ define(
                 }
                 return bounds;
             },
+            areasToBounds: function($item, offsetBounds) {
+                $item.find('.area').each(function() {
+                    var area = $(this).data('area');
+                    $(this).css({
+                        left: offsetBounds.left + area.left * offsetBounds.width,
+                        top: offsetBounds.top + area.top * offsetBounds.height,
+                        width: area.width * offsetBounds.width,
+                        height: area.height * offsetBounds.height 
+                    });
+                });
+            },
             fixSize: function($items) {
                 var w = this.$inner.width();
                 var h = this.$inner.height();
@@ -534,12 +565,15 @@ define(
                             $imgCrop.css(offsetBounds);
                             var fullWidth = bounds.width / crop.crop.width;
                             var fullHeight = bounds.height / crop.crop.height;
-                            $imgFull.css({
+                            var imgFullBounds = {
                                 left: offsetBounds.left - crop.crop.left * fullWidth,
                                 top: offsetBounds.top - crop.crop.top * fullHeight,
                                 width: fullWidth,
                                 height: fullHeight
-                            });
+                            };
+                            $imgFull.css(imgFullBounds);
+                            
+                            self.areasToBounds($item, imgFullBounds);
                         } else {
                             bounds = self.maxBounds(self.bound(cSize, {
                                 width: full.width,
@@ -556,6 +590,8 @@ define(
                                 width: bounds.width * crop.crop.width,
                                 height: bounds.height * crop.crop.height,
                             });
+                            
+                            self.areasToBounds($item, offsetBounds);
                         }
                         
                     } else {
@@ -571,6 +607,8 @@ define(
                         });
                         offsetBounds = self.boundCenter(cSize, bounds);
                         $imgFull.css(offsetBounds);
+                        
+                        self.areasToBounds($item, offsetBounds);
                     }
                 });
             },

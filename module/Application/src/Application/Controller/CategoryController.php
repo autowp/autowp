@@ -32,9 +32,12 @@ class CategoryController extends AbstractActionController
 
     private $cache;
 
-    public function __construct($cache)
+    private $textStorage;
+
+    public function __construct($cache, $textStorage)
     {
         $this->cache = $cache;
+        $this->textStorage = $textStorage;
 
         $this->categoryTable = new Category();
         $this->categoryLanguageTable = new CategoryLanguage();
@@ -81,8 +84,8 @@ class CategoryController extends AbstractActionController
             $picture = $pictureTable->fetchRow(
                 $pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('category_car', 'picture_item.item_id = category_car.car_id', null)
-                    ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
+                    ->join('category_item', 'picture_item.item_id = category_item.item_id', null)
+                    ->join('category_parent', 'category_item.category_id = category_parent.category_id', null)
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->where('category_parent.parent_id = ?', $category['id'])
                     ->order([
@@ -267,9 +270,9 @@ class CategoryController extends AbstractActionController
             $topCar = $carTable->fetchRow(
                 $carTable->select(true)
                     ->where('cars.id = ?', $carId)
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null)
-                    ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
+                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->join('category_item', 'item_parent_cache.parent_id = category_item.item_id', null)
+                    ->join('category_parent', 'category_item.category_id = category_parent.category_id', null)
                     ->where('category_parent.parent_id = ?', $currentCategory->id)
             );
         }
@@ -385,14 +388,14 @@ class CategoryController extends AbstractActionController
                     ->order($this->catalogue()->carsOrdering());
             } else {
                 $select = $carTable->select(true)
-                    ->join('category_car', 'cars.id = category_car.car_id', null)
+                    ->join('category_item', 'cars.id = category_item.item_id', null)
                     ->order($this->catalogue()->carsOrdering());
 
                 if ($isOther) {
-                    $select->where('category_car.category_id=?', $currentCategory->id);
+                    $select->where('category_item.category_id=?', $currentCategory->id);
                 } else {
                     $select
-                        ->join('category_parent', 'category_car.category_id=category_parent.category_id', null)
+                        ->join('category_parent', 'category_item.category_id = category_parent.category_id', null)
                         ->group('cars.id')
                         ->where('category_parent.parent_id = ?', $currentCategory->id);
                 }
@@ -409,8 +412,8 @@ class CategoryController extends AbstractActionController
             $users = new User();
             $contributors = $users->fetchAll(
                 $users->select(true)
-                    ->join('category_car', 'users.id = category_car.user_id', null)
-                    ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
+                    ->join('category_item', 'users.id = category_item.user_id', null)
+                    ->join('category_parent', 'category_item.category_id = category_parent.category_id', null)
                     ->where('category_parent.parent_id = ?', $currentCategory->id)
                     ->where('not users.deleted')
                     ->group('users.id')
@@ -612,6 +615,11 @@ class CategoryController extends AbstractActionController
                 }
             ]);
 
+            $description = null;
+            if ($categoryLang['text_id']) {
+                $description = $this->textStorage->getText($categoryLang['text_id']);
+            }
+
             return [
                 'title'            => $title,
                 'breadcrumbs'      => $breadcrumbs,
@@ -624,7 +632,8 @@ class CategoryController extends AbstractActionController
                     'other'            => $isOther,
                     'car_id'           => $topCar ? $topCar->id : null,
                     'path'             => $path
-                ]
+                ],
+                'description'     => $description
             ];
         });
     }
@@ -654,18 +663,18 @@ class CategoryController extends AbstractActionController
 
             if ($topCar) {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id = ?', $currentCar->id);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $currentCar->id);
             } else {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->join('category_item', 'item_parent_cache.parent_id = category_item.item_id', null);
 
                 if ($isOther) {
-                    $select->where('category_car.category_id=?', $currentCategory->id);
+                    $select->where('category_item.category_id = ?', $currentCategory->id);
                 } else {
                     $select
-                        ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
+                        ->join('category_parent', 'category_item.category_id = category_parent.category_id', null)
                         ->group('pictures.id')
                         ->where('category_parent.parent_id = ?', $currentCategory->id);
                 }
@@ -728,18 +737,18 @@ class CategoryController extends AbstractActionController
 
             if ($topCar) {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id = ?', $currentCar->id);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $currentCar->id);
             } else {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->join('category_item', 'item_parent_cache.parent_id = category_item.item_id', null);
 
                 if ($isOther) {
-                    $select->where('category_car.category_id = ?', $currentCategory->id);
+                    $select->where('category_item.category_id = ?', $currentCategory->id);
                 } else {
                     $select
-                        ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
+                        ->join('category_parent', 'category_item.category_id = category_parent.category_id', null)
                         ->group('pictures.id')
                         ->where('category_parent.parent_id = ?', $currentCategory->id);
                 }
@@ -812,18 +821,18 @@ class CategoryController extends AbstractActionController
 
             if ($topCar) {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id = ?', $currentCar->id);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $currentCar->id);
             } else {
                 $select
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->join('category_car', 'car_parent_cache.parent_id = category_car.car_id', null);
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->join('category_item', 'item_parent_cache.parent_id = category_item.item_id', null);
 
                 if ($isOther) {
-                    $select->where('category_car.category_id=?', $currentCategory->id);
+                    $select->where('category_item.category_id=?', $currentCategory->id);
                 } else {
                     $select
-                        ->join('category_parent', 'category_car.category_id = category_parent.category_id', null)
+                        ->join('category_parent', 'category_item.category_id = category_parent.category_id', null)
                         ->group('pictures.id')
                         ->where('category_parent.parent_id = ?', $currentCategory->id);
                 }

@@ -60,21 +60,21 @@ class BrandVehicleController extends AbstractActionController
         }
 
         $brandTable = $this->getBrandTable();
-        $brandVehicleTable = new DbTable\BrandCar();
+        $brandVehicleTable = new DbTable\BrandItem();
         $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
         $vehicleTable = $this->catalogue()->getCarTable();
 
-        $brandCarRow = $brandVehicleTable->fetchRow([
+        $brandItemRow = $brandVehicleTable->fetchRow([
             'brand_id = ?' => $this->params('brand_id'),
             'car_id = ?'   => $this->params('vehicle_id')
         ]);
 
-        if (! $brandCarRow) {
+        if (! $brandItemRow) {
             return $this->notFoundAction();
         }
 
-        $brandRow = $brandTable->find($brandCarRow->brand_id)->current();
-        $vehicleRow = $vehicleTable->find($brandCarRow->car_id)->current();
+        $brandRow = $brandTable->find($brandItemRow->brand_id)->current();
+        $vehicleRow = $vehicleTable->find($brandItemRow->car_id)->current();
         if (! $brandRow || ! $vehicleRow) {
             return $this->notFoundAction();
         }
@@ -86,7 +86,7 @@ class BrandVehicleController extends AbstractActionController
         ]);
 
         $values = [
-            'catname' => $brandCarRow->catname,
+            'catname' => $brandItemRow->catname,
         ];
 
         $bvlRows = $brandVehicleLangaugeTable->fetchAll([
@@ -143,7 +143,7 @@ class BrandVehicleController extends AbstractActionController
         $message = sprintf(
             'Автомобиль %s добавлен к бренду %s',
             htmlspecialchars($this->car()->formatName($vehicleRow, 'en')),
-            $brandRow->caption
+            $brandRow->name
         );
         $this->log($message, [$brandRow, $vehicleRow]);
 
@@ -176,7 +176,7 @@ class BrandVehicleController extends AbstractActionController
             $message = sprintf(
                 'Автомобиль %s отсоединен от бренда %s',
                 htmlspecialchars($this->car()->formatName($vehicleRow, 'en')),
-                $brandRow->caption
+                $brandRow->name
             );
             $this->log($message, [$brandRow, $vehicleRow]);
         }

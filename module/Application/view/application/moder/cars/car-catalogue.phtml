@@ -262,10 +262,18 @@
                 <tr>
                     <td>
                         <i class="fa fa-plus"></i>
-                        <?=$this->htmlA($this->url('moder/cars/params', [
-                            'action'    => 'new',
-                            'parent_id' => $this->car->id
-                        ]), $this->translate('moder/vehicle/catalogue/add-vehicle'))?>
+                        <?=$this->htmlA(
+                            $this->url('moder/cars/params', [
+                                'action'       => 'new',
+                                'parent_id'    => $this->car->id,
+                                'item_type_id' => $this->car['item_type_id'],
+                            ]),
+                            $this->translate(
+                                $this->car['item_type_id'] == Application\Model\DbTable\Item\Type::ENGINE
+                                    ? 'moder/vehicle/catalogue/add-engine'
+                                    : 'moder/vehicle/catalogue/add-vehicle'
+                            )
+                        )?>
                     </td>
                     <td></td>
                     <td></td>
@@ -297,7 +305,7 @@
         ])) ?>" method="post">
             <button type="submit" class="btn btn-xs btn-success">
                 <i class="fa fa-plus"></i>
-                <?=$this->escapeHtml(sprintf($this->translate('moder/vehicle/catalogue/add-brand-%s'), $brand->caption))?>
+                <?=$this->escapeHtml(sprintf($this->translate('moder/vehicle/catalogue/add-brand-%s'), $brand->name))?>
             </button>
         </form>
     <?php } ?>

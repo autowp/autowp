@@ -39,7 +39,7 @@ class IndexController extends AbstractActionController
                     $brands = new BrandTable();
 
                     $brand = $brands->createRow([
-                        'caption' => $values['name'],
+                        'name'    => $values['name'],
                         'type_id' => 1 // TODO: remove parameter
                     ]);
                     $brand->save();
@@ -51,7 +51,7 @@ class IndexController extends AbstractActionController
 
                     $this->log(sprintf(
                         'Создан новый бренд %s',
-                        $brand->caption
+                        $brand->name
                     ), $brand);
 
                     return $this->redirect()->toUrl($url);
@@ -74,6 +74,8 @@ class IndexController extends AbstractActionController
         }
 
         $menu['/moder/pictures'] = 'page/73/name';
+
+        $menu[$this->url()->fromRoute('moder/category')] = 'page/125/name';
 
         $menu[$this->url()->fromRoute('moder/perspectives')] = 'page/202/name';
 
@@ -126,7 +128,7 @@ class IndexController extends AbstractActionController
                 'name'    => 'moder/statistics/photos-with-copyrights',
                 'total'    => $totalPictures,
                 'value'    => $db->fetchOne('
-                    select count(1) from pictures where length(copyrights)
+                    select count(1) from pictures where copyrights_text_id
                 ')
             ],
             [
@@ -201,7 +203,7 @@ class IndexController extends AbstractActionController
 
         $rows = $carTable->getAdapter()->fetchAll("
             SELECT
-                cars.id, cars.caption, cars.body,
+                cars.id, cars.name, cars.body,
                 (
                     case car_parent.type
                         when 0 then 'Stock'

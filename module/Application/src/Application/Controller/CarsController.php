@@ -12,6 +12,7 @@ use Autowp\User\Model\DbTable\User\Row as UserRow;
 use Application\HostManager;
 use Application\Model\Message;
 use Application\Model\Brand as BrandModel;
+use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
@@ -22,11 +23,6 @@ use Application\Service\SpecificationsService;
 
 class CarsController extends AbstractActionController
 {
-    /**
-     * @var Engine
-     */
-    private $engineTable = null;
-
     /**
      * @var Form
      */
@@ -58,16 +54,6 @@ class CarsController extends AbstractActionController
         $this->filterForm = $filterForm;
         $this->specsService = $specsService;
         $this->message = $message;
-    }
-
-    /**
-     * @return Engine
-     */
-    private function getEngineTable()
-    {
-        return $this->engineTable
-            ? $this->engineTable
-            : $this->engineTable = new Engine();
     }
 
     private function carModerUrl(VehicleRow $car, $uri = null)
@@ -155,18 +141,17 @@ class CarsController extends AbstractActionController
                 return $this->redirect()->toUrl($this->editorUrl($car, 'spec'));
             }
         }
-
-        $engine = $car->findParentRow(Engine::class);
+        $engine = $carTable->find($car->engine_item_id)->current();
         $engineInherited = $car->engine_inherit;
         $engineInheritedFrom = [];
         if ($engine && $car->engine_inherit) {
             $carRows = $carTable->fetchAll(
                 $carTable->select(true)
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.parent_id', null)
-                    ->where('car_parent_cache.car_id = ?', $car->id)
-                    ->where('cars.engine_id = ?', $engine->id)
+                    ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', null)
+                    ->where('item_parent_cache.item_id = ?', $car->id)
+                    ->where('cars.engine_item_id = ?', $engine->id)
                     ->where('cars.id <> ?', $car->id)
-                    ->order('car_parent_cache.diff desc')
+                    ->order('item_parent_cache.diff desc')
             );
 
             foreach ($carRows as $carRow) {
@@ -214,6 +199,10 @@ class CarsController extends AbstractActionController
         $currentTab = $this->params('tab', 'info');
         foreach ($tabs as $id => &$tab) {
             $tab['active'] = $id == $currentTab;
+        }
+        
+        if ($car->item_type_id != DbTable\Item\Type::VEHICLE) {
+            unset($tabs['engine']);
         }
 
         $isSpecsAdmin = $this->user()->isAllowed('specifications', 'admin');
@@ -455,52 +444,6 @@ class CarsController extends AbstractActionController
         return $this->redirect()->toUrl($request->getServer('HTTP_REFERER'));
     }
 
-    public function engineSpecEditorAction()
-    {
-        if (! $this->user()->isAllowed('specifications', 'edit')) {
-            return $this->forbiddenAction();
-        }
-
-        $editOnlyMode = $this->user()->get()->specs_weight < 0.10;
-
-        $engines = $this->getEngineTable();
-
-        $engine = $engines->find($this->params('engine_id'))->current();
-        if (! $engine) {
-            return $this->notFoundAction();
-        }
-
-        $user = $this->user()->get();
-
-        $result = $this->specsService->getEngineForm($engine, $user, [
-            'editOnlyMode' => $editOnlyMode,
-        ], $this->language());
-
-        $form = $result['form'];
-        $formData = $result['data'];
-
-        $form->setAttribute('action', $this->url()->fromRoute(null, [], [], true));
-
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $form->setData($this->params()->fromPost());
-            if ($form->isValid()) {
-                $this->specsService->saveEngineAttributes($engine, $form->getData(), $user);
-
-                $user->invalidateSpecsVolume();
-
-                return $this->redirect()->toRoute(null, [], [], true);
-            }
-        }
-
-        return [
-            'engine'   => $engine,
-            'form'     => $form,
-            'formData' => $formData,
-            'service'  => $this->specsService
-        ];
-    }
-
     public function attrsChangeLogAction()
     {
         if (! $this->user()->isAllowed('specifications', 'edit')) {
@@ -552,8 +495,7 @@ class CarsController extends AbstractActionController
         $items = [];
 
         $cars = new Vehicle();
-        $engines = $this->getEngineTable();
-
+        
         $isModerator = $this->user()->inheritsRole('moder');
 
         foreach ($paginator->getCurrentItems() as $row) {
@@ -563,37 +505,19 @@ class CarsController extends AbstractActionController
             $path = [];
 
             $itemType = $row->findParentRow(Attr\ItemType::class);
-            if ($itemType->id == 1) {
-                $car = $cars->find($row->item_id)->current();
-                if ($car) {
-                    $objectName = $this->car()->formatName($car, $this->language());
-                    $editorUrl = $this->url()->fromRoute('cars/params', [
-                        'action' => 'car-specifications-editor',
+            $car = $cars->find($row->item_id)->current();
+            if ($car) {
+                $objectName = $this->car()->formatName($car, $this->language());
+                $editorUrl = $this->url()->fromRoute('cars/params', [
+                    'action' => 'car-specifications-editor',
+                    'car_id' => $car->id
+                ]);
+
+                if ($isModerator) {
+                    $moderUrl = $this->url()->fromRoute('moder/cars/params', [
+                        'action' => 'car',
                         'car_id' => $car->id
                     ]);
-
-                    if ($isModerator) {
-                        $moderUrl = $this->url()->fromRoute('moder/cars/params', [
-                            'action' => 'car',
-                            'car_id' => $car->id
-                        ]);
-                    }
-                }
-            } elseif ($itemType->id == 3) {
-                $engine = $engines->find($row->item_id)->current();
-                if ($engine) {
-                    $objectName = $engine->caption;
-                    $editorUrl = $this->url()->fromRoute('cars/params', [
-                        'action'    => 'engine-spec-editor',
-                        'engine_id' => $engine->id
-                    ]);
-
-                    if ($isModerator) {
-                        $moderUrl = $this->url()->fromRoute('moder/engines/params', [
-                            'action'    => 'engine',
-                            'engine_id' => $engine->id
-                        ]);
-                    }
                 }
             }
 
@@ -655,7 +579,7 @@ class CarsController extends AbstractActionController
     public function cancelCarEngineAction()
     {
         if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
-            return $this->forward('forbidden', 'error');
+            return $this->forbiddenAction();
         }
 
         $carTable = new Vehicle();
@@ -667,7 +591,7 @@ class CarsController extends AbstractActionController
 
         $engine = $car->findParentRow(Engine::class);
         $car->engine_inherit = 0;
-        $car->engine_id = null;
+        $car->engine_item_id = null;
         $car->save();
 
         $carTable->updateInteritance($car);
@@ -678,7 +602,7 @@ class CarsController extends AbstractActionController
             $message = sprintf(
                 'У автомобиля %s убран двигатель (был %s)',
                 htmlspecialchars($this->car()->formatName($car, 'en')),
-                htmlspecialchars($engine->caption)
+                htmlspecialchars($engine->name)
             );
             $this->log($message, $car);
 
@@ -696,7 +620,7 @@ class CarsController extends AbstractActionController
                             $subscriber->language
                         ),
                         $this->userUrl($user, $uri),
-                        $engine->caption,
+                        $engine->name,
                         $this->car()->formatName($car, $subscriber->language),
                         $this->carModerUrl($car, $uri)
                     );
@@ -712,7 +636,7 @@ class CarsController extends AbstractActionController
     public function inheritCarEngineAction()
     {
         if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
-            return $this->forward('forbidden', 'error');
+            return $this->forbiddenAction();
         }
 
         $carTable = new Vehicle();
@@ -723,7 +647,7 @@ class CarsController extends AbstractActionController
         }
 
         if (! $car->engine_inherit) {
-            $car->engine_id = null;
+            $car->engine_item_id = null;
             $car->engine_inherit = 1;
             $car->save();
 
@@ -765,25 +689,28 @@ class CarsController extends AbstractActionController
 
     private function enginesWalkTree($parentId, $brandId)
     {
-        $engineTable = $this->getEngineTable();
-        $select = $engineTable->select(true)
-            ->order('engines.caption');
+        $itemTable = new Vehicle();
+        $select = $itemTable->select(true)
+            ->where('cars.item_type_id = ?', DbTable\Item\Type::ENGINE)
+            ->order('cars.name');
         if ($brandId) {
             $select
-                ->join('brand_engine', 'engines.id = brand_engine.engine_id', null)
-                ->where('brand_engine.brand_id = ?', $brandId);
+                ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brandId);
         }
         if ($parentId) {
-            $select->where('engines.parent_id = ?', $parentId);
+            $select
+                ->join('car_parent', 'cars.id = car_parent.car_id', null)
+                ->where('car_parent.parent_id = ?', $parentId);
         }
 
-        $rows = $engineTable->fetchAll($select);
+        $rows = $itemTable->fetchAll($select);
 
         $engines = [];
         foreach ($rows as $row) {
             $engines[] = [
                 'id'     => $row->id,
-                'name'   => $row->caption,
+                'name'   => $row->getNameData($this->language()),
                 'childs' => $this->enginesWalkTree($row->id, null)
             ];
         }
@@ -794,16 +721,19 @@ class CarsController extends AbstractActionController
     public function selectCarEngineAction()
     {
         if (! $this->user()->isAllowed('specifications', 'edit-engine')) {
-            return $this->forward('forbidden', 'error');
+            return $this->forbiddenAction();
         }
 
         if (! $this->user()->isAllowed('specifications', 'edit')) {
-            return $this->forward('index', 'login', 'default');
+            return $this->forbiddenAction();
         }
 
         $carTable = new Vehicle();
 
-        $car = $carTable->find($this->params('car_id'))->current();
+        $car = $carTable->fetchRow([
+            'id = ?'           => (int)$this->params('car_id'),
+            'item_type_id = ?' => DbTable\Item\Type::VEHICLE
+        ]);
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -829,9 +759,10 @@ class CarsController extends AbstractActionController
             ];
         }
 
-        $engineTable = $this->getEngineTable();
-
-        $engine = $engineTable->find($this->params()->fromPost('engine'))->current();
+        $engine = $carTable->fetchRow([
+            'id = ?'           => (int)$this->params()->fromPost('engine'),
+            'item_type_id = ?' => DbTable\Item\Type::ENGINE
+        ]);
         if (! $engine) {
             return [
                 'car'     => $car,
@@ -842,7 +773,7 @@ class CarsController extends AbstractActionController
         }
 
         $car->engine_inherit = 0;
-        $car->engine_id = $engine->id;
+        $car->engine_item_id = $engine->id;
         $car->save();
 
         $carTable->updateInteritance($car);
@@ -855,7 +786,7 @@ class CarsController extends AbstractActionController
         $message = sprintf(
             'Автомобилю %s назначен двигатель %s',
             htmlspecialchars($this->car()->formatName($car, 'en')),
-            htmlspecialchars($engine->caption)
+            htmlspecialchars($engine->name)
         );
         $this->log($message, $car);
 
@@ -866,7 +797,7 @@ class CarsController extends AbstractActionController
                 $message = sprintf(
                     $this->translate('pm/user-%s-set-vehicle-engine-%s-%s-%s', 'default', $subscriber->language),
                     $this->userUrl($user, $uri),
-                    $engine->caption,
+                    $engine->name,
                     $this->car()->formatName($car, $subscriber->language),
                     $this->carModerUrl($car, $uri)
                 );
@@ -881,7 +812,7 @@ class CarsController extends AbstractActionController
     public function refreshInheritanceAction()
     {
         if (! $this->user()->isAllowed('specifications', 'admin')) {
-            return $this->forward('forbidden', 'error');
+            return $this->forbiddenAction();
         }
 
         $carTable = new Vehicle();
@@ -901,7 +832,7 @@ class CarsController extends AbstractActionController
     public function editValueAction()
     {
         if (! $this->user()->isAllowed('specifications', 'edit')) {
-            return $this->forward('forbidden', 'error');
+            return $this->forbiddenAction();
         }
 
         $attrId = (int)$this->params('attr');

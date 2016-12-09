@@ -29,7 +29,7 @@
     <li>
         <?=$this->htmlA($this->url('factories/factory-cars', [
             'id' => $this->factory->id,
-        ]), $this->translate('factories/factory-cars')) ?>
+        ]), $this->translate('factories/factory-items')) ?>
     </li>
     <?php if ($this->canEdit) { ?>
         <li>
@@ -55,7 +55,7 @@
 <?php } ?>
 
 <?php if (count($this->carPictures) > 0) { ?>
-    <h3><?=$this->escapeHtml($this->translate('factories/factory-cars'))?></h3>
+    <h3><?=$this->escapeHtml($this->translate('factories/factory-items'))?></h3>
     <?php
         $items = $this->carPictures;
     ?>
@@ -70,7 +70,7 @@
                             'title'   => $item['name'],
                             'shuffle' => true
                         ]), false) ?>
-                        <div class="caption">
+                        <div class="name">
                             <p><?=$this->htmlA($item['url'], $item['name'])?></p>
                         </div>
                     </div>

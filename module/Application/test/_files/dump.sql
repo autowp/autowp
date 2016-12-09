@@ -1091,28 +1091,6 @@ CREATE TABLE `brand_language` (
 /*!40000 ALTER TABLE `brand_language` ENABLE KEYS */;
 
 --
--- Table structure for table `brand_link_types`
---
-
-DROP TABLE IF EXISTS `brand_link_types`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `brand_link_types` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  `position` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `brand_link_types`
---
-
-/*!40000 ALTER TABLE `brand_link_types` DISABLE KEYS */;
-/*!40000 ALTER TABLE `brand_link_types` ENABLE KEYS */;
-
---
 -- Table structure for table `brand_type_language`
 --
 
@@ -1198,13 +1176,13 @@ DROP TABLE IF EXISTS `brands`;
 CREATE TABLE `brands` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `folder` varchar(50) NOT NULL DEFAULT '',
-  `caption` varchar(50) NOT NULL DEFAULT '',
+  `name` varchar(50) NOT NULL DEFAULT '',
   `position` smallint(5) unsigned NOT NULL DEFAULT '0',
   `group_id` int(10) unsigned DEFAULT NULL,
   `type_id` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `activepictures_count` int(10) unsigned NOT NULL DEFAULT '0',
   `_description` mediumtext,
-  `full_caption` varchar(50) DEFAULT NULL,
+  `full_name` varchar(50) DEFAULT NULL,
   `engines_count` int(10) unsigned NOT NULL DEFAULT '0',
   `carpictures_count` int(10) unsigned NOT NULL DEFAULT '0',
   `enginepictures_count` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1226,8 +1204,8 @@ CREATE TABLE `brands` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_folder` (`folder`),
   KEY `group_id` (`group_id`),
-  KEY `position` (`position`,`caption`),
-  KEY `type_id` (`type_id`,`position`,`caption`),
+  KEY `position` (`position`,`name`),
+  KEY `type_id` (`type_id`,`position`,`name`),
   KEY `parent_brand_id` (`parent_brand_id`),
   KEY `text_id` (`text_id`),
   CONSTRAINT `brands_fk` FOREIGN KEY (`parent_brand_id`) REFERENCES `brands` (`id`),
@@ -1244,13 +1222,13 @@ INSERT INTO `brands` VALUES (1,'bmw','BMW',0,NULL,1,0,NULL,NULL,0,0,0,0,0,0,0,0,
 /*!40000 ALTER TABLE `brands` ENABLE KEYS */;
 
 --
--- Table structure for table `brands_cars`
+-- Table structure for table `brand_item`
 --
 
-DROP TABLE IF EXISTS `brands_cars`;
+DROP TABLE IF EXISTS `brand_item`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `brands_cars` (
+CREATE TABLE `brand_item` (
   `brand_id` int(10) unsigned NOT NULL DEFAULT '0',
   `car_id` int(10) unsigned NOT NULL DEFAULT '0',
   `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -1258,18 +1236,18 @@ CREATE TABLE `brands_cars` (
   PRIMARY KEY (`brand_id`,`car_id`),
   UNIQUE KEY `brand_id` (`brand_id`,`catname`),
   KEY `car_id` (`car_id`),
-  CONSTRAINT `brands_cars_ibfk_1` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`),
-  CONSTRAINT `brands_cars_ibfk_2` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`)
+  CONSTRAINT `brand_item_ibfk_1` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`),
+  CONSTRAINT `brand_item_ibfk_2` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB; (`car_id`)';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `brands_cars`
+-- Dumping data for table `brand_item`
 --
 
-/*!40000 ALTER TABLE `brands_cars` DISABLE KEYS */;
-INSERT INTO `brands_cars` VALUES (1,1,0,'first-car'),(1,2,0,'second-car'),(1,3,0,'test-car-3'),(1,4,0,'test-car-4'),(1,5,0,'test-car-5'),(1,6,0,'test-car-6'),(1,7,0,'test-car-7'),(1,8,0,'test-car-8'),(1,9,0,'test-car-9'),(1,10,0,'test-car-10'),(1,11,0,'test-car-11'),(1,12,0,'test-car-12'),(1,13,0,'test-car-13'),(1,14,0,'test-car-14'),(1,15,0,'test-car-15'),(1,16,0,'test-car-16'),(1,17,0,'test-car-17'),(1,18,0,'test-car-18'),(1,19,0,'test-car-19'),(1,20,0,'test-car-20'),(1,21,0,'test-car-21'),(1,22,0,'test-car-22'),(1,23,0,'test-car-23'),(1,24,0,'test-car-24'),(1,25,0,'test-car-25'),(1,26,0,'test-car-26'),(1,27,0,'test-car-27'),(1,28,0,'test-car-28'),(1,29,0,'test-car-29'),(1,30,0,'test-car-30'),(1,31,0,'test-car-31'),(1,32,0,'test-car-32'),(1,33,0,'test-car-33'),(1,34,0,'test-car-34'),(1,35,0,'test-car-35'),(1,36,0,'test-car-36'),(1,37,0,'test-car-37'),(1,38,0,'test-car-38'),(1,39,0,'test-car-39'),(1,40,0,'test-car-40'),(1,41,0,'test-car-41'),(1,42,0,'test-car-42'),(1,43,0,'test-car-43'),(1,44,0,'test-car-44'),(1,45,0,'test-car-45'),(1,46,0,'test-car-46'),(1,47,0,'test-car-47'),(1,48,0,'test-car-48'),(1,49,0,'test-car-49'),(1,50,0,'test-car-50'),(1,51,0,'test-car-51'),(1,52,0,'test-car-52'),(1,53,0,'test-car-53'),(1,54,0,'test-car-54'),(1,55,0,'test-car-55'),(1,56,0,'test-car-56'),(1,57,0,'test-car-57'),(1,58,0,'test-car-58'),(1,59,0,'test-car-59'),(1,60,0,'test-car-60'),(1,61,0,'test-car-61'),(1,62,0,'test-car-62'),(1,63,0,'test-car-63'),(1,64,0,'test-car-64'),(1,65,0,'test-car-65'),(1,66,0,'test-car-66'),(1,67,0,'test-car-67'),(1,68,0,'test-car-68'),(1,69,0,'test-car-69'),(1,70,0,'test-car-70'),(1,71,0,'test-car-71'),(1,72,0,'test-car-72'),(1,73,0,'test-car-73'),(1,74,0,'test-car-74'),(1,75,0,'test-car-75'),(1,76,0,'test-car-76'),(1,77,0,'test-car-77'),(1,78,0,'test-car-78'),(1,79,0,'test-car-79'),(1,80,0,'test-car-80'),(1,81,0,'test-car-81'),(1,82,0,'test-car-82'),(1,83,0,'test-car-83'),(1,84,0,'test-car-84'),(1,85,0,'test-car-85'),(1,86,0,'test-car-86'),(1,87,0,'test-car-87'),(1,88,0,'test-car-88'),(1,89,0,'test-car-89'),(1,90,0,'test-car-90'),(1,91,0,'test-car-91'),(1,92,0,'test-car-92'),(1,93,0,'test-car-93'),(1,94,0,'test-car-94'),(1,95,0,'test-car-95'),(1,96,0,'test-car-96'),(1,97,0,'test-car-97'),(1,98,0,'test-car-98'),(1,99,0,'test-car-99'),(1,100,0,'test-car-100'),(1,101,0,'test-car-101'),(1,102,0,'test-car-102'),(1,103,0,'test-car-103'),(1,104,0,'test-car-104'),(1,105,0,'test-car-105'),(1,106,0,'test-car-106'),(1,107,0,'test-car-107'),(1,108,0,'test-car-108'),(1,109,0,'test-car-109'),(1,110,0,'test-car-110'),(1,111,0,'test-car-111'),(1,112,0,'test-car-112'),(1,113,0,'test-car-113'),(1,114,0,'test-car-114'),(1,115,0,'test-car-115'),(1,116,0,'test-car-116'),(1,117,0,'test-car-117'),(1,118,0,'test-car-118'),(1,119,0,'test-car-119'),(1,120,0,'test-car-120'),(1,121,0,'test-car-121'),(1,122,0,'test-car-122'),(1,123,0,'test-car-123'),(1,124,0,'test-car-124'),(1,125,0,'test-car-125'),(1,126,0,'test-car-126'),(1,127,0,'test-car-127'),(1,128,0,'test-car-128'),(1,129,0,'test-car-129'),(1,130,0,'test-car-130'),(1,131,0,'test-car-131'),(1,132,0,'test-car-132'),(1,133,0,'test-car-133'),(1,134,0,'test-car-134'),(1,135,0,'test-car-135'),(1,136,0,'test-car-136'),(1,137,0,'test-car-137'),(1,138,0,'test-car-138'),(1,139,0,'test-car-139'),(1,140,0,'test-car-140'),(1,141,0,'test-car-141'),(1,142,0,'test-car-142'),(1,143,0,'test-car-143'),(1,144,0,'test-car-144'),(1,145,0,'test-car-145'),(1,146,0,'test-car-146'),(1,147,0,'test-car-147'),(1,148,0,'test-car-148'),(1,149,0,'test-car-149'),(1,150,0,'test-car-150'),(1,151,0,'test-car-151'),(1,152,0,'test-car-152'),(1,153,0,'test-car-153'),(1,154,0,'test-car-154'),(1,155,0,'test-car-155'),(1,156,0,'test-car-156'),(1,157,0,'test-car-157'),(1,158,0,'test-car-158'),(1,159,0,'test-car-159'),(1,160,0,'test-car-160'),(1,161,0,'test-car-161'),(1,162,0,'test-car-162'),(1,163,0,'test-car-163'),(1,164,0,'test-car-164'),(1,165,0,'test-car-165'),(1,166,0,'test-car-166'),(1,167,0,'test-car-167'),(1,168,0,'test-car-168'),(1,169,0,'test-car-169'),(1,170,0,'test-car-170'),(1,171,0,'test-car-171'),(1,172,0,'test-car-172'),(1,173,0,'test-car-173'),(1,174,0,'test-car-174'),(1,175,0,'test-car-175'),(1,176,0,'test-car-176'),(1,177,0,'test-car-177'),(1,178,0,'test-car-178'),(1,179,0,'test-car-179'),(1,180,0,'test-car-180'),(1,181,0,'test-car-181'),(1,182,0,'test-car-182'),(1,183,0,'test-car-183'),(1,184,0,'test-car-184'),(1,185,0,'test-car-185'),(1,186,0,'test-car-186'),(1,187,0,'test-car-187'),(1,188,0,'test-car-188'),(1,189,0,'test-car-189'),(1,190,0,'test-car-190'),(1,191,0,'test-car-191'),(1,192,0,'test-car-192'),(1,193,0,'test-car-193'),(1,194,0,'test-car-194'),(1,195,0,'test-car-195'),(1,196,0,'test-car-196'),(1,197,0,'test-car-197'),(1,198,0,'test-car-198'),(1,199,0,'test-car-199'),(1,200,0,'test-car-200'),(1,201,0,'test-car-201'),(1,202,0,'test-car-202'),(1,203,0,'test-car-203');
-/*!40000 ALTER TABLE `brands_cars` ENABLE KEYS */;
+/*!40000 ALTER TABLE `brand_item` DISABLE KEYS */;
+INSERT INTO `brand_item` VALUES (1,1,0,'first-car'),(1,2,0,'second-car'),(1,3,0,'test-car-3'),(1,4,0,'test-car-4'),(1,5,0,'test-car-5'),(1,6,0,'test-car-6'),(1,7,0,'test-car-7'),(1,8,0,'test-car-8'),(1,9,0,'test-car-9'),(1,10,0,'test-car-10'),(1,11,0,'test-car-11'),(1,12,0,'test-car-12'),(1,13,0,'test-car-13'),(1,14,0,'test-car-14'),(1,15,0,'test-car-15'),(1,16,0,'test-car-16'),(1,17,0,'test-car-17'),(1,18,0,'test-car-18'),(1,19,0,'test-car-19'),(1,20,0,'test-car-20'),(1,21,0,'test-car-21'),(1,22,0,'test-car-22'),(1,23,0,'test-car-23'),(1,24,0,'test-car-24'),(1,25,0,'test-car-25'),(1,26,0,'test-car-26'),(1,27,0,'test-car-27'),(1,28,0,'test-car-28'),(1,29,0,'test-car-29'),(1,30,0,'test-car-30'),(1,31,0,'test-car-31'),(1,32,0,'test-car-32'),(1,33,0,'test-car-33'),(1,34,0,'test-car-34'),(1,35,0,'test-car-35'),(1,36,0,'test-car-36'),(1,37,0,'test-car-37'),(1,38,0,'test-car-38'),(1,39,0,'test-car-39'),(1,40,0,'test-car-40'),(1,41,0,'test-car-41'),(1,42,0,'test-car-42'),(1,43,0,'test-car-43'),(1,44,0,'test-car-44'),(1,45,0,'test-car-45'),(1,46,0,'test-car-46'),(1,47,0,'test-car-47'),(1,48,0,'test-car-48'),(1,49,0,'test-car-49'),(1,50,0,'test-car-50'),(1,51,0,'test-car-51'),(1,52,0,'test-car-52'),(1,53,0,'test-car-53'),(1,54,0,'test-car-54'),(1,55,0,'test-car-55'),(1,56,0,'test-car-56'),(1,57,0,'test-car-57'),(1,58,0,'test-car-58'),(1,59,0,'test-car-59'),(1,60,0,'test-car-60'),(1,61,0,'test-car-61'),(1,62,0,'test-car-62'),(1,63,0,'test-car-63'),(1,64,0,'test-car-64'),(1,65,0,'test-car-65'),(1,66,0,'test-car-66'),(1,67,0,'test-car-67'),(1,68,0,'test-car-68'),(1,69,0,'test-car-69'),(1,70,0,'test-car-70'),(1,71,0,'test-car-71'),(1,72,0,'test-car-72'),(1,73,0,'test-car-73'),(1,74,0,'test-car-74'),(1,75,0,'test-car-75'),(1,76,0,'test-car-76'),(1,77,0,'test-car-77'),(1,78,0,'test-car-78'),(1,79,0,'test-car-79'),(1,80,0,'test-car-80'),(1,81,0,'test-car-81'),(1,82,0,'test-car-82'),(1,83,0,'test-car-83'),(1,84,0,'test-car-84'),(1,85,0,'test-car-85'),(1,86,0,'test-car-86'),(1,87,0,'test-car-87'),(1,88,0,'test-car-88'),(1,89,0,'test-car-89'),(1,90,0,'test-car-90'),(1,91,0,'test-car-91'),(1,92,0,'test-car-92'),(1,93,0,'test-car-93'),(1,94,0,'test-car-94'),(1,95,0,'test-car-95'),(1,96,0,'test-car-96'),(1,97,0,'test-car-97'),(1,98,0,'test-car-98'),(1,99,0,'test-car-99'),(1,100,0,'test-car-100'),(1,101,0,'test-car-101'),(1,102,0,'test-car-102'),(1,103,0,'test-car-103'),(1,104,0,'test-car-104'),(1,105,0,'test-car-105'),(1,106,0,'test-car-106'),(1,107,0,'test-car-107'),(1,108,0,'test-car-108'),(1,109,0,'test-car-109'),(1,110,0,'test-car-110'),(1,111,0,'test-car-111'),(1,112,0,'test-car-112'),(1,113,0,'test-car-113'),(1,114,0,'test-car-114'),(1,115,0,'test-car-115'),(1,116,0,'test-car-116'),(1,117,0,'test-car-117'),(1,118,0,'test-car-118'),(1,119,0,'test-car-119'),(1,120,0,'test-car-120'),(1,121,0,'test-car-121'),(1,122,0,'test-car-122'),(1,123,0,'test-car-123'),(1,124,0,'test-car-124'),(1,125,0,'test-car-125'),(1,126,0,'test-car-126'),(1,127,0,'test-car-127'),(1,128,0,'test-car-128'),(1,129,0,'test-car-129'),(1,130,0,'test-car-130'),(1,131,0,'test-car-131'),(1,132,0,'test-car-132'),(1,133,0,'test-car-133'),(1,134,0,'test-car-134'),(1,135,0,'test-car-135'),(1,136,0,'test-car-136'),(1,137,0,'test-car-137'),(1,138,0,'test-car-138'),(1,139,0,'test-car-139'),(1,140,0,'test-car-140'),(1,141,0,'test-car-141'),(1,142,0,'test-car-142'),(1,143,0,'test-car-143'),(1,144,0,'test-car-144'),(1,145,0,'test-car-145'),(1,146,0,'test-car-146'),(1,147,0,'test-car-147'),(1,148,0,'test-car-148'),(1,149,0,'test-car-149'),(1,150,0,'test-car-150'),(1,151,0,'test-car-151'),(1,152,0,'test-car-152'),(1,153,0,'test-car-153'),(1,154,0,'test-car-154'),(1,155,0,'test-car-155'),(1,156,0,'test-car-156'),(1,157,0,'test-car-157'),(1,158,0,'test-car-158'),(1,159,0,'test-car-159'),(1,160,0,'test-car-160'),(1,161,0,'test-car-161'),(1,162,0,'test-car-162'),(1,163,0,'test-car-163'),(1,164,0,'test-car-164'),(1,165,0,'test-car-165'),(1,166,0,'test-car-166'),(1,167,0,'test-car-167'),(1,168,0,'test-car-168'),(1,169,0,'test-car-169'),(1,170,0,'test-car-170'),(1,171,0,'test-car-171'),(1,172,0,'test-car-172'),(1,173,0,'test-car-173'),(1,174,0,'test-car-174'),(1,175,0,'test-car-175'),(1,176,0,'test-car-176'),(1,177,0,'test-car-177'),(1,178,0,'test-car-178'),(1,179,0,'test-car-179'),(1,180,0,'test-car-180'),(1,181,0,'test-car-181'),(1,182,0,'test-car-182'),(1,183,0,'test-car-183'),(1,184,0,'test-car-184'),(1,185,0,'test-car-185'),(1,186,0,'test-car-186'),(1,187,0,'test-car-187'),(1,188,0,'test-car-188'),(1,189,0,'test-car-189'),(1,190,0,'test-car-190'),(1,191,0,'test-car-191'),(1,192,0,'test-car-192'),(1,193,0,'test-car-193'),(1,194,0,'test-car-194'),(1,195,0,'test-car-195'),(1,196,0,'test-car-196'),(1,197,0,'test-car-197'),(1,198,0,'test-car-198'),(1,199,0,'test-car-199'),(1,200,0,'test-car-200'),(1,201,0,'test-car-201'),(1,202,0,'test-car-202'),(1,203,0,'test-car-203');
+/*!40000 ALTER TABLE `brand_item` ENABLE KEYS */;
 
 --
 -- Table structure for table `brands_pictures_cache`
@@ -1349,33 +1327,33 @@ CREATE TABLE `car_parent` (
 /*!40000 ALTER TABLE `car_parent` ENABLE KEYS */;
 
 --
--- Table structure for table `car_parent_cache`
+-- Table structure for table `item_parent_cache`
 --
 
-DROP TABLE IF EXISTS `car_parent_cache`;
+DROP TABLE IF EXISTS `item_parent_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `car_parent_cache` (
-  `car_id` int(10) unsigned NOT NULL,
+CREATE TABLE `item_parent_cache` (
+  `item_id` int(10) unsigned NOT NULL,
   `parent_id` int(10) unsigned NOT NULL,
   `diff` int(11) NOT NULL DEFAULT '0',
   `tuning` tinyint(4) NOT NULL DEFAULT '0',
   `sport` tinyint(4) NOT NULL DEFAULT '0',
   `design` tinyint(4) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`car_id`,`parent_id`),
+  PRIMARY KEY (`item_id`,`parent_id`),
   KEY `parent_id` (`parent_id`),
-  CONSTRAINT `car_parent_cache_ibfk_1` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `car_parent_cache_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE
+  CONSTRAINT `item_parent_cache_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `item_parent_cache_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `car_parent_cache`
+-- Dumping data for table `item_parent_cache`
 --
 
-/*!40000 ALTER TABLE `car_parent_cache` DISABLE KEYS */;
-INSERT INTO `car_parent_cache` VALUES (1,1,0,0,0,0),(2,2,0,0,0,0),(3,3,0,0,0,0),(4,4,0,0,0,0),(5,5,0,0,0,0),(6,6,0,0,0,0),(7,7,0,0,0,0),(8,8,0,0,0,0),(9,9,0,0,0,0),(10,10,0,0,0,0),(11,11,0,0,0,0),(12,12,0,0,0,0),(13,13,0,0,0,0),(14,14,0,0,0,0),(15,15,0,0,0,0),(16,16,0,0,0,0),(17,17,0,0,0,0),(18,18,0,0,0,0),(19,19,0,0,0,0),(20,20,0,0,0,0),(21,21,0,0,0,0),(22,22,0,0,0,0),(23,23,0,0,0,0),(24,24,0,0,0,0),(25,25,0,0,0,0),(26,26,0,0,0,0),(27,27,0,0,0,0),(28,28,0,0,0,0),(29,29,0,0,0,0),(30,30,0,0,0,0),(31,31,0,0,0,0),(32,32,0,0,0,0),(33,33,0,0,0,0),(34,34,0,0,0,0),(35,35,0,0,0,0),(36,36,0,0,0,0),(37,37,0,0,0,0),(38,38,0,0,0,0),(39,39,0,0,0,0),(40,40,0,0,0,0),(41,41,0,0,0,0),(42,42,0,0,0,0),(43,43,0,0,0,0),(44,44,0,0,0,0),(45,45,0,0,0,0),(46,46,0,0,0,0),(47,47,0,0,0,0),(48,48,0,0,0,0),(49,49,0,0,0,0),(50,50,0,0,0,0),(51,51,0,0,0,0),(52,52,0,0,0,0),(53,53,0,0,0,0),(54,54,0,0,0,0),(55,55,0,0,0,0),(56,56,0,0,0,0),(57,57,0,0,0,0),(58,58,0,0,0,0),(59,59,0,0,0,0),(60,60,0,0,0,0),(61,61,0,0,0,0),(62,62,0,0,0,0),(63,63,0,0,0,0),(64,64,0,0,0,0),(65,65,0,0,0,0),(66,66,0,0,0,0),(67,67,0,0,0,0),(68,68,0,0,0,0),(69,69,0,0,0,0),(70,70,0,0,0,0),(71,71,0,0,0,0),(72,72,0,0,0,0),(73,73,0,0,0,0),(74,74,0,0,0,0),(75,75,0,0,0,0),(76,76,0,0,0,0),(77,77,0,0,0,0),(78,78,0,0,0,0),(79,79,0,0,0,0),(80,80,0,0,0,0),(81,81,0,0,0,0),(82,82,0,0,0,0),(83,83,0,0,0,0),(84,84,0,0,0,0),(85,85,0,0,0,0),(86,86,0,0,0,0),(87,87,0,0,0,0),(88,88,0,0,0,0),(89,89,0,0,0,0),(90,90,0,0,0,0),(91,91,0,0,0,0),(92,92,0,0,0,0),(93,93,0,0,0,0),(94,94,0,0,0,0),(95,95,0,0,0,0),(96,96,0,0,0,0),(97,97,0,0,0,0),(98,98,0,0,0,0),(99,99,0,0,0,0),(100,100,0,0,0,0),(101,101,0,0,0,0),(102,102,0,0,0,0),(103,103,0,0,0,0),(104,104,0,0,0,0),(105,105,0,0,0,0),(106,106,0,0,0,0),(107,107,0,0,0,0),(108,108,0,0,0,0),(109,109,0,0,0,0),(110,110,0,0,0,0),(111,111,0,0,0,0),(112,112,0,0,0,0),(113,113,0,0,0,0),(114,114,0,0,0,0),(115,115,0,0,0,0),(116,116,0,0,0,0),(117,117,0,0,0,0),(118,118,0,0,0,0),(119,119,0,0,0,0),(120,120,0,0,0,0),(121,121,0,0,0,0),(122,122,0,0,0,0),(123,123,0,0,0,0),(124,124,0,0,0,0),(125,125,0,0,0,0),(126,126,0,0,0,0),(127,127,0,0,0,0),(128,128,0,0,0,0),(129,129,0,0,0,0),(130,130,0,0,0,0),(131,131,0,0,0,0),(132,132,0,0,0,0),(133,133,0,0,0,0),(134,134,0,0,0,0),(135,135,0,0,0,0),(136,136,0,0,0,0),(137,137,0,0,0,0),(138,138,0,0,0,0),(139,139,0,0,0,0),(140,140,0,0,0,0),(141,141,0,0,0,0),(142,142,0,0,0,0),(143,143,0,0,0,0),(144,144,0,0,0,0),(145,145,0,0,0,0),(146,146,0,0,0,0),(147,147,0,0,0,0),(148,148,0,0,0,0),(149,149,0,0,0,0),(150,150,0,0,0,0),(151,151,0,0,0,0),(152,152,0,0,0,0),(153,153,0,0,0,0),(154,154,0,0,0,0),(155,155,0,0,0,0),(156,156,0,0,0,0),(157,157,0,0,0,0),(158,158,0,0,0,0),(159,159,0,0,0,0),(160,160,0,0,0,0),(161,161,0,0,0,0),(162,162,0,0,0,0),(163,163,0,0,0,0),(164,164,0,0,0,0),(165,165,0,0,0,0),(166,166,0,0,0,0),(167,167,0,0,0,0),(168,168,0,0,0,0),(169,169,0,0,0,0),(170,170,0,0,0,0),(171,171,0,0,0,0),(172,172,0,0,0,0),(173,173,0,0,0,0),(174,174,0,0,0,0),(175,175,0,0,0,0),(176,176,0,0,0,0),(177,177,0,0,0,0),(178,178,0,0,0,0),(179,179,0,0,0,0),(180,180,0,0,0,0),(181,181,0,0,0,0),(182,182,0,0,0,0),(183,183,0,0,0,0),(184,184,0,0,0,0),(185,185,0,0,0,0),(186,186,0,0,0,0),(187,187,0,0,0,0),(188,188,0,0,0,0),(189,189,0,0,0,0),(190,190,0,0,0,0),(191,191,0,0,0,0),(192,192,0,0,0,0),(193,193,0,0,0,0),(194,194,0,0,0,0),(195,195,0,0,0,0),(196,196,0,0,0,0),(197,197,0,0,0,0),(198,198,0,0,0,0),(199,199,0,0,0,0),(200,200,0,0,0,0),(201,201,0,0,0,0),(202,202,0,0,0,0),(203,203,0,0,0,0);
-/*!40000 ALTER TABLE `car_parent_cache` ENABLE KEYS */;
+/*!40000 ALTER TABLE `item_parent_cache` DISABLE KEYS */;
+INSERT INTO `item_parent_cache` VALUES (1,1,0,0,0,0),(2,2,0,0,0,0),(3,3,0,0,0,0),(4,4,0,0,0,0),(5,5,0,0,0,0),(6,6,0,0,0,0),(7,7,0,0,0,0),(8,8,0,0,0,0),(9,9,0,0,0,0),(10,10,0,0,0,0),(11,11,0,0,0,0),(12,12,0,0,0,0),(13,13,0,0,0,0),(14,14,0,0,0,0),(15,15,0,0,0,0),(16,16,0,0,0,0),(17,17,0,0,0,0),(18,18,0,0,0,0),(19,19,0,0,0,0),(20,20,0,0,0,0),(21,21,0,0,0,0),(22,22,0,0,0,0),(23,23,0,0,0,0),(24,24,0,0,0,0),(25,25,0,0,0,0),(26,26,0,0,0,0),(27,27,0,0,0,0),(28,28,0,0,0,0),(29,29,0,0,0,0),(30,30,0,0,0,0),(31,31,0,0,0,0),(32,32,0,0,0,0),(33,33,0,0,0,0),(34,34,0,0,0,0),(35,35,0,0,0,0),(36,36,0,0,0,0),(37,37,0,0,0,0),(38,38,0,0,0,0),(39,39,0,0,0,0),(40,40,0,0,0,0),(41,41,0,0,0,0),(42,42,0,0,0,0),(43,43,0,0,0,0),(44,44,0,0,0,0),(45,45,0,0,0,0),(46,46,0,0,0,0),(47,47,0,0,0,0),(48,48,0,0,0,0),(49,49,0,0,0,0),(50,50,0,0,0,0),(51,51,0,0,0,0),(52,52,0,0,0,0),(53,53,0,0,0,0),(54,54,0,0,0,0),(55,55,0,0,0,0),(56,56,0,0,0,0),(57,57,0,0,0,0),(58,58,0,0,0,0),(59,59,0,0,0,0),(60,60,0,0,0,0),(61,61,0,0,0,0),(62,62,0,0,0,0),(63,63,0,0,0,0),(64,64,0,0,0,0),(65,65,0,0,0,0),(66,66,0,0,0,0),(67,67,0,0,0,0),(68,68,0,0,0,0),(69,69,0,0,0,0),(70,70,0,0,0,0),(71,71,0,0,0,0),(72,72,0,0,0,0),(73,73,0,0,0,0),(74,74,0,0,0,0),(75,75,0,0,0,0),(76,76,0,0,0,0),(77,77,0,0,0,0),(78,78,0,0,0,0),(79,79,0,0,0,0),(80,80,0,0,0,0),(81,81,0,0,0,0),(82,82,0,0,0,0),(83,83,0,0,0,0),(84,84,0,0,0,0),(85,85,0,0,0,0),(86,86,0,0,0,0),(87,87,0,0,0,0),(88,88,0,0,0,0),(89,89,0,0,0,0),(90,90,0,0,0,0),(91,91,0,0,0,0),(92,92,0,0,0,0),(93,93,0,0,0,0),(94,94,0,0,0,0),(95,95,0,0,0,0),(96,96,0,0,0,0),(97,97,0,0,0,0),(98,98,0,0,0,0),(99,99,0,0,0,0),(100,100,0,0,0,0),(101,101,0,0,0,0),(102,102,0,0,0,0),(103,103,0,0,0,0),(104,104,0,0,0,0),(105,105,0,0,0,0),(106,106,0,0,0,0),(107,107,0,0,0,0),(108,108,0,0,0,0),(109,109,0,0,0,0),(110,110,0,0,0,0),(111,111,0,0,0,0),(112,112,0,0,0,0),(113,113,0,0,0,0),(114,114,0,0,0,0),(115,115,0,0,0,0),(116,116,0,0,0,0),(117,117,0,0,0,0),(118,118,0,0,0,0),(119,119,0,0,0,0),(120,120,0,0,0,0),(121,121,0,0,0,0),(122,122,0,0,0,0),(123,123,0,0,0,0),(124,124,0,0,0,0),(125,125,0,0,0,0),(126,126,0,0,0,0),(127,127,0,0,0,0),(128,128,0,0,0,0),(129,129,0,0,0,0),(130,130,0,0,0,0),(131,131,0,0,0,0),(132,132,0,0,0,0),(133,133,0,0,0,0),(134,134,0,0,0,0),(135,135,0,0,0,0),(136,136,0,0,0,0),(137,137,0,0,0,0),(138,138,0,0,0,0),(139,139,0,0,0,0),(140,140,0,0,0,0),(141,141,0,0,0,0),(142,142,0,0,0,0),(143,143,0,0,0,0),(144,144,0,0,0,0),(145,145,0,0,0,0),(146,146,0,0,0,0),(147,147,0,0,0,0),(148,148,0,0,0,0),(149,149,0,0,0,0),(150,150,0,0,0,0),(151,151,0,0,0,0),(152,152,0,0,0,0),(153,153,0,0,0,0),(154,154,0,0,0,0),(155,155,0,0,0,0),(156,156,0,0,0,0),(157,157,0,0,0,0),(158,158,0,0,0,0),(159,159,0,0,0,0),(160,160,0,0,0,0),(161,161,0,0,0,0),(162,162,0,0,0,0),(163,163,0,0,0,0),(164,164,0,0,0,0),(165,165,0,0,0,0),(166,166,0,0,0,0),(167,167,0,0,0,0),(168,168,0,0,0,0),(169,169,0,0,0,0),(170,170,0,0,0,0),(171,171,0,0,0,0),(172,172,0,0,0,0),(173,173,0,0,0,0),(174,174,0,0,0,0),(175,175,0,0,0,0),(176,176,0,0,0,0),(177,177,0,0,0,0),(178,178,0,0,0,0),(179,179,0,0,0,0),(180,180,0,0,0,0),(181,181,0,0,0,0),(182,182,0,0,0,0),(183,183,0,0,0,0),(184,184,0,0,0,0),(185,185,0,0,0,0),(186,186,0,0,0,0),(187,187,0,0,0,0),(188,188,0,0,0,0),(189,189,0,0,0,0),(190,190,0,0,0,0),(191,191,0,0,0,0),(192,192,0,0,0,0),(193,193,0,0,0,0),(194,194,0,0,0,0),(195,195,0,0,0,0),(196,196,0,0,0,0),(197,197,0,0,0,0),(198,198,0,0,0,0),(199,199,0,0,0,0),(200,200,0,0,0,0),(201,201,0,0,0,0),(202,202,0,0,0,0),(203,203,0,0,0,0);
+/*!40000 ALTER TABLE `item_parent_cache` ENABLE KEYS */;
 
 --
 -- Table structure for table `car_type_language`
@@ -1464,7 +1442,7 @@ DROP TABLE IF EXISTS `cars`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cars` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `caption` varchar(255) NOT NULL DEFAULT '',
+  `name` varchar(255) NOT NULL DEFAULT '',
   `begin_year` smallint(5) unsigned DEFAULT NULL,
   `end_year` smallint(5) unsigned DEFAULT NULL,
   `body` varchar(15) NOT NULL,
@@ -1491,8 +1469,8 @@ CREATE TABLE `cars` (
   `text_id` int(11) DEFAULT NULL,
   `full_text_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `caption` (`caption`,`begin_year`,`body`,`end_year`,`begin_model_year`,`end_model_year`,`is_group`),
-  KEY `fullCaptionOrder` (`caption`,`body`,`begin_year`,`end_year`),
+  UNIQUE KEY `name` (`name`,`begin_year`,`body`,`end_year`,`begin_model_year`,`end_model_year`,`is_group`),
+  KEY `fullCaptionOrder` (`name`,`body`,`begin_year`,`end_year`),
   KEY `primary_and_sorting` (`id`,`begin_order_cache`),
   KEY `engine_id` (`engine_id`),
   KEY `spec_id` (`spec_id`),
@@ -1547,7 +1525,6 @@ CREATE TABLE `category` (
   `name` varchar(50) NOT NULL,
   `short_name` varchar(50) NOT NULL,
   `catname` varchar(35) NOT NULL,
-  `split_by_brand` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `catname` (`catname`),
@@ -1563,33 +1540,33 @@ CREATE TABLE `category` (
 /*!40000 ALTER TABLE `category` ENABLE KEYS */;
 
 --
--- Table structure for table `category_car`
+-- Table structure for table `category_item`
 --
 
-DROP TABLE IF EXISTS `category_car`;
+DROP TABLE IF EXISTS `category_item`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `category_car` (
+CREATE TABLE `category_item` (
   `category_id` int(10) unsigned NOT NULL,
-  `car_id` int(10) unsigned NOT NULL,
+  `item_id` int(10) unsigned NOT NULL,
   `add_datetime` timestamp NULL DEFAULT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`category_id`,`car_id`),
-  KEY `car_id` (`car_id`),
+  PRIMARY KEY (`category_id`,`item_id`),
+  KEY `car_id` (`item_id`),
   KEY `category_id` (`category_id`,`add_datetime`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `category_car_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `category_car_ibfk_2` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `category_car_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+  CONSTRAINT `category_item_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `category_item_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `category_item_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `category_car`
+-- Dumping data for table `category_item`
 --
 
-/*!40000 ALTER TABLE `category_car` DISABLE KEYS */;
-/*!40000 ALTER TABLE `category_car` ENABLE KEYS */;
+/*!40000 ALTER TABLE `category_item` DISABLE KEYS */;
+/*!40000 ALTER TABLE `category_item` ENABLE KEYS */;
 
 --
 -- Table structure for table `category_language`
@@ -1907,7 +1884,7 @@ DROP TABLE IF EXISTS `engines`;
 CREATE TABLE `engines` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned DEFAULT NULL,
-  `caption` varchar(100) NOT NULL,
+  `name` varchar(100) NOT NULL,
   `owner_id` int(10) unsigned NOT NULL DEFAULT '0',
   `last_editor_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -1956,29 +1933,29 @@ INSERT INTO `factory` VALUES (1,'Test factory',1999,2005,NULL,NULL);
 /*!40000 ALTER TABLE `factory` ENABLE KEYS */;
 
 --
--- Table structure for table `factory_car`
+-- Table structure for table `factory_item`
 --
 
-DROP TABLE IF EXISTS `factory_car`;
+DROP TABLE IF EXISTS `factory_item`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `factory_car` (
+CREATE TABLE `factory_item` (
   `factory_id` int(10) unsigned NOT NULL,
-  `car_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`factory_id`,`car_id`),
-  KEY `car_id` (`car_id`),
-  CONSTRAINT `factory_car_ibfk_1` FOREIGN KEY (`factory_id`) REFERENCES `factory` (`id`),
-  CONSTRAINT `factory_car_ibfk_2` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`)
+  `item_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`factory_id`,`item_id`),
+  KEY `item_id` (`item_id`),
+  CONSTRAINT `factory_item_ibfk_1` FOREIGN KEY (`factory_id`) REFERENCES `factory` (`id`),
+  CONSTRAINT `factory_item_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `cars` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `factory_car`
+-- Dumping data for table `factory_item`
 --
 
-/*!40000 ALTER TABLE `factory_car` DISABLE KEYS */;
-INSERT INTO `factory_car` VALUES (1,1);
-/*!40000 ALTER TABLE `factory_car` ENABLE KEYS */;
+/*!40000 ALTER TABLE `factory_item` DISABLE KEYS */;
+INSERT INTO `factory_item` VALUES (1,1);
+/*!40000 ALTER TABLE `factory_item` ENABLE KEYS */;
 
 --
 -- Table structure for table `formated_image`
@@ -2040,7 +2017,7 @@ CREATE TABLE `forums_themes` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned DEFAULT NULL,
   `folder` varchar(30) NOT NULL DEFAULT '',
-  `caption` varchar(50) NOT NULL DEFAULT '',
+  `name` varchar(50) NOT NULL DEFAULT '',
   `position` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `description` tinytext NOT NULL,
   `topics` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2049,7 +2026,7 @@ CREATE TABLE `forums_themes` (
   `disable_topics` tinyint(4) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `folder` (`folder`),
-  UNIQUE KEY `caption` (`caption`),
+  UNIQUE KEY `caption` (`name`),
   KEY `parent_id` (`parent_id`),
   CONSTRAINT `FK_forums_themes_forums_themes_id` FOREIGN KEY (`parent_id`) REFERENCES `forums_themes` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=1170 COMMENT='InnoDB free: 125952 kB';
@@ -2073,7 +2050,7 @@ DROP TABLE IF EXISTS `forums_topics`;
 CREATE TABLE `forums_topics` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `theme_id` int(11) unsigned DEFAULT '0',
-  `caption` varchar(100) NOT NULL DEFAULT '',
+  `name` varchar(100) NOT NULL DEFAULT '',
   `author_id` int(10) unsigned NOT NULL DEFAULT '0',
   `add_datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `_messages` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2296,8 +2273,8 @@ CREATE TABLE `links` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `type` enum('default','official','helper','club') NOT NULL DEFAULT 'default' COMMENT 'Г’ГЁГЇ',
   `brandId` int(10) unsigned NOT NULL DEFAULT '0',
-  `url` varchar(100) NOT NULL COMMENT 'Г Г¤Г°ГҐГ±',
-  `caption` varchar(250) NOT NULL COMMENT 'ГЌГ Г§ГўГ Г­ГЁГҐ',
+  `url` varchar(100) NOT NULL COMMENT 'Г Г¤Г°ГҐГ±',
+  `name` varchar(250) NOT NULL COMMENT 'ГЌГ Г§ГўГ Г­ГЁГҐ',
   PRIMARY KEY (`id`),
   KEY `brand_id` (`brandId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1040 DEFAULT CHARSET=utf8;
@@ -3883,29 +3860,6 @@ CREATE TABLE `referrers` (
 /*!40000 ALTER TABLE `referrers` ENABLE KEYS */;
 
 --
--- Table structure for table `see_also`
---
-
-DROP TABLE IF EXISTS `see_also`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `see_also` (
-  `from_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `from_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `to_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `to_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`from_id`,`from_type`,`to_id`,`to_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `see_also`
---
-
-/*!40000 ALTER TABLE `see_also` DISABLE KEYS */;
-/*!40000 ALTER TABLE `see_also` ENABLE KEYS */;
-
---
 -- Table structure for table `session`
 --
 
@@ -4209,28 +4163,28 @@ CREATE TABLE `user_authority` (
 /*!40000 ALTER TABLE `user_authority` ENABLE KEYS */;
 
 --
--- Table structure for table `user_car_subscribe`
+-- Table structure for table `user_item_subscribe`
 --
 
-DROP TABLE IF EXISTS `user_car_subscribe`;
+DROP TABLE IF EXISTS `user_item_subscribe`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_car_subscribe` (
+CREATE TABLE `user_item_subscribe` (
   `user_id` int(10) unsigned NOT NULL,
-  `car_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`user_id`,`car_id`),
-  KEY `car_id_index` (`car_id`),
-  CONSTRAINT `user_car_subscribe_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `user_car_subscribe_ibfk_2` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE
+  `item_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`user_id`,`item_id`),
+  KEY `item_id_index` (`item_id`),
+  CONSTRAINT `user_item_subscribe_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `user_item_subscribe_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_car_subscribe`
+-- Dumping data for table `user_item_subscribe`
 --
 
-/*!40000 ALTER TABLE `user_car_subscribe` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_car_subscribe` ENABLE KEYS */;
+/*!40000 ALTER TABLE `user_item_subscribe` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_item_subscribe` ENABLE KEYS */;
 
 --
 -- Table structure for table `user_password_remind`

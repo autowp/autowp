@@ -135,19 +135,20 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => null
+                    'type'  => 1,
+                    'items' => []
                 ],
-                'Unsorted car',
-                'Unsorted car'
+                'Unsorted vehicle',
+                'Unsorted vehicle'
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name' => 'BMW 3 Series'
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series'
+                        ]
                     ]
                 ],
                 'BMW 3 Series',
@@ -155,10 +156,12 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => 'Under the hood',
-                    'car'         => [
-                        'name' => 'BMW 3 Series'
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => 'Under the hood',
+                            'name'        => 'BMW 3 Series'
+                        ]
                     ]
                 ],
                 'Under the hood BMW 3 Series',
@@ -166,11 +169,13 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name' => 'BMW 3 Series',
-                        'body' => 'E46'
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'body'        => 'E46'
+                        ]
                     ]
                 ],
                 'BMW 3 Series (E46)',
@@ -178,12 +183,14 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name' => 'BMW 3 Series',
-                        'body' => 'E46',
-                        'spec' => 'UK-spec'
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'body'        => 'E46',
+                            'spec'        => 'UK-spec'
+                        ]
                     ]
                 ],
                 'BMW 3 Series UK-spec (E46)',
@@ -191,13 +198,15 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'             => 'BMW 3 Series',
-                        'body'             => 'E46',
-                        'spec'             => 'UK-spec',
-                        'begin_model_year' => '1999'
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective'      => null,
+                            'name'             => 'BMW 3 Series',
+                            'body'             => 'E46',
+                            'spec'             => 'UK-spec',
+                            'begin_model_year' => '1999'
+                        ]
                     ]
                 ],
                 '1999–?? BMW 3 Series UK-spec (E46)',
@@ -205,13 +214,15 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'             => 'BMW 3 Series',
-                        'body'             => 'E46',
-                        'spec'             => 'UK-spec',
-                        'end_model_year'   => '1999'
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective'    => null,
+                            'name'           => 'BMW 3 Series',
+                            'body'           => 'E46',
+                            'spec'           => 'UK-spec',
+                            'end_model_year' => '1999'
+                        ]
                     ]
                 ],
                 '????–1999 BMW 3 Series UK-spec (E46)',
@@ -219,14 +230,16 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'             => 'BMW 3 Series',
-                        'body'             => 'E46',
-                        'spec'             => 'UK-spec',
-                        'begin_model_year' => '1999',
-                        'today'            => true
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective'      => null,
+                            'name'             => 'BMW 3 Series',
+                            'body'             => 'E46',
+                            'spec'             => 'UK-spec',
+                            'begin_model_year' => '1999',
+                            'today'            => true
+                        ]
                     ]
                 ],
                 '1999–pr. BMW 3 Series UK-spec (E46)',
@@ -234,14 +247,16 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'             => 'BMW 3 Series',
-                        'body'             => 'E46',
-                        'spec'             => 'UK-spec',
-                        'end_model_year'   => '1999',
-                        'today'            => true
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective'    => null,
+                            'name'           => 'BMW 3 Series',
+                            'body'           => 'E46',
+                            'spec'           => 'UK-spec',
+                            'end_model_year' => '1999',
+                            'today'          => true
+                        ]
                     ]
                 ],
                 '????–1999 BMW 3 Series UK-spec (E46)',
@@ -249,14 +264,16 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'             => 'BMW 3 Series',
-                        'body'             => 'E46',
-                        'spec'             => 'UK-spec',
-                        'begin_model_year' => date('Y'),
-                        'today'            => true
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective'      => null,
+                            'name'             => 'BMW 3 Series',
+                            'body'             => 'E46',
+                            'spec'             => 'UK-spec',
+                            'begin_model_year' => date('Y'),
+                            'today'            => true
+                        ]
                     ]
                 ],
                 date('Y') . ' BMW 3 Series UK-spec (E46)',
@@ -264,13 +281,15 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'       => 'BMW 3 Series',
-                        'body'       => 'E46',
-                        'spec'       => 'UK-spec',
-                        'begin_year' => 1999
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'body'        => 'E46',
+                            'spec'        => 'UK-spec',
+                            'begin_year'  => 1999
+                        ]
                     ]
                 ],
                 "BMW 3 Series UK-spec (E46) '1999–????",
@@ -278,14 +297,16 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'       => 'BMW 3 Series',
-                        'body'       => 'E46',
-                        'spec'       => 'UK-spec',
-                        'begin_year' => 1998,
-                        'end_year'   => 1999
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'body'        => 'E46',
+                            'spec'        => 'UK-spec',
+                            'begin_year'  => 1998,
+                            'end_year'    => 1999
+                        ]
                     ]
                 ],
                 "BMW 3 Series UK-spec (E46) '1998–99",
@@ -293,14 +314,16 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'       => 'BMW 3 Series',
-                        'body'       => 'E46',
-                        'spec'       => 'UK-spec',
-                        'begin_year' => 1998,
-                        'today'      => true
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'body'        => 'E46',
+                            'spec'        => 'UK-spec',
+                            'begin_year'  => 1998,
+                            'today'       => true
+                        ]
                     ]
                 ],
                 "BMW 3 Series UK-spec (E46) '1998–pr.",
@@ -308,14 +331,16 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'       => 'BMW 3 Series',
-                        'body'       => 'E46',
-                        'spec'       => 'UK-spec',
-                        'begin_year' => 1998,
-                        'end_year'   => 2001
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'body'        => 'E46',
+                            'spec'        => 'UK-spec',
+                            'begin_year'  => 1998,
+                            'end_year'    => 2001
+                        ]
                     ]
                 ],
                 "BMW 3 Series UK-spec (E46) '1998–2001",
@@ -323,13 +348,15 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'       => 'BMW 3 Series',
-                        'body'       => 'E46',
-                        'spec'       => 'UK-spec',
-                        'end_year'   => 2001
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'body'        => 'E46',
+                            'spec'        => 'UK-spec',
+                            'end_year'    => 2001
+                        ]
                     ]
                 ],
                 "BMW 3 Series UK-spec (E46) '????–2001",
@@ -337,14 +364,16 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'        => 'BMW 3 Series',
-                        'body'        => 'E46',
-                        'spec'        => 'UK-spec',
-                        'begin_year'  => 1998,
-                        'begin_month' => 11
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'body'        => 'E46',
+                            'spec'        => 'UK-spec',
+                            'begin_year'  => 1998,
+                            'begin_month' => 11
+                        ]
                     ]
                 ],
                 "BMW 3 Series UK-spec (E46) '11.1998–????",
@@ -352,13 +381,15 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'        => 'BMW 3 Series',
-                        'begin_year'  => 1998,
-                        'begin_month' => 11,
-                        'end_year'    => 1999
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'begin_year'  => 1998,
+                            'begin_month' => 11,
+                            'end_year'    => 1999
+                        ]
                     ]
                 ],
                 "BMW 3 Series '11.1998–99",
@@ -366,14 +397,16 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'        => 'BMW 3 Series',
-                        'begin_year'  => 1998,
-                        'begin_month' => 11,
-                        'end_year'    => 1999,
-                        'end_month'   => 3
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'begin_year'  => 1998,
+                            'begin_month' => 11,
+                            'end_year'    => 1999,
+                            'end_month'   => 3
+                        ]
                     ]
                 ],
                 "BMW 3 Series '11.1998–03.1999",
@@ -381,12 +414,14 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'        => 'BMW 3 Series',
-                        'end_year'    => 1999,
-                        'end_month'   => 3
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'end_year'    => 1999,
+                            'end_month'   => 3
+                        ]
                     ]
                 ],
                 "BMW 3 Series '????–03.1999",
@@ -394,11 +429,13 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'        => 'BMW 3 Series',
-                        'end_year'    => 1999,
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'end_year'    => 1999,
+                        ]
                     ]
                 ],
                 "BMW 3 Series '????–1999",
@@ -406,14 +443,16 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'             => 'BMW 3 Series',
-                        'begin_year'       => 1998,
-                        'end_year'         => 1999,
-                        'begin_model_year' => 1998,
-                        'end_model_year'   => 1999,
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective'      => null,
+                            'name'             => 'BMW 3 Series',
+                            'begin_year'       => 1998,
+                            'end_year'         => 1999,
+                            'begin_model_year' => 1998,
+                            'end_model_year'   => 1999,
+                        ]
                     ]
                 ],
                 "1998–99 BMW 3 Series '1998–99",
@@ -421,12 +460,14 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'             => 'BMW 3 Series',
-                        'begin_model_year' => 1999,
-                        'end_model_year'   => 1999,
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective'      => null,
+                            'name'             => 'BMW 3 Series',
+                            'begin_model_year' => 1999,
+                            'end_model_year'   => 1999,
+                        ]
                     ]
                 ],
                 "1999 BMW 3 Series",
@@ -434,12 +475,14 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'             => 'BMW 3 Series',
-                        'begin_model_year' => 1998,
-                        'end_model_year'   => 1999,
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective'      => null,
+                            'name'             => 'BMW 3 Series',
+                            'begin_model_year' => 1998,
+                            'end_model_year'   => 1999,
+                        ]
                     ]
                 ],
                 "1998–99 BMW 3 Series",
@@ -447,12 +490,14 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'             => 'BMW 3 Series',
-                        'begin_model_year' => 1998,
-                        'end_model_year'   => 2001,
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective'      => null,
+                            'name'             => 'BMW 3 Series',
+                            'begin_model_year' => 1998,
+                            'end_model_year'   => 2001,
+                        ]
                     ]
                 ],
                 "1998–2001 BMW 3 Series",
@@ -461,13 +506,15 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             [
                 [
                     'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'             => 'BMW 3 Series',
-                        'begin_year'  => 1998,
-                        'end_year'    => 1998,
-                        'begin_month' => 10,
-                        'end_month'   => 11,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'begin_year'  => 1998,
+                            'end_year'    => 1998,
+                            'begin_month' => 10,
+                            'end_month'   => 11,
+                        ]
                     ]
                 ],
                 "BMW 3 Series '10–11.1998",
@@ -475,11 +522,13 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
-                    'perspective' => null,
-                    'car'         => [
-                        'name'        => 'BMW 3 Series',
-                        'begin_year'  => date('Y'),
+                    'type'  => 1,
+                    'items' => [
+                        [
+                            'perspective' => null,
+                            'name'        => 'BMW 3 Series',
+                            'begin_year'  => date('Y'),
+                        ]
                     ]
                 ],
                 "BMW 3 Series '" . date('Y'),
@@ -529,18 +578,20 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             [
                 [
                     'type'        => 1,
-                    'perspective' => 'B&B',
-                    'car'         => [
-                        'name'             => 'B&B',
-                        'body'             => 'B&B',
-                        'spec'             => 'B&B',
-                        'spec_full'        => 'B&B',
-                        'begin_year'       => 'B&B',
-                        'begin_month'      => 'B&B',
-                        'end_year'         => 'B&B',
-                        'end_month'        => 'B&B',
-                        'begin_model_year' => 'B&B',
-                        'end_model_year'   => 'B&B',
+                    'items' => [
+                        [
+                            'perspective'      => 'B&B',
+                            'name'             => 'B&B',
+                            'body'             => 'B&B',
+                            'spec'             => 'B&B',
+                            'spec_full'        => 'B&B',
+                            'begin_year'       => 'B&B',
+                            'begin_month'      => 'B&B',
+                            'end_year'         => 'B&B',
+                            'end_month'        => 'B&B',
+                            'begin_model_year' => 'B&B',
+                            'end_model_year'   => 'B&B',
+                        ]
                     ]
                 ],
                 'B&amp;B B&amp;B <span class="label label-primary" title="B&amp;B" data-toggle="tooltip" data-placement="top">B&amp;B</span> (B&amp;B)'

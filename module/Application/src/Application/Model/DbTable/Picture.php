@@ -141,28 +141,23 @@ class Picture extends Table
         // prefetch
         $carIds = [];
         $perspectiveIds = [];
-        $engineIds = [];
         $brandIds = [];
         $factoryIds = [];
         foreach ($rows as $index => $row) {
             switch ($row['type']) {
                 case Picture::VEHICLE_TYPE_ID:
                     $db = $this->getAdapter();
-                    $pictureItemRow = $db->fetchRow(
+                    $pictureItemRows = $db->fetchAll(
                         $db->select(true)
                             ->from('picture_item', ['item_id', 'perspective_id'])
                             ->where('picture_id = ?', $row['id'])
                     );
-                    if ($pictureItemRow) {
+                    foreach ($pictureItemRows as $pictureItemRow) {
                         $carIds[$pictureItemRow['item_id']] = true;
                         if (in_array($pictureItemRow['perspective_id'], $this->prefixedPerspectives)) {
                             $perspectiveIds[$pictureItemRow['perspective_id']] = true;
                         }
                     }
-                    break;
-
-                case Picture::ENGINE_TYPE_ID:
-                    $engineIds[$row['engine_id']] = true;
                     break;
 
                 case Picture::LOGO_TYPE_ID:
@@ -189,7 +184,7 @@ class Picture extends Table
                 'spec' => 'spec.short_name',
                 'spec_full' => 'spec.name',
                 'body',
-                'name' => 'if(length(car_language.name) > 0, car_language.name, cars.caption)',
+                'name' => 'if(length(car_language.name) > 0, car_language.name, cars.name)',
                 'begin_year', 'end_year', 'today',
             ];
             if ($large) {
@@ -233,14 +228,6 @@ class Picture extends Table
             }
         }
 
-        $engines = [];
-        if (count($engineIds)) {
-            $table = new Engine();
-            foreach ($table->find(array_keys($engineIds)) as $row) {
-                $engines[$row->id] = $row->caption;
-            }
-        }
-
         $factories = [];
         if (count($factoryIds)) {
             $table = new Factory();
@@ -266,41 +253,37 @@ class Picture extends Table
                 continue;
             }
 
-            $caption = [
+            $name = [
                 'type' => $row['type'],
             ];
 
             switch ($row['type']) {
                 case Picture::VEHICLE_TYPE_ID:
                     $db = $this->getAdapter();
-                    $pictureItemRow = $db->fetchRow(
+                    $pictureItemRows = $db->fetchAll(
                         $db->select()
                             ->from('picture_item', ['item_id', 'perspective_id'])
                             ->where('picture_id = ?', $row['id'])
                     );
 
-                    $carId = null;
-                    $perspectiveId = null;
-                    if ($pictureItemRow) {
+                    $items = [];
+                    foreach ($pictureItemRows as $pictureItemRow) {
                         $carId = $pictureItemRow['item_id'];
                         $perspectiveId = $pictureItemRow['perspective_id'];
+
+                        $car = isset($cars[$carId]) ? $cars[$carId] : [];
+
+                        $items[] = array_replace($car, [
+                            'perspective' => isset($perspectives[$perspectiveId])
+                                ? $perspectives[$perspectiveId]
+                                : null
+                        ]);
                     }
 
-                    $car = isset($cars[$carId]) ? $cars[$carId] : null;
-                    $caption = [
-                        'type'        => $row['type'],
-                        'car'         => $car ? $car : null,
-                        'perspective' => isset($perspectives[$perspectiveId])
-                            ? $perspectives[$perspectiveId]
-                            : null
-                    ];
-                    break;
 
-                case Picture::ENGINE_TYPE_ID:
-                    $engine = isset($engines[$row['engine_id']]) ? $engines[$row['engine_id']] : null;
-                    $caption = [
-                        'type' => $row['type'],
-                        'engine' => $engine
+                    $name = [
+                        'type'  => $row['type'],
+                        'items' => $items
                     ];
                     break;
 
@@ -308,33 +291,33 @@ class Picture extends Table
                 case Picture::MIXED_TYPE_ID:
                 case Picture::UNSORTED_TYPE_ID:
                     $brand = isset($brands[$row['brand_id']]) ? $brands[$row['brand_id']] : null;
-                    $caption = [
+                    $name = [
                         'type' => $row['type'],
                         'brand' => $brand
                     ];
                     break;
 
                 case Picture::FACTORY_TYPE_ID:
-                    $caption = [
+                    $name = [
                         'type' => $row['type'],
                         'factory' => isset($factories[$row['factory_id']]) ? $factories[$row['factory_id']] : null
                     ];
                     break;
 
                 default:
-                    $caption = [
+                    $name = [
                         'type' => $row['type']
                     ];
                     break;
             }
 
-            $result[$row['id']] = $caption;
+            $result[$row['id']] = $name;
         }
 
         return $result;
     }
 
-    public function accept($pictureId, $userId, &$isFirstTimeAccepted)
+    public function accept(PictureItem $pictureItem, $pictureId, $userId, &$isFirstTimeAccepted)
     {
         $isFirstTimeAccepted = false;
 
@@ -354,7 +337,7 @@ class Picture extends Table
         }
         $picture->save();
 
-        $this->refreshCounts($picture->toArray());
+        $this->refreshPictureCounts($pictureItem, $picture);
 
         return true;
     }
@@ -373,26 +356,6 @@ class Picture extends Table
                     }
                 }
                 break;
-            case Picture::ENGINE_TYPE_ID:
-                if ($params['engine_id']) {
-                    $brandTable = new BrandTable();
-                    $brands = $brandTable->fetchAll(
-                        $brandTable->select(true)
-                            ->join('brand_engine', 'brands.id = brand_engine.brand_id', null)
-                            ->join(
-                                'engine_parent_cache',
-                                'brand_engine.engine_id = engine_parent_cache.parent_id',
-                                null
-                            )
-                            ->where('engine_parent_cache.engine_id = ?', $params['engine_id'])
-                            ->group('brands.id')
-                    );
-
-                    foreach ($brands as $brand) {
-                        $brand->refreshEnginePicturesCount();
-                    }
-                }
-                break;
             case Picture::MIXED_TYPE_ID:
             case Picture::LOGO_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:
@@ -402,7 +365,7 @@ class Picture extends Table
         }
     }
 
-    private function refreshPictureCounts($pictureItem, $picture)
+    public function refreshPictureCounts(PictureItem $pictureItem, $picture)
     {
         $data = $picture->toArray();
         $data['car_ids'] = $pictureItem->getPictureItems($picture->id);
@@ -410,23 +373,22 @@ class Picture extends Table
         $this->refreshCounts($data);
     }
 
-    public function moveToEngine(PictureItem $pictureItem, $pictureId, $id, $userId, array $options)
+    public function addToCar(PictureItem $pictureItem, $pictureId, $id, $userId, array $options)
     {
         $picture = $this->find($pictureId)->current();
         if (! $picture) {
             return false;
         }
 
-        $engineTable = new Engine();
-        $engine = $engineTable->find($id)->current();
+        $carTable = new Vehicle();
+        $car = $carTable->find($id)->current();
 
-        if (! $engine) {
+        if (! $car) {
             return false;
         }
 
         $oldParams = [
             'type'       => $picture->type,
-            'engine_id'  => $picture->engine_id,
             'brand_id'   => $picture->brand_id,
             'car_ids'    => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
@@ -435,12 +397,11 @@ class Picture extends Table
         $picture->setFromArray([
             'factory_id' => null,
             'brand_id'   => null,
-            'engine_id'  => $engine->id,
-            'type'       => Picture::ENGINE_TYPE_ID,
+            'type'       => Picture::VEHICLE_TYPE_ID,
         ]);
         $picture->save();
 
-        $pictureItem->setPictureItems($picture->id, []);
+        $pictureItem->add($picture->id, $car->id);
 
         if ($picture->image_id) {
             $this->imageStorage->changeImageName($picture->image_id, [
@@ -453,10 +414,10 @@ class Picture extends Table
 
         $log = new LogEvent();
         $log($userId, sprintf(
-            'Назначение двигателя %s картинке %s',
-            htmlspecialchars($engine->caption),
-            htmlspecialchars($options['pictureNameFormatter']->format($picture, $options['language']))
-        ), [$engine, $picture]);
+            'Картинка %s связана с автомобилем %s',
+            htmlspecialchars($picture->id),
+            htmlspecialchars('#' . $car->id)
+        ), [$car, $picture]);
 
         return true;
     }
@@ -477,7 +438,6 @@ class Picture extends Table
 
         $oldParams = [
             'type'       => $picture->type,
-            'engine_id'  => $picture->engine_id,
             'brand_id'   => $picture->brand_id,
             'car_ids'    => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
@@ -486,7 +446,6 @@ class Picture extends Table
         $picture->setFromArray([
             'factory_id' => null,
             'brand_id'   => null,
-            'engine_id'  => null,
             'type'       => Picture::VEHICLE_TYPE_ID,
         ]);
         $picture->save();
@@ -527,7 +486,6 @@ class Picture extends Table
 
         $oldParams = [
             'type'       => $picture->type,
-            'engine_id'  => $picture->engine_id,
             'brand_id'   => $picture->brand_id,
             'car_ids'    => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
@@ -536,7 +494,6 @@ class Picture extends Table
         $picture->setFromArray([
             'factory_id' => null,
             'brand_id'   => $brand->id,
-            'engine_id'  => null,
             'type'       => $type,
         ]);
         $picture->save();
@@ -555,7 +512,7 @@ class Picture extends Table
         $log = new LogEvent();
         $log($userId, sprintf(
             'Назначение бренда %s картинке %s',
-            htmlspecialchars($brand->caption),
+            htmlspecialchars($brand->name),
             htmlspecialchars($options['pictureNameFormatter']->format($picture, $options['language']))
         ), [$picture, $brand]);
 
@@ -578,7 +535,6 @@ class Picture extends Table
 
         $oldParams = [
             'type'       => $picture->type,
-            'engine_id'  => $picture->engine_id,
             'brand_id'   => $picture->brand_id,
             'car_ids'    => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
@@ -587,7 +543,6 @@ class Picture extends Table
         $picture->setFromArray([
             'factory_id' => $factory->id,
             'brand_id'   => null,
-            'engine_id'  => null,
             'type'       => Picture::FACTORY_TYPE_ID,
         ]);
         $picture->save();

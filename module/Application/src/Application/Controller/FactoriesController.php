@@ -69,11 +69,11 @@ class FactoriesController extends AbstractActionController
                     ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('cars', 'picture_item.item_id = cars.id', null)
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id = ?', $car->id)
+                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $car->id)
                     ->order([
-                        new Zend_Db_Expr('car_parent_cache.tuning asc'),
-                        new Zend_Db_Expr('car_parent_cache.sport asc'),
+                        new Zend_Db_Expr('item_parent_cache.tuning asc'),
+                        new Zend_Db_Expr('item_parent_cache.sport asc'),
                         new Zend_Db_Expr('cars.is_concept asc'),
                         new Zend_Db_Expr('picture_item.perspective_id = 10 desc'),
                         new Zend_Db_Expr('picture_item.perspective_id = 1 desc'),
@@ -84,8 +84,8 @@ class FactoriesController extends AbstractActionController
                 if (count($groups[$car->id]) > 1) {
                     $select
                         ->join(
-                            ['cpc_oc' => 'car_parent_cache'],
-                            'cpc_oc.car_id = picture_item.item_id',
+                            ['cpc_oc' => 'item_parent_cache'],
+                            'cpc_oc.item_id = picture_item.item_id',
                             null
                         )
                         ->where('cpc_oc.parent_id IN (?)', $groups[$car->id]);
@@ -107,7 +107,7 @@ class FactoriesController extends AbstractActionController
                 foreach ($cataloguePaths as $cataloguePath) {
                     $url = $this->url()->fromRoute('catalogue', [
                         'controller'    => 'catalogue',
-                        'action'        => 'brand-car',
+                        'action'        => 'brand-item',
                         'brand_catname' => $cataloguePath['brand_catname'],
                         'car_catname'   => $cataloguePath['car_catname'],
                         'path'          => $cataloguePath['path']

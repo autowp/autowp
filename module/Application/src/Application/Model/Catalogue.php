@@ -4,7 +4,7 @@ namespace Application\Model;
 
 use Autowp\Image\Storage\Request;
 use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\BrandEngine;
 use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\EngineRow;
@@ -28,9 +28,9 @@ class Catalogue
     private $brandTable;
 
     /**
-     * @var BrandCar
+     * @var BrandItem
      */
-    private $brandCarTable;
+    private $brandItemTable;
 
     /**
      * @var Vehicle
@@ -70,7 +70,7 @@ class Catalogue
         return [
             'cars.begin_order_cache',
             'cars.end_order_cache',
-            'cars.caption',
+            'cars.name',
             'cars.body',
             'cars.spec_id'
         ];
@@ -84,7 +84,7 @@ class Catalogue
             'cars.end_year',
             new Zend_Db_Expr('cars.end_month IS NULL'),
             'cars.end_month',
-            'cars.caption',
+            'cars.name',
             'cars.body'
         ];*/
     }
@@ -121,13 +121,13 @@ class Catalogue
     }
 
     /**
-     * @return BrandCar
+     * @return BrandItem
      */
-    public function getBrandCarTable()
+    public function getBrandItemTable()
     {
-        return $this->brandCarTable
-            ? $this->brandCarTable
-            : $this->brandCarTable = new BrandCar();
+        return $this->brandItemTable
+            ? $this->brandItemTable
+            : $this->brandItemTable = new BrandItem();
     }
 
     /**
@@ -209,19 +209,19 @@ class Catalogue
     {
         $urls = [];
 
-        $brandCarRows = $this->getBrandCarTable()->fetchAll([
+        $brandItemRows = $this->getBrandItemTable()->fetchAll([
             'car_id = ?' => $id
         ]);
 
-        foreach ($brandCarRows as $brandCarRow) {
-            $brand = $this->getBrandTable()->find($brandCarRow->brand_id)->current();
+        foreach ($brandItemRows as $brandItemRow) {
+            $brand = $this->getBrandTable()->find($brandItemRow->brand_id)->current();
             if (! $brand) {
-                throw new Exception("Broken link `{$brandCarRow->brand_id}`");
+                throw new Exception("Broken link `{$brandItemRow->brand_id}`");
             }
 
             $urls[] = [
                 'brand_catname' => $brand->folder,
-                'car_catname'   => $brandCarRow->catname,
+                'car_catname'   => $brandItemRow->catname,
                 'path'          => $path
             ];
         }
@@ -287,7 +287,7 @@ class Catalogue
 
                 $brand = $brandTable->find($brandEngineRow->brand_id)->current();
                 if (! $brand) {
-                    throw new Exception("Broken link `{$brandCarRow->brand_id}`");
+                    throw new Exception("Broken link `{$brandItemRow->brand_id}`");
                 }
 
                 $urls[] = [

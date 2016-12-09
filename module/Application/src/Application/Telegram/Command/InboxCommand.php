@@ -47,7 +47,7 @@ class InboxCommand extends Command
             $brandTable = new BrandTable();
 
             $brandRow = $brandTable->fetchRow([
-                'caption = ?' => (string)$arguments
+                'name = ?' => (string)$arguments
             ]);
 
             if ($brandRow) {
@@ -61,7 +61,7 @@ class InboxCommand extends Command
                     $telegramBrandRow->inbox = 0;
                     $telegramBrandRow->save();
                     $this->replyWithMessage([
-                        'text' => 'Successful unsubscribed from ' . $brandRow->caption
+                        'text' => 'Successful unsubscribed from ' . $brandRow->name
                     ]);
                 } else {
                     if (! $telegramBrandRow) {
@@ -73,7 +73,7 @@ class InboxCommand extends Command
                     $telegramBrandRow->inbox = 1;
                     $telegramBrandRow->save();
                     $this->replyWithMessage([
-                        'text' => 'Successful subscribed to ' . $brandRow->caption
+                        'text' => 'Successful subscribed to ' . $brandRow->name
                     ]);
                 }
             } else {

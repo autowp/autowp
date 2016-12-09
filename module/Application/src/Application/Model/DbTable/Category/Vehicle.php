@@ -6,8 +6,8 @@ use Zend_Db_Table;
 
 class Vehicle extends Zend_Db_Table
 {
-    protected $_name = 'category_car';
-    protected $_primary = ['category_id', 'car_id'];
+    protected $_name = 'category_item';
+    protected $_primary = ['category_id', 'item_id'];
     protected $_referenceMap = [
         'Category' => [
             'columns'       => ['category_id'],
@@ -15,7 +15,7 @@ class Vehicle extends Zend_Db_Table
             'refColumns'    => ['id']
         ],
         'Car' => [
-            'columns'       => ['car_id'],
+            'columns'       => ['item_id'],
             'refTableClass' => \Application\Model\DbTable\Vehicle::class,
             'refColumns'    => ['id']
         ],

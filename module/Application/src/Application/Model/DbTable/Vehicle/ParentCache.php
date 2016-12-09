@@ -9,12 +9,12 @@ use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 
 class ParentCache extends Table
 {
-    protected $_name = 'car_parent_cache';
-    protected $_primary = ['car_id', 'parent_id'];
+    protected $_name = 'item_parent_cache';
+    protected $_primary = ['item_id', 'parent_id'];
 
     protected $_referenceMap = [
         'Car' => [
-            'columns'       => ['car_id'],
+            'columns'       => ['item_id'],
             'refTableClass' => 'Car',
             'refColumns'    => ['id']
         ],
@@ -118,12 +118,12 @@ class ParentCache extends Table
 
         foreach ($parentIds as $parentId => $diff) {
             $row = $this->fetchRow([
-                'car_id = ?'    => $id,
+                'item_id = ?'    => $id,
                 'parent_id = ?' => $parentId
             ]);
             if (!$row) {
                 $row = $this->createRow([
-                    'car_id'    => $id,
+                    'item_id'    => $id,
                     'parent_id' => $parentId,
                     'diff'      => $diff
                 ]);
@@ -136,7 +136,7 @@ class ParentCache extends Table
         }
 
         $filter = [
-            'car_id = ?' => $id
+            'item_id = ?' => $id
         ];
         if ($parentIds) {
             $filter['parent_id not in (?)'] = array_keys($parentIds);
@@ -173,12 +173,12 @@ class ParentCache extends Table
 
         foreach ($parentInfo as $parentId => $info) {
             $row = $this->fetchRow([
-                'car_id = ?'    => $id,
+                'item_id = ?'   => $id,
                 'parent_id = ?' => $parentId
             ]);
             if (! $row) {
                 $row = $this->createRow([
-                    'car_id'    => $id,
+                    'item_id'   => $id,
                     'parent_id' => $parentId,
                     'diff'      => $info['diff'],
                     'tuning'    => $info['tuning'] ? 1 : 0,
@@ -216,7 +216,7 @@ class ParentCache extends Table
         }
 
         $filter = [
-            'car_id = ?' => $id
+            'item_id = ?' => $id
         ];
         if ($parentInfo) {
             $filter['parent_id not in (?)'] = array_keys($parentInfo);

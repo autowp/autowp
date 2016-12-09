@@ -1,5 +1,5 @@
 <?php foreach ($this->items as $item) { ?>
-    <div class="car" data-module="car-list">
+    <div class="car item-list-item" data-module="car-list">
 
         <?php if (!$this->disableTitle) { ?>
             <h3>
@@ -62,6 +62,15 @@
 
         <?php if (!$this->disableDescription && strlen($item['description'])) { ?>
             <div class="text"><?=$this->markdown($item['description'])?></div>
+        <?php } ?>
+        
+        <?php if (count($item['vehiclesOnEngine'])) { ?>
+            <p><?=$this->escapeHtml($this->translate('catalogue/engine/mounted-on:'))?></p>
+            <ul>
+                <?php foreach ($item['vehiclesOnEngine'] as $car) { ?>
+                    <li><?=$this->htmlA($car['url'], $this->car()->htmlTitle($car['name']), false)?></li>
+                <?php } ?>
+            </ul>
         <?php } ?>
 
         <ul class="list-inline">

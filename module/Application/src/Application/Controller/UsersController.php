@@ -184,9 +184,9 @@ class UsersController extends AbstractActionController
 
         $rows = $brandModel->getList($options, function ($select) use ($user) {
             $select
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                 ->where('pictures.owner_id = ?', $user->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
@@ -233,11 +233,11 @@ class UsersController extends AbstractActionController
         $pictures = $this->catalogue()->getPictureTable();
         $select = $pictures->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-            ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
+            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+            ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
             ->where('pictures.owner_id = ?', $user->id)
             ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
-            ->where('brands_cars.brand_id = ?', $brand['id'])
+            ->where('brand_item.brand_id = ?', $brand['id'])
             ->group('pictures.id')
             ->order(['pictures.add_date DESC', 'pictures.id DESC']);
 
@@ -309,34 +309,21 @@ class UsersController extends AbstractActionController
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (! $success) {
                     $carSelect = $db->select()
-                        ->from('brands_cars', ['brand_id', 'count(1)'])
-                        ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                        ->join('attrs_user_values', 'car_parent_cache.car_id = attrs_user_values.item_id', null)
-                        ->where('attrs_user_values.item_type_id = 1')
+                        ->from('brand_item', ['brand_id', 'count(1)'])
+                        ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                        ->join('attrs_user_values', 'item_parent_cache.item_id = attrs_user_values.item_id', null)
                         ->where('attrs_user_values.user_id = ?', $user->id)
-                        ->group('brands_cars.brand_id')
-                        ->order('count(1) desc')
-                        ->limit($precisionLimit);
-
-                    $engineSelect = $db->select()
-                        ->join('brand_engine', ['brand_id', 'count(1)'])
-                        ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
-                        ->join('attrs_user_values', 'engine_parent_cache.engine_id = attrs_user_values.item_id', null)
-                        ->where('attrs_user_values.item_type_id = 3')
-                        ->where('attrs_user_values.user_id = ?', $user->id)
-                        ->group('brand_engine.brand_id')
+                        ->group('brand_item.brand_id')
                         ->order('count(1) desc')
                         ->limit($precisionLimit);
 
                     $data = [];
-                    foreach ([$carSelect, $engineSelect] as $select) {
-                        $pairs = $db->fetchPairs($select);
-                        foreach ($pairs as $brandId => $value) {
-                            if (! isset($data[$brandId])) {
-                                $data[$brandId] = $value;
-                            } else {
-                                $data[$brandId] += $value;
-                            }
+                    $pairs = $db->fetchPairs($carSelect);
+                    foreach ($pairs as $brandId => $value) {
+                        if (! isset($data[$brandId])) {
+                            $data[$brandId] = $value;
+                        } else {
+                            $data[$brandId] += $value;
                         }
                     }
 
@@ -346,7 +333,7 @@ class UsersController extends AbstractActionController
                     foreach ($data as $brandId => $value) {
                         $row = $brandTable->find($brandId)->current();
                         $brands[] = [
-                            'name' => $row->caption,
+                            'name' => $row->name,
                             'url'  => $this->url()->fromRoute('catalogue', [
                                 'action'        => 'brand',
                                 'brand_catname' => $row->folder
@@ -395,19 +382,18 @@ class UsersController extends AbstractActionController
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (! $success) {
                     $select = $brandTable->select(true)
-                        ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                        ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                        ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
+                        ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                        ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                        ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                         ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                        ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
-                        ->group('brands_cars.brand_id')
+                        ->group('brand_item.brand_id')
                         ->where('pictures.owner_id = ?', $user->id)
                         ->order('count(distinct pictures.id) desc')
                         ->limit(3);
 
                     foreach ($brandTable->fetchAll($select) as $brand) {
                         $brands[] = [
-                            'name' => $brand->caption,
+                            'name' => $brand->name,
                             'url'  => $this->url()->fromRoute('catalogue', [
                                 'action'        => 'brand',
                                 'brand_catname' => $brand->folder

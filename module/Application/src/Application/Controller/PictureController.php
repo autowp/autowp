@@ -173,23 +173,6 @@ class PictureController extends AbstractActionController
         $isEngines = false;
 
         switch ($picture->type) {
-            case Picture::ENGINE_TYPE_ID:
-                if ($engine = $picture->findParentRow(Engine::class)) {
-                    $cataloguePaths = $this->catalogue()->engineCataloguePaths($engine, [
-                        'limit' => 1
-                    ]);
-
-                    foreach ($cataloguePaths as $cataloguePath) {
-                        $brandId = $brandModel->getBrandIdByCatname($cataloguePath['brand_catname']);
-                        if ($brandId) {
-                            $brands[] = $brandId;
-                        }
-                    }
-                }
-                $isEngines = true;
-
-                break;
-
             case Picture::LOGO_TYPE_ID:
             case Picture::MIXED_TYPE_ID:
             case Picture::UNSORTED_TYPE_ID:
@@ -207,18 +190,17 @@ class PictureController extends AbstractActionController
                 }
                 break;
             case Picture::VEHICLE_TYPE_ID:
-                if ($car = $picture->findParentRow(Vehicle::class)) {
-                    $language = $this->language();
-                    $brandList = $brandModel->getList($language, function ($select) use ($car) {
-                        $select
-                            ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                            ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                            ->where('car_parent_cache.car_id = ?', $car->id)
-                            ->group('brands.id');
-                    });
-                    foreach ($brandList as $brand) {
-                        $brands[] = $brand['id'];
-                    }
+                $language = $this->language();
+                $brandList = $brandModel->getList($language, function ($select) use ($picture) {
+                    $select
+                        ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                        ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                        ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
+                        ->where('picture_item.picture_id = ?', $picture->id)
+                        ->group('brands.id');
+                });
+                foreach ($brandList as $brand) {
+                    $brands[] = $brand['id'];
                 }
                 break;
         }

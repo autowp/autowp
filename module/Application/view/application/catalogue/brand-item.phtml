@@ -61,8 +61,9 @@
         <?php if ($this->user()->isAllowed('car', 'add') && $this->car['is_group']) { ?>
             <i class="fa fa-plus"></i>
             <?=$this->htmlA($this->url('moder/cars/params', [
-                'action'    => 'new',
-                'parent_id' => $this->car['id']
+                'action'       => 'new',
+                'parent_id'    => $this->car['id'],
+                'item_type_id' => $this->car['item_type_id'],
             ]), $this->translate('moder/vehicle/catalogue/add-vehicle'))?>
         <?php } ?>
 
@@ -87,7 +88,7 @@
 <?php } ?>
 
 <?php if (!isset($this->modgroup)) { ?>
-    <?=$this->partial('application/catalogue/partial/brand-car-menu', [
+    <?=$this->partial('application/catalogue/partial/brand-item-menu', [
         'title' => $this->carFullName,
         'stock' => [
             'count'  => $this->stockCount,

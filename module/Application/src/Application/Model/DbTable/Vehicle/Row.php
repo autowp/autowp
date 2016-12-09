@@ -139,7 +139,7 @@ class Row extends \Application\Db\Table\Row
             'language = ?' => (string)$language
         ]);
 
-        $name = $carLangRow ? $carLangRow->name : $this->caption;
+        $name = $carLangRow ? $carLangRow->name : $this->name;
 
         $spec = null;
         $specFull = null;
@@ -183,15 +183,15 @@ class Row extends \Application\Db\Table\Row
             $picture = $pictureTable->fetchRow(
                 $pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->join(
                         ['mp' => 'perspectives_groups_perspectives'],
                         'picture_item.perspective_id = mp.perspective_id',
                         null
                     )
                     ->where('mp.group_id=?', $groupId)
-                    ->where('car_parent_cache.parent_id = ?', $this->id)
-                    ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
+                    ->where('item_parent_cache.parent_id = ?', $this->id)
+                    ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->order([
                         'mp.position',
@@ -219,9 +219,9 @@ class Row extends \Application\Db\Table\Row
             if (! $picture) {
                 $select = $pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id = ?', $this->id)
-                    ->where('not car_parent_cache.sport and not car_parent_cache.tuning')
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $this->id)
+                    ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->limit(1);
 
@@ -263,7 +263,7 @@ class Row extends \Application\Db\Table\Row
     public function deleteFromBrand(\Application\Model\DbTable\BrandRow $brand)
     {
         $db = $this->getTable()->getAdapter();
-        $sql = 'DELETE FROM brands_cars WHERE (brand_id=?) AND (car_id=?) LIMIT 1';
+        $sql = 'DELETE FROM brand_item WHERE (brand_id=?) AND (car_id=?) LIMIT 1';
         $db->query($sql, [$brand->id, $this->id]);
 
         $brand->refreshPicturesCount();

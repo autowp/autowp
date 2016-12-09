@@ -5,13 +5,17 @@
     <?php if (!$tiny) { ?>
         <label><?=$this->escapeHtml($this->translate('moder/picture/perspective'))?></label>
     <?php } ?>
-    <?=$this->car()->htmlTitle($this->name)?>
-    <?=$this->formElement(
-        (new Zend\Form\Element\Select('perspective_id'))
-            ->setAttributes([
-                'class' => 'form-control' . ($tiny ? ' input-sm' : '')
-            ])
-            ->setValueOptions($this->options)
-            ->setValue($this->value)
-    )?>
+    <div>
+        <?php if (!$tiny) { ?>
+            <?=$this->car()->htmlTitle($this->name)?>
+        <?php } ?>
+        <?=$this->formElement(
+            (new Zend\Form\Element\Select('perspective_id'))
+                ->setAttributes([
+                    'class' => 'form-control' . ($tiny ? ' input-sm' : '')
+                ])
+                ->setValueOptions((array)$this->options)
+                ->setValue($this->value)
+        )?>
+    </div>
 </form>

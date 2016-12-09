@@ -100,15 +100,15 @@ class IndexController extends AbstractActionController
                 ->where('mp.group_id = ?', $groupId)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $car->id)
                 ->joinRight(
                     ['mp' => 'perspectives_groups_perspectives'],
                     'picture_item.perspective_id = mp.perspective_id',
                     null
                 )
                 ->order([
-                    'car_parent_cache.sport', 'car_parent_cache.tuning', 'mp.position',
+                    'item_parent_cache.sport', 'item_parent_cache.tuning', 'mp.position',
                     'pictures.width DESC', 'pictures.height DESC'
                 ])
                 ->limit(1);
@@ -148,8 +148,8 @@ class IndexController extends AbstractActionController
         if (count($left) > 0) {
             $select = $pTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                 //->order('ratio DESC')
                 ->limit(count($left));
@@ -176,8 +176,8 @@ class IndexController extends AbstractActionController
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
         );
 
@@ -186,7 +186,7 @@ class IndexController extends AbstractActionController
         if ($totalPictures > 6) {
             foreach ($cataloguePaths as $path) {
                 $url = $this->url()->fromRoute('catalogue', [
-                    'action'        => 'brand-car-pictures',
+                    'action'        => 'brand-item-pictures',
                     'brand_catname' => $path['brand_catname'],
                     'car_catname'   => $path['car_catname'],
                     'path'          => $path['path']
@@ -206,7 +206,7 @@ class IndexController extends AbstractActionController
                 $items[] = [
                     'icon'  => 'list-alt',
                     'url'   => $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-car-specifications',
+                        'action'        => 'brand-item-specifications',
                         'brand_catname' => $path['brand_catname'],
                         'car_catname'   => $path['car_catname'],
                         'path'          => $path['path']
@@ -231,14 +231,14 @@ class IndexController extends AbstractActionController
         $categoryRows = $db->fetchAll(
             $db->select()
                 ->from('category', ['name', 'catname'])
-                ->join('category_car', 'category.id = category_car.category_id', null)
-                ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
+                ->join('category_item', 'category.id = category_item.category_id', null)
+                ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', null)
                 ->joinLeft(
                     'category_language',
                     'category.id = category_language.category_id and category_language.language = :language',
                     ['lang_name' => 'name']
                 )
-                ->where('car_parent_cache.car_id = :car_id')
+                ->where('item_parent_cache.item_id = :car_id')
                 ->group(['category.id'])
                 ->bind([
                     'language' => $this->language(),
@@ -264,7 +264,7 @@ class IndexController extends AbstractActionController
     {
         $language = $this->language();
 
-        $cacheKey = 'INDEX_BRANDS_HTML260' . $language;
+        $cacheKey = 'INDEX_BRANDS_HTML261' . $language;
         $brands = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             // cache missing
@@ -307,9 +307,9 @@ class IndexController extends AbstractActionController
         $db = $this->getCategoryVehicleTable()->getAdapter();
 
         $select = $db->select()
-            ->from('category_car', 'car_id')
-            ->join('category', 'category_car.category_id = category.id', 'catname')
-            ->where('category_car.car_id = ?', $carId);
+            ->from('category_item', 'item_id')
+            ->join('category', 'category_item.category_id = category.id', 'catname')
+            ->where('category_item.item_id = ?', $carId);
 
         if ($breakOnFirst) {
             $select->limit(1);
@@ -319,7 +319,7 @@ class IndexController extends AbstractActionController
         foreach ($categoryVehicleRows as $categoryVehicleRow) {
             $result[] = [
                 'category_catname' => $categoryVehicleRow['catname'],
-                'car_id'           => $categoryVehicleRow['car_id'],
+                'car_id'           => $categoryVehicleRow['item_id'],
                 'path'             => []
             ];
         }
@@ -423,7 +423,7 @@ class IndexController extends AbstractActionController
                             $url = null;
                             foreach ($paths as $path) {
                                 $url = $this->url()->fromRoute('catalogue', [
-                                    'action'        => 'brand-car-picture',
+                                    'action'        => 'brand-item-picture',
                                     'brand_catname' => $path['brand_catname'],
                                     'car_catname'   => $path['car_catname'],
                                     'path'          => $path['path'],
@@ -489,10 +489,10 @@ class IndexController extends AbstractActionController
             $factories = $db->fetchAll(
                 $db->select()
                     ->from('factory', ['id', 'name', 'count' => new Zend_Db_Expr('count(1)')])
-                    ->join('factory_car', 'factory.id = factory_car.factory_id', null)
-                    ->join('car_parent_cache', 'factory_car.car_id = car_parent_cache.parent_id', null)
-                    ->where('not car_parent_cache.tuning')
-                    ->where('not car_parent_cache.sport')
+                    ->join('factory_item', 'factory.id = factory_item.factory_id', null)
+                    ->join('item_parent_cache', 'factory_item.item_id = item_parent_cache.parent_id', null)
+                    ->where('not item_parent_cache.tuning')
+                    ->where('not item_parent_cache.sport')
                     ->group('factory.id')
                     ->order('count desc')
                     ->limit(8)
@@ -536,7 +536,7 @@ class IndexController extends AbstractActionController
             $categoryAdapter = $categoryTable->getAdapter();
             $categoryLangTable = new CategoryLanguage();
 
-            $expr = 'COUNT(IF(category_car.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
+            $expr = 'COUNT(IF(category_item.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
 
             $items = $categoryAdapter->fetchAll(
                 $categoryAdapter->select()
@@ -549,10 +549,10 @@ class IndexController extends AbstractActionController
                         ]
                     )
                     ->join(['cp' => 'category_parent'], 'category.id = cp.parent_id', null)
-                    ->join('category_car', 'cp.category_id = category_car.category_id', null)
+                    ->join('category_item', 'cp.category_id = category_item.category_id', null)
                     ->where('category.parent_id is null')
-                    ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', null)
-                    ->join('cars', 'car_parent_cache.car_id = cars.id', null)
+                    ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', null)
+                    ->join('cars', 'item_parent_cache.item_id = cars.id', null)
                     ->where('not cars.is_group')
                     ->group('category.id')
                     ->order('new_cars_count DESC')
@@ -622,7 +622,6 @@ class IndexController extends AbstractActionController
                 $select = $carTable->select(true)
                     ->join('attrs_user_values', 'cars.id = attrs_user_values.item_id', null)
                     ->where('update_date > DATE_SUB(NOW(), INTERVAL 1 DAY)')
-                    ->where('attrs_user_values.item_type_id = ?', 1)
                     ->having('count(attrs_user_values.attribute_id) > 10')
                     ->group('cars.id')
                     ->order('MAX(attrs_user_values.update_date) DESC')

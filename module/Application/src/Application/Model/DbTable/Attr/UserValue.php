@@ -17,11 +17,7 @@ class UserValue extends Table
             'columns'       => ['user_id'],
             'refTableClass' => \Autowp\User\Model\DbTable\User::class,
             'refColumns'    => ['id']
-        ],
-        'ItemType' => [
-            'columns'       => ['item_type_id'],
-            'refTableClass' => ItemType::class,
-            'refColumns'    => ['id']
         ]
     ];
+    protected $_primary = ['attribute_id', 'item_id', 'user_id'];
 }

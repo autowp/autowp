@@ -163,22 +163,22 @@ class Pictures extends AbstractHelper
 
         $isModer = $this->isPictureModer();
 
-        $caption = $view->pic()->name($picture, $this->view->language());
-        $escCaption = $view->escape($caption);
+        $name = $view->pic()->name($picture, $this->view->language());
+        $escName = $view->escape($name);
 
         $url = $view->pic($picture)->url();
 
         $imageHtml = $this->view->img($picture->getFormatRequest(), [
             'format'  => 'picture-thumb',
-            'alt'     => $caption,
-            'title'   => $caption,
+            'alt'     => $name,
+            'title'   => $name,
             'shuffle' => true
         ]);
 
         if ($isModer && $picture->name) {
             $title = $this->view->escapeHtmlAttr($this->view->translate('picture-preview/special-name'));
-            $escCaption = '<span style="color:darkgreen" title="'.$title.'">' .
-                              $escCaption .
+            $escName = '<span style="color:darkgreen" title="'.$title.'">' .
+                              $escName .
                           '</span>';
         }
 
@@ -198,7 +198,7 @@ class Pictures extends AbstractHelper
         return '<div class="'.implode(' ', $classes).'">' .
                     '<div class="thumbnail">' .
                         $view->htmlA($url, $imageHtml, false) .
-                        '<p>' . $view->htmlA($url, $escCaption, false) . '</p>' .
+                        '<p>' . $view->htmlA($url, $escName, false) . '</p>' .
                         $this->userBehaviour($picture, $isModer) .
                     '</div>' .
                 '</div>';

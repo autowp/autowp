@@ -46,15 +46,9 @@ class Brand
             '(' .
                 $db->select()
                     ->from('cars', 'count(distinct cars.id)')
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                    ->where('brands_cars.brand_id = brands.id')
-                    ->assemble() .
-            ') + (' .
-                $db->select()
-                    ->from('brand_engine', 'count(engine_parent_cache.engine_id)')
-                    ->where('brand_engine.brand_id = brands.id')
-                    ->join('engine_parent_cache', 'brand_engine.engine_id = engine_parent_cache.parent_id', null)
+                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                    ->where('brand_item.brand_id = brands.id')
                     ->assemble() .
             ')' .
         ')');
@@ -103,7 +97,7 @@ class Brand
         $select = $db->select(true)
             ->from('brands', [
                 'id', 'folder',
-                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.caption)',
+                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.name)',
                 'cars_count' => $this->countExpr()
             ])
             ->joinLeft(
@@ -123,9 +117,9 @@ class Brand
             $newCarsCount = $db->fetchOne(
                 $db->select()
                     ->from('cars', 'count(distinct cars.id)')
-                    ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                    ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                    ->where('brands_cars.brand_id = ?', $brandRow['id'])
+                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                    ->where('brand_item.brand_id = ?', $brandRow['id'])
                     ->where('cars.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)', self::NEW_DAYS)
             );
 
@@ -172,9 +166,9 @@ class Brand
             ]
         ], function ($select) use ($language) {
             $select
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->join('cars', 'car_parent_cache.car_id = cars.id', null)
+                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('cars', 'item_parent_cache.item_id = cars.id', null)
                 ->group('brands.id')
                 ->bind([
                     'language' => $language,
@@ -286,8 +280,8 @@ class Brand
         $select = $db->select()
             ->from('brands', [
                 'id', 'folder', 'type_id',
-                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.caption)',
-                'full_caption', 'img', 'text_id'
+                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.name)',
+                'full_name', 'img', 'text_id'
             ])
             ->joinLeft(
                 'brand_language',
@@ -310,7 +304,7 @@ class Brand
             'id'        => $brand['id'],
             'name'      => $brand['name'],
             'catname'   => $brand['folder'],
-            'full_name' => $brand['full_caption'],
+            'full_name' => $brand['full_name'],
             'img'       => $brand['img'],
             'text_id'   => $brand['text_id'],
             'type_id'   => $brand['type_id']
@@ -335,10 +329,10 @@ class Brand
     {
         $brand = $this->table->fetchRow(
             $this->table->select(true)
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->join('factory_car', 'car_parent_cache.car_id = factory_car.car_id', null)
-                ->where('factory_car.factory_id = ?', (int)$factoryId)
+                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('factory_item', 'item_parent_cache.item_id = factory_item.item_id', null)
+                ->where('factory_item.factory_id = ?', (int)$factoryId)
                 ->group('brands.id')
                 ->order(new Zend_Db_Expr('count(1) desc'))
         );
@@ -382,7 +376,7 @@ class Brand
             'name'    => 'IF(' .
                 'brand_language.name IS NOT NULL and LENGTH(brand_language.name)>0,' .
                 'brand_language.name,' .
-                'brands.caption' .
+                'brands.name' .
             ')'
         ];
         foreach ($options['columns'] as $column => $expr) {
@@ -493,9 +487,9 @@ class Brand
     {
         $brandRows = $this->table->fetchAll(
             $this->table->select(true)
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->where('car_parent_cache.car_id = ?', $carId)
+                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->where('item_parent_cache.item_id = ?', $carId)
         );
         foreach ($brandRows as $brand) {
             $brand->refreshPicturesCount();

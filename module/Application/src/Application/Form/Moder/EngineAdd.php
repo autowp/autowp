@@ -28,7 +28,7 @@ class EngineAdd extends Form implements InputFilterProviderInterface
         }
 
         $elements[] = [
-            'name' => 'caption',
+            'name' => 'name',
             'type' => EngineName::class,
         ];
 
@@ -70,7 +70,7 @@ class EngineAdd extends Form implements InputFilterProviderInterface
     public function getInputFilterSpecification()
     {
         $spec = [
-            'caption' => [
+            'name' => [
                 'required' => true
             ]
         ];

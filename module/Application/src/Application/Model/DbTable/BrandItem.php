@@ -4,10 +4,10 @@ namespace Application\Model\DbTable;
 
 use Zend_Db_Table;
 
-class BrandCar extends Zend_Db_Table
+class BrandItem extends Zend_Db_Table
 {
     protected $_primary = ['brand_id', 'car_id'];
-    protected $_name = 'brands_cars';
+    protected $_name = 'brand_item';
     protected $_referenceMap = [
         'Brand' => [
             'columns'       => ['brand_id'],

@@ -12,7 +12,8 @@ class CategoryControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Controller(
-            $container->get('longCache')
+            $container->get('longCache'),
+            $container->get(\Autowp\TextStorage\Service::class)
         );
     }
 }

@@ -12,17 +12,17 @@ class FactoryRow extends Row
 
         $carIds = $db->fetchCol(
             $db->select()
-                ->from('factory_car', 'car_id')
-                ->where('factory_car.factory_id = ?', $this->id)
+                ->from('factory_item', 'item_id')
+                ->where('factory_item.factory_id = ?', $this->id)
         );
 
         $vectors = [];
         foreach ($carIds as $carId) {
             $parentIds = $db->fetchCol(
                 $db->select()
-                    ->from('car_parent_cache', 'parent_id')
-                    ->where('car_id = ?', $carId)
-                    ->where('car_id <> parent_id')
+                    ->from('item_parent_cache', 'parent_id')
+                    ->where('item_id = ?', $carId)
+                    ->where('item_id <> parent_id')
                     ->order('diff desc')
             );
 
@@ -75,17 +75,17 @@ class FactoryRow extends Row
 
         $carIds = $db->fetchCol(
             $db->select()
-                ->from('factory_car', 'car_id')
-                ->where('factory_car.factory_id = ?', $this->id)
+                ->from('factory_item', 'item_id')
+                ->where('factory_item.factory_id = ?', $this->id)
         );
 
         $vectors = [];
         foreach ($carIds as $carId) {
             $parentIds = $db->fetchCol(
                 $db->select()
-                    ->from('car_parent_cache', 'parent_id')
-                    ->where('car_id = ?', $carId)
-                    ->where('car_id <> parent_id')
+                    ->from('item_parent_cache', 'parent_id')
+                    ->where('item_id = ?', $carId)
+                    ->where('item_id <> parent_id')
                     ->order('diff desc')
             );
 

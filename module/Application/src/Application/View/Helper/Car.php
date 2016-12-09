@@ -5,7 +5,7 @@ namespace Application\View\Helper;
 use Zend\View\Helper\AbstractHelper;
 
 use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\Spec;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
@@ -25,9 +25,9 @@ class Car extends AbstractHelper
     private $textMonthFormat = '%02d.';
 
     /**
-     * @var BrandCar
+     * @var BrandItem
      */
-    private $brandCarTable;
+    private $brandItemTable;
 
     /**
      * @var VehicleParent
@@ -105,7 +105,7 @@ class Car extends AbstractHelper
             'spec'             => $spec,
             'spec_full'        => $specFull,
             'body'             => $car['body'],
-            'name'             => $car['caption'],
+            'name'             => $car['name'],
             'begin_year'       => $car['begin_year'],
             'end_year'         => $car['end_year'],
             'today'            => $car['today'],
@@ -127,7 +127,7 @@ class Car extends AbstractHelper
                 'url' => $this->view->url([
                     'module'        => 'default',
                     'controller'    => 'catalogue',
-                    'action'        => 'brand-car',
+                    'action'        => 'brand-item',
                     'brand_catname' => $url['brand_catname'],
                     'car_catname'   => $url['car_catname'],
                     'path'          => $url['path']
@@ -144,13 +144,13 @@ class Car extends AbstractHelper
     }
 
     /**
-     * @return BrandCar
+     * @return BrandItem
      */
-    private function getBrandCarTable()
+    private function getBrandItemTable()
     {
-        return $this->brandCarTable
-            ? $this->brandCarTable
-            : $this->brandCarTable = new BrandCar();
+        return $this->brandItemTable
+            ? $this->brandItemTable
+            : $this->brandItemTable = new BrandItem();
     }
 
     /**
@@ -182,19 +182,19 @@ class Car extends AbstractHelper
     {
         $urls = [];
 
-        $brandCarRows = $this->getBrandCarTable()->fetchAll([
+        $brandItemRows = $this->getBrandItemTable()->fetchAll([
             'car_id = ?' => $id
         ]);
 
-        foreach ($brandCarRows as $brandCarRow) {
-            $brand = $this->getBrandTable()->find($brandCarRow->brand_id)->current();
+        foreach ($brandItemRows as $brandItemRow) {
+            $brand = $this->getBrandTable()->find($brandItemRow->brand_id)->current();
             if (! $brand) {
-                throw new Exception("Broken link `{$brandCarRow->brand_id}`");
+                throw new Exception("Broken link `{$brandItemRow->brand_id}`");
             }
 
             $urls[] = [
                 'brand_catname' => $brand->folder,
-                'car_catname'   => $brandCarRow->catname,
+                'car_catname'   => $brandItemRow->catname,
                 'path'          => $path
             ];
         }

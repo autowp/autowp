@@ -86,7 +86,7 @@ class Forums
             if ($lastTopicRow) {
                 $lastTopic = [
                     'id'   => $lastTopicRow->id,
-                    'name' => $lastTopicRow->caption
+                    'name' => $lastTopicRow->name
                 ];
 
                 $lastMessageRow = $comments->getLastMessageRow(CommentMessage::FORUMS_TYPE_ID, $lastTopicRow->id);
@@ -112,13 +112,13 @@ class Forums
             foreach ($this->themeTable->fetchAll($select) as $srow) {
                 $subthemes[] = [
                     'id'   => $srow->id,
-                    'name' => $srow->caption
+                    'name' => $srow->name
                 ];
             }
 
             $themes[] = [
                 'id'          => $row->id,
-                'name'        => $row->caption,
+                'name'        => $row->name,
                 'description' => $row->description,
                 'lastTopic'   => $lastTopic,
                 'lastMessage' => $lastMessage,
@@ -319,7 +319,7 @@ class Forums
             $topics[] = [
                 'id'          => $topicRow->id,
                 'paginator'   => $topicPaginator,
-                'name'        => $topicRow->caption,
+                'name'        => $topicRow->name,
                 'messages'    => $messages,
                 'oldMessages' => $oldMessages,
                 'newMessages' => $newMessages,
@@ -359,7 +359,7 @@ class Forums
         if ($currentTheme) {
             $themeData = [
                 'id'             => $currentTheme->id,
-                'name'           => $currentTheme->caption,
+                'name'           => $currentTheme->name,
                 'topics'         => $currentTheme->topics,
                 'messages'       => $currentTheme->messages,
                 'disable_topics' => $currentTheme->disable_topics,
@@ -395,7 +395,7 @@ class Forums
 
         $topic = $this->topicTable->createRow([
             'theme_id'     => $theme['id'],
-            'caption'      => $values['name'],
+            'name'      => $values['name'],
             'author_id'    => $userId,
             'author_ip'    => new Zend_Db_Expr($db->quoteInto('INET6_ATON(?)', $values['ip'])),
             'add_datetime' => new Zend_Db_Expr('NOW()'),
@@ -432,7 +432,7 @@ class Forums
 
         return [
             'id'             => $theme->id,
-            'name'           => $theme->caption,
+            'name'           => $theme->name,
             'disable_topics' => $theme->disable_topics,
             'is_moderator'   => $theme->is_moderator
         ];
@@ -450,7 +450,7 @@ class Forums
         foreach ($this->themeTable->fetchAll($select) as $row) {
             $result[] = [
                 'id'   => $row->id,
-                'name' => $row->caption
+                'name' => $row->name
             ];
         }
 
@@ -481,7 +481,7 @@ class Forums
         foreach ($this->topicTable->fetchAll($select) as $row) {
             $result[] = [
                 'id'   => $row->id,
-                'name' => $row->caption
+                'name' => $row->name
             ];
         }
 
@@ -554,7 +554,7 @@ class Forums
 
         return [
             'id'       => $topic->id,
-            'name'     => $topic->caption,
+            'name'     => $topic->name,
             'theme_id' => $topic->theme_id,
             'status'   => $topic->status,
         ];
@@ -740,7 +740,7 @@ class Forums
 
             $topics[] = [
                 'id'          => $row->id,
-                'name'        => $row->caption,
+                'name'        => $row->name,
                 'messages'    => $messages,
                 'oldMessages' => $oldMessages,
                 'newMessages' => $newMessages,

@@ -24,9 +24,9 @@
             <?php /* if ($this->brandLanguage) { ?>
                 <h1><?=$this->escapeHtml($this->brandLanguage->name) ?></h1>
                 <p>
-                    <?=$this->escapeHtml($this->brand->caption) ?>
-                    <?php if ( $this->brand->full_caption && ($this->brand->full_caption != $this->brand->caption) ) { ?>
-                        <small>(<?=$this->escapeHtml($this->brand->full_caption)?>)</small>
+                    <?=$this->escapeHtml($this->brand->name) ?>
+                    <?php if ( $this->brand->full_name && ($this->brand->full_name != $this->brand->name) ) { ?>
+                        <small>(<?=$this->escapeHtml($this->brand->full_name)?>)</small>
                     <?php } ?>
                 </p>
             <?php } else { */ ?>
@@ -88,16 +88,6 @@
                 ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-vehicle')) . ' <span class="badge">' . $this->inboxVehiclePictures . '</span>', false)?>
             </li>
         <?php } ?>
-        <?php if ($this->inboxEnginePictures) { ?>
-            <li>
-                <?=$this->htmlA($this->url('moder/pictures/params', [
-                    'action'   => 'index',
-                    'status'   => Application\Model\DbTable\Picture::STATUS_INBOX,
-                    'brand_id' => $this->brand['id'],
-                    'type_id'  => Application\Model\DbTable\Picture::ENGINE_TYPE_ID,
-                ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-engine')) . ' <span class="badge">' . $this->inboxEnginePictures . '</span>', false)?>
-            </li>
-        <?php } ?>
     </ul>
 </header>
 
@@ -133,7 +123,7 @@
                 <p>
                     <strong><?=$this->escapeHtml($this->translate('catalogue/link-category/' . $key)) ?></strong><br />
                     <?php foreach ($type['links'] as $link) { ?>
-                        <?=$this->htmlA($link->url, $link->caption ? $link->caption : $link->url)?><br />
+                        <?=$this->htmlA($link->url, $link->name ? $link->name : $link->url)?><br />
                     <?php } ?>
                 </p>
             <?php } ?>

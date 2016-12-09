@@ -8,8 +8,90 @@
         'pageId' => $this->category->id ? 127 : 126,
     ]);
 ?>
-<div class="well">
-    <?=$this->partial('application/forms/bootstrap-horizontal', [
-        'form' => $this->form
-    ])?>
+
+<ul class="nav nav-tabs" id="myTab">
+    <li<?=$this->tab == 'meta' ? ' class="active"' : ''?>>
+        <?=$this->htmlA(
+            [
+                'href'          => '#meta',
+                'data-toggle'   => 'tab',
+                'data-activate' => true ? '1' : null
+            ],
+            'Meta'
+        )?>
+    </li>
+    <?php if ($this->category->id) { ?>
+        <?php foreach ($this->langData as $language => $data) { ?>
+            <li<?=$this->tab == $language ? ' class="active"' : ''?>>
+                <?=$this->htmlA(
+                    [
+                        'href'          => '#'.$language,
+                        'data-toggle'   => 'tab',
+                        'data-activate' => null//$tab['active'] ? '1' : null
+                    ],
+                    $language
+                )?>
+            </li>
+        <?php } ?>
+    <?php } ?>
+</ul>
+
+<div class="tab-content well">
+    <div class="tab-pane<?=$this->tab == 'meta' ? ' active' : ''?>" id="meta">
+        <div class="well">
+            <?php if ($this->canEdit) { ?>
+                <?=$this->partial('application/forms/bootstrap-horizontal', [
+                    'form' => $this->form
+                ])?>
+            <?php } else { ?>
+                <table class="table">
+                    <tr>
+                        <td></td>
+                        <td>Name</td>
+                        <td><?=$this->escapeHtml($this->category['name'])?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Short name</td>
+                        <td><?=$this->escapeHtml($this->category['short_name'])?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Catname</td>
+                        <td><?=$this->escapeHtml($this->category['catname'])?></td>
+                    </tr>
+                    <?php foreach ($this->langData as $language => $data) { ?>
+                        <tr>
+                            <th rowspan="2"><?=$this->escapeHtml($language)?></th>
+                            <td>Name</td>
+                            <td><?=$this->escapeHtml($data['name'])?></td>
+                        </tr>
+                        <tr>
+                            <td>Short name</td>
+                            <td><?=$this->escapeHtml($data['short_name'])?></td>
+                        </tr>
+                    <?php } ?>
+                </table>
+            <?php } ?>
+        </div>
+    </div>
+    <?php if ($this->category->id) { ?>
+        <?php foreach ($this->langData as $language => $data) { ?>
+            <div class="tab-pane<?=$this->tab == $language ? ' active' : ''?>" id="<?=$this->escapeHtmlAttr($language)?>">
+                <?=$this->partial('application/forms/markdown', [
+                    'form' => $data['form']
+                ])?>
+                <?php if ($data['text_id']) { ?>
+                    <p>
+                        <?=$this->htmlA([
+                            'class' => 'pull-right',
+                            'href'  => $this->url('info/text', [
+                                'id' => $data['text_id']
+                            ])
+                        ], $this->translate('moder/markdown/history'))?>
+                    </p>
+                <?php } ?>
+            </div>
+        <?php } ?>
+    <?php } ?>
 </div>

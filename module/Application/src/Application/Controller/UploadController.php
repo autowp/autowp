@@ -10,9 +10,9 @@ use Application\ExifGPSExtractor;
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
 use Application\Model\Comments;
+use Application\Model\DbTable;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Engine;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
@@ -95,12 +95,11 @@ class UploadController extends AbstractActionController
             $type = $replacePicture->type;
             $brandId = $replacePicture->brand_id;
             $carIds = $this->pictureItem->getPictureItems($replacePicture->id);
-            $engineId = $replacePicture->engine_id;
         } else {
             $type = (int)$this->params('type');
             $brandId = (int)$this->params('brand_id');
-            $carIds = [(int)$this->params('car_id')];
-            $engineId = (int)$this->params('engine_id');
+            $carId = (int)$this->params('car_id');
+            $carIds = $carId ? [$carId] : [];
         }
 
         $selected = false;
@@ -137,15 +136,6 @@ class UploadController extends AbstractActionController
                 }
                 $selectedName = implode(', ', $names);
                 break;
-
-            case Picture::ENGINE_TYPE_ID:
-                $engines = new Engine();
-                $engine = $engines->find($engineId)->current();
-                if ($engine) {
-                    $selected = true;
-                    $selectedName = $engine->caption;
-                }
-                break;
         }
 
         $form = null;
@@ -166,7 +156,7 @@ class UploadController extends AbstractActionController
                 );
                 $form->setData($data);
                 if ($form->isValid()) {
-                    $pictures = $this->saveUpload($form, $type, $brandId, $engineId, $carIds, $replacePicture);
+                    $pictures = $this->saveUpload($form, $type, $brandId, $carIds, $replacePicture);
 
                     if ($request->isXmlHttpRequest()) {
                         /*$urls = [];
@@ -232,7 +222,7 @@ class UploadController extends AbstractActionController
         ];
     }
 
-    private function saveUpload($form, $type, $brandId, $engineId, $carIds, $replacePicture)
+    private function saveUpload($form, $type, $brandId, $carIds, $replacePicture)
     {
         $user = $this->user()->get();
 
@@ -251,15 +241,7 @@ class UploadController extends AbstractActionController
 
             case Picture::VEHICLE_TYPE_ID:
                 break;
-
-            case Picture::ENGINE_TYPE_ID:
-                $engines = new Engine();
-                $engine = $engines->find($engineId)->current();
-                if ($engine) {
-                    $engineId = $engine->id;
-                }
-                break;
-
+                
             default:
                 throw new Exception("Unexpected type");
         }
@@ -318,15 +300,11 @@ class UploadController extends AbstractActionController
                 'height'        => $height,
                 'owner_id'      => $user ? $user->id : null,
                 'add_date'      => new Zend_Db_Expr('NOW()'),
-                //'note'          => $values['note'],
-                'views'         => 0,
                 'filesize'      => $fileSize,
-                'crc'           => 0,
                 'status'        => Picture::STATUS_INBOX,
                 'type'          => $type,
                 'removing_date' => null,
                 'brand_id'      => $brandId ? $brandId : null,
-                'engine_id'     => $engineId ? $engineId : null,
                 'ip'            => inet_pton($this->getRequest()->getServer('REMOTE_ADDR')),
                 'identity'      => $pictureTable->generateIdentity(),
                 'replace_picture_id' => $replacePicture ? $replacePicture->id : null,
@@ -451,9 +429,9 @@ class UploadController extends AbstractActionController
 
         $haveConcepts = (bool)$carTable->fetchRow(
             $carTable->select(true)
-                ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand['id'])
+                ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('cars.is_concept')
         );
 
@@ -463,7 +441,7 @@ class UploadController extends AbstractActionController
             $db->select()
                 ->from('cars', [
                     'cars.id',
-                    'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                    'name' => 'if(car_language.name, car_language.name, cars.name)',
                     'cars.begin_model_year', 'cars.end_model_year',
                     'spec' => 'spec.short_name',
                     'spec_full' => 'spec.name',
@@ -473,34 +451,60 @@ class UploadController extends AbstractActionController
                 ])
                 ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
-                ->join('brands_cars', 'cars.id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand['id'])
+                ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('NOT cars.is_concept')
-                ->order(['cars.caption', 'cars.begin_year', 'cars.end_year'])
+                ->where('cars.item_type_id = ?', DbTable\Item\Type::VEHICLE)
+                ->order([
+                    'cars.name',
+                    'cars.begin_year',
+                    'cars.end_year',
+                    'cars.begin_model_year',
+                    'cars.end_model_year'
+                ])
                 ->bind([
                     'lang' => $this->language()
                 ])
         );
-        $cars = $this->prepareCars($rows);
-
-        $engineTable = new Engine();
-        $haveEngines = (bool)$engineTable->fetchRow(
-            $engineTable->select(true)
-                ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
-                ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
-                ->where('brand_engine.brand_id = ?', $brand['id'])
+        $vehicles = $this->prepareCars($rows);
+        
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from('cars', [
+                    'cars.id',
+                    'name' => 'if(car_language.name, car_language.name, cars.name)',
+                    'cars.begin_model_year', 'cars.end_model_year',
+                    'spec' => 'spec.short_name',
+                    'spec_full' => 'spec.name',
+                    'cars.body', 'cars.today',
+                    'cars.begin_year', 'cars.end_year',
+                    'cars.is_group'
+                ])
+                ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
+                ->joinLeft('spec', 'cars.spec_id = spec.id', null)
+                ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
+                ->where('cars.item_type_id = ?', DbTable\Item\Type::ENGINE)
+                ->order([
+                    'cars.name',
+                    'cars.begin_year',
+                    'cars.end_year',
+                    'cars.begin_model_year',
+                    'cars.end_model_year'
+                ])
+                ->bind([
+                    'lang' => $this->language()
+                ])
         );
+        $engines = $this->prepareCars($rows);
 
         return [
             'brand'        => $brand,
-            'cars'         => $cars,
+            'vehicles'     => $vehicles,
+            'engines'      => $engines,
             'haveConcepts' => $haveConcepts,
             'conceptsUrl'  => $this->url()->fromRoute('upload/params', [
                 'action' => 'concepts',
-            ], [], true),
-            'haveEngines'  => $haveEngines,
-            'enginesUrl'   => $this->url()->fromRoute('upload/params', [
-                'action' => 'engines',
             ], [], true),
         ];
     }
@@ -617,7 +621,7 @@ class UploadController extends AbstractActionController
             $db->select()
                 ->from('cars', [
                     'cars.id',
-                    'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                    'name' => 'if(car_language.name, car_language.name, cars.name)',
                     'cars.begin_model_year', 'cars.end_model_year',
                     'spec' => 'spec.short_name',
                     'spec_full' => 'spec.name',
@@ -629,7 +633,7 @@ class UploadController extends AbstractActionController
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->join('car_parent', 'cars.id = car_parent.car_id', 'type')
                 ->where('car_parent.parent_id = ?', $car->id)
-                ->order(['car_parent.type', 'cars.caption', 'cars.begin_year', 'cars.end_year'])
+                ->order(['car_parent.type', 'cars.name', 'cars.begin_year', 'cars.end_year'])
                 ->bind([
                     'lang' => $this->language()
                 ])
@@ -641,50 +645,6 @@ class UploadController extends AbstractActionController
 
         return $viewModel->setTerminal(true);
     }
-
-
-    public function enginesAction()
-    {
-        $user = $this->user()->get();
-        if (! $user) {
-            return $this->forward()->dispatch(self::class, [
-                'action' => 'only-registered'
-            ]);
-        }
-
-        $brandTable = new BrandTable();
-        $brand = $brandTable->find($this->params('brand_id'))->current();
-        if (! $brand) {
-            return $this->notfoundAction();
-        }
-
-        $engineTable = new Engine();
-        $rows = $engineTable->fetchAll(
-            $engineTable->select(true)
-                ->join('engine_parent_cache', 'engines.id = engine_parent_cache.engine_id', null)
-                ->join('brand_engine', 'engine_parent_cache.parent_id = brand_engine.engine_id', null)
-                ->where('brand_engine.brand_id = ?', $brand->id)
-                ->order('engines.caption')
-        );
-        $engines = [];
-        foreach ($rows as $row) {
-            $engines[] = [
-                'name' => $row->caption,
-                'url'  => $this->url()->fromRoute('upload/params', [
-                    'action'    => 'index',
-                    'type'      => Picture::ENGINE_TYPE_ID,
-                    'engine_id' => $row->id
-                ], [], true)
-            ];
-        }
-
-        $viewModel = new ViewModel([
-            'engines' => $engines
-        ]);
-
-        return $viewModel->setTerminal(true);
-    }
-
 
     public function conceptsAction()
     {
@@ -709,7 +669,7 @@ class UploadController extends AbstractActionController
             $db->select()
                 ->from('cars', [
                     'cars.id',
-                    'name' => 'if(car_language.name, car_language.name, cars.caption)',
+                    'name' => 'if(car_language.name, car_language.name, cars.name)',
                     'cars.begin_model_year', 'cars.end_model_year',
                     'spec' => 'spec.short_name',
                     'spec_full' => 'spec.name',
@@ -719,11 +679,11 @@ class UploadController extends AbstractActionController
                 ])
                 ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
-                ->join('car_parent_cache', 'cars.id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand->id)
+                ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand->id)
                 ->where('cars.is_concept')
-                ->order(['cars.caption', 'cars.begin_year', 'cars.end_year'])
+                ->order(['cars.name', 'cars.begin_year', 'cars.end_year'])
                 ->group('cars.id')
                 ->bind([
                     'lang' => $this->language()

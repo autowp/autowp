@@ -5,6 +5,7 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
+use Application\Model\DbTable;
 use Application\Model\DbTable\Vehicle\Type as VehicleType;
 
 class Car extends Form implements InputFilterProviderInterface
@@ -20,6 +21,8 @@ class Car extends Form implements InputFilterProviderInterface
     private $translator;
 
     private $language = 'en';
+    
+    private $itemType = null;
 
     /**
      * @var VehicleType
@@ -88,7 +91,7 @@ class Car extends Form implements InputFilterProviderInterface
                     'size'     => 1
                 ]
             ],*/
-            [
+            'vehicle_type_id' => [
                 'name'    => 'vehicle_type_id',
                 'type'    => 'Select',
                 'options' => [
@@ -153,6 +156,10 @@ class Car extends Form implements InputFilterProviderInterface
                 ]
             ],
         ];
+        
+        if ($this->itemType == DbTable\Item\Type::ENGINE) {
+            unset($elements['vehicle_type_id']);
+        }
 
         foreach ($elements as $element) {
             $this->add($element);
@@ -202,6 +209,11 @@ class Car extends Form implements InputFilterProviderInterface
         if (isset($options['specOptions'])) {
             $this->specOptions = $options['specOptions'];
             unset($options['specOptions']);
+        }
+        
+        if (isset($options['itemType'])) {
+            $this->itemType = $options['itemType'];
+            unset($options['itemType']);
         }
 
         $this->translator = $options['translator'];

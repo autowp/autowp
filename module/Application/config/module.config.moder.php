@@ -266,6 +266,22 @@ return [
                             ]
                         ]
                     ],
+                    'picture-item' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/picture-item[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\PictureItemController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => Router\Http\WildcardSafe::class
+                            ]
+                        ]
+                    ],
                     'pictures' => [
                         'type' => Segment::class,
                         'options' => [
@@ -338,7 +354,7 @@ return [
         'factories' => [
             Controller\Moder\AttrsController::class        => InvokableFactory::class,
             Controller\Moder\BrandsController::class       => Controller\Moder\Service\BrandsControllerFactory::class,
-            Controller\Moder\CategoryController::class     => InvokableFactory::class,
+            Controller\Moder\CategoryController::class     => Controller\Moder\Service\CategoryControllerFactory::class,
             Controller\Moder\BrandVehicleController::class => Controller\Moder\Service\BrandVehicleControllerFactory::class,
             Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
             Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
@@ -349,6 +365,7 @@ return [
             Controller\Moder\MuseumController::class       => Controller\Moder\Service\MuseumControllerFactory::class,
             Controller\Moder\PagesController::class        => InvokableFactory::class,
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
+            Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
             Controller\Moder\PicturesController::class     => Controller\Moder\Service\PicturesControllerFactory::class,
             Controller\Moder\RightsController::class       => Controller\Moder\Service\RightsControllerFactory::class,
             Controller\Moder\TwinsController::class        => Controller\Moder\Service\TwinsControllerFactory::class,
@@ -854,12 +871,12 @@ return [
                 [
                     'spec' => [
                         'type' => 'EngineName',
-                        'name' => 'caption'
+                        'name' => 'name'
                     ],
                 ]
             ],
             'input_filter' => [
-                'caption' => [
+                'name' => [
                     'required' => true,
                     'filters'  => [
                         ['name' => 'StringTrim'],
@@ -1034,7 +1051,7 @@ return [
                 'method' => 'post',
             ],
         ],
-        'ModerBrandCar' => [
+        'ModerBrandItem' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [
                 'method' => 'post',
@@ -1169,6 +1186,20 @@ return [
                 [
                     'spec' => [
                         'type'    => 'Select',
+                        'name'    => 'item_type_id',
+                        'options' => [
+                            'label' => 'moder/vehicles/filter/item-type',
+                            'options' => [
+                                '' => '--',
+                                Model\DbTable\Item\Type::VEHICLE => 'item/type/1/name',
+                                Model\DbTable\Item\Type::ENGINE  => 'item/type/2/name',
+                            ]
+                        ]
+                    ],
+                ],
+                [
+                    'spec' => [
+                        'type'    => 'Select',
                         'name'    => 'vehicle_type_id',
                         'options' => [
                             'label' => 'moder/vehicles/filter/vehicle-type',
@@ -1264,6 +1295,9 @@ return [
                     'filters'    => [
                         ['name' => 'StringTrim'],
                     ]
+                ],
+                'item_type_id' => [
+                    'required' => false
                 ],
                 'vehicle_type_id' => [
                     'required'   => false,

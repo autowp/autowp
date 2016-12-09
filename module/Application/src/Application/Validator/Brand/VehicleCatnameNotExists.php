@@ -4,7 +4,7 @@ namespace Application\Validator\Brand;
 
 use Zend\Validator\AbstractValidator;
 
-use Application\Model\DbTable\BrandCar as BrandVehicle;
+use Application\Model\DbTable\BrandItem as BrandVehicle;
 
 class VehicleCatnameNotExists extends AbstractValidator
 {

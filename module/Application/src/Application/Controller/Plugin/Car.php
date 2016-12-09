@@ -119,11 +119,11 @@ class Car extends AbstractPlugin
                     ->group('picture_item.item_id');
             } else {
                 $select
-                    ->from($pictureTable->info('name'), ['car_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
+                    ->from($pictureTable->info('name'), ['item_parent_cache.parent_id', new Zend_Db_Expr('COUNT(1)')])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                    ->where('car_parent_cache.parent_id IN (?)', $carIds)
-                    ->group('car_parent_cache.parent_id');
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id IN (?)', $carIds)
+                    ->group('item_parent_cache.parent_id');
             }
 
             $result = array_replace($result, $pictureTableAdapter->fetchPairs($select));
@@ -176,7 +176,6 @@ class Car extends AbstractPlugin
         $carParentTable = new DbTable\Vehicle\ParentTable();
         $carParentAdapter = $carParentTable->getAdapter();
         $brandTable = new DbTable\Brand();
-        $brandCarTable = new DbTable\BrandCar();
         $categoryTable = new DbTable\Category();
 
         $carIds = [];
@@ -211,15 +210,15 @@ class Car extends AbstractPlugin
             $categoryRows = $db->fetchAll(
                 $db->select()
                     ->from($categoryTable->info('name'), ['name', 'catname'])
-                    ->join('category_car', 'category.id = category_car.category_id', null)
-                    ->join('car_parent_cache', 'category_car.car_id = car_parent_cache.parent_id', 'car_id')
+                    ->join('category_item', 'category.id = category_item.category_id', null)
+                    ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', 'item_id')
                     ->joinLeft('category_language', $langExpr, ['lang_name' => 'name'])
-                    ->where('car_parent_cache.car_id IN (?)', $carIds)
-                    ->group(['car_parent_cache.car_id', 'category.id'])
+                    ->where('item_parent_cache.item_id IN (?)', $carIds)
+                    ->group(['item_parent_cache.item_id', 'category.id'])
             );
 
             foreach ($categoryRows as $category) {
-                $carId = (int)$category['car_id'];
+                $carId = (int)$category['item_id'];
                 if (! isset($carsCategories[$carId])) {
                     $carsCategories[$carId] = [];
                 }
@@ -292,24 +291,24 @@ class Car extends AbstractPlugin
         $designCarsRows = $carParentAdapter->fetchAll(
             $carParentAdapter->select()
                 ->from('brands', [
-                    'brand_name'    => 'caption',
+                    'brand_name'    => 'name',
                     'brand_catname' => 'folder'
                 ])
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', [
-                    'brand_car_catname' => 'catname'
+                ->join('brand_item', 'brands.id = brand_item.brand_id', [
+                    'brand_item_catname' => 'catname'
                 ])
-                ->where('brands_cars.type = ?', DbTable\BrandCar::TYPE_DESIGN)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', 'car_id')
-                ->where('car_parent_cache.car_id IN (?)', $carIds ? $carIds : 0)
-                ->group('car_parent_cache.car_id')
+                ->where('brand_item.type = ?', DbTable\BrandItem::TYPE_DESIGN)
+                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', 'item_id')
+                ->where('item_parent_cache.item_id IN (?)', $carIds ? $carIds : 0)
+                ->group('item_parent_cache.item_id')
         );
         foreach ($designCarsRows as $designCarsRow) {
-            $carsDesignProject[$designCarsRow['car_id']] = [
+            $carsDesignProject[$designCarsRow['item_id']] = [
                 'brandName' => $designCarsRow['brand_name'],
                 'url'       => $controller->url()->fromRoute('catalogue', [
-                    'action'        => 'brand-car',
+                    'action'        => 'brand-item',
                     'brand_catname' => $designCarsRow['brand_catname'],
-                    'car_catname'   => $designCarsRow['brand_car_catname']
+                    'car_catname'   => $designCarsRow['brand_item_catname']
                 ])
             ];
         }
@@ -390,7 +389,7 @@ class Car extends AbstractPlugin
                             $specsLinks[] = [
                                 'name' => null,
                                 'url'  => $controller->url()->fromRoute('catalogue', [
-                                    'action'        => 'brand-car-specifications',
+                                    'action'        => 'brand-item-specifications',
                                     'brand_catname' => $path['brand_catname'],
                                     'car_catname'   => $path['car_catname'],
                                     'path'          => $path['path']
@@ -411,11 +410,16 @@ class Car extends AbstractPlugin
                     $spec = $specRow->short_name;
                 }
             }*/
+            
+            $vehiclesOnEngine = [];
+            if ($car->item_type_id == DbTable\Item\Type::ENGINE) {
+                $vehiclesOnEngine = $this->getVehiclesOnEngine($car);
+            }
 
             $item = [
                 'id'               => $car->id,
                 'row'              => $car,
-                'name'             => $car->caption,
+                'name'             => $car->name,
                 'langName'         => isset($carsLangName[$car->id]) ? $carsLangName[$car->id] : null,
                 'produced'         => $car->produced,
                 'produced_exactly' => $car->produced_exactly,
@@ -428,6 +432,7 @@ class Car extends AbstractPlugin
                 'childsCount'      => $childsCount,
                 'specsLinks'       => $specsLinks,
                 'largeFormat'      => $useLargeFormat,
+                'vehiclesOnEngine' => $vehiclesOnEngine
             ];
 
             if (! $disableTwins) {
@@ -452,7 +457,7 @@ class Car extends AbstractPlugin
                         $url = null;
                         foreach ($cataloguePaths as $cPath) {
                             $url = $controller->url()->fromRoute('catalogue', [
-                                'action'        => 'brand-car',
+                                'action'        => 'brand-item',
                                 'brand_catname' => $cPath['brand_catname'],
                                 'car_catname'   => $cPath['car_catname'],
                                 'path'          => $cPath['path']
@@ -569,6 +574,46 @@ class Car extends AbstractPlugin
             'items'              => $items,
         ];
     }
+    
+    private function getVehiclesOnEngine($engine)
+    {
+        $result = [];
+
+        $itemModel = new \Application\Model\Item();
+
+        $ids = $itemModel->getEngineVehiclesGroups($engine->id, [
+            'groupJoinLimit' => 3
+        ]);
+    
+        if ($ids) {
+            
+            $controller = $this->getController();
+            $language = $controller->language();
+            $catalogue = $controller->catalogue();
+            $itemTable = new DbTable\Vehicle();
+            
+            $rows = $itemTable->fetchAll([
+                'id in (?)' => $ids
+            ], $catalogue->carsOrdering());
+            foreach ($rows as $row) {
+                $cataloguePaths = $catalogue->cataloguePaths($row);
+                foreach ($cataloguePaths as $cPath) {
+                    $result[] = [
+                        'name' => $row->getNameData($language),
+                        'url'  => $controller->url()->fromRoute('catalogue', [
+                            'action'        => 'brand-item',
+                            'brand_catname' => $cPath['brand_catname'],
+                            'car_catname'   => $cPath['car_catname'],
+                            'path'          => $cPath['path']
+                        ])
+                    ];
+                    break;
+                }
+            }
+        }
+        
+        return $result;
+    }
 
     private function getPictureTable()
     {
@@ -609,7 +654,7 @@ class Car extends AbstractPlugin
             ->from(
                 $pictureTable->info('name'),
                 [
-                    'id', 'name', 'type', 'brand_id', 'engine_id', 'factory_id',
+                    'id', 'name', 'type', 'brand_id', 'factory_id',
                     'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
@@ -627,23 +672,23 @@ class Car extends AbstractPlugin
             $select->where('picture_item.item_id = ?', $car->id);
         } else {
             $select
-                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->join('cars', 'picture_item.item_id = cars.id', null)
-                ->where('car_parent_cache.parent_id = ?', $car->id);
+                ->where('item_parent_cache.parent_id = ?', $car->id);
 
             $order[] = 'cars.is_concept asc';
-            $order[] = 'car_parent_cache.sport asc';
-            $order[] = 'car_parent_cache.tuning asc';
+            $order[] = 'item_parent_cache.sport asc';
+            $order[] = 'item_parent_cache.tuning asc';
 
             if (isset($options['type'])) {
                 switch ($options['type']) {
                     case DbTable\Vehicle\ParentTable::TYPE_DEFAULT:
                         break;
                     case DbTable\Vehicle\ParentTable::TYPE_TUNING:
-                        $select->where('car_parent_cache.tuning');
+                        $select->where('item_parent_cache.tuning');
                         break;
                     case DbTable\Vehicle\ParentTable::TYPE_SPORT:
-                        $select->where('car_parent_cache.sport');
+                        $select->where('item_parent_cache.sport');
                         break;
                 }
             }
@@ -680,8 +725,8 @@ class Car extends AbstractPlugin
                     'pi_oc.picture_id = pictures.id'
                 )
                 ->join(
-                    ['cpc_oc' => 'car_parent_cache'],
-                    'cpc_oc.car_id = pi_oc.item_id',
+                    ['cpc_oc' => 'item_parent_cache'],
+                    'cpc_oc.item_id = pi_oc.item_id',
                     null
                 )
                 ->where('cpc_oc.parent_id IN (?)', $options['onlyChilds']);
@@ -760,22 +805,8 @@ class Car extends AbstractPlugin
             }
         }
 
-        /*$nothingFound = true;
-        foreach ($pictures as $picture) {
-            if ($picture) {
-                $nothingFound = false;
-                break;
-            }
-        }*/
-
-        $notEmptyPics = [];
-        foreach ($pictures as $picture) {
-            if ($picture) {
-                $notEmptyPics[] = $picture;
-            }
-        }
-
         $result = [];
+        $emptyPictures = 0;
         foreach ($pictures as $idx => $picture) {
             if ($picture) {
                 $pictureId = $picture['id'];
@@ -795,6 +826,44 @@ class Car extends AbstractPlugin
                 ];
             } else {
                 $result[] = false;
+                $emptyPictures++;
+            }
+        }
+        
+        if ($emptyPictures > 0 && ($car['item_type_id'] == DbTable\Item\Type::ENGINE)) {
+            $pictureTable = $this->getPictureTable();
+            $db = $pictureTable->getAdapter();
+            $pictureRows = $db->fetchAll(
+                $db->select()
+                    ->from('pictures', [
+                        'id', 'name', 'type', 'brand_id', 'factory_id',
+                        'image_id', 'crop_left', 'crop_top',
+                        'crop_width', 'crop_height', 'width', 'height', 'identity'
+                    ])
+                    ->where('pictures.status IN (?)', [
+                        DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED
+                    ])
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->where('picture_item.perspective_id = ?', 17) // under the hood
+                    ->join('cars', 'picture_item.item_id = cars.id', null)
+                    ->join('item_parent_cache', 'cars.engine_item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $car['id'])
+                    ->limit($emptyPictures)
+            );
+            
+            $extraPicIdx = 0;
+            
+            foreach ($result as $idx => $picture) {
+                if (count($pictureRows) <= $extraPicIdx) {
+                    break;
+                }
+                $pictureRow = $pictureRows[$extraPicIdx++];
+                $url = $picHelper->href($pictureRow);
+                $result[$idx] = [
+                    'format' => 'picture-thumb',
+                    'row'    => $pictureRow,
+                    'url'    => $url,
+                ];
             }
         }
 

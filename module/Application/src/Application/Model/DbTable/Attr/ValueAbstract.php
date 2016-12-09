@@ -11,11 +11,7 @@ class ValueAbstract extends Table
             'columns'       => ['attribut_id'],
             'refTableClass' => Attribute::class,
             'refColumns'    => ['id']
-        ],
-        'ItemType' => [
-            'columns'       => ['item_type_id'],
-            'refTableClass' => ItemType::class,
-            'refColumns'    => ['id']
         ]
     ];
+    protected $_primary = ['attribute_id', 'item_id'];
 }

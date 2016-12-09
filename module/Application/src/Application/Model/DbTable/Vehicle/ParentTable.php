@@ -3,7 +3,7 @@
 namespace Application\Model\DbTable\Vehicle;
 
 use Application\Db\Table;
-use Application\Model\DbTable\BrandCar;
+use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\Vehicle\ParentCache;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 
@@ -36,18 +36,18 @@ class ParentTable extends Table
         TYPE_DESIGN = 3;
 
     /**
-     * @var BrandCar
+     * @var BrandItem
      */
-    private $brandCarTable;
+    private $brandItemTable;
 
     /**
-     * @return BrandCar
+     * @return BrandItem
      */
-    private function getBrandCarTable()
+    private function getBrandItemTable()
     {
-        return $this->brandCarTable
-            ? $this->brandCarTable
-            : $this->brandCarTable = new BrandCar();
+        return $this->brandItemTable
+            ? $this->brandItemTable
+            : $this->brandItemTable = new BrandItem();
     }
 
     public function collectChildIds($id)
@@ -96,6 +96,10 @@ class ParentTable extends Table
     {
         if (! $parent->is_group) {
             throw new Exception("Only groups can have childs");
+        }
+        
+        if ($car->item_type_id != $parent->item_type_id) {
+            throw new Exception("Parent and child must be same type");
         }
 
         $id = (int)$car->id;
@@ -168,13 +172,13 @@ class ParentTable extends Table
         $result = [];
 
         $limit = $breakOnFirst ? 1 : null;
-        $brandCarRows = $this->getBrandCarTable()->fetchAll([
+        $brandItemRows = $this->getBrandItemTable()->fetchAll([
             'car_id = ?'   => $carId,
             'brand_id = ?' => $brandId
         ], null, $limit);
-        foreach ($brandCarRows as $brandCarRow) {
+        foreach ($brandItemRows as $brandItemRow) {
             $result[] = [
-                'car_catname' => $brandCarRow->catname,
+                'car_catname' => $brandItemRow->catname,
                 'path'        => []
             ];
         }
@@ -216,22 +220,22 @@ class ParentTable extends Table
 
         $result = [];
 
-        $db = $this->getBrandCarTable()->getAdapter();
+        $db = $this->getBrandItemTable()->getAdapter();
 
         $select = $db->select()
-            ->from('brands_cars', 'catname')
-            ->join('brands', 'brands_cars.brand_id = brands.id', 'folder')
-            ->where('brands_cars.car_id = ?', $carId);
+            ->from('brand_item', 'catname')
+            ->join('brands', 'brand_item.brand_id = brands.id', 'folder')
+            ->where('brand_item.car_id = ?', $carId);
 
         if ($breakOnFirst) {
             $select->limit(1);
         }
 
-        $brandCarRows = $db->fetchAll($select);
-        foreach ($brandCarRows as $brandCarRow) {
+        $brandItemRows = $db->fetchAll($select);
+        foreach ($brandItemRows as $brandItemRow) {
             $result[] = [
-                'brand_catname' => $brandCarRow['folder'],
-                'car_catname'   => $brandCarRow['catname'],
+                'brand_catname' => $brandItemRow['folder'],
+                'car_catname'   => $brandItemRow['catname'],
                 'path'          => []
             ];
         }

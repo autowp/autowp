@@ -19,16 +19,19 @@ class InboxController extends AbstractActionController
         $language = $this->language();
 
         $brands = $brandModel->getList($language, function ($select) use ($language) {
-            $select
-                ->join('brands_cars', 'brands.id = brands_cars.brand_id', null)
-                ->join('car_parent_cache', 'brands_cars.car_id = car_parent_cache.parent_id', null)
-                ->join('picture_item', 'car_parent_cache.car_id = picture_item.item_id', null)
-                ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                ->where('pictures.status = ?', Picture::STATUS_INBOX)
-                ->group('brands.id')
-                ->bind([
-                    'language' => $language
-                ]);
+            $db = $select->getAdapter();
+            $select->where(
+                'brands.id IN (?)',
+                $db->select()
+                    ->from('brand_item', 'brand_id')
+                    ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                    ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
+                    ->join('pictures', 'picture_item.picture_id = pictures.id', null)
+                    ->where('pictures.status = ?', Picture::STATUS_INBOX)
+                    ->bind([
+                        'language' => $language
+                    ])
+            );
         });
 
         $url = $this->url()->fromRoute('inbox', [
@@ -74,9 +77,9 @@ class InboxController extends AbstractActionController
         if ($brand) {
             $select
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                ->join('car_parent_cache', 'picture_item.item_id = car_parent_cache.car_id', null)
-                ->join('brands_cars', 'car_parent_cache.parent_id = brands_cars.car_id', null)
-                ->where('brands_cars.brand_id = ?', $brand['id'])
+                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                ->where('brand_item.brand_id = ?', $brand['id'])
                 ->group('pictures.id');
         }
 

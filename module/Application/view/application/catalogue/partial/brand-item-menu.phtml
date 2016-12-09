@@ -2,7 +2,7 @@
     <?php if ($this->stock['count'] > 0) { ?>
         <li<?=$this->stock['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'brand-car',
+                'action' => 'brand-item',
                 'type'   => null,
                 'page'   => 1,
             ], [], true), '<i class="fa fa-list"></i> ' . $this->escapeHtml($this->title) . ' <span class="badge">'.$this->stock['count'].'</span>', false) ?>
@@ -11,7 +11,7 @@
     <?php if ($this->tuning['count'] > 0) { ?>
         <li<?=$this->tuning['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'brand-car',
+                'action' => 'brand-item',
                 'type'   => 'tuning',
                 'page'   => 1,
             ], [], true), '<i class="fa fa-list"></i> ' . $this->escapeHtml(sprintf($this->translate('catalogue/related-with-%1$s'), $this->title)) . ' <span class="badge">'.$this->tuning['count'].'</span>', false) ?>
@@ -20,7 +20,7 @@
     <?php if ($this->sport['count'] > 0) { ?>
         <li<?=$this->sport['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'brand-car',
+                'action' => 'brand-item',
                 'type'   => 'sport',
                 'page'   => 1,
             ], [], true), '<i class="fa fa-list"></i> ' . $this->escapeHtml(sprintf($this->translate('catalogue/sport-of-%1$s'), $this->title)) . ' <span class="badge">'.$this->sport['count'].'</span>', false) ?>
@@ -29,7 +29,7 @@
     <?php if ($this->pictures['count'] > 0) { ?>
         <li<?=$this->pictures['active'] ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url('catalogue', [
-                'action' => 'brand-car-pictures',
+                'action' => 'brand-item-pictures',
                 'page'   => 1,
             ], [], true), '<i class="fa fa-th"></i> ' . $this->escapeHtml(sprintf($this->translate('catalogue/all-pictures-of-%1$s'), $this->title)) . ' <span class="badge">'.$this->pictures['count'].'</span>', false) ?>
         </li>

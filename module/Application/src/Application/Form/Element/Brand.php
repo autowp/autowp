@@ -28,8 +28,8 @@ class Brand extends Select
 
         $values = $db->fetchPairs(
             $db->select()
-                ->from($table->info('name'), ['id', 'caption'])
-                ->order(['position', 'caption'])
+                ->from($table->info('name'), ['id', 'name'])
+                ->order(['position', 'name'])
         );
 
         $this->setValueOptions(['' => '--'] + $values);

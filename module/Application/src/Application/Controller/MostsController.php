@@ -106,7 +106,7 @@ class MostsController extends AbstractActionController
                     $url = null;
                     foreach ($paths as $path) {
                         $url = $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-car-picture',
+                            'action'        => 'brand-item-picture',
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
