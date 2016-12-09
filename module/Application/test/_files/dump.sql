@@ -1525,7 +1525,6 @@ CREATE TABLE `category` (
   `name` varchar(50) NOT NULL,
   `short_name` varchar(50) NOT NULL,
   `catname` varchar(35) NOT NULL,
-  `split_by_brand` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `catname` (`catname`),
