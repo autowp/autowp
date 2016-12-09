@@ -21,12 +21,6 @@ class PictureController extends AbstractActionController
         $this->carOfDay = $carOfDay;
     }
 
-    private function serverUrl($url)
-    {
-        $helper = new \Zend\View\Helper\ServerUrl();
-        return $helper->__invoke($url);
-    }
-
     public function randomPictureAction()
     {
         $pictureTable = new Picture();
@@ -48,7 +42,7 @@ class PictureController extends AbstractActionController
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->serverUrl($this->pic()->url($pictureRow->id, $pictureRow->identity))
+                'page'   => $this->pic()->url($pictureRow->id, $pictureRow->identity, true)
             ];
         }
 
@@ -76,7 +70,7 @@ class PictureController extends AbstractActionController
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->serverUrl($this->pic()->url($pictureRow->id, $pictureRow->identity))
+                'page'   => $this->pic()->url($pictureRow->id, $pictureRow->identity, true)
             ];
         }
 
@@ -140,7 +134,7 @@ class PictureController extends AbstractActionController
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->serverUrl($this->pic()->url($pictureRow->id, $pictureRow->identity))
+                'page'   => $this->pic()->url($pictureRow->id, $pictureRow->identity, true)
             ];
         }
 

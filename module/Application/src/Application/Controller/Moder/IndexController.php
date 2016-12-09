@@ -4,9 +4,7 @@ namespace Application\Controller\Moder;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable;
 
 class IndexController extends AbstractActionController
 {
@@ -36,7 +34,7 @@ class IndexController extends AbstractActionController
                 if ($this->addBrandForm->isValid()) {
                     $values = $this->addBrandForm->getData();
 
-                    $brands = new BrandTable();
+                    $brands = new DbTable\Brand();
 
                     $brand = $brands->createRow([
                         'name'    => $values['name'],
@@ -94,7 +92,7 @@ class IndexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = new Vehicle();
+        $cars = new DbTable\Vehicle();
 
         $db = $cars->getAdapter();
 
@@ -199,7 +197,7 @@ class IndexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = new Vehicle();
+        $carTable = new DbTable\Vehicle();
 
         $rows = $carTable->getAdapter()->fetchAll("
             SELECT
