@@ -17,36 +17,36 @@ class MessageRow extends Row
      * @param bool $absolute
      * @return string
      */
-    public function getUrl($absolute = false)
+    public function getUrl()
     {
         switch ($this->type_id) {
             case CommentMessage::PICTURES_TYPE_ID:
                 $pictures = new Picture();
                 $picture = $pictures->find($this->item_id)->current();
                 if ($picture) {
-                    return ($absolute ? HOST : '/').'picture/'.($picture->identity ? $picture->identity : $picture->id);
+                    return '/picture/'.($picture->identity ? $picture->identity : $picture->id);
                 }
                 return false;
 
             case CommentMessage::VOTINGS_TYPE_ID:
-                return ($absolute ? HOST : '/').'voting/voting/id/'.(int)$this->item_id.'/';
+                return '/voting/voting/id/'.(int)$this->item_id.'/';
 
             case CommentMessage::TWINS_TYPE_ID:
-                return ($absolute ? HOST : '/').'twins/group'.(int)$this->item_id;
+                return '/twins/group'.(int)$this->item_id;
 
             case CommentMessage::ARTICLES_TYPE_ID:
                 $articles = new Article();
                 $article = $articles->find($this->item_id)->current();
                 if ($article) {
-                    return ($absolute ? HOST : '/').'articles/'.$article->catname.'/';
+                    return '/articles/'.$article->catname.'/';
                 }
                 return false;
 
             case CommentMessage::FORUMS_TYPE_ID:
-                return ($absolute ? HOST : '/').'forums/topic-message/message_id/'.(int)$this->id;
+                return '/forums/topic-message/message_id/'.(int)$this->id;
 
             case CommentMessage::MUSEUMS_TYPE_ID:
-                return ($absolute ? HOST : '/').'museums/museum/id/'.(int)$this->item_id;
+                return '/museums/museum/id/'.(int)$this->item_id;
         }
         return null;
     }

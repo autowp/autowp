@@ -58,8 +58,12 @@ class ArticlesController extends AbstractActionController
 
         $articles = [];
         foreach ($paginator->getCurrentItems() as $row) {
+            $previewUrl = null;
+            if ($row->previewExists()) {
+                $previewUrl = '/' . Article::PREVIEW_CAT_PATH . $this->preview_filename;
+            }
             $articles[] = [
-                'previewUrl'  => $row->getPreviewUrl(),
+                'previewUrl'  => $previewUrl,
                 'name'        => $row->name,
                 'description' => $row->description,
                 'author'      => $row->findParentRow(User::class),

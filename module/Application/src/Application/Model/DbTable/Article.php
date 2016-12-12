@@ -12,7 +12,7 @@ class Article extends Zend_Db_Table
           PREVIEW_HEIGHT = 80;
 
     protected $_name = 'articles';
-    protected $_rowClass = \Application\Model\DbTable\Article\Row::class;
+    protected $_rowClass = Article\Row::class;
 
     protected $_referenceMap = [
         'Author' => [

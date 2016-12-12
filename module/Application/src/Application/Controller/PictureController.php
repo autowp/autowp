@@ -7,9 +7,7 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Picture\Row as PictureRow;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable;
 
 class PictureController extends AbstractActionController
 {
@@ -50,11 +48,14 @@ class PictureController extends AbstractActionController
         return $viewModel;
     }
 
-    private function getPicturesSelect(PictureRow $picture)
+    private function getPicturesSelect(DbTable\Picture\Row $picture)
     {
         $pictureTable = $this->catalogue()->getPictureTable();
 
-        $galleryStatuses = [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW];
+        $galleryStatuses = [
+            DbTable\Picture::STATUS_ACCEPTED,
+            DbTable\Picture::STATUS_NEW
+        ];
 
         if (in_array($picture->status, $galleryStatuses)) {
             $picSelect = $pictureTable->select(true)
@@ -63,7 +64,7 @@ class PictureController extends AbstractActionController
 
             $galleryEnabled = false;
             switch ($picture->type) {
-                case Picture::VEHICLE_TYPE_ID:
+                case DbTable\Picture::VEHICLE_TYPE_ID:
                     $galleryEnabled = true;
                     $picSelect
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
@@ -75,9 +76,9 @@ class PictureController extends AbstractActionController
                         ->where('pi2.picture_id = ?', $picture->id);
                     break;
 
-                case Picture::UNSORTED_TYPE_ID:
-                case Picture::MIXED_TYPE_ID:
-                case Picture::LOGO_TYPE_ID:
+                case DbTable\Picture::UNSORTED_TYPE_ID:
+                case DbTable\Picture::MIXED_TYPE_ID:
+                case DbTable\Picture::LOGO_TYPE_ID:
                     if ($picture->brand_id) {
                         $galleryEnabled = true;
                         $picSelect
@@ -87,7 +88,7 @@ class PictureController extends AbstractActionController
 
                     break;
 
-                case Picture::FACTORY_TYPE_ID:
+                case DbTable\Picture::FACTORY_TYPE_ID:
                     if ($picture->factory_id) {
                         $galleryEnabled = true;
                         $picSelect
@@ -144,7 +145,7 @@ class PictureController extends AbstractActionController
 
         $isModer = $this->user()->inheritsRole('moder');
 
-        if ($picture->status == Picture::STATUS_REMOVING) {
+        if ($picture->status == DbTable\Picture::STATUS_REMOVING) {
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();
@@ -163,15 +164,15 @@ class PictureController extends AbstractActionController
         $car = null;
 
         switch ($picture->type) {
-            case Picture::LOGO_TYPE_ID:
-            case Picture::MIXED_TYPE_ID:
-            case Picture::UNSORTED_TYPE_ID:
+            case DbTable\Picture::LOGO_TYPE_ID:
+            case DbTable\Picture::MIXED_TYPE_ID:
+            case DbTable\Picture::UNSORTED_TYPE_ID:
                 if ($picture->brand_id) {
                     $brands[] = $picture->brand_id;
                 }
                 break;
 
-            case Picture::FACTORY_TYPE_ID:
+            case DbTable\Picture::FACTORY_TYPE_ID:
                 if ($picture->factory_id) {
                     $brandId = $brandModel->getFactoryBrandId($picture->factory_id);
                     if ($brandId) {
@@ -179,7 +180,7 @@ class PictureController extends AbstractActionController
                     }
                 }
                 break;
-            case Picture::VEHICLE_TYPE_ID:
+            case DbTable\Picture::VEHICLE_TYPE_ID:
                 $language = $this->language();
                 $brandList = $brandModel->getList($language, function ($select) use ($picture) {
                     $select
@@ -230,7 +231,7 @@ class PictureController extends AbstractActionController
 
         $isModer = $this->user()->inheritsRole('moder');
 
-        if ($picture->status == Picture::STATUS_REMOVING) {
+        if ($picture->status == DbTable\Picture::STATUS_REMOVING) {
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();

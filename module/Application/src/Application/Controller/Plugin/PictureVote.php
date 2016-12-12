@@ -4,28 +4,26 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable;
 
 use Zend_Db_Expr;
 
 class PictureVote extends AbstractPlugin
 {
     /**
-     * @var Picture
+     * @var DbTable\Picture
      */
     private $table;
 
     public function __construct()
     {
-        $this->table = new Picture();
+        $this->table = new DbTable\Picture();
     }
 
     private function isLastPicture($picture)
     {
         $result = null;
-        if ($picture->type == Picture::VEHICLE_TYPE_ID && $picture->status == Picture::STATUS_ACCEPTED) {
+        if ($picture->type == DbTable\Picture::VEHICLE_TYPE_ID && $picture->status == DbTable\Picture::STATUS_ACCEPTED) {
             $db = $this->table->getAdapter();
             $result = ! $db->fetchOne(
                 $db->select()
@@ -37,7 +35,7 @@ class PictureVote extends AbstractPlugin
                         null
                     )
                     ->where('pi2.picture_id = ?', $picture->id)
-                    ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                     ->where('pictures.id <> ?', $picture->id)
             );
         }
@@ -48,7 +46,7 @@ class PictureVote extends AbstractPlugin
     private function getAcceptedCount($picture)
     {
         $result = null;
-        if ($picture->type == Picture::VEHICLE_TYPE_ID) {
+        if ($picture->type == DbTable\Picture::VEHICLE_TYPE_ID) {
             $db = $this->table->getAdapter();
             $result = $db->fetchOne(
                 $db->select()
@@ -60,7 +58,7 @@ class PictureVote extends AbstractPlugin
                         null
                     )
                     ->where('pi2.picture_id = ?', $picture->id)
-                    ->where('status = ?', Picture::STATUS_ACCEPTED)
+                    ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
             );
         }
         return $result;
@@ -118,7 +116,7 @@ class PictureVote extends AbstractPlugin
             'canDelete'         => $this->pictureCanDelete($picture),
             'canVote'           => ! $voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
             'voteExists'        => $voteExists,
-            'moderVotes'        => $options['hideVote'] ? null : $picture->findDependentRowset(PictureModerVote::class),
+            'moderVotes'        => $options['hideVote'] ? null : $picture->findDependentRowset(DbTable\Picture\ModerVote::class),
             'pictureDeleteUrl'  => $controller->url()->fromRoute('moder/pictures/params', [
                 'action'     => 'delete-picture',
                 'picture_id' => $picture->id

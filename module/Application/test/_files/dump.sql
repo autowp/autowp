@@ -2583,31 +2583,6 @@ INSERT INTO `of_day` VALUES ('2016-11-25',NULL,1,0);
 /*!40000 ALTER TABLE `of_day` ENABLE KEYS */;
 
 --
--- Table structure for table `page_language`
---
-
-DROP TABLE IF EXISTS `page_language`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `page_language` (
-  `page_id` int(10) unsigned NOT NULL,
-  `language` varchar(5) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `breadcrumbs` varchar(100) NOT NULL,
-  PRIMARY KEY (`page_id`,`language`),
-  CONSTRAINT `page_language_ibfk_1` FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `page_language`
---
-
-/*!40000 ALTER TABLE `page_language` DISABLE KEYS */;
-/*!40000 ALTER TABLE `page_language` ENABLE KEYS */;
-
---
 -- Table structure for table `pages`
 --
 
