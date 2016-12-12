@@ -11,6 +11,7 @@ return [
             'dbname'   => 'autowp_test',
         ],
         'defaultMetadataCache' => null,
+        'params.driver_options.1002' => ""
     ],
     'db' => [
         'driver'         => 'Pdo',
