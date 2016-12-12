@@ -22,9 +22,6 @@ return [
         'dbname'         => 'autowp_test',
         'username'       => 'autowp_test',
         'password'       => 'test',
-        'driver_options' => [
-            \PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'"
-        ],
     ],
     'users' => [
         'salt'      => 'users-salt',
