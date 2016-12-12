@@ -761,7 +761,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/1/name' => "主页",
     'page/2/name' => "主目录",
     'page/10/name' => "品牌",
-    'page/14/name' => "%BRAND_NAME%按车型及推出时间排序",
+    'page/14/name' => "%BRAND_NAME%按推出时间排序",
     'page/15/name' => "%BRAND_NAME%的最新图片",
     'page/18/name' => "%PICTURE_NAME%",
     'page/19/name' => "品牌",
@@ -1067,7 +1067,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/1/breadcrumbs' => "",
     'page/2/breadcrumbs' => "",
     'page/10/breadcrumbs' => "%BRAND_NAME%",
-    'page/14/breadcrumbs' => "按用途及时间排序",
+    'page/14/breadcrumbs' => "按推出时间排序",
     'page/15/breadcrumbs' => "最新图片",
     'page/18/breadcrumbs' => "%PICTURE_NAME%",
     'page/19/breadcrumbs' => "品牌",
@@ -1243,6 +1243,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
 
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',
+    'moder-menu/unsorted' => '未分类',
 
     'moder/database-id-%s' => '数据库id: %s',
     'moder/log-of-events' => '操作日志',

@@ -853,6 +853,9 @@ class Car extends AbstractPlugin
             $extraPicIdx = 0;
 
             foreach ($result as $idx => $picture) {
+                if ($picture) {
+                    continue;
+                }
                 if (count($pictureRows) <= $extraPicIdx) {
                     break;
                 }

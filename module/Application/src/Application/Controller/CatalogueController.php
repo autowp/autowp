@@ -712,6 +712,12 @@ class CatalogueController extends AbstractActionController
                         ->where('brand_item.brand_id = ?', $brand['id'])
                 );
             }
+            
+            $requireAttention = 0;
+            $isModerator = $this->user()->inheritsRole('moder');
+            if ($isModerator) {
+                $requireAttention = $this->getBrandModerAttentionCount($brand['id']);
+            }
 
             return [
                 'topPictures' => $topPictures,
@@ -722,6 +728,7 @@ class CatalogueController extends AbstractActionController
                 'factories'   => $this->getBrandFactories($brand['id']),
                 'inboxBrandPictures'   => $inboxBrandPictures,
                 'inboxVehiclePictures' => $inboxVehiclePictures,
+                'requireAttention'     => $requireAttention
             ];
         });
     }
@@ -1429,7 +1436,7 @@ class CatalogueController extends AbstractActionController
             ->from(
                 $pictureTable->info('name'),
                 [
-                    'id', 'name', 'type', 'brand_id', 'engine_item_id', 'factory_id',
+                    'id', 'name', 'type', 'brand_id', 'factory_id',
                     'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity', 'factory_id'
                 ]
@@ -2039,6 +2046,26 @@ class CatalogueController extends AbstractActionController
             'inboxCount'       => $inboxCount,
             'requireAttention' => $requireAttention
         ];
+    }
+    
+    private function getBrandModerAttentionCount($brandId)
+    {
+        $commentTable = new CommentMessage();
+    
+        $select = $commentTable->select(true)
+            ->where('comments_messages.moderator_attention = ?', CommentMessage::MODERATOR_ATTENTION_REQUIRED)
+            ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
+            ->join('pictures', 'comments_messages.item_id = pictures.id', null)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+            ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+            ->where('brand_item.brand_id = ?', $brandId);
+    
+        $paginator = new Paginator(
+            new Zend1DbTableSelect($select)
+        );
+    
+        return $paginator->getTotalItemCount();
     }
 
     private function getCarModerAttentionCount($carId)

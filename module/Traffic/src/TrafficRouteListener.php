@@ -27,6 +27,9 @@ class TrafficRouteListener extends AbstractListenerAggregate
         $request = $e->getRequest();
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+            
+            $serviceManager = $e->getApplication()->getServiceManager();
+            
             $auth = new AuthenticationService();
 
             $unlimitedTraffic = false;
@@ -36,7 +39,6 @@ class TrafficRouteListener extends AbstractListenerAggregate
                 $user = $userTable->find($userId)->current();
 
                 if ($user) {
-                    $serviceManager = $e->getApplication()->getServiceManager();
                     $acl = $serviceManager->get(\Zend\Permissions\Acl\Acl::class);
                     $unlimitedTraffic = $acl->isAllowed($user->role, 'website', 'unlimited-traffic');
                 }
@@ -44,7 +46,7 @@ class TrafficRouteListener extends AbstractListenerAggregate
 
             $ip = $request->getServer('REMOTE_ADDR');
 
-            $service = new TrafficControl();
+            $service = $serviceManager->get(TrafficControl::class);
 
             $banInfo = $service->getBanInfo($ip);
             if ($banInfo) {

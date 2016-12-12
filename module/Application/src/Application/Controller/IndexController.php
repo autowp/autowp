@@ -366,7 +366,7 @@ class IndexController extends AbstractActionController
             $carTable = $this->catalogue()->getCarTable();
             $carOfDay = $carTable->find($carId)->current();
             if ($carOfDay) {
-                $key = 'CAR_OF_DAY_84_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
+                $key = 'CAR_OF_DAY_87_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
 
                 $carOfDayInfo = $this->cache->getItem($key, $success);
                 if (! $success) {

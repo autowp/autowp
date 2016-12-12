@@ -88,6 +88,21 @@
                 ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-vehicle')) . ' <span class="badge">' . $this->inboxVehiclePictures . '</span>', false)?>
             </li>
         <?php } ?>
+        <?php if ($this->requireAttention) { ?>
+            <li>
+                <?=$this->htmlA(
+                    $this->url('moder/comments/params', [
+                        'action'              => 'index',
+                        'brand_id'            => $this->brand['id'],
+                        'moderator_attention' => '1'
+                    ]), 
+                    '<i class="fa fa-comment"></i> ' .
+                        $this->escapeHtml($this->translate('catalogue/vehicle/comments')) . 
+                        ' ('.$this->requireAttention.')',
+                    false
+                )?>
+            </li>
+        <?php } ?>
     </ul>
 </header>
 

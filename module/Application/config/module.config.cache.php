@@ -2,6 +2,8 @@
 
 namespace Application;
 
+use Zend_Cache_Manager;
+
 return [
     'cachemanager' => [
         'fast' => [
@@ -38,4 +40,9 @@ return [
             ],
         ],
     ],
+    'service_manager' => [
+        'factories' => [
+            Zend_Cache_Manager::class => Service\ZF1CacheManagerFactory::class,
+        ]
+    ]
 ];

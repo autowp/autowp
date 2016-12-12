@@ -10,20 +10,36 @@ use DateTimeZone;
 
 use Zend_Db_Expr;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Adapter\AdapterInterface;
+use Zend\Db\Sql\Expression;
+use Zend\Db\Sql\Select;
+use Zend\Db\TableGateway\TableGateway;
+
 class TrafficControl
 {
+    /**
+     * @var AdapterInterface
+     */
+    private $adapter;
+    
     /**
      * @var Table
      */
     private $bannedTable;
+    
+    /**
+     * @var TableGateway
+     */
+    private $bannedTable2;
 
     /**
      * @var Table
      */
     private $whitelistTable;
-
+    
     /**
-     * @var Table
+     * @var TableGateway
      */
     private $monitoringTable;
 
@@ -56,6 +72,11 @@ class TrafficControl
             'time'   => 12 * 3600
         ],
     ];
+    
+    public function __construct(AdapterInterface $adapter)
+    {
+        $this->adapter = $adapter;
+    }
 
     /**
      * @return Table
@@ -70,6 +91,18 @@ class TrafficControl
         }
 
         return $this->bannedTable;
+    }
+    
+    /**
+     * @return Table
+     */
+    private function getBannedTable2()
+    {
+        if (! $this->bannedTable2) {
+            $this->bannedTable2 = new TableGateway('banned_ip', $this->adapter);
+        }
+    
+        return $this->bannedTable2;
     }
 
     /**
@@ -86,19 +119,16 @@ class TrafficControl
 
         return $this->whitelistTable;
     }
-
+    
     /**
      * @return Table
      */
     private function getMonitoringTable()
     {
         if (! $this->monitoringTable) {
-            $this->monitoringTable = new Table([
-                'name'    => 'ip_monitoring4',
-                'primary' => ['ip', 'day_date', 'hour', 'tenminute', 'minute']
-            ]);
+            $this->monitoringTable = new TableGateway('ip_monitoring4', $this->adapter);
         }
-
+    
         return $this->monitoringTable;
     }
 
@@ -242,25 +272,34 @@ class TrafficControl
      */
     public function getTopData()
     {
-        $bannedTable = $this->getBannedTable();
-
-        $sql = 'SELECT ip, INET6_NTOA(ip) as ip_text, SUM(count) AS count FROM ip_monitoring4 '.
-               'WHERE day_date=CURDATE() GROUP BY ip '.
-               'ORDER BY count DESC limit 50';
-        $rows = $bannedTable->getAdapter()->fetchAll($sql);
+        $bannedTable = $this->getBannedTable2();
+        $monitoringTable = $this->getMonitoringTable();
+        
+        $rows = $monitoringTable->select(function(Select $select) {
+            $select
+                ->columns([
+                    'ip', 
+                    'ip_text' => new Expression('INET6_NTOA(ip)'), 
+                    'count'   => new Expression('SUM(count)')
+                ])
+                ->where('day_date = CURDATE()')
+                ->group('ip')
+                ->order('count DESC')
+                ->limit(50);
+        });
 
         $result = [];
 
         foreach ($rows as $row) {
-            $banRow = $bannedTable->fetchRow([
+            $banRow = $bannedTable->select([
                 'ip = unhex(?)' => bin2hex($row['ip']),
                 'up_to >= NOW()'
-            ]);
+            ])->current();
 
             $result[] = [
                 'ip'        => $row['ip_text'],
                 'count'     => $row['count'],
-                'ban'       => $banRow ? $banRow->toArray() : null,
+                'ban'       => $banRow,
                 'whitelist' => $this->inWhiteListBin($row['ip'])
             ];
         }
@@ -384,23 +423,20 @@ class TrafficControl
         $whitelistTable = $this->getWhitelistTable();
         $bannedTable = $this->getBannedTable();
 
-        $db = $monitoringTable->getAdapter();
-
-        $rows = $db->fetchAll(
-            $db->select()
-                ->from($monitoringTable->info('name'), ['ip', 'count' => 'SUM(count)'])
+        $rows = $monitoringTable->select(function(Select $select) {
+            $select
+                ->columns(['ip', 'count' => new Expression('SUM(count)')])
                 ->where('day_date = CURDATE()')
                 ->group('ip')
                 ->order('count DESC')
-                ->limit(1000)
-        );
+                ->limit(1000);
+        });
 
-        foreach ($rows as &$row) {
+        foreach ($rows as $row) {
             $ip = $row['ip'];
             $ipText = inet_ntop($ip);
 
             print $ipText. ': ';
-
 
             if ($this->inWhitelist($ipText)) {
                 print 'whitelist, skip';

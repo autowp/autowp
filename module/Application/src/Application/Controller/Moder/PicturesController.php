@@ -2028,6 +2028,12 @@ class PicturesController extends AbstractActionController
                     );
 
                     $this->pictureItem->setPictureItems($picture->id, []);
+                    
+                    if ($picture->image_id) {
+                        $this->imageStorage()->changeImageName($picture->image_id, [
+                            'pattern' => $picture->getFileNamePattern(),
+                        ]);
+                    }
 
                     if (! $success) {
                         return $this->notFoundAction();
@@ -2057,6 +2063,12 @@ class PicturesController extends AbstractActionController
                             return $this->notFoundAction();
                         }
                     }
+                    
+                    if ($picture->image_id) {
+                        $this->imageStorage()->changeImageName($picture->image_id, [
+                            'pattern' => $picture->getFileNamePattern(),
+                        ]);
+                    }
 
                     $namespace = new \Zend\Session\Container('Moder_Car');
                     $namespace->lastCarId = $this->params('car_id');
@@ -2075,6 +2087,12 @@ class PicturesController extends AbstractActionController
                     );
 
                     $this->pictureItem->setPictureItems($picture->id, []);
+                    
+                    if ($picture->image_id) {
+                        $this->imageStorage()->changeImageName($picture->image_id, [
+                            'pattern' => $picture->getFileNamePattern(),
+                        ]);
+                    }
 
                     if (! $success) {
                         return $this->notFoundAction();

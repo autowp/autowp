@@ -1454,7 +1454,7 @@ class CarsController extends AbstractActionController
             $factoryCarTable = new DbTable\FactoryCar();
             $factoryCarTable->insert([
                 'factory_id' => $factory->id,
-                'car_id'     => $car->id
+                'item_id'    => $car->id
             ]);
 
             $this->log(sprintf(
@@ -1469,7 +1469,7 @@ class CarsController extends AbstractActionController
         return [
             'factories' => $factoryTable->fetchAll(
                 $factoryTable->select(true)
-                ->order('factory.name')
+                    ->order('factory.name')
             ),
             'car' => $car
         ];

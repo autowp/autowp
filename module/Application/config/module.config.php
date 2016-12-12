@@ -7,7 +7,6 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;
 
-use Zend_Cache_Manager;
 use Zend_Db_Adapter_Abstract;
 
 return [
@@ -95,19 +94,7 @@ return [
             ]
         ],
     ],
-    'db' => [
-        'adapter' => 'PDO_MYSQL',
-        'params' => [
-            'host'     => '',
-            'username' => '',
-            'password' => '',
-            'dbname'   => '',
-            'charset'  => 'utf8'
-        ],
-        'isDefaultTableAdapter' => true,
-        'defaultMetadataCache'  => 'fast',
-        'params.driver_options.1002' => "set time_zone = 'UTC'"
-    ],
+    
     'service_manager' => [
         'factories' => [
             Acl::class                           => Permissions\AclFactory::class,
@@ -126,8 +113,6 @@ return [
             Service\TelegramService::class       => Service\TelegramServiceFactory::class,
             Service\UsersService::class          => Service\UsersServiceFactory::class,
             VehicleNameFormatter::class          => Service\VehicleNameFormatterFactory::class,
-            Zend_Cache_Manager::class            => Service\ZF1CacheManagerFactory::class,
-            Zend_Db_Adapter_Abstract::class      => Service\ZF1DbAdapterFactory::class,
             'translator'                         => \Zend\Mvc\I18n\TranslatorFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,

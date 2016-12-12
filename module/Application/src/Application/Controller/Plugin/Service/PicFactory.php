@@ -17,7 +17,8 @@ class PicFactory implements FactoryInterface
             $container->get(\Application\PictureNameFormatter::class),
             $container->get(\Application\VehicleNameFormatter::class),
             $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Application\Model\PictureItem::class)
+            $container->get(\Application\Model\PictureItem::class),
+            $container->get('HttpRouter')
         );
     }
 }

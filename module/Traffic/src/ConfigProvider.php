@@ -66,7 +66,7 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                TrafficControl::class => InvokableFactory::class
+                TrafficControl::class => Service\TrafficControlFactory::class
             ]
         ];
     }

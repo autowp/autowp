@@ -46,25 +46,6 @@
             </div>
         <?php } ?>
         
-        <?php /*
-        <h3><?=$this->escapeHtml($this->page(82)->name)?></h3>
-        <div class="well">
-            <ul class="list-unstyled">
-                <li>
-                    <i class="fa fa-align-left"></i>
-                    <?=$this->htmlA($this->url('moder/engines'), $this->page(82)->name)?>
-                </li>
-                <?php if ($this->user()->isAllowed('engine', 'add')) { ?>
-                    <li>
-                        <i class="fa fa-plus"></i>
-                        <?=$this->htmlA($this->url('moder/engines', [
-                            'action' => 'add',
-                        ]), $this->page(170)->name)?>
-                    </li>
-                <?php } ?>
-            </ul>
-        </div>
-        */?>
         <h3><?=$this->escapeHtml($this->page(175)->name)?></h3>
         <div class="well">
             <ul class="list-unstyled">
@@ -82,6 +63,30 @@
                 <?php } ?>
             </ul>
         </div>
+        
+        <h3>Task list</h3>
+        <ul>
+            <li>
+                Accept/remove <a href="/moder/pictures/index/status/new/">old style moderation-less pictures</a>
+            </li>
+            <li>
+                <a href="/moder/cars/index/name/4x2/no_parent/0/order/1">4x2 to 4×2</a>,
+                <a href="/moder/cars/index/name/6x2/no_parent/0/order/1">6x2 to 6×2</a>,
+                etc
+            </li>
+            <li>
+                "<a href="/moder/pictures/index/status/custom1/type_id/3">Mixed</a>" to pictures with few cars
+            </li>
+            <li>
+                Split <a href="/moder/index/too-big-cars">too big cars</a>
+            </li>
+            <li>
+                Move years to model years in North America
+            </li>
+            <li>
+                Dash in soviet vehicle names, e.g <a href="/moder/cars/index/name/%D0%92%D0%90%D0%97/no_name/%D0%92%D0%90%D0%97-/no_parent/0/order/1">ВАЗ</a>
+            </li>
+        </ul>
     </div>
     <div class="col-md-6">
         <?php if ($this->addBrandForm) { ?>

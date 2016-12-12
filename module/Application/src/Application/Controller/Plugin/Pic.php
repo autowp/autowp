@@ -78,7 +78,8 @@ class Pic extends AbstractPlugin
         PictureNameFormatter $pictureNameFormatter,
         VehicleNameFormatter $vehicleNameFormatter,
         SpecificationsService $specsService,
-        PictureItem $pictureItem
+        PictureItem $pictureItem,
+        $httpRouter
     ) {
 
         $this->textStorage = $textStorage;
@@ -87,6 +88,7 @@ class Pic extends AbstractPlugin
         $this->vehicleNameFormatter = $vehicleNameFormatter;
         $this->specsService = $specsService;
         $this->pictureItem = $pictureItem;
+        $this->httpRouter = $httpRouter;
     }
 
     /**
@@ -199,14 +201,23 @@ class Pic extends AbstractPlugin
 
     public function url($id, $identity, $absolute = false, $uri = null)
     {
-        $controller = $this->getController();
+        return $this->httpRouter->assemble([
+            'picture_id' => $identity ? $identity : $id,
+        ], [
+            'name'            => 'picture/picture',
+            'force_canonical' => $absolute,
+            'uri'             => $uri
+        ]);
 
+        /*
+        $controller = $this->getController();
+        
         return $controller->url()->fromRoute('picture/picture', [
             'picture_id' => $identity ? $identity : $id,
         ], [
             'force_canonical' => $absolute,
             'uri'             => $uri
-        ], true);
+        ], true);*/
     }
 
     public function listData($pictures, array $options = [])
