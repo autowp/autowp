@@ -2,7 +2,7 @@
 
 namespace AutowpTest\Traffic\Controller;
 
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use Application\Test\AbstractHttpControllerTestCase;
 
 use Autowp\Traffic\Controller\BanController;
 use Zend\Http\Request;
@@ -10,12 +10,7 @@ use Zend\Http\Header\Cookie;
 
 class BanControllerTest extends AbstractHttpControllerTestCase
 {
-    public function setUp()
-    {
-        $this->setApplicationConfig(include __DIR__ . '/../_files/application.config.php');
-
-        parent::setUp();
-    }
+    protected $applicationConfigPath = __DIR__ . '/../_files/application.config.php';
 
     public function testBanIpForbidden()
     {

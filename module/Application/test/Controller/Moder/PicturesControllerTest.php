@@ -4,7 +4,7 @@ namespace ApplicationTest\Controller\Moder;
 
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use Application\Test\AbstractHttpControllerTestCase;
 
 use Application\Controller\Moder\PicturesController;
 use Application\Model\DbTable\Picture;
@@ -12,12 +12,7 @@ use Zend\Json\Json;
 
 class PicturesControllerTest extends AbstractHttpControllerTestCase
 {
-    public function setUp()
-    {
-        $this->setApplicationConfig(include __DIR__ . '/../../_files/application.config.php');
-
-        parent::setUp();
-    }
+    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
 
     public function testIndexForbidden()
     {
