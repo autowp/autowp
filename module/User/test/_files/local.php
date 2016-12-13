@@ -10,8 +10,7 @@ return [
             'password' => 'test',
             'dbname'   => 'autowp_test',
         ],
-        'defaultMetadataCache' => null,
-        'params.driver_options.1002' => ""
+        'defaultMetadataCache' => null
     ],
     'db' => [
         'driver'         => 'Pdo',
@@ -20,10 +19,7 @@ return [
         'charset'        => 'utf8',
         'dbname'         => 'autowp_test',
         'username'       => 'autowp_test',
-        'password'       => 'test',
-        'driver_options' => [
-            \PDO::MYSQL_ATTR_INIT_COMMAND => ""
-        ],
+        'password'       => 'test'
     ],
     'users' => [
         'salt'      => 'users-salt',
