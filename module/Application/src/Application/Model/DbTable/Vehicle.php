@@ -6,6 +6,8 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Db\Table;
 
+use Zend_Db_Expr;
+
 class Vehicle extends Table
 {
     protected $_name = 'cars';
@@ -200,5 +202,22 @@ class Vehicle extends Table
                 $this->updateInteritance($child);
             }
         }
+    }
+    
+    public function getVehiclesAndEnginesCount($parentId)
+    {
+        $db = $this->getAdapter();
+    
+        $select = $db->select()
+            ->from('cars', new Zend_Db_Expr('COUNT(1)'))
+            ->where('cars.item_type_id IN (?)', [
+                Item\Type::ENGINE,
+                Item\Type::VEHICLE
+            ])
+            ->where('not cars.is_group')
+            ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+            ->where('item_parent_cache.parent_id = ?', $parentId);
+    
+        return $db->fetchOne($select);
     }
 }

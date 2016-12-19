@@ -25,7 +25,7 @@
                             ], $this->escapeHtml($page['name']) . ' <b class="caret"></b>', false) ?>
                             <ul class="dropdown-menu">
                                 <?php foreach ($this->categories as $category) { ?>
-                                    <li><?=$this->htmlA($category['url'], $category['short_name'] . '&#xa0;<span class="count">('.($category['cars_count'] - $category['new_cars_count']) . ($category['new_cars_count'] > 0 ? '<span>+'.$category['new_cars_count'].'</span>' : '') .')</span>', false)?></li>
+                                    <li><?=$this->htmlA($category['url'], $category['name'] . '&#xa0;<span class="count">('.($category['cars_count'] - $category['new_cars_count']) . ($category['new_cars_count'] > 0 ? '<span>+'.$category['new_cars_count'].'</span>' : '') .')</span>', false)?></li>
                                 <?php } ?>
                             </ul>
                         </li>

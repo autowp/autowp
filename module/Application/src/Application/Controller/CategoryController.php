@@ -60,23 +60,6 @@ class CategoryController extends AbstractActionController
         return $db->fetchOne($select);
     }
 
-    private function getVehiclesAndEnginesCount($categoryId)
-    {
-        $db = $this->itemTable->getAdapter();
-
-        $select = $db->select()
-            ->from('cars', new Zend_Db_Expr('COUNT(1)'))
-            ->where('cars.item_type_id IN (?)', [
-                DbTable\Item\Type::ENGINE,
-                DbTable\Item\Type::VEHICLE
-            ])
-            ->where('not cars.is_group')
-            ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
-            ->where('item_parent_cache.parent_id = ?', $categoryId);
-
-        return $db->fetchOne($select);
-    }
-
     public function indexAction()
     {
         $language = $this->language();
@@ -101,7 +84,7 @@ class CategoryController extends AbstractActionController
                     'car_id = ?'   => $row->id
                 ]);
 
-                $carsCount = $this->getVehiclesAndEnginesCount($row->id);
+                $carsCount = $this->itemTable->getVehiclesAndEnginesCount($row->id);
 
                 $categories[] = [
                     'id'             => $row->id,
@@ -196,7 +179,7 @@ class CategoryController extends AbstractActionController
                     'car_id = ?'   => $row->id
                 ]);
 
-                $carsCount = $this->getVehiclesAndEnginesCount($row->id);
+                $carsCount = $this->itemTable->getVehiclesAndEnginesCount($row->id);
 
                 $category = [
                     'id'             => $row->id,
@@ -388,7 +371,7 @@ class CategoryController extends AbstractActionController
             }
         }
 
-        $key = 'CATEGORY_MENU330_' . $topCategory->id . '_' . $language;
+        $key = 'CATEGORY_MENU332_' . $topCategory->id . '_' . $language;
 
         $menu = $this->cache->getItem($key, $success);
         if (! $success) {
