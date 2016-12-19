@@ -1409,7 +1409,7 @@ CREATE TABLE `cars` (
 INSERT INTO `cars` (id, `name`, `begin_year`, `end_year`, `body`, `spec_id`,
   `spec_inherit`, `produced`, `produced_exactly`, `is_concept`, `pictures_count`,
   `today`, `add_datetime`, `begin_month`, `end_month`, `begin_order_cache`,
-  `end_order_cache`, `begin_model_year`, `end_model_year`, `_html` text,
+  `end_order_cache`, `begin_model_year`, `end_model_year`, `_html`,
   `is_group`, `car_type_inherit`, `is_concept_inherit`, `engine_item_id`,
   `engine_inherit`, `text_id`, `full_text_id`, `item_type_id`)
 VALUES 
