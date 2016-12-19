@@ -71,11 +71,11 @@ class Inbox extends Form implements InputFilterProviderInterface
             ],
             [
                 'name'    => 'brand_id',
-                'type'    => 'Select',
+                'type'    => 'Text',
                 'options' => [
                     'label'   => 'moder/pictures/filter/brand',
-                    'options' => $this->brandOptions,
-                    'disable_inarray_validator' => true
+                    /*'options' => $this->brandOptions,
+                    'disable_inarray_validator' => true*/
                 ]
             ],
             [

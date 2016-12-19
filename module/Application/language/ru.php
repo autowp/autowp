@@ -128,6 +128,8 @@ return [
     'item/type/2/name' => 'Двигатель',
     'item/type/1/name-plural' => 'ТС',
     'item/type/2/name-plural' => 'Двигатели',
+    'item/type/3/name' => 'Категория',
+    'item/type/3/name-plural' => 'Категории',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Несортировано',
@@ -1351,6 +1353,7 @@ return [
     'moder/vehicles/filter/category-exclude' => 'Категория (исключить)',
     'moder/vehicles/filter/no-parents' => 'Без родителей',
     'moder/vehicles/filter/order' => 'Сортировка',
+    'moder/items/filter/text' => 'Текст',
 
     'moder/vehicle/name' => 'Название',
     'moder/vehicle/body' => 'Номер кузова',
@@ -1380,8 +1383,7 @@ return [
     'moder/vehicle/is-concept/inherited' => 'унаследовано',
 
     'moder/vehicle/tabs/meta' => 'Мета',
-    'moder/vehicle/tabs/name' => 'Название',
-    'moder/vehicle/tabs/description' => 'Описание',
+    'moder/vehicle/tabs/name' => 'Название и описание',
     'moder/vehicle/tabs/catalogue' => 'Каталог',
     'moder/vehicle/tabs/tree' => 'Дерево',
     'moder/vehicle/tabs/categories' => 'Категории',
@@ -1399,6 +1401,7 @@ return [
 
     'moder/vehicle/catalogue/add-vehicle' => 'добавить автомобиль',
     'moder/vehicle/catalogue/add-engine' => 'добавить двигатель',
+    'moder/vehicle/catalogue/add-category' => 'добавить категорию',
     'moder/vehicle/catalogue/title/name' => 'Название',
     'moder/vehicle/catalogue/title/link' => 'Связь',
     'moder/vehicle/catalogue/title/catname' => 'Папка',

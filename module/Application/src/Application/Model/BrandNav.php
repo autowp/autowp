@@ -396,7 +396,8 @@ class BrandNav
             $bvlRow = $brandVehicleLangaugeTable->fetchRow([
                 'vehicle_id = ?' => $brandItemRow['car_id'],
                 'brand_id = ?'   => $brandItemRow['brand_id'],
-                'language = ?'   => $language
+                'language = ?'   => $language,
+                'length(name) > 0'
             ]);
 
             if ($bvlRow) {
@@ -404,7 +405,8 @@ class BrandNav
             } else {
                 $carLangRow = $carLanguageTable->fetchRow([
                     'car_id = ?'   => (int)$brandItemRow['car_id'],
-                    'language = ?' => (string)$language
+                    'language = ?' => (string)$language,
+                    'length(name) > 0'
                 ]);
 
                 $name = $carLangRow ? $carLangRow->name : $brandItemRow['car_name'];
@@ -442,7 +444,7 @@ class BrandNav
             'SIDEBAR',
             $brand['id'],
             $language,
-            '30'
+            '33'
         ]);
 
         $sections = $this->cache->getItem($cacheKey, $success);

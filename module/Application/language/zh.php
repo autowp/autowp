@@ -112,6 +112,8 @@ return [
     'item/type/2/name' => '发动机',
     'item/type/1/name-plural' => '车辆',
     'item/type/2/name-plural' => '发动机',
+    'item/type/3/name' => 'Category',
+    'item/type/3/name-plural' => 'Categories',
 
     /* BRAND PAGE*/
     'unsorted'                => '未分类',
@@ -1326,6 +1328,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicles/filter/category-exclude' => 'Category (exclude)',
     'moder/vehicles/filter/no-parents' => 'Without parents',
     'moder/vehicles/filter/order' => 'Order',
+    'moder/items/filter/text' => 'Text',
 
     'moder/vehicle/name' => '车名',
     'moder/vehicle/body' => '车身代号',
@@ -1355,8 +1358,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicle/is-concept/inherited' => '已有继承性',
 
     'moder/vehicle/tabs/meta' => 'Meta',
-    'moder/vehicle/tabs/name' => '车名',
-    'moder/vehicle/tabs/description' => '描述',
+    'moder/vehicle/tabs/name' => '车名&描述',
     'moder/vehicle/tabs/catalogue' => '目录',
     'moder/vehicle/tabs/tree' => 'Tree',
     'moder/vehicle/tabs/categories' => '用途类型',
@@ -1374,6 +1376,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
 
     'moder/vehicle/catalogue/add-vehicle' => '添加车型',
     'moder/vehicle/catalogue/add-engine' => 'add engine',
+    'moder/vehicle/catalogue/add-category' => 'add category',
     'moder/vehicle/catalogue/title/name' => '车名',
     'moder/vehicle/catalogue/title/link' => '链接',
     'moder/vehicle/catalogue/title/catname' => 'Catname',

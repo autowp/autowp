@@ -3,6 +3,7 @@
 namespace Application\Model\DbTable\Vehicle;
 
 use Application\Db\Table;
+use Application\Model\DbTable;
 use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\Vehicle\ParentCache;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
@@ -91,15 +92,73 @@ class ParentTable extends Table
 
         return array_unique($ids);
     }
+    
+    public function setParentOptions(VehicleRow $car, VehicleRow $parent, array $options)
+    {
+        $id = (int)$car->id;
+        $parentId = (int)$parent->id;
+        
+        $row = $this->fetchRow([
+            'car_id = ?'    => $id,
+            'parent_id = ?' => $parentId
+        ]);
+        if (! $row) {
+            throw new Exception("Parent not found");
+        }
+        
+        $values = array_replace([
+            'type'      => $row->type,
+            'catname'   => $row->catname,
+            'name'      => $row->name,
+        ], $options);
+        
+        $row->setFromArray($values);
+        $row->save();
+        
+        if (isset($options['languages'])) {
+            $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
+            foreach ($options['languages'] as $language => $langValues) {
+                $itemParentLanguageRow = $itemParentLanguageTable->fetchRow([
+                    'item_id = ?'   => $id,
+                    'parent_id = ?' => $parentId,
+                    'language = ?'  => $language
+                ]);
+                if (!$itemParentLanguageRow) {
+                    $itemParentLanguageRow = $itemParentLanguageTable->createRow([
+                        'item_id'   => $id,
+                        'parent_id' => $parentId,
+                        'language'  => $language
+                    ]);
+                }
+                $itemParentLanguageRow->setFromArray([
+                    'name' => $langValues['name']
+                ]);
+                $itemParentLanguageRow->save();
+            }
+        }
+    }
 
     public function addParent(VehicleRow $car, VehicleRow $parent, array $options = [])
     {
         if (! $parent->is_group) {
             throw new Exception("Only groups can have childs");
         }
-
-        if ($car->item_type_id != $parent->item_type_id) {
-            throw new Exception("Parent and child must be same type");
+        
+        $allowedCombinations = [
+            DbTable\Item\Type::VEHICLE => [
+                DbTable\Item\Type::VEHICLE => true
+            ],
+            DbTable\Item\Type::ENGINE => [
+                DbTable\Item\Type::ENGINE => true
+            ],
+            DbTable\Item\Type::CATEGORY => [
+                DbTable\Item\Type::VEHICLE => true,
+                DbTable\Item\Type::CATEGORY => true
+            ]
+        ];
+        
+        if (!isset($allowedCombinations[$parent->item_type_id][$car->item_type_id])) {
+            throw new Exception("THat type of parent is not allowed for this type");
         }
 
         $id = (int)$car->id;

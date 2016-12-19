@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\HostManager;
 use Application\Model\BrandVehicle;
+use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
 use Application\Model\Message;
 use Application\Model\PictureItem;
@@ -29,6 +30,8 @@ class CatalogueController extends AbstractActionController
      * @var PictureItem
      */
     private $pictureItem;
+    
+    private $textStorage;
 
     public function __construct(
         BrandVehicle $brandVehicle,
@@ -36,7 +39,8 @@ class CatalogueController extends AbstractActionController
         SpecificationsService $specService,
         HostManager $hostManager,
         TelegramService $telegram,
-        Message $message
+        Message $message,
+        $textStorage
     ) {
         $this->brandVehicle = $brandVehicle;
         $this->pictureItem = $pictureItem;
@@ -44,6 +48,7 @@ class CatalogueController extends AbstractActionController
         $this->hostManager = $hostManager;
         $this->telegram = $telegram;
         $this->message = $message;
+        $this->textStorage = $textStorage;
     }
 
     public function refreshBrandVehicleAction()
@@ -52,8 +57,166 @@ class CatalogueController extends AbstractActionController
 
         Console::getInstance()->writeLine("done");
     }
-
+    
     public function migrateEnginesAction()
+    {
+        $itemTable = new DbTable\Vehicle();
+        
+        $itemRows = $itemTable->fetchAll([
+            'item_type_id = ?' => DbTable\Item\Type::CATEGORY
+        ]);
+        
+        foreach ($itemRows as $itemRow) {
+            print $itemRow->id . PHP_EOL;
+            $itemRow->updateOrderCache();
+        }
+        
+        /*$categoryTable = new DbTable\Category();
+        $categoryLangTable = new DbTable\Category\Language();
+        $categoryItemTable = new DbTable\Category\Vehicle();
+        
+        $itemTable = new DbTable\Vehicle();
+        $itemLangTable = new DbTable\Vehicle\Language();
+        
+        $itemParentTable = new DbTable\Vehicle\ParentTable();
+        
+        $categoryRows = $categoryTable->fetchAll();
+        
+        foreach ($categoryRows as $categoryRow) {
+            print $categoryRow->id . PHP_EOL;
+            
+            $itemRow = $itemTable->fetchRow([
+                'migration_category_id = ?' => $categoryRow->id
+            ]);
+            if (!$itemRow) {
+                $itemRow = $itemTable->createRow([
+                    'migration_category_id' => $categoryRow->id,
+                    'name'                  => $categoryRow->name,
+                    'item_type_id'          => DbTable\Item\Type::CATEGORY,
+                    'catname'               => $categoryRow->catname,
+                    'body'                  => '',
+                    'produced_exactly'      => 0
+                ]);
+                $itemRow->save();
+            }*/
+            
+            /*$categoryLangRows = $categoryLangTable->fetchAll([
+                'category_id = ?' => $categoryRow->id
+            ]);
+            
+            foreach ($categoryLangRows as $categoryLangRow) {
+                $itemLangRow = $itemLangTable->fetchRow([
+                    'car_id = ?'   => $itemRow->id,
+                    'language = ?' => $categoryLangRow->language
+                ]);
+                if (!$itemLangRow) {
+                    $itemLangRow = $itemLangTable->createRow([
+                        'car_id'   => $itemRow->id,
+                        'language' => $categoryLangRow->language,
+                        'name'     => $categoryLangRow->name,
+                        'text_id'  => $categoryLangRow->text_id
+                    ]);
+                    $itemLangRow->save();
+                }
+            }*/
+            
+            /*if ($categoryRow->parent_id) {
+                
+                $parentItemRow = $itemTable->fetchRow([
+                    'migration_category_id = ?' => $categoryRow->parent_id
+                ]);
+                
+                if ($parentItemRow) {
+                    $parentItemRow->is_group = 1;
+                    $parentItemRow->save();
+                    
+                    //$itemParentTable->addParent($itemRow, $parentItemRow);
+                    
+                    $langData = [];
+                    foreach ($categoryLangRows as $categoryLangRow) {
+                        $langData[$categoryLangRow->language] = [
+                            'name' => $categoryLangRow->short_name
+                        ];
+                    }
+                    
+                    $itemParentTable->setParentOptions($itemRow, $parentItemRow, [
+                        'name'      => $categoryRow->short_name,
+                        'languages' => $langData
+                    ]);
+                    
+                    //$itemTable->updateInteritance($itemRow);
+                }
+            }*/
+            
+            /*$categoryItemRows = $categoryItemTable->fetchAll([
+                'category_id = ?' => $categoryRow->id,
+            ]);
+            
+            foreach ($categoryItemRows as $categoryItemRow) {
+                if (!$itemRow->is_group) {
+                    $itemRow->is_group = 1;
+                    $itemRow->save();
+                }
+                
+                $vehicleRow = $itemTable->fetchRow([
+                    'id = ?' => $categoryItemRow->item_id
+                ]);
+                
+                if ($vehicleRow) {
+                    $itemParentTable->addParent($vehicleRow, $itemRow);
+                    
+                    //$itemTable->updateInteritance($vehicleRow);
+                }
+            }
+        }*/
+        
+        /*$itemTable = new DbTable\Vehicle();
+        $itemLangTable = new DbTable\Vehicle\Language();
+        
+        $itemRows = $itemTable->fetchAll([
+            'full_text_id IS NOT NULL'
+        ]);
+        
+        foreach ($itemRows as $itemRow) {
+            $text = $this->textStorage->getText($itemRow->full_text_id);
+            $language = null;
+            
+            if (!$text) {
+                $language = 'en';
+            }
+            
+            if (preg_match('|^[[:space:] a-zA-ZІ½²³°®™‐€ÚÖćčśãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
+                $language = 'en';
+            }
+            
+            if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½²³°®™‐€ÚÖćčśãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
+                $language = 'ru';
+            }
+            
+            print $itemRow->full_text_id . '#' . $language . PHP_EOL;
+            
+            if (!$language) {
+                print $text . PHP_EOL;
+                exit;
+            }
+            
+            $langRow = $itemLangTable->fetchRow([
+                'car_id = ?'   => $itemRow->id,
+                'language = ?' => $language
+            ]);
+            if (!$langRow) {
+                $langRow = $itemLangTable->createRow([
+                    'car_id'   => $itemRow->id,
+                    'language' => $language,
+                ]);
+            }
+            
+            $langRow->full_text_id = $itemRow->full_text_id;
+            $langRow->save();
+        }*/
+    }
+
+    public function acceptOldUnsortedAction()
     {
         $pictureTable = new Picture();
         

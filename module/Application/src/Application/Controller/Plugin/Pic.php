@@ -24,7 +24,6 @@ use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\Picture\View as PictureView;
 use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\PictureItem;
 use Application\Paginator\Adapter\Zend1DbSelect;
@@ -473,12 +472,10 @@ class Pic extends AbstractPlugin
         $language = $controller->language();
         $isModer = $controller->user()->inheritsRole('moder');
 
-        $carLangTable = new VehicleLanguage();
-        $carTable = $catalogue->getCarTable();
-        $cdTable = new Category();
-        $cdlTable = new CategoryLanguage();
+        $itemTable = $catalogue->getCarTable();
         $factoryTable = new Factory();
         $twinsGroupsTable = new TwinsGroup();
+        $itemLanguageTable = new DbTable\Vehicle\Language();
 
         $pictureTable = $catalogue->getPictureTable();
         $db = $pictureTable->getAdapter();
@@ -499,7 +496,7 @@ class Pic extends AbstractPlugin
 
         $itemRows = [];
         if ($carIds) {
-            $itemRows = $carTable->fetchAll([
+            $itemRows = $itemTable->fetchAll([
                 'id IN (?)'        => $carIds,
                 'item_type_id = ?' => DbTable\Item\Type::VEHICLE
             ]);
@@ -512,8 +509,8 @@ class Pic extends AbstractPlugin
             $designProject = null;
             $detailsUrl = null;
             $factories = [];
-            $description = null;
             $text = null;
+            $fullText = null;
             $specsEditUrl = null;
             $uploadUrl = null;
 
@@ -555,8 +552,35 @@ class Pic extends AbstractPlugin
                         ])
                     ];
                 }
+                
+                $db = $itemLanguageTable->getAdapter();
+                $orderExpr = $db->quoteInto('language = ? desc', $language);
+                $itemLanguageRows = $itemLanguageTable->fetchAll([
+                    'car_id = ?' => $item['id']
+                ], new \Zend_Db_Expr($orderExpr));
+                
+                $textIds = [];
+                $fullTextIds = [];
+                foreach ($itemLanguageRows as $itemLanguageRow) {
+                    if ($itemLanguageRow->text_id) {
+                        $textIds[] = $itemLanguageRow->text_id;
+                    }
+                    if ($itemLanguageRow->full_text_id) {
+                        $fullTextIds[] = $itemLanguageRow->full_text_id;
+                    }
+                }
+                
+                $text = null;
+                if ($textIds) {
+                    $text = $this->textStorage->getFirstText($textIds);
+                }
+                
+                $fullText = null;
+                if ($fullTextIds) {
+                    $fullText = $this->textStorage->getFirstText($fullTextIds);
+                }
 
-                if ($item->full_text_id) {
+                if ((bool)$fullText) {
                     foreach ($catalogue->cataloguePaths($item) as $path) {
                         $detailsUrl = $controller->url()->fromRoute('catalogue', [
                             'action'        => 'brand-item',
@@ -583,14 +607,6 @@ class Pic extends AbstractPlugin
                     ];
                 }
 
-                if ($item->text_id) {
-                    $description = $this->textStorage->getText($item->text_id);
-                }
-
-                if ($item->full_text_id) {
-                    $text = $this->textStorage->getText($item->full_text_id);
-                }
-
                 if ($controller->user()->isAllowed('specifications', 'edit')) {
                     $specsEditUrl = $controller->url()->fromRoute('cars/params', [
                         'action' => 'car-specifications-editor',
@@ -611,7 +627,7 @@ class Pic extends AbstractPlugin
             $altNames = [];
             $altNames2 = [];
 
-            $carLangRows = $carLangTable->fetchAll([
+            $carLangRows = $itemLanguageTable->fetchAll([
                 'car_id = ?' => $item->id
             ]);
 
@@ -641,20 +657,28 @@ class Pic extends AbstractPlugin
 
             // categories
             $categories = [];
-            $categoryRows = $cdTable->fetchAll(
-                $cdTable->select(true)
-                    ->join('category_item', 'category.id = category_item.category_id', null)
-                    ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', null)
-                    ->where('item_parent_cache.item_id = ?', $item->id)
+            
+            $db = $itemTable->getAdapter();
+            $langExpr = $db->quoteInto(
+                'cars.id = car_language.car_id and car_language.language = ?',
+                $language
+            );
+            $categoryRows = $db->fetchAll(
+                $db->select()
+                    ->from($itemTable->info('name'), ['id', 'name', 'catname'])
+                    ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->joinLeft('car_language', $langExpr, ['lang_name' => 'name'])
+                    ->join('car_parent', 'cars.id = car_parent.parent_id', null)
+                    ->join(['top_item' => 'cars'], 'car_parent.car_id = top_item.id', null)
+                    ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
+                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
+                    ->where('item_parent_cache.item_id IN (?)', $item['id'])
+                    ->group(['item_parent_cache.item_id', 'cars.id'])
             );
 
             foreach ($categoryRows as $row) {
-                $lRow = $cdlTable->fetchRow([
-                    'language = ?'    => $language,
-                    'category_id = ?' => $row->id
-                ]);
-                $categories[$row->id] = [
-                    'name' => $lRow ? $lRow->name : $row->name,
+                $categories[$row['id']] = [
+                    'name' => $row['lang_name'] ? $row['lang_name'] : $row['name'],
                     'url'  => $controller->url()->fromRoute('categories', [
                         'action'           => 'category',
                         'category_catname' => $row['catname'],
@@ -701,8 +725,8 @@ class Pic extends AbstractPlugin
                 'categories'    => $categories,
                 'detailsUrl'    => $detailsUrl,
                 'factories'     => $factories,
-                'description'   => $description,
-                'text'          => $text,
+                'description'   => $text,
+                'text'          => $fullText,
                 'perspective'   => $perspective,
                 'specsEditUrl'  => $specsEditUrl,
                 'uploadUrl'     => $uploadUrl
@@ -839,9 +863,9 @@ class Pic extends AbstractPlugin
                 if ($factory = $picture->findParentRow(Factory::class)) {
                     $carIds = $factory->getRelatedCarGroupId();
                     if ($carIds) {
-                        $carTable = $catalogue->getCarTable();
+                        $itemTable = $catalogue->getCarTable();
 
-                        $carRows = $carTable->fetchAll([
+                        $carRows = $itemTable->fetchAll([
                             'id in (?)' => $carIds
                         ], $catalogue->carsOrdering());
 
@@ -1003,10 +1027,10 @@ class Pic extends AbstractPlugin
         );
 
         $modifications = [];
+        $itemTable = new Vehicle();
         foreach ($mRows as $mRow) {
             $url = null;
-            $carTable = new Vehicle();
-            $carRow = $carTable->find($mRow->car_id)->current();
+            $carRow = $itemTable->find($mRow->car_id)->current();
             if ($carRow) {
                 $carParentTable = new VehicleParent();
                 $paths = $carParentTable->getPaths($carRow->id, [

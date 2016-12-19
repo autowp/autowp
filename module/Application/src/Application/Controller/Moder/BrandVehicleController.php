@@ -129,7 +129,10 @@ class BrandVehicleController extends AbstractActionController
         $vehicleTable = $this->catalogue()->getCarTable();
 
         $brandRow = $brandTable->find($this->params('brand_id'))->current();
-        $vehicleRow = $vehicleTable->find($this->params('vehicle_id'))->current();
+        $vehicleRow = $vehicleTable->fetchRow([
+            'id = ?'              => (int)$this->params('vehicle_id'),
+            'item_type_id IN (?)' => [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE]
+        ]);
         if (! $brandRow || ! $vehicleRow) {
             return $this->notFoundAction();
         }

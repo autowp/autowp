@@ -5,6 +5,7 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Service\Mosts;
@@ -84,13 +85,30 @@ class MostsController extends AbstractActionController
         ]);
 
         $carParentTable = new VehicleParent();
+        $itemLanguageTable = new DbTable\Vehicle\Language();
 
         $idx = 0;
         foreach ($data['carList']['cars'] as &$car) {
             $description = null;
-            if ($car['car']['text_id']) {
-                $description = $this->textStorage->getText($car['car']['text_id']);
+            
+            $db = $itemLanguageTable->getAdapter();
+            $orderExpr = $db->quoteInto('language = ? desc', $this->language());
+            $itemLanguageRows = $itemLanguageTable->fetchAll([
+                'car_id = ?' => $car['car']['id']
+            ], new \Zend_Db_Expr($orderExpr));
+            
+            $textIds = [];
+            foreach ($itemLanguageRows as $itemLanguageRow) {
+                if ($itemLanguageRow->text_id) {
+                    $textIds[] = $itemLanguageRow->text_id;
+                }
             }
+            
+            $description = null;
+            if ($textIds) {
+                $description = $this->textStorage->getFirstText($textIds);
+            }
+            
             $car['description'] = $description;
 
             $pictures = [];

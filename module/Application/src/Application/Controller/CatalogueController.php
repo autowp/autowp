@@ -12,6 +12,7 @@ use Autowp\User\Model\DbTable\User;
 use Application\Model\DbTable\BrandLink;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
+use Application\Model\DbTable;
 use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Factory;
@@ -961,7 +962,7 @@ class CatalogueController extends AbstractActionController
                 'spec' => 'spec.short_name',
                 'cars.body', 'cars.today', 'cars.produced', 'cars.produced_exactly',
                 'cars.begin_year', 'cars.end_year', 'cars.begin_month', 'cars.end_month',
-                'cars.is_group', 'cars.full_text_id', 'cars.text_id',
+                'cars.is_group',
                 'brand_item_catname' => 'brand_item.catname'
             ];
 
@@ -1224,18 +1225,11 @@ class CatalogueController extends AbstractActionController
             }
 
             $counts = $this->childsTypeCount($currentCarId);
-
-            $description = null;
-            if ($currentCar['text_id']) {
-                $description = $this->textStorage->getText($currentCar['text_id']);
-            }
-            $currentCar['description'] = $description;
-
-            $text = null;
-            if ($currentCar['full_text_id']) {
-                $text = $this->textStorage->getText($currentCar['full_text_id']);
-            }
-            $currentCar['text'] = $text;
+            
+            $texts = $this->getItemTexts($currentCar['id']);
+            
+            $currentCar['description'] = $texts['description'];
+            $currentCar['text'] = $texts['text'];
             $hasHtml = (bool)$currentCar['text'];
 
             return [
@@ -1662,17 +1656,10 @@ class CatalogueController extends AbstractActionController
             $requireAttention = $this->getCarModerAttentionCount($currentCarId);
         }
 
-        $description = null;
-        if ($currentCar['text_id']) {
-            $description = $this->textStorage->getText($currentCar['text_id']);
-        }
-        $currentCar['description'] = $description;
-
-        $text = null;
-        if ($currentCar['full_text_id']) {
-            $text = $this->textStorage->getText($currentCar['full_text_id']);
-        }
-        $currentCar['text'] = $text;
+        $texts = $this->getItemTexts($currentCar['id']);
+        
+        $currentCar['description'] = $texts['description'];
+        $currentCar['text'] = $texts['text'];
         $hasHtml = (bool)$currentCar['text'];
 
         return [
@@ -1687,6 +1674,67 @@ class CatalogueController extends AbstractActionController
             'hasHtml'          => $hasHtml,
             'isCarModer'       => $this->user()->inheritsRole('cars-moder')
         ];
+    }
+    
+    private function getItemTexts($itemId)
+    {
+        $itemLanguageTable = new DbTable\Vehicle\Language();
+        
+        $db = $itemLanguageTable->getAdapter();
+        $orderExpr = $db->quoteInto('language = ? desc', $this->language());
+        $itemLanguageRows = $itemLanguageTable->fetchAll([
+            'car_id = ?' => $itemId
+        ], new \Zend_Db_Expr($orderExpr));
+        
+        $textIds = [];
+        $fullTextIds = [];
+        foreach ($itemLanguageRows as $itemLanguageRow) {
+            if ($itemLanguageRow->text_id) {
+                $textIds[] = $itemLanguageRow->text_id;
+            }
+            if ($itemLanguageRow->full_text_id) {
+                $fullTextIds[] = $itemLanguageRow->full_text_id;
+            }
+        }
+        
+        $description = null;
+        if ($textIds) {
+            $description = $this->textStorage->getFirstText($textIds);
+        }
+        
+        $text = null;
+        if ($fullTextIds) {
+            $text = $this->textStorage->getFirstText($fullTextIds);
+        }
+        
+        return [
+            'description' => $description,
+            'text'        => $text
+        ];
+    }
+    
+    private function isItemHasFullText($itemId)
+    {
+        $itemLanguageTable = new DbTable\Vehicle\Language();
+    
+        $db = $itemLanguageTable->getAdapter();
+        $orderExpr = $db->quoteInto('language = ? desc', $this->language());
+        $itemLanguageRows = $itemLanguageTable->fetchAll([
+            'car_id = ?' => $itemId
+        ], new \Zend_Db_Expr($orderExpr));
+    
+        $fullTextIds = [];
+        foreach ($itemLanguageRows as $itemLanguageRow) {
+            if ($itemLanguageRow->full_text_id) {
+                $fullTextIds[] = $itemLanguageRow->full_text_id;
+            }
+        }
+    
+        if (!$fullTextIds) {
+            return false;
+        }
+    
+        return (bool)$this->textStorage->getFirstText($fullTextIds);
     }
 
     private function brandItemGroup(
@@ -1801,17 +1849,10 @@ class CatalogueController extends AbstractActionController
         $counts = $this->childsTypeCount($currentCarId);
 
 
-        $description = null;
-        if ($currentCar['text_id']) {
-            $description = $this->textStorage->getText($currentCar['text_id']);
-        }
-        $currentCar['description'] = $description;
+        $texts = $this->getItemTexts($currentCar['id']);
 
-        $text = null;
-        if ($currentCar['full_text_id']) {
-            $text = $this->textStorage->getText($currentCar['full_text_id']);
-        }
-        $currentCar['text'] = $text;
+        $currentCar['description'] = $texts['description'];
+        $currentCar['text'] = $texts['text'];
         $hasHtml = (bool)$currentCar['text'];
 
         $carLangTable = new VehicleLanguage();
@@ -1868,7 +1909,7 @@ class CatalogueController extends AbstractActionController
                             ->where('parent_id = ?', $listCar->id)
                     );
 
-                    $hasHtml = (bool)$listCar->full_text_id;
+                    $hasHtml = $this->isItemHasFullText($listCar->id);
 
                     if (! $hasChilds && ! $hasHtml) {
                         return false;

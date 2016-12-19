@@ -149,6 +149,7 @@ class Car extends AbstractPlugin
         $hideEmpty            = isset($options['hideEmpty']) && $options['hideEmpty'];
         $disableTwins         = isset($options['disableTwins']) && $options['disableTwins'];
         $disableLargePictures = isset($options['disableLargePictures']) && $options['disableLargePictures'];
+        $useFrontPictures     = isset($options['useFrontPictures']) && $options['useFrontPictures'];
         $disableSpecs         = isset($options['disableSpecs']) && $options['disableSpecs'];
         $disableCategories    = isset($options['disableCategories']) && $options['disableCategories'];
         $picturesDateSort     = isset($options['picturesDateSort']) && $options['picturesDateSort'];
@@ -176,7 +177,7 @@ class Car extends AbstractPlugin
         $carParentTable = new DbTable\Vehicle\ParentTable();
         $carParentAdapter = $carParentTable->getAdapter();
         $brandTable = new DbTable\Brand();
-        $categoryTable = new DbTable\Category();
+        $itemTable = new DbTable\Vehicle();
 
         $carIds = [];
         foreach ($cars as $car) {
@@ -202,19 +203,22 @@ class Car extends AbstractPlugin
         // categories
         $carsCategories = [];
         if ($carIds && ! $disableCategories) {
-            $db = $categoryTable->getAdapter();
+            $db = $itemTable->getAdapter();
             $langExpr = $db->quoteInto(
-                'category.id = category_language.category_id and category_language.language = ?',
+                'cars.id = car_language.car_id and car_language.language = ?',
                 $language
             );
             $categoryRows = $db->fetchAll(
                 $db->select()
-                    ->from($categoryTable->info('name'), ['name', 'catname'])
-                    ->join('category_item', 'category.id = category_item.category_id', null)
-                    ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', 'item_id')
-                    ->joinLeft('category_language', $langExpr, ['lang_name' => 'name'])
+                    ->from($itemTable->info('name'), ['name', 'catname'])
+                    ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->joinLeft('car_language', $langExpr, ['lang_name' => 'name'])
+                    ->join('car_parent', 'cars.id = car_parent.parent_id', null)
+                    ->join(['top_item' => 'cars'], 'car_parent.car_id = top_item.id', null)
+                    ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
+                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id IN (?)', $carIds)
-                    ->group(['item_parent_cache.item_id', 'category.id'])
+                    ->group(['item_parent_cache.item_id', 'cars.id'])
             );
 
             foreach ($categoryRows as $category) {
@@ -338,24 +342,35 @@ class Car extends AbstractPlugin
                 $pGroupId = $useLargeFormat ? 5 : 4;
             }
 
-            $g = $this->getPerspectiveGroupIds($pGroupId);
-
             $carOnlyChilds = isset($onlyChilds[$car->id]) ? $onlyChilds[$car->id] : null;
 
-            $pictures = $this->getOrientedPictureList(
-                $car,
-                $g,
-                $onlyExactlyPictures,
-                $type,
-                $picturesDateSort,
-                $allowUpPictures,
-                $language,
-                $picHelper,
-                $catalogue,
-                $carOnlyChilds,
-                $useLargeFormat,
-                $pictureUrlCallback
-            );
+            if (!$useFrontPictures) {
+                $g = $this->getPerspectiveGroupIds($pGroupId);
+                $pictures = $this->getOrientedPictureList(
+                    $car,
+                    $g,
+                    $onlyExactlyPictures,
+                    $type,
+                    $picturesDateSort,
+                    $allowUpPictures,
+                    $language,
+                    $picHelper,
+                    $catalogue,
+                    $carOnlyChilds,
+                    $useLargeFormat,
+                    $pictureUrlCallback
+                );
+            } else {
+                $pictures = $this->getFrontPictureList(
+                    $car,
+                    $picturesDateSort,
+                    $allowUpPictures,
+                    $language,
+                    $picHelper,
+                    $catalogue,
+                    $pictureUrlCallback
+                );
+            }
 
             if ($hideEmpty) {
                 $hasPictures = false;
@@ -370,8 +385,37 @@ class Car extends AbstractPlugin
                     continue;
                 }
             }
+            
+            $itemLanguageTable = new DbTable\Vehicle\Language();
+            
+            $db = $itemLanguageTable->getAdapter();
+            $orderExpr = $db->quoteInto('language = ? desc', $language);
+            $itemLanguageRows = $itemLanguageTable->fetchAll([
+                'car_id = ?' => $car['id']
+            ], new \Zend_Db_Expr($orderExpr));
+            
+            $textIds = [];
+            $fullTextIds = [];
+            foreach ($itemLanguageRows as $itemLanguageRow) {
+                if ($itemLanguageRow->text_id) {
+                    $textIds[] = $itemLanguageRow->text_id;
+                }
+                if ($itemLanguageRow->full_text_id) {
+                    $fullTextIds[] = $itemLanguageRow->full_text_id;
+                }
+            }
+            
+            $description = null;
+            if ($textIds) {
+                $description = $this->textStorage->getFirstText($textIds);
+            }
+            
+            $text = null;
+            if ($fullTextIds) {
+                $text = $this->textStorage->getFirstText($fullTextIds);
+            }
 
-            $hasHtml = (bool)$car->full_text_id;
+            $hasHtml = (bool)$text;
 
             $specsLinks = [];
             if (! $disableSpecs) {
@@ -475,10 +519,6 @@ class Car extends AbstractPlugin
             }
 
             if (! $disableDescription) {
-                $description = null;
-                if ($car->text_id) {
-                    $description = $this->textStorage->getText($car->text_id);
-                }
                 $item['description'] = $description;
             }
 
@@ -635,15 +675,16 @@ class Car extends AbstractPlugin
         return $this->perspectiveCache[$pageId];
     }
 
-    private function getPictureSelect($car, array $options)
+    private function getPictureSelect($carId, array $options)
     {
         $defaults = [
-            'onlyExactlyPictures' => false,
             'perspectiveGroup'    => false,
             'type'                => null,
             'exclude'             => [],
+            'excludeItems'        => null,
             'dateSort'            => false,
-            'onlyChilds'          => null
+            'onlyChilds'          => null,
+            'onlyExactlyPictures' => false
         ];
         $options = array_merge($defaults, $options);
 
@@ -658,7 +699,11 @@ class Car extends AbstractPlugin
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
             )
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', 'perspective_id')
+            ->join(
+                'picture_item', 
+                'pictures.id = picture_item.picture_id', 
+                ['perspective_id', 'item_id']
+            )
             ->where('pictures.status IN (?)', [
                 DbTable\Picture::STATUS_ACCEPTED,
                 DbTable\Picture::STATUS_NEW
@@ -668,12 +713,12 @@ class Car extends AbstractPlugin
         $order = [];
 
         if ($options['onlyExactlyPictures']) {
-            $select->where('picture_item.item_id = ?', $car->id);
+            $select->where('picture_item.item_id = ?', $carId);
         } else {
             $select
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->join('cars', 'picture_item.item_id = cars.id', null)
-                ->where('item_parent_cache.parent_id = ?', $car->id);
+                ->where('item_parent_cache.parent_id = ?', $carId);
 
             $order[] = 'cars.is_concept asc';
             $order[] = 'item_parent_cache.sport asc';
@@ -707,6 +752,10 @@ class Car extends AbstractPlugin
 
         if ($options['exclude']) {
             $select->where('pictures.id not in (?)', $options['exclude']);
+        }
+        
+        if ($options['excludeItems']) {
+            $select->where('picture_item.item_id not in (?)', $options['excludeItems']);
         }
 
         if ($options['dateSort']) {
@@ -756,7 +805,7 @@ class Car extends AbstractPlugin
         $db = $pictureTable->getAdapter();
 
         foreach ($perspectiveGroupIds as $groupId) {
-            $select = $this->getPictureSelect($car, [
+            $select = $this->getPictureSelect($car['id'], [
                 'onlyExactlyPictures' => $onlyExactlyPictures,
                 'perspectiveGroup'    => $groupId,
                 'type'                => $type,
@@ -778,7 +827,7 @@ class Car extends AbstractPlugin
         $needMore = count($perspectiveGroupIds) - count($usedIds);
 
         if ($needMore > 0) {
-            $select = $this->getPictureSelect($car, [
+            $select = $this->getPictureSelect($car['id'], [
                 'onlyExactlyPictures' => $onlyExactlyPictures,
                 'type'                => $type,
                 'exclude'             => $usedIds,
@@ -866,6 +915,68 @@ class Car extends AbstractPlugin
                     'row'    => $pictureRow,
                     'url'    => $url,
                 ];
+            }
+        }
+
+        return $result;
+    }
+    
+    private function getFrontPictureList(
+        $car,
+        $dateSort,
+        $allowUpPictures,
+        $language,
+        $picHelper,
+        $catalogue,
+        $urlCallback
+    ) {
+
+        $itemTable = new DbTable\Vehicle();
+        
+        $pictures = [];
+        $usedIds = [];
+
+        $pictureTable = $this->getPictureTable();
+        $db = $pictureTable->getAdapter();
+        
+        $ids = $db->fetchCol(
+            $db->select()
+                ->from('cars', 'id')
+                ->where('cars.item_type_id <> ?', DbTable\Item\Type::CATEGORY)
+                ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                ->where('item_parent_cache.parent_id = ?', $car['id'])
+                ->limit(4)
+        );
+        
+        $result = [];
+        if ($ids) {
+            for ($idx=0; $idx<4; $idx++) {
+                $itemId = $ids[$idx % count($ids)];
+                
+                $select = $this->getPictureSelect($itemId, [
+                    'perspectiveGroup'    => 31,
+                    'exclude'             => $usedIds,
+                    'dateSort'            => $dateSort,
+                ]);
+                
+                $picture = $db->fetchRow($select);
+                
+                if ($picture) {
+                    $usedIds[] = $picture['id'];
+                    if ($urlCallback) {
+                        $url = $urlCallback($car, $picture);
+                    } else {
+                        $url = $picHelper->href($picture);
+                    }
+                    
+                    $result[] = [
+                        'format' => 'picture-thumb',
+                        'row'    => $picture,
+                        'url'    => $url,
+                    ];
+                } else {
+                    $result[] = false;
+                }
             }
         }
 

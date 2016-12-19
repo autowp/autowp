@@ -10,6 +10,7 @@ use Zend\View\Model\ViewModel;
 use Application\Form\Moder\Car as CarForm;
 use Application\Form\Moder\CarOrganize as CarOrganizeForm;
 use Application\Form\Moder\CarOrganizePictures as CarOrganizePicturesForm;
+use Application\Form\Moder\ItemLanguages as ItemLanguagesForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
@@ -24,7 +25,6 @@ use Application\Service\SpecificationsService;
 use Zend_Db_Expr;
 
 use Exception;
-use Locale;
 
 class CarsController extends AbstractActionController
 {
@@ -169,8 +169,6 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $categories = ['' => '--'] + $this->getCategoriesOptions(null, 0);
-
         $specTable = new DbTable\Spec();
         $specOptions = $this->loadSpecs($specTable, null, 0);
 
@@ -179,8 +177,6 @@ class CarsController extends AbstractActionController
 
         $this->filterForm->setAttribute('action', $this->url()->fromRoute(null, [], [], true));
 
-        $this->filterForm->get('category')->setValueOptions($categories);
-        $this->filterForm->get('no_category')->setValueOptions($categories);
         $this->filterForm->get('spec')->setValueOptions(array_replace(['' => '--'], $specOptions));
         $this->filterForm->get('vehicle_type_id')->setValueOptions(array_replace([
             ''      => '--',
@@ -272,30 +268,31 @@ class CarsController extends AbstractActionController
 
             if ($values['category']) {
                 $select
-                    ->join('category_item', 'cars.id = category_item.item_id', null)
-                    ->join('category_parent', 'category_item.category_id=category_parent.category_id', null)
-                    ->where('category_parent.parent_id = ?', $values['category']);
+                    ->join(['item_parent_cache'], 'cars.id = item_parent_cache.item_id', null)
+                    ->join(['category' => 'cars'], 'item_parent_cache.parent_id = category.id', null)
+                    ->where('category.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->where('category.id = ?', $values['category']);
             }
 
-            if ($values['no_category']) {
-                $cpTable = new DbTable\Category\ParentTable();
+            /*if ($values['no_category']) {
+                $itemParentTable = new DbTable\Vehicle\ParentTable();
 
-                $ids = $cpTable->getAdapter()->fetchCol(
-                    $cpTable->getAdapter()->select()
-                        ->from($cpTable->info('name'), 'category_id')
+                $ids = $itemParentTable->getAdapter()->fetchCol(
+                    $itemParentTable->getAdapter()->select()
+                        ->from('item_parent_cache', 'item_id')
                         ->where('parent_id = ?', $values['no_category'])
                 );
 
                 if ($ids) {
                     $expr = $cars->getAdapter()->quoteInto(
-                        'cars.id = no_category.item_id and no_category.category_id in (?)',
+                        'cars.id = no_category.item_id and no_category.parent_id in (?)',
                         $ids
                     );
                     $select
-                        ->joinLeft(['no_category' => 'category_item'], $expr, null)
+                        ->joinLeft(['no_category' => 'item_parent_cache'], $expr, null)
                         ->where('no_category.item_id is null');
                 }
-            }
+            }*/
 
             if ($values['no_parent']) {
                 $select
@@ -307,6 +304,13 @@ class CarsController extends AbstractActionController
                     ->joinLeft('brand_item', 'cars.id = brand_item.car_id', null)
                     ->where('item_parent_cache.item_id IS NULL')
                     ->where('brand_item.car_id IS NULL');
+            }
+            
+            if ($values['text']) {
+                $select
+                    ->join('car_language', 'cars.id = car_language.car_id', null)
+                    ->join('textstorage_text', 'car_language.text_id = textstorage_text.id', null)
+                    ->where('textstorage_text.text like ?', '%' . $values['text'] . '%');
             }
 
             switch ($values['order']) {
@@ -473,36 +477,6 @@ class CarsController extends AbstractActionController
         return $model->setTerminal(true);
     }
 
-    private function getCategoriesOptions($parent, $deep = 0)
-    {
-        $cdTable = new DbTable\Category();
-        $cdlTable = new DbTable\Category\Language();
-
-        $language = $this->language();
-
-        $filter = $parent ? [
-            'parent_id = ?'    => $parent->id
-        ] : [
-            'parent_id IS NULL'
-        ];
-
-        $rows = $cdTable->fetchAll($filter, 'name');
-
-        $categories = [];
-
-        foreach ($rows as $row) {
-            $lRow = $cdlTable->fetchRow([
-                'language = ?'    => $language,
-                'category_id = ?' => $row->id
-            ]);
-            $categories[$row->id] = str_repeat('…', $deep) . ($lRow ? $lRow->name : $row->name);
-
-            $categories = $categories + $this->getCategoriesOptions($row, $deep + 1);
-        }
-
-        return $categories;
-    }
-
     private function getRandomPicture($car)
     {
         $pictures = $this->catalogue()->getPictureTable();
@@ -531,83 +505,6 @@ class CarsController extends AbstractActionController
         return $randomPicture;
     }
 
-    public function saveDescAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $cars = $this->catalogue()->getCarTable();
-
-        $car = $cars->find($this->params('car_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canEditMeta = $this->canEditMeta($car);
-
-        $textForm = $this->getTextForm();
-
-        if ($car->full_text_id) {
-            $text = $this->textStorage->getText($car->full_text_id);
-            $textForm->populateValues([
-                'text' => $text
-            ]);
-        }
-
-        if ($canEditMeta && $this->getRequest()->isPost()) {
-            $textForm->setData($this->params()->fromPost());
-            if ($textForm->isValid()) {
-                $values = $textForm->getData();
-
-                $text = $values['markdown'];
-
-                $user = $this->user()->get();
-
-                if ($car->full_text_id) {
-                    $this->textStorage->setText($car->full_text_id, $text, $user->id);
-                } elseif ($text) {
-                    $textId = $this->textStorage->createText($text, $user->id);
-                    $car->full_text_id = $textId;
-                    $car->save();
-                }
-
-                $this->log(sprintf(
-                    'Редактирование полного описания автомобиля %s',
-                    htmlspecialchars($this->car()->formatName($car, 'en'))
-                ), $car);
-
-                if ($car->full_text_id) {
-                    $userIds = $this->textStorage->getTextUserIds($car->full_text_id);
-
-                    $userTable = new \Autowp\User\Model\DbTable\User();
-                    foreach ($userIds as $userId) {
-                        if ($userId != $user->id) {
-                            foreach ($userTable->find($userId) as $userRow) {
-                                $uri = $this->hostManager->getUriByLanguage($userRow->language);
-
-                                $message = sprintf(
-                                    $this->translate(
-                                        'pm/user-%s-edited-vehicle-full-description-%s-%s',
-                                        'default',
-                                        $userRow->language
-                                    ),
-                                    $this->userModerUrl($user, true, $uri),
-                                    $this->car()->formatName($car, $userRow->language),
-                                    $this->carModerUrl($car, true, null, $uri)
-                                );
-
-                                $this->message->send(null, $userRow->id, $message);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $this->redirectToCar($car, 'desc');
-    }
-
     private function getDescriptionForm()
     {
         $this->descForm->setAttribute(
@@ -620,22 +517,11 @@ class CarsController extends AbstractActionController
         return $this->descForm;
     }
 
-    private function getTextForm()
-    {
-        $this->textForm->setAttribute(
-            'action',
-            $this->url()->fromRoute('moder/cars/params', [
-                'action' => 'save-desc'
-            ], [], true)
-        );
-
-        return $this->textForm;
-    }
-
     private function carToForm(DbTable\Vehicle\Row $car)
     {
         return [
             'name'        => $car->name,
+            'catname'     => $car->catname,
             'body'        => $car->body,
             'spec_id'     => $car->spec_inherit ? 'inherited' : ($car->spec_id ? $car->spec_id : ''),
             'is_concept'  => $car->is_concept_inherit ? 'inherited' : (bool)$car->is_concept,
@@ -740,8 +626,8 @@ class CarsController extends AbstractActionController
 
             $request = $this->getRequest();
 
-            $textForm = null;
-            $descriptionForm = null;
+            /*$textForm = null;
+            $descriptionForm = null;*/
 
             if ($request->isPost() && $this->params('form') == 'car-edit-meta') {
                 $formModerCarEditMeta->setData($this->params()->fromPost());
@@ -752,7 +638,7 @@ class CarsController extends AbstractActionController
                     $ucsTable = new DbTable\User\CarSubscribe();
                     $ucsTable->subscribe($user, $car);
 
-                    if ($haveChilds) {
+                    if ($haveChilds || $car->item_type_id == DbTable\Item\Type::CATEGORY) {
                         $values['is_group'] = 1;
                     }
 
@@ -807,78 +693,6 @@ class CarsController extends AbstractActionController
                     return $this->redirectToCar($car, 'meta');
                 }
             }
-
-
-            $descriptionForm = $this->getDescriptionForm();
-
-            if ($car->text_id) {
-                $description = $this->textStorage->getText($car->text_id);
-                $descriptionForm->populateValues([
-                    'markdown' => $description
-                ]);
-            }
-
-            if ($request->isPost() && $this->params('form') == 'car-edit-description') {
-                $descriptionForm->setData($this->params()->fromPost());
-                if ($descriptionForm->isValid()) {
-                    $values = $descriptionForm->getData();
-
-                    $text = $values['markdown'];
-
-                    $user = $this->user()->get();
-
-                    if ($car->text_id) {
-                        $this->textStorage->setText($car->text_id, $text, $user->id);
-                    } elseif ($text) {
-                        $textId = $this->textStorage->createText($text, $user->id);
-                        $car->text_id = $textId;
-                        $car->save();
-                    }
-
-
-                    $this->log(sprintf(
-                        'Редактирование описания автомобиля %s',
-                        htmlspecialchars($this->car()->formatName($car, 'en'))
-                    ), $car);
-
-                    if ($car->text_id) {
-                        $userIds = $this->textStorage->getTextUserIds($car->text_id);
-
-                        $userTable = new \Autowp\User\Model\DbTable\User();
-                        foreach ($userIds as $userId) {
-                            if ($userId != $user->id) {
-                                foreach ($userTable->find($userId) as $userRow) {
-                                    $uri = $this->hostManager->getUriByLanguage($userRow->language);
-
-                                    $message = sprintf(
-                                        $this->translate(
-                                            'pm/user-%s-edited-vehicle-description-%s-%s',
-                                            'default',
-                                            $userRow->language
-                                        ),
-                                        $this->userModerUrl($user, true, $uri),
-                                        $this->car()->formatName($car, $userRow->language),
-                                        $this->carModerUrl($car, true, null, $uri)
-                                    );
-
-                                    $this->message->send(null, $userRow->id, $message);
-                                }
-                            }
-                        }
-                    }
-
-                    return $this->redirectToCar($car, 'meta');
-                }
-            }
-
-            $textForm = $this->getTextForm();
-
-            if ($car->full_text_id) {
-                $text = $this->textStorage->getText($car->full_text_id);
-                $textForm->populateValues([
-                    'markdown' => $text
-                ]);
-            }
         }
 
 
@@ -898,12 +712,6 @@ class CarsController extends AbstractActionController
         ]);
 
         $db = $carTable->getAdapter();
-
-        $categoriesCount = $db->fetchOne(
-            $db->select()
-                ->from('category_item', 'count(1)')
-                ->where('item_id = ?', $car->id)
-        );
 
         $carLangTable = new DbTable\Vehicle\Language();
         $langNameCount = $carLangTable->getAdapter()->fetchOne(
@@ -960,11 +768,6 @@ class CarsController extends AbstractActionController
                 ], [], true),
                 'count' => $langNameCount,
             ],
-            'desc' => [
-                'icon'  => 'glyphicon glyphicon-align-left',
-                'title' => 'moder/vehicle/tabs/description',
-                'count' => (bool)$car->full_text_id,
-            ],
             'catalogue' => [
                 'icon'      => false,
                 'title'     => 'moder/vehicle/tabs/catalogue',
@@ -988,14 +791,6 @@ class CarsController extends AbstractActionController
                     'action' => 'car-tree'
                 ], [], true),
                 'count' => 0,
-            ],
-            'categories' => [
-                'icon'      => 'glyphicon glyphicon-tag',
-                'title'     => 'moder/vehicle/tabs/categories',
-                'data-load' => $this->url()->fromRoute('moder/cars/params', [
-                    'action' => 'car-categories'
-                ], [], true),
-                'count' => $categoriesCount,
             ],
             'twins' => [
                 'icon'      => 'glyphicon glyphicon-adjust',
@@ -1022,9 +817,18 @@ class CarsController extends AbstractActionController
                 'count' => $picturesCount,
             ],
         ];
+        
+        if ($car->item_type_id != DbTable\Item\Type::VEHICLE) {
+            unset($tabs['twins']);
+        }
 
         if ($car->item_type_id != DbTable\Item\Type::ENGINE) {
             unset($tabs['vehicles']);
+        }
+        
+        if (!in_array($car->item_type_id, [DbTable\Item\Type::ENGINE, DbTable\Item\Type::VEHICLE])) {
+            unset($tabs['pictures']);
+            unset($tabs['factories']);
         }
 
         if ($this->user()->get()->id == 1) {
@@ -1053,8 +857,6 @@ class CarsController extends AbstractActionController
             'subscribed'     => (bool)$ucsRow,
             'tabs'           => $tabs,
             'specsCount'     => $specsCount,
-            'textForm'             => $textForm,
-            'descriptionForm'      => $descriptionForm,
             'formModerCarEditMeta' => $formModerCarEditMeta
         ];
     }
@@ -1159,7 +961,10 @@ class CarsController extends AbstractActionController
         }
 
         $cars = $this->catalogue()->getCarTable();
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $cars->fetchRow([
+            'id = ?' => (int)$this->params('car_id'),
+            'item_type_id IN (?)' => [DbTable\Item\Type::ENGINE, DbTable\Item\Type::VEHICLE]
+        ]);
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -1514,276 +1319,6 @@ class CarsController extends AbstractActionController
         return $this->redirectToCar($car, 'factories');
     }
 
-    private function getCategoriesArray($parent, $selection, $deep = 0)
-    {
-        $cdTable = new DbTable\Category();
-        $cdlTable = new DbTable\Category\Language();
-
-        $language = $this->language();
-
-        $filter = $parent ? [
-            'parent_id = ?' => $parent->id
-        ] : [
-            'parent_id IS NULL'
-        ];
-
-        $rows = $cdTable->fetchAll($filter, 'name');
-
-        $categories = [];
-
-        foreach ($rows as $row) {
-            $lRow = $cdlTable->fetchRow([
-                'language = ?'    => $language,
-                'category_id = ?' => $row->id
-            ]);
-
-            $childs = $this->getCategoriesArray($row, $selection, $deep + 1);
-
-            $inherited = false;
-            $active = $checked = array_key_exists($row->id, $selection);
-            if ($checked) {
-                $inherited = $selection[$row->id]['inherited'];
-            } else {
-                foreach ($childs as $child) {
-                    if ($child['active']) {
-                        $active = true;
-                        break;
-                    }
-                }
-            }
-
-            $category = [
-                'id'            => $row->id,
-                'name'          => $lRow ? $lRow->name : $row->name,
-                'categories'    => $childs,
-                'checked'       => $checked,
-                'active'        => $active,
-                'inherited'     => $inherited,
-                'user'          => $checked ? $selection[$row->id]['user'] : false,
-                'inheritedFrom' => $checked ? $selection[$row->id]['inheritedFrom'] : []
-            ];
-
-            $categories[] = $category;
-        }
-
-        return $categories;
-    }
-
-    public function carCategoriesSaveAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $cars = $this->catalogue()->getCarTable();
-
-        $car = $cars->find($this->params('car_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canEditMeta = $this->canEditMeta($car);
-
-        if (! $canEditMeta) {
-            return $this->forbiddenAction();
-        }
-
-        if (! $this->getRequest()->isPost()) {
-            return $this->forbiddenAction();
-        }
-
-        $cTable = new DbTable\Category();
-        $ccTable = new DbTable\Category\Vehicle();
-
-        $categories = $cTable->find($this->params()->fromPost('category'));
-
-        // insert new
-        $insertedNames = [];
-        $ids = [];
-
-        foreach ($categories as $category) {
-            $ids[] = $category->id;
-
-            $ccRow = $ccTable->fetchRow([
-                'category_id = ?' => $category->id,
-                'item_id = ?'     => $car->id
-            ]);
-            if (! $ccRow) {
-                $user = $this->user()->get();
-                $ccRow = $ccTable->fetchNew();
-                $ccRow->setFromArray([
-                    'item_id'      => $car->id,
-                    'category_id'  => $category->id,
-                    'add_datetime' => new Zend_Db_Expr('NOW()'),
-                    'user_id'      => $user->id
-                ]);
-                $ccRow->save();
-
-                $insertedNames[] = $category->name;
-            }
-        }
-
-        // delete old
-        $deletedNames = [];
-        $notify = [];
-        $filter = [
-            'item_id = ?' => $car->id,
-        ];
-        if (count($ids)) {
-            $filter['category_id NOT IN (?)'] = $ids;
-        }
-        foreach ($ccTable->fetchAll($filter) as $oldCc) {
-            $oldCategory = $oldCc->findParentRow(DbTable\Category::class);
-            if ($oldCategory) {
-                $deletedNames[] = $oldCategory->name;
-
-                if ($oldUser = $oldCc->findParentRow(\Autowp\User\Model\DbTable\User::class)) {
-                    $user = $this->user()->get();
-                    if ($oldUser->id != $user->id) {
-                        $notify[$oldUser->id][] = $oldCategory;
-                    }
-                }
-            }
-
-            $oldCc->delete();
-        }
-
-        if ($deletedNames || $insertedNames) {
-            $logText = sprintf(
-                'Изменение категорий автомобиля %s. ',
-                $this->car()->formatName($car, 'en')
-            ) .
-                ($deletedNames ? 'Удалено: ' . implode(', ', $deletedNames) . '. ' : '') .
-                ($insertedNames ? 'Добавлено: ' . implode(', ', $insertedNames) . '. ' : '');
-                $this->log(htmlspecialchars($logText), $car);
-        }
-
-        $users = new \Autowp\User\Model\DbTable\User();
-        foreach ($notify as $userId => $categories) {
-            $notifyUser = $users->find($userId)->current();
-            if (count($categories) && $notifyUser) {
-                $user = $this->user()->get();
-
-                $uri = $this->hostManager->getUriByLanguage($notifyUser->language);
-
-                $categoryNames = [];
-                foreach ($categories as $category) {
-                    //TODO: translate category name
-                    $categoryNames[] = $category->name . ' (' . $this->url()->fromRoute('categories', [
-                        'action'           => 'category',
-                        'category_catname' => $category->catname
-                    ], [
-                        'force_canonical' => true,
-                        'uri'             => $uri
-                    ]) .')';
-                }
-
-                $message = sprintf(
-                    $this->translate(
-                        'pm/user-%s-cancel-link-vehicle-%s-%s-with-categories-%s',
-                        'default',
-                        $notifyUser->language
-                    ),
-                    $this->userModerUrl($user, true, $uri),
-                    $this->car()->formatName($car, $notifyUser->language),
-                    $this->carModerUrl($car, true, null, $uri),
-                    implode(', ', $categoryNames)
-                );
-
-                $this->message->send(null, $notifyUser->id, $message);
-            }
-        }
-
-        return new JsonModel([
-            'ok' => true
-        ]);
-    }
-
-    public function carCategoriesAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $carTable = $this->catalogue()->getCarTable();
-
-        $car = $carTable->find($this->params('car_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $users = new \Autowp\User\Model\DbTable\User();
-
-
-        $canEditMeta = $this->canEditMeta($car);
-
-        if (! $canEditMeta) {
-            return $this->forbiddenAction();
-        }
-
-        $db = $carTable->getAdapter();
-
-        $selected = $db->fetchPairs(
-            $db->select()
-                ->from('category_item', ['category_id', 'user_id'])
-                ->where('item_id = ?', $car->id)
-        );
-
-        $inherited = $db->fetchCol(
-            $db->select()
-                ->from('category_item', ['category_id'])
-                ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', $car->id)
-            //->where('item_parent_cache.diff > 0')
-        );
-
-        $selection = [];
-
-        foreach ($selected as $id => $value) {
-            $selection[$id] = [
-                'inherited'     => false,
-                'inheritedFrom' => [],
-                'user'          => $users->find($value)->current()
-            ];
-        }
-
-        foreach ($inherited as $id) {
-            if (! isset($selection[$id])) {
-                $carRows = $carTable->fetchAll(
-                    $carTable->select(true)
-                        ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', null)
-                        ->where('item_parent_cache.item_id = ?', $car->id)
-                        ->join('category_item', 'item_parent_cache.parent_id = category_item.item_id', null)
-                        ->where('category_item.category_id = ?', $id)
-                );
-
-                $inheritedFrom = [];
-                foreach ($carRows as $carRow) {
-                    $inheritedFrom[] = [
-                        'name' => $this->car()->formatName($car, 'en'),
-                        'url'  => $this->carModerUrl($carRow)
-                    ];
-                }
-
-                $selection[$id] = [
-                    'inherited'     => true,
-                    'inheritedFrom' => $inheritedFrom,
-                    'user'          => null
-                ];
-            }
-        }
-
-        $categories = $this->getCategoriesArray(null, $selection, 0);
-
-        $model = new ViewModel([
-            'canEditMeta' => $canEditMeta,
-            'car'         => $car,
-            'categories'  => $categories
-        ]);
-
-        return $model->setTerminal(true);
-    }
-
     public function subscribeAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -1834,81 +1369,6 @@ class CarsController extends AbstractActionController
         return new JsonModel([
             'ok' => true
         ]);
-    }
-
-    public function saveNameAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        if (! $this->getRequest()->isPost()) {
-            return $this->forbiddenAction();
-        }
-
-        $cars = $this->catalogue()->getCarTable();
-
-        $car = $cars->find($this->params('car_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canEditMeta = $this->canEditMeta($car);
-
-        if (! $canEditMeta) {
-            return $this->forbiddenAction();
-        }
-
-        $carLangTable = new DbTable\Vehicle\Language();
-
-        $changes = [];
-
-        foreach ($this->allowedLanguages as $lang) {
-            $value = trim($this->params()->fromPost($lang));
-
-            $row = $carLangTable->fetchRow([
-                'car_id = ?'   => $car->id,
-                'language = ?' => $lang
-            ]);
-
-            if ($value) {
-                if (! $row) {
-                    $row = $carLangTable->createRow([
-                        'car_id'   => $car->id,
-                        'language' => $lang
-                    ]);
-                }
-
-                if ($row->name != $value) {
-                    $changes[] = 'Установлено ' . strtoupper($lang) . ': ' . $value;
-                }
-
-                $row->name = $value;
-                $row->save();
-            } else {
-                if ($row) {
-                    $changes[] = 'Удалено ' . strtoupper($lang) . ': ' . $row->name;
-                    $row->delete();
-                }
-            }
-        }
-
-        $this->brandVehicle->refreshAutoByVehicle($car->id);
-
-        if ($changes) {
-            foreach ($changes as &$change) {
-                $change = htmlspecialchars($change);
-            }
-            unset($change); // prevent future bugs
-            $message = sprintf(
-                'Редактирование названий автомобиля %s',
-                htmlspecialchars($this->car()->formatName($car, 'en')).
-                ( count($changes) ? '<p>'.implode('<br />', $changes).'</p>' : '')
-            );
-            $this->log($message, $car);
-        }
-
-        return $this->redirectToCar($car, 'name');
     }
 
     public function treeAction()
@@ -2216,34 +1676,37 @@ class CarsController extends AbstractActionController
 
         $language = $this->language();
         $imageStorage = $this->imageStorage();
+        
+        if (in_array($carRow->item_type_id, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
 
-        $brandModel = new BrandModel();
-        $brandRows = $brandModel->getList([
-            'language' => $language,
-            'columns'  => ['id', 'name', 'img']
-        ], function ($select) use ($query) {
-            $select->where('brands.name like ?', $query . '%');
-        });
-
-        foreach ($brandRows as $brandRow) {
-            $img = false;
-            if ($brandRow['img']) {
-                $imageInfo = $imageStorage->getFormatedImage($brandRow['img'], 'brandicon2');
-                if ($imageInfo) {
-                    $img = $imageInfo->getSrc();
+            $brandModel = new BrandModel();
+            $brandRows = $brandModel->getList([
+                'language' => $language,
+                'columns'  => ['id', 'name', 'img']
+            ], function ($select) use ($query) {
+                $select->where('brands.name like ?', $query . '%');
+            });
+    
+            foreach ($brandRows as $brandRow) {
+                $img = false;
+                if ($brandRow['img']) {
+                    $imageInfo = $imageStorage->getFormatedImage($brandRow['img'], 'brandicon2');
+                    if ($imageInfo) {
+                        $img = $imageInfo->getSrc();
+                    }
                 }
+    
+                $result[] = [
+                    'url'   => $this->url()->fromRoute('moder/brand-vehicle/params', [
+                        'action'     => 'add',
+                        'brand_id'   => $brandRow['id'],
+                        'vehicle_id' => $carRow->id
+                    ], [], true),
+                    'name'  => $brandRow['name'],
+                    'image' => $img,
+                    'type'  => 'brand'
+                ];
             }
-
-            $result[] = [
-                'url'   => $this->url()->fromRoute('moder/brand-vehicle/params', [
-                    'action'     => 'add',
-                    'brand_id'   => $brandRow['id'],
-                    'vehicle_id' => $carRow->id
-                ], [], true),
-                'name'  => $brandRow['name'],
-                'image' => $img,
-                'type'  => 'brand'
-            ];
         }
 
 
@@ -2307,10 +1770,15 @@ class CarsController extends AbstractActionController
             $specId = $specRow->id;
             $query = trim(str_replace($specRow->short_name, '', $query));
         }
+        
+        $allowedItemTypes = [$carRow->item_type_id];
+        if (in_array($carRow->item_type_id, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
+            $allowedItemTypes[] = DbTable\Item\Type::CATEGORY;
+        }
 
         $select = $carTable->select(true)
             ->where('cars.is_group')
-            ->where('cars.item_type_id = ?', $carRow->item_type_id)
+            ->where('cars.item_type_id IN (?)', $allowedItemTypes)
             ->where('cars.name like ?', $query . '%')
             ->order(['length(cars.name)', 'cars.is_group desc', 'cars.name'])
             ->limit(15);
@@ -2704,15 +2172,17 @@ class CarsController extends AbstractActionController
         if (! $car) {
             return $this->notFoundAction();
         }
+        
+        $canAddBrand = in_array($car->item_type_id, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE]);
 
         $brandTable = $this->getBrandTable();
 
         $relevantBrands = [];
 
-        if (strlen($car->name) > 0) {
+        if ($canAddBrand && strlen($car->name) > 0) {
             $rows = $brandTable->fetchAll(
                 $brandTable->select(true)
-                ->where('INSTR(?, name)', $car->name)
+                    ->where('INSTR(?, name)', $car->name)
             );
 
             foreach ($rows as $row) {
@@ -2721,9 +2191,9 @@ class CarsController extends AbstractActionController
 
             $brandRows = $brandTable->fetchAll(
                 $brandTable->select(true)
-                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', $car->id)
+                    ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                    ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                    ->where('item_parent_cache.item_id = ?', $car->id)
             );
 
             foreach ($brandRows as $brand) {
@@ -2741,23 +2211,24 @@ class CarsController extends AbstractActionController
 
         $carParentRows = $carParentTable->fetchAll(
             $carParentTable->select(true)
-            ->join('cars', 'car_parent.parent_id = cars.id', null)
-            ->where('car_parent.car_id = ?', $car->id)
-            ->order($order)
+                ->join('cars', 'car_parent.parent_id = cars.id', null)
+                ->where('car_parent.car_id = ?', $car->id)
+                ->order($order)
         );
         $parents = $this->perepareCatalogueCars($carParentRows, true);
 
         $carParentRows = $carParentTable->fetchAll(
             $carParentTable->select(true)
-            ->join('cars', 'car_parent.car_id = cars.id', null)
-            ->where('car_parent.parent_id = ?', $car->id)
-            ->order($order)
+                ->join('cars', 'car_parent.car_id = cars.id', null)
+                ->where('car_parent.parent_id = ?', $car->id)
+                ->order($order)
         );
         $childs = $this->perepareCatalogueCars($carParentRows, false);
-
+        
         $model = new ViewModel([
             'car'                 => $car,
             'canMove'             => $this->canMove($car),
+            'canAddBrand'         => $canAddBrand,
             'brands'              => $this->getBrandVehicles($car),
             'publicUrls'          => $this->carPublicUrls($car),
             'relevantBrands'      => $relevantBrands,
@@ -3002,6 +2473,8 @@ class CarsController extends AbstractActionController
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
+        
+        $user = $this->user()->get();
 
         $carTable = $this->catalogue()->getCarTable();
         $car = $carTable->find($this->params('car_id'))->current();
@@ -3010,27 +2483,230 @@ class CarsController extends AbstractActionController
         }
 
         $carLangTable = new DbTable\Vehicle\Language();
-
-        $languages = [];
-        $langValues = [];
-
+        
+        $values = [];
+        
         $language = $this->language();
-
+        
         foreach ($this->allowedLanguages as $code) {
-            $languages[$code] = Locale::getDisplayLanguage($code, $language);
-
             $carLangRow = $carLangTable->fetchRow([
                 'car_id = ?'   => $car->id,
                 'language = ?' => $code
             ]);
+            
+            $text = null;
+            if ($carLangRow && $carLangRow->text_id) {
+                $text = $this->textStorage->getText($carLangRow->text_id);
+            }
+            
+            $fullText = null;
+            if ($carLangRow && $carLangRow->full_text_id) {
+                $fullText = $this->textStorage->getText($carLangRow->full_text_id);
+            }
+        
+            $values[$code] = [
+                'name'      => $carLangRow ? $carLangRow->name : null,
+                'text'      => $text,
+                'full_text' => $fullText
+            ];
+        }
+        
+        $form = new ItemLanguagesForm(null, [
+            'languages' => $this->allowedLanguages
+        ]);
+        $form->setAttribute('action', $this->url()->fromRoute(null, [], [], true));
+        $form->populateValues($values);
+        
+        if ($this->getRequest()->isPost()) {
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $values = $form->getData();
+                
+                $changes = [];
+                
+                foreach ($this->allowedLanguages as $lang) {
+                    $langValues = $values[$lang];
+                    unset($values[$lang]);
+                    
+                    $fullText = $langValues['full_text'];
+                    $text = $langValues['text'];
+                    $name = $langValues['name'];
+                    
+                    $langRow = $carLangTable->fetchRow([
+                        'car_id = ?'   => $car->id,
+                        'language = ?' => $lang
+                    ]);
+                    if (! $langRow) {
+                        $langRow = $carLangTable->createRow([
+                            'car_id'   => $car->id,
+                            'language' => $lang
+                        ]);
+                        $nameChanged = true;
+                    } else {
+                        $nameChanged = ($name != $langRow->name);
+                    }
+                    
+                    $langRow->setFromArray([
+                        'name' => $name,
+                    ]);
+                    
+                    if ($langRow->text_id) {
+                        
+                        $textChanged = ($text != $this->textStorage->getText($langRow->text_id));
+                        
+                        $this->textStorage->setText($langRow->text_id, $text, $user->id);
+                    } elseif ($text) {
+                        
+                        $textChanged = true;
+                        
+                        $textId = $this->textStorage->createText($text, $user->id);
+                        $langRow->text_id = $textId;
+                    }
+                    
+                    if ($langRow->full_text_id) {
+                        
+                        $fullTextChanged = ($fullText != $this->textStorage->getText($langRow->full_text_id));
+                        
+                        $this->textStorage->setText($langRow->full_text_id, $fullText, $user->id);
+                        
+                    } elseif ($fullText) {
+                        
+                        $fullTextChanged = true;
+                        
+                        $fullTextId = $this->textStorage->createText($fullText, $user->id);
+                        $langRow->full_text_id = $fullTextId;
+                    }
+                    
+                    if ($langRow->name || $langRow->text_id || $langRow->full_text_id) {
+                        $langRow->save();
+                    }
+                    
+                    if ($nameChanged) {
+                        $changes[$lang][] = 'name';
+                    }
+                    
+                    if ($textChanged) {
+                        $changes[$lang][] = 'text';
+                    }
+                    
+                    if ($fullTextChanged) {
+                        $changes[$lang][] = 'full_text';
+                    }
+                }
+                
+                $this->brandVehicle->refreshAutoByVehicle($car->id);
+                
+                /*if ($changes) {
+                    $userIds = $this->textStorage->getTextUserIds($car->full_text_id);
+                
+                    $userTable = new \Autowp\User\Model\DbTable\User();
+                    foreach ($userIds as $userId) {
+                        if ($userId != $user->id) {
+                            foreach ($userTable->find($userId) as $userRow) {
+                                $uri = $this->hostManager->getUriByLanguage($userRow->language);
+                
+                                $message = sprintf(
+                                    $this->translate(
+                                        'pm/user-%s-edited-vehicle-full-description-%s-%s',
+                                        'default',
+                                        $userRow->language
+                                    ),
+                                    $this->userModerUrl($user, true, $uri),
+                                    $this->car()->formatName($car, $userRow->language),
+                                    $this->carModerUrl($car, true, null, $uri)
+                                );
+                
+                                $this->message->send(null, $userRow->id, $message);
+                            }
+                        }
+                    }
+                }*/
+                /*
+                    if ($car->text_id) {
+                        $userIds = $this->textStorage->getTextUserIds($car->text_id);
 
-            $langValues[$code] = $carLangRow ? $carLangRow->name : null;
+                        $userTable = new \Autowp\User\Model\DbTable\User();
+                        foreach ($userIds as $userId) {
+                            if ($userId != $user->id) {
+                                foreach ($userTable->find($userId) as $userRow) {
+                                    $uri = $this->hostManager->getUriByLanguage($userRow->language);
+
+                                    $message = sprintf(
+                                        $this->translate(
+                                            'pm/user-%s-edited-vehicle-description-%s-%s',
+                                            'default',
+                                            $userRow->language
+                                        ),
+                                        $this->userModerUrl($user, true, $uri),
+                                        $this->car()->formatName($car, $userRow->language),
+                                        $this->carModerUrl($car, true, null, $uri)
+                                    );
+
+                                    $this->message->send(null, $userRow->id, $message);
+                                }
+                            }
+                        }
+                    }
+                    
+                $changes = [];
+
+                foreach ($this->allowedLanguages as $lang) {
+                    $value = trim($this->params()->fromPost($lang));
+        
+                    $row = $carLangTable->fetchRow([
+                        'car_id = ?'   => $car->id,
+                        'language = ?' => $lang
+                    ]);
+        
+                    if ($value) {
+                        if (! $row) {
+                            $row = $carLangTable->createRow([
+                                'car_id'   => $car->id,
+                                'language' => $lang
+                            ]);
+                        }
+        
+                        if ($row->name != $value) {
+                            $changes[] = 'Установлено ' . strtoupper($lang) . ': ' . $value;
+                        }
+        
+                        $row->name = $value;
+                        $row->save();
+                    } else {
+                        if ($row) {
+                            $changes[] = 'Удалено ' . strtoupper($lang) . ': ' . $row->name;
+                            $row->delete();
+                        }
+                    }
+                }
+        
+                if ($changes) {
+                    foreach ($changes as &$change) {
+                        $change = htmlspecialchars($change);
+                    }
+                    unset($change); // prevent future bugs
+                    $message = sprintf(
+                        'Редактирование названий автомобиля %s',
+                        htmlspecialchars($this->car()->formatName($car, 'en')).
+                        ( count($changes) ? '<p>'.implode('<br />', $changes).'</p>' : '')
+                    );
+                    $this->log($message, $car);
+                }
+                
+                */
+                
+                $this->log(sprintf(
+                    'Редактирование языковых названия, описания и полного описания автомобиля %s',
+                    htmlspecialchars($this->car()->formatName($car, 'en'))
+                ), $car);
+                
+                return $this->redirect()->toUrl($this->carModerUrl($car, false, 'name'));
+            }
         }
 
         $model = new ViewModel([
-            'car'        => $car,
-            'languages'  => $languages,
-            'langValues' => $langValues
+            'car'  => $car,
+            'form' => $form
         ]);
 
         return $model->setTerminal(true);
@@ -3179,10 +2855,10 @@ class CarsController extends AbstractActionController
         ]);
     }
 
-    private function carSelectParentWalk(DbTable\Vehicle\Row $car)
+    private function carSelectParentWalk(DbTable\Vehicle\Row $car, $itemTypeId)
     {
         $data = [
-            'name'   => $this->car()->formatName($car, $this->language()),
+            'name'   => $car->getNameData($this->language()),
             'url'    => $this->url()->fromRoute('moder/cars/params', [
                 'parent_id' => $car['id']
             ], [], true),
@@ -3192,18 +2868,18 @@ class CarsController extends AbstractActionController
         $carTable = $this->catalogue()->getCarTable();
         $childRows = $carTable->fetchAll(
             $carTable->select(true)
-            ->join('car_parent', 'cars.id = car_parent.car_id', null)
-            ->where('car_parent.parent_id = ?', $car['id'])
-            ->where('cars.is_group')
-            ->order(array_merge(['car_parent.type'], $this->catalogue()->carsOrdering()))
+                ->join('car_parent', 'cars.id = car_parent.car_id', null)
+                ->where('car_parent.parent_id = ?', $car['id'])
+                ->where('cars.is_group')
+                ->where('cars.item_type_id IN (?)', $itemTypeId)
+                ->order(array_merge(['car_parent.type'], $this->catalogue()->carsOrdering()))
         );
         foreach ($childRows as $childRow) {
-            $data['childs'][] = $this->carSelectParentWalk($childRow);
+            $data['childs'][] = $this->carSelectParentWalk($childRow, $itemTypeId);
         }
 
         return $data;
     }
-
 
     public function carSelectParentAction()
     {
@@ -3231,33 +2907,70 @@ class CarsController extends AbstractActionController
                 'parent_id' => $parent->id
             ]);
         }
+        
+        $tab = $this->params('tab', 'brands');
+        
+        $showBrandsTab = $car->item_type_id != DbTable\Item\Type::CATEGORY;
+        
+        if (!$showBrandsTab) {
+            $tab = 'categories';
+        }
 
-        $brandTable = $this->getBrandTable();
-        $brand = $brandTable->find($this->params('brand_id'))->current();
-
+        $brand = null;
         $brands = [];
         $cars = [];
+        
+        if ($tab == 'brands') {
+            
+            $brandTable = $this->getBrandTable();
+            $brand = $brandTable->find($this->params('brand_id'))->current();
 
-        if ($brand) {
+            if ($brand) {
+                $rows = $carTable->fetchAll(
+                    $carTable->select(true)
+                        ->where('cars.item_type_id = ?', $car->item_type_id)
+                        ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                        ->where('brand_item.brand_id = ?', $brand->id)
+                        ->order(['cars.name', 'cars.body', 'cars.begin_year', 'cars.begin_model_year'])
+                );
+    
+                foreach ($rows as $row) {
+                    $cars[] = $this->carSelectParentWalk($row, $car->item_type_id);
+                }
+            } else {
+                $brands = $brandTable->fetchAll(null, ['brands.position', 'brands.name']);
+            }
+            
+        } elseif ($tab == 'categories') {
+            
             $rows = $carTable->fetchAll(
                 $carTable->select(true)
-                ->join('brand_item', 'cars.id = brand_item.car_id', null)
-                ->where('brand_item.brand_id = ?', $brand->id)
-                ->order($this->catalogue()->carsOrdering())
+                    ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->joinLeft('car_parent', 'cars.id = car_parent.car_id', null)
+                    ->where('car_parent.car_id IS NULL')
+                    ->order(['cars.name', 'cars.body', 'cars.begin_year', 'cars.begin_model_year'])
             );
-
-            foreach ($rows as $row) {
-                $cars[] = $this->carSelectParentWalk($row);
+            
+            
+            if ($car->item_type_id == DbTable\Item\Type::CATEGORY) {
+                $itemTypes = [DbTable\Item\Type::CATEGORY];
+            } else {
+                $itemTypes = [DbTable\Item\Type::CATEGORY]; // , DbTable\Item\Type::VEHICLE
             }
-        } else {
-            $brands = $brandTable->fetchAll(null, ['brands.position', 'brands.name']);
+            
+            foreach ($rows as $row) {
+                $cars[] = $this->carSelectParentWalk($row, $itemTypes);
+            }
+            
         }
 
         return [
-            'car'    => $car,
-            'brand'  => $brand,
-            'brands' => $brands,
-            'cars'   => $cars
+            'tab'           => $tab,
+            'car'           => $car,
+            'brand'         => $brand,
+            'brands'        => $brands,
+            'cars'          => $cars,
+            'showBrandsTab' => $showBrandsTab
         ];
     }
 
@@ -3453,19 +3166,23 @@ class CarsController extends AbstractActionController
             }
         }
 
-        $isConcept = false;
-        $isConceptInherit = false;
-        if ($values['is_concept'] == 'inherited') {
-            $isConceptInherit = true;
+        if (isset($values['is_concept'])) {
+            $isConcept = false;
+            $isConceptInherit = false;
+            if ($values['is_concept'] == 'inherited') {
+                $isConceptInherit = true;
+            } else {
+                $isConcept = (bool)$values['is_concept'];
+            }
         } else {
-            $isConcept = (bool)$values['is_concept'];
+            $isConcept = false;
+            $isConceptInherit = true;
         }
 
         $result = [
             'name'               => $values['name'],
-            'body'               => $values['body'],
-            'begin_model_year'   => $values['model_year']['begin'] ? $values['model_year']['begin'] : null,
-            'end_model_year'     => $values['model_year']['end'] ? $values['model_year']['end'] : null,
+            'catname'            => isset($values['catname']) && $values['catname'] ? $values['catname'] : null,
+            'body'               => isset($values['body']) ? $values['body'] : '',
             'begin_year'         => $values['begin']['year'] ? $values['begin']['year'] : null,
             'begin_month'        => $values['begin']['month'] ? $values['begin']['month'] : null,
             'end_year'           => $endYear ? $endYear : null,
@@ -3473,9 +3190,17 @@ class CarsController extends AbstractActionController
             'today'              => $today,
             'is_concept'         => $isConcept ? 1 : 0,
             'is_concept_inherit' => $isConceptInherit ? 1 : 0,
-            'is_group'           => $values['is_group'] ? 1 : 0
+            'is_group'           => isset($values['is_group']) && $values['is_group'] ? 1 : 0,
+            'begin_model_year'   => null,
+            'end_model_year'     => null,
+            'produced_exactly'   => 0
         ];
-
+        
+        if (array_key_exists('model_year', $values)) {
+            $result['begin_model_year'] = $values['model_year']['begin'] ? $values['model_year']['begin'] : null;
+            $result['end_model_year']   = $values['model_year']['end'] ? $values['model_year']['end'] : null;
+        }
+        
         if (array_key_exists('vehicle_type_id', $values)) {
             $result['vehicle_type_id'] = $values['vehicle_type_id'];
         }
@@ -3514,6 +3239,10 @@ class CarsController extends AbstractActionController
         switch ($itemTypeId) {
             case DbTable\Item\Type::VEHICLE:
             case DbTable\Item\Type::ENGINE:
+                $isGroup = false;
+                break;
+            case DbTable\Item\Type::CATEGORY:
+                $isGroup = true;
                 break;
             default:
                 return $this->notFoundAction();
@@ -3552,6 +3281,8 @@ class CarsController extends AbstractActionController
             $form->setData($this->params()->fromPost());
             if ($form->isValid()) {
                 $values = $this->prepareCarMetaToSave($form->getData());
+                
+                $values['is_group'] = $isGroup ? 1 : 0;
 
                 $car = $carTable->createRow($values);
                 $car->item_type_id = $itemTypeId;

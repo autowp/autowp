@@ -7,7 +7,7 @@
         'pageId' => 184,
         'args'   => [
             'PICTURE_NAME'        => $this->pic()->textTitle($this->picture['name']),
-            'CATEGORY_SHORT_NAME' => $this->categoryLang ? $this->categoryLang->short_name : $this->category->short_name,
+            'CATEGORY_SHORT_NAME' => $this->categoryLang ? $this->categoryLang->name : $this->category->name, //$this->categoryLang ? $this->categoryLang->short_name : $this->category->short_name,
             'CATEGORY_NAME'       => $this->categoryLang ? $this->categoryLang->name : $this->category->name,
             'CATEGORY_CATNAME'    => $this->category->catname
         ],

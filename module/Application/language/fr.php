@@ -120,6 +120,8 @@ return [
     'item/type/2/name' => 'Moteur',
     'item/type/1/name-plural' => 'Voiture',
     'item/type/2/name-plural' => 'Moteurs',
+    'item/type/3/name' => 'Category',
+    'item/type/3/name-plural' => 'Categories',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Non triés',
@@ -1339,6 +1341,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicles/filter/category-exclude' => 'Category (exclude)',
     'moder/vehicles/filter/no-parents' => 'Without parents',
     'moder/vehicles/filter/order' => 'Order',
+    'moder/items/filter/text' => 'Text',
 
     'moder/vehicle/name' => 'Name',
     'moder/vehicle/body' => 'Body number',
@@ -1368,8 +1371,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicle/is-concept/inherited' => 'inherited',
 
     'moder/vehicle/tabs/meta' => 'Meta',
-    'moder/vehicle/tabs/name' => 'Name',
-    'moder/vehicle/tabs/description' => 'Description',
+    'moder/vehicle/tabs/name' => 'Name & description',
     'moder/vehicle/tabs/catalogue' => 'Catalogue',
     'moder/vehicle/tabs/tree' => 'Tree',
     'moder/vehicle/tabs/categories' => 'Categories',
@@ -1387,6 +1389,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
 
     'moder/vehicle/catalogue/add-vehicle' => 'add vehicle',
     'moder/vehicle/catalogue/add-engine' => 'add moteur',
+    'moder/vehicle/catalogue/add-category' => 'add category',
     'moder/vehicle/catalogue/title/name' => 'Name',
     'moder/vehicle/catalogue/title/link' => 'Link',
     'moder/vehicle/catalogue/title/catname' => 'Catname',

@@ -13,13 +13,15 @@
         <div class="col-md-2">
             <div class="thumbnail">
                 <?php if ($picture = $category['top_picture']) { ?>
-                    <?=$this->htmlA(
-                        $category['url'],
-                        $this->htmlImg($picture['image']->getSrc(), [
-                            'format' => 'picture-thumb'
-                        ]),
-                        false
-                    ) ?>
+                    <?php if ($picture['image']) { ?>
+                        <?=$this->htmlA(
+                            $category['url'],
+                            $this->htmlImg($picture['image']->getSrc(), [
+                                'format' => 'picture-thumb'
+                            ]),
+                            false
+                        ) ?>
+                    <?php } ?>
                 <?php } ?>
                 <div class="name">
                     <h4><?=$this->htmlA([

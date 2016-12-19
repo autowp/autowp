@@ -52,4 +52,6 @@
         <?php } ?>
     </table>
 </div>
-<?=$this->paginationControl($this->paginator) ?>
+<?=$this->paginationControl($this->paginator, null, null, [
+    'route' => 'cars/params'
+]) ?>

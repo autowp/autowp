@@ -31,10 +31,9 @@
                             <span class="input-group-btn">
                                 <?=$this->htmlA([
                                     'href' => $this->url(null, [
-                                        'action'    => 'car-select-parent',
-                                        'brand_id'  => null,
-                                        'parent_id' => null
-                                    ], [], true),
+                                        'action' => 'car-select-parent',
+                                        'car_id' => $this->car['id']
+                                    ]),
                                     'class' => 'btn btn-success',
                                 ], $this->translate('moder/vehicle/catalogue/select'))?>
                             </span>
@@ -259,6 +258,27 @@
             <?php } ?>
 
             <?php if ($this->canMove) { ?>
+                <?php if ($this->car['item_type_id'] == Application\Model\DbTable\Item\Type::CATEGORY) { ?>
+                    <tr>
+                        <td>
+                            <i class="fa fa-plus"></i>
+                            <?=$this->htmlA(
+                                $this->url('moder/cars/params', [
+                                    'action'       => 'new',
+                                    'parent_id'    => $this->car->id,
+                                    'item_type_id' => Application\Model\DbTable\Item\Type::CATEGORY
+                                ]),
+                                $this->translate('moder/vehicle/catalogue/add-category')
+                            )?>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td class="urls"></td>
+                        <?php if ($this->canMove) { ?>
+                            <td></td>
+                        <?php } ?>
+                    </tr>
+                <?php } ?>
                 <tr>
                     <td>
                         <i class="fa fa-plus"></i>
@@ -287,7 +307,7 @@
     </table>
 <?php } ?>
 
-<?php if ($this->canMove) { ?>
+<?php if ($this->canMove && $this->canAddBrand) { ?>
     <form action="<?=$this->escapeHtmlAttr($this->url('moder/cars/params', [
         'action' => 'car-select-brand',
         'car_id' => $this->car->id

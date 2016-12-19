@@ -14,33 +14,59 @@
 
     $this->layout()->moduleName = 'moder/cars/car-select-parent';
 ?>
-<div class="well">
-    <?php if (!$this->brand) { ?>
-        <?php
-            $columns = 6;
-            $count = count($this->brands);
-            $perOne = ceil($count / $columns);
-            $width = round(100*$perOne/$count);
-            $idx = 0;
-        ?>
-        <table class="table" class="brand-selector"><tbody><tr>
-            <td style="width:<?=(100-$width*($columns-1)) ?>%">
-                <?php foreach ($this->brands as $brand) { ?>
-                    <?php if ($idx && ($idx%$perOne == 0)) { ?>
-                        </td><td style="width:<?=$width ?>%">
-                    <?php } ?>
-                    <?=$this->htmlA($this->url(null, [
-                        'brand_id' => $brand->id
-                    ], [], true), $brand->name) ?><br />
-                    <?php $idx++ ?>
-                <?php } ?>
-            </td>
-        </tr></tbody></table>
-    <?php } else { ?>
-        <ul>
-            <?=$this->partial('application/moder/cars/partial/car-select-parent', [
-                'cars' => $this->cars
-            ])?>
-        </ul>
+
+<ul class="nav nav-pills" style="margin-bottom:10px">
+    <?php if ($this->showBrandsTab) { ?>
+        <li<?=$this->tab == 'brands' ? ' class="active"' : ''?>>
+            <?=$this->htmlA($this->url(null, [
+                'tab' => 'brands'
+            ], [], true), '<i class="fa fa-list"></i> Brands', false) ?>
+        </li>
     <?php } ?>
-</div>
+    <li<?=$this->tab == 'categories' ? ' class="active"' : ''?>>
+        <?=$this->htmlA($this->url(null, [
+            'tab' => 'categories'
+        ], [], true), '<i class="fa fa-tag"></i> Categories', false) ?>
+    </li>
+</ul>
+
+<?php if ($this->tab == 'brands') { ?>
+    <div class="well">
+        <?php if (!$this->brand) { ?>
+            <?php
+                $columns = 6;
+                $count = count($this->brands);
+                $perOne = ceil($count / $columns);
+                $width = round(100*$perOne/$count);
+                $idx = 0;
+            ?>
+            <table class="table" class="brand-selector"><tbody><tr>
+                <td style="width:<?=(100-$width*($columns-1)) ?>%">
+                    <?php foreach ($this->brands as $brand) { ?>
+                        <?php if ($idx && ($idx%$perOne == 0)) { ?>
+                            </td><td style="width:<?=$width ?>%">
+                        <?php } ?>
+                        <?=$this->htmlA($this->url(null, [
+                            'brand_id' => $brand->id
+                        ], [], true), $brand->name) ?><br />
+                        <?php $idx++ ?>
+                    <?php } ?>
+                </td>
+            </tr></tbody></table>
+        <?php } else { ?>
+            <ul>
+                <?=$this->partial('application/moder/cars/partial/car-select-parent', [
+                    'cars' => $this->cars
+                ])?>
+            </ul>
+        <?php } ?>
+    </div>
+<?php } ?>
+
+<?php if ($this->tab == 'categories') { ?>
+    <ul>
+        <?=$this->partial('application/moder/cars/partial/car-select-parent', [
+            'cars' => $this->cars
+        ])?>
+    </ul>
+<?php } ?>

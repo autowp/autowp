@@ -8,10 +8,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Model\CarOfDay;
 use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable\Category;
-use Application\Model\DbTable\Category\Language as CategoryLanguage;
-use Application\Model\DbTable\Category\Vehicle as CategoryVehicle;
-use Application\Model\DbTable\Factory;
+use Application\Model\DbTable;
 use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
@@ -31,11 +28,6 @@ class IndexController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var CategoryVehicle
-     */
-    private $categoryVehicleTable;
-
-    /**
      * @var VehicleParent
      */
     private $vehicleParentTable;
@@ -53,16 +45,6 @@ class IndexController extends AbstractActionController
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->carOfDay = $carOfDay;
-    }
-
-    /**
-     * @return CategoryVehicle
-     */
-    private function getCategoryVehicleTable()
-    {
-        return $this->categoryVehicleTable
-            ? $this->categoryVehicleTable
-            : $this->categoryVehicleTable = new CategoryVehicle();
     }
 
     /**
@@ -170,6 +152,8 @@ class IndexController extends AbstractActionController
     private function carLinks(VehicleRow $car)
     {
         $items = [];
+        
+        $itemTable = $this->catalogue()->getCarTable();
 
         $db = $car->getTable()->getAdapter();
         $totalPictures = $db->fetchOne(
@@ -227,22 +211,25 @@ class IndexController extends AbstractActionController
                 'text'  => $this->translate('carlist/twins')
             ];
         }
-
+        
         $categoryRows = $db->fetchAll(
             $db->select()
-                ->from('category', ['name', 'catname'])
-                ->join('category_item', 'category.id = category_item.category_id', null)
-                ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', null)
+                ->from($itemTable->info('name'), ['name', 'catname'])
+                ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                 ->joinLeft(
-                    'category_language',
-                    'category.id = category_language.category_id and category_language.language = :language',
+                    'car_language', 
+                    'cars.id = car_language.car_id and car_language.language = :language', 
                     ['lang_name' => 'name']
                 )
-                ->where('item_parent_cache.item_id = :car_id')
-                ->group(['category.id'])
+                ->join('car_parent', 'cars.id = car_parent.parent_id', null)
+                ->join(['top_item' => 'cars'], 'car_parent.car_id = top_item.id', null)
+                ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
+                ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
+                ->where('item_parent_cache.item_id = :item_id')
+                ->group(['item_parent_cache.item_id', 'cars.id'])
                 ->bind([
                     'language' => $this->language(),
-                    'car_id'   => $car['id']
+                    'item_id'  => $car['id']
                 ])
         );
 
@@ -304,12 +291,13 @@ class IndexController extends AbstractActionController
 
         $result = [];
 
-        $db = $this->getCategoryVehicleTable()->getAdapter();
+        $db = $this->getVehicleParentTable()->getAdapter();
 
         $select = $db->select()
-            ->from('category_item', 'item_id')
-            ->join('category', 'category_item.category_id = category.id', 'catname')
-            ->where('category_item.item_id = ?', $carId);
+            ->from('car_parent', 'car_id')
+            ->join('cars', 'car_parent.parent_id = cars.id', 'catname')
+            ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+            ->where('car_parent.car_id = ?', $carId);
 
         if ($breakOnFirst) {
             $select->limit(1);
@@ -366,7 +354,7 @@ class IndexController extends AbstractActionController
             $carTable = $this->catalogue()->getCarTable();
             $carOfDay = $carTable->find($carId)->current();
             if ($carOfDay) {
-                $key = 'CAR_OF_DAY_87_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
+                $key = 'CAR_OF_DAY_89_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
 
                 $carOfDayInfo = $this->cache->getItem($key, $success);
                 if (! $success) {
@@ -482,7 +470,7 @@ class IndexController extends AbstractActionController
         $cacheKey = 'INDEX_FACTORIES_1';
         $factories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $table = new Factory();
+            $table = new DbTable\Factory();
 
             $db = $table->getAdapter();
 
@@ -515,6 +503,7 @@ class IndexController extends AbstractActionController
     {
         $brands = $this->catalogue()->getBrandTable();
         $pictures = $this->catalogue()->getPictureTable();
+        $itemTable = $this->catalogue()->getCarTable();
 
         $language = $this->language();
 
@@ -529,29 +518,31 @@ class IndexController extends AbstractActionController
         ]);
 
         // categories
-        $cacheKey = 'INDEX_CATEGORY8_' . $language;
+        $cacheKey = 'INDEX_CATEGORY10_' . $language;
         $destinations = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $categoryTable = new Category();
-            $categoryAdapter = $categoryTable->getAdapter();
-            $categoryLangTable = new CategoryLanguage();
+            $categoryAdapter = $itemTable->getAdapter();
+            $itemLangTable = new DbTable\Vehicle\Language();
 
-            $expr = 'COUNT(IF(category_item.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
+            $expr = 'COUNT(IF(car_parent.timestamp > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
 
             $items = $categoryAdapter->fetchAll(
                 $categoryAdapter->select()
                     ->from(
-                        $categoryTable->info('name'),
+                        ['category' => $itemTable->info('name')],
                         [
                             'id',
                             'cars_count'     => 'COUNT(1)',
                             'new_cars_count' => new Zend_Db_Expr($expr)
                         ]
                     )
-                    ->join(['cp' => 'category_parent'], 'category.id = cp.parent_id', null)
-                    ->join('category_item', 'cp.category_id = category_item.category_id', null)
-                    ->where('category.parent_id is null')
-                    ->join('item_parent_cache', 'category_item.item_id = item_parent_cache.parent_id', null)
+                    ->where('category.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->joinLeft(['top_category_parent' => 'car_parent'], 'category.id = top_category_parent.car_id', null)
+                    ->where('top_category_parent.parent_id is null')
+                    ->join('car_parent', 'category.id = car_parent.parent_id', null)
+                    ->join(['top_item' => 'cars'], 'car_parent.car_id = top_item.id', null)
+                    ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
+                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->join('cars', 'item_parent_cache.item_id = cars.id', null)
                     ->where('not cars.is_group')
                     ->group('category.id')
@@ -561,14 +552,14 @@ class IndexController extends AbstractActionController
 
             $destinations = [];
             foreach ($items as $item) {
-                $row = $categoryTable->find($item['id'])->current();
+                $row = $itemTable->find($item['id'])->current();
                 if (! $row) {
                     continue;
                 }
 
-                $langRow = $categoryLangTable->fetchRow([
+                $langRow = $itemLangTable->fetchRow([
                     'language = ?'    => $language,
-                    'category_id = ?' => $row->id
+                    'car_id = ?' => $row->id
                 ]);
 
                 $destinations[] = [
@@ -576,7 +567,7 @@ class IndexController extends AbstractActionController
                         'action'           => 'category',
                         'category_catname' => $row->catname,
                     ]),
-                    'short_name'     => $langRow ? $langRow->short_name : $row->short_name,
+                    'short_name'     => $langRow ? $langRow->name : $row->name,
                     'cars_count'     => $item['cars_count'],
                     'new_cars_count' => $item['new_cars_count']
                 ];

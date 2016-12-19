@@ -85,7 +85,10 @@ class CarsController extends AbstractActionController
 
         $carTable = new Vehicle();
 
-        $car = $carTable->find($this->params('car_id'))->current();
+        $car = $carTable->fetchRow([
+            'id = ?' => (int)$this->params('car_id'),
+            'item_type_id IN (?)' => [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE]
+        ]);
         if (! $car) {
             return $this->notFoundAction();
         }

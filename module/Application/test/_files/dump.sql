@@ -30,7 +30,8 @@ CREATE TABLE `item_type` (
 
 INSERT INTO `item_type` (`id`, `name`) VALUES
 (1, 'vehicle'),
-(2, 'engine');
+(2, 'engine'),
+(3, 'category');
 
 --
 -- Table structure for table `acl_resources`
@@ -1381,6 +1382,7 @@ CREATE TABLE `cars` (
   `text_id` int(11) DEFAULT NULL,
   `full_text_id` int(11) DEFAULT NULL,
   `item_type_id` int(11) NOT NULL DEFAULT '1',
+  `catname` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`,`begin_year`,`body`,`end_year`,`begin_model_year`,`end_model_year`,`is_group`),
   KEY `fullCaptionOrder` (`name`,`body`,`begin_year`,`end_year`),
@@ -1390,6 +1392,7 @@ CREATE TABLE `cars` (
   KEY `text_id` (`text_id`),
   KEY `full_text_id` (`full_text_id`),
   KEY `item_type_id` (`item_type_id`),
+  UNIQUE KEY `catname` (`catname`),
   CONSTRAINT `cars_ibfk_2` FOREIGN KEY (`engine_item_id`) REFERENCES `cars` (`id`),
   CONSTRAINT `cars_ibfk_3` FOREIGN KEY (`spec_id`) REFERENCES `spec` (`id`),
   CONSTRAINT `cars_ibfk_4` FOREIGN KEY (`text_id`) REFERENCES `textstorage_text` (`id`),
@@ -1403,7 +1406,13 @@ CREATE TABLE `cars` (
 --
 
 /*!40000 ALTER TABLE `cars` DISABLE KEYS */;
-INSERT INTO `cars` VALUES 
+INSERT INTO `cars` (id, `name`, `begin_year`, `end_year`, `body`, `spec_id`,
+  `spec_inherit`, `produced`, `produced_exactly`, `is_concept`, `pictures_count`,
+  `today`, `add_datetime`, `begin_month`, `end_month`, `begin_order_cache`,
+  `end_order_cache`, `begin_model_year`, `end_model_year`, `_html` text,
+  `is_group`, `car_type_inherit`, `is_concept_inherit`, `engine_item_id`,
+  `engine_inherit`, `text_id`, `full_text_id`, `item_type_id`)
+VALUES 
 (1,'test car',1999,NULL,'',NULL,1,100,1,0,0,1,'2016-11-25 18:31:47',2,NULL,NULL,NULL,2000,NULL,NULL,0,0,0,1,1,NULL,NULL,1),
 (2,'test concept car',1999,2005,'',NULL,1,233,0,1,0,0,'2016-11-25 18:31:47',6,4,NULL,NULL,1999,2005,NULL,0,0,0,NULL,1,NULL,NULL,1),
 (3,'test car 3',1923,1927,'',NULL,1,50752,1,0,0,0,'2016-11-25 18:31:47',6,1,NULL,NULL,1923,1927,NULL,0,0,0,NULL,1,NULL,NULL,1),
@@ -1458,111 +1467,6 @@ CREATE TABLE `cars_pictures` (
 
 /*!40000 ALTER TABLE `cars_pictures` DISABLE KEYS */;
 /*!40000 ALTER TABLE `cars_pictures` ENABLE KEYS */;
-
---
--- Table structure for table `category`
---
-
-DROP TABLE IF EXISTS `category`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `category` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` int(10) unsigned DEFAULT NULL,
-  `name` varchar(50) NOT NULL,
-  `short_name` varchar(50) NOT NULL,
-  `catname` varchar(35) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `catname` (`catname`),
-  KEY `parent_id` (`parent_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1054 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `category`
---
-
-/*!40000 ALTER TABLE `category` DISABLE KEYS */;
-/*!40000 ALTER TABLE `category` ENABLE KEYS */;
-
---
--- Table structure for table `category_item`
---
-
-DROP TABLE IF EXISTS `category_item`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `category_item` (
-  `category_id` int(10) unsigned NOT NULL,
-  `item_id` int(10) unsigned NOT NULL,
-  `add_datetime` timestamp NULL DEFAULT NULL,
-  `user_id` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`category_id`,`item_id`),
-  KEY `car_id` (`item_id`),
-  KEY `category_id` (`category_id`,`add_datetime`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `category_item_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `category_item_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `category_item_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `category_item`
---
-
-/*!40000 ALTER TABLE `category_item` DISABLE KEYS */;
-/*!40000 ALTER TABLE `category_item` ENABLE KEYS */;
-
---
--- Table structure for table `category_language`
---
-
-DROP TABLE IF EXISTS `category_language`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `category_language` (
-  `category_id` int(10) unsigned NOT NULL,
-  `language` varchar(5) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `short_name` varchar(50) NOT NULL,
-  PRIMARY KEY (`category_id`,`language`),
-  CONSTRAINT `category_language_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `category_language`
---
-
-/*!40000 ALTER TABLE `category_language` DISABLE KEYS */;
-/*!40000 ALTER TABLE `category_language` ENABLE KEYS */;
-
---
--- Table structure for table `category_parent`
---
-
-DROP TABLE IF EXISTS `category_parent`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `category_parent` (
-  `category_id` int(10) unsigned NOT NULL,
-  `parent_id` int(10) unsigned NOT NULL,
-  `level` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`category_id`,`parent_id`),
-  KEY `FK_category_parent_category_id2` (`parent_id`),
-  CONSTRAINT `FK_category_parent_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_category_parent_category_id2` FOREIGN KEY (`parent_id`) REFERENCES `category` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=45;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `category_parent`
---
-
-/*!40000 ALTER TABLE `category_parent` DISABLE KEYS */;
-/*!40000 ALTER TABLE `category_parent` ENABLE KEYS */;
 
 --
 -- Table structure for table `comment_topic`

@@ -191,21 +191,29 @@ class PicturesController extends AbstractActionController
     private function getFilterForm($status)
     {
         $db = $this->table->getAdapter();
+        
+        /*$subSelect = $db->select()
+            ->distinct()
+            ->from('brand_item', 'brand_id')
+            ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+            ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
+            ->join('pictures', 'picture_item.picture_id = pictures.id', null);
+        
+        if ($status) {
+            $subSelect->where('pictures.status = ?', $status);
+        }
 
         $select = $db->select()
             ->from('brands', ['id', 'name'])
-            ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-            ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
-            ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-            ->join('pictures', 'picture_item.picture_id = pictures.id', null)
+            ->where('brands.id IN (?)', new Zend_Db_Expr(
+                $subSelect->assemble()
+            ))
             ->group('brands.id')
             ->order(['brands.position', 'brands.name']);
 
-        if ($status) {
-            $select->where('pictures.status = ?', $status);
-        }
-
-        $brandMultioptions = $db->fetchPairs($select);
+        $brandMultioptions = $db->fetchPairs($select);*/
+        
+        $brandMultioptions = [];
 
         $form = new InboxForm(null, [
             'perspectiveOptions' => [
@@ -494,7 +502,7 @@ class PicturesController extends AbstractActionController
             ], $multioptions);
 
             foreach ($picturesData['items'] as &$pictureItem) {
-                $itemIds = $this->pictureItem->getPictureItems($pictureItem['id']);
+                $itemIds = $this->pictureItem->getPictureItemsByType($pictureItem['id'], DbTable\Item\Type::VEHICLE);
 
                 if (count($itemIds) == 1) {
                     $itemId = $itemIds[0];

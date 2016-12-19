@@ -3,7 +3,7 @@
         <?php if (count($car['childs'])) { ?>
             <a href="#" class="toggle">
                 <i class="fa fa-folder-o"></i><i class="fa fa-folder-open-o"></i>
-                <?=$this->escapeHtml($car['name']) ?>
+                <?=$this->car()->htmlTitle($car['name']) ?>
             </a>
             <ul>
                 <li><?=$this->htmlA($car['url'], $this->translate('moder/vehicle/move/here')) ?></li>
@@ -12,7 +12,7 @@
                 ])?>
             </ul>
         <?php } else { ?>
-            <?=$this->htmlA($car['url'], $car['name']) ?>
+            <?=$this->htmlA($car['url'], $this->car()->htmlTitle($car['name']), false) ?>
         <?php } ?>
     </li>
 <?php } ?>

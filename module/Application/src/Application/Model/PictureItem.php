@@ -158,6 +158,18 @@ class PictureItem
                 ->where('picture_id = ?', $pictureId)
         );
     }
+    
+    public function getPictureItemsByType($pictureId, $type)
+    {
+        $db = $this->table->getAdapter();
+        return $db->fetchCol(
+            $db->select()
+                ->from($this->table->info('name'), 'item_id')
+                ->where('picture_id = ?', $pictureId)
+                ->join('cars', 'picture_item.item_id = cars.id', null)
+                ->where('cars.item_type_id = ?', $type)
+        );
+    }
 
     public function getData(array $options)
     {

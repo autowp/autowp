@@ -1143,19 +1143,28 @@ return [
                 ],
                 [
                     'spec' => [
-                        'type'    => 'Select',
+                        'type'    => 'Text',
                         'name'    => 'category',
                         'options' => [
                             'label' => 'moder/vehicles/filter/category',
                         ]
                     ],
                 ],
-                [
+                /*[
                     'spec' => [
                         'type'    => 'Select',
                         'name'    => 'no_category',
                         'options' => [
                             'label' => 'moder/vehicles/filter/category-exclude',
+                        ]
+                    ],
+                ],*/
+                [
+                    'spec' => [
+                        'type'    => 'Text',
+                        'name'    => 'text',
+                        'options' => [
+                            'label' => 'moder/items/filter/text',
                         ]
                     ],
                 ],
@@ -1223,15 +1232,25 @@ return [
                 ],
                 'category' => [
                     'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
+                        ['name' => 'Digits'],
+                    ]
                 ],
-                'no_category' => [
+                /*'no_category' => [
                     'required'   => false,
-                ],
+                ],*/
                 'no_parent' => [
                     'required'   => false,
                 ],
                 'order' => [
                     'required'   => false,
+                ],
+                'text' => [
+                    'required'   => false,
+                    'filters'    => [
+                        ['name' => 'StringTrim'],
+                    ]
                 ],
             ],
         ],
