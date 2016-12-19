@@ -5,7 +5,7 @@ namespace ApplicationTest\Controller\Moder;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Headers;
 use Zend\Http\Request;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use Application\Test\AbstractHttpControllerTestCase;
 
 use Application\Controller\Moder\CarsController;
 use Application\Controller\Moder\BrandVehicleController;
@@ -13,12 +13,7 @@ use Zend\Json\Json;
 
 class CarsControllerTest extends AbstractHttpControllerTestCase
 {
-    public function setUp()
-    {
-        $this->setApplicationConfig(include __DIR__ . '/../../_files/application.config.php');
-
-        parent::setUp();
-    }
+    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
 
     public function testVehicleIsNotForbidden()
     {

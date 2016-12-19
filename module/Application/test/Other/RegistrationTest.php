@@ -4,19 +4,11 @@ namespace ApplicationTest\Other;
 
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
-use Zend\Test\PHPUnit\Controller\AbstractControllerTestCase;
+use Application\Test\AbstractHttpControllerTestCase;
 
-/**
- * @group Autowp_Registration
- */
-class RegistrationTest extends AbstractControllerTestCase
+class RegistrationTest extends AbstractHttpControllerTestCase
 {
-    public function setUp()
-    {
-        $this->setApplicationConfig(include __DIR__ . '/../_files/application.config.php');
-
-        parent::setUp();
-    }
+    protected $applicationConfigPath = __DIR__ . '/../_files/application.config.php';
 
     public function testRegistration()
     {

@@ -4,18 +4,13 @@ namespace ApplicationTest\Fronend\Controller;
 
 use Zend\Http\Request;
 use Zend\Json\Json;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use Application\Test\AbstractHttpControllerTestCase;
 
 use Application\Controller\CatalogueController;
 
 class CatalogueControllerTest extends AbstractHttpControllerTestCase
 {
-    public function setUp()
-    {
-        $this->setApplicationConfig(include __DIR__ . '/../../_files/application.config.php');
-
-        parent::setUp();
-    }
+    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
 
     public function testBrand()
     {

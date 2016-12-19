@@ -12,7 +12,16 @@ return [
             'password' => 'test',
             'dbname'   => 'autowp_test',
         ],
-        'defaultMetadataCache' => null,
+        'defaultMetadataCache' => null
+    ],
+    'db' => [
+        'driver'         => 'Pdo',
+        'pdodriver'      => 'mysql',
+        'host'           => 'localhost',
+        'charset'        => 'utf8',
+        'dbname'         => 'autowp_test',
+        'username'       => 'autowp_test',
+        'password'       => 'test'
     ],
     'users' => [
         'salt'      => 'users-salt',

@@ -2,16 +2,11 @@
 
 namespace ApplicationTest\Controller;
 
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use Application\Test\AbstractHttpControllerTestCase;
 
 class ServicesTest extends AbstractHttpControllerTestCase
 {
-    public function setUp()
-    {
-        $this->setApplicationConfig(include __DIR__ . '/_files/application.config.php');
-
-        parent::setUp();
-    }
+    protected $applicationConfigPath = __DIR__ . '/_files/application.config.php';
 
     /**
      * @dataProvider servicesProvider

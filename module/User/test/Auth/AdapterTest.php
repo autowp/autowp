@@ -2,20 +2,15 @@
 
 namespace AutowpTest\User\Auth;
 
-use Zend\Test\PHPUnit\Controller\AbstractConsoleControllerTestCase;
+use Application\Test\AbstractHttpControllerTestCase;
 
 use Autowp\User\Auth\Adapter\Id;
 use Autowp\User\Auth\Adapter\Login;
 use Autowp\User\Auth\Adapter\Remember;
 
-class AdapterTest extends AbstractConsoleControllerTestCase
+class AdapterTest extends AbstractHttpControllerTestCase
 {
-    public function setUp()
-    {
-        $this->setApplicationConfig(include __DIR__ . '/../_files/application.config.php');
-
-        parent::setUp();
-    }
+    protected $applicationConfigPath = __DIR__ . '/../_files/application.config.php';
 
     public function testIdAdapter()
     {

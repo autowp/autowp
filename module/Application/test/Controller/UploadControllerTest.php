@@ -2,21 +2,16 @@
 
 namespace ApplicationTest\Controller;
 
+use Zend\Json\Json;
+use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 use Application\Controller\UploadController;
-use Zend\Http\Header\Cookie;
-use Zend\Json\Json;
+use Application\Test\AbstractHttpControllerTestCase;
 
 class UploadControllerTest extends AbstractHttpControllerTestCase
 {
-    public function setUp()
-    {
-        $this->setApplicationConfig(include __DIR__ . '/../_files/application.config.php');
-
-        parent::setUp();
-    }
+    protected $applicationConfigPath = __DIR__ . '/../_files/application.config.php';
 
     public function testIndex()
     {
