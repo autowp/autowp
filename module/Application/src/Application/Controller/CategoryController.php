@@ -215,7 +215,7 @@ class CategoryController extends AbstractActionController
                         ]),
                         'short_name'     => $this->otherCategoryName,
                         'cars_count'     => $ownCarsCount,
-                        'new_cars_count' => $ownCarsCount, //$parent->getWeekOwnCarsCount(),
+                        'new_cars_count' => 0, //$parent->getWeekOwnCarsCount(),
                         'isOther'        => true,
                         'categories'     => []
                     ];
@@ -371,7 +371,7 @@ class CategoryController extends AbstractActionController
             }
         }
 
-        $key = 'CATEGORY_MENU332_' . $topCategory->id . '_' . $language;
+        $key = 'CATEGORY_MENU333_' . $topCategory->id . '_' . $language;
 
         $menu = $this->cache->getItem($key, $success);
         if (! $success) {

@@ -18,6 +18,16 @@
     ]);
 ?>
 
+<?php if ($this->user()->inheritsRole('moder')) { ?>
+    <p>
+        <i class="fa fa-cog"></i>
+        <?=$this->htmlA($this->url('moder/cars/params', [
+            'action' => 'car',
+            'car_id' => $this->category['id']
+        ]), $this->translate('moder/edit-object'))?>
+    </p>
+<?php } ?>
+
 <?php if ($this->description) { ?>
     <?=$this->markdown($this->description)?>
 <?php } ?>
