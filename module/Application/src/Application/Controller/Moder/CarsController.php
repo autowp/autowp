@@ -204,9 +204,9 @@ class CarsController extends AbstractActionController
 
         $this->filterForm->setData(array_replace(['order' => '1'], $this->params()->fromRoute()));
 
-        $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $select = $cars->select(true);
+        $select = $carTable->select(true);
 
         if ($this->filterForm->isValid()) {
             $values = $this->filterForm->getData();
@@ -284,7 +284,7 @@ class CarsController extends AbstractActionController
                 );
 
                 if ($ids) {
-                    $expr = $cars->getAdapter()->quoteInto(
+                    $expr = $carTable->getAdapter()->quoteInto(
                         'cars.id = no_category.item_id and no_category.parent_id in (?)',
                         $ids
                     );
@@ -452,9 +452,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -552,9 +552,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = $cars = $this->catalogue()->getCarTable();
+        $carTable = $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -960,8 +960,8 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
-        $car = $cars->fetchRow([
+        $carTable = $this->catalogue()->getCarTable();
+        $car = $carTable->fetchRow([
             'id = ?' => (int)$this->params('car_id'),
             'item_type_id IN (?)' => [DbTable\Item\Type::ENGINE, DbTable\Item\Type::VEHICLE]
         ]);
@@ -992,9 +992,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -1040,9 +1040,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -1103,8 +1103,8 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
-        $car = $cars->find($this->params('car_id'))->current();
+        $carTable = $this->catalogue()->getCarTable();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -1195,8 +1195,8 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
-        $car = $cars->find($this->params('car_id'))->current();
+        $carTable = $this->catalogue()->getCarTable();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -1240,8 +1240,8 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
-        $car = $cars->find($this->params('car_id'))->current();
+        $carTable = $this->catalogue()->getCarTable();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -1287,8 +1287,8 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
-        $car = $cars->find($this->params('car_id'))->current();
+        $carTable = $this->catalogue()->getCarTable();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -1329,9 +1329,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -1355,9 +1355,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -1839,9 +1839,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -1931,9 +1931,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -2166,9 +2166,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -2313,6 +2313,15 @@ class CarsController extends AbstractActionController
 
     private function carPublicUrls(DbTable\Vehicle\Row $car)
     {
+        if ($car['item_type_id'] == DbTable\Item\Type::CATEGORY) {
+            return [
+                $this->url()->fromRoute('categories', [
+                    'action'           => 'category',
+                    'category_catname' => $car['catname'],
+                ])
+            ];
+        }
+        
         return $this->walkUpUntilBrand($car->id, []);
     }
 
@@ -2996,10 +3005,20 @@ class CarsController extends AbstractActionController
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
         }
+        
+        $itemTypeId = (int)$this->params('item_type_id');
+        switch ($itemTypeId) {
+            case DbTable\Item\Type::VEHICLE:
+            case DbTable\Item\Type::ENGINE:
+            case DbTable\Item\Type::CATEGORY:
+                break;
+            default:
+                return $this->notFoundAction();
+        }
 
-        $carTable = $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -3047,6 +3066,7 @@ class CarsController extends AbstractActionController
         }
 
         $form = new CarOrganizeForm(null, [
+            'itemType'           => $car->item_type_id,
             'language'           => $this->language(),
             'childOptions'       => $childs,
             'inheritedIsConcept' => $car->is_concept,
@@ -3248,9 +3268,9 @@ class CarsController extends AbstractActionController
                 return $this->notFoundAction();
         }
 
-        $carTable = $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $parentCar = $cars->fetchRow([
+        $parentCar = $carTable->fetchRow([
             'id = ?'           => (int)$this->params('parent_id'),
             'item_type_id = ?' => $itemTypeId
         ]);
@@ -3354,9 +3374,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -3590,9 +3610,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -3628,9 +3648,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->catalogue()->getCarTable();
+        $carTable = $this->catalogue()->getCarTable();
 
-        $car = $cars->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('car_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }

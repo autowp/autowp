@@ -86,22 +86,6 @@ return [
                             ]
                         ]
                     ],
-                    'category' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/category[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\CategoryController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'comments' => [
                         'type' => Segment::class,
                         'options' => [

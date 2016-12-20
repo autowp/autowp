@@ -54,31 +54,6 @@ define(
                     CarTypePicker.init($(this).find('select[name=spec_ids\\[\\]]'));
                 });
                 
-                $('#categories').on('tabload', function() {
-                    $(this).find('#car-categories').each(function() {
-                        var $form = $(this);
-
-                        $form.on('submit', function(e) {
-                            e.preventDefault();
-
-                            $form.find(':submit').button('loading');
-                            $.post($form.attr('action'), $form.serializeArray(), function() {
-                                $form.find(':submit').button('reset');
-                            }, 'json');
-                        });
-
-                        $(this).find('.checkbox-tree > li').each(function() {
-                            var $li = $(this);
-                            $li.children('.fa-plus-circle').on('click', function() {
-                                $li.addClass('active');
-                            });
-                            $li.children('.fa-minus-circle').on('click', function() {
-                                $li.removeClass('active');
-                            });
-                        });
-                    });
-                });
-                
                 $('#catalogue').on('tabload', function() {
                     
                     $catalogueTab = $(this);

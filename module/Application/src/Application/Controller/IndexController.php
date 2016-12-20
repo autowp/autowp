@@ -15,6 +15,7 @@ use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
+use Application\VehicleNameFormatter as ItemNameFormatter;
 
 use Zend_Db_Expr;
 
@@ -36,15 +37,22 @@ class IndexController extends AbstractActionController
      * @var CarOfDay
      */
     private $carOfDay;
+    
+    /**
+     * @var ItemNameFormatter
+     */
+    private $itemNameFormatter;
 
     public function __construct(
         $cache,
         SpecificationsService $specsService,
-        CarOfDay $carOfDay
+        CarOfDay $carOfDay,
+        ItemNameFormatter $itemNameFormatter
     ) {
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->carOfDay = $carOfDay;
+        $this->itemNameFormatter = $itemNameFormatter;
     }
 
     /**
@@ -212,14 +220,19 @@ class IndexController extends AbstractActionController
             ];
         }
         
+        $language = $this->language();
+        
         $categoryRows = $db->fetchAll(
             $db->select()
-                ->from($itemTable->info('name'), ['name', 'catname'])
+                ->from($itemTable->info('name'), [
+                    'catname', 'begin_year', 'end_year',
+                    'name' => new Zend_Db_Expr('IF(LENGTH(car_language.name)>0,car_language.name,cars.name)')
+                ])
                 ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                 ->joinLeft(
                     'car_language', 
                     'cars.id = car_language.car_id and car_language.language = :language', 
-                    ['lang_name' => 'name']
+                    null
                 )
                 ->join('car_parent', 'cars.id = car_parent.parent_id', null)
                 ->join(['top_item' => 'cars'], 'car_parent.car_id = top_item.id', null)
@@ -228,7 +241,7 @@ class IndexController extends AbstractActionController
                 ->where('item_parent_cache.item_id = :item_id')
                 ->group(['item_parent_cache.item_id', 'cars.id'])
                 ->bind([
-                    'language' => $this->language(),
+                    'language' => $language,
                     'item_id'  => $car['id']
                 ])
         );
@@ -240,7 +253,10 @@ class IndexController extends AbstractActionController
                     'action'           => 'category',
                     'category_catname' => $category['catname'],
                 ]),
-                'text'  => $category['lang_name'] ? $category['lang_name'] : $category['name'],
+                'text'  => $this->itemNameFormatter->format(
+                    $category,
+                    $language
+                )
             ];
         }
 

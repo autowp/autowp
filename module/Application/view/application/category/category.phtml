@@ -4,7 +4,7 @@
             'blankPage' => false,
             'needRight' => false
         ],
-        'pageTitle' => $this->title,
+        'pageTitle' => $this->car()->textTitle($this->category->toArray()),
         'pageId' => 23,
         'args'   => [
             'CATEGORY_SHORT_NAME' => $this->category->name, //$this->categoryLang ? $this->categoryLang->short_name : $this->category->short_name,
@@ -25,6 +25,15 @@
             'action' => 'car',
             'car_id' => $this->category['id']
         ]), $this->translate('moder/edit-object'))?>
+        
+        <?php if ($this->user()->isAllowed('car', 'add')) { ?>
+            <i class="fa fa-plus"></i>
+            <?=$this->htmlA($this->url('moder/cars/params', [
+                'action'       => 'new',
+                'parent_id'    => $this->category['id'],
+                'item_type_id' => $this->category['item_type_id'],
+            ]), $this->translate('moder/vehicle/catalogue/add-category'))?>
+        <?php } ?>
     </p>
 <?php } ?>
 

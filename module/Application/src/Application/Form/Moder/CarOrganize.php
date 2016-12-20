@@ -5,7 +5,11 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
+use Application\Model\DbTable;
 use Application\Model\DbTable\Vehicle\Type as VehicleType;
+
+use Autowp\ZFComponents\Filter\SingleSpaces;
+use Autowp\ZFComponents\Filter\FilenameSafe;
 
 class CarOrganize extends Form implements InputFilterProviderInterface
 {
@@ -20,6 +24,8 @@ class CarOrganize extends Form implements InputFilterProviderInterface
     private $translator;
 
     private $language = 'en';
+    
+    private $itemType = null;
 
     /**
      * @var VehicleType
@@ -57,14 +63,21 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 'name'    => 'name',
                 'type'    => \Application\Form\Element\CarName::class
             ],
-            [
+            'catname' => [
+                'name'    => 'catname',
+                'type'    => 'Text',
+                'options' => [
+                    'label'   => 'Catname'
+                ]
+            ],
+            'body' =>[
                 'name'    => 'body',
                 'type'    => \Application\Form\Element\CarBody::class,
                 'attributes' => [
                     'style' => 'width: 30%'
                 ]
             ],
-            [
+            'spec_id' => [
                 'name'    => 'spec_id',
                 'type'    => 'Select',
                 'options' => [
@@ -75,7 +88,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                     'style' => 'width: 30%'
                 ]
             ],
-            [
+            'vehicle_type_id' =>[
                 'name'    => 'vehicle_type_id',
                 'type'    => 'Select',
                 'options' => [
@@ -88,7 +101,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                     'size'     => 1
                 ]
             ],
-            [
+            'model_year' =>[
                 'name'    => 'model_year',
                 'type'    => \Application\Form\Fieldset\CarModelYears::class,
                 'options' => [
@@ -111,14 +124,14 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                     'language' => $this->language
                 ]
             ],
-            [
+            'produced' =>[
                 'name'    => 'produced',
                 'type'    => \Application\Form\Fieldset\CarProduced::class,
                 'options' => [
                     'label' => 'moder/vehicle/produced'
                 ]
             ],
-            [
+            'is_concept' =>[
                 'name'    => 'is_concept',
                 'type'    => 'Select',
                 'options' => [
@@ -129,7 +142,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                     'style' => 'width: 20%'
                 ]
             ],
-            [
+            'is_group' =>[
                 'name'    => 'is_group',
                 'type'    => 'Checkbox',
                 'options' => [
@@ -154,6 +167,23 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 ],
             ],
         ];
+        
+        if ($this->itemType != DbTable\Item\Type::CATEGORY) {
+            unset($elements['catname']);
+        }
+        
+        if ($this->itemType != DbTable\Item\Type::VEHICLE) {
+            unset($elements['vehicle_type_id']);
+        }
+        
+        if (!in_array($this->itemType, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
+            unset($elements['is_group']);
+            unset($elements['is_concept']);
+            unset($elements['produced']);
+            unset($elements['model_year']);
+            unset($elements['spec_id']);
+            unset($elements['body']);
+        }
 
         foreach ($elements as $element) {
             $this->add($element);
@@ -195,6 +225,11 @@ class CarOrganize extends Form implements InputFilterProviderInterface
             $this->specOptions = $options['specOptions'];
             unset($options['specOptions']);
         }
+        
+        if (isset($options['itemType'])) {
+            $this->itemType = $options['itemType'];
+            unset($options['itemType']);
+        }
 
         if (isset($options['childOptions'])) {
             $this->childOptions = $options['childOptions'];
@@ -217,7 +252,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
      */
     public function getInputFilterSpecification()
     {
-        return [
+        $spec = [
             'name' => [
                 'required' => true
             ],
@@ -238,8 +273,31 @@ class CarOrganize extends Form implements InputFilterProviderInterface
             ],
             'childs' => [
                 'required' => true
-            ]
+            ],
+            'catname' => [
+                'required' => true,
+                'filters'  => [
+                    ['name' => 'StringTrim'],
+                    ['name' => SingleSpaces::class],
+                    ['name' => FilenameSafe::class]
+                ],
+                'validators' => [
+                    [
+                        'name' => 'StringLength',
+                        'options' => [
+                            'min' => 3,
+                            'max' => 100
+                        ]
+                    ]
+                ]
+            ],
         ];
+        
+        if ($this->itemType != DbTable\Item\Type::CATEGORY) {
+            unset($spec['catname']);
+        }
+        
+        return $spec;
     }
 
     /**

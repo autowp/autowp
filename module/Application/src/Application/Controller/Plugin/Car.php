@@ -210,7 +210,10 @@ class Car extends AbstractPlugin
             );
             $categoryRows = $db->fetchAll(
                 $db->select()
-                    ->from($itemTable->info('name'), ['name', 'catname'])
+                    ->from($itemTable->info('name'), [
+                        'catname', 'begin_year', 'end_year',
+                        'name' => new Zend_Db_Expr('IF(LENGTH(car_language.name)>0,car_language.name,cars.name)')
+                    ])
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                     ->joinLeft('car_language', $langExpr, ['lang_name' => 'name'])
                     ->join('car_parent', 'cars.id = car_parent.parent_id', null)
@@ -227,7 +230,10 @@ class Car extends AbstractPlugin
                     $carsCategories[$carId] = [];
                 }
                 $carsCategories[$carId][] = [
-                    'name' => $category['lang_name'] ? $category['lang_name'] : $category['name'],
+                    'name' => $this->vehicleNameFormatter->format(
+                        $category,
+                        $language
+                    ),
                     'url'  => $controller->url()->fromRoute('categories', [
                         'action'           => 'category',
                         'category_catname' => $category['catname'],

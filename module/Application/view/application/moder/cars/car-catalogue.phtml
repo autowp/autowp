@@ -1,13 +1,12 @@
 <?php if ($this->canUseTree) { ?>
     <?php if ($this->car['is_group']) { ?>
-        <div class="btn-group">
-            <?=$this->htmlA([
-                'href'  => $this->url(null, [
-                    'action' => 'organize',
-                ], [], true),
-                'class' => 'btn btn-default',
-            ], $this->translate('moder/vehicle/catalogue/turbo-group-creator'))?>
-        </div>
+        <?=$this->htmlA([
+            'href'  => $this->url(null, [
+                'action'       => 'organize',
+                'item_type_id' => $this->car['item_type_id']
+            ], [], true),
+            'class' => 'btn btn-default',
+        ], $this->translate('moder/vehicle/catalogue/turbo-group-creator'))?>
     <?php } ?>
     <table class="table">
         <thead>
@@ -278,30 +277,69 @@
                             <td></td>
                         <?php } ?>
                     </tr>
-                <?php } ?>
-                <tr>
-                    <td>
-                        <i class="fa fa-plus"></i>
-                        <?=$this->htmlA(
-                            $this->url('moder/cars/params', [
-                                'action'       => 'new',
-                                'parent_id'    => $this->car->id,
-                                'item_type_id' => $this->car['item_type_id'],
-                            ]),
-                            $this->translate(
-                                $this->car['item_type_id'] == Application\Model\DbTable\Item\Type::ENGINE
-                                    ? 'moder/vehicle/catalogue/add-engine'
-                                    : 'moder/vehicle/catalogue/add-vehicle'
-                            )
-                        )?>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td class="urls"></td>
-                    <?php if ($this->canMove) { ?>
+                    <tr>
+                        <td>
+                            <i class="fa fa-plus"></i>
+                            <?=$this->htmlA(
+                                $this->url('moder/cars/params', [
+                                    'action'       => 'new',
+                                    'parent_id'    => $this->car->id,
+                                    'item_type_id' => Application\Model\DbTable\Item\Type::ENGINE
+                                ]),
+                                $this->translate('moder/vehicle/catalogue/add-engine')
+                            )?>
+                        </td>
                         <td></td>
-                    <?php } ?>
-                </tr>
+                        <td></td>
+                        <td class="urls"></td>
+                        <?php if ($this->canMove) { ?>
+                            <td></td>
+                        <?php } ?>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-plus"></i>
+                            <?=$this->htmlA(
+                                $this->url('moder/cars/params', [
+                                    'action'       => 'new',
+                                    'parent_id'    => $this->car->id,
+                                    'item_type_id' => Application\Model\DbTable\Item\Type::VEHICLE
+                                ]),
+                                $this->translate('moder/vehicle/catalogue/add-vehicle')
+                            )?>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td class="urls"></td>
+                        <?php if ($this->canMove) { ?>
+                            <td></td>
+                        <?php } ?>
+                    </tr>
+                <?php } else { ?>
+                    <tr>
+                        <td>
+                            <i class="fa fa-plus"></i>
+                            <?=$this->htmlA(
+                                $this->url('moder/cars/params', [
+                                    'action'       => 'new',
+                                    'parent_id'    => $this->car->id,
+                                    'item_type_id' => $this->car['item_type_id'],
+                                ]),
+                                $this->translate(
+                                    $this->car['item_type_id'] == Application\Model\DbTable\Item\Type::ENGINE
+                                        ? 'moder/vehicle/catalogue/add-engine'
+                                        : 'moder/vehicle/catalogue/add-vehicle'
+                                )
+                            )?>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td class="urls"></td>
+                        <?php if ($this->canMove) { ?>
+                            <td></td>
+                        <?php } ?>
+                    </tr>
+                <?php } ?>
             <?php } ?>
         </tbody>
     </table>
