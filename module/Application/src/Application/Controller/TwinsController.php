@@ -179,8 +179,15 @@ class TwinsController extends AbstractActionController
             'group'              => $group,
             'description'        => $description,
             'cars'               => $this->car()->listData($carList, [
+                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'type'                 => null,
+                    'onlyExactlyPictures'  => false,
+                    'dateSort'             => false,
+                    'disableLargePictures' => true,
+                    'perspectivePageId'    => null,
+                    'onlyChilds'           => []
+                ]),
                 'disableTwins'         => true,
-                'disableLargePictures' => true,
                 'disableSpecs'         => true,
                 'pictureUrl'           => function ($car, $picture) use ($group) {
                     return $this->url()->fromRoute('twins/group/pictures/picture', [

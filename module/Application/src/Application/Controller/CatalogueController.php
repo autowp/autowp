@@ -257,6 +257,14 @@ class CatalogueController extends AbstractActionController
             return [
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
+                    'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                        'type'                 => null,
+                        'onlyExactlyPictures'  => false,
+                        'dateSort'             => false,
+                        'disableLargePictures' => false,
+                        'perspectivePageId'    => null,
+                        'onlyChilds'           => []
+                    ]),
                     'detailsUrl' => function ($listCar) use ($brand, $carParentTable) {
 
                         $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
@@ -432,6 +440,14 @@ class CatalogueController extends AbstractActionController
                 'cartype'   => $cartype,
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
+                    'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                        'type'                 => null,
+                        'onlyExactlyPictures'  => false,
+                        'dateSort'             => false,
+                        'disableLargePictures' => false,
+                        'perspectivePageId'    => null,
+                        'onlyChilds'           => []
+                    ]),
                     'detailsUrl' => function ($listCar) use ($brand, $carParentTable) {
 
                         $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
@@ -1252,8 +1268,15 @@ class CatalogueController extends AbstractActionController
                     'exact'         => true
                 ], [], true),
                 'childListData' => $this->car()->listData($listCars, [
+                    'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                        'type'                 => $type == VehicleParent::TYPE_DEFAULT ? $type : null,
+                        'onlyExactlyPictures'  => true,
+                        'dateSort'             => false,
+                        'disableLargePictures' => false,
+                        'perspectivePageId'    => null,
+                        'onlyChilds'           => []
+                    ]),
                     'disableDescription' => true,
-                    'type'       => $type == VehicleParent::TYPE_DEFAULT ? $type : null,
                     'detailsUrl' => false,
                     'allPicturesUrl' => function ($listCar) use ($brand, $brandItemCatname, $path) {
                         return $this->url()->fromRoute('catalogue', [
@@ -1264,7 +1287,6 @@ class CatalogueController extends AbstractActionController
                             'exact'         => true
                         ]);
                     },
-                    'onlyExactlyPictures' => true,
                     'specificationsUrl' => function ($listCar) use ($brand, $brandItemCatname, $path) {
 
                         $hasSpecs = $this->specsService->hasSpecs($listCar->id);
@@ -1892,8 +1914,15 @@ class CatalogueController extends AbstractActionController
                 'page'          => null
             ], [], true),
             'childListData' => $this->car()->listData($listCars, [
+                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'type'                 => $type == VehicleParent::TYPE_DEFAULT ? $type : null,
+                    'onlyExactlyPictures'  => false,
+                    'dateSort'             => false,
+                    'disableLargePictures' => false,
+                    'perspectivePageId'    => null,
+                    'onlyChilds'           => []
+                ]),
                 'disableDescription' => false,
-                'type'       => $type == VehicleParent::TYPE_DEFAULT ? $type : null,
                 'detailsUrl' => function ($listCar) use (
                     $brand,
                     $currentCarId,
@@ -1963,7 +1992,6 @@ class CatalogueController extends AbstractActionController
 
                     return false;
                 },
-                'onlyExactlyPictures' => false,
                 'specificationsUrl' => function ($listCar) use (
                     $brand,
                     $hasChildSpecs,
@@ -2060,7 +2088,7 @@ class CatalogueController extends AbstractActionController
                     $path,
                     $carParentTable
                 ) {
-
+                    
                     // found parent row
                     $carParentRow = $carParentTable->fetchRow([
                         'car_id = ?'    => $listCar->id,

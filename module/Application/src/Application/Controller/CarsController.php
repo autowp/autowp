@@ -847,7 +847,16 @@ class CarsController extends AbstractActionController
 
         return [
             'paginator'     => $paginator,
-            'childListData' => $this->car()->listData($listCars),
+            'childListData' => $this->car()->listData($listCars, [
+                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'type'                 => null,
+                    'onlyExactlyPictures'  => false,
+                    'dateSort'             => false,
+                    'disableLargePictures' => false,
+                    'perspectivePageId'    => null,
+                    'onlyChilds'           => []
+                ])
+            ]),
         ];
     }
 }

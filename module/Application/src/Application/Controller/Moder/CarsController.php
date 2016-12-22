@@ -340,7 +340,16 @@ class CarsController extends AbstractActionController
         return [
             'form'      => $this->filterForm,
             'paginator' => $paginator,
-            'listData'  => $this->car()->listData($paginator->getCurrentItems())
+            'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
+                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'type'                 => null,
+                    'onlyExactlyPictures'  => false,
+                    'dateSort'             => false,
+                    'disableLargePictures' => false,
+                    'perspectivePageId'    => null,
+                    'onlyChilds'           => []
+                ])
+            ])
         ];
     }
 
@@ -3004,16 +3013,6 @@ class CarsController extends AbstractActionController
     {
         if (! $this->user()->inheritsRole('moder')) {
             return $this->forbiddenAction();
-        }
-        
-        $itemTypeId = (int)$this->params('item_type_id');
-        switch ($itemTypeId) {
-            case DbTable\Item\Type::VEHICLE:
-            case DbTable\Item\Type::ENGINE:
-            case DbTable\Item\Type::CATEGORY:
-                break;
-            default:
-                return $this->notFoundAction();
         }
 
         $carTable = $this->catalogue()->getCarTable();

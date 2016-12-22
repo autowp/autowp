@@ -481,6 +481,9 @@ class CategoryController extends AbstractActionController
             $carParentTable = new VehicleParent();
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [
+                'pictureFetcher' => new \Application\Model\Item\DistinctItemPictureFetcher([
+                    'dateSort' => false,
+                ]),
                 'useFrontPictures' => $haveSubcategories,
                 'disableLargePictures' => true,
                 'picturesDateSort' => true,

@@ -181,8 +181,14 @@ class FactoriesController extends AbstractActionController
         return [
             'factory'  => $factory,
             'carsData' => $this->car()->listData($cars, [
-                'disableLargePictures' => true,
-                'onlyChilds'           => $groups
+                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                    'type'                 => null,
+                    'onlyExactlyPictures'  => false,
+                    'dateSort'             => false,
+                    'disableLargePictures' => true,
+                    'perspectivePageId'    => null,
+                    'onlyChilds'           => $groups
+                ])
             ]),
             'paginator' => $paginator
         ];

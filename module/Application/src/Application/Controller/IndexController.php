@@ -639,9 +639,14 @@ class IndexController extends AbstractActionController
         }
 
         $specsCars = $this->car()->listData($cars, [
-            'disableLargePictures' => true,
-            'perspectiveGroup'     => 1,
-            'allowUpPictures'      => true,
+            'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
+                'type'                 => null,
+                'onlyExactlyPictures'  => false,
+                'dateSort'             => false,
+                'disableLargePictures' => true,
+                'perspectivePageId'    => 1,
+                'onlyChilds'           => []
+            ]),
             'disableDescription'   => true,
             'callback'             => function (&$item) use ($userTable) {
                 $contribPairs = $this->specsService->getContributors([$item['id']]);

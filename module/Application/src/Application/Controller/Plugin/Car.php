@@ -5,6 +5,7 @@ namespace Application\Controller\Plugin;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Application\Model\DbTable;
+use Application\Model\Item\PictureFetcher;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Application\VehicleNameFormatter;
@@ -17,8 +18,6 @@ use Zend_Db_Expr;
 
 class Car extends AbstractPlugin
 {
-    private $perspectiveCache = [];
-
     /**
      * @var DbTable\Vehicle\Language
      */
@@ -133,7 +132,10 @@ class Car extends AbstractPlugin
 
     public function listData($cars, array $options = [])
     {
-        $type                 = isset($options['type']) ? $options['type'] : null;
+        $pictureFetcher       = $options['pictureFetcher'];
+        if (!$pictureFetcher instanceof PictureFetcher) {
+            throw new \Exception("Invalid picture fetcher provided");
+        }
         $disableTitle         = isset($options['disableTitle']) && $options['disableTitle'];
         $disableDescription   = isset($options['disableDescription']) && $options['disableDescription'];
         $disableDetailsLink   = isset($options['disableDetailsLink']) && $options['disableDetailsLink'];
@@ -148,17 +150,9 @@ class Car extends AbstractPlugin
         $onlyExactlyPictures  = isset($options['onlyExactlyPictures']) ? $options['onlyExactlyPictures'] : null;
         $hideEmpty            = isset($options['hideEmpty']) && $options['hideEmpty'];
         $disableTwins         = isset($options['disableTwins']) && $options['disableTwins'];
-        $disableLargePictures = isset($options['disableLargePictures']) && $options['disableLargePictures'];
-        $useFrontPictures     = isset($options['useFrontPictures']) && $options['useFrontPictures'];
         $disableSpecs         = isset($options['disableSpecs']) && $options['disableSpecs'];
         $disableCategories    = isset($options['disableCategories']) && $options['disableCategories'];
-        $picturesDateSort     = isset($options['picturesDateSort']) && $options['picturesDateSort'];
-        $perspectiveGroup     = isset($options['perspectiveGroup']) ? (int)$options['perspectiveGroup'] : null;
         $callback             = isset($options['callback']) && $options['callback'] ? $options['callback'] : null;
-        $allowUpPictures      = isset($options['allowUpPictures']) && $options['allowUpPictures'];
-        $onlyChilds           = isset($options['onlyChilds']) && is_array($options['onlyChilds'])
-            ? $options['onlyChilds']
-            : [];
         $pictureUrlCallback   = isset($options['pictureUrl']) ? $options['pictureUrl'] : false;
 
         $controller = $this->getController();
@@ -178,6 +172,7 @@ class Car extends AbstractPlugin
         $carParentAdapter = $carParentTable->getAdapter();
         $brandTable = new DbTable\Brand();
         $itemTable = new DbTable\Vehicle();
+        $itemLanguageTable = new DbTable\Vehicle\Language();
 
         $carIds = [];
         foreach ($cars as $car) {
@@ -338,45 +333,28 @@ class Car extends AbstractPlugin
             if (! $disableCategories) {
                 $categories = isset($carsCategories[$car->id]) ? $carsCategories[$car->id] : [];
             }
-
-            $pGroupId = null;
-            $useLargeFormat = false;
-            if ($perspectiveGroup) {
-                $pGroupId = $perspectiveGroup;
-            } else {
-                $useLargeFormat = $totalPictures > 30 && ! $disableLargePictures;
-                $pGroupId = $useLargeFormat ? 5 : 4;
+            
+            $pictures = $pictureFetcher->fetch($car->toArray(), [
+                'totalPictures' => $totalPictures
+            ]);
+            $largeFormat = false; 
+            foreach ($pictures as &$picture) {
+                if ($picture) {
+                    
+                    if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
+                        $url = $picHelper->href($picture['row']);
+                    } elseif ($pictureUrlCallback) {
+                        $url = $pictureUrlCallback($car, $picture['row']);
+                    } else {
+                        $url = $picHelper->href($picture['row']);
+                    }
+                    $picture['url'] = $url;
+                    if ($picture['format'] == 'picture-thumb-medium') {
+                        $largeFormat = true;
+                    }
+                }
             }
-
-            $carOnlyChilds = isset($onlyChilds[$car->id]) ? $onlyChilds[$car->id] : null;
-
-            if (!$useFrontPictures) {
-                $g = $this->getPerspectiveGroupIds($pGroupId);
-                $pictures = $this->getOrientedPictureList(
-                    $car,
-                    $g,
-                    $onlyExactlyPictures,
-                    $type,
-                    $picturesDateSort,
-                    $allowUpPictures,
-                    $language,
-                    $picHelper,
-                    $catalogue,
-                    $carOnlyChilds,
-                    $useLargeFormat,
-                    $pictureUrlCallback
-                );
-            } else {
-                $pictures = $this->getFrontPictureList(
-                    $car,
-                    $picturesDateSort,
-                    $allowUpPictures,
-                    $language,
-                    $picHelper,
-                    $catalogue,
-                    $pictureUrlCallback
-                );
-            }
+            unset($picture);
 
             if ($hideEmpty) {
                 $hasPictures = false;
@@ -391,8 +369,6 @@ class Car extends AbstractPlugin
                     continue;
                 }
             }
-            
-            $itemLanguageTable = new DbTable\Vehicle\Language();
             
             $db = $itemLanguageTable->getAdapter();
             $orderExpr = $db->quoteInto('language = ? desc', $language);
@@ -481,7 +457,7 @@ class Car extends AbstractPlugin
                 'hasChilds'        => $childsCount > 0,
                 'childsCount'      => $childsCount,
                 'specsLinks'       => $specsLinks,
-                'largeFormat'      => $useLargeFormat,
+                'largeFormat'      => $largeFormat,
                 'vehiclesOnEngine' => $vehiclesOnEngine
             ];
 
@@ -663,330 +639,6 @@ class Car extends AbstractPlugin
     private function getPictureTable()
     {
         return $this->getController()->catalogue()->getPictureTable();
-    }
-
-    private function getPerspectiveGroupIds($pageId)
-    {
-        if (! isset($this->perspectiveCache[$pageId])) {
-            $perspectivesGroups = new DbTable\Perspective\Group();
-            $db = $perspectivesGroups->getAdapter();
-            $this->perspectiveCache[$pageId] = $db->fetchCol(
-                $db->select()
-                    ->from($perspectivesGroups->info('name'), 'id')
-                    ->where('page_id = ?', $pageId)
-                    ->order('position')
-            );
-        }
-
-        return $this->perspectiveCache[$pageId];
-    }
-
-    private function getPictureSelect($carId, array $options)
-    {
-        $defaults = [
-            'perspectiveGroup'    => false,
-            'type'                => null,
-            'exclude'             => [],
-            'excludeItems'        => null,
-            'dateSort'            => false,
-            'onlyChilds'          => null,
-            'onlyExactlyPictures' => false
-        ];
-        $options = array_merge($defaults, $options);
-
-        $pictureTable = $this->getPictureTable();
-        $db = $pictureTable->getAdapter();
-        $select = $db->select()
-            ->from(
-                $pictureTable->info('name'),
-                [
-                    'id', 'name', 'type', 'brand_id', 'factory_id',
-                    'image_id', 'crop_left', 'crop_top',
-                    'crop_width', 'crop_height', 'width', 'height', 'identity'
-                ]
-            )
-            ->join(
-                'picture_item', 
-                'pictures.id = picture_item.picture_id', 
-                ['perspective_id', 'item_id']
-            )
-            ->where('pictures.status IN (?)', [
-                DbTable\Picture::STATUS_ACCEPTED,
-                DbTable\Picture::STATUS_NEW
-            ])
-            ->limit(1);
-
-        $order = [];
-
-        if ($options['onlyExactlyPictures']) {
-            $select->where('picture_item.item_id = ?', $carId);
-        } else {
-            $select
-                ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->join('cars', 'picture_item.item_id = cars.id', null)
-                ->where('item_parent_cache.parent_id = ?', $carId);
-
-            $order[] = 'cars.is_concept asc';
-            $order[] = 'item_parent_cache.sport asc';
-            $order[] = 'item_parent_cache.tuning asc';
-
-            if (isset($options['type'])) {
-                switch ($options['type']) {
-                    case DbTable\Vehicle\ParentTable::TYPE_DEFAULT:
-                        break;
-                    case DbTable\Vehicle\ParentTable::TYPE_TUNING:
-                        $select->where('item_parent_cache.tuning');
-                        break;
-                    case DbTable\Vehicle\ParentTable::TYPE_SPORT:
-                        $select->where('item_parent_cache.sport');
-                        break;
-                }
-            }
-        }
-
-        if ($options['perspectiveGroup']) {
-            $select
-                ->join(
-                    ['mp' => 'perspectives_groups_perspectives'],
-                    'picture_item.perspective_id = mp.perspective_id',
-                    null
-                )
-                ->where('mp.group_id = ?', $options['perspectiveGroup']);
-
-            $order[] = 'mp.position';
-        }
-
-        if ($options['exclude']) {
-            $select->where('pictures.id not in (?)', $options['exclude']);
-        }
-        
-        if ($options['excludeItems']) {
-            $select->where('picture_item.item_id not in (?)', $options['excludeItems']);
-        }
-
-        if ($options['dateSort']) {
-            $select->join(['picture_car' => 'cars'], 'cars.id = picture_car.id', null);
-            $order = array_merge($order, ['picture_car.begin_order_cache', 'picture_car.end_order_cache']);
-        }
-        $order = array_merge($order, ['pictures.width DESC', 'pictures.height DESC']);
-
-        $select->order($order);
-
-        if ($options['onlyChilds']) {
-            $select
-                ->join(
-                    ['pi_oc' => 'picture_item'],
-                    'pi_oc.picture_id = pictures.id'
-                )
-                ->join(
-                    ['cpc_oc' => 'item_parent_cache'],
-                    'cpc_oc.item_id = pi_oc.item_id',
-                    null
-                )
-                ->where('cpc_oc.parent_id IN (?)', $options['onlyChilds']);
-        }
-
-        return $select;
-    }
-
-    private function getOrientedPictureList(
-        $car,
-        array $perspectiveGroupIds,
-        $onlyExactlyPictures,
-        $type,
-        $dateSort,
-        $allowUpPictures,
-        $language,
-        $picHelper,
-        $catalogue,
-        $onlyChilds,
-        $useLargeFormat,
-        $urlCallback
-    ) {
-
-        $pictures = [];
-        $usedIds = [];
-
-        $pictureTable = $this->getPictureTable();
-        $db = $pictureTable->getAdapter();
-
-        foreach ($perspectiveGroupIds as $groupId) {
-            $select = $this->getPictureSelect($car['id'], [
-                'onlyExactlyPictures' => $onlyExactlyPictures,
-                'perspectiveGroup'    => $groupId,
-                'type'                => $type,
-                'exclude'             => $usedIds,
-                'dateSort'            => $dateSort,
-                'onlyChilds'          => $onlyChilds
-            ]);
-
-            $picture = $db->fetchRow($select);
-
-            if ($picture) {
-                $pictures[] = $picture;
-                $usedIds[] = (int)$picture['id'];
-            } else {
-                $pictures[] = null;
-            }
-        }
-
-        $needMore = count($perspectiveGroupIds) - count($usedIds);
-
-        if ($needMore > 0) {
-            $select = $this->getPictureSelect($car['id'], [
-                'onlyExactlyPictures' => $onlyExactlyPictures,
-                'type'                => $type,
-                'exclude'             => $usedIds,
-                'dateSort'            => $dateSort,
-                'onlyChilds'          => $onlyChilds
-            ]);
-
-            $rows = $db->fetchAll(
-                $select->limit($needMore)
-            );
-            $morePictures = [];
-            foreach ($rows as $row) {
-                $morePictures[] = $row;
-            }
-
-            foreach ($pictures as $key => $picture) {
-                if (count($morePictures) <= 0) {
-                    break;
-                }
-                if (! $picture) {
-                    $pictures[$key] = array_shift($morePictures);
-                }
-            }
-        }
-
-        $result = [];
-        $emptyPictures = 0;
-        foreach ($pictures as $idx => $picture) {
-            if ($picture) {
-                $pictureId = $picture['id'];
-
-                $format = $useLargeFormat && $idx == 0 ? 'picture-thumb-medium' : 'picture-thumb';
-
-                if ($urlCallback) {
-                    $url = $urlCallback($car, $picture);
-                } else {
-                    $url = $picHelper->href($picture);
-                }
-
-                $result[] = [
-                    'format' => $format,
-                    'row'    => $picture,
-                    'url'    => $url,
-                ];
-            } else {
-                $result[] = false;
-                $emptyPictures++;
-            }
-        }
-
-        if ($emptyPictures > 0 && ($car['item_type_id'] == DbTable\Item\Type::ENGINE)) {
-            $pictureTable = $this->getPictureTable();
-            $db = $pictureTable->getAdapter();
-            $pictureRows = $db->fetchAll(
-                $db->select()
-                    ->from('pictures', [
-                        'id', 'name', 'type', 'brand_id', 'factory_id',
-                        'image_id', 'crop_left', 'crop_top',
-                        'crop_width', 'crop_height', 'width', 'height', 'identity'
-                    ])
-                    ->where('pictures.status IN (?)', [
-                        DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED
-                    ])
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->where('picture_item.perspective_id = ?', 17) // under the hood
-                    ->join('cars', 'picture_item.item_id = cars.id', null)
-                    ->join('item_parent_cache', 'cars.engine_item_id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $car['id'])
-                    ->limit($emptyPictures)
-            );
-
-            $extraPicIdx = 0;
-
-            foreach ($result as $idx => $picture) {
-                if ($picture) {
-                    continue;
-                }
-                if (count($pictureRows) <= $extraPicIdx) {
-                    break;
-                }
-                $pictureRow = $pictureRows[$extraPicIdx++];
-                $url = $picHelper->href($pictureRow);
-                $result[$idx] = [
-                    'format' => 'picture-thumb',
-                    'row'    => $pictureRow,
-                    'url'    => $url,
-                ];
-            }
-        }
-
-        return $result;
-    }
-    
-    private function getFrontPictureList(
-        $car,
-        $dateSort,
-        $allowUpPictures,
-        $language,
-        $picHelper,
-        $catalogue,
-        $urlCallback
-    ) {
-
-        $itemTable = new DbTable\Vehicle();
-        
-        $pictures = [];
-        $usedIds = [];
-
-        $pictureTable = $this->getPictureTable();
-        $db = $pictureTable->getAdapter();
-        
-        $ids = $db->fetchCol(
-            $db->select()
-                ->from('cars', 'id')
-                ->where('cars.item_type_id <> ?', DbTable\Item\Type::CATEGORY)
-                ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car['id'])
-                ->limit(4)
-        );
-        
-        $result = [];
-        if ($ids) {
-            for ($idx=0; $idx<4; $idx++) {
-                $itemId = $ids[$idx % count($ids)];
-                
-                $select = $this->getPictureSelect($itemId, [
-                    'perspectiveGroup'    => 31,
-                    'exclude'             => $usedIds,
-                    'dateSort'            => $dateSort,
-                ]);
-                
-                $picture = $db->fetchRow($select);
-                
-                if ($picture) {
-                    $usedIds[] = $picture['id'];
-                    if ($urlCallback) {
-                        $url = $urlCallback($car, $picture);
-                    } else {
-                        $url = $picHelper->href($picture);
-                    }
-                    
-                    $result[] = [
-                        'format' => 'picture-thumb',
-                        'row'    => $picture,
-                        'url'    => $url,
-                    ];
-                } else {
-                    $result[] = false;
-                }
-            }
-        }
-
-        return $result;
     }
 
     public function formatName(DbTable\Vehicle\Row $vehicle, $language)
