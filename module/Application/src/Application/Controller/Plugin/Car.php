@@ -143,6 +143,7 @@ class Car extends AbstractPlugin
 
     public function listData($cars, array $options = [])
     {
+        $listBuilder          = $options['listBuilder'];
         $pictureFetcher       = $options['pictureFetcher'];
         if (!$pictureFetcher instanceof PictureFetcher) {
             throw new \Exception("Invalid picture fetcher provided");
@@ -150,21 +151,12 @@ class Car extends AbstractPlugin
         $disableTitle         = isset($options['disableTitle']) && $options['disableTitle'];
         $disableDescription   = isset($options['disableDescription']) && $options['disableDescription'];
         $disableDetailsLink   = isset($options['disableDetailsLink']) && $options['disableDetailsLink'];
-        $detailsUrl           = isset($options['detailsUrl']) ? $options['detailsUrl'] : null;
-        $allPicturesUrl       = isset($options['allPicturesUrl']) && $options['allPicturesUrl']
-            ? $options['allPicturesUrl']
-            : null;
-        $typeUrl              = isset($options['typeUrl']) && $options['typeUrl'] ? $options['typeUrl'] : null;
-        $specificationsUrl    = isset($options['specificationsUrl']) && $options['specificationsUrl']
-            ? $options['specificationsUrl']
-            : null;
         $onlyExactlyPictures  = isset($options['onlyExactlyPictures']) ? $options['onlyExactlyPictures'] : null;
         $hideEmpty            = isset($options['hideEmpty']) && $options['hideEmpty'];
         $disableTwins         = isset($options['disableTwins']) && $options['disableTwins'];
         $disableSpecs         = isset($options['disableSpecs']) && $options['disableSpecs'];
         $disableCategories    = isset($options['disableCategories']) && $options['disableCategories'];
         $callback             = isset($options['callback']) && $options['callback'] ? $options['callback'] : null;
-        $pictureUrlCallback   = isset($options['pictureUrl']) ? $options['pictureUrl'] : false;
 
         $controller = $this->getController();
         $pluginManager = $controller->getPluginManager();
@@ -188,11 +180,6 @@ class Car extends AbstractPlugin
         $carIds = [];
         foreach ($cars as $car) {
             $carIds[] = (int)$car->id;
-        }
-
-        $hasSpecs = [];
-        if (! $disableSpecs && ! $specificationsUrl) {
-            $hasSpecs = $this->specsService->hasSpecs($carIds);
         }
 
         if ($carIds) {
@@ -267,7 +254,7 @@ class Car extends AbstractPlugin
 
         // typecount
         $carsTypeCounts = [];
-        if ($carIds && $typeUrl) {
+        if ($carIds && $listBuilder->isTypeUrlEnabled()) {
             $rows = $carParentAdapter->fetchAll(
                 $carParentAdapter->select()
                     ->from($carParentTable->info('name'), ['parent_id', 'type', 'count' => 'count(1)'])
@@ -359,10 +346,8 @@ class Car extends AbstractPlugin
                     
                     if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
                         $url = $picHelper->href($picture['row']);
-                    } elseif ($pictureUrlCallback) {
-                        $url = $pictureUrlCallback($car, $picture['row']);
                     } else {
-                        $url = $picHelper->href($picture['row']);
+                        $url = $listBuilder->getPictureUrl($car, $picture['row']);
                     }
                     $picture['url'] = $url;
                     if ($picture['format'] == 'picture-thumb-medium') {
@@ -417,29 +402,12 @@ class Car extends AbstractPlugin
 
             $specsLinks = [];
             if (! $disableSpecs) {
-                if ($specificationsUrl) {
-                    $url = $specificationsUrl($car);
-                    if ($url) {
-                        $specsLinks[] = [
-                            'name' => null,
-                            'url'  => $url
-                        ];
-                    }
-                } else {
-                    if ($hasSpecs[$car->id]) {
-                        foreach ($catalogue->cataloguePaths($car) as $path) {
-                            $specsLinks[] = [
-                                'name' => null,
-                                'url'  => $controller->url()->fromRoute('catalogue', [
-                                    'action'        => 'brand-item-specifications',
-                                    'brand_catname' => $path['brand_catname'],
-                                    'car_catname'   => $path['car_catname'],
-                                    'path'          => $path['path']
-                                ])
-                            ];
-                            break;
-                        }
-                    }
+                $url = $listBuilder->getSpecificationsUrl($car);
+                if ($url) {
+                    $specsLinks[] = [
+                        'name' => null,
+                        'url'  => $url
+                    ];
                 }
             }
 
@@ -482,32 +450,11 @@ class Car extends AbstractPlugin
             }
 
             if (count($item['pictures']) < $item['totalPictures']) {
-                if ($allPicturesUrl) {
-                    $item['allPicturesUrl'] = $allPicturesUrl($car);
-                }
+                $item['allPicturesUrl'] = $listBuilder->getPicturesUrl($car);
             }
 
             if (! $disableDetailsLink && ($hasHtml || $childsCount > 0)) {
-                $url = null;
-
-                if (is_callable($detailsUrl)) {
-                    $url = $detailsUrl($car);
-                } else {
-                    if ($detailsUrl !== false) {
-                        $cataloguePaths = $catalogue->cataloguePaths($car);
-
-                        $url = null;
-                        foreach ($cataloguePaths as $cPath) {
-                            $url = $controller->url()->fromRoute('catalogue', [
-                                'action'        => 'brand-item',
-                                'brand_catname' => $cPath['brand_catname'],
-                                'car_catname'   => $cPath['car_catname'],
-                                'path'          => $cPath['path']
-                            ]);
-                            break;
-                        }
-                    }
-                }
+                $url = $listBuilder->getDetailsUrl($car);
 
                 if ($url) {
                     $item['details'] = [
@@ -534,14 +481,15 @@ class Car extends AbstractPlugin
                 ]);
             }
 
-            if ($typeUrl) {
+            if ($listBuilder->isTypeUrlEnabled()) {
                 $tuningCount = isset($carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_TUNING])
                     ? $carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_TUNING]
                     : 0;
                 if ($tuningCount) {
+                    $url = $listBuilder->getTypeUrl($car, DbTable\Vehicle\ParentTable::TYPE_TUNING);
                     $item['tuning'] = [
                         'count' => $tuningCount,
-                        'url'   => $typeUrl($car, DbTable\Vehicle\ParentTable::TYPE_TUNING)
+                        'url'   => $url
                     ];
                 }
 
@@ -549,9 +497,10 @@ class Car extends AbstractPlugin
                     ? $carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_SPORT]
                     : 0;
                 if ($sportCount) {
+                    $url = $listBuilder->getTypeUrl($car, DbTable\Vehicle\ParentTable::TYPE_SPORT);
                     $item['sport'] = [
                         'count' => $sportCount,
-                        'url'   => $typeUrl($car, DbTable\Vehicle\ParentTable::TYPE_SPORT)
+                        'url'   => $url
                     ];
                 }
             }

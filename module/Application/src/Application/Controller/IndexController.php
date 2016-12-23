@@ -644,7 +644,7 @@ class IndexController extends AbstractActionController
 
         $userTable = new User();
 
-        $cacheKey = 'INDEX_SPEC_CARS_11_' . $language;
+        $cacheKey = 'INDEX_SPEC_CARS_13_' . $language;
         $cars = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             $carTable = $this->catalogue()->getCarTable();
@@ -652,7 +652,7 @@ class IndexController extends AbstractActionController
             $cars = $carTable->fetchAll(
                 $select = $carTable->select(true)
                     ->join('attrs_user_values', 'cars.id = attrs_user_values.item_id', null)
-                    ->where('update_date > DATE_SUB(NOW(), INTERVAL 1 DAY)')
+                    ->where('update_date > DATE_SUB(NOW(), INTERVAL 3 DAY)')
                     ->having('count(attrs_user_values.attribute_id) > 10')
                     ->group('cars.id')
                     ->order('MAX(attrs_user_values.update_date) DESC')
@@ -671,6 +671,11 @@ class IndexController extends AbstractActionController
                 'perspectivePageId'    => 1,
                 'onlyChilds'           => []
             ]),
+            'listBuilder' => new \Application\Model\Item\ListBuilder([
+                'catalogue' => $this->catalogue(),
+                'router'    => $this->getEvent()->getRouter(),
+                'picHelper' => $this->getPluginManager()->get('pic')
+            ]),
             'disableDescription'   => true,
             'callback'             => function (&$item) use ($userTable) {
                 $contribPairs = $this->specsService->getContributors([$item['id']]);
@@ -683,9 +688,6 @@ class IndexController extends AbstractActionController
                 } else {
                     $item['contributors'] = [];
                 }
-            },
-            'pictureUrl' => function ($listCar, $picture) {
-                return $this->pic()->href($picture);
             }
         ]);
 

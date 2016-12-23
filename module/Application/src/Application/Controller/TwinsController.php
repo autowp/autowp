@@ -189,12 +189,12 @@ class TwinsController extends AbstractActionController
                 ]),
                 'disableTwins'         => true,
                 'disableSpecs'         => true,
-                'pictureUrl'           => function ($car, $picture) use ($group) {
-                    return $this->url()->fromRoute('twins/group/pictures/picture', [
-                        'id'         => $group['id'],
-                        'picture_id' => $picture['identity'] ? $picture['identity'] : $picture['id']
-                    ]);
-                }
+                'listBuilder' => new \Application\Model\Item\ListBuilder\Twins([
+                    'catalogue' => $this->catalogue(),
+                    'router'    => $this->getEvent()->getRouter(),
+                    'picHelper' => $this->getPluginManager()->get('pic'),
+                    'group'     => $group
+                ])
             ]),
             'picturesCount'      => $picturesCount,
             'hasSpecs'           => $hasSpecs,

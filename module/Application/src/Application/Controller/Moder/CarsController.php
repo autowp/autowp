@@ -346,7 +346,12 @@ class CarsController extends AbstractActionController
                     'disableLargePictures' => false,
                     'perspectivePageId'    => null,
                     'onlyChilds'           => []
-                ])
+                ]),
+                'listBuilder' => new \Application\Model\Item\ListBuilder([
+                    'catalogue' => $this->catalogue(),
+                    'router'    => $this->getEvent()->getRouter(),
+                    'picHelper' => $this->getPluginManager()->get('pic')
+                ]),
             ])
         ];
     }

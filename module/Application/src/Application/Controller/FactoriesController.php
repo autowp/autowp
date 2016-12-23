@@ -188,7 +188,12 @@ class FactoriesController extends AbstractActionController
                     'disableLargePictures' => true,
                     'perspectivePageId'    => null,
                     'onlyChilds'           => $groups
-                ])
+                ]),
+                'listBuilder' => new \Application\Model\Item\ListBuilder([
+                    'catalogue' => $this->catalogue(),
+                    'router'    => $this->getEvent()->getRouter(),
+                    'picHelper' => $this->getPluginManager()->get('pic')
+                ]),
             ]),
             'paginator' => $paginator
         ];

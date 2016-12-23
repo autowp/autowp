@@ -257,6 +257,14 @@ class CatalogueController extends AbstractActionController
             return [
                 'paginator' => $paginator,
                 'listData'  => $this->car()->listData($paginator->getCurrentItems(), [
+                    'listBuilder' => new \Application\Model\Item\ListBuilder\Catalogue([
+                        'catalogue'       => $this->catalogue(),
+                        'router'          => $this->getEvent()->getRouter(),
+                        'picHelper'       => $this->getPluginManager()->get('pic'),
+                        'brand'           => $brand,
+                        'specsService'    => $this->specsService,
+                        'itemParentTable' => $carParentTable
+                    ]),
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
                         'type'                 => null,
                         'onlyExactlyPictures'  => false,
@@ -264,91 +272,7 @@ class CatalogueController extends AbstractActionController
                         'disableLargePictures' => false,
                         'perspectivePageId'    => null,
                         'onlyChilds'           => []
-                    ]),
-                    'detailsUrl' => function ($listCar) use ($brand, $carParentTable) {
-
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
-                            'breakOnFirst' => true
-                        ]);
-
-                        if (count($paths) <= 0) {
-                            return false;
-                        }
-
-                        $path = $paths[0];
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path']
-                        ]);
-                    },
-                    'allPicturesUrl' => function ($listCar) use ($brand, $carParentTable) {
-
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
-                            'breakOnFirst' => true
-                        ]);
-
-                        if (count($paths) <= 0) {
-                            return false;
-                        }
-
-                        $path = $paths[0];
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-pictures',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path'],
-                            'exact'         => false
-                        ]);
-                    },
-                    'specificationsUrl' => function ($listCar) use ($brand, $carParentTable) {
-
-                        $hasSpecs = $this->specsService->hasSpecs($listCar->id);
-
-                        if (! $hasSpecs) {
-                            return false;
-                        }
-
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
-                            'breakOnFirst' => true
-                        ]);
-
-                        if (count($paths) <= 0) {
-                            return false;
-                        }
-
-                        $path = $paths[0];
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-specifications',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path'],
-                        ]);
-                    },
-                    'pictureUrl' => function ($listCar, $picture) use ($brand, $carParentTable) {
-
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
-                            'breakOnFirst' => true
-                        ]);
-
-                        if (count($paths) <= 0) {
-                            return $this->pic()->url($picture['id'], $picture['identity']);
-                        }
-
-                        $path = $paths[0];
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-picture',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path'],
-                            'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ]);
-                    }
+                    ])
                 ])
             ];
         });
@@ -448,90 +372,14 @@ class CatalogueController extends AbstractActionController
                         'perspectivePageId'    => null,
                         'onlyChilds'           => []
                     ]),
-                    'detailsUrl' => function ($listCar) use ($brand, $carParentTable) {
-
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
-                            'breakOnFirst' => true
-                        ]);
-
-                        if (count($paths) <= 0) {
-                            return false;
-                        }
-
-                        $path = $paths[0];
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path']
-                        ]);
-                    },
-                    'allPicturesUrl' => function ($listCar) use ($brand, $carParentTable) {
-
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
-                            'breakOnFirst' => true
-                        ]);
-
-                        if (count($paths) <= 0) {
-                            return false;
-                        }
-
-                        $path = $paths[0];
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-pictures',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path'],
-                            'exact'         => false
-                        ]);
-                    },
-                    'specificationsUrl' => function ($listCar) use ($brand, $carParentTable) {
-
-                        $hasSpecs = $this->specsService->hasSpecs($listCar->id);
-
-                        if (! $hasSpecs) {
-                            return false;
-                        }
-
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
-                            'breakOnFirst' => true
-                        ]);
-
-                        if (count($paths) <= 0) {
-                            return false;
-                        }
-
-                        $path = $paths[0];
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-specifications',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path'],
-                        ]);
-                    },
-                    'pictureUrl' => function ($listCar, $picture) use ($brand, $carParentTable) {
-
-                        $paths = $carParentTable->getPathsToBrand($listCar->id, $brand['id'], [
-                            'breakOnFirst' => true
-                        ]);
-
-                        if (count($paths) <= 0) {
-                            return $this->pic()->url($picture['id'], $picture['identity']);
-                        }
-
-                        $path = $paths[0];
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-picture',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path'],
-                            'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ]);
-                    }
+                    'listBuilder' => new \Application\Model\Item\ListBuilder\Catalogue([
+                        'catalogue'       => $this->catalogue(),
+                        'router'          => $this->getEvent()->getRouter(),
+                        'picHelper'       => $this->getPluginManager()->get('pic'),
+                        'brand'           => $brand,
+                        'specsService'    => $this->specsService,
+                        'itemParentTable' => $carParentTable
+                    ])
                 ])
             ];
         });
@@ -1276,84 +1124,20 @@ class CatalogueController extends AbstractActionController
                         'perspectivePageId'    => null,
                         'onlyChilds'           => []
                     ]),
+                    'listBuilder' => new \Application\Model\Item\ListBuilder\CatalogueItem([
+                        'catalogue'        => $this->catalogue(),
+                        'router'           => $this->getEvent()->getRouter(),
+                        'picHelper'        => $this->getPluginManager()->get('pic'),
+                        'brand'            => $brand,
+                        'specsService'     => $this->specsService,
+                        'itemParentTable'  => $carParentTable,
+                        'brandItemCatname' => $brandItemCatname,
+                        'itemId'           => $currentCarId,
+                        'path'             => $path
+                    ]),
                     'onlyExactlyPictures'  => true,
                     'disableDescription' => true,
-                    'detailsUrl' => false,
-                    'allPicturesUrl' => function ($listCar) use ($brand, $brandItemCatname, $path) {
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-pictures',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $brandItemCatname,
-                            'path'          => $path,
-                            'exact'         => true
-                        ]);
-                    },
-                    'specificationsUrl' => function ($listCar) use ($brand, $brandItemCatname, $path) {
-
-                        $hasSpecs = $this->specsService->hasSpecs($listCar->id);
-
-                        if (! $hasSpecs) {
-                            return false;
-                        }
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-specifications',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $brandItemCatname,
-                            'path'          => $path
-                        ]);
-                    },
-                    'typeUrl' => function ($listCar, $type) use ($carParentTable, $currentCarId, $path) {
-
-                        switch ($type) {
-                            case VehicleParent::TYPE_TUNING:
-                                $catname = 'tuning';
-                                break;
-                            case VehicleParent::TYPE_SPORT:
-                                $catname = 'sport';
-                                break;
-                            default:
-                                throw new Exception('Unexpected type');
-                                break;
-                        }
-
-                        $carParentRow = $carParentTable->fetchRow([
-                            'car_id = ?'    => $listCar->id,
-                            'parent_id = ?' => $currentCarId
-                        ]);
-                        if ($carParentRow) {
-                            $currentPath = array_merge($path, [
-                                $carParentRow->catname
-                            ]);
-                        } else {
-                            $currentPath = $path;
-                        }
-
-                        return $this->url()->fromRoute(null, [
-                            'path' => $currentPath,
-                            'type' => $catname,
-                            'page' => null,
-                        ], [], true);
-                    },
-                    'pictureUrl' => function (
-                        $listCar,
-                        $picture
-                    ) use (
-                        $brand,
-                        $currentCarId,
-                        $brandItemCatname,
-                        $path,
-                        $carParentTable
-                    ) {
-
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-picture',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $brandItemCatname,
-                            'path'          => $path,
-                            'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                        ]);
-                    }
+                    'disableDetailsLink' => true,
                 ]),
                 'canAcceptPicture' => $canAcceptPicture,
                 'inboxCount'       => $inboxCount,
@@ -1923,194 +1707,21 @@ class CatalogueController extends AbstractActionController
                     'perspectivePageId'    => null,
                     'onlyChilds'           => []
                 ]),
-                'disableDescription' => false,
-                'detailsUrl' => function ($listCar) use (
-                    $brand,
-                    $currentCarId,
-                    $brandItemCatname,
-                    $path,
-                    $carParentTable
-                ) {
-
-                    $carParentAdapter = $carParentTable->getAdapter();
-                    $hasChilds = (bool)$carParentAdapter->fetchOne(
-                        $carParentAdapter->select()
-                            ->from($carParentTable->info('name'), new Zend_Db_Expr('1'))
-                            ->where('parent_id = ?', $listCar->id)
-                    );
-
-                    $hasHtml = $this->isItemHasFullText($listCar->id);
-
-                    if (! $hasChilds && ! $hasHtml) {
-                        return false;
-                    }
-
-                    // found parent row
-                    $carParentRow = $carParentTable->fetchRow([
-                        'car_id = ?'    => $listCar->id,
-                        'parent_id = ?' => $currentCarId
-                    ]);
-                    if (! $carParentRow) {
-                        return false;
-                    }
-
-                    $currentPath = array_merge($path, [
-                        $carParentRow->catname
-                    ]);
-
-                    return $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-item',
-                        'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandItemCatname,
-                        'path'          => $currentPath
-                    ]);
-                },
-                'allPicturesUrl' => function ($listCar) use (
-                    $brand,
-                    $brandItemCatname,
-                    $path,
-                    $currentCarId,
-                    $carParentTable
-                ) {
-
-                    //TODO: more than 1 levels diff fails here
-                    $carParentRow = $carParentTable->fetchRow([
-                        'car_id = ?'    => $listCar->id,
-                        'parent_id = ?' => $currentCarId
-                    ]);
-                    if ($carParentRow) {
-                        $currentPath = array_merge($path, [
-                            $carParentRow->catname
-                        ]);
-                        return $this->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-pictures',
-                            'brand_catname' => $brand['catname'],
-                            'car_catname'   => $brandItemCatname,
-                            'path'          => $currentPath,
-                            'exact'         => false
-                        ]);
-                    }
-
-                    return false;
-                },
-                'specificationsUrl' => function ($listCar) use (
-                    $brand,
-                    $hasChildSpecs,
-                    $carParentTable,
-                    $brandItemCatname,
-                    $path,
-                    $currentCarId,
-                    $type
-                ) {
-                    if ($hasChildSpecs[$listCar->id]) {
-                        $carParentRow = $carParentTable->fetchRow([
-                            'car_id = ?'    => $listCar->id,
-                            'parent_id = ?' => $currentCarId
-                        ]);
-                        if ($carParentRow) {
-                            $currentPath = array_merge($path, [
-                                $carParentRow->catname
-                            ]);
-
-                            return $this->url()->fromRoute('catalogue', [
-                                'action'        => 'brand-item-specifications',
-                                'brand_catname' => $brand['catname'],
-                                'car_catname'   => $brandItemCatname,
-                                'path'          => $currentPath,
-                            ]);
-                        }
-                    }
-
-                    if (! $this->specsService->hasSpecs($listCar->id)) {
-                        return false;
-                    }
-
-                    switch ($type) {
-                        case VehicleParent::TYPE_TUNING:
-                            $typeStr = 'tuning';
-                            break;
-
-                        case VehicleParent::TYPE_SPORT:
-                            $typeStr = 'sport';
-                            break;
-
-                        default:
-                            $typeStr = null;
-                            break;
-                    }
-
-                    return $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-item-specifications',
-                        'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandItemCatname,
-                        'path'          => $path,
-                        'type'          => $typeStr
-                    ]);
-                },
-                'typeUrl' => function ($listCar, $type) use ($carParentTable, $currentCarId, $path) {
-
-                    switch ($type) {
-                        case VehicleParent::TYPE_TUNING:
-                            $catname = 'tuning';
-                            break;
-                        case VehicleParent::TYPE_SPORT:
-                            $catname = 'sport';
-                            break;
-                        default:
-                            throw new Exception('Unexpected type');
-                            break;
-                    }
-
-                    $carParentRow = $carParentTable->fetchRow([
-                        'car_id = ?'    => $listCar->id,
-                        'parent_id = ?' => $currentCarId
-                    ]);
-                    if ($carParentRow) {
-                        $currentPath = array_merge($path, [
-                            $carParentRow->catname
-                        ]);
-                    } else {
-                        $currentPath = $path;
-                    }
-
-                    return $this->url()->fromRoute('catalogue', [
-                        'path' => $currentPath,
-                        'type' => $catname,
-                        'page' => null,
-                    ], [], true);
-                },
-                'pictureUrl' => function (
-                    $listCar,
-                    $picture
-                ) use (
-                    $brand,
-                    $currentCarId,
-                    $brandItemCatname,
-                    $path,
-                    $carParentTable
-                ) {
-                    
-                    // found parent row
-                    $carParentRow = $carParentTable->fetchRow([
-                        'car_id = ?'    => $listCar->id,
-                        'parent_id = ?' => $currentCarId
-                    ]);
-                    if (! $carParentRow) {
-                        return $this->pic()->url($picture['id'], $picture['identity']);
-                    }
-
-                    $currentPath = array_merge($path, [
-                        $carParentRow->catname
-                    ]);
-
-                    return $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-item-picture',
-                        'brand_catname' => $brand['catname'],
-                        'car_catname'   => $brandItemCatname,
-                        'path'          => $currentPath,
-                        'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
-                    ]);
-                }
+                'listBuilder' => new \Application\Model\Item\ListBuilder\CatalogueGroupItem([
+                    'catalogue'        => $this->catalogue(),
+                    'router'           => $this->getEvent()->getRouter(),
+                    'picHelper'        => $this->getPluginManager()->get('pic'),
+                    'brand'            => $brand,
+                    'specsService'     => $this->specsService,
+                    'itemParentTable'  => $carParentTable,
+                    'brandItemCatname' => $brandItemCatname,
+                    'itemId'           => $currentCarId,
+                    'path'             => $path,
+                    'language'         => $this->language(),
+                    'textStorage'      => $this->textStorage,
+                    'hasChildSpecs'    => $hasChildSpecs
+                ]),
+                'disableDescription' => false
             ]),
             'canAcceptPicture' => $canAcceptPicture,
             'inboxCount'       => $inboxCount,
