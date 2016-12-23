@@ -1,6 +1,6 @@
 define(
-    ['jquery', './car-type-picker', 'bootstrap', 'typeahead'],
-    function($, CarTypePicker) {
+    ['jquery', './car-type-picker', 'markdown-edit-tabbar', 'bootstrap', 'typeahead'],
+    function($, CarTypePicker, Markdown) {
         return {
             init: function(options) {
                 $('.subscription').each(function() {
@@ -52,6 +52,10 @@ define(
                 $('#meta').each(function() {
                     CarTypePicker.init($(this).find('select[name=vehicle_type_id\\[\\]]'));
                     CarTypePicker.init($(this).find('select[name=spec_ids\\[\\]]'));
+                });
+                
+                $('#name').on('tabload', function() {
+                	Markdown(this);
                 });
                 
                 $('#catalogue').on('tabload', function() {

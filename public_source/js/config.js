@@ -6,6 +6,9 @@ require.config({
     shim: {
         'bootstrap': {
             deps: ['jquery']
+        },
+        'markdown': {
+            exports: 'markdown'
         }
     }
 });

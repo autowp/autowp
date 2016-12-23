@@ -1,0 +1,26 @@
+<ul class="nav nav-tabs" id="languages-form-tabs">
+    <?php $index = 0?>
+    <?php foreach ($this->form->getIterator() as $key => $element) { ?>
+        <li<?=$index++ ? '' : ' class="active"'?>>
+            <?=$this->htmlA(
+                [
+                    'href'          => '#tab-'.$key,
+                    'data-toggle'   => 'tab',
+                ],
+                mb_strtoupper($element->getLabel())
+            )?>
+        </li>
+    <?php } ?>
+</ul>
+
+<div class="tab-content well">
+    <?php $index = 0?>
+    <?php foreach ($this->form->getIterator() as $key => $element) { ?>
+        <div class="tab-pane<?=$index++ ? '' : ' active'?>" id="tab-<?=$key?>">
+            <?=$this->partial('application/moder/cars/partial/languages-form-elements-horizontal', [
+                'form'   => $element,
+                'prefix' => $key
+            ])?>
+        </div>
+    <?php } ?>
+</div>

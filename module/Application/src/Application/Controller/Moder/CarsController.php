@@ -28,7 +28,7 @@ use Exception;
 
 class CarsController extends AbstractActionController
 {
-    private $allowedLanguages = ['ru', 'en', 'it', 'fr', 'zh', 'de', 'es'];
+    private $allowedLanguages = ['ru', 'en', 'it', 'fr', 'zh', 'de', 'es', 'pt'];
 
     /**
      * @var DbTable\Vehicle\ParentTable
@@ -2502,6 +2502,7 @@ class CarsController extends AbstractActionController
         $carLangTable = new DbTable\Vehicle\Language();
         
         $values = [];
+        $textIds = [];
         
         $language = $this->language();
         
@@ -2526,6 +2527,11 @@ class CarsController extends AbstractActionController
                 'text'      => $text,
                 'full_text' => $fullText
             ];
+            
+            $textIds[$code] = [
+                'text'      => $carLangRow ? $carLangRow->text_id : null,
+                'full_text' => $carLangRow ? $carLangRow->full_text_id : null
+            ];
         }
         
         $form = new ItemLanguagesForm(null, [
@@ -2533,6 +2539,12 @@ class CarsController extends AbstractActionController
         ]);
         $form->setAttribute('action', $this->url()->fromRoute(null, [], [], true));
         $form->populateValues($values);
+        
+        foreach ($textIds as $langCode => $row) {
+            $fieldset = $form->get($langCode);
+            $fieldset->get('text')->setAttribute('text-id', $row['text']);
+            $fieldset->get('full_text')->setAttribute('text-id', $row['full_text']);
+        }
         
         if ($this->getRequest()->isPost()) {
             $form->setData($this->params()->fromPost());
