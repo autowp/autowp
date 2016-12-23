@@ -47,6 +47,8 @@ class Car extends AbstractPlugin
      * @var VehicleNameFormatter
      */
     private $vehicleNameFormatter;
+    
+    private $categoryPictureFetcher;
 
     public function __construct(
         TextStorage $textStorage,
@@ -128,6 +130,15 @@ class Car extends AbstractPlugin
             $result = array_replace($result, $pictureTableAdapter->fetchPairs($select));
         }
         return $result;
+    }
+    
+    private function getCategoryPictureFetcher()
+    {
+        return $this->categoryPictureFetcher
+            ? $this->categoryPictureFetcher
+            : $this->categoryPictureFetcher = new \Application\Model\Item\DistinctItemPictureFetcher([
+                'dateSort' => false
+            ]);
     }
 
     public function listData($cars, array $options = [])
@@ -334,7 +345,12 @@ class Car extends AbstractPlugin
                 $categories = isset($carsCategories[$car->id]) ? $carsCategories[$car->id] : [];
             }
             
-            $pictures = $pictureFetcher->fetch($car->toArray(), [
+            $cFetcher = $pictureFetcher;
+            if ($car['item_type_id'] == DbTable\Item\Type::CATEGORY) {
+                $cFetcher = $this->getCategoryPictureFetcher();
+            }
+            
+            $pictures = $cFetcher->fetch($car->toArray(), [
                 'totalPictures' => $totalPictures
             ]);
             $largeFormat = false; 

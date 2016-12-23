@@ -24,6 +24,8 @@ class Car extends Form implements InputFilterProviderInterface
     private $translator;
 
     private $language = 'en';
+    
+    private $itemId = null;
 
     private $itemType = null;
 
@@ -233,6 +235,11 @@ class Car extends Form implements InputFilterProviderInterface
             $this->specOptions = $options['specOptions'];
             unset($options['specOptions']);
         }
+        
+        if (isset($options['itemId'])) {
+            $this->itemId = $options['itemId'];
+            unset($options['itemId']);
+        }
 
         if (isset($options['itemType'])) {
             $this->itemType = $options['itemType'];
@@ -287,6 +294,12 @@ class Car extends Form implements InputFilterProviderInterface
                         'options' => [
                             'min' => 3,
                             'max' => 100
+                        ]
+                    ],
+                    [
+                        'name'    => \Application\Validator\Item\CatnameNotExists::class,
+                        'options' => [
+                            'exclude' => (int)$this->itemId
                         ]
                     ]
                 ]

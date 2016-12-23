@@ -41,6 +41,8 @@ class PerspectivePictureFetcher extends PictureFetcher
     public function setPerspectivePageId($id)
     {
         $this->perspectivePageId = (int)$id;
+        
+        return $this;
     }
     
     public function setOnlyExactlyPictures($value)

@@ -266,12 +266,10 @@ class CarsController extends AbstractActionController
                 $select->where('cars.end_year = ?', $values['to_year']);
             }
 
-            if ($values['category']) {
+            if ($values['parent_id']) {
                 $select
                     ->join(['item_parent_cache'], 'cars.id = item_parent_cache.item_id', null)
-                    ->join(['category' => 'cars'], 'item_parent_cache.parent_id = category.id', null)
-                    ->where('category.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->where('category.id = ?', $values['category']);
+                    ->where('item_parent_cache.parent_id = ?', $values['parent_id']);
             }
 
             /*if ($values['no_category']) {
@@ -609,6 +607,7 @@ class CarsController extends AbstractActionController
             }
 
             $formModerCarEditMeta = new CarForm(null, [
+                'itemId'             => $car->id,
                 'itemType'           => $car->item_type_id,
                 'language'           => $this->language(),
                 'translator'         => $this->translator,
@@ -3258,10 +3257,10 @@ class CarsController extends AbstractActionController
         switch ($itemTypeId) {
             case DbTable\Item\Type::VEHICLE:
             case DbTable\Item\Type::ENGINE:
-                $isGroup = false;
+                $forceIsGroup = false;
                 break;
             case DbTable\Item\Type::CATEGORY:
-                $isGroup = true;
+                $forceIsGroup = true;
                 break;
             default:
                 return $this->notFoundAction();
@@ -3301,7 +3300,9 @@ class CarsController extends AbstractActionController
             if ($form->isValid()) {
                 $values = $this->prepareCarMetaToSave($form->getData());
                 
-                $values['is_group'] = $isGroup ? 1 : 0;
+                if ($forceIsGroup) {
+                    $values['is_group'] = 1;
+                }
 
                 $car = $carTable->createRow($values);
                 $car->item_type_id = $itemTypeId;

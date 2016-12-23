@@ -42,6 +42,34 @@
 <?php } ?>
 
 <?=$this->partial('application/cars', $this->listData)?>
+
+<?php if ($this->otherItemsCount > 0) { ?>
+    <h3><?=$this->escapeHtml($this->otherCategoryName)?></h3>
+    <div class="row thumbnails">
+        <?php foreach ($this->otherPictures as $picture) { ?>
+            <div class="col-md-3">
+                <?=$this->htmlA([
+                    'href'  => $picture['url'],
+                    'class' => 'thumbnail'
+                ], $this->htmlImg([
+                    'src'     => $picture['src'],
+                    'alt'     => $picture['name'],
+                    'title'   => $picture['name'],
+                    'shuffle' => true
+                ]), false)?>
+            </div>
+        <?php } ?>
+    </div>
+    <?php if ($this->user()->isAllowed('car', 'add')) { ?>
+        <i class="fa fa-align-left"></i>
+        <?=$this->htmlA($this->url('categories', [
+            'action'           => 'category',
+            'category_catname' => $this->category['catname'],
+            'other'            => true,
+        ]), $this->translate('carlist/details') . ' ('.$this->otherItemsCount.')')?>
+    <?php } ?>
+<?php } ?>
+
 <?=$this->paginationControl($this->paginator, null, null, [
     'urlParams' => $this->urlParams
 ]) ?>

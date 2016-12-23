@@ -96,7 +96,7 @@ class CarsController extends AbstractActionController
         $user = $this->user()->get();
 
         $result = $this->specsService->getCarForm($car, $user, [
-            'editOnlyMode' => $editOnlyMode,
+            'editOnlyMode' => $editOnlyMode
         ], $this->language());
 
         $carForm = $result['form'];

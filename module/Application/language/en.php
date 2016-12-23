@@ -1338,7 +1338,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/vehicles/filter/spec' => 'Spec',
     'moder/vehicles/filter/from-year' => 'Year from',
     'moder/vehicles/filter/to-year' => 'Year to',
-    'moder/vehicles/filter/category' => 'Category',
+    'moder/vehicles/filter/parent' => 'Parent',
     'moder/vehicles/filter/category-exclude' => 'Category (exclude)',
     'moder/vehicles/filter/no-parents' => 'Without parents',
     'moder/vehicles/filter/order' => 'Order',

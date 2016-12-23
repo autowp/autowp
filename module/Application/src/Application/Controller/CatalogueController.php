@@ -1276,6 +1276,7 @@ class CatalogueController extends AbstractActionController
                         'perspectivePageId'    => null,
                         'onlyChilds'           => []
                     ]),
+                    'onlyExactlyPictures'  => true,
                     'disableDescription' => true,
                     'detailsUrl' => false,
                     'allPicturesUrl' => function ($listCar) use ($brand, $brandItemCatname, $path) {

@@ -162,8 +162,8 @@ class IndexController extends AbstractActionController
         $items = [];
         
         $itemTable = $this->catalogue()->getCarTable();
-
-        $db = $car->getTable()->getAdapter();
+        
+        $db = $itemTable->getAdapter();
         $totalPictures = $db->fetchOne(
             $db->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
@@ -172,92 +172,116 @@ class IndexController extends AbstractActionController
                 ->where('item_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
         );
-
-        $cataloguePaths = $this->catalogue()->cataloguePaths($car);
-
-        if ($totalPictures > 6) {
-            foreach ($cataloguePaths as $path) {
-                $url = $this->url()->fromRoute('catalogue', [
-                    'action'        => 'brand-item-pictures',
-                    'brand_catname' => $path['brand_catname'],
-                    'car_catname'   => $path['car_catname'],
-                    'path'          => $path['path']
-                ]);
-                $items[] = [
-                    'icon'  => 'th',
-                    'url'   => $url,
-                    'text'  => $this->translate('carlist/all pictures'),
-                    'count' => $totalPictures
-                ];
-                break;
-            }
-        }
-
-        if ($this->specsService->hasSpecs($car->id)) {
-            foreach ($cataloguePaths as $path) {
-                $items[] = [
-                    'icon'  => 'list-alt',
-                    'url'   => $this->url()->fromRoute('catalogue', [
-                        'action'        => 'brand-item-specifications',
-                        'brand_catname' => $path['brand_catname'],
-                        'car_catname'   => $path['car_catname'],
-                        'path'          => $path['path']
-                    ]),
-                    'text'  => $this->translate('carlist/specifications')
-                ];
-                break;
-            }
-        }
-
-        $twins = new Twins();
-        foreach ($twins->getCarGroups($car->id) as $twinsGroup) {
-            $items[] = [
-                'icon'  => 'adjust',
-                'url'   => $this->url()->fromRoute('twins/group', [
-                    'id' => $twinsGroup['id']
-                ]),
-                'text'  => $this->translate('carlist/twins')
-            ];
-        }
         
         $language = $this->language();
         
-        $categoryRows = $db->fetchAll(
-            $db->select()
-                ->from($itemTable->info('name'), [
-                    'catname', 'begin_year', 'end_year',
-                    'name' => new Zend_Db_Expr('IF(LENGTH(car_language.name)>0,car_language.name,cars.name)')
-                ])
-                ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                ->joinLeft(
-                    'car_language', 
-                    'cars.id = car_language.car_id and car_language.language = :language', 
-                    null
-                )
-                ->join('car_parent', 'cars.id = car_parent.parent_id', null)
-                ->join(['top_item' => 'cars'], 'car_parent.car_id = top_item.id', null)
-                ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
-                ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
-                ->where('item_parent_cache.item_id = :item_id')
-                ->group(['item_parent_cache.item_id', 'cars.id'])
-                ->bind([
-                    'language' => $language,
-                    'item_id'  => $car['id']
-                ])
-        );
-
-        foreach ($categoryRows as $category) {
+        if ($car->item_type_id == DbTable\Item\Type::CATEGORY) {
             $items[] = [
-                'icon'  => 'tag',
+                'icon'  => 'align-left',
                 'url'   => $this->url()->fromRoute('categories', [
                     'action'           => 'category',
-                    'category_catname' => $category['catname'],
+                    'category_catname' => $car->catname,
                 ]),
-                'text'  => $this->itemNameFormatter->format(
-                    $category,
-                    $language
-                )
+                'text'  => $this->translate('carlist/details')
             ];
+            
+            if ($totalPictures > 6) {
+                $items[] = [
+                    'icon'  => 'th',
+                    'url'   => $this->url()->fromRoute('categories', [
+                        'action'           => 'category-pictures',
+                        'category_catname' => $car->catname,
+                    ]),
+                    'text'  => $this->translate('carlist/all pictures'),
+                    'count' => $totalPictures
+                ];
+            }
+            
+        } else {
+            $cataloguePaths = $this->catalogue()->cataloguePaths($car);
+            
+            if ($totalPictures > 6) {
+                foreach ($cataloguePaths as $path) {
+                    $url = $this->url()->fromRoute('catalogue', [
+                        'action'        => 'brand-item-pictures',
+                        'brand_catname' => $path['brand_catname'],
+                        'car_catname'   => $path['car_catname'],
+                        'path'          => $path['path']
+                    ]);
+                    $items[] = [
+                        'icon'  => 'th',
+                        'url'   => $url,
+                        'text'  => $this->translate('carlist/all pictures'),
+                        'count' => $totalPictures
+                    ];
+                    break;
+                }
+            }
+            
+            if ($this->specsService->hasSpecs($car->id)) {
+                foreach ($cataloguePaths as $path) {
+                    $items[] = [
+                        'icon'  => 'list-alt',
+                        'url'   => $this->url()->fromRoute('catalogue', [
+                            'action'        => 'brand-item-specifications',
+                            'brand_catname' => $path['brand_catname'],
+                            'car_catname'   => $path['car_catname'],
+                            'path'          => $path['path']
+                        ]),
+                        'text'  => $this->translate('carlist/specifications')
+                    ];
+                    break;
+                }
+            }
+            
+            $twins = new Twins();
+            foreach ($twins->getCarGroups($car->id) as $twinsGroup) {
+                $items[] = [
+                    'icon'  => 'adjust',
+                    'url'   => $this->url()->fromRoute('twins/group', [
+                        'id' => $twinsGroup['id']
+                    ]),
+                    'text'  => $this->translate('carlist/twins')
+                ];
+            }
+            
+            $categoryRows = $db->fetchAll(
+                $db->select()
+                    ->from($itemTable->info('name'), [
+                        'catname', 'begin_year', 'end_year',
+                        'name' => new Zend_Db_Expr('IF(LENGTH(car_language.name)>0,car_language.name,cars.name)')
+                    ])
+                    ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->joinLeft(
+                        'car_language',
+                        'cars.id = car_language.car_id and car_language.language = :language',
+                        null
+                        )
+                    ->join('car_parent', 'cars.id = car_parent.parent_id', null)
+                    ->join(['top_item' => 'cars'], 'car_parent.car_id = top_item.id', null)
+                    ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
+                    ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
+                    ->where('item_parent_cache.item_id = :item_id')
+                    ->group(['item_parent_cache.item_id', 'cars.id'])
+                    ->bind([
+                        'language' => $language,
+                        'item_id'  => $car['id']
+                    ])
+            );
+            
+            foreach ($categoryRows as $category) {
+                $items[] = [
+                    'icon'  => 'tag',
+                    'url'   => $this->url()->fromRoute('categories', [
+                        'action'           => 'category',
+                        'category_catname' => $category['catname'],
+                    ]),
+                    'text'  => $this->itemNameFormatter->format(
+                        $category,
+                        $language
+                        )
+                ];
+            }
         }
 
         return $items;
@@ -323,7 +347,7 @@ class IndexController extends AbstractActionController
         foreach ($categoryVehicleRows as $categoryVehicleRow) {
             $result[] = [
                 'category_catname' => $categoryVehicleRow['catname'],
-                'car_id'           => $categoryVehicleRow['item_id'],
+                'car_id'           => $categoryVehicleRow['car_id'],
                 'path'             => []
             ];
         }
@@ -370,7 +394,7 @@ class IndexController extends AbstractActionController
             $carTable = $this->catalogue()->getCarTable();
             $carOfDay = $carTable->find($carId)->current();
             if ($carOfDay) {
-                $key = 'CAR_OF_DAY_89_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
+                $key = 'CAR_OF_DAY_90_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
 
                 $carOfDayInfo = $this->cache->getItem($key, $success);
                 if (! $success) {

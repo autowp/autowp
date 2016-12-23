@@ -11,8 +11,6 @@ use Application\Model\DbTable;
 use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\BrandLink;
-use Application\Model\DbTable\Category;
-use Application\Model\DbTable\Category\Language as CategoryLanguage;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\DbTable\Factory;
@@ -665,7 +663,10 @@ class Pic extends AbstractPlugin
             );
             $categoryRows = $db->fetchAll(
                 $db->select()
-                    ->from($itemTable->info('name'), ['id', 'name', 'catname'])
+                    ->from($itemTable->info('name'), [
+                        'id', 'catname', 'begin_year', 'end_year',
+                        'name' => new Zend_Db_Expr('IF(LENGTH(car_language.name)>0,car_language.name,cars.name)')
+                    ])
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                     ->joinLeft('car_language', $langExpr, ['lang_name' => 'name'])
                     ->join('car_parent', 'cars.id = car_parent.parent_id', null)
@@ -678,7 +679,7 @@ class Pic extends AbstractPlugin
 
             foreach ($categoryRows as $row) {
                 $categories[$row['id']] = [
-                    'name' => $row['lang_name'] ? $row['lang_name'] : $row['name'],
+                    'name' => $row,
                     'url'  => $controller->url()->fromRoute('categories', [
                         'action'           => 'category',
                         'category_catname' => $row['catname'],

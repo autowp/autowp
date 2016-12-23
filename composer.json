@@ -23,7 +23,7 @@
         "michelf/php-markdown": "^1.6",
         "league/html-to-markdown": "^4.1",
         "autowp/external-login-service": ">=1.1.8",
-        "autowp/textstorage": "^1.0.1",
+        "autowp/textstorage": "^2.0.2",
         "autowp/zf-components": "^1.0.7",
         "zendframework/zend-authentication": "^2.5",
         "zendframework/zend-cache": ">=2.7",

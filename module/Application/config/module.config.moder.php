@@ -1074,8 +1074,9 @@ return [
                             'label' => 'moder/vehicles/filter/item-type',
                             'options' => [
                                 '' => '--',
-                                Model\DbTable\Item\Type::VEHICLE => 'item/type/1/name',
-                                Model\DbTable\Item\Type::ENGINE  => 'item/type/2/name',
+                                Model\DbTable\Item\Type::VEHICLE  => 'item/type/1/name',
+                                Model\DbTable\Item\Type::ENGINE   => 'item/type/2/name',
+                                Model\DbTable\Item\Type::CATEGORY => 'item/type/3/name',
                             ]
                         ]
                     ],
@@ -1128,9 +1129,9 @@ return [
                 [
                     'spec' => [
                         'type'    => 'Text',
-                        'name'    => 'category',
+                        'name'    => 'parent_id',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/category',
+                            'label' => 'moder/vehicles/filter/parent',
                         ]
                     ],
                 ],
@@ -1214,7 +1215,7 @@ return [
                         ['name' => 'Digits'],
                     ]
                 ],
-                'category' => [
+                'parent_id' => [
                     'required'   => false,
                     'filters'    => [
                         ['name' => 'StringTrim'],

@@ -288,7 +288,8 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                             'min' => 3,
                             'max' => 100
                         ]
-                    ]
+                    ],
+                    ['name' => \Application\Validator\Item\CatnameNotExists::class]
                 ]
             ],
         ];

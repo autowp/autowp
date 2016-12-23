@@ -481,9 +481,7 @@ class CategoryController extends AbstractActionController
             $carParentTable = new VehicleParent();
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [
-                'pictureFetcher' => new \Application\Model\Item\DistinctItemPictureFetcher([
-                    'dateSort' => false,
-                ]),
+                'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([]),
                 'useFrontPictures' => $haveSubcategories,
                 'disableLargePictures' => true,
                 'picturesDateSort' => true,
@@ -695,6 +693,60 @@ class CategoryController extends AbstractActionController
             if ($categoryLang['text_id']) {
                 $description = $this->textStorage->getText($categoryLang['text_id']);
             }
+            
+            $otherPictures = [];
+            $otherItemsCount = 0;
+            $isLastPage = $paginator->getCurrentPageNumber() == $paginator->count();
+            if ($haveSubcategories && $isLastPage && ! $topCar) {
+
+                $select = $this->itemTable->select(true)
+                    ->where('cars.item_type_id IN (?)', [
+                        DbTable\Item\Type::ENGINE,
+                        DbTable\Item\Type::VEHICLE
+                    ])
+                    ->join('car_parent', 'cars.id = car_parent.car_id', null)
+                    ->where('car_parent.parent_id = ?', $currentCategory->id);
+                    
+                $otherPaginator = new \Zend\Paginator\Paginator(
+                    new Zend1DbTableSelect($select)
+                );
+                
+                $otherItemsCount = $otherPaginator->getTotalItemCount();
+                
+                $pictureTable = new Picture();
+                $pictureRows = $pictureTable->fetchAll(
+                    $pictureTable->select(true)
+                        ->where('pictures.status IN (?)', [
+                            Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
+                        ])
+                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                        ->join('cars', 'picture_item.item_id = cars.id', null)
+                        ->where('cars.item_type_id IN (?)', [
+                            DbTable\Item\Type::ENGINE,
+                            DbTable\Item\Type::VEHICLE
+                        ])
+                        ->join('car_parent', 'cars.id = car_parent.car_id', null)
+                        ->where('car_parent.parent_id = ?', $currentCategory->id)
+                        ->order($this->catalogue()->picturesOrdering())
+                        ->limit(4)
+                );
+                
+                $imageStorage = $this->imageStorage();
+                foreach ($pictureRows as $pictureRow) {
+                    $imageInfo = $imageStorage->getFormatedImage($pictureRow->getFormatRequest(), 'picture-thumb');
+                    
+                    $otherPictures[] = [
+                        'name' => $this->pic()->name($pictureRow, $language),
+                        'src'  => $imageInfo ? $imageInfo->getSrc() : null,
+                        'url'  => $this->url()->fromRoute('categories', [
+                            'action'           => 'category',
+                            'category_catname' => $currentCategory['catname'],
+                            'other'            => true,
+                            'picture_id'       => $pictureRow['identity'] ? $pictureRow['identity'] : $pictureRow['id']
+                        ], [], true)
+                    ];
+                }
+            }
 
             return [
                 'title'            => $title,
@@ -709,7 +761,10 @@ class CategoryController extends AbstractActionController
                     'car_id'           => $topCar ? $topCar->id : null,
                     'path'             => $path
                 ],
-                'description'     => $description
+                'description'     => $description,
+                'otherItemsCount' => $otherItemsCount,
+                'otherPictures'   => $otherPictures,
+                'otherCategoryName' => $this->otherCategoryName
             ];
         });
     }

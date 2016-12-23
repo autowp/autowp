@@ -1349,7 +1349,7 @@ return [
     'moder/vehicles/filter/spec' => 'Рынок',
     'moder/vehicles/filter/from-year' => 'Год начала',
     'moder/vehicles/filter/to-year' => 'Год окончания',
-    'moder/vehicles/filter/category' => 'Категория',
+    'moder/vehicles/filter/parent' => 'Родитель',
     'moder/vehicles/filter/category-exclude' => 'Категория (исключить)',
     'moder/vehicles/filter/no-parents' => 'Без родителей',
     'moder/vehicles/filter/order' => 'Сортировка',

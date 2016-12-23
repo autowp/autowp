@@ -160,7 +160,11 @@
             foreach ($this->items as $item) {
 
                 foreach ($item['categories'] as $category) {
-                    $list[$category['url']] = $this->htmlA($category['url'], '<i class="fa fa-tag"></i> ' . $this->escapeHtml($category['name']), false);
+                    $list[$category['url']] = $this->htmlA(
+                        $category['url'], 
+                        '<i class="fa fa-tag"></i> ' . $this->car()->htmlTitle($category['name']), 
+                        false
+                    );
                 }
 
                 if ($item['specsEditUrl']) {
