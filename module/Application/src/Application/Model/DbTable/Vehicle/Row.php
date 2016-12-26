@@ -29,46 +29,6 @@ class Row extends \Application\Db\Table\Row
             : $this->specTable = new Spec();
     }
 
-    private static function buildYearsString(array $options)
-    {
-        $defaults = [
-            'begin_year' => null,
-            'end_year'   => null,
-            'today'      => null
-        ];
-        $options = array_replace($defaults, $options);
-
-        $result = '';
-
-        $by = $options['begin_year'];
-        $ey = $options['end_year'];
-
-        $cy = (int)date('Y');
-
-        if (! is_null($by)) {
-            if ($by > 0) {
-                $result = $by;
-                if (! is_null($ey) && ($ey > $by)) {
-                    if (((int)($ey / 1000)) == ((int)($by / 1000))) {
-                        $result .= '–'.substr($ey, 2, 2);
-                    } else {
-                        $result .= '–'.$ey;
-                    }
-                } elseif (is_null($ey) || ($ey <= 0) || ($ey < $by)) {
-                    if ($options['today']) {
-                        if ($by < $cy) {
-                            $result .= '–н.в.';
-                        }
-                    } elseif ($by < $cy) {
-                        $result .= '–????';
-                    }
-                }
-            }
-        }
-
-        return $result;
-    }
-
     public function getNameData($language = 'en')
     {
         if (! is_string($language)) {
@@ -104,15 +64,6 @@ class Row extends \Application\Db\Table\Row
             'end_year'         => $this->end_year,
             'today'            => $this->today
         ];
-    }
-
-    public function getYearsString()
-    {
-        return self::buildYearsString([
-            'begin_year' => $this->begin_year,
-            'end_year'   => $this->end_year,
-            'today'      => $this->today
-        ]);
     }
 
     public function getOrientedPictureList(array $perspectiveGroupIds)
