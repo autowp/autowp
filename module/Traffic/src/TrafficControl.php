@@ -170,7 +170,7 @@ class TrafficControl
 
         $group = array_merge(['ip'], $profile['group']);
 
-        $rows = $monitoringTable->select(function(Select $select) use ($profile, $group) {
+        $rows = $monitoringTable->select(function (Select $select) use ($profile, $group) {
             $select
                 ->columns(['ip', 'c' => new Expression('SUM(count)')])
                 ->where('day_date = CURDATE()')
@@ -233,7 +233,7 @@ class TrafficControl
         $bannedTable = $this->getBannedTable();
         $monitoringTable = $this->getMonitoringTable();
 
-        $rows = $monitoringTable->select(function(Select $select) {
+        $rows = $monitoringTable->select(function (Select $select) {
             $select
                 ->columns([
                     'ip',
@@ -271,7 +271,7 @@ class TrafficControl
      */
     public function getWhitelistData()
     {
-        $rows = $this->getWhitelistTable()->select(function(Select $select) {
+        $rows = $this->getWhitelistTable()->select(function (Select $select) {
             $select
                 ->columns([
                     'description',
@@ -374,7 +374,7 @@ class TrafficControl
         $monitoringTable = $this->getMonitoringTable();
         $whitelistTable = $this->getWhitelistTable();
 
-        $rows = $monitoringTable->select(function(Select $select) {
+        $rows = $monitoringTable->select(function (Select $select) {
             $select
                 ->columns(['ip', 'count' => new Expression('SUM(count)')])
                 ->where('day_date = CURDATE()')

@@ -157,7 +157,6 @@ class CategoryController extends AbstractActionController
         $categories = [];
 
         if ($maxDeep > 0) {
-
             $select = $this->itemTable->select(true)
                 ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                 ->order($this->catalogue()->carsOrdering());
@@ -266,12 +265,12 @@ class CategoryController extends AbstractActionController
         $topCategory = $currentCategory;
 
         while (true) {
-            $parentCategory =$this->itemTable->fetchRow(
+            $parentCategory = $this->itemTable->fetchRow(
                 $this->itemTable->select(true)
                     ->join('item_parent', 'cars.id = item_parent.parent_id', null)
                     ->where('item_parent.car_id = ?', $topCategory->id)
             );
-            if (!$parentCategory) {
+            if (! $parentCategory) {
                 break;
             }
 
@@ -488,7 +487,6 @@ class CategoryController extends AbstractActionController
             $otherItemsCount = 0;
             $isLastPage = $paginator->getCurrentPageNumber() == $paginator->count();
             if ($haveSubcategories && $isLastPage && ! $currentCar && ! $isOther) {
-
                 $select = $this->itemTable->select(true)
                     ->where('cars.item_type_id IN (?)', [
                         DbTable\Item\Type::ENGINE,

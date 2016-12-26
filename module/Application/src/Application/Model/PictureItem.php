@@ -158,7 +158,7 @@ class PictureItem
                 ->where('picture_id = ?', $pictureId)
         );
     }
-    
+
     public function getPictureItemsByType($pictureId, $type)
     {
         $db = $this->table->getAdapter();

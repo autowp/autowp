@@ -796,9 +796,9 @@ class CatalogueController extends AbstractActionController
 
             foreach ($rows as $row) {
                  $result[$row['id']] = $this->itemNameFormatter->format(
-                    $row,
-                    $language
-                );
+                     $row,
+                     $language
+                 );
             }
         }
 

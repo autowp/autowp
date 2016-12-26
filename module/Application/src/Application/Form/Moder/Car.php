@@ -24,7 +24,7 @@ class Car extends Form implements InputFilterProviderInterface
     private $translator;
 
     private $language = 'en';
-    
+
     private $itemId = null;
 
     private $itemType = null;
@@ -168,7 +168,7 @@ class Car extends Form implements InputFilterProviderInterface
                 ]
             ],
         ];
-        
+
         if ($this->itemType != DbTable\Item\Type::CATEGORY) {
             unset($elements['catname']);
         }
@@ -176,8 +176,8 @@ class Car extends Form implements InputFilterProviderInterface
         if ($this->itemType != DbTable\Item\Type::VEHICLE) {
             unset($elements['vehicle_type_id']);
         }
-        
-        if (!in_array($this->itemType, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
+
+        if (! in_array($this->itemType, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
             unset($elements['is_group']);
             unset($elements['is_concept']);
             unset($elements['produced']);
@@ -235,7 +235,7 @@ class Car extends Form implements InputFilterProviderInterface
             $this->specOptions = $options['specOptions'];
             unset($options['specOptions']);
         }
-        
+
         if (isset($options['itemId'])) {
             $this->itemId = $options['itemId'];
             unset($options['itemId']);
@@ -305,11 +305,11 @@ class Car extends Form implements InputFilterProviderInterface
                 ]
             ],
         ];
-        
+
         if ($this->itemType != DbTable\Item\Type::CATEGORY) {
             unset($spec['catname']);
         }
-        
+
         return $spec;
     }
 

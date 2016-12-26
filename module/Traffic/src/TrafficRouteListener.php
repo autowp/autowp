@@ -27,9 +27,8 @@ class TrafficRouteListener extends AbstractListenerAggregate
         $request = $e->getRequest();
 
         if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-            
             $serviceManager = $e->getApplication()->getServiceManager();
-            
+
             $auth = new AuthenticationService();
 
             $unlimitedTraffic = false;

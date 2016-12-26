@@ -10,7 +10,7 @@ abstract class AbstractHttpControllerTestCase extends ZendTestCase
 
     protected function setUp()
     {
-        if (!$this->applicationConfigPath) {
+        if (! $this->applicationConfigPath) {
             throw new \Exception("Application config path not provided");
         }
 

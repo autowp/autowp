@@ -24,7 +24,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
     private $translator;
 
     private $language = 'en';
-    
+
     private $itemType = null;
 
     /**
@@ -70,7 +70,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                     'label'   => 'Catname'
                 ]
             ],
-            'body' =>[
+            'body' => [
                 'name'    => 'body',
                 'type'    => \Application\Form\Element\CarBody::class,
                 'attributes' => [
@@ -88,7 +88,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                     'style' => 'width: 30%'
                 ]
             ],
-            'vehicle_type_id' =>[
+            'vehicle_type_id' => [
                 'name'    => 'vehicle_type_id',
                 'type'    => 'Select',
                 'options' => [
@@ -101,7 +101,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                     'size'     => 1
                 ]
             ],
-            'model_year' =>[
+            'model_year' => [
                 'name'    => 'model_year',
                 'type'    => \Application\Form\Fieldset\CarModelYears::class,
                 'options' => [
@@ -124,14 +124,14 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                     'language' => $this->language
                 ]
             ],
-            'produced' =>[
+            'produced' => [
                 'name'    => 'produced',
                 'type'    => \Application\Form\Fieldset\CarProduced::class,
                 'options' => [
                     'label' => 'moder/vehicle/produced'
                 ]
             ],
-            'is_concept' =>[
+            'is_concept' => [
                 'name'    => 'is_concept',
                 'type'    => 'Select',
                 'options' => [
@@ -142,7 +142,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                     'style' => 'width: 20%'
                 ]
             ],
-            'is_group' =>[
+            'is_group' => [
                 'name'    => 'is_group',
                 'type'    => 'Checkbox',
                 'options' => [
@@ -167,16 +167,16 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 ],
             ],
         ];
-        
+
         if ($this->itemType != DbTable\Item\Type::CATEGORY) {
             unset($elements['catname']);
         }
-        
+
         if ($this->itemType != DbTable\Item\Type::VEHICLE) {
             unset($elements['vehicle_type_id']);
         }
-        
-        if (!in_array($this->itemType, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
+
+        if (! in_array($this->itemType, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
             unset($elements['is_group']);
             unset($elements['is_concept']);
             unset($elements['produced']);
@@ -225,7 +225,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
             $this->specOptions = $options['specOptions'];
             unset($options['specOptions']);
         }
-        
+
         if (isset($options['itemType'])) {
             $this->itemType = $options['itemType'];
             unset($options['itemType']);
@@ -293,11 +293,11 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 ]
             ],
         ];
-        
+
         if ($this->itemType != DbTable\Item\Type::CATEGORY) {
             unset($spec['catname']);
         }
-        
+
         return $spec;
     }
 

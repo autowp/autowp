@@ -13,13 +13,13 @@ class CatnameNotExists extends AbstractValidator
     protected $messageTemplates = [
         self::EXISTS => "Catname '%value%' already exists"
     ];
-    
+
     private $exclude;
-    
+
     public function setExclude($exclude)
     {
         $this->exclude = (int)$exclude;
-    
+
         return $this;
     }
 

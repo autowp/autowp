@@ -196,7 +196,6 @@ class IndexController extends AbstractActionController
                     'count' => $totalPictures
                 ];
             }
-
         } else {
             $cataloguePaths = $this->catalogue()->cataloguePaths($car);
 
@@ -256,7 +255,7 @@ class IndexController extends AbstractActionController
                         'item_language',
                         'cars.id = item_language.car_id and item_language.language = :language',
                         null
-                        )
+                    )
                     ->join('item_parent', 'cars.id = item_parent.parent_id', null)
                     ->join(['top_item' => 'cars'], 'item_parent.car_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
@@ -279,7 +278,7 @@ class IndexController extends AbstractActionController
                     'text'  => $this->itemNameFormatter->format(
                         $category,
                         $language
-                        )
+                    )
                 ];
             }
         }

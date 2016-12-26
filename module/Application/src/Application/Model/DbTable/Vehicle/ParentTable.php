@@ -123,7 +123,7 @@ class ParentTable extends Table
                     'parent_id = ?' => $parentId,
                     'language = ?'  => $language
                 ]);
-                if (!$itemParentLanguageRow) {
+                if (! $itemParentLanguageRow) {
                     $itemParentLanguageRow = $itemParentLanguageTable->createRow([
                         'item_id'   => $id,
                         'parent_id' => $parentId,
@@ -157,7 +157,7 @@ class ParentTable extends Table
             ]
         ];
 
-        if (!isset($allowedCombinations[$parent->item_type_id][$car->item_type_id])) {
+        if (! isset($allowedCombinations[$parent->item_type_id][$car->item_type_id])) {
             throw new Exception("THat type of parent is not allowed for this type");
         }
 

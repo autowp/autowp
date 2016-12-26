@@ -10,19 +10,19 @@ abstract class PictureFetcher
      * @var DbTable\Picture
      */
     private $pictureTable;
-    
+
     /**
      * @var boolean
      */
     protected $dateSort;
-    
+
     abstract public function fetch(array $item, array $options = []);
-    
+
     public function __construct(array $options)
     {
         $this->setOptions($options);
     }
-    
+
     public function setOptions(array $options)
     {
         foreach ($options as $key => $value) {
@@ -30,7 +30,7 @@ abstract class PictureFetcher
             $this->$method($value);
         }
     }
-    
+
     /**
      * @param boolean $value
      * @return PictureFetcher
@@ -38,10 +38,10 @@ abstract class PictureFetcher
     public function setDateSort($value)
     {
         $this->dateSort = (bool)$value;
-        
+
         return $this;
     }
-    
+
     /**
      * @return DbTable\Picture
      */
@@ -51,7 +51,7 @@ abstract class PictureFetcher
             ? $this->pictureTable
             : $this->pictureTable = new DbTable\Picture();
     }
-    
+
     protected function getPictureSelect($carId, array $options)
     {
         $defaults = [
@@ -64,7 +64,7 @@ abstract class PictureFetcher
             'onlyExactlyPictures' => false
         ];
         $options = array_merge($defaults, $options);
-    
+
         $pictureTable = $this->getPictureTable();
         $db = $pictureTable->getAdapter();
         $select = $db->select()
@@ -86,7 +86,7 @@ abstract class PictureFetcher
                 DbTable\Picture::STATUS_NEW
             ])
             ->limit(1);
-    
+
         $order = [];
 
         if ($options['onlyExactlyPictures']) {

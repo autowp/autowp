@@ -12,38 +12,38 @@ class CatalogueItem extends Catalogue
      * @var string
      */
     protected $brandItemCatname;
-    
+
     /**
      * @var array
      */
     protected $path;
-    
+
     /**
      * @var int
      */
     protected $itemId;
-    
+
     public function setBrandItemCatname($brandItemCatname)
     {
         $this->brandItemCatname = $brandItemCatname;
-        
+
         return $this;
     }
-    
+
     public function setPath(array $path)
     {
         $this->path = $path;
-    
+
         return $this;
     }
-    
+
     public function setItemId($itemId)
     {
         $this->itemId = $itemId;
-    
+
         return $this;
     }
-    
+
     public function getPicturesUrl(DbTable\Vehicle\Row $item)
     {
         return $this->router->assemble([
@@ -56,15 +56,15 @@ class CatalogueItem extends Catalogue
             'name' => 'catalogue'
         ]);
     }
-    
+
     public function getSpecificationsUrl(DbTable\Vehicle\Row $item)
     {
         $hasSpecs = $this->specsService->hasSpecs($item->id);
-        
+
         if (! $hasSpecs) {
             return false;
         }
-        
+
         return $this->router->assemble([
             'action'        => 'brand-item-specifications',
             'brand_catname' => $this->brand['catname'],
@@ -74,7 +74,7 @@ class CatalogueItem extends Catalogue
             'name' => 'catalogue'
         ]);
     }
-    
+
     public function getTypeUrl(DbTable\Vehicle\Row $item, $type)
     {
         switch ($type) {
@@ -88,7 +88,7 @@ class CatalogueItem extends Catalogue
                 throw new Exception('Unexpected type');
                 break;
         }
-        
+
         $carParentRow = $this->itemParentTable->fetchRow([
             'car_id = ?'    => $item->id,
             'parent_id = ?' => $this->itemId
@@ -100,7 +100,7 @@ class CatalogueItem extends Catalogue
         } else {
             $currentPath = $this->path;
         }
-        
+
         return $this->router->assemble([
             'action'        => 'brand-item',
             'brand_catname' => $this->brand['catname'],
@@ -112,7 +112,7 @@ class CatalogueItem extends Catalogue
             'name' => 'catalogue'
         ]);
     }
-    
+
     public function getPictureUrl(DbTable\Vehicle\Row $item, array $picture)
     {
         return $this->router->assemble([

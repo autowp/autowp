@@ -12,48 +12,48 @@ class Catalogue extends ListBuilder
      * @var DbTable\Vehicle\ParentTable
      */
     protected $itemParentTable;
-    
+
     /**
      * @var array
      */
     protected $brand;
-    
+
     /**
      * @var SpecificationsService
      */
     protected $specsService;
-    
+
     /**
      * @var array
      */
     private $pathsToBrand = [];
-    
+
     public function setItemParentTable(DbTable\Vehicle\ParentTable $itemParentTable)
     {
         $this->itemParentTable = $itemParentTable;
-        
+
         return $this;
     }
-    
+
     public function setBrand(array $brand)
     {
         $this->brand = $brand;
-    
+
         return $this;
     }
-    
+
     public function setSpecsService(SpecificationsService $specsService)
     {
         $this->specsService = $specsService;
-    
+
         return $this;
     }
-    
+
     public function isTypeUrlEnabled()
     {
         return true;
     }
-    
+
     private function getPathsToBrand($itemId, $brandId)
     {
         if (! isset($this->pathsToBrand[$itemId][$brandId])) {
@@ -62,22 +62,22 @@ class Catalogue extends ListBuilder
             ]);
             $this->pathsToBrand[$itemId][$brandId] = $paths;
         }
-    
+
         return $this->pathsToBrand[$itemId][$brandId];
     }
-    
+
     public function getDetailsUrl(DbTable\Vehicle\Row $item)
     {
         $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
             'breakOnFirst' => true
         ]);
-        
+
         if (count($paths) <= 0) {
             return null;
         }
-        
+
         $path = $paths[0];
-        
+
         return $this->router->assemble([
             'action'        => 'brand-item',
             'brand_catname' => $this->brand['catname'],
@@ -87,19 +87,19 @@ class Catalogue extends ListBuilder
             'name' => 'catalogue'
         ]);
     }
-    
+
     public function getPicturesUrl(DbTable\Vehicle\Row $item)
     {
         $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
             'breakOnFirst' => true
         ]);
-        
+
         if (count($paths) <= 0) {
             return null;
         }
-        
+
         $path = $paths[0];
-        
+
         return $this->router->assemble([
             'action'        => 'brand-item-pictures',
             'brand_catname' => $this->brand['catname'],
@@ -110,25 +110,25 @@ class Catalogue extends ListBuilder
             'name' => 'catalogue'
         ]);
     }
-    
+
     public function getSpecificationsUrl(DbTable\Vehicle\Row $item)
     {
         $hasSpecs = $this->specsService->hasSpecs($item->id);
-        
+
         if (! $hasSpecs) {
             return false;
         }
-        
+
         $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
             'breakOnFirst' => true
         ]);
-        
+
         if (count($paths) <= 0) {
             return null;
         }
-        
+
         $path = $paths[0];
-        
+
         return $this->router->assemble([
             'action'        => 'brand-item-specifications',
             'brand_catname' => $this->brand['catname'],
@@ -138,19 +138,19 @@ class Catalogue extends ListBuilder
             'name' => 'catalogue'
         ]);
     }
-    
+
     public function getPictureUrl(DbTable\Vehicle\Row $item, array $picture)
     {
         $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
             'breakOnFirst' => true
         ]);
-        
+
         if (count($paths) <= 0) {
             return $this->picHelper->url($picture['id'], $picture['identity']);
         }
-        
+
         $path = $paths[0];
-        
+
         return $this->router->assemble([
             'action'        => 'brand-item-picture',
             'brand_catname' => $this->brand['catname'],

@@ -839,7 +839,7 @@ class CarsController extends AbstractActionController
             unset($tabs['vehicles']);
         }
 
-        if (!in_array($car->item_type_id, [DbTable\Item\Type::ENGINE, DbTable\Item\Type::VEHICLE])) {
+        if (! in_array($car->item_type_id, [DbTable\Item\Type::ENGINE, DbTable\Item\Type::VEHICLE])) {
             unset($tabs['pictures']);
             unset($tabs['factories']);
         }
@@ -1691,7 +1691,6 @@ class CarsController extends AbstractActionController
         $imageStorage = $this->imageStorage();
 
         if (in_array($carRow->item_type_id, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
-
             $brandModel = new BrandModel();
             $brandRows = $brandModel->getList([
                 'language' => $language,
@@ -2585,12 +2584,10 @@ class CarsController extends AbstractActionController
                     ]);
 
                     if ($langRow->text_id) {
-
                         $textChanged = ($text != $this->textStorage->getText($langRow->text_id));
 
                         $this->textStorage->setText($langRow->text_id, $text, $user->id);
                     } elseif ($text) {
-
                         $textChanged = true;
 
                         $textId = $this->textStorage->createText($text, $user->id);
@@ -2598,13 +2595,10 @@ class CarsController extends AbstractActionController
                     }
 
                     if ($langRow->full_text_id) {
-
                         $fullTextChanged = ($fullText != $this->textStorage->getText($langRow->full_text_id));
 
                         $this->textStorage->setText($langRow->full_text_id, $fullText, $user->id);
-
                     } elseif ($fullText) {
-
                         $fullTextChanged = true;
 
                         $fullTextId = $this->textStorage->createText($fullText, $user->id);
@@ -2946,7 +2940,7 @@ class CarsController extends AbstractActionController
 
         $showBrandsTab = $car->item_type_id != DbTable\Item\Type::CATEGORY;
 
-        if (!$showBrandsTab) {
+        if (! $showBrandsTab) {
             $tab = 'categories';
         }
 
@@ -2955,7 +2949,6 @@ class CarsController extends AbstractActionController
         $cars = [];
 
         if ($tab == 'brands') {
-
             $brandTable = $this->getBrandTable();
             $brand = $brandTable->find($this->params('brand_id'))->current();
 
@@ -2974,9 +2967,7 @@ class CarsController extends AbstractActionController
             } else {
                 $brands = $brandTable->fetchAll(null, ['brands.position', 'brands.name']);
             }
-
         } elseif ($tab == 'categories') {
-
             $rows = $carTable->fetchAll(
                 $carTable->select(true)
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
@@ -2995,7 +2986,6 @@ class CarsController extends AbstractActionController
             foreach ($rows as $row) {
                 $cars[] = $this->carSelectParentWalk($row, $itemTypes);
             }
-
         }
 
         return [

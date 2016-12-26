@@ -145,7 +145,7 @@ class Car extends AbstractPlugin
     {
         $listBuilder          = $options['listBuilder'];
         $pictureFetcher       = $options['pictureFetcher'];
-        if (!$pictureFetcher instanceof PictureFetcher) {
+        if (! $pictureFetcher instanceof PictureFetcher) {
             throw new \Exception("Invalid picture fetcher provided");
         }
         $disableTitle         = isset($options['disableTitle']) && $options['disableTitle'];
@@ -343,7 +343,6 @@ class Car extends AbstractPlugin
             $largeFormat = false;
             foreach ($pictures as &$picture) {
                 if ($picture) {
-
                     if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
                         $url = $picHelper->href($picture['row']);
                     } else {
