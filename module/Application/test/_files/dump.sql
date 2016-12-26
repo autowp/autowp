@@ -1135,36 +1135,36 @@ CREATE TABLE `brands_pictures_cache` (
 /*!40000 ALTER TABLE `brands_pictures_cache` ENABLE KEYS */;
 
 --
--- Table structure for table `car_language`
+-- Table structure for table `item_language`
 --
 
-DROP TABLE IF EXISTS `car_language`;
+DROP TABLE IF EXISTS `item_language`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `car_language` (
+CREATE TABLE `item_language` (
   `car_id` int(10) unsigned NOT NULL,
   `language` varchar(5) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`car_id`,`language`),
-  CONSTRAINT `car_language_ibfk_1` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE
+  CONSTRAINT `item_language_ibfk_1` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `car_language`
+-- Dumping data for table `item_language`
 --
 
-/*!40000 ALTER TABLE `car_language` DISABLE KEYS */;
-/*!40000 ALTER TABLE `car_language` ENABLE KEYS */;
+/*!40000 ALTER TABLE `item_language` DISABLE KEYS */;
+/*!40000 ALTER TABLE `item_language` ENABLE KEYS */;
 
 --
--- Table structure for table `car_parent`
+-- Table structure for table `item_parent`
 --
 
-DROP TABLE IF EXISTS `car_parent`;
+DROP TABLE IF EXISTS `item_parent`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `car_parent` (
+CREATE TABLE `item_parent` (
   `car_id` int(10) unsigned NOT NULL,
   `parent_id` int(10) unsigned NOT NULL,
   `is_primary` tinyint(1) NOT NULL DEFAULT '0',
@@ -1175,17 +1175,17 @@ CREATE TABLE `car_parent` (
   `manual_catname` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`car_id`,`parent_id`),
   UNIQUE KEY `unique_catname` (`parent_id`,`catname`),
-  CONSTRAINT `car_parent_ibfk_1` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`),
-  CONSTRAINT `car_parent_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `cars` (`id`)
+  CONSTRAINT `item_parent_ibfk_1` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`),
+  CONSTRAINT `item_parent_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `cars` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `car_parent`
+-- Dumping data for table `item_parent`
 --
 
-/*!40000 ALTER TABLE `car_parent` DISABLE KEYS */;
-/*!40000 ALTER TABLE `car_parent` ENABLE KEYS */;
+/*!40000 ALTER TABLE `item_parent` DISABLE KEYS */;
+/*!40000 ALTER TABLE `item_parent` ENABLE KEYS */;
 
 --
 -- Table structure for table `item_parent_cache`
