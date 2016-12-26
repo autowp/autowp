@@ -14,7 +14,7 @@ use Zend_Db_Expr;
 
 class ParentTable extends Table
 {
-    protected $_name = 'car_parent';
+    protected $_name = 'item_parent';
     protected $_primary = ['car_id', 'parent_id'];
 
     protected $_referenceMap = [
@@ -92,12 +92,12 @@ class ParentTable extends Table
 
         return array_unique($ids);
     }
-    
+
     public function setParentOptions(VehicleRow $car, VehicleRow $parent, array $options)
     {
         $id = (int)$car->id;
         $parentId = (int)$parent->id;
-        
+
         $row = $this->fetchRow([
             'car_id = ?'    => $id,
             'parent_id = ?' => $parentId
@@ -105,16 +105,16 @@ class ParentTable extends Table
         if (! $row) {
             throw new Exception("Parent not found");
         }
-        
+
         $values = array_replace([
             'type'      => $row->type,
             'catname'   => $row->catname,
             'name'      => $row->name,
         ], $options);
-        
+
         $row->setFromArray($values);
         $row->save();
-        
+
         if (isset($options['languages'])) {
             $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
             foreach ($options['languages'] as $language => $langValues) {
@@ -143,7 +143,7 @@ class ParentTable extends Table
         if (! $parent->is_group) {
             throw new Exception("Only groups can have childs");
         }
-        
+
         $allowedCombinations = [
             DbTable\Item\Type::VEHICLE => [
                 DbTable\Item\Type::VEHICLE => true
@@ -156,7 +156,7 @@ class ParentTable extends Table
                 DbTable\Item\Type::CATEGORY => true
             ]
         ];
-        
+
         if (!isset($allowedCombinations[$parent->item_type_id][$car->item_type_id])) {
             throw new Exception("THat type of parent is not allowed for this type");
         }

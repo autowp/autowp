@@ -631,9 +631,9 @@ class UploadController extends AbstractActionController
                 ])
                 ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
-                ->join('car_parent', 'cars.id = car_parent.car_id', 'type')
-                ->where('car_parent.parent_id = ?', $car->id)
-                ->order(['car_parent.type', 'cars.name', 'cars.begin_year', 'cars.end_year'])
+                ->join('item_parent', 'cars.id = item_parent.car_id', 'type')
+                ->where('item_parent.parent_id = ?', $car->id)
+                ->order(['item_parent.type', 'cars.name', 'cars.begin_year', 'cars.end_year'])
                 ->bind([
                     'lang' => $this->language()
                 ])

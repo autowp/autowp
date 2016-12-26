@@ -6,8 +6,6 @@ use Application\Model\DbTable;
 
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
-use Zend_Db_Expr;
-
 class BrandVehicle
 {
     /**

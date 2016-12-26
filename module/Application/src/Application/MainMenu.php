@@ -146,8 +146,8 @@ class MainMenu
             $rows = $itemTable->fetchAll(
                 $itemTable->select(true)
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft('car_parent', 'cars.id = car_parent.car_id', null)
-                    ->where('car_parent.car_id IS NULL')
+                    ->joinLeft('item_parent', 'cars.id = item_parent.car_id', null)
+                    ->where('item_parent.car_id IS NULL')
                     ->order('cars.name')
             );
 

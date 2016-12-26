@@ -257,8 +257,8 @@ class IndexController extends AbstractActionController
                         'cars.id = car_language.car_id and car_language.language = :language',
                         null
                         )
-                    ->join('car_parent', 'cars.id = car_parent.parent_id', null)
-                    ->join(['top_item' => 'cars'], 'car_parent.car_id = top_item.id', null)
+                    ->join('item_parent', 'cars.id = item_parent.parent_id', null)
+                    ->join(['top_item' => 'cars'], 'item_parent.car_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id = :item_id')
@@ -334,10 +334,10 @@ class IndexController extends AbstractActionController
         $db = $this->getVehicleParentTable()->getAdapter();
 
         $select = $db->select()
-            ->from('car_parent', 'car_id')
-            ->join('cars', 'car_parent.parent_id = cars.id', 'catname')
+            ->from('item_parent', 'car_id')
+            ->join('cars', 'item_parent.parent_id = cars.id', 'catname')
             ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-            ->where('car_parent.car_id = ?', $carId);
+            ->where('item_parent.car_id = ?', $carId);
 
         if ($breakOnFirst) {
             $select->limit(1);
@@ -564,7 +564,7 @@ class IndexController extends AbstractActionController
             $categoryAdapter = $itemTable->getAdapter();
             $itemLangTable = new DbTable\Vehicle\Language();
 
-            $expr = 'COUNT(IF(car_parent.timestamp > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
+            $expr = 'COUNT(IF(item_parent.timestamp > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
 
             $items = $categoryAdapter->fetchAll(
                 $categoryAdapter->select()
@@ -577,10 +577,10 @@ class IndexController extends AbstractActionController
                         ]
                     )
                     ->where('category.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft(['top_category_parent' => 'car_parent'], 'category.id = top_category_parent.car_id', null)
+                    ->joinLeft(['top_category_parent' => 'item_parent'], 'category.id = top_category_parent.car_id', null)
                     ->where('top_category_parent.parent_id is null')
-                    ->join('car_parent', 'category.id = car_parent.parent_id', null)
-                    ->join(['top_item' => 'cars'], 'car_parent.car_id = top_item.id', null)
+                    ->join('item_parent', 'category.id = item_parent.parent_id', null)
+                    ->join(['top_item' => 'cars'], 'item_parent.car_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->join('cars', 'item_parent_cache.item_id = cars.id', null)

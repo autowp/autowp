@@ -841,7 +841,7 @@ class CatalogueController extends AbstractActionController
                 $cpAlias = 'cp'. $idx;
                 $select
                     ->join(
-                        [$cpAlias => 'car_parent'],
+                        [$cpAlias => 'item_parent'],
                         $field . ' = ' . $cpAlias . '.car_id',
                         null
                     )
@@ -999,7 +999,7 @@ class CatalogueController extends AbstractActionController
         $carTable = $this->catalogue()->getCarTable();
         $db = $carTable->getAdapter();
         $select = $db->select()
-            ->from('car_parent', ['type', 'count(1)'])
+            ->from('item_parent', ['type', 'count(1)'])
             ->where('parent_id = ?', $carId)
             ->group('type');
 
@@ -1559,9 +1559,9 @@ class CatalogueController extends AbstractActionController
         $listCars = [];
 
         $select = $carTable->select(true)
-            ->join('car_parent', 'cars.id = car_parent.car_id', null)
-            ->where('car_parent.parent_id = ?', $currentCarId)
-            ->where('car_parent.type = ?', $type)
+            ->join('item_parent', 'cars.id = item_parent.car_id', null)
+            ->where('item_parent.parent_id = ?', $currentCarId)
+            ->where('item_parent.type = ?', $type)
             ->order($this->carsOrder());
 
         $paginator = new Paginator(
@@ -1983,9 +1983,9 @@ class CatalogueController extends AbstractActionController
                 ->order($this->carsOrder());
             if ($currentCar['is_group']) {
                 $select
-                    ->where('car_parent.type = ?', $type)
-                    ->join('car_parent', 'cars.id = car_parent.car_id', null)
-                    ->where('car_parent.parent_id = ?', $currentCarId);
+                    ->where('item_parent.type = ?', $type)
+                    ->join('item_parent', 'cars.id = item_parent.car_id', null)
+                    ->where('item_parent.parent_id = ?', $currentCarId);
             } else {
                 $select
                     ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
@@ -1999,9 +1999,9 @@ class CatalogueController extends AbstractActionController
                     ->order($this->carsOrder());
                 if ($currentCar['is_group']) {
                     $select
-                        ->where('car_parent.type = ?', $type)
-                        ->join('car_parent', 'cars.id = car_parent.car_id', null)
-                        ->where('car_parent.parent_id = ?', $currentCarId);
+                        ->where('item_parent.type = ?', $type)
+                        ->join('item_parent', 'cars.id = item_parent.car_id', null)
+                        ->where('item_parent.parent_id = ?', $currentCarId);
                 } else {
                     $select
                         ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)

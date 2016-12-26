@@ -201,17 +201,17 @@ class IndexController extends AbstractActionController
             SELECT
                 cars.id, cars.name, cars.body,
                 (
-                    case car_parent.type
+                    case item_parent.type
                         when 0 then 'Stock'
                         when 1 then 'Related'
                         when 2 then 'Sport'
-                        else car_parent.type
+                        else item_parent.type
                     end
                 ) as t,
                 count(1) as c
-            from car_parent
-            join cars on car_parent.parent_id=cars.id
-            group by cars.id, car_parent.type
+            from item_parent
+            join cars on item_parent.parent_id=cars.id
+            group by cars.id, item_parent.type
             order by c desc
                 limit 100
         ");

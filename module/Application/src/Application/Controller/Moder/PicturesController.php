@@ -191,14 +191,14 @@ class PicturesController extends AbstractActionController
     private function getFilterForm($status)
     {
         $db = $this->table->getAdapter();
-        
+
         /*$subSelect = $db->select()
             ->distinct()
             ->from('brand_item', 'brand_id')
             ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
             ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
             ->join('pictures', 'picture_item.picture_id = pictures.id', null);
-        
+
         if ($status) {
             $subSelect->where('pictures.status = ?', $status);
         }
@@ -212,7 +212,7 @@ class PicturesController extends AbstractActionController
             ->order(['brands.position', 'brands.name']);
 
         $brandMultioptions = $db->fetchPairs($select);*/
-        
+
         $brandMultioptions = [];
 
         $form = new InboxForm(null, [
@@ -1633,10 +1633,10 @@ class PicturesController extends AbstractActionController
 
         $rows = $carParentTable->fetchAll(
             $carParentTable->select(true)
-                ->join('cars', 'cars.id = car_parent.car_id', null)
-                ->where('car_parent.parent_id = ?', $car->id)
+                ->join('cars', 'cars.id = item_parent.car_id', null)
+                ->where('item_parent.parent_id = ?', $car->id)
                 ->order([
-                    'car_parent.type',
+                    'item_parent.type',
                     'cars.begin_order_cache',
                     'cars.end_order_cache',
                     'cars.name',
@@ -2036,7 +2036,7 @@ class PicturesController extends AbstractActionController
                     );
 
                     $this->pictureItem->setPictureItems($picture->id, []);
-                    
+
                     if ($picture->image_id) {
                         $this->imageStorage()->changeImageName($picture->image_id, [
                             'pattern' => $picture->getFileNamePattern(),
@@ -2071,7 +2071,7 @@ class PicturesController extends AbstractActionController
                             return $this->notFoundAction();
                         }
                     }
-                    
+
                     if ($picture->image_id) {
                         $this->imageStorage()->changeImageName($picture->image_id, [
                             'pattern' => $picture->getFileNamePattern(),
@@ -2095,7 +2095,7 @@ class PicturesController extends AbstractActionController
                     );
 
                     $this->pictureItem->setPictureItems($picture->id, []);
-                    
+
                     if ($picture->image_id) {
                         $this->imageStorage()->changeImageName($picture->image_id, [
                             'pattern' => $picture->getFileNamePattern(),

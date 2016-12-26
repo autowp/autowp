@@ -111,8 +111,8 @@ class VehicleType
             $db->select()
                 ->distinct()
                 ->from('vehicle_vehicle_type', ['vehicle_type_id'])
-                ->join('car_parent', 'vehicle_vehicle_type.vehicle_id = car_parent.parent_id', null)
-                ->where('car_parent.car_id = ?', (int)$vehicleId)
+                ->join('item_parent', 'vehicle_vehicle_type.vehicle_id = item_parent.parent_id', null)
+                ->where('item_parent.car_id = ?', (int)$vehicleId)
         );
 
         return $ids;
@@ -133,8 +133,8 @@ class VehicleType
 
         $ids = $db->fetchCol(
             $db->select()
-                ->from('car_parent', ['car_id'])
-                ->where('car_parent.parent_id = ?', $vehicleId)
+                ->from('item_parent', ['car_id'])
+                ->where('item_parent.parent_id = ?', $vehicleId)
         );
 
         foreach ($ids as $id) {

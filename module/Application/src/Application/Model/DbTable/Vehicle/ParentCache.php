@@ -148,8 +148,8 @@ class ParentCache extends Table
 
         $childCars = $carTable->fetchAll(
             $carTable->select(true)
-                ->join('car_parent', 'cars.id = car_parent.car_id', null)
-                ->where('car_parent.parent_id = ?', $id)
+                ->join('item_parent', 'cars.id = item_parent.car_id', null)
+                ->where('item_parent.parent_id = ?', $id)
         );
 
         foreach ($childCars as $childCar) {
@@ -228,8 +228,8 @@ class ParentCache extends Table
 
         $childCars = $carTable->fetchAll(
             $carTable->select(true)
-                ->join('car_parent', 'cars.id = car_parent.car_id', null)
-                ->where('car_parent.parent_id = ?', $id)
+                ->join('item_parent', 'cars.id = item_parent.car_id', null)
+                ->where('item_parent.parent_id = ?', $id)
         );
 
         foreach ($childCars as $childCar) {

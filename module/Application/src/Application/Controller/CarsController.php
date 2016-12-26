@@ -658,8 +658,8 @@ class CarsController extends AbstractActionController
         }
         if ($parentId) {
             $select
-                ->join('car_parent', 'cars.id = car_parent.car_id', null)
-                ->where('car_parent.parent_id = ?', $parentId);
+                ->join('item_parent', 'cars.id = item_parent.car_id', null)
+                ->where('item_parent.parent_id = ?', $parentId);
         }
 
         $rows = $itemTable->fetchAll($select);

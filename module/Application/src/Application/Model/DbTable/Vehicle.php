@@ -11,7 +11,7 @@ use Zend_Db_Expr;
 class Vehicle extends Table
 {
     const MAX_NAME = 100;
-    
+
     protected $_name = 'cars';
     protected $_rowClass = Vehicle\Row::class;
     protected $_referenceMap = [
@@ -51,8 +51,8 @@ class Vehicle extends Table
     {
         $parents = $this->fetchAll(
             $this->select(true)
-                ->join('car_parent', 'cars.id = car_parent.parent_id', null)
-                ->where('car_parent.car_id = ?', $car->id)
+                ->join('item_parent', 'cars.id = item_parent.parent_id', null)
+                ->where('item_parent.car_id = ?', $car->id)
         );
 
         $somethingChanged = false;
@@ -196,8 +196,8 @@ class Vehicle extends Table
 
             $childs = $this->fetchAll(
                 $this->select(true)
-                    ->join('car_parent', 'cars.id = car_parent.car_id', null)
-                    ->where('car_parent.parent_id = ?', $car->id)
+                    ->join('item_parent', 'cars.id = item_parent.car_id', null)
+                    ->where('item_parent.parent_id = ?', $car->id)
             );
 
             foreach ($childs as $child) {
@@ -205,11 +205,11 @@ class Vehicle extends Table
             }
         }
     }
-    
+
     public function getVehiclesAndEnginesCount($parentId)
     {
         $db = $this->getAdapter();
-    
+
         $select = $db->select()
             ->from('cars', new Zend_Db_Expr('COUNT(1)'))
             ->where('cars.item_type_id IN (?)', [
@@ -219,7 +219,7 @@ class Vehicle extends Table
             ->where('not cars.is_group')
             ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
             ->where('item_parent_cache.parent_id = ?', $parentId);
-    
+
         return $db->fetchOne($select);
     }
 }

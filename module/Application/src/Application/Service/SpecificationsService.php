@@ -1823,7 +1823,7 @@ class SpecificationsService
 
         $parentIds = $db->fetchCol(
             $db->select()
-                ->from('car_parent', 'parent_id')
+                ->from('item_parent', 'parent_id')
                 ->where('car_id = ?', $itemId)
         );
 
@@ -2087,8 +2087,8 @@ class SpecificationsService
         $valueTable = $this->getValueTable();
         $db = $valueTable->getAdapter();
         $select = $db->select()
-            ->from($valueTable->info('name'), 'car_parent.parent_id')
-            ->join('car_parent', 'attrs_values.item_id = car_parent.car_id', null);
+            ->from($valueTable->info('name'), 'item_parent.parent_id')
+            ->join('item_parent', 'attrs_values.item_id = item_parent.car_id', null);
         if (is_array($itemId)) {
             if (count($itemId) <= 0) {
                 return [];
@@ -2096,7 +2096,7 @@ class SpecificationsService
             $ids = $db->fetchCol(
                 $select
                     ->distinct()
-                    ->where('car_parent.parent_id IN (?)', $itemId)
+                    ->where('item_parent.parent_id IN (?)', $itemId)
             );
             $result = [];
             foreach ($itemId as $id) {
@@ -2109,7 +2109,7 @@ class SpecificationsService
         } else {
             return (bool)$db->fetchOne(
                 $select
-                    ->where('car_parent.parent_id = ?', $itemId)
+                    ->where('item_parent.parent_id = ?', $itemId)
             );
         }
 
