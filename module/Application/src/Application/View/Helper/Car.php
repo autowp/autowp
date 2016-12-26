@@ -9,7 +9,7 @@ use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\Spec;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
-use Application\VehicleNameFormatter;
+use Application\ItemNameFormatter;
 
 use Exception;
 
@@ -45,13 +45,13 @@ class Car extends AbstractHelper
     private $specTable;
 
     /**
-     * @var VehicleNameFormatter
+     * @var ItemNameFormatter
      */
-    private $vehicleNameFormatter;
+    private $itemNameFormatter;
 
-    public function __construct(VehicleNameFormatter $vehicleNameFormatter)
+    public function __construct(ItemNameFormatter $itemNameFormatter)
     {
-        $this->vehicleNameFormatter = $vehicleNameFormatter;
+        $this->itemNameFormatter = $itemNameFormatter;
     }
 
     /**
@@ -73,12 +73,12 @@ class Car extends AbstractHelper
 
     public function htmlTitle(array $car)
     {
-        return $this->vehicleNameFormatter->formatHtml($car, $this->view->language());
+        return $this->itemNameFormatter->formatHtml($car, $this->view->language());
     }
 
     public function textTitle(array $car)
     {
-        return $this->vehicleNameFormatter->format($car, $this->view->language());
+        return $this->itemNameFormatter->format($car, $this->view->language());
     }
 
     public function title()

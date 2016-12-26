@@ -8,7 +8,7 @@ use Application\Model\DbTable;
 use Application\Model\Item\PictureFetcher;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
-use Application\VehicleNameFormatter;
+use Application\ItemNameFormatter;
 
 use Autowp\TextStorage\Service as TextStorage;
 
@@ -44,21 +44,21 @@ class Car extends AbstractPlugin
     private $specsService = null;
 
     /**
-     * @var VehicleNameFormatter
+     * @var ItemNameFormatter
      */
-    private $vehicleNameFormatter;
-    
+    private $itemNameFormatter;
+
     private $categoryPictureFetcher;
 
     public function __construct(
         TextStorage $textStorage,
         SpecificationsService $specsService,
-        VehicleNameFormatter $vehicleNameFormatter
+        ItemNameFormatter $itemNameFormatter
     ) {
 
         $this->textStorage = $textStorage;
         $this->specsService = $specsService;
-        $this->vehicleNameFormatter = $vehicleNameFormatter;
+        $this->itemNameFormatter = $itemNameFormatter;
     }
 
     /**
@@ -131,7 +131,7 @@ class Car extends AbstractPlugin
         }
         return $result;
     }
-    
+
     private function getCategoryPictureFetcher()
     {
         return $this->categoryPictureFetcher
@@ -223,7 +223,7 @@ class Car extends AbstractPlugin
                     $carsCategories[$carId] = [];
                 }
                 $carsCategories[$carId][] = [
-                    'name' => $this->vehicleNameFormatter->format(
+                    'name' => $this->itemNameFormatter->format(
                         $category,
                         $language
                     ),
@@ -331,19 +331,19 @@ class Car extends AbstractPlugin
             if (! $disableCategories) {
                 $categories = isset($carsCategories[$car->id]) ? $carsCategories[$car->id] : [];
             }
-            
+
             $cFetcher = $pictureFetcher;
             if ($car['item_type_id'] == DbTable\Item\Type::CATEGORY) {
                 $cFetcher = $this->getCategoryPictureFetcher();
             }
-            
+
             $pictures = $cFetcher->fetch($car->toArray(), [
                 'totalPictures' => $totalPictures
             ]);
-            $largeFormat = false; 
+            $largeFormat = false;
             foreach ($pictures as &$picture) {
                 if ($picture) {
-                    
+
                     if (isset($picture['isVehicleHood']) && $picture['isVehicleHood']) {
                         $url = $picHelper->href($picture['row']);
                     } else {
@@ -370,13 +370,13 @@ class Car extends AbstractPlugin
                     continue;
                 }
             }
-            
+
             $db = $itemLanguageTable->getAdapter();
             $orderExpr = $db->quoteInto('language = ? desc', $language);
             $itemLanguageRows = $itemLanguageTable->fetchAll([
                 'car_id = ?' => $car['id']
             ], new \Zend_Db_Expr($orderExpr));
-            
+
             $textIds = [];
             $fullTextIds = [];
             foreach ($itemLanguageRows as $itemLanguageRow) {
@@ -387,12 +387,12 @@ class Car extends AbstractPlugin
                     $fullTextIds[] = $itemLanguageRow->full_text_id;
                 }
             }
-            
+
             $description = null;
             if ($textIds) {
                 $description = $this->textStorage->getFirstText($textIds);
             }
-            
+
             $text = null;
             if ($fullTextIds) {
                 $text = $this->textStorage->getFirstText($fullTextIds);
@@ -608,7 +608,7 @@ class Car extends AbstractPlugin
 
     public function formatName(DbTable\Vehicle\Row $vehicle, $language)
     {
-        return $this->vehicleNameFormatter->format(
+        return $this->itemNameFormatter->format(
             $vehicle->getNameData($language),
             $language
         );

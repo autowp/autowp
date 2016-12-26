@@ -12,7 +12,7 @@ class CarFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Helper(
-            $container->get(\Application\VehicleNameFormatter::class)
+            $container->get(\Application\ItemNameFormatter::class)
         );
     }
 }

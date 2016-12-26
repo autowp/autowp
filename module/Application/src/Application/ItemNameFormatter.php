@@ -4,7 +4,7 @@ namespace Application;
 
 use Zend\View\Renderer\PhpRenderer;
 
-class VehicleNameFormatter
+class ItemNameFormatter
 {
     private $translator;
 

@@ -24,7 +24,7 @@ class ServicesTest extends AbstractHttpControllerTestCase
     {
         return [
             [\Application\Model\Message::class],
-            [\Application\VehicleNameFormatter::class],
+            [\Application\ItemNameFormatter::class],
             [\Application\PictureNameFormatter::class],
             [\Autowp\Image\Storage::class],
             [\Application\HostManager::class],

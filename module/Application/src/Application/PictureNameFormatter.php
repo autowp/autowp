@@ -12,9 +12,9 @@ class PictureNameFormatter
     private $translator;
 
     /**
-     * @var VehicleNameFormatter
+     * @var ItemNameFormatter
      */
-    private $vehicleNameFormatter;
+    private $itemNameFormatter;
 
     /**
      * @var PhpRenderer
@@ -29,12 +29,12 @@ class PictureNameFormatter
     public function __construct(
         $translator,
         PhpRenderer $renderer,
-        VehicleNameFormatter $vehicleNameFormatter
+        ItemNameFormatter $itemNameFormatter
     ) {
 
         $this->translator = $translator;
         $this->renderer = $renderer;
-        $this->vehicleNameFormatter = $vehicleNameFormatter;
+        $this->itemNameFormatter = $itemNameFormatter;
     }
 
     private function translate($string, $language)
@@ -75,7 +75,7 @@ class PictureNameFormatter
                         $result[] = self::mbUcfirst($this->translate($item['perspective'], $language));
                     }
 
-                    $result[] = $this->vehicleNameFormatter->format($item, $language);
+                    $result[] = $this->itemNameFormatter->format($item, $language);
 
                     return implode(' ', $result);
                 }
@@ -133,7 +133,7 @@ class PictureNameFormatter
                         $result[] = $this->renderer->escapeHtml(self::mbUcfirst($perspective, $language));
                     }
 
-                    $result[] = $this->vehicleNameFormatter->formatHtml($item, $language);
+                    $result[] = $this->itemNameFormatter->formatHtml($item, $language);
                     return implode(' ', $result);
                 }
 

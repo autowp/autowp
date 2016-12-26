@@ -14,7 +14,7 @@ class PictureNameFormatterFactory implements FactoryInterface
         return new Model(
             $container->get('MvcTranslator'),
             $container->get('ViewRenderer'),
-            $container->get(\Application\VehicleNameFormatter::class)
+            $container->get(\Application\ItemNameFormatter::class)
         );
     }
 }

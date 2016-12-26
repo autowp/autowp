@@ -14,7 +14,7 @@ class CarFactory implements FactoryInterface
         return new Plugin(
             $container->get(\Autowp\TextStorage\Service::class),
             $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Application\VehicleNameFormatter::class)
+            $container->get(\Application\ItemNameFormatter::class)
         );
     }
 }

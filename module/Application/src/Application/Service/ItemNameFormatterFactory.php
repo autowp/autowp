@@ -5,9 +5,9 @@ namespace Application\Service;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\VehicleNameFormatter as Model;
+use Application\ItemNameFormatter as Model;
 
-class VehicleNameFormatterFactory implements FactoryInterface
+class ItemNameFormatterFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

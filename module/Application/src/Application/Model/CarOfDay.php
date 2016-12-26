@@ -5,7 +5,7 @@ namespace Application\Model;
 use Application\Db\Table;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle;
-use Application\VehicleNameFormatter;
+use Application\ItemNameFormatter;
 
 use Zend_Db_Expr;
 use Zend_Oauth_Token_Access;
@@ -19,13 +19,13 @@ class CarOfDay
     private $table;
 
     /**
-     * @var VehicleNameFormatter
+     * @var ItemNameFormatter
      */
-    private $vehicleNameFormatter;
+    private $itemNameFormatter;
 
-    public function __construct(VehicleNameFormatter $vehicleNameFormatter)
+    public function __construct(ItemNameFormatter $itemNameFormatter)
     {
-        $this->vehicleNameFormatter = $vehicleNameFormatter;
+        $this->itemNameFormatter = $itemNameFormatter;
 
         $this->table = new Table([
             'name'    => 'of_day',
@@ -152,7 +152,7 @@ class CarOfDay
 
         $text = sprintf(
             'Vehicle of the day: %s %s',
-            $this->vehicleNameFormatter->format($car->getNameData('en'), 'en'),
+            $this->itemNameFormatter->format($car->getNameData('en'), 'en'),
             $url
         );
 

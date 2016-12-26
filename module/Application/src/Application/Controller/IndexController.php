@@ -15,7 +15,7 @@ use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
-use Application\VehicleNameFormatter as ItemNameFormatter;
+use Application\ItemNameFormatter;
 
 use Zend_Db_Expr;
 
@@ -37,7 +37,7 @@ class IndexController extends AbstractActionController
      * @var CarOfDay
      */
     private $carOfDay;
-    
+
     /**
      * @var ItemNameFormatter
      */
@@ -160,9 +160,9 @@ class IndexController extends AbstractActionController
     private function carLinks(VehicleRow $car)
     {
         $items = [];
-        
+
         $itemTable = $this->catalogue()->getCarTable();
-        
+
         $db = $itemTable->getAdapter();
         $totalPictures = $db->fetchOne(
             $db->select()
@@ -172,9 +172,9 @@ class IndexController extends AbstractActionController
                 ->where('item_parent_cache.parent_id = ?', $car->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
         );
-        
+
         $language = $this->language();
-        
+
         if ($car->item_type_id == DbTable\Item\Type::CATEGORY) {
             $items[] = [
                 'icon'  => 'align-left',
@@ -184,7 +184,7 @@ class IndexController extends AbstractActionController
                 ]),
                 'text'  => $this->translate('carlist/details')
             ];
-            
+
             if ($totalPictures > 6) {
                 $items[] = [
                     'icon'  => 'th',
@@ -196,10 +196,10 @@ class IndexController extends AbstractActionController
                     'count' => $totalPictures
                 ];
             }
-            
+
         } else {
             $cataloguePaths = $this->catalogue()->cataloguePaths($car);
-            
+
             if ($totalPictures > 6) {
                 foreach ($cataloguePaths as $path) {
                     $url = $this->url()->fromRoute('catalogue', [
@@ -217,7 +217,7 @@ class IndexController extends AbstractActionController
                     break;
                 }
             }
-            
+
             if ($this->specsService->hasSpecs($car->id)) {
                 foreach ($cataloguePaths as $path) {
                     $items[] = [
@@ -233,7 +233,7 @@ class IndexController extends AbstractActionController
                     break;
                 }
             }
-            
+
             $twins = new Twins();
             foreach ($twins->getCarGroups($car->id) as $twinsGroup) {
                 $items[] = [
@@ -244,7 +244,7 @@ class IndexController extends AbstractActionController
                     'text'  => $this->translate('carlist/twins')
                 ];
             }
-            
+
             $categoryRows = $db->fetchAll(
                 $db->select()
                     ->from($itemTable->info('name'), [
@@ -268,7 +268,7 @@ class IndexController extends AbstractActionController
                         'item_id'  => $car['id']
                     ])
             );
-            
+
             foreach ($categoryRows as $category) {
                 $items[] = [
                     'icon'  => 'tag',

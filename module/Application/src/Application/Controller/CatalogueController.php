@@ -24,12 +24,11 @@ use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
-use Application\VehicleNameFormatter as ItemNameFormatter;
+use Application\ItemNameFormatter;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Select;
@@ -51,7 +50,7 @@ class CatalogueController extends AbstractActionController
      * @var BrandVehicle
      */
     private $brandVehicle;
-    
+
     /**
      * @var ItemNameFormatter
      */
@@ -581,7 +580,7 @@ class CatalogueController extends AbstractActionController
                         ->where('brand_item.brand_id = ?', $brand['id'])
                 );
             }
-            
+
             $requireAttention = 0;
             $isModerator = $this->user()->inheritsRole('moder');
             if ($isModerator) {
@@ -1099,9 +1098,9 @@ class CatalogueController extends AbstractActionController
             }
 
             $counts = $this->childsTypeCount($currentCarId);
-            
+
             $texts = $this->getItemTexts($currentCar['id']);
-            
+
             $currentCar['description'] = $texts['description'];
             $currentCar['text'] = $texts['text'];
             $hasHtml = (bool)$currentCar['text'];
@@ -1474,7 +1473,7 @@ class CatalogueController extends AbstractActionController
         }
 
         $texts = $this->getItemTexts($currentCar['id']);
-        
+
         $currentCar['description'] = $texts['description'];
         $currentCar['text'] = $texts['text'];
         $hasHtml = (bool)$currentCar['text'];
@@ -1492,17 +1491,17 @@ class CatalogueController extends AbstractActionController
             'isCarModer'       => $this->user()->inheritsRole('cars-moder')
         ];
     }
-    
+
     private function getItemTexts($itemId)
     {
         $itemLanguageTable = new DbTable\Vehicle\Language();
-        
+
         $db = $itemLanguageTable->getAdapter();
         $orderExpr = $db->quoteInto('language = ? desc', $this->language());
         $itemLanguageRows = $itemLanguageTable->fetchAll([
             'car_id = ?' => $itemId
         ], new \Zend_Db_Expr($orderExpr));
-        
+
         $textIds = [];
         $fullTextIds = [];
         foreach ($itemLanguageRows as $itemLanguageRow) {
@@ -1513,23 +1512,23 @@ class CatalogueController extends AbstractActionController
                 $fullTextIds[] = $itemLanguageRow->full_text_id;
             }
         }
-        
+
         $description = null;
         if ($textIds) {
             $description = $this->textStorage->getFirstText($textIds);
         }
-        
+
         $text = null;
         if ($fullTextIds) {
             $text = $this->textStorage->getFirstText($fullTextIds);
         }
-        
+
         return [
             'description' => $description,
             'text'        => $text
         ];
     }
-    
+
     private function brandItemGroup(
         $brand,
         array $currentCar,
@@ -1714,11 +1713,11 @@ class CatalogueController extends AbstractActionController
             'requireAttention' => $requireAttention
         ];
     }
-    
+
     private function getBrandModerAttentionCount($brandId)
     {
         $commentTable = new CommentMessage();
-    
+
         $select = $commentTable->select(true)
             ->where('comments_messages.moderator_attention = ?', CommentMessage::MODERATOR_ATTENTION_REQUIRED)
             ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
@@ -1727,11 +1726,11 @@ class CatalogueController extends AbstractActionController
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
             ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
             ->where('brand_item.brand_id = ?', $brandId);
-    
+
         $paginator = new Paginator(
             new Zend1DbTableSelect($select)
         );
-    
+
         return $paginator->getTotalItemCount();
     }
 

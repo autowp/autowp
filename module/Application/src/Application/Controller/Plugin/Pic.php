@@ -28,7 +28,7 @@ use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
-use Application\VehicleNameFormatter;
+use Application\ItemNameFormatter;
 
 use Exception;
 
@@ -55,9 +55,9 @@ class Pic extends AbstractPlugin
     private $pictureNameFormatter;
 
     /**
-     * @var VehicleNameFormatter
+     * @var ItemNameFormatter
      */
-    private $vehicleNameFormatter;
+    private $itemNameFormatter;
 
     /**
      * @var SpecificationsService
@@ -73,7 +73,7 @@ class Pic extends AbstractPlugin
         $textStorage,
         $translator,
         PictureNameFormatter $pictureNameFormatter,
-        VehicleNameFormatter $vehicleNameFormatter,
+        ItemNameFormatter $itemNameFormatter,
         SpecificationsService $specsService,
         PictureItem $pictureItem,
         $httpRouter
@@ -82,7 +82,7 @@ class Pic extends AbstractPlugin
         $this->textStorage = $textStorage;
         $this->translator = $translator;
         $this->pictureNameFormatter = $pictureNameFormatter;
-        $this->vehicleNameFormatter = $vehicleNameFormatter;
+        $this->itemNameFormatter = $itemNameFormatter;
         $this->specsService = $specsService;
         $this->pictureItem = $pictureItem;
         $this->httpRouter = $httpRouter;
@@ -208,7 +208,7 @@ class Pic extends AbstractPlugin
 
         /*
         $controller = $this->getController();
-        
+
         return $controller->url()->fromRoute('picture/picture', [
             'picture_id' => $identity ? $identity : $id,
         ], [
@@ -550,13 +550,13 @@ class Pic extends AbstractPlugin
                         ])
                     ];
                 }
-                
+
                 $db = $itemLanguageTable->getAdapter();
                 $orderExpr = $db->quoteInto('language = ? desc', $language);
                 $itemLanguageRows = $itemLanguageTable->fetchAll([
                     'car_id = ?' => $item['id']
                 ], new \Zend_Db_Expr($orderExpr));
-                
+
                 $textIds = [];
                 $fullTextIds = [];
                 foreach ($itemLanguageRows as $itemLanguageRow) {
@@ -567,12 +567,12 @@ class Pic extends AbstractPlugin
                         $fullTextIds[] = $itemLanguageRow->full_text_id;
                     }
                 }
-                
+
                 $text = null;
                 if ($textIds) {
                     $text = $this->textStorage->getFirstText($textIds);
                 }
-                
+
                 $fullText = null;
                 if ($fullTextIds) {
                     $fullText = $this->textStorage->getFirstText($fullTextIds);
@@ -655,7 +655,7 @@ class Pic extends AbstractPlugin
 
             // categories
             $categories = [];
-            
+
             $db = $itemTable->getAdapter();
             $langExpr = $db->quoteInto(
                 'cars.id = car_language.car_id and car_language.language = ?',
@@ -1378,7 +1378,7 @@ class Pic extends AbstractPlugin
                         'width'  => $pictureItem['area'][2] / $image->getWidth(),
                         'height' => $pictureItem['area'][3] / $image->getHeight(),
                     ],
-                    'name' => $this->vehicleNameFormatter->formatHtml($item->getNameData($language), $language)
+                    'name' => $this->itemNameFormatter->formatHtml($item->getNameData($language), $language)
                 ];
             }
 

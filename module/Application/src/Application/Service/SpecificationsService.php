@@ -20,7 +20,7 @@ use Exception;
 use NumberFormatter;
 
 use Zend_Db_Expr;
-use Application\VehicleNameFormatter;
+use Application\ItemNameFormatter;
 
 class SpecificationsService
 {
@@ -128,16 +128,16 @@ class SpecificationsService
     private $translator;
 
     /**
-     * @var VehicleNameFormatter
+     * @var ItemNameFormatter
      */
-    private $vehicleNameFormatter;
+    private $itemNameFormatter;
 
     public function __construct(
         $translator,
-        VehicleNameFormatter $vehicleNameFormatter
+        ItemNameFormatter $itemNameFormatter
     ) {
         $this->translator = $translator;
-        $this->vehicleNameFormatter = $vehicleNameFormatter;
+        $this->itemNameFormatter = $itemNameFormatter;
     }
 
     /**
@@ -1429,7 +1429,7 @@ class SpecificationsService
 
             $name = $carParentName;
             if (! $name) {
-                $name = $this->vehicleNameFormatter->format($car->getNameData($language), $language);
+                $name = $this->itemNameFormatter->format($car->getNameData($language), $language);
             }
 
             $result[] = [

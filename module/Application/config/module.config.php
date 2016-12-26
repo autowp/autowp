@@ -94,7 +94,7 @@ return [
             ]
         ],
     ],
-    
+
     'service_manager' => [
         'factories' => [
             Acl::class                           => Permissions\AclFactory::class,
@@ -112,7 +112,7 @@ return [
             Service\SpecificationsService::class => Service\SpecificationsServiceFactory::class,
             Service\TelegramService::class       => Service\TelegramServiceFactory::class,
             Service\UsersService::class          => Service\UsersServiceFactory::class,
-            VehicleNameFormatter::class          => Service\VehicleNameFormatterFactory::class,
+            ItemNameFormatter::class             => Service\ItemNameFormatterFactory::class,
             'translator'                         => \Zend\Mvc\I18n\TranslatorFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,

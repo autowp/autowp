@@ -13,7 +13,7 @@ class SpecificationsServiceFactory implements FactoryInterface
     {
         return new SpecificationsService(
             $container->get('MvcTranslator'),
-            $container->get(\Application\VehicleNameFormatter::class)
+            $container->get(\Application\ItemNameFormatter::class)
         );
     }
 }
