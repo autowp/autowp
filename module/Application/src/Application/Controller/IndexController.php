@@ -249,12 +249,12 @@ class IndexController extends AbstractActionController
                 $db->select()
                     ->from($itemTable->info('name'), [
                         'catname', 'begin_year', 'end_year',
-                        'name' => new Zend_Db_Expr('IF(LENGTH(car_language.name)>0,car_language.name,cars.name)')
+                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,cars.name)')
                     ])
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                     ->joinLeft(
-                        'car_language',
-                        'cars.id = car_language.car_id and car_language.language = :language',
+                        'item_language',
+                        'cars.id = item_language.car_id and item_language.language = :language',
                         null
                         )
                     ->join('item_parent', 'cars.id = item_parent.parent_id', null)

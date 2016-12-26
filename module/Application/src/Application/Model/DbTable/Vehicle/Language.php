@@ -6,7 +6,7 @@ use Application\Db\Table;
 
 class Language extends Table
 {
-    protected $_name = 'car_language';
+    protected $_name = 'item_language';
     protected $_primary = ['car_id', 'language'];
 
     protected $_referenceMap = [

@@ -779,14 +779,14 @@ class CatalogueController extends AbstractActionController
                 $db->select()
                     ->from('cars', [
                         'cars.id',
-                        'name' => 'if(car_language.name, car_language.name, cars.name)',
+                        'name' => 'if(item_language.name, item_language.name, cars.name)',
                         'cars.begin_model_year', 'cars.end_model_year',
                         'spec' => 'spec.short_name',
                         'spec_full' => 'spec.name',
                         'cars.body', 'cars.today',
                         'cars.begin_year', 'cars.end_year'
                     ])
-                    ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
+                    ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :lang', null)
                     ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                     ->where('cars.id in (?)', $ids),
                 [
@@ -820,14 +820,14 @@ class CatalogueController extends AbstractActionController
             $db = $carTable->getAdapter();
             $select = $db->select()
                 ->from('cars', [])
-                ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
+                ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null);
 
             $columns = [
                 'cars.id',
                 'cars.is_concept',
                 'cars.item_type_id',
-                'name' => 'if(length(car_language.name) > 0, car_language.name, cars.name)',
+                'name' => 'if(length(item_language.name) > 0, item_language.name, cars.name)',
                 'cars.begin_model_year', 'cars.end_model_year',
                 'spec' => 'spec.short_name',
                 'cars.body', 'cars.today', 'cars.produced', 'cars.produced_exactly',

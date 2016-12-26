@@ -441,7 +441,7 @@ class UploadController extends AbstractActionController
             $db->select()
                 ->from('cars', [
                     'cars.id',
-                    'name' => 'if(car_language.name, car_language.name, cars.name)',
+                    'name' => 'if(item_language.name, item_language.name, cars.name)',
                     'cars.begin_model_year', 'cars.end_model_year',
                     'spec' => 'spec.short_name',
                     'spec_full' => 'spec.name',
@@ -449,7 +449,7 @@ class UploadController extends AbstractActionController
                     'cars.begin_year', 'cars.end_year',
                     'cars.is_group'
                 ])
-                ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
+                ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->join('brand_item', 'cars.id = brand_item.car_id', null)
                 ->where('brand_item.brand_id = ?', $brand['id'])
@@ -472,7 +472,7 @@ class UploadController extends AbstractActionController
             $db->select()
                 ->from('cars', [
                     'cars.id',
-                    'name' => 'if(car_language.name, car_language.name, cars.name)',
+                    'name' => 'if(item_language.name, item_language.name, cars.name)',
                     'cars.begin_model_year', 'cars.end_model_year',
                     'spec' => 'spec.short_name',
                     'spec_full' => 'spec.name',
@@ -480,7 +480,7 @@ class UploadController extends AbstractActionController
                     'cars.begin_year', 'cars.end_year',
                     'cars.is_group'
                 ])
-                ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
+                ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->join('brand_item', 'cars.id = brand_item.car_id', null)
                 ->where('brand_item.brand_id = ?', $brand['id'])
@@ -621,7 +621,7 @@ class UploadController extends AbstractActionController
             $db->select()
                 ->from('cars', [
                     'cars.id',
-                    'name' => 'if(car_language.name, car_language.name, cars.name)',
+                    'name' => 'if(item_language.name, item_language.name, cars.name)',
                     'cars.begin_model_year', 'cars.end_model_year',
                     'spec' => 'spec.short_name',
                     'spec_full' => 'spec.name',
@@ -629,7 +629,7 @@ class UploadController extends AbstractActionController
                     'cars.begin_year', 'cars.end_year',
                     'cars.is_group'
                 ])
-                ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
+                ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->join('item_parent', 'cars.id = item_parent.car_id', 'type')
                 ->where('item_parent.parent_id = ?', $car->id)
@@ -669,7 +669,7 @@ class UploadController extends AbstractActionController
             $db->select()
                 ->from('cars', [
                     'cars.id',
-                    'name' => 'if(car_language.name, car_language.name, cars.name)',
+                    'name' => 'if(item_language.name, item_language.name, cars.name)',
                     'cars.begin_model_year', 'cars.end_model_year',
                     'spec' => 'spec.short_name',
                     'spec_full' => 'spec.name',
@@ -677,7 +677,7 @@ class UploadController extends AbstractActionController
                     'cars.begin_year', 'cars.end_year',
                     'cars.is_group'
                 ])
-                ->joinLeft('car_language', 'cars.id = car_language.car_id and car_language.language = :lang', null)
+                ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
                 ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)

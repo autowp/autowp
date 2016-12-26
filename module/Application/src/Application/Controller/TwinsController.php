@@ -236,21 +236,21 @@ class TwinsController extends AbstractActionController
 
             $db = $carTable->getAdapter();
 
-            $langJoinExpr = 'cars.id = car_language.car_id and ' .
-                $db->quoteInto('car_language.language = ?', $language);
+            $langJoinExpr = 'cars.id = item_language.car_id and ' .
+                $db->quoteInto('item_language.language = ?', $language);
 
             $rows = $db->fetchAll(
                 $db->select()
                     ->from('cars', [
                         'cars.id',
-                        'name' => 'if(length(car_language.name), car_language.name, cars.name)',
+                        'name' => 'if(length(item_language.name), item_language.name, cars.name)',
                         'cars.body', 'cars.begin_model_year', 'cars.end_model_year',
                         'cars.begin_year', 'cars.end_year', 'cars.today',
                         'spec' => 'spec.short_name',
                         'spec_full' => 'spec.name',
                     ])
                     ->join('twins_groups_cars', 'cars.id = twins_groups_cars.car_id', 'twins_group_id')
-                    ->joinLeft('car_language', $langJoinExpr, null)
+                    ->joinLeft('item_language', $langJoinExpr, null)
                     ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                     ->where('twins_groups_cars.twins_group_id in (?)', $ids)
                     ->order('name')

@@ -658,17 +658,17 @@ class Pic extends AbstractPlugin
 
             $db = $itemTable->getAdapter();
             $langExpr = $db->quoteInto(
-                'cars.id = car_language.car_id and car_language.language = ?',
+                'cars.id = item_language.car_id and item_language.language = ?',
                 $language
             );
             $categoryRows = $db->fetchAll(
                 $db->select()
                     ->from($itemTable->info('name'), [
                         'id', 'catname', 'begin_year', 'end_year',
-                        'name' => new Zend_Db_Expr('IF(LENGTH(car_language.name)>0,car_language.name,cars.name)')
+                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,cars.name)')
                     ])
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft('car_language', $langExpr, ['lang_name' => 'name'])
+                    ->joinLeft('item_language', $langExpr, ['lang_name' => 'name'])
                     ->join('item_parent', 'cars.id = item_parent.parent_id', null)
                     ->join(['top_item' => 'cars'], 'item_parent.car_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])

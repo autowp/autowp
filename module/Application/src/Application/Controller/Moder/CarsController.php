@@ -306,8 +306,8 @@ class CarsController extends AbstractActionController
 
             if ($values['text']) {
                 $select
-                    ->join('car_language', 'cars.id = car_language.car_id', null)
-                    ->join('textstorage_text', 'car_language.text_id = textstorage_text.id', null)
+                    ->join('item_language', 'cars.id = item_language.car_id', null)
+                    ->join('textstorage_text', 'item_language.text_id = textstorage_text.id', null)
                     ->where('textstorage_text.text like ?', '%' . $values['text'] . '%');
             }
 
@@ -729,7 +729,7 @@ class CarsController extends AbstractActionController
         $carLangTable = new DbTable\Vehicle\Language();
         $langNameCount = $carLangTable->getAdapter()->fetchOne(
             $carLangTable->getAdapter()->select()
-                ->from('car_language', 'count(1)')
+                ->from('item_language', 'count(1)')
                 ->where('car_id = ?', $car->id)
         );
 
