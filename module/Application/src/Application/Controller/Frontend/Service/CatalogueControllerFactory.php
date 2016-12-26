@@ -15,7 +15,8 @@ class CatalogueControllerFactory implements FactoryInterface
             $container->get(\Autowp\TextStorage\Service::class),
             $container->get('longCache'),
             $container->get(\Application\Service\SpecificationsService::class),
-            $container->get(\Application\Model\BrandVehicle::class)
+            $container->get(\Application\Model\BrandVehicle::class),
+            $container->get(\Application\VehicleNameFormatter::class)
         );
     }
 }

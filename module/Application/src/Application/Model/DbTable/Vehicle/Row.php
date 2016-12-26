@@ -3,7 +3,6 @@
 namespace Application\Model\DbTable\Vehicle;
 
 use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable\Attr;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
 use Application\Model\DbTable\Spec;
@@ -65,63 +64,6 @@ class Row extends \Application\Db\Table\Row
                     }
                 }
             }
-        }
-
-        return $result;
-    }
-
-    public static function buildFullName(array $options)
-    {
-        $defaults = [
-            'begin_model_year' => null,
-            'end_model_year'   => null,
-            'spec'             => null,
-            'body'             => null,
-            'name'             => null,
-            'begin_year'       => null,
-            'end_year'         => null,
-            'today'            => null
-        ];
-        $options = array_replace($defaults, $options);
-
-        $result = $options['name'];
-
-        if ($options['spec']) {
-            $result .= ' ' . $options['spec'];
-        }
-
-        $by = $options['begin_model_year'];
-        $ey = $options['end_model_year'];
-
-        if ($by) {
-            if ($ey) {
-                if ($by != $ey) {
-                    $by10 = floor($by / 100);
-                    $ey10 = floor($ey / 100);
-                    if ($by10 != $ey10) {
-                        $result = $by . '–' . $ey . ' ' . $result;
-                    } else {
-                        $result = $by . '–' . substr($ey, 2, 2) . ' ' . $result;
-                    }
-                } else {
-                    $result = $by . ' ' . $result;
-                }
-            } else {
-                $result = $by . ' ' . $result;
-            }
-        }
-
-        if (strlen($options['body']) > 0) {
-            $result .= ' ('.$options['body'].')';
-        }
-
-        $years = self::buildYearsString([
-            'begin_year' => $options['begin_year'],
-            'end_year'   => $options['end_year'],
-            'today'      => $options['today']
-        ]);
-        if ($years) {
-            $result .= " '".$years;
         }
 
         return $result;

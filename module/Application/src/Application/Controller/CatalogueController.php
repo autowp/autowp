@@ -29,8 +29,7 @@ use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
-
-use Exception;
+use Application\VehicleNameFormatter as ItemNameFormatter;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Select;
@@ -52,18 +51,25 @@ class CatalogueController extends AbstractActionController
      * @var BrandVehicle
      */
     private $brandVehicle;
+    
+    /**
+     * @var ItemNameFormatter
+     */
+    private $itemNameFormatter;
 
     public function __construct(
         $textStorage,
         $cache,
         SpecificationsService $specsService,
-        BrandVehicle $brandVehicle
+        BrandVehicle $brandVehicle,
+        ItemNameFormatter $itemNameFormatter
     ) {
 
         $this->textStorage = $textStorage;
         $this->cache = $cache;
         $this->specsService = $specsService;
         $this->brandVehicle = $brandVehicle;
+        $this->itemNameFormatter = $itemNameFormatter;
     }
 
     private function doBrandAction(callable $callback)
@@ -790,7 +796,10 @@ class CatalogueController extends AbstractActionController
             );
 
             foreach ($rows as $row) {
-                $result[$row['id']] = VehicleRow::buildFullName($row);
+                 $result[$row['id']] = $this->itemNameFormatter->format(
+                    $row,
+                    $language
+                );
             }
         }
 
@@ -861,7 +870,10 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $carFullName = VehicleRow::buildFullName($currentCar);
+            $carFullName = $this->itemNameFormatter->format(
+                $currentCar,
+                $language
+            );
 
             // prefetch car names
             $ids = [];
