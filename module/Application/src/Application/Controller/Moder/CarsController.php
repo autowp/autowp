@@ -3372,8 +3372,9 @@ class CarsController extends AbstractActionController
         }
 
         return [
-            'parentCar' => $parentCar,
-            'form'      => $form
+            'itemTypeId' => $itemTypeId,
+            'parentCar'  => $parentCar,
+            'form'       => $form
         ];
     }
 

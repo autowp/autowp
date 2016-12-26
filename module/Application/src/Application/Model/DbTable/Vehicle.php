@@ -10,6 +10,8 @@ use Zend_Db_Expr;
 
 class Vehicle extends Table
 {
+    const MAX_NAME = 100;
+    
     protected $_name = 'cars';
     protected $_rowClass = Vehicle\Row::class;
     protected $_referenceMap = [

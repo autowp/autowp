@@ -7,12 +7,14 @@ use Zend\InputFilter\InputProviderInterface;
 
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
+use Application\Model\DbTable;
+
 class CarName extends Text implements InputProviderInterface
 {
     protected $attributes = [
         'type'      => 'text',
-        'maxlength' => 80,
-        'size'      => 80
+        'maxlength' => DbTable\Vehicle::MAX_NAME,
+        'size'      => DbTable\Vehicle::MAX_NAME
     ];
 
     /**
@@ -41,7 +43,7 @@ class CarName extends Text implements InputProviderInterface
                     'name' => 'StringLength',
                     'options' => [
                         'min' => 2,
-                        'max' => 80
+                        'max' => DbTable\Vehicle::MAX_NAME
                     ]
                 ]
             ]

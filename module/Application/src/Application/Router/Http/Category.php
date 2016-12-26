@@ -168,91 +168,31 @@ class Category implements RouteInterface
             return false;
         }
 
-        if (preg_match('|^([0-9]+)$|', $path[0], $match)) {
-            $carId = intval($match[1]);
-            array_shift($path);
+        $treePath = [];
+        while (count($path) > 0) {
+            $node = array_shift($path);
 
-            $treePath = [];
-            while (count($path) > 0) {
-                $node = array_shift($path);
+            if ($node == 'pictures') {
+                if (! count($path)) {
+                    // category/:category_catname/[:other/]:car_id/:path/pictures
+                    return $this->assembleMatch([
+                        'action'           => 'category-pictures',
+                        'category_catname' => $categoryCatname,
+                        'other'            => $isOther,
+                        'path'             => $treePath,
+                    ], $length);
+                }
 
-                if ($node == 'pictures') {
+                if (preg_match('|^page([0-9]+)$|', $path[0], $match)) {
+                    array_shift($path);
+                    $page = intval($match[1]);
+
                     if (! count($path)) {
-                        // category/:category_catname/[:other/]:car_id/:path/pictures
+                        // category/:category_catname/[:other/]:car_id/:path/pictures/pageX
                         return $this->assembleMatch([
                             'action'           => 'category-pictures',
                             'category_catname' => $categoryCatname,
                             'other'            => $isOther,
-                            'car_id'           => $carId,
-                            'path'             => $treePath,
-                        ], $length);
-                    }
-
-                    if (preg_match('|^page([0-9]+)$|', $path[0], $match)) {
-                        array_shift($path);
-                        $page = intval($match[1]);
-
-                        if (! count($path)) {
-                            // category/:category_catname/[:other/]:car_id/:path/pictures/pageX
-                            return $this->assembleMatch([
-                                'action'           => 'category-pictures',
-                                'category_catname' => $categoryCatname,
-                                'other'            => $isOther,
-                                'car_id'           => $carId,
-                                'path'             => $treePath,
-                                'page'             => $page
-                            ], $length);
-                        }
-
-                        return false;
-                    }
-
-                    $pictureId = $path[0];
-                    array_shift($path);
-
-                    if (! count($path)) {
-                        // category/:category_catname/[:other/]:picture
-                        return $this->assembleMatch([
-                            'action'           => 'category-picture',
-                            'category_catname' => $categoryCatname,
-                            'other'            => $isOther,
-                            'car_id'           => $carId,
-                            'path'             => $treePath,
-                            'picture_id'       => $pictureId
-                        ], $length);
-                    }
-
-                    if ($path[0] == 'gallery') {
-                        array_shift($path);
-
-                        if (! $path) {
-                            // category/:category_catname/[:other/]:picture/gallery
-                            return $this->assembleMatch([
-                                'action'           => 'category-picture-gallery',
-                                'category_catname' => $categoryCatname,
-                                'other'            => $isOther,
-                                'car_id'           => $carId,
-                                'path'             => $treePath,
-                                'picture_id'       => $pictureId
-                            ], $length);
-                        }
-
-                        return false;
-                    }
-
-                    return false;
-                }
-
-                if (preg_match('|^page([0-9]+)$|', $node, $match)) {
-                    $page = intval($match[1]);
-
-                    if (! count($path)) {
-                        // category/:category_catname/[:other/]:car_id/:path/pageX
-                        return $this->assembleMatch([
-                            'action'           => 'category',
-                            'category_catname' => $categoryCatname,
-                            'other'            => $isOther,
-                            'car_id'           => $carId,
                             'path'             => $treePath,
                             'page'             => $page
                         ], $length);
@@ -261,20 +201,67 @@ class Category implements RouteInterface
                     return false;
                 }
 
-                $treePath[] = $node;
+                $pictureId = $path[0];
+                array_shift($path);
+
+                if (! count($path)) {
+                    // category/:category_catname/[:other/]:picture
+                    return $this->assembleMatch([
+                        'action'           => 'category-picture',
+                        'category_catname' => $categoryCatname,
+                        'other'            => $isOther,
+                        'path'             => $treePath,
+                        'picture_id'       => $pictureId
+                    ], $length);
+                }
+
+                if ($path[0] == 'gallery') {
+                    array_shift($path);
+
+                    if (! $path) {
+                        // category/:category_catname/[:other/]:picture/gallery
+                        return $this->assembleMatch([
+                            'action'           => 'category-picture-gallery',
+                            'category_catname' => $categoryCatname,
+                            'other'            => $isOther,
+                            'path'             => $treePath,
+                            'picture_id'       => $pictureId
+                        ], $length);
+                    }
+
+                    return false;
+                }
+
+                return false;
             }
 
-            // category/:category_catname/[:other/]:car_id/:path
-            return $this->assembleMatch([
-                'action'           => 'category',
-                'category_catname' => $categoryCatname,
-                'other'            => $isOther,
-                'car_id'           => $carId,
-                'path'             => $treePath,
-            ], $length);
+            if (preg_match('|^page([0-9]+)$|', $node, $match)) {
+                $page = intval($match[1]);
 
-            return false;
+                if (! count($path)) {
+                    // category/:category_catname/[:other/]:car_id/:path/pageX
+                    return $this->assembleMatch([
+                        'action'           => 'category',
+                        'category_catname' => $categoryCatname,
+                        'other'            => $isOther,
+                        'path'             => $treePath,
+                        'page'             => $page
+                    ], $length);
+                }
+
+                return false;
+            }
+
+            $treePath[] = $node;
         }
+
+        // category/:category_catname/[:other/]:car_id/:path
+        return $this->assembleMatch([
+            'action'           => 'category',
+            'category_catname' => $categoryCatname,
+            'other'            => $isOther,
+            'path'             => $treePath,
+        ], $length);
 
         return false;
     }
@@ -300,13 +287,9 @@ class Category implements RouteInterface
                         $url[] = 'other';
                     }
 
-                    if (isset($data['car_id']) && $data['car_id']) {
-                        $url[] = $data['car_id'];
-
-                        if (isset($data['path']) && is_array($data['path'])) {
-                            foreach ($data['path'] as $node) {
-                                $url[] = $node;
-                            }
+                    if (isset($data['path']) && is_array($data['path'])) {
+                        foreach ($data['path'] as $node) {
+                            $url[] = $node;
                         }
                     }
 
@@ -324,13 +307,9 @@ class Category implements RouteInterface
                         $url[] = 'other';
                     }
 
-                    if (isset($data['car_id']) && $data['car_id']) {
-                        $url[] = $data['car_id'];
-
-                        if (isset($data['path']) && is_array($data['path'])) {
-                            foreach ($data['path'] as $node) {
-                                $url[] = $node;
-                            }
+                    if (isset($data['path']) && is_array($data['path'])) {
+                        foreach ($data['path'] as $node) {
+                            $url[] = $node;
                         }
                     }
 
@@ -350,13 +329,9 @@ class Category implements RouteInterface
                         $url[] = 'other';
                     }
 
-                    if (isset($data['car_id']) && $data['car_id']) {
-                        $url[] = $data['car_id'];
-
-                        if (isset($data['path']) && is_array($data['path'])) {
-                            foreach ($data['path'] as $node) {
-                                $url[] = $node;
-                            }
+                    if (isset($data['path']) && is_array($data['path'])) {
+                        foreach ($data['path'] as $node) {
+                            $url[] = $node;
                         }
                     }
 
@@ -373,13 +348,9 @@ class Category implements RouteInterface
                         $url[] = 'other';
                     }
 
-                    if (isset($data['car_id']) && $data['car_id']) {
-                        $url[] = $data['car_id'];
-
-                        if (isset($data['path']) && is_array($data['path'])) {
-                            foreach ($data['path'] as $node) {
-                                $url[] = $node;
-                            }
+                    if (isset($data['path']) && is_array($data['path'])) {
+                        foreach ($data['path'] as $node) {
+                            $url[] = $node;
                         }
                     }
 

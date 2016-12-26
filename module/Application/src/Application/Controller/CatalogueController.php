@@ -427,8 +427,6 @@ class CatalogueController extends AbstractActionController
 
         $factories = [];
         foreach ($rows as $idx => $row) {
-            $id = (int)$row['id'];
-
             $factories[] = [
                 'name' => $row['factory_name'],
                 'url'  => $this->url()->fromRoute('factories/factory', [
@@ -1520,30 +1518,6 @@ class CatalogueController extends AbstractActionController
         ];
     }
     
-    private function isItemHasFullText($itemId)
-    {
-        $itemLanguageTable = new DbTable\Vehicle\Language();
-    
-        $db = $itemLanguageTable->getAdapter();
-        $orderExpr = $db->quoteInto('language = ? desc', $this->language());
-        $itemLanguageRows = $itemLanguageTable->fetchAll([
-            'car_id = ?' => $itemId
-        ], new \Zend_Db_Expr($orderExpr));
-    
-        $fullTextIds = [];
-        foreach ($itemLanguageRows as $itemLanguageRow) {
-            if ($itemLanguageRow->full_text_id) {
-                $fullTextIds[] = $itemLanguageRow->full_text_id;
-            }
-        }
-    
-        if (!$fullTextIds) {
-            return false;
-        }
-    
-        return (bool)$this->textStorage->getFirstText($fullTextIds);
-    }
-
     private function brandItemGroup(
         $brand,
         array $currentCar,

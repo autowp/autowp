@@ -4,7 +4,7 @@
             'blankPage' => false,
             'needRight' => false
         ],
-        'pageTitle' => $this->car()->textTitle($this->category->toArray()),
+        'pageTitle' => $this->car()->textTitle($this->currentItem->toArray()),
         'pageId' => 23,
         'args'   => [
             'CATEGORY_SHORT_NAME' => $this->category->name, //$this->categoryLang ? $this->categoryLang->short_name : $this->category->short_name,
@@ -30,9 +30,9 @@
             <i class="fa fa-plus"></i>
             <?=$this->htmlA($this->url('moder/cars/params', [
                 'action'       => 'new',
-                'parent_id'    => $this->category['id'],
-                'item_type_id' => $this->category['item_type_id'],
-            ]), $this->translate('moder/vehicle/catalogue/add-category'))?>
+                'parent_id'    => $this->currentItem['id'],
+                'item_type_id' => $this->currentItem['item_type_id'],
+            ]), $this->translate('item/type/'.$this->currentItem['item_type_id'].'/add-sub-item'))?>
         <?php } ?>
     </p>
 <?php } ?>

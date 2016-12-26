@@ -14,8 +14,6 @@ class Category extends ListBuilder
      */
     protected $itemParentTable;
     
-    protected $topItem;
-    
     protected $currentItem;
     
     protected $category;
@@ -31,13 +29,6 @@ class Category extends ListBuilder
     {
         $this->itemParentTable = $itemParentTable;
         
-        return $this;
-    }
-    
-    public function setTopItem($topItem)
-    {
-        $this->topItem = $topItem;
-    
         return $this;
     }
     
@@ -112,7 +103,6 @@ class Category extends ListBuilder
             'action'           => 'category',
             'category_catname' => $this->category->catname,
             'other'            => $this->isOther,
-            'car_id'           => $this->topItem ? $this->topItem->id : $item->id,
             'path'             => $currentPath,
             'page'             => 1
         ], [
@@ -126,7 +116,6 @@ class Category extends ListBuilder
             return $this->router->assemble([
                 'action'           => 'category-pictures',
                 'category_catname' => $item->catname,
-                'car_id'           => $this->topItem ? $this->topItem->id : null,
                 'path'             => $this->path,
             ], [
                 'name' => 'categories'
@@ -135,7 +124,7 @@ class Category extends ListBuilder
         
         // found parent row
         if ($this->currentItem) {
-            $carParentRow = $carParentTable->fetchRow([
+            $carParentRow = $this->itemParentTable->fetchRow([
                 'car_id = ?'    => $item->id,
                 'parent_id = ?' => $this->currentItem->id
             ]);
@@ -154,7 +143,6 @@ class Category extends ListBuilder
             'action'           => 'category-pictures',
             'category_catname' => $this->category->catname,
             'other'            => $this->isOther,
-            'car_id'           => $this->topItem ? $this->topItem->id : $item->id,
             'path'             => $currentPath,
             'page'             => 1
         ], [
@@ -173,7 +161,6 @@ class Category extends ListBuilder
             return $this->router->assemble([
                 'action'           => 'category-picture',
                 'category_catname' => $item->catname,
-                'car_id'           => $this->topItem ? $this->topItem->id : $item->id,
                 'picture_id'       => $picture['identity'] ? $picture['identity'] : $picture['id']
             ], [
                 'name' => 'categories'
@@ -182,7 +169,7 @@ class Category extends ListBuilder
         
         // found parent row
         if ($this->currentItem) {
-            $carParentRow = $carParentTable->fetchRow([
+            $carParentRow = $this->itemParentTable->fetchRow([
                 'car_id = ?'    => $item->id,
                 'parent_id = ?' => $this->currentItem->id
             ]);
@@ -201,7 +188,6 @@ class Category extends ListBuilder
             'action'           => 'category-picture',
             'category_catname' => $this->category->catname,
             'other'            => $this->isOther,
-            'car_id'           => $this->topItem ? $this->topItem->id : $item->id,
             'path'             => $currentPath,
             'picture_id'       => $picture['identity'] ? $picture['identity'] : $picture['id']
         ], [

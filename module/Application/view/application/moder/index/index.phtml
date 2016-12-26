@@ -32,14 +32,14 @@
                             <?=$this->htmlA($this->url('moder/cars/params', [
                                 'action'       => 'new',
                                 'item_type_id' => Application\Model\DbTable\Item\Type::VEHICLE
-                            ]), $this->page(163)->name)?>
+                            ]), $this->translate('item/type/1/new-item'))?>
                         </li>
                         <li>
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA($this->url('moder/cars/params', [
                                 'action'       => 'new',
                                 'item_type_id' => Application\Model\DbTable\Item\Type::ENGINE
-                            ]), $this->page(206)->name)?>
+                            ]), $this->translate('item/type/2/new-item'))?>
                         </li>
                     <?php } ?>
                 </ul>
