@@ -5,7 +5,7 @@ return array_replace(include 'root.php', [
         'plural_forms' => 'nplurals=2; plural=(n==1)?0:1'
     ],
 
-    'test' => 'test is ok',
+    'test' => 'test ist ok',
 
     /* Common words */
     'and' => 'and',
