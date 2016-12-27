@@ -52,7 +52,7 @@ class BrandVehicle
 
         $this->brandVehicleTable->delete([
             'brand_id = ?' => $brandId,
-            'car_id = ?'   => $vehicleId
+            'item_id = ?'  => $vehicleId
         ]);
 
         $brandRow->refreshPicturesCount();
@@ -98,7 +98,7 @@ class BrandVehicle
         $languageTable = new DbTable\Vehicle\Language;
 
         $languageRow = $languageTable->fetchRow([
-            'car_id = ?'   => $vehicleRow->id,
+            'item_id = ?'  => $vehicleRow->id,
             'language = ?' => $language
         ]);
 
@@ -143,7 +143,7 @@ class BrandVehicle
             $exists = (bool)$this->brandVehicleTable->fetchRow([
                 'brand_id = ?' => $brandRow->id,
                 'catname = ?'  => $catname,
-                'car_id <> ?'  => $vehicleRow->id
+                'item_id <> ?' => $vehicleRow->id
             ]);
 
             $i++;
@@ -162,7 +162,7 @@ class BrandVehicle
 
         $brandVehicleRow = $this->brandVehicleTable->fetchRow([
             'brand_id = ?' => $brandRow->id,
-            'car_id = ?'   => $vehicleRow->id
+            'item_id = ?'  => $vehicleRow->id
         ]);
 
         if ($brandVehicleRow) {
@@ -176,7 +176,7 @@ class BrandVehicle
 
         $brandVehicleRow = $this->brandVehicleTable->createRow([
             'brand_id' => $brandRow->id,
-            'car_id'   => $vehicleRow->id,
+            'item_id'  => $vehicleRow->id,
             'type'     => DbTable\BrandItem::TYPE_DEFAULT,
             'catname'  => $catname,
             'is_auto'  => 1
@@ -265,7 +265,7 @@ class BrandVehicle
 
         $brandVehicleRow = $this->brandVehicleTable->fetchRow([
             'brand_id = ?' => $brandId,
-            'car_id = ?'   => $vehicleId
+            'item_id = ?'  => $vehicleId
         ]);
 
         if (! $brandVehicleRow) {
@@ -306,7 +306,7 @@ class BrandVehicle
         $brandId = (int)$brandId;
 
         $bvRow = $this->brandVehicleTable->fetchRow([
-            'car_id = ?'   => $vehicleId,
+            'item_id = ?'  => $vehicleId,
             'brand_id = ?' => $brandId
         ]);
 
@@ -344,7 +344,7 @@ class BrandVehicle
     public function refreshAutoByVehicle($vehicleId)
     {
         $brandVehicleRows = $this->brandVehicleTable->fetchAll([
-            'car_id = ?' => (int)$vehicleId
+            'item_id = ?' => (int)$vehicleId
         ]);
 
         foreach ($brandVehicleRows as $brandVehicleRow) {
@@ -359,10 +359,10 @@ class BrandVehicle
         $brandVehicleRows = $this->brandVehicleTable->fetchAll([
             'is_auto',
             'brand_id >= 58'
-        ], ['brand_id', 'car_id']);
+        ], ['brand_id', 'item_id']);
 
         foreach ($brandVehicleRows as $brandVehicleRow) {
-            $this->refreshAuto($brandVehicleRow->brand_id, $brandVehicleRow->car_id);
+            $this->refreshAuto($brandVehicleRow->brand_id, $brandVehicleRow->item_id);
         }
 
         return true;

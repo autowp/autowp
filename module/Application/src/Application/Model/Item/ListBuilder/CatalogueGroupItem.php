@@ -71,7 +71,7 @@ class CatalogueGroupItem extends CatalogueItem
         $db = $this->itemLanguageTable->getAdapter();
         $orderExpr = $db->quoteInto('language = ? desc', $this->language);
         $itemLanguageRows = $this->itemLanguageTable->fetchAll([
-            'car_id = ?' => $itemId
+            'item_id = ?' => $itemId
         ], new Zend_Db_Expr($orderExpr));
 
         $fullTextIds = [];
@@ -92,7 +92,7 @@ class CatalogueGroupItem extends CatalogueItem
     {
         if (! isset($this->itemParentRows[$itemId][$parentId])) {
             $this->itemParentRows[$itemId][$parentId] = $this->itemParentTable->fetchRow([
-                'car_id = ?'    => $itemId,
+                'item_id = ?'   => $itemId,
                 'parent_id = ?' => $parentId
             ]);
         }

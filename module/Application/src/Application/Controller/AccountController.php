@@ -824,9 +824,9 @@ class AccountController extends AbstractActionController
             $car = $carTable->find($conflict['itemId'])->current();
             $conflict['object'] = $car ? $this->car()->formatName($car, $language) : null;
             $conflict['url'] = $this->url()->fromRoute('cars/params', [
-                'action' => 'car-specifications-editor',
-                'car_id' => $conflict['itemId'],
-                'tab'    => 'spec'
+                'action'  => 'car-specifications-editor',
+                'item_id' => $conflict['itemId'],
+                'tab'     => 'spec'
             ]);
         }
         unset($conflict);

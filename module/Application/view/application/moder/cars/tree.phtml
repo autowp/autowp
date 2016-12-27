@@ -32,11 +32,11 @@
                 <?php foreach ($this->parents as $car) { ?>
                     <li class="parent">
                         <?=$this->htmlA($this->url([
-                            'car_id' => $car->id
+                            'item_id' => $car->id
                         ]), $this->car()->htmlTitle($car->getNameData($this->language())), false)?>
                         <?=$this->htmlA($this->url([
-                            'action' => 'car',
-                            'car_id' => $car->id
+                            'action'  => 'car',
+                            'item_id' => $car->id
                         ]), '<i class="fa fa-cog"></i>', false)?>
                         <?=$this->htmlA([
                             'href'    => '#',
@@ -48,11 +48,11 @@
                 <li>
                     <ul><li>
                         <strong><?=$this->htmlA($this->url([
-                            'car_id' => $this->car->id
+                            'item_id' => $this->car->id
                         ]), $this->car()->htmlTitle($this->car->getNameData($this->language())), false)?></strong>
                         <?=$this->htmlA($this->url([
-                            'action' => 'car',
-                            'car_id' => $this->car->id
+                            'action'  => 'car',
+                            'item_id' => $this->car->id
                         ]), '<i class="fa fa-cog"></i>', false)?>
                         <ul>
                             <?php foreach ($this->childs as $car) { ?>

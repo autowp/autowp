@@ -31,7 +31,7 @@
 <?php } ?>
 <?php if ($this->canEditFactory) { ?>
     <p><?=$this->htmlA($this->url('moder/cars/params', [
-        'action' => 'car-select-factory',
-        'car_id' => $this->car->id
+        'action'  => 'car-select-factory',
+        'item_id' => $this->car->id
     ]), $this->translate('moder/vehicle/factories/select-factory')) ?></p>
 <?php } ?>

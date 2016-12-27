@@ -195,7 +195,7 @@ class PicturesController extends AbstractActionController
         /*$subSelect = $db->select()
             ->distinct()
             ->from('brand_item', 'brand_id')
-            ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+            ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
             ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
             ->join('pictures', 'picture_item.picture_id = pictures.id', null);
 
@@ -340,19 +340,19 @@ class PicturesController extends AbstractActionController
                 }
                 $select
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = ?', $formdata['brand_id']);
             }
         }
 
-        if ($formdata['car_id']) {
+        if ($formdata['item_id']) {
             if (! $pictureItemJoined) {
                 $pictureItemJoined = true;
                 $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
             }
             $select
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $formdata['car_id']);
+                ->where('item_parent_cache.parent_id = ?', $formdata['item_id']);
         }
 
         if ($formdata['perspective_id']) {
@@ -448,7 +448,7 @@ class PicturesController extends AbstractActionController
                             'pictures.id = pi_left.picture_id',
                             null
                         )
-                        ->where('pi_left.car_id IS NULL');
+                        ->where('pi_left.item_id IS NULL');
                     break;
             }
         }
@@ -1217,7 +1217,7 @@ class PicturesController extends AbstractActionController
             $relatedBrands = $brandModel->getList($this->language(), function ($select) use ($item) {
                 $select
                     ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                    ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                    ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                     ->where('item_parent_cache.item_id = ?', $item['id'])
                     ->group('brands.id');
             });
@@ -1559,16 +1559,16 @@ class PicturesController extends AbstractActionController
             $cars[] = [
                 'name' => $this->car()->formatName($row, $this->language()),
                 'url'  => $this->url()->fromRoute(null, [
-                    'action' => 'move',
-                    'car_id' => $row['id'],
-                    'type'   => Picture::VEHICLE_TYPE_ID
+                    'action'  => 'move',
+                    'item_id' => $row['id'],
+                    'type'    => Picture::VEHICLE_TYPE_ID
                 ], [], true),
                 'haveChilds' => $haveChilds,
                 'isGroup'    => $row->is_group,
                 'type'       => null,
                 'loadUrl'    => $this->url()->fromRoute(null, [
-                    'action' => 'car-childs',
-                    'car_id' => $row['id']
+                    'action'  => 'car-childs',
+                    'item_id' => $row['id']
                 ], [], true),
             ];
         }
@@ -1584,7 +1584,7 @@ class PicturesController extends AbstractActionController
 
         $items = [];
         foreach ($rows as $carParentRow) {
-            $car = $carTable->find($carParentRow->car_id)->current();
+            $car = $carTable->find($carParentRow->item_id)->current();
             if ($car) {
                 $haveChilds = (bool)$carParentAdapter->fetchOne(
                     $carParentAdapter->select()
@@ -1595,7 +1595,7 @@ class PicturesController extends AbstractActionController
                     'name' => $this->car()->formatName($car, $this->language()),
                     'url'  => $this->url()->fromRoute(null, [
                         'action' => 'move',
-                        'car_id' => $car['id'],
+                        'item_id' => $car['id'],
                         'type'   => Picture::VEHICLE_TYPE_ID
                     ], [], true),
                     'haveChilds' => $haveChilds,
@@ -1603,7 +1603,7 @@ class PicturesController extends AbstractActionController
                     'type'       => $carParentRow->type,
                     'loadUrl'    => $this->url()->fromRoute(null, [
                         'action' => 'car-childs',
-                        'car_id' => $car['id']
+                        'item_id' => $car['id']
                     ], [], true),
                 ];
             }
@@ -1626,14 +1626,14 @@ class PicturesController extends AbstractActionController
         $carTable = new Vehicle();
         $carParentTable = $this->getCarParentTable();
 
-        $car = $carTable->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
 
         $rows = $carParentTable->fetchAll(
             $carParentTable->select(true)
-                ->join('cars', 'cars.id = item_parent.car_id', null)
+                ->join('cars', 'cars.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $car->id)
                 ->order([
                     'item_parent.type',
@@ -1670,7 +1670,7 @@ class PicturesController extends AbstractActionController
         $rows = $carTable->fetchAll(
             $carTable->select(true)
                 ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brand->id)
                 ->where('cars.is_concept')
                 ->order(['cars.name', 'cars.begin_year', 'cars.end_year'])
@@ -2049,7 +2049,7 @@ class PicturesController extends AbstractActionController
                     break;
 
                 case Picture::VEHICLE_TYPE_ID:
-                    $carId = (int)$this->params('car_id');
+                    $carId = (int)$this->params('item_id');
 
                     if ($srcItem) {
                         $this->pictureItem->changePictureItem($picture->id, $srcItem->id, $carId);
@@ -2057,7 +2057,7 @@ class PicturesController extends AbstractActionController
                         $success = $this->table->addToCar(
                             $this->pictureItem,
                             $picture->id,
-                            $this->params('car_id'),
+                            $this->params('item_id'),
                             $userId,
                             [
                                 'language'             => $this->language(),
@@ -2079,7 +2079,7 @@ class PicturesController extends AbstractActionController
                     }
 
                     $namespace = new \Zend\Session\Container('Moder_Car');
-                    $namespace->lastCarId = $this->params('car_id');
+                    $namespace->lastCarId = $this->params('item_id');
                     break;
 
                 case Picture::FACTORY_TYPE_ID:
@@ -2128,7 +2128,7 @@ class PicturesController extends AbstractActionController
         if ($brand) {
             $rows = $carTable->fetchAll(
                 $carTable->select(true)
-                    ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                    ->join('brand_item', 'cars.id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = ?', $brand['id'])
                     ->where('NOT cars.is_concept')
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::VEHICLE)
@@ -2144,7 +2144,7 @@ class PicturesController extends AbstractActionController
 
             $rows = $carTable->fetchAll(
                 $carTable->select(true)
-                    ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                    ->join('brand_item', 'cars.id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = ?', $brand['id'])
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::ENGINE)
                     ->order([
@@ -2161,7 +2161,7 @@ class PicturesController extends AbstractActionController
                 $haveConcepts = (bool)$carTable->fetchRow(
                     $carTable->select(true)
                         ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
-                        ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                        ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                         ->where('brand_item.brand_id = ?', $brand['id'])
                         ->where('cars.is_concept')
                 );

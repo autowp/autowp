@@ -363,7 +363,7 @@ class Catalogue implements RouteInterface
 
             $carParentTable = new VehicleParent();
 
-            $currentCarId = $brandItemRow->car_id;
+            $currentCarId = $brandItemRow->item_id;
             while ($path) {
                 $carParentRow = $carParentTable->fetchRow([
                     'parent_id = ?' => $currentCarId,
@@ -377,7 +377,7 @@ class Catalogue implements RouteInterface
                 array_shift($path);
                 $treePath[] = $carParentRow->catname;
 
-                $currentCarId = $carParentRow->car_id;
+                $currentCarId = $carParentRow->item_id;
             }
 
             if (! $path) {

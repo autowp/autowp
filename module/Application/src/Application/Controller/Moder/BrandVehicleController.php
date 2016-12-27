@@ -34,9 +34,9 @@ class BrandVehicleController extends AbstractActionController
     private function vehicleModerUrl(DbTable\Vehicle\Row $car, $full = false, $tab = null, $uri = null)
     {
         return $this->url()->fromRoute('moder/cars/params', [
-            'action' => 'car',
-            'car_id' => $car->id,
-            'tab'    => $tab
+            'action'  => 'car',
+            'item_id' => $car->id,
+            'tab'     => $tab
         ], [
             'force_canonical' => $full,
             'uri'             => $uri
@@ -65,8 +65,8 @@ class BrandVehicleController extends AbstractActionController
         $vehicleTable = $this->catalogue()->getCarTable();
 
         $brandItemRow = $brandVehicleTable->fetchRow([
-            'brand_id = ?' => $this->params('brand_id'),
-            'car_id = ?'   => $this->params('vehicle_id')
+            'brand_id = ?'  => $this->params('brand_id'),
+            'item_id = ?'   => $this->params('vehicle_id')
         ]);
 
         if (! $brandItemRow) {
@@ -74,7 +74,7 @@ class BrandVehicleController extends AbstractActionController
         }
 
         $brandRow = $brandTable->find($brandItemRow->brand_id)->current();
-        $vehicleRow = $vehicleTable->find($brandItemRow->car_id)->current();
+        $vehicleRow = $vehicleTable->find($brandItemRow->item_id)->current();
         if (! $brandRow || ! $vehicleRow) {
             return $this->notFoundAction();
         }

@@ -106,12 +106,12 @@ class CatalogueController extends AbstractActionController
 
             foreach ($categoryLangRows as $categoryLangRow) {
                 $itemLangRow = $itemLangTable->fetchRow([
-                    'car_id = ?'   => $itemRow->id,
+                    'item_id = ?'   => $itemRow->id,
                     'language = ?' => $categoryLangRow->language
                 ]);
                 if (!$itemLangRow) {
                     $itemLangRow = $itemLangTable->createRow([
-                        'car_id'   => $itemRow->id,
+                        'item_id'   => $itemRow->id,
                         'language' => $categoryLangRow->language,
                         'name'     => $categoryLangRow->name,
                         'text_id'  => $categoryLangRow->text_id
@@ -201,12 +201,12 @@ class CatalogueController extends AbstractActionController
             }
 
             $langRow = $itemLangTable->fetchRow([
-                'car_id = ?'   => $itemRow->id,
+                'item_id = ?'   => $itemRow->id,
                 'language = ?' => $language
             ]);
             if (!$langRow) {
                 $langRow = $itemLangTable->createRow([
-                    'car_id'   => $itemRow->id,
+                    'item_id'   => $itemRow->id,
                     'language' => $language,
                 ]);
             }

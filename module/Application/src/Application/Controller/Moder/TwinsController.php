@@ -133,7 +133,7 @@ class TwinsController extends AbstractActionController
 
         $vehicleRows = $vehicleTable->fetchAll(
             $vehicleTable->select(true)
-                ->join('twins_groups_cars', 'cars.id = twins_groups_cars.car_id', null)
+                ->join('twins_groups_cars', 'cars.id = twins_groups_cars.item_id', null)
                 ->where('twins_groups_cars.twins_group_id = ?', $group->id)
         );
 

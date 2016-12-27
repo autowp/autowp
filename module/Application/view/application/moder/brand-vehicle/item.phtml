@@ -20,9 +20,9 @@
     ]), $this->brand->name)?>
     &rarr;
     <?=$this->htmlA($this->url('moder/cars/params', [
-        'action' => 'car',
-        'car_id' => $this->vehicle->id,
-        'tab'    => 'catalogue'
+        'action'  => 'car',
+        'item_id' => $this->vehicle->id,
+        'tab'     => 'catalogue'
     ]), $this->car()->htmlTitle($this->vehicle->getNameData($this->language())), false)?>
 </p>
 

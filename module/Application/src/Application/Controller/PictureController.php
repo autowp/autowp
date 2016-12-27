@@ -185,7 +185,7 @@ class PictureController extends AbstractActionController
                 $brandList = $brandModel->getList($language, function ($select) use ($picture) {
                     $select
                         ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                        ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                        ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                         ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                         ->where('picture_item.picture_id = ?', $picture->id)
                         ->group('brands.id');
@@ -198,7 +198,7 @@ class PictureController extends AbstractActionController
 
         /*$this->_helper->actionStack('brands', 'sidebar', 'default', [
             'brand_id'   => $brands,
-            'car_id'     => $car ? $car->id : null,
+            'item_id'     => $car ? $car->id : null,
             'type'       => (int)$picture->type,
         ]);*/
 

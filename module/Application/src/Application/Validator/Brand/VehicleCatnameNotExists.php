@@ -41,7 +41,7 @@ class VehicleCatnameNotExists extends AbstractValidator
             'catname = ?'  => (string)$value
         ];
         if ($this->ignoreVehicleId) {
-            $filter['car_id <> ?'] = $this->ignoreVehicleId;
+            $filter['item_id <> ?'] = $this->ignoreVehicleId;
         }
 
         $table = new BrandVehicle();

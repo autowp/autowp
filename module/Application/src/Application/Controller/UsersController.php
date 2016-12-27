@@ -185,7 +185,7 @@ class UsersController extends AbstractActionController
         $rows = $brandModel->getList($options, function ($select) use ($user) {
             $select
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                 ->where('pictures.owner_id = ?', $user->id)
@@ -234,7 +234,7 @@ class UsersController extends AbstractActionController
         $select = $pictures->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+            ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
             ->where('pictures.owner_id = ?', $user->id)
             ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
             ->where('brand_item.brand_id = ?', $brand['id'])
@@ -310,7 +310,7 @@ class UsersController extends AbstractActionController
                 if (! $success) {
                     $carSelect = $db->select()
                         ->from('brand_item', ['brand_id', 'count(1)'])
-                        ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                        ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                         ->join('attrs_user_values', 'item_parent_cache.item_id = attrs_user_values.item_id', null)
                         ->where('attrs_user_values.user_id = ?', $user->id)
                         ->group('brand_item.brand_id')
@@ -383,7 +383,7 @@ class UsersController extends AbstractActionController
                 if (! $success) {
                     $select = $brandTable->select(true)
                         ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                        ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                        ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                         ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                         ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                         ->group('brand_item.brand_id')

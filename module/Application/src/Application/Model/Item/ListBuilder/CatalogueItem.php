@@ -90,7 +90,7 @@ class CatalogueItem extends Catalogue
         }
 
         $carParentRow = $this->itemParentTable->fetchRow([
-            'car_id = ?'    => $item->id,
+            'item_id = ?'   => $item->id,
             'parent_id = ?' => $this->itemId
         ]);
         if ($carParentRow) {

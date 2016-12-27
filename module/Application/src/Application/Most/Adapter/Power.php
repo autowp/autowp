@@ -40,9 +40,9 @@ class Power extends AbstractAdapter
 
         $db->query('
             create temporary table '.$tableNameQuoted.' (
-                car_id int unsigned not null,
+                item_id int unsigned not null,
                 power int unsigned not null,
-                primary key(car_id)
+                primary key(item_id)
             )
         ');
 
@@ -83,7 +83,7 @@ class Power extends AbstractAdapter
         }
 
         $db->query(
-            'insert ignore into '.$tableNameQuoted.' (car_id, power) '.
+            'insert ignore into '.$tableNameQuoted.' (item_id, power) '.
             $attrsSelect->assemble()
         );
 
@@ -111,14 +111,14 @@ class Power extends AbstractAdapter
         }
 
         $db->query(
-            'insert ignore into '.$tableNameQuoted.' (car_id, power) '.
+            'insert ignore into '.$tableNameQuoted.' (item_id, power) '.
             $attrsSelect->assemble()
         );
 
 
         $cars = $carsTable->fetchAll(
             $select
-                ->join(self::TEMP_TABLE_NAME, 'cars.id='.$tableNameQuoted.'.car_id', null)
+                ->join(self::TEMP_TABLE_NAME, 'cars.id='.$tableNameQuoted.'.item_id', null)
                 ->group('cars.id')
                 ->order('power ' . $this->order)
         );

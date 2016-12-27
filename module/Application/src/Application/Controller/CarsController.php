@@ -58,8 +58,8 @@ class CarsController extends AbstractActionController
     private function carModerUrl(VehicleRow $car, $uri = null)
     {
         return $this->url()->fromRoute('moder/cars/params', [
-            'action' => 'car',
-            'car_id' => $car->id,
+            'action'  => 'car',
+            'item_id' => $car->id,
         ], [
             'force_canonical' => true,
             'uri'             => $uri
@@ -69,9 +69,9 @@ class CarsController extends AbstractActionController
     private function editorUrl($car, $tab = null)
     {
         return $this->url()->fromRoute('cars/params', [
-            'action' => 'car-specifications-editor',
-            'car_id' => $car->id,
-            'tab'    => $tab
+            'action'  => 'car-specifications-editor',
+            'item_id' => $car->id,
+            'tab'     => $tab
         ]);
     }
 
@@ -86,7 +86,7 @@ class CarsController extends AbstractActionController
         $carTable = new Vehicle();
 
         $car = $carTable->fetchRow([
-            'id = ?' => (int)$this->params('car_id'),
+            'id = ?' => (int)$this->params('item_id'),
             'item_type_id IN (?)' => [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE]
         ]);
         if (! $car) {
@@ -160,8 +160,8 @@ class CarsController extends AbstractActionController
                 $engineInheritedFrom[] = [
                     'name' => $this->car()->formatName($carRow, $this->language()),
                     'url'  => $this->url()->fromRoute('moder/cars/params', [
-                        'action' => 'car',
-                        'car_id' => $carRow->id
+                        'action'  => 'car',
+                        'item_id' => $carRow->id
                     ])
                 ];
             }
@@ -234,7 +234,7 @@ class CarsController extends AbstractActionController
 
         $carTable = new Vehicle();
 
-        $car = $carTable->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -472,14 +472,14 @@ class CarsController extends AbstractActionController
             if ($car) {
                 $objectName = $this->car()->formatName($car, $this->language());
                 $editorUrl = $this->url()->fromRoute('cars/params', [
-                    'action' => 'car-specifications-editor',
-                    'car_id' => $car->id
+                    'action'  => 'car-specifications-editor',
+                    'item_id' => $car->id
                 ]);
 
                 if ($isModerator) {
                     $moderUrl = $this->url()->fromRoute('moder/cars/params', [
-                        'action' => 'car',
-                        'car_id' => $car->id
+                        'action'  => 'car',
+                        'item_id' => $car->id
                     ]);
                 }
             }
@@ -542,7 +542,7 @@ class CarsController extends AbstractActionController
 
         $carTable = new Vehicle();
 
-        $car = $carTable->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -599,7 +599,7 @@ class CarsController extends AbstractActionController
 
         $carTable = new Vehicle();
 
-        $car = $carTable->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -653,12 +653,12 @@ class CarsController extends AbstractActionController
             ->order('cars.name');
         if ($brandId) {
             $select
-                ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                ->join('brand_item', 'cars.id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brandId);
         }
         if ($parentId) {
             $select
-                ->join('item_parent', 'cars.id = item_parent.car_id', null)
+                ->join('item_parent', 'cars.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $parentId);
         }
 
@@ -689,7 +689,7 @@ class CarsController extends AbstractActionController
         $carTable = new Vehicle();
 
         $car = $carTable->fetchRow([
-            'id = ?'           => (int)$this->params('car_id'),
+            'id = ?'           => (int)$this->params('item_id'),
             'item_type_id = ?' => DbTable\Item\Type::VEHICLE
         ]);
         if (! $car) {
@@ -706,7 +706,7 @@ class CarsController extends AbstractActionController
             $brands = $brandModel->getList($language, function ($select) {
                 $select
                     ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                    ->join('cars', 'brand_item.car_id = cars.id', null)
+                    ->join('cars', 'brand_item.item_id = cars.id', null)
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::ENGINE)
                     ->group('brands.id');
             });
@@ -777,7 +777,7 @@ class CarsController extends AbstractActionController
 
         $carTable = new Vehicle();
 
-        $car = $carTable->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }

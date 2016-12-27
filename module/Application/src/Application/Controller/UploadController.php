@@ -98,7 +98,7 @@ class UploadController extends AbstractActionController
         } else {
             $type = (int)$this->params('type');
             $brandId = (int)$this->params('brand_id');
-            $carId = (int)$this->params('car_id');
+            $carId = (int)$this->params('item_id');
             $carIds = $carId ? [$carId] : [];
         }
 
@@ -430,7 +430,7 @@ class UploadController extends AbstractActionController
         $haveConcepts = (bool)$carTable->fetchRow(
             $carTable->select(true)
                 ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('cars.is_concept')
         );
@@ -449,9 +449,9 @@ class UploadController extends AbstractActionController
                     'cars.begin_year', 'cars.end_year',
                     'cars.is_group'
                 ])
-                ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :lang', null)
+                ->joinLeft('item_language', 'cars.id = item_language.item_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
-                ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                ->join('brand_item', 'cars.id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('NOT cars.is_concept')
                 ->where('cars.item_type_id = ?', DbTable\Item\Type::VEHICLE)
@@ -480,9 +480,9 @@ class UploadController extends AbstractActionController
                     'cars.begin_year', 'cars.end_year',
                     'cars.is_group'
                 ])
-                ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :lang', null)
+                ->joinLeft('item_language', 'cars.id = item_language.item_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
-                ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                ->join('brand_item', 'cars.id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('cars.item_type_id = ?', DbTable\Item\Type::ENGINE)
                 ->order([
@@ -542,16 +542,16 @@ class UploadController extends AbstractActionController
                 'end_year'         => $row['end_year'],
                 'today'            => $row['today'],
                 'url'  => $this->url()->fromRoute('upload/params', [
-                    'action' => 'index',
-                    'type'   => Picture::VEHICLE_TYPE_ID,
-                    'car_id' => $row['id']
+                    'action'  => 'index',
+                    'type'    => Picture::VEHICLE_TYPE_ID,
+                    'item_id' => $row['id']
                 ], [], true),
                 'haveChilds' => $haveChilds,
                 'isGroup'    => $row['is_group'],
                 'type'       => null,
                 'loadUrl'    => $this->url()->fromRoute('upload/params', [
-                    'action' => 'car-childs',
-                    'car_id' => $row['id']
+                    'action'  => 'car-childs',
+                    'item_id' => $row['id']
                 ], [], true),
             ];
         }
@@ -582,16 +582,16 @@ class UploadController extends AbstractActionController
                 'end_year'         => $row['end_year'],
                 'today'            => $row['today'],
                 'url'  => $this->url()->fromRoute('upload/params', [
-                    'action' => 'index',
-                    'type'   => Picture::VEHICLE_TYPE_ID,
-                    'car_id' => $row['id']
+                    'action'  => 'index',
+                    'type'    => Picture::VEHICLE_TYPE_ID,
+                    'item_id' => $row['id']
                 ], [], true),
                 'haveChilds' => $haveChilds,
                 'isGroup'    => $row['is_group'],
                 'type'       => $row['type'],
                 'loadUrl'    => $this->url()->fromRoute('upload/params', [
-                    'action' => 'car-childs',
-                    'car_id' => $row['id']
+                    'action'  => 'car-childs',
+                    'item_id' => $row['id']
                 ], [], true),
             ];
         }
@@ -610,7 +610,7 @@ class UploadController extends AbstractActionController
 
         $carTable = new Vehicle();
 
-        $car = $carTable->find($this->params('car_id'))->current();
+        $car = $carTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notfoundAction();
         }
@@ -629,9 +629,9 @@ class UploadController extends AbstractActionController
                     'cars.begin_year', 'cars.end_year',
                     'cars.is_group'
                 ])
-                ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :lang', null)
+                ->joinLeft('item_language', 'cars.id = item_language.item_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
-                ->join('item_parent', 'cars.id = item_parent.car_id', 'type')
+                ->join('item_parent', 'cars.id = item_parent.item_id', 'type')
                 ->where('item_parent.parent_id = ?', $car->id)
                 ->order(['item_parent.type', 'cars.name', 'cars.begin_year', 'cars.end_year'])
                 ->bind([
@@ -677,10 +677,10 @@ class UploadController extends AbstractActionController
                     'cars.begin_year', 'cars.end_year',
                     'cars.is_group'
                 ])
-                ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :lang', null)
+                ->joinLeft('item_language', 'cars.id = item_language.item_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
                 ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brand->id)
                 ->where('cars.is_concept')
                 ->order(['cars.name', 'cars.begin_year', 'cars.end_year'])

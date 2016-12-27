@@ -236,7 +236,7 @@ class BrandsController extends AbstractActionController
         $carTable = new Vehicle();
         $cars = $carTable->fetchAll(
             $carTable->select(true)
-                ->join('brand_item', 'cars.id = brand_item.car_id', null)
+                ->join('brand_item', 'cars.id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brand->id)
                 ->order('cars.name')
         );

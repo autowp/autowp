@@ -30,15 +30,15 @@
                             <span class="input-group-btn">
                                 <?=$this->htmlA([
                                     'href' => $this->url(null, [
-                                        'action' => 'car-select-parent',
-                                        'car_id' => $this->car['id']
+                                        'action'  => 'car-select-parent',
+                                        'item_id' => $this->car['id']
                                     ]),
                                     'class' => 'btn btn-success',
                                 ], $this->translate('moder/vehicle/catalogue/select'))?>
                             </span>
                             <input type="text" name="parent" class="form-control" placeholder="<?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/select-placeholder'))?>" data-autocomplete="<?=$this->escapeHtmlAttr($this->url(null, [
-                                'action' => 'car-autocomplete',
-                                'car_id' => $this->car['id']
+                                'action'  => 'car-autocomplete',
+                                'item_id' => $this->car['id']
                             ], [], true))?>" />
                         </div>
                     </form>
@@ -347,8 +347,8 @@
 
 <?php if ($this->canMove && $this->canAddBrand) { ?>
     <form action="<?=$this->escapeHtmlAttr($this->url('moder/cars/params', [
-        'action' => 'car-select-brand',
-        'car_id' => $this->car->id
+        'action'  => 'car-select-brand',
+        'item_id' => $this->car->id
     ], [], true)) ?>" method="post"><div>
         <button type="submit" class="btn btn-xs btn-success">
             <i class="fa fa-plus"></i>

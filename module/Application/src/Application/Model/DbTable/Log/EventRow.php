@@ -28,7 +28,7 @@ class EventRow extends Row
                     $tableName = 'log_events_pictures';
                     break;
                 case $table instanceof \Application\Model\DbTable\Vehicle:
-                    $col = 'car_id';
+                    $col = 'item_id';
                     $tableName = 'log_events_cars';
                     break;
                 case $table instanceof \Application\Model\DbTable\Brand:

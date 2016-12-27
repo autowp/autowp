@@ -19,8 +19,8 @@
                 <tr>
                     <td>
                         <?=$this->htmlA($this->url('moder/cars/params', [
-                            'action'     => 'car',
-                            'car_id'     => $item['row']->id
+                            'action'  => 'car',
+                            'item_id' => $item['row']->id
                         ]), $this->car()->htmlTitle($item['row']->getNameData($this->language())), false) ?>
                     </td>
                     <td>
@@ -66,7 +66,7 @@
                                                 'picture_id'  => $this->picture->id,
                                                 'src_item_id' => $item['item_id'],
                                                 'type'        => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
-                                                'car_id'      => $this->lastCar->id
+                                                'item_id'     => $this->lastCar->id
                                             ]),
                                             '<i class="fa fa-arrow-right"></i> ' .
                                             $this->escapeHtml($this->translate('moder/picture/catalogue/move-to')) . ' ' .
@@ -180,7 +180,7 @@
                     'action'     => 'move',
                     'picture_id' => $this->picture->id,
                     'type'       => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
-                    'car_id'     => $this->lastCar->id
+                    'item_id'    => $this->lastCar->id
                 ])
             ],
             '<i class="fa fa-plus"></i> ' .

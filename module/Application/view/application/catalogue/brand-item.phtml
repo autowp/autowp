@@ -54,8 +54,8 @@
     <p>
         <i class="fa fa-cog"></i>
         <?=$this->htmlA($this->url('moder/cars/params', [
-            'action' => 'car',
-            'car_id' => $this->car['id']
+            'action'  => 'car',
+            'item_id' => $this->car['id']
         ]), $this->translate('moder/edit-object'))?>
 
         <?php if ($this->user()->isAllowed('car', 'add') && $this->car['is_group']) { ?>
@@ -70,17 +70,17 @@
         <?php if ($this->canAcceptPicture && $this->inboxCount) { ?>
             <i class="fa fa-th"></i>
             <?=$this->htmlA($this->url('moder/pictures/params', [
-                'action'     => 'index',
-                'car_id'     => $this->car['id'],
-                'status'     => 'inbox'
+                'action'  => 'index',
+                'item_id' => $this->car['id'],
+                'status'  => 'inbox'
             ]), $this->translate('catalogue/vehicle/inbox') . ' ('.$this->inboxCount.')')?>
         <?php } ?>
 
         <?php if ($this->requireAttention) { ?>
             <i class="fa fa-comment"></i>
             <?=$this->htmlA($this->url('moder/comments/params', [
-                'action'     => 'index',
-                'car_id'     => $this->car['id'],
+                'action'              => 'index',
+                'item_id'             => $this->car['id'],
                 'moderator_attention' => '1'
             ]), $this->translate('catalogue/vehicle/comments') . ' ('.$this->requireAttention.')')?>
         <?php } ?>

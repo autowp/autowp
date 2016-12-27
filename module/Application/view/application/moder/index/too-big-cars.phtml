@@ -13,8 +13,8 @@
             <tr>
                 <td><?=$this->escapeHtml($row['id'])?></td>
                 <td><?=$this->htmlA($this->url('moder/cars/params', [
-                    'action' => 'car',
-                    'car_id' => $row['id']
+                    'action'  => 'car',
+                    'item_id' => $row['id']
                 ]), $row['name'])?></td>
                 <td><?=$this->escapeHtml($row['body'])?></td>
                 <td><?=$this->escapeHtml($row['t'])?></td>

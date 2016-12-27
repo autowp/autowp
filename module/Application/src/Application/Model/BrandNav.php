@@ -44,7 +44,7 @@ class BrandNav
     {
         $defaults = [
             'brand_id'    => null,
-            'car_id'      => null,
+            'item_id'     => null,
             'type'        => null,
             'is_concepts' => false,
             'language'    => 'en'
@@ -57,7 +57,7 @@ class BrandNav
             return;
         }
 
-        $carId = (int)$params['car_id'];
+        $carId = (int)$params['item_id'];
         $type = $params['type'];
         $type = strlen($type) ? (int)$type : null;
         $isConcepts = (bool)$params['is_concepts'];
@@ -129,7 +129,7 @@ class BrandNav
                 $select = $db->select()
                     ->from('cars', new Zend_Db_Expr('1'))
                     ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = ?', $brand['id'])
                     ->where('cars.is_concept')
                     ->limit(1);
@@ -292,8 +292,8 @@ class BrandNav
                 'brand_item_catname' => 'catname',
                 'brand_id'
             ])
-            ->join('cars', 'cars.id = brand_item.car_id', [
-                'car_id'   => 'id',
+            ->join('cars', 'cars.id = brand_item.item_id', [
+                'item_id'  => 'id',
                 'car_name' => 'cars.name',
             ])
             ->where('brand_item.brand_id = ?', $brandId)
@@ -367,7 +367,7 @@ class BrandNav
                 $conceptsSeparatly
             );
             foreach ($db->fetchAll($select) as $row) {
-                $rows[$row['car_id']] = $row;
+                $rows[$row['item_id']] = $row;
             }
             $select = $this->carSectionGroupsSelect(
                 $brand['id'],
@@ -377,7 +377,7 @@ class BrandNav
                 $conceptsSeparatly
             );
             foreach ($db->fetchAll($select) as $row) {
-                $rows[$row['car_id']] = $row;
+                $rows[$row['item_id']] = $row;
             }
         }
 
@@ -394,7 +394,7 @@ class BrandNav
             ]);
 
             $bvlRow = $brandVehicleLangaugeTable->fetchRow([
-                'vehicle_id = ?' => $brandItemRow['car_id'],
+                'vehicle_id = ?' => $brandItemRow['item_id'],
                 'brand_id = ?'   => $brandItemRow['brand_id'],
                 'language = ?'   => $language,
                 'length(name) > 0'
@@ -404,7 +404,7 @@ class BrandNav
                 $name = $bvlRow->name;
             } else {
                 $carLangRow = $carLanguageTable->fetchRow([
-                    'car_id = ?'   => (int)$brandItemRow['car_id'],
+                    'item_id = ?'  => (int)$brandItemRow['item_id'],
                     'language = ?' => (string)$language,
                     'length(name) > 0'
                 ]);
@@ -429,9 +429,9 @@ class BrandNav
             }
 
             $groups[] = [
-                'car_id' => $brandItemRow['car_id'],
-                'url'    => $url,
-                'name'   => $name,
+                'item_id' => $brandItemRow['item_id'],
+                'url'     => $url,
+                'name'    => $name,
             ];
         }
 
@@ -521,8 +521,8 @@ class BrandNav
 
         foreach ($sections as &$section) {
             foreach ($section['groups'] as &$group) {
-                $group['active'] = in_array($group['car_id'], $selectedIds);
-                unset($group['car_id']);
+                $group['active'] = in_array($group['item_id'], $selectedIds);
+                unset($group['item_id']);
             }
         }
 

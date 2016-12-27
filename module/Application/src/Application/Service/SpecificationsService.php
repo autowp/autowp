@@ -1028,7 +1028,7 @@ class SpecificationsService
             $db = $carParentTable->getAdapter();
             $this->carChildsCache[$parentId] = $db->fetchCol(
                 $db->select()
-                    ->from($carParentTable->info('name'), 'car_id')
+                    ->from($carParentTable->info('name'), 'item_id')
                     ->where('parent_id = ?', $parentId)
             );
         }
@@ -1419,7 +1419,7 @@ class SpecificationsService
             $carParentName = null;
             if ($contextCarId) {
                 $carParentRow = $carParentTable->fetchRow([
-                    'car_id = ?'    => $car->id,
+                    'item_id = ?'   => $car->id,
                     'parent_id = ?' => $contextCarId
                 ]);
                 if ($carParentRow) {
@@ -1824,7 +1824,7 @@ class SpecificationsService
         $parentIds = $db->fetchCol(
             $db->select()
                 ->from('item_parent', 'parent_id')
-                ->where('car_id = ?', $itemId)
+                ->where('item_id = ?', $itemId)
         );
 
         if (count($parentIds) > 0) {
@@ -2057,7 +2057,7 @@ class SpecificationsService
         $db = $valueTable->getAdapter();
         $select = $db->select()
             ->from($valueTable->info('name'), ['twins_groups_cars.twins_group_id', new Zend_Db_Expr('1')])
-            ->join('twins_groups_cars', 'attrs_values.item_id = twins_groups_cars.car_id', null)
+            ->join('twins_groups_cars', 'attrs_values.item_id = twins_groups_cars.item_id', null)
             ->where('twins_groups_cars.twins_group_id in (?)', $groupIds);
 
         return $db->fetchPairs($select);
@@ -2088,7 +2088,7 @@ class SpecificationsService
         $db = $valueTable->getAdapter();
         $select = $db->select()
             ->from($valueTable->info('name'), 'item_parent.parent_id')
-            ->join('item_parent', 'attrs_values.item_id = item_parent.car_id', null);
+            ->join('item_parent', 'attrs_values.item_id = item_parent.item_id', null);
         if (is_array($itemId)) {
             if (count($itemId) <= 0) {
                 return [];

@@ -44,7 +44,7 @@ class CarOfDay
                 INNER JOIN pictures AS p ON picture_item.picture_id=p.id
             WHERE p.type=? AND p.status=?
                 AND (c.begin_year AND c.end_year OR c.begin_model_year AND c.end_model_year)
-                AND c.id NOT IN (SELECT car_id FROM of_day WHERE car_id)
+                AND c.id NOT IN (SELECT item_id FROM of_day WHERE item_id)
             GROUP BY c.id
             HAVING p_count >= 5
             ORDER BY RAND()
@@ -67,12 +67,12 @@ class CarOfDay
             ]);
         }
 
-        if (! $dayRow['car_id']) {
+        if (! $dayRow['item_id']) {
             $row = $this->getCarOfDayCadidate();
             if ($row) {
                 print $row['id']  ."\n";
 
-                $dayRow->car_id = $row['id'];
+                $dayRow->item_id = $row['id'];
                 $dayRow->save();
             }
         }
@@ -84,7 +84,7 @@ class CarOfDay
             'day_date <= CURDATE()'
         ], 'day_date DESC');
 
-        return $row ? $row->car_id : null;
+        return $row ? $row->item_id : null;
     }
 
     private function pictureByPerspective($pictureTable, $car, $perspective)
@@ -119,7 +119,7 @@ class CarOfDay
         $carTable = new Vehicle();
 
         $car = $carTable->fetchRow([
-            'id = ?' => (int)$dayRow->car_id
+            'id = ?' => (int)$dayRow->item_id
         ]);
 
         if (! $car) {

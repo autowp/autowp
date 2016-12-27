@@ -24,7 +24,7 @@ class ModificationController extends AbstractActionController
                 'module'     => 'moder',
                 'controller' => 'cars',
                 'action'     => 'car',
-                'car_id'     => $carId,
+                'item_id'    => $carId,
                 'tab'        => $tab
             ], 'default', true)
         );
@@ -47,7 +47,7 @@ class ModificationController extends AbstractActionController
 
         $cars = $this->_helper->catalogue()->getCarTable();
 
-        $car = $cars->find($this->_getParam('car_id'))->current();
+        $car = $cars->find($this->_getParam('item_id'))->current();
         if (! $car) {
             return $this->_forward('notfound', 'error', 'default');
         }
@@ -98,7 +98,7 @@ class ModificationController extends AbstractActionController
             }
 
             $mRow = $mTable->createRow([
-                'car_id'           => $car->id,
+                'item_id'          => $car->id,
                 'name'             => $values['name'],
                 'group_id'         => $values['group_id'] ? $values['group_id'] : null,
                 'begin_year'       => $values['begin_year'] ? $values['begin_year'] : null,
@@ -130,7 +130,7 @@ class ModificationController extends AbstractActionController
 
         $cars = $this->_helper->catalogue()->getCarTable();
 
-        $car = $cars->find($this->_getParam('car_id'))->current();
+        $car = $cars->find($this->_getParam('item_id'))->current();
         if (! $car) {
             return $this->_forward('notfound', 'error', 'default');
         }
@@ -232,7 +232,7 @@ class ModificationController extends AbstractActionController
 
         $cars = $this->_helper->catalogue()->getCarTable();
 
-        $car = $cars->find($this->_getParam('car_id'))->current();
+        $car = $cars->find($this->_getParam('item_id'))->current();
         if (! $car) {
             return $this->_forward('notfound', 'error', 'default');
         }
@@ -242,7 +242,7 @@ class ModificationController extends AbstractActionController
         $mgRows = $mgTable->fetchAll(
             $mgTable->select(true)
                 ->join('modification', 'modification_group.id = modification.group_id', null)
-                ->join('item_parent_cache', 'modification.car_id = item_parent_cache.parent_id', null)
+                ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', null)
                 ->where('item_parent_cache.item_id = ?', $car->id)
                 ->group('modification_group.id')
         );
@@ -253,7 +253,7 @@ class ModificationController extends AbstractActionController
         $names = $db->fetchPairs(
             $db->select()
                 ->from($mTable->info('name'), ['id', 'name'])
-                ->join('item_parent_cache', 'modification.car_id = item_parent_cache.parent_id', null)
+                ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', null)
                 ->where('item_parent_cache.item_id = ?', $car->id)
                 ->order(['modification.group_id', 'modification.name'])
         );
@@ -264,7 +264,7 @@ class ModificationController extends AbstractActionController
             $map[] = $db->fetchCol(
                 $db->select()
                     ->from($mTable->info('name'), 'id')
-                    ->join('item_parent_cache', 'modification.car_id = item_parent_cache.parent_id', null)
+                    ->join('item_parent_cache', 'modification.item_id = item_parent_cache.parent_id', null)
                     ->where('item_parent_cache.item_id = ?', $car->id)
                     ->where('modification.group_id = ?', $mgRow->id)
                     ->order(['modification.group_id', 'modification.name'])
@@ -280,7 +280,7 @@ class ModificationController extends AbstractActionController
             $db->select(true)
                 ->from($combModTable->info('name'), ['combination_id', 'modification_id'])
                 ->join('combination', 'combination_modification.combination_id = combination.id', null)
-                ->where('combination.car_id = ?', $car->id)
+                ->where('combination.item_id = ?', $car->id)
         );
         $values = [];
         foreach ($combModRows as $combModRow) {
@@ -345,6 +345,6 @@ class ModificationController extends AbstractActionController
 
         $modModel->delete($id);
 
-        return $this->redirectToCar($this->getParam('car_id'), 'modifications');
+        return $this->redirectToCar($this->getParam('item_id'), 'modifications');
     }
 }

@@ -50,7 +50,7 @@ class ParentCache extends Table
         $rows = $adapter->fetchAll(
             $adapter->select()
                 ->from($cpTableName, ['parent_id', 'type'])
-                ->where('car_id = ?', $id)
+                ->where('item_id = ?', $id)
         );
 
         $result = [];
@@ -101,7 +101,7 @@ class ParentCache extends Table
             $toCheck = $adapter->fetchCol(
                 $adapter->select()
                     ->from($cpTableName, 'parent_id')
-                    ->where('car_id in (?)', $toCheck)
+                    ->where('item_id in (?)', $toCheck)
             );
 
             $diff++;
@@ -148,7 +148,7 @@ class ParentCache extends Table
 
         $childCars = $carTable->fetchAll(
             $carTable->select(true)
-                ->join('item_parent', 'cars.id = item_parent.car_id', null)
+                ->join('item_parent', 'cars.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $id)
         );
 
@@ -228,7 +228,7 @@ class ParentCache extends Table
 
         $childCars = $carTable->fetchAll(
             $carTable->select(true)
-                ->join('item_parent', 'cars.id = item_parent.car_id', null)
+                ->join('item_parent', 'cars.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $id)
         );
 

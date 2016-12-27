@@ -216,7 +216,7 @@ class FactoryController extends AbstractActionController
             $db->select()
                 ->from('brands', ['id', 'name'])
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                 ->join('factory_item', 'item_parent_cache.item_id = factory_item.item_id', null)
                 ->group('brands.id')
                 ->order(['brands.position', 'brands.name'])

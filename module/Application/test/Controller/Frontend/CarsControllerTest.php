@@ -15,7 +15,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testSelectCarEngine()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/cars/select-car-engine/car_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/cars/select-car-engine/item_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -27,7 +27,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testCarsSpecificationsEditor()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/cars/car-specifications-editor/car_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/cars/car-specifications-editor/item_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');

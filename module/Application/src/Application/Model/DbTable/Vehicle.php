@@ -52,7 +52,7 @@ class Vehicle extends Table
         $parents = $this->fetchAll(
             $this->select(true)
                 ->join('item_parent', 'cars.id = item_parent.parent_id', null)
-                ->where('item_parent.car_id = ?', $car->id)
+                ->where('item_parent.item_id = ?', $car->id)
         );
 
         $somethingChanged = false;
@@ -196,7 +196,7 @@ class Vehicle extends Table
 
             $childs = $this->fetchAll(
                 $this->select(true)
-                    ->join('item_parent', 'cars.id = item_parent.car_id', null)
+                    ->join('item_parent', 'cars.id = item_parent.item_id', null)
                     ->where('item_parent.parent_id = ?', $car->id)
             );
 

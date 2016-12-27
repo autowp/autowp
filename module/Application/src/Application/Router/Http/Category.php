@@ -174,7 +174,7 @@ class Category implements RouteInterface
 
             if ($node == 'pictures') {
                 if (! count($path)) {
-                    // category/:category_catname/[:other/]:car_id/:path/pictures
+                    // category/:category_catname/[:other/]:item_id/:path/pictures
                     return $this->assembleMatch([
                         'action'           => 'category-pictures',
                         'category_catname' => $categoryCatname,
@@ -188,7 +188,7 @@ class Category implements RouteInterface
                     $page = intval($match[1]);
 
                     if (! count($path)) {
-                        // category/:category_catname/[:other/]:car_id/:path/pictures/pageX
+                        // category/:category_catname/[:other/]:item_id/:path/pictures/pageX
                         return $this->assembleMatch([
                             'action'           => 'category-pictures',
                             'category_catname' => $categoryCatname,
@@ -239,7 +239,7 @@ class Category implements RouteInterface
                 $page = intval($match[1]);
 
                 if (! count($path)) {
-                    // category/:category_catname/[:other/]:car_id/:path/pageX
+                    // category/:category_catname/[:other/]:item_id/:path/pageX
                     return $this->assembleMatch([
                         'action'           => 'category',
                         'category_catname' => $categoryCatname,
@@ -255,7 +255,7 @@ class Category implements RouteInterface
             $treePath[] = $node;
         }
 
-        // category/:category_catname/[:other/]:car_id/:path
+        // category/:category_catname/[:other/]:item_id/:path
         return $this->assembleMatch([
             'action'           => 'category',
             'category_catname' => $categoryCatname,

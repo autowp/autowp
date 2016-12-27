@@ -400,7 +400,7 @@ return [
                 [
                     'spec' => [
                         'type' => 'Text',
-                        'name' => 'car_id',
+                        'name' => 'item_id',
                         'options' => [
                             'label' => 'moder/comments/filter/vehicle-id',
                         ]
@@ -423,7 +423,7 @@ return [
                         ['name' => 'StringTrim']
                     ]
                 ],
-                'car_id' => [
+                'item_id' => [
                     'required' => false,
                     'filters'  => [
                         ['name' => 'StringTrim']

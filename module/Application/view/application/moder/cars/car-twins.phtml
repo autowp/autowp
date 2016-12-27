@@ -31,7 +31,7 @@
 <?php } ?>
 <?php if ($this->canEditTwins) { ?>
     <p><?=$this->htmlA($this->url('moder/cars/params', [
-        'action' => 'car-select-twins-group',
-        'car_id' => $this->car->id
+        'action'  => 'car-select-twins-group',
+        'item_id' => $this->car->id
     ]), $this->translate('moder/vehicle/twins/select-or-create')) ?></p>
 <?php } ?>

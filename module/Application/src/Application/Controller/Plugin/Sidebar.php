@@ -23,7 +23,7 @@ class Sidebar extends AbstractPlugin
     {
         $defaults = [
             'brand_id'    => null,
-            'car_id'      => null,
+            'item_id'     => null,
             'type'        => null,
             'is_concepts' => false,
             'is_engines'  => false

@@ -75,8 +75,8 @@
                 <?php foreach ($this->cars as $car) { ?>
                     <li>
                         <?=$this->htmlA($this->url('moder/cars/params', [
-                            'action' => 'car',
-                            'car_id' => $car->id
+                            'action'  => 'car',
+                            'item_id' => $car->id
                         ]), $this->car()->htmlTitle($car->getNameData($this->language())), false) ?>
                     </li>
                 <?php } ?>

@@ -85,7 +85,7 @@ class Category extends ListBuilder
         // found parent row
         if ($this->currentItem) {
             $carParentRow = $this->itemParentTable->fetchRow([
-                'car_id = ?'    => $item->id,
+                'item_id = ?'   => $item->id,
                 'parent_id = ?' => $this->currentItem->id
             ]);
             if (! $carParentRow) {
@@ -125,7 +125,7 @@ class Category extends ListBuilder
         // found parent row
         if ($this->currentItem) {
             $carParentRow = $this->itemParentTable->fetchRow([
-                'car_id = ?'    => $item->id,
+                'item_id = ?'   => $item->id,
                 'parent_id = ?' => $this->currentItem->id
             ]);
             if (! $carParentRow) {
@@ -170,7 +170,7 @@ class Category extends ListBuilder
         // found parent row
         if ($this->currentItem) {
             $carParentRow = $this->itemParentTable->fetchRow([
-                'car_id = ?'    => $item->id,
+                'item_id = ?'   => $item->id,
                 'parent_id = ?' => $this->currentItem->id
             ]);
             if (! $carParentRow) {

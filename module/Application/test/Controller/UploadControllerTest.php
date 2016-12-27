@@ -29,7 +29,7 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
     public function testSelectVehicle()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/upload/index/type/1/car_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/upload/index/type/1/item_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -66,7 +66,7 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
                 ]
             ]
         ]);
-        $this->dispatch('https://www.autowp.ru/upload/index/type/1/car_id/1', Request::METHOD_POST, [], true);
+        $this->dispatch('https://www.autowp.ru/upload/index/type/1/item_id/1', Request::METHOD_POST, [], true);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');

@@ -46,10 +46,10 @@ class LogController extends AbstractActionController
                    ->where('log_events_brands.brand_id = ?', $brandId);
         }
 
-        $carId = (int)$this->params()->fromRoute('car_id');
+        $carId = (int)$this->params()->fromRoute('item_id');
         if ($carId) {
             $select->join('log_events_cars', 'log_events.id=log_events_cars.log_event_id', null)
-                   ->where('log_events_cars.car_id = ?', $carId);
+                   ->where('log_events_cars.item_id = ?', $carId);
         }
 
         $pictureId = (int)$this->params()->fromRoute('picture_id');
@@ -89,7 +89,7 @@ class LogController extends AbstractActionController
         foreach ($paginator->getCurrentItems() as $event) {
             $vehicleRows = $vehicleTable->fetchAll(
                 $vehicleTable->select(true)
-                    ->join('log_events_cars', 'cars.id = log_events_cars.car_id', null)
+                    ->join('log_events_cars', 'cars.id = log_events_cars.item_id', null)
                     ->where('log_events_cars.log_event_id = ?', $event->id)
             );
             $vehicles = [];
@@ -97,8 +97,8 @@ class LogController extends AbstractActionController
                 $vehicles[] = [
                     'name' => $vehicleRow->getNameData($language),
                     'url'  => $this->url()->fromRoute('moder/cars/params', [
-                        'action' => 'car',
-                        'car_id' => $vehicleRow->id
+                        'action'  => 'car',
+                        'item_id' => $vehicleRow->id
                     ])
                 ];
             }

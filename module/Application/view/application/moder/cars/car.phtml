@@ -35,8 +35,8 @@
                 <p>
                     <?php if ($this->user()->isAllowed('specifications', 'edit')) { ?>
                         <?=$this->htmlA($this->url('cars/params', [
-                            'action' => 'car-specifications-editor',
-                            'car_id' => $this->car->id
+                            'action'  => 'car-specifications-editor',
+                            'item_id' => $this->car->id
                         ]), $this->translate('carlist/edit-specs')) ?>
                         <?php if ($this->specsCount > 0) { ?>
                             <span class="badge"><?=$this->specsCount?></span>
@@ -45,8 +45,8 @@
                 </p>
             <?php } ?>
             <p><?=$this->htmlA($this->url('log/params', [
-                'action' => 'index',
-                'car_id' => $this->car['id']
+                'action'  => 'index',
+                'item_id' => $this->car['id']
             ]), $this->translate('moder/log-of-events')) ?></p>
         </div>
     </div>
@@ -99,7 +99,7 @@
                 'form' => $this->formModerCarEditMeta
             ])?>
 
-            
+
         <?php } else { ?>
             <table class="table table-condensed">
                 <tr>

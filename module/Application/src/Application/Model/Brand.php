@@ -47,7 +47,7 @@ class Brand
                 $db->select()
                     ->from('cars', 'count(distinct cars.id)')
                     ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = brands.id')
                     ->assemble() .
             ')' .
@@ -118,7 +118,7 @@ class Brand
                 $db->select()
                     ->from('cars', 'count(distinct cars.id)')
                     ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = ?', $brandRow['id'])
                     ->where('cars.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)', self::NEW_DAYS)
             );
@@ -167,7 +167,7 @@ class Brand
         ], function ($select) use ($language) {
             $select
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                 ->join('cars', 'item_parent_cache.item_id = cars.id', null)
                 ->group('brands.id')
                 ->bind([
@@ -330,7 +330,7 @@ class Brand
         $brand = $this->table->fetchRow(
             $this->table->select(true)
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                 ->join('factory_item', 'item_parent_cache.item_id = factory_item.item_id', null)
                 ->where('factory_item.factory_id = ?', (int)$factoryId)
                 ->group('brands.id')
@@ -488,7 +488,7 @@ class Brand
         $brandRows = $this->table->fetchAll(
             $this->table->select(true)
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                 ->where('item_parent_cache.item_id = ?', $carId)
         );
         foreach ($brandRows as $brand) {

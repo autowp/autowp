@@ -37,7 +37,7 @@ class Row extends \Application\Db\Table\Row
 
         $carLangTable = new VehicleLanguage();
         $carLangRow = $carLangTable->fetchRow([
-            'car_id = ?'   => $this->id,
+            'item_id = ?'  => $this->id,
             'language = ?' => (string)$language
         ]);
 
@@ -156,7 +156,7 @@ class Row extends \Application\Db\Table\Row
     public function deleteFromBrand(\Application\Model\DbTable\BrandRow $brand)
     {
         $db = $this->getTable()->getAdapter();
-        $sql = 'DELETE FROM brand_item WHERE (brand_id=?) AND (car_id=?) LIMIT 1';
+        $sql = 'DELETE FROM brand_item WHERE (brand_id=?) AND (item_id=?) LIMIT 1';
         $db->query($sql, [$brand->id, $this->id]);
 
         $brand->refreshPicturesCount();

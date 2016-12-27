@@ -94,7 +94,7 @@ class MostsController extends AbstractActionController
             $db = $itemLanguageTable->getAdapter();
             $orderExpr = $db->quoteInto('language = ? desc', $this->language());
             $itemLanguageRows = $itemLanguageTable->fetchAll([
-                'car_id = ?' => $car['car']['id']
+                'item_id = ?' => $car['car']['id']
             ], new \Zend_Db_Expr($orderExpr));
 
             $textIds = [];

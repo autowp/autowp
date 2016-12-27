@@ -6,7 +6,7 @@ use Zend_Db_Table;
 
 class BrandItem extends Zend_Db_Table
 {
-    protected $_primary = ['brand_id', 'car_id'];
+    protected $_primary = ['brand_id', 'item_id'];
     protected $_name = 'brand_item';
     protected $_referenceMap = [
         'Brand' => [
@@ -15,7 +15,7 @@ class BrandItem extends Zend_Db_Table
             'refColumns'    => ['id']
         ],
         'Car' => [
-            'columns'       => ['car_id'],
+            'columns'       => ['item_id'],
             'refTableClass' => \Application\Model\DbTable\Vehicle::class,
             'refColumns'    => ['id']
         ]

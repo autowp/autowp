@@ -35,8 +35,8 @@ class CommentsController extends AbstractActionController
         $brandRows = $brandTable->fetchAll(
             $brandTable->select(true)
                 /*->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
-                ->join('pictures', 'pictures.car_id = item_parent_cache.item_id', null)
+                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                ->join('pictures', 'pictures.item_id = item_parent_cache.item_id', null)
                 ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
                 ->join('comments_messages', 'comments_messages.item_id = pictures.id', null)
                 ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
@@ -101,17 +101,17 @@ class CommentsController extends AbstractActionController
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.car_id', null)
+                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = ?', $values['brand_id']);
             }
 
-            if ($values['car_id']) {
+            if ($values['item_id']) {
                 $select
                     ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $values['car_id']);
+                    ->where('item_parent_cache.parent_id = ?', $values['item_id']);
             }
         }
 

@@ -189,7 +189,7 @@ class Picture extends Table
                 ->from('cars', $columns)
                 ->where('cars.id in (?)', array_keys($carIds))
                 ->joinLeft('spec', 'cars.spec_id = spec.id', null)
-                ->joinLeft('item_language', 'cars.id = item_language.car_id and item_language.language = :language', null);
+                ->joinLeft('item_language', 'cars.id = item_language.item_id and item_language.language = :language', null);
 
             foreach ($db->fetchAll($select, ['language' => $language]) as $row) {
                 $data = [
@@ -340,7 +340,7 @@ class Picture extends Table
         switch ($params['type']) {
             case Picture::VEHICLE_TYPE_ID:
                 $brandModel = new BrandModel();
-                foreach ($params['car_ids'] as $carId) {
+                foreach ($params['item_ids'] as $carId) {
                     $carTable = new Vehicle();
                     $car = $carTable->find($carId)->current();
                     if ($car) {
@@ -361,7 +361,7 @@ class Picture extends Table
     public function refreshPictureCounts(PictureItem $pictureItem, $picture)
     {
         $data = $picture->toArray();
-        $data['car_ids'] = $pictureItem->getPictureItems($picture->id);
+        $data['item_ids'] = $pictureItem->getPictureItems($picture->id);
 
         $this->refreshCounts($data);
     }
@@ -383,7 +383,7 @@ class Picture extends Table
         $oldParams = [
             'type'       => $picture->type,
             'brand_id'   => $picture->brand_id,
-            'car_ids'    => $pictureItem->getPictureItems($picture->id),
+            'item_ids'   => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
         ];
 
@@ -432,7 +432,7 @@ class Picture extends Table
         $oldParams = [
             'type'       => $picture->type,
             'brand_id'   => $picture->brand_id,
-            'car_ids'    => $pictureItem->getPictureItems($picture->id),
+            'item_ids'   => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
         ];
 
@@ -480,7 +480,7 @@ class Picture extends Table
         $oldParams = [
             'type'       => $picture->type,
             'brand_id'   => $picture->brand_id,
-            'car_ids'    => $pictureItem->getPictureItems($picture->id),
+            'item_ids'   => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
         ];
 
@@ -529,7 +529,7 @@ class Picture extends Table
         $oldParams = [
             'type'       => $picture->type,
             'brand_id'   => $picture->brand_id,
-            'car_ids'    => $pictureItem->getPictureItems($picture->id),
+            'item_ids'   => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
         ];
 

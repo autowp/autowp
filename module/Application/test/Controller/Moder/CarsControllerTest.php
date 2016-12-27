@@ -22,7 +22,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
          */
         $request = $this->getRequest();
         $request->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('http://www.autowp.ru/moder/cars/car/car_id/1', 'GET');
+        $this->dispatch('http://www.autowp.ru/moder/cars/car/item_id/1', 'GET');
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -98,7 +98,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testSelectTwinsGroup()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-twins-group/car_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-twins-group/item_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -110,7 +110,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testSelectBrand()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-brand/car_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-brand/item_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -122,7 +122,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testSelectFactory()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-factory/car_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-factory/item_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -134,7 +134,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testSelectParent()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-parent/car_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-parent/item_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -146,7 +146,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testOrganize()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/organize/car_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/moder/cars/organize/item_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -158,7 +158,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testOrganizePicturesForm()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/organize-pictures/car_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/moder/cars/organize-pictures/item_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -190,7 +190,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
                 ]
             ]
         ]);
-        $this->dispatch('https://www.autowp.ru/upload/index/type/1/car_id/1', Request::METHOD_POST, [], true);
+        $this->dispatch('https://www.autowp.ru/upload/index/type/1/item_id/1', Request::METHOD_POST, [], true);
 
         $this->assertResponseStatusCode(200);
         $this->assertResponseHeaderContains('Content-Type', 'application/json; charset=utf-8');
@@ -202,7 +202,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         // do organize
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/organize-pictures/car_id/1', Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/moder/cars/organize-pictures/item_id/1', Request::METHOD_POST, [
             'name'   => 'Pictures organize test item',
             'childs' => [$pictureId]
         ]);
@@ -214,7 +214,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
     public function testTree()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/car-tree/car_id/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/moder/cars/car-tree/item_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');

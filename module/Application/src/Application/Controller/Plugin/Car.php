@@ -198,7 +198,7 @@ class Car extends AbstractPlugin
         if ($carIds && ! $disableCategories) {
             $db = $itemTable->getAdapter();
             $langExpr = $db->quoteInto(
-                'cars.id = item_language.car_id and item_language.language = ?',
+                'cars.id = item_language.item_id and item_language.language = ?',
                 $language
             );
             $categoryRows = $db->fetchAll(
@@ -210,7 +210,7 @@ class Car extends AbstractPlugin
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                     ->joinLeft('item_language', $langExpr, ['lang_name' => 'name'])
                     ->join('item_parent', 'cars.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'cars'], 'item_parent.car_id = top_item.id', null)
+                    ->join(['top_item' => 'cars'], 'item_parent.item_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id IN (?)', $carIds)
@@ -280,12 +280,12 @@ class Car extends AbstractPlugin
         $carsLangName = [];
         if ($carIds) {
             $carLangRows = $this->getCarLanguageTable()->fetchAll([
-                'car_id IN (?)' => $carIds,
+                'item_id IN (?)' => $carIds,
                 'language = ?'  => $language,
                 'length(name) > 0'
             ]);
             foreach ($carLangRows as $carLangRow) {
-                $carsLangName[$carLangRow->car_id] = $carLangRow->name;
+                $carsLangName[$carLangRow->item_id] = $carLangRow->name;
             }
         }
 
@@ -301,7 +301,7 @@ class Car extends AbstractPlugin
                     'brand_item_catname' => 'catname'
                 ])
                 ->where('brand_item.type = ?', DbTable\BrandItem::TYPE_DESIGN)
-                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', 'item_id')
+                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', 'item_id')
                 ->where('item_parent_cache.item_id IN (?)', $carIds ? $carIds : 0)
                 ->group('item_parent_cache.item_id')
         );
@@ -373,7 +373,7 @@ class Car extends AbstractPlugin
             $db = $itemLanguageTable->getAdapter();
             $orderExpr = $db->quoteInto('language = ? desc', $language);
             $itemLanguageRows = $itemLanguageTable->fetchAll([
-                'car_id = ?' => $car['id']
+                'item_id = ?' => $car['id']
             ], new \Zend_Db_Expr($orderExpr));
 
             $textIds = [];
@@ -468,15 +468,15 @@ class Car extends AbstractPlugin
 
             if ($specEditor) {
                 $item['specEditorUrl'] = $controller->url()->fromRoute('cars/params', [
-                    'action' => 'car-specifications-editor',
-                    'car_id' => $car->id
+                    'action'  => 'car-specifications-editor',
+                    'item_id' => $car->id
                 ]);
             }
 
             if ($isCarModer) {
                 $item['moderUrl'] = $controller->url()->fromRoute('moder/cars/params', [
-                    'action' => 'car',
-                    'car_id' => $car->id
+                    'action'  => 'car',
+                    'item_id' => $car->id
                 ]);
             }
 

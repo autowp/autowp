@@ -253,11 +253,11 @@ class IndexController extends AbstractActionController
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                     ->joinLeft(
                         'item_language',
-                        'cars.id = item_language.car_id and item_language.language = :language',
+                        'cars.id = item_language.item_id and item_language.language = :language',
                         null
                     )
                     ->join('item_parent', 'cars.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'cars'], 'item_parent.car_id = top_item.id', null)
+                    ->join(['top_item' => 'cars'], 'item_parent.item_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id = :item_id')
@@ -333,10 +333,10 @@ class IndexController extends AbstractActionController
         $db = $this->getVehicleParentTable()->getAdapter();
 
         $select = $db->select()
-            ->from('item_parent', 'car_id')
+            ->from('item_parent', 'item_id')
             ->join('cars', 'item_parent.parent_id = cars.id', 'catname')
             ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-            ->where('item_parent.car_id = ?', $carId);
+            ->where('item_parent.item_id = ?', $carId);
 
         if ($breakOnFirst) {
             $select->limit(1);
@@ -346,7 +346,7 @@ class IndexController extends AbstractActionController
         foreach ($categoryVehicleRows as $categoryVehicleRow) {
             $result[] = [
                 'category_catname' => $categoryVehicleRow['catname'],
-                'car_id'           => $categoryVehicleRow['car_id'],
+                'item_id'          => $categoryVehicleRow['item_id'],
                 'path'             => []
             ];
         }
@@ -356,7 +356,7 @@ class IndexController extends AbstractActionController
         }
 
         $parents = $this->getVehicleParentTable()->fetchAll([
-            'car_id = ?' => $carId
+            'item_id = ?' => $carId
         ]);
 
         foreach ($parents as $parent) {
@@ -365,7 +365,7 @@ class IndexController extends AbstractActionController
             foreach ($paths as $path) {
                 $result[] = [
                     'category_catname' => $path['category_catname'],
-                    'car_id'           => $path['car_id'],
+                    'item_id'          => $path['item_id'],
                     'path'             => array_merge($path['path'], [$parent->catname])
                 ];
             }
@@ -463,7 +463,7 @@ class IndexController extends AbstractActionController
                                     $url = $this->url()->fromRoute('categories', [
                                         'action'           => 'category-picture',
                                         'category_catname' => $path['category_catname'],
-                                        'car_id'           => $path['car_id'],
+                                        'item_id'          => $path['item_id'],
                                         'path'             => $path['path'],
                                         'picture_id'       => $identity
                                     ]);
@@ -576,10 +576,10 @@ class IndexController extends AbstractActionController
                         ]
                     )
                     ->where('category.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft(['top_category_parent' => 'item_parent'], 'category.id = top_category_parent.car_id', null)
+                    ->joinLeft(['top_category_parent' => 'item_parent'], 'category.id = top_category_parent.item_id', null)
                     ->where('top_category_parent.parent_id is null')
                     ->join('item_parent', 'category.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'cars'], 'item_parent.car_id = top_item.id', null)
+                    ->join(['top_item' => 'cars'], 'item_parent.item_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->join('cars', 'item_parent_cache.item_id = cars.id', null)
@@ -597,8 +597,8 @@ class IndexController extends AbstractActionController
                 }
 
                 $langRow = $itemLangTable->fetchRow([
-                    'language = ?'    => $language,
-                    'car_id = ?' => $row->id
+                    'language = ?' => $language,
+                    'item_id = ?'  => $row->id
                 ]);
 
                 $destinations[] = [

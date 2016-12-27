@@ -516,7 +516,7 @@ class Pic extends AbstractPlugin
                 $twinsGroupsRows = $twinsGroupsTable->fetchAll(
                     $twinsGroupsTable->select(true)
                         ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
-                        ->where('twins_groups_cars.car_id = ?', $item->id)
+                        ->where('twins_groups_cars.item_id = ?', $item->id)
                 );
 
                 foreach ($twinsGroupsRows as $twinsGroup) {
@@ -537,7 +537,7 @@ class Pic extends AbstractPlugin
                             'brand_item_catname' => 'catname'
                         ])
                         ->where('brand_item.type = ?', BrandItem::TYPE_DESIGN)
-                        ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', 'item_id')
+                        ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', 'item_id')
                         ->where('item_parent_cache.item_id = ?', $item->id)
                 );
                 if ($designCarsRow) {
@@ -554,7 +554,7 @@ class Pic extends AbstractPlugin
                 $db = $itemLanguageTable->getAdapter();
                 $orderExpr = $db->quoteInto('language = ? desc', $language);
                 $itemLanguageRows = $itemLanguageTable->fetchAll([
-                    'car_id = ?' => $item['id']
+                    'item_id = ?' => $item['id']
                 ], new \Zend_Db_Expr($orderExpr));
 
                 $textIds = [];
@@ -607,16 +607,16 @@ class Pic extends AbstractPlugin
 
                 if ($controller->user()->isAllowed('specifications', 'edit')) {
                     $specsEditUrl = $controller->url()->fromRoute('cars/params', [
-                        'action' => 'car-specifications-editor',
-                        'car_id' => $item['id']
+                        'action'  => 'car-specifications-editor',
+                        'item_id' => $item['id']
                     ]);
                 }
 
                 if ($controller->user()->logedIn()) {
                     $uploadUrl = $controller->url()->fromRoute('upload/params', [
-                        'action' => 'index',
-                        'type'   => '1',
-                        'car_id' => $item['id']
+                        'action'  => 'index',
+                        'type'    => '1',
+                        'item_id' => $item['id']
                     ]);
                 }
             }
@@ -626,7 +626,7 @@ class Pic extends AbstractPlugin
             $altNames2 = [];
 
             $carLangRows = $itemLanguageTable->fetchAll([
-                'car_id = ?' => $item->id
+                'item_id = ?' => $item->id
             ]);
 
             $currentLangName = null;
@@ -658,7 +658,7 @@ class Pic extends AbstractPlugin
 
             $db = $itemTable->getAdapter();
             $langExpr = $db->quoteInto(
-                'cars.id = item_language.car_id and item_language.language = ?',
+                'cars.id = item_language.item_id and item_language.language = ?',
                 $language
             );
             $categoryRows = $db->fetchAll(
@@ -670,7 +670,7 @@ class Pic extends AbstractPlugin
                     ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                     ->joinLeft('item_language', $langExpr, ['lang_name' => 'name'])
                     ->join('item_parent', 'cars.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'cars'], 'item_parent.car_id = top_item.id', null)
+                    ->join(['top_item' => 'cars'], 'item_parent.item_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id IN (?)', $item['id'])
@@ -803,8 +803,8 @@ class Pic extends AbstractPlugin
             $specsEditUrl = null;
             if ($controller->user()->isAllowed('specifications', 'edit')) {
                 $specsEditUrl = $controller->url()->fromRoute('cars/params', [
-                    'action' => 'car-specifications-editor',
-                    'car_id' => $engineRow->id
+                    'action'  => 'car-specifications-editor',
+                    'item_id' => $engineRow->id
                 ]);
             }
 
@@ -848,7 +848,7 @@ class Pic extends AbstractPlugin
         $brandIds = $db->fetchCol(
             $db->select()
                 ->from('brand_item', 'brand_id')
-                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->where('picture_item.picture_id = ?', $picture->id)
         );
@@ -1031,7 +1031,7 @@ class Pic extends AbstractPlugin
         $itemTable = new Vehicle();
         foreach ($mRows as $mRow) {
             $url = null;
-            $carRow = $itemTable->find($mRow->car_id)->current();
+            $carRow = $itemTable->find($mRow->item_id)->current();
             if ($carRow) {
                 $carParentTable = new VehicleParent();
                 $paths = $carParentTable->getPaths($carRow->id, [
@@ -1127,8 +1127,8 @@ class Pic extends AbstractPlugin
 
                     foreach ($vehicleTable->find($carIds) as $car) {
                         $url = $controller->url()->fromRoute('moder/cars/params', [
-                            'action' => 'car',
-                            'car_id' => $car->id
+                            'action'  => 'car',
+                            'item_id' => $car->id
                         ]);
                         $links[$url] = sprintf(
                             $this->translator->translate('moder/picture/edit-vehicle-%s'),
@@ -1139,7 +1139,7 @@ class Pic extends AbstractPlugin
                         $brands = $brandModel->getList(['language' => $language], function ($select) use ($car) {
                             $select
                                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                                ->join('item_parent_cache', 'brand_item.car_id = item_parent_cache.parent_id', null)
+                                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                                 ->where('item_parent_cache.item_id = ?', $car->id)
                                 ->group('brands.id');
                         });

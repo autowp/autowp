@@ -15,11 +15,11 @@ use Zend_Db_Expr;
 class ParentTable extends Table
 {
     protected $_name = 'item_parent';
-    protected $_primary = ['car_id', 'parent_id'];
+    protected $_primary = ['item_id', 'parent_id'];
 
     protected $_referenceMap = [
         'Car' => [
-            'columns'       => ['car_id'],
+            'columns'       => ['item_id'],
             'refTableClass' => 'Car',
             'refColumns'    => ['id']
         ],
@@ -64,7 +64,7 @@ class ParentTable extends Table
 
             $toCheck = $adapter->fetchCol(
                 $adapter->select()
-                    ->from($cpTableName, 'car_id')
+                    ->from($cpTableName, 'item_id')
                     ->where('parent_id in (?)', $toCheck)
             );
         }
@@ -86,7 +86,7 @@ class ParentTable extends Table
             $toCheck = $adapter->fetchCol(
                 $adapter->select()
                     ->from($cpTableName, 'parent_id')
-                    ->where('car_id in (?)', $toCheck)
+                    ->where('item_id in (?)', $toCheck)
             );
         }
 
@@ -99,7 +99,7 @@ class ParentTable extends Table
         $parentId = (int)$parent->id;
 
         $row = $this->fetchRow([
-            'car_id = ?'    => $id,
+            'item_id = ?'   => $id,
             'parent_id = ?' => $parentId
         ]);
         if (! $row) {
@@ -177,12 +177,12 @@ class ParentTable extends Table
         }
 
         $row = $this->fetchRow([
-            'car_id = ?'    => $id,
+            'item_id = ?'   => $id,
             'parent_id = ?' => $parentId
         ]);
         if (! $row) {
             $row = $this->createRow([
-                'car_id'    => $id,
+                'item_id'   => $id,
                 'parent_id' => $parentId,
                 'catname'   => $options['catname'],
                 'name'      => $options['name'],
@@ -202,7 +202,7 @@ class ParentTable extends Table
         $parentId = (int)$parent->id;
 
         $row = $this->fetchRow([
-            'car_id = ?'    => $id,
+            'item_id = ?'   => $id,
             'parent_id = ?' => $parentId
         ]);
         if ($row) {
@@ -232,7 +232,7 @@ class ParentTable extends Table
 
         $limit = $breakOnFirst ? 1 : null;
         $brandItemRows = $this->getBrandItemTable()->fetchAll([
-            'car_id = ?'   => $carId,
+            'item_id = ?'  => $carId,
             'brand_id = ?' => $brandId
         ], null, $limit);
         foreach ($brandItemRows as $brandItemRow) {
@@ -247,7 +247,7 @@ class ParentTable extends Table
         }
 
         $parents = $this->fetchAll([
-            'car_id = ?' => $carId
+            'item_id = ?' => $carId
         ]);
 
         foreach ($parents as $parent) {
@@ -284,7 +284,7 @@ class ParentTable extends Table
         $select = $db->select()
             ->from('brand_item', 'catname')
             ->join('brands', 'brand_item.brand_id = brands.id', 'folder')
-            ->where('brand_item.car_id = ?', $carId);
+            ->where('brand_item.item_id = ?', $carId);
 
         if ($breakOnFirst) {
             $select->limit(1);
@@ -304,7 +304,7 @@ class ParentTable extends Table
         }
 
         $parents = $this->fetchAll([
-            'car_id = ?' => $carId
+            'item_id = ?' => $carId
         ]);
 
         foreach ($parents as $parent) {

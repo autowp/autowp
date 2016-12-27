@@ -22,10 +22,10 @@
     <p>
         <i class="fa fa-cog"></i>
         <?=$this->htmlA($this->url('moder/cars/params', [
-            'action' => 'car',
-            'car_id' => $this->category['id']
+            'action'  => 'car',
+            'item_id' => $this->category['id']
         ]), $this->translate('moder/edit-object'))?>
-        
+
         <?php if ($this->user()->isAllowed('car', 'add')) { ?>
             <i class="fa fa-plus"></i>
             <?=$this->htmlA($this->url('moder/cars/params', [

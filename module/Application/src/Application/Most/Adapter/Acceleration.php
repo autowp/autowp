@@ -84,7 +84,7 @@ class Acceleration extends AbstractAdapter
             $valueColumn = $axis['q'] != 1 ? new Zend_Db_Expr('axis.value / ' . $axis['q']) : 'axis.value';
 
             $axisSelect
-                ->columns(['car_id' => 'cars.id', 'size_value' => $valueColumn])
+                ->columns(['item_id' => 'cars.id', 'size_value' => $valueColumn])
                 ->join(['axis' => $attrValuesTable], 'cars.id = axis.item_id', null)
                 ->where('axis.attribute_id = ?', $attr->id)
                 ->where('axis.value > 0')
@@ -97,7 +97,7 @@ class Acceleration extends AbstractAdapter
         $select
             ->join(
                 ['tbl' => new Zend_Db_Expr('((' . $selects[0] . ') UNION (' . $selects[1] . '))')],
-                'cars.id = tbl.car_id',
+                'cars.id = tbl.item_id',
                 null
             )
             ->group('cars.id');

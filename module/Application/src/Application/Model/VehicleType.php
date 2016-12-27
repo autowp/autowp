@@ -112,7 +112,7 @@ class VehicleType
                 ->distinct()
                 ->from('vehicle_vehicle_type', ['vehicle_type_id'])
                 ->join('item_parent', 'vehicle_vehicle_type.vehicle_id = item_parent.parent_id', null)
-                ->where('item_parent.car_id = ?', (int)$vehicleId)
+                ->where('item_parent.item_id = ?', (int)$vehicleId)
         );
 
         return $ids;
@@ -133,7 +133,7 @@ class VehicleType
 
         $ids = $db->fetchCol(
             $db->select()
-                ->from('item_parent', ['car_id'])
+                ->from('item_parent', ['item_id'])
                 ->where('item_parent.parent_id = ?', $vehicleId)
         );
 

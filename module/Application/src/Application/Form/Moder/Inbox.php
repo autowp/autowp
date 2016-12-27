@@ -79,7 +79,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 ]
             ],
             [
-                'name'    => 'car_id',
+                'name'    => 'item_id',
                 'type'    => 'Text',
                 'options' => [
                     'label' => 'moder/picture/filter/vehicle',
@@ -277,7 +277,7 @@ class Inbox extends Form implements InputFilterProviderInterface
             'brand_id' => [
                 'required' => false
             ],
-            'car_id' => [
+            'item_id' => [
                 'required' => false,
                 'filters' => [
                     ['name' => 'StringTrim']

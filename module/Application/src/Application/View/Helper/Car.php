@@ -183,7 +183,7 @@ class Car extends AbstractHelper
         $urls = [];
 
         $brandItemRows = $this->getBrandItemTable()->fetchAll([
-            'car_id = ?' => $id
+            'item_id = ?' => $id
         ]);
 
         foreach ($brandItemRows as $brandItemRow) {
@@ -202,7 +202,7 @@ class Car extends AbstractHelper
         $carParentTable = $this->getCarParentTable();
 
         $parentRows = $this->getCarParentTable()->fetchAll([
-            'car_id = ?' => $id
+            'item_id = ?' => $id
         ]);
         foreach ($parentRows as $parentRow) {
             $urls = array_merge(

@@ -78,7 +78,7 @@ class Brakes extends AbstractAdapter
                 ->info(Zend_Db_Table_Abstract::NAME);
 
             $axisSelect
-                ->columns(['car_id' => 'cars.id', 'size_value' => new Zend_Db_Expr('diameter.value*thickness.value')])
+                ->columns(['item_id' => 'cars.id', 'size_value' => new Zend_Db_Expr('diameter.value*thickness.value')])
                 ->join(['diameter' => $diameterValuesTable], 'cars.id = diameter.item_id', null)
                 ->where('diameter.attribute_id = ?', $diameter->id)
                 ->where('diameter.value > 0')
@@ -95,7 +95,7 @@ class Brakes extends AbstractAdapter
         $select
             ->join(
                 ['tbl' => new Zend_Db_Expr('((' . $selects[0] . ') UNION (' . $selects[1] . '))')],
-                'cars.id = tbl.car_id',
+                'cars.id = tbl.item_id',
                 null
             )
             ->group('cars.id');
