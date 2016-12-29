@@ -62,7 +62,9 @@ class Row extends \Application\Db\Table\Row
             'name'             => $name,
             'begin_year'       => $this->begin_year,
             'end_year'         => $this->end_year,
-            'today'            => $this->today
+            'today'            => $this->today,
+            'begin_month'      => $this->begin_month,
+            'end_month'        => $this->end_month,
         ];
     }
 

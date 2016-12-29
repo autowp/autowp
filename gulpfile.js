@@ -20,7 +20,6 @@ var gulp = require("gulp")
   , gutil = require("gulp-util")
   , rev = require('gulp-rev')
   , jshint = require('gulp-jshint')
-  , gulp = require('gulp');
 ;
 
 gulp.task("build.css", ["copy.jcrop", 'copy.flags'], function () {
@@ -59,7 +58,7 @@ gulp.task('build.css.gz', ['build.css', 'rev'], function() {
 });
 
 gulp.task('build.js', shell.task([
-    './node_modules/requirejs/bin/r.js -o ./public_source/build.js generateSourceMaps=false preserveLicenseComments=1 optimize=uglify2',
+    './node_modules/requirejs/bin/r.js -o ./public_source/build.js generateSourceMaps=false preserveLicenseComments=1 optimize=uglify2'
 ]));
 
 gulp.task('build.js.gz', ['build.js'], function () {
@@ -91,7 +90,7 @@ gulp.task('rev', ['build.css'], function() {
 gulp.task("copy.fonts", function () {
     return gulp.src([
         './node_modules/bootstrap/fonts/*',
-        './node_modules/font-awesome/fonts/*',
+        './node_modules/font-awesome/fonts/*'
     ])
         .pipe(gulpCopy("./public_html/fonts", {prefix: 3}));
 });
@@ -200,7 +199,7 @@ gulp.task('lint', function() {
         '!./public_source/js/bootstrap.js',
         '!./public_source/js/Chart.js',
         '!./public_source/js/bloodhound.js',
-        '!./public_source/js/async.js',
+        '!./public_source/js/async.js'
     ])
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
