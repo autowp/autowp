@@ -8,21 +8,7 @@ use Autowp\User\Model\DbTable\User as UserTable;
 
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\BrandItem;
-use Application\Model\DbTable\BrandLink;
-use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Comment\Topic as CommentTopic;
-use Application\Model\DbTable\Factory;
-use Application\Model\DbTable\Modification as ModificationTable;
-use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
-use Application\Model\DbTable\Picture\Row as PictureRow;
-use Application\Model\DbTable\Picture\View as PictureView;
-use Application\Model\DbTable\Twins\Group as TwinsGroup;
-use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\PictureItem;
 use Application\Paginator\Adapter\Zend1DbSelect;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -39,7 +25,7 @@ use Zend_Db_Table_Select;
 class Pic extends AbstractPlugin
 {
     /**
-     * @var PictureView
+     * @var DbTable\Picture\View
      */
     private $pictureViewTable = null;
 
@@ -69,6 +55,11 @@ class Pic extends AbstractPlugin
      */
     private $pictureItem;
 
+    /**
+     * @var DbTable\Picture
+     */
+    private $pictureTable;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -86,26 +77,28 @@ class Pic extends AbstractPlugin
         $this->specsService = $specsService;
         $this->pictureItem = $pictureItem;
         $this->httpRouter = $httpRouter;
+
+        $this->pictureTable = new DbTable\Picture();
     }
 
     /**
-     * @return PictureModerVote
+     * @return DbTable\Picture\ModerVote
      */
     private function getModerVoteTable()
     {
         return $this->moderVoteTable
             ? $this->moderVoteTable
-            : $this->moderVoteTable = new PictureModerVote();
+            : $this->moderVoteTable = new DbTable\Picture\ModerVote();
     }
 
     /**
-     * @return PictureView
+     * @return DbTable\Picture\View
      */
     private function getPictureViewTable()
     {
         return $this->pictureViewTable
             ? $this->pictureViewTable
-            : $this->pictureViewTable = new PictureView();
+            : $this->pictureViewTable = new DbTable\Picture\View();
     }
 
     public function href($row, array $options = [])
@@ -119,11 +112,11 @@ class Pic extends AbstractPlugin
 
         $controller = $this->getController();
 
-        $brandTable = new BrandTable();
+        $brandTable = new DbTable\Brand();
 
         $url = null;
         switch ($row['type']) {
-            case Picture::LOGO_TYPE_ID:
+            case DbTable\Picture::LOGO_TYPE_ID:
                 $brandRow = $brandTable->find($row['brand_id'])->current();
                 if ($brandRow) {
                     $url = $controller->url()->fromRoute('catalogue', [
@@ -137,7 +130,7 @@ class Pic extends AbstractPlugin
                 }
                 break;
 
-            case Picture::MIXED_TYPE_ID:
+            case DbTable\Picture::MIXED_TYPE_ID:
                 $brandRow = $brandTable->find($row['brand_id'])->current();
                 if ($brandRow) {
                     $url = $controller->url()->fromRoute('catalogue', [
@@ -150,7 +143,7 @@ class Pic extends AbstractPlugin
                 }
                 break;
 
-            case Picture::UNSORTED_TYPE_ID:
+            case DbTable\Picture::UNSORTED_TYPE_ID:
                 $brandRow = $brandTable->find($row['brand_id'])->current();
                 if ($brandRow) {
                     $url = $controller->url()->fromRoute('catalogue', [
@@ -163,11 +156,11 @@ class Pic extends AbstractPlugin
                 }
                 break;
 
-            case Picture::VEHICLE_TYPE_ID:
+            case DbTable\Picture::VEHICLE_TYPE_ID:
                 $carIds = $this->pictureItem->getPictureItems($row['id']);
                 if ($carIds) {
                     $carId = $carIds[0];
-                    $carParentTable = new VehicleParent();
+                    $carParentTable = new DbTable\Vehicle\ParentTable();
                     $paths = $carParentTable->getPaths($carId, [
                         'breakOnFirst' => true
                     ]);
@@ -205,16 +198,6 @@ class Pic extends AbstractPlugin
             'force_canonical' => $absolute,
             'uri'             => $uri
         ]);
-
-        /*
-        $controller = $this->getController();
-
-        return $controller->url()->fromRoute('picture/picture', [
-            'picture_id' => $identity ? $identity : $id,
-        ], [
-            'force_canonical' => $absolute,
-            'uri'             => $uri
-        ], true);*/
     }
 
     public function listData($pictures, array $options = [])
@@ -293,13 +276,13 @@ class Pic extends AbstractPlugin
             // messages
             $messages = [];
             if (! $options['disableBehaviour'] && count($ids)) {
-                $ctTable = new CommentTopic();
+                $ctTable = new DbTable\Comment\Topic();
                 $db = $ctTable->getAdapter();
                 $messages = $db->fetchPairs(
                     $ctTable->select()
                         ->from($ctTable->info('name'), ['item_id', 'messages'])
                         ->where('item_id in (?)', $ids)
-                        ->where('type_id = ?', CommentMessage::PICTURES_TYPE_ID)
+                        ->where('type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID)
                 );
             }
 
@@ -364,7 +347,7 @@ class Pic extends AbstractPlugin
                         'messages'
                     );
 
-                $bind['type_id'] = CommentMessage::PICTURES_TYPE_ID;
+                $bind['type_id'] = DbTable\Comment\Message::PICTURES_TYPE_ID;
             }
 
             $rows = $db->fetchAll($select, $bind);
@@ -382,31 +365,30 @@ class Pic extends AbstractPlugin
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = PictureRow::buildFormatRequest($picture);
+            $requests[$idx] = DbTable\Picture\Row::buildFormatRequest($picture);
         }
 
         $imagesInfo = $imageStorage->getFormatedImages($requests, 'picture-thumb');
 
         // names
-        $pictureTable = new Picture();
-        $names = $pictureTable->getNameData($rows, [
+        $names = $this->pictureTable->getNameData($rows, [
             'language' => $language
         ]);
 
         // comments
         if (! $options['disableBehaviour']) {
             if ($userId) {
-                $ctTable = new CommentTopic();
+                $ctTable = new DbTable\Comment\Topic();
                 $newMessages = $ctTable->getNewMessages(
-                    CommentMessage::PICTURES_TYPE_ID,
+                    DbTable\Comment\Message::PICTURES_TYPE_ID,
                     $ids,
                     $userId
                 );
             }
         }
 
-        $brandTable = new BrandTable();
-        $carParentTable = new VehicleParent();
+        $brandTable = new DbTable\Brand();
+        $carParentTable = new DbTable\Vehicle\ParentTable();
 
         $items = [];
         foreach ($rows as $idx => $row) {
@@ -439,7 +421,7 @@ class Pic extends AbstractPlugin
 
                 $item = array_replace($item, [
                     'resolution'     => (int)$row['width'] . '×' . (int)$row['height'],
-                    'cropped'        => PictureRow::checkCropParameters($row),
+                    'cropped'        => DbTable\Picture\Row::checkCropParameters($row),
                     'cropResolution' => $row['crop_width'] . '×' . $row['crop_height'],
                     'status'         => $row['status'],
                     'views'          => (int)$row['views'],
@@ -471,15 +453,14 @@ class Pic extends AbstractPlugin
         $isModer = $controller->user()->inheritsRole('moder');
 
         $itemTable = $catalogue->getCarTable();
-        $factoryTable = new Factory();
-        $twinsGroupsTable = new TwinsGroup();
+        $factoryTable = new DbTable\Factory();
+        $twinsGroupsTable = new DbTable\Twins\Group();
         $itemLanguageTable = new DbTable\Vehicle\Language();
 
-        $pictureTable = $catalogue->getPictureTable();
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
         if ($isModer) {
-            $perspectives = new Perspective();
+            $perspectives = new DbTable\Perspective();
 
             $multioptions = $perspectives->getAdapter()->fetchPairs(
                 $perspectives->getAdapter()->select()
@@ -536,7 +517,7 @@ class Pic extends AbstractPlugin
                         ->join('brand_item', 'brands.id = brand_item.brand_id', [
                             'brand_item_catname' => 'catname'
                         ])
-                        ->where('brand_item.type = ?', BrandItem::TYPE_DESIGN)
+                        ->where('brand_item.type = ?', DbTable\BrandItem::TYPE_DESIGN)
                         ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', 'item_id')
                         ->where('item_parent_cache.item_id = ?', $item->id)
                 );
@@ -835,8 +816,7 @@ class Pic extends AbstractPlugin
 
         $isModer = $controller->user()->inheritsRole('moder');
 
-        $pictureTable = $catalogue->getPictureTable();
-        $db = $pictureTable->getAdapter();
+        $db = $this->pictureTable->getAdapter();
 
         $factory = null;
         $factoryCars = [];
@@ -854,14 +834,14 @@ class Pic extends AbstractPlugin
         );
 
         switch ($picture->type) {
-            case Picture::LOGO_TYPE_ID:
-            case Picture::MIXED_TYPE_ID:
-            case Picture::UNSORTED_TYPE_ID:
+            case DbTable\Picture::LOGO_TYPE_ID:
+            case DbTable\Picture::MIXED_TYPE_ID:
+            case DbTable\Picture::UNSORTED_TYPE_ID:
                 $brandIds = [$picture->brand_id];
                 break;
 
-            case Picture::FACTORY_TYPE_ID:
-                if ($factory = $picture->findParentRow(Factory::class)) {
+            case DbTable\Picture::FACTORY_TYPE_ID:
+                if ($factory = $picture->findParentRow(DbTable\Factory::class)) {
                     $carIds = $factory->getRelatedCarGroupId();
                     if ($carIds) {
                         $itemTable = $catalogue->getCarTable();
@@ -904,7 +884,7 @@ class Pic extends AbstractPlugin
 
         // links
         $ofLinks = [];
-        $linksTable = new BrandLink();
+        $linksTable = new DbTable\BrandLink();
         if (count($brandIds)) {
             $links = $linksTable->fetchAll(
                 $linksTable->select(true)
@@ -918,11 +898,11 @@ class Pic extends AbstractPlugin
 
         $replacePicture = null;
         if ($picture->replace_picture_id) {
-            $replacePictureRow = $pictureTable->find($picture->replace_picture_id)->current();
+            $replacePictureRow = $this->pictureTable->find($picture->replace_picture_id)->current();
 
             $replacePicture = $controller->pic()->href($replacePictureRow->toArray());
 
-            if ($replacePictureRow->status == Picture::STATUS_REMOVING) {
+            if ($replacePictureRow->status == DbTable\Picture::STATUS_REMOVING) {
                 if (! $controller->user()->inheritsRole('moder')) {
                     $replacePicture = null;
                 }
@@ -937,7 +917,7 @@ class Pic extends AbstractPlugin
         $userTable = new UserTable();
 
         $moderVotes = [];
-        foreach ($picture->findDependentRowset(PictureModerVote::class) as $moderVote) {
+        foreach ($picture->findDependentRowset(DbTable\Picture\ModerVote::class) as $moderVote) {
             $moderVotes[] = [
                 'vote'   => $moderVote->vote,
                 'reason' => $moderVote->reason,
@@ -963,14 +943,12 @@ class Pic extends AbstractPlugin
             $total = $paginator->getTotalItemCount();
 
             if ($total < 500) {
-                $db = $pictureTable->getAdapter();
+                $db = $this->pictureTable->getAdapter();
 
                 $paginatorPictures = $db->fetchAll(
                     $db->select()
                         ->from(['_pic' => new Zend_Db_Expr('('.$picSelect->assemble() .')')], ['id', 'identity'])
                 );
-
-                //$paginatorPictures = $pictureTable->fetchAll($picSelect);
 
                 $pageNumber = 0;
                 foreach ($paginatorPictures as $n => $p) {
@@ -1013,13 +991,13 @@ class Pic extends AbstractPlugin
             }
         }
 
-        $names = $pictureTable->getNameData([$picture->toArray()], [
+        $names = $this->pictureTable->getNameData([$picture->toArray()], [
             'language' => $language,
             'large'    => true
         ]);
         $name = $names[$picture->id];
 
-        $mTable = new ModificationTable();
+        $mTable = new DbTable\Modification();
         $mRows = $mTable->fetchAll(
             $mTable->select(true)
                 ->join('modification_picture', 'modification.id = modification_picture.modification_id', null)
@@ -1028,12 +1006,12 @@ class Pic extends AbstractPlugin
         );
 
         $modifications = [];
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Vehicle();
         foreach ($mRows as $mRow) {
             $url = null;
             $carRow = $itemTable->find($mRow->item_id)->current();
             if ($carRow) {
-                $carParentTable = new VehicleParent();
+                $carParentTable = new DbTable\Vehicle\ParentTable();
                 $paths = $carParentTable->getPaths($carRow->id, [
                     'breakOnFirst' => true
                 ]);
@@ -1101,7 +1079,7 @@ class Pic extends AbstractPlugin
         ];
 
         // refresh views count
-        $views = new PictureView();
+        $views = new DbTable\Picture\View();
         $views->inc($picture);
 
         return $data;
@@ -1119,10 +1097,10 @@ class Pic extends AbstractPlugin
         ])] = sprintf($this->translator->translate('moder/picture/edit-picture-%s'), $picture->id);
 
         switch ($picture->type) {
-            case Picture::VEHICLE_TYPE_ID:
+            case DbTable\Picture::VEHICLE_TYPE_ID:
                 $carIds = $this->pictureItem->getPictureItems($picture['id']);
                 if ($carIds) {
-                    $vehicleTable = new Vehicle();
+                    $vehicleTable = new DbTable\Vehicle();
                     $brandModel = new BrandModel();
 
                     foreach ($vehicleTable->find($carIds) as $car) {
@@ -1159,8 +1137,8 @@ class Pic extends AbstractPlugin
 
                 break;
 
-            case Picture::FACTORY_TYPE_ID:
-                if ($factory = $picture->findParentRow(Factory::class)) {
+            case DbTable\Picture::FACTORY_TYPE_ID:
+                if ($factory = $picture->findParentRow(DbTable\Factory::class)) {
                     $links[$controller->url()->fromRoute('moder/factories/params', [
                         'action'     => 'factory',
                         'factory_id' => $factory->id
@@ -1168,9 +1146,9 @@ class Pic extends AbstractPlugin
                 }
                 break;
 
-            case Picture::MIXED_TYPE_ID:
-            case Picture::LOGO_TYPE_ID:
-            case Picture::UNSORTED_TYPE_ID:
+            case DbTable\Picture::MIXED_TYPE_ID:
+            case DbTable\Picture::LOGO_TYPE_ID:
+            case DbTable\Picture::UNSORTED_TYPE_ID:
                 $brandModel = new BrandModel();
                 $brand = $brandModel->getBrandById($picture->brand_id, $language);
                 if ($brand) {
@@ -1199,7 +1177,7 @@ class Pic extends AbstractPlugin
 
         $itemsPerPage = 10;
 
-        $galleryStatuses = [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW];
+        $galleryStatuses = [DbTable\Picture::STATUS_ACCEPTED, DbTable\Picture::STATUS_NEW];
 
         $gallery = [];
 
@@ -1247,7 +1225,7 @@ class Pic extends AbstractPlugin
                 'messages'
             )
             ->bind([
-                'type_id' => CommentMessage::PICTURES_TYPE_ID
+                'type_id' => DbTable\Comment\Message::PICTURES_TYPE_ID
             ]);
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -1276,9 +1254,9 @@ class Pic extends AbstractPlugin
         $cropRequests = [];
         $imageIds = [];
         foreach ($rows as $idx => $picture) {
-            $request = PictureRow::buildFormatRequest($picture);
+            $request = DbTable\Picture\Row::buildFormatRequest($picture);
             $fullRequests[$idx] = $request;
-            if (PictureRow::checkCropParameters($picture)) {
+            if (DbTable\Picture\Row::checkCropParameters($picture)) {
                 $cropRequests[$idx] = $request;
             }
             $ids[] = (int)$picture['id'];
@@ -1292,8 +1270,7 @@ class Pic extends AbstractPlugin
 
 
         // names
-        $pictureTable = new Picture();
-        $names = $pictureTable->getNameData($rows, [
+        $names = $this->pictureTable->getNameData($rows, [
             'language' => $language
         ]);
 
@@ -1304,9 +1281,9 @@ class Pic extends AbstractPlugin
         }
 
         if ($userId) {
-            $ctTable = new CommentTopic();
+            $ctTable = new DbTable\Comment\Topic();
             $newMessages = $ctTable->getNewMessages(
-                CommentMessage::PICTURES_TYPE_ID,
+                DbTable\Comment\Message::PICTURES_TYPE_ID,
                 $ids,
                 $userId
             );
@@ -1331,7 +1308,7 @@ class Pic extends AbstractPlugin
 
             $sUrl = $image->getSrc();
 
-            if (PictureRow::checkCropParameters($row)) {
+            if (DbTable\Picture\Row::checkCropParameters($row)) {
                 $crop = isset($cropImagesInfo[$idx]) ? $cropImagesInfo[$idx]->toArray() : null;
 
                 $crop['crop'] = [
@@ -1366,7 +1343,7 @@ class Pic extends AbstractPlugin
                 'onlyWithArea' => true
             ]);
 
-            $itemTable = new Vehicle();
+            $itemTable = new DbTable\Vehicle();
 
             $areas = [];
             foreach ($itemsData as $pictureItem) {
@@ -1407,8 +1384,7 @@ class Pic extends AbstractPlugin
 
     public function name($pictureRow, $language)
     {
-        $pictureTable = new Picture();
-        $names = $pictureTable->getNameData([$pictureRow->toArray()], [
+        $names = $this->pictureTable->getNameData([$pictureRow->toArray()], [
             'language' => $language,
             'large'    => true
         ]);

@@ -44,11 +44,6 @@ class Pic extends AbstractHtmlElement
         return false;
     }
 
-    private static function mbUcfirst($str)
-    {
-        return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
-    }
-
     public function htmlTitle(array $picture)
     {
         return $this->pictureNameFormatter->formatHtml($picture, $this->view->language());
