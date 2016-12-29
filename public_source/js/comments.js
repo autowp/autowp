@@ -10,47 +10,6 @@ define(
             var itemId = $element.data('commentsItemId');
             var type = $element.data('commentsType');
             
-            /*$element.find('.moderator-attention-sign').each(function() {
-                var $block = $(this);
-                var id = $block.data('id');
-                var $btn = $('.btn', this);
-                
-                $btn.on('click', function() {
-                    
-                    $btn.button('loading');
-                    
-                    var authorId = $block.data('authorId');
-                    
-                    if (authorId) {
-                        require(['message'], function(Message) {
-                            var message = window.location + "\nfixed";
-                            
-                            Message.showDialog(authorId, message, function() {
-                                $.post('/comments/complete', {id: id}, function() {
-                                    $block.remove();
-                                    $btn.button('reset');
-                                });
-                            }, function() {
-                                $btn.button('reset');
-                            });
-                        });
-                    } else {
-                        $.post('/comments/complete', {id: id}, function() {
-                            $btn.button('reset');
-                            $block.remove();
-                        });
-                    }
-                });
-            });
-            
-            $element.find('.remove-all-comments').on('click', function() {
-                var self = this;
-                $.post('/comments/delete-all', {item_id: itemId, type: type}, function(json) {
-                    $(self).hide();
-                    $element.find('.message').remove()
-                }, 'json');
-            });*/
-            
             $element.find('[data-toggle="tooltip"]').tooltip();
             
             $element.find('.comment-remove-button').on('click', function(e) {
@@ -102,7 +61,7 @@ define(
                             $vote.find('.vote-down').addClass('active');
                             $vote.find('.vote-up').removeClass('active');
                         }
-                    })
+                    });
                 }
                 
                 $vote.find('.vote-down').on('click', function(e) {
@@ -127,20 +86,20 @@ define(
                     }
                     
                     var $modal = $(
-                        '<div class="modal fade">\
-                            <div class="modal-dialog">\
-                                <div class="modal-content">\
-                                    <div class="modal-header">\
-                                        <button type="button" data-dismiss="modal" class="close">×</button>\
-                                        <h3 class="modal-title">Голоса</h3>\
-                                    </div>\
-                                    <div class="modal-body"></div>\
-                                    <div class="modal-footer">\
-                                        <button data-dismiss="modal" class="btn btn-default">Закрыть</button>\
-                                    </div>\
-                                </div>\
-                            </div>\
-                        </div>'
+                        '<div class="modal fade">' +
+                            '<div class="modal-dialog">' +
+                                '<div class="modal-content">' +
+                                    '<div class="modal-header">' +
+                                        '<button type="button" data-dismiss="modal" class="close">×</button>' +
+                                        '<h3 class="modal-title">Голоса</h3>' +
+                                    '</div>' +
+                                    '<div class="modal-body"></div>' +
+                                    '<div class="modal-footer">' +
+                                        '<button data-dismiss="modal" class="btn btn-default">Закрыть</button>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>'
                     );
                     
                     var $body = $modal.find('.modal-body');
@@ -150,7 +109,7 @@ define(
                         $modal.remove();
                     });
                     
-                    var $btnClose = $modal.find('.btn-default')
+                    var $btnClose = $modal.find('.btn-default');
                     
                     $btnClose.button('loading');
                     $.get('/comments/votes', {id: $vote.data('id')}, function(html) {
@@ -181,7 +140,7 @@ define(
                 $form.find(':input[name=parent_id]').val($msg.data('id'));
                 $form.find(':input[name=resolve]').val('1');
                 
-                if ($textarea.val().length == 0) {
+                if ($textarea.val().length === 0) {
                     $textarea.val(resolveText);
                 }
             });

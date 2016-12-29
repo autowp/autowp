@@ -28,7 +28,7 @@ define(
                                 $('<p />').append($('<strong />').text(museum.name))
                             );
                             if (museum.desc) {
-                                info.append($('<p />').text(museum.desc))
+                                info.append($('<p />').text(museum.desc));
                             }
                             if (museum.url) {
                                 info.append(
@@ -38,7 +38,7 @@ define(
                                 );
                             }
                             if (museum.address) {
-                                info.append($('<p />').text(museum.address))
+                                info.append($('<p />').text(museum.address));
                             }
                             
                             var infowindow = new googlemaps.InfoWindow({
@@ -100,6 +100,6 @@ define(
                     }
                 });
             }
-        }
+        };
     }
 );

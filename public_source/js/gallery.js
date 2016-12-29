@@ -4,7 +4,7 @@ define(
         
         var Gallery = function(items) {
             this.init(items);
-        }
+        };
         
         Gallery.prototype = {
             init: function(options) {
@@ -210,12 +210,12 @@ define(
                     
                     if (cropMode) {
                         $item.addClass('crop');
-                        var $img = $('<img />', {
+                        var $imgCrop = $('<img />', {
                             src: crop.src,
                             alt: '',
                             'class': 'crop'
                         });
-                        $item.prepend($img);
+                        $item.prepend($imgCrop);
                     }
                     
                     var $img = $('<img />', {
@@ -251,7 +251,7 @@ define(
                 if ($prev.length) {
                     $left.show();
                 } else {
-                    $left.hide()
+                    $left.hide();
                 }
                 var $next = $item.next('.item');
                 if ($next.length) {
@@ -277,7 +277,7 @@ define(
                 return {
                     width: width,
                     height: height
-                }
+                };
             },
             boundCenter: function(container, content) {
                 return {
@@ -285,7 +285,7 @@ define(
                     top: (container.height - content.height) / 2,
                     width: content.width,
                     height: content.height
-                }
+                };
             },
             maxBounds: function(bounds, maxBounds) {
                 if (bounds.height > maxBounds.height || bounds.width > maxBounds.width) {
@@ -388,7 +388,7 @@ define(
                 var self = this;
                 this.$carousel.find('.item').each(function(idx) {
                     if ($(this).data('id') == id) {
-                        self.$carousel.carousel(idx)
+                        self.$carousel.carousel(idx);
                         
                         return false;
                     }

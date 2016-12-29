@@ -1,5 +1,4 @@
 define(
-    'default/cars/car-specifications-editor',
     ['jquery'],
     function($) {
         return {
@@ -14,13 +13,13 @@ define(
                 });
                 
                 $('a[data-toggle="tab"][data-load]').on('show.bs.tab', function (e) {
-                    var $this = $(this)
-                        , selector = $this.attr('data-target')
-                        , $target
+                    var $this = $(this),
+                          selector = $this.attr('data-target'),
+                          $target;
 
                     if (!selector) {
-                        selector = $this.attr('href')
-                        selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
+                        selector = $this.attr('href');
+                        selector = selector && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
                     }
 
                     $target = $(selector);
@@ -32,6 +31,6 @@ define(
                     $(this).removeData('load').removeAttr('data-load');
                 });
             }
-        }
+        };
     }
 );

@@ -75,7 +75,7 @@ define(
             loadData: function() {
                 var params = {
                     bounds: this.map.getBounds().toUrlValue()
-                }
+                };
                 var self = this;
                 $.getJSON('/map/data', params, function(data) {
                     self.renderData(data);
@@ -152,6 +152,6 @@ define(
                     }
                 });
             }
-        }
+        };
     }
 );

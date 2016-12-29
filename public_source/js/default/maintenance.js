@@ -1,5 +1,4 @@
 define(
-    'default/maintenance',
     ['jquery', 'bootstrap'],
     function($, Bootstrap) {
         return {
@@ -12,6 +11,6 @@ define(
                     });
                 }, 10000);
             }
-        }
+        };
     }
 );

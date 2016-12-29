@@ -3,44 +3,48 @@ define(
     function($, filesize) {
         
         var Carousel = function (element, options) {
-            this.$element    = $(element)
-            this.options     = options
-            this.sliding     = null
-            this.$active     = null
-            this.$items      = null
+            this.$element    = $(element);
+            this.options     = options;
+            this.sliding     = null;
+            this.$active     = null;
+            this.$items      = null;
             this.onSlide     = options.slide;
 
-            this.$element.on('keydown.bs.carousel', $.proxy(this.keydown, this))
-        }
+            this.$element.on('keydown.bs.carousel', $.proxy(this.keydown, this));
+        };
         
-        Carousel.TRANSITION_DURATION = 600
+        Carousel.TRANSITION_DURATION = 600;
 
         $.extend(Carousel.prototype, {
             keydown: function (e) {
-                if (/input|textarea/i.test(e.target.tagName)) return
+                if (/input|textarea/i.test(e.target.tagName)) {
+                    return;
+                }
                 switch (e.which) {
-                  case 37: this.prev(); break
-                  case 39: this.next(); break
-                  default: return
+                  case 37: this.prev(); break;
+                  case 39: this.next(); break;
+                  default: return;
                 }
 
-                e.preventDefault()
+                e.preventDefault();
             },
             getItemIndex: function (item) {
-                return this.$element.find('.item').index(item || this.$active)
+                return this.$element.find('.item').index(item || this.$active);
             },
             getItemForDirection: function (direction, active) {
                 var $items = this.$element.find('.item');
-                var activeIndex = this.getItemIndex(active)
-                var willWrap = (direction == 'prev' && activeIndex === 0)
-                            || (direction == 'next' && activeIndex == ($items.length - 1))
-                if (willWrap) return active
-                var delta = direction == 'prev' ? -1 : 1
-                var itemIndex = (activeIndex + delta) % $items.length
-                return $items.eq(itemIndex)
+                var activeIndex = this.getItemIndex(active);
+                var willWrap = (direction == 'prev' && activeIndex === 0) ||
+                               (direction == 'next' && activeIndex == ($items.length - 1));
+                if (willWrap) {
+                    return active;
+                }
+                var delta = direction == 'prev' ? -1 : 1;
+                var itemIndex = (activeIndex + delta) % $items.length;
+                return $items.eq(itemIndex);
             },
             to: function (pos) {
-                var that        = this
+                var that        = this;
                 var activeIndex = this.getItemIndex(this.$active = this.$element.find('.item.active'));
                 
                 var $items = this.$element.find('.item');
@@ -49,48 +53,50 @@ define(
                 
                 //if (this.sliding)       return this.$element.one('slid.bs.carousel', function () { that.to(pos) }) // yes, "slid"
 
-                return this.slide(pos > activeIndex ? 'next' : 'prev', $items.eq(pos))
+                return this.slide(pos > activeIndex ? 'next' : 'prev', $items.eq(pos));
             },
             next: function () {
-                if (this.sliding) return
-                return this.slide('next')
+                if (this.sliding) return;
+                return this.slide('next');
             },
             prev: function () {
-                if (this.sliding) return
-                return this.slide('prev')
+                if (this.sliding) return;
+                return this.slide('prev');
             },
             slide: function (type, next) {
-                var $active   = this.$element.find('.item.active')
-                var $next     = next || this.getItemForDirection(type, $active)
-                var direction = type == 'next' ? 'left' : 'right'
-                var that      = this
+                var $active   = this.$element.find('.item.active');
+                var $next     = next || this.getItemForDirection(type, $active);
+                var direction = type == 'next' ? 'left' : 'right';
+                var that      = this;
 
-                if ($next.hasClass('active')) return (this.sliding = false)
-
-                var relatedTarget = $next[0]
-                this.onSlide(relatedTarget, direction);
-
-                this.sliding = true
-
-                if ($.support.transition && this.$element.hasClass('slide')) {
-                  $next.addClass(type)
-                  $next[0].offsetWidth // force reflow
-                  $active.addClass(direction)
-                  $next.addClass(direction)
-                  $active
-                    .one('bsTransitionEnd', function () {
-                      $next.removeClass([type, direction].join(' ')).addClass('active')
-                      $active.removeClass(['active', direction].join(' '))
-                      that.sliding = false
-                    })
-                    .emulateTransitionEnd(Carousel.TRANSITION_DURATION)
-                } else {
-                  $active.removeClass('active')
-                  $next.addClass('active')
-                  this.sliding = false
+                if ($next.hasClass('active')) {
+                    return (this.sliding = false);
                 }
 
-                return this
+                var relatedTarget = $next[0];
+                this.onSlide(relatedTarget, direction);
+
+                this.sliding = true;
+
+                if ($.support.transition && this.$element.hasClass('slide')) {
+                    $next.addClass(type);
+                    $next[0].offsetWidth; // force reflow
+                    $active.addClass(direction);
+                    $next.addClass(direction);
+                    $active
+                        .one('bsTransitionEnd', function () {
+                            $next.removeClass([type, direction].join(' ')).addClass('active');
+                            $active.removeClass(['active', direction].join(' '));
+                            that.sliding = false;
+                        })
+                        .emulateTransitionEnd(Carousel.TRANSITION_DURATION);
+                } else {
+                    $active.removeClass('active');
+                    $next.addClass('active');
+                    this.sliding = false;
+                }
+
+                return this;
             }
         });
         
@@ -116,7 +122,7 @@ define(
         
         var Gallery = function(items) {
             this.init(items);
-        }
+        };
         
         Gallery.prototype = {
             MAX_INDICATORS: 80,
@@ -395,7 +401,7 @@ define(
                             
                             console.log(winCenter, nodeCenter);
                             
-                            return winCenter > nodeCenter ? 'bottom' : 'top'
+                            return winCenter > nodeCenter ? 'bottom' : 'top';
                         }
                     });
                     areas.push($area);
@@ -440,12 +446,12 @@ define(
                     
                     if (cropMode) {
                         $item.addClass('crop');
-                        var $img = $('<img />', {
+                        var $imgCrop = $('<img />', {
                             src: crop.src,
                             alt: '',
                             'class': 'crop'
                         });
-                        $item.prepend($img);
+                        $item.prepend($imgCrop);
                     }
                     
                     var $img = $('<img />', {
@@ -499,7 +505,7 @@ define(
                 return {
                     width: width,
                     height: height
-                }
+                };
             },
             boundCenter: function(container, content) {
                 return {
@@ -507,7 +513,7 @@ define(
                     top: (container.height - content.height) / 2,
                     width: content.width,
                     height: content.height
-                }
+                };
             },
             maxBounds: function(bounds, maxBounds) {
                 if (bounds.height > maxBounds.height || bounds.width > maxBounds.width) {
@@ -633,7 +639,7 @@ define(
                 this.refreshIndicator();
                 this.$e.find('.item').each(function(idx) {
                     if ($(this).data('position') == position) {
-                        self.carousel.to(idx)
+                        self.carousel.to(idx);
                         return false;
                     }
                 });
@@ -642,7 +648,7 @@ define(
                 var self = this;
                 this.$carousel.find('.item').each(function(idx) {
                     if ($(this).data('id') == id) {
-                        self.$carousel.carousel(idx)
+                        self.$carousel.carousel(idx);
                         
                         self.position = $(this).data('position');
                         self.refreshIndicator();

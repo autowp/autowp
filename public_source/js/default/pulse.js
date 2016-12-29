@@ -6,14 +6,14 @@ define(
                 
                 Raphael.fn.drawGrid = function (x, y, w, h, wv, hv, color) {
                     color = color || "#000";
-                    var path = ["M", Math.round(x) + .5, Math.round(y) + .5, "L", Math.round(x + w) + .5, Math.round(y) + .5, Math.round(x + w) + .5, Math.round(y + h) + .5, Math.round(x) + .5, Math.round(y + h) + .5, Math.round(x) + .5, Math.round(y) + .5],
+                    var path = ["M", Math.round(x) + 0.5, Math.round(y) + 0.5, "L", Math.round(x + w) + 0.5, Math.round(y) + 0.5, Math.round(x + w) + 0.5, Math.round(y + h) + 0.5, Math.round(x) + 0.5, Math.round(y + h) + 0.5, Math.round(x) + 0.5, Math.round(y) + 0.5],
                         rowHeight = h / hv,
                         columnWidth = w / wv;
                     for (var i = 1; i < hv; i++) {
-                        path = path.concat(["M", Math.round(x) + .5, Math.round(y + i * rowHeight) + .5, "H", Math.round(x + w) + .5]);
+                        path = path.concat(["M", Math.round(x) + 0.5, Math.round(y + i * rowHeight) + 0.5, "H", Math.round(x + w) + 0.5]);
                     }
                     for (i = 1; i < wv; i++) {
-                        path = path.concat(["M", Math.round(x + i * columnWidth) + .5, Math.round(y) + .5, "V", Math.round(y + h) + .5]);
+                        path = path.concat(["M", Math.round(x + i * columnWidth) + 0.5, Math.round(y) + 0.5, "V", Math.round(y + h) + 0.5]);
                     }
                     return this.path(path.join(",")).attr({stroke: color});
                 };
@@ -66,8 +66,8 @@ define(
                         Y = (height - bottomgutter - topgutter) / max;
                     
                     r.drawGrid(
-                        leftgutter + X * .5 + .5, 
-                        topgutter + .5, 
+                        leftgutter + X * 0.5 + 0.5, 
+                        topgutter + 0.5, 
                         width - leftgutter - X, 
                         height - topgutter - bottomgutter, 
                         labelsCount-1, 
@@ -92,12 +92,12 @@ define(
                             var value = data[i],
                                 cHeight = Y * value,
                                 y = Math.round(height - bottomgutter - cHeight),
-                                x = Math.round(leftgutter + X * (i + .5));
+                                x = Math.round(leftgutter + X * (i + 0.5));
                             
                             if (value) {
                                 rects.push(r.rect(x - cWidth/2, y, cWidth, Math.round(cHeight)).attr({
                                     fill: color,
-                                    opacity: .9,
+                                    opacity: 0.9,
                                     stroke: color
                                 }));
                             }
@@ -110,7 +110,7 @@ define(
                         $.map(map, function(rects) {
                             $.map(rects, function(rect) {
                                 rect.attr({
-                                    opacity: .1
+                                    opacity: 0.1
                                 });
                             });
                         });
@@ -125,14 +125,14 @@ define(
                         $.map(map, function(rects) {
                             $.map(rects, function(rect) {
                                 rect.attr({
-                                    opacity: .9
+                                    opacity: 0.9
                                 });
                             });
                         });
-                    })
+                    });
                 });
                 
             }
-        }
+        };
     }
 );

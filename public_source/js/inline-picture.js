@@ -41,14 +41,14 @@ define(
                         top: (offset.top + $img.outerHeight()) + 'px'
                     })
                     .fadeIn(300);
-            }
+            };
             
             this.out = function() {
                 var self = this;
                 this.timer = setTimeout(function() {
                     self.$details.fadeOut(300);
                 }, this.delay);
-            }
+            };
         };
     }
 );

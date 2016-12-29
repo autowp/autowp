@@ -184,7 +184,24 @@ gulp.task('favicon', ['favicon-1', 'favicon-2'], function () {
 });
 
 gulp.task('lint', function() {
-    return gulp.src('./public_source/js/**/*.js')
+    return gulp.src([
+        './public_source/js/**/*.js', 
+        '!./public_source/js/respond.js',
+        '!./public_source/js/typeahead.js',
+        '!./public_source/js/raphael.js',
+        '!./public_source/js/require.js',
+        '!./public_source/js/markdown.js',
+        '!./public_source/js/jquery.Jcrop.js',
+        '!./public_source/js/jquery.js',
+        '!./public_source/js/filesize.js',
+        '!./public_source/js/domReady.js',
+        '!./public_source/js/diff.js',
+        '!./public_source/js/bootstrap-tagsinput.js',
+        '!./public_source/js/bootstrap.js',
+        '!./public_source/js/Chart.js',
+        '!./public_source/js/bloodhound.js',
+        '!./public_source/js/async.js',
+    ])
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
 });

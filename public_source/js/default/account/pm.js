@@ -1,5 +1,4 @@
 define(
-    'default/account/pm',
     ['jquery', 'message', 'domReady!'],
     function($, Message) {
         return {
@@ -13,6 +12,6 @@ define(
                     });
                 });
             }
-        }
+        };
     }
 );

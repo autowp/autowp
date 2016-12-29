@@ -7,11 +7,11 @@ define(
                     var offset = $(this).offset();
 
                     var div = $(
-                        '<div>\
-                            <a href="#" class="close">&times;</a>\
-                            <p>Постоянная ссылка на сообщение</p>\
-                            <input type="text" readonly="readonly" style="width:98%" /><br />\
-                         </div>'
+                        '<div>' +
+                            '<a href="#" class="close">&times;</a>' +
+                            '<p>Постоянная ссылка на сообщение</p>' +
+                            '<input type="text" readonly="readonly" style="width:98%" /><br />' +
+                         '</div>'
                     );
 
                     //TODO: extract url to options
@@ -21,7 +21,7 @@ define(
 
                     $('.close', div).on('click', function(e) {
                         e.preventDefault();
-                        $(div).remove()
+                        $(div).remove();
                     });
 
                     $(div).css({
@@ -38,6 +38,6 @@ define(
                     return false;
                 });
             }
-        }
+        };
     }
 );

@@ -1,5 +1,4 @@
 define(
-    'navbar',
     ['jquery', 'bootstrap'],
     function($) {
         return {
@@ -14,21 +13,21 @@ define(
                     function reload() {
                         if (!$modal) {
                             $modal = $(
-                                '<div class="modal fade">\
-                                    <div class="modal-dialog">\
-                                        <div class="modal-content">\
-                                            <div class="modal-header">\
-                                                <button type="button" data-dismiss="modal" class="close">×</button>\
-                                                <h3 class="modal-title">Online</h3>\
-                                            </div>\
-                                            <div class="modal-body"></div>\
-                                            <div class="modal-footer">\
-                                                <button class="btn btn-primary">Обновить</a>\
-                                                <button data-dismiss="modal" class="btn btn-default">Закрыть</button>\
-                                            </div>\
-                                        </div>\
-                                    </div>\
-                                </div>'
+                                '<div class="modal fade">' +
+                                    '<div class="modal-dialog">' +
+                                        '<div class="modal-content">' +
+                                            '<div class="modal-header">' +
+                                                '<button type="button" data-dismiss="modal" class="close">×</button>' +
+                                                '<h3 class="modal-title">Online</h3>' +
+                                            '</div>' +
+                                            '<div class="modal-body"></div>' +
+                                            '<div class="modal-footer">' +
+                                                '<button class="btn btn-primary">Обновить</a>' +
+                                                '<button data-dismiss="modal" class="btn btn-default">Закрыть</button>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>'
                             );
                             $body = $modal.find('.modal-body');
                             $btnRefresh = $modal.find('.btn-primary').on('click', function(e) {

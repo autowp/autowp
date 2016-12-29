@@ -32,6 +32,6 @@ define(
 
                 $pre.eq(1).empty().append(fragment);
             }
-        }
+        };
     }
 );

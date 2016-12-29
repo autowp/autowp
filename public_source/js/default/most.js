@@ -1,5 +1,4 @@
 define(
-    'default/most',
     ['jquery', 'bootstrap'],
     function($, Bootstrap) {
         return {
@@ -8,6 +7,6 @@ define(
                     placement: 'bottom'
                 });
             }
-        }
+        };
     }
 );

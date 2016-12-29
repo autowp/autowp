@@ -85,7 +85,7 @@ define(
                             // The actual data
                             data: dataset.values
                         });
-                    })
+                    });
                     
                     var data = {
                         labels: json.years,
@@ -98,6 +98,6 @@ define(
                     
                 });
             }
-        }
+        };
     }
 );

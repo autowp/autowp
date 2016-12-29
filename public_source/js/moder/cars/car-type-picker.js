@@ -51,6 +51,6 @@ define(
                     $select.val([]);
                 }
             }
-        }
+        };
     }
 );

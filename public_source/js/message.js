@@ -1,5 +1,4 @@
 define(
-    'message',
     ['jquery', 'bootstrap'],
     function($, Bootstrap) {
         return {
@@ -7,23 +6,23 @@ define(
                 var self = this;
                 
                 var $modal = $(
-                    '<div class="modal fade">\
-                        <div class="modal-dialog">\
-                            <form action="/account/send-personal-message" class="modal-content" method="post">\
-                                <div class="modal-header">\
-                                    <a class="close">×</a>\
-                                    <h3 class="modal-title">Отправить личное сообщение</h3>\
-                                </div>\
-                                <div class="modal-body">\
-                                    <textarea cols="65" rows="5" name="contents" placeholder="Текст сообщения" class="form-control"></textarea>\
-                                </div>\
-                                <div class="modal-footer">\
-                                    <button class="btn btn-primary" data-loading-text="отправляется ..." data-complete-text="отправлено" data-send-text="отправить">отправить</button>\
-                                    <button class="btn btn-default cancel">отменить</button>\
-                                </div>\
-                            </form>\
-                        </div>\
-                    </div>'
+                    '<div class="modal fade">' +
+                        '<div class="modal-dialog">' +
+                            '<form action="/account/send-personal-message" class="modal-content" method="post">' +
+                                '<div class="modal-header">' +
+                                    '<a class="close">×</a>' +
+                                    '<h3 class="modal-title">Отправить личное сообщение</h3>' +
+                                '</div>' +
+                                '<div class="modal-body">' +
+                                    '<textarea cols="65" rows="5" name="contents" placeholder="Текст сообщения" class="form-control"></textarea>' +
+                                '</div>' +
+                                '<div class="modal-footer">' +
+                                    '<button class="btn btn-primary" data-loading-text="отправляется ..." data-complete-text="отправлено" data-send-text="отправить">отправить</button>' +
+                                    '<button class="btn btn-default cancel">отменить</button>' +
+                                '</div>' +
+                            '</form>' +
+                        '</div>' +
+                    '</div>'
                 );
                 
                 var $form = $modal.find('form');
@@ -102,6 +101,6 @@ define(
                     }
                 });
             }
-        }
+        };
     }
 );

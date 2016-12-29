@@ -26,7 +26,7 @@ define(
         
         var Dialog = function(options) {
             this.init(options);
-        }
+        };
         
         Dialog.prototype = {
             init: function(options) {

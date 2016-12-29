@@ -145,7 +145,7 @@ define(
                         }, function() {
                             $form.show();
                             $form[0].reset();
-                        })
+                        });
                     });
                 });
             },
@@ -189,10 +189,10 @@ define(
                                         id: picture.id
                                     });
                                     $.post(self.cropSaveUrl, params, function(json) {
-                                        var cropStr = Math.round(crop.w) + '×' 
-                                                    + Math.round(crop.h) + '+' 
-                                                    + Math.round(crop.x) + '+' 
-                                                    + Math.round(crop.y);
+                                        var cropStr = Math.round(crop.w) + '×' +
+                                                      Math.round(crop.h) + '+' +
+                                                      Math.round(crop.x) + '+' +
+                                                      Math.round(crop.y);
                                         
                                         $cropBtn
                                             .text(self.croppedToMsg.replace('%s', cropStr))
@@ -213,6 +213,6 @@ define(
                 
                 $picture.append($cropBtn);
             }
-        }
+        };
     }
 );

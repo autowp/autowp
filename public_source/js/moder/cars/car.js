@@ -31,13 +31,13 @@ define(
                 });
                 
                 $('a[data-toggle="tab"][data-load]').on('show.bs.tab', function (e) {
-                    var $this = $(this)
-                        , selector = $this.attr('data-target')
-                        , $target
+                    var $this = $(this),
+                        selector = $this.attr('data-target'),
+                        $target;
 
                     if (!selector) {
-                        selector = $this.attr('href')
-                        selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
+                        selector = $this.attr('href');
+                        selector = selector && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
                     }
 
                     $target = $(selector);
@@ -92,7 +92,7 @@ define(
                                 
                                 $.map(json.urls, function(urls, id) {
                                     $catalogueTab.find('tr').filter(function() {
-                                        return $(this).data('id') == id
+                                        return $(this).data('id') == id;
                                     }).find('.urls').each(function() {
                                         var $cell = $(this).empty();
                                         $.map(urls, function(url) {
@@ -103,8 +103,8 @@ define(
                                                 }),
                                                 '<br />'
                                             ]);
-                                        })
-                                    })
+                                        });
+                                    });
                                 });
                             } else {
                                 alert(json.messages.join("\n"));
@@ -153,7 +153,7 @@ define(
                                         if (item.image) {
                                             $div.prepend($('<img />', {
                                                 src: item.image
-                                            }))
+                                            }));
                                         }
                                         
                                         return $div[0];
@@ -175,11 +175,11 @@ define(
                     var $tree = $(this).find('.tree');
                     $(this).find('.btn').on('click', function() {
                         $tree[$(this).hasClass('active') ? 'removeClass' : 'addClass']('stock-only');
-                    })
+                    });
                 });
                 
                 $('a[data-toggle="tab"][data-activate]').tab('show');
             }
-        }
+        };
     }
 );

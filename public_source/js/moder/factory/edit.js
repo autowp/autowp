@@ -58,6 +58,6 @@ define(
                     $('#lat').val(event.latLng.lat());
                 });
             }
-        }
+        };
     }
 );

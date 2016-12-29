@@ -10,6 +10,6 @@ define(
                     $node[$node.hasClass('open') ? 'removeClass' : 'addClass']('open');
                 });
             }
-        }
+        };
     }
 );

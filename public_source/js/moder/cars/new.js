@@ -5,6 +5,6 @@ define(
             init: function(options) {
                 CarTypePicker.init($('select[multiple]'));
             }
-        }
+        };
     }
 );

@@ -7,9 +7,9 @@ define(
                     var $this = $(this);
                     $.getJSON(options.hostByAddrUrl, {ip: $this.text()}, function(json) {
                         $this.text(json.host);
-                    })
+                    });
                 });
             }
-        }
+        };
     }
 );

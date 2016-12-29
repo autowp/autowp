@@ -83,6 +83,6 @@ define(
                     areaDialog.show();
                 });
             }
-        }
+        };
     }
 );
