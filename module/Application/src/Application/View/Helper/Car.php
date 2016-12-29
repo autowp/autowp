@@ -81,39 +81,6 @@ class Car extends AbstractHelper
         return $this->itemNameFormatter->format($car, $this->view->language());
     }
 
-    public function title()
-    {
-        if (! $this->car) {
-            return false;
-        }
-
-        $car = $this->car;
-
-        $spec = null;
-        $specFull = null;
-        if ($car->spec_id) {
-            $specRow = $this->getSpecTable()->find($car->spec_id)->current();
-            if ($specRow) {
-                $spec = $specRow->short_name;
-                $specFull = $specRow->name;
-            }
-        }
-
-        return $this->htmlTitle([
-            'begin_model_year' => $car['begin_model_year'],
-            'end_model_year'   => $car['end_model_year'],
-            'spec'             => $spec,
-            'spec_full'        => $specFull,
-            'body'             => $car['body'],
-            'name'             => $car['name'],
-            'begin_year'       => $car['begin_year'],
-            'end_year'         => $car['end_year'],
-            'today'            => $car['today'],
-            'begin_month'      => $car['begin_month'],
-            'end_month'        => $car['end_month']
-        ]);
-    }
-
     public function catalogueLinks()
     {
         if (! $this->car) {
