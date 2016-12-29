@@ -445,8 +445,6 @@ class IndexController extends AbstractActionController
                         if ($row) {
                             $format = $idx > 0 ? 'picture-thumb' : 'picture-thumb-medium';
 
-                            $identity = $row['identity'] ? $row['identity'] : $row['id'];
-
                             $url = null;
                             foreach ($paths as $path) {
                                 $url = $this->url()->fromRoute('catalogue', [
@@ -454,7 +452,7 @@ class IndexController extends AbstractActionController
                                     'brand_catname' => $path['brand_catname'],
                                     'car_catname'   => $path['car_catname'],
                                     'path'          => $path['path'],
-                                    'picture_id'    => $identity
+                                    'picture_id'    => $row['identity']
                                 ]);
                             }
 
@@ -465,7 +463,7 @@ class IndexController extends AbstractActionController
                                         'category_catname' => $path['category_catname'],
                                         'item_id'          => $path['item_id'],
                                         'path'             => $path['path'],
-                                        'picture_id'       => $identity
+                                        'picture_id'       => $row['identity']
                                     ]);
                                 }
                             }

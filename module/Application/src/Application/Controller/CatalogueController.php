@@ -102,21 +102,9 @@ class CatalogueController extends AbstractActionController
     {
         $selectRow = clone $select;
 
-        $selectRow
-            ->where('pictures.id = ?', (int)$pictureId)
-            ->where('pictures.identity IS NULL');
+        $selectRow->where('pictures.identity = ?', (string)$pictureId);
 
-        $picture = $selectRow->getTable()->fetchRow($selectRow);
-
-        if (! $picture) {
-            $selectRow = clone $select;
-
-            $selectRow->where('pictures.identity = ?', (string)$pictureId);
-
-            $picture = $selectRow->getTable()->fetchRow($selectRow);
-        }
-
-        return $picture;
+        return $selectRow->getTable()->fetchRow($selectRow);
     }
 
     /**
@@ -482,7 +470,7 @@ class CatalogueController extends AbstractActionController
                         );
 
                         if (! $carId) {
-                            return $this->pic()->url($picture['id'], $picture['identity']);
+                            return $this->pic()->url($picture['identity']);
                         }
 
                         $paths = $carParentTable->getPathsToBrand($carId, $brand['id'], [
@@ -490,7 +478,7 @@ class CatalogueController extends AbstractActionController
                         ]);
 
                         if (count($paths) <= 0) {
-                            return $this->pic()->url($picture['id'], $picture['identity']);
+                            return $this->pic()->url($picture['identity']);
                         }
 
                         $path = $paths[0];
@@ -500,7 +488,7 @@ class CatalogueController extends AbstractActionController
                             'brand_catname' => $brand['catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
-                            'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
+                            'picture_id'    => $picture['identity']
                         ]);
                     }
                 ]);
@@ -632,7 +620,7 @@ class CatalogueController extends AbstractActionController
                 'url'   => function ($row) {
                     return $this->url()->fromRoute('catalogue', [
                         'action'     => $this->params('action') . '-picture',
-                        'picture_id' => $row['identity'] ? $row['identity'] : $row['id']
+                        'picture_id' => $row['identity']
                     ], [], true);
                 }
             ]);
@@ -1421,8 +1409,6 @@ class CatalogueController extends AbstractActionController
                             'path'          => $path,
                             'exact'         => false,
                             'picture_id'    => $pictureRow['row']['identity']
-                                ? $pictureRow['row']['identity']
-                                : $pictureRow['row']['id']
                         ], [], true)
                     ];
                 } else {
@@ -1605,7 +1591,7 @@ class CatalogueController extends AbstractActionController
                         'car_catname'   => $brandItemCatname,
                         'path'          => $path,
                         'exact'         => true,
-                        'picture_id'    => $pictureRow['identity'] ? $pictureRow['identity'] : $pictureRow['id']
+                        'picture_id'    => $pictureRow['identity']
                     ], [], true)
                 ];
             }
@@ -1831,7 +1817,7 @@ class CatalogueController extends AbstractActionController
                         'car_catname'   => $brandItemCatname,
                         'path'          => $path,
                         'exact'         => $exact,
-                        'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                        'picture_id'    => $row['identity']
                     ], [], true);
                 }
             ]);
@@ -2168,7 +2154,7 @@ class CatalogueController extends AbstractActionController
                                 'brand_catname' => $path['brand_catname'],
                                 'car_catname'   => $path['car_catname'],
                                 'path'          => $path['path'],
-                                'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
+                                'picture_id'    => $picture['identity']
                             ]);
                         }
 

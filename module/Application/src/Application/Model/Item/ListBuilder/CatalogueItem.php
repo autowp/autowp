@@ -120,7 +120,7 @@ class CatalogueItem extends Catalogue
             'brand_catname' => $this->brand['catname'],
             'car_catname'   => $this->brandItemCatname,
             'path'          => $this->path,
-            'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
+            'picture_id'    => $picture['identity']
         ], [
             'name' => 'catalogue'
         ]);

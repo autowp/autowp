@@ -1111,30 +1111,6 @@ INSERT INTO `brand_item` VALUES (1,1,0,'first-car'),(1,2,0,'second-car'),(1,3,0,
 /*!40000 ALTER TABLE `brand_item` ENABLE KEYS */;
 
 --
--- Table structure for table `brands_pictures_cache`
---
-
-DROP TABLE IF EXISTS `brands_pictures_cache`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `brands_pictures_cache` (
-  `brand_id` int(10) unsigned NOT NULL,
-  `picture_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`brand_id`,`picture_id`),
-  KEY `picture_id` (`picture_id`),
-  CONSTRAINT `brands_pictures_cache_ibfk_1` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `brands_pictures_cache_ibfk_2` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `brands_pictures_cache`
---
-
-/*!40000 ALTER TABLE `brands_pictures_cache` DISABLE KEYS */;
-/*!40000 ALTER TABLE `brands_pictures_cache` ENABLE KEYS */;
-
---
 -- Table structure for table `item_language`
 --
 
@@ -2894,7 +2870,7 @@ CREATE TABLE `pictures` (
   `name` varchar(255) DEFAULT NULL,
   `source_id` int(10) unsigned DEFAULT NULL,
   `copyrights` text,
-  `identity` varchar(10) DEFAULT NULL,
+  `identity` varchar(10) NOT NULL,
   `replace_picture_id` int(10) unsigned DEFAULT NULL,
   `image_id` int(10) unsigned DEFAULT NULL,
   `factory_id` int(10) unsigned DEFAULT NULL,
@@ -2932,11 +2908,11 @@ CREATE TABLE `pictures` (
 
 /*!40000 ALTER TABLE `pictures` DISABLE KEYS */;
 INSERT INTO `pictures` VALUES 
-(1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,1,NULL,'\0\0',NULL,NULL),
-(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',0,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,33,NULL,'\0\0',NULL,NULL),
-(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',3,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,35,NULL,'\0\0',NULL,NULL),
-(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',2,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,37,NULL,'\0\0',NULL,NULL),
-(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',   2,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,NULL,NULL,38,NULL,'\0\0',NULL,NULL);
+(1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity1',NULL,1,NULL,'\0\0',NULL,NULL),
+(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',0,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity2',NULL,33,NULL,'\0\0',NULL,NULL),
+(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',3,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity3',NULL,35,NULL,'\0\0',NULL,NULL),
+(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',2,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity4',NULL,37,NULL,'\0\0',NULL,NULL),
+(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',   2,NULL,1,   NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity5',NULL,38,NULL,'\0\0',NULL,NULL);
 /*!40000 ALTER TABLE `pictures` ENABLE KEYS */;
 
 --

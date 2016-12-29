@@ -148,7 +148,7 @@ class CarOfDay
             return;
         }
 
-        $url = 'http://wheelsage.org/picture/' . ($picture->identity ? $picture->identity : $picture->id);
+        $url = 'http://wheelsage.org/picture/' . $picture->identity;
 
         $text = sprintf(
             'Vehicle of the day: %s %s',

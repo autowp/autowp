@@ -135,7 +135,7 @@ class TwinsController extends AbstractActionController
             'url'   => function ($row) use ($group) {
                 return $this->url()->fromRoute('twins/group/pictures/picture', [
                     'id'         => $group['id'],
-                    'picture_id' => $row['identity'] ? $row['identity'] : $row['id']
+                    'picture_id' => $row['identity']
                 ]);
             }
         ]);
@@ -293,7 +293,7 @@ class TwinsController extends AbstractActionController
 
                     $url = $this->url()->fromRoute('twins/group/pictures/picture', [
                         'id'         => $group['id'],
-                        'picture_id' => $pictureRow['identity'] ? $pictureRow['identity'] : $pictureRow['id']
+                        'picture_id' => $pictureRow['identity']
                     ]);
 
                     $picture = [
@@ -416,17 +416,9 @@ class TwinsController extends AbstractActionController
         $pictureId = (string)$this->params('picture_id');
 
         $select = $twins->getGroupPicturesSelect($group['id'])
-            ->where('pictures.id = ?', $pictureId)
-            ->where('pictures.identity IS NULL');
+            ->where('pictures.identity = ?', $pictureId);
 
         $picture = $select->getTable()->fetchRow($select);
-
-        if (! $picture) {
-            $select = $twins->getGroupPicturesSelect($group['id'])
-                ->where('pictures.identity = ?', $pictureId);
-
-            $picture = $select->getTable()->fetchRow($select);
-        }
 
         if (! $picture) {
             return $this->notFoundAction();
@@ -461,7 +453,7 @@ class TwinsController extends AbstractActionController
                 'gallery2'   => true,
                 'galleryUrl' => $this->url()->fromRoute('twins/group/pictures/picture/gallery', [
                     'id'         => $group['id'],
-                    'picture_id' => $picture['identity'] ? $picture['identity'] : $picture['id']
+                    'picture_id' => $picture['identity']
                 ])
             ]);
         });
@@ -482,7 +474,7 @@ class TwinsController extends AbstractActionController
                 'urlParams' => [
                     'action'     => 'picture',
                     'id'         => $group['id'],
-                    'picture_id' => $picture['identity'] ? $picture['identity'] : $picture['id']
+                    'picture_id' => $picture['identity']
                 ]
             ]));
         });

@@ -122,7 +122,7 @@ class Pic extends AbstractPlugin
                     $url = $controller->url()->fromRoute('catalogue', [
                         'action'        => 'logotypes-picture',
                         'brand_catname' => $brandRow->folder,
-                        'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                        'picture_id'    => $row['identity']
                     ], [
                         'force_canonical' => $options['canonical'],
                         'uri'             => $options['uri']
@@ -136,7 +136,7 @@ class Pic extends AbstractPlugin
                     $url = $controller->url()->fromRoute('catalogue', [
                         'action'        => 'mixed-picture',
                         'brand_catname' => $brandRow->folder,
-                        'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                        'picture_id'    => $row['identity']
                     ], [
                         'force_canonical' => $options['canonical']
                     ]);
@@ -149,7 +149,7 @@ class Pic extends AbstractPlugin
                     $url = $controller->url()->fromRoute('catalogue', [
                         'action'        => 'other-picture',
                         'brand_catname' => $brandRow->folder,
-                        'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                        'picture_id'    => $row['identity']
                     ], [
                         'force_canonical' => $options['canonical']
                     ]);
@@ -173,7 +173,7 @@ class Pic extends AbstractPlugin
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
-                            'picture_id'    => $row['identity'] ? $row['identity'] : $row['id']
+                            'picture_id'    => $row['identity']
                         ], [
                             'force_canonical' => $options['canonical']
                         ]);
@@ -183,16 +183,16 @@ class Pic extends AbstractPlugin
         }
 
         if ($options['fallback'] && ! $url) {
-            $url = $this->url($row['id'], $row['identity'], $options['canonical']);
+            $url = $this->url($row['identity'], $options['canonical']);
         }
 
         return $url;
     }
 
-    public function url($id, $identity, $absolute = false, $uri = null)
+    public function url($identity, $absolute = false, $uri = null)
     {
         return $this->httpRouter->assemble([
-            'picture_id' => $identity ? $identity : $id,
+            'picture_id' => $identity
         ], [
             'name'            => 'picture/picture',
             'force_canonical' => $absolute,
@@ -981,7 +981,7 @@ class Pic extends AbstractPlugin
                     $val = $controller->url()->fromRoute(
                         $options['paginator']['route'],
                         array_replace($options['paginator']['urlParams'], [
-                            'picture_id' => $pic['identity'] ? $pic['identity'] : $pic['id']
+                            'picture_id' => $pic['identity']
                         ])
                     );
                 }
@@ -1334,7 +1334,7 @@ class Pic extends AbstractPlugin
 
             $reuseParams = isset($options['reuseParams']) && $options['reuseParams'];
             $url = $controller->url()->fromRoute($route, array_replace($options['urlParams'], [
-                'picture_id' => $row['identity'] ? $row['identity'] : $id,
+                'picture_id' => $row['identity'],
                 'gallery'    => null,
             ]), [], $reuseParams);
 

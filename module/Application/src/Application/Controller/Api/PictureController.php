@@ -42,7 +42,7 @@ class PictureController extends AbstractActionController
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->pic()->url($pictureRow->id, $pictureRow->identity, true)
+                'page'   => $this->pic()->url($pictureRow->identity, true)
             ];
         }
 
@@ -70,7 +70,7 @@ class PictureController extends AbstractActionController
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->pic()->url($pictureRow->id, $pictureRow->identity, true)
+                'page'   => $this->pic()->url($pictureRow->identity, true)
             ];
         }
 
@@ -134,7 +134,7 @@ class PictureController extends AbstractActionController
                 'status' => true,
                 'url'    => $imageInfo->getSrc(),
                 'name'   => $this->pic()->name($pictureRow, $this->language()),
-                'page'   => $this->pic()->url($pictureRow->id, $pictureRow->identity, true)
+                'page'   => $this->pic()->url($pictureRow->identity, true)
             ];
         }
 

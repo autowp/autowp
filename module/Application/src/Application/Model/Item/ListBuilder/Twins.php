@@ -20,7 +20,7 @@ class Twins extends ListBuilder
     {
         return $this->router->assemble([
             'id'         => $this->group['id'],
-            'picture_id' => $picture['identity'] ? $picture['identity'] : $picture['id']
+            'picture_id' => $picture['identity']
         ], [
             'name' => 'twins/group/pictures/picture'
         ]);

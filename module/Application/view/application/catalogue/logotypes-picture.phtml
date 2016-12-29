@@ -6,7 +6,7 @@
         ],
         'pageId' => 192,
         'args'   => [
-            'PICTURE_ID'    => $this->picture['identity'] ? $this->picture['identity'] : $this->picture['id'],
+            'PICTURE_ID'    => $this->picture['identity'],
             'PICTURE_NAME'  => $this->pic()->textTitle($this->picture['name']),
             'BRAND_NAME'    => $this->brand['name'],
             'BRAND_CATNAME' => $this->brand['catname'],

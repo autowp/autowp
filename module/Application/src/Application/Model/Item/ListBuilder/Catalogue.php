@@ -146,7 +146,7 @@ class Catalogue extends ListBuilder
         ]);
 
         if (count($paths) <= 0) {
-            return $this->picHelper->url($picture['id'], $picture['identity']);
+            return $this->picHelper->url($picture['identity']);
         }
 
         $path = $paths[0];
@@ -156,7 +156,7 @@ class Catalogue extends ListBuilder
             'brand_catname' => $this->brand['catname'],
             'car_catname'   => $path['car_catname'],
             'path'          => $path['path'],
-            'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
+            'picture_id'    => $picture['identity']
         ], [
             'name' => 'catalogue'
         ]);

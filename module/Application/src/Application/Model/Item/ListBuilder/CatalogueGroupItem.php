@@ -241,7 +241,7 @@ class CatalogueGroupItem extends CatalogueItem
         // found parent row
         $carParentRow = $this->getItemParentRow($item->id, $this->itemId);
         if (! $carParentRow) {
-            return $this->picHelper->url($picture['id'], $picture['identity']);
+            return $this->picHelper->url($picture['identity']);
         }
 
         return $this->router->assemble([
@@ -251,7 +251,7 @@ class CatalogueGroupItem extends CatalogueItem
             'path'          => array_merge($this->path, [
                 $carParentRow->catname
             ]),
-            'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
+            'picture_id'    => $picture['identity']
         ], [
             'name' => 'catalogue'
         ]);

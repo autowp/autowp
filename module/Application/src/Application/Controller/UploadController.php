@@ -82,13 +82,8 @@ class UploadController extends AbstractActionController
         $replacePicture = false;
         if ($replace) {
             $replacePicture = $pictureTable->fetchRow([
-                'identity = ?' => $replace
+                'id = ?' => $replace
             ]);
-            if (! $replacePicture) {
-                $replacePicture = $pictureTable->fetchRow([
-                    'id = ?' => $replace
-                ]);
-            }
         }
 
         if ($replacePicture) {
@@ -161,7 +156,7 @@ class UploadController extends AbstractActionController
                     if ($request->isXmlHttpRequest()) {
                         /*$urls = [];
                         foreach ($pictures as $picture) {
-                            $identity = $picture->identity ? $picture->identity : $picture->id;
+                            $identity = $picture->identity;
 
                             $urls[] = $this->view->serverUrl($this->_helper->url->url([
                                 'module'     => 'default',

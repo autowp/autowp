@@ -128,7 +128,7 @@ class MostsController extends AbstractActionController
                             'brand_catname' => $path['brand_catname'],
                             'car_catname'   => $path['car_catname'],
                             'path'          => $path['path'],
-                            'picture_id'    => $picture['identity'] ? $picture['identity'] : $picture['id']
+                            'picture_id'    => $picture['identity']
                         ]);
                     }
 

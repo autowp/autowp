@@ -237,7 +237,7 @@ class TelegramService
         $uri = $this->getUriByChatId($chatId);
 
         return $this->router->assemble([
-            'picture_id' => $picture->identity ? $picture->identity : $picture->id,
+            'picture_id' => $picture->identity
         ], [
             'name'            => 'picture/picture',
             'force_canonical' => true,

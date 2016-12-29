@@ -24,7 +24,7 @@ class MessageRow extends Row
                 $pictures = new Picture();
                 $picture = $pictures->find($this->item_id)->current();
                 if ($picture) {
-                    return '/picture/'.($picture->identity ? $picture->identity : $picture->id);
+                    return '/picture/'.$picture->identity;
                 }
                 return false;
 

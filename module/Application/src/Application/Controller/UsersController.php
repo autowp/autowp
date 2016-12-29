@@ -91,7 +91,7 @@ class UsersController extends AbstractActionController
         $lastPictures = [];
         foreach ($lastPictureRows as $lastPictureRow) {
             $lastPictures[] = [
-                'url'  => $this->pic()->url($lastPictureRow->id, $lastPictureRow->identity),
+                'url'  => $this->pic()->url($lastPictureRow->identity),
                 'name' => $names[$lastPictureRow->id]
             ];
         }

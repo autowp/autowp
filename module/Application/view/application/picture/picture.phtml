@@ -25,9 +25,9 @@
         <?php if ($this->items[0]['designProject']) { ?>
             <sup class="designBrand">
                 <?=sprintf(
-                    $this->translate('carlist/designed by %s'), 
+                    $this->translate('carlist/designed by %s'),
                     $this->htmlA(
-                        $this->items[0]['designProject']['url'], 
+                        $this->items[0]['designProject']['url'],
                         $this->items[0]['designProject']['brand']
                     )
                 )?>
@@ -161,8 +161,8 @@
 
                 foreach ($item['categories'] as $category) {
                     $list[$category['url']] = $this->htmlA(
-                        $category['url'], 
-                        '<i class="fa fa-tag"></i> ' . $this->car()->htmlTitle($category['name']), 
+                        $category['url'],
+                        '<i class="fa fa-tag"></i> ' . $this->car()->htmlTitle($category['name']),
                         false
                     );
                 }
@@ -308,7 +308,7 @@
                 if (count($this->items) || $this->picture->brand_id || count($this->engines)) {
                     $list[] = $this->htmlA($this->url('upload/params', [
                         'action'  => 'index',
-                        'replace' => $this->picture->identity ? $this->picture->identity : $this->picture->id
+                        'replace' => $this->picture->identity
                     ]), '<i class="fa fa-exchange"></i> ' . $this->escapeHtml($this->translate('picture/propose-image-replacement')), false);
                 }
             }

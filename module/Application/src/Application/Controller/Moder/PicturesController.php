@@ -651,7 +651,7 @@ class PicturesController extends AbstractActionController
 
             $message = sprintf(
                 $this->translate('pm/your-picture-%s-enqueued-to-remove-%s', 'default', $owner->language),
-                $this->pic()->url($picture->id, $picture->identity, true, $uri),
+                $this->pic()->url($picture->identity, true, $uri),
                 implode("\n", $reasons)
             );
 
@@ -1099,7 +1099,7 @@ class PicturesController extends AbstractActionController
                 ), $picture);
 
 
-                $pictureUrl = $this->pic()->url($picture->id, $picture->identity, true);
+                $pictureUrl = $this->pic()->url($picture->identity, true);
                 if ($previousStatusUserId != $user->id) {
                     $userTable = new User();
                     foreach ($userTable->find($previousStatusUserId) as $prevUser) {
@@ -1840,8 +1840,8 @@ class PicturesController extends AbstractActionController
             foreach ($recepients as $recepient) {
                 $uri = $this->hostManager->getUriByLanguage($recepient->language);
 
-                $url = $this->pic()->url($picture->id, $picture->identity, true, $uri);
-                $replaceUrl = $this->pic()->url($replacePicture->id, $replacePicture->identity, true, $uri);
+                $url = $this->pic()->url($picture->identity, true, $uri);
+                $replaceUrl = $this->pic()->url($replacePicture->identity, true, $uri);
 
                 $moderUrl = $this->url()->fromRoute('users/user', [
                     'user_id' => $user->identity ? $user->identity : 'user' . $user->id
@@ -1897,7 +1897,7 @@ class PicturesController extends AbstractActionController
 
                     $message = sprintf(
                         $this->translate('pm/your-picture-accepted-%s', 'default', $owner->language),
-                        $this->pic()->url($picture->id, $picture->identity, true, $uri)
+                        $this->pic()->url($picture->identity, true, $uri)
                     );
 
                     $this->message->send(null, $owner->id, $message);
@@ -1911,7 +1911,7 @@ class PicturesController extends AbstractActionController
                 foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                     $message = sprintf(
                         'Принята картинка %s',
-                        $this->pic()->url($picture->id, $picture->identity, true)
+                        $this->pic()->url($picture->identity, true)
                     );
                     $this->message->send(null, $prevUser->id, $message);
                 }

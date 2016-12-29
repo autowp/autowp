@@ -261,7 +261,7 @@ class CatalogueController extends AbstractActionController
 
                     $message = sprintf(
                         $this->translate('pm/your-picture-accepted-%s', 'default', $owner->language),
-                        $this->pic()->url($picture->id, $picture->identity, true, $uri)
+                        $this->pic()->url($picture->identity, true, $uri)
                     );
 
                     $this->message->send(null, $owner->id, $message);
@@ -275,7 +275,7 @@ class CatalogueController extends AbstractActionController
                 foreach ($userTable->find($previousStatusUserId) as $prevUser) {
                     $message = sprintf(
                         'Принята картинка %s',
-                        $this->pic()->url($picture->id, $picture->identity, true)
+                        $this->pic()->url($picture->identity, true)
                     );
                     $this->message->send(null, $prevUser->id, $message);
                 }

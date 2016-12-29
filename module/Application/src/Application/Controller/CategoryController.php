@@ -153,7 +153,7 @@ class CategoryController extends AbstractActionController
     private function categoriesMenu($parent, $language, $maxDeep)
     {
         $categories = [];
-        
+
         $otherCategoriesName = $this->translate('categories/other');
 
         if ($maxDeep > 0) {
@@ -486,7 +486,7 @@ class CategoryController extends AbstractActionController
             $otherPictures = [];
             $otherItemsCount = 0;
             $isLastPage = $paginator->getCurrentPageNumber() == $paginator->count();
-            
+
             if ($haveSubcategories && $isLastPage && $currentCar->item_type_id == DbTable\Item\Type::CATEGORY && ! $isOther) {
                 $select = $this->itemTable->select(true)
                     ->where('cars.item_type_id IN (?)', [
@@ -531,7 +531,7 @@ class CategoryController extends AbstractActionController
                             'action'           => 'category',
                             'category_catname' => $currentCategory['catname'],
                             'other'            => true,
-                            'picture_id'       => $pictureRow['identity'] ? $pictureRow['identity'] : $pictureRow['id']
+                            'picture_id'       => $pictureRow['identity']
                         ], [], true)
                     ];
                 }
@@ -600,7 +600,7 @@ class CategoryController extends AbstractActionController
                         'category_catname' => $currentCategory->catname,
                         'other'            => $isOther,
                         'path'             => $path,
-                        'picture_id'       => $picture['identity'] ? $picture['identity'] : $picture['id']
+                        'picture_id'       => $picture['identity']
                     ]);
                 }
             ]);
@@ -641,19 +641,9 @@ class CategoryController extends AbstractActionController
 
             $pictureId = (string)$this->params('picture_id');
 
-            $selectRow
-                ->where('pictures.id = ?', $pictureId)
-                ->where('pictures.identity IS NULL');
+            $selectRow->where('pictures.identity = ?', $pictureId);
 
             $picture = $selectRow->getTable()->fetchRow($selectRow);
-
-            if (! $picture) {
-                $selectRow = clone $select;
-
-                $selectRow->where('pictures.identity = ?', $pictureId);
-
-                $picture = $selectRow->getTable()->fetchRow($selectRow);
-            }
 
             if (! $picture) {
                 return $this->notFoundAction();
@@ -670,7 +660,7 @@ class CategoryController extends AbstractActionController
                             'category_catname' => $currentCategory->catname,
                             'other'            => $isOther,
                             'path'             => $path,
-                            'picture_id'       => $picture['identity'] ? $picture['identity'] : $picture['id']
+                            'picture_id'       => $picture['identity']
                         ])
                     ]
                 )
@@ -707,19 +697,9 @@ class CategoryController extends AbstractActionController
 
             $pictureId = (string)$this->params('picture_id');
 
-            $selectRow
-                ->where('pictures.id = ?', $pictureId)
-                ->where('pictures.identity IS NULL');
+            $selectRow->where('pictures.identity = ?', $pictureId);
 
             $picture = $selectRow->getTable()->fetchRow($selectRow);
-
-            if (! $picture) {
-                $selectRow = clone $select;
-
-                $selectRow->where('pictures.identity = ?', $pictureId);
-
-                $picture = $selectRow->getTable()->fetchRow($selectRow);
-            }
 
             if (! $picture) {
                 return $this->notFoundAction();

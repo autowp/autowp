@@ -221,16 +221,10 @@ class UserText extends AbstractHtmlElement
 
         if ($pictureId) {
             $pictureTable = new Picture();
-            $picture = $pictureTable->fetchRow([
-                'id = ?' => $pictureId,
-                'identity IS NULL'
-            ]);
 
-            if (! $picture) {
-                $picture = $pictureTable->fetchRow([
-                    'identity = ?' => $pictureId
-                ]);
-            }
+            $picture = $pictureTable->fetchRow([
+                'identity = ?' => $pictureId
+            ]);
 
             if ($picture) {
                 return $this->view->inlinePicture($picture);

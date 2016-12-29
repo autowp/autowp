@@ -161,7 +161,7 @@ class Category extends ListBuilder
             return $this->router->assemble([
                 'action'           => 'category-picture',
                 'category_catname' => $item->catname,
-                'picture_id'       => $picture['identity'] ? $picture['identity'] : $picture['id']
+                'picture_id'       => $picture['identity']
             ], [
                 'name' => 'categories'
             ]);
@@ -189,7 +189,7 @@ class Category extends ListBuilder
             'category_catname' => $this->category->catname,
             'other'            => $this->isOther,
             'path'             => $currentPath,
-            'picture_id'       => $picture['identity'] ? $picture['identity'] : $picture['id']
+            'picture_id'       => $picture['identity']
         ], [
             'name' => 'categories'
         ]);

@@ -17,18 +17,9 @@ class PictureController extends AbstractActionController
 
         $pTable = $this->catalogue()->getPictureTable();
 
-        $picture = $pTable->fetchRow([
-            'id = ?'    => $identity,
-            'identity IS NULL'
+        return $pTable->fetchRow([
+            'identity = ?' => $identity
         ]);
-
-        if (! $picture) {
-            $picture = $pTable->fetchRow([
-                'identity = ?' => $identity
-            ]);
-        }
-
-        return $picture;
     }
 
     public function previewAction()
@@ -212,7 +203,7 @@ class PictureController extends AbstractActionController
         return array_replace($data, [
             'gallery2'   => true,
             'galleryUrl' => $this->url()->fromRoute('picture/picture', [
-                'picture_id' => $picture->identity ? $picture->identity : $picture->id
+                'picture_id' => $picture->identity
             ], [
                 'query' => [
                     'gallery' => '1'
