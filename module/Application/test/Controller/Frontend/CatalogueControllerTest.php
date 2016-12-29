@@ -105,7 +105,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testOtherPicture()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/other/2/', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/bmw/other/identity2/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -118,7 +118,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testMixedPicture()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/mixed/3/', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/bmw/mixed/identity3/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -131,7 +131,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testLogotypesPicture()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/logotypes/4/', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/bmw/logotypes/identity4/', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
@@ -201,7 +201,7 @@ class CatalogueControllerTest extends AbstractHttpControllerTestCase
 
     public function testVehiclePicture()
     {
-        $this->dispatch('https://www.autowp.ru/bmw/first-car/pictures/1', Request::METHOD_GET);
+        $this->dispatch('https://www.autowp.ru/bmw/first-car/pictures/identity1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
