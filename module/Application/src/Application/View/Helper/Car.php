@@ -4,46 +4,10 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\BrandItem;
-use Application\Model\DbTable\Spec;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\ItemNameFormatter;
-
-use Exception;
 
 class Car extends AbstractHelper
 {
-    /**
-     * @var VehicleRow
-     */
-    private $car = null;
-
-    private $monthFormat = '<small class="month">%02d.</small>';
-
-    private $textMonthFormat = '%02d.';
-
-    /**
-     * @var BrandItem
-     */
-    private $brandItemTable;
-
-    /**
-     * @var VehicleParent
-     */
-    private $carParentTable;
-
-    /**
-     * @var BrandTable
-     */
-    private $brandTable;
-
-    /**
-     * @var Spec
-     */
-    private $specTable;
-
     /**
      * @var ItemNameFormatter
      */
@@ -54,20 +18,8 @@ class Car extends AbstractHelper
         $this->itemNameFormatter = $itemNameFormatter;
     }
 
-    /**
-     * @return Spec
-     */
-    private function getSpecTable()
+    public function __invoke()
     {
-        return $this->specTable
-            ? $this->specTable
-            : $this->specTable = new Spec();
-    }
-
-    public function __invoke(VehicleRow $car = null)
-    {
-        $this->car = $car;
-
         return $this;
     }
 
@@ -79,105 +31,5 @@ class Car extends AbstractHelper
     public function textTitle(array $car)
     {
         return $this->itemNameFormatter->format($car, $this->view->language());
-    }
-
-    public function catalogueLinks()
-    {
-        if (! $this->car) {
-            return [];
-        }
-
-        $result = [];
-
-        foreach ($this->carPublicUrls($this->car) as $url) {
-            $result[] = [
-                'url' => $this->view->url([
-                    'module'        => 'default',
-                    'controller'    => 'catalogue',
-                    'action'        => 'brand-item',
-                    'brand_catname' => $url['brand_catname'],
-                    'car_catname'   => $url['car_catname'],
-                    'path'          => $url['path']
-                ], 'catalogue', true)
-            ];
-        }
-
-        return $result;
-    }
-
-    public function cataloguePaths()
-    {
-        return $this->carPublicUrls($this->car);
-    }
-
-    /**
-     * @return BrandItem
-     */
-    private function getBrandItemTable()
-    {
-        return $this->brandItemTable
-            ? $this->brandItemTable
-            : $this->brandItemTable = new BrandItem();
-    }
-
-    /**
-     * @return BrandTable
-     */
-    private function getBrandTable()
-    {
-        return $this->brandTable
-            ? $this->brandTable
-            : $this->brandTable = new BrandTable();
-    }
-
-    /**
-     * @return VehicleParent
-     */
-    private function getCarParentTable()
-    {
-        return $this->carParentTable
-            ? $this->carParentTable
-            : $this->carParentTable = new VehicleParent();
-    }
-
-    private function carPublicUrls(VehicleRow $car)
-    {
-        return $this->walkUpUntilBrand($car->id, []);
-    }
-
-    private function walkUpUntilBrand($id, array $path)
-    {
-        $urls = [];
-
-        $brandItemRows = $this->getBrandItemTable()->fetchAll([
-            'item_id = ?' => $id
-        ]);
-
-        foreach ($brandItemRows as $brandItemRow) {
-            $brand = $this->getBrandTable()->find($brandItemRow->brand_id)->current();
-            if (! $brand) {
-                throw new Exception("Broken link `{$brandItemRow->brand_id}`");
-            }
-
-            $urls[] = [
-                'brand_catname' => $brand->folder,
-                'car_catname'   => $brandItemRow->catname,
-                'path'          => $path
-            ];
-        }
-
-        $carParentTable = $this->getCarParentTable();
-
-        $parentRows = $this->getCarParentTable()->fetchAll([
-            'item_id = ?' => $id
-        ]);
-        foreach ($parentRows as $parentRow) {
-            $urls = array_merge(
-                $urls,
-                $this->walkUpUntilBrand($parentRow->parent_id, array_merge([$parentRow->catname], $path))
-            );
-        }
-
-        return $urls;
     }
 }
