@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "description": "WheelsAge",
   "devDependencies": {
-    "jshint": ">=2.9.2"
+    "gulp-jshint": "^2.0.4",
+    "jshint": "^2.9.4"
   },
   "jshintConfig": {
     "strict": true,

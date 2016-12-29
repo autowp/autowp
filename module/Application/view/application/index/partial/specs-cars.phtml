@@ -10,7 +10,7 @@
                 <div class="car" style="margin-bottom: 2em">
 
                     <h3>
-                        <?=$this->car($item['row'])->title()?>
+                        <?=$this->car()->htmlTitle($item['nameData'])?>
                         <?php if ($item['designProject']) { ?>
                             <sup class="designBrand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($item['designProject']['url'], $item['designProject']['brandName']))?></sup>
                         <?php } ?>

@@ -1,5 +1,4 @@
 define(
-    'moder/traffic/whitelist',
     ['jquery'],
     function($) {
         return {

@@ -17,8 +17,6 @@ use Zend_Db_Expr;
 
 class CategoryController extends AbstractActionController
 {
-    private $otherCategoryName = 'Other';
-
     private $cache;
 
     private $textStorage;
@@ -155,6 +153,8 @@ class CategoryController extends AbstractActionController
     private function categoriesMenu($parent, $language, $maxDeep)
     {
         $categories = [];
+        
+        $otherCategoriesName = $this->translate('categories/other');
 
         if ($maxDeep > 0) {
             $select = $this->itemTable->select(true)
@@ -210,7 +210,7 @@ class CategoryController extends AbstractActionController
                             'other'            => true,
                             'page'             => null
                         ]),
-                        'short_name'     => $this->otherCategoryName,
+                        'short_name'     => $otherCategoriesName,
                         'cars_count'     => $ownCarsCount,
                         'new_cars_count' => 0, //$parent->getWeekOwnCarsCount(),
                         'isOther'        => true,
@@ -220,11 +220,11 @@ class CategoryController extends AbstractActionController
             }
         }
 
-        usort($categories, function ($a, $b) {
-            if ($a["short_name"] == $this->otherCategoryName) {
+        usort($categories, function ($a, $b) use ($otherCategoriesName) {
+            if ($a["short_name"] == $otherCategoriesName) {
                 return 1;
             }
-            if ($b["short_name"] == $this->otherCategoryName) {
+            if ($b["short_name"] == $otherCategoriesName) {
                 return -1;
             }
             return strcmp($a["short_name"], $b["short_name"]);
@@ -337,7 +337,7 @@ class CategoryController extends AbstractActionController
             $currentCar = $childCar;
         }
 
-        $key = 'CATEGORY_MENU333_' . $topCategory->id . '_' . $language;
+        $key = 'CATEGORY_MENU334_' . $topCategory->id . '_' . $language;
 
         $menu = $this->cache->getItem($key, $success);
         if (! $success) {
@@ -486,7 +486,8 @@ class CategoryController extends AbstractActionController
             $otherPictures = [];
             $otherItemsCount = 0;
             $isLastPage = $paginator->getCurrentPageNumber() == $paginator->count();
-            if ($haveSubcategories && $isLastPage && ! $currentCar && ! $isOther) {
+            
+            if ($haveSubcategories && $isLastPage && $currentCar->item_type_id == DbTable\Item\Type::CATEGORY && ! $isOther) {
                 $select = $this->itemTable->select(true)
                     ->where('cars.item_type_id IN (?)', [
                         DbTable\Item\Type::ENGINE,
@@ -551,7 +552,7 @@ class CategoryController extends AbstractActionController
                 'description'     => $description,
                 'otherItemsCount' => $otherItemsCount,
                 'otherPictures'   => $otherPictures,
-                'otherCategoryName' => $this->otherCategoryName
+                'otherCategoryName' => $this->translate('categories/other')
             ];
         });
     }

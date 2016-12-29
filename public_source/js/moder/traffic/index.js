@@ -1,5 +1,4 @@
 define(
-    'moder/traffic/index',
     ['jquery'],
     function($) {
         return {

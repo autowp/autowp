@@ -18,7 +18,9 @@ var gulp = require("gulp")
   , packageJSON = require("./package")
   , favicons = require("gulp-favicons")
   , gutil = require("gulp-util")
-  , rev = require('gulp-rev');
+  , rev = require('gulp-rev')
+  , jshint = require('gulp-jshint')
+  , gulp = require('gulp');
 ;
 
 gulp.task("build.css", ["copy.jcrop", 'copy.flags'], function () {
@@ -179,6 +181,12 @@ gulp.task("favicon-2", function () {
 
 gulp.task('favicon', ['favicon-1', 'favicon-2'], function () {
     return gulp;
+});
+
+gulp.task('lint', function() {
+    return gulp.src('./public_source/js/**/*.js')
+        .pipe(jshint())
+        .pipe(jshint.reporter('default'));
 });
 
 /*gulp.task("minify.brands.png", function () {

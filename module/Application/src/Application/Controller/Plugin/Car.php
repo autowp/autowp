@@ -427,8 +427,8 @@ class Car extends AbstractPlugin
 
             $item = [
                 'id'               => $car->id,
-                'row'              => $car,
                 'name'             => $car->name,
+                'nameData'         => $car->getNameData($language),
                 'langName'         => isset($carsLangName[$car->id]) ? $carsLangName[$car->id] : null,
                 'produced'         => $car->produced,
                 'produced_exactly' => $car->produced_exactly,

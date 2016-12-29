@@ -6,7 +6,7 @@ $numberFormatter = NumberFormatter::create($this->language(), NumberFormatter::D
 
         <?php if (!$this->disableTitle) { ?>
             <h3>
-                <?=$this->car($item['row'])->title()?>
+                <?=$this->car()->htmlTitle($item['nameData'])?>
                 <?php if ($item['designProject']) { ?>
                     <sup class="designBrand"><?=sprintf($this->translate('carlist/designed by %s'), $this->htmlA($item['designProject']['url'], $item['designProject']['brandName']))?></sup>
                 <?php } ?>
@@ -31,8 +31,8 @@ $numberFormatter = NumberFormatter::create($this->language(), NumberFormatter::D
             </h3>
         <?php } ?>
 
-        <?php if ($item['langName'] && ($item['name'] != $item['langName'])) { ?>
-            <h4><?=$this->escapeHtml($item['langName'])?></h4>
+        <?php if ($item['nameData']['name'] != $item['name']) { ?>
+            <h4><?=$this->escapeHtml($item['name'])?></h4>
         <?php } ?>
 
         <div class="row thumbnails">

@@ -1240,6 +1240,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
 
     'category/name' => 'Name',
     'category/parent' => 'Parent',
+    'categories/other' => 'Other',
 
     'moder/categories/add' => 'Add',
     'moder/categories/edit' => 'Edit',

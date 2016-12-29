@@ -1271,6 +1271,7 @@ return array_replace(include 'root.php', [
 
     'category/name' => 'Название',
     'category/parent' => 'Родитель',
+    'categories/other' => 'Другие',
 
     'moder/categories/add' => 'Добавить',
     'moder/categories/edit' => 'Изменить',

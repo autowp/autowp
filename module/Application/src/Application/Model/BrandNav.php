@@ -444,7 +444,7 @@ class BrandNav
             'SIDEBAR',
             $brand['id'],
             $language,
-            '33'
+            '34'
         ]);
 
         $sections = $this->cache->getItem($cacheKey, $success);
