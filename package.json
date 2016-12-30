@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "description": "WheelsAge",
   "devDependencies": {
+    "gulp-amd-optimizer": "^0.4.1",
     "gulp-jshint": "^2.0.4",
     "jshint": "^2.9.4"
   },

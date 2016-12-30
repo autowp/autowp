@@ -1,6 +1,6 @@
 define(
-    ['jquery', 'bootstrap', 'gallery', 'gallery2'],
-    function($, Bootstrap, Gallery, Gallery2) {
+    ['jquery', 'bootstrap', 'gallery2'],
+    function($, Bootstrap, Gallery2) {
         return {
             init: function(options) {
                 

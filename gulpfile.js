@@ -58,7 +58,7 @@ gulp.task('build.css.gz', ['build.css', 'rev'], function() {
 });
 
 gulp.task('build.js', shell.task([
-    './node_modules/requirejs/bin/r.js -o ./public_source/build.js generateSourceMaps=false preserveLicenseComments=1 optimize=uglify2'
+    './node_modules/requirejs/bin/r.js -o ./public_source/build.js generateSourceMaps=false preserveLicenseComments=1 optimize=uglify2 findNestedDependencies=true'
 ]));
 
 gulp.task('build.js.gz', ['build.js'], function () {
