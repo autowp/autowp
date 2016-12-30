@@ -346,30 +346,6 @@ CREATE TABLE `articles_sources` (
 /*!40000 ALTER TABLE `articles_sources` ENABLE KEYS */;
 
 --
--- Table structure for table `articles_twins_groups`
---
-
-DROP TABLE IF EXISTS `articles_twins_groups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `articles_twins_groups` (
-  `article_id` int(10) unsigned NOT NULL,
-  `twins_group_id` int(11) unsigned NOT NULL,
-  PRIMARY KEY (`article_id`,`twins_group_id`),
-  KEY `twins_group_id` (`twins_group_id`),
-  CONSTRAINT `article_twins_groups_fk` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`),
-  CONSTRAINT `articles_twins_groups_fk` FOREIGN KEY (`twins_group_id`) REFERENCES `twins_groups` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB; (`twins_group_id`)';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `articles_twins_groups`
---
-
-/*!40000 ALTER TABLE `articles_twins_groups` DISABLE KEYS */;
-/*!40000 ALTER TABLE `articles_twins_groups` ENABLE KEYS */;
-
---
 -- Table structure for table `articles_votings_criterias`
 --
 
@@ -2135,30 +2111,6 @@ CREATE TABLE `log_events_pictures` (
 /*!40000 ALTER TABLE `log_events_pictures` ENABLE KEYS */;
 
 --
--- Table structure for table `log_events_twins_groups`
---
-
-DROP TABLE IF EXISTS `log_events_twins_groups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `log_events_twins_groups` (
-  `log_event_id` int(10) unsigned NOT NULL,
-  `twins_group_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`log_event_id`,`twins_group_id`),
-  KEY `twins_group_id` (`twins_group_id`),
-  CONSTRAINT `log_events_twins_groups_ibfk_1` FOREIGN KEY (`log_event_id`) REFERENCES `log_events` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `log_events_twins_groups_ibfk_2` FOREIGN KEY (`twins_group_id`) REFERENCES `twins_groups` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `log_events_twins_groups`
---
-
-/*!40000 ALTER TABLE `log_events_twins_groups` DISABLE KEYS */;
-/*!40000 ALTER TABLE `log_events_twins_groups` ENABLE KEYS */;
-
---
 -- Table structure for table `log_events_user`
 --
 
@@ -3252,57 +3204,6 @@ CREATE TABLE `textstorage_text` (
 
 /*!40000 ALTER TABLE `textstorage_text` DISABLE KEYS */;
 /*!40000 ALTER TABLE `textstorage_text` ENABLE KEYS */;
-
---
--- Table structure for table `twins_groups`
---
-
-DROP TABLE IF EXISTS `twins_groups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `twins_groups` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(80) NOT NULL,
-  `add_datetime` timestamp NULL DEFAULT NULL,
-  `text_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `text_id` (`text_id`),
-  CONSTRAINT `twins_groups_ibfk_1` FOREIGN KEY (`text_id`) REFERENCES `textstorage_text` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2020 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 122880 kB';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `twins_groups`
---
-
-/*!40000 ALTER TABLE `twins_groups` DISABLE KEYS */;
-INSERT INTO `twins_groups` VALUES (1,'test twins','2016-11-25 18:31:51',NULL);
-/*!40000 ALTER TABLE `twins_groups` ENABLE KEYS */;
-
---
--- Table structure for table `twins_groups_cars`
---
-
-DROP TABLE IF EXISTS `twins_groups_cars`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `twins_groups_cars` (
-  `twins_group_id` int(10) unsigned NOT NULL,
-  `item_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`twins_group_id`,`item_id`),
-  KEY `item_id` (`item_id`),
-  CONSTRAINT `twins_groups_cars_fk` FOREIGN KEY (`twins_group_id`) REFERENCES `twins_groups` (`id`),
-  CONSTRAINT `twins_groups_cars_fk1` FOREIGN KEY (`item_id`) REFERENCES `cars` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 122880 kB; (`twins_group_id`)';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `twins_groups_cars`
---
-
-/*!40000 ALTER TABLE `twins_groups_cars` DISABLE KEYS */;
-INSERT INTO `twins_groups_cars` VALUES (1,1);
-/*!40000 ALTER TABLE `twins_groups_cars` ENABLE KEYS */;
 
 --
 -- Table structure for table `user_account`

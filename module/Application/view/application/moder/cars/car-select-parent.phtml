@@ -28,6 +28,13 @@
             'tab' => 'categories'
         ], [], true), '<i class="fa fa-tag"></i> Categories', false) ?>
     </li>
+    <?php if ($this->showTwinsTab) { ?>
+        <li<?=$this->tab == 'twins' ? ' class="active"' : ''?>>
+            <?=$this->htmlA($this->url(null, [
+                'tab' => 'twins'
+            ], [], true), '<i class="fa fa-list"></i> Twins', false) ?>
+        </li>
+    <?php } ?>
 </ul>
 
 <?php if ($this->tab == 'brands') { ?>
@@ -69,4 +76,37 @@
             'cars' => $this->cars
         ])?>
     </ul>
+<?php } ?>
+
+<?php if ($this->tab == 'twins') { ?>
+    <div class="well">
+        <?php if (!$this->brand) { ?>
+            <?php
+                $columns = 6;
+                $count = count($this->brands);
+                $perOne = ceil($count / $columns);
+                $width = round(100*$perOne/$count);
+                $idx = 0;
+            ?>
+            <table class="table" class="brand-selector"><tbody><tr>
+                <td style="width:<?=(100-$width*($columns-1)) ?>%">
+                    <?php foreach ($this->brands as $brand) { ?>
+                        <?php if ($idx && ($idx%$perOne == 0)) { ?>
+                            </td><td style="width:<?=$width ?>%">
+                        <?php } ?>
+                        <?=$this->htmlA($this->url(null, [
+                            'brand_id' => $brand->id
+                        ], [], true), $brand->name) ?><br />
+                        <?php $idx++ ?>
+                    <?php } ?>
+                </td>
+            </tr></tbody></table>
+        <?php } else { ?>
+            <ul>
+                <?=$this->partial('application/moder/cars/partial/car-select-parent', [
+                    'cars' => $this->cars
+                ])?>
+            </ul>
+        <?php } ?>
+    </div>
 <?php } ?>

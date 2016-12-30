@@ -888,46 +888,6 @@ return [
                 ]
             ]
         ],
-        'ModerTwinsGroup' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-                'legend' => 'moder/twins/add/title',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type'    => 'Text',
-                        'name'    => 'name',
-                        'options' => [
-                            'label' => 'moder/twins/name',
-                        ],
-                        'attributes' => [
-                            'maxlength'  => 255,
-                            'size'       => 80,
-                        ]
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'name' => [
-                    'required' => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim'],
-                        ['name' => 'SingleSpaces']
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'min' => 1,
-                                'max' => 255
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-        ],
         'ModerBrandEdit' => [
             'type' => Form\Moder\Brand\Edit::class,
             'attributes'  => [

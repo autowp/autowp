@@ -21,35 +21,37 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>
-                    <form class="car-add-parent" method="post" action="<?=$this->escapeHtmlAttr($this->url(null, [
-                        'action' => 'add-parent',
-                    ], [], true)) ?>">
-                        <div class="input-group" style="max-width:400px">
-                            <span class="input-group-btn">
-                                <?=$this->htmlA([
-                                    'href' => $this->url(null, [
-                                        'action'  => 'car-select-parent',
-                                        'item_id' => $this->car['id']
-                                    ]),
-                                    'class' => 'btn btn-success',
-                                ], $this->translate('moder/vehicle/catalogue/select'))?>
-                            </span>
-                            <input type="text" name="parent" class="form-control" placeholder="<?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/select-placeholder'))?>" data-autocomplete="<?=$this->escapeHtmlAttr($this->url(null, [
-                                'action'  => 'car-autocomplete',
-                                'item_id' => $this->car['id']
-                            ], [], true))?>" />
-                        </div>
-                    </form>
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <?php if ($this->canMove) { ?>
+            <?php if ($this->car['item_type_id'] != Application\Model\DbTable\Item\Type::TWINS) { ?>
+                <tr>
+                    <td>
+                        <form class="car-add-parent" method="post" action="<?=$this->escapeHtmlAttr($this->url(null, [
+                            'action' => 'add-parent',
+                        ], [], true)) ?>">
+                            <div class="input-group" style="max-width:400px">
+                                <span class="input-group-btn">
+                                    <?=$this->htmlA([
+                                        'href' => $this->url(null, [
+                                            'action'  => 'car-select-parent',
+                                            'item_id' => $this->car['id']
+                                        ]),
+                                        'class' => 'btn btn-success',
+                                    ], $this->translate('moder/vehicle/catalogue/select'))?>
+                                </span>
+                                <input type="text" name="parent" class="form-control" placeholder="<?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/select-placeholder'))?>" data-autocomplete="<?=$this->escapeHtmlAttr($this->url(null, [
+                                    'action'  => 'car-autocomplete',
+                                    'item_id' => $this->car['id']
+                                ], [], true))?>" />
+                            </div>
+                        </form>
+                    </td>
                     <td></td>
-                <?php } ?>
-            </tr>
+                    <td></td>
+                    <td></td>
+                    <?php if ($this->canMove) { ?>
+                        <td></td>
+                    <?php } ?>
+                </tr>
+            <?php } ?>
             <?php foreach ($this->brands as $brand) { ?>
                 <tr>
                     <td>

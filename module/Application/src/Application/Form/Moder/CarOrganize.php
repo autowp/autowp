@@ -172,7 +172,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
             unset($elements['catname']);
         }
 
-        if ($this->itemType != DbTable\Item\Type::VEHICLE) {
+        if (! in_array($this->itemType, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::TWINS])) {
             unset($elements['vehicle_type_id']);
         }
 

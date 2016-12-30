@@ -454,7 +454,6 @@ class Pic extends AbstractPlugin
 
         $itemTable = $catalogue->getCarTable();
         $factoryTable = new DbTable\Factory();
-        $twinsGroupsTable = new DbTable\Twins\Group();
         $itemLanguageTable = new DbTable\Vehicle\Language();
 
         $db = $this->pictureTable->getAdapter();
@@ -494,10 +493,11 @@ class Pic extends AbstractPlugin
             $uploadUrl = null;
 
             if ($itemsCount == 1) {
-                $twinsGroupsRows = $twinsGroupsTable->fetchAll(
-                    $twinsGroupsTable->select(true)
-                        ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
-                        ->where('twins_groups_cars.item_id = ?', $item->id)
+                $twinsGroupsRows = $itemTable->fetchAll(
+                    $itemTable->select(true)
+                        ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
+                        ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', null)
+                        ->where('item_parent_cache.item_id = ?', $item->id)
                 );
 
                 foreach ($twinsGroupsRows as $twinsGroup) {

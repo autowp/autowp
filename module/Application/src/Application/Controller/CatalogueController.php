@@ -522,9 +522,10 @@ class CatalogueController extends AbstractActionController
             $haveTwins = $cars->getAdapter()->fetchOne(
                 $cars->getAdapter()->select()
                     ->from($cars->info('name'), 'id')
-                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                    ->join('twins_groups_cars', 'cars.id = twins_groups_cars.item_id', null)
+                    ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
+                    ->join(['ipc1' => 'item_parent_cache'], 'cars.id = ipc1.parent_id', null)
+                    ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
+                    ->join('brand_item', 'ipc2.parent_id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = ?', $brand['id'])
                     ->limit(1)
             );

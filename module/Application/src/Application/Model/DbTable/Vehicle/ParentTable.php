@@ -154,11 +154,14 @@ class ParentTable extends Table
             DbTable\Item\Type::CATEGORY => [
                 DbTable\Item\Type::VEHICLE => true,
                 DbTable\Item\Type::CATEGORY => true
+            ],
+            DbTable\Item\Type::TWINS => [
+                DbTable\Item\Type::VEHICLE => true
             ]
         ];
 
         if (! isset($allowedCombinations[$parent->item_type_id][$car->item_type_id])) {
-            throw new Exception("THat type of parent is not allowed for this type");
+            throw new Exception("That type of parent is not allowed for this type");
         }
 
         $id = (int)$car->id;

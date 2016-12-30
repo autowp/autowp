@@ -87,7 +87,7 @@ return array_replace(include 'root.php', [
     'index/brands'             => 'Marques',
     'index/factories'          => 'Usines',
     'index/specifications'     => 'Specifications',
-    'index/twins/description' => 'Savez-vous, que la Daewoo Matiz a [six clones](/twins/group87)? Savez-vous, ce qui est commun entre [Lotus и Kia](/twins/group5)? Sûr que vous vous sentez intéressant cette section.',
+    'index/twins/description' => 'Savez-vous, que la Daewoo Matiz a [six clones](/twins/group118812)? Savez-vous, ce qui est commun entre [Lotus и Kia](/twins/group118750)? Sûr que vous vous sentez intéressant cette section.',
     'index/categories/description' => "Savez-vous quelle technique a permis d'observer la loi et l'ordre dans les rues de villes du monde à des moments différents? Et pas de voitures voyagé Pape? Non? Ensuite, vous êtes exactement dans cette section.",
     'index/categories/mosts' => "Voulez-vous savoir quel genre de voiture est le plus rapide? Voulez-vous savoir combien pèse le plus puissant camion de l'exploitation minière",
 
@@ -128,6 +128,10 @@ return array_replace(include 'root.php', [
     'item/type/3/name-plural' => 'Categories',
     'item/type/3/new-item' => 'New category',
     'item/type/3/add-sub-item' => 'Add sub-category',
+    'item/type/4/name' => 'Twins',
+    'item/type/4/name-plural' => 'Twins',
+    'item/type/4/new-item' => 'New twnis group',
+    'item/type/4/add-sub-item' => 'Add sub-twins',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Non triés',

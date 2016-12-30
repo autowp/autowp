@@ -62,11 +62,6 @@ class CarsController extends AbstractActionController
     /**
      * @var Form
      */
-    private $twinsForm;
-
-    /**
-     * @var Form
-     */
     private $brandItemForm;
 
     /**
@@ -110,7 +105,6 @@ class CarsController extends AbstractActionController
         $translator,
         Form $descForm,
         Form $textForm,
-        Form $twinsForm,
         Form $brandItemForm,
         Form $carParentForm,
         Form $filterForm,
@@ -125,7 +119,6 @@ class CarsController extends AbstractActionController
         $this->translator = $translator;
         $this->descForm = $descForm;
         $this->textForm = $textForm;
-        $this->twinsForm = $twinsForm;
         $this->brandItemForm = $brandItemForm;
         $this->carParentForm = $carParentForm;
         $this->filterForm = $filterForm;
@@ -733,12 +726,6 @@ class CarsController extends AbstractActionController
                 ->where('item_id = ?', $car->id)
         );
 
-        $twinsGroupsCount = $db->fetchOne(
-            $db->select()
-                ->from('twins_groups_cars', 'count(1)')
-                ->where('item_id = ?', $car->id)
-        );
-
         $catalogueLinksCount = $db->fetchOne(
             $db->select()
                 ->from('item_parent', 'count(1)')
@@ -804,14 +791,6 @@ class CarsController extends AbstractActionController
                     'action' => 'car-tree'
                 ], [], true),
                 'count' => 0,
-            ],
-            'twins' => [
-                'icon'      => 'glyphicon glyphicon-adjust',
-                'title'     => 'moder/vehicle/tabs/twins',
-                'data-load' => $this->url()->fromRoute('moder/cars/params', [
-                    'action' => 'car-twins'
-                ], [], true),
-                'count' => $twinsGroupsCount,
             ],
             'factories' => [
                 'icon'      => 'fa fa-cogs',
@@ -1108,143 +1087,6 @@ class CarsController extends AbstractActionController
         } else {
             return $this->redirect()->toUrl($this->carModerUrl($car, false, 'catalogue'));
         }
-    }
-
-    public function carSelectTwinsGroupAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $carTable = $this->catalogue()->getCarTable();
-        $car = $carTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canEditTwins = $this->user()->isAllowed('twins', 'edit');
-        if (! $canEditTwins) {
-            return $this->forbiddenAction();
-        }
-
-        $brand = null;
-
-        $twinsGroups = new DbTable\Twins\Group();
-
-        $twinsGroup = $twinsGroups->find($this->params('twins_group_id'))->current();
-
-        if ($twinsGroup) {
-            $twinsGroupsCars = new DbTable\Twins\GroupVehicle();
-            $twinsGroupsCars->insert([
-                'twins_group_id' => $twinsGroup->id,
-                'item_id' => $car->id
-            ]);
-
-            $this->log(sprintf(
-                'Автомобиль %s добавлен в группу близнецов %s',
-                htmlspecialchars($this->car()->formatName($car, 'en')),
-                htmlspecialchars($twinsGroup->name)
-            ), [$twinsGroup, $car]);
-
-            return $this->redirectToCar($car, 'twins');
-        }
-
-        $brandTable = $this->getBrandTable();
-        $brand = $brandTable->find($this->params('brand_id'))->current();
-        $brands = [];
-        $groups = [];
-        if ($brand) {
-            $groups = $twinsGroups->fetchAll(
-                $twinsGroups
-                ->select(true)
-                ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
-                ->join('item_parent_cache', 'twins_groups_cars.item_id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand->id)
-                ->group('twins_groups.id')
-                ->order('twins_groups.name')
-            );
-        } else {
-            $brands = $brandTable->fetchAll(
-                $brandTable->select(true)
-                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
-                ->join('twins_groups_cars', 'item_parent_cache.item_id = twins_groups_cars.item_id', null)
-                ->group('brands.id')
-                ->order(['brands.position', 'brands.name'])
-            );
-        }
-
-        $this->twinsForm->setAttribute('action', $this->url()->fromRoute('moder/cars/params', [], [], true));
-        if ($this->getRequest()->isPost()) {
-            $this->twinsForm->setData($this->params()->fromPost());
-            if ($this->twinsForm->isValid()) {
-                $values = $this->twinsForm->getData();
-                $values['add_datetime'] = new Zend_Db_Expr('NOW()');
-
-                $id = $twinsGroups->insert($values);
-
-                return $this->forward()->dispatch(self::class, [
-                    'action'         => 'car-select-twins-group',
-                    'item_id'        => $car->id,
-                    'twins_group_id' => $id
-                ]);
-            }
-        }
-
-        return [
-            'car'               => $car,
-            'brand'             => $brand,
-            'formTwinsGroupAdd' => $this->twinsForm,
-            'canEditTwins'      => $canEditTwins,
-            'brands'            => $brands,
-            'groups'            => $groups
-        ];
-    }
-
-    public function carRemoveFromTwinsGroupAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $carTable = $this->catalogue()->getCarTable();
-        $car = $carTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-            $canEditTwins = $this->user()->isAllowed('twins', 'edit');
-        if (! $canEditTwins) {
-            throw new Exception('Access denied');
-        }
-
-                $twinsGroups = new DbTable\Twins\Group();
-                $twinsGroup = $twinsGroups->find($this->params('twins_group_id'))->current();
-
-        if (! $twinsGroup) {
-            return $this->notFoundAction();
-        }
-
-                $twinsGroupVehicleTable = new DbTable\Twins\GroupVehicle();
-                $twinsGroupCar = $twinsGroupVehicleTable->fetchRow(
-                    $twinsGroupVehicleTable->select(true)
-                        ->where('item_id = ?', $car->id)
-                        ->where('twins_group_id = ?', $twinsGroup->id)
-                );
-
-                $twinsGroupCar->delete();
-
-                // remove empty group
-                $twinsGroupsCarsRow = $twinsGroupVehicleTable->fetchRow(
-                    $twinsGroupVehicleTable->select(true)
-                        ->where('twins_group_id = ?', $twinsGroup->id)
-                );
-        if (! $twinsGroupsCarsRow) {
-            $twinsGroup->delete();
-        }
-
-                return $this->redirectToCar($car, 'twins');
     }
 
     public function carSelectFactoryAction()
@@ -1786,6 +1628,7 @@ class CarsController extends AbstractActionController
         $allowedItemTypes = [$carRow->item_type_id];
         if (in_array($carRow->item_type_id, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
             $allowedItemTypes[] = DbTable\Item\Type::CATEGORY;
+            $allowedItemTypes[] = DbTable\Item\Type::TWINS;
         }
 
         $select = $carTable->select(true)
@@ -1843,98 +1686,6 @@ class CarsController extends AbstractActionController
         }
 
         return new JsonModel($result);
-    }
-
-    public function carTwinsAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $carTable = $this->catalogue()->getCarTable();
-
-        $car = $carTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-
-        $twinsGroupsTable = new DbTable\Twins\Group();
-
-        $twinsGroups = [];
-        $canEditTwins = $this->user()->isAllowed('twins', 'edit');
-
-        $twinsGroupRows = $twinsGroupsTable->fetchAll(
-            $twinsGroupsTable->select(true)
-            ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
-            ->where('twins_groups_cars.item_id = ?', $car->id)
-        );
-        foreach ($twinsGroupRows as $twinsGroupRow) {
-            $twinsGroup = [
-                'id'        => $twinsGroupRow->id,
-                'name'      => $twinsGroupRow->name,
-                'inherited' => false,
-            ];
-
-            if ($canEditTwins) {
-                $twinsGroup['removeUrl'] = $this->url()->fromRoute('moder/cars/params', [
-                    'action'         => 'car-remove-from-twins-group',
-                    'item_id'        => $car->id,
-                    'twins_group_id' => $twinsGroup['id']
-                ]);
-            }
-
-            $twinsGroups[$twinsGroupRow->id] = $twinsGroup;
-        }
-        $twinsGroupRows = $twinsGroupsTable->fetchAll(
-            $twinsGroupsTable->select(true)
-            ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
-            ->join('item_parent_cache', 'twins_groups_cars.item_id = item_parent_cache.parent_id', null)
-            ->where('item_parent_cache.item_id = ?', $car->id)
-        );
-        foreach ($twinsGroupRows as $twinsGroupRow) {
-            if (isset($twinsGroups[$twinsGroupRow->id])) {
-                continue;
-            }
-
-            $carRows = $carTable->fetchAll(
-                $carTable->select(true)
-                ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', $car->id)
-                ->join('twins_groups_cars', 'twins_groups_cars.item_id = item_parent_cache.parent_id', null)
-                ->where('twins_groups_cars.twins_group_id = ?', $twinsGroupRow->id)
-            );
-
-            $inheritedFrom = [];
-            foreach ($carRows as $carRow) {
-                $inheritedFrom[] = [
-                    'name' => $this->car()->formatName($carRow, $this->language()),
-                    'url'  => $this->carModerUrl($carRow)
-                ];
-            }
-
-            $twinsGroups[$twinsGroupRow->id] = [
-                'id'            => $twinsGroupRow->id,
-                'name'          => $twinsGroupRow->name,
-                'inherited'     => true,
-                'inheritedFrom' => $inheritedFrom
-            ];
-        }
-
-        foreach ($twinsGroups as &$twinsGroup) {
-            $twinsGroup['url'] = $this->url()->fromRoute('moder/twins/params', [
-                'action'         => 'twins-group',
-                'twins_group_id' => $twinsGroup['id']
-            ]);
-        }
-
-        $model = new ViewModel([
-            'car'          => $car,
-            'twinsGroups'  => $twinsGroups,
-            'canEditTwins' => $canEditTwins,
-        ]);
-
-        return $model->setTerminal(true);
     }
 
     public function carFactoriesAction()
@@ -2330,6 +2081,14 @@ class CarsController extends AbstractActionController
                 $this->url()->fromRoute('categories', [
                     'action'           => 'category',
                     'category_catname' => $car['catname'],
+                ])
+            ];
+        }
+        
+        if ($car['item_type_id'] == DbTable\Item\Type::TWINS) {
+            return [
+                $this->url()->fromRoute('twins/group', [
+                    'id' => $car['id'],
                 ])
             ];
         }
@@ -2943,6 +2702,8 @@ class CarsController extends AbstractActionController
         if (! $showBrandsTab) {
             $tab = 'categories';
         }
+        
+        $showTwinsTab = $car->item_type_id == DbTable\Item\Type::VEHICLE;
 
         $brand = null;
         $brands = [];
@@ -2986,6 +2747,42 @@ class CarsController extends AbstractActionController
             foreach ($rows as $row) {
                 $cars[] = $this->carSelectParentWalk($row, $itemTypes);
             }
+        } elseif ($tab == 'twins') {
+            $brandTable = $this->getBrandTable();
+            $brand = $brandTable->find($this->params('brand_id'))->current();
+            
+            if ($brand) {
+                $rows = $carTable->fetchAll(
+                    $carTable->select(true)
+                        ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
+                        ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = cars.id', null)
+                        ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
+                        ->join('brand_item', 'ipc2.parent_id = brand_item.item_id', null)
+                        ->where('brand_item.brand_id = ?', $brand->id)
+                        ->order($this->catalogue()->carsOrdering())
+                );
+            
+                foreach ($rows as $row) {
+                    $cars[] = [
+                        'name'   => $row->getNameData($this->language()),
+                        'url'    => $this->url()->fromRoute('moder/cars/params', [
+                            'parent_id' => $row['id']
+                        ], [], true),
+                        'childs' => []
+                    ];
+                }
+            } else {
+                $brands = $brandTable->fetchAll(
+                    $brandTable->select(true)
+                        ->join('brand_item', 'brands.id = brand_item.brand_id', null)
+                        ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = brand_item.item_id', null)
+                        ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
+                        ->join('cars', 'ipc2.parent_id = cars.id', null)
+                        ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
+                        ->group('brands.id')
+                        ->order(['brands.position', 'brands.name'])
+                );
+            }
         }
 
         return [
@@ -2994,7 +2791,8 @@ class CarsController extends AbstractActionController
             'brand'         => $brand,
             'brands'        => $brands,
             'cars'          => $cars,
-            'showBrandsTab' => $showBrandsTab
+            'showBrandsTab' => $showBrandsTab,
+            'showTwinsTab'  => $showTwinsTab
         ];
     }
 
@@ -3267,6 +3065,7 @@ class CarsController extends AbstractActionController
                 $forceIsGroup = false;
                 break;
             case DbTable\Item\Type::CATEGORY:
+            case DbTable\Item\Type::TWINS:
                 $forceIsGroup = true;
                 break;
             default:

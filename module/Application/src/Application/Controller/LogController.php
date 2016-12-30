@@ -58,12 +58,6 @@ class LogController extends AbstractActionController
                    ->where('log_events_pictures.picture_id = ?', $pictureId);
         }
 
-        $groupId = (int)$this->params()->fromRoute('twins_group_id');
-        if ($groupId) {
-            $select->join('log_events_twins_groups', 'log_events.id=log_events_twins_groups.log_event_id', null)
-                   ->where('log_events_twins_groups.twins_group_id = ?', $groupId);
-        }
-
         $factoryId = (int)$this->params()->fromRoute('factory_id');
         if ($factoryId) {
             $select->join('log_events_factory', 'log_events.id = log_events_factory.log_event_id', null)
@@ -131,23 +125,6 @@ class LogController extends AbstractActionController
                 ];
             }
 
-            $groupsRows = $twinsGroupsTable->fetchAll(
-                $twinsGroupsTable->select(true)
-                    ->join('log_events_twins_groups', 'twins_groups.id = log_events_twins_groups.twins_group_id', null)
-                    ->where('log_events_twins_groups.log_event_id = ?', $event->id)
-            );
-            $twinsGroups = [];
-
-            foreach ($groupsRows as $groupsRow) {
-                $twinsGroups[] = [
-                    'name' => $groupsRow['name'],
-                    'url'  => $this->url()->fromRoute('moder/twins/params', [
-                        'action'         => 'twins-group',
-                        'twins_group_id' => $groupsRow['id']
-                    ])
-                ];
-            }
-
             $factoryRows = $factoryTable->fetchAll(
                 $factoryTable->select(true)
                     ->join('log_events_factory', 'factory.id = log_events_factory.factory_id', null)
@@ -172,7 +149,6 @@ class LogController extends AbstractActionController
                 'vehicles'    => $vehicles,
                 'brands'      => $brands,
                 'pictures'    => $pictures,
-                'twinsGroups' => $twinsGroups,
                 'factories'   => $factories
             ];
         }

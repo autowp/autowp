@@ -2046,6 +2046,7 @@ class SpecificationsService
     /**
      * @param array $itemId
      * @return array
+     * @todo: merge with childs has specs
      */
     public function twinsGroupsHasSpecs(array $groupIds)
     {
@@ -2056,9 +2057,9 @@ class SpecificationsService
         $valueTable = $this->getValueTable();
         $db = $valueTable->getAdapter();
         $select = $db->select()
-            ->from($valueTable->info('name'), ['twins_groups_cars.twins_group_id', new Zend_Db_Expr('1')])
-            ->join('twins_groups_cars', 'attrs_values.item_id = twins_groups_cars.item_id', null)
-            ->where('twins_groups_cars.twins_group_id in (?)', $groupIds);
+            ->from($valueTable->info('name'), ['item_parent.parent_id', new Zend_Db_Expr('1')])
+            ->join('item_parent', 'attrs_values.item_id = item_parent.item_id', null)
+            ->where('item_parent.parent_id in (?)', $groupIds);
 
         return $db->fetchPairs($select);
     }

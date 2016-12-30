@@ -36,9 +36,6 @@
                 <?php foreach ($event['pictures'] as $picture) { ?>
                     Picture: <?=$this->htmlA($picture['url'], $this->pic()->htmlTitle($picture['name']), false)?><br />
                 <?php } ?>
-                <?php foreach ($event['twinsGroups'] as $group) { ?>
-                    Twins: <?=$this->htmlA($group['url'], $group['name'])?><br />
-                <?php } ?>
                 <?php foreach ($event['factories'] as $factory) { ?>
                     Factory: <?=$this->htmlA($factory['url'], $factory['name'])?><br />
                 <?php } ?>

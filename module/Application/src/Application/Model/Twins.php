@@ -2,11 +2,7 @@
 
 namespace Application\Model;
 
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Twins\Group as TwinsGroup;
-use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
+use Application\Model\DbTable;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend_Db_Expr;
@@ -15,63 +11,48 @@ use Zend_Db_Select;
 class Twins
 {
     /**
-     * @var TwinsGroup
-     */
-    private $groupsTable;
-
-    /**
-     * @var BrandTable
+     * @var DbTable\Brand
      */
     private $brandTable;
 
     /**
-     * @var Picture
+     * @var DbTable\Picture
      */
     private $pictureTable;
 
     /**
-     * @var Vehicle
+     * @var DbTable\Vehicle
      */
     private $carTable;
 
     /**
-     * @return TwinsGroup
-     */
-    private function getGroupsTable()
-    {
-        return $this->groupsTable
-            ? $this->groupsTable
-            : $this->groupsTable = new TwinsGroup();
-    }
-
-    /**
-     * @return BrandTable
+     * @return DbTable\Brand
      */
     private function getBrandTable()
     {
         return $this->brandTable
             ? $this->brandTable
-            : $this->brandTable = new BrandTable();
+            : $this->brandTable = new DbTable\Brand();
     }
 
     /**
-     * @return Picture
+     * @return DbTable\Picture
      */
     private function getPictureTable()
     {
         return $this->pictureTable
             ? $this->pictureTable
-            : $this->pictureTable = new Picture();
+            : $this->pictureTable = new DbTable\Picture();
     }
 
     /**
-     * @return Cars
+     * @return DbTable\Vehicle
      */
-    private function getCarTable()
+    private function getItemTable()
     {
         return $this->carTable
             ? $this->carTable
-            : $this->carTable = new Vehicle();
+            : $this->carTable = new DbTable\Vehicle();
     }
 
     /**
@@ -99,24 +80,17 @@ class Twins
                 'id',
                 'name'      => 'IFNULL(brand_language.name, brands.name)',
                 'folder'    => 'folder',
-                'count'     => new Zend_Db_Expr('count(distinct tg.id)'),
+                'count'     => new Zend_Db_Expr('count(distinct cars.id)'),
                 'new_count' => new Zend_Db_Expr(
-                    'count(distinct if(tg.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), tg.id, null))'
+                    'count(distinct if(cars.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), cars.id, null))'
                 ),
             ])
             ->joinLeft('brand_language', $langExpr, null)
             ->join('brand_item', 'brands.id = brand_item.brand_id', null)
             ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
-            ->join(
-                ['tgc' => 'twins_groups_cars'],
-                'item_parent_cache.item_id = tgc.item_id',
-                null
-            )
-            ->join(
-                ['tg' => 'twins_groups'],
-                'tgc.twins_group_id = tg.id',
-                null
-            )
+            ->join('item_parent', 'item_parent_cache.item_id = item_parent.item_id', null)
+            ->join('cars', 'item_parent.parent_id = cars.id', null)
+            ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
             ->group('brands.id');
 
         if ($limit > 0) {
@@ -146,17 +120,19 @@ class Twins
 
         $select = $db->select()
             ->from($pictureTable->info('name'), null)
+            ->where('pictures.status IN (?)', [
+                DbTable\Picture::STATUS_ACCEPTED,
+                DbTable\Picture::STATUS_NEW
+            ])
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->join(['tgc' => 'twins_groups_cars'], 'tgc.item_id = item_parent_cache.parent_id', null)
-            ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW]);
+            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null);
 
         if (is_array($groupId)) {
             if ($groupId) {
                 $select
-                    ->columns(['tgc.twins_group_id', 'COUNT(1)'])
-                    ->group('tgc.twins_group_id')
-                    ->where('tgc.twins_group_id in (?)', $groupId);
+                    ->columns(['item_parent_cache.parent_id', 'COUNT(1)'])
+                    ->group('item_parent_cache.parent_id')
+                    ->where('item_parent_cache.parent_id in (?)', $groupId);
 
                 $result = $db->fetchPairs($select);
             } else {
@@ -165,7 +141,7 @@ class Twins
         } else {
             $select
                 ->columns('COUNT(1)')
-                ->where('tgc.twins_group_id = ?', (int)$groupId);
+                ->where('item_parent_cache.parent_id = ?', (int)$groupId);
 
             $result = (int)$db->fetchOne($select);
         }
@@ -186,8 +162,9 @@ class Twins
                 ->from($brandTable->info('name'), 'id')
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
                 ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
-                ->join(['tgc' => 'twins_groups_cars'], 'item_parent_cache.item_id = tgc.item_id', null)
-                ->where('tgc.twins_group_id = ?', $groupId)
+                ->where('item_parent_cache.item_id = ?', $groupId)
+                ->join('cars', 'item_parent_cache.item_id = cars.id', null)
+                ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
         );
     }
 
@@ -204,11 +181,8 @@ class Twins
                 ->from('brands', 'count(distinct brands.id)')
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
                 ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
-                ->join(
-                    ['tgc' => 'twins_groups_cars'],
-                    'item_parent_cache.item_id = tgc.item_id',
-                    null
-                )
+                ->join('cars', 'item_parent_cache.item_id = cars.id', null)
+                ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
         );
     }
 
@@ -225,16 +199,17 @@ class Twins
 
         $brandId = (int)$options['brandId'];
 
-        $select = $this->getGroupsTable()->select(true)
-            ->order('twins_groups.add_datetime desc');
+        $select = $this->getItemTable()->select(true)
+            ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
+            ->order('cars.add_datetime desc');
 
         if ($options['brandId']) {
             $select
-                ->join(['tgc' => 'twins_groups_cars'], 'twins_groups.id = tgc.twins_group_id', null)
-                ->join('item_parent_cache', 'tgc.item_id = item_parent_cache.item_id', null)
+                ->join('item_parent', 'cars.id = item_parent.parent_id', null)
+                ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.item_id', null)
                 ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brandId)
-                ->group('twins_groups.id');
+                ->group('cars.id');
         }
 
         return new \Zend\Paginator\Paginator(
@@ -244,15 +219,15 @@ class Twins
 
     /**
      * @param int $groupId
-     * @return VehicleRow[]
+     * @return DbTable\Vehicle\Row[]
      */
     public function getGroupCars($groupId)
     {
-        $carTable = $this->getCarTable();
+        $carTable = $this->getItemTable();
         return $carTable->fetchAll(
             $carTable->select(true)
-                ->join('twins_groups_cars', 'cars.id = twins_groups_cars.item_id', null)
-                ->where('twins_groups_cars.twins_group_id = ?', (int)$groupId)
+                ->join('item_parent', 'cars.id = item_parent.item_id', null)
+                ->where('item_parent.parent_id = ?', (int)$groupId)
                 ->order('name')
         );
     }
@@ -274,9 +249,11 @@ class Twins
         $select = $this->getPictureTable()->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->join(['tgc' => 'twins_groups_cars'], 'tgc.item_id = item_parent_cache.parent_id', null)
-            ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
-            ->where('tgc.twins_group_id = ?', (int)$groupId);
+            ->where('pictures.status IN (?)', [
+                DbTable\Picture::STATUS_NEW,
+                DbTable\Picture::STATUS_ACCEPTED
+            ])
+            ->where('item_parent_cache.parent_id = ?', (int)$groupId);
 
         if ($ordering) {
             $select->order($ordering);
@@ -291,7 +268,10 @@ class Twins
      */
     public function getGroup($groupId)
     {
-        $row = $this->getGroupsTable()->find($groupId)->current();
+        $row = $this->getItemTable()->fetchRow([
+            'id = ?' => $groupId,
+            'item_type_id = ?' => DbTable\Item\Type::TWINS
+        ]);
         if (! $row) {
             return null;
         }
@@ -299,7 +279,7 @@ class Twins
         return [
             'id'      => $row->id,
             'name'    => $row->name,
-            'text_id' => $row->text_id
+            'text_id' => null//$row->text_id
         ];
     }
 
@@ -309,14 +289,14 @@ class Twins
      */
     public function getCarGroups($carId)
     {
-        $groupTable = $this->getGroupsTable();
+        $groupTable = $this->getItemTable();
 
         $rows = $groupTable->fetchAll(
             $groupTable->select(true)
-                ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
-                ->join('item_parent_cache', 'twins_groups_cars.item_id=item_parent_cache.parent_id', null)
+                ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
+                ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', null)
                 ->where('item_parent_cache.item_id = ?', (int)$carId)
-                ->group('twins_groups.id')
+                ->group('cars.id')
         );
 
         $result = [];
@@ -336,17 +316,17 @@ class Twins
      */
     public function getCarsGroups(array $carIds)
     {
-        $groupTable = $this->getGroupsTable();
+        $groupTable = $this->getItemTable();
 
         $db = $groupTable->getAdapter();
 
         $rows = $db->fetchAll(
             $db->select()
                 ->from($groupTable->info('name'), ['id', 'name'])
-                ->join('twins_groups_cars', 'twins_groups.id = twins_groups_cars.twins_group_id', null)
-                ->join('item_parent_cache', 'twins_groups_cars.item_id = item_parent_cache.parent_id', 'item_id')
+                ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
+                ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', 'item_id')
                 ->where('item_parent_cache.item_id IN (?)', $carIds)
-                ->group(['item_parent_cache.item_id', 'twins_groups.id'])
+                ->group(['item_parent_cache.item_id', 'cars.id'])
         );
 
         $result = [];

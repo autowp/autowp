@@ -60,160 +60,99 @@ class CatalogueController extends AbstractActionController
 
     public function migrateEnginesAction()
     {
-        $itemTable = new DbTable\Vehicle();
-
-        $itemRows = $itemTable->fetchAll([
-            'item_type_id = ?' => DbTable\Item\Type::CATEGORY
-        ]);
-
-        foreach ($itemRows as $itemRow) {
-            print $itemRow->id . PHP_EOL;
-            $itemRow->updateOrderCache();
-        }
-
-        /*$categoryTable = new DbTable\Category();
-        $categoryLangTable = new DbTable\Category\Language();
-        $categoryItemTable = new DbTable\Category\Vehicle();
-
+        $groupTable = new DbTable\Twins\Group();
+        $groupVehicleTable = new DbTable\Twins\GroupVehicle();
+        
         $itemTable = new DbTable\Vehicle();
         $itemLangTable = new DbTable\Vehicle\Language();
 
         $itemParentTable = new DbTable\Vehicle\ParentTable();
+        
+        $db = $itemParentTable->getAdapter();
 
-        $categoryRows = $categoryTable->fetchAll();
+        $groupRows = $groupTable->fetchAll();
 
-        foreach ($categoryRows as $categoryRow) {
-            print $categoryRow->id . PHP_EOL;
+        foreach ($groupRows as $groupRow) {
+            print $groupRow->id . PHP_EOL;
 
             $itemRow = $itemTable->fetchRow([
-                'migration_category_id = ?' => $categoryRow->id
+                'migration_group_id = ?' => $groupRow->id
             ]);
             if (!$itemRow) {
                 $itemRow = $itemTable->createRow([
-                    'migration_category_id' => $categoryRow->id,
-                    'name'                  => $categoryRow->name,
-                    'item_type_id'          => DbTable\Item\Type::CATEGORY,
-                    'catname'               => $categoryRow->catname,
-                    'body'                  => '',
-                    'produced_exactly'      => 0
+                    'migration_group_id' => $groupRow->id,
+                    'name'               => $groupRow->name,
+                    'item_type_id'       => DbTable\Item\Type::TWINS,
+                    'catname'            => null,
+                    'body'               => '',
+                    'produced_exactly'   => 0,
+                    'add_datetime'       => $groupRow->add_datetime,
+                    'is_group'           => 1
                 ]);
                 $itemRow->save();
-            }*/
+            }
 
-            /*$categoryLangRows = $categoryLangTable->fetchAll([
-                'category_id = ?' => $categoryRow->id
+            $groupVehicleRows = $groupVehicleTable->fetchAll([
+                'twins_group_id = ?' => $groupRow->id,
             ]);
 
-            foreach ($categoryLangRows as $categoryLangRow) {
-                $itemLangRow = $itemLangTable->fetchRow([
-                    'item_id = ?'   => $itemRow->id,
-                    'language = ?' => $categoryLangRow->language
-                ]);
-                if (!$itemLangRow) {
-                    $itemLangRow = $itemLangTable->createRow([
-                        'item_id'   => $itemRow->id,
-                        'language' => $categoryLangRow->language,
-                        'name'     => $categoryLangRow->name,
-                        'text_id'  => $categoryLangRow->text_id
-                    ]);
-                    $itemLangRow->save();
-                }
-            }*/
-
-            /*if ($categoryRow->parent_id) {
-
-                $parentItemRow = $itemTable->fetchRow([
-                    'migration_category_id = ?' => $categoryRow->parent_id
-                ]);
-
-                if ($parentItemRow) {
-                    $parentItemRow->is_group = 1;
-                    $parentItemRow->save();
-
-                    //$itemParentTable->addParent($itemRow, $parentItemRow);
-
-                    $langData = [];
-                    foreach ($categoryLangRows as $categoryLangRow) {
-                        $langData[$categoryLangRow->language] = [
-                            'name' => $categoryLangRow->short_name
-                        ];
-                    }
-
-                    $itemParentTable->setParentOptions($itemRow, $parentItemRow, [
-                        'name'      => $categoryRow->short_name,
-                        'languages' => $langData
-                    ]);
-
-                    //$itemTable->updateInteritance($itemRow);
-                }
-            }*/
-
-            /*$categoryItemRows = $categoryItemTable->fetchAll([
-                'category_id = ?' => $categoryRow->id,
-            ]);
-
-            foreach ($categoryItemRows as $categoryItemRow) {
-                if (!$itemRow->is_group) {
-                    $itemRow->is_group = 1;
-                    $itemRow->save();
-                }
-
+            foreach ($groupVehicleRows as $groupVehicleRow) {
                 $vehicleRow = $itemTable->fetchRow([
-                    'id = ?' => $categoryItemRow->item_id
+                    'id = ?' => $groupVehicleRow->item_id
                 ]);
 
                 if ($vehicleRow) {
                     $itemParentTable->addParent($vehicleRow, $itemRow);
 
-                    //$itemTable->updateInteritance($vehicleRow);
+                    $itemTable->updateInteritance($vehicleRow);
                 }
             }
-        }*/
-
-        /*$itemTable = new DbTable\Vehicle();
-        $itemLangTable = new DbTable\Vehicle\Language();
-
-        $itemRows = $itemTable->fetchAll([
-            'full_text_id IS NOT NULL'
-        ]);
-
-        foreach ($itemRows as $itemRow) {
-            $text = $this->textStorage->getText($itemRow->full_text_id);
-            $language = null;
-
-            if (!$text) {
-                $language = 'en';
-            }
-
-            if (preg_match('|^[[:space:] a-zA-ZІ½²³°®™‐€ÚÖćčśãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
-                $language = 'en';
-            }
-
-            if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½²³°®™‐€ÚÖćčśãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
-                $language = 'ru';
-            }
-
-            print $itemRow->full_text_id . '#' . $language . PHP_EOL;
-
-            if (!$language) {
-                print $text . PHP_EOL;
-                exit;
-            }
-
-            $langRow = $itemLangTable->fetchRow([
-                'item_id = ?'   => $itemRow->id,
-                'language = ?' => $language
-            ]);
-            if (!$langRow) {
-                $langRow = $itemLangTable->createRow([
-                    'item_id'   => $itemRow->id,
-                    'language' => $language,
+            
+            if ($groupRow->text_id) {
+                $text = $this->textStorage->getText($groupRow->text_id);
+                $language = null;
+                
+                if (!$text) {
+                    $language = 'en';
+                }
+                
+                if (preg_match('|^[[:space:] a-zA-ZІ½²³°®™‐€ÚÖćčśãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
+                    $language = 'en';
+                }
+                
+                if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½²³°®™‐€ÚÖćčśãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
+                    $language = 'ru';
+                }
+                
+                print $groupRow->text_id . '#' . $language . PHP_EOL;
+                
+                if (!$language) {
+                    print $text . PHP_EOL;
+                    exit;
+                }
+                
+                $langRow = $itemLangTable->fetchRow([
+                    'item_id = ?'  => $itemRow->id,
+                    'language = ?' => $language
                 ]);
+                if (!$langRow) {
+                    $langRow = $itemLangTable->createRow([
+                        'item_id'  => $itemRow->id,
+                        'language' => $language,
+                    ]);
+                }
+                
+                $langRow->text_id = $groupRow->text_id;
+                $langRow->save();
             }
-
-            $langRow->full_text_id = $itemRow->full_text_id;
-            $langRow->save();
-        }*/
+            
+            $db->query('
+                insert into log_events_cars (log_event_id, item_id)
+                select log_event_id, ?
+                from log_events_twins_groups
+                where twins_group_id = ?
+            ', [$itemRow->id, $groupRow->id]);
+        }
     }
 
     public function acceptOldUnsortedAction()

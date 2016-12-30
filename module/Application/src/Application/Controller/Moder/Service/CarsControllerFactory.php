@@ -17,7 +17,6 @@ class CarsControllerFactory implements FactoryInterface
             $container->get('MvcTranslator'),
             clone $container->get('DescriptionForm'),
             clone $container->get('DescriptionForm'),
-            $container->get('ModerTwinsGroup'),
             $container->get('ModerBrandItem'),
             $container->get('ModerCarParent'),
             $container->get('ModerCarsFilter'),

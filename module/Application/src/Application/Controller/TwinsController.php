@@ -6,10 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Comment\Topic as CommentTopic;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable;
 use Application\Model\Twins;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
@@ -209,8 +206,8 @@ class TwinsController extends AbstractActionController
 
     private function prepareList($list)
     {
-        $ctTable = new CommentTopic();
-        $pictureTable = new Picture();
+        $ctTable = new DbTable\Comment\Topic();
+        $pictureTable = new DbTable\Picture();
 
         $imageStorage = $this->imageStorage();
 
@@ -224,7 +221,7 @@ class TwinsController extends AbstractActionController
         $picturesCounts = $this->getTwins()->getGroupPicturesCount($ids);
 
         $commentsStats = $ctTable->getTopicStat(
-            CommentMessage::TWINS_TYPE_ID,
+            DbTable\Comment\Message::TWINS_TYPE_ID,
             $ids
         );
 
@@ -232,7 +229,7 @@ class TwinsController extends AbstractActionController
 
         $carLists = [];
         if (count($ids)) {
-            $carTable = new Vehicle();
+            $carTable = new DbTable\Vehicle();
 
             $db = $carTable->getAdapter();
 
@@ -249,14 +246,14 @@ class TwinsController extends AbstractActionController
                         'spec' => 'spec.short_name',
                         'spec_full' => 'spec.name',
                     ])
-                    ->join('twins_groups_cars', 'cars.id = twins_groups_cars.item_id', 'twins_group_id')
+                    ->join('item_parent', 'cars.id = item_parent.item_id', 'parent_id')
                     ->joinLeft('item_language', $langJoinExpr, null)
                     ->joinLeft('spec', 'cars.spec_id = spec.id', null)
-                    ->where('twins_groups_cars.twins_group_id in (?)', $ids)
+                    ->where('item_parent.parent_id in (?)', $ids)
                     ->order('name')
             );
             foreach ($rows as $row) {
-                $carLists[$row['twins_group_id']][] = $row;
+                $carLists[$row['parent_id']][] = $row;
             }
         }
 
@@ -274,7 +271,7 @@ class TwinsController extends AbstractActionController
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                         ->where('item_parent_cache.parent_id = ?', (int)$car['id'])
-                        ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
+                        ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                         ->order([
                             new Zend_Db_Expr('picture_item.perspective_id=7 DESC'),
                             new Zend_Db_Expr('picture_item.perspective_id=8 DESC')
@@ -330,9 +327,9 @@ class TwinsController extends AbstractActionController
                 'picturesUrl'   => $this->url()->fromRoute('twins/group/pictures', [
                     'id' => $group->id,
                 ]),
-                'moderUrl'      => $this->url()->fromRoute('moder/twins/params', [
-                    'action'         => 'twins-group',
-                    'twins_group_id' => $group->id
+                'moderUrl'      => $this->url()->fromRoute('moder/cars/params', [
+                    'action'  => 'car',
+                    'item_id' => $group->id
                 ])
             ];
         }

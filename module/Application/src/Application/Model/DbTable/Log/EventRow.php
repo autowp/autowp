@@ -39,10 +39,6 @@ class EventRow extends Row
                     $col = 'article_id';
                     $tableName = 'log_events_articles';
                     break;
-                case $table instanceof \Application\Model\DbTable\Twins\Group:
-                    $col = 'twins_group_id';
-                    $tableName = 'log_events_twins_groups';
-                    break;
                 case $table instanceof \Autowp\User\Model\DbTable\User:
                     $col = 'user_id';
                     $tableName = 'log_events_user';

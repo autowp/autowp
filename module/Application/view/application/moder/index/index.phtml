@@ -41,6 +41,13 @@
                                 'item_type_id' => Application\Model\DbTable\Item\Type::ENGINE
                             ]), $this->translate('item/type/2/new-item'))?>
                         </li>
+                        <li>
+                            <i class="fa fa-plus"></i>
+                            <?=$this->htmlA($this->url('moder/cars/params', [
+                                'action'       => 'new',
+                                'item_type_id' => Application\Model\DbTable\Item\Type::TWINS
+                            ]), $this->translate('item/type/4/new-item'))?>
+                        </li>
                     <?php } ?>
                 </ul>
             </div>

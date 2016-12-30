@@ -87,7 +87,7 @@ return array_replace(include 'root.php', [
     'index/brands'             => 'Brands',
     'index/factories'          => 'Factories',
     'index/specifications'     => 'Specifications',
-    'index/twins/description' => 'Вы знаете, что Daewoo Matiz имеет аж целых [шесть клонов](/twins/group87)? А знаете, что [общего у Lotus и Kia](/twins/group5)? Уверены, что вам покажется интересным этот раздел.',
+    'index/twins/description' => 'Вы знаете, что Daewoo Matiz имеет аж целых [шесть клонов](/twins/group118812)? А знаете, что [общего у Lotus и Kia](/twins/group118750)? Уверены, что вам покажется интересным этот раздел.',
     'index/categories/description' => 'А знаете ли вы, какая техника помогала блюсти правопорядок на улицах мировых городов в разное время? А на каких автомобилях ездил Папа Римский? Нет? Тогда вам точно в этот раздел.',
     'index/categories/mosts' => 'Хотите знать, какой автомобиль был самым быстрым? Хотите знать, сколько весит самый могучий карьерный самосвал? Заходите и узнаете.',
 
@@ -128,6 +128,10 @@ return array_replace(include 'root.php', [
     'item/type/3/name-plural' => 'Categories',
     'item/type/3/new-item' => 'New category',
     'item/type/3/add-sub-item' => 'Add sub-category',
+    'item/type/4/name' => 'Twins',
+    'item/type/4/name-plural' => 'Twins',
+    'item/type/4/new-item' => 'New twnis group',
+    'item/type/4/add-sub-item' => 'Add sub-twins',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Unsorted',
