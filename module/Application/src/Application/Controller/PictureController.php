@@ -201,7 +201,6 @@ class PictureController extends AbstractActionController
         ]);
 
         return array_replace($data, [
-            'gallery2'   => true,
             'galleryUrl' => $this->url()->fromRoute('picture/picture', [
                 'picture_id' => $picture->identity
             ], [

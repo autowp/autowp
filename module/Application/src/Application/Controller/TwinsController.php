@@ -450,7 +450,6 @@ class TwinsController extends AbstractActionController
 
             return array_replace($data, [
                 'group'      => $group,
-                'gallery2'   => true,
                 'galleryUrl' => $this->url()->fromRoute('twins/group/pictures/picture/gallery', [
                     'id'         => $group['id'],
                     'picture_id' => $picture['identity']

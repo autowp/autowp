@@ -654,7 +654,6 @@ class CategoryController extends AbstractActionController
                 'picture'     => array_replace(
                     $this->pic()->picPageData($picture, $select, []),
                     [
-                        'gallery2'   => true,
                         'galleryUrl' => $this->url()->fromRoute('categories', [
                             'action'           => 'category-picture-gallery',
                             'category_catname' => $currentCategory->catname,

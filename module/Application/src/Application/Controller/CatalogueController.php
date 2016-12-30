@@ -670,7 +670,6 @@ class CatalogueController extends AbstractActionController
                     'picture'     => array_replace(
                         $this->pic()->picPageData($picture, $select),
                         [
-                            'gallery2'   => true,
                             'galleryUrl' => $this->url()->fromRoute('catalogue', [
                                 'action'  => str_replace('-picture', '-gallery', $this->params('action')),
                                 'gallery' => $this->galleryType($picture)
@@ -1900,7 +1899,6 @@ class CatalogueController extends AbstractActionController
                     'picture'     => array_replace(
                         $this->pic()->picPageData($picture, $select),
                         [
-                            'gallery2'   => true,
                             'galleryUrl' => $this->url()->fromRoute('catalogue', [
                                 'action'  => 'brand-item-gallery',
                                 'gallery' => $this->galleryType($picture)
