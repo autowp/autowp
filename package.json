@@ -4,9 +4,22 @@
   "version": "0.0.1",
   "description": "WheelsAge",
   "devDependencies": {
+    "compression-webpack-plugin": "^0.3.2",
+    "css-loader": "^0.26.1",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "font-awesome-webpack": "0.0.4",
     "gulp-amd-optimizer": "^0.4.1",
     "gulp-jshint": "^2.0.4",
-    "jshint": "^2.9.4"
+    "image-webpack-loader": "^3.1.0",
+    "jshint": "^2.9.4",
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
+    "style-loader": "^0.13.1",
+    "svg-inline-loader": "^0.7.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.14.0",
+    "webpack-manifest-plugin": "^1.1.0"
   },
   "jshintConfig": {
     "strict": true,
@@ -41,6 +54,7 @@
     "bower": "^1.7.9",
     "chart.js": "^2.2.2",
     "diff": "^3.0.0",
+    "exports-loader": "^0.6.3",
     "favicons": "^4.8.3",
     "filesize": "^3.3.0",
     "flag-icon-css": "^2.4.0",
@@ -63,15 +77,18 @@
     "gulp-shell": ">=0.5.2",
     "gulp-uglify": ">=2.0.0",
     "gulp-util": "^3.0.7",
+    "imports-loader": "^0.7.0",
     "jcrop-0.9.12": "^0.9.12",
     "jquery": "^3.1.0",
+    "load-google-maps-api": "0.0.2",
     "markdown": "^0.5.0",
     "raphael": "^2.2.1",
     "requirejs": "^2.3.2",
-    "requirejs-async": "^0.1.2",
-    "requirejs-domready": "^2.0.3",
     "respond.js": "^1.4.2",
     "typeahead.js": "^0.11.1",
     "yargs": ">=5.0.0"
+  },
+  "scripts": {
+    "start": "node_modules/.bin/webpack --progress --colors --config webpack.config.js"
   }
 }
