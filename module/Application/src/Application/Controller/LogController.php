@@ -28,7 +28,6 @@ class LogController extends AbstractActionController
         $vehicleTable = new Vehicle();
         $brandModel = new BrandModel();
         $picturesTable = new Picture();
-        $twinsGroupsTable = new TwinsGroup();
         $factoryTable = new Factory();
 
         $select = $logTable->select(true)

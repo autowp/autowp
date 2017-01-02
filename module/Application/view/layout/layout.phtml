@@ -22,12 +22,24 @@
     
     $this->gulpRev([
         'stylesheets' => [
-            'css/styles.css'
+            'application.css'
+        ],
+        'scripts' => [
+            'application.js'
         ]
     ]);
+    
+    $moduleOptions = isset($this->layout()->moduleOptions)
+        ? $this->layout()->moduleOptions
+        : null;
+    
+    $module = null;
+    if (isset($this->layout()->moduleName)) {
+        $module = $this->layout()->moduleName;
+    }
 ?>
 <?=$this->doctype() . PHP_EOL ?>
-<html dir="ltr" lang="<?=$this->language()?>">
+<html dir="ltr" lang="<?=$this->language()?>"<?=$module ? ' data-page-module="'.$this->escapeHtmlAttr($module).'"' : ''?><?=$moduleOptions ? ' data-page-module-options="'.$this->escapeHtmlAttr(Zend\Json\Json::encode($moduleOptions)).'"' : ''?>>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -41,11 +53,6 @@
             echo $this->headScript()
                 ->appendFile(
                     'http://html5shim.googlecode.com/svn/trunk/html5.js',
-                    'text/javascript',
-                    ['conditional' => 'lt IE 9']
-                )
-                ->appendFile(
-                    '/js/respond.js',
                     'text/javascript',
                     ['conditional' => 'lt IE 9']
                 );
@@ -147,22 +154,5 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 </footer>
             <?php } ?>
         </div>
-
-        <script type="text/javascript" src="/js/application.js"></script>
-        <script type="text/javascript">
-require(['application'], function(App) {
-    App.init();
-    <?php
-        $moduleOptions = isset($this->layout()->moduleOptions)
-            ? $this->layout()->moduleOptions
-            : null;
-    ?>
-    <?php if (isset($this->layout()->moduleName)) { ?>
-        require([<?=Zend\Json\Json::encode($this->layout()->moduleName)?>], function(Module) {
-            Module.init(<?=Zend\Json\Json::encode($moduleOptions)?>);
-        });
-    <?php } ?>
-});
-        </script>
     </body>
 </html>

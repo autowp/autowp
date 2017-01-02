@@ -231,7 +231,7 @@ return [
     ],
 
     'gulp-rev' => [
-        'manifest' => __DIR__ . '/../../../public_html/rev-manifest.json',
-        'prefix'   => '/'
+        'manifest' => __DIR__ . '/../../../public_html/dist/manifest.json',
+        'prefix'   => '/dist/'
     ]
 ];

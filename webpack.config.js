@@ -3,31 +3,33 @@ var path = require("path");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var ManifestPlugin = require('webpack-manifest-plugin');
 var CompressionPlugin = require("compression-webpack-plugin");
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     context: __dirname,
-    //entry: "application.js",
     entry: {
         application: 'application.js',
-        vendor: ["jquery", "underscore", "bootstrap", "typeahead.js", 
+        /*vendor: ["jquery", "typeahead.js", 
             "font-awesome-webpack", "chart.js", "raphael", "filesize", 
             "load-google-maps-api", 'jcrop-0.9.12/css/jquery.Jcrop.css', 
             'jcrop-0.9.12/js/jquery.Jcrop', "markdown", "diff", 
-            'bootstrap-tagsinput'],
+            'bootstrap-tagsinput'],*/
     },
     resolve: {
-        modulesDirectories: ['assets', 'assets/js', 'assets/less', 'node_modules'],
+        modulesDirectories: ['assets', 'node_modules'],
         alias: {
             requireLib: 'require',
             chart: require.resolve('chart.js'),
-            typeahead: require.resolve('typeahead.js')
+            typeahead: require.resolve('typeahead.js'),
+            markdown: require.resolve('markdown/lib/markdown.js')
         },
         
     },
     module: {
         loaders: [
-            { test: /bootstrap/, loader: 'imports?jquery' },
-            { test: /markdown/, loader: 'exports?markdown' },
+            { test: /bootstrap/, loader: 'imports?jQuery=jquery' },
+            { test: /Jcrop/, loader: 'imports?jQuery=jquery' },
+            { test: /bootstrap-tagsinput/, loader: 'imports?window.jQuery=jquery' },
             {
                 test: /\.css$/,
                 loader: ExtractTextPlugin.extract("style-loader", "css-loader")
@@ -46,6 +48,8 @@ module.exports = {
             },
             { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?name=fonts/[name].[ext]&limit=10000&mimetype=application/font-woff" },
             { test: /fontawesome-webfont\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader?name=fonts/[name].[ext]" },
+            
+            { test: /glyphicons-halflings-regular\.(ttf|eot|svg)$/, loader: "file-loader?name=fonts/[name].[ext]" },
         ],
     },
     plugins: [
@@ -59,7 +63,8 @@ module.exports = {
             threshold: 10240,
             minRatio: 0.8
         }),
-        new webpack.optimize.CommonsChunkPlugin("vendor", "js/vendor.bundle.[chunkhash].js")
+        //new webpack.optimize.CommonsChunkPlugin("vendor", "js/vendor.bundle.js"), //.[chunkhash]
+        new HtmlWebpackPlugin()
     ],
     output: {
         path: path.join(__dirname, "public_html/dist"),
