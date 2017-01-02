@@ -5,6 +5,7 @@ require("bootstrap/bootstrap");
 require("styles.less");
 require("flags/flags.js");
 require("font-awesome-webpack");
+require('es6-promise').polyfill();
 
 var doc = document;
 $(function() {
@@ -87,7 +88,6 @@ $(function() {
     });
     
     $('[data-page-module]').each(function() {
-        var element = this;
         var module = './' + $(this).data('page-module');
         var moduleOptions = $(this).data('page-module-options');
         require([module], function(Module) {

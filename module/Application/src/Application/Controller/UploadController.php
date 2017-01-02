@@ -82,7 +82,7 @@ class UploadController extends AbstractActionController
         $replacePicture = false;
         if ($replace) {
             $replacePicture = $pictureTable->fetchRow([
-                'id = ?' => $replace
+                'identity = ?' => $replace
             ]);
         }
 

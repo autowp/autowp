@@ -1,12 +1,10 @@
 var $ = require("jquery");
 
-var markup = require('html!./message/modal.html');
-
 module.exports = {
     showDialog: function(userId, message, sentCallback, cancelCallback) {
         var self = this;
         
-        var $modal = $(markup);
+        var $modal = $(require('html!./message/modal.html'));
         
         var $form = $modal.find('form');
         

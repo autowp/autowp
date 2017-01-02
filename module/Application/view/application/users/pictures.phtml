@@ -14,6 +14,8 @@
     $cols = 4;
     $count = count($this->brands);
     $rows = ceil($count / $cols);
+    
+    $this->layout()->moduleName = 'default/users/user-brands';
 ?>
 
 <?php for ($i=0; $i<$rows; $i++) { ?>

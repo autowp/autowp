@@ -25,16 +25,16 @@ class MapController extends AbstractActionController
         geoPHP::version(); // for autoload classes
 
         $bounds = $this->params()->fromQuery('bounds');
-        $bounds = explode(',', $bounds);
+        $bounds = explode(',', (string)$bounds);
 
         if (count($bounds) < 4) {
-            return $this->_forward('notfound', 'error');
+            return $this->notfoundAction();
         }
 
-        $latLo = (float)$bounds[0];
-        $lngLo = (float)$bounds[1];
-        $latHi = (float)$bounds[2];
-        $lngHi = (float)$bounds[3];
+        $lngLo = (float)$bounds[0];
+        $latLo = (float)$bounds[1];
+        $lngHi = (float)$bounds[2];
+        $latHi = (float)$bounds[3];
 
         $line = new LineString([
             new Point($lngLo, $latLo),
@@ -48,7 +48,6 @@ class MapController extends AbstractActionController
         $coordsFilter = [
             'ST_Contains(GeomFromText(?), point)' => $polygon->out('wkt'),
         ];
-
         $pictureTable = new Picture();
 
         $imageStorage = $this->imageStorage();

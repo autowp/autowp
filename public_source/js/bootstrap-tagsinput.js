@@ -1,1 +1,0 @@
-../../node_modules/bootstrap-tagsinput/src/bootstrap-tagsinput.js

@@ -124,7 +124,7 @@ Gallery.prototype = {
             }
         };
         
-        this.$e = $(require('./gallery.html'));
+        this.$e = $(require('html!./gallery.html'));
         
         var $carousel = this.$e.find('.carousel');
         this.$carousel = $carousel;

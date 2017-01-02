@@ -457,7 +457,7 @@ class Brand
         $height = ceil($count / $width);
 
         $cmd = sprintf(
-            'montage ' . implode(' ', $images) . ' -background %s -geometry +0+0 -tile %dx %s',
+            'montage ' . implode(' ', $images) . ' -background %s -geometry +1+1 -tile %dx %s',
             escapeshellarg($background ? $background : 'none'),
             $width,
             escapeshellarg($destImg)
@@ -472,10 +472,10 @@ class Brand
             $top = floor($index / $width);
             $left = $index - $top * $width;
             $css[] = sprintf(
-                '.brandicon-%s {background-position: -%dpx -%dpx}',
+                '.brandicon.brandicon-%s {background-position: -%dpx -%dpx}',
                 $catname,
-                $left * $format->getWidth(),
-                $top * $format->getHeight()
+                1 + ($format->getWidth() + 1 + 1) * $left,
+                1 + ($format->getHeight() + 1 + 1) * $top
             );
             $index++;
         }

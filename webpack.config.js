@@ -30,6 +30,7 @@ module.exports = {
             { test: /bootstrap/, loader: 'imports?jQuery=jquery' },
             { test: /Jcrop/, loader: 'imports?jQuery=jquery' },
             { test: /bootstrap-tagsinput/, loader: 'imports?window.jQuery=jquery' },
+            { test: "\.html$/", loader: "html" },
             {
                 test: /\.css$/,
                 loader: ExtractTextPlugin.extract("style-loader", "css-loader")
@@ -46,10 +47,10 @@ module.exports = {
                     'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'
                 ]
             },
-            { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?name=fonts/[name].[ext]&limit=10000&mimetype=application/font-woff" },
-            { test: /fontawesome-webfont\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader?name=fonts/[name].[ext]" },
+            { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?name=fonts/[hash].[ext]&limit=10000&mimetype=application/font-woff" },
+            { test: /fontawesome-webfont\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader?name=fonts/[hash].[ext]" },
             
-            { test: /glyphicons-halflings-regular\.(ttf|eot|svg)$/, loader: "file-loader?name=fonts/[name].[ext]" },
+            { test: /glyphicons-halflings-regular\.(ttf|eot|svg)$/, loader: "file-loader?name=fonts/[hash].[ext]" },
         ],
     },
     plugins: [
