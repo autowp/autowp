@@ -19,7 +19,7 @@
  <ul><li>')
         ->setMessageSeparatorString('</li><li>')
         ->setMessageCloseString('</li></ul></div>');
-    
+
     $this->gulpRev([
         'stylesheets' => [
             'application.css'
@@ -28,11 +28,11 @@
             'application.js'
         ]
     ]);
-    
+
     $moduleOptions = isset($this->layout()->moduleOptions)
         ? $this->layout()->moduleOptions
         : null;
-    
+
     $module = null;
     if (isset($this->layout()->moduleName)) {
         $module = $this->layout()->moduleName;
@@ -43,7 +43,7 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <?=$this->render('layout/favicons')?>
+        <?=$this->favicons()?>
         <?php
             echo $this->headMeta()
                 ->appendName('keywords', $this->translate('layout/meta/keywords'))

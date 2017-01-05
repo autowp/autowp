@@ -40,7 +40,8 @@ return [
             'formelement'                  => Form\View\Helper\FormElement::class,
             'formElement'                  => Form\View\Helper\FormElement::class,
             'FormElement'                  => Form\View\Helper\FormElement::class,
-            'formpicturemulticheckbox'     => Form\View\Helper\FormPictureMultiCheckbox::class
+            'formpicturemulticheckbox'     => Form\View\Helper\FormPictureMultiCheckbox::class,
+            'favicons'                     => View\Helper\Favicons::class,
         ],
         'factories' => [
             'car'            => View\Helper\Service\CarFactory::class,
