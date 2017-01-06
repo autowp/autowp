@@ -149,10 +149,10 @@ class CarsController extends AbstractActionController
         if ($engine && $car->engine_inherit) {
             $carRows = $carTable->fetchAll(
                 $carTable->select(true)
-                    ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', null)
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                     ->where('item_parent_cache.item_id = ?', $car->id)
-                    ->where('cars.engine_item_id = ?', $engine->id)
-                    ->where('cars.id <> ?', $car->id)
+                    ->where('item.engine_item_id = ?', $engine->id)
+                    ->where('item.id <> ?', $car->id)
                     ->order('item_parent_cache.diff desc')
             );
 
@@ -649,16 +649,16 @@ class CarsController extends AbstractActionController
     {
         $itemTable = new Vehicle();
         $select = $itemTable->select(true)
-            ->where('cars.item_type_id = ?', DbTable\Item\Type::ENGINE)
-            ->order('cars.name');
+            ->where('item.item_type_id = ?', DbTable\Item\Type::ENGINE)
+            ->order('item.name');
         if ($brandId) {
             $select
-                ->join('brand_item', 'cars.id = brand_item.item_id', null)
+                ->join('brand_item', 'item.id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brandId);
         }
         if ($parentId) {
             $select
-                ->join('item_parent', 'cars.id = item_parent.item_id', null)
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $parentId);
         }
 
@@ -706,8 +706,8 @@ class CarsController extends AbstractActionController
             $brands = $brandModel->getList($language, function ($select) {
                 $select
                     ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                    ->join('cars', 'brand_item.item_id = cars.id', null)
-                    ->where('cars.item_type_id = ?', DbTable\Item\Type::ENGINE)
+                    ->join('item', 'brand_item.item_id = item.id', null)
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::ENGINE)
                     ->group('brands.id');
             });
 
@@ -830,8 +830,8 @@ class CarsController extends AbstractActionController
         $carTable = $this->catalogue()->getCarTable();
 
         $select = $carTable->select(true)
-            ->where('cars.begin_year is null and cars.begin_model_year is null')
-            ->order($this->catalogue()->carsOrdering());
+            ->where('item.begin_year is null and item.begin_model_year is null')
+            ->order($this->catalogue()->itemOrdering());
 
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)

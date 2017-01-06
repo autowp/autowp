@@ -58,7 +58,7 @@ class Brakes extends AbstractAdapter
         $selects = [];
         foreach ([$rear, $front] as $axis) {
             $axisSelect = $select->getAdapter()->select()
-                ->from('cars', []);
+                ->from('item', []);
             if ($wheres) {
                 $axisSelect->where($wheres);
             }
@@ -78,14 +78,14 @@ class Brakes extends AbstractAdapter
                 ->info(Zend_Db_Table_Abstract::NAME);
 
             $axisSelect
-                ->columns(['item_id' => 'cars.id', 'size_value' => new Zend_Db_Expr('diameter.value*thickness.value')])
-                ->join(['diameter' => $diameterValuesTable], 'cars.id = diameter.item_id', null)
+                ->columns(['item_id' => 'item.id', 'size_value' => new Zend_Db_Expr('diameter.value*thickness.value')])
+                ->join(['diameter' => $diameterValuesTable], 'item.id = diameter.item_id', null)
                 ->where('diameter.attribute_id = ?', $diameter->id)
                 ->where('diameter.value > 0')
-                ->join(['thickness' => $thicknessValuesTable], 'cars.id = thickness.item_id', null)
+                ->join(['thickness' => $thicknessValuesTable], 'item.id = thickness.item_id', null)
                 ->where('thickness.attribute_id = ?', $thickness->id)
                 ->where('thickness.value > 0')
-                ->group('cars.id')
+                ->group('item.id')
                 ->order('size_value ' . $this->order)
                 ->limit($limit);
 
@@ -95,10 +95,10 @@ class Brakes extends AbstractAdapter
         $select
             ->join(
                 ['tbl' => new Zend_Db_Expr('((' . $selects[0] . ') UNION (' . $selects[1] . '))')],
-                'cars.id = tbl.item_id',
+                'item.id = tbl.item_id',
                 null
             )
-            ->group('cars.id');
+            ->group('item.id');
 
 
         if ($this->order == 'asc') {

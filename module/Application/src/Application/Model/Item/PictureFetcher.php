@@ -94,10 +94,10 @@ abstract class PictureFetcher
         } else {
             $select
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->join('cars', 'picture_item.item_id = cars.id', null)
+                ->join('item', 'picture_item.item_id = item.id', null)
                 ->where('item_parent_cache.parent_id = ?', $carId);
 
-            $order[] = 'cars.is_concept asc';
+            $order[] = 'item.is_concept asc';
             $order[] = 'item_parent_cache.sport asc';
             $order[] = 'item_parent_cache.tuning asc';
 
@@ -136,7 +136,7 @@ abstract class PictureFetcher
         }
 
         if ($options['dateSort']) {
-            $select->join(['picture_car' => 'cars'], 'cars.id = picture_car.id', null);
+            $select->join(['picture_car' => 'item'], 'item.id = picture_car.id', null);
             $order = array_merge($order, ['picture_car.begin_order_cache', 'picture_car.end_order_cache']);
         }
         $order = array_merge($order, ['pictures.width DESC', 'pictures.height DESC']);

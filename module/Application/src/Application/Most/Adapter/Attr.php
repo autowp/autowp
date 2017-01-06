@@ -43,7 +43,7 @@ class Attr extends AbstractAdapter
         $select
             ->where($tableName.'.attribute_id = ?', $attribute->id)
             ->where($tableName.'.value IS NOT NULL')
-            ->join($tableName, 'cars.id='.$tableName.'.item_id', null)
+            ->join($tableName, 'item.id='.$tableName.'.item_id', null)
             ->order($tableName.'.value ' . $this->order);
 
         $cars = $select->getTable()->fetchAll($select);

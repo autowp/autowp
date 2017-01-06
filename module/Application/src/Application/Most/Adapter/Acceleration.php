@@ -60,7 +60,7 @@ class Acceleration extends AbstractAdapter
         $limit = $this->most->getCarsCount();
 
         $axisBaseSelect = $axisSelect = $select->getAdapter()->select()
-            ->from('cars', []);
+            ->from('item', []);
         if ($wheres) {
             $axisSelect->where($wheres);
         }
@@ -84,8 +84,8 @@ class Acceleration extends AbstractAdapter
             $valueColumn = $axis['q'] != 1 ? new Zend_Db_Expr('axis.value / ' . $axis['q']) : 'axis.value';
 
             $axisSelect
-                ->columns(['item_id' => 'cars.id', 'size_value' => $valueColumn])
-                ->join(['axis' => $attrValuesTable], 'cars.id = axis.item_id', null)
+                ->columns(['item_id' => 'item.id', 'size_value' => $valueColumn])
+                ->join(['axis' => $attrValuesTable], 'item.id = axis.item_id', null)
                 ->where('axis.attribute_id = ?', $attr->id)
                 ->where('axis.value > 0')
                 ->order('size_value ' . $this->order)
@@ -97,10 +97,10 @@ class Acceleration extends AbstractAdapter
         $select
             ->join(
                 ['tbl' => new Zend_Db_Expr('((' . $selects[0] . ') UNION (' . $selects[1] . '))')],
-                'cars.id = tbl.item_id',
+                'item.id = tbl.item_id',
                 null
             )
-            ->group('cars.id');
+            ->group('item.id');
 
 
         if ($this->order == 'asc') {

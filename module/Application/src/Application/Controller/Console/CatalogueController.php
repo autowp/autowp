@@ -62,12 +62,12 @@ class CatalogueController extends AbstractActionController
     {
         $groupTable = new DbTable\Twins\Group();
         $groupVehicleTable = new DbTable\Twins\GroupVehicle();
-        
+
         $itemTable = new DbTable\Vehicle();
         $itemLangTable = new DbTable\Vehicle\Language();
 
         $itemParentTable = new DbTable\Vehicle\ParentTable();
-        
+
         $db = $itemParentTable->getAdapter();
 
         $groupRows = $groupTable->fetchAll();
@@ -107,30 +107,30 @@ class CatalogueController extends AbstractActionController
                     $itemTable->updateInteritance($vehicleRow);
                 }
             }
-            
+
             if ($groupRow->text_id) {
                 $text = $this->textStorage->getText($groupRow->text_id);
                 $language = null;
-                
+
                 if (!$text) {
                     $language = 'en';
                 }
-                
+
                 if (preg_match('|^[[:space:] a-zA-ZІ½²³°®™‐€ÚÖćčśãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
                     $language = 'en';
                 }
-                
+
                 if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½²³°®™‐€ÚÖćčśãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
                     $language = 'ru';
                 }
-                
+
                 print $groupRow->text_id . '#' . $language . PHP_EOL;
-                
+
                 if (!$language) {
                     print $text . PHP_EOL;
                     exit;
                 }
-                
+
                 $langRow = $itemLangTable->fetchRow([
                     'item_id = ?'  => $itemRow->id,
                     'language = ?' => $language
@@ -141,13 +141,13 @@ class CatalogueController extends AbstractActionController
                         'language' => $language,
                     ]);
                 }
-                
+
                 $langRow->text_id = $groupRow->text_id;
                 $langRow->save();
             }
-            
+
             $db->query('
-                insert into log_events_cars (log_event_id, item_id)
+                insert into log_events_item (log_event_id, item_id)
                 select log_event_id, ?
                 from log_events_twins_groups
                 where twins_group_id = ?

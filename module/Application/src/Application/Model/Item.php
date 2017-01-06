@@ -19,8 +19,8 @@ class Item
 
         $vehicleIds = $db->fetchCol(
             $db->select()
-                ->from('cars', 'id')
-                ->join('item_parent_cache', 'cars.engine_item_id = item_parent_cache.item_id', null)
+                ->from('item', 'id')
+                ->join('item_parent_cache', 'item.engine_item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $engineId)
         );
 

@@ -64,12 +64,12 @@ class Power extends AbstractAdapter
         $funct = $this->order == 'ASC' ? 'min' : 'max';
         $expr = $funct.'('.$valuesTableName.'.value)';
         $attrsSelect = $db->select()
-            ->from(['engines' => 'cars'], ['cars.id', 'V' => new Zend_Db_Expr($expr)])
-            ->join('cars', 'engines.id = cars.engine_item_id', null)
+            ->from(['engines' => 'item'], ['item.id', 'V' => new Zend_Db_Expr($expr)])
+            ->join('item', 'engines.id = item.engine_item_id', null)
             ->join($valuesTableName, 'engines.id = '.$valuesTableName.'.item_id', null)
             ->where($valuesTableName.'.attribute_id = ?', $powerAttr->id)
             ->where($valuesTableName.'.value > 0')
-            ->group('cars.id')
+            ->group('item.id')
             ->order('V '. $this->order)
             ->limit($limit);
 
@@ -93,11 +93,11 @@ class Power extends AbstractAdapter
         $funct = $this->order == 'ASC' ? 'min' : 'max';
            $expr = $funct.'('.$valuesTableName.'.value)';
         $attrsSelect = $db->select()
-            ->from('cars', ['cars.id', 'V' => new Zend_Db_Expr($expr)])
-            ->join($valuesTableName, 'cars.id='.$valuesTableName.'.item_id', null)
+            ->from('item', ['item.id', 'V' => new Zend_Db_Expr($expr)])
+            ->join($valuesTableName, 'item.id='.$valuesTableName.'.item_id', null)
             ->where($valuesTableName.'.attribute_id = ?', $powerAttr->id)
             ->where($valuesTableName.'.value > 0')
-            ->group('cars.id')
+            ->group('item.id')
             ->order('V '. $this->order)
             ->limit($limit);
 
@@ -118,8 +118,8 @@ class Power extends AbstractAdapter
 
         $cars = $carsTable->fetchAll(
             $select
-                ->join(self::TEMP_TABLE_NAME, 'cars.id='.$tableNameQuoted.'.item_id', null)
-                ->group('cars.id')
+                ->join(self::TEMP_TABLE_NAME, 'item.id='.$tableNameQuoted.'.item_id', null)
+                ->group('item.id')
                 ->order('power ' . $this->order)
         );
 

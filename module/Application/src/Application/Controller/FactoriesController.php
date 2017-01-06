@@ -59,7 +59,7 @@ class FactoriesController extends AbstractActionController
 
             $cars = $carTable->fetchAll([
                 'id in (?)' => array_keys($groups)
-            ], $this->catalogue()->carsOrdering());
+            ], $this->catalogue()->itemOrdering());
 
             $catalogue = $this->catalogue();
             $carParentTable = new VehicleParent();
@@ -68,13 +68,13 @@ class FactoriesController extends AbstractActionController
                 $select = $pictureTable->select(true)
                     ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('cars', 'picture_item.item_id = cars.id', null)
-                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->join('item', 'picture_item.item_id = item.id', null)
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id = ?', $car->id)
                     ->order([
                         new Zend_Db_Expr('item_parent_cache.tuning asc'),
                         new Zend_Db_Expr('item_parent_cache.sport asc'),
-                        new Zend_Db_Expr('cars.is_concept asc'),
+                        new Zend_Db_Expr('item.is_concept asc'),
                         new Zend_Db_Expr('picture_item.perspective_id = 10 desc'),
                         new Zend_Db_Expr('picture_item.perspective_id = 1 desc'),
                         new Zend_Db_Expr('picture_item.perspective_id = 7 desc'),
@@ -165,7 +165,7 @@ class FactoriesController extends AbstractActionController
 
             $select = $carTable->select(true)
                 ->where('id IN (?)', array_keys($groups))
-                ->order($this->catalogue()->carsOrdering());
+                ->order($this->catalogue()->itemOrdering());
 
             $paginator = new \Zend\Paginator\Paginator(
                 new Zend1DbTableSelect($select)

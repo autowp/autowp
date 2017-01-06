@@ -495,8 +495,8 @@ class Pic extends AbstractPlugin
             if ($itemsCount == 1) {
                 $twinsGroupsRows = $itemTable->fetchAll(
                     $itemTable->select(true)
-                        ->where('cars.item_type_id = ?', DbTable\Item\Type::TWINS)
-                        ->join('item_parent_cache', 'cars.id = item_parent_cache.parent_id', null)
+                        ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
+                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                         ->where('item_parent_cache.item_id = ?', $item->id)
                 );
 
@@ -639,23 +639,23 @@ class Pic extends AbstractPlugin
 
             $db = $itemTable->getAdapter();
             $langExpr = $db->quoteInto(
-                'cars.id = item_language.item_id and item_language.language = ?',
+                'item.id = item_language.item_id and item_language.language = ?',
                 $language
             );
             $categoryRows = $db->fetchAll(
                 $db->select()
                     ->from($itemTable->info('name'), [
                         'id', 'catname', 'begin_year', 'end_year',
-                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,cars.name)')
+                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,item.name)')
                     ])
-                    ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                     ->joinLeft('item_language', $langExpr, ['lang_name' => 'name'])
-                    ->join('item_parent', 'cars.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'cars'], 'item_parent.item_id = top_item.id', null)
+                    ->join('item_parent', 'item.id = item_parent.parent_id', null)
+                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id IN (?)', $item['id'])
-                    ->group(['item_parent_cache.item_id', 'cars.id'])
+                    ->group(['item_parent_cache.item_id', 'item.id'])
             );
 
             foreach ($categoryRows as $row) {
@@ -744,7 +744,7 @@ class Pic extends AbstractPlugin
             if ($vehicleIds) {
                 $carRows = $itemTable->fetchAll([
                     'id in (?)' => $vehicleIds
-                ], $catalogue->carsOrdering());
+                ], $catalogue->itemOrdering());
 
                 foreach ($carRows as $carRow) {
                     $cataloguePaths = $catalogue->cataloguePaths($carRow);
@@ -848,7 +848,7 @@ class Pic extends AbstractPlugin
 
                         $carRows = $itemTable->fetchAll([
                             'id in (?)' => $carIds
-                        ], $catalogue->carsOrdering());
+                        ], $catalogue->itemOrdering());
 
                         $limit = 10;
 

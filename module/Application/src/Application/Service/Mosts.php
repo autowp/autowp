@@ -345,9 +345,9 @@ class Mosts
 
     private function betweenYearsExpr($from, $to)
     {
-        return 'cars.begin_order_cache between "'.$from.'-01-01" and "'.$to.'-12-31" or ' .
-               'cars.end_order_cache between "'.$from.'-01-01" and "'.$to.'-12-31" or ' .
-               '(cars.begin_order_cache < "'.$from.'-01-01" and cars.end_order_cache > "'.$to.'-12-31")';
+        return 'item.begin_order_cache between "'.$from.'-01-01" and "'.$to.'-12-31" or ' .
+               'item.end_order_cache between "'.$from.'-01-01" and "'.$to.'-12-31" or ' .
+               '(item.begin_order_cache < "'.$from.'-01-01" and item.end_order_cache > "'.$to.'-12-31")';
     }
 
     public function getYears()
@@ -361,8 +361,8 @@ class Mosts
                 [
                     'name'   => 'mosts/period/before1920',
                     'folder' => 'before1920',
-                    'where'  => 'cars.begin_order_cache <= "1919-12-31" or ' .
-                                'cars.end_order_cache <= "1919-12-31"'
+                    'where'  => 'item.begin_order_cache <= "1919-12-31" or ' .
+                                'item.end_order_cache <= "1919-12-31"'
                 ],
                 [
                     'name'   => 'mosts/period/1920-29',
@@ -417,8 +417,8 @@ class Mosts
                 [
                     'name'   => 'mosts/period/present',
                     'folder' => 'today',
-                    'where'  => 'cars.end_order_cache >="'.$cy.'-01-01" and cars.end_order_cache<"2100-01-01" ' .
-                                'or cars.end_order_cache is null and cars.today'
+                    'where'  => 'item.end_order_cache >="'.$cy.'-01-01" and item.end_order_cache<"2100-01-01" ' .
+                                'or item.end_order_cache is null and item.today'
                 ]
             ];
         }
@@ -595,7 +595,7 @@ class Mosts
         if ($carType) {
             $ids = $this->getCarTypesIds($carType);
 
-            $select->join('vehicle_vehicle_type', 'cars.id = vehicle_vehicle_type.vehicle_id', null);
+            $select->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null);
 
             if (count($ids) == 1) {
                 $select->where('vehicle_vehicle_type.vehicle_type_id = ?', $ids[0]);
@@ -610,11 +610,11 @@ class Mosts
 
         if ($brandId) {
             $select
-                ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('not item_parent_cache.tuning')
                 ->where('brand_item.brand_id = ?', $brandId)
-                ->group('cars.id');
+                ->group('item.id');
         }
 
         $most = new Most([
@@ -686,7 +686,7 @@ class Mosts
         if ($brandId) {
             $carsTable = new Vehicle();
             $select = $carsTable->select(true)
-                ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('not item_parent_cache.tuning')
                 ->where('brand_item.brand_id = ?', $brandId)

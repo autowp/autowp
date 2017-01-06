@@ -148,7 +148,7 @@ class ParentCache extends Table
 
         $childCars = $carTable->fetchAll(
             $carTable->select(true)
-                ->join('item_parent', 'cars.id = item_parent.item_id', null)
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $id)
         );
 
@@ -228,7 +228,7 @@ class ParentCache extends Table
 
         $childCars = $carTable->fetchAll(
             $carTable->select(true)
-                ->join('item_parent', 'cars.id = item_parent.item_id', null)
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $id)
         );
 

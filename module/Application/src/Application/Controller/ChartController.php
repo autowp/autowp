@@ -91,14 +91,14 @@ class ChartController extends AbstractRestfulController
 
             $pairs = $db->fetchPairs(
                 $db->select()
-                    ->from($dataTableName, ['year' => 'year(cars.begin_order_cache)', 'round(avg(value))'])
+                    ->from($dataTableName, ['year' => 'year(item.begin_order_cache)', 'round(avg(value))'])
                     ->where($dataTableName . '.attribute_id = ?', $attrRow->id)
-                    ->join('cars', $dataTableName . '.item_id = cars.id', null)
-                    ->join('car_types_parents', 'cars.car_type_id = car_types_parents.id', null)
+                    ->join('item', $dataTableName . '.item_id = item.id', null)
+                    ->join('car_types_parents', 'item.car_type_id = car_types_parents.id', null)
                     ->where('car_types_parents.parent_id = ?', 29)
-                    ->where('cars.begin_order_cache')
-                    ->where('cars.begin_order_cache < "2100-01-01 00:00:00"')
-                    ->where('cars.spec_id in (?)', $specIds)
+                    ->where('item.begin_order_cache')
+                    ->where('item.begin_order_cache < "2100-01-01 00:00:00"')
+                    ->where('item.spec_id in (?)', $specIds)
                     ->group('year')
                     ->order('year')
             );

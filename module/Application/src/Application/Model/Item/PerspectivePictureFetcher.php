@@ -175,8 +175,8 @@ class PerspectivePictureFetcher extends PictureFetcher
                     ])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->where('picture_item.perspective_id = ?', 17) // under the hood
-                    ->join('cars', 'picture_item.item_id = cars.id', null)
-                    ->join('item_parent_cache', 'cars.engine_item_id = item_parent_cache.item_id', null)
+                    ->join('item', 'picture_item.item_id = item.id', null)
+                    ->join('item_parent_cache', 'item.engine_item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id = ?', $item['id'])
                     ->limit($emptyPictures)
             );

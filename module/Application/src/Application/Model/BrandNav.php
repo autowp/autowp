@@ -127,11 +127,11 @@ class BrandNav
 
                 $db = $carTable->getAdapter();
                 $select = $db->select()
-                    ->from('cars', new Zend_Db_Expr('1'))
-                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->from('item', new Zend_Db_Expr('1'))
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                     ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = ?', $brand['id'])
-                    ->where('cars.is_concept')
+                    ->where('item.is_concept')
                     ->limit(1);
                 if ($db->fetchOne($select) > 0) {
                     $groups['concepts'] = [
@@ -292,21 +292,21 @@ class BrandNav
                 'brand_item_catname' => 'catname',
                 'brand_id'
             ])
-            ->join('cars', 'cars.id = brand_item.item_id', [
+            ->join('item', 'item.id = brand_item.item_id', [
                 'item_id'  => 'id',
-                'car_name' => 'cars.name',
+                'car_name' => 'item.name',
             ])
             ->where('brand_item.brand_id = ?', $brandId)
-            ->where('cars.item_type_id = ?', $itemTypeId)
-            ->group('cars.id');
+            ->where('item.item_type_id = ?', $itemTypeId)
+            ->group('item.id');
         if ($conceptsSeparatly) {
-            $select->where('NOT cars.is_concept');
+            $select->where('NOT item.is_concept');
         }
 
         if ($itemTypeId == DbTable\Item\Type::VEHICLE) {
             if ($carTypeId) {
                 $select
-                    ->join('vehicle_vehicle_type', 'cars.id = vehicle_vehicle_type.vehicle_id', null)
+                    ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
                     ->join('car_types_parents', 'vehicle_vehicle_type.vehicle_type_id = car_types_parents.id', null)
                     ->where('car_types_parents.parent_id = ?', $carTypeId);
             } else {
@@ -314,7 +314,7 @@ class BrandNav
                     $select
                         ->joinLeft(
                             'vehicle_vehicle_type',
-                            'cars.id = vehicle_vehicle_type.vehicle_id',
+                            'item.id = vehicle_vehicle_type.vehicle_id',
                             null
                         )
                         ->where('vehicle_vehicle_type.vehicle_id is null');
@@ -327,7 +327,7 @@ class BrandNav
 
                     $select->join(
                         'vehicle_vehicle_type',
-                        'cars.id = vehicle_vehicle_type.vehicle_id',
+                        'item.id = vehicle_vehicle_type.vehicle_id',
                         null
                     );
 

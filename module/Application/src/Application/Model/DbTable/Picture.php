@@ -177,7 +177,7 @@ class Picture extends Table
                 'spec' => 'spec.short_name',
                 'spec_full' => 'spec.name',
                 'body',
-                'name' => 'if(length(item_language.name) > 0, item_language.name, cars.name)',
+                'name' => 'if(length(item_language.name) > 0, item_language.name, item.name)',
                 'begin_year', 'end_year', 'today',
             ];
             if ($large) {
@@ -186,10 +186,10 @@ class Picture extends Table
             }
 
             $select = $db->select()
-                ->from('cars', $columns)
-                ->where('cars.id in (?)', array_keys($carIds))
-                ->joinLeft('spec', 'cars.spec_id = spec.id', null)
-                ->joinLeft('item_language', 'cars.id = item_language.item_id and item_language.language = :language', null);
+                ->from('item', $columns)
+                ->where('item.id in (?)', array_keys($carIds))
+                ->joinLeft('spec', 'item.spec_id = spec.id', null)
+                ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :language', null);
 
             foreach ($db->fetchAll($select, ['language' => $language]) as $row) {
                 $data = [

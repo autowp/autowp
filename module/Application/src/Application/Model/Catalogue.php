@@ -52,27 +52,27 @@ class Catalogue
     /**
      * @return array
      */
-    public function carsOrdering()
+    public function itemOrdering()
     {
         return [
-            'cars.begin_order_cache',
-            'cars.end_order_cache',
-            'cars.name',
-            'cars.body',
-            'cars.spec_id'
+            'item.begin_order_cache',
+            'item.end_order_cache',
+            'item.name',
+            'item.body',
+            'item.spec_id'
         ];
 
         /*return [
-            new Zend_Db_Expr('cars.begin_year IS NULL'),
-            'cars.begin_year',
-            new Zend_Db_Expr('cars.begin_month IS NULL'),
-            'cars.begin_month',
-            new Zend_Db_Expr('cars.end_year=0'),
-            'cars.end_year',
-            new Zend_Db_Expr('cars.end_month IS NULL'),
-            'cars.end_month',
-            'cars.name',
-            'cars.body'
+            new Zend_Db_Expr('item.begin_year IS NULL'),
+            'item.begin_year',
+            new Zend_Db_Expr('item.begin_month IS NULL'),
+            'item.begin_month',
+            new Zend_Db_Expr('item.end_year=0'),
+            'item.end_year',
+            new Zend_Db_Expr('item.end_month IS NULL'),
+            'item.end_month',
+            'item.name',
+            'item.body'
         ];*/
     }
 

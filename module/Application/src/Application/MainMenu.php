@@ -145,10 +145,10 @@ class MainMenu
 
             $rows = $itemTable->fetchAll(
                 $itemTable->select(true)
-                    ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft('item_parent', 'cars.id = item_parent.item_id', null)
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->joinLeft('item_parent', 'item.id = item_parent.item_id', null)
                     ->where('item_parent.item_id IS NULL')
-                    ->order('cars.name')
+                    ->order('item.name')
             );
 
             foreach ($rows as $row) {

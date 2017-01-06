@@ -78,7 +78,7 @@ class Row extends \Application\Db\Table\Row
                 $vehicleTable = new Vehicle();
                 $cars = $vehicleTable->fetchAll(
                     $vehicleTable->select(true)
-                        ->join('picture_item', 'cars.id = picture_item.item_id', null)
+                        ->join('picture_item', 'item.id = picture_item.item_id', null)
                         ->where('picture_item.picture_id = ?', $this->id)
                 );
 

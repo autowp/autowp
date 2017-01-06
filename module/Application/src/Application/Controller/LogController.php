@@ -10,7 +10,6 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Twins\Group as TwinsGroup;
 use Application\Model\DbTable\Vehicle;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
@@ -47,8 +46,8 @@ class LogController extends AbstractActionController
 
         $carId = (int)$this->params()->fromRoute('item_id');
         if ($carId) {
-            $select->join('log_events_cars', 'log_events.id=log_events_cars.log_event_id', null)
-                   ->where('log_events_cars.item_id = ?', $carId);
+            $select->join('log_events_item', 'log_events.id=log_events_item.log_event_id', null)
+                   ->where('log_events_item.item_id = ?', $carId);
         }
 
         $pictureId = (int)$this->params()->fromRoute('picture_id');
@@ -82,8 +81,8 @@ class LogController extends AbstractActionController
         foreach ($paginator->getCurrentItems() as $event) {
             $vehicleRows = $vehicleTable->fetchAll(
                 $vehicleTable->select(true)
-                    ->join('log_events_cars', 'cars.id = log_events_cars.item_id', null)
-                    ->where('log_events_cars.log_event_id = ?', $event->id)
+                    ->join('log_events_item', 'item.id = log_events_item.item_id', null)
+                    ->where('log_events_item.log_event_id = ?', $event->id)
             );
             $vehicles = [];
             foreach ($vehicleRows as $vehicleRow) {

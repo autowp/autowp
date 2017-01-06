@@ -38,7 +38,7 @@ class CarOfDay
         $db = $this->table->getAdapter();
         $sql = '
             SELECT c.id, count(p.id) AS p_count
-            FROM cars AS c
+            FROM item AS c
                 INNER JOIN item_parent_cache AS cpc ON c.id=cpc.parent_id
                 INNER JOIN picture_item ON cpc.item_id = picture_item.item_id
                 INNER JOIN pictures AS p ON picture_item.picture_id=p.id

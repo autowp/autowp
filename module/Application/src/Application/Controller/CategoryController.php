@@ -44,15 +44,15 @@ class CategoryController extends AbstractActionController
     {
         $db = $this->itemTable->getAdapter();
 
-        //TODO: group by cars.id
+        //TODO: group by item.id
         $select = $db->select()
-            ->from('cars', new Zend_Db_Expr('COUNT(1)'))
-            ->where('cars.item_type_id IN (?)', [
+            ->from('item', new Zend_Db_Expr('COUNT(1)'))
+            ->where('item.item_type_id IN (?)', [
                 DbTable\Item\Type::ENGINE,
                 DbTable\Item\Type::VEHICLE
             ])
-            ->where('not cars.is_group')
-            ->join('item_parent', 'cars.id = item_parent.item_id', null)
+            ->where('not item.is_group')
+            ->join('item_parent', 'item.id = item_parent.item_id', null)
             ->where('item_parent.parent_id = ?', $categoryId);
 
         return $db->fetchOne($select);
@@ -71,7 +71,7 @@ class CategoryController extends AbstractActionController
             $rows = $this->itemTable->fetchAll(
                 $this->itemTable->select(true)
                     ->where('item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft('item_parent', 'cars.id = item_parent.item_id', null)
+                    ->joinLeft('item_parent', 'item.id = item_parent.item_id', null)
                     ->where('item_parent.parent_id is null')
                     ->order('name')
             );
@@ -158,16 +158,16 @@ class CategoryController extends AbstractActionController
 
         if ($maxDeep > 0) {
             $select = $this->itemTable->select(true)
-                ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                ->order($this->catalogue()->carsOrdering());
+                ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                ->order($this->catalogue()->itemOrdering());
 
             if ($parent) {
                 $select
-                    ->join('item_parent', 'cars.id = item_parent.item_id', null)
+                    ->join('item_parent', 'item.id = item_parent.item_id', null)
                     ->where('item_parent.parent_id = ?', $parent->id);
             } else {
                 $select
-                    ->joinLeft('item_parent', 'cars.id = item_parent.item_id', null)
+                    ->joinLeft('item_parent', 'item.id = item_parent.item_id', null)
                     ->where('item_parent.parent_id IS NULL');
             }
 
@@ -267,7 +267,7 @@ class CategoryController extends AbstractActionController
         while (true) {
             $parentCategory = $this->itemTable->fetchRow(
                 $this->itemTable->select(true)
-                    ->join('item_parent', 'cars.id = item_parent.parent_id', null)
+                    ->join('item_parent', 'item.id = item_parent.parent_id', null)
                     ->where('item_parent.item_id = ?', $topCategory->id)
             );
             if (! $parentCategory) {
@@ -312,7 +312,7 @@ class CategoryController extends AbstractActionController
         foreach ($path as $pathNode) {
             $childCar = $this->itemTable->fetchRow(
                 $this->itemTable->select(true)
-                    ->join('item_parent', 'cars.id = item_parent.item_id', null)
+                    ->join('item_parent', 'item.id = item_parent.item_id', null)
                     ->where('item_parent.parent_id = ?', $currentCar->id)
                     ->where('item_parent.catname = ?', $pathNode)
             );
@@ -390,21 +390,21 @@ class CategoryController extends AbstractActionController
 
             $haveSubcategories = (bool)$this->itemTable->fetchRow(
                 $this->itemTable->select(true)
-                    ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->join('item_parent', 'cars.id = item_parent.item_id', null)
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->join('item_parent', 'item.id = item_parent.item_id', null)
                     ->where('item_parent.parent_id = ?', $currentCategory->id)
             );
 
             $select = $this->itemTable->select(true)
-                ->join('item_parent', 'cars.id = item_parent.item_id', null)
-                ->order($this->catalogue()->carsOrdering())
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
+                ->order($this->catalogue()->itemOrdering())
                 ->where('item_parent.parent_id = ?', $currentCar ? $currentCar->id : $currentCategory->id);
 
             if ($isOther) {
-                $select->where('cars.item_type_id <> ?', DbTable\Item\Type::CATEGORY);
+                $select->where('item.item_type_id <> ?', DbTable\Item\Type::CATEGORY);
             } else {
                 if ($haveSubcategories) {
-                    $select->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY);
+                    $select->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY);
                 }
             }
 
@@ -449,7 +449,7 @@ class CategoryController extends AbstractActionController
 
             if ($currentCar && $paginator->getTotalItemCount() <= 0) {
                 $select = $this->itemTable->select(true)
-                    ->where('cars.id = ?', $currentCar->id);
+                    ->where('item.id = ?', $currentCar->id);
 
                 $paginator = new \Zend\Paginator\Paginator(
                     new Zend1DbTableSelect($select)
@@ -460,7 +460,7 @@ class CategoryController extends AbstractActionController
 
                 $parentItemRow = $this->itemTable->fetchRow(
                     $this->itemTable->select(true)
-                        ->join('item_parent', 'cars.id = item_parent.parent_id', null)
+                        ->join('item_parent', 'item.id = item_parent.parent_id', null)
                         ->where('item_parent.item_id = ?', $currentCar->id)
                         ->where('item_parent.catname = ?', $catname)
                 );
@@ -489,11 +489,11 @@ class CategoryController extends AbstractActionController
 
             if ($haveSubcategories && $isLastPage && $currentCar->item_type_id == DbTable\Item\Type::CATEGORY && ! $isOther) {
                 $select = $this->itemTable->select(true)
-                    ->where('cars.item_type_id IN (?)', [
+                    ->where('item.item_type_id IN (?)', [
                         DbTable\Item\Type::ENGINE,
                         DbTable\Item\Type::VEHICLE
                     ])
-                    ->join('item_parent', 'cars.id = item_parent.item_id', null)
+                    ->join('item_parent', 'item.id = item_parent.item_id', null)
                     ->where('item_parent.parent_id = ?', $currentCategory->id);
 
                 $otherPaginator = new \Zend\Paginator\Paginator(
@@ -509,12 +509,12 @@ class CategoryController extends AbstractActionController
                             Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
                         ])
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->join('cars', 'picture_item.item_id = cars.id', null)
-                        ->where('cars.item_type_id IN (?)', [
+                        ->join('item', 'picture_item.item_id = item.id', null)
+                        ->where('item.item_type_id IN (?)', [
                             DbTable\Item\Type::ENGINE,
                             DbTable\Item\Type::VEHICLE
                         ])
-                        ->join('item_parent', 'cars.id = item_parent.item_id', null)
+                        ->join('item_parent', 'item.id = item_parent.item_id', null)
                         ->where('item_parent.parent_id = ?', $currentCategory->id)
                         ->order($this->catalogue()->picturesOrdering())
                         ->limit(4)

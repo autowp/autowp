@@ -248,20 +248,20 @@ class IndexController extends AbstractActionController
                 $db->select()
                     ->from($itemTable->info('name'), [
                         'catname', 'begin_year', 'end_year',
-                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,cars.name)')
+                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,item.name)')
                     ])
-                    ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                     ->joinLeft(
                         'item_language',
-                        'cars.id = item_language.item_id and item_language.language = :language',
+                        'item.id = item_language.item_id and item_language.language = :language',
                         null
                     )
-                    ->join('item_parent', 'cars.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'cars'], 'item_parent.item_id = top_item.id', null)
+                    ->join('item_parent', 'item.id = item_parent.parent_id', null)
+                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id = :item_id')
-                    ->group(['item_parent_cache.item_id', 'cars.id'])
+                    ->group(['item_parent_cache.item_id', 'item.id'])
                     ->bind([
                         'language' => $language,
                         'item_id'  => $car['id']
@@ -334,8 +334,8 @@ class IndexController extends AbstractActionController
 
         $select = $db->select()
             ->from('item_parent', 'item_id')
-            ->join('cars', 'item_parent.parent_id = cars.id', 'catname')
-            ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+            ->join('item', 'item_parent.parent_id = item.id', 'catname')
+            ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
             ->where('item_parent.item_id = ?', $carId);
 
         if ($breakOnFirst) {
@@ -577,11 +577,11 @@ class IndexController extends AbstractActionController
                     ->joinLeft(['top_category_parent' => 'item_parent'], 'category.id = top_category_parent.item_id', null)
                     ->where('top_category_parent.parent_id is null')
                     ->join('item_parent', 'category.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'cars'], 'item_parent.item_id = top_item.id', null)
+                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
-                    ->join('cars', 'item_parent_cache.item_id = cars.id', null)
-                    ->where('not cars.is_group')
+                    ->join('item', 'item_parent_cache.item_id = item.id', null)
+                    ->where('not item.is_group')
                     ->group('category.id')
                     ->order('new_cars_count DESC')
                     ->limit(15)
@@ -648,10 +648,10 @@ class IndexController extends AbstractActionController
 
             $cars = $carTable->fetchAll(
                 $select = $carTable->select(true)
-                    ->join('attrs_user_values', 'cars.id = attrs_user_values.item_id', null)
+                    ->join('attrs_user_values', 'item.id = attrs_user_values.item_id', null)
                     ->where('update_date > DATE_SUB(NOW(), INTERVAL 3 DAY)')
                     ->having('count(attrs_user_values.attribute_id) > 10')
-                    ->group('cars.id')
+                    ->group('item.id')
                     ->order('MAX(attrs_user_values.update_date) DESC')
                     ->limit(4)
             );

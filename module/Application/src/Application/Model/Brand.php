@@ -45,8 +45,8 @@ class Brand
         return new Zend_Db_Expr('(' .
             '(' .
                 $db->select()
-                    ->from('cars', 'count(distinct cars.id)')
-                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->from('item', 'count(distinct item.id)')
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                     ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = brands.id')
                     ->assemble() .
@@ -116,11 +116,11 @@ class Brand
         foreach ($db->fetchAll($select) as $brandRow) {
             $newCarsCount = $db->fetchOne(
                 $db->select()
-                    ->from('cars', 'count(distinct cars.id)')
-                    ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                    ->from('item', 'count(distinct item.id)')
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                     ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                     ->where('brand_item.brand_id = ?', $brandRow['id'])
-                    ->where('cars.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)', self::NEW_DAYS)
+                    ->where('item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)', self::NEW_DAYS)
             );
 
             $items[] = [
@@ -158,7 +158,7 @@ class Brand
                 'img',
                 'cars_count' => $this->countExpr(),
                 'new_cars_count' => new Zend_Db_Expr(
-                    'COUNT(IF(cars.add_datetime > DATE_SUB(NOW(), INTERVAL :new_days DAY), 1, NULL))'
+                    'COUNT(IF(item.add_datetime > DATE_SUB(NOW(), INTERVAL :new_days DAY), 1, NULL))'
                 ),
                 'carpictures_count', 'enginepictures_count',
                 'logopictures_count', 'mixedpictures_count',
@@ -168,7 +168,7 @@ class Brand
             $select
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
                 ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
-                ->join('cars', 'item_parent_cache.item_id = cars.id', null)
+                ->join('item', 'item_parent_cache.item_id = item.id', null)
                 ->group('brands.id')
                 ->bind([
                     'language' => $language,

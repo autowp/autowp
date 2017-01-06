@@ -29,7 +29,7 @@ class EventRow extends Row
                     break;
                 case $table instanceof \Application\Model\DbTable\Vehicle:
                     $col = 'item_id';
-                    $tableName = 'log_events_cars';
+                    $tableName = 'log_events_item';
                     break;
                 case $table instanceof \Application\Model\DbTable\Brand:
                     $col = 'brand_id';

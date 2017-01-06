@@ -198,23 +198,23 @@ class Car extends AbstractPlugin
         if ($carIds && ! $disableCategories) {
             $db = $itemTable->getAdapter();
             $langExpr = $db->quoteInto(
-                'cars.id = item_language.item_id and item_language.language = ?',
+                'item.id = item_language.item_id and item_language.language = ?',
                 $language
             );
             $categoryRows = $db->fetchAll(
                 $db->select()
                     ->from($itemTable->info('name'), [
                         'catname', 'begin_year', 'end_year',
-                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,cars.name)')
+                        'name' => new Zend_Db_Expr('IF(LENGTH(item_language.name)>0,item_language.name,item.name)')
                     ])
-                    ->where('cars.item_type_id = ?', DbTable\Item\Type::CATEGORY)
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::CATEGORY)
                     ->joinLeft('item_language', $langExpr, ['lang_name' => 'name'])
-                    ->join('item_parent', 'cars.id = item_parent.parent_id', null)
-                    ->join(['top_item' => 'cars'], 'item_parent.item_id = top_item.id', null)
+                    ->join('item_parent', 'item.id = item_parent.parent_id', null)
+                    ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
                     ->where('top_item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])
                     ->join('item_parent_cache', 'top_item.id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id IN (?)', $carIds)
-                    ->group(['item_parent_cache.item_id', 'cars.id'])
+                    ->group(['item_parent_cache.item_id', 'item.id'])
             );
 
             foreach ($categoryRows as $category) {
@@ -579,7 +579,7 @@ class Car extends AbstractPlugin
 
             $rows = $itemTable->fetchAll([
                 'id in (?)' => $ids
-            ], $catalogue->carsOrdering());
+            ], $catalogue->itemOrdering());
             foreach ($rows as $row) {
                 $cataloguePaths = $catalogue->cataloguePaths($row);
                 foreach ($cataloguePaths as $cPath) {

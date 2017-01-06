@@ -188,7 +188,7 @@ class FactoryController extends AbstractActionController
 
         $cars = $carTable->fetchAll(
             $carTable->select(true)
-                ->join('factory_item', 'cars.id = factory_item.item_id', null)
+                ->join('factory_item', 'item.id = factory_item.item_id', null)
                 ->where('factory_item.factory_id = ?', $factory->id)
         );
 

@@ -103,7 +103,7 @@ class IndexController extends AbstractActionController
         ');
 
         $totalCars = $db->fetchOne('
-            select count(1) from cars
+            select count(1) from item
         ');
 
         $totalCarAttrs = $db->fetchOne('
@@ -132,11 +132,11 @@ class IndexController extends AbstractActionController
                 'total'    => $totalCars,
                 'value'    => $db->fetchOne('
                     select count(1) from (
-                        select cars.id, count(pictures.id) as c
-                        from cars
-                            inner join picture_item on cars.id = picture_item.item_id
+                        select item.id, count(pictures.id) as c
+                        from item
+                            inner join picture_item on item.id = picture_item.item_id
                             inner join pictures on picture_item.picture_id = pictures.id
-                        group by cars.id
+                        group by item.id
                         having c >= 4
                     ) as T1
                 ')
@@ -160,7 +160,7 @@ class IndexController extends AbstractActionController
                 'total'    => $totalCars,
                 'value'    => $db->fetchOne('
                     select count(1)
-                    from cars
+                    from item
                     where begin_year
                 ')
             ],
@@ -169,7 +169,7 @@ class IndexController extends AbstractActionController
                 'total'    => $totalCars,
                 'value'    => $db->fetchOne('
                     select count(1)
-                    from cars
+                    from item
                     where begin_year and end_year
                 ')
             ],
@@ -178,7 +178,7 @@ class IndexController extends AbstractActionController
                 'total'    => $totalCars,
                 'value'    => $db->fetchOne('
                     select count(1)
-                    from cars
+                    from item
                     where begin_year and end_year and begin_month and end_month
                 ')
             ],
@@ -199,7 +199,7 @@ class IndexController extends AbstractActionController
 
         $rows = $carTable->getAdapter()->fetchAll("
             SELECT
-                cars.id, cars.name, cars.body,
+                item.id, item.name, item.body,
                 (
                     case item_parent.type
                         when 0 then 'Stock'
@@ -210,8 +210,8 @@ class IndexController extends AbstractActionController
                 ) as t,
                 count(1) as c
             from item_parent
-            join cars on item_parent.parent_id=cars.id
-            group by cars.id, item_parent.type
+            join item on item_parent.parent_id=item.id
+            group by item.id, item_parent.type
             order by c desc
                 limit 100
         ");

@@ -233,22 +233,22 @@ class TwinsController extends AbstractActionController
 
             $db = $carTable->getAdapter();
 
-            $langJoinExpr = 'cars.id = item_language.item_id and ' .
+            $langJoinExpr = 'item.id = item_language.item_id and ' .
                 $db->quoteInto('item_language.language = ?', $language);
 
             $rows = $db->fetchAll(
                 $db->select()
-                    ->from('cars', [
-                        'cars.id',
-                        'name' => 'if(length(item_language.name), item_language.name, cars.name)',
-                        'cars.body', 'cars.begin_model_year', 'cars.end_model_year',
-                        'cars.begin_year', 'cars.end_year', 'cars.today',
+                    ->from('item', [
+                        'item.id',
+                        'name' => 'if(length(item_language.name), item_language.name, item.name)',
+                        'item.body', 'item.begin_model_year', 'item.end_model_year',
+                        'item.begin_year', 'item.end_year', 'item.today',
                         'spec' => 'spec.short_name',
                         'spec_full' => 'spec.name',
                     ])
-                    ->join('item_parent', 'cars.id = item_parent.item_id', 'parent_id')
+                    ->join('item_parent', 'item.id = item_parent.item_id', 'parent_id')
                     ->joinLeft('item_language', $langJoinExpr, null)
-                    ->joinLeft('spec', 'cars.spec_id = spec.id', null)
+                    ->joinLeft('spec', 'item.spec_id = spec.id', null)
                     ->where('item_parent.parent_id in (?)', $ids)
                     ->order('name')
             );

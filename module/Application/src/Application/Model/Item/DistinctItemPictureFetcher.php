@@ -16,9 +16,9 @@ class DistinctItemPictureFetcher extends PictureFetcher
 
         $ids = $db->fetchCol(
             $db->select()
-                ->from('cars', 'id')
-                ->where('cars.item_type_id <> ?', DbTable\Item\Type::CATEGORY)
-                ->join('item_parent_cache', 'cars.id = item_parent_cache.item_id', null)
+                ->from('item', 'id')
+                ->where('item.item_type_id <> ?', DbTable\Item\Type::CATEGORY)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $item['id'])
                 ->limit(self::COUNT)
         );
