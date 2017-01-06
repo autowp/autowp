@@ -195,9 +195,9 @@ class IndexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Vehicle();
 
-        $rows = $carTable->getAdapter()->fetchAll("
+        $rows = $itemTable->getAdapter()->fetchAll("
             SELECT
                 item.id, item.name, item.body,
                 (

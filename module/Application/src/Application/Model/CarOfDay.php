@@ -116,9 +116,9 @@ class CarOfDay
             return;
         }
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $car = $carTable->fetchRow([
+        $car = $itemTable->fetchRow([
             'id = ?' => (int)$dayRow->item_id
         ]);
 

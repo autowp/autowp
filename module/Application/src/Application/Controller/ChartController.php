@@ -80,8 +80,8 @@ class ChartController extends AbstractRestfulController
 
         $dataTableName = $dataTable->info('name');
 
-        $carTable = new Vehicle();
-        $db = $carTable->getAdapter();
+        $itemTable = new Vehicle();
+        $db = $itemTable->getAdapter();
         $specTable = new Spec();
 
         $datasets = [];

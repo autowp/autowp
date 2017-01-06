@@ -55,9 +55,9 @@ class FactoriesController extends AbstractActionController
         $carPictures = [];
         $groups = $factory->getRelatedCarGroups();
         if (count($groups) > 0) {
-            $carTable = new Vehicle();
+            $itemTable = new Vehicle();
 
-            $cars = $carTable->fetchAll([
+            $cars = $itemTable->fetchAll([
                 'id in (?)' => array_keys($groups)
             ], $this->catalogue()->itemOrdering());
 
@@ -161,9 +161,9 @@ class FactoriesController extends AbstractActionController
         $cars = [];
         $groups = $factory->getRelatedCarGroups();
         if (count($groups) > 0) {
-            $carTable = $this->catalogue()->getCarTable();
+            $itemTable = $this->catalogue()->getItemTable();
 
-            $select = $carTable->select(true)
+            $select = $itemTable->select(true)
                 ->where('id IN (?)', array_keys($groups))
                 ->order($this->catalogue()->itemOrdering());
 

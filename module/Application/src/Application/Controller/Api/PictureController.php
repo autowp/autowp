@@ -84,10 +84,10 @@ class PictureController extends AbstractActionController
         $pictureRow = null;
 
         if ($carId) {
-            $carTable = new Vehicle();
+            $itemTable = new Vehicle();
             $pictureTable = new Picture();
 
-            $carRow = $carTable->find($carId)->current();
+            $carRow = $itemTable->find($carId)->current();
             if ($carRow) {
                 foreach ([31, null] as $groupId) {
                     $select = $pictureTable->select(true)

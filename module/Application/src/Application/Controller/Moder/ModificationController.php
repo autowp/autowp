@@ -45,7 +45,7 @@ class ModificationController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->_helper->catalogue()->getCarTable();
+        $cars = $this->_helper->catalogue()->getItemTable();
 
         $car = $cars->find($this->_getParam('item_id'))->current();
         if (! $car) {
@@ -128,7 +128,7 @@ class ModificationController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->_helper->catalogue()->getCarTable();
+        $cars = $this->_helper->catalogue()->getItemTable();
 
         $car = $cars->find($this->_getParam('item_id'))->current();
         if (! $car) {
@@ -230,7 +230,7 @@ class ModificationController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = $this->_helper->catalogue()->getCarTable();
+        $cars = $this->_helper->catalogue()->getItemTable();
 
         $car = $cars->find($this->_getParam('item_id'))->current();
         if (! $car) {

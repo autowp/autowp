@@ -123,9 +123,9 @@ class BrandNav
 
             if ($conceptsSeparatly) {
                 // concepts
-                $carTable = new DbTable\Vehicle();
+                $itemTable = new DbTable\Vehicle();
 
-                $db = $carTable->getAdapter();
+                $db = $itemTable->getAdapter();
                 $select = $db->select()
                     ->from('item', new Zend_Db_Expr('1'))
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
@@ -506,11 +506,11 @@ class BrandNav
             $this->cache->setItem($cacheKey, $sections);
         }
 
-        $carTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Vehicle();
 
         $selectedIds = [];
         if ($carId) {
-            $db = $carTable->getAdapter();
+            $db = $itemTable->getAdapter();
             $selectedIds = $db->fetchCol(
                 $db->select()
                     ->distinct()

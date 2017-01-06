@@ -229,9 +229,9 @@ class TwinsController extends AbstractActionController
 
         $carLists = [];
         if (count($ids)) {
-            $carTable = new DbTable\Vehicle();
+            $itemTable = new DbTable\Vehicle();
 
-            $db = $carTable->getAdapter();
+            $db = $itemTable->getAdapter();
 
             $langJoinExpr = 'item.id = item_language.item_id and ' .
                 $db->quoteInto('item_language.language = ?', $language);

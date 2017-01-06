@@ -814,14 +814,14 @@ class AccountController extends AbstractActionController
         $paginator = $data['paginator'];
 
         $userTable = new User();
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
         foreach ($conflicts as &$conflict) {
             foreach ($conflict['values'] as &$value) {
                 $value['user'] = $userTable->find($value['userId'])->current();
             }
 
-            $car = $carTable->find($conflict['itemId'])->current();
+            $car = $itemTable->find($conflict['itemId'])->current();
             $conflict['object'] = $car ? $this->car()->formatName($car, $language) : null;
             $conflict['url'] = $this->url()->fromRoute('cars/params', [
                 'action'  => 'car-specifications-editor',

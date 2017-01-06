@@ -161,7 +161,7 @@ class IndexController extends AbstractActionController
     {
         $items = [];
 
-        $itemTable = $this->catalogue()->getCarTable();
+        $itemTable = $this->catalogue()->getItemTable();
 
         $db = $itemTable->getAdapter();
         $totalPictures = $db->fetchOne(
@@ -390,8 +390,8 @@ class IndexController extends AbstractActionController
         $carOfDayLinks = [];
 
         if ($carId) {
-            $carTable = $this->catalogue()->getCarTable();
-            $carOfDay = $carTable->find($carId)->current();
+            $itemTable = $this->catalogue()->getItemTable();
+            $carOfDay = $itemTable->find($carId)->current();
             if ($carOfDay) {
                 $key = 'CAR_OF_DAY_90_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
 
@@ -540,7 +540,7 @@ class IndexController extends AbstractActionController
     {
         $brands = $this->catalogue()->getBrandTable();
         $pictures = $this->catalogue()->getPictureTable();
-        $itemTable = $this->catalogue()->getCarTable();
+        $itemTable = $this->catalogue()->getItemTable();
 
         $language = $this->language();
 
@@ -644,10 +644,10 @@ class IndexController extends AbstractActionController
         $cacheKey = 'INDEX_SPEC_CARS_13_' . $language;
         $cars = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $carTable = $this->catalogue()->getCarTable();
+            $itemTable = $this->catalogue()->getItemTable();
 
-            $cars = $carTable->fetchAll(
-                $select = $carTable->select(true)
+            $cars = $itemTable->fetchAll(
+                $select = $itemTable->select(true)
                     ->join('attrs_user_values', 'item.id = attrs_user_values.item_id', null)
                     ->where('update_date > DATE_SUB(NOW(), INTERVAL 3 DAY)')
                     ->having('count(attrs_user_values.attribute_id) > 10')

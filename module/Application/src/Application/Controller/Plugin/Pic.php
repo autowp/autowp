@@ -452,7 +452,7 @@ class Pic extends AbstractPlugin
         $language = $controller->language();
         $isModer = $controller->user()->inheritsRole('moder');
 
-        $itemTable = $catalogue->getCarTable();
+        $itemTable = $catalogue->getItemTable();
         $factoryTable = new DbTable\Factory();
         $itemLanguageTable = new DbTable\Vehicle\Language();
 
@@ -725,7 +725,7 @@ class Pic extends AbstractPlugin
 
         $language = $controller->language();
 
-        $itemTable = $catalogue->getCarTable();
+        $itemTable = $catalogue->getItemTable();
         $itemModel = new \Application\Model\Item();
 
         $engineRows = [];
@@ -844,7 +844,7 @@ class Pic extends AbstractPlugin
                 if ($factory = $picture->findParentRow(DbTable\Factory::class)) {
                     $carIds = $factory->getRelatedCarGroupId();
                     if ($carIds) {
-                        $itemTable = $catalogue->getCarTable();
+                        $itemTable = $catalogue->getItemTable();
 
                         $carRows = $itemTable->fetchAll([
                             'id in (?)' => $carIds

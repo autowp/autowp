@@ -76,7 +76,7 @@ class SpecificationsService
     /**
      * @var Vehicle
      */
-    private $carTable = null;
+    private $itemTable = null;
 
     /**
      * @var VehicleParent
@@ -197,11 +197,11 @@ class SpecificationsService
     /**
      * @return Vehicle
      */
-    private function getCarTable()
+    private function getItemTable()
     {
-        return $this->carTable
-            ? $this->carTable
-            : $this->carTable = new Vehicle();
+        return $this->itemTable
+            ? $this->itemTable
+            : $this->itemTable = new Vehicle();
     }
 
     private function getAttributeTable()
@@ -1009,7 +1009,7 @@ class SpecificationsService
             return;
         }
 
-        $carRows = $this->getCarTable()->fetchAll([
+        $carRows = $this->getItemTable()->fetchAll([
             'engine_item_id = ?' => $itemId
         ]);
 
@@ -1375,7 +1375,7 @@ class SpecificationsService
             'parent'    => 0
         ]);
 
-        $itemTable = $this->getCarTable();
+        $itemTable = $this->getItemTable();
         $engineNameAttr = 100;
 
         $carIds = [];
@@ -1747,7 +1747,7 @@ class SpecificationsService
             ];
         }
 
-        $carRow = $this->getCarTable()->fetchRow([
+        $carRow = $this->getItemTable()->fetchRow([
             'id = ?' => $itemId
         ]);
 

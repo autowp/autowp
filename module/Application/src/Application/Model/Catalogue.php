@@ -32,7 +32,7 @@ class Catalogue
     /**
      * @var Vehicle
      */
-    private $carTable;
+    private $itemTable;
 
     /**
      * @var VehicleParent
@@ -120,11 +120,11 @@ class Catalogue
     /**
      * @return Vehicle
      */
-    public function getCarTable()
+    public function getItemTable()
     {
-        return $this->carTable
-            ? $this->carTable
-            : $this->carTable = new Vehicle();
+        return $this->itemTable
+            ? $this->itemTable
+            : $this->itemTable = new Vehicle();
     }
 
     /**

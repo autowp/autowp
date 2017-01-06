@@ -341,8 +341,8 @@ class Picture extends Table
             case Picture::VEHICLE_TYPE_ID:
                 $brandModel = new BrandModel();
                 foreach ($params['item_ids'] as $carId) {
-                    $carTable = new Vehicle();
-                    $car = $carTable->find($carId)->current();
+                    $itemTable = new Vehicle();
+                    $car = $itemTable->find($carId)->current();
                     if ($car) {
                         $car->refreshPicturesCount();
                         $brandModel->refreshPicturesCountByVehicle($car->id);
@@ -373,8 +373,8 @@ class Picture extends Table
             return false;
         }
 
-        $carTable = new Vehicle();
-        $car = $carTable->find($id)->current();
+        $itemTable = new Vehicle();
+        $car = $itemTable->find($id)->current();
 
         if (! $car) {
             return false;
@@ -422,8 +422,8 @@ class Picture extends Table
             return false;
         }
 
-        $carTable = new Vehicle();
-        $car = $carTable->find($id)->current();
+        $itemTable = new Vehicle();
+        $car = $itemTable->find($id)->current();
 
         if (! $car) {
             return false;

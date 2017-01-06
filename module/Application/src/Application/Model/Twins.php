@@ -23,7 +23,7 @@ class Twins
     /**
      * @var DbTable\Vehicle
      */
-    private $carTable;
+    private $itemTable;
 
     /**
      * @return DbTable\Brand
@@ -50,9 +50,9 @@ class Twins
      */
     private function getItemTable()
     {
-        return $this->carTable
-            ? $this->carTable
-            : $this->carTable = new DbTable\Vehicle();
+        return $this->itemTable
+            ? $this->itemTable
+            : $this->itemTable = new DbTable\Vehicle();
     }
 
     /**
@@ -223,9 +223,9 @@ class Twins
      */
     public function getGroupCars($groupId)
     {
-        $carTable = $this->getItemTable();
-        return $carTable->fetchAll(
-            $carTable->select(true)
+        $itemTable = $this->getItemTable();
+        return $itemTable->fetchAll(
+            $itemTable->select(true)
                 ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', (int)$groupId)
                 ->order('name')

@@ -83,9 +83,9 @@ class CarsController extends AbstractActionController
 
         $editOnlyMode = $this->user()->get()->specs_weight < 0.10;
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $car = $carTable->fetchRow([
+        $car = $itemTable->fetchRow([
             'id = ?' => (int)$this->params('item_id'),
             'item_type_id IN (?)' => [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE]
         ]);
@@ -143,12 +143,12 @@ class CarsController extends AbstractActionController
                 return $this->redirect()->toUrl($this->editorUrl($car, 'spec'));
             }
         }
-        $engine = $carTable->find($car->engine_item_id)->current();
+        $engine = $itemTable->find($car->engine_item_id)->current();
         $engineInherited = $car->engine_inherit;
         $engineInheritedFrom = [];
         if ($engine && $car->engine_inherit) {
-            $carRows = $carTable->fetchAll(
-                $carTable->select(true)
+            $carRows = $itemTable->fetchAll(
+                $itemTable->select(true)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                     ->where('item_parent_cache.item_id = ?', $car->id)
                     ->where('item.engine_item_id = ?', $engine->id)
@@ -232,9 +232,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $car = $carTable->find($this->params('item_id'))->current();
+        $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -256,7 +256,7 @@ class CarsController extends AbstractActionController
             return $this->forward('forbidden', 'error');
         }
 
-        //$carTable = new Vehicle();
+        //$itemTable = new Vehicle();
         $itemId = (int)$this->params('item_id');
 
         $toItemId = (int)$this->params('to_item_id');
@@ -335,7 +335,7 @@ class CarsController extends AbstractActionController
 
     public function specsAdminAction()
     {
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
         if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
@@ -540,9 +540,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $car = $carTable->find($this->params('item_id'))->current();
+        $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -552,7 +552,7 @@ class CarsController extends AbstractActionController
         $car->engine_item_id = null;
         $car->save();
 
-        $carTable->updateInteritance($car);
+        $itemTable->updateInteritance($car);
 
         $this->specsService->updateActualValues($car->id);
 
@@ -597,9 +597,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $car = $carTable->find($this->params('item_id'))->current();
+        $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
@@ -609,7 +609,7 @@ class CarsController extends AbstractActionController
             $car->engine_inherit = 1;
             $car->save();
 
-            $carTable->updateInteritance($car);
+            $itemTable->updateInteritance($car);
 
             $this->specsService->updateActualValues($car->id);
 
@@ -686,9 +686,9 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $car = $carTable->fetchRow([
+        $car = $itemTable->fetchRow([
             'id = ?'           => (int)$this->params('item_id'),
             'item_type_id = ?' => DbTable\Item\Type::VEHICLE
         ]);
@@ -719,7 +719,7 @@ class CarsController extends AbstractActionController
             ];
         }
 
-        $engine = $carTable->fetchRow([
+        $engine = $itemTable->fetchRow([
             'id = ?'           => (int)$this->params()->fromPost('engine'),
             'item_type_id = ?' => DbTable\Item\Type::ENGINE
         ]);
@@ -736,7 +736,7 @@ class CarsController extends AbstractActionController
         $car->engine_item_id = $engine->id;
         $car->save();
 
-        $carTable->updateInteritance($car);
+        $itemTable->updateInteritance($car);
 
         $this->specsService->updateActualValues($car->id);
 
@@ -775,14 +775,14 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $car = $carTable->find($this->params('item_id'))->current();
+        $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
 
-        $carTable->updateInteritance($car);
+        $itemTable->updateInteritance($car);
 
         $this->specsService->updateActualValues($car->id);
 
@@ -827,9 +827,9 @@ class CarsController extends AbstractActionController
 
         $listCars = [];
 
-        $carTable = $this->catalogue()->getCarTable();
+        $itemTable = $this->catalogue()->getItemTable();
 
-        $select = $carTable->select(true)
+        $select = $itemTable->select(true)
             ->where('item.begin_year is null and item.begin_model_year is null')
             ->order($this->catalogue()->itemOrdering());
 

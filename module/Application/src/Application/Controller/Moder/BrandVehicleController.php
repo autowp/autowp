@@ -62,7 +62,7 @@ class BrandVehicleController extends AbstractActionController
         $brandTable = $this->getBrandTable();
         $brandVehicleTable = new DbTable\BrandItem();
         $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
-        $vehicleTable = $this->catalogue()->getCarTable();
+        $vehicleTable = $this->catalogue()->getItemTable();
 
         $brandItemRow = $brandVehicleTable->fetchRow([
             'brand_id = ?'  => $this->params('brand_id'),
@@ -126,7 +126,7 @@ class BrandVehicleController extends AbstractActionController
         }
 
         $brandTable = $this->getBrandTable();
-        $vehicleTable = $this->catalogue()->getCarTable();
+        $vehicleTable = $this->catalogue()->getItemTable();
 
         $brandRow = $brandTable->find($this->params('brand_id'))->current();
         $vehicleRow = $vehicleTable->fetchRow([
@@ -160,7 +160,7 @@ class BrandVehicleController extends AbstractActionController
         }
 
         $brandTable = $this->getBrandTable();
-        $vehicleTable = $this->catalogue()->getCarTable();
+        $vehicleTable = $this->catalogue()->getItemTable();
 
         $brandRow = $brandTable->find($this->params('brand_id'))->current();
         $vehicleRow = $vehicleTable->find($this->params('vehicle_id'))->current();

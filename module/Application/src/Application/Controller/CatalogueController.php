@@ -225,7 +225,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandAction(function ($brand) {
 
-            $select = $this->catalogue()->getCarTable()->select(true)
+            $select = $this->catalogue()->getItemTable()->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brand['id'])
@@ -322,7 +322,7 @@ class CatalogueController extends AbstractActionController
                 }
             }
 
-            $select = $this->catalogue()->getCarTable()->select(true)
+            $select = $this->catalogue()->getItemTable()->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brand['id'])
@@ -517,7 +517,7 @@ class CatalogueController extends AbstractActionController
                 }
             }
 
-            $cars = $this->catalogue()->getCarTable();
+            $cars = $this->catalogue()->getItemTable();
 
             $haveTwins = $cars->getAdapter()->fetchOne(
                 $cars->getAdapter()->select()
@@ -758,8 +758,8 @@ class CatalogueController extends AbstractActionController
         $result = [];
 
         if (count($ids)) {
-            $carTable = $this->catalogue()->getCarTable();
-            $db = $carTable->getAdapter();
+            $itemTable = $this->catalogue()->getItemTable();
+            $db = $itemTable->getAdapter();
 
             $language = $this->language();
 
@@ -797,7 +797,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandAction(function ($brand) use ($callback) {
 
-            $carTable = $this->catalogue()->getCarTable();
+            $itemTable = $this->catalogue()->getItemTable();
 
             $language = $this->language();
 
@@ -805,7 +805,7 @@ class CatalogueController extends AbstractActionController
             $path = $path ? (array)$path : [];
             $path = array_values($path);
 
-            $db = $carTable->getAdapter();
+            $db = $itemTable->getAdapter();
             $select = $db->select()
                 ->from('item', [])
                 ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
@@ -984,8 +984,8 @@ class CatalogueController extends AbstractActionController
 
     private function childsTypeCount($carId)
     {
-        $carTable = $this->catalogue()->getCarTable();
-        $db = $carTable->getAdapter();
+        $itemTable = $this->catalogue()->getItemTable();
+        $db = $itemTable->getAdapter();
         $select = $db->select()
             ->from('item_parent', ['type', 'count(1)'])
             ->where('parent_id = ?', $carId)
@@ -1062,12 +1062,12 @@ class CatalogueController extends AbstractActionController
                     break;
             }
 
-            $carTable = $this->catalogue()->getCarTable();
+            $itemTable = $this->catalogue()->getItemTable();
             $carParentTable = new VehicleParent();
 
             $currentCarId = $currentCar['id'];
 
-            $listCars = $carTable->find($currentCarId);
+            $listCars = $itemTable->find($currentCarId);
 
             $currentPictures = [];
             $currentPicturesCount = 0;
@@ -1539,12 +1539,12 @@ class CatalogueController extends AbstractActionController
                 break;
         }
 
-        $carTable = $this->catalogue()->getCarTable();
+        $itemTable = $this->catalogue()->getItemTable();
         $carParentTable = new VehicleParent();
 
         $listCars = [];
 
-        $select = $carTable->select(true)
+        $select = $itemTable->select(true)
             ->join('item_parent', 'item.id = item_parent.item_id', null)
             ->where('item_parent.parent_id = ?', $currentCarId)
             ->where('item_parent.type = ?', $type)
@@ -1960,11 +1960,11 @@ class CatalogueController extends AbstractActionController
                     break;
             }
 
-            //$list = $this->catalogue()->getCarTable()->find($brandItemRow->item_id);
+            //$list = $this->catalogue()->getItemTable()->find($brandItemRow->item_id);
 
-            $carTable = $this->catalogue()->getCarTable();
+            $itemTable = $this->catalogue()->getItemTable();
 
-            $select = $carTable->select(true)
+            $select = $itemTable->select(true)
                 ->order($this->carsOrder());
             if ($currentCar['is_group']) {
                 $select
@@ -1977,10 +1977,10 @@ class CatalogueController extends AbstractActionController
                     ->where('item_parent_cache.parent_id = ?', $currentCarId)
                     ->where('item_parent_cache.diff <= 1');
             }
-            $childCars = $carTable->fetchAll($select);
+            $childCars = $itemTable->fetchAll($select);
 
             if (count($childCars) <= 0) {
-                $select = $carTable->select(true)
+                $select = $itemTable->select(true)
                     ->order($this->carsOrder());
                 if ($currentCar['is_group']) {
                     $select
@@ -1993,7 +1993,7 @@ class CatalogueController extends AbstractActionController
                         ->where('item_parent_cache.parent_id = ?', $currentCarId);
                 }
 
-                $childCars = $carTable->fetchAll($select);
+                $childCars = $itemTable->fetchAll($select);
             }
 
             $cars = [];
@@ -2028,11 +2028,11 @@ class CatalogueController extends AbstractActionController
 
     private function mostsActive($brandId)
     {
-        $carTable = new Vehicle();
-        $db = $carTable->getAdapter();
+        $itemTable = new Vehicle();
+        $db = $itemTable->getAdapter();
         $carsCount = $db->fetchOne(
             $db->select()
-                ->from($carTable->info('name'), 'count(1)')
+                ->from($itemTable->info('name'), 'count(1)')
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', (int)$brandId)

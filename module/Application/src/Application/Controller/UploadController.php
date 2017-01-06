@@ -333,10 +333,10 @@ class UploadController extends AbstractActionController
                     break;
                 case Picture::VEHICLE_TYPE_ID:
                     $carIds = $this->pictureItem->getPictureItems($picture->id);
-                    $carTable = new Vehicle();
+                    $itemTable = new Vehicle();
                     $brandModel = new BrandModel();
                     //TODO: prevent double refresh
-                    foreach ($carTable->find($carIds) as $car) {
+                    foreach ($itemTable->find($carIds) as $car) {
                         $car->refreshPicturesCount();
                         $brandModel->refreshPicturesCountByVehicle($car->id);
                     }
@@ -420,17 +420,17 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $haveConcepts = (bool)$carTable->fetchRow(
-            $carTable->select(true)
+        $haveConcepts = (bool)$itemTable->fetchRow(
+            $itemTable->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('brand_item.brand_id = ?', $brand['id'])
                 ->where('item.is_concept')
         );
 
-        $db = $carTable->getAdapter();
+        $db = $itemTable->getAdapter();
 
         $rows = $db->fetchAll(
             $db->select()
@@ -603,14 +603,14 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $car = $carTable->find($this->params('item_id'))->current();
+        $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notfoundAction();
         }
 
-        $db = $carTable->getAdapter();
+        $db = $itemTable->getAdapter();
 
         $rows = $db->fetchAll(
             $db->select()
@@ -656,9 +656,9 @@ class UploadController extends AbstractActionController
             return $this->notfoundAction();
         }
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $db = $carTable->getAdapter();
+        $db = $itemTable->getAdapter();
 
         $rows = $db->fetchAll(
             $db->select()

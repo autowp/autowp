@@ -144,10 +144,10 @@ class ParentCache extends Table
 
         $this->delete($filter);
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $childCars = $carTable->fetchAll(
-            $carTable->select(true)
+        $childCars = $itemTable->fetchAll(
+            $itemTable->select(true)
                 ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $id)
         );
@@ -224,10 +224,10 @@ class ParentCache extends Table
 
         $this->delete($filter);
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $childCars = $carTable->fetchAll(
-            $carTable->select(true)
+        $childCars = $itemTable->fetchAll(
+            $itemTable->select(true)
                 ->join('item_parent', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $id)
         );

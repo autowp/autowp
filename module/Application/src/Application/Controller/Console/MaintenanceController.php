@@ -98,9 +98,9 @@ class MaintenanceController extends AbstractActionController
     {
         $console = Console::getInstance();
 
-        $carTable = new Vehicle();
+        $itemTable = new Vehicle();
 
-        $select = $carTable->select(true)
+        $select = $itemTable->select(true)
             ->order('id');
 
         $paginator = new \Zend\Paginator\Paginator(

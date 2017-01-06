@@ -75,11 +75,11 @@ class AboutController extends AbstractActionController
         );
         $totalPictures = round($totalPictures, -4);
 
-        $carTable = new Vehicle();
-        $carTableAdapter = $carTable->getAdapter();
-        $totalCars = $carTableAdapter->fetchOne(
-            $carTableAdapter->select()
-                ->from($carTable->info('name'), 'count(1)')
+        $itemTable = new Vehicle();
+        $itemTableAdapter = $itemTable->getAdapter();
+        $totalCars = $itemTableAdapter->fetchOne(
+            $itemTableAdapter->select()
+                ->from($itemTable->info('name'), 'count(1)')
         );
         $totalCars = round($totalCars, -3);
 
