@@ -5,7 +5,6 @@ require("bootstrap/bootstrap");
 require("styles.less");
 require("flags/flags.js");
 require("font-awesome-webpack");
-require('es6-promise').polyfill();
 
 var doc = document;
 $(function() {

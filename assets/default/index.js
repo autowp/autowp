@@ -1,10 +1,7 @@
-define(
-    ['jquery', 'brand-popover'],
-    function($, BrandPopover) {
-        return {
-            init: function() {
-                BrandPopover.apply('.popover-handler');
-            }
-        };
+var BrandPopover = require('brand-popover');
+
+module.exports = {
+    init: function() {
+        BrandPopover.apply('.popover-handler');
     }
-);
+};

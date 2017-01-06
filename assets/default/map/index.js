@@ -41,15 +41,7 @@ module.exports = {
             self.vectorLayer = new ol.layer.Vector();
             self.map.addLayer(self.vectorLayer);
             
-            self.iconStyle = new ol.style.Style({
-                image: new ol.style.Icon({
-                    anchor: [0.5, 1],
-                    anchorXUnits: 'fraction',
-                    anchorYUnits: 'fraction',
-                    src: markerSrc,
-                    scale: [0.05]
-                })
-            });
+            self.iconStyle = require('map/icon-style');
             
             self.map.on('moveend', function() {
                 self.queueLoadData();
@@ -59,13 +51,23 @@ module.exports = {
                 self.queueLoadData();
             });
             
+            self.map.on("pointermove", function (evt) {
+                var hit = this.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+                    return true;
+                }); 
+                if (hit) {
+                    this.getTarget().style.cursor = 'pointer';
+                } else {
+                    this.getTarget().style.cursor = '';
+                }
+            });
+            
             self.map.on("click", function(e) {
                 self.map.forEachFeatureAtPixel(e.pixel, function (feature, layer) {
                     
                     self.closePopup();
                     
                     var factory = feature.get('place');
-                    console.log(feature, factory);
                     
                     var element = self.popupHtml(factory);
                     var point = ol.proj.fromLonLat([factory.location.lng, factory.location.lat]);

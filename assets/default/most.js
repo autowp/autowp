@@ -1,12 +1,9 @@
-define(
-    ['jquery'],
-    function($) {
-        return {
-            init: function() {
-                $('small.unit').tooltip({
-                    placement: 'bottom'
-                });
-            }
-        };
+var $ = require('jquery');
+
+module.exports = {
+    init: function() {
+        $('small.unit').tooltip({
+            placement: 'bottom'
+        });
     }
-);
+};

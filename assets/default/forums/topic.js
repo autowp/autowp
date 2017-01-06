@@ -1,43 +1,36 @@
-define(
-    ['jquery'],
-    function($) {
-        return {
-            init: function() {
-                $('.permanent-link').on('click', function() {
-                    var offset = $(this).offset();
+var $ = require('jquery');
 
-                    var div = $(
-                        '<div>' +
-                            '<a href="#" class="close">&times;</a>' +
-                            '<p>Постоянная ссылка на сообщение</p>' +
-                            '<input type="text" readonly="readonly" style="width:98%" /><br />' +
-                         '</div>'
-                    );
+module.exports = {
+    init: function() {
+        $('.permanent-link').on('click', function() {
+            var offset = $(this).offset();
 
-                    //TODO: extract url to options
-                    $('input', div).val(
-                        'http://www.autowp.ru' + $(this).attr('href')
-                    );
+            var div = $(
+                require('html!./permalink.html')
+            );
 
-                    $('.close', div).on('click', function(e) {
-                        e.preventDefault();
-                        $(div).remove();
-                    });
+            //TODO: extract url to options
+            $('input', div).val(
+                'http://www.autowp.ru' + $(this).attr('href')
+            );
 
-                    $(div).css({
-                        position: 'absolute',
-                        backgroundColor: 'white',
-                        padding: '5px',
-                        left: offset.left,
-                        top: offset.top + $(this).height(),
-                        border: 'border: 1px solid #cccccc',
-                        width: '230px'
-                    });
+            $('.close', div).on('click', function(e) {
+                e.preventDefault();
+                $(div).remove();
+            });
 
-                    $(document.body).append(div);
-                    return false;
-                });
-            }
-        };
+            $(div).css({
+                position: 'absolute',
+                backgroundColor: 'white',
+                padding: '5px',
+                left: offset.left,
+                top: offset.top + $(this).height(),
+                border: 'border: 1px solid #cccccc',
+                width: '230px'
+            });
+
+            $(document.body).append(div);
+            return false;
+        });
     }
-);
+};
