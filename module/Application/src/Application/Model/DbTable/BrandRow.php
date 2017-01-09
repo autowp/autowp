@@ -35,13 +35,6 @@ class BrandRow extends Row
         return $langRow ? $langRow->name : $this->name;
     }
 
-    public function getTotalPicturesCount()
-    {
-        return $this->carpictures_count + $this->enginepictures_count +
-               $this->logopictures_count + $this->mixedpictures_count +
-               $this->unsortedpictures_count;
-    }
-
     public function refreshPicturesCount()
     {
         $this->refreshCarPicturesCount();

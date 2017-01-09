@@ -1037,6 +1037,7 @@ return [
                                 Model\DbTable\Item\Type::VEHICLE  => 'item/type/1/name',
                                 Model\DbTable\Item\Type::ENGINE   => 'item/type/2/name',
                                 Model\DbTable\Item\Type::CATEGORY => 'item/type/3/name',
+                                Model\DbTable\Item\Type::TWINS    => 'item/type/4/name',
                             ]
                         ]
                     ],
