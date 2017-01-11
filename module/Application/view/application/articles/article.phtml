@@ -11,35 +11,25 @@
         ]
     ]);
 ?>
-<div class="row">
-    <div class="col-sm-4">
-        <?=$this->partial('application/articles/sidebar', [
-            'brands'   => $this->menu,
-            'selected' => $this->selectedBrandIds
-        ])?>
-    </div>
-    <div class="col-sm-8">
-        <div class="well">
-            <div class="article clearfix">
-                <?=$this->article->findParentRow(Application\Model\DbTable\Html::class)->html ?>
-            </div>
-        </div>
-
-        <?php if (count($this->links)) { ?>
-            <div class="well">
-                <?php foreach ($this->links as $link) { ?>
-                    <?=$this->htmlA($link['url'], $link['name']) ?>
-                <?php } ?>
-            </div>
-        <?php } ?>
-
-        <?php if ($this->article->enabled) { ?>
-            <div style="text-align:left;margin-bottom:20px;clear:both">
-                <?=$this->comments([
-                    'type'    => Application\Model\DbTable\Comment\Message::ARTICLES_TYPE_ID,
-                    'item_id' => $this->article->id
-                ]) ?>
-            </div>
-        <?php } ?>
+<div class="well">
+    <div class="article clearfix">
+        <?=$this->article->findParentRow(Application\Model\DbTable\Html::class)->html ?>
     </div>
 </div>
+
+<?php if (count($this->links)) { ?>
+    <div class="well">
+        <?php foreach ($this->links as $link) { ?>
+            <?=$this->htmlA($link['url'], $link['name']) ?>
+        <?php } ?>
+    </div>
+<?php } ?>
+
+<?php if ($this->article->enabled) { ?>
+    <div style="text-align:left;margin-bottom:20px;clear:both">
+        <?=$this->comments([
+            'type'    => Application\Model\DbTable\Comment\Message::ARTICLES_TYPE_ID,
+            'item_id' => $this->article->id
+        ]) ?>
+    </div>
+<?php } ?>

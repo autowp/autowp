@@ -47,55 +47,27 @@ class Row extends \Application\Db\Table\Row
         $filenameFilter = new FilenameSafe();
 
         switch ($this->type) {
-            case Picture::LOGO_TYPE_ID:
-                $brand = $this->findParentRow(BrandTable::class);
-                if ($brand) {
-                    $catname = $filenameFilter->filter($brand->folder);
-                    $firstChar = mb_substr($catname, 0, 1);
-                    $result = $firstChar . '/' . $catname.'/logotypes/'.$catname.'_logo';
-                }
-                break;
-
-            case Picture::MIXED_TYPE_ID:
-                $brand = $this->findParentRow(BrandTable::class);
-                if ($brand) {
-                    $catname = $filenameFilter->filter($brand->folder);
-                    $firstChar = mb_substr($catname, 0, 1);
-                    $result = $firstChar . '/' . $catname.'/mixed/'.$catname.'_mixed';
-                }
-                break;
-
-            case Picture::UNSORTED_TYPE_ID:
-                $brand = $this->findParentRow(BrandTable::class);
-                if ($brand) {
-                    $catname = $filenameFilter->filter($brand->folder);
-                    $firstChar = mb_substr($catname, 0, 1);
-                    $result = $firstChar . '/' . $catname . '/unsorted/' . $catname.'_unsorted';
-                }
-                break;
 
             case Picture::VEHICLE_TYPE_ID:
-                $vehicleTable = new Vehicle();
-                $cars = $vehicleTable->fetchAll(
-                    $vehicleTable->select(true)
+                $itemTable = new Vehicle();
+                $cars = $itemTable->fetchAll(
+                    $itemTable->select(true)
                         ->join('picture_item', 'item.id = picture_item.item_id', null)
                         ->where('picture_item.picture_id = ?', $this->id)
                 );
 
                 if (count($cars) > 1) {
-                    $brandTable = new BrandTable();
-
-                    $brands = $brandTable->fetchAll(
-                        $brandTable->select(true)
-                            ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                            ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                    $brands = $itemTable->fetchAll(
+                        $itemTable->select(true)
+                            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                            ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                             ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                             ->where('picture_item.picture_id = ?', $this->id)
                     );
 
                     $f = [];
                     foreach ($brands as $brand) {
-                        $f[] = $filenameFilter->filter($brand->folder);
+                        $f[] = $filenameFilter->filter($brand->catname);
                     }
                     $f = array_unique($f);
                     sort($f, SORT_STRING);
@@ -109,12 +81,10 @@ class Row extends \Application\Db\Table\Row
 
                     $carCatname = $filenameFilter->filter($car->name);
 
-                    $brandTable = new BrandTable();
-
-                    $brands = $brandTable->fetchAll(
-                        $brandTable->select(true)
-                            ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                            ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                    $brands = $itemTable->fetchAll(
+                        $itemTable->select(true)
+                            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                            ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                             ->where('item_parent_cache.item_id = ?', $car->id)
                     );
 
@@ -126,7 +96,7 @@ class Row extends \Application\Db\Table\Row
                     if (count($sBrands) > 1) {
                         $f = [];
                         foreach ($sBrands as $brand) {
-                            $f[] = $filenameFilter->filter($brand->folder);
+                            $f[] = $filenameFilter->filter($brand->catname);
                         }
                         $f = array_unique($f);
                         sort($f, SORT_STRING);
@@ -148,7 +118,7 @@ class Row extends \Application\Db\Table\Row
                             $sBrandsA = array_values($sBrands);
                             $brand = $sBrandsA[0];
 
-                            $brandFolder = $filenameFilter->filter($brand->folder);
+                            $brandFolder = $filenameFilter->filter($brand->catname);
                             $firstChar = mb_substr($brandFolder, 0, 1);
 
                             $carFolder = $carCatname;

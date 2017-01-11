@@ -6,14 +6,12 @@
         ],
         'pageId' => 76,
     ]);
+    $this->layout()->moduleName = 'default/inbox';
 ?>
 <div>
     <?=$this->formSelect((new Zend\Form\Element\Select('brand'))
         ->setValueOptions($this->brands)
         ->setValue($this->brand)
-        ->setAttributes([
-            'onchange' => 'window.location = $(this).val()'
-        ])
     )?>
 </div>
 <div class="row">

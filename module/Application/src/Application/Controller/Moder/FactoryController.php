@@ -8,7 +8,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
-use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle;
@@ -208,18 +208,18 @@ class FactoryController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $brandTable = new BrandTable();
+        $itemTable = new DbTable\Vehicle();
 
-        $db = $brandTable->getAdapter();
+        $db = $itemTable->getAdapter();
 
         $brandOptions = ['' => '-'] + $db->fetchPairs(
             $db->select()
-                ->from('brands', ['id', 'name'])
-                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                ->from('item', ['id', 'name'])
+                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->join('factory_item', 'item_parent_cache.item_id = factory_item.item_id', null)
-                ->group('brands.id')
-                ->order(['brands.position', 'brands.name'])
+                ->group('item.id')
+                ->order(['item.position', 'item.name'])
         );
 
         $this->filterForm->setAttribute('action', $this->url()->fromRoute(null, [], [], true));

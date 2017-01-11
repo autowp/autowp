@@ -5,9 +5,7 @@ namespace Application\Service;
 use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Telegram\Brand as TelegramBrand;
-use Application\Model\DbTable\Telegram\Chat as TelegramChat;
+use Application\Model\DbTable;
 use Application\Telegram\Command\InboxCommand;
 use Application\Telegram\Command\MeCommand;
 use Application\Telegram\Command\NewCommand;
@@ -107,12 +105,12 @@ class TelegramService
 
     private function unsubscribeChat($chatId)
     {
-        $telegramBrandTable = new TelegramBrand();
+        $telegramBrandTable = new DbTable\Telegram\Brand();
         $telegramBrandTable->delete([
             'chat_id = ?' => (int)$chatId
         ]);
 
-        $telegramChatTable = new TelegramChat();
+        $telegramChatTable = new DbTable\Telegram\Chat();
         $telegramChatTable->delete([
             'chat_id = ?' => (int)$chatId
         ]);
@@ -125,7 +123,7 @@ class TelegramService
 
     public function notifyInbox($pictureId)
     {
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
 
         $picture = $pictureTable->find($pictureId)->current();
         if (! $picture) {
@@ -135,7 +133,7 @@ class TelegramService
         $brandIds = $this->getPictureBrandIds($picture);
 
         if (count($brandIds)) {
-            $telegramBrandTable = new TelegramBrand();
+            $telegramBrandTable = new DbTable\Telegram\Brand();
 
             $db = $telegramBrandTable->getAdapter();
 
@@ -163,7 +161,7 @@ class TelegramService
 
     public function notifyPicture($pictureId)
     {
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
 
         $picture = $pictureTable->find($pictureId)->current();
         if (! $picture) {
@@ -173,7 +171,7 @@ class TelegramService
         $brandIds = $this->getPictureBrandIds($picture);
 
         if (count($brandIds)) {
-            $telegramBrandTable = new TelegramBrand();
+            $telegramBrandTable = new DbTable\Telegram\Brand();
 
             $db = $telegramBrandTable->getAdapter();
 
@@ -213,19 +211,15 @@ class TelegramService
         $brandIds = [];
 
         switch ($picture->type) {
-            case Picture::VEHICLE_TYPE_ID:
+            case DbTable\Picture::VEHICLE_TYPE_ID:
                 $brandIds = $db->fetchCol(
                     $db->select()
-                        ->from('brand_item', 'brand_id')
-                        ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                        ->from('item', 'id')
+                        ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                         ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                         ->where('picture_item.picture_id = ?', $picture->id)
                 );
-                break;
-            case Picture::LOGO_TYPE_ID:
-            case Picture::MIXED_TYPE_ID:
-            case Picture::UNSORTED_TYPE_ID:
-                $brandIds = [$picture->brand_id];
                 break;
         }
 
@@ -274,7 +268,7 @@ class TelegramService
             }
         }
 
-        $chatTable = new TelegramChat();
+        $chatTable = new DbTable\Telegram\Chat();
 
         $chatRows = $chatTable->fetchAll([
             'user_id = ?' => (int)$userId,

@@ -6,7 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Service\DayPictures;
 use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable\Picture;
+use Application\Model\DbTable;
 
 class InboxController extends AbstractActionController
 {
@@ -21,13 +21,14 @@ class InboxController extends AbstractActionController
         $brands = $brandModel->getList($language, function ($select) use ($language) {
             $db = $select->getAdapter();
             $select->where(
-                'brands.id IN (?)',
+                'item.id IN (?)',
                 $db->select()
-                    ->from('brand_item', 'brand_id')
-                    ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                    ->from('item', 'id')
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                     ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                     ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                    ->where('pictures.status = ?', Picture::STATUS_INBOX)
+                    ->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX)
                     ->bind([
                         'language' => $language
                     ])
@@ -70,16 +71,15 @@ class InboxController extends AbstractActionController
 
         $brand = $brandModel->getBrandByCatname($this->params('brand'), $language);
 
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
 
         $select = $pictureTable->select(true)
-            ->where('pictures.status = ?', Picture::STATUS_INBOX);
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX);
         if ($brand) {
             $select
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand['id'])
+                ->where('item_parent_cache.parent_id = ?', $brand['id'])
                 ->group('pictures.id');
         }
 

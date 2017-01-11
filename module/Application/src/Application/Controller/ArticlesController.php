@@ -15,38 +15,13 @@ class ArticlesController extends AbstractActionController
 {
     const ARTICLES_PER_PAGE = 10;
 
-    private function getBrandsMenu()
-    {
-        $brandModel = new BrandModel();
-
-        $language = $this->language();
-
-        return $brandModel->getList($language, function ($select) {
-            $select
-                ->join(['abc' => 'articles_brands_cache'], 'item.id = abc.brand_id', null)
-                ->join('articles', 'abc.article_id = articles.id', null)
-                ->where('articles.enabled')
-                ->group('item.id');
-        });
-    }
-
     public function indexAction()
     {
-        $brandModel = new BrandModel();
-
-        $brand = $brandModel->getBrandByCatname($this->params('brand_catname'), $this->language());
-
         $articles = new Article();
 
         $select = $articles->select(true)
             ->where('articles.enabled')
             ->order(['articles.ratio DESC', 'articles.add_date DESC']);
-
-        if ($brand) {
-            $select
-                ->join(['abc' => 'articles_brands_cache'], 'articles.id=abc.article_id', null)
-                ->where('abc.brand_id = ?', $brand['id']);
-        }
 
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)
@@ -76,14 +51,10 @@ class ArticlesController extends AbstractActionController
         }
 
         return [
-            'menu'             => $this->getBrandsMenu(),
-            'brand'            => $brand,
             'paginator'        => $paginator,
             'articles'         => $articles,
-            'selectedBrandIds' => $brand ? [$brand['id']] : [],
             'urlParams'        => [
-                'action'        => 'index',
-                'brand_catname' => $brand ? $brand['catname'] : null
+                'action' => 'index'
             ]
         ];
     }
@@ -101,34 +72,8 @@ class ArticlesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $links = [];
-
-        $brandModel = new BrandModel();
-        $brands = $brandModel->getList($this->language(), function ($select) use ($article) {
-            $select
-                ->join('articles_brands', 'item.id = articles_brands.brand_id', null)
-                ->where('articles_brands.article_id = ?', $article->id);
-        });
-        foreach ($brands as $brand) {
-            $links[] = [
-                'url'  => $this->url()->fromRoute('catalogue', [
-                    'action'        => 'brand',
-                    'brand_catname' => $brand['catname']
-                ]),
-                'name' => $brand['name']
-            ];
-        }
-
-        $selectedBrandIds = [];
-        foreach ($article->findDependentRowset(BrandCache::class) as $abc) {
-            $selectedBrandIds[] = $abc->brand_id;
-        }
-
         return [
-            'article'          => $article,
-            'menu'             => $this->getBrandsMenu(),
-            'selectedBrandIds' => $selectedBrandIds,
-            'links'            => $links
+            'article' => $article,
         ];
     }
 }
