@@ -68,24 +68,14 @@
                 ]), '<i class="fa fa-sort-amount-desc"></i> ' . $this->escapeHtml($this->page(21)->name), false)?>
             </li>
         <?php } ?>
-        <?php if ($this->inboxBrandPictures) { ?>
+        <?php if ($this->inboxPictures) { ?>
             <li>
                 <?=$this->htmlA($this->url('moder/pictures/params', [
-                    'action'   => 'index',
-                    'status'   => Application\Model\DbTable\Picture::STATUS_INBOX,
-                    'brand_id' => $this->brand['id'],
-                    'type_id'  => 'unsorted+mixed+logo',
-                ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge">' . $this->inboxBrandPictures . '</span>', false)?>
-            </li>
-        <?php } ?>
-        <?php if ($this->inboxVehiclePictures) { ?>
-            <li>
-                <?=$this->htmlA($this->url('moder/pictures/params', [
-                    'action'   => 'index',
-                    'status'   => Application\Model\DbTable\Picture::STATUS_INBOX,
-                    'brand_id' => $this->brand['id'],
-                    'type_id'  => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
-                ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-vehicle')) . ' <span class="badge">' . $this->inboxVehiclePictures . '</span>', false)?>
+                    'action'  => 'index',
+                    'status'  => Application\Model\DbTable\Picture::STATUS_INBOX,
+                    'item_id' => $this->brand['id'],
+                    'type_id' => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
+                ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge">' . $this->inboxPictures . '</span>', false)?>
             </li>
         <?php } ?>
         <?php if ($this->requireAttention) { ?>

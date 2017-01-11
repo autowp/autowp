@@ -545,8 +545,7 @@ class CatalogueController extends AbstractActionController
                 'brand_id' => $brand['id']
             ]);
 
-            $inboxBrandPictures = null;
-            $inboxVehiclePictures = null;
+            $inboxPictures = null;
 
             if ($this->user()->isAllowed('picture', 'move')) {
                 $pictureTable = new Picture();
@@ -558,14 +557,7 @@ class CatalogueController extends AbstractActionController
                     Picture::LOGO_TYPE_ID
                 ];
 
-                $inboxBrandPictures = $db->fetchOne(
-                    $db->select()
-                        ->from('pictures', 'count(1)')
-                        ->where('pictures.type in (?)', $brandRelatedTypes)
-                        ->where('pictures.status = ?', Picture::STATUS_INBOX)
-                        ->where('pictures.brand_id = ?', $brand['id'])
-                );
-                $inboxVehiclePictures = $db->fetchOne(
+                $inboxPictures = $db->fetchOne(
                     $db->select()
                         ->from('pictures', 'count(distinct pictures.id)')
                         ->where('pictures.status = ?', Picture::STATUS_INBOX)
@@ -588,9 +580,8 @@ class CatalogueController extends AbstractActionController
                 'mostsActive' => $this->mostsActive($brand['id']),
                 'description' => $description,
                 'factories'   => $this->getBrandFactories($brand['id']),
-                'inboxBrandPictures'   => $inboxBrandPictures,
-                'inboxVehiclePictures' => $inboxVehiclePictures,
-                'requireAttention'     => $requireAttention
+                'inboxPictures'    => $inboxPictures,
+                'requireAttention' => $requireAttention
             ];
         });
     }
@@ -607,10 +598,10 @@ class CatalogueController extends AbstractActionController
             ->where('picture_item.item_id = ?', $brandId);
         
         switch ($type) {
-            case Picture::MIXED_TYPE_ID:
+            case 'mixed':
                 $select->where('picture_item.perspective_id = ?', 25);
                 break;
-            case Picture::LOGO_TYPE_ID:
+            case 'logo':
                 $select->where('picture_item.perspective_id = ?', 22);
                 break;
             default:
@@ -660,17 +651,17 @@ class CatalogueController extends AbstractActionController
 
     public function otherAction()
     {
-        return $this->typePictures(Picture::UNSORTED_TYPE_ID);
+        return $this->typePictures('unsorted');
     }
 
     public function mixedAction()
     {
-        return $this->typePictures(Picture::MIXED_TYPE_ID);
+        return $this->typePictures('mixed');
     }
 
     public function logotypesAction()
     {
-        return $this->typePictures(Picture::LOGO_TYPE_ID);
+        return $this->typePictures('logo');
     }
 
     private function typePicturesPicture($type)
@@ -703,17 +694,17 @@ class CatalogueController extends AbstractActionController
 
     public function otherPictureAction()
     {
-        return $this->typePicturesPicture(Picture::UNSORTED_TYPE_ID);
+        return $this->typePicturesPicture('unsorted');
     }
 
     public function mixedPictureAction()
     {
-        return $this->typePicturesPicture(Picture::MIXED_TYPE_ID);
+        return $this->typePicturesPicture('mixedd');
     }
 
     public function logotypesPictureAction()
     {
-        return $this->typePicturesPicture(Picture::LOGO_TYPE_ID);
+        return $this->typePicturesPicture('logo');
     }
 
     private function typePicturesGallery($type)
@@ -747,17 +738,17 @@ class CatalogueController extends AbstractActionController
 
     public function otherGalleryAction()
     {
-        return $this->typePicturesGallery(Picture::UNSORTED_TYPE_ID);
+        return $this->typePicturesGallery('unsorted');
     }
 
     public function mixedGalleryAction()
     {
-        return $this->typePicturesGallery(Picture::MIXED_TYPE_ID);
+        return $this->typePicturesGallery('mixed');
     }
 
     public function logotypesGalleryAction()
     {
-        return $this->typePicturesGallery(Picture::LOGO_TYPE_ID);
+        return $this->typePicturesGallery('logo');
     }
 
     private function stripName($brand, $name)

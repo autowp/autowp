@@ -167,12 +167,6 @@ return array_replace(include 'root.php', [
 
     'picturelist/engine' => 'Engine',
     'picturelist/engine-%s' => '%s engine',
-    'picturelist/logotype' => 'Logotype',
-    'picturelist/logotype-%s' => '%s logotype',
-    'picturelist/mixed' => 'Miscellaneous',
-    'picturelist/mixed-%s' => '%s miscellaneous',
-    'picturelist/unsorted' => 'Unsorted',
-    'picturelist/unsorted-%s' => '%s unsorted',
     'picturelist/factory' => 'Factory',
 
     'present-time-abbr'       => 'pr.',
@@ -310,8 +304,6 @@ return array_replace(include 'root.php', [
     'catalogue/brand/popular-images' => 'Popular images',
     'catalogue/brand/new-pictures' => 'New pictures',
     'catalogue/brand/inbox/by-brand' => 'Brand inbox',
-    'catalogue/brand/inbox/by-vehicle' => 'Vehicle inbox',
-    'catalogue/brand/inbox/by-engine' => 'Engine inbox',
     'catalogue/brand/factories' => 'Factories',
     'catalogue/link-category/official' => 'Official websites',
     'catalogue/link-category/helper'   => 'Helped create the project',
@@ -1080,7 +1072,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
 
     'moder-menu/title' => 'Moderator menu',
     'moder-menu/inbox' => 'Inbox',
-    'moder-menu/unsorted' => 'Unsorted',
 
     'moder/database-id-%s' => 'Database id: %s',
     'moder/log-of-events' => 'Log of events',
@@ -1110,8 +1101,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/filter/order' => 'Order by',
 
     'moder/pictures/filter' => 'Filter',
-    'moder/pictures/filter/brand' => 'Brand',
-    'moder/pictures/filter/brand/any' => 'any',
     'moder/pictures/filter/perspective' => 'Perspective',
     'moder/pictures/filter/perspective/any' => 'any',
     'moder/pictures/filter/perspective/empty' => 'empty',

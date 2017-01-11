@@ -67,18 +67,6 @@ class PictureController extends AbstractActionController
                         ->where('pi2.picture_id = ?', $picture->id);
                     break;
 
-                case DbTable\Picture::UNSORTED_TYPE_ID:
-                case DbTable\Picture::MIXED_TYPE_ID:
-                case DbTable\Picture::LOGO_TYPE_ID:
-                    if ($picture->brand_id) {
-                        $galleryEnabled = true;
-                        $picSelect
-                            ->where('pictures.type = ?', $picture->type)
-                            ->where('pictures.brand_id = ?', $picture->brand_id);
-                    }
-
-                    break;
-
                 case DbTable\Picture::FACTORY_TYPE_ID:
                     if ($picture->factory_id) {
                         $galleryEnabled = true;
@@ -155,14 +143,6 @@ class PictureController extends AbstractActionController
         $car = null;
 
         switch ($picture->type) {
-            case DbTable\Picture::LOGO_TYPE_ID:
-            case DbTable\Picture::MIXED_TYPE_ID:
-            case DbTable\Picture::UNSORTED_TYPE_ID:
-                if ($picture->brand_id) {
-                    $brands[] = $picture->brand_id;
-                }
-                break;
-
             case DbTable\Picture::FACTORY_TYPE_ID:
                 if ($picture->factory_id) {
                     $brandId = $brandModel->getFactoryBrandId($picture->factory_id);

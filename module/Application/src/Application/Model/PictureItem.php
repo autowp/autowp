@@ -167,7 +167,7 @@ class PictureItem
                 ->from($this->table->info('name'), 'item_id')
                 ->where('picture_id = ?', $pictureId)
                 ->join('item', 'picture_item.item_id = item.id', null)
-                ->where('item.item_type_id = ?', $type)
+                ->where('item.item_type_id IN (?)', $type)
         );
     }
 

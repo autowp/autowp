@@ -1,0 +1,89 @@
+<?php if ($this->canEdit) { ?>
+    <form action="<?=$this->escapeHtmlAttr($this->url(null, [
+        'action' => 'save-links'
+    ], [], true)) ?>" method="post">
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th><?=$this->escapeHtml($this->translate('moder/brands/links/text'))?></th>
+                    <th><?=$this->escapeHtml($this->translate('moder/brands/links/address'))?></th>
+                    <th><?=$this->escapeHtml($this->translate('moder/brands/links/type'))?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($this->links as $link) { ?>
+                    <tr>
+                        <td><?=$this->formText(
+                            (new Zend\Form\Element\Text('link['.$link['id'].'][name]'))
+                                ->setAttributes([
+                                    'value' => $link['name'],
+                                    'class' => 'form-control'
+                                ])
+                        ) ?></td>
+                        <td><?=$this->formText(
+                            (new Zend\Form\Element\Text('link['.$link['id'].'][url]'))
+                                ->setAttributes([
+                                    'value' => $link['url'],
+                                    'class' => 'form-control'
+                                ])
+                        ) ?></td>
+                        <td>
+                            <?=$this->formSelect(
+                                (new Zend\Form\Element\Select('link['.$link['id'].'][type]'))
+                                    ->setAttributes([
+                                        'value' => $link['type'],
+                                        'options' => [
+                                            'default'  => 'moder/brands/links/type/interest-link',
+                                            'official' => 'moder/brands/links/type/official',
+                                            'club'     => 'moder/brands/links/type/club'
+                                        ],
+                                        'class' => 'form-control'
+                                    ])
+                            ) ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+                <tr>
+                    <td><?=$this->formText((new Zend\Form\Element\Text('new[name]'))
+                        ->setAttributes(['class' => 'form-control'])
+                    ) ?></td>
+                    <td><?=$this->formText((new Zend\Form\Element\Text('new[url]'))
+                        ->setAttributes(['class' => 'form-control'])
+                    ) ?></td>
+                    <td>
+                        <?=$this->formSelect(
+                            (new Zend\Form\Element\Select('new[type]'))
+                                ->setAttributes([
+                                    'value' => '',
+                                    'options' => [
+                                        'default'  => 'moder/brands/links/type/interest-link',
+                                        'official' => 'moder/brands/links/type/official',
+                                        'club'     => 'moder/brands/links/type/club'
+                                    ],
+                                    'class' => 'form-control'
+                                ])
+                        ) ?>
+                    </td>
+                </tr>
+                <tr><td colspan="3">
+                    <input class="btn btn-primary" type="submit" value="<?=$this->escapeHtmlAttr($this->translate('submit'))?>" />
+                </td></tr>
+            </tbody>
+        </table>
+    </form>
+<?php } else { ?>
+    <table class="table table-condensed table-stripped"><tbody>
+        <tr>
+            <th><?=$this->escapeHtml($this->translate('moder/brands/links/text'))?></th>
+            <th><?=$this->escapeHtml($this->translate('moder/brands/links/address'))?></th>
+            <th><?=$this->escapeHtml($this->translate('moder/brands/links/type'))?></th>
+        </tr>
+        <?php foreach ($this->links as $link) { ?>
+            <tr>
+                <td><?=$this->escapeHtml($link['name'])?></td>
+                <td><?=$this->escapeHtml($link['url'])?></td>
+                <td><?=$this->escapeHtml($link['type'])?></td>
+            </tr>
+        <?php } ?>
+    </tbody></table>
+<?php } ?>

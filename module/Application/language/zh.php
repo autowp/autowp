@@ -157,12 +157,6 @@ return array_replace(include 'root.php', [
 
     'picturelist/engine' => '发动机',
     'picturelist/engine-%s' => '%s 发动机',
-    'picturelist/logotype' => '商标',
-    'picturelist/logotype-%s' => '%s 商标',
-    'picturelist/mixed' => '其它',
-    'picturelist/mixed-%s' => '%s 其它',
-    'picturelist/unsorted' => '未分类',
-    'picturelist/unsorted-%s' => '-%s 未分类',
     'picturelist/factory' => 'Factory',
 
     'present-time-abbr'       => '至今',
@@ -298,8 +292,6 @@ return array_replace(include 'root.php', [
     'catalogue/brand/popular-images' => '热门图片',
     'catalogue/brand/new-pictures' => '按上传时间',
     'catalogue/brand/inbox/by-brand' => 'Brand inbox',
-    'catalogue/brand/inbox/by-vehicle' => 'Vehicle inbox',
-    'catalogue/brand/inbox/by-engine' => 'Engine inbox',
     'catalogue/brand/factories' => '工厂',
     'catalogue/link-category/official' => '官方网站',
     'catalogue/link-category/helper'   => '协助发展',
@@ -1059,7 +1051,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
 
     'moder-menu/title' => '管理员菜单',
     'moder-menu/inbox' => '收件箱',
-    'moder-menu/unsorted' => '未分类',
 
     'moder/database-id-%s' => '数据库id: %s',
     'moder/log-of-events' => '操作日志',
@@ -1089,8 +1080,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/filter/order' => 'Order by',
 
     'moder/pictures/filter' => 'Filter',
-    'moder/pictures/filter/brand' => '品牌',
-    'moder/pictures/filter/brand/any' => 'any',
     'moder/pictures/filter/perspective' => '透视',
     'moder/pictures/filter/perspective/any' => 'any',
     'moder/pictures/filter/perspective/empty' => 'empty',

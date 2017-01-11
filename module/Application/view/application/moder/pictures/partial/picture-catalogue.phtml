@@ -106,54 +106,6 @@
 <?php } ?>
 <?php
     switch ($this->picture->type) {
-        case Application\Model\DbTable\Picture::LOGO_TYPE_ID:
-            ?>
-            <p>
-                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/logo'))?>
-                <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
-                    <?=$this->htmlA($this->url('moder/brands/params', [
-                        'action'     => 'brand',
-                        'brand_id'   => $brand->id
-                    ]), $brand->name) ?>
-                <?php } else { ?>
-                    <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                <?php } ?>
-            </p>
-            <?php
-            break;
-
-        case Application\Model\DbTable\Picture::MIXED_TYPE_ID:
-            ?>
-            <p>
-                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/mixed'))?>
-                <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
-                    <?=$this->htmlA($this->url('moder/brands/params', [
-                        'action'   => 'brand',
-                        'brand_id' => $brand->id
-                    ]), $brand->name) ?>
-                <?php } else { ?>
-                    <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                <?php } ?>
-            </p>
-            <?php
-            break;
-
-        case Application\Model\DbTable\Picture::UNSORTED_TYPE_ID:
-            ?>
-            <p>
-                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/unsorted'))?>
-                <?php if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) { ?>
-                    <?=$this->htmlA($this->url('moder/brands/params', [
-                        'action'   => 'brand',
-                        'brand_id' => $brand->id
-                    ]), $brand->name) ?>
-                <?php } else { ?>
-                    <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                <?php } ?>
-            </p>
-            <?php
-            break;
-
         case Application\Model\DbTable\Picture::FACTORY_TYPE_ID:
             ?>
             <p>

@@ -1866,6 +1866,14 @@ class CarsController extends AbstractActionController
                 ])
             ];
         }
+        
+        if ($car['item_type_id'] == DbTable\Item\Type::BRAND) {
+            return [
+                $this->url()->fromRoute('catalogue', [
+                    'brand_catname' => $car['catname'],
+                ])
+            ];
+        }
 
         return $this->walkUpUntilBrand($car->id, []);
     }
@@ -2448,7 +2456,7 @@ class CarsController extends AbstractActionController
             } else {
                 $brands = $itemTable->fetchAll([
                     'item_type_id = ?' => DbTable\Item\Type::BRAND
-                ], ['brands.position', 'brands.name']);
+                ], ['item.position', 'item.name']);
             }
         } elseif ($tab == 'categories') {
             $rows = $itemTable->fetchAll(
@@ -2482,6 +2490,7 @@ class CarsController extends AbstractActionController
                         ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', null)
                         ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
                         ->where('ipc2.parent_id = ?', $brand->id)
+                        ->group('item.id')
                         ->order($this->catalogue()->itemOrdering())
                 );
 
@@ -2497,6 +2506,7 @@ class CarsController extends AbstractActionController
             } else {
                 $brands = $itemTable->fetchAll(
                     $itemTable->select(true)
+                        ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
                         ->join(['ipc1' => 'item_parent_cache'], 'ipc1.parent_id = item.id', null)
                         ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
                         ->join(['twins' => 'item'], 'ipc2.parent_id = twins.id', null)

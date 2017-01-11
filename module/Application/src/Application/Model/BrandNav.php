@@ -59,7 +59,7 @@ class BrandNav
 
         $carId = (int)$params['item_id'];
         $type = $params['type'];
-        $type = strlen($type) ? (int)$type : null;
+        $type = strlen($type) ? (string)$type : null;
         $isConcepts = (bool)$params['is_concepts'];
 
         return $this->brandSections($params['language'], $brand, $type, $carId, $isConcepts);
@@ -112,6 +112,9 @@ class BrandNav
             $conceptsSeparatly ? '1' : '0',
             '9'
         ]);
+        
+        $picturesTable = new DbTable\Picture;
+        $picturesAdapter = $picturesTable->getAdapter();
 
         $groups = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
@@ -138,9 +141,6 @@ class BrandNav
                     ];
                 }
             }
-
-            $picturesTable = new DbTable\Picture;
-            $picturesAdapter = $picturesTable->getAdapter();
 
             // logotypes
             $logoPicturesCount = $picturesAdapter->fetchOne(
@@ -214,15 +214,15 @@ class BrandNav
         }
 
         if (isset($groups['logo'])) {
-            $groups['logo']['active'] = isset($type) && $type == Picture::LOGO_TYPE_ID;
+            $groups['logo']['active'] = isset($type) && $type == 'logo';
         }
 
         if (isset($groups['mixed'])) {
-            $groups['mixed']['active'] = isset($type) && $type == Picture::MIXED_TYPE_ID;
+            $groups['mixed']['active'] = isset($type) && $type == 'mixed';
         }
 
         if (isset($groups['unsorted'])) {
-            $groups['unsorted']['active'] = isset($type) && $type == Picture::UNSORTED_TYPE_ID;
+            $groups['unsorted']['active'] = isset($type) && $type == 'unsorted';
         }
 
         return array_values($groups);

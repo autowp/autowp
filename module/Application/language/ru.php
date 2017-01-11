@@ -177,12 +177,6 @@ return array_replace(include 'root.php', [
 
     'picturelist/engine' => 'Engine',
     'picturelist/engine-%s' => 'Двигатель %s',
-    'picturelist/logotype' => 'Логотип',
-    'picturelist/logotype-%s' => 'Логотип %s',
-    'picturelist/mixed' => 'Разное',
-    'picturelist/mixed-%s' => '%s разное',
-    'picturelist/unsorted' => 'Несортировано',
-    'picturelist/unsorted-%s' => '%s',
     'picturelist/factory' => 'Завод',
 
     'present-time-abbr'      => 'н.в.',
@@ -322,8 +316,6 @@ return array_replace(include 'root.php', [
     'catalogue/brand/popular-images' => 'Популярные картинки',
     'catalogue/brand/new-pictures' => 'Новые фото',
     'catalogue/brand/inbox/by-brand' => 'Инбокс бренда',
-    'catalogue/brand/inbox/by-vehicle' => 'Инбокс автомобилей',
-    'catalogue/brand/inbox/by-engine' => 'Инбокс двигателей',
     'catalogue/brand/factories' => 'Заводы',
     'catalogue/link-category/official' => 'Официальные сайты',
     'catalogue/link-category/helper'   => 'Помогли созданию проекта',
@@ -1090,7 +1082,6 @@ return array_replace(include 'root.php', [
 
     'moder-menu/title' => 'Меню модератора',
     'moder-menu/inbox' => 'Инбокс',
-    'moder-menu/unsorted' => 'Несортировано',
 
     'moder/database-id-%s' => 'В базе данных чиcлится под номером %s',
     'moder/log-of-events' => 'Журнал событий',
@@ -1120,8 +1111,6 @@ return array_replace(include 'root.php', [
     'moder/picture/filter/order' => 'Сортировать по',
 
     'moder/pictures/filter' => 'Фильтр',
-    'moder/pictures/filter/brand' => 'Бренд',
-    'moder/pictures/filter/brand/any' => 'любой',
     'moder/pictures/filter/perspective' => 'Ракурс',
     'moder/pictures/filter/perspective/any' => 'любой',
     'moder/pictures/filter/perspective/empty' => 'не задан',

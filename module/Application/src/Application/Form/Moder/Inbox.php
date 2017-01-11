@@ -70,15 +70,6 @@ class Inbox extends Form implements InputFilterProviderInterface
                 ]
             ],
             [
-                'name'    => 'brand_id',
-                'type'    => 'Text',
-                'options' => [
-                    'label'   => 'moder/pictures/filter/brand',
-                    /*'options' => $this->brandOptions,
-                    'disable_inarray_validator' => true*/
-                ]
-            ],
-            [
                 'name'    => 'item_id',
                 'type'    => 'Text',
                 'options' => [
@@ -93,11 +84,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                     'options' => [
                         ''                        => 'moder/pictures/filter/type/any',
                         Picture::VEHICLE_TYPE_ID  => 'moder/pictures/filter/type/item',
-                        //Picture::LOGO_TYPE_ID     => 'moder/pictures/filter/type/logotype',
-                        //Picture::MIXED_TYPE_ID    => 'moder/pictures/filter/type/mixed',
-                        //Picture::UNSORTED_TYPE_ID => 'moder/pictures/filter/type/unsorted',
                         Picture::FACTORY_TYPE_ID  => 'moder/pictures/filter/type/factory',
-                        //'unsorted+mixed+logo'     => 'moder/pictures/filter/type/unsorted+mixed+logo',
                     ]
                 ]
             ],
@@ -272,9 +259,6 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'required' => false
             ],
             'perspective_id' => [
-                'required' => false
-            ],
-            'brand_id' => [
                 'required' => false
             ],
             'item_id' => [

@@ -82,24 +82,6 @@ class PictureNameFormatter
 
                 return 'Unsorted vehicle';
 
-            case Picture::LOGO_TYPE_ID:
-                if ($picture['brand']) {
-                    return sprintf($this->translate('picturelist/logotype-%s', $language), $picture['brand']);
-                }
-                return $this->translate('picturelist/logotype', $language);
-
-            case Picture::MIXED_TYPE_ID:
-                if ($picture['brand']) {
-                    return sprintf($this->translate('picturelist/mixed-%s', $language), $picture['brand']);
-                }
-                return $this->translate('picturelist/mixed', $language);
-
-            case Picture::UNSORTED_TYPE_ID:
-                if ($picture['brand']) {
-                    return sprintf($this->translate('picturelist/unsorted-%s', $language), $picture['brand']);
-                }
-                return $this->translate('picturelist/unsorted', $language);
-
             case Picture::FACTORY_TYPE_ID:
                 if ($picture['factory']) {
                     return $picture['factory'];
@@ -139,9 +121,6 @@ class PictureNameFormatter
 
                 return 'Unsorted vehicle';
 
-            case Picture::LOGO_TYPE_ID:
-            case Picture::MIXED_TYPE_ID:
-            case Picture::UNSORTED_TYPE_ID:
             case Picture::FACTORY_TYPE_ID:
                 return $this->renderer->escapeHtml($this->format($picture, $language));
                 break;

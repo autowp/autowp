@@ -167,12 +167,6 @@ return array_replace(include 'root.php', [
 
     'picturelist/engine' => 'Moteur',
     'picturelist/engine-%s' => '%s moteur',
-    'picturelist/logotype' => 'Logotype',
-    'picturelist/logotype-%s' => '%s logotype',
-    'picturelist/mixed' => 'Varié',
-    'picturelist/mixed-%s' => '%s varié',
-    'picturelist/unsorted' => 'Non triés',
-    'picturelist/unsorted-%s' => '%s non triés',
     'picturelist/factory' => 'Usine',
 
     'present-time-abbr'       => 'pr.',
@@ -310,8 +304,6 @@ S'il vous plaît noter que l'ajout d'images modérés. c'est-à-dire toutes les 
     'catalogue/brand/popular-images' => 'Images populaires',
     'catalogue/brand/new-pictures' => 'Nouvelles photos',
     'catalogue/brand/inbox/by-brand' => 'Brand inbox',
-    'catalogue/brand/inbox/by-vehicle' => 'Vehicle inbox',
-    'catalogue/brand/inbox/by-engine' => 'Engine inbox',
     'catalogue/brand/factories' => 'Les usines',
     'catalogue/link-category/official' => 'Les sites officiels',
     'catalogue/link-category/helper'   => 'Aider à créer le projet',
@@ -1078,7 +1070,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
 
     'moder-menu/title' => 'Menu modérateur',
     'moder-menu/inbox' => 'Inbox',
-    'moder-menu/unsorted' => 'Non trié',
 
     'moder/database-id-%s' => 'Base de données id: %s',
     'moder/log-of-events' => 'Log des événements',
@@ -1108,8 +1099,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/filter/order' => 'Commandé par',
 
     'moder/pictures/filter' => 'Filtre',
-    'moder/pictures/filter/brand' => 'Marque',
-    'moder/pictures/filter/brand/any' => 'tout',
     'moder/pictures/filter/perspective' => 'Perspective',
     'moder/pictures/filter/perspective/any' => 'tout',
     'moder/pictures/filter/perspective/empty' => 'vide',

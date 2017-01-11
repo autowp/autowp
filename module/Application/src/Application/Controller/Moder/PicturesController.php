@@ -299,28 +299,8 @@ class PicturesController extends AbstractActionController
             }
         }
 
-        $brandRelatedTypes = [Picture::UNSORTED_TYPE_ID, Picture::LOGO_TYPE_ID, Picture::MIXED_TYPE_ID];
-
         if (strlen($formdata['type_id'])) {
-            if ($formdata['type_id'] == 'unsorted+mixed+logo') {
-                $select->where('pictures.type IN (?)', $brandRelatedTypes);
-            } else {
-                $select->where('pictures.type = ?', $formdata['type_id']);
-            }
-        }
-
-        if ($formdata['brand_id']) {
-            if (strlen($formdata['type_id']) && in_array($formdata['type_id'], $brandRelatedTypes)) {
-                $select->where('pictures.brand_id = ?', $formdata['brand_id']);
-            } else {
-                if (! $pictureItemJoined) {
-                    $pictureItemJoined = true;
-                    $select->join('picture_item', 'pictures.id = picture_item.picture_id', null);
-                }
-                $select
-                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $formdata['brand_id']);
-            }
+            $select->where('pictures.type = ?', $formdata['type_id']);
         }
 
         if ($formdata['item_id']) {
@@ -411,11 +391,6 @@ class PicturesController extends AbstractActionController
 
         if ($formdata['lost']) {
             switch ($formdata['type_id']) {
-                case Picture::LOGO_TYPE_ID:
-                case Picture::MIXED_TYPE_ID:
-                case Picture::UNSORTED_TYPE_ID:
-                    $select->where('pictures.brand_id IS NULL');
-                    break;
                 case Picture::FACTORY_TYPE_ID:
                     $select->where('pictures.factory_id IS NULL');
                     break;
@@ -480,7 +455,10 @@ class PicturesController extends AbstractActionController
             ], $multioptions);
 
             foreach ($picturesData['items'] as &$pictureItem) {
-                $itemIds = $this->pictureItem->getPictureItemsByType($pictureItem['id'], DbTable\Item\Type::VEHICLE);
+                $itemIds = $this->pictureItem->getPictureItemsByType($pictureItem['id'], [
+                    DbTable\Item\Type::VEHICLE,
+                    DbTable\Item\Type::BRAND
+                ]);
 
                 if (count($itemIds) == 1) {
                     $itemId = $itemIds[0];
@@ -1246,19 +1224,6 @@ class PicturesController extends AbstractActionController
                 ],
                 'hasArea' => $hasArea
             ];
-        }
-
-        switch ($picture->type) {
-            case Picture::UNSORTED_TYPE_ID:
-            case Picture::MIXED_TYPE_ID:
-            case Picture::LOGO_TYPE_ID:
-                if ($picture->brand_id) {
-                    $brandModel = new BrandModel();
-                    $relatedBrands = $brandModel->getList($this->language(), function ($select) use ($picture) {
-                        $select->where('item.id = ?', $picture->brand_id);
-                    });
-                }
-                break;
         }
 
         return [

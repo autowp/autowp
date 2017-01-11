@@ -21,20 +21,6 @@ class ModerMenu extends AbstractHtmlElement
                     ->where('status = ?', Picture::STATUS_INBOX)
             );
 
-            $unsortedCount = $pTable->getAdapter()->fetchOne(
-                $pTable->getAdapter()->select()
-                    ->from($pTable->info('name'), 'count(1)')
-                    ->where('type = ?', Picture::UNSORTED_TYPE_ID)
-                    ->where('status <> ?', Picture::STATUS_REMOVING)
-            );
-
-            $items[] = [
-                'href'  => '/moder/pictures/index/type_id/0/status/custom1/order/2',
-                'label' => $this->view->translate('moder-menu/unsorted'),
-                'count' => $unsortedCount,
-                'icon'  => 'fa fa-th'
-            ];
-
             $items[] = [
                 'href'  => '/moder/pictures/index/order/1/status/inbox',
                 'label' => $this->view->translate('moder-menu/inbox'),

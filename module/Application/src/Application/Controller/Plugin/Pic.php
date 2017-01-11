@@ -116,46 +116,6 @@ class Pic extends AbstractPlugin
 
         $url = null;
         switch ($row['type']) {
-            case DbTable\Picture::LOGO_TYPE_ID:
-                $brandRow = $brandTable->find($row['brand_id'])->current();
-                if ($brandRow) {
-                    $url = $controller->url()->fromRoute('catalogue', [
-                        'action'        => 'logotypes-picture',
-                        'brand_catname' => $brandRow->folder,
-                        'picture_id'    => $row['identity']
-                    ], [
-                        'force_canonical' => $options['canonical'],
-                        'uri'             => $options['uri']
-                    ]);
-                }
-                break;
-
-            case DbTable\Picture::MIXED_TYPE_ID:
-                $brandRow = $brandTable->find($row['brand_id'])->current();
-                if ($brandRow) {
-                    $url = $controller->url()->fromRoute('catalogue', [
-                        'action'        => 'mixed-picture',
-                        'brand_catname' => $brandRow->folder,
-                        'picture_id'    => $row['identity']
-                    ], [
-                        'force_canonical' => $options['canonical']
-                    ]);
-                }
-                break;
-
-            case DbTable\Picture::UNSORTED_TYPE_ID:
-                $brandRow = $brandTable->find($row['brand_id'])->current();
-                if ($brandRow) {
-                    $url = $controller->url()->fromRoute('catalogue', [
-                        'action'        => 'other-picture',
-                        'brand_catname' => $brandRow->folder,
-                        'picture_id'    => $row['identity']
-                    ], [
-                        'force_canonical' => $options['canonical']
-                    ]);
-                }
-                break;
-
             case DbTable\Picture::VEHICLE_TYPE_ID:
                 $carIds = $this->pictureItem->getPictureItems($row['id']);
                 if ($carIds) {
@@ -859,14 +819,6 @@ class Pic extends AbstractPlugin
         );
 
         switch ($picture->type) {
-            case DbTable\Picture::LOGO_TYPE_ID:
-            case DbTable\Picture::MIXED_TYPE_ID:
-            case DbTable\Picture::UNSORTED_TYPE_ID:
-                if ($picture->brand_id) {
-                    $brandIds = [$picture->brand_id];
-                }
-                break;
-
             case DbTable\Picture::FACTORY_TYPE_ID:
                 if ($factory = $picture->findParentRow(DbTable\Factory::class)) {
                     $carIds = $factory->getRelatedCarGroupId();
@@ -1169,20 +1121,6 @@ class Pic extends AbstractPlugin
                         'action'     => 'factory',
                         'factory_id' => $factory->id
                     ])] = sprintf($this->translator->translate('moder/picture/edit-factory-%s'), $factory->name);
-                }
-                break;
-
-            case DbTable\Picture::MIXED_TYPE_ID:
-            case DbTable\Picture::LOGO_TYPE_ID:
-            case DbTable\Picture::UNSORTED_TYPE_ID:
-                $brandModel = new BrandModel();
-                $brand = $brandModel->getBrandById($picture->brand_id, $language);
-                if ($brand) {
-                    $url = $controller->url()->fromRoute('moder/cars/params', [
-                        'action'  => 'car',
-                        'item_id' => $brand['id']
-                    ]);
-                    $links[$url] = sprintf($this->translator->translate('moder/picture/edit-brand-%s'), $brand['name']);
                 }
                 break;
         }
