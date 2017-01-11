@@ -18,10 +18,7 @@ use Application\Model\PictureItem;
 class Picture extends Table
 {
     const
-        UNSORTED_TYPE_ID = 0,
         VEHICLE_TYPE_ID  = 1,
-        LOGO_TYPE_ID     = 2,
-        MIXED_TYPE_ID    = 3,
         FACTORY_TYPE_ID  = 7;
 
     const
@@ -153,12 +150,6 @@ class Picture extends Table
                     }
                     break;
 
-                case Picture::LOGO_TYPE_ID:
-                case Picture::MIXED_TYPE_ID:
-                case Picture::UNSORTED_TYPE_ID:
-                    $brandIds[$row['brand_id']] = true;
-                    break;
-
                 case Picture::FACTORY_TYPE_ID:
                     $factoryIds[$row['factory_id']] = true;
                     break;
@@ -280,16 +271,6 @@ class Picture extends Table
                     ];
                     break;
 
-                case Picture::LOGO_TYPE_ID:
-                case Picture::MIXED_TYPE_ID:
-                case Picture::UNSORTED_TYPE_ID:
-                    $brand = isset($brands[$row['brand_id']]) ? $brands[$row['brand_id']] : null;
-                    $name = [
-                        'type' => $row['type'],
-                        'brand' => $brand
-                    ];
-                    break;
-
                 case Picture::FACTORY_TYPE_ID:
                     $name = [
                         'type' => $row['type'],
@@ -348,10 +329,6 @@ class Picture extends Table
                         $brandModel->refreshPicturesCountByVehicle($car->id);
                     }
                 }
-                break;
-            case Picture::MIXED_TYPE_ID:
-            case Picture::LOGO_TYPE_ID:
-            case Picture::UNSORTED_TYPE_ID:
                 break;
             case Picture::FACTORY_TYPE_ID:
                 break;

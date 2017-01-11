@@ -112,8 +112,6 @@ class Pic extends AbstractPlugin
 
         $controller = $this->getController();
 
-        $brandTable = new DbTable\Brand();
-
         $url = null;
         switch ($row['type']) {
             case DbTable\Picture::VEHICLE_TYPE_ID:
@@ -371,7 +369,6 @@ class Pic extends AbstractPlugin
             }
         }
 
-        $brandTable = new DbTable\Brand();
         $carParentTable = new DbTable\Vehicle\ParentTable();
 
         $items = [];

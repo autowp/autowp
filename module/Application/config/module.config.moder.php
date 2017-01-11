@@ -375,15 +375,6 @@ return [
                 ],
                 [
                     'spec' => [
-                        'type' => 'Text',
-                        'name' => 'brand_id',
-                        'options' => [
-                            'label' => 'moder/comments/filter/brand-id',
-                        ]
-                    ]
-                ],
-                [
-                    'spec' => [
                         'type' => 'Select',
                         'name' => 'moderator_attention',
                         'options' => [
@@ -1038,6 +1029,7 @@ return [
                                 Model\DbTable\Item\Type::ENGINE   => 'item/type/2/name',
                                 Model\DbTable\Item\Type::CATEGORY => 'item/type/3/name',
                                 Model\DbTable\Item\Type::TWINS    => 'item/type/4/name',
+                                Model\DbTable\Item\Type::BRAND    => 'item/type/5/name',
                             ]
                         ]
                     ],

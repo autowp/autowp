@@ -538,7 +538,6 @@ class IndexController extends AbstractActionController
 
     public function indexAction()
     {
-        $brands = $this->catalogue()->getBrandTable();
         $pictures = $this->catalogue()->getPictureTable();
         $itemTable = $this->catalogue()->getItemTable();
 

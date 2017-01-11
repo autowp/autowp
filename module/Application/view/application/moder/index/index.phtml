@@ -48,6 +48,13 @@
                                 'item_type_id' => Application\Model\DbTable\Item\Type::TWINS
                             ]), $this->translate('item/type/4/new-item'))?>
                         </li>
+                        <li>
+                            <i class="fa fa-plus"></i>
+                            <?=$this->htmlA($this->url('moder/cars/params', [
+                                'action'       => 'new',
+                                'item_type_id' => Application\Model\DbTable\Item\Type::BRAND
+                            ]), $this->translate('item/type/5/new-item'))?>
+                        </li>
                     <?php } ?>
                 </ul>
             </div>
@@ -82,7 +89,7 @@
                 etc
             </li>
             <li>
-                "<a href="/moder/pictures/index/status/custom1/type_id/3">Mixed</a>" to pictures with few cars
+                "<a href="/moder/pictures/index/status/custom1/perspective_id/25">Mixed</a>" to pictures with few cars
             </li>
             <li>
                 Split <a href="/moder/index/too-big-cars">too big cars</a>
@@ -94,8 +101,8 @@
                 Dash in soviet vehicle names, e.g <a href="/moder/cars/index/name/%D0%92%D0%90%D0%97/no_name/%D0%92%D0%90%D0%97-/no_parent/0/order/1">ВАЗ</a>
             </li>
             <li>
-                Missed type in sidebar menu of <a href="/moder/cars/index/vehicle_type_id/empty/vehicle_childs_type_id/17/">Trucks</a>
-                and <a href="/moder/cars/index/vehicle_type_id/empty/vehicle_childs_type_id/19/">Buses</a>
+                Missed type in sidebar menu of <a href="/moder/cars/index/vehicle_type_id/empty/vehicle_childs_type_id/17/item_type_id/1">Trucks</a>
+                and <a href="/moder/cars/index/vehicle_type_id/empty/vehicle_childs_type_id/19/item_type_id/1">Buses</a>
             </li>
         </ul>
     </div>

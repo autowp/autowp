@@ -260,18 +260,6 @@
 
             switch ($this->picture->type) {
 
-                case Application\Model\DbTable\Picture::MIXED_TYPE_ID:
-                    if ($this->user()->logedIn()) {
-                        if ($brand = $this->picture->findParentRow(Application\Model\DbTable\Brand::class)) {
-                            $list[] = $this->htmlA($this->url('upload/params', [
-                                'action'     => 'index',
-                                'type'       => Application\Model\DbTable\Picture::MIXED_TYPE_ID,
-                                'brand_id'   => $brand->id
-                            ]), '<i class="fa fa-upload"></i> ' . $this->escapeHtml($this->page(29)->name) . ' ' . $this->pic()->htmlTitle($this->name), false);
-                        }
-                    }
-                    break;
-
                 case Application\Model\DbTable\Picture::FACTORY_TYPE_ID:
                     if ($this->factory) {
                         $list[] = $this->htmlA($this->url('factories/factory', [

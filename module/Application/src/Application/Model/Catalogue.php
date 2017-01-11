@@ -19,11 +19,6 @@ class Catalogue
     private $carsPerPage = 7;
 
     /**
-     * @var BrandTable
-     */
-    private $brandTable;
-
-    /**
      * @var Vehicle
      */
     private $itemTable;
@@ -89,16 +84,6 @@ class Catalogue
     public function getPicturesPerPage()
     {
         return $this->picturesPerPage;
-    }
-
-    /**
-     * @return BrandTable
-     */
-    public function getBrandTable()
-    {
-        return $this->brandTable
-            ? $this->brandTable
-            : $this->brandTable = new BrandTable();
     }
 
     /**

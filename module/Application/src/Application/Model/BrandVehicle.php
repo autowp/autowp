@@ -242,7 +242,7 @@ class BrandVehicle
         if (! $values['name']) {
             $brandRow = $this->itemTable->fetchRow([
                 'id = ?'           => (int)$brandId,
-                'item_type_id = ?' => DbTable\Item\Type::BRAND
+                //'item_type_id = ?' => DbTable\Item\Type::BRAND
             ]);
             $vehicleRow = $this->itemTable->find($vehicleId)->current();
             $values['name'] = $this->extractName($brandRow, $vehicleRow, $language);
@@ -335,7 +335,7 @@ class BrandVehicle
         if (!$bvRow->manual_catname) {
             $brandRow = $this->itemTable->fetchRow([
                 'id = ?'           => (int)$brandId,
-                'item_type_id = ?' => DbTable\Item\Type::BRAND
+                //'item_type_id = ?' => DbTable\Item\Type::BRAND
             ]);
             $vehicleRow = $this->itemTable->find($vehicleId)->current();
 

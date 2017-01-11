@@ -551,12 +551,6 @@ class CatalogueController extends AbstractActionController
                 $pictureTable = new Picture();
                 $db = $pictureTable->getAdapter();
 
-                $brandRelatedTypes = [
-                    Picture::MIXED_TYPE_ID,
-                    Picture::UNSORTED_TYPE_ID,
-                    Picture::LOGO_TYPE_ID
-                ];
-
                 $inboxPictures = $db->fetchOne(
                     $db->select()
                         ->from('pictures', 'count(distinct pictures.id)')

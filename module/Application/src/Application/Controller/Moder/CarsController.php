@@ -2799,6 +2799,7 @@ class CarsController extends AbstractActionController
                 break;
             case DbTable\Item\Type::CATEGORY:
             case DbTable\Item\Type::TWINS:
+            case DbTable\Item\Type::BRAND:
                 $forceIsGroup = true;
                 break;
             default:

@@ -173,7 +173,6 @@ class Car extends AbstractPlugin
         $pictureTable = $this->getPictureTable();
         $carParentTable = new DbTable\Vehicle\ParentTable();
         $carParentAdapter = $carParentTable->getAdapter();
-        $brandTable = new DbTable\Brand();
         $itemTable = new DbTable\Vehicle();
         $itemLanguageTable = new DbTable\Vehicle\Language();
 
