@@ -364,6 +364,10 @@ class BrandNav
         $aliases = $this->getBrandAliases($brand);
 
         $carLanguageTable = new DbTable\Vehicle\Language();
+        
+        $langSortExpr = new Zend_Db_Expr(
+            $db->quoteInto('language = ? desc', $language)
+        );
 
         $groups = [];
         foreach ($rows as $brandItemRow) {
@@ -376,9 +380,8 @@ class BrandNav
             $bvlRow = $itemParentLangaugeTable->fetchRow([
                 'item_id = ?'   => $brandItemRow['item_id'],
                 'parent_id = ?' => $brandItemRow['brand_id'],
-                'language = ?'  => $language,
                 'length(name) > 0'
-            ]);
+            ], $langSortExpr);
 
             if ($bvlRow) {
                 $name = $bvlRow->name;
@@ -424,7 +427,7 @@ class BrandNav
             'SIDEBAR',
             $brand['id'],
             $language,
-            '38'
+            '39'
         ]);
 
         $sections = $this->cache->getItem($cacheKey, $success);

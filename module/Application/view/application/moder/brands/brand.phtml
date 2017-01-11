@@ -11,7 +11,6 @@
             'BRAND_NAME' => $this->brand->name
         ]
     ]);
-    $this->layout()->moduleName = 'moder/brands/brand';
 ?>
 
 <?php
@@ -106,18 +105,7 @@
             <?php } ?>
         </div>
 
-        <h3><?=$this->escapeHtml($this->translate('brand/logo'))?></h3>
-        <div class="well">
-            <?php if ($this->canLogo) { ?>
-                <?=$this->markdown($this->translate('moder/brands/logo/description'))?>
-            <?php } ?>
-            <?=$this->img($this->brand->img, ['style' => 'max-width:100%']) ?>
-            <?php if ($this->canLogo) { ?>
-                <?=$this->partial('application/forms/bootstrap-horizontal', [
-                    'form' => $this->formLogo
-                ])?>
-            <?php } ?>
-        </div>
+
 
     </div>
     <div class="col-md-6">

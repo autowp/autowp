@@ -13,7 +13,6 @@
             <tr>
                 <th><?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/title/name'))?></th>
                 <th><?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/title/link'))?></th>
-                <th><?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/title/catname'))?></th>
                 <th><?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/title/public'))?></th>
                 <?php if ($this->canMove) { ?>
                     <th><?=$this->escapeHtml($this->translate('moder/vehicle/catalogue/title/remove'))?></th>
@@ -23,7 +22,7 @@
         <tbody>
             <?php if ($this->car['item_type_id'] != Application\Model\DbTable\Item\Type::TWINS) { ?>
                 <tr>
-                    <td>
+                    <td colspan="3">
                         <form class="car-add-parent" method="post" action="<?=$this->escapeHtmlAttr($this->url(null, [
                             'action' => 'add-parent',
                         ], [], true)) ?>">
@@ -44,9 +43,6 @@
                             </div>
                         </form>
                     </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
                     <?php if ($this->canMove) { ?>
                         <td></td>
                     <?php } ?>
@@ -55,7 +51,6 @@
             <?php foreach ($this->parents as $car) { ?>
                 <tr data-id="<?=$car['id']?>">
                     <td>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <i class="fa fa-arrow-up"></i>
                         <?=$this->htmlA($car['url'], $this->car()->htmlTitle($car['name']), false)?>
                         <?php if ($car['duplicateRow']) { ?>
@@ -67,38 +62,11 @@
                         <?php } ?>
                     </td>
                     <td>
-                        <form class="car-parent-type" method="post" action="<?=$this->escapeHtmlAttr($car['typeUrl']) ?>">
-                            <?=$this->formElement(
-                                (new Zend\Form\Element\Select('type'))
-                                    ->setAttribute('class', 'form-control input-sm')
-                                    ->setValueOptions($this->carParentTypeOptions)
-                                    ->setValue($car['parent']['type'])
-                            )?>
-                        </form>
-                    </td>
-                    <td>
-                        <form class="car-parent-catname" method="post" action="<?=$this->escapeHtmlAttr($car['catnameUrl']) ?>">
-                            <div class="input-group" style="max-width:200px">
-                                <?=$this->formElement(
-                                    (new Zend\Form\Element\Text('name', [
-                                        'value_options' => $this->carParentTypeOptions
-                                    ]))
-                                        ->setAttribute('class', 'form-control input-sm')
-                                        ->setAttribute('placeholder', $this->translate('moder/vehicle/catalogue/parent-name-placeholder'))
-                                        ->setValue($car['parent']['name'])
-                                )?>
-                                <span class="input-group-btn" style="width:0px;"></span>
-                                <?=$this->formElement(
-                                    (new Zend\Form\Element\Text('catname'))
-                                        ->setAttribute('class', 'form-control input-sm')
-                                        ->setAttribute('placeholder', $this->translate('moder/vehicle/catalogue/parent-catname-placeholder'))
-                                        ->setValue($car['parent']['catname'])
-                                )?>
-                                <span class="input-group-btn">
-                                    <button class="btn btn-sm btn-default" type="submit">Ok</button>
-                                </span>
-                            </div>
-                        </form>
+                        <?=$this->htmlA(
+                            $car['editUrl'],
+                            $this->escapeHtml($car['parent']['name']) . ' <span class="fa fa-pencil"></span>',
+                            false
+                        )?>
                     </td>
                     <td class="urls">
                         <?php foreach ($car['publicUrls'] as $url) { ?>
@@ -117,8 +85,8 @@
                 </tr>
             <?php } ?>
             <tr class="success" data-id="<?=$this->car['id']?>">
-                <td colspan="3">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <td colspan="2">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-arrow-right"></i>
                     <?=$this->car()->htmlTitle($this->car->getNameData($this->language()))?>
                 </td>
@@ -152,37 +120,11 @@
                         <?php } ?>
                     </td>
                     <td>
-                        <form class="car-parent-type" method="post" action="<?=$this->escapeHtmlAttr($car['typeUrl']) ?>">
-                            <?=$this->formElement(
-                                (new Zend\Form\Element\Select('type', [
-                                    'value_options' => $this->carParentTypeOptions
-                                ]))
-                                    ->setAttribute('class', 'form-control input-sm')
-                                    ->setValue($car['parent']['type'])
-                            )?>
-                        </form>
-                    </td>
-                    <td>
-                        <form class="car-parent-catname" method="post" action="<?=$this->escapeHtmlAttr($car['catnameUrl']) ?>">
-                            <div class="input-group" style="max-width:200px">
-                                <?=$this->formElement(
-                                    (new Zend\Form\Element\Text('name'))
-                                        ->setAttribute('class', 'form-control input-sm')
-                                        ->setValue($car['parent']['name'])
-                                        ->setAttribute('placeholder', $this->translate('moder/vehicle/catalogue/parent-name-placeholder'))
-                                )?>
-                                <span class="input-group-btn" style="width:0px;"></span>
-                                <?=$this->formElement(
-                                    (new Zend\Form\Element\Text('catname'))
-                                        ->setAttribute('class', 'form-control input-sm')
-                                        ->setValue($car['parent']['catname'])
-                                        ->setAttribute('placeholder', $this->translate('moder/vehicle/catalogue/parent-catname-placeholder'))
-                                )?>
-                                <span class="input-group-btn">
-                                    <button class="btn btn-sm btn-default" type="submit">Ok</button>
-                                </span>
-                            </div>
-                        </form>
+                        <?=$this->htmlA(
+                            $car['editUrl'],
+                            $this->escapeHtml($car['parent']['name']) . ' <span class="fa fa-pencil"></span>',
+                            false
+                        )?>
                     </td>
                     <td class="urls">
                         <?php foreach ($car['publicUrls'] as $url) { ?>
@@ -204,7 +146,7 @@
             <?php if ($this->canMove) { ?>
                 <?php if ($this->car['item_type_id'] == Application\Model\DbTable\Item\Type::CATEGORY) { ?>
                     <tr>
-                        <td>
+                        <td colspan="2">
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA(
                                 $this->url('moder/cars/params', [
@@ -215,15 +157,13 @@
                                 $this->translate('moder/vehicle/catalogue/add-category')
                             )?>
                         </td>
-                        <td></td>
-                        <td></td>
                         <td class="urls"></td>
                         <?php if ($this->canMove) { ?>
                             <td></td>
                         <?php } ?>
                     </tr>
                     <tr>
-                        <td>
+                        <td colspan="2">
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA(
                                 $this->url('moder/cars/params', [
@@ -234,15 +174,13 @@
                                 $this->translate('moder/vehicle/catalogue/add-engine')
                             )?>
                         </td>
-                        <td></td>
-                        <td></td>
                         <td class="urls"></td>
                         <?php if ($this->canMove) { ?>
                             <td></td>
                         <?php } ?>
                     </tr>
                     <tr>
-                        <td>
+                        <td colspan="2">
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA(
                                 $this->url('moder/cars/params', [
@@ -253,8 +191,6 @@
                                 $this->translate('moder/vehicle/catalogue/add-vehicle')
                             )?>
                         </td>
-                        <td></td>
-                        <td></td>
                         <td class="urls"></td>
                         <?php if ($this->canMove) { ?>
                             <td></td>
@@ -262,7 +198,7 @@
                     </tr>
                 <?php } else { ?>
                     <tr>
-                        <td>
+                        <td colspan="2">
                             <i class="fa fa-plus"></i>
                             <?=$this->htmlA(
                                 $this->url('moder/cars/params', [
@@ -277,8 +213,6 @@
                                 )
                             )?>
                         </td>
-                        <td></td>
-                        <td></td>
                         <td class="urls"></td>
                         <?php if ($this->canMove) { ?>
                             <td></td>

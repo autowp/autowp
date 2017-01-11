@@ -831,6 +831,7 @@ class CatalogueController extends AbstractActionController
             $field = 'item.id';
             foreach (array_reverse($path) as $idx => $pathNode) {
                 $cpAlias = 'cp'. $idx;
+                $iplAlias = 'ipl'. $idx;
                 $select
                     ->join(
                         [$cpAlias => 'item_parent'],
@@ -839,8 +840,23 @@ class CatalogueController extends AbstractActionController
                     )
                     ->where($cpAlias.'.catname = ?', $pathNode);
                 $field = $cpAlias . '.parent_id';
+                
+                $langSortExpr = new Zend_Db_Expr(
+                    $db->quoteInto($iplAlias.'.language = ? desc', $language)
+                );
 
-                $columns['cp_'.$idx.'_name'] = $cpAlias.'.name';
+                $columns['cp_'.$idx.'_name'] = new Zend_Db_Expr(
+                    '(' .
+                        $db->select()
+                            ->from([$iplAlias => 'item_parent_language'], 'name')
+                            ->where($iplAlias.'.item_id = ' . $cpAlias .'.item_id')
+                            ->where($iplAlias.'.parent_id = ' . $cpAlias .'.parent_id')
+                            ->order($langSortExpr)
+                            ->limit(1)
+                            ->assemble() .
+                    ')'
+                );
+                //$columns['cp_'.$idx.'_name'] = $cpAlias.'.name';
                 $columns['cp_'.$idx.'_item_id'] = $cpAlias.'.item_id';
             }
             $columns['top_item_id'] = $field;

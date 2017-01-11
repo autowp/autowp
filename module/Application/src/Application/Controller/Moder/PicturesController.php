@@ -1601,13 +1601,14 @@ class PicturesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $brandTable = new BrandTable();
-        $brand = $brandTable->find($this->params('brand_id'))->current();
+        $itemTable = new DbTable\Vehicle();
+        $brand = $itemTable->fetchRow([
+            'id = ?'           => (int)$this->params('brand_id'),
+            'item_type_id = ?' => DbTable\Item\Type::BRAND
+        ]);
         if (! $brand) {
             return $this->notFoundAction();
         }
-
-        $itemTable = new Vehicle();
 
         $rows = $itemTable->fetchAll(
             $itemTable->select(true)

@@ -1,2 +1,16 @@
 libjpeg-progs
 jpegoptim
+memcached
+nginx
+php-imagick
+php-memcache
+php-memcached
+php7.0
+php7.0-cli
+php7.0-curl
+php7.0-fpm
+php7.0-intl
+php7.0-json
+php7.0-gd
+php7.0-mbstring
+php7.0-mysql

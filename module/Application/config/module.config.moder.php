@@ -38,12 +38,12 @@ return [
                             ]
                         ]
                     ],
-                    'brand-vehicle' => [
+                    'item-parent' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => '/brand-vehicle[/:action]',
+                            'route' => '/item-parent[/:action]',
                             'defaults' => [
-                                'controller' => Controller\Moder\BrandVehicleController::class,
+                                'controller' => Controller\Moder\ItemParentController::class,
                                 'action'     => 'index'
                             ],
                         ],
@@ -289,7 +289,7 @@ return [
     'controllers' => [
         'factories' => [
             Controller\Moder\AttrsController::class        => InvokableFactory::class,
-            Controller\Moder\BrandVehicleController::class => Controller\Moder\Service\BrandVehicleControllerFactory::class,
+            Controller\Moder\ItemParentController::class   => Controller\Moder\Service\ItemParentControllerFactory::class,
             Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
             Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
             Controller\Moder\FactoryController::class      => Controller\Moder\Service\FactoryControllerFactory::class,

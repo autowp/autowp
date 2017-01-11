@@ -336,14 +336,12 @@ class Picture extends Table
 
         $oldParams = [
             'type'       => $picture->type,
-            'brand_id'   => $picture->brand_id,
             'item_ids'   => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
         ];
 
         $picture->setFromArray([
             'factory_id' => null,
-            'brand_id'   => null,
             'type'       => Picture::VEHICLE_TYPE_ID,
         ]);
         $picture->save();
@@ -385,14 +383,12 @@ class Picture extends Table
 
         $oldParams = [
             'type'       => $picture->type,
-            'brand_id'   => $picture->brand_id,
             'item_ids'   => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
         ];
 
         $picture->setFromArray([
             'factory_id' => null,
-            'brand_id'   => null,
             'type'       => Picture::VEHICLE_TYPE_ID,
         ]);
         $picture->save();
@@ -434,14 +430,12 @@ class Picture extends Table
 
         $oldParams = [
             'type'       => $picture->type,
-            'brand_id'   => $picture->brand_id,
             'item_ids'   => $pictureItem->getPictureItems($picture->id),
             'factory_id' => $picture->factory_id
         ];
 
         $picture->setFromArray([
             'factory_id' => $factory->id,
-            'brand_id'   => null,
             'type'       => Picture::FACTORY_TYPE_ID,
         ]);
         $picture->save();

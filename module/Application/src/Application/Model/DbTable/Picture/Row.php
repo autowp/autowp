@@ -5,11 +5,7 @@ namespace Application\Model\DbTable\Picture;
 use Autowp\Image\Storage\Request;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable;
 
 use Exception;
 
@@ -48,8 +44,8 @@ class Row extends \Application\Db\Table\Row
 
         switch ($this->type) {
 
-            case Picture::VEHICLE_TYPE_ID:
-                $itemTable = new Vehicle();
+            case DbTable\Picture::VEHICLE_TYPE_ID:
+                $itemTable = new DbTable\Vehicle();
                 $cars = $itemTable->fetchAll(
                     $itemTable->select(true)
                         ->join('picture_item', 'item.id = picture_item.item_id', null)
@@ -139,7 +135,7 @@ class Row extends \Application\Db\Table\Row
                 }
                 break;
 
-            case Picture::FACTORY_TYPE_ID:
+            case DbTable\Picture::FACTORY_TYPE_ID:
                 $factory = $this->findParentRow(\Application\Model\DbTable\Factory::class);
                 if ($factory) {
                     $result = implode('/', [
@@ -170,9 +166,9 @@ class Row extends \Application\Db\Table\Row
 
     protected function _delete()
     {
-        $comments = new CommentMessage();
+        $comments = new DbTable\Comment\Message();
         $comments->delete([
-            'type_id = ?' => CommentMessage::PICTURES_TYPE_ID,
+            'type_id = ?' => DbTable\Comment\Message::PICTURES_TYPE_ID,
             'item_id = ?' => $this->id,
         ]);
 
@@ -241,11 +237,11 @@ class Row extends \Application\Db\Table\Row
 
     public function canAccept()
     {
-        if (! in_array($this->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])) {
+        if (! in_array($this->status, [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_INBOX])) {
             return false;
         }
 
-        $moderVoteTable = new PictureModerVote();
+        $moderVoteTable = new DbTable\Picture\ModerVote();
         $deleteVote = $moderVoteTable->fetchRow([
             'picture_id = ?' => $this->id,
             'vote = 0'
@@ -259,11 +255,11 @@ class Row extends \Application\Db\Table\Row
 
     public function canDelete()
     {
-        if (! in_array($this->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])) {
+        if (! in_array($this->status, [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_INBOX])) {
             return false;
         }
 
-        $moderVoteTable = new PictureModerVote();
+        $moderVoteTable = new DbTable\Picture\ModerVote();
         $acceptVote = $moderVoteTable->fetchRow([
             'picture_id = ?' => $this->id,
             'vote > 0'

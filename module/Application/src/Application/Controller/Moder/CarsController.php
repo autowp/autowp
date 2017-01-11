@@ -28,12 +28,12 @@ use Exception;
 
 class CarsController extends AbstractActionController
 {
-    private $allowedLanguages = ['ru', 'en', 'it', 'fr', 'zh', 'de', 'es', 'pt'];
+    private $allowedLanguages = ['en'];
 
     /**
      * @var DbTable\Vehicle\ParentTable
      */
-    private $carParentTable;
+    private $itemParentTable;
 
     private $textStorage;
 
@@ -101,9 +101,9 @@ class CarsController extends AbstractActionController
         BrandVehicle $brandVehicle,
         Message $message,
         SpecificationsService $specificationsService,
-        PictureItem $pictureItem
+        PictureItem $pictureItem,
+        array $languages
     ) {
-
         $this->hostManager = $hostManager;
         $this->textStorage = $textStorage;
         $this->translator = $translator;
@@ -116,6 +116,7 @@ class CarsController extends AbstractActionController
         $this->message = $message;
         $this->specificationsService = $specificationsService;
         $this->pictureItem = $pictureItem;
+        $this->allowedLanguages = $languages;
     }
 
     private function canMove(DbTable\Vehicle\Row $car)
@@ -559,8 +560,8 @@ class CarsController extends AbstractActionController
         $canEditMeta = $this->canEditMeta($car);
 
         if ($canEditMeta) {
-            $carParentTable = $this->getCarParentTable();
-            $haveChilds = (bool)$carParentTable->fetchRow([
+            $itemParentTable = $this->getCarParentTable();
+            $haveChilds = (bool)$itemParentTable->fetchRow([
                 'parent_id = ?' => $car->id
             ]);
 
@@ -1217,10 +1218,10 @@ class CarsController extends AbstractActionController
 
         $graphItemsIds = array_keys($graphItems);
 
-        $carParentTable = $this->getCarParentTable();
+        $itemParentTable = $this->getCarParentTable();
 
-        $carParentRows = $carParentTable->fetchAll(
-            $carParentTable->select(true)
+        $carParentRows = $itemParentTable->fetchAll(
+            $itemParentTable->select(true)
                 ->where('item_id in (?)', $graphItemsIds)
                 ->where('parent_id in (?)', $graphItemsIds)
         );
@@ -1232,7 +1233,7 @@ class CarsController extends AbstractActionController
             ];
         }
 
-        $carParentRows = $carParentTable->fetchAll([
+        $carParentRows = $itemParentTable->fetchAll([
             'parent_id = ?' => $car->id
         ]);
 
@@ -1323,8 +1324,8 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $carParentTable = $this->getCarParentTable();
-        $carParentRow = $carParentTable->fetchRow([
+        $itemParentTable = $this->getCarParentTable();
+        $carParentRow = $itemParentTable->fetchRow([
             'item_id = ?'   => $car->id,
             'parent_id = ?' => $parentCar->id
         ]);
@@ -1369,10 +1370,8 @@ class CarsController extends AbstractActionController
         if (! $parentCar) {
             return $this->notFoundAction();
         }
-
-        $carParentTable = $this->getCarParentTable();
-
-        $carParentTable->removeParent($car, $parentCar);
+        
+        $this->brandVehicle->remove($parentCar->id, $car->id);
 
         $itemTable->updateInteritance($car);
 
@@ -1423,7 +1422,7 @@ class CarsController extends AbstractActionController
          return $this->_forward('add-parent-options');
          }*/
 
-        $this->getCarParentTable()->addParent($car, $parentCar);
+        $this->brandVehicle->create($parentCar->id, $car->id);
 
         $itemTable->updateInteritance($car);
 
@@ -1736,12 +1735,12 @@ class CarsController extends AbstractActionController
             'type'   => $carParentRow ? $carParentRow->type : null
         ];
 
-        $carParentTable = $this->getCarParentTable();
-        $carParentRows = $carParentTable->fetchAll(
-            $carParentTable->select(true)
-            ->join('item', 'item_parent.item_id = item.id', null)
-            ->where('item_parent.parent_id = ?', $car['id'])
-            ->order(array_merge(['item_parent.type'], $this->catalogue()->itemOrdering()))
+        $itemParentTable = $this->getCarParentTable();
+        $carParentRows = $itemParentTable->fetchAll(
+            $itemParentTable->select(true)
+                ->join('item', 'item_parent.item_id = item.id', null)
+                ->where('item_parent.parent_id = ?', $car['id'])
+                ->order(array_merge(['item_parent.type'], $this->catalogue()->itemOrdering()))
         );
 
         $itemTable = $this->catalogue()->getItemTable();
@@ -1819,20 +1818,20 @@ class CarsController extends AbstractActionController
         $parents = [];
         $childs = [];
 
-        $carParentTable = $this->getCarParentTable();
+        $itemParentTable = $this->getCarParentTable();
 
         $order = array_merge(['item_parent.type'], $this->catalogue()->itemOrdering());
 
-        $carParentRows = $carParentTable->fetchAll(
-            $carParentTable->select(true)
+        $carParentRows = $itemParentTable->fetchAll(
+            $itemParentTable->select(true)
                 ->join('item', 'item_parent.parent_id = item.id', null)
                 ->where('item_parent.item_id = ?', $car->id)
                 ->order($order)
         );
         $parents = $this->perepareCatalogueCars($carParentRows, true);
 
-        $carParentRows = $carParentTable->fetchAll(
-            $carParentTable->select(true)
+        $carParentRows = $itemParentTable->fetchAll(
+            $itemParentTable->select(true)
                 ->join('item', 'item_parent.item_id = item.id', null)
                 ->where('item_parent.parent_id = ?', $car->id)
                 ->order($order)
@@ -1840,20 +1839,14 @@ class CarsController extends AbstractActionController
         $childs = $this->perepareCatalogueCars($carParentRows, false);
 
         $model = new ViewModel([
-            'car'                 => $car,
-            'canMove'             => $this->canMove($car),
-            'canAddBrand'         => $canAddBrand,
-            'publicUrls'          => $this->carPublicUrls($car),
-            'relevantBrands'      => $relevantBrands,
-            'canUseTree'          => $canUseTree,
-            'parents'             => $parents,
-            'childs'              => $childs,
-            'carParentTypeOptions' => [
-                DbTable\Vehicle\ParentTable::TYPE_DEFAULT => $this->translate('catalogue/sub-model'),
-                DbTable\Vehicle\ParentTable::TYPE_TUNING  => $this->translate('catalogue/related'),
-                DbTable\Vehicle\ParentTable::TYPE_SPORT   => $this->translate('catalogue/sport'),
-                DbTable\Vehicle\ParentTable::TYPE_DESIGN  => $this->translate('catalogue/design'),
-            ]
+            'car'            => $car,
+            'canMove'        => $this->canMove($car),
+            'canAddBrand'    => $canAddBrand,
+            'publicUrls'     => $this->carPublicUrls($car),
+            'relevantBrands' => $relevantBrands,
+            'canUseTree'     => $canUseTree,
+            'parents'        => $parents,
+            'childs'         => $childs
         ]);
 
         return $model->setTerminal(true);
@@ -1864,9 +1857,9 @@ class CarsController extends AbstractActionController
      */
     private function getCarParentTable()
     {
-        return $this->carParentTable
-            ? $this->carParentTable
-            : $this->carParentTable = new DbTable\Vehicle\ParentTable();
+        return $this->itemParentTable
+            ? $this->itemParentTable
+            : $this->itemParentTable = new DbTable\Vehicle\ParentTable();
     }
 
     private function walkUpUntilBrand($id, array $path)
@@ -1939,7 +1932,9 @@ class CarsController extends AbstractActionController
         $cars = [];
 
         $itemTable = $this->catalogue()->getItemTable();
-        $carParentTable = new DbTable\Vehicle\ParentTable();
+        $itemParentTable = new DbTable\Vehicle\ParentTable();
+        $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
+        $db = $itemParentLanguageTable->getAdapter();
 
         $parentIds = [];
         foreach ($carParentRows as $carParentRow) {
@@ -1947,6 +1942,10 @@ class CarsController extends AbstractActionController
         }
 
         $language = $this->language();
+        
+        $langSortExpr = new Zend_Db_Expr(
+            $db->quoteInto('language = ? desc', $language)
+        );
 
         foreach ($carParentRows as $carParentRow) {
             $carRow = $itemTable->fetchRow([
@@ -1988,6 +1987,12 @@ class CarsController extends AbstractActionController
 
                 $duplicateRow = $itemTable->fetchRow($select);
             }
+            
+            $itemParentLanguageRow = $itemParentLanguageTable->fetchRow([
+                'item_id = ?'   => $carParentRow->item_id,
+                'parent_id = ?' => $carParentRow->parent_id,
+                'length(name) > 0'
+            ], $langSortExpr);
 
             $cars[] = [
                 'id'         => $carRow->id,
@@ -2002,7 +2007,7 @@ class CarsController extends AbstractActionController
                 ]),
                 'parent'    => [
                     'type'    => $carParentRow->type,
-                    'name'    => $carParentRow->name,
+                    'name'    => $itemParentLanguageRow ? $itemParentLanguageRow->name : null,
                     'catname' => $carParentRow->catname,
                 ],
                 'deleteUrl' => $this->url()->fromRoute('moder/cars/params', [
@@ -2020,6 +2025,11 @@ class CarsController extends AbstractActionController
                     'item_id'    => $carParentRow->item_id,
                     'parent_id'  => $carParentRow->parent_id
                 ], [], true),
+                'editUrl' => $this->url()->fromRoute('moder/item-parent/params', [
+                    'action'    => 'item',
+                    'item_id'   => $carParentRow->item_id,
+                    'parent_id' => $carParentRow->parent_id
+                ])
             ];
         }
 
@@ -2337,9 +2347,9 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $carParentTable = $this->getCarParentTable();
+        $itemParentTable = $this->getCarParentTable();
 
-        $carParentRow = $carParentTable->fetchRow([
+        $carParentRow = $itemParentTable->fetchRow([
             'item_id = ?'   => $car->id,
             'parent_id = ?' => $parent->id
         ]);
@@ -2363,7 +2373,7 @@ class CarsController extends AbstractActionController
         if ($this->carParentForm->isValid()) {
             $values = $this->carParentForm->getData();
 
-            $row = $carParentTable->fetchRow([
+            $row = $itemParentTable->fetchRow([
                 'parent_id = ?' => $carParentRow->parent_id,
                 'catname = ?'   => $values['catname'],
                 'item_id <> ?'   => $carParentRow->item_id
@@ -2399,9 +2409,9 @@ class CarsController extends AbstractActionController
             (int)$car->id => $this->carPublicUrls($car)
         ];
 
-        $carParentTable = $this->getCarParentTable();
+        $itemParentTable = $this->getCarParentTable();
 
-        $carParentRows = $carParentTable->fetchAll([
+        $carParentRows = $itemParentTable->fetchAll([
             'parent_id = ?' => $car->id
         ]);
         foreach ($carParentRows as $cpRow) {
@@ -2619,13 +2629,13 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carParentTable = $this->getCarParentTable();
+        $itemParentTable = $this->getCarParentTable();
         $itemTable = $this->catalogue()->getItemTable();
 
         $order = array_merge(['item_parent.type'], $this->catalogue()->itemOrdering());
 
-        $carParentRows = $carParentTable->fetchAll(
-            $carParentTable->select(true)
+        $carParentRows = $itemParentTable->fetchAll(
+            $itemParentTable->select(true)
                 ->join('item', 'item_parent.item_id = item.id', null)
                 ->where('item_parent.parent_id = ?', $car->id)
                 ->where('item_parent.type = ?', DbTable\Vehicle\ParentTable::TYPE_DEFAULT)
@@ -2705,8 +2715,7 @@ class CarsController extends AbstractActionController
                     htmlspecialchars($this->car()->formatName($newCar, 'en'))
                 ), $newCar);
 
-
-                $carParentTable->addParent($newCar, $car);
+                $this->brandVehicle->create($car->id, $newCar->id);
 
                 $message = sprintf(
                     '%s выбран как родительский автомобиль для %s',
@@ -2721,7 +2730,7 @@ class CarsController extends AbstractActionController
                 $childCarRows = $itemTable->find($values['childs']);
 
                 foreach ($childCarRows as $childCarRow) {
-                    $carParentTable->addParent($childCarRow, $newCar);
+                    $this->brandVehicle->create($newCar->id, $childCarRow->id);
 
                     $message = sprintf(
                         '%s выбран как родительский автомобиль для %s',
@@ -2730,7 +2739,8 @@ class CarsController extends AbstractActionController
                     );
                     $this->log($message, [$newCar, $childCarRow]);
 
-                    $carParentTable->removeParent($childCarRow, $car);
+                    $this->brandVehicle->remove($car->id, $childCarRow->id);
+
                     $message = sprintf(
                         '%s перестал быть родительским автомобилем для %s',
                         htmlspecialchars($this->car()->formatName($car, 'en')),
@@ -2932,7 +2942,7 @@ class CarsController extends AbstractActionController
                 $ucsTable->subscribe($user, $car);
 
                 if ($parentCar) {
-                    $this->getCarParentTable()->addParent($car, $parentCar);
+                    $this->brandVehicle->create($parentCar->id, $car->id);
 
                     $message = sprintf(
                         '%s выбран как родительский автомобиль для %s',
@@ -2983,7 +2993,7 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $carParentTable = $this->getCarParentTable();
+        $itemParentTable = $this->getCarParentTable();
         $itemTable = $this->catalogue()->getItemTable();
         $imageStorage = $this->imageStorage();
 
@@ -3074,7 +3084,7 @@ class CarsController extends AbstractActionController
                 $car->is_group = 1;
                 $car->save();
 
-                $carParentTable->addParent($newCar, $car);
+                $this->brandVehicle->create($car->id, $newCar->id);
 
                 $message = sprintf(
                     '%s выбран как родительский автомобиль для %s',

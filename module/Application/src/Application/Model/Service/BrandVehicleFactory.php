@@ -13,7 +13,7 @@ class BrandVehicleFactory implements FactoryInterface
     {
         $config = $container->get('Config');
         return new Model(
-            array_keys($config['hosts'])
+            $config['content_languages']
         );
     }
 }

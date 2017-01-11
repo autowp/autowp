@@ -174,6 +174,8 @@ return [
             'cookie'   => '.wheelsage.org'
         ]
     ],
+    
+    'content_languages' => ['ru', 'en', 'it', 'fr', 'zh', 'de', 'es', 'pt'],
 
     /*'acl' => [
         'cache'         => 'long',
@@ -196,6 +198,7 @@ return [
     'validators' => [
         'factories' => [
             Validator\Brand\NameNotExists::class => InvokableFactory::class,
+            Validator\ItemParent\CatnameNotExists::class => InvokableFactory::class,
             Validator\User\EmailExists::class    => InvokableFactory::class,
             Validator\User\EmailNotExists::class => InvokableFactory::class,
             Validator\User\Login::class          => InvokableFactory::class,

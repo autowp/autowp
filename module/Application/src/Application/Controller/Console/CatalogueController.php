@@ -60,16 +60,62 @@ class CatalogueController extends AbstractActionController
 
     public function migrateEnginesAction()
     {
-        $brandTable = new DbTable\Brand();
-
         $itemTable = new DbTable\Vehicle();
         $itemLangTable = new DbTable\Vehicle\Language();
 
         $itemParentTable = new DbTable\Vehicle\ParentTable();
+        $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
         $itemParentCacheTable = new DbTable\Vehicle\ParentCache();
         
 
         $db = $itemParentTable->getAdapter();
+        
+        $itemParentRows = $itemParentTable->fetchAll([
+            'length(name) > 0'
+        ], 'item_id');
+        
+        foreach ($itemParentRows as $itemParentRow) {
+            
+            print_r($itemParentRow->toArray());
+            
+            $text = $itemParentRow->name;
+            
+            $language = null;
+            
+            if (preg_match('|^[[:space:] a-zA-ZІ½ª²³°®™„”‐€ŤÚőçÚÖńćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
+                $language = 'en';
+            }
+            
+            if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½ª²³°®™„”‐€ŤÚőçÚÖńćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
+                $language = 'ru';
+            }
+            
+            if (!$language) {
+                print $text . PHP_EOL;
+                exit;
+            }
+            
+            $itemParentLanguageRow = $itemParentLanguageTable->fetchRow([
+                'item_id = ?' => $itemParentRow->item_id,
+                'parent_id = ?' => $itemParentRow->parent_id,
+                'language = ?' => $language
+            ]);
+            
+            if (!$itemParentLanguageRow) {
+                $itemParentLanguageRow = $itemParentLanguageTable->createRow([
+                    'item_id' => $itemParentRow->item_id,
+                    'parent_id' => $itemParentRow->parent_id,
+                    'language' => $language
+                ]);
+            }
+            
+            if (!$itemParentLanguageRow->name) {
+                $itemParentLanguageRow->name = $text;
+                $itemParentLanguageRow->save();
+            }
+            
+            print_r($itemParentLanguageRow->toArray());
+        }
         
         /*$rows = $itemTable->fetchAll(['item_type_id = ?' => DbTable\Item\Type::BRAND]);
         foreach ($rows as $row) {
@@ -247,7 +293,7 @@ class CatalogueController extends AbstractActionController
         // brand_alias
         
         // brand_vehicle_language
-        $brandVehicleLanguageTable = new DbTable\Brand\VehicleLanguage();
+        /*$brandVehicleLanguageTable = new DbTable\Brand\VehicleLanguage();
         $itemParentLanguageTable = new \Zend_Db_Table([
             'name' => 'item_parent_language',
             'primary' => [
@@ -287,7 +333,7 @@ class CatalogueController extends AbstractActionController
             $itemParentLanguageRow->save();
             
             print_r($itemParentLanguageRow->toArray()); 
-        }
+        }*/
     }
 
     public function acceptOldUnsortedAction()
