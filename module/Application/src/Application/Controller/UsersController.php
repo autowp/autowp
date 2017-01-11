@@ -10,7 +10,7 @@ use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Rename as UserRename;
 
 use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable\Brand as BrandTable;
+use Application\Model\DbTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User\Account as UserAccount;
@@ -19,6 +19,10 @@ use Application\Model\Contact;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend_Db_Expr;
+
+use DateInterval;
+use DateTime;
+use DateTimeZone;
 
 class UsersController extends AbstractActionController
 {
@@ -177,26 +181,25 @@ class UsersController extends AbstractActionController
         $options = [
             'language' => $this->language(),
             'columns'  => [
-                'img',
+                'logo_id',
                 'pictures_count' => new Zend_Db_Expr('COUNT(distinct pictures.id)')
             ]
         ];
 
         $rows = $brandModel->getList($options, function ($select) use ($user) {
             $select
-                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                 ->where('pictures.owner_id = ?', $user->id)
                 ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
-                ->group('brands.id');
+                ->group('item.id');
         });
 
         $brands = [];
         foreach ($rows as $row) {
             $brands[] = [
-                'img'           => $row['img'],
+                'logo_id'       => $row['logo_id'],
                 'name'          => $row['name'],
                 'catname'       => $row['catname'],
                 'picturesCount' => $row['pictures_count'],
@@ -234,10 +237,9 @@ class UsersController extends AbstractActionController
         $select = $pictures->select(true)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
             ->where('pictures.owner_id = ?', $user->id)
             ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
-            ->where('brand_item.brand_id = ?', $brand['id'])
+            ->where('item_parent_cache.parent_id = ?', $brand['id'])
             ->group('pictures.id')
             ->order(['pictures.add_date DESC', 'pictures.id DESC']);
 
@@ -270,13 +272,18 @@ class UsersController extends AbstractActionController
     public function onlineAction()
     {
         $userTable = new User();
+        
+        $now = new DateTime();
+        $now->setTimezone(new DateTimeZone(MYSQL_TIMEZONE));
+        $now->sub(new DateInterval('PT5M'));
 
         $viewModel = new ViewModel([
             'users' => $userTable->fetchAll(
                 $userTable->select(true)
-                    ->join('session', 'users.id = session.user_id', null)
-                    ->where('session.modified >= ?', time() - 5 * 60)
-                    ->group('users.id')
+                    ->where('last_online >= ?', $now->format(MYSQL_DATETIME_FORMAT))
+                    //->join('session', 'users.id = session.user_id', null)
+                    //->where('session.modified >= ?', time() - 5 * 60)
+                    //->group('users.id')
             )
         ]);
         $viewModel->setTerminal($this->getRequest()->isXmlHttpRequest());
@@ -287,7 +294,7 @@ class UsersController extends AbstractActionController
     private function specsRating()
     {
         $userTable = new User();
-        $brandTable = new BrandTable();
+        $itemTable = new DbTable\Vehicle();
 
         $select = $userTable->select(true)
             ->where('not deleted')
@@ -297,7 +304,7 @@ class UsersController extends AbstractActionController
 
         $valueTitle = 'users/rating/specs-volume';
 
-        $db = $brandTable->getAdapter();
+        $db = $itemTable->getAdapter();
 
         $precisionLimit = 50;
 
@@ -309,11 +316,12 @@ class UsersController extends AbstractActionController
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (! $success) {
                     $carSelect = $db->select()
-                        ->from('brand_item', ['brand_id', 'count(1)'])
-                        ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                        ->from('item', ['id', 'count(1)'])
+                        ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                         ->join('attrs_user_values', 'item_parent_cache.item_id = attrs_user_values.item_id', null)
                         ->where('attrs_user_values.user_id = ?', $user->id)
-                        ->group('brand_item.brand_id')
+                        ->group('item.id')
                         ->order('count(1) desc')
                         ->limit($precisionLimit);
 
@@ -331,12 +339,15 @@ class UsersController extends AbstractActionController
                     $data = array_slice($data, 0, 3, true);
 
                     foreach ($data as $brandId => $value) {
-                        $row = $brandTable->find($brandId)->current();
+                        $row = $itemTable->fetchRow([
+                            'id = ?'           => $brandId,
+                            'item_type_id = ?' => DbTable\Item\Type::BRAND
+                        ]);
                         $brands[] = [
                             'name' => $row->name,
                             'url'  => $this->url()->fromRoute('catalogue', [
                                 'action'        => 'brand',
-                                'brand_catname' => $row->folder
+                                'brand_catname' => $row->catname
                             ]),
                             'value' => $value
                         ];
@@ -364,7 +375,7 @@ class UsersController extends AbstractActionController
     private function picturesRating()
     {
         $userTable = new User();
-        $brandTable = new BrandTable();
+        $itemTable = new DbTable\Vehicle();
 
         $select = $userTable->select(true)
             ->where('not deleted')
@@ -381,22 +392,22 @@ class UsersController extends AbstractActionController
                 $cacheKey = 'RATING_USER_PICTURES_BRAND_6_' . $user->id;
                 $brands = $this->cache->getItem($cacheKey, $success);
                 if (! $success) {
-                    $select = $brandTable->select(true)
-                        ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                        ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                    $select = $itemTable->select(true)
+                        ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                         ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                         ->join('pictures', 'picture_item.picture_id = pictures.id', null)
-                        ->group('brand_item.brand_id')
+                        ->group('item.id')
                         ->where('pictures.owner_id = ?', $user->id)
                         ->order('count(distinct pictures.id) desc')
                         ->limit(3);
 
-                    foreach ($brandTable->fetchAll($select) as $brand) {
+                    foreach ($itemTable->fetchAll($select) as $brand) {
                         $brands[] = [
                             'name' => $brand->name,
                             'url'  => $this->url()->fromRoute('catalogue', [
                                 'action'        => 'brand',
-                                'brand_catname' => $brand->folder
+                                'brand_catname' => $brand->catname
                             ]),
                         ];
                     }

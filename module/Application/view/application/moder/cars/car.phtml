@@ -157,6 +157,9 @@
     <?php if (isset($this->tabs['pictures'])) { ?>
         <div class="tab-pane<?=$this->tabs['pictures']['active'] ? ' active' : ''?>" id="pictures">Loading ...</div>
     <?php } ?>
+    <?php if (isset($this->tabs['links'])) { ?>
+        <div class="tab-pane<?=$this->tabs['links']['active'] ? ' active' : ''?>" id="links">Loading ...</div>
+    <?php } ?>
     <?php if ($this->user()->get()->id == 1) { ?>
         <div class="tab-pane<?=$this->tabs['modifications']['active'] ? ' active' : ''?>" id="modifications">Loading ...</div>
     <?php } ?>

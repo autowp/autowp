@@ -107,8 +107,6 @@ class Brakes extends AbstractAdapter
             $select->order('max(tbl.size_value) ' . $this->order);
         }
 
-        //print $select; exit;
-
         $cars = $select->getTable()->fetchAll($select);
 
         $result = [];

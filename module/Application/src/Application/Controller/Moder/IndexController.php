@@ -23,7 +23,7 @@ class IndexController extends AbstractActionController
 
         $request = $this->getRequest();
 
-        if ($this->user()->isAllowed('brand', 'add')) {
+        /*if ($this->user()->isAllowed('brand', 'add')) {
             $this->addBrandForm->setAttribute(
                 'action',
                 $this->url()->fromRoute('moder/index/params', ['form' => 'add-brand'])
@@ -55,7 +55,7 @@ class IndexController extends AbstractActionController
                     return $this->redirect()->toUrl($url);
                 }
             }
-        }
+        }*/
 
 
         $menu = [];

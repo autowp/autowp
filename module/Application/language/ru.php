@@ -140,6 +140,10 @@ return array_replace(include 'root.php', [
     'item/type/4/name-plural' => 'Близнецы',
     'item/type/4/new-item' => 'Новая группа близнецов',
     'item/type/4/add-sub-item' => 'Добавить подгруппу близнецов',
+    'item/type/5/name' => 'Марка',
+    'item/type/5/name-plural' => 'Марки',
+    'item/type/5/new-item' => 'Новая марка',
+    'item/type/5/add-sub-item' => 'Добавить подмарку',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Несортировано',
@@ -268,7 +272,7 @@ return array_replace(include 'root.php', [
     'mosts/period/1980-89'    => '1980-89ых',
     'mosts/period/1990-99'    => '1990-99ых',
     'mosts/period/2000-09'    => '2000-09ых',
-    'mosts/period/2010-15'    => '2010-15ых',
+    'mosts/period/2010-16'    => '2010-16ых',
     'mosts/period/present'    => 'нашего времени',
     'mosts/period/all-time'   => 'за всю историю',
 
@@ -401,6 +405,7 @@ return array_replace(include 'root.php', [
     'perspective/logo'           => 'логотип',
     'perspective/mascot'         => 'маскот',
     'perspective/sketch'         => 'эскиз',
+    'perspective/mixed'          => 'разное',
 
     'login/sign-in' => 'Вход',
     'login/sign-out' => 'Выход',
@@ -1122,12 +1127,8 @@ return array_replace(include 'root.php', [
     'moder/pictures/filter/perspective/empty' => 'не задан',
     'moder/pictures/filter/type' => 'Тип',
     'moder/pictures/filter/type/any' => 'любой',
-    'moder/pictures/filter/type/item' => 'тс или двигатель',
-    'moder/pictures/filter/type/logotype' => 'логотип',
-    'moder/pictures/filter/type/mixed' => 'разное',
-    'moder/pictures/filter/type/unsorted' => 'несортировано',
+    'moder/pictures/filter/type/item' => 'марка, тс, двигатель',
     'moder/pictures/filter/type/factory' => 'завод',
-    'moder/pictures/filter/type/unsorted+mixed+logo' => 'несортировано + разное + логотип',
     'moder/pictures/filter/comments' => 'Комментарии',
     'moder/pictures/filter/comments/not-matters'  => 'не важно',
     'moder/pictures/filter/comments/has-comments' => 'есть',

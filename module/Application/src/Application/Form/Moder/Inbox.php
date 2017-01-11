@@ -93,11 +93,11 @@ class Inbox extends Form implements InputFilterProviderInterface
                     'options' => [
                         ''                        => 'moder/pictures/filter/type/any',
                         Picture::VEHICLE_TYPE_ID  => 'moder/pictures/filter/type/item',
-                        Picture::LOGO_TYPE_ID     => 'moder/pictures/filter/type/logotype',
-                        Picture::MIXED_TYPE_ID    => 'moder/pictures/filter/type/mixed',
-                        Picture::UNSORTED_TYPE_ID => 'moder/pictures/filter/type/unsorted',
+                        //Picture::LOGO_TYPE_ID     => 'moder/pictures/filter/type/logotype',
+                        //Picture::MIXED_TYPE_ID    => 'moder/pictures/filter/type/mixed',
+                        //Picture::UNSORTED_TYPE_ID => 'moder/pictures/filter/type/unsorted',
                         Picture::FACTORY_TYPE_ID  => 'moder/pictures/filter/type/factory',
-                        'unsorted+mixed+logo'     => 'moder/pictures/filter/type/unsorted+mixed+logo',
+                        //'unsorted+mixed+logo'     => 'moder/pictures/filter/type/unsorted+mixed+logo',
                     ]
                 ]
             ],

@@ -175,11 +175,10 @@ class PictureController extends AbstractActionController
                 $language = $this->language();
                 $brandList = $brandModel->getList($language, function ($select) use ($picture) {
                     $select
-                        ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                        ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                         ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                         ->where('picture_item.picture_id = ?', $picture->id)
-                        ->group('brands.id');
+                        ->group('item.id');
                 });
                 foreach ($brandList as $brand) {
                     $brands[] = $brand['id'];

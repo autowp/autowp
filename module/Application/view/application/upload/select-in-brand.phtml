@@ -43,16 +43,21 @@
 
     <div style="margin: 5px 0">
         <?=$this->htmlA($this->url('upload/params', [
-            'action' => 'index',
-            'type'   => Application\Model\DbTable\Picture::LOGO_TYPE_ID
+            'action'         => 'index',
+            'type'           => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
+            'item_id'        => $this->brand['id'],
+            'perspective_id' => 22
         ], [], true), $this->translate('upload/select/logo')) ?><br />
         <?=$this->htmlA($this->url('upload/params', [
-            'action' => 'index',
-            'type'   => Application\Model\DbTable\Picture::MIXED_TYPE_ID
+            'action'         => 'index',
+            'type'           => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
+            'item_id'        => $this->brand['id'],
+            'perspective_id' => 25
         ], [], true), $this->translate('upload/select/mixed-long')) ?><br />
         <?=$this->htmlA($this->url('upload/params', [
-            'action' => 'index',
-            'type'   => Application\Model\DbTable\Picture::UNSORTED_TYPE_ID
+            'action'  => 'index',
+            'type'    => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
+            'item_id' => $this->brand['id']
         ], [], true), $this->translate('upload/select/unsorted-long')) ?>
     </div>
 </div>

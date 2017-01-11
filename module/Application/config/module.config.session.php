@@ -7,7 +7,8 @@ use Zend\Session\SaveHandler\SaveHandlerInterface;
 return [
     'service_manager' => [
         'factories' => [
-            SaveHandlerInterface::class => Session\Service\SaveHandlerDbTableFactory::class
+            SaveHandlerInterface::class => Session\Service\SaveHandlerCacheFactory::class
+            //Session\Service\SaveHandlerDbTableFactory::class
         ]
     ],
     'session_config' => [
@@ -16,6 +17,7 @@ return [
         'remember_me_seconds' => 864000,
         'cookie_httponly'     => false,
         'cookie_domain'       => '.wheelsage.org',
+        'name'                => 'sid'
     ],
     'session_storage' => [
         'type' => \Zend\Session\Storage\SessionArrayStorage::class

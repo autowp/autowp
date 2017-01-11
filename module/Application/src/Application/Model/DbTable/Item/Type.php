@@ -12,5 +12,6 @@ class Type extends Table
     const VEHICLE  = 1,
           ENGINE   = 2,
           CATEGORY = 3,
-          TWINS    = 4;
+          TWINS    = 4,
+          BRAND    = 5;
 }

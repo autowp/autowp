@@ -32,7 +32,7 @@ class Mosts
                 'order'     => 'ASC'
             ]
         ],
-        [
+        /*[
             'catName'   => 'dynamic',
             'adapter'   => [
                 'name'      => 'acceleration',
@@ -50,7 +50,7 @@ class Mosts
                 'attribute' => 48,
                 'order'     => 'DESC'
             ]
-        ],
+        ],*/
 
         [
             'catName'   => 'mighty',
@@ -275,7 +275,7 @@ class Mosts
             ]
         ],
 
-        [
+        /*[
             'catName'   => 'bigbrakes',
             'adapter'   => [
                 'name'       => 'brakes',
@@ -308,7 +308,7 @@ class Mosts
                     ],
                 ]
             ]
-        ],
+        ],*/
 
 
         [
@@ -464,8 +464,7 @@ class Mosts
                 ->join('car_types_parents', 'car_types.id = car_types_parents.parent_id', null)
                 ->join('vehicle_vehicle_type', 'car_types_parents.id = vehicle_vehicle_type.vehicle_type_id', null)
                 ->join('item_parent_cache', 'vehicle_vehicle_type.vehicle_id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brandId)
+                ->where('item_parent_cache.parent_id = ?', $brandId)
                 ->group('car_types.id');
         }
 
@@ -482,8 +481,7 @@ class Mosts
                     ->join('car_types_parents', 'car_types.id = car_types_parents.parent_id', null)
                     ->join('vehicle_vehicle_type', 'car_types_parents.id = vehicle_vehicle_type.vehicle_type_id', null)
                     ->join('item_parent_cache', 'vehicle_vehicle_type.vehicle_id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                    ->where('brand_item.brand_id = ?', $brandId)
+                    ->where('item_parent_cache.parent_id = ?', $brandId)
                     ->group('car_types.id');
             }
 
@@ -611,9 +609,8 @@ class Mosts
         if ($brandId) {
             $select
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('not item_parent_cache.tuning')
-                ->where('brand_item.brand_id = ?', $brandId)
+                ->where('item_parent_cache.parent_id = ?', $brandId)
                 ->group('item.id');
         }
 
@@ -687,9 +684,8 @@ class Mosts
             $carsTable = new Vehicle();
             $select = $carsTable->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
                 ->where('not item_parent_cache.tuning')
-                ->where('brand_item.brand_id = ?', $brandId)
+                ->where('item_parent_cache.parent_id = ?', $brandId)
                 ->limit(1);
 
             foreach ($years as $idx => $year) {

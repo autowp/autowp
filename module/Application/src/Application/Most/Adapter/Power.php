@@ -15,8 +15,6 @@ class Power extends AbstractAdapter
 
     protected $order;
 
-    const TEMP_TABLE_NAME = '__engine_power_temp';
-
     public function setAttributes(array $value)
     {
         $this->attributes = $value;
@@ -30,25 +28,6 @@ class Power extends AbstractAdapter
     public function getCars(Zend_Db_Table_Select $select, $language)
     {
         $carsTable = $select->getTable();
-        $db = $carsTable->getAdapter();
-
-        $wheres = implode($select->getPart(Zend_Db_Select::WHERE));
-        $joins = $select->getPart(Zend_Db_Select::FROM);
-        unset($joins['cars']);
-
-        $tableNameQuoted = $db->quoteIdentifier(self::TEMP_TABLE_NAME);
-
-        $db->query('
-            create temporary table '.$tableNameQuoted.' (
-                item_id int unsigned not null,
-                power int unsigned not null,
-                primary key(item_id)
-            )
-        ');
-
-        $limit = $this->most->getCarsCount();
-
-
 
         $attributes = new Attribute();
 
@@ -58,70 +37,16 @@ class Power extends AbstractAdapter
 
         $valuesTable = $specService->getValueDataTable($powerAttr->type_id);
         $valuesTableName = $valuesTable->info(Zend_Db_Table_Abstract::NAME);
-
-
-
-        $funct = $this->order == 'ASC' ? 'min' : 'max';
-        $expr = $funct.'('.$valuesTableName.'.value)';
-        $attrsSelect = $db->select()
-            ->from(['engines' => 'item'], ['item.id', 'V' => new Zend_Db_Expr($expr)])
-            ->join('item', 'engines.id = item.engine_item_id', null)
-            ->join($valuesTableName, 'engines.id = '.$valuesTableName.'.item_id', null)
+        
+        $select
+            ->join($valuesTableName, 'item.id = '.$valuesTableName.'.item_id', null)
             ->where($valuesTableName.'.attribute_id = ?', $powerAttr->id)
             ->where($valuesTableName.'.value > 0')
             ->group('item.id')
-            ->order('V '. $this->order)
-            ->limit($limit);
+            ->order($valuesTableName.'.value ' . $this->order)
+            ->limit($this->most->getCarsCount());
 
-        if ($wheres) {
-            $attrsSelect->where($wheres);
-        }
-        foreach ($joins as $join) {
-            if ($join['joinType'] == Zend_Db_Select::INNER_JOIN) {
-                $attrsSelect->join($join['tableName'], $join['joinCondition'], null, $join['schema']);
-            }
-        }
-
-        $db->query(
-            'insert ignore into '.$tableNameQuoted.' (item_id, power) '.
-            $attrsSelect->assemble()
-        );
-
-        //print $attrsSelect->assemble();
-
-
-        $funct = $this->order == 'ASC' ? 'min' : 'max';
-           $expr = $funct.'('.$valuesTableName.'.value)';
-        $attrsSelect = $db->select()
-            ->from('item', ['item.id', 'V' => new Zend_Db_Expr($expr)])
-            ->join($valuesTableName, 'item.id='.$valuesTableName.'.item_id', null)
-            ->where($valuesTableName.'.attribute_id = ?', $powerAttr->id)
-            ->where($valuesTableName.'.value > 0')
-            ->group('item.id')
-            ->order('V '. $this->order)
-            ->limit($limit);
-
-        if ($wheres) {
-            $attrsSelect->where($wheres);
-        }
-        foreach ($joins as $join) {
-            if ($join['joinType'] == Zend_Db_Select::INNER_JOIN) {
-                $attrsSelect->join($join['tableName'], $join['joinCondition'], null, $join['schema']);
-            }
-        }
-
-        $db->query(
-            'insert ignore into '.$tableNameQuoted.' (item_id, power) '.
-            $attrsSelect->assemble()
-        );
-
-
-        $cars = $carsTable->fetchAll(
-            $select
-                ->join(self::TEMP_TABLE_NAME, 'item.id='.$tableNameQuoted.'.item_id', null)
-                ->group('item.id')
-                ->order('power ' . $this->order)
-        );
+        $cars = $carsTable->fetchAll($select);
 
         $result = [];
         foreach ($cars as $car) {

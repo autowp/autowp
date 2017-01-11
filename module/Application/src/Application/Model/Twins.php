@@ -11,11 +11,6 @@ use Zend_Db_Select;
 class Twins
 {
     /**
-     * @var DbTable\Brand
-     */
-    private $brandTable;
-
-    /**
      * @var DbTable\Picture
      */
     private $pictureTable;
@@ -24,16 +19,6 @@ class Twins
      * @var DbTable\Vehicle
      */
     private $itemTable;
-
-    /**
-     * @return DbTable\Brand
-     */
-    private function getBrandTable()
-    {
-        return $this->brandTable
-            ? $this->brandTable
-            : $this->brandTable = new DbTable\Brand();
-    }
 
     /**
      * @return DbTable\Picture
@@ -70,28 +55,28 @@ class Twins
         $language = $options['language'];
         $limit = $options['limit'];
 
-        $brandTable = $this->getBrandTable();
-        $db = $brandTable->getAdapter();
+        $itemTable = $this->getItemTable();
+        $db = $itemTable->getAdapter();
 
-        $langExpr = $db->quoteInto('brands.id = brand_language.brand_id and brand_language.language = ?', $language);
+        $langExpr = $db->quoteInto('item.id = item_language.item_id and item_language.language = ?', $language);
 
         $select = $db->select(true)
-            ->from('brands', [
+            ->from('item', [
                 'id',
-                'name'      => 'IFNULL(brand_language.name, brands.name)',
-                'folder'    => 'folder',
-                'count'     => new Zend_Db_Expr('count(distinct item.id)'),
+                'name'      => 'IFNULL(item_language.name, item.name)',
+                'catname',
+                'count'     => new Zend_Db_Expr('count(distinct twins.id)'),
                 'new_count' => new Zend_Db_Expr(
-                    'count(distinct if(item.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), item.id, null))'
+                    'count(distinct if(twins.add_datetime > date_sub(NOW(), INTERVAL 7 DAY), twins.id, null))'
                 ),
             ])
-            ->joinLeft('brand_language', $langExpr, null)
-            ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-            ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
-            ->join('item_parent', 'item_parent_cache.item_id = item_parent.item_id', null)
-            ->join('item', 'item_parent.parent_id = item.id', null)
-            ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
-            ->group('brands.id');
+            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+            ->joinLeft('item_language', $langExpr, null)
+            ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', null)
+            ->join('item_parent', 'ipc1.item_id = item_parent.item_id', null)
+            ->join(['twins' => 'item'], 'item_parent.parent_id = twins.id', null)
+            ->where('twins.item_type_id = ?', DbTable\Item\Type::TWINS)
+            ->group('item.id');
 
         if ($limit > 0) {
             $select
@@ -155,16 +140,16 @@ class Twins
      */
     public function getGroupBrandIds($groupId)
     {
-        $brandTable = $this->getBrandTable();
-        $brandAdapter = $brandTable->getAdapter();
+        $itemTable = $this->getItemTable();
+        $brandAdapter = $itemTable->getAdapter();
         return $brandAdapter->fetchCol(
             $brandAdapter->select()
-                ->from($brandTable->info('name'), 'id')
-                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                ->from($itemTable->info('name'), 'id')
+                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->where('item_parent_cache.item_id = ?', $groupId)
-                ->join('item', 'item_parent_cache.item_id = item.id', null)
-                ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
+                ->join(['vehicle' => 'item'], 'item_parent_cache.item_id = vehicle.id', null)
+                ->where('vehicle.item_type_id = ?', DbTable\Item\Type::TWINS)
         );
     }
 
@@ -173,16 +158,16 @@ class Twins
      */
     public function getTotalBrandsCount()
     {
-        $brandTable = $this->getBrandTable();
-        $db = $brandTable->getAdapter();
+        $itemTable = $this->getItemTable();
+        $db = $itemTable->getAdapter();
 
         return (int)$db->fetchOne(
             $db->select(true)
-                ->from('brands', 'count(distinct brands.id)')
-                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
-                ->join('item', 'item_parent_cache.item_id = item.id', null)
-                ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
+                ->from('item', 'count(distinct item.id)')
+                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                ->join(['vehicle' => 'item'], 'item_parent_cache.item_id = vehicle.id', null)
+                ->where('vehicle.item_type_id = ?', DbTable\Item\Type::TWINS)
         );
     }
 
@@ -207,8 +192,9 @@ class Twins
             $select
                 ->join('item_parent', 'item.id = item_parent.parent_id', null)
                 ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brandId)
+                ->join(['brand' => 'item'], 'item_parent_cache.parent_id = brand.id', null)
+                ->where('brand.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->where('item_parent_cache.parent_id = ?', $brandId)
                 ->group('item.id');
         }
 

@@ -189,8 +189,7 @@ class CatalogueController extends AbstractActionController
             $select = $this->selectFromPictures()
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand['id'])
+                ->where('item_parent_cache.parent_id = ?', $brand['id'])
                 ->group('pictures.id')
                 ->order([
                     'pictures.accept_datetime DESC',
@@ -227,8 +226,7 @@ class CatalogueController extends AbstractActionController
 
             $select = $this->catalogue()->getItemTable()->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand['id'])
+                ->where('item_parent_cache.parent_id = ?', $brand['id'])
                 ->where('item.is_concept')
                 ->where('not item.is_concept_inherit')
                 ->group('item.id')
@@ -299,8 +297,7 @@ class CatalogueController extends AbstractActionController
                 ->join('vehicle_vehicle_type', 'car_types.id = vehicle_vehicle_type.vehicle_type_id', null)
                 ->join('item', 'vehicle_vehicle_type.vehicle_id = item.id', null)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand['id'])
+                ->where('item_parent_cache.parent_id = ?', $brand['id'])
                 ->where('item.begin_year or item.begin_model_year')
                 ->where('not item.is_group')
                 ->group('car_types.id')
@@ -324,8 +321,7 @@ class CatalogueController extends AbstractActionController
 
             $select = $this->catalogue()->getItemTable()->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand['id'])
+                ->where('item_parent_cache.parent_id = ?', $brand['id'])
                 ->where('item.begin_year or item.begin_model_year')
                 ->where('not item.is_group')
                 ->group('item.id')
@@ -394,8 +390,7 @@ class CatalogueController extends AbstractActionController
                 )
                 ->join('factory_item', 'factory.id = factory_item.factory_id', null)
                 ->join('item_parent_cache', 'factory_item.item_id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brandId)
+                ->where('item_parent_cache.parent_id = ?', $brandId)
                 ->group('factory.id')
                 ->join('pictures', 'factory.id = pictures.factory_id', null)
                 ->where('pictures.type = ?', Picture::FACTORY_TYPE_ID)
@@ -446,8 +441,7 @@ class CatalogueController extends AbstractActionController
                 $select = $this->selectOrderFromPictures()
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                    ->where('brand_item.brand_id = ?', $brand['id'])
+                    ->where('item_parent_cache.parent_id = ?', $brand['id'])
                     ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
                     ->group('pictures.id')
                     ->limit(12);
@@ -465,8 +459,7 @@ class CatalogueController extends AbstractActionController
                                 ->from('picture_item', 'item_id')
                                 ->where('picture_item.picture_id = ?', $picture['id'])
                                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                                ->where('brand_item.brand_id = ?', $brand['id'])
+                                ->where('item_parent_cache.parent_id = ?', $brand['id'])
                         );
 
                         if (! $carId) {
@@ -507,7 +500,7 @@ class CatalogueController extends AbstractActionController
             foreach ($types as $key => &$type) {
                 $type['links'] = $links->fetchAll(
                     $links->select()
-                        ->where('brandId = ?', $brand['id'])
+                        ->where('item_id = ?', $brand['id'])
                         ->where('type = ?', $key)
                 );
             }
@@ -525,14 +518,27 @@ class CatalogueController extends AbstractActionController
                     ->where('item.item_type_id = ?', DbTable\Item\Type::TWINS)
                     ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', null)
                     ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
-                    ->join('brand_item', 'ipc2.parent_id = brand_item.item_id', null)
-                    ->where('brand_item.brand_id = ?', $brand['id'])
+                    ->where('ipc2.parent_id = ?', $brand['id'])
                     ->limit(1)
             );
 
+            $itemLanguageTable = new DbTable\Vehicle\Language();
+            $db = $itemLanguageTable->getAdapter();
+            $orderExpr = $db->quoteInto('language = ? desc', $this->language());
+            $itemLanguageRows = $itemLanguageTable->fetchAll([
+                'item_id = ?' => $brand['id']
+            ], new \Zend_Db_Expr($orderExpr));
+            
+            $textIds = [];
+            foreach ($itemLanguageRows as $itemLanguageRow) {
+                if ($itemLanguageRow->text_id) {
+                    $textIds[] = $itemLanguageRow->text_id;
+                }
+            }
+            
             $description = null;
-            if ($brand['text_id']) {
-                $description = $this->textStorage->getText($brand['text_id']);
+            if ($textIds) {
+                $description = $this->textStorage->getFirstText($textIds);
             }
 
             $this->sidebar()->brand([
@@ -565,8 +571,7 @@ class CatalogueController extends AbstractActionController
                         ->where('pictures.status = ?', Picture::STATUS_INBOX)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                        ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                        ->where('brand_item.brand_id = ?', $brand['id'])
+                        ->where('item_parent_cache.parent_id = ?', $brand['id'])
                 );
             }
 
@@ -597,9 +602,23 @@ class CatalogueController extends AbstractActionController
      */
     private function typePicturesSelect($brandId, $type, $onlyAccepted = true)
     {
-        return $this->selectOrderFromPictures($onlyAccepted)
-            ->where('pictures.brand_id = ?', $brandId)
-            ->where('pictures.type = ?', $type);
+        $select = $this->selectOrderFromPictures($onlyAccepted)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->where('picture_item.item_id = ?', $brandId);
+        
+        switch ($type) {
+            case Picture::MIXED_TYPE_ID:
+                $select->where('picture_item.perspective_id = ?', 25);
+                break;
+            case Picture::LOGO_TYPE_ID:
+                $select->where('picture_item.perspective_id = ?', 22);
+                break;
+            default:
+                $select->where('picture_item.perspective_id not in (?) or picture_item.perspective_id is null', [22, 25]);
+                break;
+        }
+        
+        return $select;
     }
 
     private function typePictures($type)
@@ -821,7 +840,7 @@ class CatalogueController extends AbstractActionController
                 'item.body', 'item.today', 'item.produced', 'item.produced_exactly',
                 'item.begin_year', 'item.end_year', 'item.begin_month', 'item.end_month',
                 'item.is_group',
-                'brand_item_catname' => 'brand_item.catname'
+                'brand_item_catname' => 'item_parent.catname'
             ];
 
             $field = 'item.id';
@@ -843,16 +862,16 @@ class CatalogueController extends AbstractActionController
 
             $select
                 ->columns($columns)
-                ->join('brand_item', $field . ' = brand_item.item_id', null)
-                ->where('brand_item.brand_id = :brand_id')
-                ->where('brand_item.catname = :brand_item_catname');
+                ->join('item_parent', $field . ' = item_parent.item_id', null)
+                ->where('item_parent.parent_id = :brand_id')
+                ->where('item_parent.catname = :brand_item_catname');
 
             $currentCar = $db->fetchRow($select, [
                 'lang'               => $language,
                 'brand_id'           => (int)$brand['id'],
                 'brand_item_catname' => (string)$this->params('car_catname')
             ]);
-
+            
             if (! $currentCar) {
                 return $this->notFoundAction();
             }
@@ -892,7 +911,8 @@ class CatalogueController extends AbstractActionController
                 $topCarName = $carFullName;
             }
 
-            $bvName = $this->brandVehicle->getName($brand['id'], $currentCar['top_item_id'], $language);
+            $bvName = false;
+            //$bvName = $this->brandVehicle->getName($brand['id'], $currentCar['top_item_id'], $language);
             if (! $bvName) {
                 $bvName = $this->stripName($brand, $topCarName);
             }
@@ -939,15 +959,16 @@ class CatalogueController extends AbstractActionController
             // new design projects
             $designCarsRow = $db->fetchRow(
                 $db->select()
-                    ->from('brands', [
+                    ->from('item', [
                         'brand_name'    => 'name',
-                        'brand_catname' => 'folder'
+                        'brand_catname' => 'catname'
                     ])
-                    ->join('brand_item', 'brands.id = brand_item.brand_id', [
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                    ->join('item_parent', 'item.id = item_parent.parent_id', [
                         'brand_item_catname' => 'catname'
                     ])
-                    ->where('brand_item.type = ?', BrandItem::TYPE_DESIGN)
-                    ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', 'item_id')
+                    ->where('item_parent.type = ?', VehicleParent::TYPE_DESIGN)
+                    ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id = ?', $currentCar['id'])
             );
             if ($designCarsRow) {
@@ -1710,8 +1731,7 @@ class CatalogueController extends AbstractActionController
             ->join('pictures', 'comments_messages.item_id = pictures.id', null)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-            ->where('brand_item.brand_id = ?', $brandId);
+            ->where('item_parent_cache.parent_id = ?', $brandId);
 
         $paginator = new Paginator(
             new Zend1DbTableSelect($select)
@@ -2034,8 +2054,7 @@ class CatalogueController extends AbstractActionController
             $db->select()
                 ->from($itemTable->info('name'), 'count(1)')
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', (int)$brandId)
+                ->where('item_parent_cache.parent_id = ?', (int)$brandId)
         );
 
         return $carsCount >= $this->mostsMinCarsCount;

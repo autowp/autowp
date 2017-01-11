@@ -63,6 +63,10 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 'name'    => 'name',
                 'type'    => \Application\Form\Element\CarName::class
             ],
+            'full_name' => [
+                'name'    => 'full_name',
+                'type'    => \Application\Form\Element\BrandFullName::class,
+            ],
             'catname' => [
                 'name'    => 'catname',
                 'type'    => 'Text',
@@ -167,8 +171,12 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 ],
             ],
         ];
+        
+        if ($this->itemType != DbTable\Item\Type::BRAND) {
+            unset($elements['full_name']);
+        }
 
-        if ($this->itemType != DbTable\Item\Type::CATEGORY) {
+        if (! in_array($this->itemType, [DbTable\Item\Type::CATEGORY, DbTable\Item\Type::BRAND])) {
             unset($elements['catname']);
         }
 

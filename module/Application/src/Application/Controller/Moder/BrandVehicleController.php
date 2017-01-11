@@ -55,6 +55,9 @@ class BrandVehicleController extends AbstractActionController
 
     public function itemAction()
     {
+        print 'Temporarly disabled';
+        exit;
+        
         if (! $this->user()->isAllowed('car', 'move')) {
             return $this->forbiddenAction();
         }
@@ -62,7 +65,7 @@ class BrandVehicleController extends AbstractActionController
         $brandTable = $this->getBrandTable();
         $brandVehicleTable = new DbTable\BrandItem();
         $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
-        $vehicleTable = $this->catalogue()->getItemTable();
+        $itemTable = $this->catalogue()->getItemTable();
 
         $brandItemRow = $brandVehicleTable->fetchRow([
             'brand_id = ?'  => $this->params('brand_id'),
@@ -74,7 +77,7 @@ class BrandVehicleController extends AbstractActionController
         }
 
         $brandRow = $brandTable->find($brandItemRow->brand_id)->current();
-        $vehicleRow = $vehicleTable->find($brandItemRow->item_id)->current();
+        $vehicleRow = $itemTable->find($brandItemRow->item_id)->current();
         if (! $brandRow || ! $vehicleRow) {
             return $this->notFoundAction();
         }
@@ -121,15 +124,20 @@ class BrandVehicleController extends AbstractActionController
 
     public function addAction()
     {
+        print 'Temporarly disabled';
+        exit;
+        
         if (! $this->user()->isAllowed('car', 'move')) {
             return $this->forbiddenAction();
         }
 
-        $brandTable = $this->getBrandTable();
-        $vehicleTable = $this->catalogue()->getItemTable();
+        $itemTable = $this->catalogue()->getItemTable();
 
-        $brandRow = $brandTable->find($this->params('brand_id'))->current();
-        $vehicleRow = $vehicleTable->fetchRow([
+        $brandRow = $itemTable->fetchRow([
+            'item_type_id = ?' => DbTable\Item\Type::BRAND,
+            'id = ?'           => (int)$this->params('brand_id')
+        ]);
+        $vehicleRow = $itemTable->fetchRow([
             'id = ?'              => (int)$this->params('vehicle_id'),
             'item_type_id IN (?)' => [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE]
         ]);
@@ -155,15 +163,20 @@ class BrandVehicleController extends AbstractActionController
 
     public function deleteAction()
     {
+        print 'Temporarly disabled';
+        exit;
+        
         if (! $this->user()->isAllowed('car', 'move')) {
             return $this->forbiddenAction();
         }
 
-        $brandTable = $this->getBrandTable();
-        $vehicleTable = $this->catalogue()->getItemTable();
+        $itemTable = $this->catalogue()->getItemTable();
 
-        $brandRow = $brandTable->find($this->params('brand_id'))->current();
-        $vehicleRow = $vehicleTable->find($this->params('vehicle_id'))->current();
+        $brandRow = $brandTable->fetchRow([
+            'item_type_id = ?' => DbTable\Item\Type::BRAND,
+            'id = ?'           => (int)$this->params('brand_id')
+        ]);
+        $vehicleRow = $itemTable->find($this->params('vehicle_id'))->current();
 
         if (! $brandRow || ! $vehicleRow) {
             return $this->notFoundAction();

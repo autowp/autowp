@@ -464,54 +464,6 @@ class Picture extends Table
         return true;
     }
 
-    public function moveToBrand(PictureItem $pictureItem, $pictureId, $id, $type, $userId, array $options)
-    {
-        $picture = $this->find($pictureId)->current();
-        if (! $picture) {
-            return false;
-        }
-
-        $brandTable = new BrandTable();
-        $brand = $brandTable->find($id)->current();
-        if (! $brand) {
-            return false;
-        }
-
-        $oldParams = [
-            'type'       => $picture->type,
-            'brand_id'   => $picture->brand_id,
-            'item_ids'   => $pictureItem->getPictureItems($picture->id),
-            'factory_id' => $picture->factory_id
-        ];
-
-        $picture->setFromArray([
-            'factory_id' => null,
-            'brand_id'   => $brand->id,
-            'type'       => $type,
-        ]);
-        $picture->save();
-
-        $pictureItem->setPictureItems($picture->id, []);
-
-        if ($picture->image_id) {
-            $this->imageStorage->changeImageName($picture->image_id, [
-                'pattern' => $picture->getFileNamePattern(),
-            ]);
-        }
-
-        $this->refreshCounts($oldParams);
-        $this->refreshPictureCounts($pictureItem, $picture);
-
-        $log = new LogEvent();
-        $log($userId, sprintf(
-            'Назначение бренда %s картинке %s',
-            htmlspecialchars($brand->name),
-            htmlspecialchars($options['pictureNameFormatter']->format($picture, $options['language']))
-        ), [$picture, $brand]);
-
-        return true;
-    }
-
     public function moveToFactory(PictureItem $pictureItem, $pictureId, $id, $userId, array $options)
     {
         $picture = $this->find($pictureId)->current();

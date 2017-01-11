@@ -58,7 +58,7 @@ class TwinsController extends AbstractActionController
     {
         $language = $this->language();
 
-        $key = 'TWINS_SIDEBAR_4_' . $language;
+        $key = 'TWINS_SIDEBAR_7_' . $language;
 
         $arr = $this->cache->getItem($key, $success);
         if (! $success) {
@@ -68,7 +68,7 @@ class TwinsController extends AbstractActionController
 
             foreach ($arr as &$brand) {
                 $brand['url'] = $this->url()->fromRoute('twins/brand', [
-                    'brand_catname' => $brand['folder']
+                    'brand_catname' => $brand['catname']
                 ]);
             }
             unset($brand);
@@ -356,7 +356,10 @@ class TwinsController extends AbstractActionController
 
     public function brandAction()
     {
-        $brand = $this->catalogue()->getBrandTable()->findRowByCatname($this->params('brand_catname'));
+        $brand = $this->catalogue()->getItemTable()->fetchRow([
+            'item_type_id = ?' => DbTable\Item\Type::BRAND,
+            'catname = ?'      => (string)$this->params('brand_catname')
+        ]);
 
         if (! $brand) {
             return $this->notFoundAction();
@@ -365,8 +368,8 @@ class TwinsController extends AbstractActionController
         $canEdit = $this->user()->isAllowed('twins', 'edit');
 
         $paginator = $this->getTwins()->getGroupsPaginator([
-                'brandId' => $brand->id
-            ])
+            'brandId' => $brand->id
+        ])
             ->setItemCountPerPage(self::GROUPS_PER_PAGE)
             ->setCurrentPageNumber($this->params('page'));
 

@@ -4,6 +4,7 @@ namespace Application;
 
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\AbstractListenerAggregate;
+use Zend\Http\Request;
 use Zend\Mvc\MvcEvent;
 use Zend\Session\ManagerInterface;
 
@@ -19,34 +20,41 @@ class SessionDispatchListener extends AbstractListenerAggregate
     }
 
     /**
-     * Test if the content-type received is allowable.
-     *
      * @param  MvcEvent $e
      * @return null
      */
     public function onBootstrap(MvcEvent $e)
     {
-        $cookieDomain = $this->getHostCookieDomain($e->getRequest());
-        if ($cookieDomain) {
+        $request = $e->getRequest();
+        if ($request instanceof Request) {
             $serviceManager = $e->getApplication()->getServiceManager();
             $sessionManager = $serviceManager->get(ManagerInterface::class);
-            $sessionManager->getConfig()->setStorageOption('cookie_domain', $cookieDomain);
-            $sessionManager->start();
+            $config = $sessionManager->getConfig();
+            
+            $cookieDomain = $this->getHostCookieDomain($request);
+            if ($cookieDomain) {
+                $config->setCookieDomain($cookieDomain);
+                //$sessionManager->start();
+            }
+            
+            /*$cookies = $request->getCookie();
+            $key = $config->getName();
+            if (isset($cookies[$key])) {
+                $sessionManager->start();
+            }*/
         }
     }
 
-    private function getHostCookieDomain($request)
+    private function getHostCookieDomain(Request $request)
     {
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
-            $hostname = $request->getUri()->getHost();
+        $hostname = $request->getUri()->getHost();
 
-            switch ($hostname) {
-                case 'www.autowp.ru':
-                case 'autowp.ru':
-                    return '.autowp.ru';
-                default:
-                    return '.wheelsage.org';
-            }
+        switch ($hostname) {
+            case 'www.autowp.ru':
+            case 'autowp.ru':
+                return '.autowp.ru';
+            default:
+                return '.wheelsage.org';
         }
 
         return null;

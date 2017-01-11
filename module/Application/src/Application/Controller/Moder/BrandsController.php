@@ -98,7 +98,7 @@ class BrandsController extends AbstractActionController
 
     public function brandAction()
     {
-        if (! $this->user()->inheritsRole('moder')) {
+        if (! $this->user()->inheritsRole('admin')) {
             return $this->forbiddenAction();
         }
 

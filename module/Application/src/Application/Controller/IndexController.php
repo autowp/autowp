@@ -290,7 +290,7 @@ class IndexController extends AbstractActionController
     {
         $language = $this->language();
 
-        $cacheKey = 'INDEX_BRANDS_HTML261' . $language;
+        $cacheKey = 'INDEX_BRANDS_HTML264' . $language;
         $brands = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             // cache missing
@@ -393,7 +393,7 @@ class IndexController extends AbstractActionController
             $itemTable = $this->catalogue()->getItemTable();
             $carOfDay = $itemTable->find($carId)->current();
             if ($carOfDay) {
-                $key = 'CAR_OF_DAY_90_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
+                $key = 'CAR_OF_DAY_93_' . $carOfDay->id . '_' . $language . '_' . $httpsFlag;
 
                 $carOfDayInfo = $this->cache->getItem($key, $success);
                 if (! $success) {
@@ -626,7 +626,7 @@ class IndexController extends AbstractActionController
 
             foreach ($twinsBrands as &$brand) {
                 $brand['url'] = $this->url()->fromRoute('twins/brand', [
-                    'brand_catname' => $brand['folder']
+                    'brand_catname' => $brand['catname']
                 ]);
             }
             unset($brand);
@@ -641,7 +641,7 @@ class IndexController extends AbstractActionController
 
         $userTable = new User();
 
-        $cacheKey = 'INDEX_SPEC_CARS_13_' . $language;
+        $cacheKey = 'INDEX_SPEC_CARS_15_' . $language;
         $cars = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             $itemTable = $this->catalogue()->getItemTable();

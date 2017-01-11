@@ -132,6 +132,10 @@ return array_replace(include 'root.php', [
     'item/type/4/name-plural' => 'Twins',
     'item/type/4/new-item' => 'New twnis group',
     'item/type/4/add-sub-item' => 'Add sub-twins',
+    'item/type/5/name' => 'Brand',
+    'item/type/5/name-plural' => 'Brands',
+    'item/type/5/new-item' => 'New brand',
+    'item/type/5/add-sub-item' => 'Add sub-brand',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Non triés',
@@ -256,7 +260,7 @@ return array_replace(include 'root.php', [
     'mosts/period/1980-89'    => '1980-89',
     'mosts/period/1990-99'    => '1990-99',
     'mosts/period/2000-09'    => '2000-09',
-    'mosts/period/2010-15'    => '2010-15',
+    'mosts/period/2010-16'    => '2010-16',
     'mosts/period/present'    => 'au présent',
     'mosts/period/all-time'   => 'dans l\'histoire',
 
@@ -389,6 +393,7 @@ Le commentaire suivant, vous pourrez laisser "%s", et alors que vous avez le tem
     'perspective/logo'           => 'logo',
     'perspective/mascot'         => 'mascot',
     'perspective/sketch'         => 'sketch',
+    'perspective/mixed'          => 'mixed',
 
     'login/sign-in' => 'Entrée',
     'login/sign-out' => 'Sortie',
@@ -1110,12 +1115,8 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/pictures/filter/perspective/empty' => 'vide',
     'moder/pictures/filter/type' => 'Type',
     'moder/pictures/filter/type/any' => 'tout',
-    'moder/pictures/filter/type/item' => 'véhicule, moteur',
-    'moder/pictures/filter/type/logotype' => 'logotype',
-    'moder/pictures/filter/type/mixed' => 'mixte',
-    'moder/pictures/filter/type/unsorted' => 'non trié',
+    'moder/pictures/filter/type/item' => 'brand, véhicule, moteur',
     'moder/pictures/filter/type/factory' => 'usine',
-    'moder/pictures/filter/type/unsorted+mixed+logo' => 'non trié + mixte + logotype',
     'moder/pictures/filter/comments' => 'commentaires',
     'moder/pictures/filter/comments/not-matters'  => 'pas les questions',
     'moder/pictures/filter/comments/has-comments' => 'a des commentaires',

@@ -67,7 +67,7 @@ class BrandNav
 
     private function brandSections($language, $brand, $type, $carId, $isConcepts)
     {
-        $conceptsSeparatly = ! in_array($brand['type_id'], [3, 4]);
+        $conceptsSeparatly = true;//! in_array($brand['type_id'], [3, 4]);
 
         // create groups array
         $sections = $this->carSections($language, $brand, $conceptsSeparatly, $carId);
@@ -75,10 +75,6 @@ class BrandNav
         $sections = array_merge(
             $sections,
             [
-                [
-                    'name'   => null,
-                    'groups' => $this->subBrandGroups($language, $brand)
-                ],
                 [
                     'name'   => null,
                     'groups' => $this->otherGroups(
@@ -114,7 +110,7 @@ class BrandNav
             $brand['id'],
             $language,
             $conceptsSeparatly ? '1' : '0',
-            '3'
+            '9'
         ]);
 
         $groups = $this->cache->getItem($cacheKey, $success);
@@ -129,8 +125,7 @@ class BrandNav
                 $select = $db->select()
                     ->from('item', new Zend_Db_Expr('1'))
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                    ->where('brand_item.brand_id = ?', $brand['id'])
+                    ->where('item_parent_cache.parent_id = ?', $brand['id'])
                     ->where('item.is_concept')
                     ->limit(1);
                 if ($db->fetchOne($select) > 0) {
@@ -151,9 +146,11 @@ class BrandNav
             $logoPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
-                    ->where('type = ?', Picture::LOGO_TYPE_ID)
-                    ->where('brand_id = ?', $brand['id'])
+                    ->where('pictures.status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->where('picture_item.perspective_id = ?', 22)
+                    ->where('picture_item.item_id = ?', $brand['id'])
             );
             if ($logoPicturesCount > 0) {
                 $groups['logo'] = [
@@ -170,9 +167,11 @@ class BrandNav
             $mixedPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
-                    ->where('type = ?', Picture::MIXED_TYPE_ID)
-                    ->where('brand_id = ?', $brand['id'])
+                    ->where('pictures.status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->where('picture_item.perspective_id = ?', 25)
+                    ->where('picture_item.item_id = ?', $brand['id'])
             );
             if ($mixedPicturesCount > 0) {
                 $groups['mixed'] = [
@@ -189,9 +188,11 @@ class BrandNav
             $unsortedPicturesCount = $picturesAdapter->fetchOne(
                 $select = $picturesAdapter->select()
                     ->from('pictures', new Zend_Db_Expr('count(*)'))
-                    ->where('status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
-                    ->where('type = ?', Picture::UNSORTED_TYPE_ID)
-                    ->where('brand_id = ?', $brand['id'])
+                    ->where('pictures.status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+                    ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->where('picture_item.perspective_id NOT IN (?) OR picture_item.perspective_id IS NULL', [22, 25])
+                    ->where('picture_item.item_id = ?', $brand['id'])
             );
 
             if ($unsortedPicturesCount > 0) {
@@ -239,9 +240,9 @@ class BrandNav
             $aliases[] = $brandAliasRow->name;
         }
 
-        $brandLangTable = new DbTable\BrandLanguage();
+        $brandLangTable = new DbTable\Vehicle\Language();
         $brandLangRows = $brandLangTable->fetchAll([
-            'brand_id = ?' => $brand['id']
+            'item_id = ?' => $brand['id']
         ]);
         foreach ($brandLangRows as $brandLangRow) {
             $aliases[] = $brandLangRow->name;
@@ -260,50 +261,28 @@ class BrandNav
         return $aliases;
     }
 
-    private function subBrandGroups($language, array $brand)
-    {
-        $brandModel = new BrandModel();
-
-        $rows = $brandModel->getList($language, function ($select) use ($brand) {
-            $select->where('parent_brand_id = ?', $brand['id']);
-        });
-
-        $groups = [];
-        foreach ($rows as $subBrand) {
-            $groups[] = [
-                'url'  => $this->url('catalogue', [
-                    'action'        => 'brand',
-                    'brand_catname' => $subBrand['catname']
-                ]),
-                'name' => $subBrand['name'],
-            ];
-        }
-
-        return $groups;
-    }
-
     private function carSectionGroupsSelect($brandId, $itemTypeId, $carTypeId, $nullType, $conceptsSeparatly)
     {
-        $brandItemTable = new DbTable\BrandItem();
-        $db = $brandItemTable->getAdapter();
+        $itemParentTable = new DbTable\Vehicle\ParentTable();
+        $db = $itemParentTable->getAdapter();
 
         $select = $db->select()
-            ->from($brandItemTable->info('name'), [
+            ->from($itemParentTable->info('name'), [
                 'brand_item_catname' => 'catname',
-                'brand_id'
+                'brand_id' => 'parent_id'
             ])
-            ->join('item', 'item.id = brand_item.item_id', [
+            ->join('item', 'item.id = item_parent.item_id', [
                 'item_id'  => 'id',
                 'car_name' => 'item.name',
             ])
-            ->where('brand_item.brand_id = ?', $brandId)
-            ->where('item.item_type_id = ?', $itemTypeId)
+            ->where('item_parent.parent_id = ?', $brandId)
             ->group('item.id');
         if ($conceptsSeparatly) {
             $select->where('NOT item.is_concept');
         }
 
         if ($itemTypeId == DbTable\Item\Type::VEHICLE) {
+            $select->where('item.item_type_id IN (?)', [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::BRAND]);
             if ($carTypeId) {
                 $select
                     ->join('vehicle_vehicle_type', 'item.id = vehicle_vehicle_type.vehicle_id', null)
@@ -336,6 +315,8 @@ class BrandNav
                     }
                 }
             }
+        } else {
+            $select->where('item.item_type_id = ?', $itemTypeId);
         }
 
         return $select;
@@ -343,9 +324,8 @@ class BrandNav
 
     private function carSectionGroups($language, array $brand, array $section, $conceptsSeparatly, $carId)
     {
-        $brandItemTable = new DbTable\BrandItem();
-        $brandVehicleLangaugeTable = new DbTable\Brand\VehicleLanguage();
-        $db = $brandItemTable->getAdapter();
+        $itemParentLangaugeTable = new DbTable\Item\ParentLanguage();
+        $db = $itemParentLangaugeTable->getAdapter();
 
         $rows = [];
         if ($section['car_type_id']) {
@@ -393,10 +373,10 @@ class BrandNav
                 'car_catname'   => $brandItemRow['brand_item_catname']
             ]);
 
-            $bvlRow = $brandVehicleLangaugeTable->fetchRow([
-                'vehicle_id = ?' => $brandItemRow['item_id'],
-                'brand_id = ?'   => $brandItemRow['brand_id'],
-                'language = ?'   => $language,
+            $bvlRow = $itemParentLangaugeTable->fetchRow([
+                'item_id = ?'   => $brandItemRow['item_id'],
+                'parent_id = ?' => $brandItemRow['brand_id'],
+                'language = ?'  => $language,
                 'length(name) > 0'
             ]);
 
@@ -444,7 +424,7 @@ class BrandNav
             'SIDEBAR',
             $brand['id'],
             $language,
-            '34'
+            '38'
         ]);
 
         $sections = $this->cache->getItem($cacheKey, $success);

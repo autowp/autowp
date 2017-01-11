@@ -46,7 +46,8 @@
         "zendframework/zend-view": ">=2.7",
         "zendframework/zendframework1": "1.*",
         "zfcampus/zf-oauth2": "^1.3",
-        "autowp/image": ">=1.1.2"
+        "autowp/image": ">=1.1.2",
+        "ps/image-optimizer": "^1.0"
     },
     "autoload": {
         "psr-4": {

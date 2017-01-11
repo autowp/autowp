@@ -1,9 +1,9 @@
 <?php if (count($this->carList)) { ?>
-    <?php if ($this->brand->img) { ?>
+    <?php if ($this->brand->logo_id) { ?>
         <?=$this->htmlA($this->url('catalogue', [
             'action'        => 'brand',
-            'brand_catname' => $this->brand->folder
-        ]), $this->img($this->brand->img, [
+            'brand_catname' => $this->brand->catname
+        ]), $this->img($this->brand->logo_id, [
             'alt'    => '',
             'title'  => ($this->brandLang ? $this->brandLang->name : $this->brand->name),
             'style'  => "float:right;margin:0 0 5px 5px",

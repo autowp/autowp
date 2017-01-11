@@ -36,21 +36,6 @@ class ParentTable extends Table
         TYPE_SPORT = 2,
         TYPE_DESIGN = 3;
 
-    /**
-     * @var BrandItem
-     */
-    private $brandItemTable;
-
-    /**
-     * @return BrandItem
-     */
-    private function getBrandItemTable()
-    {
-        return $this->brandItemTable
-            ? $this->brandItemTable
-            : $this->brandItemTable = new BrandItem();
-    }
-
     public function collectChildIds($id)
     {
         $cpTableName = $this->info('name');
@@ -152,11 +137,16 @@ class ParentTable extends Table
                 DbTable\Item\Type::ENGINE => true
             ],
             DbTable\Item\Type::CATEGORY => [
-                DbTable\Item\Type::VEHICLE => true,
+                DbTable\Item\Type::VEHICLE  => true,
                 DbTable\Item\Type::CATEGORY => true
             ],
             DbTable\Item\Type::TWINS => [
                 DbTable\Item\Type::VEHICLE => true
+            ],
+            DbTable\Item\Type::BRAND => [
+                DbTable\Item\Type::BRAND   => true,
+                DbTable\Item\Type::VEHICLE => true,
+                DbTable\Item\Type::ENGINE  => true,
             ]
         ];
 
@@ -168,11 +158,16 @@ class ParentTable extends Table
         $parentId = (int)$parent->id;
 
         $defaults = [
-            'type'    => self::TYPE_DEFAULT,
-            'catname' => $id,
-            'name'    => null
+            'type'           => self::TYPE_DEFAULT,
+            'catname'        => $id,
+            'manual_catname' => isset($options['catname']),
+            'name'           => null
         ];
-        $options = array_merge($defaults, $options);
+        $options = array_replace($defaults, $options);
+        
+        if (! isset($options['type'])) {
+            throw new Exception("Type cannot be null");
+        }
 
         $parentIds = $this->collectParentIds($parentId);
         if (in_array($id, $parentIds)) {
@@ -185,12 +180,13 @@ class ParentTable extends Table
         ]);
         if (! $row) {
             $row = $this->createRow([
-                'item_id'   => $id,
-                'parent_id' => $parentId,
-                'catname'   => $options['catname'],
-                'name'      => $options['name'],
-                'timestamp' => new Zend_Db_Expr('now()'),
-                'type'      => $options['type']
+                'item_id'        => $id,
+                'parent_id'      => $parentId,
+                'catname'        => $options['catname'],
+                'manual_catname' => $options['manual_catname'] ? 1 : 0,
+                'name'           => $options['name'],
+                'timestamp'      => new Zend_Db_Expr('now()'),
+                'type'           => $options['type']
             ]);
             $row->save();
         }
@@ -234,9 +230,9 @@ class ParentTable extends Table
         $result = [];
 
         $limit = $breakOnFirst ? 1 : null;
-        $brandItemRows = $this->getBrandItemTable()->fetchAll([
-            'item_id = ?'  => $carId,
-            'brand_id = ?' => $brandId
+        $brandItemRows = $this->fetchAll([
+            'item_id = ?'   => $carId,
+            'parent_id = ?' => $brandId
         ], null, $limit);
         foreach ($brandItemRows as $brandItemRow) {
             $result[] = [
@@ -279,29 +275,25 @@ class ParentTable extends Table
         }
 
         $breakOnFirst = isset($options['breakOnFirst']) && $options['breakOnFirst'];
+        $db = $this->getAdapter();
 
         $result = [];
-
-        $db = $this->getBrandItemTable()->getAdapter();
-
-        $select = $db->select()
-            ->from('brand_item', 'catname')
-            ->join('brands', 'brand_item.brand_id = brands.id', 'folder')
-            ->where('brand_item.item_id = ?', $carId);
-
-        if ($breakOnFirst) {
-            $select->limit(1);
-        }
-
-        $brandItemRows = $db->fetchAll($select);
-        foreach ($brandItemRows as $brandItemRow) {
+        
+        $brand = $db->fetchRow(
+            $db->select()
+                ->from('item', ['catname'])
+                ->where('item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->where('id = ?', $carId)
+        );
+        
+        if ($brand) {
             $result[] = [
-                'brand_catname' => $brandItemRow['folder'],
-                'car_catname'   => $brandItemRow['catname'],
+                'brand_catname' => $brand['catname'],
+                'car_catname'   => null,
                 'path'          => []
             ];
         }
-
+        
         if ($breakOnFirst && count($result)) {
             return $result;
         }
@@ -309,6 +301,28 @@ class ParentTable extends Table
         $parents = $this->fetchAll([
             'item_id = ?' => $carId
         ]);
+        
+        foreach ($parents as $parentRow) {
+            
+            $brand = $db->fetchRow(
+                $db->select()
+                    ->from('item', ['catname'])
+                    ->where('item_type_id = ?', DbTable\Item\Type::BRAND)
+                    ->where('id = ?', $parentRow['parent_id'])
+            );
+            
+            if ($brand) {
+                $result[] = [
+                    'brand_catname' => $brand['catname'],
+                    'car_catname'   => $parentRow['catname'],
+                    'path'          => []
+                ];
+            }
+        }
+
+        if ($breakOnFirst && count($result)) {
+            return $result;
+        }
 
         foreach ($parents as $parent) {
             $paths = $this->getPaths($parent->parent_id, $options);

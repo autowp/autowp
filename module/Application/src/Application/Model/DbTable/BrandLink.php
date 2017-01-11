@@ -10,9 +10,9 @@ class BrandLink extends Table
     protected $_primary = 'id';
 
     protected $_referenceMap = [
-        'Brand' => [
-            'columns'       => ['brandId'],
-            'refTableClass' => \Application\Model\DbTable\Brand::class,
+        'Item' => [
+            'columns'       => ['item_id'],
+            'refTableClass' => Vehicle::class,
             'refColumns'    => ['id']
         ]
     ];

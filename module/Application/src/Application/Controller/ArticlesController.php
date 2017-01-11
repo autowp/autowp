@@ -23,10 +23,10 @@ class ArticlesController extends AbstractActionController
 
         return $brandModel->getList($language, function ($select) {
             $select
-                ->join(['abc' => 'articles_brands_cache'], 'brands.id = abc.brand_id', null)
+                ->join(['abc' => 'articles_brands_cache'], 'item.id = abc.brand_id', null)
                 ->join('articles', 'abc.article_id = articles.id', null)
                 ->where('articles.enabled')
-                ->group('brands.id');
+                ->group('item.id');
         });
     }
 
@@ -60,7 +60,7 @@ class ArticlesController extends AbstractActionController
         foreach ($paginator->getCurrentItems() as $row) {
             $previewUrl = null;
             if ($row->previewExists()) {
-                $previewUrl = '/' . Article::PREVIEW_CAT_PATH . $this->preview_filename;
+                $previewUrl = '/' . Article::PREVIEW_CAT_PATH . $row->preview_filename;
             }
             $articles[] = [
                 'previewUrl'  => $previewUrl,
@@ -106,7 +106,7 @@ class ArticlesController extends AbstractActionController
         $brandModel = new BrandModel();
         $brands = $brandModel->getList($this->language(), function ($select) use ($article) {
             $select
-                ->join('articles_brands', 'brands.id = articles_brands.brand_id', null)
+                ->join('articles_brands', 'item.id = articles_brands.brand_id', null)
                 ->where('articles_brands.article_id = ?', $article->id);
         });
         foreach ($brands as $brand) {

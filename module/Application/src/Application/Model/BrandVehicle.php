@@ -9,19 +9,24 @@ use Autowp\ZFComponents\Filter\FilenameSafe;
 class BrandVehicle
 {
     /**
-     * @var DbTable\Brand
+     * @var DbTable\Vehicle
      */
-    private $brandTable;
+    private $itemTable;
+    
+    /**
+     * @var DbTable\Vehicle\Language
+     */
+    private $itemLangTable;
 
     /**
-     * @var DbTable\BrandItem
+     * @var DbTable\Vehicle\ParentTable
      */
-    private $brandVehicleTable;
+    private $itemParentTable;
 
     /**
-     * @var DbTable\Brand\VehicleLanguage
+     * @var DbTable\Item\ParentLanguage
      */
-    private $brandVehicleLanguageTable;
+    private $itemParentLanguageTable;
 
     private $languages = ['ru', 'en', 'fr', 'zh'];
 
@@ -29,10 +34,10 @@ class BrandVehicle
     {
         $this->languages = $languages;
 
-        $this->brandTable = new DbTable\Brand();
-        $this->vehicleTable = new DbTable\Vehicle();
-        $this->brandVehicleTable = new DbTable\BrandItem();
-        $this->brandVehicleLanguageTable = new DbTable\Brand\VehicleLanguage();
+        $this->itemTable = new DbTable\Vehicle();
+        $this->itemLangTable = new DbTable\Vehicle\Language();
+        $this->itemParentTable = new DbTable\Vehicle\ParentTable();
+        $this->itemParentLanguageTable = new DbTable\Item\ParentLanguage();
     }
 
     public function delete($brandId, $vehicleId)
@@ -40,41 +45,46 @@ class BrandVehicle
         $brandId = (int)$brandId;
         $vehicleId = (int)$vehicleId;
 
-        $brandRow = $this->brandTable->find($brandId)->current();
+        $brandRow = $this->itemTable->fetchRow([
+            'id = ?' => (int)$brandId,
+            'item_type_id = ?' => DbTable\Item\Type::BRAND
+        ]);
         if (! $brandRow) {
             return false;
         }
 
-        $this->brandVehicleLanguageTable->delete([
-            'brand_id = ?'   => $brandId,
-            'vehicle_id = ?' => $vehicleId
+        $this->itemParentLanguageTable->delete([
+            'parent_id = ?' => $brandId,
+            'item_id = ?'   => $vehicleId
         ]);
 
-        $this->brandVehicleTable->delete([
-            'brand_id = ?' => $brandId,
-            'item_id = ?'  => $vehicleId
+        $this->itemParentTable->delete([
+            'parent_id = ?' => $brandId,
+            'item_id = ?'   => $vehicleId
         ]);
+        
+        // TODO: rebuild cache
 
         $brandRow->refreshPicturesCount();
 
         return true;
     }
 
-    private function getBrandAliases(DbTable\BrandRow $brandRow)
+    private function getBrandAliases(DbTable\Vehicle\Row $brandRow)
     {
         $aliases = [$brandRow['name']];
 
-        $brandAliasTable = new DbTable\BrandAlias();
+        // TODO: aliases
+        /*$brandAliasTable = new DbTable\BrandAlias();
         $brandAliasRows = $brandAliasTable->fetchAll([
             'brand_id = ?' => $brandRow['id']
         ]);
         foreach ($brandAliasRows as $brandAliasRow) {
             $aliases[] = $brandAliasRow->name;
-        }
+        }*/
 
-        $brandLangTable = new DbTable\BrandLanguage();
-        $brandLangRows = $brandLangTable->fetchAll([
-            'brand_id = ?' => $brandRow['id']
+        $brandLangRows = $this->itemLangTable->fetchAll([
+            'item_id = ?' => $brandRow['id']
         ]);
         foreach ($brandLangRows as $brandLangRow) {
             $aliases[] = $brandLangRow->name;
@@ -95,9 +105,7 @@ class BrandVehicle
 
     private function getVehicleName(DbTable\Vehicle\Row $vehicleRow, $language)
     {
-        $languageTable = new DbTable\Vehicle\Language;
-
-        $languageRow = $languageTable->fetchRow([
+        $languageRow = $this->itemLangTable->fetchRow([
             'item_id = ?'  => $vehicleRow->id,
             'language = ?' => $language
         ]);
@@ -105,7 +113,7 @@ class BrandVehicle
         return $languageRow ? $languageRow->name : $vehicleRow->name;
     }
 
-    private function extractName(DbTable\BrandRow $brandRow, DbTable\Vehicle\Row $vehicleRow, $language)
+    private function extractName(DbTable\Vehicle\Row $brandRow, DbTable\Vehicle\Row $vehicleRow, $language)
     {
         $vehicleName = $this->getVehicleName($vehicleRow, $language);
         $aliases = $this->getBrandAliases($brandRow);
@@ -131,7 +139,7 @@ class BrandVehicle
         return $name;
     }
 
-    private function extractCatname(DbTable\BrandRow $brandRow, DbTable\Vehicle\Row $vehicleRow)
+    private function extractCatname(DbTable\Vehicle\Row $brandRow, DbTable\Vehicle\Row $vehicleRow)
     {
         $filter = new FilenameSafe();
         $catnameTemplate = $filter->filter($this->extractName($brandRow, $vehicleRow, 'en'));
@@ -140,10 +148,10 @@ class BrandVehicle
         do {
             $catname = $catnameTemplate . ($i ? '_' . $i : '');
 
-            $exists = (bool)$this->brandVehicleTable->fetchRow([
-                'brand_id = ?' => $brandRow->id,
-                'catname = ?'  => $catname,
-                'item_id <> ?' => $vehicleRow->id
+            $exists = (bool)$this->itemParentTable->fetchRow([
+                'parent_id = ?' => $brandRow->id,
+                'catname = ?'   => $catname,
+                'item_id <> ?'  => $vehicleRow->id
             ]);
 
             $i++;
@@ -154,15 +162,20 @@ class BrandVehicle
 
     public function create($brandId, $vehicleId)
     {
-        $brandRow = $this->brandTable->find($brandId)->current();
-        $vehicleRow = $this->vehicleTable->find($vehicleId)->current();
+        throw new Exception("Deprecated");
+        
+        $brandRow = $this->itemTable->fetchRow([
+            'id = ?'           => (int)$brandId,
+            'item_type_id = ?' => DbTable\Item\Type::BRAND
+        ]);
+        $vehicleRow = $this->itemTable->find($vehicleId)->current();
         if (! $brandRow || ! $vehicleRow) {
             return false;
         }
 
-        $brandVehicleRow = $this->brandVehicleTable->fetchRow([
-            'brand_id = ?' => $brandRow->id,
-            'item_id = ?'  => $vehicleRow->id
+        $brandVehicleRow = $this->itemParentTable->fetchRow([
+            'parent_id = ?' => $brandRow->id,
+            'item_id = ?'   => $vehicleRow->id
         ]);
 
         if ($brandVehicleRow) {
@@ -174,12 +187,12 @@ class BrandVehicle
             return false;
         }
 
-        $brandVehicleRow = $this->brandVehicleTable->createRow([
-            'brand_id' => $brandRow->id,
-            'item_id'  => $vehicleRow->id,
-            'type'     => DbTable\BrandItem::TYPE_DEFAULT,
-            'catname'  => $catname,
-            'is_auto'  => 1
+        $brandVehicleRow = $this->itemParentTable->createRow([
+            'parent_id' => $brandRow->id,
+            'item_id'   => $vehicleRow->id,
+            'type'      => DbTable\Vehicle\ParentTable::TYPE_DEFAULT,
+            'catname'   => $catname,
+            'manual_catname' => 0
         ]);
         $brandVehicleRow->save();
 
@@ -202,16 +215,16 @@ class BrandVehicle
         $brandId = (int)$brandId;
         $vehicleId = (int)$vehicleId;
 
-        $bvlRow = $this->brandVehicleLanguageTable->fetchRow([
-            'vehicle_id = ?' => $vehicleId,
-            'brand_id = ?'   => $brandId,
-            'language = ?'   => $language
+        $bvlRow = $this->itemParentLanguageTable->fetchRow([
+            'item_id = ?'   => $vehicleId,
+            'parent_id = ?' => $brandId,
+            'language = ?'  => $language
         ]);
         if (! $bvlRow) {
-            $bvlRow = $this->brandVehicleLanguageTable->createRow([
-                'vehicle_id' => $vehicleId,
-                'brand_id'   => $brandId,
-                'language'   => $language
+            $bvlRow = $this->itemParentLanguageTable->createRow([
+                'item_id'   => $vehicleId,
+                'parent_id' => $brandId,
+                'language'  => $language
             ]);
         }
 
@@ -227,14 +240,17 @@ class BrandVehicle
         }
 
         if (! $values['name']) {
-            $brandRow = $this->brandTable->find($brandId)->current();
-            $vehicleRow = $this->vehicleTable->find($vehicleId)->current();
+            $brandRow = $this->itemTable->fetchRow([
+                'id = ?'           => (int)$brandId,
+                'item_type_id = ?' => DbTable\Item\Type::BRAND
+            ]);
+            $vehicleRow = $this->itemTable->find($vehicleId)->current();
             $values['name'] = $this->extractName($brandRow, $vehicleRow, $language);
             $isAuto = true;
         }
 
         $bvlRow->setFromArray([
-            'name'    => mb_substr($values['name'], 0, DbTable\Brand\VehicleLanguage::MAX_NAME),
+            'name'    => mb_substr($values['name'], 0, DbTable\Item\ParentLanguage::MAX_NAME),
             'is_auto' => $isAuto ? 1 : 0
         ]);
         $bvlRow->save();
@@ -263,9 +279,9 @@ class BrandVehicle
         $brandId = (int)$brandId;
         $vehicleId = (int)$vehicleId;
 
-        $brandVehicleRow = $this->brandVehicleTable->fetchRow([
-            'brand_id = ?' => $brandId,
-            'item_id = ?'  => $vehicleId
+        $brandVehicleRow = $this->itemParentTable->fetchRow([
+            'parent_id = ?' => $brandId,
+            'item_id = ?'   => $vehicleId
         ]);
 
         if (! $brandVehicleRow) {
@@ -284,16 +300,19 @@ class BrandVehicle
         }
 
         if (! $newCatname || $newCatname == '_') {
-            $brandRow = $this->brandTable->find($brandId)->current();
-            $vehicleRow = $this->vehicleTable->find($vehicleId)->current();
+            $brandRow = $this->itemTable->fetchRow([
+                'id = ?'           => (int)$brandId,
+                'item_type_id = ?' => DbTable\Item\Type::BRAND
+            ]);
+            $vehicleRow = $this->itemTable->find($vehicleId)->current();
             $newCatname = $this->extractCatname($brandRow, $vehicleRow);
             $isAuto = true;
         }
 
         $brandVehicleRow->setFromArray([
-            'catname' => $newCatname,
-            'type'    => $values['type'],
-            'is_auto' => $isAuto ? 1 : 0,
+            'catname'        => $newCatname,
+            'type'           => $values['type'],
+            'manual_catname' => $isAuto ? 0 : 1,
         ]);
         $brandVehicleRow->save();
 
@@ -305,17 +324,20 @@ class BrandVehicle
         $vehicleId = (int)$vehicleId;
         $brandId = (int)$brandId;
 
-        $bvRow = $this->brandVehicleTable->fetchRow([
-            'item_id = ?'  => $vehicleId,
-            'brand_id = ?' => $brandId
+        $bvRow = $this->itemParentTable->fetchRow([
+            'item_id = ?'   => $vehicleId,
+            'parent_id = ?' => $brandId
         ]);
 
         if (! $bvRow) {
             return false;
         }
-        if ($bvRow->is_auto) {
-            $brandRow = $this->brandTable->find($brandId)->current();
-            $vehicleRow = $this->vehicleTable->find($vehicleId)->current();
+        if (!$bvRow->manual_catname) {
+            $brandRow = $this->itemTable->fetchRow([
+                'id = ?'           => (int)$brandId,
+                'item_type_id = ?' => DbTable\Item\Type::BRAND
+            ]);
+            $vehicleRow = $this->itemTable->find($vehicleId)->current();
 
             $catname = $this->extractCatname($brandRow, $vehicleRow);
             if (! $catname) {
@@ -326,9 +348,9 @@ class BrandVehicle
             $bvRow->save();
         }
 
-        $bvlRows = $this->brandVehicleLanguageTable->fetchAll([
-            'vehicle_id = ?' => $vehicleId,
-            'brand_id = ?'   => $brandId
+        $bvlRows = $this->itemParentLanguageTable->fetchAll([
+            'item_id = ?'   => $vehicleId,
+            'parent_id = ?' => $brandId
         ]);
 
         $values = [];
@@ -343,12 +365,12 @@ class BrandVehicle
 
     public function refreshAutoByVehicle($vehicleId)
     {
-        $brandVehicleRows = $this->brandVehicleTable->fetchAll([
+        $brandVehicleRows = $this->itemParentTable->fetchAll([
             'item_id = ?' => (int)$vehicleId
         ]);
 
         foreach ($brandVehicleRows as $brandVehicleRow) {
-            $this->refreshAuto($brandVehicleRow->brand_id, $vehicleId);
+            $this->refreshAuto($brandVehicleRow->parent_id, $vehicleId);
         }
 
         return true;
@@ -356,13 +378,12 @@ class BrandVehicle
 
     public function refreshAllAuto()
     {
-        $brandVehicleRows = $this->brandVehicleTable->fetchAll([
-            'is_auto',
-            'brand_id >= 58'
-        ], ['brand_id', 'item_id']);
+        $brandVehicleRows = $this->itemParentTable->fetchAll([
+            'not manual_catname',
+        ], ['parent_id', 'item_id']);
 
         foreach ($brandVehicleRows as $brandVehicleRow) {
-            $this->refreshAuto($brandVehicleRow->brand_id, $brandVehicleRow->item_id);
+            $this->refreshAuto($brandVehicleRow->parent_id, $brandVehicleRow->item_id);
         }
 
         return true;
@@ -370,10 +391,10 @@ class BrandVehicle
 
     public function getName($brandId, $vehicleId, $language)
     {
-        $bvlRow = $this->brandVehicleLanguageTable->fetchRow([
-            'brand_id = ?'   => (int)$brandId,
-            'vehicle_id = ?' => (int)$vehicleId,
-            'language = ?'   => (string)$language
+        $bvlRow = $this->itemParentLanguageTable->fetchRow([
+            'parent_id = ?' => (int)$brandId,
+            'item_id = ?'   => (int)$vehicleId,
+            'language = ?'  => (string)$language
         ]);
 
         if (! $bvlRow) {

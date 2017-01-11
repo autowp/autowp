@@ -20,6 +20,16 @@
     }
 ?>
 
+<?php if ($this->user()->inheritsRole('museum-moder')) { ?>
+    <p>
+        <i class="fa fa-cog"></i>
+        <?=$this->htmlA($this->url('moder/museum/params', [
+            'action'    => 'item',
+            'museum_id' => $this->museum['id']
+        ]), $this->translate('moder/edit-object'))?>
+    </p>
+<?php } ?>
+
 <div id="google-map"></div>
 
 <div class="well">

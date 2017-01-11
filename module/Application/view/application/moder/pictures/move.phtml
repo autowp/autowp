@@ -99,15 +99,17 @@
                 <div style="margin: 5px 0">
                     <?=$this->htmlA($this->url(null, [
                         'action' => 'move',
-                        'type'   => Application\Model\DbTable\Picture::LOGO_TYPE_ID
+                        'type'   => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
+                        'perspective_id' => 22
                     ], [], true), $this->translate('upload/select/logo')) ?><br />
-                    <?php /*=$this->htmlA($this->url(null, [
-                        'action' => 'move',
-                        'type'   => Application\Model\DbTable\Picture::MIXED_TYPE_ID
-                    ], [], true), $this->translate('upload/select/mixed-long')) ?><br /> */ ?>
                     <?=$this->htmlA($this->url(null, [
                         'action' => 'move',
-                        'type'   => Application\Model\DbTable\Picture::UNSORTED_TYPE_ID
+                        'type'   => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
+                        'perspective_id' => 25
+                    ], [], true), $this->translate('upload/select/mixed-long')) ?><br />
+                    <?=$this->htmlA($this->url(null, [
+                        'action' => 'move',
+                        'type'   => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID
                     ], [], true), $this->translate('upload/select/unsorted-long')) ?>
                 </div>
             <?php } ?>

@@ -132,6 +132,10 @@ return array_replace(include 'root.php', [
     'item/type/4/name-plural' => 'Twins',
     'item/type/4/new-item' => 'New twnis group',
     'item/type/4/add-sub-item' => 'Add sub-twins',
+    'item/type/5/name' => 'Brand',
+    'item/type/5/name-plural' => 'Brands',
+    'item/type/5/new-item' => 'New brand',
+    'item/type/5/add-sub-item' => 'Add sub-brand',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Unsorted',
@@ -256,7 +260,7 @@ return array_replace(include 'root.php', [
     'mosts/period/1980-89'    => '1980-89th',
     'mosts/period/1990-99'    => '1990-99th',
     'mosts/period/2000-09'    => '2000-09th',
-    'mosts/period/2010-15'    => '2010-15th',
+    'mosts/period/2010-16'    => '2010-16th',
     'mosts/period/present'    => 'present time',
     'mosts/period/all-time'   => 'all time',
 
@@ -389,6 +393,7 @@ Next, you can leave a comment in the "%s", as long as you have the time to clari
     'perspective/logo'           => 'logo',
     'perspective/mascot'         => 'mascot',
     'perspective/sketch'         => 'sketch',
+    'perspective/mixed'          => 'mixed',
 
     'login/sign-in' => 'Sign in',
     'login/sign-out' => 'Sign out',
@@ -1112,13 +1117,8 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/pictures/filter/perspective/empty' => 'empty',
     'moder/pictures/filter/type' => 'Type',
     'moder/pictures/filter/type/any' => 'any',
-    'moder/pictures/filter/type/item' => 'vehicle or engine',
-    'moder/pictures/filter/type/logotype' => 'logotype',
-    'moder/pictures/filter/type/mixed' => 'mixed',
-    'moder/pictures/filter/type/unsorted' => 'unsorted',
-    'moder/pictures/filter/type/engine' => 'engine',
+    'moder/pictures/filter/type/item' => 'brand, vehicle, engine',
     'moder/pictures/filter/type/factory' => 'factory',
-    'moder/pictures/filter/type/unsorted+mixed+logo' => 'unsroted + mixed + logo',
     'moder/pictures/filter/comments' => 'Comments',
     'moder/pictures/filter/comments/not-matters'  => 'not matters',
     'moder/pictures/filter/comments/has-comments' => 'has',

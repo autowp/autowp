@@ -60,71 +60,66 @@ class CatalogueController extends AbstractActionController
 
     public function migrateEnginesAction()
     {
-        $groupTable = new DbTable\Twins\Group();
-        $groupVehicleTable = new DbTable\Twins\GroupVehicle();
+        $brandTable = new DbTable\Brand();
 
         $itemTable = new DbTable\Vehicle();
         $itemLangTable = new DbTable\Vehicle\Language();
 
         $itemParentTable = new DbTable\Vehicle\ParentTable();
+        $itemParentCacheTable = new DbTable\Vehicle\ParentCache();
+        
 
         $db = $itemParentTable->getAdapter();
+        
+        /*$rows = $itemTable->fetchAll(['item_type_id = ?' => DbTable\Item\Type::BRAND]);
+        foreach ($rows as $row) {
+            print $row->id . PHP_EOL;
+            $itemParentCacheTable->rebuildCache($row);
+        }*/
 
-        $groupRows = $groupTable->fetchAll();
+        /*$brandRows = $brandTable->fetchAll(null, 'id');
 
-        foreach ($groupRows as $groupRow) {
-            print $groupRow->id . PHP_EOL;
+        foreach ($brandRows as $brandRow) {
+            print $brandRow->id . PHP_EOL;
 
             $itemRow = $itemTable->fetchRow([
-                'migration_group_id = ?' => $groupRow->id
+                'migration_brand_id = ?' => $brandRow->id
             ]);
             if (!$itemRow) {
                 $itemRow = $itemTable->createRow([
-                    'migration_group_id' => $groupRow->id,
-                    'name'               => $groupRow->name,
-                    'item_type_id'       => DbTable\Item\Type::TWINS,
-                    'catname'            => null,
+                    'migration_brand_id' => $brandRow->id,
+                    'name'               => $brandRow->name,
+                    'full_name'          => $brandRow->full_name,
+                    'item_type_id'       => DbTable\Item\Type::BRAND,
+                    'catname'            => $brandRow->folder,
+                    'position'           => $brandRow->position,
                     'body'               => '',
                     'produced_exactly'   => 0,
-                    'add_datetime'       => $groupRow->add_datetime,
-                    'is_group'           => 1
+                    'is_group'           => 1,
+                    'begin_year'         => $brandRow->from_year ? $brandRow->from_year : null,
+                    'end_year'           => $brandRow->to_year ? $brandRow->to_year : null,
+                    'logo_id'            => $brandRow->img ? $brandRow->img : null
                 ]);
                 $itemRow->save();
             }
-
-            $groupVehicleRows = $groupVehicleTable->fetchAll([
-                'twins_group_id = ?' => $groupRow->id,
-            ]);
-
-            foreach ($groupVehicleRows as $groupVehicleRow) {
-                $vehicleRow = $itemTable->fetchRow([
-                    'id = ?' => $groupVehicleRow->item_id
-                ]);
-
-                if ($vehicleRow) {
-                    $itemParentTable->addParent($vehicleRow, $itemRow);
-
-                    $itemTable->updateInteritance($vehicleRow);
-                }
-            }
-
-            if ($groupRow->text_id) {
-                $text = $this->textStorage->getText($groupRow->text_id);
+            
+            if ($brandRow->text_id) {
+                $text = $this->textStorage->getText($brandRow->text_id);
                 $language = null;
 
                 if (!$text) {
                     $language = 'en';
                 }
 
-                if (preg_match('|^[[:space:] a-zA-ZІ½²³°®™‐€ÚÖćčśãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
+                if (preg_match('|^[[:space:] a-zA-ZІ½²³°®™„”‐€ŤÚőçÚÖćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
                     $language = 'en';
                 }
 
-                if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½²³°®™‐€ÚÖćčśãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
+                if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½²³°®™„”‐€ŤÚőçÚÖćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
                     $language = 'ru';
                 }
 
-                print $groupRow->text_id . '#' . $language . PHP_EOL;
+                print $brandRow->text_id . '#' . $language . PHP_EOL;
 
                 if (!$language) {
                     print $text . PHP_EOL;
@@ -142,16 +137,156 @@ class CatalogueController extends AbstractActionController
                     ]);
                 }
 
-                $langRow->text_id = $groupRow->text_id;
+                $langRow->text_id = $brandRow->text_id;
                 $langRow->save();
             }
 
             $db->query('
-                insert into log_events_item (log_event_id, item_id)
+                insert ignore into log_events_item (log_event_id, item_id)
                 select log_event_id, ?
-                from log_events_twins_groups
-                where twins_group_id = ?
-            ', [$itemRow->id, $groupRow->id]);
+                from log_events_brands
+                where brand_id = ?
+            ', [$itemRow->id, $brandRow->id]);
+        }*/
+        
+        // parent_brand_id
+        /*$brandRows = $brandTable->fetchAll('parent_brand_id');
+        foreach ($brandRows as $brandRow) {
+            
+            print $brandRow->id . PHP_EOL;
+            
+            $parentBrandItemRow = $itemTable->fetchRow([
+                'migration_brand_id = ?' => $brandRow->parent_brand_id
+            ]);
+            
+            $childBrandItemRow = $itemTable->fetchRow([
+                'migration_brand_id = ?' => $brandRow->id
+            ]);
+            
+            $itemParentTable->addParent($childBrandItemRow, $parentBrandItemRow);
+            
+            $itemTable->updateInteritance($childBrandItemRow);
+        }*/
+        
+        // brand_language
+        /*$brandLanguageTable = new DbTable\BrandLanguage();
+        foreach ($brandLanguageTable->fetchAll(null, 'brand_id') as $brandLanguageRow) {
+            
+            print $brandLanguageRow->brand_id . ' ' . $brandLanguageRow->language . PHP_EOL;
+            
+            $brandItemRow = $itemTable->fetchRow([
+                'migration_brand_id = ?' => $brandLanguageRow->brand_id
+            ]);
+            
+            $langRow = $itemLangTable->fetchRow([
+                'item_id = ?'  => $brandItemRow->id,
+                'language = ?' => $brandLanguageRow->language
+            ]);
+            if (!$langRow) {
+                $langRow = $itemLangTable->createRow([
+                    'item_id'  => $brandItemRow->id,
+                    'language' => $brandLanguageRow->language,
+                ]);
+            }
+            $langRow->name = $brandLanguageRow->name;
+            $langRow->save();
+            
+            print $langRow->item_id . ' ' . $langRow->language . PHP_EOL;
+        }*/
+        
+        // brand_item
+        /*$brandItemTable = new DbTable\BrandItem();
+        foreach ($brandItemTable->fetchAll(['brand_id >= 58'], 'brand_id') as $brandItemRow) {
+            
+            print $brandItemRow->brand_id . ' ' . $brandItemRow->item_id . PHP_EOL;
+            
+            $brandRow = $itemTable->fetchRow([
+                'migration_brand_id = ?' => $brandItemRow->brand_id
+            ]);
+            
+            $vehicleRow = $itemTable->fetchRow([
+                'id = ?' => $brandItemRow->item_id
+            ]);
+        
+            $itemParentTable->addParent($vehicleRow, $brandRow, [
+                'type'           => $brandItemRow->type,
+                'catname'        => $brandItemRow->catname,
+                'manual_catname' => $brandItemRow->is_auto,
+                'type'           => $brandItemRow->type
+            ]);
+            
+            //print $brandRow->id . ' ' . $vehicleRow->id . PHP_EOL;
+        
+            //$itemTable->updateInteritance($vehicleRow);
+        }*/
+        
+        /*$pictureTable = new DbTable\Picture();
+        
+        $rows = $pictureTable->fetchAll([
+            'type = ?' => DbTable\Picture::UNSORTED_TYPE_ID
+        ], 'id');
+        
+        foreach ($rows as $picture) {
+            
+            print $picture->id . PHP_EOL;
+            
+            $brandRow = $itemTable->fetchRow([
+                'migration_brand_id = ?' => $picture->brand_id
+            ]);
+            
+            if (!$brandRow) {
+                throw new Exception("Brand not found");
+            }
+            
+            $this->pictureItem->setPictureItems($picture->id, [$brandRow->id]);
+            
+            $picture->type = DbTable\Picture::VEHICLE_TYPE_ID;
+            $picture->save();
+        }*/
+        
+        // brand_alias
+        
+        // brand_vehicle_language
+        $brandVehicleLanguageTable = new DbTable\Brand\VehicleLanguage();
+        $itemParentLanguageTable = new \Zend_Db_Table([
+            'name' => 'item_parent_language',
+            'primary' => [
+                'item_id', 'parent_id', 'language'
+            ]
+        ]);
+        
+        $rows = $brandVehicleLanguageTable->fetchAll(null, 'brand_id');
+        foreach ($rows as $brandVehicleLanguageRow) {
+            print_r($brandVehicleLanguageRow->toArray());
+            
+            $brandRow = $itemTable->fetchRow([
+                'migration_brand_id = ?' => $brandVehicleLanguageRow->brand_id
+            ]);
+            
+            if (!$brandRow) {
+                throw new Exception("Brand not found");
+            }
+            
+            $itemParentLanguageRow = $itemParentLanguageTable->fetchRow([
+                'item_id = ?'   => $brandVehicleLanguageRow->vehicle_id,
+                'parent_id = ?' => $brandRow->id,
+                'language = ?'  => $brandVehicleLanguageRow->language
+            ]);
+            if (!$itemParentLanguageRow) {
+                $itemParentLanguageRow = $itemParentLanguageTable->createRow([
+                    'item_id'   => $brandVehicleLanguageRow->vehicle_id,
+                    'parent_id' => $brandRow->id,
+                    'language'  => $brandVehicleLanguageRow->language
+                ]);
+            }
+            
+            $itemParentLanguageRow->setFromArray([
+                'name'    => $brandVehicleLanguageRow->name,
+                'is_auto' => $brandVehicleLanguageRow->is_auto,
+            ]);
+            $itemParentLanguageRow->save();
+            
+            print_r($itemParentLanguageRow->toArray()); 
         }
     }
 

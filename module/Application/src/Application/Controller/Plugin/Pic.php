@@ -168,15 +168,39 @@ class Pic extends AbstractPlugin
                     if (count($paths) > 0) {
                         $path = $paths[0];
 
-                        $url = $controller->url()->fromRoute('catalogue', [
-                            'action'        => 'brand-item-picture',
-                            'brand_catname' => $path['brand_catname'],
-                            'car_catname'   => $path['car_catname'],
-                            'path'          => $path['path'],
-                            'picture_id'    => $row['identity']
-                        ], [
-                            'force_canonical' => $options['canonical']
-                        ]);
+                        if ($path['car_catname']) {
+                            $url = $controller->url()->fromRoute('catalogue', [
+                                'action'        => 'brand-item-picture',
+                                'brand_catname' => $path['brand_catname'],
+                                'car_catname'   => $path['car_catname'],
+                                'path'          => $path['path'],
+                                'picture_id'    => $row['identity']
+                            ], [
+                                'force_canonical' => $options['canonical']
+                            ]);
+                        } else {
+                            $perspectiveId = $this->pictureItem->getPerspective($row['id'], $carId);
+                            
+                            switch ($perspectiveId) {
+                                case 22: 
+                                    $action = 'logotypes-picture';
+                                    break;
+                                case 25:
+                                    $action = 'mixed-picture';
+                                    break;
+                                default:
+                                    $action = 'other-picture';
+                                    break;
+                            }
+                            
+                            $url = $controller->url()->fromRoute('catalogue', [
+                                'action'        => $action,
+                                'brand_catname' => $path['brand_catname'],
+                                'picture_id'    => $row['identity']
+                            ], [
+                                'force_canonical' => $options['canonical']
+                            ]);
+                        }
                     }
                 }
                 break;
@@ -510,15 +534,15 @@ class Pic extends AbstractPlugin
 
                 $designCarsRow = $db->fetchRow(
                     $db->select()
-                        ->from('brands', [
+                        ->from('item', [
                             'brand_name'    => 'name',
-                            'brand_catname' => 'folder'
+                            'brand_catname' => 'catname'
                         ])
-                        ->join('brand_item', 'brands.id = brand_item.brand_id', [
+                        ->join('item_parent', 'item.id = item_parent.parent_id', [
                             'brand_item_catname' => 'catname'
                         ])
-                        ->where('brand_item.type = ?', DbTable\BrandItem::TYPE_DESIGN)
-                        ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', 'item_id')
+                        ->where('item_parent.type = ?', DbTable\Vehicle\ParentTable::TYPE_DESIGN)
+                        ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                         ->where('item_parent_cache.item_id = ?', $item->id)
                 );
                 if ($designCarsRow) {
@@ -827,8 +851,9 @@ class Pic extends AbstractPlugin
 
         $brandIds = $db->fetchCol(
             $db->select()
-                ->from('brand_item', 'brand_id')
-                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                ->from('item', 'id')
+                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->where('picture_item.picture_id = ?', $picture->id)
         );
@@ -837,7 +862,9 @@ class Pic extends AbstractPlugin
             case DbTable\Picture::LOGO_TYPE_ID:
             case DbTable\Picture::MIXED_TYPE_ID:
             case DbTable\Picture::UNSORTED_TYPE_ID:
-                $brandIds = [$picture->brand_id];
+                if ($picture->brand_id) {
+                    $brandIds = [$picture->brand_id];
+                }
                 break;
 
             case DbTable\Picture::FACTORY_TYPE_ID:
@@ -888,7 +915,7 @@ class Pic extends AbstractPlugin
         if (count($brandIds)) {
             $links = $linksTable->fetchAll(
                 $linksTable->select(true)
-                    ->where('brandId in (?)', $brandIds)
+                    ->where('item_id in (?)', $brandIds)
                     ->where('type = ?', 'official')
             );
             foreach ($links as $link) {
@@ -1116,16 +1143,15 @@ class Pic extends AbstractPlugin
 
                         $brands = $brandModel->getList(['language' => $language], function ($select) use ($car) {
                             $select
-                                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                                 ->where('item_parent_cache.item_id = ?', $car->id)
-                                ->group('brands.id');
+                                ->group('item.id');
                         });
 
                         foreach ($brands as $brand) {
-                            $url = $controller->url()->fromRoute('moder/brands/params', [
-                                'action'   => 'brand',
-                                'brand_id' => $brand['id']
+                            $url = $controller->url()->fromRoute('moder/cars/params', [
+                                'action'  => 'car',
+                                'item_id' => $brand['id']
                             ]);
                             $links[$url] = sprintf(
                                 $this->translator->translate('moder/picture/edit-brand-%s'),
@@ -1152,9 +1178,9 @@ class Pic extends AbstractPlugin
                 $brandModel = new BrandModel();
                 $brand = $brandModel->getBrandById($picture->brand_id, $language);
                 if ($brand) {
-                    $url = $controller->url()->fromRoute('moder/brands/params', [
-                        'action'   => 'brand',
-                        'brand_id' => $brand['id']
+                    $url = $controller->url()->fromRoute('moder/cars/params', [
+                        'action'  => 'car',
+                        'item_id' => $brand['id']
                     ]);
                     $links[$url] = sprintf($this->translator->translate('moder/picture/edit-brand-%s'), $brand['name']);
                 }

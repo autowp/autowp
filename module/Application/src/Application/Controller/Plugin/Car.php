@@ -293,15 +293,15 @@ class Car extends AbstractPlugin
         $carsDesignProject = [];
         $designCarsRows = $carParentAdapter->fetchAll(
             $carParentAdapter->select()
-                ->from('brands', [
+                ->from('item', [
                     'brand_name'    => 'name',
-                    'brand_catname' => 'folder'
+                    'brand_catname' => 'catname'
                 ])
-                ->join('brand_item', 'brands.id = brand_item.brand_id', [
+                ->join('item_parent', 'item.id = item_parent.parent_id', [
                     'brand_item_catname' => 'catname'
                 ])
-                ->where('brand_item.type = ?', DbTable\BrandItem::TYPE_DESIGN)
-                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', 'item_id')
+                ->where('item_parent.type = ?', DbTable\Vehicle\ParentTable::TYPE_DESIGN)
+                ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                 ->where('item_parent_cache.item_id IN (?)', $carIds ? $carIds : 0)
                 ->group('item_parent_cache.item_id')
         );

@@ -6,9 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
 use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable\BrandLanguage;
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable;
 
 class BrandsController extends AbstractActionController
 {
@@ -47,8 +45,8 @@ class BrandsController extends AbstractActionController
                         ]);
 
                         $img = false;
-                        if ($item['img']) {
-                            $imageInfo = $imageStorage->getFormatedImage($item['img'], 'brandicon');
+                        if ($item['logo_id']) {
+                            $imageInfo = $imageStorage->getFormatedImage($item['logo_id'], 'brandicon');
                             if ($imageInfo) {
                                 $img = $imageInfo->getSrc();
                             }
@@ -74,27 +72,30 @@ class BrandsController extends AbstractActionController
             return $this->notFoundAction();
         }*/
 
-        $brands = new BrandTable();
+        $itemTable = new DbTable\Vehicle();
 
-        $brand = $brands->find($this->params('brand_id'))->current();
+        $brand = $itemTable->fetchRow([
+            'item_type_id = ?' => DbTable\Item\Type::BRAND,
+            'id = ?'           => (int)$this->params('brand_id')
+        ]);
         if (! $brand) {
             return $this->notFoundAction();
         }
 
         $language = $this->language();
-        $brandLangTable = new BrandLanguage();
+        $brandLangTable = new DbTable\Vehicle\Language();
         $brandLang = $brandLangTable->fetchRow([
-            'brand_id = ?' => $brand->id,
+            'item_id = ?' => $brand->id,
             'language = ?' => $language
         ]);
 
-        $cars = new Vehicle();
-        $carList = $cars->fetchAll(
-            $cars->select(true)
+        
+        $carList = $itemTable->fetchAll(
+            $itemTable->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand->id)
+                ->where('item_parent_cache.parent_id = ?', $brand->id)
                 ->where('item.add_datetime > DATE_SUB(NOW(), INTERVAL 7 DAY)')
+                ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
                 ->group('item.id')
                 ->order(['item.add_datetime DESC'])
                 ->limit(30)

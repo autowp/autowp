@@ -11,7 +11,6 @@ use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
 use Application\Model\Comments;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Brand as BrandTable;
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle;
@@ -75,7 +74,7 @@ class UploadController extends AbstractActionController
                 'action' => 'only-registered'
             ]);
         }
-
+        
         $pictureTable = $this->catalogue()->getPictureTable();
 
         $replace = $this->params('replace');
@@ -85,42 +84,22 @@ class UploadController extends AbstractActionController
                 'identity = ?' => $replace
             ]);
         }
+        
+        $perspectiveId = null;
 
         if ($replacePicture) {
             $type = $replacePicture->type;
-            $brandId = $replacePicture->brand_id;
             $carIds = $this->pictureItem->getPictureItems($replacePicture->id);
         } else {
             $type = (int)$this->params('type');
-            $brandId = (int)$this->params('brand_id');
             $carId = (int)$this->params('item_id');
             $carIds = $carId ? [$carId] : [];
+            $perspectiveId = (int)$this->params('perspective_id');
         }
 
         $selected = false;
         $selectedName = null;
         switch ($type) {
-            case Picture::UNSORTED_TYPE_ID:
-            case Picture::MIXED_TYPE_ID:
-            case Picture::LOGO_TYPE_ID:
-                $brandModel = new BrandModel();
-                $brand = $brandModel->getBrandById($brandId, $this->language());
-                if ($brand) {
-                    $selected = true;
-                    switch ($type) {
-                        case Picture::UNSORTED_TYPE_ID:
-                            $selectedName = $brand['name'] . ' / ' . $this->translate('upload/select/unsorted');
-                            break;
-                        case Picture::MIXED_TYPE_ID:
-                            $selectedName = $brand['name'] . ' / ' . $this->translate('upload/select/mixed');
-                            break;
-                        case Picture::LOGO_TYPE_ID:
-                            $selectedName = $brand['name'] . ' / ' . $this->translate('upload/select/logo');
-                            break;
-                    }
-                }
-                break;
-
             case Picture::VEHICLE_TYPE_ID:
                 $cars = new Vehicle();
                 $cars = $cars->find($carIds);
@@ -151,7 +130,7 @@ class UploadController extends AbstractActionController
                 );
                 $form->setData($data);
                 if ($form->isValid()) {
-                    $pictures = $this->saveUpload($form, $type, $brandId, $carIds, $replacePicture);
+                    $pictures = $this->saveUpload($form, $type, $carIds, $perspectiveId, $replacePicture);
 
                     if ($request->isXmlHttpRequest()) {
                         /*$urls = [];
@@ -217,23 +196,15 @@ class UploadController extends AbstractActionController
         ];
     }
 
-    private function saveUpload($form, $type, $brandId, $carIds, $replacePicture)
+    private function saveUpload($form, $type, $carIds, $perspectiveId, $replacePicture)
     {
         $user = $this->user()->get();
 
         $values = $form->getData();
+        
+        $perspectiveId = null;
 
         switch ($type) {
-            case Picture::UNSORTED_TYPE_ID:
-            case Picture::MIXED_TYPE_ID:
-            case Picture::LOGO_TYPE_ID:
-                $brands = new BrandTable();
-                $brand = $brands->find($brandId)->current();
-                if ($brand) {
-                    $brandId = $brand->id;
-                }
-                break;
-
             case Picture::VEHICLE_TYPE_ID:
                 break;
 
@@ -299,7 +270,7 @@ class UploadController extends AbstractActionController
                 'status'        => Picture::STATUS_INBOX,
                 'type'          => $type,
                 'removing_date' => null,
-                'brand_id'      => $brandId ? $brandId : null,
+                //'brand_id'      => $brandId ? $brandId : null,
                 'ip'            => inet_pton($this->getRequest()->getServer('REMOTE_ADDR')),
                 'identity'      => $pictureTable->generateIdentity(),
                 'replace_picture_id' => $replacePicture ? $replacePicture->id : null,
@@ -308,8 +279,13 @@ class UploadController extends AbstractActionController
 
             if ($carIds) {
                 $this->pictureItem->setPictureItems($picture->id, $carIds);
+                if ($perspectiveId) {
+                    $this->pictureItem->setProperties($picture->id, $brandId, [
+                        'perspective' => $perspectiveId
+                    ]);
+                }
             }
-
+            
             // increment uploads counter
             if ($user) {
                 $user->pictures_added = new Zend_Db_Expr('pictures_added+1');
@@ -323,14 +299,6 @@ class UploadController extends AbstractActionController
 
             // recalculate chached counts
             switch ($picture->type) {
-                case Picture::UNSORTED_TYPE_ID:
-                case Picture::LOGO_TYPE_ID:
-                case Picture::MIXED_TYPE_ID:
-                    $brand = $picture->findParentRow(BrandTable::class);
-                    if ($brand) {
-                        $brand->refreshPicturesCount();
-                    }
-                    break;
                 case Picture::VEHICLE_TYPE_ID:
                     $carIds = $this->pictureItem->getPictureItems($picture->id);
                     $itemTable = new Vehicle();
@@ -425,8 +393,7 @@ class UploadController extends AbstractActionController
         $haveConcepts = (bool)$itemTable->fetchRow(
             $itemTable->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand['id'])
+                ->where('item_parent_cache.parent_id = ?', $brand['id'])
                 ->where('item.is_concept')
         );
 
@@ -446,8 +413,8 @@ class UploadController extends AbstractActionController
                 ])
                 ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->join('brand_item', 'item.id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand['id'])
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
+                ->where('item_parent.parent_id = ?', $brand['id'])
                 ->where('NOT item.is_concept')
                 ->where('item.item_type_id = ?', DbTable\Item\Type::VEHICLE)
                 ->order([
@@ -477,8 +444,8 @@ class UploadController extends AbstractActionController
                 ])
                 ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'item.spec_id = spec.id', null)
-                ->join('brand_item', 'item.id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand['id'])
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
+                ->where('item_parent.parent_id = ?', $brand['id'])
                 ->where('item.item_type_id = ?', DbTable\Item\Type::ENGINE)
                 ->order([
                     'item.name',
@@ -650,13 +617,14 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $brandTable = new BrandTable();
-        $brand = $brandTable->find($this->params('brand_id'))->current();
+        $itemTable = new Vehicle();
+        $brand = $itemTable->fetchRow([
+            'item_type_id = ?' => DbTable\Item\Type::BRAND,
+            'id = ?'           => (int)$this->params('brand_id')
+        ]);
         if (! $brand) {
             return $this->notfoundAction();
         }
-
-        $itemTable = new Vehicle();
 
         $db = $itemTable->getAdapter();
 
@@ -675,8 +643,7 @@ class UploadController extends AbstractActionController
                 ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
                 ->joinLeft('spec', 'item.spec_id = spec.id', null)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brand->id)
+                ->where('item_parent_cache.parent_id = ?', $brand->id)
                 ->where('item.is_concept')
                 ->order(['item.name', 'item.begin_year', 'item.end_year'])
                 ->group('item.id')

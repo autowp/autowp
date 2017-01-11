@@ -52,64 +52,7 @@
                     <?php } ?>
                 </tr>
             <?php } ?>
-            <?php foreach ($this->brands as $brand) { ?>
-                <tr>
-                    <td>
-                        <i class="fa fa-arrow-up"></i>
-                        <?=$this->htmlA($brand['brand']['moderUrl'], $brand['brand']['name']) ?>
-                    </td>
-                    <td colspan="2">
-                        <?=$this->htmlA($brand['editUrl'], $this->escapeHtml($brand['name']) . ' <span class="fa fa-pencil"></span>', false)?>
-                    </td>
-                    <td>
-                        <?=$this->htmlA($brand['url'], $brand['url']) ?>
-                    </td>
-                    <?php if ($this->canMove) { ?>
-                        <td>
-                            <form action="<?=$this->escapeHtmlAttr($brand['deleteUrl']) ?>" method="post">
-                                <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-times"></i></button>
-                            </form>
-                        </td>
-                    <?php } ?>
-                </tr>
-            <?php } ?>
             <?php foreach ($this->parents as $car) { ?>
-                <?php foreach ($car['inheritBrands'] as $brand) { ?>
-                    <tr class="warning">
-                        <td>
-                            <i class="fa fa-arrow-up"></i>
-                            <?=$this->htmlA($brand['moderUrl'], $brand['name']) ?>
-                        </td>
-                        <td colspan="2"></td>
-                        <td>
-                            <?=$this->htmlA($brand['url'], $brand['url']) ?>
-                        </td>
-                        <?php if ($this->canMove) { ?>
-                            <td></td>
-                        <?php } ?>
-                    </tr>
-                    <?php if ($parentCar = $brand['car']) { ?>
-                        <tr class="warning">
-                            <td>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <i class="fa fa-arrow-up"></i>
-                                <?=$this->htmlA($parentCar['url'], $parentCar['name'])?>
-                            </td>
-                            <td>
-                                <?=$this->escapeHtml($this->carParentTypeOptions[$parentCar['type']])?>
-                            </td>
-                            <td></td>
-                            <td>
-                                <?php foreach ($parentCar['publicUrls'] as $url) { ?>
-                                    <?=$this->htmlA($url, $url)?><br />
-                                <?php } ?>
-                            </td>
-                            <?php if ($this->canMove) { ?>
-                                <td></td>
-                            <?php } ?>
-                        </tr>
-                    <?php } ?>
-                <?php } ?>
                 <tr data-id="<?=$car['id']?>">
                     <td>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -358,10 +301,10 @@
         </button>
     </div></form>
     <?php foreach ($this->relevantBrands as $brand) { ?>
-        <form action="<?=$this->escapeHtmlAttr($this->url('moder/brand-vehicle/params', [
-            'action'     => 'add',
-            'brand_id'   => $brand->id,
-            'vehicle_id' => $this->car->id
+        <form action="<?=$this->escapeHtmlAttr($this->url('moder/cars/params', [
+            'action'    => 'add-parent',
+            'parent_id' => $brand->id,
+            'item_id'   => $this->car->id
         ])) ?>" method="post">
             <button type="submit" class="btn btn-xs btn-success">
                 <i class="fa fa-plus"></i>

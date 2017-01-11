@@ -4,7 +4,6 @@ namespace Application\Model;
 
 use Autowp\Image\Storage\Request;
 use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\BrandItem;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Vehicle;
 use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
@@ -23,11 +22,6 @@ class Catalogue
      * @var BrandTable
      */
     private $brandTable;
-
-    /**
-     * @var BrandItem
-     */
-    private $brandItemTable;
 
     /**
      * @var Vehicle
@@ -108,16 +102,6 @@ class Catalogue
     }
 
     /**
-     * @return BrandItem
-     */
-    public function getBrandItemTable()
-    {
-        return $this->brandItemTable
-            ? $this->brandItemTable
-            : $this->brandItemTable = new BrandItem();
-    }
-
-    /**
      * @return Vehicle
      */
     public function getItemTable()
@@ -176,26 +160,24 @@ class Catalogue
     {
         $urls = [];
 
-        $brandItemRows = $this->getBrandItemTable()->fetchAll([
-            'item_id = ?' => $id
-        ]);
-
-        foreach ($brandItemRows as $brandItemRow) {
-            $brand = $this->getBrandTable()->find($brandItemRow->brand_id)->current();
-            if (! $brand) {
-                throw new Exception("Broken link `{$brandItemRow->brand_id}`");
-            }
-
-            $urls[] = [
-                'brand_catname' => $brand->folder,
-                'car_catname'   => $brandItemRow->catname,
-                'path'          => $path
-            ];
-        }
-
         $parentRows = $this->getCarParentTable()->fetchAll([
             'item_id = ?' => $id
         ]);
+
+        foreach ($parentRows as $parentRow) {
+            $brand = $this->getItemTable()->fetchRow([
+                'id = ?'           => $parentRow->parent_id,
+                'item_type_id = ?' => DbTable\Item\Type::BRAND
+            ]);
+            if ($brand) {
+                $urls[] = [
+                    'brand_catname' => $brand->catname,
+                    'car_catname'   => $parentRow->catname,
+                    'path'          => $path
+                ];
+            }
+        }
+        
         foreach ($parentRows as $parentRow) {
             $urls = array_merge(
                 $urls,

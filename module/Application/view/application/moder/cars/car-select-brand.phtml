@@ -26,10 +26,10 @@
                 <?php if ($idx && ($idx%$perOne == 0)) { ?>
                     </td><td valign="top" style="width:<?=$width ?>%">
                 <?php } ?>
-                <form action="<?=$this->escapeHtmlAttr($this->url('moder/brand-vehicle/params', [
-                    'action'     => 'add',
-                    'brand_id'   => $brand->id,
-                    'vehicle_id' => $this->car->id
+                <form action="<?=$this->escapeHtmlAttr($this->url('moder/cars/params', [
+                    'action'    => 'add-parent',
+                    'parent_id' => $brand->id,
+                    'item_id'   => $this->car->id
                 ]))?>" method="post">
                     <button type="submit" class="btn btn-link"><?=$this->escapeHtml($brand->name)?></button>
                 </form>

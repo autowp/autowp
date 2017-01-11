@@ -124,6 +124,10 @@ return array_replace(include 'root.php', [
     'item/type/4/name-plural' => 'Twins',
     'item/type/4/new-item' => 'New twnis group',
     'item/type/4/add-sub-item' => 'Add sub-twins',
+    'item/type/5/name' => 'Brand',
+    'item/type/5/name-plural' => 'Brands',
+    'item/type/5/new-item' => 'New brand',
+    'item/type/5/add-sub-item' => 'Add sub-brand',
 
     /* BRAND PAGE*/
     'unsorted'                => '未分类',
@@ -244,7 +248,7 @@ return array_replace(include 'root.php', [
     'mosts/period/1980-89'    => '1980-89年',
     'mosts/period/1990-99'    => '1990-99年',
     'mosts/period/2000-09'    => '2000-09年',
-    'mosts/period/2010-15'    => '2010-15年',
+    'mosts/period/2010-16'    => '2010-16年',
     'mosts/period/present'    => '现款车型',
     'mosts/period/all-time'   => '所有年份',
 
@@ -377,6 +381,7 @@ return array_replace(include 'root.php', [
     'perspective/logo'           => '商标',
     'perspective/mascot'         => '立标',
     'perspective/sketch'         => 'sketch',
+    'perspective/mixed'          => 'mixed',
 
     'login/sign-in' => '登录',
     'login/sign-out' => '注销',
@@ -1091,12 +1096,8 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/pictures/filter/perspective/empty' => 'empty',
     'moder/pictures/filter/type' => '型号',
     'moder/pictures/filter/type/any' => 'any',
-    'moder/pictures/filter/type/item' => 'vehicle or engine',
-    'moder/pictures/filter/type/logotype' => 'logotype',
-    'moder/pictures/filter/type/mixed' => 'mixed',
-    'moder/pictures/filter/type/unsorted' => 'unsorted',
+    'moder/pictures/filter/type/item' => 'brand, vehicle, engine',
     'moder/pictures/filter/type/factory' => 'factory',
-    'moder/pictures/filter/type/unsorted+mixed+logo' => 'unsorted + mixed + logotype',
     'moder/pictures/filter/comments' => '评论',
     'moder/pictures/filter/comments/not-matters'  => 'not matters',
     'moder/pictures/filter/comments/has-comments' => 'has',

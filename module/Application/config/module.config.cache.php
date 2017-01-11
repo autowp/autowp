@@ -39,6 +39,12 @@ return [
                 'lifetime' => 600
             ],
         ],
+        'sessionCache' => [
+            'adapter' => [
+                'name'     =>'blackHole',
+                'lifetime' => 864000
+            ],
+        ],
     ],
     'service_manager' => [
         'factories' => [

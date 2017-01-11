@@ -346,8 +346,7 @@ class CarsController extends AbstractActionController
         $auvTable = new Attr\UserValue();
 
         $rows = $auvTable->fetchAll([
-            'item_id = ?'      => $itemId,
-            'item_type_id = ?' => $itemType->id
+            'item_id = ?' => $itemId
         ], 'update_date');
 
         $language = $this->language();
@@ -376,7 +375,6 @@ class CarsController extends AbstractActionController
                 'deleteUrl' => $this->url()->fromRoute('cars/params', [
                     'action'       => 'delete-value',
                     'attribute_id' => $row->attribute_id,
-                    'item_type_id' => $row->item_type_id,
                     'item_id'      => $row->item_id,
                     'user_id'      => $row->user_id
                 ], [], true)
@@ -653,8 +651,8 @@ class CarsController extends AbstractActionController
             ->order('item.name');
         if ($brandId) {
             $select
-                ->join('brand_item', 'item.id = brand_item.item_id', null)
-                ->where('brand_item.brand_id = ?', $brandId);
+                ->join('item_parent', 'item.id = item_parent.item_id', null)
+                ->where('item_parent.parent_id = ?', $brandId);
         }
         if ($parentId) {
             $select
@@ -705,10 +703,10 @@ class CarsController extends AbstractActionController
         if (! $brand) {
             $brands = $brandModel->getList($language, function ($select) {
                 $select
-                    ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                    ->join('item', 'brand_item.item_id = item.id', null)
-                    ->where('item.item_type_id = ?', DbTable\Item\Type::ENGINE)
-                    ->group('brands.id');
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                    ->join(['engine' => 'item'], 'item_parent_cache.item_id = engine.id', null)
+                    ->where('engine.item_type_id = ?', DbTable\Item\Type::ENGINE)
+                    ->group('item.id');
             });
 
             return [

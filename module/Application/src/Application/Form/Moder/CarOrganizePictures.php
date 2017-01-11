@@ -57,6 +57,10 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
                 'name'    => 'name',
                 'type'    => \Application\Form\Element\CarName::class
             ],
+            'full_name' => [
+                'name'    => 'full_name',
+                'type'    => \Application\Form\Element\BrandFullName::class,
+            ],
             [
                 'name'    => 'body',
                 'type'    => \Application\Form\Element\CarBody::class,
@@ -154,6 +158,27 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
                 ],
             ],
         ];
+        
+        if ($this->itemType != DbTable\Item\Type::BRAND) {
+            unset($elements['full_name']);
+        }
+        
+        if (! in_array($this->itemType, [DbTable\Item\Type::CATEGORY, DbTable\Item\Type::BRAND])) {
+            unset($elements['catname']);
+        }
+        
+        if (! in_array($this->itemType, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::TWINS])) {
+            unset($elements['vehicle_type_id']);
+        }
+        
+        if (! in_array($this->itemType, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
+            unset($elements['is_group']);
+            unset($elements['is_concept']);
+            unset($elements['produced']);
+            unset($elements['model_year']);
+            unset($elements['spec_id']);
+            unset($elements['body']);
+        }
 
         foreach ($elements as $element) {
             $this->add($element);

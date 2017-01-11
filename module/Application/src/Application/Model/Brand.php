@@ -2,7 +2,8 @@
 
 namespace Application\Model;
 
-use Application\Model\DbTable\Brand as Table;
+use Application\Model\DbTable;
+
 use Zend_Db_Expr;
 
 use Collator;
@@ -21,7 +22,7 @@ class Brand
     const ICON_FORMAT = 'brandicon';
 
     /**
-     * @var Table
+     * @var DbTable\Vehicle
      */
     private $table;
 
@@ -29,13 +30,13 @@ class Brand
 
     public function __construct()
     {
-        $this->table = new Table();
+        $this->table = new DbTable\Vehicle();
     }
 
     public function getTotalCount()
     {
-        $sql = 'SELECT COUNT(1) FROM brands';
-        return $this->table->getAdapter()->fetchOne($sql);
+        $sql = 'SELECT COUNT(1) FROM item WHERE item_type_id = ?';
+        return $this->table->getAdapter()->fetchOne($sql, [DbTable\Item\Type::BRAND]);
     }
 
     private function countExpr()
@@ -45,10 +46,9 @@ class Brand
         return new Zend_Db_Expr('(' .
             '(' .
                 $db->select()
-                    ->from('item', 'count(distinct item.id)')
-                    ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                    ->where('brand_item.brand_id = brands.id')
+                    ->from(['product' => 'item'], 'count(distinct product.id)')
+                    ->join('item_parent_cache', 'product.id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = item.id')
                     ->assemble() .
             ')' .
         ')');
@@ -95,18 +95,19 @@ class Brand
         $items = [];
 
         $select = $db->select(true)
-            ->from('brands', [
-                'id', 'folder',
-                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.name)',
+            ->from('item', [
+                'id', 'catname',
+                'name' => 'IF(LENGTH(item_language.name)>0, item_language.name, item.name)',
                 'cars_count' => $this->countExpr()
             ])
             ->joinLeft(
-                'brand_language',
-                'brands.id = brand_language.brand_id and brand_language.language = :language',
+                'item_language',
+                'item.id = item_language.item_id and item_language.language = :language',
                 null
             )
-            ->where('brands.id <> 58') // exclude "other"
-            ->group('brands.id')
+            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+            //->where('brands.id <> 58') // exclude "other"
+            ->group('item.id')
             ->order('cars_count DESC')
             ->limit(self::TOP_COUNT)
             ->bind([
@@ -118,14 +119,14 @@ class Brand
                 $db->select()
                     ->from('item', 'count(distinct item.id)')
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                    ->join('brand_item', 'item_parent_cache.parent_id = brand_item.item_id', null)
-                    ->where('brand_item.brand_id = ?', $brandRow['id'])
+                    ->where('item_parent_cache.parent_id = ?', $brandRow['id'])
+                    ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
                     ->where('item.add_datetime > DATE_SUB(NOW(), INTERVAL ? DAY)', self::NEW_DAYS)
             );
 
             $items[] = [
                 'id'             => $brandRow['id'],
-                'catname'        => $brandRow['folder'],
+                'catname'        => $brandRow['catname'],
                 'name'           => $brandRow['name'],
                 'cars_count'     => $brandRow['cars_count'],
                 'new_cars_count' => $newCarsCount
@@ -155,21 +156,20 @@ class Brand
         $rows = $this->getList([
             'language' => $language,
             'columns'  => [
-                'img',
+                'logo_id',
                 'cars_count' => $this->countExpr(),
                 'new_cars_count' => new Zend_Db_Expr(
-                    'COUNT(IF(item.add_datetime > DATE_SUB(NOW(), INTERVAL :new_days DAY), 1, NULL))'
+                    'COUNT(IF(subitem.add_datetime > DATE_SUB(NOW(), INTERVAL :new_days DAY), 1, NULL))'
                 ),
-                'carpictures_count', 'enginepictures_count',
+                /*'carpictures_count', 'enginepictures_count',
                 'logopictures_count', 'mixedpictures_count',
-                'unsortedpictures_count'
+                'unsortedpictures_count'*/
             ]
         ], function ($select) use ($language) {
             $select
-                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
-                ->join('item', 'item_parent_cache.item_id = item.id', null)
-                ->group('brands.id')
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                ->join(['subitem' => 'item'], 'item_parent_cache.item_id = subitem.id', null)
+                ->group('item.id')
                 ->bind([
                     'language' => $language,
                     'new_days' => self::NEW_DAYS
@@ -237,16 +237,16 @@ class Brand
                 ];
             }
 
-            $picturesCount = $row['carpictures_count'] + $row['enginepictures_count'] +
+            /*$picturesCount = $row['carpictures_count'] + $row['enginepictures_count'] +
                 $row['logopictures_count'] + $row['mixedpictures_count'] +
-                $row['unsortedpictures_count'];
+                $row['unsortedpictures_count'];*/
 
             $result[$line][$char]['brands'][] = [
                 'id'             => $row['id'],
                 'name'           => $name,
                 'catname'        => $row['catname'],
-                'img'            => $row['img'],
-                'totalPictures'  => $picturesCount,
+                'logo_id'        => $row['logo_id'],
+                'totalPictures'  => 0, //$picturesCount,
                 'newCars'        => $row['new_cars_count'],
                 'totalCars'      => $row['cars_count']
             ];
@@ -269,7 +269,7 @@ class Brand
         return $db->fetchOne(
             $db->select()
                 ->from('brands', 'id')
-                ->where('folder = ?', (string)$catname)
+                ->where('catname = ?', (string)$catname)
         );
     }
 
@@ -278,16 +278,17 @@ class Brand
         $db = $this->table->getAdapter();
 
         $select = $db->select()
-            ->from('brands', [
-                'id', 'folder', 'type_id',
-                'name' => 'IF(LENGTH(brand_language.name)>0, brand_language.name, brands.name)',
-                'full_name', 'img', 'text_id'
+            ->from('item', [
+                'id', 'catname',
+                'name' => 'IF(LENGTH(item_language.name)>0, item_language.name, item.name)',
+                'full_name', 'logo_id'
             ])
             ->joinLeft(
-                'brand_language',
-                'brands.id = brand_language.brand_id and brand_language.language = :language',
+                'item_language',
+                'item.id = item_language.item_id and item_language.language = :language',
                 null
             )
+            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
             ->bind([
                 'language' => (string)$language
             ]);
@@ -303,25 +304,23 @@ class Brand
         return [
             'id'        => $brand['id'],
             'name'      => $brand['name'],
-            'catname'   => $brand['folder'],
+            'catname'   => $brand['catname'],
             'full_name' => $brand['full_name'],
-            'img'       => $brand['img'],
-            'text_id'   => $brand['text_id'],
-            'type_id'   => $brand['type_id']
+            'logo_id'   => $brand['logo_id'],
         ];
     }
 
     public function getBrandById($id, $language)
     {
         return $this->fetchBrand($language, function ($select) use ($id) {
-            $select->where('brands.id = ?', (int)$id);
+            $select->where('item.id = ?', (int)$id);
         });
     }
 
     public function getBrandByCatname($catname, $language)
     {
         return $this->fetchBrand($language, function ($select) use ($catname) {
-            $select->where('brands.folder = ?', (string)$catname);
+            $select->where('item.catname = ?', (string)$catname);
         });
     }
 
@@ -329,11 +328,11 @@ class Brand
     {
         $brand = $this->table->fetchRow(
             $this->table->select(true)
-                ->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
+                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
                 ->join('factory_item', 'item_parent_cache.item_id = factory_item.item_id', null)
                 ->where('factory_item.factory_id = ?', (int)$factoryId)
-                ->group('brands.id')
+                ->group('item.id')
                 ->order(new Zend_Db_Expr('count(1) desc'))
         );
         if (! $brand) {
@@ -371,22 +370,20 @@ class Brand
 
         $columns = [
             'id',
-            'type_id',
-            'catname' => 'folder',
+            'catname',
             'name'    => 'IF(' .
-                'brand_language.name IS NOT NULL and LENGTH(brand_language.name)>0,' .
-                'brand_language.name,' .
-                'brands.name' .
+                'item_language.name IS NOT NULL and LENGTH(item_language.name)>0,' .
+                'item_language.name,' .
+                'item.name' .
             ')'
         ];
         foreach ($options['columns'] as $column => $expr) {
             switch ($expr) {
                 case 'id':
-                case 'type_id':
                 case 'name':
                     break;
-                case 'img':
-                    $columns[] = 'img';
+                case 'logo_id':
+                    $columns[] = 'logo_id';
                     break;
                 default:
                     if (is_numeric($column)) {
@@ -398,13 +395,14 @@ class Brand
         }
 
         $select = $db->select()
-            ->from('brands', $columns)
+            ->from('item', $columns)
+            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
             ->joinLeft(
-                'brand_language',
-                'brands.id = brand_language.brand_id and brand_language.language = :language',
+                'item_language',
+                'item.id = item_language.item_id and item_language.language = :language',
                 null
             )
-            ->order(['brands.position'])
+            ->order(['item.position'])
             ->bind([
                 'language' => (string)$options['language']
             ]);
@@ -425,10 +423,10 @@ class Brand
         $list = $this->getList([
             'language' => 'en',
             'columns'  => [
-                'img'
+                'logo_id'
             ]
         ], function ($select) {
-            $select->where('img');
+            $select->where('logo_id');
         });
 
         $images = [];
@@ -439,8 +437,8 @@ class Brand
 
         foreach ($list as $brand) {
             $img = false;
-            if ($brand['img']) {
-                $imageInfo = $imageStorage->getFormatedImage($brand['img'], self::ICON_FORMAT);
+            if ($brand['logo_id']) {
+                $imageInfo = $imageStorage->getFormatedImage($brand['logo_id'], self::ICON_FORMAT);
                 if ($imageInfo) {
                     $img = $imageInfo->getSrc();
                 }
@@ -485,7 +483,7 @@ class Brand
 
     public function refreshPicturesCountByVehicle($carId)
     {
-        $brandRows = $this->table->fetchAll(
+        /*$brandRows = $this->table->fetchAll(
             $this->table->select(true)
                 ->join('brand_item', 'brands.id = brand_item.brand_id', null)
                 ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
@@ -493,6 +491,6 @@ class Brand
         );
         foreach ($brandRows as $brand) {
             $brand->refreshPicturesCount();
-        }
+        }*/
     }
 }
