@@ -307,7 +307,6 @@ class Pic extends AbstractPlugin
                     'pictures.width', 'pictures.height',
                     'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                     'pictures.status', 'pictures.image_id',
-                    'pictures.brand_id',
                     'pictures.type', 'pictures.factory_id'
                 ]);
 
@@ -1178,7 +1177,7 @@ class Pic extends AbstractPlugin
                 'pictures.width', 'pictures.height',
                 'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                 'pictures.image_id', 'pictures.filesize',
-                'pictures.brand_id', 'pictures.type', 'pictures.factory_id'
+                'pictures.type', 'pictures.factory_id'
             ])
             ->joinLeft(
                 ['ct' => 'comment_topic'],

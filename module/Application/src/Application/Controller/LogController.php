@@ -38,12 +38,6 @@ class LogController extends AbstractActionController
                    ->where('log_events_articles.article_id = ?', $articleId);
         }
 
-        $brandId = (int)$this->params()->fromRoute('brand_id');
-        if ($brandId) {
-            $select->join('log_events_brands', 'log_events.id=log_events_brands.log_event_id', null)
-                   ->where('log_events_brands.brand_id = ?', $brandId);
-        }
-
         $carId = (int)$this->params()->fromRoute('item_id');
         if ($carId) {
             $select->join('log_events_item', 'log_events.id=log_events_item.log_event_id', null)
@@ -95,12 +89,6 @@ class LogController extends AbstractActionController
                 ];
             }
 
-            $brands = $brandModel->getList($language, function ($select) use ($event) {
-                $select
-                    ->join('log_events_brands', 'brands.id = log_events_brands.brand_id', null)
-                    ->where('log_events_brands.log_event_id = ?', $event->id);
-            });
-
             $picturesRows = $picturesTable->fetchAll(
                 $picturesTable->select(true)
                     ->join('log_events_pictures', 'pictures.id = log_events_pictures.picture_id', null)
@@ -145,7 +133,6 @@ class LogController extends AbstractActionController
                 'date'        => $event->getDateTime('add_datetime'),
                 'desc'        => $event->description,
                 'vehicles'    => $vehicles,
-                'brands'      => $brands,
                 'pictures'    => $pictures,
                 'factories'   => $factories
             ];

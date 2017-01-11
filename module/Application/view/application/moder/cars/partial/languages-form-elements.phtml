@@ -1,13 +1,23 @@
 <ul class="nav nav-tabs" id="languages-form-tabs">
     <?php $index = 0?>
     <?php foreach ($this->form->getIterator() as $key => $element) { ?>
+        <?php 
+            $values = 0;
+            foreach ($element->getIterator() as $subElement) {
+                if ($subElement->getValue()) {
+                    $values++;
+                }
+            }
+        ?>
         <li<?=$index++ ? '' : ' class="active"'?>>
             <?=$this->htmlA(
                 [
                     'href'          => '#tab-'.$key,
                     'data-toggle'   => 'tab',
                 ],
-                mb_strtoupper($element->getLabel())
+                $this->escapeHtml(mb_strtoupper($element->getLabel())) .
+                ($values > 0 ? ' <span class="badge">'.$values.'</span>' : ''),
+                false
             )?>
         </li>
     <?php } ?>

@@ -3,9 +3,7 @@
 namespace Application\Model\DbTable\Vehicle;
 
 use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
-use Application\Model\DbTable\Spec;
+use Application\Model\DbTable;
 
 use DateTime;
 use Exception;
@@ -15,18 +13,18 @@ use Zend_Db_Expr;
 class Row extends \Application\Db\Table\Row
 {
     /**
-     * @var Spec
+     * @var DbTable\Spec
      */
     private $specTable;
 
     /**
-     * @return Spec
+     * @return DbTable\Spec
      */
     private function getSpecTable()
     {
         return $this->specTable
             ? $this->specTable
-            : $this->specTable = new Spec();
+            : $this->specTable = new DbTable\Spec();
     }
 
     public function getNameData($language = 'en')
@@ -35,7 +33,7 @@ class Row extends \Application\Db\Table\Row
             throw new Exception('`language` is not string');
         }
 
-        $carLangTable = new VehicleLanguage();
+        $carLangTable = new DbTable\Vehicle\Language();
         $carLangRow = $carLangTable->fetchRow([
             'item_id = ?'  => $this->id,
             'language = ?' => (string)$language
@@ -70,7 +68,7 @@ class Row extends \Application\Db\Table\Row
 
     public function getOrientedPictureList(array $perspectiveGroupIds)
     {
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
         $pictures = [];
         $db = $this->getTable()->getAdapter();
 
@@ -87,10 +85,13 @@ class Row extends \Application\Db\Table\Row
                     ->where('mp.group_id=?', $groupId)
                     ->where('item_parent_cache.parent_id = ?', $this->id)
                     ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
-                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                    ->where('pictures.status IN (?)', [
+                        DbTable\Picture::STATUS_ACCEPTED, 
+                        DbTable\Picture::STATUS_NEW
+                    ])
                     ->order([
                         'mp.position',
-                        new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
+                        new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', DbTable\Picture::STATUS_ACCEPTED)),
                         'pictures.width DESC', 'pictures.height DESC'
                     ])
                     ->limit(1)
@@ -117,7 +118,10 @@ class Row extends \Application\Db\Table\Row
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id = ?', $this->id)
                     ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
-                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                    ->where('pictures.status IN (?)', [
+                        DbTable\Picture::STATUS_ACCEPTED, 
+                        DbTable\Picture::STATUS_NEW
+                    ])
                     ->limit(1);
 
                 if (count($ids) > 0) {
@@ -148,21 +152,12 @@ class Row extends \Application\Db\Table\Row
                 JOIN picture_item ON pictures.id = picture_item.picture_id
             WHERE picture_item.item_id=? AND pictures.type=?
         ';
-        $this->pictures_count = (int)$db->fetchOne($sql, [$this->id, Picture::VEHICLE_TYPE_ID]);
+        $this->pictures_count = (int)$db->fetchOne($sql, [$this->id, DbTable\Picture::VEHICLE_TYPE_ID]);
         $this->save();
 
         $brandModel = new BrandModel();
         $brandModel->refreshPicturesCountByVehicle($this->id);
     }
-
-    /*public function deleteFromBrand(\Application\Model\DbTable\BrandRow $brand)
-    {
-        $db = $this->getTable()->getAdapter();
-        $sql = 'DELETE FROM brand_item WHERE (brand_id=?) AND (item_id=?) LIMIT 1';
-        $db->query($sql, [$brand->id, $this->id]);
-
-        $brand->refreshPicturesCount();
-    }*/
 
     public function updateOrderCache()
     {

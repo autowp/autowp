@@ -27,12 +27,6 @@
                 <?php foreach ($event['vehicles'] as $vehicle) { ?>
                     Item: <?=$this->htmlA($vehicle['url'], $this->car()->htmlTitle($vehicle['name']), false)?><br />
                 <?php } ?>
-                <?php foreach ($event['brands'] as $brand) { ?>
-                    Brand: <?=$this->htmlA($this->url('moder/brands/params', [
-                        'action'   => 'brand',
-                        'brand_id' => $brand['id']
-                    ]), $brand['name'])?><br />
-                <?php } ?>
                 <?php foreach ($event['pictures'] as $picture) { ?>
                     Picture: <?=$this->htmlA($picture['url'], $this->pic()->htmlTitle($picture['name']), false)?><br />
                 <?php } ?>

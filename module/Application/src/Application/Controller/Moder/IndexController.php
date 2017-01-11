@@ -8,13 +8,6 @@ use Application\Model\DbTable;
 
 class IndexController extends AbstractActionController
 {
-    private $addBrandForm;
-
-    public function __construct($addBrandForm)
-    {
-        $this->addBrandForm = $addBrandForm;
-    }
-
     public function indexAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -22,41 +15,6 @@ class IndexController extends AbstractActionController
         }
 
         $request = $this->getRequest();
-
-        /*if ($this->user()->isAllowed('brand', 'add')) {
-            $this->addBrandForm->setAttribute(
-                'action',
-                $this->url()->fromRoute('moder/index/params', ['form' => 'add-brand'])
-            );
-
-            if ($request->isPost() && $this->params('form') == 'add-brand') {
-                $this->addBrandForm->setData($request->getPost());
-                if ($this->addBrandForm->isValid()) {
-                    $values = $this->addBrandForm->getData();
-
-                    $brands = new DbTable\Brand();
-
-                    $brand = $brands->createRow([
-                        'name'    => $values['name'],
-                        'type_id' => 1 // TODO: remove parameter
-                    ]);
-                    $brand->save();
-
-                    $url = $this->url()->fromRoute('moder/brands/params', [
-                        'action'   => 'brand',
-                        'brand_id' => $brand->id
-                    ]);
-
-                    $this->log(sprintf(
-                        'Создан новый бренд %s',
-                        $brand->name
-                    ), $brand);
-
-                    return $this->redirect()->toUrl($url);
-                }
-            }
-        }*/
-
 
         $menu = [];
 
@@ -79,8 +37,7 @@ class IndexController extends AbstractActionController
         $menu[$this->url()->fromRoute('moder/hotlink')] = 'Hotlinks';
 
         return [
-            'menu'         => $menu,
-            'addBrandForm' => $this->addBrandForm,
+            'menu' => $menu,
         ];
     }
 

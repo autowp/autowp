@@ -107,13 +107,6 @@
         </ul>
     </div>
     <div class="col-md-6">
-        <?php if ($this->addBrandForm) { ?>
-            <div class="well">
-                <?=$this->partial('application/forms/bootstrap-horizontal', [
-                    'form' => $this->addBrandForm
-                ])?>
-            </div>
-        <?php } ?>
         <h2><?=$this->escapeHtml($this->translate('moder/index/other-tools'))?></h2>
         <div class="well">
             <?php foreach ($this->menu as $url => $name) { ?>

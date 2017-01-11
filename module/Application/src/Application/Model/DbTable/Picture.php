@@ -6,14 +6,9 @@ use Autowp\Image;
 
 use Application\Db\Table;
 use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\Factory;
-use Application\Model\DbTable\Log\Event as LogEvent;
-use Application\Model\DbTable\Perspective;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\PictureItem;
 
 use Zend_Db_Expr;
-use Application\Model\PictureItem;
 
 class Picture extends Table
 {
@@ -30,14 +25,9 @@ class Picture extends Table
 
     protected $_name = 'pictures';
 
-    protected $_rowClass = \Application\Model\DbTable\Picture\Row::class;
+    protected $_rowClass = Picture\Row::class;
 
     protected $_referenceMap = [
-        'Brand' => [
-            'columns'       => ['brand_id'],
-            'refTableClass' => BrandTable::class,
-            'refColumns'    => ['id']
-        ],
         'Factory' => [
             'columns'       => ['factory_id'],
             'refTableClass' => Factory::class,
@@ -51,11 +41,6 @@ class Picture extends Table
         'Change_Status_User' => [
             'columns'       => ['change_status_user_id'],
             'refTableClass' => \Autowp\User\Model\DbTable\User::class,
-            'refColumns'    => ['id']
-        ],
-        'Source' => [
-            'columns'       => ['source_id'],
-            'refTableClass' => \Application\Model\DbTable\Sources::class,
             'refColumns'    => ['id']
         ],
     ];
@@ -220,14 +205,6 @@ class Picture extends Table
             }
         }
 
-        $brands = [];
-        if (count($brandIds)) {
-            $table = new BrandTable();
-            foreach ($table->find(array_keys($brandIds)) as $row) {
-                $brands[$row->id] = $row->getLanguageName($language);
-            }
-        }
-
         foreach ($rows as $index => $row) {
             if ($row['name']) {
                 $result[$row['id']] = [
@@ -382,7 +359,7 @@ class Picture extends Table
         $this->refreshCounts($oldParams);
         $this->refreshPictureCounts($pictureItem, $picture);
 
-        $log = new LogEvent();
+        $log = new Log\Event();
         $log($userId, sprintf(
             'Картинка %s связана с автомобилем %s',
             htmlspecialchars($picture->id),
@@ -431,7 +408,7 @@ class Picture extends Table
         $this->refreshCounts($oldParams);
         $this->refreshPictureCounts($pictureItem, $picture);
 
-        $log = new LogEvent();
+        $log = new Log\Event();
         $log($userId, sprintf(
             'Картинка %s связана с автомобилем %s',
             htmlspecialchars($picture->id),
@@ -478,7 +455,7 @@ class Picture extends Table
         $this->refreshCounts($oldParams);
         $this->refreshPictureCounts($pictureItem, $picture);
 
-        $log = new LogEvent();
+        $log = new Log\Event();
         $log($userId, sprintf(
             'Назначение завода %s картинке %s',
             htmlspecialchars($factory->name),

@@ -328,7 +328,7 @@ return [
             Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
             Controller\Moder\FactoryController::class      => Controller\Moder\Service\FactoryControllerFactory::class,
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
-            Controller\Moder\IndexController::class        => Controller\Moder\Service\IndexControllerFactory::class,
+            Controller\Moder\IndexController::class        => InvokableFactory::class,
             Controller\Moder\MuseumController::class       => Controller\Moder\Service\MuseumControllerFactory::class,
             Controller\Moder\PagesController::class        => InvokableFactory::class,
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
@@ -418,43 +418,6 @@ return [
                     'required' => false,
                     'filters'  => [
                         ['name' => 'StringTrim']
-                    ]
-                ]
-            ]
-        ],
-        'ModerTwinsEditForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'Text',
-                        'name' => 'name',
-                        'options' => [
-                            'label'     => 'twins/group/name',
-                            'maxlength' => 255,
-                            'size'      => 80,
-                        ]
-                    ]
-                ]
-            ],
-            'input_filter' => [
-                'name' => [
-                    'required' => true,
-                    'filters'  => [
-                        ['name' => 'StringTrim'],
-                        ['name' => 'SingleSpaces']
-                    ],
-                    'validators' => [
-                        [
-                            'name' => 'StringLength',
-                            'options' => [
-                                'min' => 1,
-                                'max' => 255
-                            ]
-                        ]
                     ]
                 ]
             ]
@@ -878,12 +841,6 @@ return [
                     'required' => true
                 ]
             ]
-        ],
-        'ModerBrandEdit' => [
-            'type' => Form\Moder\Brand\Edit::class,
-            'attributes'  => [
-                'method' => 'post',
-            ],
         ],
         'ModerBrandItem' => [
             'type'     => 'Zend\Form\Form',

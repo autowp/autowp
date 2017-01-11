@@ -31,10 +31,6 @@ class EventRow extends Row
                     $col = 'item_id';
                     $tableName = 'log_events_item';
                     break;
-                case $table instanceof \Application\Model\DbTable\Brand:
-                    $col = 'brand_id';
-                    $tableName = 'log_events_brands';
-                    break;
                 case $table instanceof \Application\Model\DbTable\Article:
                     $col = 'article_id';
                     $tableName = 'log_events_articles';

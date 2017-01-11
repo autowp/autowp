@@ -166,7 +166,7 @@ class PerspectivePictureFetcher extends PictureFetcher
             $pictureRows = $db->fetchAll(
                 $db->select()
                     ->from('pictures', [
-                        'id', 'name', 'type', 'brand_id', 'factory_id',
+                        'id', 'name', 'type', 'factory_id',
                         'image_id', 'crop_left', 'crop_top',
                         'crop_width', 'crop_height', 'width', 'height', 'identity'
                     ])
