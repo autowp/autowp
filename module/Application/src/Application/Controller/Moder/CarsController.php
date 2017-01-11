@@ -83,6 +83,11 @@ class CarsController extends AbstractActionController
      * @var PictureItem
      */
     private $pictureItem;
+    
+    /**
+     * @var Form
+     */
+    private $logoForm;
 
     public function __construct(
         HostManager $hostManager,
@@ -92,6 +97,7 @@ class CarsController extends AbstractActionController
         Form $textForm,
         Form $carParentForm,
         Form $filterForm,
+        Form $logoForm,
         BrandVehicle $brandVehicle,
         Message $message,
         SpecificationsService $specificationsService,
@@ -105,6 +111,7 @@ class CarsController extends AbstractActionController
         $this->textForm = $textForm;
         $this->carParentForm = $carParentForm;
         $this->filterForm = $filterForm;
+        $this->logoForm = $logoForm;
         $this->brandVehicle = $brandVehicle;
         $this->message = $message;
         $this->specificationsService = $specificationsService;
@@ -683,6 +690,47 @@ class CarsController extends AbstractActionController
             }
         }
 
+        $canLogo = $this->user()->isAllowed('brand', 'logo');
+        if ($canLogo) {
+            $this->logoForm->setAttribute('action', $this->url()->fromRoute('moder/cars/params', [
+                'action'  => 'car',
+                'item_id' => $car->id,
+                'tab'     => 'logo',
+                'form'    => 'logo'
+            ]));
+            
+            if ($request->isPost() && $this->params('form') == 'logo') {
+                $data = array_merge_recursive(
+                    $this->getRequest()->getPost()->toArray(),
+                    $this->getRequest()->getFiles()->toArray()
+                );
+                $this->logoForm->setData($data);
+                if ($this->logoForm->isValid()) {
+                    $tempFilepath = $data['logo']['tmp_name'];
+            
+                    $imageStorage = $this->imageStorage();
+            
+                    $oldImageId = $car->logo_id;
+            
+                    $newImageId = $imageStorage->addImageFromFile($tempFilepath, 'brand');
+                    $car->logo_id = $newImageId;
+                    $car->save();
+            
+                    if ($oldImageId) {
+                        $imageStorage->removeImage($oldImageId);
+                    }
+            
+                    $this->log(sprintf(
+                        'Закачен логотип %s',
+                        htmlspecialchars($car->name)
+                    ), $car);
+            
+                    $this->flashMessenger()->addSuccessMessage($this->translate('moder/brands/logo/saved'));
+            
+                    return $this->redirectToCar($car, 'logo');
+                }
+            }
+        }
 
         $picturesCount = $pictures->getAdapter()->fetchOne(
             $pictures->getAdapter()->select()
@@ -736,7 +784,7 @@ class CarsController extends AbstractActionController
                 ->from('links', 'count(1)')
                 ->where('item_id = ?', $car->id)
         );
-
+        
         $tabs = [
             'meta' => [
                 'icon'  => 'glyphicon glyphicon-pencil',
@@ -750,6 +798,11 @@ class CarsController extends AbstractActionController
                     'action' => 'car-name'
                 ], [], true),
                 'count' => $langNameCount,
+            ],
+            'logo' => [
+                'icon'  => 'glyphicon glyphicon-align-left',
+                'title' => 'brand/logo',
+                'count' => $car->logo_id ? 1 : 0,
             ],
             'catalogue' => [
                 'icon'      => false,
@@ -803,6 +856,7 @@ class CarsController extends AbstractActionController
         
         if ($car->item_type_id != DbTable\Item\Type::BRAND) {
             unset($tabs['links']);
+            unset($tabs['logo']);
         }
 
         if ($car->item_type_id != DbTable\Item\Type::VEHICLE) {
@@ -840,6 +894,8 @@ class CarsController extends AbstractActionController
         $specsCount = $this->specificationsService->getSpecsCount($car->id);
 
         return [
+            'canLogo'        => $canLogo,
+            'formLogo'       => $this->logoForm,
             'picturesCount'  => $picturesCount,
             'canEditMeta'    => $canEditMeta,
             'car'            => $car,

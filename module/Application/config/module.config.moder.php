@@ -38,22 +38,6 @@ return [
                             ]
                         ]
                     ],
-                    'brands' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/brands[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\BrandsController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'brand-vehicle' => [
                         'type' => Segment::class,
                         'options' => [
@@ -282,22 +266,6 @@ return [
                             ]
                         ]
                     ],
-                    'twins' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/twins[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\TwinsController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => false,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'users' => [
                         'type' => Segment::class,
                         'options' => [
@@ -321,8 +289,6 @@ return [
     'controllers' => [
         'factories' => [
             Controller\Moder\AttrsController::class        => InvokableFactory::class,
-            Controller\Moder\BrandsController::class       => Controller\Moder\Service\BrandsControllerFactory::class,
-            Controller\Moder\CategoryController::class     => Controller\Moder\Service\CategoryControllerFactory::class,
             Controller\Moder\BrandVehicleController::class => Controller\Moder\Service\BrandVehicleControllerFactory::class,
             Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
             Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
@@ -335,7 +301,6 @@ return [
             Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
             Controller\Moder\PicturesController::class     => Controller\Moder\Service\PicturesControllerFactory::class,
             Controller\Moder\RightsController::class       => Controller\Moder\Service\RightsControllerFactory::class,
-            Controller\Moder\TwinsController::class        => Controller\Moder\Service\TwinsControllerFactory::class,
             Controller\Moder\UsersController::class        => InvokableFactory::class,
         ]
     ],

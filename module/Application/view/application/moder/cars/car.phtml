@@ -144,6 +144,19 @@
             </table>
         <?php } ?>
     </div>
+    <?php if (isset($this->tabs['logo'])) { ?>
+        <div class="tab-pane<?=$this->tabs['logo']['active'] ? ' active' : ''?>" id="logo">
+            <?php if ($this->canLogo) { ?>
+                <?=$this->markdown($this->translate('moder/brands/logo/description'))?>
+            <?php } ?>
+            <?=$this->img($this->car->logo_id, ['style' => 'max-width:100%']) ?>
+            <?php if ($this->canLogo) { ?>
+                <?=$this->partial('application/forms/bootstrap-horizontal', [
+                    'form' => $this->formLogo
+                ])?>
+            <?php } ?>
+        </div>
+    <?php } ?>
     <div class="tab-pane<?=$this->tabs['name']['active'] ? ' active' : ''?>" id="name">Loading ...</div>
 
     <div class="tab-pane<?=$this->tabs['catalogue']['active'] ? ' active' : ''?>" id="catalogue">Loading ...</div>
