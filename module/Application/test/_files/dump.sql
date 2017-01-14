@@ -1,3 +1,5 @@
+use autowp_test;
+
 -- MySQL dump 10.13  Distrib 5.7.16, for Linux (x86_64)
 --
 -- Host: localhost    Database: autowp_test
