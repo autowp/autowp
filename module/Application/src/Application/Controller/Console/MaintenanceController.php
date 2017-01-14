@@ -45,7 +45,7 @@ class MaintenanceController extends AbstractActionController
         $console->write('Dumping ... ');
 
         $cmd = sprintf(
-            'mysqldump -u%s -p%s -h%s --set-gtid-purged=OFF %s > %s',
+            'mysqldump -u%s -p%s -h%s --set-gtid-purged=OFF --hex-blob %s -r %s',
             escapeshellarg($config['username']),
             escapeshellarg($config['password']),
             escapeshellarg($config['host']),

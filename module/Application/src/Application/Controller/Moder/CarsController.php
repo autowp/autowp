@@ -2799,11 +2799,21 @@ class CarsController extends AbstractActionController
             $isConcept = false;
             $isConceptInherit = true;
         }
+        
+        $catname = null;
+        if (isset($values['catname'])) {
+            if (!$values['catname']) {
+                $values['catname'] = $values['name'];
+            }
+            
+            $filter = new \Autowp\ZFComponents\Filter\FilenameSafe();
+            $catname = $filter->filter($values['catname']);
+        }
 
         $result = [
             'name'               => $values['name'],
             'full_name'          => isset($values['full_name']) && $values['full_name'] ? $values['full_name'] : null,
-            'catname'            => isset($values['catname']) && $values['catname'] ? $values['catname'] : null,
+            'catname'            => $catname,
             'body'               => isset($values['body']) ? $values['body'] : '',
             'begin_year'         => $values['begin']['year'] ? $values['begin']['year'] : null,
             'begin_month'        => $values['begin']['month'] ? $values['begin']['month'] : null,

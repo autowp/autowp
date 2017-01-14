@@ -4,9 +4,7 @@ namespace Application\Telegram\Command;
 
 use Telegram\Bot\Commands\Command;
 
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\Telegram\Brand as TelegramBrand;
-use Application\Model\DbTable\Telegram\Chat as TelegramChat;
+use Application\Model\DbTable;
 
 class InboxCommand extends Command
 {
@@ -27,7 +25,7 @@ class InboxCommand extends Command
     {
         $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
 
-        $chatTable = new TelegramChat();
+        $chatTable = new DbTable\Telegram\Chat();
 
         $chatRow = $chatTable->fetchRow(
             $chatTable->select(true)
@@ -44,17 +42,18 @@ class InboxCommand extends Command
         }
 
         if ($arguments) {
-            $brandTable = new BrandTable();
+            $brandTable = new DbTable\Vehicle();
 
             $brandRow = $brandTable->fetchRow([
-                'name = ?' => (string)$arguments
+                'name = ?'         => (string)$arguments,
+                'item_type_id = ?' => DbTable\Item\Type::BRAND
             ]);
 
             if ($brandRow) {
-                $telegramBrandTable = new TelegramBrand();
+                $telegramBrandTable = new DbTable\Telegram\Brand();
                 $telegramBrandRow = $telegramBrandTable->fetchRow([
-                    'brand_id = ?' => $brandRow->id,
-                    'chat_id  = ?' => $chatId
+                    'item_id = ?' => $brandRow->id,
+                    'chat_id = ?' => $chatId
                 ]);
 
                 if ($telegramBrandRow && $telegramBrandRow->inbox) {
@@ -66,8 +65,8 @@ class InboxCommand extends Command
                 } else {
                     if (! $telegramBrandRow) {
                         $telegramBrandRow = $telegramBrandTable->createRow([
-                            'brand_id' => $brandRow->id,
-                            'chat_id'  => $chatId
+                            'item_id' => $brandRow->id,
+                            'chat_id' => $chatId
                         ]);
                     }
                     $telegramBrandRow->inbox = 1;

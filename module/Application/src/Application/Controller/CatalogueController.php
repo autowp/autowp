@@ -603,6 +603,8 @@ class CatalogueController extends AbstractActionController
                 break;
         }
         
+        //print $select;
+        
         return $select;
     }
 
@@ -693,7 +695,7 @@ class CatalogueController extends AbstractActionController
 
     public function mixedPictureAction()
     {
-        return $this->typePicturesPicture('mixedd');
+        return $this->typePicturesPicture('mixed');
     }
 
     public function logotypesPictureAction()
@@ -1256,7 +1258,7 @@ class CatalogueController extends AbstractActionController
             ->from(
                 $pictureTable->info('name'),
                 [
-                    'id', 'name', 'type', 'brand_id', 'factory_id',
+                    'id', 'name', 'type', 'factory_id',
                     'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity', 'factory_id'
                 ]

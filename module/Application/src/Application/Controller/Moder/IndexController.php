@@ -56,12 +56,12 @@ class IndexController extends AbstractActionController
         ');
 
         $totalBrands = $db->fetchOne('
-            select count(1) from brands
-        ');
+            select count(1) from item where item_type_id = ?
+        ', [DbTable\Item\Type::BRAND]);
 
         $totalCars = $db->fetchOne('
-            select count(1) from item
-        ');
+            select count(1) from item where item_type_id = ?
+        ', [DbTable\Item\Type::VEHICLE]);
 
         $totalCarAttrs = $db->fetchOne('
             select count(1)
@@ -73,7 +73,6 @@ class IndexController extends AbstractActionController
         $carAttrsValues = $db->fetchOne('
             select count(1)
             from attrs_values
-            where item_type_id = 1
         ');
 
         $data = [

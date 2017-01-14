@@ -839,101 +839,12 @@ DROP TABLE IF EXISTS `brand_alias`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `brand_alias` (
   `name` varchar(255) NOT NULL,
-  `brand_id` int(11) unsigned DEFAULT NULL,
+  `item_id` int(11) unsigned DEFAULT NULL,
   PRIMARY KEY (`name`),
-  KEY `FK_brand_alias_brands_id` (`brand_id`),
-  CONSTRAINT `FK_brand_alias_brands_id` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`)
+  KEY `FK_brand_alias_item_id` (`item_id`),
+  CONSTRAINT `FK_brand_alias_item_id` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `brand_alias`
---
-
-/*!40000 ALTER TABLE `brand_alias` DISABLE KEYS */;
-/*!40000 ALTER TABLE `brand_alias` ENABLE KEYS */;
-
---
--- Table structure for table `brand_types`
---
-
-DROP TABLE IF EXISTS `brand_types`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `brand_types` (
-  `id` int(10) unsigned NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `catname` varchar(50) NOT NULL,
-  `index_items` smallint(5) unsigned NOT NULL DEFAULT '10',
-  `index_description` varchar(255) NOT NULL,
-  `ordering` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `catname` (`catname`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `brand_types`
---
-
-/*!40000 ALTER TABLE `brand_types` DISABLE KEYS */;
-/*!40000 ALTER TABLE `brand_types` ENABLE KEYS */;
-
---
--- Table structure for table `brands`
---
-
-DROP TABLE IF EXISTS `brands`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `brands` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `folder` varchar(50) NOT NULL DEFAULT '',
-  `name` varchar(50) NOT NULL DEFAULT '',
-  `position` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `group_id` int(10) unsigned DEFAULT NULL,
-  `type_id` tinyint(3) unsigned NOT NULL DEFAULT '1',
-  `activepictures_count` int(10) unsigned NOT NULL DEFAULT '0',
-  `_description` mediumtext,
-  `full_name` varchar(50) DEFAULT NULL,
-  `engines_count` int(10) unsigned NOT NULL DEFAULT '0',
-  `carpictures_count` int(10) unsigned NOT NULL DEFAULT '0',
-  `enginepictures_count` int(10) unsigned NOT NULL DEFAULT '0',
-  `logopictures_count` int(10) unsigned NOT NULL DEFAULT '0',
-  `unsortedpictures_count` int(10) unsigned NOT NULL DEFAULT '0',
-  `mixedpictures_count` int(10) unsigned NOT NULL DEFAULT '0',
-  `cars_count` int(10) unsigned NOT NULL DEFAULT '0',
-  `new_style` tinyint(1) NOT NULL DEFAULT '0',
-  `manual_sort` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `new_models_style` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `conceptcars_count` int(10) unsigned NOT NULL DEFAULT '0',
-  `parent_brand_id` int(10) unsigned DEFAULT NULL,
-  `twins_groups_count` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `new_twins_groups_count` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `from_year` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `to_year` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `img` int(10) unsigned DEFAULT NULL,
-  `text_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_folder` (`folder`),
-  KEY `group_id` (`group_id`),
-  KEY `position` (`position`,`name`),
-  KEY `type_id` (`type_id`,`position`,`name`),
-  KEY `parent_brand_id` (`parent_brand_id`),
-  KEY `text_id` (`text_id`),
-  CONSTRAINT `brands_fk` FOREIGN KEY (`parent_brand_id`) REFERENCES `brands` (`id`),
-  CONSTRAINT `brands_ibfk_1` FOREIGN KEY (`text_id`) REFERENCES `textstorage_text` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1893 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 123904 kB; (`parent_brand_id`)';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `brands`
---
-
-/*!40000 ALTER TABLE `brands` DISABLE KEYS */;
-INSERT INTO `brands` VALUES (1,'bmw','BMW',0,NULL,1,0,NULL,NULL,0,0,0,0,0,0,0,0,0,0,0,NULL,0,0,0,0,NULL,NULL),(2,'test-brand','Test brand',0,NULL,1,0,NULL,NULL,0,0,0,0,0,0,0,0,0,0,0,NULL,0,0,0,0,NULL,NULL);
-/*!40000 ALTER TABLE `brands` ENABLE KEYS */;
 
 --
 -- Table structure for table `item_language`
@@ -2625,31 +2536,6 @@ CREATE TABLE `picture_view` (
 /*!40000 ALTER TABLE `picture_view` ENABLE KEYS */;
 
 --
--- Table structure for table `picture_votes_ips`
---
-
-DROP TABLE IF EXISTS `picture_votes_ips`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `picture_votes_ips` (
-  `picture_id` int(10) unsigned NOT NULL,
-  `ip` varchar(15) NOT NULL,
-  `vote_datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `vote` int(11) DEFAULT NULL,
-  `user_id` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`picture_id`,`ip`),
-  CONSTRAINT `picture_votes_ips_ibfk_1` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `picture_votes_ips`
---
-
-/*!40000 ALTER TABLE `picture_votes_ips` DISABLE KEYS */;
-/*!40000 ALTER TABLE `picture_votes_ips` ENABLE KEYS */;
-
---
 -- Table structure for table `pictures`
 --
 
@@ -2701,7 +2587,6 @@ CREATE TABLE `pictures` (
   KEY `width` (`width`,`height`,`add_date`,`id`),
   KEY `copyrights_text_id` (`copyrights_text_id`),
   CONSTRAINT `pictures_fk` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `pictures_fk4` FOREIGN KEY (`_brand_id`) REFERENCES `brands` (`id`),
   CONSTRAINT `pictures_fk5` FOREIGN KEY (`type`) REFERENCES `pictures_types` (`id`),
   CONSTRAINT `pictures_fk6` FOREIGN KEY (`replace_picture_id`) REFERENCES `pictures` (`id`) ON DELETE SET NULL,
   CONSTRAINT `pictures_fk7` FOREIGN KEY (`image_id`) REFERENCES `image` (`id`),
@@ -2970,12 +2855,12 @@ DROP TABLE IF EXISTS `telegram_brand`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `telegram_brand` (
-  `brand_id` int(10) unsigned NOT NULL,
+  `item_id` int(10) unsigned NOT NULL,
   `chat_id` int(11) NOT NULL,
   `inbox` tinyint(1) NOT NULL DEFAULT '0',
   `new` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`brand_id`,`chat_id`),
-  CONSTRAINT `telegram_brand_ibfk_1` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`) ON DELETE CASCADE
+  PRIMARY KEY (`item_id`,`chat_id`),
+  CONSTRAINT `telegram_brand_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

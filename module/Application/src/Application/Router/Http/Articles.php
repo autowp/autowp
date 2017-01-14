@@ -62,30 +62,13 @@ class Articles implements RouteInterface
         $match = null;
 
         if ($path) {
-            $brandTable = new BrandTable();
-
-            $isBrandFolder = (bool)$brandTable->fetchRow([
-                'folder = ?' => $path[0]
-            ]);
-
-            if ($isBrandFolder) {
-                $data['action'] = 'index';
-                $data['brand_catname'] = $path[0];
+            if (preg_match('|^page([0-9]+)$|', $path[0], $match)) {
+                $data['page'] = intval($match[1]);
                 array_shift($path);
-
-                if ($path && preg_match('|^page([0-9]+)$|', $path[0], $match)) {
-                    $data['page'] = intval($match[1]);
-                    array_shift($path);
-                }
             } else {
-                if (preg_match('|^page([0-9]+)$|', $path[0], $match)) {
-                    $data['page'] = intval($match[1]);
-                    array_shift($path);
-                } else {
-                    $data['action'] = 'article';
-                    $data['article_catname'] = $path[0];
-                    array_shift($path);
-                }
+                $data['action'] = 'article';
+                $data['article_catname'] = $path[0];
+                array_shift($path);
             }
         }
 
@@ -113,10 +96,6 @@ class Articles implements RouteInterface
                 break;
 
             case 'index':
-                if (isset($data['brand_catname'])) {
-                    $url[] = $data['brand_catname'];
-                }
-
                 if (isset($data['page']) && $data['page'] > 1) {
                     $url[] = 'page'.$data['page'];
                 }

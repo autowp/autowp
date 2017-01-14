@@ -448,26 +448,28 @@ class CategoryController extends AbstractActionController
             ]);
 
             if ($currentCar && $paginator->getTotalItemCount() <= 0) {
-                $select = $this->itemTable->select(true)
-                    ->where('item.id = ?', $currentCar->id);
-
-                $paginator = new \Zend\Paginator\Paginator(
-                    new Zend1DbTableSelect($select)
-                );
-
-                $cPath = $path;
-                $catname = array_pop($cPath);
-
-                $parentItemRow = $this->itemTable->fetchRow(
-                    $this->itemTable->select(true)
-                        ->join('item_parent', 'item.id = item_parent.parent_id', null)
-                        ->where('item_parent.item_id = ?', $currentCar->id)
-                        ->where('item_parent.catname = ?', $catname)
-                );
-
-                $listBuilder
-                    ->setPath($cPath)
-                    ->setCurrentItem($parentItemRow);
+                if ($path) {
+                    $select = $this->itemTable->select(true)
+                        ->where('item.id = ?', $currentCar->id);
+    
+                    $paginator = new \Zend\Paginator\Paginator(
+                        new Zend1DbTableSelect($select)
+                    );
+                
+                    $cPath = $path;
+                    $catname = array_pop($cPath);
+    
+                    $parentItemRow = $this->itemTable->fetchRow(
+                        $this->itemTable->select(true)
+                            ->join('item_parent', 'item.id = item_parent.parent_id', null)
+                            ->where('item_parent.item_id = ?', $currentCar->id)
+                            ->where('item_parent.catname = ?', $catname)
+                    );
+    
+                    $listBuilder
+                        ->setPath($cPath)
+                        ->setCurrentItem($parentItemRow);
+                }
             }
 
             $listData = $this->car()->listData($paginator->getCurrentItems(), [

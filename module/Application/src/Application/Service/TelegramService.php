@@ -78,7 +78,7 @@ class TelegramService
     {
         $message = $this->getApi()->setWebhook([
             'url'         => $this->webhook,
-            'certificate' => ''
+            //'certificate' => ''
         ]);
     }
 
@@ -140,7 +140,7 @@ class TelegramService
             $rows = $db->fetchAll(
                 $db->select()
                     ->from($telegramBrandTable->info('name'), ['chat_id'])
-                    ->where('telegram_brand.brand_id in (?)', $brandIds)
+                    ->where('telegram_brand.item_id in (?)', $brandIds)
                     ->where('telegram_brand.inbox')
                     ->join('telegram_chat', 'telegram_brand.chat_id = telegram_chat.chat_id', null)
                     ->join('users', 'telegram_chat.user_id = users.id', null)
@@ -184,7 +184,7 @@ class TelegramService
             $select = $db->select()
                 ->distinct()
                 ->from('telegram_brand', ['chat_id'])
-                ->where('telegram_brand.brand_id in (?)', $brandIds)
+                ->where('telegram_brand.item_id in (?)', $brandIds)
                 ->where('telegram_brand.new');
 
             if ($authorChatId) {

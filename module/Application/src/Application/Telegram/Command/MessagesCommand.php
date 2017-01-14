@@ -4,7 +4,7 @@ namespace Application\Telegram\Command;
 
 use Telegram\Bot\Commands\Command;
 
-use Application\Model\DbTable\Telegram\Chat as TelegramChat;
+use Application\Model\DbTable;
 
 class MessagesCommand extends Command
 {
@@ -25,7 +25,7 @@ class MessagesCommand extends Command
     {
         $chatId = (int)$this->getUpdate()->getMessage()->getChat()->getId();
 
-        $chatTable = new TelegramChat();
+        $chatTable = new DbTable\Telegram\Chat();
 
         $chatRow = $chatTable->fetchRow(
             $chatTable->select(true)

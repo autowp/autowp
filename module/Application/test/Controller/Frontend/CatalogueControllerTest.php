@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Fronend\Controller;
+namespace ApplicationTest\Controller\Frontend;
 
 use Zend\Http\Request;
 use Zend\Json\Json;

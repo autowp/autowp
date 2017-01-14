@@ -106,7 +106,7 @@ class Brand
                 null
             )
             ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
-            //->where('brands.id <> 58') // exclude "other"
+            ->where('item.position = 0') // exclude "other"
             ->group('item.id')
             ->order('cars_count DESC')
             ->limit(self::TOP_COUNT)

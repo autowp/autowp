@@ -234,7 +234,7 @@ class BrandNav
 
         $brandAliasTable = new DbTable\BrandAlias();
         $brandAliasRows = $brandAliasTable->fetchAll([
-            'brand_id = ?' => $brand['id']
+            'item_id = ?' => $brand['id']
         ]);
         foreach ($brandAliasRows as $brandAliasRow) {
             $aliases[] = $brandAliasRow->name;

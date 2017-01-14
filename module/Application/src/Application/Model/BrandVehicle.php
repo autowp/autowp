@@ -94,20 +94,19 @@ class BrandVehicle
     {
         $aliases = [$parentRow['name']];
 
-        // TODO: aliases
-        /*$brandAliasTable = new DbTable\BrandAlias();
+        $brandAliasTable = new DbTable\BrandAlias();
         $brandAliasRows = $brandAliasTable->fetchAll([
-            'brand_id = ?' => $brandRow['id']
+            'item_id = ?' => $parentRow['id']
         ]);
         foreach ($brandAliasRows as $brandAliasRow) {
             $aliases[] = $brandAliasRow->name;
-        }*/
+        }
 
-        $brandLangRows = $this->itemLangTable->fetchAll([
+        $itemLangRows = $this->itemLangTable->fetchAll([
             'item_id = ?' => $parentRow['id']
         ]);
-        foreach ($brandLangRows as $brandLangRow) {
-            $aliases[] = $brandLangRow->name;
+        foreach ($itemLangRows as $itemLangRow) {
+            $aliases[] = $itemLangRow->name;
         }
 
         usort($aliases, function ($a, $b) {
@@ -123,14 +122,14 @@ class BrandVehicle
         return $aliases;
     }
 
-    private function getVehicleName(DbTable\Vehicle\Row $vehicleRow, $language)
+    private function getVehicleName(DbTable\Vehicle\Row $itemRow, $language)
     {
         $languageRow = $this->itemLangTable->fetchRow([
-            'item_id = ?'  => $vehicleRow->id,
+            'item_id = ?'  => $itemRow->id,
             'language = ?' => $language
         ]);
 
-        return $languageRow ? $languageRow->name : $vehicleRow->name;
+        return $languageRow && $languageRow->name ? $languageRow->name : $itemRow->name;
     }
 
     private function extractName(DbTable\Vehicle\Row $parentRow, DbTable\Vehicle\Row $vehicleRow, $language)

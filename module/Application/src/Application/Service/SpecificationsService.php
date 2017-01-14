@@ -6,6 +6,7 @@ use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
+use Application\ItemNameFormatter;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
 use Application\Model\DbTable\Picture;
@@ -20,7 +21,6 @@ use Exception;
 use NumberFormatter;
 
 use Zend_Db_Expr;
-use Application\ItemNameFormatter;
 
 class SpecificationsService
 {
@@ -1341,7 +1341,7 @@ class SpecificationsService
 
         $carTypeTable = new VehicleType();
         $attributeTable = $this->getAttributeTable();
-        $carParentTable = new VehicleParent();
+        $itemParentLangaugeTable = new DbTable\Item\ParentLanguage();
 
         $ids = [];
         foreach ($cars as $car) {
@@ -1418,12 +1418,20 @@ class SpecificationsService
 
             $carParentName = null;
             if ($contextCarId) {
-                $carParentRow = $carParentTable->fetchRow([
+                $db = $itemParentLangaugeTable->getAdapter();
+                
+                $langSortExpr = new Zend_Db_Expr(
+                    $db->quoteInto('language = ? desc', $language)
+                );
+                
+                $itemParentLangRow = $itemParentLangaugeTable->fetchRow([
                     'item_id = ?'   => $car->id,
-                    'parent_id = ?' => $contextCarId
-                ]);
-                if ($carParentRow) {
-                    $carParentName = $carParentRow->name;
+                    'parent_id = ?' => $contextCarId,
+                    'length(name) > 0'
+                ], $langSortExpr);
+                
+                if ($itemParentLangRow) {
+                    $carParentName = $itemParentLangRow->name;
                 }
             }
 
