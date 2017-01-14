@@ -9,33 +9,20 @@ use Zend\Paginator\Paginator;
 
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable\BrandLink;
+use Application\ItemNameFormatter;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
-use Application\Model\DbTable\BrandItem;
-use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Factory;
-use Application\Model\DbTable\Modification as ModificationTable;
-use Application\Model\DbTable\Modification\Group as ModificationGroup;
-use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Picture\Row as PictureRow;
-use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\Language as VehicleLanguage;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
-use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
-use Application\ItemNameFormatter;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Select;
 
 class CatalogueController extends AbstractActionController
 {
-    private $mostsMinCarsCount = 200;
+    private $mostsMinCarsCount = 1;
 
     private $textStorage;
 
@@ -61,7 +48,8 @@ class CatalogueController extends AbstractActionController
         $cache,
         SpecificationsService $specsService,
         BrandVehicle $brandVehicle,
-        ItemNameFormatter $itemNameFormatter
+        ItemNameFormatter $itemNameFormatter,
+        $mostsMinCarsCount
     ) {
 
         $this->textStorage = $textStorage;
@@ -69,6 +57,7 @@ class CatalogueController extends AbstractActionController
         $this->specsService = $specsService;
         $this->brandVehicle = $brandVehicle;
         $this->itemNameFormatter = $itemNameFormatter;
+        $this->mostsMinCarsCount = $mostsMinCarsCount;
     }
 
     private function doBrandAction(callable $callback)
@@ -96,7 +85,7 @@ class CatalogueController extends AbstractActionController
     /**
      * @param Zend_Db_Table_Select $select
      * @param string $pictureId
-     * @return PictureRow
+     * @return DbTable\Picture\Row
      */
     private function fetchSelectPicture(Zend_Db_Table_Select $select, $pictureId)
     {
@@ -127,7 +116,8 @@ class CatalogueController extends AbstractActionController
 
         if ($onlyAccepted) {
             $select->where('pictures.status IN (?)', [
-                Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
+                DbTable\Picture::STATUS_NEW,
+                DbTable\Picture::STATUS_ACCEPTED
             ]);
         }
 
@@ -238,7 +228,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $carParentTable = new VehicleParent();
+            $carParentTable = new DbTable\Vehicle\ParentTable();
 
             $this->sidebar()->brand([
                 'brand_id'    => $brand['id'],
@@ -273,7 +263,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->doBrandAction(function ($brand) {
 
-            $carTypeTable = new VehicleType();
+            $carTypeTable = new DbTable\Vehicle\Type();
 
             $cartype = false;
             if ($this->params('cartype_catname')) {
@@ -334,15 +324,11 @@ class CatalogueController extends AbstractActionController
 
             $paginator = $this->carsPaginator($select, $this->params('page'));
 
-            if (! $paginator->getTotalItemCount()) {
-                return $this->notFoundAction();
-            }
-
             if ($paginator->getTotalItemCount() <= 0) {
                 return $this->notFoundAction();
             }
 
-            $carParentTable = new VehicleParent();
+            $carParentTable = new DbTable\Vehicle\ParentTable();
 
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
@@ -376,7 +362,7 @@ class CatalogueController extends AbstractActionController
 
     private function getBrandFactories($brandId)
     {
-        $factoryTable = new Factory();
+        $factoryTable = new DbTable\Factory();
         $db = $factoryTable->getAdapter();
         $rows = $db->fetchAll(
             $db->select()
@@ -393,8 +379,8 @@ class CatalogueController extends AbstractActionController
                 ->where('item_parent_cache.parent_id = ?', $brandId)
                 ->group('factory.id')
                 ->join('pictures', 'factory.id = pictures.factory_id', null)
-                ->where('pictures.type = ?', Picture::FACTORY_TYPE_ID)
-                ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
+                ->where('pictures.type = ?', DbTable\Picture::FACTORY_TYPE_ID)
+                ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
                 ->columns([
                     'pictures.id', 'pictures.identity',
                     'pictures.width', 'pictures.height',
@@ -408,7 +394,7 @@ class CatalogueController extends AbstractActionController
         // prefetch
         $requests = [];
         foreach ($rows as $idx => $picture) {
-            $requests[$idx] = PictureRow::buildFormatRequest($picture);
+            $requests[$idx] = DbTable\Picture\Row::buildFormatRequest($picture);
         }
 
         $imagesInfo = $this->imageStorage()->getFormatedImages($requests, 'picture-thumb');
@@ -442,11 +428,14 @@ class CatalogueController extends AbstractActionController
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id = ?', $brand['id'])
-                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                    ->where('pictures.status IN (?)', [
+                        DbTable\Picture::STATUS_ACCEPTED,
+                        DbTable\Picture::STATUS_NEW
+                    ])
                     ->group('pictures.id')
                     ->limit(12);
 
-                $carParentTable = new VehicleParent();
+                $carParentTable = new DbTable\Vehicle\ParentTable();
 
                 $topPictures = $this->pic()->listData($select, [
                     'width' => 4,
@@ -496,7 +485,7 @@ class CatalogueController extends AbstractActionController
                 'default'  => []
             ];
 
-            $links = new BrandLink();
+            $links = new DbTable\BrandLink();
             foreach ($types as $key => &$type) {
                 $type['links'] = $links->fetchAll(
                     $links->select()
@@ -528,14 +517,14 @@ class CatalogueController extends AbstractActionController
             $itemLanguageRows = $itemLanguageTable->fetchAll([
                 'item_id = ?' => $brand['id']
             ], new \Zend_Db_Expr($orderExpr));
-            
+
             $textIds = [];
             foreach ($itemLanguageRows as $itemLanguageRow) {
                 if ($itemLanguageRow->text_id) {
                     $textIds[] = $itemLanguageRow->text_id;
                 }
             }
-            
+
             $description = null;
             if ($textIds) {
                 $description = $this->textStorage->getFirstText($textIds);
@@ -548,13 +537,13 @@ class CatalogueController extends AbstractActionController
             $inboxPictures = null;
 
             if ($this->user()->isAllowed('picture', 'move')) {
-                $pictureTable = new Picture();
+                $pictureTable = new DbTable\Picture();
                 $db = $pictureTable->getAdapter();
 
                 $inboxPictures = $db->fetchOne(
                     $db->select()
                         ->from('pictures', 'count(distinct pictures.id)')
-                        ->where('pictures.status = ?', Picture::STATUS_INBOX)
+                        ->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                         ->where('item_parent_cache.parent_id = ?', $brand['id'])
@@ -590,7 +579,7 @@ class CatalogueController extends AbstractActionController
         $select = $this->selectOrderFromPictures($onlyAccepted)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->where('picture_item.item_id = ?', $brandId);
-        
+
         switch ($type) {
             case 'mixed':
                 $select->where('picture_item.perspective_id = ?', 25);
@@ -602,9 +591,9 @@ class CatalogueController extends AbstractActionController
                 $select->where('picture_item.perspective_id not in (?) or picture_item.perspective_id is null', [22, 25]);
                 break;
         }
-        
+
         //print $select;
-        
+
         return $select;
     }
 
@@ -711,13 +700,13 @@ class CatalogueController extends AbstractActionController
 
             switch ($this->params('gallery')) {
                 case 'inbox':
-                    $select->where('pictures.status = ?', Picture::STATUS_INBOX);
+                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX);
                     break;
                 case 'removing':
-                    $select->where('pictures.status = ?', Picture::STATUS_REMOVING);
+                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_REMOVING);
                     break;
                 default:
-                    $select->where('pictures.status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED]);
+                    $select->where('pictures.status in (?)', [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED]);
                     break;
             }
 
@@ -842,7 +831,7 @@ class CatalogueController extends AbstractActionController
                     )
                     ->where($cpAlias.'.catname = ?', $pathNode);
                 $field = $cpAlias . '.parent_id';
-                
+
                 $langSortExpr = new Zend_Db_Expr(
                     $db->quoteInto($iplAlias.'.language = ? desc', $language)
                 );
@@ -874,7 +863,7 @@ class CatalogueController extends AbstractActionController
                 'brand_id'           => (int)$brand['id'],
                 'brand_item_catname' => (string)$this->params('car_catname')
             ]);
-            
+
             if (! $currentCar) {
                 return $this->notFoundAction();
             }
@@ -970,7 +959,7 @@ class CatalogueController extends AbstractActionController
                     ->join('item_parent', 'item.id = item_parent.parent_id', [
                         'brand_item_catname' => 'catname'
                     ])
-                    ->where('item_parent.type = ?', VehicleParent::TYPE_DESIGN)
+                    ->where('item_parent.type = ?', DbTable\Vehicle\ParentTable::TYPE_DESIGN)
                     ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id = ?', $currentCar['id'])
             );
@@ -1018,9 +1007,9 @@ class CatalogueController extends AbstractActionController
         $pairs = $db->fetchPairs($select);
 
         return [
-            'stock'  => isset($pairs[VehicleParent::TYPE_DEFAULT]) ? $pairs[VehicleParent::TYPE_DEFAULT] : 0,
-            'tuning' => isset($pairs[VehicleParent::TYPE_TUNING]) ? $pairs[VehicleParent::TYPE_TUNING] : 0,
-            'sport'  => isset($pairs[VehicleParent::TYPE_SPORT]) ? $pairs[VehicleParent::TYPE_SPORT] : 0
+            'stock'  => isset($pairs[DbTable\Vehicle\ParentTable::TYPE_DEFAULT]) ? $pairs[DbTable\Vehicle\ParentTable::TYPE_DEFAULT] : 0,
+            'tuning' => isset($pairs[DbTable\Vehicle\ParentTable::TYPE_TUNING]) ? $pairs[DbTable\Vehicle\ParentTable::TYPE_TUNING] : 0,
+            'sport'  => isset($pairs[DbTable\Vehicle\ParentTable::TYPE_SPORT]) ? $pairs[DbTable\Vehicle\ParentTable::TYPE_SPORT] : 0
         ];
     }
 
@@ -1031,7 +1020,7 @@ class CatalogueController extends AbstractActionController
             $modification = null;
             $modId = (int)$this->params('mod');
             if ($modId) {
-                $mTable = new ModificationTable();
+                $mTable = new DbTable\Modification();
 
                 $modification = $mTable->find($modId)->current();
                 if (! $modification) {
@@ -1041,7 +1030,7 @@ class CatalogueController extends AbstractActionController
 
             $modgroupId = (int)$this->params('modgroup');
             if ($modgroupId) {
-                $mgTable = new ModificationGroup();
+                $mgTable = new DbTable\Modification\Group();
 
                 $modgroup = $mgTable->find($modgroupId)->current();
                 if (! $modgroup) {
@@ -1076,18 +1065,18 @@ class CatalogueController extends AbstractActionController
             $type = $this->params('type');
             switch ($type) {
                 case 'tuning':
-                    $type = VehicleParent::TYPE_TUNING;
+                    $type = DbTable\Vehicle\ParentTable::TYPE_TUNING;
                     break;
                 case 'sport':
-                    $type = VehicleParent::TYPE_SPORT;
+                    $type = DbTable\Vehicle\ParentTable::TYPE_SPORT;
                     break;
                 default:
-                    $type = VehicleParent::TYPE_DEFAULT;
+                    $type = DbTable\Vehicle\ParentTable::TYPE_DEFAULT;
                     break;
             }
 
             $itemTable = $this->catalogue()->getItemTable();
-            $carParentTable = new VehicleParent();
+            $carParentTable = new DbTable\Vehicle\ParentTable();
 
             $currentCarId = $currentCar['id'];
 
@@ -1138,7 +1127,7 @@ class CatalogueController extends AbstractActionController
                 ], [], true),
                 'childListData' => $this->car()->listData($listCars, [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                        'type'                 => $type == VehicleParent::TYPE_DEFAULT ? $type : null,
+                        'type'                 => $type == DbTable\Vehicle\ParentTable::TYPE_DEFAULT ? $type : null,
                         'onlyExactlyPictures'  => true,
                         'dateSort'             => false,
                         'disableLargePictures' => false,
@@ -1169,7 +1158,7 @@ class CatalogueController extends AbstractActionController
 
     private function brandItemGroupModifications($carId, $groupId, $modificationId)
     {
-        $mTable = new ModificationTable();
+        $mTable = new DbTable\Modification();
         $db = $mTable->getAdapter();
 
         $select = $mTable->select(true)
@@ -1210,7 +1199,7 @@ class CatalogueController extends AbstractActionController
     private function brandItemModifications($carId, $modificationId)
     {
         // modifications
-        $mgTable = new ModificationGroup();
+        $mgTable = new DbTable\Modification\Group();
 
         $modificationGroups = [];
 
@@ -1263,7 +1252,7 @@ class CatalogueController extends AbstractActionController
                     'crop_width', 'crop_height', 'width', 'height', 'identity', 'factory_id'
                 ]
             )
-            ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+            ->where('pictures.status IN (?)', [DbTable\Picture::STATUS_ACCEPTED, DbTable\Picture::STATUS_NEW])
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
             ->where('item_parent_cache.parent_id = ?', $carId)
@@ -1299,12 +1288,12 @@ class CatalogueController extends AbstractActionController
             /*
             if (isset($options['type'])) {
                 switch ($options['type']) {
-                    case VehicleParent::TYPE_DEFAULT:
+                    case DbTable\Vehicle\ParentTable::TYPE_DEFAULT:
                         break;
-                    case VehicleParent::TYPE_TUNING:
+                    case DbTable\Vehicle\ParentTable::TYPE_TUNING:
                         $select->where('item_parent_cache.tuning');
                         break;
-                    case VehicleParent::TYPE_SPORT:
+                    case DbTable\Vehicle\ParentTable::TYPE_SPORT:
                         $select->where('item_parent_cache.sport');
                         break;
                 }
@@ -1375,7 +1364,7 @@ class CatalogueController extends AbstractActionController
 
     private function getPerspectiveGroupIds($pageId)
     {
-        $perspectivesGroups = new PerspectiveGroup();
+        $perspectivesGroups = new DbTable\Perspective\Group();
         $db = $perspectivesGroups->getAdapter();
         return $db->fetchCol(
             $db->select()
@@ -1396,7 +1385,7 @@ class CatalogueController extends AbstractActionController
     ) {
         $currentCarId = $currentCar['id'];
 
-        $mTable = new ModificationTable();
+        $mTable = new DbTable\Modification();
         $imageStorage = $this->imageStorage();
         $catalogue = $this->catalogue();
 
@@ -1553,18 +1542,18 @@ class CatalogueController extends AbstractActionController
         $type = $this->params('type');
         switch ($type) {
             case 'tuning':
-                $type = VehicleParent::TYPE_TUNING;
+                $type = DbTable\Vehicle\ParentTable::TYPE_TUNING;
                 break;
             case 'sport':
-                $type = VehicleParent::TYPE_SPORT;
+                $type = DbTable\Vehicle\ParentTable::TYPE_SPORT;
                 break;
             default:
-                $type = VehicleParent::TYPE_DEFAULT;
+                $type = DbTable\Vehicle\ParentTable::TYPE_DEFAULT;
                 break;
         }
 
         $itemTable = $this->catalogue()->getItemTable();
-        $carParentTable = new VehicleParent();
+        $carParentTable = new DbTable\Vehicle\ParentTable();
 
         $listCars = [];
 
@@ -1589,7 +1578,7 @@ class CatalogueController extends AbstractActionController
 
         $currentPictures = [];
         $currentPicturesCount = 0;
-        if ($isLastPage && $type == VehicleParent::TYPE_DEFAULT) {
+        if ($isLastPage && $type == DbTable\Vehicle\ParentTable::TYPE_DEFAULT) {
             $select = $this->selectOrderFromPictures()
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('picture_item.item_id = ?', $currentCarId);
@@ -1657,7 +1646,7 @@ class CatalogueController extends AbstractActionController
         $currentCar['text'] = $texts['text'];
         $hasHtml = (bool)$currentCar['text'];
 
-        $carLangTable = new VehicleLanguage();
+        $carLangTable = new DbTable\Vehicle\Language();
         $carLangRows = $carLangTable->fetchAll([
             'item_id = ?' => $currentCar['id'],
             'length(name) > 0'
@@ -1695,7 +1684,7 @@ class CatalogueController extends AbstractActionController
             ], [], true),
             'childListData' => $this->car()->listData($listCars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'type'                 => $type == VehicleParent::TYPE_DEFAULT ? $type : null,
+                    'type'                 => $type == DbTable\Vehicle\ParentTable::TYPE_DEFAULT ? $type : null,
                     'onlyExactlyPictures'  => false,
                     'dateSort'             => false,
                     'disableLargePictures' => false,
@@ -1726,11 +1715,11 @@ class CatalogueController extends AbstractActionController
 
     private function getBrandModerAttentionCount($brandId)
     {
-        $commentTable = new CommentMessage();
+        $commentTable = new DbTable\Comment\Message();
 
         $select = $commentTable->select(true)
-            ->where('comments_messages.moderator_attention = ?', CommentMessage::MODERATOR_ATTENTION_REQUIRED)
-            ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
+            ->where('comments_messages.moderator_attention = ?', DbTable\Comment\Message::MODERATOR_ATTENTION_REQUIRED)
+            ->where('comments_messages.type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID)
             ->join('pictures', 'comments_messages.item_id = pictures.id', null)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
@@ -1745,11 +1734,11 @@ class CatalogueController extends AbstractActionController
 
     private function getCarModerAttentionCount($carId)
     {
-        $commentTable = new CommentMessage();
+        $commentTable = new DbTable\Comment\Message();
 
         $select = $commentTable->select(true)
-            ->where('comments_messages.moderator_attention = ?', CommentMessage::MODERATOR_ATTENTION_REQUIRED)
-            ->where('comments_messages.type_id = ?', CommentMessage::PICTURES_TYPE_ID)
+            ->where('comments_messages.moderator_attention = ?', DbTable\Comment\Message::MODERATOR_ATTENTION_REQUIRED)
+            ->where('comments_messages.type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID)
             ->join('pictures', 'comments_messages.item_id = pictures.id', null)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
@@ -1766,7 +1755,7 @@ class CatalogueController extends AbstractActionController
     {
         $pictureTable = $this->catalogue()->getPictureTable();
         $select = $pictureTable->select(true)
-            ->where('pictures.status = ?', Picture::STATUS_INBOX)
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
             ->where('item_parent_cache.parent_id = ?', $carId);
@@ -1811,7 +1800,7 @@ class CatalogueController extends AbstractActionController
             $modification = null;
             $modId = (int)$this->params('mod');
             if ($modId) {
-                $mTable = new ModificationTable();
+                $mTable = new DbTable\Modification();
 
                 $modification = $mTable->find($modId)->current();
                 if (! $modification) {
@@ -1873,7 +1862,7 @@ class CatalogueController extends AbstractActionController
 
         $isModer = $this->user()->inheritsRole('moder');
 
-        if ($picture->status == Picture::STATUS_REMOVING) {
+        if ($picture->status == DbTable\Picture::STATUS_REMOVING) {
             $user = $this->user()->get();
             if (! $user) {
                 return $this->notFoundAction();
@@ -1885,12 +1874,12 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $select->where('pictures.status = ?', Picture::STATUS_REMOVING);
-        } elseif ($picture->status == Picture::STATUS_INBOX) {
-            $select->where('pictures.status = ?', Picture::STATUS_INBOX);
+            $select->where('pictures.status = ?', DbTable\Picture::STATUS_REMOVING);
+        } elseif ($picture->status == DbTable\Picture::STATUS_INBOX) {
+            $select->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX);
         } else {
             $select->where('pictures.status IN (?)', [
-                Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
+                DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED
             ]);
         }
 
@@ -1899,9 +1888,9 @@ class CatalogueController extends AbstractActionController
 
     private function galleryType($picture)
     {
-        if ($picture->status == Picture::STATUS_REMOVING) {
+        if ($picture->status == DbTable\Picture::STATUS_REMOVING) {
             $gallery = 'removing';
-        } elseif ($picture->status == Picture::STATUS_INBOX) {
+        } elseif ($picture->status == DbTable\Picture::STATUS_INBOX) {
             $gallery = 'inbox';
         } else {
             $gallery = null;
@@ -1943,13 +1932,13 @@ class CatalogueController extends AbstractActionController
 
             switch ($this->params('gallery')) {
                 case 'inbox':
-                    $select->where('pictures.status = ?', Picture::STATUS_INBOX);
+                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_INBOX);
                     break;
                 case 'removing':
-                    $select->where('pictures.status = ?', Picture::STATUS_REMOVING);
+                    $select->where('pictures.status = ?', DbTable\Picture::STATUS_REMOVING);
                     break;
                 default:
-                    $select->where('pictures.status in (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED]);
+                    $select->where('pictures.status in (?)', [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED]);
                     break;
             }
 
@@ -1973,13 +1962,13 @@ class CatalogueController extends AbstractActionController
             $type = $this->params('type');
             switch ($type) {
                 case 'tuning':
-                    $type = VehicleParent::TYPE_TUNING;
+                    $type = DbTable\Vehicle\ParentTable::TYPE_TUNING;
                     break;
                 case 'sport':
-                    $type = VehicleParent::TYPE_SPORT;
+                    $type = DbTable\Vehicle\ParentTable::TYPE_SPORT;
                     break;
                 default:
-                    $type = VehicleParent::TYPE_DEFAULT;
+                    $type = DbTable\Vehicle\ParentTable::TYPE_DEFAULT;
                     break;
             }
 
@@ -2051,7 +2040,7 @@ class CatalogueController extends AbstractActionController
 
     private function mostsActive($brandId)
     {
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Vehicle();
         $db = $itemTable->getAdapter();
         $carsCount = $db->fetchOne(
             $db->select()
@@ -2149,12 +2138,12 @@ class CatalogueController extends AbstractActionController
             $imageStorage = $this->imageStorage();
             $imagesInfo = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb');
 
-            $pictureTable = new Picture();
+            $pictureTable = new DbTable\Picture();
             $names = $pictureTable->getNameData($allPictures, [
                 'language' => $language
             ]);
 
-            $carParentTable = new VehicleParent();
+            $carParentTable = new DbTable\Vehicle\ParentTable();
 
             $idx = 0;
             foreach ($data['carList']['cars'] as &$car) {

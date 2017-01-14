@@ -115,5 +115,6 @@ return [
                 ]
             ]
         ]
-    ]
+    ],
+    'mosts_min_vehicles_count' => 1
 ];

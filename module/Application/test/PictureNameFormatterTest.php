@@ -50,54 +50,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 0,
-                    'brand' => null
-                ],
-                'Unsorted',
-                'Unsorted'
-            ],
-            [
-                [
-                    'type'  => 0,
-                    'brand' => 'Toyota'
-                ],
-                'Toyota unsorted',
-                'Toyota unsorted'
-            ],
-            [
-                [
-                    'type'  => 2,
-                    'brand' => null
-                ],
-                'Logotype',
-                'Logotype'
-            ],
-            [
-                [
-                    'type'  => 2,
-                    'brand' => 'Toyota'
-                ],
-                'Toyota logotype',
-                'Toyota logotype'
-            ],
-            [
-                [
-                    'type'  => 3,
-                    'brand' => null
-                ],
-                'Miscellaneous',
-                'Miscellaneous'
-            ],
-            [
-                [
-                    'type'  => 3,
-                    'brand' => 'Toyota'
-                ],
-                'Toyota miscellaneous',
-                'Toyota miscellaneous'
-            ],
-            [
-                [
                     'type'    => 7,
                     'factory' => null
                 ],
@@ -519,27 +471,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
     public function escapeDataProvider()
     {
         return [
-            [
-                [
-                    'type'  => 0,
-                    'brand' => 'B&B'
-                ],
-                'B&amp;B unsorted',
-            ],
-            [
-                [
-                    'type'  => 2,
-                    'brand' => 'B&B'
-                ],
-                'B&amp;B logotype',
-            ],
-            [
-                [
-                    'type'  => 3,
-                    'brand' => 'B&B'
-                ],
-                'B&amp;B miscellaneous',
-            ],
             [
                 [
                     'type'    => 7,

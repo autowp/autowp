@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Controller;
+namespace ApplicationTest\Frontend\Controller;
 
 use Application\Controller\UsersController;
 
@@ -8,7 +8,7 @@ use Application\Test\AbstractHttpControllerTestCase;
 
 class UsersControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../_files/application.config.php';
+    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
 
     public function testIndexActionCanBeAccessed()
     {

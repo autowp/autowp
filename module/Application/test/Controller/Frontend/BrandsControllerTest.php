@@ -14,7 +14,7 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
 
     public function testNewcars()
     {
-        $brandId = 1;
+        $brandId = 204;
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/1', Request::METHOD_POST, [
@@ -29,7 +29,7 @@ class BrandsControllerTest extends AbstractHttpControllerTestCase
         // add to brand
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/brand-vehicle/add/brand_id/'.$brandId.'/vehicle_id/' . $carId, Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/moder/cars/add-parent/parent_id/'.$brandId.'/item_id/' . $carId, Request::METHOD_POST, [
             'name' => 'Test car'
         ]);
 

@@ -5,11 +5,10 @@ namespace ApplicationTest\Controller\Moder;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Headers;
 use Zend\Http\Request;
-use Application\Test\AbstractHttpControllerTestCase;
+use Zend\Json\Json;
 
 use Application\Controller\Moder\CarsController;
-use Application\Controller\Moder\BrandVehicleController;
-use Zend\Json\Json;
+use Application\Test\AbstractHttpControllerTestCase;
 
 class CarsControllerTest extends AbstractHttpControllerTestCase
 {
@@ -72,15 +71,15 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         // add to brand
         $this->reset();
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/brand-vehicle/add/brand_id/1/vehicle_id/' . $carId, Request::METHOD_POST, [
+        $this->dispatch('https://www.autowp.ru/moder/cars/add-parent/parent_id/205/item_id/' . $carId, Request::METHOD_POST, [
             'name' => 'Test car'
         ]);
 
         $this->assertResponseStatusCode(302);
         $this->assertModuleName('application');
-        $this->assertControllerName(BrandVehicleController::class);
-        $this->assertMatchedRouteName('moder/brand-vehicle/params');
-        $this->assertActionName('add');
+        $this->assertControllerName(CarsController::class);
+        $this->assertMatchedRouteName('moder/cars/params');
+        $this->assertActionName('add-parent');
     }
 
     public function testAlpha()

@@ -16,16 +16,10 @@ use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\Comments;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Comment\Topic as CommentTopic;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Picture\ModerVote as PictureModerVote;
-use Application\Model\DbTable\Picture\Row as PictureRow;
 use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\Message;
 use Application\Model\PictureItem;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -42,7 +36,7 @@ class PicturesController extends AbstractActionController
     private $table;
 
     /**
-     * @var VehicleParent
+     * @var DbTable\Vehicle\ParentTable
      */
     private $carParentTable;
 
@@ -102,7 +96,7 @@ class PicturesController extends AbstractActionController
     {
         return $this->carParentTable
             ? $this->carParentTable
-            : $this->carParentTable = new VehicleParent();
+            : $this->carParentTable = new DbTable\Vehicle\ParentTable();
     }
 
     public function __construct(
@@ -419,13 +413,13 @@ class PicturesController extends AbstractActionController
             $expr = 'pictures.id = comment_topic.item_id and ' .
                     $this->table->getAdapter()->quoteInto(
                         'comment_topic.type_id = ?',
-                        CommentMessage::PICTURES_TYPE_ID
+                        DbTable\Comment\Message::PICTURES_TYPE_ID
                     );
             $select->joinLeft('comment_topic', $expr, null);
         } elseif ($joinComments) {
             $select
                 ->join('comment_topic', 'pictures.id = comment_topic.item_id', null)
-                ->where('comment_topic.type_id = ?', CommentMessage::PICTURES_TYPE_ID);
+                ->where('comment_topic.type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID);
         }
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -506,7 +500,7 @@ class PicturesController extends AbstractActionController
         ];
     }
 
-    private function pictureUrl(PictureRow $picture, $forceCanonical = false, $uri = null)
+    private function pictureUrl(DbTable\Picture\Row $picture, $forceCanonical = false, $uri = null)
     {
         return $this->url()->fromRoute('moder/pictures/params', [
             'action'     => 'picture',
@@ -589,7 +583,7 @@ class PicturesController extends AbstractActionController
         if ($owner = $picture->findParentRow(User::class, 'Owner')) {
             $uri = $this->hostManager->getUriByLanguage($owner->language);
 
-            $requests = new PictureModerVote();
+            $requests = new DbTable\Picture\ModerVote();
             $deleteRequests = $requests->fetchAll(
                 $requests->select()
                     ->where('picture_id = ?', $picture->id)
@@ -779,7 +773,7 @@ class PicturesController extends AbstractActionController
                     $vote = (bool)($values['vote']);
 
                     $user = $this->user()->get();
-                    $moderVotes = new PictureModerVote();
+                    $moderVotes = new DbTable\Picture\ModerVote();
                     $moderVotes->insert([
                         'user_id'    => $user->id,
                         'picture_id' => $picture->id,
@@ -815,7 +809,7 @@ class PicturesController extends AbstractActionController
 
         if ($voteExists) {
             if ($request->isPost() && $this->params('form') == 'picture-unvote') {
-                $moderVotes = new PictureModerVote();
+                $moderVotes = new DbTable\Picture\ModerVote();
 
                 $user = $this->user()->get();
                 $moderVotes->delete([
@@ -831,7 +825,7 @@ class PicturesController extends AbstractActionController
 
         $moderVotes = null;
         if (! $hideVote) {
-            $moderVotes = $picture->findDependentRowset(PictureModerVote::class);
+            $moderVotes = $picture->findDependentRowset(DbTable\Picture\ModerVote::class);
         }
 
         return [
@@ -1271,19 +1265,19 @@ class PicturesController extends AbstractActionController
         return $this->user()->isAllowed('picture', 'crop');
     }
 
-    private function canNormalize(PictureRow $picture)
+    private function canNormalize(DbTable\Picture\Row $picture)
     {
         return in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX])
             && $this->user()->isAllowed('picture', 'normalize');
     }
 
-    private function canFlop(PictureRow $picture)
+    private function canFlop(DbTable\Picture\Row $picture)
     {
         return in_array($picture->status, [Picture::STATUS_NEW, Picture::STATUS_INBOX, Picture::STATUS_REMOVING])
             && $this->user()->isAllowed('picture', 'flop');
     }
 
-    private function canRestore(PictureRow $picture)
+    private function canRestore(DbTable\Picture\Row $picture)
     {
         return $picture->status == Picture::STATUS_REMOVING
             && $this->user()->isAllowed('picture', 'restore');
@@ -1758,14 +1752,14 @@ class PicturesController extends AbstractActionController
         // comments
         $comments = new Comments();
         $comments->moveMessages(
-            CommentMessage::PICTURES_TYPE_ID,
+            DbTable\Comment\Message::PICTURES_TYPE_ID,
             $replacePicture->id,
-            CommentMessage::PICTURES_TYPE_ID,
+            DbTable\Comment\Message::PICTURES_TYPE_ID,
             $picture->id
         );
-        $ctTable = new CommentTopic();
-        $ctTable->updateTopicStat(CommentMessage::PICTURES_TYPE_ID, $replacePicture->id);
-        $ctTable->updateTopicStat(CommentMessage::PICTURES_TYPE_ID, $picture->id);
+        $ctTable = new DbTable\Comment\Topic();
+        $ctTable->updateTopicStat(DbTable\Comment\Message::PICTURES_TYPE_ID, $replacePicture->id);
+        $ctTable->updateTopicStat(DbTable\Comment\Message::PICTURES_TYPE_ID, $picture->id);
 
         // pms
         $owner = $picture->findParentRow(User::class, 'Owner');
@@ -1815,12 +1809,12 @@ class PicturesController extends AbstractActionController
         ], [], true);
     }
 
-    private function canAccept(PictureRow $picture)
+    private function canAccept(DbTable\Picture\Row $picture)
     {
         return $picture->canAccept() && $this->user()->isAllowed('picture', 'accept');
     }
 
-    private function accept(PictureRow $picture)
+    private function accept(DbTable\Picture\Row $picture)
     {
         $canAccept = $this->canAccept($picture);
 
@@ -1907,7 +1901,7 @@ class PicturesController extends AbstractActionController
 
         $reason = trim($this->params()->fromPost('reason'));
 
-        $moderVotes = new PictureModerVote();
+        $moderVotes = new DbTable\Picture\ModerVote();
 
         foreach ($pictureRows as $picture) {
             $voteExists = $this->pictureVoteExists($picture, $user);
@@ -1984,7 +1978,7 @@ class PicturesController extends AbstractActionController
                             return $this->notFoundAction();
                         }
                     }
-                    
+
                     if ($perspectiveId) {
                         $this->pictureItem->setProperties($picture->id, $carId, [
                             'perspective' => $perspectiveId

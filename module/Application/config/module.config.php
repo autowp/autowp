@@ -174,7 +174,7 @@ return [
             'cookie'   => '.wheelsage.org'
         ]
     ],
-    
+
     'content_languages' => ['ru', 'en', 'it', 'fr', 'zh', 'de', 'es', 'pt'],
 
     /*'acl' => [
@@ -236,5 +236,7 @@ return [
     'gulp-rev' => [
         'manifest' => __DIR__ . '/../../../public_html/dist/manifest.json',
         'prefix'   => '/dist/'
-    ]
+    ],
+
+    'mosts_min_vehicles_count' => 200
 ];

@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Controller;
+namespace ApplicationTest\Frontend\Controller;
 
 use Application\Test\AbstractHttpControllerTestCase;
 use Zend\Json\Json;
@@ -9,7 +9,7 @@ use Application\Controller\Api\PictureController;
 
 class ApiPictureControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../_files/application.config.php';
+    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
 
     public function testRandomPicture()
     {

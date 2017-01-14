@@ -1,6 +1,6 @@
 <?php
 
-namespace ApplicationTest\Controller;
+namespace ApplicationTest\Frontend\Controller;
 
 use Zend\Json\Json;
 use Zend\Http\Header\Cookie;
@@ -11,7 +11,7 @@ use Application\Test\AbstractHttpControllerTestCase;
 
 class UploadControllerTest extends AbstractHttpControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../_files/application.config.php';
+    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
 
     public function testIndex()
     {
@@ -54,7 +54,7 @@ class UploadControllerTest extends AbstractHttpControllerTestCase
 
         $file = tempnam(sys_get_temp_dir(), 'upl');
         $filename = 'test.jpg';
-        copy(__DIR__ . '/../_files/' . $filename, $file);
+        copy(__DIR__ . '/../../_files/' . $filename, $file);
 
         $request->getFiles()->fromArray([
             'picture' => [
