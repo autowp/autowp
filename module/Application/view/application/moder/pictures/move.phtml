@@ -31,8 +31,8 @@
 
     <?php foreach ($this->factories as $factory) { ?>
         <?=$this->htmlA($this->url(null, [
-            'factory_id' => $factory['id'],
-            'type'       => Application\Model\DbTable\Picture::FACTORY_TYPE_ID
+            'item_id' => $factory['id'],
+            'type'    => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID
         ], [], true), $factory['name']) ?><br />
     <?php } ?>
 <?php } else { ?>

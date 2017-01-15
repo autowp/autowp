@@ -7,7 +7,6 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Brand as BrandModel;
-use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
@@ -27,7 +26,6 @@ class LogController extends AbstractActionController
         $vehicleTable = new Item();
         $brandModel = new BrandModel();
         $picturesTable = new Picture();
-        $factoryTable = new Factory();
 
         $select = $logTable->select(true)
             ->order(['add_datetime DESC', 'id DESC']);
@@ -48,12 +46,6 @@ class LogController extends AbstractActionController
         if ($pictureId) {
             $select->join('log_events_pictures', 'log_events.id=log_events_pictures.log_event_id', null)
                    ->where('log_events_pictures.picture_id = ?', $pictureId);
-        }
-
-        $factoryId = (int)$this->params()->fromRoute('factory_id');
-        if ($factoryId) {
-            $select->join('log_events_factory', 'log_events.id = log_events_factory.log_event_id', null)
-                ->where('log_events_factory.factory_id = ?', $factoryId);
         }
 
         $userId = (int)$this->params()->fromRoute('user_id');
@@ -111,30 +103,12 @@ class LogController extends AbstractActionController
                 ];
             }
 
-            $factoryRows = $factoryTable->fetchAll(
-                $factoryTable->select(true)
-                    ->join('log_events_factory', 'factory.id = log_events_factory.factory_id', null)
-                    ->where('log_events_factory.log_event_id = ?', $event->id)
-            );
-            $factories = [];
-
-            foreach ($factoryRows as $factoryRow) {
-                $factories[] = [
-                    'name' => $factoryRow['name'],
-                    'url'  => $this->url()->fromRoute('moder/factories/params', [
-                        'action'     => 'factory',
-                        'factory_id' => $factoryRow['id']
-                    ])
-                ];
-            }
-
             $events[] = [
                 'user'        => $event->findParentRow(User::class),
                 'date'        => $event->getDateTime('add_datetime'),
                 'desc'        => $event->description,
                 'vehicles'    => $vehicles,
-                'pictures'    => $pictures,
-                'factories'   => $factories
+                'pictures'    => $pictures
             ];
         }
 

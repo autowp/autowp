@@ -128,6 +128,10 @@ return array_replace(include 'root.php', [
     'item/type/5/name-plural' => 'Brands',
     'item/type/5/new-item' => 'New brand',
     'item/type/5/add-sub-item' => 'Add sub-brand',
+    'item/type/6/name' => 'Factory',
+    'item/type/6/name-plural' => 'Factories',
+    'item/type/6/new-item' => 'New factory',
+    'item/type/6/add-sub-item' => 'Add sub-factory',
 
     /* BRAND PAGE*/
     'unsorted'                => '未分类',

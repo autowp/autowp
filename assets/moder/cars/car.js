@@ -1,6 +1,7 @@
 var $ = require('jquery');
 var CarTypePicker = require('./car-type-picker');
 var Markdown = require('markdown-edit-tabbar');
+var Picker = require("latlng-picker");
 require('typeahead');
 
 module.exports = {
@@ -57,6 +58,14 @@ module.exports = {
         $('#meta').each(function() {
             CarTypePicker.init($(this).find('select[name=vehicle_type_id\\[\\]]'));
             CarTypePicker.init($(this).find('select[name=spec_ids\\[\\]]'));
+            var $lat = $(this).find(':input[name=lat]');
+            var $lng = $(this).find(':input[name=lng]');
+            if ($lat.length && $lng.length) {
+                new Picker({
+                    lat: $lat,
+                    lng: $lng
+                });
+            }
         });
         
         $('#name').on('tabload', function() {

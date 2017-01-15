@@ -170,7 +170,37 @@ class Car extends Form implements InputFilterProviderInterface
                     'disabled' => $this->isGroupDisabled ? true : null
                 ]
             ],
+            'lat' => [
+                'type' => 'Text',
+                'name' => 'lat',
+                'options' => [
+                    'label' => 'latitude'
+                ],
+                'attributes' => [
+                    'id'        => 'lat',
+                    'maxlength' => 20,
+                    'size'      => 20,
+                    'style'     => 'width: 20%'
+                ],
+            ],
+            'lng' => [
+                'type' => 'Text',
+                'name' => 'lng',
+                'options' => [
+                    'label' => 'longtitude'
+                ],
+                'attributes' => [
+                    'id'        => 'lng',
+                    'maxlength' => 20,
+                    'size'      => 20,
+                    'style'     => 'width: 20%'
+                ]
+            ]
         ];
+        
+        if ($this->itemType != DbTable\Item\Type::FACTORY) {
+            unset($elements['lat'], $elements['lng']);
+        }
 
         if ($this->itemType != DbTable\Item\Type::BRAND) {
             unset($elements['full_name']);
@@ -311,6 +341,18 @@ class Car extends Form implements InputFilterProviderInterface
                     ]
                 ]
             ],
+            'lat' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ]
+            ],
+            'lng' => [
+                'required' => false,
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ]
+            ]
         ];
 
         if ($this->itemType != DbTable\Item\Type::CATEGORY) {

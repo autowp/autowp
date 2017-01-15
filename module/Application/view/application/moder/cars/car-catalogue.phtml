@@ -1,3 +1,9 @@
+<?php 
+    $canHaveParents = !in_array($this->car['item_type_id'], [
+        Application\Model\DbTable\Item\Type::TWINS,
+        Application\Model\DbTable\Item\Type::FACTORY
+    ]);
+?>
 <?php if ($this->canUseTree) { ?>
     <?php if ($this->car['is_group']) { ?>
         <?=$this->htmlA([
@@ -20,7 +26,7 @@
             </tr>
         </thead>
         <tbody>
-            <?php if ($this->car['item_type_id'] != Application\Model\DbTable\Item\Type::TWINS) { ?>
+            <?php if ($canHaveParents) { ?>
                 <tr>
                     <td colspan="3">
                         <form class="car-add-parent" method="post" action="<?=$this->escapeHtmlAttr($this->url(null, [
@@ -196,7 +202,7 @@
                             <td></td>
                         <?php } ?>
                     </tr>
-                <?php } else { ?>
+                <?php } elseif ($this->car['item_type_id'] != Application\Model\DbTable\Item\Type::FACTORY) { ?>
                     <tr>
                         <td colspan="2">
                             <i class="fa fa-plus"></i>

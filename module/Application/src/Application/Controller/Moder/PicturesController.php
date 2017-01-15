@@ -384,20 +384,13 @@ class PicturesController extends AbstractActionController
         }
 
         if ($formdata['lost']) {
-            switch ($formdata['type_id']) {
-                case Picture::FACTORY_TYPE_ID:
-                    $select->where('pictures.factory_id IS NULL');
-                    break;
-                default:
-                    $select
-                        ->joinLeft(
-                            ['pi_left' => 'picture_item'],
-                            'pictures.id = pi_left.picture_id',
-                            null
-                        )
-                        ->where('pi_left.item_id IS NULL');
-                    break;
-            }
+            $select
+                ->joinLeft(
+                    ['pi_left' => 'picture_item'],
+                    'pictures.id = pi_left.picture_id',
+                    null
+                )
+                ->where('pi_left.item_id IS NULL');
         }
 
         if ($formdata['gps']) {
@@ -1995,31 +1988,6 @@ class PicturesController extends AbstractActionController
                     $namespace->lastCarId = $this->params('item_id');
                     break;
 
-                case Picture::FACTORY_TYPE_ID:
-                    $success = $this->table->moveToFactory(
-                        $this->pictureItem,
-                        $picture->id,
-                        $this->params('factory_id'),
-                        $userId,
-                        [
-                            'language'   => $this->language(),
-                            'pictureNameFormatter' => $this->pictureNameFormatter
-                        ]
-                    );
-
-                    $this->pictureItem->setPictureItems($picture->id, []);
-
-                    if ($picture->image_id) {
-                        $this->imageStorage()->changeImageName($picture->image_id, [
-                            'pattern' => $picture->getFileNamePattern(),
-                        ]);
-                    }
-
-                    if (! $success) {
-                        return $this->notFoundAction();
-                    }
-                    break;
-
                 default:
                     throw new Exception("Unexpected type");
                     break;
@@ -2081,9 +2049,10 @@ class PicturesController extends AbstractActionController
         } elseif ($this->params('factories')) {
             $showFactories = true;
 
-            $factoryTable = new Factory();
-            $factories = $factoryTable->fetchAll(
-                $factoryTable->select(true)
+            $factoryTable = new Item();
+            $factories = $itemTable->fetchAll(
+                $itemTable->select(true)
+                    ->where('item_type_id = ?', DbTable\Item\Type::FACTORY)
                     ->order('name')
             );
         } else {

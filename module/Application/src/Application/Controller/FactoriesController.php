@@ -28,9 +28,12 @@ class FactoriesController extends AbstractActionController
 
     public function factoryAction()
     {
-        $table = new DbTable\Factory();
+        $itemTable = $this->catalogue()->getItemTable();
 
-        $factory = $table->find($this->params()->fromRoute('id'))->current();
+        $factory = $itemTable->fetchRow([
+            'id = ?'           => (int)$this->params()->fromRoute('id'),
+            'item_type_id = ?' => DbTable\Item\Type::FACTORY
+        ]);
         if (! $factory) {
             return $this->notFoundAction();
         }
@@ -38,9 +41,9 @@ class FactoriesController extends AbstractActionController
         $pictureTable = new DbTable\Picture();
 
         $select = $pictureTable->select(true)
-            ->where('type = ?', DbTable\Picture::FACTORY_TYPE_ID)
-            ->where('factory_id = ?', $factory->id)
-            ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED);
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->where('picture_item.item_id = ?', $factory->id)
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
 
         $pictures = $this->pic()->listData($select, [
             'width' => 4
@@ -52,8 +55,6 @@ class FactoriesController extends AbstractActionController
         $carPictures = [];
         $groups = $factory->getRelatedCarGroups();
         if (count($groups) > 0) {
-            $itemTable = new DbTable\Item();
-
             $cars = $itemTable->fetchAll([
                 'id in (?)' => array_keys($groups)
             ], $this->catalogue()->itemOrdering());
@@ -121,20 +122,34 @@ class FactoriesController extends AbstractActionController
                 ];
             }
         }
-
-        /*$carPictures = $this->pic()->listData($carPictures, [
-            'width'            => 4,
-            'disableBehaviour' => true
-        ]);*/
+        
+        $itemPointTable = new DbTable\Item\Point();
+        $itemPointRow = $itemPointTable->fetchRow([
+            'item_id = ?' => $factory->id
+        ]);
 
         $point = null;
-        if ($factory->point) {
-            $point = geoPHP::load(substr($factory->point, 4), 'wkb');
+        if ($itemPointRow && $itemPointRow->point) {
+            $point = geoPHP::load(substr($itemPointRow->point, 4), 'wkb');
         }
-
+        
+        $itemLanguageTable = new DbTable\Item\Language();
+        $db = $itemLanguageTable->getAdapter();
+        $orderExpr = $db->quoteInto('language = ? desc', $this->language());
+        $itemLanguageRows = $itemLanguageTable->fetchAll([
+            'item_id = ?' => $factory['id']
+        ], new \Zend_Db_Expr($orderExpr));
+        
+        $textIds = [];
+        foreach ($itemLanguageRows as $itemLanguageRow) {
+            if ($itemLanguageRow->text_id) {
+                $textIds[] = $itemLanguageRow->text_id;
+            }
+        }
+        
         $description = null;
-        if ($factory['text_id']) {
-            $description = $this->textStorage->getText($factory['text_id']);
+        if ($textIds) {
+            $description = $this->textStorage->getFirstText($textIds);
         }
 
         return [
@@ -149,11 +164,14 @@ class FactoriesController extends AbstractActionController
 
     public function factoryCarsAction()
     {
-        $table = new DbTable\Factory();
+        $itemTable = $this->catalogue()->getItemTable();
 
-        $factory = $table->find($this->params()->fromRoute('id'))->current();
+        $factory = $itemTable->fetchRow([
+            'id = ?'           => (int)$this->params()->fromRoute('id'),
+            'item_type_id = ?' => DbTable\Item\Type::FACTORY
+        ]);
         if (! $factory) {
-            return $this->_forward('notfound', 'error');
+            return $this->notFounAction();
         }
 
         $paginator = null;
@@ -161,8 +179,6 @@ class FactoriesController extends AbstractActionController
         $cars = [];
         $groups = $factory->getRelatedCarGroups();
         if (count($groups) > 0) {
-            $itemTable = $this->catalogue()->getItemTable();
-
             $select = $itemTable->select(true)
                 ->where('id IN (?)', array_keys($groups))
                 ->order($this->catalogue()->itemOrdering());

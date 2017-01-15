@@ -13,5 +13,6 @@ class Type extends Table
           ENGINE   = 2,
           CATEGORY = 3,
           TWINS    = 4,
-          BRAND    = 5;
+          BRAND    = 5,
+          FACTORY  = 6;
 }

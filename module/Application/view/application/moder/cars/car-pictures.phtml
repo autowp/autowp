@@ -1,9 +1,11 @@
-<div class="btn-group">
-    <?=$this->htmlA([
-        'href'  => $this->url(null, [
-            'action'    => 'organize-pictures',
-        ], [], true),
-        'class' => 'btn btn-default',
-    ], $this->translate('moder/vehicle/pictures/turbo-group-creator'))?>
-</div>
+<?php if ($this->canUseTurboGroupCreator) { ?>
+    <div class="btn-group">
+        <?=$this->htmlA([
+            'href'  => $this->url(null, [
+                'action'    => 'organize-pictures',
+            ], [], true),
+            'class' => 'btn btn-default',
+        ], $this->translate('moder/vehicle/pictures/turbo-group-creator'))?>
+    </div>
+<?php } ?>
 <?=$this->partial('application/pictures', $this->picturesData)?>

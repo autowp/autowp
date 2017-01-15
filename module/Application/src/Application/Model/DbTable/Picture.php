@@ -28,11 +28,6 @@ class Picture extends Table
     protected $_rowClass = Picture\Row::class;
 
     protected $_referenceMap = [
-        'Factory' => [
-            'columns'       => ['factory_id'],
-            'refTableClass' => Factory::class,
-            'refColumns'    => ['id']
-        ],
         'Owner' => [
             'columns'       => ['owner_id'],
             'refTableClass' => \Autowp\User\Model\DbTable\User::class,
@@ -134,10 +129,6 @@ class Picture extends Table
                         }
                     }
                     break;
-
-                case Picture::FACTORY_TYPE_ID:
-                    $factoryIds[$row['factory_id']] = true;
-                    break;
             }
         }
 
@@ -214,55 +205,31 @@ class Picture extends Table
                 continue;
             }
 
-            $name = [
-                'type' => $row['type'],
-            ];
+            $db = $this->getAdapter();
+            $pictureItemRows = $db->fetchAll(
+                $db->select()
+                    ->from('picture_item', ['item_id', 'perspective_id'])
+                    ->where('picture_id = ?', $row['id'])
+            );
 
-            switch ($row['type']) {
-                case Picture::VEHICLE_TYPE_ID:
-                    $db = $this->getAdapter();
-                    $pictureItemRows = $db->fetchAll(
-                        $db->select()
-                            ->from('picture_item', ['item_id', 'perspective_id'])
-                            ->where('picture_id = ?', $row['id'])
-                    );
+            $items = [];
+            foreach ($pictureItemRows as $pictureItemRow) {
+                $carId = $pictureItemRow['item_id'];
+                $perspectiveId = $pictureItemRow['perspective_id'];
 
-                    $items = [];
-                    foreach ($pictureItemRows as $pictureItemRow) {
-                        $carId = $pictureItemRow['item_id'];
-                        $perspectiveId = $pictureItemRow['perspective_id'];
+                $car = isset($cars[$carId]) ? $cars[$carId] : [];
 
-                        $car = isset($cars[$carId]) ? $cars[$carId] : [];
-
-                        $items[] = array_replace($car, [
-                            'perspective' => isset($perspectives[$perspectiveId])
-                                ? $perspectives[$perspectiveId]
-                                : null
-                        ]);
-                    }
-
-
-                    $name = [
-                        'type'  => $row['type'],
-                        'items' => $items
-                    ];
-                    break;
-
-                case Picture::FACTORY_TYPE_ID:
-                    $name = [
-                        'type' => $row['type'],
-                        'factory' => isset($factories[$row['factory_id']]) ? $factories[$row['factory_id']] : null
-                    ];
-                    break;
-
-                default:
-                    $name = [
-                        'type' => $row['type']
-                    ];
-                    break;
+                $items[] = array_replace($car, [
+                    'perspective' => isset($perspectives[$perspectiveId])
+                        ? $perspectives[$perspectiveId]
+                        : null
+                ]);
             }
 
-            $result[$row['id']] = $name;
+            $result[$row['id']] = [
+                'type'  => $row['type'],
+                'items' => $items
+            ];
         }
 
         return $result;
@@ -335,14 +302,12 @@ class Picture extends Table
         }
 
         $oldParams = [
-            'type'       => $picture->type,
-            'item_ids'   => $pictureItem->getPictureItems($picture->id),
-            'factory_id' => $picture->factory_id
+            'type'     => $picture->type,
+            'item_ids' => $pictureItem->getPictureItems($picture->id),
         ];
 
         $picture->setFromArray([
-            'factory_id' => null,
-            'type'       => Picture::VEHICLE_TYPE_ID,
+            'type'     => Picture::VEHICLE_TYPE_ID,
         ]);
         $picture->save();
 
@@ -384,12 +349,10 @@ class Picture extends Table
         $oldParams = [
             'type'       => $picture->type,
             'item_ids'   => $pictureItem->getPictureItems($picture->id),
-            'factory_id' => $picture->factory_id
         ];
 
         $picture->setFromArray([
-            'factory_id' => null,
-            'type'       => Picture::VEHICLE_TYPE_ID,
+            'type' => Picture::VEHICLE_TYPE_ID,
         ]);
         $picture->save();
 
@@ -431,11 +394,9 @@ class Picture extends Table
         $oldParams = [
             'type'       => $picture->type,
             'item_ids'   => $pictureItem->getPictureItems($picture->id),
-            'factory_id' => $picture->factory_id
         ];
 
         $picture->setFromArray([
-            'factory_id' => $factory->id,
             'type'       => Picture::FACTORY_TYPE_ID,
         ]);
         $picture->save();

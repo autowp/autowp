@@ -50,22 +50,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'    => 7,
-                    'factory' => null
-                ],
-                'Factory',
-                'Factory'
-            ],
-            [
-                [
-                    'type'    => 7,
-                    'factory' => 'АЗЛК'
-                ],
-                'АЗЛК',
-                'АЗЛК'
-            ],
-            [
-                [
                     'type'  => 1,
                     'items' => []
                 ],
@@ -471,13 +455,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
     public function escapeDataProvider()
     {
         return [
-            [
-                [
-                    'type'    => 7,
-                    'factory' => 'B&B'
-                ],
-                'B&amp;B'
-            ],
             [
                 [
                     'type'        => 1,
