@@ -2935,8 +2935,7 @@ CREATE TABLE `item_point` (
 
 
 ALTER TABLE `item_point`
-  ADD PRIMARY KEY (`item_id`),
-  ADD SPATIAL KEY `point` (`point`);
+  ADD PRIMARY KEY (`item_id`);
 
 ALTER TABLE `item_point`
   ADD CONSTRAINT `item_point_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE;
