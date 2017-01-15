@@ -1340,9 +1340,9 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
 
     'moder/brands/new/title' => 'New brand',
     'moder/brands/vehicles-count:' => 'Vehicles: ',
-    'moder/brands/engines-count:' => 'Engines: ',
-    'moder/brands/vehicle-pictures-count:' => 'Vehicle pictures: ',
+    'moder/brands/engines-count:' => 'Engines: ',    'moder/brands/vehicle-pictures-count:' => 'Vehicle pictures: ',
     'moder/brands/engine-pictures-count:' => 'Engine pictures: ',
+
     'moder/brands/logo-pictures-count:' => 'Logotype pictures: ',
     'moder/brands/mixed-pictures-count:' => 'Mixed pictures: ',
     'moder/brands/unsorted-pictures-count:' => 'Unsorted pictures: ',
