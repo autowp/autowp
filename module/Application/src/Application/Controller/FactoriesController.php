@@ -4,10 +4,7 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Application\Model\DbTable\Factory;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
+use Application\Model\DbTable;
 
 use geoPHP;
 
@@ -31,19 +28,19 @@ class FactoriesController extends AbstractActionController
 
     public function factoryAction()
     {
-        $table = new Factory();
+        $table = new DbTable\Factory();
 
         $factory = $table->find($this->params()->fromRoute('id'))->current();
         if (! $factory) {
             return $this->notFoundAction();
         }
 
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
 
         $select = $pictureTable->select(true)
-            ->where('type = ?', Picture::FACTORY_TYPE_ID)
+            ->where('type = ?', DbTable\Picture::FACTORY_TYPE_ID)
             ->where('factory_id = ?', $factory->id)
-            ->where('status = ?', Picture::STATUS_ACCEPTED);
+            ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED);
 
         $pictures = $this->pic()->listData($select, [
             'width' => 4
@@ -55,18 +52,21 @@ class FactoriesController extends AbstractActionController
         $carPictures = [];
         $groups = $factory->getRelatedCarGroups();
         if (count($groups) > 0) {
-            $itemTable = new Vehicle();
+            $itemTable = new DbTable\Item();
 
             $cars = $itemTable->fetchAll([
                 'id in (?)' => array_keys($groups)
             ], $this->catalogue()->itemOrdering());
 
             $catalogue = $this->catalogue();
-            $carParentTable = new VehicleParent();
+            $itemParentTable = new DbTable\Item\ParentTable();
 
             foreach ($cars as $car) {
                 $select = $pictureTable->select(true)
-                    ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+                    ->where('pictures.status IN (?)', [
+                        DbTable\Picture::STATUS_NEW,
+                        DbTable\Picture::STATUS_ACCEPTED
+                    ])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item', 'picture_item.item_id = item.id', null)
                     ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
@@ -99,7 +99,7 @@ class FactoriesController extends AbstractActionController
                     $src = $imagesInfo->getSrc();
                 }
 
-                $cataloguePaths = $carParentTable->getPaths($car->id, [
+                $cataloguePaths = $itemParentTable->getPaths($car->id, [
                     'breakOnFirst' => true
                 ]);
 
@@ -149,7 +149,7 @@ class FactoriesController extends AbstractActionController
 
     public function factoryCarsAction()
     {
-        $table = new Factory();
+        $table = new DbTable\Factory();
 
         $factory = $table->find($this->params()->fromRoute('id'))->current();
         if (! $factory) {

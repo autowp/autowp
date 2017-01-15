@@ -27,7 +27,7 @@ class Power extends AbstractAdapter
 
     public function getCars(Zend_Db_Table_Select $select, $language)
     {
-        $carsTable = $select->getTable();
+        $itemTable = $select->getTable();
 
         $attributes = new Attribute();
 
@@ -37,7 +37,7 @@ class Power extends AbstractAdapter
 
         $valuesTable = $specService->getValueDataTable($powerAttr->type_id);
         $valuesTableName = $valuesTable->info(Zend_Db_Table_Abstract::NAME);
-        
+
         $select
             ->join($valuesTableName, 'item.id = '.$valuesTableName.'.item_id', null)
             ->where($valuesTableName.'.attribute_id = ?', $powerAttr->id)
@@ -46,7 +46,7 @@ class Power extends AbstractAdapter
             ->order($valuesTableName.'.value ' . $this->order)
             ->limit($this->most->getCarsCount());
 
-        $cars = $carsTable->fetchAll($select);
+        $cars = $itemTable->fetchAll($select);
 
         $result = [];
         foreach ($cars as $car) {

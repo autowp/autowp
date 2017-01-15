@@ -19,7 +19,7 @@ use Application\Model\DbTable;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable\Item;
 use Application\Model\Message;
 use Application\Model\PictureItem;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -36,9 +36,9 @@ class PicturesController extends AbstractActionController
     private $table;
 
     /**
-     * @var DbTable\Vehicle\ParentTable
+     * @var DbTable\Item\ParentTable
      */
-    private $carParentTable;
+    private $itemParentTable;
 
     private $textStorage;
 
@@ -94,9 +94,9 @@ class PicturesController extends AbstractActionController
 
     private function getCarParentTable()
     {
-        return $this->carParentTable
-            ? $this->carParentTable
-            : $this->carParentTable = new DbTable\Vehicle\ParentTable();
+        return $this->itemParentTable
+            ? $this->itemParentTable
+            : $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     public function __construct(
@@ -1015,7 +1015,7 @@ class PicturesController extends AbstractActionController
         $lastCar = null;
         $namespace = new \Zend\Session\Container('Moder_Car');
         if (isset($namespace->lastCarId)) {
-            $cars = new Vehicle();
+            $cars = new Item();
             $car = $cars->find($namespace->lastCarId)->current();
 
             if ($car) {
@@ -1161,7 +1161,7 @@ class PicturesController extends AbstractActionController
 
         $items = [];
         $itemIds = $this->pictureItem->getPictureItems($picture['id']);
-        $itemTable = new Vehicle();
+        $itemTable = new Item();
         foreach ($itemTable->find($itemIds) as $item) {
             $brandModel = new BrandModel();
             $relatedBrands = $brandModel->getList($this->language(), function ($select) use ($item) {
@@ -1482,14 +1482,14 @@ class PicturesController extends AbstractActionController
 
     private function prepareCars(Zend_Db_Table_Rowset $rows)
     {
-        $carParentTable = $this->getCarParentTable();
-        $carParentAdapter = $carParentTable->getAdapter();
+        $itemParentTable = $this->getCarParentTable();
+        $itemParentAdapter = $itemParentTable->getAdapter();
 
         $cars = [];
         foreach ($rows as $row) {
-            $haveChilds = (bool)$carParentAdapter->fetchOne(
-                $carParentAdapter->select()
-                    ->from($carParentTable->info('name'), new Zend_Db_Expr('1'))
+            $haveChilds = (bool)$itemParentAdapter->fetchOne(
+                $itemParentAdapter->select()
+                    ->from($itemParentTable->info('name'), new Zend_Db_Expr('1'))
                     ->where('parent_id = ?', $row->id)
             );
             $cars[] = [
@@ -1514,17 +1514,17 @@ class PicturesController extends AbstractActionController
 
     private function prepareCarParentRows($rows)
     {
-        $carParentTable = $this->getCarParentTable();
-        $carParentAdapter = $carParentTable->getAdapter();
-        $itemTable = new Vehicle();
+        $itemParentTable = $this->getCarParentTable();
+        $itemParentAdapter = $itemParentTable->getAdapter();
+        $itemTable = new Item();
 
         $items = [];
-        foreach ($rows as $carParentRow) {
-            $car = $itemTable->find($carParentRow->item_id)->current();
+        foreach ($rows as $itemParentRow) {
+            $car = $itemTable->find($itemParentRow->item_id)->current();
             if ($car) {
-                $haveChilds = (bool)$carParentAdapter->fetchOne(
-                    $carParentAdapter->select()
-                        ->from($carParentTable->info('name'), new Zend_Db_Expr('1'))
+                $haveChilds = (bool)$itemParentAdapter->fetchOne(
+                    $itemParentAdapter->select()
+                        ->from($itemParentTable->info('name'), new Zend_Db_Expr('1'))
                         ->where('parent_id = ?', $car->id)
                 );
                 $items[] = [
@@ -1536,7 +1536,7 @@ class PicturesController extends AbstractActionController
                     ], [], true),
                     'haveChilds' => $haveChilds,
                     'isGroup'    => $car['is_group'],
-                    'type'       => $carParentRow->type,
+                    'type'       => $itemParentRow->type,
                     'loadUrl'    => $this->url()->fromRoute(null, [
                         'action' => 'car-childs',
                         'item_id' => $car['id']
@@ -1559,16 +1559,16 @@ class PicturesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTable = new Vehicle();
-        $carParentTable = $this->getCarParentTable();
+        $itemTable = new Item();
+        $itemParentTable = $this->getCarParentTable();
 
         $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
 
-        $rows = $carParentTable->fetchAll(
-            $carParentTable->select(true)
+        $rows = $itemParentTable->fetchAll(
+            $itemParentTable->select(true)
                 ->join('item', 'item.id = item_parent.item_id', null)
                 ->where('item_parent.parent_id = ?', $car->id)
                 ->order([
@@ -1595,7 +1595,7 @@ class PicturesController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
         $brand = $itemTable->fetchRow([
             'id = ?'           => (int)$this->params('brand_id'),
             'item_type_id = ?' => DbTable\Item\Type::BRAND
@@ -1949,7 +1949,7 @@ class PicturesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new Item();
         $srcItem = $itemTable->find($this->params('src_item_id'))->current();
 
         $type = trim($this->params('type'));

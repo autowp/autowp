@@ -1,11 +1,9 @@
 <?php
 
-namespace Application\Model\DbTable\Vehicle;
+namespace Application\Model\DbTable\Item;
 
 use Application\Db\Table;
-use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
+use Application\Model\DbTable;
 
 class ParentCache extends Table
 {
@@ -15,29 +13,29 @@ class ParentCache extends Table
     protected $_referenceMap = [
         'Car' => [
             'columns'       => ['item_id'],
-            'refTableClass' => 'Car',
+            'refTableClass' => DbTable\Item::class,
             'refColumns'    => ['id']
         ],
         'Parent' => [
             'columns'       => ['parent_id'],
-            'refTableClass' => 'Car',
+            'refTableClass' => DbTable\Item::class,
             'refColumns'    => ['id']
         ]
     ];
 
     /**
-     * @var VehicleParent
+     * @var DbTable\Item\ParentTable
      */
-    private $carParentTable;
+    private $itemParentTable;
 
     /**
-     * @return VehicleParent
+     * @return DbTable\Item\ParentTable
      */
     private function getCarParentTable()
     {
-        return $this->carParentTable
-            ? $this->carParentTable
-            : $this->carParentTable = new VehicleParent();
+        return $this->itemParentTable
+            ? $this->itemParentTable
+            : $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     private function collectParentInfo($id, $diff = 1)
@@ -56,9 +54,9 @@ class ParentCache extends Table
         $result = [];
         foreach ($rows as $row) {
             $parentId = $row['parent_id'];
-            $isTuning = $row['type'] == VehicleParent::TYPE_TUNING;
-            $isSport  = $row['type'] == VehicleParent::TYPE_SPORT;
-            $isDesign = $row['type'] == VehicleParent::TYPE_DESIGN;
+            $isTuning = $row['type'] == DbTable\Item\ParentTable::TYPE_TUNING;
+            $isSport  = $row['type'] == DbTable\Item\ParentTable::TYPE_SPORT;
+            $isDesign = $row['type'] == DbTable\Item\ParentTable::TYPE_DESIGN;
             $result[$parentId] = [
                 'diff'   => $diff,
                 'tuning' => $isTuning,
@@ -81,7 +79,7 @@ class ParentCache extends Table
 
     /*protected function _collectParentIds($id)
     {
-        $cpTable = new VehicleParent();
+        $cpTable = new DbTable\Item\ParentTable();
 
         $cpTableName = $cpTable->info('name');
         $adapter = $cpTable->getAdapter();
@@ -110,7 +108,7 @@ class ParentCache extends Table
         return $ids;
     }*/
 
-    /*public function rebuildCache(VehicleRow $car)
+    /*public function rebuildCache(DbTable\Item\Row $car)
     {
         $id = (int)$car->id;
 
@@ -144,7 +142,7 @@ class ParentCache extends Table
 
         $this->delete($filter);
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $childCars = $itemTable->fetchAll(
             $itemTable->select(true)
@@ -157,7 +155,7 @@ class ParentCache extends Table
         }
     }*/
 
-    public function rebuildCache(VehicleRow $car)
+    public function rebuildCache(DbTable\Item\Row $car)
     {
         $id = (int)$car->id;
 
@@ -224,7 +222,7 @@ class ParentCache extends Table
 
         $this->delete($filter);
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $childCars = $itemTable->fetchAll(
             $itemTable->select(true)

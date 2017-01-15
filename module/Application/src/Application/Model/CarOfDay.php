@@ -4,7 +4,7 @@ namespace Application\Model;
 
 use Application\Db\Table;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable\Item;
 use Application\ItemNameFormatter;
 
 use Zend_Db_Expr;
@@ -116,7 +116,7 @@ class CarOfDay
             return;
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new Item();
 
         $car = $itemTable->fetchRow([
             'id = ?' => (int)$dayRow->item_id

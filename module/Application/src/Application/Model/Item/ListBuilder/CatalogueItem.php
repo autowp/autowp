@@ -44,7 +44,7 @@ class CatalogueItem extends Catalogue
         return $this;
     }
 
-    public function getPicturesUrl(DbTable\Vehicle\Row $item)
+    public function getPicturesUrl(DbTable\Item\Row $item)
     {
         return $this->router->assemble([
             'action'        => 'brand-item-pictures',
@@ -57,7 +57,7 @@ class CatalogueItem extends Catalogue
         ]);
     }
 
-    public function getSpecificationsUrl(DbTable\Vehicle\Row $item)
+    public function getSpecificationsUrl(DbTable\Item\Row $item)
     {
         $hasSpecs = $this->specsService->hasSpecs($item->id);
 
@@ -75,13 +75,13 @@ class CatalogueItem extends Catalogue
         ]);
     }
 
-    public function getTypeUrl(DbTable\Vehicle\Row $item, $type)
+    public function getTypeUrl(DbTable\Item\Row $item, $type)
     {
         switch ($type) {
-            case DbTable\Vehicle\ParentTable::TYPE_TUNING:
+            case DbTable\Item\ParentTable::TYPE_TUNING:
                 $catname = 'tuning';
                 break;
-            case DbTable\Vehicle\ParentTable::TYPE_SPORT:
+            case DbTable\Item\ParentTable::TYPE_SPORT:
                 $catname = 'sport';
                 break;
             default:
@@ -89,13 +89,13 @@ class CatalogueItem extends Catalogue
                 break;
         }
 
-        $carParentRow = $this->itemParentTable->fetchRow([
+        $itemParentRow = $this->itemParentTable->fetchRow([
             'item_id = ?'   => $item->id,
             'parent_id = ?' => $this->itemId
         ]);
-        if ($carParentRow) {
+        if ($itemParentRow) {
             $currentPath = array_merge($this->path, [
-                $carParentRow->catname
+                $itemParentRow->catname
             ]);
         } else {
             $currentPath = $this->path;
@@ -113,7 +113,7 @@ class CatalogueItem extends Catalogue
         ]);
     }
 
-    public function getPictureUrl(DbTable\Vehicle\Row $item, array $picture)
+    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
     {
         return $this->router->assemble([
             'action'        => 'brand-item-picture',

@@ -72,7 +72,7 @@ class BrandsController extends AbstractActionController
             return $this->notFoundAction();
         }*/
 
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
 
         $brand = $itemTable->fetchRow([
             'item_type_id = ?' => DbTable\Item\Type::BRAND,
@@ -83,13 +83,13 @@ class BrandsController extends AbstractActionController
         }
 
         $language = $this->language();
-        $brandLangTable = new DbTable\Vehicle\Language();
+        $brandLangTable = new DbTable\Item\Language();
         $brandLang = $brandLangTable->fetchRow([
             'item_id = ?' => $brand->id,
             'language = ?' => $language
         ]);
 
-        
+
         $carList = $itemTable->fetchAll(
             $itemTable->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)

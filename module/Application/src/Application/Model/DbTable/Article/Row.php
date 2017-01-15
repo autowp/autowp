@@ -2,8 +2,6 @@
 
 namespace Application\Model\DbTable\Article;
 
-use Application\Model\DbTable\Article;
-
 class Row extends \Application\Db\Table\Row
 {
     public function previewExists()

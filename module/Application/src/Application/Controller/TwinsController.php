@@ -229,7 +229,7 @@ class TwinsController extends AbstractActionController
 
         $carLists = [];
         if (count($ids)) {
-            $itemTable = new DbTable\Vehicle();
+            $itemTable = new DbTable\Item();
 
             $db = $itemTable->getAdapter();
 

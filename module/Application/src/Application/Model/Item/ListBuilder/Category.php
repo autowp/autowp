@@ -10,7 +10,7 @@ use Zend_Db_Expr;
 class Category extends ListBuilder
 {
     /**
-     * @var DbTable\Vehicle\ParentTable
+     * @var DbTable\Item\ParentTable
      */
     protected $itemParentTable;
 
@@ -25,7 +25,7 @@ class Category extends ListBuilder
 
     protected $path;
 
-    public function setItemParentTable(DbTable\Vehicle\ParentTable $itemParentTable)
+    public function setItemParentTable(DbTable\Item\ParentTable $itemParentTable)
     {
         $this->itemParentTable = $itemParentTable;
 
@@ -60,7 +60,7 @@ class Category extends ListBuilder
         return $this;
     }
 
-    public function getDetailsUrl(DbTable\Vehicle\Row $item)
+    public function getDetailsUrl(DbTable\Item\Row $item)
     {
         if ($item->item_type_id == DbTable\Item\Type::CATEGORY) {
             return $this->router->assemble([
@@ -71,9 +71,9 @@ class Category extends ListBuilder
             ]);
         }
 
-        $carParentAdapter = $this->itemParentTable->getAdapter();
-        $hasChilds = (bool)$carParentAdapter->fetchOne(
-            $carParentAdapter->select()
+        $itemParentAdapter = $this->itemParentTable->getAdapter();
+        $hasChilds = (bool)$itemParentAdapter->fetchOne(
+            $itemParentAdapter->select()
                 ->from($this->itemParentTable->info('name'), new Zend_Db_Expr('1'))
                 ->where('parent_id = ?', $item->id)
         );
@@ -84,16 +84,16 @@ class Category extends ListBuilder
 
         // found parent row
         if ($this->currentItem) {
-            $carParentRow = $this->itemParentTable->fetchRow([
+            $itemParentRow = $this->itemParentTable->fetchRow([
                 'item_id = ?'   => $item->id,
                 'parent_id = ?' => $this->currentItem->id
             ]);
-            if (! $carParentRow) {
+            if (! $itemParentRow) {
                 return null;
             }
 
             $currentPath = array_merge($this->path, [
-                $carParentRow->catname
+                $itemParentRow->catname
             ]);
         } else {
             $currentPath = [];
@@ -110,7 +110,7 @@ class Category extends ListBuilder
         ]);
     }
 
-    public function getPicturesUrl(DbTable\Vehicle\Row $item)
+    public function getPicturesUrl(DbTable\Item\Row $item)
     {
         if ($item->item_type_id == DbTable\Item\Type::CATEGORY) {
             return $this->router->assemble([
@@ -124,16 +124,16 @@ class Category extends ListBuilder
 
         // found parent row
         if ($this->currentItem) {
-            $carParentRow = $this->itemParentTable->fetchRow([
+            $itemParentRow = $this->itemParentTable->fetchRow([
                 'item_id = ?'   => $item->id,
                 'parent_id = ?' => $this->currentItem->id
             ]);
-            if (! $carParentRow) {
+            if (! $itemParentRow) {
                 return null;
             }
 
             $currentPath = array_merge($this->path, [
-                $carParentRow->catname
+                $itemParentRow->catname
             ]);
         } else {
             $currentPath = [];
@@ -150,12 +150,12 @@ class Category extends ListBuilder
         ]);
     }
 
-    public function getSpecificationsUrl(DbTable\Vehicle\Row $item)
+    public function getSpecificationsUrl(DbTable\Item\Row $item)
     {
         return null;
     }
 
-    public function getPictureUrl(DbTable\Vehicle\Row $item, array $picture)
+    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
     {
         if ($item->item_type_id == DbTable\Item\Type::CATEGORY) {
             return $this->router->assemble([
@@ -169,16 +169,16 @@ class Category extends ListBuilder
 
         // found parent row
         if ($this->currentItem) {
-            $carParentRow = $this->itemParentTable->fetchRow([
+            $itemParentRow = $this->itemParentTable->fetchRow([
                 'item_id = ?'   => $item->id,
                 'parent_id = ?' => $this->currentItem->id
             ]);
-            if (! $carParentRow) {
+            if (! $itemParentRow) {
                 return null;
             }
 
             $currentPath = array_merge($this->path, [
-                $carParentRow->catname
+                $itemParentRow->catname
             ]);
         } else {
             $currentPath = [];

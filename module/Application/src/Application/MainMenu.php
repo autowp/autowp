@@ -140,8 +140,8 @@ class MainMenu
         if (! $success) {
             $categories = [];
 
-            $itemTable = new DbTable\Vehicle();
-            $itemLangTable = new DbTable\Vehicle\Language();
+            $itemTable = new DbTable\Item();
+            $itemLangTable = new DbTable\Item\Language();
 
             $rows = $itemTable->fetchAll(
                 $itemTable->select(true)

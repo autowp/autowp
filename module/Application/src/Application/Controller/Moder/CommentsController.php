@@ -28,7 +28,7 @@ class CommentsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
 
         $brandRows = $itemTable->fetchAll(
             $itemTable->select(true)

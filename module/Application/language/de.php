@@ -1338,31 +1338,17 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/pciture/move/factories' => 'Factories',
     'moder/pciture/move/engines' => 'Engines',
 
-    'moder/brands/new/title' => 'New brand',
-    'moder/brands/vehicles-count:' => 'Vehicles: ',
-    'moder/brands/engines-count:' => 'Engines: ',    'moder/brands/vehicle-pictures-count:' => 'Vehicle pictures: ',
-    'moder/brands/engine-pictures-count:' => 'Engine pictures: ',
-
-    'moder/brands/logo-pictures-count:' => 'Logotype pictures: ',
-    'moder/brands/mixed-pictures-count:' => 'Mixed pictures: ',
-    'moder/brands/unsorted-pictures-count:' => 'Unsorted pictures: ',
-    'moder/brands/total-pictures-count:' => 'Total pictures: ',
-    'moder/brands/public-url:' => 'Public URL: ',
-
     'brand' => 'Brand',
     'brand/name' => 'Name',
     'brand/logo' => 'Logotype',
 
-    'moder/brands/meta-data' => 'Meta data',
     'moder/brands/meta-data/full-name' => 'Full name',
-    'moder/brands/description' => 'Short description',
     'moder/brands/logo/description' => '* Logotopy must be in PNG format.
 * All transparent regions must be transparent but not white!
 * Logotype must be close to edges. Margin not required
 * Upload images in maximum resolution - thats give quality and ability to use it in future. On website logo scaled automaticaly',
     'moder/brands/logo/saved' => 'Logotype saved',
 
-    'moder/brands/vehicles' => 'Vehicles',
     'moder/brands/links' => 'Links',
     'moder/brands/links/text' => 'Text',
     'moder/brands/links/address' => 'Address',

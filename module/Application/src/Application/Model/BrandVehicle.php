@@ -13,17 +13,17 @@ use Zend_Db_Expr;
 class BrandVehicle
 {
     /**
-     * @var DbTable\Vehicle
+     * @var DbTable\Item
      */
     private $itemTable;
-    
+
     /**
-     * @var DbTable\Vehicle\Language
+     * @var DbTable\Item\Language
      */
     private $itemLangTable;
 
     /**
-     * @var DbTable\Vehicle\ParentTable
+     * @var DbTable\Item\ParentTable
      */
     private $itemParentTable;
 
@@ -33,7 +33,7 @@ class BrandVehicle
     private $itemParentLanguageTable;
 
     private $languages = ['en'];
-    
+
     private $allowedCombinations = [
         DbTable\Item\Type::VEHICLE => [
             DbTable\Item\Type::VEHICLE => true
@@ -59,9 +59,9 @@ class BrandVehicle
     {
         $this->languages = $languages;
 
-        $this->itemTable = new DbTable\Vehicle();
-        $this->itemLangTable = new DbTable\Vehicle\Language();
-        $this->itemParentTable = new DbTable\Vehicle\ParentTable();
+        $this->itemTable = new DbTable\Item();
+        $this->itemLangTable = new DbTable\Item\Language();
+        $this->itemParentTable = new DbTable\Item\ParentTable();
         $this->itemParentLanguageTable = new DbTable\Item\ParentLanguage();
     }
 
@@ -90,7 +90,7 @@ class BrandVehicle
         return true;
     }
 
-    private function getBrandAliases(DbTable\Vehicle\Row $parentRow)
+    private function getBrandAliases(DbTable\Item\Row $parentRow)
     {
         $aliases = [$parentRow['name']];
 
@@ -122,7 +122,7 @@ class BrandVehicle
         return $aliases;
     }
 
-    private function getVehicleName(DbTable\Vehicle\Row $itemRow, $language)
+    private function getVehicleName(DbTable\Item\Row $itemRow, $language)
     {
         $languageRow = $this->itemLangTable->fetchRow([
             'item_id = ?'  => $itemRow->id,
@@ -132,7 +132,7 @@ class BrandVehicle
         return $languageRow && $languageRow->name ? $languageRow->name : $itemRow->name;
     }
 
-    private function extractName(DbTable\Vehicle\Row $parentRow, DbTable\Vehicle\Row $vehicleRow, $language)
+    private function extractName(DbTable\Item\Row $parentRow, DbTable\Item\Row $vehicleRow, $language)
     {
         $vehicleName = $this->getVehicleName($vehicleRow, $language);
         $aliases = $this->getBrandAliases($parentRow);
@@ -158,7 +158,7 @@ class BrandVehicle
         return $name;
     }
 
-    private function extractCatname(DbTable\Vehicle\Row $brandRow, DbTable\Vehicle\Row $vehicleRow)
+    private function extractCatname(DbTable\Item\Row $brandRow, DbTable\Item\Row $vehicleRow)
     {
         $filter = new FilenameSafe();
         $catnameTemplate = $filter->filter($this->extractName($brandRow, $vehicleRow, 'en'));
@@ -186,34 +186,34 @@ class BrandVehicle
         if (! $parentRow || ! $itemRow) {
             return false;
         }
-        
+
         if (! $parentRow->is_group) {
             throw new Exception("Only groups can have childs");
         }
-        
+
         if (! isset($this->allowedCombinations[$parentRow->item_type_id][$itemRow->item_type_id])) {
             throw new Exception("That type of parent is not allowed for this type");
         }
-        
+
         $itemId = (int)$itemRow->id;
         $parentId = (int)$parentRow->id;
-        
+
         $catname = $this->extractCatname($parentRow, $itemRow);
         if (! $catname) {
             throw new Exception('Failed to create catname');
         }
-        
+
         $defaults = [
-            'type'           => DbTable\Vehicle\ParentTable::TYPE_DEFAULT,
+            'type'           => DbTable\Item\ParentTable::TYPE_DEFAULT,
             'catname'        => $catname,
             'manual_catname' => isset($options['catname'])
         ];
         $options = array_replace($defaults, $options);
-        
+
         if (! isset($options['type'])) {
             throw new Exception("Type cannot be null");
         }
-        
+
         $parentIds = $this->itemParentTable->collectParentIds($parentId);
         if (in_array($itemId, $parentIds)) {
             throw new Exception('Cycle detected');
@@ -246,13 +246,13 @@ class BrandVehicle
         }
 
         $this->setItemParentLanguages($parentId, $itemId, $values, true);
-        
-        $cpcTable = new DbTable\Vehicle\ParentCache();
+
+        $cpcTable = new DbTable\Item\ParentCache();
         $cpcTable->rebuildCache($itemRow);
 
         return true;
     }
-    
+
     public function remove($parentId, $itemId)
     {
         $parentRow = $this->itemTable->find($parentId)->current();
@@ -260,10 +260,10 @@ class BrandVehicle
         if (! $parentRow || ! $itemRow) {
             return false;
         }
-        
+
         $itemId = (int)$itemRow->id;
         $parentId = (int)$parentRow->id;
-        
+
         $row = $this->itemParentTable->fetchRow([
             'item_id = ?'   => $itemId,
             'parent_id = ?' => $parentId
@@ -271,7 +271,7 @@ class BrandVehicle
         if ($row) {
             $row->delete();
         }
-        
+
         $bvlRows = $this->itemParentLanguageTable->fetchAll([
             'item_id = ?'   => $itemId,
             'parent_id = ?' => $parentId
@@ -279,8 +279,8 @@ class BrandVehicle
         foreach ($bvlRows as $bvlRow) {
             $bvlRow->delete();
         }
-        
-        $cpcTable = new DbTable\Vehicle\ParentCache();
+
+        $cpcTable = new DbTable\Item\ParentCache();
         $cpcTable->rebuildCache($itemRow);
     }
 
@@ -364,7 +364,7 @@ class BrandVehicle
         if ($forceIsAuto) {
             $isAuto = true;
         } else {
-            $isAuto = !$itemParentRow->manual_catname;
+            $isAuto = ! $itemParentRow->manual_catname;
             if ($itemParentRow->catname != $newCatname) {
                 $isAuto = false;
             }
@@ -400,7 +400,7 @@ class BrandVehicle
         if (! $bvRow) {
             return false;
         }
-        if (!$bvRow->manual_catname) {
+        if (! $bvRow->manual_catname) {
             $brandRow = $this->itemTable->fetchRow([
                 'id = ?'           => (int)$parentId,
                 //'item_type_id = ?' => DbTable\Item\Type::BRAND

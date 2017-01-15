@@ -2,10 +2,7 @@
 
 namespace Application\Service;
 
-use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\Type as VehicleType;
+use Application\Model\DbTable;
 use Application\Most;
 use Application\Service\SpecificationsService;
 
@@ -434,7 +431,7 @@ class Mosts
     public function getPrespectiveGroups()
     {
         if ($this->perspectiveGroups === null) {
-            $pgTable = new PerspectiveGroup();
+            $pgTable = new DbTable\Perspective\Group();
             $groups = $pgTable->fetchAll(
                 $pgTable->select(true)
                     ->where('page_id = ?', 1)
@@ -453,7 +450,7 @@ class Mosts
 
     public function getCarTypes($language, $brandId)
     {
-        $carTypesTable = new VehicleType();
+        $carTypesTable = new DbTable\Vehicle\Type();
         $carTypes = [];
         $select = $carTypesTable->select(true)
             ->where('car_types.parent_id IS NULL')
@@ -516,7 +513,7 @@ class Mosts
 
     private function getOrientedPictureList($carId, array $perspective_group_ids)
     {
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
         $pictures = [];
         $db = $pictureTable->getAdapter();
 
@@ -533,10 +530,13 @@ class Mosts
                     ->where('mp.group_id = ?', $groupId)
                     ->where('item_parent_cache.parent_id = ?', $carId)
                     ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
-                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                    ->where('pictures.status IN (?)', [
+                        DbTable\Picture::STATUS_ACCEPTED,
+                        DbTable\Picture::STATUS_NEW
+                    ])
                     ->order([
                         'mp.position',
-                        new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', Picture::STATUS_ACCEPTED)),
+                        new Zend_Db_Expr($db->quoteInto('pictures.status=? DESC', DbTable\Picture::STATUS_ACCEPTED)),
                         'pictures.width DESC', 'pictures.height DESC'
                     ])
                     ->limit(1)
@@ -563,7 +563,10 @@ class Mosts
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                     ->where('item_parent_cache.parent_id = ?', $carId)
                     ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
-                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                    ->where('pictures.status IN (?)', [
+                        DbTable\Picture::STATUS_ACCEPTED,
+                        DbTable\Picture::STATUS_NEW
+                    ])
                     ->limit(1);
 
                 if (count($ids) > 0) {
@@ -586,9 +589,9 @@ class Mosts
 
     public function getCarsData($cMost, $carType, $cYear, $brandId, $language)
     {
-        $carsTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
-        $select = $carsTable->select(true);
+        $select = $itemTable->select(true);
 
         if ($carType) {
             $ids = $this->getCarTypesIds($carType);
@@ -634,7 +637,7 @@ class Mosts
     private function getCarTypesIds($carType)
     {
         $result = [$carType->id];
-        foreach ($carType->findDependentRowset(VehicleType::class) as $child) {
+        foreach ($carType->findDependentRowset(DbTable\Vehicle\Type::class) as $child) {
             $result[] = $child->id;
             $result = array_merge($result, $this->getCarTypesIds($child));
         }
@@ -673,7 +676,7 @@ class Mosts
             }
         }
 
-        $carTypesTable = new VehicleType();
+        $carTypesTable = new DbTable\Vehicle\Type();
         $carType = $carTypesTable->fetchRow([
             'catname = ?' => (string)$carTypeCatname
         ]);
@@ -681,8 +684,8 @@ class Mosts
         $years = $this->getYears();
 
         if ($brandId) {
-            $carsTable = new Vehicle();
-            $select = $carsTable->select(true)
+            $itemTable = new DbTable\Item();
+            $select = $itemTable->select(true)
                 ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
                 ->where('not item_parent_cache.tuning')
                 ->where('item_parent_cache.parent_id = ?', $brandId)
@@ -691,7 +694,7 @@ class Mosts
             foreach ($years as $idx => $year) {
                 $cSelect = clone $select;
                 $cSelect->where($year['where']);
-                $rowExists = (bool)$carsTable->fetchRow($cSelect);
+                $rowExists = (bool)$itemTable->fetchRow($cSelect);
                 if (! $rowExists) {
                     unset($years[$idx]);
                 }

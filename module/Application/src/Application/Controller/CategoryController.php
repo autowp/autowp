@@ -9,8 +9,6 @@ use Zend\View\Model\ViewModel;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend_Db_Expr;
@@ -22,12 +20,12 @@ class CategoryController extends AbstractActionController
     private $textStorage;
 
     /**
-     * @var DbTable\Vehicle
+     * @var DbTable\Item
      */
     private $itemTable;
 
     /**
-     * @var DbTable\Vehicle\Item
+     * @var DbTable\Item\Language
      */
     private $itemLanguageTable;
 
@@ -36,8 +34,8 @@ class CategoryController extends AbstractActionController
         $this->cache = $cache;
         $this->textStorage = $textStorage;
 
-        $this->itemTable = new DbTable\Vehicle();
-        $this->itemLanguageTable = new DbTable\Vehicle\Language();
+        $this->itemTable = new DbTable\Item();
+        $this->itemLanguageTable = new DbTable\Item\Language();
     }
 
     private function getOwnVehiclesAndEnginesCount($categoryId)
@@ -106,7 +104,10 @@ class CategoryController extends AbstractActionController
                 $pictureTable->select(true)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                    ->where('pictures.status IN (?)', [
+                        DbTable\Picture::STATUS_ACCEPTED,
+                        DbTable\Picture::STATUS_NEW
+                    ])
                     ->where('item_parent_cache.parent_id = ?', $category['id'])
                     ->order([
                         new Zend_Db_Expr('picture_item.perspective_id = 7 DESC'),
@@ -434,7 +435,7 @@ class CategoryController extends AbstractActionController
                 $title = $categoryLang ? $categoryLang->name : $currentCategory->name;
             }
 
-            $itemParentTable = new VehicleParent();
+            $itemParentTable = new DbTable\Item\ParentTable();
 
             $listBuilder = new \Application\Model\Item\ListBuilder\Category([
                 'catalogue'       => $this->catalogue(),
@@ -451,21 +452,21 @@ class CategoryController extends AbstractActionController
                 if ($path) {
                     $select = $this->itemTable->select(true)
                         ->where('item.id = ?', $currentCar->id);
-    
+
                     $paginator = new \Zend\Paginator\Paginator(
                         new Zend1DbTableSelect($select)
                     );
-                
+
                     $cPath = $path;
                     $catname = array_pop($cPath);
-    
+
                     $parentItemRow = $this->itemTable->fetchRow(
                         $this->itemTable->select(true)
                             ->join('item_parent', 'item.id = item_parent.parent_id', null)
                             ->where('item_parent.item_id = ?', $currentCar->id)
                             ->where('item_parent.catname = ?', $catname)
                     );
-    
+
                     $listBuilder
                         ->setPath($cPath)
                         ->setCurrentItem($parentItemRow);
@@ -504,11 +505,12 @@ class CategoryController extends AbstractActionController
 
                 $otherItemsCount = $otherPaginator->getTotalItemCount();
 
-                $pictureTable = new Picture();
+                $pictureTable = new DbTable\Picture();
                 $pictureRows = $pictureTable->fetchAll(
                     $pictureTable->select(true)
                         ->where('pictures.status IN (?)', [
-                            Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
+                            DbTable\Picture::STATUS_NEW,
+                            DbTable\Picture::STATUS_ACCEPTED
                         ])
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item', 'picture_item.item_id = item.id', null)
@@ -577,7 +579,8 @@ class CategoryController extends AbstractActionController
             $select = $pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status IN (?)', [
-                    Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
+                    DbTable\Picture::STATUS_NEW,
+                    DbTable\Picture::STATUS_ACCEPTED
                 ])
                 ->order($this->catalogue()->picturesOrdering())
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
@@ -633,7 +636,8 @@ class CategoryController extends AbstractActionController
             $select = $pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status IN (?)', [
-                    Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
+                    DbTable\Picture::STATUS_NEW,
+                    DbTable\Picture::STATUS_ACCEPTED
                 ])
                 ->order($this->catalogue()->picturesOrdering())
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
@@ -687,7 +691,8 @@ class CategoryController extends AbstractActionController
             $select = $pictureTable->select(true)
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('pictures.status IN (?)', [
-                    Picture::STATUS_NEW, Picture::STATUS_ACCEPTED
+                    DbTable\Picture::STATUS_NEW,
+                    DbTable\Picture::STATUS_ACCEPTED
                 ])
                 ->order($this->catalogue()->picturesOrdering())
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)

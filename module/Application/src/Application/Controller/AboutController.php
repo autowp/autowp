@@ -9,7 +9,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable\Item;
 
 class AboutController extends AbstractActionController
 {
@@ -75,7 +75,7 @@ class AboutController extends AbstractActionController
         );
         $totalPictures = round($totalPictures, -4);
 
-        $itemTable = new Vehicle();
+        $itemTable = new Item();
         $itemTableAdapter = $itemTable->getAdapter();
         $totalCars = $itemTableAdapter->fetchOne(
             $itemTableAdapter->select()

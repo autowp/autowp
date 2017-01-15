@@ -10,7 +10,7 @@ use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable\Item;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class LogController extends AbstractActionController
@@ -24,7 +24,7 @@ class LogController extends AbstractActionController
         }
 
         $logTable = new LogEvent();
-        $vehicleTable = new Vehicle();
+        $vehicleTable = new Item();
         $brandModel = new BrandModel();
         $picturesTable = new Picture();
         $factoryTable = new Factory();

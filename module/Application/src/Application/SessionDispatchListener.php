@@ -30,13 +30,13 @@ class SessionDispatchListener extends AbstractListenerAggregate
             $serviceManager = $e->getApplication()->getServiceManager();
             $sessionManager = $serviceManager->get(ManagerInterface::class);
             $config = $sessionManager->getConfig();
-            
+
             $cookieDomain = $this->getHostCookieDomain($request);
             if ($cookieDomain) {
                 $config->setCookieDomain($cookieDomain);
                 //$sessionManager->start();
             }
-            
+
             /*$cookies = $request->getCookie();
             $key = $config->getName();
             if (isset($cookies[$key])) {

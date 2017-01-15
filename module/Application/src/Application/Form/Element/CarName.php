@@ -13,8 +13,8 @@ class CarName extends Text implements InputProviderInterface
 {
     protected $attributes = [
         'type'      => 'text',
-        'maxlength' => DbTable\Vehicle::MAX_NAME,
-        'size'      => DbTable\Vehicle::MAX_NAME
+        'maxlength' => DbTable\Item::MAX_NAME,
+        'size'      => DbTable\Item::MAX_NAME
     ];
 
     /**
@@ -43,7 +43,7 @@ class CarName extends Text implements InputProviderInterface
                     'name' => 'StringLength',
                     'options' => [
                         'min' => 2,
-                        'max' => DbTable\Vehicle::MAX_NAME
+                        'max' => DbTable\Item::MAX_NAME
                     ]
                 ]
             ]

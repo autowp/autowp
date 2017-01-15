@@ -103,11 +103,11 @@
                 <tr data-id="<?=$car['id']?>">
                     <td>
                         <i class="fa fa-arrow-down"></i>
-                        <?php if ($car['parent']['type'] == Application\Model\DbTable\Vehicle\ParentTable::TYPE_TUNING) { ?>
+                        <?php if ($car['parent']['type'] == Application\Model\DbTable\Item\ParentTable::TYPE_TUNING) { ?>
                             <?=$this->escapeHtml($this->translate('moder/vehicle/link-type-prefix/related'))?>
-                        <?php } elseif ($car['parent']['type'] == Application\Model\DbTable\Vehicle\ParentTable::TYPE_DESIGN) { ?>
+                        <?php } elseif ($car['parent']['type'] == Application\Model\DbTable\Item\ParentTable::TYPE_DESIGN) { ?>
                             <?=$this->escapeHtml($this->translate('moder/vehicle/link-type-prefix/design'))?>
-                        <?php } elseif ($car['parent']['type'] == Application\Model\DbTable\Vehicle\ParentTable::TYPE_SPORT) { ?>
+                        <?php } elseif ($car['parent']['type'] == Application\Model\DbTable\Item\ParentTable::TYPE_SPORT) { ?>
                             <?=$this->escapeHtml($this->translate('moder/vehicle/link-type-prefix/sport'))?>
                         <?php } ?>
                         <?=$this->htmlA($car['url'], $this->car()->htmlTitle($car['name']), false)?>

@@ -22,7 +22,7 @@ class Brand
     const ICON_FORMAT = 'brandicon';
 
     /**
-     * @var DbTable\Vehicle
+     * @var DbTable\Item
      */
     private $table;
 
@@ -30,7 +30,7 @@ class Brand
 
     public function __construct()
     {
-        $this->table = new DbTable\Vehicle();
+        $this->table = new DbTable\Item();
     }
 
     public function getTotalCount()

@@ -9,11 +9,6 @@ use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\ItemNameFormatter;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
-use Application\Model\DbTable\Vehicle\Type as VehicleType;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Spec\Table\Car as CarSpecTable;
 
@@ -74,14 +69,14 @@ class SpecificationsService
     private $zoneAttrs = [];
 
     /**
-     * @var Vehicle
+     * @var DbTable\Item
      */
     private $itemTable = null;
 
     /**
-     * @var VehicleParent
+     * @var DbTable\Item\ParentTable
      */
-    private $carParentTable = null;
+    private $itemParentTable = null;
 
     /**
      * @var array
@@ -185,23 +180,23 @@ class SpecificationsService
     }
 
     /**
-     * @return VehicleParent
+     * @return DbTable\Item\ParentTable
      */
     private function getCarParentTable()
     {
-        return $this->carParentTable
-            ? $this->carParentTable
-            : $this->carParentTable = new VehicleParent();
+        return $this->itemParentTable
+            ? $this->itemParentTable
+            : $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     /**
-     * @return Vehicle
+     * @return DbTable\Item
      */
     private function getItemTable()
     {
         return $this->itemTable
             ? $this->itemTable
-            : $this->itemTable = new Vehicle();
+            : $this->itemTable = new DbTable\Item();
     }
 
     private function getAttributeTable()
@@ -681,12 +676,12 @@ class SpecificationsService
     }
 
     /**
-     * @param VehicleRow $car
+     * @param DbTable\Item\Row $car
      * @param UserRow $user
      * @param array $options
      * @return array
      */
-    public function getCarForm(VehicleRow $car, UserRow $user, array $options, $language)
+    public function getCarForm(DbTable\Item\Row $car, UserRow $user, array $options, $language)
     {
         $vtTable = new \Application\Model\VehicleType();
         $vehicleTypeIds = $vtTable->getVehicleTypes($car->id);
@@ -949,11 +944,11 @@ class SpecificationsService
     }
 
     /**
-     * @param VehicleRow $car
+     * @param DbTable\Item\Row $car
      * @param array $values
      * @param UserRow $user
      */
-    public function saveCarAttributes(VehicleRow $car, array $values, UserRow $user)
+    public function saveCarAttributes(DbTable\Item\Row $car, array $values, UserRow $user)
     {
         $vtTable = new \Application\Model\VehicleType();
         $vehicleTypeIds = $vtTable->getVehicleTypes($car->id);
@@ -1024,11 +1019,11 @@ class SpecificationsService
     private function getChildCarIds($parentId)
     {
         if (! isset($this->carChildsCache[$parentId])) {
-            $carParentTable = $this->getCarParentTable();
-            $db = $carParentTable->getAdapter();
+            $itemParentTable = $this->getCarParentTable();
+            $db = $itemParentTable->getAdapter();
             $this->carChildsCache[$parentId] = $db->fetchCol(
                 $db->select()
-                    ->from($carParentTable->info('name'), 'item_id')
+                    ->from($itemParentTable->info('name'), 'item_id')
                     ->where('parent_id = ?', $parentId)
             );
         }
@@ -1065,7 +1060,7 @@ class SpecificationsService
 
     private function specPicture($car, $perspectives)
     {
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
         $pictureTableAdapter = $pictureTable->getAdapter();
 
         $order = [];
@@ -1083,7 +1078,10 @@ class SpecificationsService
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->where('pictures.status in (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                ->where('pictures.status in (?)', [
+                    DbTable\Picture::STATUS_ACCEPTED,
+                    DbTable\Picture::STATUS_NEW
+                ])
                 ->order($order)
                 ->limit(1)
         );
@@ -1339,7 +1337,7 @@ class SpecificationsService
         $topPerspectives = [10, 1, 7, 8, 11, 12, 2, 4, 13, 5];
         $bottomPerspectives = [13, 2, 9, 6, 5];
 
-        $carTypeTable = new VehicleType();
+        $carTypeTable = new DbTable\Vehicle\Type();
         $attributeTable = $this->getAttributeTable();
         $itemParentLangaugeTable = new DbTable\Item\ParentLanguage();
 
@@ -1416,26 +1414,26 @@ class SpecificationsService
                 }
             }
 
-            $carParentName = null;
+            $itemParentName = null;
             if ($contextCarId) {
                 $db = $itemParentLangaugeTable->getAdapter();
-                
+
                 $langSortExpr = new Zend_Db_Expr(
                     $db->quoteInto('language = ? desc', $language)
                 );
-                
+
                 $itemParentLangRow = $itemParentLangaugeTable->fetchRow([
                     'item_id = ?'   => $car->id,
                     'parent_id = ?' => $contextCarId,
                     'length(name) > 0'
                 ], $langSortExpr);
-                
+
                 if ($itemParentLangRow) {
-                    $carParentName = $itemParentLangRow->name;
+                    $itemParentName = $itemParentLangRow->name;
                 }
             }
 
-            $name = $carParentName;
+            $name = $itemParentName;
             if (! $name) {
                 $name = $this->itemNameFormatter->format($car->getNameData($language), $language);
             }

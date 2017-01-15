@@ -112,7 +112,7 @@ class BrandNav
             $conceptsSeparatly ? '1' : '0',
             '9'
         ]);
-        
+
         $picturesTable = new DbTable\Picture;
         $picturesAdapter = $picturesTable->getAdapter();
 
@@ -122,7 +122,7 @@ class BrandNav
 
             if ($conceptsSeparatly) {
                 // concepts
-                $itemTable = new DbTable\Vehicle();
+                $itemTable = new DbTable\Item();
 
                 $db = $itemTable->getAdapter();
                 $select = $db->select()
@@ -240,7 +240,7 @@ class BrandNav
             $aliases[] = $brandAliasRow->name;
         }
 
-        $brandLangTable = new DbTable\Vehicle\Language();
+        $brandLangTable = new DbTable\Item\Language();
         $brandLangRows = $brandLangTable->fetchAll([
             'item_id = ?' => $brand['id']
         ]);
@@ -263,7 +263,7 @@ class BrandNav
 
     private function carSectionGroupsSelect($brandId, $itemTypeId, $carTypeId, $nullType, $conceptsSeparatly)
     {
-        $itemParentTable = new DbTable\Vehicle\ParentTable();
+        $itemParentTable = new DbTable\Item\ParentTable();
         $db = $itemParentTable->getAdapter();
 
         $select = $db->select()
@@ -363,8 +363,8 @@ class BrandNav
 
         $aliases = $this->getBrandAliases($brand);
 
-        $carLanguageTable = new DbTable\Vehicle\Language();
-        
+        $carLanguageTable = new DbTable\Item\Language();
+
         $langSortExpr = new Zend_Db_Expr(
             $db->quoteInto('language = ? desc', $language)
         );
@@ -489,7 +489,7 @@ class BrandNav
             $this->cache->setItem($cacheKey, $sections);
         }
 
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
 
         $selectedIds = [];
         if ($carId) {

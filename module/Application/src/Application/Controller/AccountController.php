@@ -16,7 +16,7 @@ use Application\Controller\LoginController;
 use Application\Model\DbTable\LoginState;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User\Account as UserAccount;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable\Item;
 use Application\Model\Forums;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
@@ -814,7 +814,7 @@ class AccountController extends AbstractActionController
         $paginator = $data['paginator'];
 
         $userTable = new User();
-        $itemTable = new Vehicle();
+        $itemTable = new Item();
 
         foreach ($conflicts as &$conflict) {
             foreach ($conflict['values'] as &$value) {

@@ -47,7 +47,7 @@ class IndexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $cars = new DbTable\Vehicle();
+        $cars = new DbTable\Item();
 
         $db = $cars->getAdapter();
 
@@ -151,7 +151,7 @@ class IndexController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
 
         $rows = $itemTable->getAdapter()->fetchAll("
             SELECT

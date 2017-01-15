@@ -11,7 +11,7 @@ use Zend_Db_Expr;
 class CatalogueGroupItem extends CatalogueItem
 {
     /**
-     * @var DbTable\Vehicle\Language
+     * @var DbTable\Item\Language
      */
     private $itemLanguageTable;
 
@@ -35,7 +35,7 @@ class CatalogueGroupItem extends CatalogueItem
     {
         parent::__construct($options);
 
-        $this->itemLanguageTable = new DbTable\Vehicle\Language();
+        $this->itemLanguageTable = new DbTable\Item\Language();
     }
 
     public function setLanguage($language)
@@ -100,11 +100,11 @@ class CatalogueGroupItem extends CatalogueItem
         return $this->itemParentRows[$itemId][$parentId];
     }
 
-    public function getDetailsUrl(DbTable\Vehicle\Row $item)
+    public function getDetailsUrl(DbTable\Item\Row $item)
     {
-        $carParentAdapter = $this->itemParentTable->getAdapter();
-        $hasChilds = (bool)$carParentAdapter->fetchOne(
-            $carParentAdapter->select()
+        $itemParentAdapter = $this->itemParentTable->getAdapter();
+        $hasChilds = (bool)$itemParentAdapter->fetchOne(
+            $itemParentAdapter->select()
                 ->from($this->itemParentTable->info('name'), new Zend_Db_Expr('1'))
                 ->where('parent_id = ?', $item->id)
         );
@@ -116,8 +116,8 @@ class CatalogueGroupItem extends CatalogueItem
         }
 
         // found parent row
-        $carParentRow = $this->getItemParentRow($item->id, $this->itemId);
-        if (! $carParentRow) {
+        $itemParentRow = $this->getItemParentRow($item->id, $this->itemId);
+        if (! $itemParentRow) {
             return null;
         }
 
@@ -126,18 +126,18 @@ class CatalogueGroupItem extends CatalogueItem
             'brand_catname' => $this->brand['catname'],
             'car_catname'   => $this->brandItemCatname,
             'path'          => array_merge($this->path, [
-                $carParentRow->catname
+                $itemParentRow->catname
             ])
         ], [
             'name' => 'catalogue'
         ]);
     }
 
-    public function getPicturesUrl(DbTable\Vehicle\Row $item)
+    public function getPicturesUrl(DbTable\Item\Row $item)
     {
         //TODO: more than 1 levels diff fails here
-        $carParentRow = $this->getItemParentRow($item->id, $this->itemId);
-        if (! $carParentRow) {
+        $itemParentRow = $this->getItemParentRow($item->id, $this->itemId);
+        if (! $itemParentRow) {
             return null;
         }
 
@@ -146,7 +146,7 @@ class CatalogueGroupItem extends CatalogueItem
             'brand_catname' => $this->brand['catname'],
             'car_catname'   => $this->brandItemCatname,
             'path'          => array_merge($this->path, [
-                $carParentRow->catname
+                $itemParentRow->catname
             ]),
             'exact'         => false
         ], [
@@ -154,17 +154,17 @@ class CatalogueGroupItem extends CatalogueItem
         ]);
     }
 
-    public function getSpecificationsUrl(DbTable\Vehicle\Row $item)
+    public function getSpecificationsUrl(DbTable\Item\Row $item)
     {
         if ($this->hasChildSpecs[$item->id]) {
-            $carParentRow = $this->getItemParentRow($item->id, $this->itemId);
-            if ($carParentRow) {
+            $itemParentRow = $this->getItemParentRow($item->id, $this->itemId);
+            if ($itemParentRow) {
                 return $this->router->assemble([
                     'action'        => 'brand-item-specifications',
                     'brand_catname' => $this->brand['catname'],
                     'car_catname'   => $this->brandItemCatname,
                     'path'          => array_merge($this->path, [
-                        $carParentRow->catname
+                        $itemParentRow->catname
                     ]),
                 ], [
                     'name' => 'catalogue'
@@ -177,11 +177,11 @@ class CatalogueGroupItem extends CatalogueItem
         }
 
         switch ($this->type) {
-            case DbTable\Vehicle\ParentTable::TYPE_TUNING:
+            case DbTable\Item\ParentTable::TYPE_TUNING:
                 $typeStr = 'tuning';
                 break;
 
-            case DbTable\Vehicle\ParentTable::TYPE_SPORT:
+            case DbTable\Item\ParentTable::TYPE_SPORT:
                 $typeStr = 'sport';
                 break;
 
@@ -201,13 +201,13 @@ class CatalogueGroupItem extends CatalogueItem
         ]);
     }
 
-    public function getTypeUrl(DbTable\Vehicle\Row $item, $type)
+    public function getTypeUrl(DbTable\Item\Row $item, $type)
     {
         switch ($type) {
-            case DbTable\Vehicle\ParentTable::TYPE_TUNING:
+            case DbTable\Item\ParentTable::TYPE_TUNING:
                 $catname = 'tuning';
                 break;
-            case DbTable\Vehicle\ParentTable::TYPE_SPORT:
+            case DbTable\Item\ParentTable::TYPE_SPORT:
                 $catname = 'sport';
                 break;
             default:
@@ -215,10 +215,10 @@ class CatalogueGroupItem extends CatalogueItem
                 break;
         }
 
-        $carParentRow = $this->getItemParentRow($item->id, $this->itemId);
-        if ($carParentRow) {
+        $itemParentRow = $this->getItemParentRow($item->id, $this->itemId);
+        if ($itemParentRow) {
             $currentPath = array_merge($this->path, [
-                $carParentRow->catname
+                $itemParentRow->catname
             ]);
         } else {
             $currentPath = $this->path;
@@ -236,11 +236,11 @@ class CatalogueGroupItem extends CatalogueItem
         ]);
     }
 
-    public function getPictureUrl(DbTable\Vehicle\Row $item, array $picture)
+    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
     {
         // found parent row
-        $carParentRow = $this->getItemParentRow($item->id, $this->itemId);
-        if (! $carParentRow) {
+        $itemParentRow = $this->getItemParentRow($item->id, $this->itemId);
+        if (! $itemParentRow) {
             return $this->picHelper->url($picture['identity']);
         }
 
@@ -249,7 +249,7 @@ class CatalogueGroupItem extends CatalogueItem
             'brand_catname' => $this->brand['catname'],
             'car_catname'   => $this->brandItemCatname,
             'path'          => array_merge($this->path, [
-                $carParentRow->catname
+                $itemParentRow->catname
             ]),
             'picture_id'    => $picture['identity']
         ], [

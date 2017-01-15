@@ -3,7 +3,6 @@
 namespace Application\Model\DbTable;
 
 use Application\Db\Table;
-use Application\Model\DbTable\Factory;
 
 class FactoryCar extends Table
 {
@@ -18,7 +17,7 @@ class FactoryCar extends Table
         ],
         'Car' => [
             'columns'       => ['item_id'],
-            'refTableClass' => \Application\Model\DbTable\Vehicle::class,
+            'refTableClass' => Item::class,
             'refColumns'    => ['id']
         ],
     ];

@@ -6,7 +6,7 @@ use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Application\Db\Table;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
+use Application\Model\DbTable;
 
 class CarSubscribe extends Table
 {
@@ -21,12 +21,12 @@ class CarSubscribe extends Table
         ],
         'Car' => [
             'columns'       => ['item_id'],
-            'refTableClass' => Application\Model\DbTable\Vehicle::class,
+            'refTableClass' => Application\Model\DbTable\Item::class,
             'refColumns'    => ['id']
         ]
     ];
 
-    public function subscribe(UserRow $user, VehicleRow $car)
+    public function subscribe(UserRow $user, DbTable\Item\Row $car)
     {
         $row = $this->fetchRow([
            'user_id = ?' => $user->id,
@@ -40,7 +40,7 @@ class CarSubscribe extends Table
         }
     }
 
-    public function unsubscribe(UserRow $user, VehicleRow $car)
+    public function unsubscribe(UserRow $user, DbTable\Item\Row $car)
     {
         $row = $this->fetchRow([
             'user_id = ?' => $user->id,
@@ -51,7 +51,7 @@ class CarSubscribe extends Table
         }
     }
 
-    public function getCarSubscribers(VehicleRow $car)
+    public function getCarSubscribers(DbTable\Item\Row $car)
     {
         $uTable = new User();
 

@@ -6,9 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Article;
-use Application\Model\DbTable\Article\BrandCache;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class ArticlesController extends AbstractActionController

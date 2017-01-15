@@ -383,29 +383,6 @@ return [
                 ],
             ],
         ],
-        'AddBrandForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-                'legend' => 'moder/brands/new/title',
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => 'BrandName',
-                        'name' => 'name'
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'name' => [
-                    'required'   => true,
-                    'validators' => [
-                        ['name' => Validator\Brand\NameNotExists::class]
-                    ]
-                ]
-            ]
-        ],
         'DescriptionForm' => [
             'type'     => 'Zend\Form\Form',
             'attributes'  => [

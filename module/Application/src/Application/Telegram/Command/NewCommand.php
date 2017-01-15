@@ -24,7 +24,7 @@ class NewCommand extends Command
     public function handle($arguments)
     {
         if ($arguments) {
-            $itemTable = new DbTable\Vehicle();
+            $itemTable = new DbTable\Item();
 
             $brandRow = $brandTable->fetchRow([
                 'name = ?'         => (string)$arguments,

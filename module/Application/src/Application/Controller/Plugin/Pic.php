@@ -118,8 +118,8 @@ class Pic extends AbstractPlugin
                 $carIds = $this->pictureItem->getPictureItems($row['id']);
                 if ($carIds) {
                     $carId = $carIds[0];
-                    $carParentTable = new DbTable\Vehicle\ParentTable();
-                    $paths = $carParentTable->getPaths($carId, [
+                    $itemParentTable = new DbTable\Item\ParentTable();
+                    $paths = $itemParentTable->getPaths($carId, [
                         'breakOnFirst' => true
                     ]);
 
@@ -138,9 +138,9 @@ class Pic extends AbstractPlugin
                             ]);
                         } else {
                             $perspectiveId = $this->pictureItem->getPerspective($row['id'], $carId);
-                            
+
                             switch ($perspectiveId) {
-                                case 22: 
+                                case 22:
                                     $action = 'logotypes-picture';
                                     break;
                                 case 25:
@@ -150,7 +150,7 @@ class Pic extends AbstractPlugin
                                     $action = 'other-picture';
                                     break;
                             }
-                            
+
                             $url = $controller->url()->fromRoute('catalogue', [
                                 'action'        => $action,
                                 'brand_catname' => $path['brand_catname'],
@@ -368,7 +368,7 @@ class Pic extends AbstractPlugin
             }
         }
 
-        $carParentTable = new DbTable\Vehicle\ParentTable();
+        $itemParentTable = new DbTable\Item\ParentTable();
 
         $items = [];
         foreach ($rows as $idx => $row) {
@@ -434,7 +434,7 @@ class Pic extends AbstractPlugin
 
         $itemTable = $catalogue->getItemTable();
         $factoryTable = new DbTable\Factory();
-        $itemLanguageTable = new DbTable\Vehicle\Language();
+        $itemLanguageTable = new DbTable\Item\Language();
 
         $db = $this->pictureTable->getAdapter();
 
@@ -497,7 +497,7 @@ class Pic extends AbstractPlugin
                         ->join('item_parent', 'item.id = item_parent.parent_id', [
                             'brand_item_catname' => 'catname'
                         ])
-                        ->where('item_parent.type = ?', DbTable\Vehicle\ParentTable::TYPE_DESIGN)
+                        ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DESIGN)
                         ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                         ->where('item_parent_cache.item_id = ?', $item->id)
                 );
@@ -981,13 +981,13 @@ class Pic extends AbstractPlugin
         );
 
         $modifications = [];
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
         foreach ($mRows as $mRow) {
             $url = null;
             $carRow = $itemTable->find($mRow->item_id)->current();
             if ($carRow) {
-                $carParentTable = new DbTable\Vehicle\ParentTable();
-                $paths = $carParentTable->getPaths($carRow->id, [
+                $itemParentTable = new DbTable\Item\ParentTable();
+                $paths = $itemParentTable->getPaths($carRow->id, [
                     'breakOnFirst' => true
                 ]);
                 if (count($paths) > 0) {
@@ -1075,7 +1075,7 @@ class Pic extends AbstractPlugin
             case DbTable\Picture::VEHICLE_TYPE_ID:
                 $carIds = $this->pictureItem->getPictureItems($picture['id']);
                 if ($carIds) {
-                    $vehicleTable = new DbTable\Vehicle();
+                    $vehicleTable = new DbTable\Item();
                     $brandModel = new BrandModel();
 
                     foreach ($vehicleTable->find($carIds) as $car) {
@@ -1303,7 +1303,7 @@ class Pic extends AbstractPlugin
                 'onlyWithArea' => true
             ]);
 
-            $itemTable = new DbTable\Vehicle();
+            $itemTable = new DbTable\Item();
 
             $areas = [];
             foreach ($itemsData as $pictureItem) {

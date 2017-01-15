@@ -79,7 +79,7 @@ class ListBuilder
         return $this->cataloguePaths[$id];
     }
 
-    public function getDetailsUrl(DbTable\Vehicle\Row $item)
+    public function getDetailsUrl(DbTable\Item\Row $item)
     {
         $cataloguePaths = $this->getCataloguePath($item);
 
@@ -98,12 +98,12 @@ class ListBuilder
         return null;
     }
 
-    public function getPicturesUrl(DbTable\Vehicle\Row $item)
+    public function getPicturesUrl(DbTable\Item\Row $item)
     {
         return null;
     }
 
-    public function getSpecificationsUrl(DbTable\Vehicle\Row $item)
+    public function getSpecificationsUrl(DbTable\Item\Row $item)
     {
         foreach ($this->getCataloguePath($item) as $path) {
             return $this->router->assemble([
@@ -120,12 +120,12 @@ class ListBuilder
         return null;
     }
 
-    public function getTypeUrl(DbTable\Vehicle\Row $item, $type)
+    public function getTypeUrl(DbTable\Item\Row $item, $type)
     {
         return null;
     }
 
-    public function getPictureUrl(DbTable\Vehicle\Row $item, array $picture)
+    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
     {
         return $this->picHelper->href($picture);
     }

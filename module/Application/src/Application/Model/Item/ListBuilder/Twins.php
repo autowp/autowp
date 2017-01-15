@@ -16,7 +16,7 @@ class Twins extends ListBuilder
         return $this;
     }
 
-    public function getPictureUrl(DbTable\Vehicle\Row $item, array $picture)
+    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
     {
         return $this->router->assemble([
             'id'         => $this->group['id'],
