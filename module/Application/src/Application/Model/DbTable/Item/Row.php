@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Model\DbTable\Vehicle;
+namespace Application\Model\DbTable\Item;
 
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
@@ -33,7 +33,7 @@ class Row extends \Application\Db\Table\Row
             throw new Exception('`language` is not string');
         }
 
-        $carLangTable = new DbTable\Vehicle\Language();
+        $carLangTable = new DbTable\Item\Language();
         $carLangRow = $carLangTable->fetchRow([
             'item_id = ?'  => $this->id,
             'language = ?' => (string)$language
@@ -86,7 +86,7 @@ class Row extends \Application\Db\Table\Row
                     ->where('item_parent_cache.parent_id = ?', $this->id)
                     ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
                     ->where('pictures.status IN (?)', [
-                        DbTable\Picture::STATUS_ACCEPTED, 
+                        DbTable\Picture::STATUS_ACCEPTED,
                         DbTable\Picture::STATUS_NEW
                     ])
                     ->order([
@@ -119,7 +119,7 @@ class Row extends \Application\Db\Table\Row
                     ->where('item_parent_cache.parent_id = ?', $this->id)
                     ->where('not item_parent_cache.sport and not item_parent_cache.tuning')
                     ->where('pictures.status IN (?)', [
-                        DbTable\Picture::STATUS_ACCEPTED, 
+                        DbTable\Picture::STATUS_ACCEPTED,
                         DbTable\Picture::STATUS_NEW
                     ])
                     ->limit(1);

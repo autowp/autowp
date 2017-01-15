@@ -11,10 +11,6 @@ use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
 use Application\Model\Comments;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Model\PictureItem;
 use Application\Service\TelegramService;
 
@@ -28,9 +24,9 @@ use Exception;
 class UploadController extends AbstractActionController
 {
     /**
-     * @var VehicleParent
+     * @var DbTable\Item\ParentTable
      */
-    private $carParentTable;
+    private $itemParentTable;
 
     private $partial;
 
@@ -56,9 +52,9 @@ class UploadController extends AbstractActionController
 
     private function getCarParentTable()
     {
-        return $this->carParentTable
-            ? $this->carParentTable
-            : $this->carParentTable = new VehicleParent();
+        return $this->itemParentTable
+            ? $this->itemParentTable
+            : $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     public function onlyRegisteredAction()
@@ -74,7 +70,7 @@ class UploadController extends AbstractActionController
                 'action' => 'only-registered'
             ]);
         }
-        
+
         $pictureTable = $this->catalogue()->getPictureTable();
 
         $replace = $this->params('replace');
@@ -84,7 +80,7 @@ class UploadController extends AbstractActionController
                 'identity = ?' => $replace
             ]);
         }
-        
+
         $perspectiveId = null;
 
         if ($replacePicture) {
@@ -100,8 +96,8 @@ class UploadController extends AbstractActionController
         $selected = false;
         $selectedName = null;
         switch ($type) {
-            case Picture::VEHICLE_TYPE_ID:
-                $cars = new Vehicle();
+            case DbTable\Picture::VEHICLE_TYPE_ID:
+                $cars = new DbTable\Item();
                 $cars = $cars->find($carIds);
                 $names = [];
                 foreach ($cars as $car) {
@@ -201,11 +197,11 @@ class UploadController extends AbstractActionController
         $user = $this->user()->get();
 
         $values = $form->getData();
-        
+
         $perspectiveId = null;
 
         switch ($type) {
-            case Picture::VEHICLE_TYPE_ID:
+            case DbTable\Picture::VEHICLE_TYPE_ID:
                 break;
 
             default:
@@ -267,7 +263,7 @@ class UploadController extends AbstractActionController
                 'owner_id'      => $user ? $user->id : null,
                 'add_date'      => new Zend_Db_Expr('NOW()'),
                 'filesize'      => $fileSize,
-                'status'        => Picture::STATUS_INBOX,
+                'status'        => DbTable\Picture::STATUS_INBOX,
                 'type'          => $type,
                 'removing_date' => null,
                 //'brand_id'      => $brandId ? $brandId : null,
@@ -285,7 +281,7 @@ class UploadController extends AbstractActionController
                     ]);
                 }
             }
-            
+
             // increment uploads counter
             if ($user) {
                 $user->pictures_added = new Zend_Db_Expr('pictures_added+1');
@@ -299,9 +295,9 @@ class UploadController extends AbstractActionController
 
             // recalculate chached counts
             switch ($picture->type) {
-                case Picture::VEHICLE_TYPE_ID:
+                case DbTable\Picture::VEHICLE_TYPE_ID:
                     $carIds = $this->pictureItem->getPictureItems($picture->id);
-                    $itemTable = new Vehicle();
+                    $itemTable = new DbTable\Item();
                     $brandModel = new BrandModel();
                     //TODO: prevent double refresh
                     foreach ($itemTable->find($carIds) as $car) {
@@ -315,13 +311,13 @@ class UploadController extends AbstractActionController
             if ($values['note']) {
                 $commentTable = new Comments();
                 $commentTable->add([
-                    'typeId'             => CommentMessage::PICTURES_TYPE_ID,
+                    'typeId'             => DbTable\Comment\Message::PICTURES_TYPE_ID,
                     'itemId'             => $picture->id,
                     'parentId'           => null,
                     'authorId'           => $user->id,
                     'message'            => $values['note'],
                     'ip'                 => $this->getRequest()->getServer('REMOTE_ADDR'),
-                    'moderatorAttention' => CommentMessage::MODERATOR_ATTENTION_NONE
+                    'moderatorAttention' => DbTable\Comment\Message::MODERATOR_ATTENTION_NONE
                 ]);
             }
 
@@ -388,7 +384,7 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $haveConcepts = (bool)$itemTable->fetchRow(
             $itemTable->select(true)
@@ -483,14 +479,14 @@ class UploadController extends AbstractActionController
 
     private function prepareCars($rows)
     {
-        $carParentTable = $this->getCarParentTable();
-        $carParentAdapter = $carParentTable->getAdapter();
+        $itemParentTable = $this->getCarParentTable();
+        $itemParentAdapter = $itemParentTable->getAdapter();
 
         $cars = [];
         foreach ($rows as $row) {
-            $haveChilds = (bool)$carParentAdapter->fetchOne(
-                $carParentAdapter->select()
-                    ->from($carParentTable->info('name'), new Zend_Db_Expr('1'))
+            $haveChilds = (bool)$itemParentAdapter->fetchOne(
+                $itemParentAdapter->select()
+                    ->from($itemParentTable->info('name'), new Zend_Db_Expr('1'))
                     ->where('parent_id = ?', $row['id'])
             );
             $cars[] = [
@@ -505,7 +501,7 @@ class UploadController extends AbstractActionController
                 'today'            => $row['today'],
                 'url'  => $this->url()->fromRoute('upload/params', [
                     'action'  => 'index',
-                    'type'    => Picture::VEHICLE_TYPE_ID,
+                    'type'    => DbTable\Picture::VEHICLE_TYPE_ID,
                     'item_id' => $row['id']
                 ], [], true),
                 'haveChilds' => $haveChilds,
@@ -523,14 +519,14 @@ class UploadController extends AbstractActionController
 
     private function prepareCarParentRows($rows)
     {
-        $carParentTable = $this->getCarParentTable();
-        $carParentAdapter = $carParentTable->getAdapter();
+        $itemParentTable = $this->getCarParentTable();
+        $itemParentAdapter = $itemParentTable->getAdapter();
 
         $items = [];
         foreach ($rows as $row) {
-            $haveChilds = (bool)$carParentAdapter->fetchOne(
-                $carParentAdapter->select()
-                    ->from($carParentTable->info('name'), new Zend_Db_Expr('1'))
+            $haveChilds = (bool)$itemParentAdapter->fetchOne(
+                $itemParentAdapter->select()
+                    ->from($itemParentTable->info('name'), new Zend_Db_Expr('1'))
                     ->where('parent_id = ?', $row['id'])
             );
             $items[] = [
@@ -545,7 +541,7 @@ class UploadController extends AbstractActionController
                 'today'            => $row['today'],
                 'url'  => $this->url()->fromRoute('upload/params', [
                     'action'  => 'index',
-                    'type'    => Picture::VEHICLE_TYPE_ID,
+                    'type'    => DbTable\Picture::VEHICLE_TYPE_ID,
                     'item_id' => $row['id']
                 ], [], true),
                 'haveChilds' => $haveChilds,
@@ -570,7 +566,7 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
@@ -679,7 +675,7 @@ class UploadController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        if ($picture->status != Picture::STATUS_INBOX) {
+        if ($picture->status != DbTable\Picture::STATUS_INBOX) {
             return $this->forbiddenAction();
         }
 

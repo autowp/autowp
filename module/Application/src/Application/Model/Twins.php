@@ -16,7 +16,7 @@ class Twins
     private $pictureTable;
 
     /**
-     * @var DbTable\Vehicle
+     * @var DbTable\Item
      */
     private $itemTable;
 
@@ -31,13 +31,13 @@ class Twins
     }
 
     /**
-     * @return DbTable\Vehicle
+     * @return DbTable\Item
      */
     private function getItemTable()
     {
         return $this->itemTable
             ? $this->itemTable
-            : $this->itemTable = new DbTable\Vehicle();
+            : $this->itemTable = new DbTable\Item();
     }
 
     /**
@@ -205,7 +205,7 @@ class Twins
 
     /**
      * @param int $groupId
-     * @return DbTable\Vehicle\Row[]
+     * @return DbTable\Item\Row[]
      */
     public function getGroupCars($groupId)
     {

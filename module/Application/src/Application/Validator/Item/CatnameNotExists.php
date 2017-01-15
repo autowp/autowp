@@ -27,7 +27,7 @@ class CatnameNotExists extends AbstractValidator
     {
         $this->setValue($value);
 
-        $table = new DbTable\Vehicle();
+        $table = new DbTable\Item();
         $row = $table->fetchRow([
             'catname = ?' => (string)$value,
             'id <> ?'     => (int)$this->exclude

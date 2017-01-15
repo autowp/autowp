@@ -8,12 +8,12 @@ use Application\Db\Table;
 
 use Zend_Db_Expr;
 
-class Vehicle extends Table
+class Item extends Table
 {
     const MAX_NAME = 100;
 
     protected $_name = 'item';
-    protected $_rowClass = Vehicle\Row::class;
+    protected $_rowClass = Item\Row::class;
     protected $_referenceMap = [
         'Type' => [
             'columns'       => ['car_type_id'],
@@ -47,7 +47,7 @@ class Vehicle extends Table
         return parent::insert($data);
     }
 
-    public function updateInteritance(Vehicle\Row $car)
+    public function updateInteritance(Item\Row $car)
     {
         $parents = $this->fetchAll(
             $this->select(true)
@@ -117,7 +117,7 @@ class Vehicle extends Table
                 }
             }
 
-            $carTypeParentTable = new \Application\Model\DbTable\Vehicle\TypeParent();
+            $carTypeParentTable = new Vehicle\TypeParent();
             $carTypeParentTableName = $carTypeParentTable->info('name');
             $db = $carTypeParentTable->getAdapter();
             foreach ($map as $id => $count) {

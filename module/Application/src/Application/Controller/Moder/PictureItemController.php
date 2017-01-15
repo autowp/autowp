@@ -9,7 +9,7 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Picture\Row as PictureRow;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable\Item;
 use Application\Model\PictureItem;
 
 class PictureItemController extends AbstractActionController
@@ -25,7 +25,7 @@ class PictureItemController extends AbstractActionController
     private $pictureItem;
 
     /**
-     * @var Vehicle
+     * @var Item
      */
     private $itemTable;
 
@@ -35,7 +35,7 @@ class PictureItemController extends AbstractActionController
     ) {
         $this->pictureItem = $pictureItem;
         $this->pictureTable = $pictureTable;
-        $this->itemTable = new Vehicle();
+        $this->itemTable = new Item();
     }
 
     private function getPictureUrl(PictureRow $picture, $forceCanonical = false, $uri = null)

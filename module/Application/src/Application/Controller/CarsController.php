@@ -14,9 +14,6 @@ use Application\Model\Message;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
-use Application\Model\DbTable\User\CarSubscribe as UserCarSubscribe;
-use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
@@ -55,7 +52,7 @@ class CarsController extends AbstractActionController
         $this->message = $message;
     }
 
-    private function carModerUrl(VehicleRow $car, $uri = null)
+    private function carModerUrl(DbTable\Item\Row $car, $uri = null)
     {
         return $this->url()->fromRoute('moder/cars/params', [
             'action'  => 'car',
@@ -83,7 +80,7 @@ class CarsController extends AbstractActionController
 
         $editOnlyMode = $this->user()->get()->specs_weight < 0.10;
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $car = $itemTable->fetchRow([
             'id = ?' => (int)$this->params('item_id'),
@@ -232,7 +229,7 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
@@ -256,7 +253,7 @@ class CarsController extends AbstractActionController
             return $this->forward('forbidden', 'error');
         }
 
-        //$itemTable = new Vehicle();
+        //$itemTable = new DbTable\Item();
         $itemId = (int)$this->params('item_id');
 
         $toItemId = (int)$this->params('to_item_id');
@@ -335,7 +332,7 @@ class CarsController extends AbstractActionController
 
     public function specsAdminAction()
     {
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         if (! $this->user()->isAllowed('specifications', 'admin')) {
             return $this->forward('forbidden', 'error');
@@ -456,7 +453,7 @@ class CarsController extends AbstractActionController
 
         $items = [];
 
-        $cars = new Vehicle();
+        $cars = new DbTable\Item();
 
         $isModerator = $this->user()->inheritsRole('moder');
 
@@ -538,14 +535,14 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
             return $this->notFoundAction();
         }
 
-        $engine = $car->findParentRow(Vehicle::class, 'Engine');
+        $engine = $car->findParentRow(DbTable\Item::class, 'Engine');
         $car->engine_inherit = 0;
         $car->engine_item_id = null;
         $car->save();
@@ -563,7 +560,7 @@ class CarsController extends AbstractActionController
             $this->log($message, $car);
 
             $user = $this->user()->get();
-            $ucsTable = new UserCarSubscribe();
+            $ucsTable = new DbTable\User\CarSubscribe();
 
             foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
@@ -595,7 +592,7 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {
@@ -618,7 +615,7 @@ class CarsController extends AbstractActionController
             $this->log($message, $car);
 
             $user = $this->user()->get();
-            $ucsTable = new UserCarSubscribe();
+            $ucsTable = new DbTable\User\CarSubscribe();
 
             foreach ($ucsTable->getCarSubscribers($car) as $subscriber) {
                 if ($subscriber && ($subscriber->id != $user->id)) {
@@ -645,7 +642,7 @@ class CarsController extends AbstractActionController
 
     private function enginesWalkTree($parentId, $brandId)
     {
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
         $select = $itemTable->select(true)
             ->where('item.item_type_id = ?', DbTable\Item\Type::ENGINE)
             ->order('item.name');
@@ -684,7 +681,7 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $car = $itemTable->fetchRow([
             'id = ?'           => (int)$this->params('item_id'),
@@ -739,7 +736,7 @@ class CarsController extends AbstractActionController
         $this->specsService->updateActualValues($car->id);
 
         $user = $this->user()->get();
-        $ucsTable = new UserCarSubscribe();
+        $ucsTable = new DbTable\User\CarSubscribe();
 
         $message = sprintf(
             'Автомобилю %s назначен двигатель %s',
@@ -773,7 +770,7 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $car = $itemTable->find($this->params('item_id'))->current();
         if (! $car) {

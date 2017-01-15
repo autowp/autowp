@@ -3,7 +3,6 @@
 namespace Application\Model\DbTable\Vehicle;
 
 use Application\Db\Table;
-use Application\Model\DbTable\Vehicle\Type as VehicleType;
 
 class TypeParent extends Table
 {
@@ -13,12 +12,12 @@ class TypeParent extends Table
     {
         $this->delete([]);
 
-        $table = new VehicleType();
+        $table = new Type();
 
         $this->rebuildStep($table, [0], 0);
     }
 
-    private function rebuildStep(VehicleType $table, $id, $level)
+    private function rebuildStep(Type $table, $id, $level)
     {
         $select = $table->select()
             ->from($table, 'id');

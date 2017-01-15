@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Model\DbTable\Vehicle;
+namespace Application\Model\DbTable\Item;
 
 use Application\Db\Table;
 
@@ -12,7 +12,7 @@ class Language extends Table
     protected $_referenceMap = [
         'Car' => [
             'columns'       => ['item_id'],
-            'refTableClass' => \Application\Model\DbTable\Vehicle::class,
+            'refTableClass' => \Application\Model\DbTable\Item::class,
             'refColumns'    => ['id']
         ],
     ];

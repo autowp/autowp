@@ -25,7 +25,7 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
      * @var DbTable\Vehicle\Type
      */
     private $carTypeTable = null;
-    
+
     private $itemType = null;
 
     public function __construct($name = null, $options = [])
@@ -160,19 +160,19 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
                 ],
             ],
         ];
-        
+
         if ($this->itemType != DbTable\Item\Type::BRAND) {
             unset($elements['full_name']);
         }
-        
+
         if (! in_array($this->itemType, [DbTable\Item\Type::CATEGORY, DbTable\Item\Type::BRAND])) {
             unset($elements['catname']);
         }
-        
+
         if (! in_array($this->itemType, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::TWINS])) {
             unset($elements['vehicle_type_id']);
         }
-        
+
         if (! in_array($this->itemType, [DbTable\Item\Type::VEHICLE, DbTable\Item\Type::ENGINE])) {
             unset($elements['is_group']);
             unset($elements['is_concept']);
@@ -222,7 +222,7 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
             $this->specOptions = $options['specOptions'];
             unset($options['specOptions']);
         }
-        
+
         if (isset($options['itemType'])) {
             $this->itemType = $options['itemType'];
             unset($options['itemType']);

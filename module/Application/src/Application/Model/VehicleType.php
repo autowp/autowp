@@ -2,32 +2,30 @@
 
 namespace Application\Model;
 
-use Application\Model\DbTable\Vehicle as VehicleTable;
-use Application\Model\DbTable\Vehicle\Type as VehicleTypeTable;
-use Application\Model\DbTable\Vehicle\VehicleType as VehicleVehicleTypeTable;
+use Application\Model\DbTable;
 
 class VehicleType
 {
     /**
-     * @var VehicleTable
+     * @var DbTable\Item
      */
     private $vehicleTable;
 
     /**
-     * @var VehicleTypeTable
+     * @var DbTable\Vehicle\Type
      */
     private $vehicleTypeTable;
 
     /**
-     * @var VehicleVehicleTypeTable
+     * @var DbTable\Vehicle\VehicleType
      */
     private $vehicleVehicleTypeTable;
 
     public function __construct()
     {
-        $this->vehicleTable = new VehicleTable();
-        $this->vehicleTypeTable = new VehicleTypeTable();
-        $this->vehicleVehicleTypeTable = new VehicleVehicleTypeTable();
+        $this->vehicleTable = new DbTable\Item();
+        $this->vehicleTypeTable = new DbTable\Vehicle\Type();
+        $this->vehicleVehicleTypeTable = new DbTable\Vehicle\VehicleType();
     }
 
     public function setVehicleTypes($vehicleId, array $types)

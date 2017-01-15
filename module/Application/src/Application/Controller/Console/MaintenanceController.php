@@ -9,7 +9,7 @@ use Zend\Session\SessionManager;
 
 use Application\Model\Comments;
 use Application\Model\DbTable\Category\ParentTable as CategoryParent;
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable\Item;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Exception;
@@ -98,7 +98,7 @@ class MaintenanceController extends AbstractActionController
     {
         $console = Console::getInstance();
 
-        $itemTable = new Vehicle();
+        $itemTable = new Item();
 
         $select = $itemTable->select(true)
             ->order('id');

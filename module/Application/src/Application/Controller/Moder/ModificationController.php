@@ -5,16 +5,13 @@ namespace Application\Controller\Moder;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Form\Modification as ModificationForm;
-use Application\Model\DbTable\CombinationModification;
-use Application\Model\DbTable\Modification as ModificationTable;
-use Application\Model\DbTable\Modification\Group as ModificationGroup;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
+use Application\Model\DbTable;
 use Application\Model\Modification;
 
 class ModificationController extends AbstractActionController
 {
     /**
-     * @param VehicleRow $car
+     * @param DbTable\Item\Row $car
      * @return string
      */
     private function carModerUrl($carId, $full = false, $tab = null)
@@ -31,7 +28,7 @@ class ModificationController extends AbstractActionController
     }
 
     /**
-     * @param VehicleRow $car
+     * @param DbTable\Item\Row $car
      * @return void
      */
     private function redirectToCar($carId, $tab = null)
@@ -52,8 +49,8 @@ class ModificationController extends AbstractActionController
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $mTable = new ModificationTable();
-        $mgTable = new ModificationGroup();
+        $mTable = new DbTable\Modification();
+        $mgTable = new DbTable\Modification\Group();
 
         $groupOptions = [
             '' => 'без группы'
@@ -135,14 +132,14 @@ class ModificationController extends AbstractActionController
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $mTable = new ModificationTable();
+        $mTable = new DbTable\Modification();
 
         $mRow = $mTable->find($this->getParam('modification_id'))->current();
         if (! $mRow) {
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $mgTable = new ModificationGroup();
+        $mgTable = new DbTable\Modification\Group();
 
         $groupOptions = [
             '' => 'без группы'
@@ -237,7 +234,7 @@ class ModificationController extends AbstractActionController
             return $this->_forward('notfound', 'error', 'default');
         }
 
-        $mgTable = new ModificationGroup();
+        $mgTable = new DbTable\Modification\Group();
 
         $mgRows = $mgTable->fetchAll(
             $mgTable->select(true)
@@ -247,7 +244,7 @@ class ModificationController extends AbstractActionController
                 ->group('modification_group.id')
         );
 
-        $mTable = new ModificationTable();
+        $mTable = new DbTable\Modification();
         $db = $mTable->getAdapter();
 
         $names = $db->fetchPairs(
@@ -274,7 +271,7 @@ class ModificationController extends AbstractActionController
         $combinations = $this->groupCombinations($map);
 
         // get selected combinations
-        $combModTable = new CombinationModification();
+        $combModTable = new DbTable\CombinationModification();
         $db = $combModTable->getAdapter();
         $combModRows = $db->fetchAll(
             $db->select(true)

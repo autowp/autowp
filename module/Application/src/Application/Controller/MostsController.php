@@ -6,8 +6,6 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
 use Application\Model\DbTable;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
 
@@ -79,13 +77,13 @@ class MostsController extends AbstractActionController
         $imageStorage = $this->imageStorage();
         $imagesInfo = $imageStorage->getFormatedImages($formatRequests, 'picture-thumb');
 
-        $pictureTable = new Picture();
+        $pictureTable = new DbTable\Picture();
         $names = $pictureTable->getNameData($allPictures, [
             'language' => $language
         ]);
 
-        $carParentTable = new VehicleParent();
-        $itemLanguageTable = new DbTable\Vehicle\Language();
+        $itemParentTable = new DbTable\Item\ParentTable();
+        $itemLanguageTable = new DbTable\Item\Language();
 
         $idx = 0;
         foreach ($data['carList']['cars'] as &$car) {
@@ -113,7 +111,7 @@ class MostsController extends AbstractActionController
 
             $pictures = [];
 
-            $paths = $carParentTable->getPaths($car['car']['id'], [
+            $paths = $itemParentTable->getPaths($car['car']['id'], [
                 'breakOnFirst' => true
             ]);
 

@@ -71,7 +71,7 @@ class Catalogue implements RouteInterface
             return false;
         }
 
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
         $brand = $itemTable->fetchRow([
             'catname = ?'      => $path[0],
             'item_type_id = ?' => DbTable\Item\Type::BRAND
@@ -338,8 +338,8 @@ class Catalogue implements RouteInterface
                 return false;
                 break;
         }
-        
-        $itemParentTable = new DbTable\Vehicle\ParentTable();
+
+        $itemParentTable = new DbTable\Item\ParentTable();
 
         $brandItemRow = $itemParentTable->fetchRow([
             'parent_id = ?' => $brand->id,
@@ -363,19 +363,19 @@ class Catalogue implements RouteInterface
 
             $currentCarId = $brandItemRow->item_id;
             while ($path) {
-                $carParentRow = $itemParentTable->fetchRow([
+                $itemParentRow = $itemParentTable->fetchRow([
                     'parent_id = ?' => $currentCarId,
                     'catname = ?'   => $path[0]
                 ]);
 
-                if (! $carParentRow) {
+                if (! $itemParentRow) {
                     break;
                 }
 
                 array_shift($path);
-                $treePath[] = $carParentRow->catname;
+                $treePath[] = $itemParentRow->catname;
 
-                $currentCarId = $carParentRow->item_id;
+                $currentCarId = $itemParentRow->item_id;
             }
 
             if (! $path) {

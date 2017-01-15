@@ -6,7 +6,6 @@ use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
 use Application\Model\DbTable;
-use Application\Model\DbTable\Vehicle\Type as VehicleType;
 
 use Autowp\ZFComponents\Filter\SingleSpaces;
 use Autowp\ZFComponents\Filter\FilenameSafe;
@@ -28,7 +27,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
     private $itemType = null;
 
     /**
-     * @var VehicleType
+     * @var DbTable\Vehicle\Type
      */
     private $carTypeTable = null;
 
@@ -171,7 +170,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
                 ],
             ],
         ];
-        
+
         if ($this->itemType != DbTable\Item\Type::BRAND) {
             unset($elements['full_name']);
         }
@@ -310,13 +309,13 @@ class CarOrganize extends Form implements InputFilterProviderInterface
     }
 
     /**
-     * @return VehicleType
+     * @return DbTable\Vehicle\Type
      */
     private function getCarTypeTable()
     {
         return $this->carTypeTable
-        ? $this->carTypeTable
-        : $this->carTypeTable = new VehicleType();
+            ? $this->carTypeTable
+            : $this->carTypeTable = new DbTable\Vehicle\Type();
     }
 
     private function getCarTypeOptions($parentId = null)

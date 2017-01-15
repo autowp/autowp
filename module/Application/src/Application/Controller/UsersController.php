@@ -272,7 +272,7 @@ class UsersController extends AbstractActionController
     public function onlineAction()
     {
         $userTable = new User();
-        
+
         $now = new DateTime();
         $now->setTimezone(new DateTimeZone(MYSQL_TIMEZONE));
         $now->sub(new DateInterval('PT5M'));
@@ -281,9 +281,9 @@ class UsersController extends AbstractActionController
             'users' => $userTable->fetchAll(
                 $userTable->select(true)
                     ->where('last_online >= ?', $now->format(MYSQL_DATETIME_FORMAT))
-                    //->join('session', 'users.id = session.user_id', null)
-                    //->where('session.modified >= ?', time() - 5 * 60)
-                    //->group('users.id')
+                //->join('session', 'users.id = session.user_id', null)
+                //->where('session.modified >= ?', time() - 5 * 60)
+                //->group('users.id')
             )
         ]);
         $viewModel->setTerminal($this->getRequest()->isXmlHttpRequest());
@@ -294,7 +294,7 @@ class UsersController extends AbstractActionController
     private function specsRating()
     {
         $userTable = new User();
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
 
         $select = $userTable->select(true)
             ->where('not deleted')
@@ -375,7 +375,7 @@ class UsersController extends AbstractActionController
     private function picturesRating()
     {
         $userTable = new User();
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
 
         $select = $userTable->select(true)
             ->where('not deleted')

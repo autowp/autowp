@@ -43,9 +43,8 @@ class Row extends \Application\Db\Table\Row
         $filenameFilter = new FilenameSafe();
 
         switch ($this->type) {
-
             case DbTable\Picture::VEHICLE_TYPE_ID:
-                $itemTable = new DbTable\Vehicle();
+                $itemTable = new DbTable\Item();
                 $cars = $itemTable->fetchAll(
                     $itemTable->select(true)
                         ->join('picture_item', 'item.id = picture_item.item_id', null)

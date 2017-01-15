@@ -12,7 +12,7 @@ class BrandAlias extends Zend_Db_Table
     protected $_referenceMap = [
         'Item' => [
             'columns'       => ['item_id'],
-            'refTableClass' => Vehicle::class,
+            'refTableClass' => Item::class,
             'refColumns'    => ['id']
         ],
     ];

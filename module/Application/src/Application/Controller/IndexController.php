@@ -9,10 +9,6 @@ use Autowp\User\Model\DbTable\User;
 use Application\Model\CarOfDay;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Perspective\Group as PerspectiveGroup;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
 use Application\Model\Twins;
 use Application\Service\SpecificationsService;
 use Application\ItemNameFormatter;
@@ -29,7 +25,7 @@ class IndexController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var VehicleParent
+     * @var DbTable\Item\ParentTable
      */
     private $vehicleParentTable;
 
@@ -56,18 +52,18 @@ class IndexController extends AbstractActionController
     }
 
     /**
-     * @return VehicleParent
+     * @return DbTable\Item\ParentTable
      */
     private function getVehicleParentTable()
     {
         return $this->vehicleParentTable
             ? $this->vehicleParentTable
-            : $this->vehicleParentTable = new VehicleParent();
+            : $this->vehicleParentTable = new DbTable\Item\ParentTable();
     }
 
     private function getOrientedPictureList($car)
     {
-        $perspectivesGroups = new PerspectiveGroup();
+        $perspectivesGroups = new DbTable\Perspective\Group();
 
         $db = $perspectivesGroups->getAdapter();
         $perspectivesGroupIds = $db->fetchCol(
@@ -88,7 +84,10 @@ class IndexController extends AbstractActionController
 
             $select = $pTable->select(true)
                 ->where('mp.group_id = ?', $groupId)
-                ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                ->where('pictures.status IN (?)', [
+                    DbTable\Picture::STATUS_ACCEPTED,
+                    DbTable\Picture::STATUS_NEW
+                ])
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
@@ -140,7 +139,10 @@ class IndexController extends AbstractActionController
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->where('pictures.status IN (?)', [Picture::STATUS_ACCEPTED, Picture::STATUS_NEW])
+                ->where('pictures.status IN (?)', [
+                    DbTable\Picture::STATUS_ACCEPTED,
+                    DbTable\Picture::STATUS_NEW
+                ])
                 //->order('ratio DESC')
                 ->limit(count($left));
 
@@ -157,7 +159,7 @@ class IndexController extends AbstractActionController
         return $pictures;
     }
 
-    private function carLinks(VehicleRow $car)
+    private function carLinks(DbTable\Item\Row $car)
     {
         $items = [];
 
@@ -170,7 +172,10 @@ class IndexController extends AbstractActionController
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                 ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+                ->where('pictures.status IN (?)', [
+                    DbTable\Picture::STATUS_NEW,
+                    DbTable\Picture::STATUS_ACCEPTED
+                ])
         );
 
         $language = $this->language();
@@ -427,9 +432,9 @@ class IndexController extends AbstractActionController
                         'language' => $language
                     ]);
 
-                    $carParentTable = new VehicleParent();
+                    $itemParentTable = new DbTable\Item\ParentTable();
 
-                    $paths = $carParentTable->getPaths($carOfDay->id, [
+                    $paths = $itemParentTable->getPaths($carOfDay->id, [
                         'breakOnFirst' => true
                     ]);
 
@@ -545,7 +550,7 @@ class IndexController extends AbstractActionController
 
         $select = $pictures->select(true)
             ->where('pictures.accept_datetime > DATE_SUB(CURDATE(), INTERVAL 3 DAY)')
-            ->where('pictures.status = ?', Picture::STATUS_ACCEPTED)
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
             ->order(['pictures.accept_datetime DESC', 'pictures.id DESC'])
             ->limit(6);
 
@@ -558,7 +563,7 @@ class IndexController extends AbstractActionController
         $destinations = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
             $categoryAdapter = $itemTable->getAdapter();
-            $itemLangTable = new DbTable\Vehicle\Language();
+            $itemLangTable = new DbTable\Item\Language();
 
             $expr = 'COUNT(IF(item_parent.timestamp > DATE_SUB(NOW(), INTERVAL 7 DAY), 1, NULL))';
 

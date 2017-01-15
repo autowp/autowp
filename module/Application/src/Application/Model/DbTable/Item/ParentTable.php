@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Model\DbTable\Vehicle;
+namespace Application\Model\DbTable\Item;
 
 use Application\Db\Table;
 use Application\Model\DbTable;
@@ -15,12 +15,12 @@ class ParentTable extends Table
     protected $_referenceMap = [
         'Car' => [
             'columns'       => ['item_id'],
-            'refTableClass' => DbTable\Vehicle::class,
+            'refTableClass' => DbTable\Item::class,
             'refColumns'    => ['id']
         ],
         'Parent' => [
             'columns'       => ['parent_id'],
-            'refTableClass' => DbTable\Vehicle::class,
+            'refTableClass' => DbTable\Item::class,
             'refColumns'    => ['id']
         ],
     ];
@@ -30,7 +30,7 @@ class ParentTable extends Table
         TYPE_TUNING = 1,
         TYPE_SPORT = 2,
         TYPE_DESIGN = 3;
-    
+
     const MAX_CATNAME = 70;
 
     public function collectChildIds($id)
@@ -141,14 +141,14 @@ class ParentTable extends Table
         $db = $this->getAdapter();
 
         $result = [];
-        
+
         $brand = $db->fetchRow(
             $db->select()
                 ->from('item', ['catname'])
                 ->where('item_type_id = ?', DbTable\Item\Type::BRAND)
                 ->where('id = ?', $carId)
         );
-        
+
         if ($brand) {
             $result[] = [
                 'brand_catname' => $brand['catname'],
@@ -156,7 +156,7 @@ class ParentTable extends Table
                 'path'          => []
             ];
         }
-        
+
         if ($breakOnFirst && count($result)) {
             return $result;
         }
@@ -164,16 +164,15 @@ class ParentTable extends Table
         $parents = $this->fetchAll([
             'item_id = ?' => $carId
         ]);
-        
+
         foreach ($parents as $parentRow) {
-            
             $brand = $db->fetchRow(
                 $db->select()
                     ->from('item', ['catname'])
                     ->where('item_type_id = ?', DbTable\Item\Type::BRAND)
                     ->where('id = ?', $parentRow['parent_id'])
             );
-            
+
             if ($brand) {
                 $result[] = [
                     'brand_catname' => $brand['catname'],

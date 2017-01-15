@@ -5,8 +5,7 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle\Type as VehicleType;
+use Application\Model\DbTable;
 
 class Inbox extends Form implements InputFilterProviderInterface
 {
@@ -15,7 +14,7 @@ class Inbox extends Form implements InputFilterProviderInterface
     private $brandOptions = [];
 
     /**
-     * @var VehicleType
+     * @var DbTable\Vehicle\Type
      */
     private $carTypeTable = null;
 
@@ -45,10 +44,10 @@ class Inbox extends Form implements InputFilterProviderInterface
                     'label'   => 'moder/picture/filter/status',
                     'options' => [
                         ''                       => 'moder/picture/filter/status/any',
-                        Picture::STATUS_INBOX    => 'moder/picture/filter/status/inbox',
-                        Picture::STATUS_NEW      => 'moder/picture/filter/status/new',
-                        Picture::STATUS_ACCEPTED => 'moder/picture/filter/status/accepted',
-                        Picture::STATUS_REMOVING => 'moder/picture/filter/status/removing',
+                        DbTable\Picture::STATUS_INBOX    => 'moder/picture/filter/status/inbox',
+                        DbTable\Picture::STATUS_NEW      => 'moder/picture/filter/status/new',
+                        DbTable\Picture::STATUS_ACCEPTED => 'moder/picture/filter/status/accepted',
+                        DbTable\Picture::STATUS_REMOVING => 'moder/picture/filter/status/removing',
                         'custom1'                => 'moder/picture/filter/status/all-except-removing'
                     ],
                 ]
@@ -82,9 +81,9 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'options' => [
                     'label'   => 'moder/pictures/filter/type',
                     'options' => [
-                        ''                        => 'moder/pictures/filter/type/any',
-                        Picture::VEHICLE_TYPE_ID  => 'moder/pictures/filter/type/item',
-                        Picture::FACTORY_TYPE_ID  => 'moder/pictures/filter/type/factory',
+                        ''                                => 'moder/pictures/filter/type/any',
+                        DbTable\Picture::VEHICLE_TYPE_ID  => 'moder/pictures/filter/type/item',
+                        DbTable\Picture::FACTORY_TYPE_ID  => 'moder/pictures/filter/type/factory',
                     ]
                 ]
             ],
@@ -211,13 +210,13 @@ class Inbox extends Form implements InputFilterProviderInterface
     }
 
     /**
-     * @return VehicleType
+     * @return DbTable\Vehicle\Type
      */
     private function getCarTypeTable()
     {
         return $this->carTypeTable
             ? $this->carTypeTable
-            : $this->carTypeTable = new VehicleType();
+            : $this->carTypeTable = new DbTable\Vehicle\Type();
     }
 
     private function getCarTypeOptions($parentId = null)

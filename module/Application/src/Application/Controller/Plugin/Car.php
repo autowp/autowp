@@ -19,7 +19,7 @@ use Zend_Db_Expr;
 class Car extends AbstractPlugin
 {
     /**
-     * @var DbTable\Vehicle\Language
+     * @var DbTable\Item\Language
      */
     private $carLangTable;
 
@@ -61,21 +61,11 @@ class Car extends AbstractPlugin
         $this->itemNameFormatter = $itemNameFormatter;
     }
 
-    /**
-     * @return Spec
-     */
-    private function getSpecTable()
-    {
-        return $this->specTable
-            ? $this->specTable
-            : $this->specTable = new Spec();
-    }
-
     private function getCarLanguageTable()
     {
         return $this->carLangTable
             ? $this->carLangTable
-            : $this->carLangTable = new DbTable\Vehicle\Language();
+            : $this->carLangTable = new DbTable\Item\Language();
     }
 
     /**
@@ -171,10 +161,10 @@ class Car extends AbstractPlugin
         $catalogue = $controller->catalogue();
 
         $pictureTable = $this->getPictureTable();
-        $carParentTable = new DbTable\Vehicle\ParentTable();
-        $carParentAdapter = $carParentTable->getAdapter();
-        $itemTable = new DbTable\Vehicle();
-        $itemLanguageTable = new DbTable\Vehicle\Language();
+        $itemParentTable = new DbTable\Item\ParentTable();
+        $itemParentAdapter = $itemParentTable->getAdapter();
+        $itemTable = new DbTable\Item();
+        $itemLanguageTable = new DbTable\Item\Language();
 
         $carIds = [];
         foreach ($cars as $car) {
@@ -182,9 +172,9 @@ class Car extends AbstractPlugin
         }
 
         if ($carIds) {
-            $childsCounts = $carParentAdapter->fetchPairs(
-                $carParentAdapter->select()
-                    ->from($carParentTable->info('name'), ['parent_id', new Zend_Db_Expr('count(1)')])
+            $childsCounts = $itemParentAdapter->fetchPairs(
+                $itemParentAdapter->select()
+                    ->from($itemParentTable->info('name'), ['parent_id', new Zend_Db_Expr('count(1)')])
                     ->where('parent_id IN (?)', $carIds)
                     ->group('parent_id')
             );
@@ -254,13 +244,13 @@ class Car extends AbstractPlugin
         // typecount
         $carsTypeCounts = [];
         if ($carIds && $listBuilder->isTypeUrlEnabled()) {
-            $rows = $carParentAdapter->fetchAll(
-                $carParentAdapter->select()
-                    ->from($carParentTable->info('name'), ['parent_id', 'type', 'count' => 'count(1)'])
+            $rows = $itemParentAdapter->fetchAll(
+                $itemParentAdapter->select()
+                    ->from($itemParentTable->info('name'), ['parent_id', 'type', 'count' => 'count(1)'])
                     ->where('parent_id IN (?)', $carIds)
                     ->where('type IN (?)', [
-                        DbTable\Vehicle\ParentTable::TYPE_TUNING,
-                        DbTable\Vehicle\ParentTable::TYPE_SPORT
+                        DbTable\Item\ParentTable::TYPE_TUNING,
+                        DbTable\Item\ParentTable::TYPE_SPORT
                     ])
                     ->group(['parent_id', 'type'])
             );
@@ -290,8 +280,8 @@ class Car extends AbstractPlugin
 
         // design projects
         $carsDesignProject = [];
-        $designCarsRows = $carParentAdapter->fetchAll(
-            $carParentAdapter->select()
+        $designCarsRows = $itemParentAdapter->fetchAll(
+            $itemParentAdapter->select()
                 ->from('item', [
                     'brand_name'    => 'name',
                     'brand_catname' => 'catname'
@@ -299,7 +289,7 @@ class Car extends AbstractPlugin
                 ->join('item_parent', 'item.id = item_parent.parent_id', [
                     'brand_item_catname' => 'catname'
                 ])
-                ->where('item_parent.type = ?', DbTable\Vehicle\ParentTable::TYPE_DESIGN)
+                ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DESIGN)
                 ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                 ->where('item_parent_cache.item_id IN (?)', $carIds ? $carIds : 0)
                 ->group('item_parent_cache.item_id')
@@ -411,14 +401,6 @@ class Car extends AbstractPlugin
 
             $childsCount = isset($childsCounts[$car->id]) ? $childsCounts[$car->id] : 0;
 
-            /*$spec = null;
-            if ($car->spec_id) {
-                $specRow = $this->getSpecTable()->find($car->spec_id)->current();
-                if ($specRow) {
-                    $spec = $specRow->short_name;
-                }
-            }*/
-
             $vehiclesOnEngine = [];
             if ($car->item_type_id == DbTable\Item\Type::ENGINE) {
                 $vehiclesOnEngine = $this->getVehiclesOnEngine($car);
@@ -480,22 +462,22 @@ class Car extends AbstractPlugin
             }
 
             if ($listBuilder->isTypeUrlEnabled()) {
-                $tuningCount = isset($carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_TUNING])
-                    ? $carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_TUNING]
+                $tuningCount = isset($carsTypeCounts[$car->id][DbTable\Item\ParentTable::TYPE_TUNING])
+                    ? $carsTypeCounts[$car->id][DbTable\Item\ParentTable::TYPE_TUNING]
                     : 0;
                 if ($tuningCount) {
-                    $url = $listBuilder->getTypeUrl($car, DbTable\Vehicle\ParentTable::TYPE_TUNING);
+                    $url = $listBuilder->getTypeUrl($car, DbTable\Item\ParentTable::TYPE_TUNING);
                     $item['tuning'] = [
                         'count' => $tuningCount,
                         'url'   => $url
                     ];
                 }
 
-                $sportCount = isset($carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_SPORT])
-                    ? $carsTypeCounts[$car->id][DbTable\Vehicle\ParentTable::TYPE_SPORT]
+                $sportCount = isset($carsTypeCounts[$car->id][DbTable\Item\ParentTable::TYPE_SPORT])
+                    ? $carsTypeCounts[$car->id][DbTable\Item\ParentTable::TYPE_SPORT]
                     : 0;
                 if ($sportCount) {
-                    $url = $listBuilder->getTypeUrl($car, DbTable\Vehicle\ParentTable::TYPE_SPORT);
+                    $url = $listBuilder->getTypeUrl($car, DbTable\Item\ParentTable::TYPE_SPORT);
                     $item['sport'] = [
                         'count' => $sportCount,
                         'url'   => $url
@@ -574,7 +556,7 @@ class Car extends AbstractPlugin
             $controller = $this->getController();
             $language = $controller->language();
             $catalogue = $controller->catalogue();
-            $itemTable = new DbTable\Vehicle();
+            $itemTable = new DbTable\Item();
 
             $rows = $itemTable->fetchAll([
                 'id in (?)' => $ids
@@ -604,7 +586,7 @@ class Car extends AbstractPlugin
         return $this->getController()->catalogue()->getPictureTable();
     }
 
-    public function formatName(DbTable\Vehicle\Row $vehicle, $language)
+    public function formatName(DbTable\Item\Row $vehicle, $language)
     {
         return $this->itemNameFormatter->format(
             $vehicle->getNameData($language),

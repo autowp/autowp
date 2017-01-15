@@ -2,7 +2,7 @@
 
 namespace Application\Model;
 
-use Application\Model\DbTable\Vehicle;
+use Application\Model\DbTable\Item;
 
 class Item
 {
@@ -13,7 +13,7 @@ class Item
         ];
         $options = array_replace($defaults, $options);
 
-        $itemTable = new Vehicle();
+        $itemTable = new Item();
 
         $db = $itemTable->getAdapter();
 

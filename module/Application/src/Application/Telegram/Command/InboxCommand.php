@@ -42,7 +42,7 @@ class InboxCommand extends Command
         }
 
         if ($arguments) {
-            $brandTable = new DbTable\Vehicle();
+            $brandTable = new DbTable\Item();
 
             $brandRow = $brandTable->fetchRow([
                 'name = ?'         => (string)$arguments,

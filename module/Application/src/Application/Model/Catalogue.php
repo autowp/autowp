@@ -3,12 +3,8 @@
 namespace Application\Model;
 
 use Autowp\Image\Storage\Request;
-use Application\Model\DbTable\Brand as BrandTable;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
-use Application\Model\DbTable\Vehicle\ParentTable as VehicleParent;
-use Application\Model\DbTable\Vehicle\Row as VehicleRow;
-use Application\Model\DbTable\Vehicle\Type as VehicleType;
+
+use Application\Model\DbTable;
 
 use Exception;
 
@@ -19,22 +15,22 @@ class Catalogue
     private $carsPerPage = 7;
 
     /**
-     * @var Vehicle
+     * @var DbTable\Item
      */
     private $itemTable;
 
     /**
-     * @var VehicleParent
+     * @var DbTable\Item\ParentTable
      */
-    private $carParentTable;
+    private $itemParentTable;
 
     /**
-     * @var VehicleType
+     * @var DbTable\Vehicle\Type
      */
     private $carTypeTable;
 
     /**
-     * @var Picture
+     * @var DbTable\Picture
      */
     private $pictureTable;
 
@@ -87,50 +83,50 @@ class Catalogue
     }
 
     /**
-     * @return Vehicle
+     * @return DbTable\Item
      */
     public function getItemTable()
     {
         return $this->itemTable
             ? $this->itemTable
-            : $this->itemTable = new Vehicle();
+            : $this->itemTable = new DbTable\Item();
     }
 
     /**
-     * @return VehicleParent
+     * @return DbTable\Item\ParentTable
      */
     public function getCarParentTable()
     {
-        return $this->carParentTable
-            ? $this->carParentTable
-            : $this->carParentTable = new VehicleParent();
+        return $this->itemParentTable
+            ? $this->itemParentTable
+            : $this->itemParentTable = new DbTable\Item\ParentTable();
     }
 
     /**
-     * @return VehicleType
+     * @return DbTable\Vehicle\Type
      */
     public function getCarTypeTable()
     {
         return $this->carTypeTable
-        ? $this->carTypeTable
-        : $this->carTypeTable = new VehicleType();
+            ? $this->carTypeTable
+            : $this->carTypeTable = new DbTable\Vehicle\Type();
     }
 
     /**
-     * @return Picture
+     * @return DbTable\Picture
      */
     public function getPictureTable()
     {
         return $this->pictureTable
             ? $this->pictureTable
-            : $this->pictureTable = new Picture();
+            : $this->pictureTable = new DbTable\Picture();
     }
 
     /**
-     * @param VehicleRow $car
+     * @param DbTable\Item\Row $car
      * @return array
      */
-    public function cataloguePaths(VehicleRow $car)
+    public function cataloguePaths(DbTable\Item\Row $car)
     {
         return $this->walkUpUntilBrand($car->id, []);
     }
@@ -162,7 +158,7 @@ class Catalogue
                 ];
             }
         }
-        
+
         foreach ($parentRows as $parentRow) {
             $urls = array_merge(
                 $urls,

@@ -9,7 +9,7 @@ use Application\Service\SpecificationsService;
 class Catalogue extends ListBuilder
 {
     /**
-     * @var DbTable\Vehicle\ParentTable
+     * @var DbTable\Item\ParentTable
      */
     protected $itemParentTable;
 
@@ -28,7 +28,7 @@ class Catalogue extends ListBuilder
      */
     private $pathsToBrand = [];
 
-    public function setItemParentTable(DbTable\Vehicle\ParentTable $itemParentTable)
+    public function setItemParentTable(DbTable\Item\ParentTable $itemParentTable)
     {
         $this->itemParentTable = $itemParentTable;
 
@@ -66,7 +66,7 @@ class Catalogue extends ListBuilder
         return $this->pathsToBrand[$itemId][$brandId];
     }
 
-    public function getDetailsUrl(DbTable\Vehicle\Row $item)
+    public function getDetailsUrl(DbTable\Item\Row $item)
     {
         $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
             'breakOnFirst' => true
@@ -88,7 +88,7 @@ class Catalogue extends ListBuilder
         ]);
     }
 
-    public function getPicturesUrl(DbTable\Vehicle\Row $item)
+    public function getPicturesUrl(DbTable\Item\Row $item)
     {
         $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
             'breakOnFirst' => true
@@ -111,7 +111,7 @@ class Catalogue extends ListBuilder
         ]);
     }
 
-    public function getSpecificationsUrl(DbTable\Vehicle\Row $item)
+    public function getSpecificationsUrl(DbTable\Item\Row $item)
     {
         $hasSpecs = $this->specsService->hasSpecs($item->id);
 
@@ -139,7 +139,7 @@ class Catalogue extends ListBuilder
         ]);
     }
 
-    public function getPictureUrl(DbTable\Vehicle\Row $item, array $picture)
+    public function getPictureUrl(DbTable\Item\Row $item, array $picture)
     {
         $paths = $this->getPathsToBrand($item->id, $this->brand['id'], [
             'breakOnFirst' => true

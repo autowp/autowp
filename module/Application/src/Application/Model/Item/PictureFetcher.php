@@ -103,12 +103,12 @@ abstract class PictureFetcher
 
             if (isset($options['type'])) {
                 switch ($options['type']) {
-                    case DbTable\Vehicle\ParentTable::TYPE_DEFAULT:
+                    case DbTable\Item\ParentTable::TYPE_DEFAULT:
                         break;
-                    case DbTable\Vehicle\ParentTable::TYPE_TUNING:
+                    case DbTable\Item\ParentTable::TYPE_TUNING:
                         $select->where('item_parent_cache.tuning');
                         break;
-                    case DbTable\Vehicle\ParentTable::TYPE_SPORT:
+                    case DbTable\Item\ParentTable::TYPE_SPORT:
                         $select->where('item_parent_cache.sport');
                         break;
                 }

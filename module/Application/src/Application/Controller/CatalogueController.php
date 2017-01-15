@@ -228,7 +228,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $carParentTable = new DbTable\Vehicle\ParentTable();
+            $itemParentTable = new DbTable\Item\ParentTable();
 
             $this->sidebar()->brand([
                 'brand_id'    => $brand['id'],
@@ -244,7 +244,7 @@ class CatalogueController extends AbstractActionController
                         'picHelper'       => $this->getPluginManager()->get('pic'),
                         'brand'           => $brand,
                         'specsService'    => $this->specsService,
-                        'itemParentTable' => $carParentTable
+                        'itemParentTable' => $itemParentTable
                     ]),
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
                         'type'                 => null,
@@ -328,7 +328,7 @@ class CatalogueController extends AbstractActionController
                 return $this->notFoundAction();
             }
 
-            $carParentTable = new DbTable\Vehicle\ParentTable();
+            $itemParentTable = new DbTable\Item\ParentTable();
 
             $this->sidebar()->brand([
                 'brand_id' => $brand['id']
@@ -353,7 +353,7 @@ class CatalogueController extends AbstractActionController
                         'picHelper'       => $this->getPluginManager()->get('pic'),
                         'brand'           => $brand,
                         'specsService'    => $this->specsService,
-                        'itemParentTable' => $carParentTable
+                        'itemParentTable' => $itemParentTable
                     ])
                 ])
             ];
@@ -435,13 +435,13 @@ class CatalogueController extends AbstractActionController
                     ->group('pictures.id')
                     ->limit(12);
 
-                $carParentTable = new DbTable\Vehicle\ParentTable();
+                $itemParentTable = new DbTable\Item\ParentTable();
 
                 $topPictures = $this->pic()->listData($select, [
                     'width' => 4,
-                    'url'   => function ($picture) use ($carParentTable, $brand) {
+                    'url'   => function ($picture) use ($itemParentTable, $brand) {
 
-                        $db = $carParentTable->getAdapter();
+                        $db = $itemParentTable->getAdapter();
 
                         $carId = $db->fetchOne(
                             $db->select()
@@ -455,7 +455,7 @@ class CatalogueController extends AbstractActionController
                             return $this->pic()->url($picture['identity']);
                         }
 
-                        $paths = $carParentTable->getPathsToBrand($carId, $brand['id'], [
+                        $paths = $itemParentTable->getPathsToBrand($carId, $brand['id'], [
                             'breakOnFirst' => true
                         ]);
 
@@ -511,7 +511,7 @@ class CatalogueController extends AbstractActionController
                     ->limit(1)
             );
 
-            $itemLanguageTable = new DbTable\Vehicle\Language();
+            $itemLanguageTable = new DbTable\Item\Language();
             $db = $itemLanguageTable->getAdapter();
             $orderExpr = $db->quoteInto('language = ? desc', $this->language());
             $itemLanguageRows = $itemLanguageTable->fetchAll([
@@ -959,7 +959,7 @@ class CatalogueController extends AbstractActionController
                     ->join('item_parent', 'item.id = item_parent.parent_id', [
                         'brand_item_catname' => 'catname'
                     ])
-                    ->where('item_parent.type = ?', DbTable\Vehicle\ParentTable::TYPE_DESIGN)
+                    ->where('item_parent.type = ?', DbTable\Item\ParentTable::TYPE_DESIGN)
                     ->join('item_parent_cache', 'item_parent.item_id = item_parent_cache.parent_id', 'item_id')
                     ->where('item_parent_cache.item_id = ?', $currentCar['id'])
             );
@@ -1007,9 +1007,9 @@ class CatalogueController extends AbstractActionController
         $pairs = $db->fetchPairs($select);
 
         return [
-            'stock'  => isset($pairs[DbTable\Vehicle\ParentTable::TYPE_DEFAULT]) ? $pairs[DbTable\Vehicle\ParentTable::TYPE_DEFAULT] : 0,
-            'tuning' => isset($pairs[DbTable\Vehicle\ParentTable::TYPE_TUNING]) ? $pairs[DbTable\Vehicle\ParentTable::TYPE_TUNING] : 0,
-            'sport'  => isset($pairs[DbTable\Vehicle\ParentTable::TYPE_SPORT]) ? $pairs[DbTable\Vehicle\ParentTable::TYPE_SPORT] : 0
+            'stock'  => isset($pairs[DbTable\Item\ParentTable::TYPE_DEFAULT]) ? $pairs[DbTable\Item\ParentTable::TYPE_DEFAULT] : 0,
+            'tuning' => isset($pairs[DbTable\Item\ParentTable::TYPE_TUNING]) ? $pairs[DbTable\Item\ParentTable::TYPE_TUNING] : 0,
+            'sport'  => isset($pairs[DbTable\Item\ParentTable::TYPE_SPORT]) ? $pairs[DbTable\Item\ParentTable::TYPE_SPORT] : 0
         ];
     }
 
@@ -1065,18 +1065,18 @@ class CatalogueController extends AbstractActionController
             $type = $this->params('type');
             switch ($type) {
                 case 'tuning':
-                    $type = DbTable\Vehicle\ParentTable::TYPE_TUNING;
+                    $type = DbTable\Item\ParentTable::TYPE_TUNING;
                     break;
                 case 'sport':
-                    $type = DbTable\Vehicle\ParentTable::TYPE_SPORT;
+                    $type = DbTable\Item\ParentTable::TYPE_SPORT;
                     break;
                 default:
-                    $type = DbTable\Vehicle\ParentTable::TYPE_DEFAULT;
+                    $type = DbTable\Item\ParentTable::TYPE_DEFAULT;
                     break;
             }
 
             $itemTable = $this->catalogue()->getItemTable();
-            $carParentTable = new DbTable\Vehicle\ParentTable();
+            $itemParentTable = new DbTable\Item\ParentTable();
 
             $currentCarId = $currentCar['id'];
 
@@ -1127,7 +1127,7 @@ class CatalogueController extends AbstractActionController
                 ], [], true),
                 'childListData' => $this->car()->listData($listCars, [
                     'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                        'type'                 => $type == DbTable\Vehicle\ParentTable::TYPE_DEFAULT ? $type : null,
+                        'type'                 => $type == DbTable\Item\ParentTable::TYPE_DEFAULT ? $type : null,
                         'onlyExactlyPictures'  => true,
                         'dateSort'             => false,
                         'disableLargePictures' => false,
@@ -1140,7 +1140,7 @@ class CatalogueController extends AbstractActionController
                         'picHelper'        => $this->getPluginManager()->get('pic'),
                         'brand'            => $brand,
                         'specsService'     => $this->specsService,
-                        'itemParentTable'  => $carParentTable,
+                        'itemParentTable'  => $itemParentTable,
                         'brandItemCatname' => $brandItemCatname,
                         'itemId'           => $currentCarId,
                         'path'             => $path
@@ -1288,12 +1288,12 @@ class CatalogueController extends AbstractActionController
             /*
             if (isset($options['type'])) {
                 switch ($options['type']) {
-                    case DbTable\Vehicle\ParentTable::TYPE_DEFAULT:
+                    case DbTable\Item\ParentTable::TYPE_DEFAULT:
                         break;
-                    case DbTable\Vehicle\ParentTable::TYPE_TUNING:
+                    case DbTable\Item\ParentTable::TYPE_TUNING:
                         $select->where('item_parent_cache.tuning');
                         break;
-                    case DbTable\Vehicle\ParentTable::TYPE_SPORT:
+                    case DbTable\Item\ParentTable::TYPE_SPORT:
                         $select->where('item_parent_cache.sport');
                         break;
                 }
@@ -1493,7 +1493,7 @@ class CatalogueController extends AbstractActionController
 
     private function getItemTexts($itemId)
     {
-        $itemLanguageTable = new DbTable\Vehicle\Language();
+        $itemLanguageTable = new DbTable\Item\Language();
 
         $db = $itemLanguageTable->getAdapter();
         $orderExpr = $db->quoteInto('language = ? desc', $this->language());
@@ -1542,18 +1542,18 @@ class CatalogueController extends AbstractActionController
         $type = $this->params('type');
         switch ($type) {
             case 'tuning':
-                $type = DbTable\Vehicle\ParentTable::TYPE_TUNING;
+                $type = DbTable\Item\ParentTable::TYPE_TUNING;
                 break;
             case 'sport':
-                $type = DbTable\Vehicle\ParentTable::TYPE_SPORT;
+                $type = DbTable\Item\ParentTable::TYPE_SPORT;
                 break;
             default:
-                $type = DbTable\Vehicle\ParentTable::TYPE_DEFAULT;
+                $type = DbTable\Item\ParentTable::TYPE_DEFAULT;
                 break;
         }
 
         $itemTable = $this->catalogue()->getItemTable();
-        $carParentTable = new DbTable\Vehicle\ParentTable();
+        $itemParentTable = new DbTable\Item\ParentTable();
 
         $listCars = [];
 
@@ -1578,7 +1578,7 @@ class CatalogueController extends AbstractActionController
 
         $currentPictures = [];
         $currentPicturesCount = 0;
-        if ($isLastPage && $type == DbTable\Vehicle\ParentTable::TYPE_DEFAULT) {
+        if ($isLastPage && $type == DbTable\Item\ParentTable::TYPE_DEFAULT) {
             $select = $this->selectOrderFromPictures()
                 ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                 ->where('picture_item.item_id = ?', $currentCarId);
@@ -1646,7 +1646,7 @@ class CatalogueController extends AbstractActionController
         $currentCar['text'] = $texts['text'];
         $hasHtml = (bool)$currentCar['text'];
 
-        $carLangTable = new DbTable\Vehicle\Language();
+        $carLangTable = new DbTable\Item\Language();
         $carLangRows = $carLangTable->fetchAll([
             'item_id = ?' => $currentCar['id'],
             'length(name) > 0'
@@ -1684,7 +1684,7 @@ class CatalogueController extends AbstractActionController
             ], [], true),
             'childListData' => $this->car()->listData($listCars, [
                 'pictureFetcher' => new \Application\Model\Item\PerspectivePictureFetcher([
-                    'type'                 => $type == DbTable\Vehicle\ParentTable::TYPE_DEFAULT ? $type : null,
+                    'type'                 => $type == DbTable\Item\ParentTable::TYPE_DEFAULT ? $type : null,
                     'onlyExactlyPictures'  => false,
                     'dateSort'             => false,
                     'disableLargePictures' => false,
@@ -1697,7 +1697,7 @@ class CatalogueController extends AbstractActionController
                     'picHelper'        => $this->getPluginManager()->get('pic'),
                     'brand'            => $brand,
                     'specsService'     => $this->specsService,
-                    'itemParentTable'  => $carParentTable,
+                    'itemParentTable'  => $itemParentTable,
                     'brandItemCatname' => $brandItemCatname,
                     'itemId'           => $currentCarId,
                     'path'             => $path,
@@ -1962,13 +1962,13 @@ class CatalogueController extends AbstractActionController
             $type = $this->params('type');
             switch ($type) {
                 case 'tuning':
-                    $type = DbTable\Vehicle\ParentTable::TYPE_TUNING;
+                    $type = DbTable\Item\ParentTable::TYPE_TUNING;
                     break;
                 case 'sport':
-                    $type = DbTable\Vehicle\ParentTable::TYPE_SPORT;
+                    $type = DbTable\Item\ParentTable::TYPE_SPORT;
                     break;
                 default:
-                    $type = DbTable\Vehicle\ParentTable::TYPE_DEFAULT;
+                    $type = DbTable\Item\ParentTable::TYPE_DEFAULT;
                     break;
             }
 
@@ -2040,7 +2040,7 @@ class CatalogueController extends AbstractActionController
 
     private function mostsActive($brandId)
     {
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
         $db = $itemTable->getAdapter();
         $carsCount = $db->fetchOne(
             $db->select()
@@ -2143,13 +2143,13 @@ class CatalogueController extends AbstractActionController
                 'language' => $language
             ]);
 
-            $carParentTable = new DbTable\Vehicle\ParentTable();
+            $itemParentTable = new DbTable\Item\ParentTable();
 
             $idx = 0;
             foreach ($data['carList']['cars'] as &$car) {
                 $pictures = [];
 
-                $paths = $carParentTable->getPaths($car['car']['id'], [
+                $paths = $itemParentTable->getPaths($car['car']['id'], [
                     'breakOnFirst' => true
                 ]);
 

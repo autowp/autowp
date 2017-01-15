@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Model\DbTable\Vehicle;
+namespace Application\Model\DbTable\Item;
 
 use Application\Db\Table;
 

@@ -11,7 +11,6 @@ use Application\HostManager;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\Vehicle;
 use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 
@@ -184,7 +183,7 @@ class FactoryController extends AbstractActionController
             $description = '';
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item();
 
         $cars = $itemTable->fetchAll(
             $itemTable->select(true)
@@ -208,7 +207,7 @@ class FactoryController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $itemTable = new DbTable\Vehicle();
+        $itemTable = new DbTable\Item();
 
         $db = $itemTable->getAdapter();
 
