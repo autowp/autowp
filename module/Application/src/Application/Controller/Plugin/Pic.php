@@ -302,7 +302,8 @@ class Pic extends AbstractPlugin
                 ->columns([
                     'pictures.id', 'pictures.identity', 'pictures.name',
                     'pictures.width', 'pictures.height',
-                    'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
+                    'pictures.crop_left', 'pictures.crop_top',
+                    'pictures.crop_width', 'pictures.crop_height',
                     'pictures.status', 'pictures.image_id'
                 ]);
 
@@ -380,7 +381,6 @@ class Pic extends AbstractPlugin
 
             $item = [
                 'id'        => $id,
-                'type'      => $row['type'],
                 'name'      => $name,
                 'url'       => $url,
                 'src'       => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null,
@@ -572,7 +572,6 @@ class Pic extends AbstractPlugin
                 if ($controller->user()->logedIn()) {
                     $uploadUrl = $controller->url()->fromRoute('upload/params', [
                         'action'  => 'index',
-                        'type'    => '1',
                         'item_id' => $item['id']
                     ]);
                 }
@@ -1178,7 +1177,8 @@ class Pic extends AbstractPlugin
             ->columns([
                 'pictures.id', 'pictures.identity', 'pictures.name',
                 'pictures.width', 'pictures.height',
-                'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
+                'pictures.crop_left', 'pictures.crop_top',
+                'pictures.crop_width', 'pictures.crop_height',
                 'pictures.image_id', 'pictures.filesize'
             ])
             ->joinLeft(
@@ -1323,7 +1323,6 @@ class Pic extends AbstractPlugin
 
             $gallery[] = [
                 'id'          => $id,
-                'type'        => $row['type'],
                 'url'         => $url,
                 'sourceUrl'   => $sUrl,
                 'crop'        => $crop,

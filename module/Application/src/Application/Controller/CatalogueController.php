@@ -374,7 +374,7 @@ class CatalogueController extends AbstractActionController
                         'cars_count'   => 'count(ipc2.item_id)',
                         'pictures.id', 'pictures.identity',
                         'pictures.width', 'pictures.height',
-                        'pictures.crop_left', 'pictures.crop_top', 
+                        'pictures.crop_left', 'pictures.crop_top',
                         'pictures.crop_width', 'pictures.crop_height',
                         'pictures.status', 'pictures.image_id'
                     ]
@@ -1247,7 +1247,7 @@ class CatalogueController extends AbstractActionController
             ->from(
                 $pictureTable->info('name'),
                 [
-                    'id', 'name', 'type', 'image_id', 'crop_left', 'crop_top',
+                    'id', 'name', 'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
             )

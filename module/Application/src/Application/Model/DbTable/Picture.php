@@ -180,7 +180,6 @@ class Picture extends Table
         foreach ($rows as $index => $row) {
             if ($row['name']) {
                 $result[$row['id']] = [
-                    'type' => $row['type'],
                     'name' => $row['name']
                 ];
                 continue;
@@ -208,7 +207,6 @@ class Picture extends Table
             }
 
             $result[$row['id']] = [
-                'type'  => $row['type'],
                 'items' => $items
             ];
         }

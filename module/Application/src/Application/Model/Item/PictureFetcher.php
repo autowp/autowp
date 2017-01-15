@@ -71,7 +71,7 @@ abstract class PictureFetcher
             ->from(
                 $pictureTable->info('name'),
                 [
-                    'id', 'name', 'type',
+                    'id', 'name',
                     'image_id', 'crop_left', 'crop_top',
                     'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
