@@ -142,23 +142,6 @@ class Row extends \Application\Db\Table\Row
         return $pictures;
     }
 
-    public function refreshPicturesCount()
-    {
-        $db = $this->getTable()->getAdapter();
-
-        $sql = '
-            SELECT COUNT(pictures.id)
-            FROM pictures
-                JOIN picture_item ON pictures.id = picture_item.picture_id
-            WHERE picture_item.item_id=? AND pictures.type=?
-        ';
-        $this->pictures_count = (int)$db->fetchOne($sql, [$this->id, DbTable\Picture::VEHICLE_TYPE_ID]);
-        $this->save();
-
-        $brandModel = new BrandModel();
-        $brandModel->refreshPicturesCountByVehicle($this->id);
-    }
-
     public function updateOrderCache()
     {
         $begin = null;
@@ -210,17 +193,17 @@ class Row extends \Application\Db\Table\Row
         ]);
         $this->save();
     }
-    
+
     public function getRelatedCarGroupId()
     {
         $db = $this->getTable()->getAdapter();
-    
+
         $carIds = $db->fetchCol(
             $db->select()
                 ->from('item_parent', 'item_id')
                 ->where('item_parent.parent_id = ?', $this->id)
         );
-    
+
         $vectors = [];
         foreach ($carIds as $carId) {
             $parentIds = $db->fetchCol(
@@ -230,7 +213,7 @@ class Row extends \Application\Db\Table\Row
                     ->where('item_id <> parent_id')
                     ->order('diff desc')
             );
-    
+
             // remove parents
             foreach ($parentIds as $parentId) {
                 $index = array_search($parentId, $carIds);
@@ -238,16 +221,16 @@ class Row extends \Application\Db\Table\Row
                     unset($carIds[$index]);
                 }
             }
-    
+
             $vector = $parentIds;
             $vector[] = $carId;
-    
+
             $vectors[] = $vector;
         }
-    
+
         do {
             // look for same root
-    
+
             $matched = false;
             for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
                 for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
@@ -265,25 +248,25 @@ class Row extends \Application\Db\Table\Row
                 }
             }
         } while ($matched);
-    
+
         $resultIds = [];
         foreach ($vectors as $vector) {
             $resultIds[] = $vector[count($vector) - 1];
         }
-    
+
         return $resultIds;
     }
-    
+
     public function getRelatedCarGroups()
     {
         $db = $this->getTable()->getAdapter();
-    
+
         $carIds = $db->fetchCol(
             $db->select()
                 ->from('item_parent', 'item_id')
                 ->where('item_parent.parent_id = ?', $this->id)
         );
-    
+
         $vectors = [];
         foreach ($carIds as $carId) {
             $parentIds = $db->fetchCol(
@@ -298,7 +281,7 @@ class Row extends \Application\Db\Table\Row
                     ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
                     ->order('item_parent_cache.diff desc')
             );
-    
+
             // remove parents
             foreach ($parentIds as $parentId) {
                 $index = array_search($parentId, $carIds);
@@ -306,19 +289,19 @@ class Row extends \Application\Db\Table\Row
                     unset($carIds[$index]);
                 }
             }
-    
+
             $vector = $parentIds;
             $vector[] = $carId;
-    
+
             $vectors[] = [
                 'parents' => $vector,
                 'childs'  => [$carId]
             ];
         }
-    
+
         do {
             // look for same root
-    
+
             $matched = false;
             for ($i = 0; ($i < count($vectors) - 1) && ! $matched; $i++) {
                 for ($j = $i + 1; $j < count($vectors) && ! $matched; $j++) {
@@ -339,13 +322,13 @@ class Row extends \Application\Db\Table\Row
                 }
             }
         } while ($matched);
-    
+
         $result = [];
         foreach ($vectors as $vector) {
             $carId = $vector['parents'][count($vector['parents']) - 1];
             $result[$carId] = $vector['childs'];
         }
-    
+
         return $result;
     }
 }

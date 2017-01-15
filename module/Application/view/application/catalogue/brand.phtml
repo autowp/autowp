@@ -74,7 +74,6 @@
                     'action'  => 'index',
                     'status'  => Application\Model\DbTable\Picture::STATUS_INBOX,
                     'item_id' => $this->brand['id'],
-                    'type_id' => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
                 ]), '<i class="fa-fw fa fa-th"></i> ' . $this->escapeHtml($this->translate('catalogue/brand/inbox/by-brand')) . ' <span class="badge">' . $this->inboxPictures . '</span>', false)?>
             </li>
         <?php } ?>
@@ -85,9 +84,9 @@
                         'action'              => 'index',
                         'item_id'             => $this->brand['id'],
                         'moderator_attention' => '1'
-                    ]), 
+                    ]),
                     '<i class="fa fa-comment"></i> ' .
-                        $this->escapeHtml($this->translate('catalogue/vehicle/comments')) . 
+                        $this->escapeHtml($this->translate('catalogue/vehicle/comments')) .
                         ' ('.$this->requireAttention.')',
                     false
                 )?>

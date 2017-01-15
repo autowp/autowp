@@ -5,17 +5,12 @@ namespace Application\Model\DbTable;
 use Autowp\Image;
 
 use Application\Db\Table;
-use Application\Model\Brand as BrandModel;
 use Application\Model\PictureItem;
 
 use Zend_Db_Expr;
 
 class Picture extends Table
 {
-    const
-        VEHICLE_TYPE_ID  = 1,
-        FACTORY_TYPE_ID  = 7;
-
     const
         STATUS_NEW      = 'new',
         STATUS_ACCEPTED = 'accepted',
@@ -111,24 +106,18 @@ class Picture extends Table
         // prefetch
         $carIds = [];
         $perspectiveIds = [];
-        $brandIds = [];
-        $factoryIds = [];
         foreach ($rows as $index => $row) {
-            switch ($row['type']) {
-                case Picture::VEHICLE_TYPE_ID:
-                    $db = $this->getAdapter();
-                    $pictureItemRows = $db->fetchAll(
-                        $db->select(true)
-                            ->from('picture_item', ['item_id', 'perspective_id'])
-                            ->where('picture_id = ?', $row['id'])
-                    );
-                    foreach ($pictureItemRows as $pictureItemRow) {
-                        $carIds[$pictureItemRow['item_id']] = true;
-                        if (in_array($pictureItemRow['perspective_id'], $this->prefixedPerspectives)) {
-                            $perspectiveIds[$pictureItemRow['perspective_id']] = true;
-                        }
-                    }
-                    break;
+            $db = $this->getAdapter();
+            $pictureItemRows = $db->fetchAll(
+                $db->select(true)
+                    ->from('picture_item', ['item_id', 'perspective_id'])
+                    ->where('picture_id = ?', $row['id'])
+            );
+            foreach ($pictureItemRows as $pictureItemRow) {
+                $carIds[$pictureItemRow['item_id']] = true;
+                if (in_array($pictureItemRow['perspective_id'], $this->prefixedPerspectives)) {
+                    $perspectiveIds[$pictureItemRow['perspective_id']] = true;
+                }
             }
         }
 
@@ -188,14 +177,6 @@ class Picture extends Table
             }
         }
 
-        $factories = [];
-        if (count($factoryIds)) {
-            $table = new Factory();
-            foreach ($table->find(array_keys($factoryIds)) as $row) {
-                $factories[$row->id] = $row->name;
-            }
-        }
-
         foreach ($rows as $index => $row) {
             if ($row['name']) {
                 $result[$row['id']] = [
@@ -235,7 +216,7 @@ class Picture extends Table
         return $result;
     }
 
-    public function accept(PictureItem $pictureItem, $pictureId, $userId, &$isFirstTimeAccepted)
+    public function accept($pictureId, $userId, &$isFirstTimeAccepted)
     {
         $isFirstTimeAccepted = false;
 
@@ -255,36 +236,7 @@ class Picture extends Table
         }
         $picture->save();
 
-        $this->refreshPictureCounts($pictureItem, $picture);
-
         return true;
-    }
-
-    private function refreshCounts($params)
-    {
-        switch ($params['type']) {
-            case Picture::VEHICLE_TYPE_ID:
-                $brandModel = new BrandModel();
-                foreach ($params['item_ids'] as $carId) {
-                    $itemTable = new Item();
-                    $car = $itemTable->find($carId)->current();
-                    if ($car) {
-                        $car->refreshPicturesCount();
-                        $brandModel->refreshPicturesCountByVehicle($car->id);
-                    }
-                }
-                break;
-            case Picture::FACTORY_TYPE_ID:
-                break;
-        }
-    }
-
-    public function refreshPictureCounts(PictureItem $pictureItem, $picture)
-    {
-        $data = $picture->toArray();
-        $data['item_ids'] = $pictureItem->getPictureItems($picture->id);
-
-        $this->refreshCounts($data);
     }
 
     public function addToCar(PictureItem $pictureItem, $pictureId, $id, $userId, array $options)
@@ -301,16 +253,6 @@ class Picture extends Table
             return false;
         }
 
-        $oldParams = [
-            'type'     => $picture->type,
-            'item_ids' => $pictureItem->getPictureItems($picture->id),
-        ];
-
-        $picture->setFromArray([
-            'type'     => Picture::VEHICLE_TYPE_ID,
-        ]);
-        $picture->save();
-
         $pictureItem->add($picture->id, $car->id);
 
         if ($picture->image_id) {
@@ -318,9 +260,6 @@ class Picture extends Table
                 'pattern' => $picture->getFileNamePattern(),
             ]);
         }
-
-        $this->refreshCounts($oldParams);
-        $this->refreshPictureCounts($pictureItem, $picture);
 
         $log = new Log\Event();
         $log($userId, sprintf(
@@ -346,16 +285,6 @@ class Picture extends Table
             return false;
         }
 
-        $oldParams = [
-            'type'       => $picture->type,
-            'item_ids'   => $pictureItem->getPictureItems($picture->id),
-        ];
-
-        $picture->setFromArray([
-            'type' => Picture::VEHICLE_TYPE_ID,
-        ]);
-        $picture->save();
-
         $pictureItem->setPictureItems($picture->id, [$car->id]);
 
         if ($picture->image_id) {
@@ -364,58 +293,12 @@ class Picture extends Table
             ]);
         }
 
-        $this->refreshCounts($oldParams);
-        $this->refreshPictureCounts($pictureItem, $picture);
-
         $log = new Log\Event();
         $log($userId, sprintf(
             'Картинка %s связана с автомобилем %s',
             htmlspecialchars($picture->id),
             htmlspecialchars('#' . $car->id)
         ), [$car, $picture]);
-
-        return true;
-    }
-
-    public function moveToFactory(PictureItem $pictureItem, $pictureId, $id, $userId, array $options)
-    {
-        $picture = $this->find($pictureId)->current();
-        if (! $picture) {
-            return false;
-        }
-
-        $factoryTable = new Factory();
-        $factory = $factoryTable->find($id)->current();
-
-        if (! $factory) {
-            return false;
-        }
-
-        $oldParams = [
-            'type'       => $picture->type,
-            'item_ids'   => $pictureItem->getPictureItems($picture->id),
-        ];
-
-        $picture->setFromArray([
-            'type'       => Picture::FACTORY_TYPE_ID,
-        ]);
-        $picture->save();
-
-        $pictureItem->setPictureItems($picture->id, []);
-
-        $this->imageStorage->changeImageName($picture->image_id, [
-            'pattern' => $picture->getFileNamePattern(),
-        ]);
-
-        $this->refreshCounts($oldParams);
-        $this->refreshPictureCounts($pictureItem, $picture);
-
-        $log = new Log\Event();
-        $log($userId, sprintf(
-            'Назначение завода %s картинке %s',
-            htmlspecialchars($factory->name),
-            htmlspecialchars($options['pictureNameFormatter']->format($picture, $options['language']))
-        ), [$factory, $picture]);
 
         return true;
     }

@@ -47,23 +47,21 @@
                 'title'   => $this->pic()->textTitle($this->name),
                 'shuffle' => true
             ]), false)?>
-            <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
-                <?php if (count($this->items) == 1) { ?>
-                    <?php if (count($this->items[0]['altNames'])) { ?>
-                        <div class="languages">
-                            <p><?=$this->escapeHtml($this->translate('picture/other-languages'))?></p>
-                            <ul class="list-unstyled">
-                                <?php foreach ($this->items[0]['altNames'] as $name => $languages) { ?>
-                                    <li>
-                                        <?php foreach ($languages as $language) { ?>
-                                            <sup><?=$this->escapeHtml(strtoupper($language))?></sup>
-                                        <?php } ?>
-                                        <?=$this->escapeHtml($name) ?>
-                                    </li>
-                                <?php } ?>
-                            </ul>
-                        </div>
-                    <?php } ?>
+            <?php if (count($this->items) == 1) { ?>
+                <?php if (count($this->items[0]['altNames'])) { ?>
+                    <div class="languages">
+                        <p><?=$this->escapeHtml($this->translate('picture/other-languages'))?></p>
+                        <ul class="list-unstyled">
+                            <?php foreach ($this->items[0]['altNames'] as $name => $languages) { ?>
+                                <li>
+                                    <?php foreach ($languages as $language) { ?>
+                                        <sup><?=$this->escapeHtml(strtoupper($language))?></sup>
+                                    <?php } ?>
+                                    <?=$this->escapeHtml($name) ?>
+                                </li>
+                            <?php } ?>
+                        </ul>
+                    </div>
                 <?php } ?>
             <?php } ?>
         </div>
@@ -73,23 +71,20 @@
             </div>
         <?php } ?>
 
-        <?php if ($this->picture->type == Application\Model\DbTable\Picture::VEHICLE_TYPE_ID) { ?>
-
-            <?php /*if (count($this->modifications) > 0) { ?>
-                <p>
-                    <?php foreach ($this->modifications as $modification) { ?>
-                        <?php if ($modification['url']) { ?>
-                            <?=$this->htmlA([
-                                'class' => 'label label-primary',
-                                'href'  => $modification['url']
-                            ], $modification['name'])?>
-                        <?php } else { ?>
-                            <span class="label label-primary"><?=$this->escapeHtml($modification['name'])?></span>
-                        <?php } ?>
+        <?php /*if (count($this->modifications) > 0) { ?>
+            <p>
+                <?php foreach ($this->modifications as $modification) { ?>
+                    <?php if ($modification['url']) { ?>
+                        <?=$this->htmlA([
+                            'class' => 'label label-primary',
+                            'href'  => $modification['url']
+                        ], $modification['name'])?>
+                    <?php } else { ?>
+                        <span class="label label-primary"><?=$this->escapeHtml($modification['name'])?></span>
                     <?php } ?>
-                </p>
-            <?php } */ ?>
-        <?php } ?>
+                <?php } ?>
+            </p>
+        <?php } */ ?>
 
         <?php foreach ($this->items as $item) { ?>
             <?php if ($item['description']) { ?>

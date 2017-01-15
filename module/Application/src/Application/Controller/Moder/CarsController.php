@@ -3073,14 +3073,6 @@ class CarsController extends AbstractActionController
 
                 $brandModel = new BrandModel();
 
-                // old car cache
-                $car->refreshPicturesCount();
-                $brandModel->refreshPicturesCountByVehicle($car->id);
-
-                // new car cache
-                $newCar->refreshPicturesCount();
-                $brandModel->refreshPicturesCountByVehicle($newCar->id);
-
                 $this->specificationsService->updateActualValues($newCar->id);
 
                 $user = $this->user()->get();

@@ -42,110 +42,93 @@ class Row extends \Application\Db\Table\Row
 
         $filenameFilter = new FilenameSafe();
 
-        switch ($this->type) {
-            case DbTable\Picture::VEHICLE_TYPE_ID:
-                $itemTable = new DbTable\Item();
-                $cars = $itemTable->fetchAll(
-                    $itemTable->select(true)
-                        ->join('picture_item', 'item.id = picture_item.item_id', null)
-                        ->where('picture_item.picture_id = ?', $this->id)
-                );
+        $itemTable = new DbTable\Item();
+        $cars = $itemTable->fetchAll(
+            $itemTable->select(true)
+                ->join('picture_item', 'item.id = picture_item.item_id', null)
+                ->where('picture_item.picture_id = ?', $this->id)
+        );
 
-                if (count($cars) > 1) {
-                    $brands = $itemTable->fetchAll(
-                        $itemTable->select(true)
-                            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
-                            ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                            ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                            ->where('picture_item.picture_id = ?', $this->id)
-                    );
+        if (count($cars) > 1) {
+            $brands = $itemTable->fetchAll(
+                $itemTable->select(true)
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                    ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
+                    ->where('picture_item.picture_id = ?', $this->id)
+            );
 
-                    $f = [];
-                    foreach ($brands as $brand) {
-                        $f[] = $filenameFilter->filter($brand->catname);
-                    }
-                    $f = array_unique($f);
-                    sort($f, SORT_STRING);
+            $f = [];
+            foreach ($brands as $brand) {
+                $f[] = $filenameFilter->filter($brand->catname);
+            }
+            $f = array_unique($f);
+            sort($f, SORT_STRING);
 
-                    $brandsFolder = implode('/', $f);
-                    $firstChar = mb_substr($brandsFolder, 0, 1);
+            $brandsFolder = implode('/', $f);
+            $firstChar = mb_substr($brandsFolder, 0, 1);
 
-                    $result = $firstChar . '/' . $brandsFolder .'/mixed';
-                } elseif (count($cars) == 1) {
-                    $car = $cars[0];
+            $result = $firstChar . '/' . $brandsFolder .'/mixed';
+        } elseif (count($cars) == 1) {
+            $car = $cars[0];
 
-                    $carCatname = $filenameFilter->filter($car->name);
+            $carCatname = $filenameFilter->filter($car->name);
 
-                    $brands = $itemTable->fetchAll(
-                        $itemTable->select(true)
-                            ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
-                            ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                            ->where('item_parent_cache.item_id = ?', $car->id)
-                    );
+            $brands = $itemTable->fetchAll(
+                $itemTable->select(true)
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                    ->where('item_parent_cache.item_id = ?', $car->id)
+            );
 
-                    $sBrands = [];
-                    foreach ($brands as $brand) {
-                        $sBrands[$brand->id] = $brand;
-                    }
+            $sBrands = [];
+            foreach ($brands as $brand) {
+                $sBrands[$brand->id] = $brand;
+            }
 
-                    if (count($sBrands) > 1) {
-                        $f = [];
-                        foreach ($sBrands as $brand) {
-                            $f[] = $filenameFilter->filter($brand->catname);
-                        }
-                        $f = array_unique($f);
-                        sort($f, SORT_STRING);
-
-                        $carFolder = $carCatname;
-                        foreach ($f as $i) {
-                            $carFolder = str_replace($i, '', $carFolder);
-                        }
-
-                        $carFolder = str_replace('__', '_', $carFolder);
-                        $carFolder = trim($carFolder, '_-');
-
-                        $brandsFolder = implode('/', $f);
-                        $firstChar = mb_substr($brandsFolder, 0, 1);
-
-                        $result = $firstChar . '/' . $brandsFolder .'/'.$carFolder.'/'.$carCatname;
-                    } else {
-                        if (count($sBrands) == 1) {
-                            $sBrandsA = array_values($sBrands);
-                            $brand = $sBrandsA[0];
-
-                            $brandFolder = $filenameFilter->filter($brand->catname);
-                            $firstChar = mb_substr($brandFolder, 0, 1);
-
-                            $carFolder = $carCatname;
-                            $carFolder = trim(str_replace($brandFolder, '', $carFolder), '_-');
-
-                            $result = implode('/', [
-                                $firstChar,
-                                $brandFolder,
-                                $carFolder,
-                                $carCatname
-                            ]);
-                        } else {
-                            $carFolder = $filenameFilter->filter($car->name);
-                            $firstChar = mb_substr($carFolder, 0, 1);
-                            $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
-                        }
-                    }
+            if (count($sBrands) > 1) {
+                $f = [];
+                foreach ($sBrands as $brand) {
+                    $f[] = $filenameFilter->filter($brand->catname);
                 }
-                break;
+                $f = array_unique($f);
+                sort($f, SORT_STRING);
 
-            case DbTable\Picture::FACTORY_TYPE_ID:
-                $factory = $this->findParentRow(\Application\Model\DbTable\Factory::class);
-                if ($factory) {
+                $carFolder = $carCatname;
+                foreach ($f as $i) {
+                    $carFolder = str_replace($i, '', $carFolder);
+                }
+
+                $carFolder = str_replace('__', '_', $carFolder);
+                $carFolder = trim($carFolder, '_-');
+
+                $brandsFolder = implode('/', $f);
+                $firstChar = mb_substr($brandsFolder, 0, 1);
+
+                $result = $firstChar . '/' . $brandsFolder .'/'.$carFolder.'/'.$carCatname;
+            } else {
+                if (count($sBrands) == 1) {
+                    $sBrandsA = array_values($sBrands);
+                    $brand = $sBrandsA[0];
+
+                    $brandFolder = $filenameFilter->filter($brand->catname);
+                    $firstChar = mb_substr($brandFolder, 0, 1);
+
+                    $carFolder = $carCatname;
+                    $carFolder = trim(str_replace($brandFolder, '', $carFolder), '_-');
+
                     $result = implode('/', [
-                        'factories',
-                        $filenameFilter->filter($factory->name)
+                        $firstChar,
+                        $brandFolder,
+                        $carFolder,
+                        $carCatname
                     ]);
+                } else {
+                    $carFolder = $filenameFilter->filter($car->name);
+                    $firstChar = mb_substr($carFolder, 0, 1);
+                    $result = $firstChar . '/' . $carFolder.'/'.$carCatname;
                 }
-                break;
-
-            default:
-                throw new Exception("Unknown picture type [{$this->type}]");
+            }
         }
 
         $result = str_replace('//', '/', $result);

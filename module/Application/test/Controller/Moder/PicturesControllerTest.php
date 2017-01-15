@@ -86,7 +86,6 @@ class PicturesControllerTest extends AbstractHttpControllerTestCase
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $url = 'https://www.autowp.ru/moder/pictures/move/' . implode('/', [
             'picture_id/' . $pictureId,
-            'type/' . Picture::VEHICLE_TYPE_ID,
             'item_id/1'
         ]);
         $this->dispatch($url, Request::METHOD_POST);

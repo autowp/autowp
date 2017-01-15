@@ -208,20 +208,14 @@ class TelegramService
     {
         $db = $picture->getTable()->getAdapter();
 
-        $brandIds = [];
-
-        switch ($picture->type) {
-            case DbTable\Picture::VEHICLE_TYPE_ID:
-                $brandIds = $db->fetchCol(
-                    $db->select()
-                        ->from('item', 'id')
-                        ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
-                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                        ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                        ->where('picture_item.picture_id = ?', $picture->id)
-                );
-                break;
-        }
+        $brandIds = $db->fetchCol(
+            $db->select()
+                ->from('item', 'id')
+                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
+                ->where('picture_item.picture_id = ?', $picture->id)
+        );
 
         return $brandIds;
     }

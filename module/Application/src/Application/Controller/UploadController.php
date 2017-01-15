@@ -84,29 +84,24 @@ class UploadController extends AbstractActionController
         $perspectiveId = null;
 
         if ($replacePicture) {
-            $type = $replacePicture->type;
             $carIds = $this->pictureItem->getPictureItems($replacePicture->id);
         } else {
-            $type = (int)$this->params('type');
             $carId = (int)$this->params('item_id');
             $carIds = $carId ? [$carId] : [];
             $perspectiveId = (int)$this->params('perspective_id');
         }
 
         $selected = false;
-        $selectedName = null;
-        switch ($type) {
-            case DbTable\Picture::VEHICLE_TYPE_ID:
-                $cars = new DbTable\Item();
-                $cars = $cars->find($carIds);
-                $names = [];
-                foreach ($cars as $car) {
-                    $selected = true;
-                    $names[] = $this->car()->formatName($car, $this->language());
-                }
-                $selectedName = implode(', ', $names);
-                break;
+
+        $cars = new DbTable\Item();
+        $cars = $cars->find($carIds);
+        $names = [];
+        foreach ($cars as $car) {
+            $selected = true;
+            $names[] = $this->car()->formatName($car, $this->language());
         }
+        $selectedName = implode(', ', $names);
+
 
         $form = null;
 
@@ -126,7 +121,7 @@ class UploadController extends AbstractActionController
                 );
                 $form->setData($data);
                 if ($form->isValid()) {
-                    $pictures = $this->saveUpload($form, $type, $carIds, $perspectiveId, $replacePicture);
+                    $pictures = $this->saveUpload($form, $carIds, $perspectiveId, $replacePicture);
 
                     if ($request->isXmlHttpRequest()) {
                         /*$urls = [];
@@ -192,21 +187,13 @@ class UploadController extends AbstractActionController
         ];
     }
 
-    private function saveUpload($form, $type, $carIds, $perspectiveId, $replacePicture)
+    private function saveUpload($form, $carIds, $perspectiveId, $replacePicture)
     {
         $user = $this->user()->get();
 
         $values = $form->getData();
 
         $perspectiveId = null;
-
-        switch ($type) {
-            case DbTable\Picture::VEHICLE_TYPE_ID:
-                break;
-
-            default:
-                throw new Exception("Unexpected type");
-        }
 
         $pictureTable = $this->catalogue()->getPictureTable();
 
@@ -264,7 +251,6 @@ class UploadController extends AbstractActionController
                 'add_date'      => new Zend_Db_Expr('NOW()'),
                 'filesize'      => $fileSize,
                 'status'        => DbTable\Picture::STATUS_INBOX,
-                'type'          => $type,
                 'removing_date' => null,
                 //'brand_id'      => $brandId ? $brandId : null,
                 'ip'            => inet_pton($this->getRequest()->getServer('REMOTE_ADDR')),
@@ -292,20 +278,6 @@ class UploadController extends AbstractActionController
             $this->imageStorage()->changeImageName($picture->image_id, [
                 'pattern' => $picture->getFileNamePattern(),
             ]);
-
-            // recalculate chached counts
-            switch ($picture->type) {
-                case DbTable\Picture::VEHICLE_TYPE_ID:
-                    $carIds = $this->pictureItem->getPictureItems($picture->id);
-                    $itemTable = new DbTable\Item();
-                    $brandModel = new BrandModel();
-                    //TODO: prevent double refresh
-                    foreach ($itemTable->find($carIds) as $car) {
-                        $car->refreshPicturesCount();
-                        $brandModel->refreshPicturesCountByVehicle($car->id);
-                    }
-                    break;
-            }
 
             // add comment
             if ($values['note']) {
@@ -501,7 +473,6 @@ class UploadController extends AbstractActionController
                 'today'            => $row['today'],
                 'url'  => $this->url()->fromRoute('upload/params', [
                     'action'  => 'index',
-                    'type'    => DbTable\Picture::VEHICLE_TYPE_ID,
                     'item_id' => $row['id']
                 ], [], true),
                 'haveChilds' => $haveChilds,
@@ -541,7 +512,6 @@ class UploadController extends AbstractActionController
                 'today'            => $row['today'],
                 'url'  => $this->url()->fromRoute('upload/params', [
                     'action'  => 'index',
-                    'type'    => DbTable\Picture::VEHICLE_TYPE_ID,
                     'item_id' => $row['id']
                 ], [], true),
                 'haveChilds' => $haveChilds,

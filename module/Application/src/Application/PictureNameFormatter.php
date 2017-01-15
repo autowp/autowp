@@ -57,36 +57,25 @@ class PictureNameFormatter
             return $picture['name'];
         }
 
-        switch ($picture['type']) {
-            case Picture::VEHICLE_TYPE_ID:
-                $result = [];
+        $result = [];
 
-                if (count($picture['items']) > 1) {
-                    foreach ($picture['items'] as $item) {
-                        $result[] = $item['name'];
-                    }
+        if (count($picture['items']) > 1) {
+            foreach ($picture['items'] as $item) {
+                $result[] = $item['name'];
+            }
 
-                    return implode(', ', $result);
-                } elseif (count($picture['items']) == 1) {
-                    $item = $picture['items'][0];
+            return implode(', ', $result);
+        } elseif (count($picture['items']) == 1) {
+            $item = $picture['items'][0];
 
-                    $result = [];
-                    if ($item['perspective']) {
-                        $result[] = self::mbUcfirst($this->translate($item['perspective'], $language));
-                    }
+            $result = [];
+            if ($item['perspective']) {
+                $result[] = self::mbUcfirst($this->translate($item['perspective'], $language));
+            }
 
-                    $result[] = $this->itemNameFormatter->format($item, $language);
+            $result[] = $this->itemNameFormatter->format($item, $language);
 
-                    return implode(' ', $result);
-                }
-
-                return 'Unsorted vehicle';
-
-            case Picture::FACTORY_TYPE_ID:
-                if ($picture['factory']) {
-                    return $picture['factory'];
-                }
-                return $this->translate('picturelist/factory', $language);
+            return implode(' ', $result);
         }
 
         return 'Picture';
@@ -98,32 +87,23 @@ class PictureNameFormatter
             return $this->renderer->escapeHtml($picture['name']);
         }
 
-        switch ($picture['type']) {
-            case Picture::VEHICLE_TYPE_ID:
-                $result = [];
-                if (count($picture['items']) > 1) {
-                    foreach ($picture['items'] as $item) {
-                        $result[] = $this->renderer->escapeHtml($item['name']);
-                    }
-                    return implode(', ', $result);
-                } elseif (count($picture['items']) == 1) {
-                    $item = $picture['items'][0];
+        $result = [];
+        if (count($picture['items']) > 1) {
+            foreach ($picture['items'] as $item) {
+                $result[] = $this->renderer->escapeHtml($item['name']);
+            }
+            return implode(', ', $result);
+        } elseif (count($picture['items']) == 1) {
+            $item = $picture['items'][0];
 
-                    $result = [];
-                    if ($item['perspective']) {
-                        $perspective = $this->translate($item['perspective'], $language);
-                        $result[] = $this->renderer->escapeHtml(self::mbUcfirst($perspective, $language));
-                    }
+            $result = [];
+            if ($item['perspective']) {
+                $perspective = $this->translate($item['perspective'], $language);
+                $result[] = $this->renderer->escapeHtml(self::mbUcfirst($perspective, $language));
+            }
 
-                    $result[] = $this->itemNameFormatter->formatHtml($item, $language);
-                    return implode(' ', $result);
-                }
-
-                return 'Unsorted vehicle';
-
-            case Picture::FACTORY_TYPE_ID:
-                return $this->renderer->escapeHtml($this->format($picture, $language));
-                break;
+            $result[] = $this->itemNameFormatter->formatHtml($item, $language);
+            return implode(' ', $result);
         }
 
         return 'Picture';

@@ -68,8 +68,6 @@ class PictureItemController extends AbstractActionController
 
         $this->pictureItem->remove($picture->id, $item->id);
 
-        $this->pictureTable->refreshPictureCounts($this->pictureItem, $picture);
-
         return $this->redirect()->toUrl($this->getPictureUrl($picture));
     }
 

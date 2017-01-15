@@ -113,55 +113,52 @@ class Pic extends AbstractPlugin
         $controller = $this->getController();
 
         $url = null;
-        switch ($row['type']) {
-            case DbTable\Picture::VEHICLE_TYPE_ID:
-                $carIds = $this->pictureItem->getPictureItems($row['id']);
-                if ($carIds) {
-                    $carId = $carIds[0];
-                    $itemParentTable = new DbTable\Item\ParentTable();
-                    $paths = $itemParentTable->getPaths($carId, [
-                        'breakOnFirst' => true
+
+        $carIds = $this->pictureItem->getPictureItems($row['id']);
+        if ($carIds) {
+            $carId = $carIds[0];
+            $itemParentTable = new DbTable\Item\ParentTable();
+            $paths = $itemParentTable->getPaths($carId, [
+                'breakOnFirst' => true
+            ]);
+
+            if (count($paths) > 0) {
+                $path = $paths[0];
+
+                if ($path['car_catname']) {
+                    $url = $controller->url()->fromRoute('catalogue', [
+                        'action'        => 'brand-item-picture',
+                        'brand_catname' => $path['brand_catname'],
+                        'car_catname'   => $path['car_catname'],
+                        'path'          => $path['path'],
+                        'picture_id'    => $row['identity']
+                    ], [
+                        'force_canonical' => $options['canonical']
                     ]);
+                } else {
+                    $perspectiveId = $this->pictureItem->getPerspective($row['id'], $carId);
 
-                    if (count($paths) > 0) {
-                        $path = $paths[0];
-
-                        if ($path['car_catname']) {
-                            $url = $controller->url()->fromRoute('catalogue', [
-                                'action'        => 'brand-item-picture',
-                                'brand_catname' => $path['brand_catname'],
-                                'car_catname'   => $path['car_catname'],
-                                'path'          => $path['path'],
-                                'picture_id'    => $row['identity']
-                            ], [
-                                'force_canonical' => $options['canonical']
-                            ]);
-                        } else {
-                            $perspectiveId = $this->pictureItem->getPerspective($row['id'], $carId);
-
-                            switch ($perspectiveId) {
-                                case 22:
-                                    $action = 'logotypes-picture';
-                                    break;
-                                case 25:
-                                    $action = 'mixed-picture';
-                                    break;
-                                default:
-                                    $action = 'other-picture';
-                                    break;
-                            }
-
-                            $url = $controller->url()->fromRoute('catalogue', [
-                                'action'        => $action,
-                                'brand_catname' => $path['brand_catname'],
-                                'picture_id'    => $row['identity']
-                            ], [
-                                'force_canonical' => $options['canonical']
-                            ]);
-                        }
+                    switch ($perspectiveId) {
+                        case 22:
+                            $action = 'logotypes-picture';
+                            break;
+                        case 25:
+                            $action = 'mixed-picture';
+                            break;
+                        default:
+                            $action = 'other-picture';
+                            break;
                     }
+
+                    $url = $controller->url()->fromRoute('catalogue', [
+                        'action'        => $action,
+                        'brand_catname' => $path['brand_catname'],
+                        'picture_id'    => $row['identity']
+                    ], [
+                        'force_canonical' => $options['canonical']
+                    ]);
                 }
-                break;
+            }
         }
 
         if ($options['fallback'] && ! $url) {
@@ -306,8 +303,7 @@ class Pic extends AbstractPlugin
                     'pictures.id', 'pictures.identity', 'pictures.name',
                     'pictures.width', 'pictures.height',
                     'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
-                    'pictures.status', 'pictures.image_id',
-                    'pictures.type'
+                    'pictures.status', 'pictures.image_id'
                 ]);
 
             $select
@@ -1183,8 +1179,7 @@ class Pic extends AbstractPlugin
                 'pictures.id', 'pictures.identity', 'pictures.name',
                 'pictures.width', 'pictures.height',
                 'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
-                'pictures.image_id', 'pictures.filesize',
-                'pictures.type',
+                'pictures.image_id', 'pictures.filesize'
             ])
             ->joinLeft(
                 ['ct' => 'comment_topic'],

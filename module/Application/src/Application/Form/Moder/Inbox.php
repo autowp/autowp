@@ -76,18 +76,6 @@ class Inbox extends Form implements InputFilterProviderInterface
                 ]
             ],
             [
-                'name'    => 'type_id',
-                'type'    => 'Select',
-                'options' => [
-                    'label'   => 'moder/pictures/filter/type',
-                    'options' => [
-                        ''                                => 'moder/pictures/filter/type/any',
-                        DbTable\Picture::VEHICLE_TYPE_ID  => 'moder/pictures/filter/type/item',
-                        DbTable\Picture::FACTORY_TYPE_ID  => 'moder/pictures/filter/type/factory',
-                    ]
-                ]
-            ],
-            [
                 'name'    => 'comments',
                 'type'    => 'Select',
                 'options' => [

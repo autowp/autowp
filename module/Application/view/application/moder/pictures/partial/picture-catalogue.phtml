@@ -65,7 +65,6 @@
                                                 'action'      => 'move',
                                                 'picture_id'  => $this->picture->id,
                                                 'src_item_id' => $item['item_id'],
-                                                'type'        => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
                                                 'item_id'     => $this->lastCar->id
                                             ]),
                                             '<i class="fa fa-arrow-right"></i> ' .
@@ -112,7 +111,6 @@
                 'href'  => $this->url(null, [
                     'action'     => 'move',
                     'picture_id' => $this->picture->id,
-                    'type'       => Application\Model\DbTable\Picture::VEHICLE_TYPE_ID,
                     'item_id'    => $this->lastCar->id
                 ])
             ],

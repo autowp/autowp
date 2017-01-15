@@ -2217,7 +2217,7 @@ CREATE TABLE `pictures` (
   `note` varchar(255) NOT NULL DEFAULT '',
   `crc` int(11) DEFAULT NULL,
   `status` enum('new','accepted','removing','removed','inbox') NOT NULL,
-  `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `removing_date` date DEFAULT NULL,
   `_brand_id` int(10) unsigned DEFAULT NULL,
   `change_status_user_id` int(10) unsigned DEFAULT NULL,
@@ -2242,17 +2242,13 @@ CREATE TABLE `pictures` (
   KEY `crc` (`crc`),
   KEY `dateAndIdOrdering` (`status`,`add_date`,`id`),
   KEY `comments` (`status`),
-  KEY `item_id` (`type`,`status`),
-  KEY `brandIndex` (`_brand_id`,`type`,`status`),
   KEY `owner_id` (`owner_id`,`status`),
   KEY `accept_datetime` (`status`,`accept_datetime`),
-  KEY `pictures_fk5` (`type`),
   KEY `pictures_fk6` (`replace_picture_id`),
   KEY `_factory_id` (`_factory_id`),
   KEY `width` (`width`,`height`,`add_date`,`id`),
   KEY `copyrights_text_id` (`copyrights_text_id`),
   CONSTRAINT `pictures_fk` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `pictures_fk5` FOREIGN KEY (`type`) REFERENCES `pictures_types` (`id`),
   CONSTRAINT `pictures_fk6` FOREIGN KEY (`replace_picture_id`) REFERENCES `pictures` (`id`) ON DELETE SET NULL,
   CONSTRAINT `pictures_fk7` FOREIGN KEY (`image_id`) REFERENCES `image` (`id`),
   CONSTRAINT `pictures_ibfk_2` FOREIGN KEY (`copyrights_text_id`) REFERENCES `textstorage_text` (`id`)
@@ -2264,7 +2260,7 @@ CREATE TABLE `pictures` (
 --
 
 /*!40000 ALTER TABLE `pictures` DISABLE KEYS */;
-INSERT INTO `pictures` (`id`, `width`, `height`, `filesize`, `owner_id`, `add_date`, `note`, `crc`, `status`, `type`, `removing_date`, `_brand_id`, `change_status_user_id`, `crop_left`, `crop_top`, `crop_width`, `crop_height`, `accept_datetime`, `name`, `source_id`, `copyrights`, `identity`, `replace_picture_id`, `image_id`, `_factory_id`, `ip`, `copyrights_text_id`, `point`) VALUES (1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity1',NULL,1,NULL,0x7F000001,NULL,NULL),(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity2',NULL,33,NULL,0x7F000001,NULL,NULL),(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity3',NULL,35,NULL,0x7F000001,NULL,NULL),(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity4',NULL,37,NULL,0x7F000001,NULL,NULL),(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity5',NULL,38,NULL,0x7F000001,NULL,NULL);
+INSERT INTO `pictures` (`id`, `width`, `height`, `filesize`, `owner_id`, `add_date`, `note`, `crc`, `status`, `_type`, `removing_date`, `_brand_id`, `change_status_user_id`, `crop_left`, `crop_top`, `crop_width`, `crop_height`, `accept_datetime`, `name`, `source_id`, `copyrights`, `identity`, `replace_picture_id`, `image_id`, `_factory_id`, `ip`, `copyrights_text_id`, `point`) VALUES (1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity1',NULL,1,NULL,0x7F000001,NULL,NULL),(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity2',NULL,33,NULL,0x7F000001,NULL,NULL),(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity3',NULL,35,NULL,0x7F000001,NULL,NULL),(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity4',NULL,37,NULL,0x7F000001,NULL,NULL),(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity5',NULL,38,NULL,0x7F000001,NULL,NULL);
 /*!40000 ALTER TABLE `pictures` ENABLE KEYS */;
 
 --
@@ -2293,29 +2289,6 @@ CREATE TABLE `pictures_moder_votes` (
 
 /*!40000 ALTER TABLE `pictures_moder_votes` DISABLE KEYS */;
 /*!40000 ALTER TABLE `pictures_moder_votes` ENABLE KEYS */;
-
---
--- Table structure for table `pictures_types`
---
-
-DROP TABLE IF EXISTS `pictures_types`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `pictures_types` (
-  `id` tinyint(3) unsigned NOT NULL,
-  `name` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pictures_types`
---
-
-/*!40000 ALTER TABLE `pictures_types` DISABLE KEYS */;
-INSERT INTO `pictures_types` (`id`, `name`) VALUES (1,'Автомобиль'),(4,'Двигатель'),(7,'Завод'),(6,'Интерьер'),(2,'Логотип бренда'),(5,'Модель'),(0,'Несортировано'),(3,'Разное');
-/*!40000 ALTER TABLE `pictures_types` ENABLE KEYS */;
 
 --
 -- Table structure for table `referer`

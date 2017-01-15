@@ -60,7 +60,7 @@ class CatalogueController extends AbstractActionController
 
     public function migrateEnginesAction()
     {
-        $itemTable = new DbTable\Item();
+        /*$itemTable = new DbTable\Item();
         $itemLangTable = new DbTable\Item\Language();
 
         $itemParentTable = new DbTable\Item\ParentTable();
@@ -71,7 +71,7 @@ class CatalogueController extends AbstractActionController
 
         $factoryTable = new DbTable\Factory();
         $factoryCarTable = new DbTable\FactoryCar();
-        
+
         $db = $factoryTable->getAdapter();
 
         foreach ($factoryTable->fetchAll(null, null) as $factoryRow) {
@@ -141,55 +141,55 @@ class CatalogueController extends AbstractActionController
                         'item_id' => $itemRow->id
                     ]);
                 }
-    
+
                 $itemPointRow->point = $factoryRow->point;
                 $itemPointRow->save();
             }
-            
+
             $db->query('
                 insert ignore into log_events_item (log_event_id, item_id)
                 select log_event_id, ?
                 from log_events_factory
                 where factory_id = ?
             ', [$itemRow->id, $factoryRow->id]);
-            
+
             $factoryCarRows = $factoryCarTable->fetchAll([
                 'factory_id = ?' => $factoryRow->id
             ]);
             foreach ($factoryCarRows as $factoryCarRow) {
-            
+
                 print 'car=' . $factoryCarRow->item_id . PHP_EOL;
-            
+
                 $vehicleRow = $itemTable->fetchRow([
                     'id = ?' => $factoryCarRow->item_id
                 ]);
-            
+
                 $this->brandVehicle->create($itemRow->id, $vehicleRow->id);
-            
+
                 $itemTable->updateInteritance($vehicleRow);
             }
-            
+
             $itemParentCacheTable->rebuildCache($itemRow);
-            
-            
+
+
             $pictureRows = $pictureTable->fetchAll([
                 'type = ?'       => DbTable\Picture::FACTORY_TYPE_ID,
                 'factory_id = ?' => $factoryRow->id
             ], 'id');
-            
+
             foreach ($pictureRows as $picture) {
-            
+
                 print 'picture=' . $picture->id . PHP_EOL;
-            
+
                 $this->pictureItem->setPictureItems($picture->id, [$itemRow->id]);
                 $this->pictureItem->setProperties($picture->id, $itemRow->id, [
                     'perspective' => 16
                 ]);
-            
+
                 $picture->type = DbTable\Picture::VEHICLE_TYPE_ID;
                 $picture->save();
             }
-        }
+        }*/
 
         /*$db = $itemParentTable->getAdapter();
 
@@ -252,7 +252,7 @@ class CatalogueController extends AbstractActionController
 
 
 
-            
+
         }*/
 
         // parent_brand_id
@@ -391,7 +391,7 @@ class CatalogueController extends AbstractActionController
 
             $previousStatusUserId = $picture->change_status_user_id;
 
-            $success = $pictureTable->accept($this->pictureItem, $picture->id, $userId, $isFirstTimeAccepted);
+            $success = $pictureTable->accept($picture->id, $userId, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
                 $owner = $picture->findParentRow(User::class, 'Owner');
                 if ($owner && ($owner->id != $userId)) {

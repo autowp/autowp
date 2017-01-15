@@ -16,7 +16,6 @@ use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\Comments;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Factory;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
@@ -25,8 +24,6 @@ use Application\Model\PictureItem;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\TelegramService;
-
-use Exception;
 
 use Zend_Db_Expr;
 use Zend_Db_Table_Rowset;
@@ -293,10 +290,6 @@ class PicturesController extends AbstractActionController
             }
         }
 
-        if (strlen($formdata['type_id'])) {
-            $select->where('pictures.type = ?', $formdata['type_id']);
-        }
-
         if ($formdata['item_id']) {
             if (! $pictureItemJoined) {
                 $pictureItemJoined = true;
@@ -341,8 +334,7 @@ class PicturesController extends AbstractActionController
             $select
                 ->join('item', 'picture_item.item_id = item.id', null)
                 ->join('car_types_parents', 'item.car_type_id=car_types_parents.id', null)
-                ->where('car_types_parents.parent_id = ?', $formdata['car_type_id'])
-                ->where('pictures.type = ?', Picture::VEHICLE_TYPE_ID);
+                ->where('car_types_parents.parent_id = ?', $formdata['car_type_id']);
         }
 
         if ($formdata['special_name']) {
@@ -632,10 +624,6 @@ class PicturesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        if ($picture->type != Picture::VEHICLE_TYPE_ID) {
-            throw new Exception('Invalid picture type');
-        }
-
         $perspectives = new Perspective();
 
         $request = $this->getRequest();
@@ -701,9 +689,9 @@ class PicturesController extends AbstractActionController
         $canDelete = $this->pictureCanDelete($picture);
 
         $isLastPicture = null;
-        if ($picture->type == Picture::VEHICLE_TYPE_ID && $picture->status == Picture::STATUS_ACCEPTED) {
+        if ($picture->status == Picture::STATUS_ACCEPTED) {
             $db = $this->table->getAdapter();
-            $result = ! $db->fetchOne(
+            $isLastPicture = ! $db->fetchOne(
                 $db->select()
                     ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
@@ -718,22 +706,19 @@ class PicturesController extends AbstractActionController
             );
         }
 
-        $acceptedCount = null;
-        if ($picture->type == Picture::VEHICLE_TYPE_ID) {
-            $db = $this->table->getAdapter();
-            $acceptedCount = $db->fetchOne(
-                $db->select()
-                    ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join(
-                        ['pi2' => 'picture_item'],
-                        'picture_item.item_id = pi2.item_id',
-                        null
-                    )
-                    ->where('pi2.picture_id = ?', $picture->id)
-                    ->where('status = ?', Picture::STATUS_ACCEPTED)
-            );
-        }
+        $db = $this->table->getAdapter();
+        $acceptedCount = $db->fetchOne(
+            $db->select()
+                ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join(
+                    ['pi2' => 'picture_item'],
+                    'picture_item.item_id = pi2.item_id',
+                    null
+                )
+                ->where('pi2.picture_id = ?', $picture->id)
+                ->where('status = ?', Picture::STATUS_ACCEPTED)
+        );
 
         $user = $this->user()->get();
         $voteExists = $this->pictureVoteExists($picture, $user);
@@ -1489,8 +1474,7 @@ class PicturesController extends AbstractActionController
                 'name' => $this->car()->formatName($row, $this->language()),
                 'url'  => $this->url()->fromRoute(null, [
                     'action'  => 'move',
-                    'item_id' => $row['id'],
-                    'type'    => Picture::VEHICLE_TYPE_ID
+                    'item_id' => $row['id']
                 ], [], true),
                 'haveChilds' => $haveChilds,
                 'isGroup'    => $row->is_group,
@@ -1524,8 +1508,7 @@ class PicturesController extends AbstractActionController
                     'name' => $this->car()->formatName($car, $this->language()),
                     'url'  => $this->url()->fromRoute(null, [
                         'action' => 'move',
-                        'item_id' => $car['id'],
-                        'type'   => Picture::VEHICLE_TYPE_ID
+                        'item_id' => $car['id']
                     ], [], true),
                     'haveChilds' => $haveChilds,
                     'isGroup'    => $car['is_group'],
@@ -1818,7 +1801,7 @@ class PicturesController extends AbstractActionController
 
             $pictureTable = new Picture();
 
-            $success = $pictureTable->accept($this->pictureItem, $picture->id, $user->id, $isFirstTimeAccepted);
+            $success = $pictureTable->accept($picture->id, $user->id, $isFirstTimeAccepted);
             if ($success && $isFirstTimeAccepted) {
                 $owner = $picture->findParentRow(User::class, 'Owner');
                 if ($owner && ($owner->id != $user->id)) {
@@ -1945,53 +1928,45 @@ class PicturesController extends AbstractActionController
         $itemTable = new Item();
         $srcItem = $itemTable->find($this->params('src_item_id'))->current();
 
-        $type = trim($this->params('type'));
-        if (strlen($type)) {
+        $carId = (int)$this->params('item_id');
+        if (strlen($carId)) {
             $userId = $this->user()->get()->id;
-            switch ($type) {
-                case Picture::VEHICLE_TYPE_ID:
-                    $carId = (int)$this->params('item_id');
-                    $perspectiveId = (int)$this->params('perspective_id');
 
-                    if ($srcItem) {
-                        $this->pictureItem->changePictureItem($picture->id, $srcItem->id, $carId);
-                    } else {
-                        $success = $this->table->addToCar(
-                            $this->pictureItem,
-                            $picture->id,
-                            $carId,
-                            $userId,
-                            [
-                                'language'             => $this->language(),
-                                'pictureNameFormatter' => $this->pictureNameFormatter
-                            ]
-                        );
+            $perspectiveId = (int)$this->params('perspective_id');
 
-                        if (! $success) {
-                            return $this->notFoundAction();
-                        }
-                    }
+            if ($srcItem) {
+                $this->pictureItem->changePictureItem($picture->id, $srcItem->id, $carId);
+            } else {
+                $success = $this->table->addToCar(
+                    $this->pictureItem,
+                    $picture->id,
+                    $carId,
+                    $userId,
+                    [
+                        'language'             => $this->language(),
+                        'pictureNameFormatter' => $this->pictureNameFormatter
+                    ]
+                );
 
-                    if ($perspectiveId) {
-                        $this->pictureItem->setProperties($picture->id, $carId, [
-                            'perspective' => $perspectiveId
-                        ]);
-                    }
-
-                    if ($picture->image_id) {
-                        $this->imageStorage()->changeImageName($picture->image_id, [
-                            'pattern' => $picture->getFileNamePattern(),
-                        ]);
-                    }
-
-                    $namespace = new \Zend\Session\Container('Moder_Car');
-                    $namespace->lastCarId = $this->params('item_id');
-                    break;
-
-                default:
-                    throw new Exception("Unexpected type");
-                    break;
+                if (! $success) {
+                    return $this->notFoundAction();
+                }
             }
+
+            if ($perspectiveId) {
+                $this->pictureItem->setProperties($picture->id, $carId, [
+                    'perspective' => $perspectiveId
+                ]);
+            }
+
+            if ($picture->image_id) {
+                $this->imageStorage()->changeImageName($picture->image_id, [
+                    'pattern' => $picture->getFileNamePattern(),
+                ]);
+            }
+
+            $namespace = new \Zend\Session\Container('Moder_Car');
+            $namespace->lastCarId = $carId;
 
             return $this->redirect()->toUrl($this->pictureUrl($picture));
         }

@@ -36,7 +36,6 @@ class CommentsController extends AbstractActionController
                 /*->join('brand_item', 'brands.id = brand_item.brand_id', null)
                 ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                 ->join('pictures', 'pictures.item_id = item_parent_cache.item_id', null)
-                ->where('pictures.type = ?', DbTable\Picture::VEHICLE_TYPE_ID)
                 ->join('comments_messages', 'comments_messages.item_id = pictures.id', null)
                 ->where('comments_messages.type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID)
                 ->group('brands.id')*/

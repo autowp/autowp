@@ -42,7 +42,7 @@ class CarOfDay
                 INNER JOIN item_parent_cache AS cpc ON c.id=cpc.parent_id
                 INNER JOIN picture_item ON cpc.item_id = picture_item.item_id
                 INNER JOIN pictures AS p ON picture_item.picture_id=p.id
-            WHERE p.type=? AND p.status=?
+            WHERE p.status=?
                 AND (c.begin_year AND c.end_year OR c.begin_model_year AND c.end_model_year)
                 AND c.id NOT IN (SELECT item_id FROM of_day WHERE item_id)
             GROUP BY c.id
@@ -50,7 +50,7 @@ class CarOfDay
             ORDER BY RAND()
             LIMIT 1
         ';
-        return $db->fetchRow($sql, [Picture::VEHICLE_TYPE_ID, Picture::STATUS_ACCEPTED]);
+        return $db->fetchRow($sql, [Picture::STATUS_ACCEPTED]);
     }
 
     public function pick()

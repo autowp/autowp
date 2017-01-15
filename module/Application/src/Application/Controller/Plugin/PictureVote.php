@@ -23,7 +23,7 @@ class PictureVote extends AbstractPlugin
     private function isLastPicture($picture)
     {
         $result = null;
-        if ($picture->type == DbTable\Picture::VEHICLE_TYPE_ID && $picture->status == DbTable\Picture::STATUS_ACCEPTED) {
+        if ($picture->status == DbTable\Picture::STATUS_ACCEPTED) {
             $db = $this->table->getAdapter();
             $result = ! $db->fetchOne(
                 $db->select()
@@ -46,21 +46,21 @@ class PictureVote extends AbstractPlugin
     private function getAcceptedCount($picture)
     {
         $result = null;
-        if ($picture->type == DbTable\Picture::VEHICLE_TYPE_ID) {
-            $db = $this->table->getAdapter();
-            $result = $db->fetchOne(
-                $db->select()
-                    ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join(
-                        ['pi2' => 'picture_item'],
-                        'picture_item.item_id = pi2.item_id',
-                        null
-                    )
-                    ->where('pi2.picture_id = ?', $picture->id)
-                    ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
-            );
-        }
+
+        $db = $this->table->getAdapter();
+        $result = $db->fetchOne(
+            $db->select()
+                ->from('pictures', [new Zend_Db_Expr('COUNT(1)')])
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join(
+                    ['pi2' => 'picture_item'],
+                    'picture_item.item_id = pi2.item_id',
+                    null
+                )
+                ->where('pi2.picture_id = ?', $picture->id)
+                ->where('status = ?', DbTable\Picture::STATUS_ACCEPTED)
+        );
+
         return $result;
     }
 
