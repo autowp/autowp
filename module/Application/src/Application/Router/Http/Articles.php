@@ -6,8 +6,6 @@ use Zend\Router\Http\RouteInterface;
 use Zend\Router\Http\RouteMatch;
 use Zend\Stdlib\RequestInterface as Request;
 
-use Application\Model\DbTable\Brand as BrandTable;
-
 class Articles implements RouteInterface
 {
     const DELIMETER = '/';
