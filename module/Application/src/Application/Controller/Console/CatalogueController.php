@@ -66,9 +66,82 @@ class CatalogueController extends AbstractActionController
         $itemParentTable = new DbTable\Item\ParentTable();
         $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
         $itemParentCacheTable = new DbTable\Item\ParentCache();
+        $itemPointTable = new DbTable\Item\Point();
 
+        $factoryTable = new DbTable\Factory();
 
-        $db = $itemParentTable->getAdapter();
+        foreach ($factoryTable->fetchAll() as $factoryRow) {
+            print $factoryRow->id . PHP_EOL;
+
+            $itemRow = $itemTable->fetchRow([
+                'migration_factory_id = ?' => $factoryRow->id
+            ]);
+            if (!$itemRow) {
+                $itemRow = $itemTable->createRow([
+                    'migration_factory_id' => $factoryRow->id,
+                    'name'               => $factoryRow->name,
+                    'item_type_id'       => DbTable\Item\Type::FACTORY,
+                    'body'               => '',
+                    'produced_exactly'   => 0,
+                    'is_group'           => 1,
+                    'begin_year'         => $factoryRow->year_from ? $factoryRow->year_from : null,
+                    'end_year'           => $factoryRow->year_to ? $factoryRow->year_to : null
+                ]);
+                $itemRow->save();
+            }
+
+            if ($factoryRow->text_id) {
+                $text = $this->textStorage->getText($factoryRow->text_id);
+                $language = null;
+
+                if (!$text) {
+                    $language = 'en';
+                }
+
+                if (preg_match('|^[[:space:] a-zA-ZІ½²³°®™„”‐€ŤÚőçÚÖćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
+                    $language = 'en';
+                }
+
+                if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½²³°®™„”‐€ŤÚőçÚÖćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
+                    $language = 'ru';
+                }
+
+                print $factoryRow->text_id . '#' . $language . PHP_EOL;
+
+                if (!$language) {
+                    print $text . PHP_EOL;
+                    exit;
+                }
+
+                $langRow = $itemLangTable->fetchRow([
+                    'item_id = ?'  => $itemRow->id,
+                    'language = ?' => $language
+                ]);
+                if (!$langRow) {
+                    $langRow = $itemLangTable->createRow([
+                        'item_id'  => $itemRow->id,
+                        'language' => $language,
+                    ]);
+                }
+
+                $langRow->text_id = $factoryRow->text_id;
+                $langRow->save();
+            }
+
+            $itemPointRow = $itemPointTable->fetchRow([
+                'item_id = ?' => $itemRow->id
+            ]);
+            if (!$itemPointRow) {
+                $itemPointRow = $itemPointTable->createRow([
+                    'item_id' => $itemRow->id
+                ]);
+            }
+
+            $itemPointRow->point = $factoryRow->point;
+            $itemPointRow->save();
+        }
+
+        /*$db = $itemParentTable->getAdapter();
 
         $itemParentRows = $itemParentTable->fetchAll([
             'length(name) > 0'
@@ -114,7 +187,7 @@ class CatalogueController extends AbstractActionController
             }
 
             print_r($itemParentLanguageRow->toArray());
-        }
+        }*/
 
         /*$rows = $itemTable->fetchAll(['item_type_id = ?' => DbTable\Item\Type::BRAND]);
         foreach ($rows as $row) {
@@ -125,66 +198,9 @@ class CatalogueController extends AbstractActionController
         /*$brandRows = $brandTable->fetchAll(null, 'id');
 
         foreach ($brandRows as $brandRow) {
-            print $brandRow->id . PHP_EOL;
 
-            $itemRow = $itemTable->fetchRow([
-                'migration_brand_id = ?' => $brandRow->id
-            ]);
-            if (!$itemRow) {
-                $itemRow = $itemTable->createRow([
-                    'migration_brand_id' => $brandRow->id,
-                    'name'               => $brandRow->name,
-                    'full_name'          => $brandRow->full_name,
-                    'item_type_id'       => DbTable\Item\Type::BRAND,
-                    'catname'            => $brandRow->folder,
-                    'position'           => $brandRow->position,
-                    'body'               => '',
-                    'produced_exactly'   => 0,
-                    'is_group'           => 1,
-                    'begin_year'         => $brandRow->from_year ? $brandRow->from_year : null,
-                    'end_year'           => $brandRow->to_year ? $brandRow->to_year : null,
-                    'logo_id'            => $brandRow->img ? $brandRow->img : null
-                ]);
-                $itemRow->save();
-            }
 
-            if ($brandRow->text_id) {
-                $text = $this->textStorage->getText($brandRow->text_id);
-                $language = null;
 
-                if (!$text) {
-                    $language = 'en';
-                }
-
-                if (preg_match('|^[[:space:] a-zA-ZІ½²³°®™„”‐€ŤÚőçÚÖćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
-                    $language = 'en';
-                }
-
-                if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½²³°®™„”‐€ŤÚőçÚÖćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
-                    $language = 'ru';
-                }
-
-                print $brandRow->text_id . '#' . $language . PHP_EOL;
-
-                if (!$language) {
-                    print $text . PHP_EOL;
-                    exit;
-                }
-
-                $langRow = $itemLangTable->fetchRow([
-                    'item_id = ?'  => $itemRow->id,
-                    'language = ?' => $language
-                ]);
-                if (!$langRow) {
-                    $langRow = $itemLangTable->createRow([
-                        'item_id'  => $itemRow->id,
-                        'language' => $language,
-                    ]);
-                }
-
-                $langRow->text_id = $brandRow->text_id;
-                $langRow->save();
-            }
 
             $db->query('
                 insert ignore into log_events_item (log_event_id, item_id)

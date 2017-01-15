@@ -52,6 +52,10 @@ class BrandVehicle
             DbTable\Item\Type::BRAND   => true,
             DbTable\Item\Type::VEHICLE => true,
             DbTable\Item\Type::ENGINE  => true,
+        ],
+        DbTable\Item\Type::FACTORY => [
+            DbTable\Item\Type::VEHICLE => true,
+            DbTable\Item\Type::ENGINE  => true,
         ]
     ];
 
