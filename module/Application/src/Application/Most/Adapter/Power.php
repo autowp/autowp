@@ -4,8 +4,6 @@ namespace Application\Most\Adapter;
 
 use Application\Model\DbTable\Attr\Attribute;
 
-use Zend_Db_Expr;
-use Zend_Db_Select;
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 
