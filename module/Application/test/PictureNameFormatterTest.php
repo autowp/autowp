@@ -43,22 +43,13 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
         return [
             [
                 [
-                    'type'  => -1
+                    'items' => []
                 ],
                 'Picture',
                 'Picture'
             ],
             [
                 [
-                    'type'  => 1,
-                    'items' => []
-                ],
-                'Unsorted vehicle',
-                'Unsorted vehicle'
-            ],
-            [
-                [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -71,7 +62,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => 'Under the hood',
@@ -84,7 +74,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -98,7 +87,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -113,7 +101,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective'      => null,
@@ -129,7 +116,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective'    => null,
@@ -145,7 +131,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective'      => null,
@@ -162,7 +147,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective'    => null,
@@ -179,7 +163,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective'      => null,
@@ -196,7 +179,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -212,7 +194,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -229,7 +210,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -246,7 +226,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -263,7 +242,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -279,7 +257,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -296,7 +273,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -312,7 +288,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -329,7 +304,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -344,7 +318,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -358,7 +331,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective'      => null,
@@ -375,7 +347,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective'      => null,
@@ -390,7 +361,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective'      => null,
@@ -405,7 +375,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective'      => null,
@@ -420,7 +389,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'        => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -437,7 +405,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
             ],
             [
                 [
-                    'type'  => 1,
                     'items' => [
                         [
                             'perspective' => null,
@@ -457,7 +424,6 @@ class PictureNameFormatterTest extends AbstractHttpControllerTestCase
         return [
             [
                 [
-                    'type'        => 1,
                     'items' => [
                         [
                             'perspective'      => 'B&B',

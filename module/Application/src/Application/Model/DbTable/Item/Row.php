@@ -2,7 +2,6 @@
 
 namespace Application\Model\DbTable\Item;
 
-use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 
 use DateTime;
