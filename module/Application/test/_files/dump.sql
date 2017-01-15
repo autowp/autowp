@@ -1530,7 +1530,7 @@ CREATE TABLE `item_type` (
 --
 
 /*!40000 ALTER TABLE `item_type` DISABLE KEYS */;
-INSERT INTO `item_type` (`id`, `name`) VALUES (1,'vehicle'),(2,'engine'),(3,'category'),(4,'twins'),(5,'brand');
+INSERT INTO `item_type` (`id`, `name`) VALUES (1,'vehicle'),(2,'engine'),(3,'category'),(4,'twins'),(5,'brand'),(6,'factory');
 /*!40000 ALTER TABLE `item_type` ENABLE KEYS */;
 
 --

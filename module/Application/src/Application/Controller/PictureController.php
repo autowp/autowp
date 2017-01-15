@@ -53,35 +53,14 @@ class PictureController extends AbstractActionController
                 ->where('pictures.status IN (?)', $galleryStatuses)
                 ->order($this->catalogue()->picturesOrdering());
 
-            $galleryEnabled = false;
-            switch ($picture->type) {
-                case DbTable\Picture::VEHICLE_TYPE_ID:
-                    $galleryEnabled = true;
-                    $picSelect
-                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                        ->join(
-                            ['pi2' => 'picture_item'],
-                            'picture_item.item_id = pi2.item_id',
-                            null
-                        )
-                        ->where('pi2.picture_id = ?', $picture->id);
-                    break;
-
-                case DbTable\Picture::FACTORY_TYPE_ID:
-                    if ($picture->factory_id) {
-                        $galleryEnabled = true;
-                        $picSelect
-                            ->where('pictures.type = ?', $picture->type)
-                            ->where('pictures.factory_id = ?', $picture->factory_id);
-                    }
-
-                    break;
-            }
-
-            if (! $galleryEnabled) {
-                $picSelect
-                    ->where('pictures.id = ?', $picture->id);
-            }
+            $picSelect
+                ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                ->join(
+                    ['pi2' => 'picture_item'],
+                    'picture_item.item_id = pi2.item_id',
+                    null
+                )
+                ->where('pi2.picture_id = ?', $picture->id);
         } else {
             $picSelect = $pictureTable->select(true)
                 ->where('pictures.id = ?', $picture->id);
@@ -142,35 +121,17 @@ class PictureController extends AbstractActionController
         $brands = [];
         $car = null;
 
-        switch ($picture->type) {
-            case DbTable\Picture::FACTORY_TYPE_ID:
-                if ($picture->factory_id) {
-                    $brandId = $brandModel->getFactoryBrandId($picture->factory_id);
-                    if ($brandId) {
-                        $brands[] = $brandId;
-                    }
-                }
-                break;
-            case DbTable\Picture::VEHICLE_TYPE_ID:
-                $language = $this->language();
-                $brandList = $brandModel->getList($language, function ($select) use ($picture) {
-                    $select
-                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                        ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
-                        ->where('picture_item.picture_id = ?', $picture->id)
-                        ->group('item.id');
-                });
-                foreach ($brandList as $brand) {
-                    $brands[] = $brand['id'];
-                }
-                break;
+        $language = $this->language();
+        $brandList = $brandModel->getList($language, function ($select) use ($picture) {
+            $select
+                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
+                ->where('picture_item.picture_id = ?', $picture->id)
+                ->group('item.id');
+        });
+        foreach ($brandList as $brand) {
+            $brands[] = $brand['id'];
         }
-
-        /*$this->_helper->actionStack('brands', 'sidebar', 'default', [
-            'brand_id'   => $brands,
-            'item_id'     => $car ? $car->id : null,
-            'type'       => (int)$picture->type,
-        ]);*/
 
         $data = $this->pic()->picPageData($picture, $picSelect, $brands, [
             'paginator' => [

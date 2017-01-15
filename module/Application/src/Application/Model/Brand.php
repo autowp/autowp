@@ -324,24 +324,6 @@ class Brand
         });
     }
 
-    public function getFactoryBrandId($factoryId)
-    {
-        $brand = $this->table->fetchRow(
-            $this->table->select(true)
-                ->where('item.item_type_id = ?', DbTable\Item\Type::BRAND)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                ->join('factory_item', 'item_parent_cache.item_id = factory_item.item_id', null)
-                ->where('factory_item.factory_id = ?', (int)$factoryId)
-                ->group('item.id')
-                ->order(new Zend_Db_Expr('count(1) desc'))
-        );
-        if (! $brand) {
-            return null;
-        }
-
-        return $brand->id;
-    }
-
     public function getBrand($options, callable $callback)
     {
         $result = $this->getList($options, $callback);

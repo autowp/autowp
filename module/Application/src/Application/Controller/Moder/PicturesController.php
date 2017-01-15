@@ -384,20 +384,13 @@ class PicturesController extends AbstractActionController
         }
 
         if ($formdata['lost']) {
-            switch ($formdata['type_id']) {
-                case Picture::FACTORY_TYPE_ID:
-                    $select->where('pictures.factory_id IS NULL');
-                    break;
-                default:
-                    $select
-                        ->joinLeft(
-                            ['pi_left' => 'picture_item'],
-                            'pictures.id = pi_left.picture_id',
-                            null
-                        )
-                        ->where('pi_left.item_id IS NULL');
-                    break;
-            }
+            $select
+                ->joinLeft(
+                    ['pi_left' => 'picture_item'],
+                    'pictures.id = pi_left.picture_id',
+                    null
+                )
+                ->where('pi_left.item_id IS NULL');
         }
 
         if ($formdata['gps']) {

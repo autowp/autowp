@@ -780,40 +780,40 @@ class Pic extends AbstractPlugin
 
         return $engines;
     }
-    
+
     private function picPageFactoriesData($picture)
     {
         $controller = $this->getController();
         $catalogue = $controller->catalogue();
-        
+
         $language = $controller->language();
-        
+
         $itemTable = $catalogue->getItemTable();
-        
+
         $factories = $itemTable->fetchAll(
             $itemTable->select(true)
                 ->where('item.item_type_id = ?', DbTable\Item\Type::FACTORY)
                 ->join('picture_item', 'item.id = picture_item.item_id', null)
                 ->where('picture_item.picture_id = ?', $picture['id'])
         );
-        
+
         $result = [];
-        
+
         foreach ($factories as $factory) {
-            
+
             $factoryCars = [];
             $factoryCarsMore = false;
-            
+
             $carIds = $factory->getRelatedCarGroupId();
             if ($carIds) {
                 $itemTable = $catalogue->getItemTable();
-        
+
                 $carRows = $itemTable->fetchAll([
                     'id in (?)' => $carIds
                 ], $catalogue->itemOrdering());
-        
+
                 $limit = 10;
-        
+
                 if (count($carRows) > $limit) {
                     $rows = [];
                     foreach ($carRows as $carRow) {
@@ -822,10 +822,10 @@ class Pic extends AbstractPlugin
                     $carRows = array_slice($rows, 0, $limit);
                     $factoryCarsMore = true;
                 }
-        
+
                 foreach ($carRows as $carRow) {
                     $cataloguePaths = $catalogue->cataloguePaths($carRow);
-        
+
                     foreach ($cataloguePaths as $cPath) {
                         $factoryCars[] = [
                             'name' => $controller->car()->formatName($carRow, $language),
@@ -840,14 +840,14 @@ class Pic extends AbstractPlugin
                     }
                 }
             }
-            
+
             $result[] = [
                 'id'        => $factory['id'],
                 'items'     => $factoryCars,
                 'itemsMore' => $factoryCarsMore,
             ];
         }
-        
+
         return $result;
     }
 
@@ -1093,56 +1093,41 @@ class Pic extends AbstractPlugin
             'picture_id' => $picture->id
         ])] = sprintf($this->translator->translate('moder/picture/edit-picture-%s'), $picture->id);
 
-        switch ($picture->type) {
-            case DbTable\Picture::VEHICLE_TYPE_ID:
-                $carIds = $this->pictureItem->getPictureItems($picture['id']);
-                if ($carIds) {
-                    $vehicleTable = new DbTable\Item();
-                    $brandModel = new BrandModel();
+        $carIds = $this->pictureItem->getPictureItems($picture['id']);
+        if ($carIds) {
+            $vehicleTable = new DbTable\Item();
+            $brandModel = new BrandModel();
 
-                    foreach ($vehicleTable->find($carIds) as $car) {
-                        $url = $controller->url()->fromRoute('moder/cars/params', [
-                            'action'  => 'car',
-                            'item_id' => $car->id
-                        ]);
-                        $links[$url] = sprintf(
-                            $this->translator->translate('moder/picture/edit-vehicle-%s'),
-                            $controller->car()->formatName($car, $language)
-                        );
+            foreach ($vehicleTable->find($carIds) as $car) {
+                $url = $controller->url()->fromRoute('moder/cars/params', [
+                    'action'  => 'car',
+                    'item_id' => $car->id
+                ]);
+                $links[$url] = sprintf(
+                    $this->translator->translate('moder/picture/edit-vehicle-%s'),
+                    $controller->car()->formatName($car, $language)
+                );
 
 
-                        $brands = $brandModel->getList(['language' => $language], function ($select) use ($car) {
-                            $select
-                                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                                ->where('item_parent_cache.item_id = ?', $car->id)
-                                ->group('item.id');
-                        });
+                $brands = $brandModel->getList(['language' => $language], function ($select) use ($car) {
+                    $select
+                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                        ->where('item_parent_cache.item_id = ?', $car->id)
+                        ->group('item.id');
+                });
 
-                        foreach ($brands as $brand) {
-                            $url = $controller->url()->fromRoute('moder/cars/params', [
-                                'action'  => 'car',
-                                'item_id' => $brand['id']
-                            ]);
-                            $links[$url] = sprintf(
-                                $this->translator->translate('moder/picture/edit-brand-%s'),
-                                $brand['name']
-                            );
-                        }
-                    }
+                foreach ($brands as $brand) {
+                    $url = $controller->url()->fromRoute('moder/cars/params', [
+                        'action'  => 'car',
+                        'item_id' => $brand['id']
+                    ]);
+                    $links[$url] = sprintf(
+                        $this->translator->translate('moder/picture/edit-brand-%s'),
+                        $brand['name']
+                    );
                 }
-
-                break;
-
-            case DbTable\Picture::FACTORY_TYPE_ID:
-                if ($factory = $picture->findParentRow(DbTable\Factory::class)) {
-                    $links[$controller->url()->fromRoute('moder/factories/params', [
-                        'action'     => 'factory',
-                        'factory_id' => $factory->id
-                    ])] = sprintf($this->translator->translate('moder/picture/edit-factory-%s'), $factory->name);
-                }
-                break;
+            }
         }
-
         return $links;
     }
 
@@ -1199,7 +1184,7 @@ class Pic extends AbstractPlugin
                 'pictures.width', 'pictures.height',
                 'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                 'pictures.image_id', 'pictures.filesize',
-                'pictures.type', 'pictures.factory_id'
+                'pictures.type',
             ])
             ->joinLeft(
                 ['ct' => 'comment_topic'],

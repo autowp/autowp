@@ -104,25 +104,6 @@
         </tbody>
     </table>
 <?php } ?>
-<?php
-    switch ($this->picture->type) {
-        case Application\Model\DbTable\Picture::FACTORY_TYPE_ID:
-            ?>
-            <p>
-                <?=$this->escapeHtml($this->translate('moder/picture/catalogue/factory'))?>
-                <?php if ($factory = $this->picture->findParentRow(Application\Model\DbTable\Factory::class)) { ?>
-                    <?=$this->htmlA($this->url('moder/factories/params', [
-                        'action'     => 'factory',
-                        'factory_id' => $factory->id
-                    ]), $factory->name) ?>
-                <?php } else { ?>
-                    <?=$this->escapeHtml($this->translate('moder/picture/catalogue/not-set'))?>
-                <?php } ?>
-            </p>
-            <?php
-            break;
-    }
-?>
 <?php if ($this->canMove) { ?>
     <?php if ($this->lastCar) { ?>
         <p><?=$this->htmlA(

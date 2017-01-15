@@ -466,7 +466,7 @@ class CarsController extends AbstractActionController
         $picturesData = $this->pic()->listData($select, [
             'width' => 6
         ]);
-        
+
         $canUseTurboGroupCreator = in_array($car['item_type_id'], [
             DbTable\Item\Type::VEHICLE,
             DbTable\Item\Type::ENGINE,
@@ -549,21 +549,21 @@ class CarsController extends AbstractActionController
             ],
         ];
     }
-    
+
     private function setItemPoint(DbTable\Item\Row $item, $point)
     {
         $itemPointTable = new DbTable\Item\Point();
         $itemPointRow = $itemPointTable->fetchRow([
             'item_id = ?' => $item['id']
         ]);
-        
+
         if ($point) {
             if (!$itemPointRow) {
                 $itemPointRow = $itemPointTable->createRow([
                     'item_id' => $item['id']
                 ]);
             }
-            
+
             $db = $itemPointTable->getAdapter();
             $itemPointRow->point = new Zend_Db_Expr($db->quoteInto('GeomFromText(?)', $point->out('wkt')));
             $itemPointRow->save();
@@ -573,7 +573,7 @@ class CarsController extends AbstractActionController
             }
         }
     }
-    
+
     private function getItemPoint(DbTable\Item\Row $item)
     {
         $point = null;
@@ -587,7 +587,7 @@ class CarsController extends AbstractActionController
                 $point = geoPHP::load(substr($itemPointRow->point, 4), 'wkb');
             }
         }
-        
+
         return $point;
     }
 
@@ -699,7 +699,7 @@ class CarsController extends AbstractActionController
                     $user = $this->user()->get();
                     $ucsTable = new DbTable\User\CarSubscribe();
                     $ucsTable->subscribe($user, $car);
-                    
+
                     $forceIsGroup = in_array($car->item_type_id, [
                         DbTable\Item\Type::CATEGORY,
                         DbTable\Item\Type::TWINS,
@@ -713,12 +713,12 @@ class CarsController extends AbstractActionController
                     $car->setFromArray($this->prepareCarMetaToSave($values))->save();
 
                     $vehicleType->setVehicleTypes($car->id, (array)$values['vehicle_type_id']);
-                    
+
                     if (isset($values['lat'], $values['lng'])) {
                         if (strlen($values['lat']) && strlen($values['lng'])) {
                             geoPHP::version(); // for autoload classes
                             $point = new Point($values['lng'], $values['lat']);
-                            
+
                             $this->setItemPoint($car, $point);
                         } else {
                             $this->setItemPoint($car, null);
@@ -938,8 +938,8 @@ class CarsController extends AbstractActionController
         }
 
         $picturesTab = in_array($car->item_type_id, [
-            DbTable\Item\Type::ENGINE, 
-            DbTable\Item\Type::VEHICLE, 
+            DbTable\Item\Type::ENGINE,
+            DbTable\Item\Type::VEHICLE,
             DbTable\Item\Type::BRAND,
             DbTable\Item\Type::FACTORY
         ]);
@@ -1104,91 +1104,6 @@ class CarsController extends AbstractActionController
             ),
             'car' => $car
         ];
-    }
-
-    public function carSelectFactoryAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $itemTable = $this->catalogue()->getItemTable();
-        $car = $itemTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canEditFactory = $this->user()->isAllowed('factory', 'edit');
-        if (! $canEditFactory) {
-            return $this->forbiddenAction();
-        }
-
-        $factoryTable = new DbTable\Factory();
-
-        $factory = $factoryTable->find($this->params()->fromPost('factory_id'))->current();
-
-        if ($factory) {
-            $factoryCarTable = new DbTable\FactoryCar();
-            $factoryCarTable->insert([
-                'factory_id' => $factory->id,
-                'item_id'    => $car->id
-            ]);
-
-            $this->log(sprintf(
-                'Автомобиль %s добавлен к заводу %s',
-                htmlspecialchars($this->car()->formatName($car, 'en')),
-                htmlspecialchars($factory->name)
-            ), [$factory, $car]);
-
-            return $this->redirectToCar($car, 'factories');
-        }
-
-        return [
-            'factories' => $factoryTable->fetchAll(
-                $factoryTable->select(true)
-                    ->order('factory.name')
-            ),
-            'car' => $car
-        ];
-    }
-
-
-    public function carRemoveFromFactoryAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $itemTable = $this->catalogue()->getItemTable();
-        $car = $itemTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canEditFactory = $this->user()->isAllowed('factory', 'edit');
-        if (! $canEditFactory) {
-            return $this->forbiddenAction();
-        }
-
-        $factoryTable = new DbTable\Factory();
-        $factory = $factoryTable->find($this->params('factory_id'))->current();
-
-        if (! $factory) {
-            return $this->notFoundAction();
-        }
-
-        $factoryCarTable = new DbTable\FactoryCar();
-        $factoryCar = $factoryCarTable->fetchRow(
-            $factoryCarTable->select(true)
-                ->where('item_id = ?', $car->id)
-                ->where('factory_id = ?', $factory->id)
-        );
-
-        if ($factoryCar) {
-            $factoryCar->delete();
-        }
-
-        return $this->redirectToCar($car, 'factories');
     }
 
     public function subscribeAction()
@@ -1890,7 +1805,7 @@ class CarsController extends AbstractActionController
                 ])
             ];
         }
-        
+
         if ($car['item_type_id'] == DbTable\Item\Type::CATEGORY) {
             return [
                 $this->url()->fromRoute('categories', [
@@ -2488,7 +2403,7 @@ class CarsController extends AbstractActionController
         }
 
         $showTwinsTab = $car->item_type_id == DbTable\Item\Type::VEHICLE;
-        
+
         $showFactoriesTab = in_array($car->item_type_id, [
             DbTable\Item\Type::VEHICLE,
             DbTable\Item\Type::ENGINE
@@ -2871,11 +2786,11 @@ class CarsController extends AbstractActionController
             $result['produced'] = strlen($values['produced']['count']) ? (int)$values['produced']['count'] : null;
             $result['produced_exactly'] = $values['produced']['exactly'] ? 1 : 0;
         }
-        
+
         if (array_key_exists('lat', $values)) {
             $result['lat'] = $values['lat'];
         }
-        
+
         if (array_key_exists('lng', $values)) {
             $result['lng'] = $values['lng'];
         }
@@ -2938,7 +2853,7 @@ class CarsController extends AbstractActionController
             $form->setData($this->params()->fromPost());
             if ($form->isValid()) {
                 $values = $this->prepareCarMetaToSave($form->getData());
-                
+
                 if ($forceIsGroup) {
                     $values['is_group'] = 1;
                 }
@@ -2946,12 +2861,12 @@ class CarsController extends AbstractActionController
                 $car = $itemTable->createRow($values);
                 $car->item_type_id = $itemTypeId;
                 $car->save();
-                
+
                 if (isset($values['lat'], $values['lng'])) {
                     if (strlen($values['lat']) && strlen($values['lng'])) {
                         geoPHP::version(); // for autoload classes
                         $point = new Point($values['lng'], $values['lat']);
-                
+
                         $this->setItemPoint($car, $point);
                     } else {
                         $this->setItemPoint($car, null);
