@@ -67,10 +67,14 @@ class CatalogueController extends AbstractActionController
         $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
         $itemParentCacheTable = new DbTable\Item\ParentCache();
         $itemPointTable = new DbTable\Item\Point();
+        $pictureTable = new DbTable\Picture();
 
         $factoryTable = new DbTable\Factory();
+        $factoryCarTable = new DbTable\FactoryCar();
+        
+        $db = $factoryTable->getAdapter();
 
-        foreach ($factoryTable->fetchAll() as $factoryRow) {
+        foreach ($factoryTable->fetchAll(null, null) as $factoryRow) {
             print $factoryRow->id . PHP_EOL;
 
             $itemRow = $itemTable->fetchRow([
@@ -128,17 +132,63 @@ class CatalogueController extends AbstractActionController
                 $langRow->save();
             }
 
-            $itemPointRow = $itemPointTable->fetchRow([
-                'item_id = ?' => $itemRow->id
-            ]);
-            if (!$itemPointRow) {
-                $itemPointRow = $itemPointTable->createRow([
-                    'item_id' => $itemRow->id
+            if ($factoryRow->point) {
+                $itemPointRow = $itemPointTable->fetchRow([
+                    'item_id = ?' => $itemRow->id
                 ]);
+                if (!$itemPointRow) {
+                    $itemPointRow = $itemPointTable->createRow([
+                        'item_id' => $itemRow->id
+                    ]);
+                }
+    
+                $itemPointRow->point = $factoryRow->point;
+                $itemPointRow->save();
             }
-
-            $itemPointRow->point = $factoryRow->point;
-            $itemPointRow->save();
+            
+            $db->query('
+                insert ignore into log_events_item (log_event_id, item_id)
+                select log_event_id, ?
+                from log_events_factory
+                where factory_id = ?
+            ', [$itemRow->id, $factoryRow->id]);
+            
+            $factoryCarRows = $factoryCarTable->fetchAll([
+                'factory_id = ?' => $factoryRow->id
+            ]);
+            foreach ($factoryCarRows as $factoryCarRow) {
+            
+                print 'car=' . $factoryCarRow->item_id . PHP_EOL;
+            
+                $vehicleRow = $itemTable->fetchRow([
+                    'id = ?' => $factoryCarRow->item_id
+                ]);
+            
+                $this->brandVehicle->create($itemRow->id, $vehicleRow->id);
+            
+                $itemTable->updateInteritance($vehicleRow);
+            }
+            
+            $itemParentCacheTable->rebuildCache($itemRow);
+            
+            
+            $pictureRows = $pictureTable->fetchAll([
+                'type = ?'       => DbTable\Picture::FACTORY_TYPE_ID,
+                'factory_id = ?' => $factoryRow->id
+            ], 'id');
+            
+            foreach ($pictureRows as $picture) {
+            
+                print 'picture=' . $picture->id . PHP_EOL;
+            
+                $this->pictureItem->setPictureItems($picture->id, [$itemRow->id]);
+                $this->pictureItem->setProperties($picture->id, $itemRow->id, [
+                    'perspective' => 16
+                ]);
+            
+                $picture->type = DbTable\Picture::VEHICLE_TYPE_ID;
+                $picture->save();
+            }
         }
 
         /*$db = $itemParentTable->getAdapter();
@@ -202,32 +252,11 @@ class CatalogueController extends AbstractActionController
 
 
 
-            $db->query('
-                insert ignore into log_events_item (log_event_id, item_id)
-                select log_event_id, ?
-                from log_events_brands
-                where brand_id = ?
-            ', [$itemRow->id, $brandRow->id]);
+            
         }*/
 
         // parent_brand_id
-        /*$brandRows = $brandTable->fetchAll('parent_brand_id');
-        foreach ($brandRows as $brandRow) {
-
-            print $brandRow->id . PHP_EOL;
-
-            $parentBrandItemRow = $itemTable->fetchRow([
-                'migration_brand_id = ?' => $brandRow->parent_brand_id
-            ]);
-
-            $childBrandItemRow = $itemTable->fetchRow([
-                'migration_brand_id = ?' => $brandRow->id
-            ]);
-
-            $itemParentTable->addParent($childBrandItemRow, $parentBrandItemRow);
-
-            $itemTable->updateInteritance($childBrandItemRow);
-        }*/
+        /**/
 
         // brand_language
         /*$brandLanguageTable = new DbTable\BrandLanguage();
@@ -281,29 +310,7 @@ class CatalogueController extends AbstractActionController
             //$itemTable->updateInteritance($vehicleRow);
         }*/
 
-        /*$pictureTable = new DbTable\Picture();
-
-        $rows = $pictureTable->fetchAll([
-            'type = ?' => DbTable\Picture::UNSORTED_TYPE_ID
-        ], 'id');
-
-        foreach ($rows as $picture) {
-
-            print $picture->id . PHP_EOL;
-
-            $brandRow = $itemTable->fetchRow([
-                'migration_brand_id = ?' => $picture->brand_id
-            ]);
-
-            if (!$brandRow) {
-                throw new Exception("Brand not found");
-            }
-
-            $this->pictureItem->setPictureItems($picture->id, [$brandRow->id]);
-
-            $picture->type = DbTable\Picture::VEHICLE_TYPE_ID;
-            $picture->save();
-        }*/
+        /**/
 
         // brand_alias
 

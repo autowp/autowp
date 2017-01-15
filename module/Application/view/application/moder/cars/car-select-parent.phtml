@@ -32,7 +32,14 @@
         <li<?=$this->tab == 'twins' ? ' class="active"' : ''?>>
             <?=$this->htmlA($this->url(null, [
                 'tab' => 'twins'
-            ], [], true), '<i class="fa fa-list"></i> Twins', false) ?>
+            ], [], true), '<i class="fa fa-adjust"></i> Twins', false) ?>
+        </li>
+    <?php } ?>
+    <?php if ($this->showFactoriesTab) { ?>
+        <li<?=$this->tab == 'factories' ? ' class="active"' : ''?>>
+            <?=$this->htmlA($this->url(null, [
+                'tab' => 'factories'
+            ], [], true), '<i class="fa fa-cogs"></i> ' . $this->escapeHtml($this->translate('moder/vehicle/tabs/factories')), false) ?>
         </li>
     <?php } ?>
 </ul>
@@ -108,5 +115,15 @@
                 ])?>
             </ul>
         <?php } ?>
+    </div>
+<?php } ?>
+
+<?php if ($this->tab == 'factories') { ?>
+    <div class="well">
+        <ul>
+            <?=$this->partial('application/moder/cars/partial/car-select-parent', [
+                'cars' => $this->cars
+            ])?>
+        </ul>
     </div>
 <?php } ?>

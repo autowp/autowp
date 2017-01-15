@@ -362,31 +362,31 @@ class CatalogueController extends AbstractActionController
 
     private function getBrandFactories($brandId)
     {
-        $factoryTable = new DbTable\Factory();
-        $db = $factoryTable->getAdapter();
+        $itemTable = new DbTable\Item();
+        $db = $itemTable->getAdapter();
         $rows = $db->fetchAll(
             $db->select()
                 ->from(
-                    'factory',
+                    'item',
                     [
                         'factory_id'   => 'id',
                         'factory_name' => 'name',
-                        'cars_count'   => 'count(item_parent_cache.item_id)'
+                        'cars_count'   => 'count(ipc2.item_id)',
+                        'pictures.id', 'pictures.identity',
+                        'pictures.width', 'pictures.height',
+                        'pictures.crop_left', 'pictures.crop_top', 
+                        'pictures.crop_width', 'pictures.crop_height',
+                        'pictures.status', 'pictures.image_id'
                     ]
                 )
-                ->join('factory_item', 'factory.id = factory_item.factory_id', null)
-                ->join('item_parent_cache', 'factory_item.item_id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $brandId)
-                ->group('factory.id')
-                ->join('pictures', 'factory.id = pictures.factory_id', null)
-                ->where('pictures.type = ?', DbTable\Picture::FACTORY_TYPE_ID)
+                ->where('item.item_type_id = ?', DbTable\Item\Type::FACTORY)
+                ->join(['ipc1' => 'item_parent_cache'], 'item.id = ipc1.parent_id', null)
+                ->join(['ipc2' => 'item_parent_cache'], 'ipc1.item_id = ipc2.item_id', null)
+                ->where('ipc2.parent_id = ?', $brandId)
+                ->group('item.id')
+                ->join('picture_item', 'item.id = picture_item.item_id', null)
+                ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                 ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED)
-                ->columns([
-                    'pictures.id', 'pictures.identity',
-                    'pictures.width', 'pictures.height',
-                    'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
-                    'pictures.status', 'pictures.image_id'
-                ])
                 ->order('cars_count desc')
                 ->limit(4)
         );
@@ -406,7 +406,7 @@ class CatalogueController extends AbstractActionController
                 'url'  => $this->url()->fromRoute('factories/factory', [
                     'id' => $row['factory_id']
                 ]),
-                'src'       => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null
+                'src'  => isset($imagesInfo[$idx]) ? $imagesInfo[$idx]->getSrc() : null
             ];
         }
 
@@ -1247,9 +1247,8 @@ class CatalogueController extends AbstractActionController
             ->from(
                 $pictureTable->info('name'),
                 [
-                    'id', 'name', 'type', 'factory_id',
-                    'image_id', 'crop_left', 'crop_top',
-                    'crop_width', 'crop_height', 'width', 'height', 'identity', 'factory_id'
+                    'id', 'name', 'type', 'image_id', 'crop_left', 'crop_top',
+                    'crop_width', 'crop_height', 'width', 'height', 'identity'
                 ]
             )
             ->where('pictures.status IN (?)', [DbTable\Picture::STATUS_ACCEPTED, DbTable\Picture::STATUS_NEW])

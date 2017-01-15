@@ -39,10 +39,6 @@ class EventRow extends Row
                     $col = 'user_id';
                     $tableName = 'log_events_user';
                     break;
-                case $table instanceof \Application\Model\DbTable\Factory:
-                    $col = 'factory_id';
-                    $tableName = 'log_events_factory';
-                    break;
                 default:
                     throw new Exception('Unknown data type');
             }

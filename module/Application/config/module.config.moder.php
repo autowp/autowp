@@ -86,22 +86,6 @@ return [
                             ]
                         ]
                     ],
-                    'factories' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/factory[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\FactoryController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'hotlink' => [
                         'type' => Literal::class,
                         'options' => [
@@ -292,7 +276,6 @@ return [
             Controller\Moder\ItemParentController::class   => Controller\Moder\Service\ItemParentControllerFactory::class,
             Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
             Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
-            Controller\Moder\FactoryController::class      => Controller\Moder\Service\FactoryControllerFactory::class,
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
             Controller\Moder\IndexController::class        => InvokableFactory::class,
             Controller\Moder\MuseumController::class       => Controller\Moder\Service\MuseumControllerFactory::class,
@@ -513,187 +496,6 @@ return [
                     'required' => true
                 ]
             ]
-        ],
-        'ModerFactoryAddForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-                'legend' => 'moder/factories/add/title'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => Form\Element\FactoryName::class,
-                        'name' => 'name'
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type' => Form\Element\Year::class,
-                        'name' => 'year_from',
-                        'options' => [
-                            'label' => 'factory/year_from'
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type' => Form\Element\Year::class,
-                        'name' => 'year_to',
-                        'options' => [
-                            'label' => 'factory/year_to'
-                        ]
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'name' => [
-                    'required' => true
-                ],
-                'year_from' => [
-                    'required' => false
-                ],
-                'year_to' => [
-                    'required' => false
-                ],
-            ],
-        ],
-        'ModerFactoryEditForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-                'legend' => 'moder/factories/edit/title'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type' => Form\Element\FactoryName::class,
-                        'name' => 'name'
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type' => Form\Element\Year::class,
-                        'name' => 'year_from',
-                        'options' => [
-                            'label' => 'factory/year_from'
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type' => Form\Element\Year::class,
-                        'name' => 'year_to',
-                        'options' => [
-                            'label' => 'factory/year_to'
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Text',
-                        'name' => 'lat',
-                        'options' => [
-                            'label' => 'latitude'
-                        ],
-                        'attributes' => [
-                            'id'        => 'lat',
-                            'maxlength' => 20,
-                            'size'      => 20,
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Text',
-                        'name' => 'lng',
-                        'options' => [
-                            'label' => 'longtitude'
-                        ],
-                        'attributes' => [
-                            'id'        => 'lng',
-                            'maxlength' => 20,
-                            'size'      => 20,
-                        ]
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'name' => [
-                    'required' => true
-                ],
-                'year_from' => [
-                    'required' => false
-                ],
-                'year_to' => [
-                    'required' => false
-                ],
-                'lat' => [
-                    'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ]
-                ],
-                'lng' => [
-                    'required' => false,
-                    'filters' => [
-                        ['name' => 'StringTrim']
-                    ]
-                ]
-            ],
-        ],
-        'ModerFactoryFilterForm' => [
-            'type'     => 'Zend\Form\Form',
-            'attributes'  => [
-                'method' => 'post',
-                'legend' => 'moder/factories/filter'
-            ],
-            'elements' => [
-                [
-                    'spec' => [
-                        'type'    => 'Text',
-                        'name'    => 'name',
-                        'options' => [
-                            'label' => 'factory/name'
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'brand_id',
-                        'options' => [
-                            'label' => 'moder/factories/filter/brand-id'
-                        ]
-                    ],
-                ],
-                [
-                    'spec' => [
-                        'type' => 'Select',
-                        'name' => 'order',
-                        'options' => [
-                            'label'   => 'moder/factories/filter/order',
-                            'options' => [
-                                0 => 'id asc',
-                                1 => 'id desc',
-                                2 => 'moder/factories/filter/order/name-asc',
-                                3 => 'moder/factories/filter/order/name-desc',
-                            ]
-                        ]
-                    ],
-                ]
-            ],
-            'input_filter' => [
-                'name' => [
-                    'required' => false
-                ],
-                'brand_id' => [
-                    'required' => false
-                ],
-                'order' => [
-                    'required' => false
-                ],
-            ],
         ],
         'ModerPictureForm' => [
             'type'     => 'Zend\Form\Form',
@@ -952,6 +754,7 @@ return [
                                 Model\DbTable\Item\Type::CATEGORY => 'item/type/3/name',
                                 Model\DbTable\Item\Type::TWINS    => 'item/type/4/name',
                                 Model\DbTable\Item\Type::BRAND    => 'item/type/5/name',
+                                Model\DbTable\Item\Type::FACTORY  => 'item/type/6/name',
                             ]
                         ]
                     ],

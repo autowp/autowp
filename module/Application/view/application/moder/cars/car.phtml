@@ -13,6 +13,11 @@
     ]);
 
     $this->layout()->moduleName = 'moder/cars/car';
+    
+    $specsAllowed = in_array($this->car->item_type_id, [
+        Application\Model\DbTable\Item\Type::VEHICLE,
+        Application\Model\DbTable\Item\Type::ENGINE
+    ]);
 ?>
 <?php $this->pageTitle()->setAutoEscape(false)->captureStart('SET') ?>
     <?=$this->escapeHtml($this->translate('item/type/'.$this->car->item_type_id.'/name'))?>:
@@ -31,7 +36,7 @@
         <div class="well">
             <p><?=$this->escapeHtml(sprintf($this->translate('moder/database-id-%s'), $this->car->id))?></p>
 
-            <?php if ($this->car->item_type_id != Application\Model\DbTable\Item\Type::CATEGORY) { ?>
+            <?php if ($specsAllowed) { ?>
                 <p>
                     <?php if ($this->user()->isAllowed('specifications', 'edit')) { ?>
                         <?=$this->htmlA($this->url('cars/params', [
@@ -164,9 +169,6 @@
         <div class="tab-pane<?=$this->tabs['vehicles']['active'] ? ' active' : ''?>" id="vehicles">Loading ...</div>
     <?php } ?>
     <div class="tab-pane<?=$this->tabs['tree']['active'] ? ' active' : ''?>" id="tree">Loading ...</div>
-    <?php if (isset($this->tabs['factories'])) { ?>
-        <div class="tab-pane<?=$this->tabs['factories']['active'] ? ' active' : ''?>" id="factories">Loading ...</div>
-    <?php } ?>
     <?php if (isset($this->tabs['pictures'])) { ?>
         <div class="tab-pane<?=$this->tabs['pictures']['active'] ? ' active' : ''?>" id="pictures">Loading ...</div>
     <?php } ?>

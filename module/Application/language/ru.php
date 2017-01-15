@@ -144,10 +144,10 @@ return array_replace(include 'root.php', [
     'item/type/5/name-plural' => 'Марки',
     'item/type/5/new-item' => 'Новая марка',
     'item/type/5/add-sub-item' => 'Добавить подмарку',
-    'item/type/6/name' => 'Factory',
-    'item/type/6/name-plural' => 'Factories',
-    'item/type/6/new-item' => 'New factory',
-    'item/type/6/add-sub-item' => 'Add sub-factory',
+    'item/type/6/name' => 'Завод',
+    'item/type/6/name-plural' => 'Заводы',
+    'item/type/6/new-item' => 'Новый завод',
+    'item/type/6/add-sub-item' => 'Добавить под-завод',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Несортировано',

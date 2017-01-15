@@ -258,37 +258,34 @@
                 }
             }
 
-            switch ($this->picture->type) {
-
-                case Application\Model\DbTable\Picture::FACTORY_TYPE_ID:
-                    if ($this->factory) {
-                        $list[] = $this->htmlA($this->url('factories/factory', [
-                            'id' => $this->factory->id
-                        ]), $this->translate('picture/factory-details'));
-                    }
-                    if (count($this->factoryCars) > 0) {
-                        if (count($this->factoryCars) == 1)
-                            foreach ($this->factoryCars as $car) {
-                                $list[] = $this->escapeHtml($this->translate('picture/on-that-factory-produced-vehicle')) . ' ' . $this->htmlA($car['url'], $car['name']);
-                            }
-                        else {
-                            $a = [];
-                            foreach ($this->factoryCars as $car) {
-                                $a[] = $this->htmlA($car['url'], $car['name']);
-                            }
-
-                            if ($this->factoryCarsMore) {
-                                $a[] = ' ' . $this->escapeHtml($this->translate('picture/on-that-factory-produced-vehicles/and')) .
-                                       ' ' . $this->htmlA($this->url('factories/factory-cars', [
-                                    'id' => $this->factory->id
-                                ]), $this->translate('picture/on-that-factory-produced-vehicles/and-other'));
-                            }
-
-                            $list[] = $this->escapeHtml($this->translate('picture/on-that-factory-produced-vehicles:')) .
-                                      $this->htmlList($a, false, [], false);
+            foreach ($this->factories as $factory) {
+                if ($factory) {
+                    $list[] = $this->htmlA($this->url('factories/factory', [
+                        'id' => $factory['id']
+                    ]), $this->translate('picture/factory-details'));
+                }
+                if (count($factory['items']) > 0) {
+                    if (count($factory['items']) == 1)
+                        foreach ($factory['items'] as $car) {
+                            $list[] = $this->escapeHtml($this->translate('picture/on-that-factory-produced-vehicle')) . ' ' . $this->htmlA($car['url'], $car['name']);
                         }
+                    else {
+                        $a = [];
+                        foreach ($factory['items'] as $car) {
+                            $a[] = $this->htmlA($car['url'], $car['name']);
+                        }
+
+                        if ($factory['itemsMore']) {
+                            $a[] = ' ' . $this->escapeHtml($this->translate('picture/on-that-factory-produced-vehicles/and')) .
+                                   ' ' . $this->htmlA($this->url('factories/factory-cars', [
+                                'id' => $factory['id']
+                            ]), $this->translate('picture/on-that-factory-produced-vehicles/and-other'));
+                        }
+
+                        $list[] = $this->escapeHtml($this->translate('picture/on-that-factory-produced-vehicles:')) .
+                                  $this->htmlList($a, false, [], false);
                     }
-                    break;
+                }
             }
 
             if ($this->user()->logedIn()) {

@@ -509,21 +509,22 @@ class IndexController extends AbstractActionController
 
     private function factories()
     {
-        $cacheKey = 'INDEX_FACTORIES_1';
+        $cacheKey = 'INDEX_FACTORIES_3';
         $factories = $this->cache->getItem($cacheKey, $success);
         if (! $success) {
-            $table = new DbTable\Factory();
+            $itemTable = $this->catalogue()->getItemTable();
 
-            $db = $table->getAdapter();
+            $db = $itemTable->getAdapter();
 
             $factories = $db->fetchAll(
                 $db->select()
-                    ->from('factory', ['id', 'name', 'count' => new Zend_Db_Expr('count(1)')])
-                    ->join('factory_item', 'factory.id = factory_item.factory_id', null)
-                    ->join('item_parent_cache', 'factory_item.item_id = item_parent_cache.parent_id', null)
+                    ->from('item', ['id', 'name', 'count' => new Zend_Db_Expr('count(1)')])
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::FACTORY)
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                    ->where('item_parent_cache.item_id <> item_parent_cache.parent_id', null)
                     ->where('not item_parent_cache.tuning')
                     ->where('not item_parent_cache.sport')
-                    ->group('factory.id')
+                    ->group('item.id')
                     ->order('count desc')
                     ->limit(8)
             );

@@ -1075,60 +1075,6 @@ CREATE TABLE `day_stat` (
 /*!40000 ALTER TABLE `day_stat` ENABLE KEYS */;
 
 --
--- Table structure for table `factory`
---
-
-DROP TABLE IF EXISTS `factory`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `factory` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `year_from` smallint(5) unsigned DEFAULT NULL,
-  `year_to` smallint(5) unsigned DEFAULT NULL,
-  `point` point DEFAULT NULL,
-  `text_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `text_id` (`text_id`),
-  KEY `point` (`point`(25))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `factory`
---
-
-/*!40000 ALTER TABLE `factory` DISABLE KEYS */;
-INSERT INTO `factory` (`id`, `name`, `year_from`, `year_to`, `point`, `text_id`) VALUES (1,'Test factory',1999,2005,NULL,NULL);
-/*!40000 ALTER TABLE `factory` ENABLE KEYS */;
-
---
--- Table structure for table `factory_item`
---
-
-DROP TABLE IF EXISTS `factory_item`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `factory_item` (
-  `factory_id` int(10) unsigned NOT NULL,
-  `item_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`factory_id`,`item_id`),
-  KEY `item_id` (`item_id`),
-  CONSTRAINT `factory_item_ibfk_1` FOREIGN KEY (`factory_id`) REFERENCES `factory` (`id`),
-  CONSTRAINT `factory_item_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `factory_item`
---
-
-/*!40000 ALTER TABLE `factory_item` DISABLE KEYS */;
-INSERT INTO `factory_item` (`factory_id`, `item_id`) VALUES (1,1);
-/*!40000 ALTER TABLE `factory_item` ENABLE KEYS */;
-
---
 -- Table structure for table `formated_image`
 --
 
@@ -1731,30 +1677,6 @@ CREATE TABLE `log_events_articles` (
 /*!40000 ALTER TABLE `log_events_articles` ENABLE KEYS */;
 
 --
--- Table structure for table `log_events_factory`
---
-
-DROP TABLE IF EXISTS `log_events_factory`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `log_events_factory` (
-  `log_event_id` int(10) unsigned NOT NULL,
-  `factory_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`log_event_id`,`factory_id`),
-  KEY `factory_id` (`factory_id`),
-  CONSTRAINT `log_events_factory_ibfk_1` FOREIGN KEY (`log_event_id`) REFERENCES `log_events` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `log_events_factory_ibfk_2` FOREIGN KEY (`factory_id`) REFERENCES `factory` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `log_events_factory`
---
-
-/*!40000 ALTER TABLE `log_events_factory` DISABLE KEYS */;
-/*!40000 ALTER TABLE `log_events_factory` ENABLE KEYS */;
-
---
 -- Table structure for table `log_events_item`
 --
 
@@ -2310,7 +2232,7 @@ CREATE TABLE `pictures` (
   `identity` varchar(10) NOT NULL,
   `replace_picture_id` int(10) unsigned DEFAULT NULL,
   `image_id` int(10) unsigned DEFAULT NULL,
-  `factory_id` int(10) unsigned DEFAULT NULL,
+  `_factory_id` int(10) unsigned DEFAULT NULL,
   `ip` varbinary(16) NOT NULL,
   `copyrights_text_id` int(11) DEFAULT NULL,
   `point` point DEFAULT NULL,
@@ -2326,14 +2248,13 @@ CREATE TABLE `pictures` (
   KEY `accept_datetime` (`status`,`accept_datetime`),
   KEY `pictures_fk5` (`type`),
   KEY `pictures_fk6` (`replace_picture_id`),
-  KEY `factory_id` (`factory_id`),
+  KEY `_factory_id` (`_factory_id`),
   KEY `width` (`width`,`height`,`add_date`,`id`),
   KEY `copyrights_text_id` (`copyrights_text_id`),
   CONSTRAINT `pictures_fk` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`),
   CONSTRAINT `pictures_fk5` FOREIGN KEY (`type`) REFERENCES `pictures_types` (`id`),
   CONSTRAINT `pictures_fk6` FOREIGN KEY (`replace_picture_id`) REFERENCES `pictures` (`id`) ON DELETE SET NULL,
   CONSTRAINT `pictures_fk7` FOREIGN KEY (`image_id`) REFERENCES `image` (`id`),
-  CONSTRAINT `pictures_ibfk_1` FOREIGN KEY (`factory_id`) REFERENCES `factory` (`id`),
   CONSTRAINT `pictures_ibfk_2` FOREIGN KEY (`copyrights_text_id`) REFERENCES `textstorage_text` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=917309 DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 125952 kB; (`owner_id`)';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2343,7 +2264,7 @@ CREATE TABLE `pictures` (
 --
 
 /*!40000 ALTER TABLE `pictures` DISABLE KEYS */;
-INSERT INTO `pictures` (`id`, `width`, `height`, `filesize`, `owner_id`, `add_date`, `note`, `crc`, `status`, `type`, `removing_date`, `_brand_id`, `change_status_user_id`, `crop_left`, `crop_top`, `crop_width`, `crop_height`, `accept_datetime`, `name`, `source_id`, `copyrights`, `identity`, `replace_picture_id`, `image_id`, `factory_id`, `ip`, `copyrights_text_id`, `point`) VALUES (1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity1',NULL,1,NULL,0x7F000001,NULL,NULL),(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity2',NULL,33,NULL,0x7F000001,NULL,NULL),(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity3',NULL,35,NULL,0x7F000001,NULL,NULL),(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity4',NULL,37,NULL,0x7F000001,NULL,NULL),(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity5',NULL,38,NULL,0x7F000001,NULL,NULL);
+INSERT INTO `pictures` (`id`, `width`, `height`, `filesize`, `owner_id`, `add_date`, `note`, `crc`, `status`, `type`, `removing_date`, `_brand_id`, `change_status_user_id`, `crop_left`, `crop_top`, `crop_width`, `crop_height`, `accept_datetime`, `name`, `source_id`, `copyrights`, `identity`, `replace_picture_id`, `image_id`, `_factory_id`, `ip`, `copyrights_text_id`, `point`) VALUES (1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity1',NULL,1,NULL,0x7F000001,NULL,NULL),(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity2',NULL,33,NULL,0x7F000001,NULL,NULL),(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity3',NULL,35,NULL,0x7F000001,NULL,NULL),(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity4',NULL,37,NULL,0x7F000001,NULL,NULL),(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity5',NULL,38,NULL,0x7F000001,NULL,NULL);
 /*!40000 ALTER TABLE `pictures` ENABLE KEYS */;
 
 --

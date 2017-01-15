@@ -307,7 +307,7 @@ class Pic extends AbstractPlugin
                     'pictures.width', 'pictures.height',
                     'pictures.crop_left', 'pictures.crop_top', 'pictures.crop_width', 'pictures.crop_height',
                     'pictures.status', 'pictures.image_id',
-                    'pictures.type', 'pictures.factory_id'
+                    'pictures.type'
                 ]);
 
             $select
@@ -433,7 +433,6 @@ class Pic extends AbstractPlugin
         $isModer = $controller->user()->inheritsRole('moder');
 
         $itemTable = $catalogue->getItemTable();
-        $factoryTable = new DbTable\Factory();
         $itemLanguageTable = new DbTable\Item\Language();
 
         $db = $this->pictureTable->getAdapter();
@@ -552,10 +551,11 @@ class Pic extends AbstractPlugin
                 }
 
                 // factories
-                $factoryRows = $factoryTable->fetchAll(
-                    $factoryTable->select(true)
-                        ->join('factory_item', 'factory.id = factory_item.factory_id', null)
-                        ->where('factory_item.item_id = ?', $item->id)
+                $factoryRows = $itemTable->fetchAll(
+                    $itemTable->select(true)
+                        ->where('item.item_type_id = ?', DbTable\Item\Type::FACTORY)
+                        ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                        ->where('item_parent_cache.item_id = ?', $item->id)
                 );
                 foreach ($factoryRows as $factoryRow) {
                     $factories[] = [
@@ -780,6 +780,76 @@ class Pic extends AbstractPlugin
 
         return $engines;
     }
+    
+    private function picPageFactoriesData($picture)
+    {
+        $controller = $this->getController();
+        $catalogue = $controller->catalogue();
+        
+        $language = $controller->language();
+        
+        $itemTable = $catalogue->getItemTable();
+        
+        $factories = $itemTable->fetchAll(
+            $itemTable->select(true)
+                ->where('item.item_type_id = ?', DbTable\Item\Type::FACTORY)
+                ->join('picture_item', 'item.id = picture_item.item_id', null)
+                ->where('picture_item.picture_id = ?', $picture['id'])
+        );
+        
+        $result = [];
+        
+        foreach ($factories as $factory) {
+            
+            $factoryCars = [];
+            $factoryCarsMore = false;
+            
+            $carIds = $factory->getRelatedCarGroupId();
+            if ($carIds) {
+                $itemTable = $catalogue->getItemTable();
+        
+                $carRows = $itemTable->fetchAll([
+                    'id in (?)' => $carIds
+                ], $catalogue->itemOrdering());
+        
+                $limit = 10;
+        
+                if (count($carRows) > $limit) {
+                    $rows = [];
+                    foreach ($carRows as $carRow) {
+                        $rows[] = $carRow;
+                    }
+                    $carRows = array_slice($rows, 0, $limit);
+                    $factoryCarsMore = true;
+                }
+        
+                foreach ($carRows as $carRow) {
+                    $cataloguePaths = $catalogue->cataloguePaths($carRow);
+        
+                    foreach ($cataloguePaths as $cPath) {
+                        $factoryCars[] = [
+                            'name' => $controller->car()->formatName($carRow, $language),
+                            'url'  => $controller->url()->fromRoute('catalogue', [
+                                'action'        => 'brand-item',
+                                'brand_catname' => $cPath['brand_catname'],
+                                'car_catname'   => $cPath['car_catname'],
+                                'path'          => $cPath['path']
+                            ])
+                        ];
+                        break;
+                    }
+                }
+            }
+            
+            $result[] = [
+                'id'        => $factory['id'],
+                'items'     => $factoryCars,
+                'itemsMore' => $factoryCarsMore,
+            ];
+        }
+        
+        return $result;
+    }
 
     public function picPageData($picture, $picSelect, $brandIds = [], array $options = [])
     {
@@ -798,9 +868,6 @@ class Pic extends AbstractPlugin
 
         $db = $this->pictureTable->getAdapter();
 
-        $factory = null;
-        $factoryCars = [];
-        $factoryCarsMore = false;
         $items = [];
 
         $language = $controller->language();
@@ -813,49 +880,6 @@ class Pic extends AbstractPlugin
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->where('picture_item.picture_id = ?', $picture->id)
         );
-
-        switch ($picture->type) {
-            case DbTable\Picture::FACTORY_TYPE_ID:
-                if ($factory = $picture->findParentRow(DbTable\Factory::class)) {
-                    $carIds = $factory->getRelatedCarGroupId();
-                    if ($carIds) {
-                        $itemTable = $catalogue->getItemTable();
-
-                        $carRows = $itemTable->fetchAll([
-                            'id in (?)' => $carIds
-                        ], $catalogue->itemOrdering());
-
-                        $limit = 10;
-
-                        if (count($carRows) > $limit) {
-                            $rows = [];
-                            foreach ($carRows as $carRow) {
-                                $rows[] = $carRow;
-                            }
-                            $carRows = array_slice($rows, 0, $limit);
-                            $factoryCarsMore = true;
-                        }
-
-                        foreach ($carRows as $carRow) {
-                            $cataloguePaths = $catalogue->cataloguePaths($carRow);
-
-                            foreach ($cataloguePaths as $cPath) {
-                                $factoryCars[] = [
-                                    'name' => $controller->car()->formatName($carRow, $language),
-                                    'url'  => $controller->url()->fromRoute('catalogue', [
-                                        'action'        => 'brand-item',
-                                        'brand_catname' => $cPath['brand_catname'],
-                                        'car_catname'   => $cPath['car_catname'],
-                                        'path'          => $cPath['path']
-                                    ])
-                                ];
-                                break;
-                            }
-                        }
-                    }
-                }
-                break;
-        }
 
         // links
         $ofLinks = [];
@@ -1040,9 +1064,6 @@ class Pic extends AbstractPlugin
             ],
             'paginator'         => $paginator,
             'paginatorPictures' => $pageNumbers,
-            'factory'           => $factory,
-            'factoryCars'       => $factoryCars,
-            'factoryCarsMore'   => $factoryCarsMore,
             'moderLinks'        => $moderLinks,
             'modifications'     => $modifications,
             'pictureVote'       => $this->getController()->pictureVote($picture->id, [
@@ -1050,7 +1071,8 @@ class Pic extends AbstractPlugin
             ]),
             //'picturePerspectives' => $picturePerspectives,
             'items'             => $this->picPageItemsData($picture, $itemIds),
-            'engines'           => $this->picPageEnginesData($picture, $itemIds)
+            'engines'           => $this->picPageEnginesData($picture, $itemIds),
+            'factories'         => $this->picPageFactoriesData($picture)
         ];
 
         // refresh views count

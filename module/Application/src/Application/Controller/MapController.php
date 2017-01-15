@@ -5,7 +5,7 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
-use Application\Model\DbTable\Factory;
+use Application\Model\DbTable;
 use Application\Model\DbTable\Museum;
 use Application\Model\DbTable\Picture;
 
@@ -46,39 +46,48 @@ class MapController extends AbstractActionController
         $polygon = new Polygon([$line]);
 
         $coordsFilter = [
-            'ST_Contains(GeomFromText(?), point)' => $polygon->out('wkt'),
+            
         ];
         $pictureTable = new Picture();
 
         $imageStorage = $this->imageStorage();
 
-        $factoryTable = new Factory();
+        $itemTable = new DbTable\Item();
+        $db = $itemTable->getAdapter();
 
-        $factories = $factoryTable->fetchAll($coordsFilter, 'name');
+        $factories = $db->fetchAll(
+            $db->select()
+                ->from('item', ['id', 'name'])
+                ->join('item_point', 'item.id = item_point.item_id', 'point')
+                ->where('ST_Contains(GeomFromText(?), item_point.point)', $polygon->out('wkt'))
+                ->order('item.name')
+        );
 
         $data = [];
         foreach ($factories as $factory) {
             $point = null;
-            if ($factory->point) {
-                $point = geoPHP::load(substr($factory->point, 4), 'wkb');
+            if ($factory['point']) {
+                $point = geoPHP::load(substr($factory['point'], 4), 'wkb');
             }
 
             $row = [
-                'id'   => 'factory' . $factory->id,
-                'name' => $factory->name,
+                'id'   => 'factory' . $factory['id'],
+                'name' => $factory['name'],
                 'location' => [
                     'lat'  => $point ? $point->y() : null,
                     'lng'  => $point ? $point->x() : null,
                 ],
                 'url'  => $this->url()->fromRoute('factories/factory', [
-                    'id' => $factory->id
+                    'id' => $factory['id']
                 ])
             ];
 
-            $picture = $pictureTable->fetchRow([
-                'type = ?'       => Picture::FACTORY_TYPE_ID,
-                'factory_id = ?' => $factory->id
-            ]);
+            $picture = $pictureTable->fetchRow(
+                $pictureTable->select(true)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->where('picture_item.item_id = ?', $factory['id'])
+                    ->limit(1)
+            );
 
             if ($picture) {
                 $image = $imageStorage->getFormatedImage($picture->getFormatRequest(), 'format9');
