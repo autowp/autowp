@@ -6,7 +6,7 @@ module.exports = {
             var offset = $(this).offset();
 
             var div = $(
-                require('html!./permalink.html')
+                require('./permalink.html')
             );
 
             //TODO: extract url to options

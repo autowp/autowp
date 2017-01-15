@@ -1,7 +1,7 @@
 var $ = require("jquery");
 var ol = require("openlayers");
 var markerSrc = require("img/map-marker-icon.png");
-var popupMarkup = require('html!./popup.html');
+var popupMarkup = require('./popup.html');
 require("./index.less");
 
 module.exports = {

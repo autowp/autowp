@@ -31,7 +31,13 @@ module.exports = {
             { test: /bootstrap/, loader: 'imports?jQuery=jquery' },
             { test: /Jcrop/, loader: 'imports?jQuery=jquery' },
             { test: /bootstrap-tagsinput/, loader: 'imports?window.jQuery=jquery' },
-            { test: "\.html$/", loader: "html" },
+            { 
+                test: /.html$/, 
+                loader: "html-loader",
+                query: {
+                    minimize: true
+                }
+            },
             {
                 test: /\.css$/,
                 loader: ExtractTextPlugin.extract("style-loader", "css-loader")
@@ -52,7 +58,14 @@ module.exports = {
             { test: /fontawesome-webfont\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader?name=fonts/[hash].[ext]" },
             
             { test: /glyphicons-halflings-regular\.(ttf|eot|svg)$/, loader: "file-loader?name=fonts/[hash].[ext]" },
+            { test: /\.json$/, loader: "json-loader"}
         ],
+        rules: [
+            {
+                test: /\.json$/,
+                use: 'json-loader'
+            }
+        ]
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({minimize: true}),

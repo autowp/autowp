@@ -4,7 +4,7 @@ module.exports = {
     showDialog: function(userId, message, sentCallback, cancelCallback) {
         var self = this;
         
-        var $modal = $(require('html!./message/modal.html'));
+        var $modal = $(require('./message/modal.html'));
         
         var $form = $modal.find('form');
         

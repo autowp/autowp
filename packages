@@ -3,6 +3,7 @@ git
 jpegoptim
 imagemagick
 libjpeg-progs
+libpng12-0 - for webpack image module
 memcached
 mysql-client
 mysql-server

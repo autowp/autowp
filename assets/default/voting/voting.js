@@ -14,7 +14,7 @@ module.exports = {
             function reload() {
                 if (!$modal) {
                     $modal = $(
-                        require('html!./who-vote.html')
+                        require('./who-vote.html')
                     );
                     $modal.find('.modal-title').text($a.text());
                     $body = $modal.find('.modal-body');

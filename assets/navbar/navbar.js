@@ -15,7 +15,7 @@ module.exports = {
             
             function reload() {
                 if (!$modal) {
-                    $modal = $(require('html!./online.html'));
+                    $modal = $(require('./online.html'));
                     $body = $modal.find('.modal-body');
                     $btnRefresh = $modal.find('.btn-primary').on('click', function(e) {
                         e.preventDefault();
