@@ -107,7 +107,7 @@ return array_replace(include 'root.php', [
         '全部%s个品牌'
     ],
     'brands/pictures:' => '图片: ',
-    
+
     'item/type/1/name' => '车辆',
     'item/type/1/name-plural' => '车辆',
     'item/type/1/new-item' => 'New vehicle',
@@ -1317,31 +1317,17 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/pciture/move/factories' => '工厂',
     'moder/pciture/move/engines' => '发动机',
 
-    'moder/brands/new/title' => 'New brand',
-    'moder/brands/vehicles-count:' => '车型: ',
-    'moder/brands/engines-count:' => '发动机: ',
-    'moder/brands/vehicle-pictures-count:' => '车辆图片: ',
-    'moder/brands/engine-pictures-count:' => '发动机图片: ',
-    'moder/brands/logo-pictures-count:' => '商标图片: ',
-    'moder/brands/mixed-pictures-count:' => '其它图片: ',
-    'moder/brands/unsorted-pictures-count:' => '未分类图片: ',
-    'moder/brands/total-pictures-count:' => '所哟图片: ',
-    'moder/brands/public-url:' => 'Public URL: ',
-
     'brand' => 'Brand',
     'brand/name' => '名字',
     'brand/logo' => '商标',
 
-    'moder/brands/meta-data' => '元数据',
     'moder/brands/meta-data/full-name' => '全名',
-    'moder/brands/description' => '简介',
     'moder/brands/logo/description' => '* 商标必须是PNG格式。
 * 所有的透明区域必须是透明的，而不是白的！
 * 标识必须靠近边缘，不需要留白。
 * 上传最大分辨率的图像——这是为了追求更好的质量和未来使用它的能力。商标在网站上自动缩放。',
     'moder/brands/logo/saved' => 'Logotype saved',
 
-    'moder/brands/vehicles' => '车型',
     'moder/brands/links' => 'Links',
     'moder/brands/links/text' => '文章',
     'moder/brands/links/address' => '地址',
