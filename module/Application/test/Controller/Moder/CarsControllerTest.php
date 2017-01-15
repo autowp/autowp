@@ -106,18 +106,6 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $this->assertActionName('car-select-brand');
     }
 
-    public function testSelectFactory()
-    {
-        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
-        $this->dispatch('https://www.autowp.ru/moder/cars/car-select-factory/item_id/1', Request::METHOD_GET);
-
-        $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(CarsController::class);
-        $this->assertMatchedRouteName('moder/cars/params');
-        $this->assertActionName('car-select-factory');
-    }
-
     public function testSelectParent()
     {
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));

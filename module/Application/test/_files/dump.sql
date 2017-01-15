@@ -3082,6 +3082,21 @@ CREATE TABLE `voting_variant_vote` (
 
 /*!40000 ALTER TABLE `voting_variant_vote` DISABLE KEYS */;
 /*!40000 ALTER TABLE `voting_variant_vote` ENABLE KEYS */;
+
+CREATE TABLE `item_point` (
+  `item_id` int(10) UNSIGNED NOT NULL,
+  `point` point NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE `item_point`
+  ADD PRIMARY KEY (`item_id`),
+  ADD SPATIAL KEY `point` (`point`);
+
+ALTER TABLE `item_point`
+  ADD CONSTRAINT `item_point_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE;
+
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
