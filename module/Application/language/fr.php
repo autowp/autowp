@@ -1101,6 +1101,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/filter/not-linked' => 'Non lié',
     'moder/picture/filter/gps' => 'With coordinates',
     'moder/picture/filter/order' => 'Commandé par',
+    'moder/picture/filter/similar' => 'Similar',
 
     'moder/pictures/filter' => 'Filtre',
     'moder/pictures/filter/perspective' => 'Perspective',

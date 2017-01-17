@@ -18,7 +18,8 @@ class CatalogueControllerFactory implements FactoryInterface
             $container->get(\Application\HostManager::class),
             $container->get(\Application\Service\TelegramService::class),
             $container->get(\Application\Model\Message::class),
-            $container->get(\Autowp\TextStorage\Service::class)
+            $container->get(\Autowp\TextStorage\Service::class),
+            $container->get(\Application\DuplicateFinder::class)
         );
     }
 }

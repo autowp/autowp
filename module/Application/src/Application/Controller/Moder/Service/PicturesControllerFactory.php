@@ -23,7 +23,8 @@ class PicturesControllerFactory implements FactoryInterface
             $container->get(\Application\Service\TelegramService::class),
             $container->get(\Application\Model\Message::class),
             $container->get(\Autowp\Traffic\TrafficControl::class),
-            $container->get(\Application\Model\PictureItem::class)
+            $container->get(\Application\Model\PictureItem::class),
+            $container->get(\Application\DuplicateFinder::class)
         );
     }
 }

@@ -226,6 +226,22 @@
 
             </div>
         <?php } ?>
+        
+        <?php if ($this->similarPicture) { ?>
+            <h3>Similar picture</h3>
+            <div class="well">
+                <p class="alert alert-warning" role="alert">
+                    <span class="fa fa-file-image-o"></span>
+                    <?=$this->htmlA($this->similarPicture['url'], 'Similar picture: ' . $this->similarPicture['distance'])?>
+                </p>
+                <p><?=$this->htmlA($this->similarPicture['url'], $this->img($this->similarPicture['formatRequest'], [
+                    'format' => 'picture-thumb',
+                ]), false)?></p>
+                <form action="<?=$this->escapeHtmlAttr($this->similarPicture['hideUrl'])?>" method="post">
+                    <button class="btn btn-default" type="submit">Hide</button>
+                </form>
+            </div>
+        <?php } ?>
 
         <h3><?=$this->escapeHtml($this->translate('moder/picture/uploader'))?></h3>
         <div class="well">

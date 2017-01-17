@@ -2940,6 +2940,28 @@ ALTER TABLE `item_point`
 ALTER TABLE `item_point`
   ADD CONSTRAINT `item_point_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE;
 
+CREATE TABLE `df_distance` (
+  `src_picture_id` int(10) UNSIGNED NOT NULL,
+  `dst_picture_id` int(10) UNSIGNED NOT NULL,
+  `distance` tinyint(4) NOT NULL,
+  `hide` tinyint(4) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+ALTER TABLE `df_distance`
+  ADD PRIMARY KEY (`src_picture_id`,`dst_picture_id`),
+  ADD KEY `dst_picture_id` (`dst_picture_id`);
+
+ALTER TABLE `df_distance`
+  ADD CONSTRAINT `df_distance_ibfk_1` FOREIGN KEY (`src_picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `df_distance_ibfk_2` FOREIGN KEY (`dst_picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE;
+
+CREATE TABLE `df_hash` (
+ `picture_id` int(10) unsigned NOT NULL,
+ `hash` bigint(20) NOT NULL,
+ PRIMARY KEY (`picture_id`),
+ CONSTRAINT `df_hash_ibfk_1` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

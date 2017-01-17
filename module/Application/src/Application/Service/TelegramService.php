@@ -92,7 +92,7 @@ class TelegramService
         try {
             $this->getApi()->sendMessage($params);
         } catch (TelegramResponseException $e) {
-            if ($e->getMessage() == 'Bot was blocked by the user') {
+            if ($e->getMessage() == 'Forbidden: Bot was blocked by the user') {
                 if (isset($params['chat_id'])) {
                     $this->unsubscribeChat($params['chat_id']);
                     return;

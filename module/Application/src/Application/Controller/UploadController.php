@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Application\DuplicateFinder;
 use Application\ExifGPSExtractor;
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
@@ -39,15 +40,22 @@ class UploadController extends AbstractActionController
      * @var PictureItem
      */
     private $pictureItem;
+    
+    /**
+     * @var DuplicateFinder
+     */
+    private $duplicateFinder;
 
     public function __construct(
         $partial,
         TelegramService $telegram,
-        PictureItem $pictureItem
+        PictureItem $pictureItem,
+        DuplicateFinder $duplicateFinder
     ) {
         $this->partial = $partial;
         $this->telegram = $telegram;
         $this->pictureItem = $pictureItem;
+        $this->duplicateFinder = $duplicateFinder;
     }
 
     private function getCarParentTable()
@@ -311,6 +319,9 @@ class UploadController extends AbstractActionController
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-thumb');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-medium');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-gallery-full');
+            
+            // index
+            $this->duplicateFinder->indexImage($picture->id, $tempFilePath);
 
             $this->telegram->notifyInbox($picture->id);
 
@@ -583,7 +594,7 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $itemTable = new Vehicle();
+        $itemTable = new DbTable\Item(); 
         $brand = $itemTable->fetchRow([
             'item_type_id = ?' => DbTable\Item\Type::BRAND,
             'id = ?'           => (int)$this->params('brand_id')

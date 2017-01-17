@@ -11,6 +11,7 @@ use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
+use Application\DuplicateFinder;
 use Application\Form\Moder\Inbox as InboxForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
@@ -88,6 +89,11 @@ class PicturesController extends AbstractActionController
      * @var PictureItem
      */
     private $pictureItem;
+    
+    /**
+     * @var DuplicateFinder
+     */
+    private $duplicateFinder;
 
     private function getCarParentTable()
     {
@@ -108,7 +114,8 @@ class PicturesController extends AbstractActionController
         TelegramService $telegram,
         Message $message,
         TrafficControl $trafficControl,
-        PictureItem $pictureItem
+        PictureItem $pictureItem,
+        DuplicateFinder $duplicateFinder
     ) {
 
         $this->hostManager = $hostManager;
@@ -123,6 +130,7 @@ class PicturesController extends AbstractActionController
         $this->message = $message;
         $this->trafficControl = $trafficControl;
         $this->pictureItem = $pictureItem;
+        $this->duplicateFinder = $duplicateFinder;
     }
 
     public function ownerTypeaheadAction()
@@ -225,6 +233,7 @@ class PicturesController extends AbstractActionController
             7 => ['sql' => 'comment_topic.messages DESC'],
             8 => ['sql' => 'picture_view.views DESC'],
             9 => ['sql' => 'pdr.day_date DESC'],
+            10 => ['sql' => 'df_distance.distance ASC'],
         ];
 
         if ($this->getRequest()->isPost()) {
@@ -255,23 +264,6 @@ class PicturesController extends AbstractActionController
         $joinLeftComments = false;
         $joinComments = false;
         $pictureItemJoined = false;
-
-        if ($formdata['order']) {
-            $select->order($orders[$formdata['order']]['sql']);
-            switch ($formdata['order']) {
-                case 7:
-                    $joinLeftComments = true;
-                    break;
-                case 8:
-                    $select->joinLeft('picture_view', 'pictures.id = picture_view.picture_id', null);
-                    break;
-                case 9:
-                    $joinPdr = true;
-                    break;
-            }
-        } else {
-            $select->order($orders[1]['sql']);
-        }
 
         if (strlen($formdata['status'])) {
             switch ($formdata['status']) {
@@ -340,6 +332,13 @@ class PicturesController extends AbstractActionController
         if ($formdata['special_name']) {
             $select->where('pictures.name <> "" and pictures.name is not null');
         }
+        
+        if ($formdata['similar']) {
+            $formdata['order'] = 10;
+            $select
+                ->join('df_distance', 'pictures.id = df_distance.src_picture_id', null)
+                ->where('not df_distance.hide');
+        }
 
         if (strlen($formdata['requests'])) {
             switch ($formdata['requests']) {
@@ -387,6 +386,23 @@ class PicturesController extends AbstractActionController
 
         if ($formdata['gps']) {
             $select->where('pictures.point IS NOT NULL');
+        }
+        
+        if ($formdata['order']) {
+            $select->order($orders[$formdata['order']]['sql']);
+            switch ($formdata['order']) {
+                case 7:
+                    $joinLeftComments = true;
+                    break;
+                case 8:
+                    $select->joinLeft('picture_view', 'pictures.id = picture_view.picture_id', null);
+                    break;
+                case 9:
+                    $joinPdr = true;
+                    break;
+            }
+        } else {
+            $select->order($orders[1]['sql']);
         }
 
         if ($joinPdr) {
@@ -454,6 +470,18 @@ class PicturesController extends AbstractActionController
                         'value'   => $perspective,
                         'user'    => null
                     ];
+                }
+                
+                $pictureItem['similar'] = null;
+                $similar = $this->duplicateFinder->findSimilar($pictureItem['id']);
+                if ($similar) {
+                    $similarRow = $this->table->find($similar['picture_id'])->current();
+                    if ($similarRow) {
+                        $pictureItem['similar'] = [
+                            'url'      => $this->pictureUrl($similarRow),
+                            'distance' => $similar['distance']
+                        ];
+                    }
                 }
             }
         }
@@ -1197,6 +1225,24 @@ class PicturesController extends AbstractActionController
                 'hasArea' => $hasArea
             ];
         }
+        
+        $similarPicture = null;
+        $similar = $this->duplicateFinder->findSimilar($picture['id']);
+        if ($similar) {
+            $similarRow = $this->table->find($similar['picture_id'])->current();
+            if ($similarRow) {
+                $similarPicture = [
+                    'url'           => $this->pictureUrl($similarRow),
+                    'distance'      => $similar['distance'],
+                    'formatRequest' => $similarRow->getFormatRequest(),
+                    'hideUrl'       => $this->url()->fromRoute('moder/pictures/params', [
+                        'action'  => 'hide-similar',
+                        'id'      => $picture['id'],
+                        'dest_id' => $similarRow['id']
+                    ])
+                ];
+            }
+        }
 
         return [
             'ban'             => $ban,
@@ -1234,8 +1280,29 @@ class PicturesController extends AbstractActionController
             'crop'                          => $crop,
             'banForm'                       => $this->banForm,
             'pictureVote'                   => $this->pictureVote($picture->id, []),
-            'items'                         => $items
+            'items'                         => $items,
+            'similarPicture'                => $similarPicture
         ];
+    }
+    
+    public function hideSimilarAction()
+    {
+        if (! $this->getRequest()->isPost()) {
+            return $this->forbiddenAction();
+        }
+        
+        $srcPicture = $this->table->find($this->params('id'))->current();
+        $dstPicture = $this->table->find($this->params('dest_id'))->current();
+        
+        if (! $srcPicture || ! $dstPicture) {
+            return $this->notFoundAction();
+        }
+        
+        $this->duplicateFinder->hideSimilar($srcPicture['id'], $dstPicture['id']);
+        
+        $this->log('Отменёно предупреждение о повторе', [$srcPicture, $dstPicture]);
+        
+        return $this->redirect()->toUrl($this->pictureUrl($srcPicture));
     }
 
     private function canCrop()
@@ -1928,19 +1995,19 @@ class PicturesController extends AbstractActionController
         $itemTable = new Item();
         $srcItem = $itemTable->find($this->params('src_item_id'))->current();
 
-        $carId = (int)$this->params('item_id');
-        if (strlen($carId)) {
+        $itemId = (int)$this->params('item_id');
+        if ($itemId) {
             $userId = $this->user()->get()->id;
 
             $perspectiveId = (int)$this->params('perspective_id');
 
             if ($srcItem) {
-                $this->pictureItem->changePictureItem($picture->id, $srcItem->id, $carId);
+                $this->pictureItem->changePictureItem($picture->id, $srcItem->id, $itemId);
             } else {
                 $success = $this->table->addToCar(
                     $this->pictureItem,
                     $picture->id,
-                    $carId,
+                        $itemId,
                     $userId,
                     [
                         'language'             => $this->language(),
@@ -1954,7 +2021,7 @@ class PicturesController extends AbstractActionController
             }
 
             if ($perspectiveId) {
-                $this->pictureItem->setProperties($picture->id, $carId, [
+                $this->pictureItem->setProperties($picture->id, $itemId, [
                     'perspective' => $perspectiveId
                 ]);
             }
@@ -1966,7 +2033,7 @@ class PicturesController extends AbstractActionController
             }
 
             $namespace = new \Zend\Session\Container('Moder_Car');
-            $namespace->lastCarId = $carId;
+            $namespace->lastCarId = $itemId;
 
             return $this->redirect()->toUrl($this->pictureUrl($picture));
         }
@@ -2013,14 +2080,12 @@ class PicturesController extends AbstractActionController
             );
             $engines = $this->prepareCars($rows);
 
-            if (! $srcItem) {
-                $haveConcepts = (bool)$itemTable->fetchRow(
-                    $itemTable->select(true)
-                        ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                        ->where('item_parent_cache.parent_id = ?', $brand['id'])
-                        ->where('item.is_concept')
-                );
-            }
+            $haveConcepts = (bool)$itemTable->fetchRow(
+                $itemTable->select(true)
+                    ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $brand['id'])
+                    ->where('item.is_concept')
+            );
         } elseif ($this->params('factories')) {
             $showFactories = true;
 

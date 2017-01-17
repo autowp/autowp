@@ -145,6 +145,14 @@ class Inbox extends Form implements InputFilterProviderInterface
                 ]
             ],
             [
+                'name'    => 'similar',
+                'type'    => 'Checkbox',
+                'options' => [
+                    'label' => 'moder/picture/filter/similar',
+                    'value' => '1',
+                ]
+            ],
+            [
                 'name'    => 'order',
                 'type'    => 'Select',
                 'options' => [
@@ -290,6 +298,9 @@ class Inbox extends Form implements InputFilterProviderInterface
             'order' => [
                 'required' => false
             ],
+            'similar' => [
+                'required' => false
+            ]
         ];
     }
 }

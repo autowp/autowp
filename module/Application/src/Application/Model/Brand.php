@@ -168,6 +168,7 @@ class Brand
         ], function ($select) use ($language) {
             $select
                 ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
+                ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
                 ->join(['subitem' => 'item'], 'item_parent_cache.item_id = subitem.id', null)
                 ->group('item.id')
                 ->bind([

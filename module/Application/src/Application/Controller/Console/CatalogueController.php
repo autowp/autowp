@@ -5,6 +5,7 @@ namespace Application\Controller\Console;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Application\DuplicateFinder;
 use Application\HostManager;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
@@ -40,7 +41,8 @@ class CatalogueController extends AbstractActionController
         HostManager $hostManager,
         TelegramService $telegram,
         Message $message,
-        $textStorage
+        $textStorage,
+        DuplicateFinder $duplicateFinder
     ) {
         $this->brandVehicle = $brandVehicle;
         $this->pictureItem = $pictureItem;
@@ -49,6 +51,7 @@ class CatalogueController extends AbstractActionController
         $this->telegram = $telegram;
         $this->message = $message;
         $this->textStorage = $textStorage;
+        $this->duplicateFinder = $duplicateFinder;
     }
 
     public function refreshBrandVehicleAction()
@@ -60,6 +63,19 @@ class CatalogueController extends AbstractActionController
 
     public function migrateEnginesAction()
     {
+        $pictureTable = new DbTable\Picture();
+        
+        $imageStorage = $this->imageStorage();
+        
+        $rows = $pictureTable->fetchAll(null, 'id');
+        
+        foreach ($rows as $row) {
+            print $row->id . PHP_EOL;
+            
+            $hash = $this->duplicateFinder->updateDistance($row->id);
+        }
+        
+        
         /*$itemTable = new DbTable\Item();
         $itemLangTable = new DbTable\Item\Language();
 
@@ -67,7 +83,7 @@ class CatalogueController extends AbstractActionController
         $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
         $itemParentCacheTable = new DbTable\Item\ParentCache();
         $itemPointTable = new DbTable\Item\Point();
-        $pictureTable = new DbTable\Picture();
+        
 
         $factoryTable = new DbTable\Factory();
         $factoryCarTable = new DbTable\FactoryCar();

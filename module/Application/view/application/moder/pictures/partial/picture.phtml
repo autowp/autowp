@@ -37,5 +37,11 @@
                 ], $this->perspective))?>
             </div>
         <?php } ?>
+        <?php if ($this->similar) { ?>
+            <p class="alert alert-warning" role="alert" style="margin-bottom:-1px">
+                <span class="fa fa-file-image-o"></span>
+                <?=$this->htmlA($this->similar['url'], 'Similar picture: ' . $this->similar['distance'])?>
+            </p>
+        <?php } ?>
     </div>
 </div>

@@ -23,7 +23,7 @@ class BrandsController extends AbstractActionController
 
         $language = $this->language();
 
-        $cacheKey = 'brands_list_40_' . $language . '_' . ($isHttps ? 'HTTPS' : 'HTTP');
+        $cacheKey = 'brands_list_41_' . $language . '_' . ($isHttps ? 'HTTPS' : 'HTTP');
 
         $items = $this->cache->getItem($cacheKey, $success);
         if (! $success) {

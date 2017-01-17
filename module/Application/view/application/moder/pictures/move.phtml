@@ -98,14 +98,17 @@
                 <div style="margin: 5px 0">
                     <?=$this->htmlA($this->url(null, [
                         'action'         => 'move',
-                        'perspective_id' => 22
+                        'perspective_id' => 22,
+                        'item_id'        => $this->brand['id']
                     ], [], true), $this->translate('upload/select/logo')) ?><br />
                     <?=$this->htmlA($this->url(null, [
                         'action'         => 'move',
-                        'perspective_id' => 25
+                        'perspective_id' => 25,
+                        'item_id'        => $this->brand['id']
                     ], [], true), $this->translate('upload/select/mixed-long')) ?><br />
                     <?=$this->htmlA($this->url(null, [
-                        'action' => 'move',
+                        'action'  => 'move',
+                        'item_id' => $this->brand['id']
                     ], [], true), $this->translate('upload/select/unsorted-long')) ?>
                 </div>
             <?php } ?>

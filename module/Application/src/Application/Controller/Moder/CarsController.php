@@ -703,7 +703,8 @@ class CarsController extends AbstractActionController
                     $forceIsGroup = in_array($car->item_type_id, [
                         DbTable\Item\Type::CATEGORY,
                         DbTable\Item\Type::TWINS,
-                        DbTable\Item\Type::FACTORY
+                        DbTable\Item\Type::FACTORY,
+                        DbTable\Item\Type::BRAND
                     ]);
 
                     if ($haveChilds || $forceIsGroup) {

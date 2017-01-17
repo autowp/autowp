@@ -1113,6 +1113,7 @@ return array_replace(include 'root.php', [
     'moder/picture/filter/not-linked' => 'Без привязки',
     'moder/picture/filter/gps' => 'С координатами',
     'moder/picture/filter/order' => 'Сортировать по',
+    'moder/picture/filter/similar' => 'Похожие',
 
     'moder/pictures/filter' => 'Фильтр',
     'moder/pictures/filter/perspective' => 'Ракурс',

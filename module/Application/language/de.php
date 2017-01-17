@@ -1103,6 +1103,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/filter/not-linked' => 'Not linked',
     'moder/picture/filter/gps' => 'With coordinates',
     'moder/picture/filter/order' => 'Order by',
+    'moder/picture/filter/similar' => 'Similar', 
 
     'moder/pictures/filter' => 'Filter',
     'moder/pictures/filter/perspective' => 'Perspective',
