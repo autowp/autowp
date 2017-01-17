@@ -67,12 +67,15 @@ class CatalogueController extends AbstractActionController
         
         $imageStorage = $this->imageStorage();
         
-        $rows = $pictureTable->fetchAll(null, 'id');
+        $rows = $pictureTable->fetchAll('id >= 210834', 'id');
+        
+        $this->duplicateFinder->updateDistance(359979);
+        $this->duplicateFinder->updateDistance(1045801);
         
         foreach ($rows as $row) {
             print $row->id . PHP_EOL;
             
-            $hash = $this->duplicateFinder->updateDistance($row->id);
+            $this->duplicateFinder->updateDistance($row->id);
         }
         
         

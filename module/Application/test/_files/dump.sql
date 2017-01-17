@@ -2960,7 +2960,7 @@ CREATE TABLE `df_hash` (
  `hash` bigint(20) NOT NULL,
  PRIMARY KEY (`picture_id`),
  CONSTRAINT `df_hash_ibfk_1` FOREIGN KEY (`picture_id`) REFERENCES `pictures` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
