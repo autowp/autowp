@@ -89,7 +89,7 @@ class PicturesController extends AbstractActionController
      * @var PictureItem
      */
     private $pictureItem;
-    
+
     /**
      * @var DuplicateFinder
      */
@@ -333,20 +333,20 @@ class PicturesController extends AbstractActionController
         if ($formdata['special_name']) {
             $select->where('pictures.name <> "" and pictures.name is not null');
         }
-        
+
         if ($formdata['similar']) {
             $formdata['order'] = 10;
             $select
                 ->join('df_distance', 'pictures.id = df_distance.src_picture_id', null)
                 ->where('not df_distance.hide');
-            
+
             if (strlen($formdata['status'])) {
-                
+
                 if (!$similarPictureJoined) {
                     $similarPictureJoined = true;
                     $select->join(['similar' => 'pictures'], 'df_distance.dst_picture_id = similar.id', null);
                 }
-                
+
                 switch ($formdata['status']) {
                     case Picture::STATUS_INBOX:
                     case Picture::STATUS_NEW:
@@ -411,7 +411,7 @@ class PicturesController extends AbstractActionController
         if ($formdata['gps']) {
             $select->where('pictures.point IS NOT NULL');
         }
-        
+
         if ($formdata['order']) {
             $select->order($orders[$formdata['order']]['sql']);
             switch ($formdata['order']) {
@@ -495,7 +495,7 @@ class PicturesController extends AbstractActionController
                         'user'    => null
                     ];
                 }
-                
+
                 $pictureItem['similar'] = null;
                 $similar = $this->duplicateFinder->findSimilar($pictureItem['id']);
                 if ($similar) {
@@ -711,8 +711,8 @@ class PicturesController extends AbstractActionController
                 $message = sprintf(
                     $this->translate(
                         $vote
-                            ? 'pm/new-picture-%s-accept-vote-%s/accept'
-                            : 'pm/new-picture-%s-accept-vote-%s/delete',
+                            ? 'pm/new-picture-%s-vote-%s/accept'
+                            : 'pm/new-picture-%s-vote-%s/delete',
                         'default',
                         $owner->language
                     ),
@@ -1249,7 +1249,7 @@ class PicturesController extends AbstractActionController
                 'hasArea' => $hasArea
             ];
         }
-        
+
         $similarPicture = null;
         $similar = $this->duplicateFinder->findSimilar($picture['id']);
         if ($similar) {
@@ -1308,24 +1308,24 @@ class PicturesController extends AbstractActionController
             'similarPicture'                => $similarPicture
         ];
     }
-    
+
     public function hideSimilarAction()
     {
         if (! $this->getRequest()->isPost()) {
             return $this->forbiddenAction();
         }
-        
+
         $srcPicture = $this->table->find($this->params('id'))->current();
         $dstPicture = $this->table->find($this->params('dest_id'))->current();
-        
+
         if (! $srcPicture || ! $dstPicture) {
             return $this->notFoundAction();
         }
-        
+
         $this->duplicateFinder->hideSimilar($srcPicture['id'], $dstPicture['id']);
-        
+
         $this->log('Отменёно предупреждение о повторе', [$srcPicture, $dstPicture]);
-        
+
         return $this->redirect()->toUrl($this->pictureUrl($srcPicture));
     }
 
@@ -2122,7 +2122,7 @@ class PicturesController extends AbstractActionController
             );
         } elseif ($this->params('museums')) {
             $showMuseums = true;
-        
+
             $museums = $itemTable->fetchAll(
                 $itemTable->select(true)
                     ->where('item_type_id = ?', DbTable\Item\Type::MUSEUM)

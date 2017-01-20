@@ -485,7 +485,7 @@ class CatalogueController extends AbstractActionController
                 'default'  => []
             ];
 
-            $links = new DbTable\BrandLink();
+            $links = new DbTable\Item\Link();
             foreach ($types as $key => &$type) {
                 $type['links'] = $links->fetchAll(
                     $links->select()
@@ -1781,7 +1781,7 @@ class CatalogueController extends AbstractActionController
                 ['perspectives.position'],
                 $this->catalogue()->picturesOrdering()
             ));
-        
+
         if ($exact) {
             $select
                 ->where('picture_item.item_id = ?', $carId);

@@ -229,7 +229,7 @@ class BrandNav
     {
         $aliases = [$brand['name']];
 
-        $brandAliasTable = new DbTable\BrandAlias();
+        $brandAliasTable = new DbTable\Item\Alias();
         $brandAliasRows = $brandAliasTable->fetchAll([
             'item_id = ?' => $brand['id']
         ]);

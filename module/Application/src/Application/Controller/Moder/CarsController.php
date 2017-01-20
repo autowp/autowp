@@ -925,12 +925,12 @@ class CarsController extends AbstractActionController
                 'count' => $linksCount,
             ]
         ];
-        
+
         if ($car->item_type_id == DbTable\Item\Type::MUSEUM) {
             unset($tabs['catalogue']);
             unset($tabs['tree']);
         }
-        
+
         $linksTab = in_array($car->item_type_id, [
             DbTable\Item\Type::BRAND,
             DbTable\Item\Type::MUSEUM
@@ -1422,10 +1422,6 @@ class CarsController extends AbstractActionController
         if (! $parentCar) {
             return $this->notFoundAction();
         }
-
-        /*if (!$parentCar->is_group) {
-         return $this->_forward('add-parent-options');
-         }*/
 
         $this->brandVehicle->create($parentCar->id, $car->id);
 
@@ -3393,7 +3389,7 @@ class CarsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $links = new DbTable\BrandLink();
+        $links = new DbTable\Item\Link();
 
         foreach ($this->params()->fromPost('link') as $id => $link) {
             $row = $links->find($id)->current();
@@ -3438,7 +3434,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $linkTable = new DbTable\BrandLink();
+        $linkTable = new DbTable\Item\Link();
         $linkRows = $linkTable->fetchAll([
             'item_id = ?' => $item->id
         ]);
