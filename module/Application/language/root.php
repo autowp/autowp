@@ -33,7 +33,7 @@ return [
     'page/192/name' => "%PICTURE_NAME%",
     'page/193/name' => "%PICTURE_NAME%",
     'page/194/name' => "%PICTURE_NAME%",
-    
+
     'page/10/title' => "%BRAND_NAME%",
     'page/2/title' => "",
     'page/18/title' => "%PICTURE_NAME%",
@@ -91,7 +91,7 @@ return [
     'page/192/title' => "%PICTURE_NAME%",
     'page/193/title' => "%PICTURE_NAME%",
     'page/194/title' => "%PICTURE_NAME%",
-    
+
     'page/1/breadcrumbs' => "",
     'page/2/breadcrumbs' => "",
     'page/10/breadcrumbs' => "%BRAND_NAME%",
@@ -153,7 +153,6 @@ return [
     'page/107/breadcrumbs' => "",
     'page/110/breadcrumbs' => "",
     'page/114/breadcrumbs' => "",
-    'page/116/breadcrumbs' => "%MUSEUM_NAME%",
     'page/117/breadcrumbs' => "",
     'page/119/breadcrumbs' => "",
     'page/120/breadcrumbs' => "",
@@ -192,7 +191,7 @@ return [
     'page/192/breadcrumbs' => "%PICTURE_NAME%",
     'page/193/breadcrumbs' => "%PICTURE_NAME%",
     'page/194/breadcrumbs' => "%PICTURE_NAME%",
-    
+
     'page/131/title' => "",
     'page/131/breadcrumbs' => "",
 ];

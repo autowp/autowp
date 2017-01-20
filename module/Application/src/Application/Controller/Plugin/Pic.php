@@ -878,7 +878,7 @@ class Pic extends AbstractPlugin
 
         // links
         $ofLinks = [];
-        $linksTable = new DbTable\BrandLink();
+        $linksTable = new DbTable\Item\Link();
         if (count($brandIds)) {
             $links = $linksTable->fetchAll(
                 $linksTable->select(true)

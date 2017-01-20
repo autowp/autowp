@@ -1,10 +1,10 @@
 <?php
 
-namespace Application\Model\DbTable;
+namespace Application\Model\DbTable\Item;
 
 use Application\Db\Table;
 
-class BrandLink extends Table
+class Link extends Table
 {
     protected $_name = 'links';
     protected $_primary = 'id';
@@ -12,7 +12,7 @@ class BrandLink extends Table
     protected $_referenceMap = [
         'Item' => [
             'columns'       => ['item_id'],
-            'refTableClass' => Item::class,
+            'refTableClass' => Application\Model\DbTable\Item::class,
             'refColumns'    => ['id']
         ]
     ];

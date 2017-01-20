@@ -67,7 +67,7 @@ class CatalogueController extends AbstractActionController
     {
         $pictureTable = new DbTable\Picture();
         $imageStorage = $this->imageStorage();
-        
+
         foreach ($pictureTable->fetchAll('id >= 332734', 'id') as $pictureRow) {
             print $pictureRow->id . PHP_EOL;
             $resolution = $imageStorage->getImageResolution($pictureRow->image_id);
@@ -78,20 +78,20 @@ class CatalogueController extends AbstractActionController
                 $pictureRow->save();
             }
         }
-        
+
         /*$itemTable = new DbTable\Item();
         $itemLangTable = new DbTable\Item\Language();
         $itemPointTable = new DbTable\Item\Point();
-        
-        $linkTable = new DbTable\BrandLink();
-        
+
+        $linkTable = new DbTable\Item\Link();
+
         $itemParentCacheTable = new DbTable\Item\ParentCache();
-        
+
         $museumTable = new DbTable\Museum();
-        
+
         foreach ($museumTable->fetchAll(null, 'id') as $museumRow) {
             print $museumRow->id . PHP_EOL;
-            
+
             $itemRow = $itemTable->fetchRow([
                 'migration_museum_id = ?' => $museumRow->id
             ]);
@@ -106,7 +106,7 @@ class CatalogueController extends AbstractActionController
                 ]);
                 $itemRow->save();
             }
-            
+
             if ($museumRow->point) {
                 $itemPointRow = $itemPointTable->fetchRow([
                     'item_id = ?' => $itemRow->id
@@ -116,34 +116,34 @@ class CatalogueController extends AbstractActionController
                         'item_id' => $itemRow->id
                     ]);
                 }
-            
+
                 $itemPointRow->point = $museumRow->point;
                 $itemPointRow->save();
             }
-            
+
             if ($museumRow->description) {
                 $text = $museumRow->description;
                 $language = null;
-            
+
                 if (!$text) {
                     $language = 'en';
                 }
-            
+
                 if (preg_match('|^[[:space:] a-zA-ZІ½²³°®™„”‐€ŤÚőçÚÖćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
                     $language = 'en';
                 }
-            
+
                 if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½²³°®™„”‐€ŤÚőçÚÖćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
                     $language = 'ru';
                 }
-            
+
                 print $museumRow->id . '#' . $language . PHP_EOL;
-            
+
                 if (!$language) {
                     print $text . PHP_EOL;
                     exit;
                 }
-                
+
                 $langRow = $itemLangTable->fetchRow([
                     'item_id = ?'  => $itemRow->id,
                     'language = ?' => $language
@@ -154,20 +154,20 @@ class CatalogueController extends AbstractActionController
                         'language' => $language,
                     ]);
                 }
-                
+
                 if (!$langRow->text_id) {
                     $textId = $this->textStorage->createText($text, 9);
                     $langRow->text_id = $textId;
                 }
-            
+
                 $langRow->save();
             }
-            
+
             if ($museumRow->url) {
                 $linkRow = $linkTable->fetchRow([
                     'item_id = ?' => $itemRow->id
                 ]);
-                
+
                 if (! $linkRow) {
                     $linkRow = $linkTable->createRow([
                         'item_id' => $itemRow->id,
@@ -178,16 +178,16 @@ class CatalogueController extends AbstractActionController
                     $linkRow->save();
                 }
             }
-            
+
             if ($museumRow->img) {
-                
+
                 $alreadyDone = (bool)$pictureTable->fetchRow([
                     'image_id = ?' => $museumRow->img
                 ]);
-                
-                if (!$alreadyDone) { 
+
+                if (!$alreadyDone) {
                     $image = $imageStorage->getImage($museumRow->img);
-                    
+
                     // add record to db
                     $picture = $pictureTable->createRow([
                         'image_id'      => $museumRow->img,
@@ -203,34 +203,34 @@ class CatalogueController extends AbstractActionController
                         'replace_picture_id' => null,
                     ]);
                     $picture->save();
-                    
+
                     $this->pictureItem->setPictureItems($picture->id, [$itemRow->id]);
                 }
             }
-            
+
             $itemParentCacheTable->rebuildCache($itemRow);
         }*/
-        
+
         /*
-        
-        
-        
+
+
+
         $rows = $pictureTable->fetchAll('id >= 238504', 'id');
-        
+
         foreach ($rows as $row) {
             print $row->id . PHP_EOL;
-            
+
             $this->duplicateFinder->updateDistance($row->id);
         }*/
-        
-        
+
+
         /*
 
         $itemParentTable = new DbTable\Item\ParentTable();
         $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
-        
-        
-        
+
+
+
 
         $factoryTable = new DbTable\Factory();
         $factoryCarTable = new DbTable\FactoryCar();
@@ -238,11 +238,11 @@ class CatalogueController extends AbstractActionController
         $db = $factoryTable->getAdapter();
 
         foreach ($factoryTable->fetchAll(null, null) as $factoryRow) {
-            
 
-            
 
-            
+
+
+
 
             $db->query('
                 insert ignore into log_events_item (log_event_id, item_id)

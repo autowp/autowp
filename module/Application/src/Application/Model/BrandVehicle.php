@@ -98,7 +98,7 @@ class BrandVehicle
     {
         $aliases = [$parentRow['name']];
 
-        $brandAliasTable = new DbTable\BrandAlias();
+        $brandAliasTable = new DbTable\Item\Alias();
         $brandAliasRows = $brandAliasTable->fetchAll([
             'item_id = ?' => $parentRow['id'],
             'length(name) > 0'
@@ -137,28 +137,28 @@ class BrandVehicle
 
         return $languageRow && $languageRow->name ? $languageRow->name : $itemRow->name;
     }
-    
+
     private function getYearsPrefix($begin, $end)
     {
         $bms = (int)($begin / 100);
         $ems = (int)($end / 100);
-    
+
         if ($end == $begin) {
             return $begin;
         }
-    
+
         if ($bms == $ems) {
             return $begin . '–' . sprintf('%02d', $end % 100);
         }
-    
+
         if (! $begin) {
             return 'xx–' . $end;
         }
-    
+
         if ($end) {
             return $begin . '–' . $end;
         }
-    
+
         return $begin . '–xx';
     }
 
@@ -166,7 +166,7 @@ class BrandVehicle
     {
         $vehicleName = $this->getVehicleName($vehicleRow, $language);
         $aliases = $this->getBrandAliases($parentRow);
-        
+
         $name = $vehicleName;
         foreach ($aliases as $alias) {
             $name = str_ireplace('by The ' . $alias . ' Company', '', $name);
@@ -186,7 +186,7 @@ class BrandVehicle
                 $name = $vehicleRow->body;
             }
         }
-        
+
         if (! $name && $vehicleRow->begin_model_year) {
             $modelYearsDifferent = $vehicleRow->begin_model_year != $parentRow->begin_model_year
                                 || $vehicleRow->end_model_year != $parentRow->end_model_year;
@@ -194,7 +194,7 @@ class BrandVehicle
                 $name = $this->getYearsPrefix($vehicleRow->begin_model_year, $vehicleRow->end_model_year);
             }
         }
-        
+
         if (! $name && $vehicleRow->begin_year) {
             $yearsDifferent = $vehicleRow->begin_year != $parentRow->begin_year
                            || $vehicleRow->end_year != $parentRow->end_year;
@@ -202,20 +202,20 @@ class BrandVehicle
                 $name = $this->getYearsPrefix($vehicleRow->begin_year, $vehicleRow->end_year);
             }
         }
-        
+
         if (! $name && $vehicleRow->spec_id) {
             $specsDifferent = $vehicleRow->spec_id != $parentRow->spec_id;
             if ($specsDifferent) {
-                
+
                 $specTable = new DbTable\Spec();
                 $specRow = $specTable->find($vehicleRow->spec_id)->current();
-                
+
                 if ($specRow) {
                     $name = $specRow->short_name;
                 }
             }
         }
-        
+
         if (! $name) {
             $name = $vehicleName;
         }
@@ -235,7 +235,7 @@ class BrandVehicle
         } else {
             $diffName = $this->extractName($brandRow, $vehicleRow, 'en');
         }
-        
+
         $filter = new FilenameSafe();
         $catnameTemplate = $filter->filter($diffName);
 
@@ -481,12 +481,12 @@ class BrandVehicle
         }
 
         $this->setItemParentLanguages($parentId, $itemId, $values, false);
-        
+
         $bvRow = $this->itemParentTable->fetchRow([
             'item_id = ?'   => $itemId,
             'parent_id = ?' => $parentId
         ]);
-        
+
         if (! $bvRow) {
             return false;
         }
@@ -495,16 +495,16 @@ class BrandVehicle
                 'id = ?' => (int)$parentId
             ]);
             $vehicleRow = $this->itemTable->find($itemId)->current();
-        
+
             $catname = $this->extractCatname($brandRow, $vehicleRow);
             if (! $catname) {
                 return false;
             }
-        
+
             $bvRow->catname = $catname;
             $bvRow->save();
         }
-        
+
         return true;
     }
 
