@@ -115,7 +115,7 @@ class AccountController extends AbstractActionController
         $this->message = $message;
     }
 
-    private function forwadToLogin()
+    private function forwardToLogin()
     {
         return $this->forward()->dispatch(LoginController::class, [
             'action' => 'index'
@@ -168,12 +168,12 @@ class AccountController extends AbstractActionController
     {
         $currentUser = $this->user()->get();
         if (! $currentUser) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
-        $users = new User();
+        $userTable = new User();
 
-        $user = $users->find($this->params()->fromPost('user_id'))->current();
+        $user = $userTable->find($this->params()->fromPost('user_id'))->current();
         if (! $user) {
             return $this->notFoundAction();
         }
@@ -191,7 +191,7 @@ class AccountController extends AbstractActionController
     public function deletePersonalMessageAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $user = $this->user()->get();
@@ -206,7 +206,7 @@ class AccountController extends AbstractActionController
     public function addAccountFailedAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         return [
@@ -235,7 +235,7 @@ class AccountController extends AbstractActionController
         $user = $this->user()->get();
 
         if (! $user) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $uaTable = new UserAccount();
@@ -323,7 +323,7 @@ class AccountController extends AbstractActionController
     {
         $user = $this->user()->get();
         if (! $user) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $serviceId = (string)$this->params('service');
@@ -360,7 +360,7 @@ class AccountController extends AbstractActionController
         $user = $this->user()->get();
 
         if (! $user) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $request = $this->getRequest();
@@ -507,7 +507,7 @@ class AccountController extends AbstractActionController
     {
         $user = $this->user()->get();
         if (! $user) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $request = $this->getRequest();
@@ -581,7 +581,7 @@ class AccountController extends AbstractActionController
     public function personalMessagesInboxAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $user = $this->user()->get();
@@ -598,7 +598,7 @@ class AccountController extends AbstractActionController
     public function personalMessagesSentAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $user = $this->user()->get();
@@ -615,7 +615,7 @@ class AccountController extends AbstractActionController
     public function personalMessagesSystemAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $user = $this->user()->get();
@@ -632,7 +632,7 @@ class AccountController extends AbstractActionController
     public function personalMessagesUserAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $users = new User();
@@ -659,7 +659,7 @@ class AccountController extends AbstractActionController
     public function notTakenPicturesAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $pictures = $this->catalogue()->getPictureTable();
@@ -693,7 +693,7 @@ class AccountController extends AbstractActionController
     public function clearSystemMessagesAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $this->message->deleteAllSystem($this->user()->get()->id);
@@ -704,7 +704,7 @@ class AccountController extends AbstractActionController
     public function clearSentMessagesAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $this->message->deleteAllSent($this->user()->get()->id);
@@ -716,7 +716,7 @@ class AccountController extends AbstractActionController
     {
         $user = $this->user()->get();
         if (! $user) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $request = $this->getRequest();
@@ -753,7 +753,7 @@ class AccountController extends AbstractActionController
     public function deleteAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $request = $this->getRequest();
@@ -799,7 +799,7 @@ class AccountController extends AbstractActionController
     public function specsConflictsAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $filter = $this->params('conflict', '0');
@@ -843,7 +843,7 @@ class AccountController extends AbstractActionController
     public function contactsAction()
     {
         if (! $this->user()->logedIn()) {
-            return $this->forwadToLogin();
+            return $this->forwardToLogin();
         }
 
         $user = $this->user()->get();

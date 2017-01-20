@@ -2462,26 +2462,20 @@ CREATE TABLE `telegram_brand` (
 -- Table structure for table `telegram_chat`
 --
 
-DROP TABLE IF EXISTS `telegram_chat`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `telegram_chat` (
   `chat_id` int(11) NOT NULL,
-  `user_id` int(10) unsigned DEFAULT NULL,
+  `user_id` int(10) UNSIGNED DEFAULT NULL,
   `token` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`chat_id`),
-  KEY `user_id` (`user_id`),
-  KEY `token` (`token`),
-  CONSTRAINT `telegram_chat_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  `messages` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `telegram_chat`
---
+ALTER TABLE `telegram_chat`
+  ADD PRIMARY KEY (`chat_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `token` (`token`);
 
-/*!40000 ALTER TABLE `telegram_chat` DISABLE KEYS */;
-/*!40000 ALTER TABLE `telegram_chat` ENABLE KEYS */;
+ALTER TABLE `telegram_chat`
+  ADD CONSTRAINT `telegram_chat_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Table structure for table `textstorage_revision`
