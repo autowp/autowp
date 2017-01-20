@@ -842,6 +842,7 @@ class CatalogueController extends AbstractActionController
                             ->from([$iplAlias => 'item_parent_language'], 'name')
                             ->where($iplAlias.'.item_id = ' . $cpAlias .'.item_id')
                             ->where($iplAlias.'.parent_id = ' . $cpAlias .'.parent_id')
+                            ->where('length('.$iplAlias.'.name) > 0')
                             ->order($langSortExpr)
                             ->limit(1)
                             ->assemble() .
@@ -904,7 +905,7 @@ class CatalogueController extends AbstractActionController
             }
 
             $bvName = false;
-            //$bvName = $this->brandVehicle->getName($brand['id'], $currentCar['top_item_id'], $language);
+            $bvName = $this->brandVehicle->getName($brand['id'], $currentCar['top_item_id'], $language);
             if (! $bvName) {
                 $bvName = $this->stripName($brand, $topCarName);
             }
@@ -1773,9 +1774,14 @@ class CatalogueController extends AbstractActionController
      */
     private function getBrandItemPicturesSelect($carId, $exact, $onlyAccepted = true)
     {
-        $select = $this->selectOrderFromPictures($onlyAccepted)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null);
-
+        $select = $this->selectFromPictures($onlyAccepted)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->joinLeft('perspectives', 'picture_item.perspective_id = perspectives.id', null)
+            ->order(array_merge(
+                ['perspectives.position'],
+                $this->catalogue()->picturesOrdering()
+            ));
+        
         if ($exact) {
             $select
                 ->where('picture_item.item_id = ?', $carId);

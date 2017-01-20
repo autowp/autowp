@@ -104,6 +104,10 @@
         <div class="well">
             <?=$this->escapeHtml($this->translate('moder/picture/resolution:'))?>
             <b><?=$this->picture->width ?>×<?=$this->picture->height ?></b><br />
+            <?php if ($this->picture->dpi_x || $this->picture->dpi_y) { ?>
+                DPI:
+                <b><?=$this->picture->dpi_x ?>×<?=$this->picture->dpi_y ?></b><br />
+            <?php } ?>
             <?=$this->escapeHtml($this->translate('moder/picture/filesize:'))?>
             <b><?=$this->fileSize($this->picture->filesize) ?></b><br />
             <?=$this->escapeHtml($this->translate('moder/picture/upload-date:'))?>

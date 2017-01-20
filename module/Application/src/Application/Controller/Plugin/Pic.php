@@ -850,7 +850,7 @@ class Pic extends AbstractPlugin
     {
         $options = array_replace([
             'paginator' => [
-                'route'     => 'picture/picture',
+                'route'     => null,
                 'urlParams' => []
             ]
         ], $options);
@@ -976,7 +976,9 @@ class Pic extends AbstractPlugin
                         $options['paginator']['route'],
                         array_replace($options['paginator']['urlParams'], [
                             'picture_id' => $pic['identity']
-                        ])
+                        ]),
+                        [],
+                        true
                     );
                 }
                 unset($val);

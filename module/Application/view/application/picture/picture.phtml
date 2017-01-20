@@ -111,7 +111,16 @@
     <div class="col-md-6">
         <p><?=$this->escapeHtml($this->translate('picture/image-specifications'))?>:</p>
         <ul>
-            <li><?=$this->escapeHtml($this->translate('Resolution'))?>: <strong><?=(int)$this->picture->width.'×'.(int)$this->picture->height ?></strong></li>
+            <li>
+                <?=$this->escapeHtml($this->translate('Resolution'))?>: <strong><?=(int)$this->picture->width.'×'.(int)$this->picture->height ?></strong>
+                <?php if ($this->picture->dpi_x || $this->picture->dpi_y) { ?>
+                    @ <strong><?=$this->picture->dpi_x ?>×<?=$this->picture->dpi_y ?></strong>
+                    <a href="https://en.wikipedia.org/wiki/Dots_per_inch"><abbr title="Dots Per Inch">DPI</abbr></a>
+                    <?php if ($this->picture->dpi_x > 0 && $this->picture->dpi_y > 0) { ?>
+                        <?=round(2.54 * $this->picture->width / $this->picture->dpi_x) ?>×<?=round(2.54 * $this->picture->height / $this->picture->dpi_y) ?>cm
+                    <?php } ?> 
+                <?php } ?>
+            </li>
             <li><?=$this->escapeHtml($this->translate('Filesize'))?>: <strong><?=$this->escapeHtml($this->fileSize($this->picture->filesize)) ?></strong></li>
             <?php if ($this->owner) { ?>
                 <li>

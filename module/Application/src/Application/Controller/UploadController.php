@@ -216,8 +216,6 @@ class UploadController extends AbstractActionController
             $tempFilePaths[] = $data['tmp_name'];
         }
 
-
-
         $result = [];
 
         foreach ($tempFilePaths as $tempFilePath) {
@@ -249,12 +247,16 @@ class UploadController extends AbstractActionController
 
             $image = $this->imageStorage()->getImage($imageId);
             $fileSize = $image->getFileSize();
+            
+            $resolution = $this->imageStorage()->getImageResolution($imageId);
 
             // add record to db
             $picture = $pictureTable->createRow([
                 'image_id'      => $imageId,
                 'width'         => $width,
                 'height'        => $height,
+                'dpi_x'         => $resolution ? $resolution['x'] : null,
+                'dpi_y'         => $resolution ? $resolution['y'] : null,
                 'owner_id'      => $user ? $user->id : null,
                 'add_date'      => new Zend_Db_Expr('NOW()'),
                 'filesize'      => $fileSize,

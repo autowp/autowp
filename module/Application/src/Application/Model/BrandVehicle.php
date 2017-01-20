@@ -137,6 +137,30 @@ class BrandVehicle
 
         return $languageRow && $languageRow->name ? $languageRow->name : $itemRow->name;
     }
+    
+    private function getYearsPrefix($begin, $end)
+    {
+        $bms = (int)($begin / 100);
+        $ems = (int)($end / 100);
+    
+        if ($end == $begin) {
+            return $begin;
+        }
+    
+        if ($bms == $ems) {
+            return $begin . '–' . sprintf('%02d', $end % 100);
+        }
+    
+        if (! $begin) {
+            return 'xx–' . $end;
+        }
+    
+        if ($end) {
+            return $begin . '–' . $end;
+        }
+    
+        return $begin . '–xx';
+    }
 
     private function extractName(DbTable\Item\Row $parentRow, DbTable\Item\Row $vehicleRow, $language)
     {
@@ -158,6 +182,41 @@ class BrandVehicle
         $name = trim(preg_replace("|[[:space:]]+|", ' ', $name));
         $name = ltrim($name, '/');
         if (! $name) {
+            if ($vehicleRow->body && ($vehicleRow->body != $parentRow->body)) {
+                $name = $vehicleRow->body;
+            }
+        }
+        
+        if (! $name && $vehicleRow->begin_model_year) {
+            $modelYearsDifferent = $vehicleRow->begin_model_year != $parentRow->begin_model_year
+                                || $vehicleRow->end_model_year != $parentRow->end_model_year;
+            if ($modelYearsDifferent) {
+                $name = $this->getYearsPrefix($vehicleRow->begin_model_year, $vehicleRow->end_model_year);
+            }
+        }
+        
+        if (! $name && $vehicleRow->begin_year) {
+            $yearsDifferent = $vehicleRow->begin_year != $parentRow->begin_year
+                           || $vehicleRow->end_year != $parentRow->end_year;
+            if ($yearsDifferent) {
+                $name = $this->getYearsPrefix($vehicleRow->begin_year, $vehicleRow->end_year);
+            }
+        }
+        
+        if (! $name && $vehicleRow->spec_id) {
+            $specsDifferent = $vehicleRow->spec_id != $parentRow->spec_id;
+            if ($specsDifferent) {
+                
+                $specTable = new DbTable\Spec();
+                $specRow = $specTable->find($vehicleRow->spec_id)->current();
+                
+                if ($specRow) {
+                    $name = $specRow->short_name;
+                }
+            }
+        }
+        
+        if (! $name) {
             $name = $vehicleName;
         }
 
@@ -166,8 +225,19 @@ class BrandVehicle
 
     private function extractCatname(DbTable\Item\Row $brandRow, DbTable\Item\Row $vehicleRow)
     {
+        $itemParentLangRow = $this->itemParentLanguageTable->fetchRow([
+            'parent_id = ?' => $brandRow['id'],
+            'item_id = ?'   => $vehicleRow['id'],
+            'length(name) > 0'
+        ], new \Zend_Db_Expr('language = "en" desc'));
+        if ($itemParentLangRow) {
+            $diffName = $itemParentLangRow->name;
+        } else {
+            $diffName = $this->extractName($brandRow, $vehicleRow, 'en');
+        }
+        
         $filter = new FilenameSafe();
-        $catnameTemplate = $filter->filter($this->extractName($brandRow, $vehicleRow, 'en'));
+        $catnameTemplate = $filter->filter($diffName);
 
         $i = 0;
         do {
@@ -398,30 +468,6 @@ class BrandVehicle
         $itemId = (int)$itemId;
         $parentId = (int)$parentId;
 
-        $bvRow = $this->itemParentTable->fetchRow([
-            'item_id = ?'   => $itemId,
-            'parent_id = ?' => $parentId
-        ]);
-
-        if (! $bvRow) {
-            return false;
-        }
-        if (! $bvRow->manual_catname) {
-            $brandRow = $this->itemTable->fetchRow([
-                'id = ?'           => (int)$parentId,
-                //'item_type_id = ?' => DbTable\Item\Type::BRAND
-            ]);
-            $vehicleRow = $this->itemTable->find($itemId)->current();
-
-            $catname = $this->extractCatname($brandRow, $vehicleRow);
-            if (! $catname) {
-                return false;
-            }
-
-            $bvRow->catname = $catname;
-            $bvRow->save();
-        }
-
         $bvlRows = $this->itemParentLanguageTable->fetchAll([
             'item_id = ?'   => $itemId,
             'parent_id = ?' => $parentId
@@ -434,7 +480,32 @@ class BrandVehicle
             ];
         }
 
-        return $this->setItemParentLanguages($parentId, $itemId, $values, false);
+        $this->setItemParentLanguages($parentId, $itemId, $values, false);
+        
+        $bvRow = $this->itemParentTable->fetchRow([
+            'item_id = ?'   => $itemId,
+            'parent_id = ?' => $parentId
+        ]);
+        
+        if (! $bvRow) {
+            return false;
+        }
+        if (! $bvRow->manual_catname) {
+            $brandRow = $this->itemTable->fetchRow([
+                'id = ?' => (int)$parentId
+            ]);
+            $vehicleRow = $this->itemTable->find($itemId)->current();
+        
+            $catname = $this->extractCatname($brandRow, $vehicleRow);
+            if (! $catname) {
+                return false;
+            }
+        
+            $bvRow->catname = $catname;
+            $bvRow->save();
+        }
+        
+        return true;
     }
 
     public function refreshAutoByVehicle($itemId)

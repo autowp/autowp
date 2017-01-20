@@ -65,12 +65,26 @@ class CatalogueController extends AbstractActionController
 
     public function migrateEnginesAction()
     {
-        $itemTable = new DbTable\Item();
+        $pictureTable = new DbTable\Picture();
+        $imageStorage = $this->imageStorage();
+        
+        foreach ($pictureTable->fetchAll('id >= 332734', 'id') as $pictureRow) {
+            print $pictureRow->id . PHP_EOL;
+            $resolution = $imageStorage->getImageResolution($pictureRow->image_id);
+            print_r($resolution);
+            if ($resolution) {
+                $pictureRow->dpi_x = $resolution['x'];
+                $pictureRow->dpi_y = $resolution['y'];
+                $pictureRow->save();
+            }
+        }
+        
+        /*$itemTable = new DbTable\Item();
         $itemLangTable = new DbTable\Item\Language();
         $itemPointTable = new DbTable\Item\Point();
-        $pictureTable = new DbTable\Picture();
+        
         $linkTable = new DbTable\BrandLink();
-        $imageStorage = $this->imageStorage();
+        
         $itemParentCacheTable = new DbTable\Item\ParentCache();
         
         $museumTable = new DbTable\Museum();
@@ -107,7 +121,7 @@ class CatalogueController extends AbstractActionController
                 $itemPointRow->save();
             }
             
-            /*if ($museumRow->description) {
+            if ($museumRow->description) {
                 $text = $museumRow->description;
                 $language = null;
             
@@ -163,7 +177,7 @@ class CatalogueController extends AbstractActionController
                     ]);
                     $linkRow->save();
                 }
-            }*/
+            }
             
             if ($museumRow->img) {
                 
@@ -195,7 +209,7 @@ class CatalogueController extends AbstractActionController
             }
             
             $itemParentCacheTable->rebuildCache($itemRow);
-        }
+        }*/
         
         /*
         
