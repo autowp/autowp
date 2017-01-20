@@ -2066,11 +2066,13 @@ class PicturesController extends AbstractActionController
         $brand = $brandModel->getBrandById($this->params('brand_id'), $this->language());
         $brands = null;
         $factories = null;
+        $museums = null;
         $vehicles = [];
         $engines = [];
         $haveConcepts = null;
 
         $showFactories = false;
+        $showMuseums = false;
 
         if ($brand) {
             $rows = $itemTable->fetchAll(
@@ -2113,10 +2115,17 @@ class PicturesController extends AbstractActionController
         } elseif ($this->params('factories')) {
             $showFactories = true;
 
-            $factoryTable = new Item();
             $factories = $itemTable->fetchAll(
                 $itemTable->select(true)
                     ->where('item_type_id = ?', DbTable\Item\Type::FACTORY)
+                    ->order('name')
+            );
+        } elseif ($this->params('museums')) {
+            $showMuseums = true;
+        
+            $museums = $itemTable->fetchAll(
+                $itemTable->select(true)
+                    ->where('item_type_id = ?', DbTable\Item\Type::MUSEUM)
                     ->order('name')
             );
         } else {
@@ -2132,11 +2141,13 @@ class PicturesController extends AbstractActionController
             'vehicles'     => $vehicles,
             'engines'      => $engines,
             'factories'    => $factories,
+            'museums'      => $museums,
             'haveConcepts' => $haveConcepts,
             'conceptsUrl'  => $this->url()->fromRoute(null, [
                 'action' => 'concepts'
             ], [], true),
-            'showFactories' => $showFactories
+            'showFactories' => $showFactories,
+            'showMuseums'   => $showMuseums
         ];
     }
 }

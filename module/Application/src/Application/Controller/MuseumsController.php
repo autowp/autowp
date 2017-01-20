@@ -61,12 +61,24 @@ class MuseumsController extends AbstractActionController
         if ($textIds) {
             $description = $this->textStorage->getFirstText($textIds);
         }
+        
+        $pictureTable = new DbTable\Picture();
+        
+        $select = $pictureTable->select(true)
+            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+            ->where('picture_item.item_id = ?', $museum->id)
+            ->where('pictures.status = ?', DbTable\Picture::STATUS_ACCEPTED);
+        
+        $pictures = $this->pic()->listData($select, [
+            'width' => 4
+        ]);
 
         return [
             'museum'      => $museum,
             'point'       => $point,
             'links'       => $links,
-            'description' => $description
+            'description' => $description,
+            'pictures'    => $pictures,
         ];
     }
 }

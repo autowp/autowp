@@ -15,7 +15,7 @@
 
 <?php if (!$this->srcItem) { ?>
     <ul class="nav nav-pills" style="margin-bottom: 30px">
-        <li<?=$this->showFactories ? '' : ' class="active"'?>><?=$this->htmlA($this->url('moder/pictures/params', [
+        <li<?=$this->showFactories || $this->showMuseums ? '' : ' class="active"'?>><?=$this->htmlA($this->url('moder/pictures/params', [
             'action'     => 'move',
             'picture_id' => $this->picture->id,
         ]), $this->translate('moder/pciture/move/brands'))?></li>
@@ -24,10 +24,22 @@
             'picture_id' => $this->picture->id,
             'factories'  => 1
         ]), $this->translate('moder/pciture/move/factories'))?></li>
+        <li<?=$this->showMuseums ? ' class="active"' : ''?>><?=$this->htmlA($this->url('moder/pictures/params', [
+            'action'     => 'move',
+            'picture_id' => $this->picture->id,
+            'museums'    => 1
+        ]), $this->translate('item/type/7/name-plural'))?></li>
     </ul>
 <?php } ?>
 
-<?php if ($this->showFactories && !$this->srcItem) { ?>
+<?php if ($this->showMuseums && !$this->srcItem) { ?>
+
+    <?php foreach ($this->museums as $item) { ?>
+        <?=$this->htmlA($this->url(null, [
+            'item_id' => $item['id'],
+        ], [], true), $item['name']) ?><br />
+    <?php } ?>
+<?php } else if ($this->showFactories && !$this->srcItem) { ?>
 
     <?php foreach ($this->factories as $factory) { ?>
         <?=$this->htmlA($this->url(null, [
