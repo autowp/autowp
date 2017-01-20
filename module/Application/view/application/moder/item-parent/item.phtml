@@ -1,0 +1,32 @@
+<?php
+    $this->pageEnv([
+        'layout' => [
+            'isAdminPage' => true,
+            'blankPage'   => false,
+            'needRight'   => false
+        ],
+        'pageId' => 78,
+        'args'   => [
+            'CAR_ID'   => $this->item->id,
+            'CAR_NAME' => $this->car()->textTitle($this->item->getNameData($this->language()))
+        ]
+    ]);
+?>
+
+<p>
+    <?=$this->htmlA($this->url('moder/cars/params', [
+        'action'  => 'car',
+        'item_id' => $this->parent->id,
+        'tab'     => 'catalogue'
+    ]), $this->car()->htmlTitle($this->parent->getNameData($this->language())), false)?>
+    &rarr;
+    <?=$this->htmlA($this->url('moder/cars/params', [
+        'action'  => 'car',
+        'item_id' => $this->item->id,
+        'tab'     => 'catalogue'
+    ]), $this->car()->htmlTitle($this->item->getNameData($this->language())), false)?>
+</p>
+
+<?=$this->partial('application/forms/bootstrap-horizontal', [
+    'form' => $this->form
+])?>
