@@ -795,7 +795,6 @@ class Pic extends AbstractPlugin
         $result = [];
 
         foreach ($factories as $factory) {
-
             $factoryCars = [];
             $factoryCarsMore = false;
 

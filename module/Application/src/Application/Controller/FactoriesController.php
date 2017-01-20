@@ -122,7 +122,7 @@ class FactoriesController extends AbstractActionController
                 ];
             }
         }
-        
+
         $itemPointTable = new DbTable\Item\Point();
         $itemPointRow = $itemPointTable->fetchRow([
             'item_id = ?' => $factory->id
@@ -132,21 +132,21 @@ class FactoriesController extends AbstractActionController
         if ($itemPointRow && $itemPointRow->point) {
             $point = geoPHP::load(substr($itemPointRow->point, 4), 'wkb');
         }
-        
+
         $itemLanguageTable = new DbTable\Item\Language();
         $db = $itemLanguageTable->getAdapter();
         $orderExpr = $db->quoteInto('language = ? desc', $this->language());
         $itemLanguageRows = $itemLanguageTable->fetchAll([
             'item_id = ?' => $factory['id']
         ], new \Zend_Db_Expr($orderExpr));
-        
+
         $textIds = [];
         foreach ($itemLanguageRows as $itemLanguageRow) {
             if ($itemLanguageRow->text_id) {
                 $textIds[] = $itemLanguageRow->text_id;
             }
         }
-        
+
         $description = null;
         if ($textIds) {
             $description = $this->textStorage->getFirstText($textIds);

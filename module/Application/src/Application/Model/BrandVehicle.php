@@ -206,7 +206,6 @@ class BrandVehicle
         if (! $name && $vehicleRow->spec_id) {
             $specsDifferent = $vehicleRow->spec_id != $parentRow->spec_id;
             if ($specsDifferent) {
-
                 $specTable = new DbTable\Spec();
                 $specRow = $specTable->find($vehicleRow->spec_id)->current();
 

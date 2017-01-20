@@ -186,7 +186,7 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
                 ],
             ],
         ];
-        
+
         $pointFields = in_array($this->itemType, [
             DbTable\Item\Type::FACTORY,
             DbTable\Item\Type::MUSEUM

@@ -21,13 +21,13 @@ class MapController extends AbstractActionController
      * @var ItemNameFormatter
      */
     private $itemNameFormatter;
-    
+
     public function __construct(
         ItemNameFormatter $itemNameFormatter
     ) {
         $this->itemNameFormatter = $itemNameFormatter;
     }
-    
+
     public function indexAction()
     {
     }
@@ -58,10 +58,10 @@ class MapController extends AbstractActionController
         $polygon = new Polygon([$line]);
 
         $coordsFilter = [
-            
+
         ];
         $pictureTable = new Picture();
-        
+
         $language = $this->language();
 
         $imageStorage = $this->imageStorage();
@@ -83,7 +83,7 @@ class MapController extends AbstractActionController
             if ($item['point']) {
                 $point = geoPHP::load(substr($item['point'], 4), 'wkb');
             }
-            
+
             $url = null;
             switch ($item['item_type_id']) {
                 case DbTable\Item\Type::FACTORY:
@@ -91,7 +91,7 @@ class MapController extends AbstractActionController
                         'id' => $item['id']
                     ]);
                     break;
-                    
+
                 case DbTable\Item\Type::MUSEUM:
                     $url = $this->url()->fromRoute('museums/museum', [
                         'id' => $item['id']

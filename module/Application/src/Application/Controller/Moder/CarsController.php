@@ -558,7 +558,7 @@ class CarsController extends AbstractActionController
         ]);
 
         if ($point) {
-            if (!$itemPointRow) {
+            if (! $itemPointRow) {
                 $itemPointRow = $itemPointTable->createRow([
                     'item_id' => $item['id']
                 ]);

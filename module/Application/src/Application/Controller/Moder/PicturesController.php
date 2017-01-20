@@ -341,8 +341,7 @@ class PicturesController extends AbstractActionController
                 ->where('not df_distance.hide');
 
             if (strlen($formdata['status'])) {
-
-                if (!$similarPictureJoined) {
+                if (! $similarPictureJoined) {
                     $similarPictureJoined = true;
                     $select->join(['similar' => 'pictures'], 'df_distance.dst_picture_id = similar.id', null);
                 }
@@ -2031,7 +2030,7 @@ class PicturesController extends AbstractActionController
                 $success = $this->table->addToCar(
                     $this->pictureItem,
                     $picture->id,
-                        $itemId,
+                    $itemId,
                     $userId,
                     [
                         'language'             => $this->language(),

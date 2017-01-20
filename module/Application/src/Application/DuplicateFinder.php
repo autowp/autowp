@@ -12,37 +12,35 @@ use Jenssegers\ImageHash\ImageHash;
 
 use InvalidArgumentException;
 
-use PDOException;
-
 class DuplicateFinder
 {
     private $threshold = 3;
-    
+
     /**
      * @var TableGateway
      */
     private $hashTable;
-    
+
     /**
      * @var TableGateway
      */
     private $distanceTable;
-    
+
     public function __construct(Adapter $adapter)
     {
         $this->adapter = $adapter;
         $this->hashTable = new TableGateway('df_hash', $this->adapter);
         $this->distanceTable = new TableGateway('df_distance', $this->adapter);
     }
-    
+
     public function indexImage($id, $filepath)
     {
         $id = (int)$id;
-        
-        if (!$id) {
+
+        if (! $id) {
             throw new InvalidArgumentException("Invalid id provided");
         }
-        
+
         $row = $this->hashTable->select([
             'picture_id' => $id
         ])->current();
@@ -57,7 +55,6 @@ class DuplicateFinder
                 'picture_id' => $id,
                 'hash'       => $hash
             ]);
-            
         } else {
             $this->hashTable->update([
                 'hash'       => $hash
@@ -65,29 +62,29 @@ class DuplicateFinder
                 'picture_id' => $id
             ]);
         }
-        
+
         $this->updateDistance($id);
-        
+
         return null;
     }
-    
+
     public function updateDistance($id)
     {
         $id = (int)$id;
-        
-        if (!$id) {
+
+        if (! $id) {
             throw new InvalidArgumentException("Invalid id provided");
         }
-        
+
         $row = $this->hashTable->select([
             'picture_id' => $id
         ])->current();
-        
-        if (!$row) {
+
+        if (! $row) {
             return;
         }
-        
-        $similarRows = $this->hashTable->select(function(Select $select) use ($id, $row) {
+
+        $similarRows = $this->hashTable->select(function (Select $select) use ($id, $row) {
             $select
                 ->columns([
                     'picture_id',
@@ -100,7 +97,7 @@ class DuplicateFinder
                     'distance <= ?' => $this->threshold
                 ]);
         });
-        
+
         foreach ($similarRows as $similarRow) {
             try {
                 $this->distanceTable->insert([
@@ -109,7 +106,6 @@ class DuplicateFinder
                     'distance'       => $similarRow['distance']
                 ]);
             } catch (InvalidQueryException $e) {
-                
             }
             try {
                 $this->distanceTable->insert([
@@ -118,14 +114,13 @@ class DuplicateFinder
                     'distance'       => $similarRow['distance']
                 ]);
             } catch (InvalidQueryException $e) {
-            
             }
         }
     }
-    
+
     public function findSimilar($id)
     {
-        $row = $this->distanceTable->select(function(Select $select) use ($id) {
+        $row = $this->distanceTable->select(function (Select $select) use ($id) {
             $select
                 ->columns([
                     'dst_picture_id',
@@ -139,17 +134,17 @@ class DuplicateFinder
                 ->order('distance ASC')
                 ->limit(1);
         })->current();
-        
+
         if (! $row) {
             return null;
         }
-        
+
         return [
             'picture_id' => $row['dst_picture_id'],
             'distance'   => $row['distance']
         ];
     }
-    
+
     public function hideSimilar($srcId, $dstId)
     {
         $this->distanceTable->update([

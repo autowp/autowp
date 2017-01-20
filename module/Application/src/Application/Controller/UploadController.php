@@ -40,7 +40,7 @@ class UploadController extends AbstractActionController
      * @var PictureItem
      */
     private $pictureItem;
-    
+
     /**
      * @var DuplicateFinder
      */
@@ -247,7 +247,7 @@ class UploadController extends AbstractActionController
 
             $image = $this->imageStorage()->getImage($imageId);
             $fileSize = $image->getFileSize();
-            
+
             $resolution = $this->imageStorage()->getImageResolution($imageId);
 
             // add record to db
@@ -320,7 +320,7 @@ class UploadController extends AbstractActionController
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-thumb');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-medium');
             $this->imageStorage()->getFormatedImage($formatRequest, 'picture-gallery-full');
-            
+
             // index
             $this->duplicateFinder->indexImage($picture->id, $tempFilePath);
 
@@ -595,7 +595,7 @@ class UploadController extends AbstractActionController
             ]);
         }
 
-        $itemTable = new DbTable\Item(); 
+        $itemTable = new DbTable\Item();
         $brand = $itemTable->fetchRow([
             'item_type_id = ?' => DbTable\Item\Type::BRAND,
             'id = ?'           => (int)$this->params('brand_id')

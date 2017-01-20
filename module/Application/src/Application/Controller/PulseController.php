@@ -41,7 +41,7 @@ class PulseController extends AbstractActionController
         $logTable = new LogEvent();
         $logAdapter = $logTable->getAdapter();
         $now = new DateTime();
-        
+
         switch ($this->params()->fromQuery('period')) {
             case 'year':
                 $period = 'year';
@@ -105,7 +105,7 @@ class PulseController extends AbstractActionController
                     $date = $row['date'] . ' ' . $row['hour'];
                     break;
             }
-            
+
             $data[$uid][$date] = (int)$row['value'];
         }
 

@@ -109,7 +109,7 @@ class ItemParentController extends AbstractActionController
     {
         print 'Temporarly disabled';
         exit;
-        
+
         if (! $this->user()->isAllowed('car', 'move')) {
             return $this->forbiddenAction();
         }
@@ -148,7 +148,7 @@ class ItemParentController extends AbstractActionController
     {
         print 'Temporarly disabled';
         exit;
-        
+
         if (! $this->user()->isAllowed('car', 'move')) {
             return $this->forbiddenAction();
         }
