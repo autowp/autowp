@@ -2240,6 +2240,8 @@ CREATE TABLE `pictures` (
 INSERT INTO `pictures` (`id`, `width`, `height`, `filesize`, `owner_id`, `add_date`, `note`, `crc`, `status`, `_type`, `removing_date`, `_brand_id`, `change_status_user_id`, `crop_left`, `crop_top`, `crop_width`, `crop_height`, `accept_datetime`, `name`, `source_id`, `copyrights`, `identity`, `replace_picture_id`, `image_id`, `_factory_id`, `ip`, `copyrights_text_id`, `point`) VALUES (1,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity1',NULL,1,NULL,0x7F000001,NULL,NULL),(2,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity2',NULL,33,NULL,0x7F000001,NULL,NULL),(3,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity3',NULL,35,NULL,0x7F000001,NULL,NULL),(4,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'accepted',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity4',NULL,37,NULL,0x7F000001,NULL,NULL),(5,1600,1200,0,1,'2016-11-25 18:31:50','',NULL,'inbox',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'2016-11-25 18:31:50',NULL,NULL,NULL,'identity5',NULL,38,NULL,0x7F000001,NULL,NULL);
 /*!40000 ALTER TABLE `pictures` ENABLE KEYS */;
 
+alter table `pictures` add `dpi_x` int(11) DEFAULT NULL,
+ add `dpi_y` int(11) DEFAULT NULL;
 --
 -- Table structure for table `pictures_moder_votes`
 --

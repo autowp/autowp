@@ -3191,7 +3191,7 @@ class CarsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
-        $mgTable = new Modification\Group();
+        $mgTable = new DbTable\Modification\Group();
 
         $mgRows = $mgTable->fetchAll(
             $mgTable->select(true)
@@ -3214,6 +3214,7 @@ class CarsController extends AbstractActionController
             'car'    => $car,
             'groups' => $groups
         ]);
+        return $model->setTerminal(true);
     }
 
     public function carModificationPicturesAction()
@@ -3230,8 +3231,8 @@ class CarsController extends AbstractActionController
         }
 
         $mTable = new DbTable\Modification();
-        $mpTable = new Modification\Picture();
-        $mgTable = new Modification\Group();
+        $mpTable = new DbTable\Modification\Picture();
+        $mgTable = new DbTable\Modification\Group();
         $pictureTable = new DbTable\Picture();
         $db = $mpTable->getAdapter();
         $imageStorage = $this->imageStorage();

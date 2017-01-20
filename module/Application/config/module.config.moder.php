@@ -38,22 +38,6 @@ return [
                             ]
                         ]
                     ],
-                    'item-parent' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/item-parent[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\ItemParentController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'cars' => [
                         'type' => Segment::class,
                         'options' => [
@@ -150,6 +134,38 @@ return [
                             'route' => '/index[/:action]',
                             'defaults' => [
                                 'controller' => Controller\Moder\IndexController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => Router\Http\WildcardSafe::class
+                            ]
+                        ]
+                    ],
+                    'item-parent' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/item-parent[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\ItemParentController::class,
+                                'action'     => 'index'
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes'  => [
+                            'params' => [
+                                'type' => Router\Http\WildcardSafe::class
+                            ]
+                        ]
+                    ],
+                    'modification' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => '/modification[/:action]',
+                            'defaults' => [
+                                'controller' => Controller\Moder\ModificationController::class,
                                 'action'     => 'index'
                             ],
                         ],
