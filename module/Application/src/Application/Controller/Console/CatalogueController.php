@@ -20,6 +20,8 @@ use Autowp\User\Model\DbTable\User;
 
 use Zend\Authentication\AuthenticationService;
 
+use Zend_Db_Expr;
+
 class CatalogueController extends AbstractActionController
 {
     /**
@@ -63,79 +65,71 @@ class CatalogueController extends AbstractActionController
 
     public function migrateEnginesAction()
     {
-        $pictureTable = new DbTable\Picture();
-        
-        $imageStorage = $this->imageStorage();
-        
-        $rows = $pictureTable->fetchAll('id >= 210834', 'id');
-        
-        $this->duplicateFinder->updateDistance(359979);
-        $this->duplicateFinder->updateDistance(1045801);
-        
-        foreach ($rows as $row) {
-            print $row->id . PHP_EOL;
-            
-            $this->duplicateFinder->updateDistance($row->id);
-        }
-        
-        
-        /*$itemTable = new DbTable\Item();
+        $itemTable = new DbTable\Item();
         $itemLangTable = new DbTable\Item\Language();
-
-        $itemParentTable = new DbTable\Item\ParentTable();
-        $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
-        $itemParentCacheTable = new DbTable\Item\ParentCache();
         $itemPointTable = new DbTable\Item\Point();
+        $pictureTable = new DbTable\Picture();
+        $linkTable = new DbTable\BrandLink();
+        $imageStorage = $this->imageStorage();
+        $itemParentCacheTable = new DbTable\Item\ParentCache();
         
-
-        $factoryTable = new DbTable\Factory();
-        $factoryCarTable = new DbTable\FactoryCar();
-
-        $db = $factoryTable->getAdapter();
-
-        foreach ($factoryTable->fetchAll(null, null) as $factoryRow) {
-            print $factoryRow->id . PHP_EOL;
-
+        $museumTable = new DbTable\Museum();
+        
+        foreach ($museumTable->fetchAll(null, 'id') as $museumRow) {
+            print $museumRow->id . PHP_EOL;
+            
             $itemRow = $itemTable->fetchRow([
-                'migration_factory_id = ?' => $factoryRow->id
+                'migration_museum_id = ?' => $museumRow->id
             ]);
             if (!$itemRow) {
                 $itemRow = $itemTable->createRow([
-                    'migration_factory_id' => $factoryRow->id,
-                    'name'               => $factoryRow->name,
-                    'item_type_id'       => DbTable\Item\Type::FACTORY,
+                    'migration_museum_id' => $museumRow->id,
+                    'name'               => $museumRow->name,
+                    'item_type_id'       => DbTable\Item\Type::MUSEUM,
                     'body'               => '',
                     'produced_exactly'   => 0,
                     'is_group'           => 1,
-                    'begin_year'         => $factoryRow->year_from ? $factoryRow->year_from : null,
-                    'end_year'           => $factoryRow->year_to ? $factoryRow->year_to : null
                 ]);
                 $itemRow->save();
             }
-
-            if ($factoryRow->text_id) {
-                $text = $this->textStorage->getText($factoryRow->text_id);
+            
+            if ($museumRow->point) {
+                $itemPointRow = $itemPointTable->fetchRow([
+                    'item_id = ?' => $itemRow->id
+                ]);
+                if (!$itemPointRow) {
+                    $itemPointRow = $itemPointTable->createRow([
+                        'item_id' => $itemRow->id
+                    ]);
+                }
+            
+                $itemPointRow->point = $museumRow->point;
+                $itemPointRow->save();
+            }
+            
+            /*if ($museumRow->description) {
+                $text = $museumRow->description;
                 $language = null;
-
+            
                 if (!$text) {
                     $language = 'en';
                 }
-
+            
                 if (preg_match('|^[[:space:] a-zA-ZІ½²³°®™„”‐€ŤÚőçÚÖćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
                     $language = 'en';
                 }
-
+            
                 if (preg_match('|^[[:space:] а-яА-Яa-zёЁA-ZІ½²³°®™„”‐€ŤÚőçÚÖćčśșãéëóüòäáéâàèíßôĕłа́øęąñïêŠŻŽÝ~0-9±Ⅲº<>∙­·:;.,!?…`£#​​*«»×&=’()%"“”$–—+\\\\\'/\[\]_№-]+$|isu', $text)) {
                     $language = 'ru';
                 }
-
-                print $factoryRow->text_id . '#' . $language . PHP_EOL;
-
+            
+                print $museumRow->id . '#' . $language . PHP_EOL;
+            
                 if (!$language) {
                     print $text . PHP_EOL;
                     exit;
                 }
-
+                
                 $langRow = $itemLangTable->fetchRow([
                     'item_id = ?'  => $itemRow->id,
                     'language = ?' => $language
@@ -146,24 +140,95 @@ class CatalogueController extends AbstractActionController
                         'language' => $language,
                     ]);
                 }
-
-                $langRow->text_id = $factoryRow->text_id;
+                
+                if (!$langRow->text_id) {
+                    $textId = $this->textStorage->createText($text, 9);
+                    $langRow->text_id = $textId;
+                }
+            
                 $langRow->save();
             }
-
-            if ($factoryRow->point) {
-                $itemPointRow = $itemPointTable->fetchRow([
+            
+            if ($museumRow->url) {
+                $linkRow = $linkTable->fetchRow([
                     'item_id = ?' => $itemRow->id
                 ]);
-                if (!$itemPointRow) {
-                    $itemPointRow = $itemPointTable->createRow([
-                        'item_id' => $itemRow->id
+                
+                if (! $linkRow) {
+                    $linkRow = $linkTable->createRow([
+                        'item_id' => $itemRow->id,
+                        'type'    => 'default',
+                        'url'     => $museumRow->url,
+                        'name'    => ''
                     ]);
+                    $linkRow->save();
                 }
-
-                $itemPointRow->point = $factoryRow->point;
-                $itemPointRow->save();
+            }*/
+            
+            if ($museumRow->img) {
+                
+                $alreadyDone = (bool)$pictureTable->fetchRow([
+                    'image_id = ?' => $museumRow->img
+                ]);
+                
+                if (!$alreadyDone) { 
+                    $image = $imageStorage->getImage($museumRow->img);
+                    
+                    // add record to db
+                    $picture = $pictureTable->createRow([
+                        'image_id'      => $museumRow->img,
+                        'width'         => $image->getWidth(),
+                        'height'        => $image->getHeight(),
+                        'owner_id'      => 9,
+                        'add_date'      => '2014-01-01 00:00:00',
+                        'filesize'      => $image->getFileSize(),
+                        'status'        => DbTable\Picture::STATUS_ACCEPTED,
+                        'removing_date' => null,
+                        'ip'            => new Zend_Db_Expr('inet6_aton("127.0.0.1")'),
+                        'identity'      => $pictureTable->generateIdentity(),
+                        'replace_picture_id' => null,
+                    ]);
+                    $picture->save();
+                    
+                    $this->pictureItem->setPictureItems($picture->id, [$itemRow->id]);
+                }
             }
+            
+            $itemParentCacheTable->rebuildCache($itemRow);
+        }
+        
+        /*
+        
+        
+        
+        $rows = $pictureTable->fetchAll('id >= 238504', 'id');
+        
+        foreach ($rows as $row) {
+            print $row->id . PHP_EOL;
+            
+            $this->duplicateFinder->updateDistance($row->id);
+        }*/
+        
+        
+        /*
+
+        $itemParentTable = new DbTable\Item\ParentTable();
+        $itemParentLanguageTable = new DbTable\Item\ParentLanguage();
+        
+        
+        
+
+        $factoryTable = new DbTable\Factory();
+        $factoryCarTable = new DbTable\FactoryCar();
+
+        $db = $factoryTable->getAdapter();
+
+        foreach ($factoryTable->fetchAll(null, null) as $factoryRow) {
+            
+
+            
+
+            
 
             $db->query('
                 insert ignore into log_events_item (log_event_id, item_id)

@@ -164,11 +164,15 @@
     <?php } ?>
     <div class="tab-pane<?=$this->tabs['name']['active'] ? ' active' : ''?>" id="name">Loading ...</div>
 
-    <div class="tab-pane<?=$this->tabs['catalogue']['active'] ? ' active' : ''?>" id="catalogue">Loading ...</div>
+    <?php if (isset($this->tabs['tree'])) { ?>
+        <div class="tab-pane<?=$this->tabs['catalogue']['active'] ? ' active' : ''?>" id="catalogue">Loading ...</div>
+    <?php } ?>
     <?php if (isset($this->tabs['vehicles'])) { ?>
         <div class="tab-pane<?=$this->tabs['vehicles']['active'] ? ' active' : ''?>" id="vehicles">Loading ...</div>
     <?php } ?>
-    <div class="tab-pane<?=$this->tabs['tree']['active'] ? ' active' : ''?>" id="tree">Loading ...</div>
+    <?php if (isset($this->tabs['tree'])) { ?>
+        <div class="tab-pane<?=$this->tabs['tree']['active'] ? ' active' : ''?>" id="tree">Loading ...</div>
+    <?php } ?>
     <?php if (isset($this->tabs['pictures'])) { ?>
         <div class="tab-pane<?=$this->tabs['pictures']['active'] ? ' active' : ''?>" id="pictures">Loading ...</div>
     <?php } ?>

@@ -72,7 +72,7 @@ class Inbox extends Form implements InputFilterProviderInterface
                 'name'    => 'item_id',
                 'type'    => 'Text',
                 'options' => [
-                    'label' => 'moder/picture/filter/vehicle',
+                    'label' => 'moder/picture/filter/item',
                 ]
             ],
             [

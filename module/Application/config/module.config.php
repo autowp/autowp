@@ -30,7 +30,7 @@ return [
             Controller\InfoController::class            => Controller\Frontend\Service\InfoControllerFactory::class,
             Controller\LogController::class             => InvokableFactory::class,
             Controller\LoginController::class           => Controller\Frontend\Service\LoginControllerFactory::class,
-            Controller\MapController::class             => InvokableFactory::class,
+            Controller\MapController::class             => Controller\Frontend\Service\MapControllerFactory::class,
             Controller\MostsController::class           => Controller\Frontend\Service\MostsControllerFactory::class,
             Controller\NewController::class             => InvokableFactory::class,
             Controller\MuseumsController::class         => InvokableFactory::class,

@@ -260,7 +260,6 @@ class UploadController extends AbstractActionController
                 'filesize'      => $fileSize,
                 'status'        => DbTable\Picture::STATUS_INBOX,
                 'removing_date' => null,
-                //'brand_id'      => $brandId ? $brandId : null,
                 'ip'            => inet_pton($this->getRequest()->getServer('REMOTE_ADDR')),
                 'identity'      => $pictureTable->generateIdentity(),
                 'replace_picture_id' => $replacePicture ? $replacePicture->id : null,

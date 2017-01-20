@@ -192,4 +192,7 @@ return [
     'page/192/breadcrumbs' => "%PICTURE_NAME%",
     'page/193/breadcrumbs' => "%PICTURE_NAME%",
     'page/194/breadcrumbs' => "%PICTURE_NAME%",
+    
+    'page/131/title' => "",
+    'page/131/breadcrumbs' => "",
 ];

@@ -100,14 +100,16 @@ class BrandVehicle
 
         $brandAliasTable = new DbTable\BrandAlias();
         $brandAliasRows = $brandAliasTable->fetchAll([
-            'item_id = ?' => $parentRow['id']
+            'item_id = ?' => $parentRow['id'],
+            'length(name) > 0'
         ]);
         foreach ($brandAliasRows as $brandAliasRow) {
             $aliases[] = $brandAliasRow->name;
         }
 
         $itemLangRows = $this->itemLangTable->fetchAll([
-            'item_id = ?' => $parentRow['id']
+            'item_id = ?' => $parentRow['id'],
+            'length(name) > 0'
         ]);
         foreach ($itemLangRows as $itemLangRow) {
             $aliases[] = $itemLangRow->name;
@@ -140,7 +142,7 @@ class BrandVehicle
     {
         $vehicleName = $this->getVehicleName($vehicleRow, $language);
         $aliases = $this->getBrandAliases($parentRow);
-
+        
         $name = $vehicleName;
         foreach ($aliases as $alias) {
             $name = str_ireplace('by The ' . $alias . ' Company', '', $name);

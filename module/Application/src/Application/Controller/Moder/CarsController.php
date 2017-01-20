@@ -704,7 +704,8 @@ class CarsController extends AbstractActionController
                         DbTable\Item\Type::CATEGORY,
                         DbTable\Item\Type::TWINS,
                         DbTable\Item\Type::FACTORY,
-                        DbTable\Item\Type::BRAND
+                        DbTable\Item\Type::BRAND,
+                        DbTable\Item\Type::MUSEUM
                     ]);
 
                     if ($haveChilds || $forceIsGroup) {
@@ -924,9 +925,21 @@ class CarsController extends AbstractActionController
                 'count' => $linksCount,
             ]
         ];
+        
+        if ($car->item_type_id == DbTable\Item\Type::MUSEUM) {
+            unset($tabs['catalogue']);
+            unset($tabs['tree']);
+        }
+        
+        $linksTab = in_array($car->item_type_id, [
+            DbTable\Item\Type::BRAND,
+            DbTable\Item\Type::MUSEUM
+        ]);
+        if (! $linksTab) {
+            unset($tabs['links']);
+        }
 
         if ($car->item_type_id != DbTable\Item\Type::BRAND) {
-            unset($tabs['links']);
             unset($tabs['logo']);
         }
 
@@ -942,7 +955,8 @@ class CarsController extends AbstractActionController
             DbTable\Item\Type::ENGINE,
             DbTable\Item\Type::VEHICLE,
             DbTable\Item\Type::BRAND,
-            DbTable\Item\Type::FACTORY
+            DbTable\Item\Type::FACTORY,
+            DbTable\Item\Type::MUSEUM
         ]);
         if (! $picturesTab) {
             unset($tabs['pictures']);
@@ -2815,6 +2829,7 @@ class CarsController extends AbstractActionController
             case DbTable\Item\Type::TWINS:
             case DbTable\Item\Type::BRAND:
             case DbTable\Item\Type::FACTORY:
+            case DbTable\Item\Type::MUSEUM:
                 $forceIsGroup = true;
                 break;
             default:

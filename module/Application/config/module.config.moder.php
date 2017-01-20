@@ -160,22 +160,6 @@ return [
                             ]
                         ]
                     ],
-                    'museum' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => '/museum[/:action]',
-                            'defaults' => [
-                                'controller' => Controller\Moder\MuseumController::class,
-                                'action'     => 'index'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes'  => [
-                            'params' => [
-                                'type' => Router\Http\WildcardSafe::class
-                            ]
-                        ]
-                    ],
                     'pages' => [
                         'type' => Segment::class,
                         'options' => [
@@ -278,7 +262,6 @@ return [
             Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
             Controller\Moder\IndexController::class        => InvokableFactory::class,
-            Controller\Moder\MuseumController::class       => Controller\Moder\Service\MuseumControllerFactory::class,
             Controller\Moder\PagesController::class        => InvokableFactory::class,
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
             Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
@@ -755,6 +738,7 @@ return [
                                 Model\DbTable\Item\Type::TWINS    => 'item/type/4/name',
                                 Model\DbTable\Item\Type::BRAND    => 'item/type/5/name',
                                 Model\DbTable\Item\Type::FACTORY  => 'item/type/6/name',
+                                Model\DbTable\Item\Type::MUSEUM   => 'item/type/7/name',
                             ]
                         ]
                     ],

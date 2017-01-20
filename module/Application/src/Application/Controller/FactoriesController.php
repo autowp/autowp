@@ -158,7 +158,8 @@ class FactoriesController extends AbstractActionController
             'pictures'    => $pictures,
             'carPictures' => $carPictures,
             'point'       => $point,
-            'canEdit'     => $this->user()->isAllowed('factory', 'edit')
+            'canEdit'     => $this->user()->isAllowed('factory', 'edit'),
+            'factoryName' => $factory->getNameData($language)
         ];
     }
 

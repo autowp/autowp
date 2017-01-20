@@ -198,7 +198,11 @@ class Car extends Form implements InputFilterProviderInterface
             ]
         ];
         
-        if ($this->itemType != DbTable\Item\Type::FACTORY) {
+        $pointFields = in_array($this->itemType, [
+            DbTable\Item\Type::FACTORY,
+            DbTable\Item\Type::MUSEUM
+        ]);
+        if (! $pointFields) {
             unset($elements['lat'], $elements['lng']);
         }
 

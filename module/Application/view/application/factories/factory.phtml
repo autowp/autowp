@@ -19,6 +19,9 @@
         ];
     }
 ?>
+<?php $this->pageTitle()->setAutoEscape(false)->captureStart('SET') ?>
+    <?=$this->car()->htmlTitle($this->factoryName) ?>
+<?php $this->pageTitle()->captureEnd() ?>
 <ul class="nav nav-pills" style="margin-bottom:10px">
     <li class="active">
         <?=$this->htmlA($this->url('factories/factory', [

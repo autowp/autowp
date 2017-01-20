@@ -14,6 +14,11 @@ return array_replace(include 'root.php', [
         '%1$s изображения',
         '%1$s изображений'
     ],
+    '%1$s items'      => [
+        '%1$s единица данных',
+        '%1$s единицы данных',
+        '%1$s единиц данных'
+    ],
     '%1$s vehicles'      => [
         '%1$s автомобиль',
         '%1$s автомобиля',
@@ -148,6 +153,10 @@ return array_replace(include 'root.php', [
     'item/type/6/name-plural' => 'Заводы',
     'item/type/6/new-item' => 'Новый завод',
     'item/type/6/add-sub-item' => 'Добавить под-завод',
+    'item/type/7/name' => 'Музей',
+    'item/type/7/name-plural' => 'Музеи',
+    'item/type/7/new-item' => 'Новый музей',
+    'item/type/7/add-sub-item' => 'Добавить под-музей',
 
     /* BRAND PAGE*/
     'unsorted'                => 'Несортировано',
@@ -881,7 +890,7 @@ return array_replace(include 'root.php', [
     'page/128/name' => "Входящие",
     'page/129/name' => "Профиль",
     'page/130/name' => "Мои картинки",
-    'page/131/name' => "Автомобили, двигатели, категории",
+    'page/131/name' => "Единицы данных",
     'page/133/name' => "Управление доступом",
     'page/134/name' => "Новый пароль",
     'page/135/name' => "Новый пароль сохранён",
@@ -977,7 +986,6 @@ return array_replace(include 'root.php', [
     'page/128/title' => "Входящие",
     'page/129/title' => "Профиль",
     'page/130/title' => "Мои картинки",
-    'page/131/title' => "Автомобили, двигатели, категории",
     'page/133/title' => "Access Control",
     'page/134/title' => "Новый пароль",
     'page/135/title' => "",
@@ -1039,7 +1047,6 @@ return array_replace(include 'root.php', [
     'page/118/breadcrumbs' => "Новый",
     'page/122/breadcrumbs' => "Технические характеристики",
     'page/123/breadcrumbs' => "My accounts",
-    'page/131/breadcrumbs' => "Автомобили, двигатели, категории",
     'page/136/breadcrumbs' => "О проекте",
     'page/141/breadcrumbs' => "Добавленные картинки %BRAND_NAME%",
     'page/144/breadcrumbs' => "Выбор бренда",
@@ -1107,7 +1114,7 @@ return array_replace(include 'root.php', [
     'moder/picture/filter/status/removing' => 'в очереди на удаление',
     'moder/picture/filter/status/all-except-removing' => 'все, кроме удалённых',
     'moder/picture/filter/vehicle-type' => 'Тип кузова',
-    'moder/picture/filter/vehicle' => 'Автомобиль (id)',
+    'moder/picture/filter/item' => 'Единица данных (id)',
     'moder/picture/filter/owner' => 'Добавил (id)',
     'moder/picture/filter/special-name' => 'Только с особым названием',
     'moder/picture/filter/not-linked' => 'Без привязки',

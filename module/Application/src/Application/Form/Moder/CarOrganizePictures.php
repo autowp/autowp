@@ -145,6 +145,32 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
                     'readonly' => true,
                 ]
             ],
+            'lat' => [
+                'type' => 'Text',
+                'name' => 'lat',
+                'options' => [
+                    'label' => 'latitude'
+                ],
+                'attributes' => [
+                    'id'        => 'lat',
+                    'maxlength' => 20,
+                    'size'      => 20,
+                    'style'     => 'width: 20%'
+                ],
+            ],
+            'lng' => [
+                'type' => 'Text',
+                'name' => 'lng',
+                'options' => [
+                    'label' => 'longtitude'
+                ],
+                'attributes' => [
+                    'id'        => 'lng',
+                    'maxlength' => 20,
+                    'size'      => 20,
+                    'style'     => 'width: 20%'
+                ]
+            ],
             [
                 'name'    => 'childs',
                 'type'    => \Application\Form\Element\PictureMultiCheckbox::class,
@@ -160,6 +186,14 @@ class CarOrganizePictures extends Form implements InputFilterProviderInterface
                 ],
             ],
         ];
+        
+        $pointFields = in_array($this->itemType, [
+            DbTable\Item\Type::FACTORY,
+            DbTable\Item\Type::MUSEUM
+        ]);
+        if (! $pointFields) {
+            unset($elements['lat'], $elements['lng']);
+        }
 
         if ($this->itemType != DbTable\Item\Type::BRAND) {
             unset($elements['full_name']);

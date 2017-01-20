@@ -1530,7 +1530,14 @@ CREATE TABLE `item_type` (
 --
 
 /*!40000 ALTER TABLE `item_type` DISABLE KEYS */;
-INSERT INTO `item_type` (`id`, `name`) VALUES (1,'vehicle'),(2,'engine'),(3,'category'),(4,'twins'),(5,'brand'),(6,'factory');
+INSERT INTO `item_type` (`id`, `name`) VALUES
+(1, 'vehicle'),
+(2, 'engine'),
+(3, 'category'),
+(4, 'twins'),
+(5, 'brand'),
+(6, 'factory'),
+(7, 'museum');
 /*!40000 ALTER TABLE `item_type` ENABLE KEYS */;
 
 --
@@ -1896,36 +1903,6 @@ CREATE TABLE `modification_value` (
 
 /*!40000 ALTER TABLE `modification_value` DISABLE KEYS */;
 /*!40000 ALTER TABLE `modification_value` ENABLE KEYS */;
-
---
--- Table structure for table `museum`
---
-
-DROP TABLE IF EXISTS `museum`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `museum` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `_lat` double DEFAULT NULL,
-  `_lng` double DEFAULT NULL,
-  `url` varchar(255) DEFAULT NULL,
-  `description` text NOT NULL,
-  `address` text NOT NULL,
-  `img` int(10) unsigned DEFAULT NULL,
-  `point` point DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  KEY `point` (`point`(25))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `museum`
---
-
-/*!40000 ALTER TABLE `museum` DISABLE KEYS */;
-/*!40000 ALTER TABLE `museum` ENABLE KEYS */;
 
 --
 -- Table structure for table `of_day`

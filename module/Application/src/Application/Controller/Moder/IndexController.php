@@ -25,9 +25,6 @@ class IndexController extends AbstractActionController
         $menu[$this->url()->fromRoute('moder/comments')] = 'page/110/name';
 
         $menu['/moder/users'] = 'page/203/name';
-        if ($this->user()->isAllowed('museums', 'manage')) {
-            $menu[$this->url()->fromRoute('moder/museum')] = 'page/115/name';
-        }
 
         $menu['/moder/pictures'] = 'page/73/name';
 

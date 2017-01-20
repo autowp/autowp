@@ -264,6 +264,7 @@ class PicturesController extends AbstractActionController
         $joinLeftComments = false;
         $joinComments = false;
         $pictureItemJoined = false;
+        $similarPictureJoined = false;
 
         if (strlen($formdata['status'])) {
             switch ($formdata['status']) {
@@ -338,6 +339,29 @@ class PicturesController extends AbstractActionController
             $select
                 ->join('df_distance', 'pictures.id = df_distance.src_picture_id', null)
                 ->where('not df_distance.hide');
+            
+            if (strlen($formdata['status'])) {
+                
+                if (!$similarPictureJoined) {
+                    $similarPictureJoined = true;
+                    $select->join(['similar' => 'pictures'], 'df_distance.dst_picture_id = similar.id', null);
+                }
+                
+                switch ($formdata['status']) {
+                    case Picture::STATUS_INBOX:
+                    case Picture::STATUS_NEW:
+                    case Picture::STATUS_ACCEPTED:
+                    case Picture::STATUS_REMOVING:
+                        $select->where('similar.status = ?', $formdata['status']);
+                        break;
+                    case 'custom1':
+                        $select->where('similar.status not in (?)', [
+                        Picture::STATUS_REMOVING,
+                        Picture::STATUS_REMOVED
+                        ]);
+                        break;
+                }
+            }
         }
 
         if (strlen($formdata['requests'])) {

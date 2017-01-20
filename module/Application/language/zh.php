@@ -12,6 +12,9 @@ return array_replace(include 'root.php', [
     '%1$s picures'       => [
         '%1$s 张图片',
     ],
+    '%1$s items'      => [
+        '%1$s items'
+    ],
     '%1$s vehicles'      => [
         '%1$s 款车型',
     ],
@@ -132,6 +135,10 @@ return array_replace(include 'root.php', [
     'item/type/6/name-plural' => 'Factories',
     'item/type/6/new-item' => 'New factory',
     'item/type/6/add-sub-item' => 'Add sub-factory',
+    'item/type/7/name' => 'Museum',
+    'item/type/7/name-plural' => 'Museums',
+    'item/type/7/new-item' => 'New museum',
+    'item/type/7/add-sub-item' => 'Add sub-museum',
 
     /* BRAND PAGE*/
     'unsorted'                => '未分类',
@@ -856,7 +863,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/128/name' => "收件箱",
     'page/129/name' => "头像",
     'page/130/name' => "已贡献图片",
-    'page/131/name' => "车型, engines, categories",
+    'page/131/name' => "Items",
     'page/133/name' => "账号管理",
     'page/134/name' => "设定新密码",
     'page/135/name' => "新密码已保存",
@@ -952,7 +959,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/128/title' => "收件箱",
     'page/129/title' => "头像",
     'page/130/title' => "已贡献图片",
-    'page/131/title' => "车型, engines, categories",
     'page/133/title' => "访问控制",
     'page/134/title' => "设定新密码",
     'page/136/title' => "关于我们",
@@ -1010,7 +1016,6 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'page/118/breadcrumbs' => "新闻",
     'page/122/breadcrumbs' => "性能参数",
     'page/123/breadcrumbs' => "我的账号",
-    'page/131/breadcrumbs' => "车型, engines, categories",
     'page/141/breadcrumbs' => "%BRAND_NAME% pictures",
     'page/144/breadcrumbs' => "品牌选项",
     'page/146/breadcrumbs' => "姊妹车型选项",
@@ -1076,7 +1081,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/picture/filter/status/removing' => '位于删除队列',
     'moder/picture/filter/status/all-except-removing' => 'all, except removing',
     'moder/picture/filter/vehicle-type' => '车型',
-    'moder/picture/filter/vehicle' => '车型(id)',
+    'moder/picture/filter/item' => 'Item (id)',
     'moder/picture/filter/owner' => '由(id)上传',
     'moder/picture/filter/special-name' => 'Special name only',
     'moder/picture/filter/not-linked' => 'Not linked',

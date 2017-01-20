@@ -481,9 +481,28 @@ class CategoryController extends AbstractActionController
                 'listBuilder' => $listBuilder
             ]);
 
-            $description = null;
+            /*$description = null;
             if ($categoryLang['text_id']) {
                 $description = $this->textStorage->getText($categoryLang['text_id']);
+            }*/
+            
+            $itemLanguageTable = new DbTable\Item\Language();
+            $db = $itemLanguageTable->getAdapter();
+            $orderExpr = $db->quoteInto('language = ? desc', $this->language());
+            $itemLanguageRows = $itemLanguageTable->fetchAll([
+                'item_id = ?' => $currentCategory['id']
+            ], new \Zend_Db_Expr($orderExpr));
+            
+            $textIds = [];
+            foreach ($itemLanguageRows as $itemLanguageRow) {
+                if ($itemLanguageRow->text_id) {
+                    $textIds[] = $itemLanguageRow->text_id;
+                }
+            }
+            
+            $description = null;
+            if ($textIds) {
+                $description = $this->textStorage->getFirstText($textIds);
             }
 
             $otherPictures = [];
