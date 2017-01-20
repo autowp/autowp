@@ -79,4 +79,76 @@ class AccountControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('account/personal-messages/user');
         $this->assertActionName('personal-messages-user');
     }
+
+    public function testProfile()
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/account', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(AccountController::class);
+        $this->assertMatchedRouteName('account');
+        $this->assertActionName('profile');
+    }
+
+    public function testContacts()
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/account/contacts', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(AccountController::class);
+        $this->assertMatchedRouteName('account/contacts');
+        $this->assertActionName('contacts');
+    }
+
+    public function testEmail()
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/account/email', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(AccountController::class);
+        $this->assertMatchedRouteName('account/email');
+        $this->assertActionName('email');
+    }
+
+    public function testAccess()
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/account/access', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(AccountController::class);
+        $this->assertMatchedRouteName('account/access');
+        $this->assertActionName('access');
+    }
+
+    public function testAccounts()
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/account/accounts', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(AccountController::class);
+        $this->assertMatchedRouteName('account/accounts');
+        $this->assertActionName('accounts');
+    }
+
+    public function testSpecsConflicts()
+    {
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/account/specs-conflicts', Request::METHOD_GET);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(AccountController::class);
+        $this->assertMatchedRouteName('account/specs-conflicts');
+        $this->assertActionName('specs-conflicts');
+    }
 }
