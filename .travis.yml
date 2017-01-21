@@ -2,7 +2,7 @@ sudo: required
 dist: trusty
 language: php
 php:
-  - 7.0.12
+  - 7.0.13
   - 7.1
 git:
   submodules: false
