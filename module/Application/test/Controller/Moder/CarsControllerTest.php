@@ -200,7 +200,7 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
     public function testCreateBrand()
     {
-        $catname = 'test-brand-' . (100000000 * microtime(true));
+        $catname = 'test-brand-' . (10000 * microtime(true));
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/5', Request::METHOD_POST, [

@@ -27,7 +27,7 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
 
     public function testCreateCategoryAddItemAndGet()
     {
-        $catname = 'catname-' . (100000000 * microtime(true));
+        $catname = 'catname-' . (10000 * microtime(true));
 
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/3', Request::METHOD_POST, [
@@ -73,6 +73,8 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
 
         // request category page
         $this->reset();
+
+        print $catname;
 
         $this->dispatch('https://www.autowp.ru/category/' . $catname, Request::METHOD_GET);
 
