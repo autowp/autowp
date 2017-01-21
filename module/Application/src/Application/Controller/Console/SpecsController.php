@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\User\Model\DbTable\User;
@@ -25,14 +24,14 @@ class SpecsController extends AbstractActionController
     {
         $this->specsService->refreshConflictFlags();
 
-        Console::getInstance()->writeLine("done");
+        return "done\n";
     }
 
     public function refreshUsersStatAction()
     {
         $this->specsService->refreshUsersConflictsStat();
 
-        Console::getInstance()->writeLine("done");
+        return "done\n";
     }
 
     public function refreshItemConflictFlagsAction()
@@ -42,7 +41,7 @@ class SpecsController extends AbstractActionController
 
         $this->specsService->refreshItemConflictFlags($typeId, $itemId);
 
-        Console::getInstance()->writeLine("done");
+        return "done\n";
     }
 
 
@@ -52,7 +51,7 @@ class SpecsController extends AbstractActionController
 
         $this->specsService->refreshUserConflicts($userId);
 
-        Console::getInstance()->writeLine("done");
+        return "done\n";
     }
 
     public function updateSpecsVolumesAction()
@@ -61,6 +60,6 @@ class SpecsController extends AbstractActionController
 
         $userTable->updateSpecsVolumes();
 
-        Console::getInstance()->writeLine("done");
+        return "done\n";
     }
 }

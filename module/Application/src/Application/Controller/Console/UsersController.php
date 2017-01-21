@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Service\UsersService;
@@ -23,22 +22,20 @@ class UsersController extends AbstractActionController
     {
         $this->usersService->restoreVotes();
 
-        $console = Console::getInstance();
-        $console->writeLine("User votes restored");
+        return "User votes restored\n";
     }
 
     public function refreshVoteLimitsAction()
     {
         $affected = $this->usersService->updateUsersVoteLimits();
 
-        $console = Console::getInstance();
-        $console->writeLine(sprintf("Updated %s users\n", $affected));
+        return sprintf("Updated %s users\n", $affected);
     }
 
     public function deleteUnusedAction()
     {
-        $console = Console::getInstance();
-
         $this->usersService->deleteUnused();
+
+        return "Deleted\n";
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\CarOfDay;
@@ -29,6 +28,6 @@ class TwitterController extends AbstractActionController
     {
         $this->carOfDay->putCurrentToTwitter($this->twitterConfig);
 
-        Console::getInstance()->writeLine("done");
+        return "done\n";
     }
 }

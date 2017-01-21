@@ -13,6 +13,7 @@ return [
             Controller\Console\MessageController::class     => Controller\Console\Service\MessageControllerFactory::class,
             Controller\Console\MidnightController::class    => Controller\Console\Service\MidnightControllerFactory::class,
             Controller\Console\PicturesController::class    => InvokableFactory::class,
+            Controller\Console\RefererController::class     => InvokableFactory::class,
             Controller\Console\SpecsController::class       => Controller\Console\Service\SpecsControllerFactory::class,
             Controller\Console\TelegramController::class    => Controller\Console\Service\TelegramControllerFactory::class,
             Controller\Console\TwitterController::class     => Controller\Console\Service\TwitterControllerFactory::class,

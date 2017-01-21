@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Service\TelegramService;
@@ -23,13 +22,13 @@ class TelegramController extends AbstractActionController
     {
         $this->telegram->registerWebhook();
 
-        Console::getInstance()->writeLine("done");
+        return "done\n";
     }
 
     public function notifyInboxAction()
     {
         $this->telegram->notifyInbox($this->params('picture_id'));
 
-        Console::getInstance()->writeLine("done");
+        return "done\n";
     }
 }

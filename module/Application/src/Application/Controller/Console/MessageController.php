@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\Message;
@@ -23,13 +22,13 @@ class MessageController extends AbstractActionController
     {
         $count = $this->message->recycleSystem();
 
-        Console::getInstance()->writeLine(sprintf("%d messages was deleted", $count));
+        return sprintf("%d messages was deleted\n", $count);
     }
 
     public function clearDeletedPMAction()
     {
         $count = $this->message->recycle();
 
-        Console::getInstance()->writeLine(sprintf("%d messages was deleted", $count));
+        return sprintf("%d messages was deleted\n", $count);
     }
 }
