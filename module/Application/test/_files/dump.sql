@@ -1379,24 +1379,25 @@ INSERT INTO `item` (`id`, `name`, `begin_year`, `end_year`, `body`, `spec_id`, `
 -- Table structure for table `item_language`
 --
 
-DROP TABLE IF EXISTS `item_language`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `item_language` (
-  `item_id` int(10) unsigned NOT NULL,
+  `item_id` int(10) UNSIGNED NOT NULL,
   `language` varchar(5) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`item_id`,`language`),
-  CONSTRAINT `item_language_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE
+  `name` varchar(255) DEFAULT NULL,
+  `text_id` int(11) DEFAULT NULL,
+  `full_text_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `item_language`
---
+ALTER TABLE `item_language`
+  ADD PRIMARY KEY (`item_id`,`language`),
+  ADD KEY `language` (`language`),
+  ADD KEY `text_id` (`text_id`),
+  ADD KEY `full_text_id` (`full_text_id`);
 
-/*!40000 ALTER TABLE `item_language` DISABLE KEYS */;
-/*!40000 ALTER TABLE `item_language` ENABLE KEYS */;
+ALTER TABLE `item_language`
+  ADD CONSTRAINT `item_language_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `item_language_ibfk_2` FOREIGN KEY (`language`) REFERENCES `language` (`code`),
+  ADD CONSTRAINT `item_language_ibfk_3` FOREIGN KEY (`text_id`) REFERENCES `textstorage_text` (`id`),
+  ADD CONSTRAINT `item_language_ibfk_4` FOREIGN KEY (`full_text_id`) REFERENCES `textstorage_text` (`id`);
 
 --
 -- Table structure for table `item_parent`

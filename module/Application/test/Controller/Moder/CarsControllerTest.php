@@ -197,4 +197,78 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('moder/cars/params');
         $this->assertActionName('car-tree');
     }
+
+    public function testCreateBrand()
+    {
+        $catname = 'test-brand-' . (100000000 * microtime(true));
+
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/5', Request::METHOD_POST, [
+            'name'      => 'Test brand',
+            'full_name' => 'Test brand full name',
+            'catname'   => $catname,
+            'begin'     => [
+                'year' => 1950
+            ]
+        ]);
+
+        $this->assertResponseStatusCode(302);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CarsController::class);
+        $this->assertMatchedRouteName('moder/cars/params');
+        $this->assertActionName('new');
+
+        $this->assertHasResponseHeader('Location');
+
+        $header = $this->getResponse()->getHeaders()->get('Location');
+        $path = $header->uri()->getPath();
+
+        $this->assertStringStartsWith('/moder/cars/car/item_id/', $path);
+
+        $path = explode('/', $path);
+        $brandId = (int)array_pop($path);
+
+        $this->assertNotEmpty($brandId);
+
+        // set language values
+        $this->reset();
+
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/moder/cars/car-name/item_id/' . $brandId, Request::METHOD_POST, [
+            'ru'      => [
+                'name'      => 'Тест',
+                'text'      => 'Краткое описание',
+                'full_text' => 'Полное описание'
+            ],
+            'en'      => [
+                'name'      => 'Test',
+                'text'      => 'Short description',
+                'full_text' => 'Full description'
+            ]
+        ]);
+
+        $this->assertResponseStatusCode(302);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CarsController::class);
+        $this->assertMatchedRouteName('moder/cars/params');
+        $this->assertActionName('car-name');
+
+        // set links
+        $this->reset();
+
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/moder/cars/save-links/item_id/' . $brandId, Request::METHOD_POST, [
+            'new'      => [
+                'name' => 'Тест',
+                'url'  => 'http://example.com',
+                'type' => 'default'
+            ]
+        ]);
+
+        $this->assertResponseStatusCode(302);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CarsController::class);
+        $this->assertMatchedRouteName('moder/cars/params');
+        $this->assertActionName('save-links');
+    }
 }

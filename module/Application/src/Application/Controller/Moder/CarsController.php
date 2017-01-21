@@ -1173,106 +1173,6 @@ class CarsController extends AbstractActionController
         ]);
     }
 
-    public function treeAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $car = $itemTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canEditMeta = $this->canEditMeta($car);
-
-        if (! $canEditMeta) {
-            return $this->notFoundAction();
-        }
-
-        $parents = $itemTable->fetchAll(
-            $itemTable->select(true)
-                ->join('item_parent', 'item.id = item_parent.parent_id', null)
-                ->where('item_parent.item_id = ?', $car->id)
-                ->order($this->catalogue()->itemOrdering())
-        );
-
-        $allParents = $itemTable->fetchAll(
-            $itemTable->select(true)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.parent_id', null)
-                ->where('item_parent_cache.item_id = ?', $car->id)
-                ->order($this->catalogue()->itemOrdering())
-        );
-
-        $allChilds = $itemTable->fetchAll(
-            $itemTable->select(true)
-                ->join('item_parent_cache', 'item.id = item_parent_cache.item_id', null)
-                ->where('item_parent_cache.parent_id = ?', $car->id)
-                ->order($this->catalogue()->itemOrdering())
-        );
-
-        $graphItems = [];
-        foreach ($allParents as $c) {
-            $graphItems[$c->id] = $this->car()->formatName($c, $this->language());
-        }
-        foreach ($allChilds as $c) {
-            $graphItems[$c->id] = $this->car()->formatName($c, $this->language());
-        }
-
-        $graphItemsIds = array_keys($graphItems);
-
-        $itemParentTable = $this->getCarParentTable();
-
-        $itemParentRows = $itemParentTable->fetchAll(
-            $itemParentTable->select(true)
-                ->where('item_id in (?)', $graphItemsIds)
-                ->where('parent_id in (?)', $graphItemsIds)
-        );
-        $graphLinks = [];
-        foreach ($itemParentRows as $itemParentRow) {
-            $graphLinks[] = [
-                'item_id'   => $itemParentRow->item_id,
-                'parent_id' => $itemParentRow->parent_id
-            ];
-        }
-
-        $itemParentRows = $itemParentTable->fetchAll([
-            'parent_id = ?' => $car->id
-        ]);
-
-        $childCars = [];
-        foreach ($itemParentRows as $itemParentRow) {
-            $childRow = $itemTable->find($itemParentRow->item_id)->current();
-            $childCars[] = [
-                'name'      => $this->car()->formatName($childRow, $this->language()),
-                'isPrimary' => $itemParentRow->is_primary,
-                'treeUrl'   => $this->url()->fromRoute('moder/cars/params', [
-                    'item_id' => $childRow->id
-                ], [], true),
-                'moderUrl'  => $this->url()->fromRoute('moder/cars/params', [
-                    'action'  => 'car',
-                    'item_id' => $childRow->id
-                ], [], true),
-                'setIsPrimaryUrl' => $this->url()->fromRoute('moder/cars/params', [
-                    'action'    => 'set-is-primary',
-                    'item_id'   => $childRow->id,
-                    'parent_id' => $car->id,
-                    'value'     => ! $itemParentRow->is_primary
-                ], [], true)
-            ];
-        }
-
-        return [
-            'car'        => $car,
-            'parents'    => $parents,
-            'childs'     => $childCars,
-            'graphItems' => $graphItems,
-            'graphLinks' => $graphLinks
-        ];
-    }
-
     public function rebuildTreeAction()
     {
         if (! $this->user()->inheritsRole('moder')) {
@@ -1299,53 +1199,6 @@ class CarsController extends AbstractActionController
         return $this->redirect()->toRoute('moder/cars/params', [
             'action' => 'tree'
         ], [], true);
-    }
-
-    public function setIsPrimaryAction()
-    {
-        if (! $this->user()->inheritsRole('moder')) {
-            return $this->forbiddenAction();
-        }
-
-        $itemTable = $this->catalogue()->getItemTable();
-
-        $car = $itemTable->find($this->params('item_id'))->current();
-        if (! $car) {
-            return $this->notFoundAction();
-        }
-
-        $canEditMeta = $this->canEditMeta($car);
-        if (! $canEditMeta) {
-            return $this->notFoundAction();
-        }
-
-        $parentCar = $itemTable->find($this->params('parent_id'))->current();
-        if (! $parentCar) {
-            return $this->notFoundAction();
-        }
-
-        $canEditMeta = $this->canEditMeta($parentCar);
-        if (! $canEditMeta) {
-            return $this->notFoundAction();
-        }
-
-        $itemParentTable = $this->getCarParentTable();
-        $itemParentRow = $itemParentTable->fetchRow([
-            'item_id = ?'   => $car->id,
-            'parent_id = ?' => $parentCar->id
-        ]);
-
-        if (! $itemParentRow) {
-            return $this->notFoundAction();
-        }
-
-        $itemParentRow->is_primary = (bool)$this->params('value');
-        $itemParentRow->save();
-
-        return $this->redirect()->toRoute('moder/cars/params', [
-            'action'  => 'tree',
-            'item_id' => $parentCar->id,
-        ]);
     }
 
     public function removeParentAction()
@@ -3392,7 +3245,9 @@ class CarsController extends AbstractActionController
 
         $links = new DbTable\Item\Link();
 
-        foreach ($this->params()->fromPost('link') as $id => $link) {
+        $data = $this->params()->fromPost('link');
+        $data = is_array($data) ? $data : [];
+        foreach ($data as $id => $link) {
             $row = $links->find($id)->current();
             if ($row) {
                 if (strlen($link['url'])) {
