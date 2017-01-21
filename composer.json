@@ -21,7 +21,6 @@
         "irazasyed/telegram-bot-sdk": "dev-master",
         "phayes/geophp": "^1.2",
         "michelf/php-markdown": "^1.6",
-        "league/html-to-markdown": "^4.1",
         "autowp/external-login-service": ">=1.1.8",
         "autowp/textstorage": "^2.0.2",
         "autowp/zf-components": "^1.0.7",
@@ -46,8 +45,7 @@
         "zendframework/zend-view": ">=2.7",
         "zendframework/zendframework1": "1.*",
         "zfcampus/zf-oauth2": "^1.3",
-        "autowp/image": ">=1.1.2",
-        "ps/image-optimizer": "^1.0",
+        "autowp/image": ">=1.1.6",
         "jenssegers/imagehash": "^0.4.1"
     },
     "autoload": {
