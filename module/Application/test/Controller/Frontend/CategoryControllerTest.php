@@ -4,7 +4,6 @@ namespace ApplicationTest\Frontend\Controller;
 
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
-use Zend\Json\Json;
 
 use Application\Test\AbstractHttpControllerTestCase;
 
@@ -79,7 +78,7 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(200);
         $this->assertModuleName('application');
-        $this->assertControllerName(\Application\Controller\Moder\CarsController::class);
+        $this->assertControllerName(\Application\Controller\CategoryController::class);
         $this->assertMatchedRouteName('categories');
         $this->assertActionName('category');
     }
