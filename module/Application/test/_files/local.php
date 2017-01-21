@@ -12,7 +12,10 @@ return [
             'password' => 'test',
             'dbname'   => 'autowp_test',
         ],
-        'defaultMetadataCache' => null
+        'defaultMetadataCache' => null,
+        'driver_options' => [
+            1002 => "set time_zone = 'UTC'"
+        ]
     ],
     'db' => [
         'driver'         => 'Pdo',
@@ -21,7 +24,10 @@ return [
         'charset'        => 'utf8',
         'dbname'         => 'autowp_test',
         'username'       => 'autowp_test',
-        'password'       => 'test'
+        'password'       => 'test',
+        'driver_options' => [
+            \PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'"
+        ],
     ],
     'users' => [
         'salt'      => 'users-salt',

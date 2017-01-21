@@ -158,7 +158,11 @@ class CommentsController extends AbstractRestfulController
         $typeId = (int)$this->params('type_id');
 
         if ($this->needWait()) {
-            return $this->forward('confirm');
+            return $this->forward()->dispatch(self::class, [
+                'action'  => 'confirm',
+                'item_id' => $itemId,
+                'type_id' => $typeId
+            ]);
         }
 
         $form = $this->getAddForm([
@@ -214,13 +218,18 @@ class CommentsController extends AbstractRestfulController
                 $moderatorAttention = (bool)$values['moderator_attention'];
             }
 
+            $ip = $request->getServer('REMOTE_ADDR');
+            if (!$ip) {
+                $ip = '127.0.0.1';
+            }
+
             $messageId = $this->comments->add([
                 'typeId'             => $typeId,
                 'itemId'             => $itemId,
                 'parentId'           => $values['parent_id'] ? $values['parent_id'] : null,
                 'authorId'           => $user->id,
                 'message'            => $values['message'],
-                'ip'                 => $request->getServer('REMOTE_ADDR'),
+                'ip'                 => $ip,
                 'moderatorAttention' => $moderatorAttention
             ]);
 
