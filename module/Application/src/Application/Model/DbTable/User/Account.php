@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable\User;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 class Account extends Table
 {

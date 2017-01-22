@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable\Attr;
 
-use Application\Db\Table\Row;
+use Autowp\Commons\Db\Table\Row;
 
 class AttributeRow extends Row
 {

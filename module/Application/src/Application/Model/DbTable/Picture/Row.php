@@ -10,7 +10,7 @@ use Application\Model\DbTable;
 
 use Exception;
 
-class Row extends \Application\Db\Table\Row
+class Row extends \Autowp\Commons\Db\Table\Row
 {
     private static function between($a, $min, $max)
     {

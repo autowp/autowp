@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable\Article;
 
-class Row extends \Application\Db\Table\Row
+class Row extends \Autowp\Commons\Db\Table\Row
 {
     public function previewExists()
     {

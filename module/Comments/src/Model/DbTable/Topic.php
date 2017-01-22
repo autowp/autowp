@@ -2,7 +2,7 @@
 
 namespace Autowp\Comments\Model\DbTable;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 class Topic extends Table
 {

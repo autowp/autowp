@@ -4,10 +4,9 @@ namespace Application\Model;
 
 use Autowp\Comments;
 use Autowp\Comments\CommentsService;
+use Autowp\Commons\Db\Table;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
-
-use Application\Db\Table;
 
 use Zend_Db_Expr;
 

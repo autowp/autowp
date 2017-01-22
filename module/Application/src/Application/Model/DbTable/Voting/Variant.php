@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable\Voting;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 class Variant extends Table
 {

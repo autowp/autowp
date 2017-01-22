@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Db;
+namespace Autowp\Commons\Db;
 
 use Zend_Db_Table;
 

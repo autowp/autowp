@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Db\Table;
+namespace Autowp\Commons\Db\Table;
 
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Row;
@@ -45,6 +45,7 @@ class Row extends Zend_Db_Table_Row
             return null;
         }
 
+        //TODO: extract constant
         $timezone = new DateTimeZone(MYSQL_TIMEZONE);
 
         return DateTime::createFromFormat($format, $value, $timezone);

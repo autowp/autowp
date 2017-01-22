@@ -4,7 +4,7 @@ namespace Application\Model\DbTable;
 
 use Autowp\Image;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 use Application\Model\PictureItem;
 
 use Zend_Db_Expr;

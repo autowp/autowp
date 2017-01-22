@@ -2,7 +2,7 @@
 
 namespace Autowp\Traffic;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 use DateInterval;
 use DateTime;

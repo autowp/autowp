@@ -5,7 +5,7 @@ namespace Application\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 use Application\Model\DbTable;
 
 class CarSubscribe extends Table

@@ -5,9 +5,10 @@ namespace Autowp\Comments\Model\DbTable;
 /**
  * @todo remove dependency from application
  */
-use Application\Db\Table\Row;
 use Application\Model\DbTable\Article;
 use Application\Model\DbTable\Picture;
+
+use Autowp\Commons\Db\Table\Row;
 
 use Zend_Db_Expr;
 

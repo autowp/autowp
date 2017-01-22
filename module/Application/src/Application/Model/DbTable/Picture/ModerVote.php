@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable\Picture;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 class ModerVote extends Table
 {

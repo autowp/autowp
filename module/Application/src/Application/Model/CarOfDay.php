@@ -2,7 +2,8 @@
 
 namespace Application\Model;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
+
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
 use Application\ItemNameFormatter;

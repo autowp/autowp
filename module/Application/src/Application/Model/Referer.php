@@ -2,7 +2,8 @@
 
 namespace Application\Model;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
+
 use Application\Model\Referer\Whitelist;
 
 class Referer extends Table
