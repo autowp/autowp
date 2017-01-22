@@ -7,7 +7,7 @@ use DateTimeZone;
 use Exception;
 use Zend_Db_Table_Select;
 
-use Application\Paginator\Adapter\Zend1DbTableSelect;
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 
 class DayPictures
 {

@@ -39,5 +39,4 @@ class ContactsControllerTest extends AbstractHttpControllerTestCase
         $this->assertMatchedRouteName('api/contacts');
         $this->assertActionName('delete');
     }
-
 }

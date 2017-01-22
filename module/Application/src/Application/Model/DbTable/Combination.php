@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 class Combination extends Table
 {

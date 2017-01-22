@@ -6,11 +6,12 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Comments;
+
 use Application\DuplicateFinder;
 use Application\ExifGPSExtractor;
 use Application\Form\Upload as UploadForm;
 use Application\Model\Brand as BrandModel;
-use Application\Model\Comments;
 use Application\Model\DbTable;
 use Application\Model\PictureItem;
 use Application\Service\TelegramService;
@@ -46,16 +47,23 @@ class UploadController extends AbstractActionController
      */
     private $duplicateFinder;
 
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
     public function __construct(
         $partial,
         TelegramService $telegram,
         PictureItem $pictureItem,
-        DuplicateFinder $duplicateFinder
+        DuplicateFinder $duplicateFinder,
+        Comments\CommentsService $comments
     ) {
         $this->partial = $partial;
         $this->telegram = $telegram;
         $this->pictureItem = $pictureItem;
         $this->duplicateFinder = $duplicateFinder;
+        $this->comments = $comments;
     }
 
     private function getCarParentTable()
@@ -290,15 +298,14 @@ class UploadController extends AbstractActionController
 
             // add comment
             if ($values['note']) {
-                $commentTable = new Comments();
-                $commentTable->add([
-                    'typeId'             => DbTable\Comment\Message::PICTURES_TYPE_ID,
+                $this->comments->add([
+                    'typeId'             => Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
                     'itemId'             => $picture->id,
                     'parentId'           => null,
                     'authorId'           => $user->id,
                     'message'            => $values['note'],
                     'ip'                 => $this->getRequest()->getServer('REMOTE_ADDR'),
-                    'moderatorAttention' => DbTable\Comment\Message::MODERATOR_ATTENTION_NONE
+                    'moderatorAttention' => Comments\Model\DbTable\Message::MODERATOR_ATTENTION_NONE
                 ]);
             }
 

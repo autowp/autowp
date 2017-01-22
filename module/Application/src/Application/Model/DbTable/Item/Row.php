@@ -9,7 +9,7 @@ use Exception;
 
 use Zend_Db_Expr;
 
-class Row extends \Application\Db\Table\Row
+class Row extends \Autowp\Commons\Db\Table\Row
 {
     /**
      * @var DbTable\Spec

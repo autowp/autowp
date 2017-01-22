@@ -18,9 +18,9 @@ use Application\Model\DbTable;
 use Application\Model\Modification;
 use Application\Model\PictureItem;
 use Application\Model\VehicleType;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 
 use geoPHP;
@@ -168,7 +168,7 @@ class CarsController extends AbstractActionController
         $this->filterForm->get('spec')->setValueOptions(array_replace(['' => '--'], $specOptions));
         $this->filterForm->get('vehicle_type_id')->setValueOptions(array_replace([
             ''      => '--',
-            'empty' => 'moder/vehicles/filter/vehicle-type/empty'
+            'empty' => 'moder/items/filter/vehicle-type/empty'
         ], $vehicleTypeOptions));
         $this->filterForm->get('vehicle_childs_type_id')->setValueOptions(array_replace([
             '' => '--'

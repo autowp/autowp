@@ -2,15 +2,8 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Console\ColorInterface;
-use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Session\SessionManager;
-
-use Application\Model\Comments;
-use Application\Model\DbTable\Category\ParentTable as CategoryParent;
-use Application\Model\DbTable\Item;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Exception;
 
@@ -36,13 +29,19 @@ class MaintenanceController extends AbstractActionController
 
     public function dumpAction()
     {
-        $console = Console::getInstance();
-
         $config = $this->db->getConfig();
 
-        $destFile = __DIR__ . '/../../../../../../data/dump/' . date('Y-m-d_H.i.s') . '.dump.sql';
+        $dir = __DIR__ . '/../../../../../../data/dump';
 
-        $console->write('Dumping ... ');
+        if (! is_dir($dir)) {
+            if (! mkdir($dir, null, true)) {
+                throw new Exception("Error creating dir `$dir`");
+            }
+        }
+
+        $destFile = realpath($dir) . '/' . date('Y-m-d_H.i.s') . '.dump.sql';
+
+        print 'Dumping ... ';
 
         $cmd = sprintf(
             'mysqldump -u%s -p%s -h%s --set-gtid-purged=OFF --hex-blob %s -r %s',
@@ -59,9 +58,9 @@ class MaintenanceController extends AbstractActionController
             throw new Exception('Error creating dump');
         }
 
-        $console->writeLine('ok');
+        print "ok\n";
 
-        $console->write('Gzipping ... ');
+        print 'Gzipping ... ';
 
         $cmd = sprintf(
             'gzip %s',
@@ -70,7 +69,7 @@ class MaintenanceController extends AbstractActionController
 
         exec($cmd);
 
-        $console->writeLine('ok');
+        return "ok\n";
     }
 
     public function clearSessionsAction()
@@ -82,50 +81,6 @@ class MaintenanceController extends AbstractActionController
 
         $this->sessionManager->getSaveHandler()->gc($gcMaxLifetime);
 
-        Console::getInstance()->writeLine("Garabage collected", ColorInterface::GREEN);
-    }
-
-    public function rebuildCategoryParentAction()
-    {
-        $cpTable = new CategoryParent();
-
-        $cpTable->rebuild();
-
-        Console::getInstance()->writeLine("Ok");
-    }
-
-    public function rebuildCarOrderCacheAction()
-    {
-        $console = Console::getInstance();
-
-        $itemTable = new Item();
-
-        $select = $itemTable->select(true)
-            ->order('id');
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
-        );
-        $paginator->setItemCountPerPage(100);
-
-        $pagesCount = $paginator->count();
-        for ($i = 1; $i <= $pagesCount; $i++) {
-            $paginator->setCurrentPageNumber($i);
-            foreach ($paginator->getCurrentItems() as $carRow) {
-                $console->writeLine($carRow->id);
-                $carRow->updateOrderCache();
-            }
-        }
-
-        $console->writeLine("ok");
-    }
-
-    public function commentsRepliesCountAction()
-    {
-        $comments = new Comments();
-
-        $affected = $comments->updateRepliesCount();
-
-        Console::getInstance()->writeLine("ok $affected");
+        return "Garabage collected\n";
     }
 }

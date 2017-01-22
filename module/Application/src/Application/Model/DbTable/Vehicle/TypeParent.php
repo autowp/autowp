@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable\Vehicle;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 class TypeParent extends Table
 {

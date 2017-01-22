@@ -27,23 +27,21 @@ class SpecsController extends AbstractActionController
         return "done\n";
     }
 
+    public function refreshItemConflictFlagsAction()
+    {
+        $itemId = $this->params('item_id');
+
+        $this->specsService->refreshItemConflictFlags($itemId);
+
+        return "done\n";
+    }
+
     public function refreshUsersStatAction()
     {
         $this->specsService->refreshUsersConflictsStat();
 
         return "done\n";
     }
-
-    public function refreshItemConflictFlagsAction()
-    {
-        $typeId = $this->params('type_id');
-        $itemId = $this->params('item_id');
-
-        $this->specsService->refreshItemConflictFlags($typeId, $itemId);
-
-        return "done\n";
-    }
-
 
     public function refreshUserStatAction()
     {

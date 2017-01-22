@@ -6,7 +6,7 @@ use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
-use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Autowp\Comments\Model\DbTable\Message as CommentMessage;
 
 return [
     'router' => [
@@ -727,7 +727,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'name',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/name',
+                            'label' => 'moder/items/filter/name',
                         ]
                     ],
                 ],
@@ -736,7 +736,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'no_name',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/name-exclude',
+                            'label' => 'moder/items/filter/name-exclude',
                         ]
                     ],
                 ],
@@ -745,7 +745,7 @@ return [
                         'type'    => 'Select',
                         'name'    => 'item_type_id',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/item-type',
+                            'label' => 'moder/items/filter/item-type',
                             'options' => [
                                 '' => '--',
                                 Model\DbTable\Item\Type::VEHICLE  => 'item/type/1/name',
@@ -764,7 +764,7 @@ return [
                         'type'    => 'Select',
                         'name'    => 'vehicle_type_id',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/vehicle-type',
+                            'label' => 'moder/items/filter/vehicle-type',
                         ]
                     ],
                 ],
@@ -782,7 +782,7 @@ return [
                         'type'    => 'Select',
                         'name'    => 'spec',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/spec',
+                            'label' => 'moder/items/filter/spec',
                         ]
                     ],
                 ],
@@ -791,7 +791,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'from_year',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/from-year',
+                            'label' => 'moder/items/filter/from-year',
                         ]
                     ],
                 ],
@@ -800,7 +800,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'to_year',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/to-year',
+                            'label' => 'moder/items/filter/to-year',
                         ]
                     ],
                 ],
@@ -809,7 +809,7 @@ return [
                         'type'    => 'Text',
                         'name'    => 'parent_id',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/parent',
+                            'label' => 'moder/items/filter/parent',
                         ]
                     ],
                 ],
@@ -818,7 +818,7 @@ return [
                         'type'    => 'Select',
                         'name'    => 'no_category',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/category-exclude',
+                            'label' => 'moder/items/filter/category-exclude',
                         ]
                     ],
                 ],*/
@@ -836,7 +836,7 @@ return [
                         'type'    => 'Checkbox',
                         'name'    => 'no_parent',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/no-parents',
+                            'label' => 'moder/items/filter/no-parents',
                         ]
                     ],
                 ],
@@ -845,7 +845,7 @@ return [
                         'type'    => 'Select',
                         'name'    => 'order',
                         'options' => [
-                            'label' => 'moder/vehicles/filter/order',
+                            'label' => 'moder/items/filter/order',
                             'options' => [
                                 0 => 'id asc',
                                 1 => 'id desc',

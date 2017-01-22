@@ -7,6 +7,8 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Comments;
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
@@ -16,13 +18,11 @@ use Application\DuplicateFinder;
 use Application\Form\Moder\Inbox as InboxForm;
 use Application\HostManager;
 use Application\Model\Brand as BrandModel;
-use Application\Model\Comments;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
 use Application\Model\PictureItem;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\TelegramService;
 
@@ -95,6 +95,11 @@ class PicturesController extends AbstractActionController
      */
     private $duplicateFinder;
 
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
     private function getCarParentTable()
     {
         return $this->itemParentTable
@@ -115,7 +120,8 @@ class PicturesController extends AbstractActionController
         MessageService $message,
         TrafficControl $trafficControl,
         PictureItem $pictureItem,
-        DuplicateFinder $duplicateFinder
+        DuplicateFinder $duplicateFinder,
+        Comments\CommentsService $comments
     ) {
 
         $this->hostManager = $hostManager;
@@ -131,6 +137,7 @@ class PicturesController extends AbstractActionController
         $this->trafficControl = $trafficControl;
         $this->pictureItem = $pictureItem;
         $this->duplicateFinder = $duplicateFinder;
+        $this->comments = $comments;
     }
 
     public function ownerTypeaheadAction()
@@ -437,13 +444,13 @@ class PicturesController extends AbstractActionController
             $expr = 'pictures.id = comment_topic.item_id and ' .
                     $this->table->getAdapter()->quoteInto(
                         'comment_topic.type_id = ?',
-                        DbTable\Comment\Message::PICTURES_TYPE_ID
+                        Comments\Model\DbTable\Message::PICTURES_TYPE_ID
                     );
             $select->joinLeft('comment_topic', $expr, null);
         } elseif ($joinComments) {
             $select
                 ->join('comment_topic', 'pictures.id = comment_topic.item_id', null)
-                ->where('comment_topic.type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID);
+                ->where('comment_topic.type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID);
         }
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -1816,16 +1823,15 @@ class PicturesController extends AbstractActionController
         }
 
         // comments
-        $comments = new Comments();
-        $comments->moveMessages(
-            DbTable\Comment\Message::PICTURES_TYPE_ID,
+        $this->comments->moveMessages(
+            Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
             $replacePicture->id,
-            DbTable\Comment\Message::PICTURES_TYPE_ID,
+            Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
             $picture->id
         );
-        $ctTable = new DbTable\Comment\Topic();
-        $ctTable->updateTopicStat(DbTable\Comment\Message::PICTURES_TYPE_ID, $replacePicture->id);
-        $ctTable->updateTopicStat(DbTable\Comment\Message::PICTURES_TYPE_ID, $picture->id);
+        $ctTable = new Comments\Model\DbTable\Topic();
+        $ctTable->updateTopicStat(Comments\Model\DbTable\Message::PICTURES_TYPE_ID, $replacePicture->id);
+        $ctTable->updateTopicStat(Comments\Model\DbTable\Message::PICTURES_TYPE_ID, $picture->id);
 
         // pms
         $owner = $picture->findParentRow(User::class, 'Owner');

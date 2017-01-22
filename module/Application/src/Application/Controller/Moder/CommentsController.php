@@ -5,10 +5,11 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\Comments;
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class CommentsController extends AbstractActionController
 {
@@ -37,7 +38,7 @@ class CommentsController extends AbstractActionController
                 ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
                 ->join('pictures', 'pictures.item_id = item_parent_cache.item_id', null)
                 ->join('comments_messages', 'comments_messages.item_id = pictures.id', null)
-                ->where('comments_messages.type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID)
+                ->where('comments_messages.type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
                 ->group('brands.id')*/
                 ->order(['item.position', 'item.name'])
         );
@@ -59,7 +60,7 @@ class CommentsController extends AbstractActionController
             return $this->redirect()->toUrl($this->url()->fromRoute('moder/comments/params', $params));
         }
 
-        $commentTable = new DbTable\Comment\Message();
+        $commentTable = new Comments\Model\DbTable\Message();
 
         $select = $commentTable->select(true)
             ->order(['comments_messages.datetime DESC']);
@@ -85,9 +86,9 @@ class CommentsController extends AbstractActionController
 
             if (strlen($values['moderator_attention'])) {
                 switch ($values['moderator_attention']) {
-                    case DbTable\Comment\Message::MODERATOR_ATTENTION_NONE:
-                    case DbTable\Comment\Message::MODERATOR_ATTENTION_REQUIRED:
-                    case DbTable\Comment\Message::MODERATOR_ATTENTION_COMPLETED:
+                    case Comments\Model\DbTable\Message::MODERATOR_ATTENTION_NONE:
+                    case Comments\Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED:
+                    case Comments\Model\DbTable\Message::MODERATOR_ATTENTION_COMPLETED:
                         $select->where('comments_messages.moderator_attention = ?', $values['moderator_attention']);
                         break;
                 }
@@ -95,7 +96,7 @@ class CommentsController extends AbstractActionController
 
             if ($values['item_id']) {
                 $select
-                    ->where('comments_messages.type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID)
+                    ->where('comments_messages.type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
@@ -114,7 +115,7 @@ class CommentsController extends AbstractActionController
         $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $status = '';
-            if ($commentRow->type_id == DbTable\Comment\Message::PICTURES_TYPE_ID) {
+            if ($commentRow->type_id == Comments\Model\DbTable\Message::PICTURES_TYPE_ID) {
                 $pictures = $this->catalogue()->getPictureTable();
                 $picture = $pictures->find($commentRow->item_id)->current();
                 if ($picture) {

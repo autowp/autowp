@@ -22,6 +22,7 @@ return [
         'Zend\\Session',
         'Zend\\Validator',
         'Autowp\\User',
+        'Autowp\\Comments',
         'Autowp\\Image',
         'Autowp\\Message',
         'Autowp\\TextStorage',

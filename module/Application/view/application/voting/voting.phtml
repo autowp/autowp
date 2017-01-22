@@ -89,7 +89,7 @@
 
 <div id="comments">
     <?=$this->comments([
-        'type'    => Application\Model\DbTable\Comment\Message::VOTINGS_TYPE_ID,
+        'type'    => Autowp\Comments\Model\DbTable\Message::VOTINGS_TYPE_ID,
         'item_id' => $this->voting->id
     ]) ?>
 </div>

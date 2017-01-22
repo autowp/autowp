@@ -2,6 +2,7 @@
 
 namespace Application\Service;
 
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
@@ -9,7 +10,6 @@ use Application\Form\AttrsZoneAttributes as AttrsZoneAttributesForm;
 use Application\ItemNameFormatter;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Spec\Table\Car as CarSpecTable;
 
 use Exception;
@@ -2826,7 +2826,7 @@ class SpecificationsService
         }
     }
 
-    public function refreshItemConflictFlags($typeId, $itemId)
+    public function refreshItemConflictFlags($itemId)
     {
         $valueTable = $this->getUserValueTable();
         $select = $valueTable->select(true)

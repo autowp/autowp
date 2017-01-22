@@ -5,18 +5,17 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Comments;
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Rename as UserRename;
 
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Model\Contact;
-
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend_Db_Expr;
 
@@ -33,10 +32,19 @@ class UsersController extends AbstractActionController
      */
     private $trafficControl;
 
-    public function __construct($cache, TrafficControl $trafficControl)
-    {
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
+    public function __construct(
+        $cache,
+        TrafficControl $trafficControl,
+        Comments\CommentsService $comments
+    ) {
         $this->cache = $cache;
         $this->trafficControl = $trafficControl;
+        $this->comments = $comments;
     }
 
     private function getUser()
@@ -100,9 +108,12 @@ class UsersController extends AbstractActionController
             ];
         }
 
-        $comments = new CommentMessage();
-        $lastComments = $comments->fetchAll(
-            $comments->select()
+        /**
+         * @todo Use CommentsService
+         */
+        $commentsTable = new Comments\Model\DbTable\Message();
+        $lastComments = $commentsTable->fetchAll(
+            $commentsTable->select()
                 ->where('author_id = ?', $user->id)
                 ->where('type_id <> ?', CommentMessage::FORUMS_TYPE_ID)
                 ->where('not deleted')
@@ -457,9 +468,7 @@ class UsersController extends AbstractActionController
 
         $order = $this->params('order');
 
-        $model = new \Application\Model\Comments();
-
-        $select = $model->getSelectByUser($user->id, $order);
+        $select = $this->comments->getSelectByUser($user->id, $order);
 
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)

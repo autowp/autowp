@@ -2,7 +2,7 @@
 
 namespace Application\Model\Referer;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 class Blacklist extends Table
 {

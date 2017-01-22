@@ -4,13 +4,13 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable\Log\Event as LogEvent;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class LogController extends AbstractActionController
 {

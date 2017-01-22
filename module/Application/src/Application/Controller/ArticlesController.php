@@ -4,10 +4,10 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable\Article;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class ArticlesController extends AbstractActionController
 {

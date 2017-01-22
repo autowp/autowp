@@ -5,7 +5,7 @@ namespace Autowp\User\Model\DbTable\User;
 use DateInterval;
 use DateTime;
 
-class Row extends \Application\Db\Table\Row
+class Row extends \Autowp\Commons\Db\Table\Row
 {
     public function getCompoundName()
     {

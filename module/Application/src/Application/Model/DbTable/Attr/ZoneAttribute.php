@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable\Attr;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 class ZoneAttribute extends Table
 {

@@ -34,7 +34,7 @@
 
 <div class="well">
     <?=$this->markdown($this->description) ?>
-    
+
     <?php if (count($this->links)) { ?>
         <p>
             <?=$this->escapeHtml($this->translate('museums/museum/website:'))?>
@@ -52,7 +52,7 @@
 
 <div id="comments">
     <?=$this->comments([
-        'type'    => Application\Model\DbTable\Comment\Message::MUSEUMS_TYPE_ID,
+        'type'    => Autowp\Comments\Model\DbTable\Message::MUSEUMS_TYPE_ID,
         'item_id' => $this->museum->id
     ]) ?>
 </div>

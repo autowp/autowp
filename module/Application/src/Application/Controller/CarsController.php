@@ -6,6 +6,7 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
@@ -14,7 +15,6 @@ use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
 class CarsController extends AbstractActionController

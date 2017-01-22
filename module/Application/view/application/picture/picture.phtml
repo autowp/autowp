@@ -118,7 +118,7 @@
                     <a href="https://en.wikipedia.org/wiki/Dots_per_inch"><abbr title="Dots Per Inch">DPI</abbr></a>
                     <?php if ($this->picture->dpi_x > 0 && $this->picture->dpi_y > 0) { ?>
                         <?=round(2.54 * $this->picture->width / $this->picture->dpi_x) ?>×<?=round(2.54 * $this->picture->height / $this->picture->dpi_y) ?>cm
-                    <?php } ?> 
+                    <?php } ?>
                 <?php } ?>
             </li>
             <li><?=$this->escapeHtml($this->translate('Filesize'))?>: <strong><?=$this->escapeHtml($this->fileSize($this->picture->filesize)) ?></strong></li>
@@ -369,7 +369,7 @@
 
 <div id="comments">
     <?=$this->comments([
-        'type'    => Application\Model\DbTable\Comment\Message::PICTURES_TYPE_ID,
+        'type'    => Autowp\Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
         'item_id' => $this->picture->id
     ]) ?>
 </div>

@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable\Modification;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 class Group extends Table
 {

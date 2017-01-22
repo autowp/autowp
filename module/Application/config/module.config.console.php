@@ -32,7 +32,7 @@ return [
                 ],
                 'catalogue' => [
                     'options' => [
-                        'route'    => 'catalogue (refresh-brand-vehicle|migrate-vehicle-type|migrate-picture-item|migrate-engines):action',
+                        'route'    => 'catalogue (refresh-brand-vehicle|rebuild-car-order-cache):action',
                         'defaults' => [
                             'controller' => Controller\Console\CatalogueController::class,
                         ]
@@ -40,7 +40,7 @@ return [
                 ],
                 'maintenance' => [
                     'options' => [
-                        'route'    => 'maintenance (dump|clear-sessions|rebuild-category-parent|rebuild-car-order-cache|comments-replies-count):action',
+                        'route'    => 'maintenance (dump|clear-sessions):action',
                         'defaults' => [
                             'controller' => Controller\Console\MaintenanceController::class,
                         ]
@@ -80,7 +80,7 @@ return [
                 ],
                 'specs-refresh-item-conflict-flags' => [
                     'options' => [
-                        'route'    => 'specs refresh-item-conflict-flags <type_id> <item_id>',
+                        'route'    => 'specs refresh-item-conflict-flags <item_id>',
                         'defaults' => [
                             'controller' => Controller\Console\SpecsController::class,
                             'action'     => 'refresh-item-conflict-flags'

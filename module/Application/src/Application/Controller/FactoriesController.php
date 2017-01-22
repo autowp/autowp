@@ -6,11 +6,11 @@ use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable;
 
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
+
 use geoPHP;
 
 use Zend_Db_Expr;
-
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class FactoriesController extends AbstractActionController
 {

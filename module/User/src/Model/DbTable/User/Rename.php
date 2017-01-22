@@ -2,7 +2,7 @@
 
 namespace Autowp\User\Model\DbTable\User;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 class Rename extends Table
 {

@@ -44,7 +44,8 @@ class Module implements
     public function getConsoleUsage(Console $console)
     {
         return [
-            'message ' => 'Usage'
+            'message clear-old-system-pm' => 'Clear old system messages',
+            'message clear-deleted-pm'    => 'Clear deleted messages'
         ];
     }
 }

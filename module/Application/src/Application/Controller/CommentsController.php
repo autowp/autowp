@@ -6,11 +6,11 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Comments;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 
 use Application\HostManager;
-use Application\Model\Comments;
 use Application\Model\DbTable;
 
 use DateTime;
@@ -20,6 +20,9 @@ use Zend_Db_Expr;
 
 class CommentsController extends AbstractRestfulController
 {
+    /**
+     * @var Comments\CommentsService
+     */
     private $comments = null;
 
     private $form = null;
@@ -37,12 +40,13 @@ class CommentsController extends AbstractRestfulController
     public function __construct(
         HostManager $hostManager,
         $form,
-        MessageService $message
+        MessageService $message,
+        Comments\CommentsService $comments
     ) {
 
         $this->hostManager = $hostManager;
         $this->form = $form;
-        $this->comments = new Comments();
+        $this->comments = $comments;
         $this->message = $message;
     }
 
@@ -92,14 +96,14 @@ class CommentsController extends AbstractRestfulController
     private function messageUrl($typeId, $object, $canonical, $uri = null)
     {
         switch ($typeId) {
-            case DbTable\Comment\Message::PICTURES_TYPE_ID:
+            case Comments\Model\DbTable\Message::PICTURES_TYPE_ID:
                 $url = $this->pic()->href($object, [
                     'canonical' => $canonical,
                     'uri'       => $uri
                 ]);
                 break;
 
-            case DbTable\Comment\Message::TWINS_TYPE_ID:
+            case Comments\Model\DbTable\Message::TWINS_TYPE_ID:
                 $url = $this->url()->fromRoute('twins/group', [
                     'id' => $object->id
                 ], [
@@ -108,7 +112,7 @@ class CommentsController extends AbstractRestfulController
                 ]);
                 break;
 
-            case DbTable\Comment\Message::VOTINGS_TYPE_ID:
+            case Comments\Model\DbTable\Message::VOTINGS_TYPE_ID:
                 $url = $this->url()->fromRoute('votings/voting', [
                     'id' => $object->id
                 ], [
@@ -117,7 +121,7 @@ class CommentsController extends AbstractRestfulController
                 ]);
                 break;
 
-            case DbTable\Comment\Message::ARTICLES_TYPE_ID:
+            case Comments\Model\DbTable\Message::ARTICLES_TYPE_ID:
                 $url = $this->url()->fromRoute('articles', [
                     'action'          => 'article',
                     'article_catname' => $object->catname
@@ -127,7 +131,7 @@ class CommentsController extends AbstractRestfulController
                 ]);
                 break;
 
-            case DbTable\Comment\Message::MUSEUMS_TYPE_ID:
+            case Comments\Model\DbTable\Message::MUSEUMS_TYPE_ID:
                 $url = $this->url()->fromRoute('museums/museum', [
                     'id' => $object->id
                 ], [
@@ -174,27 +178,27 @@ class CommentsController extends AbstractRestfulController
 
             $object = null;
             switch ($typeId) {
-                case DbTable\Comment\Message::PICTURES_TYPE_ID:
+                case Comments\Model\DbTable\Message::PICTURES_TYPE_ID:
                     $pictures = $this->catalogue()->getPictureTable();
                     $object = $pictures->find($itemId)->current();
                     break;
 
-                case DbTable\Comment\Message::TWINS_TYPE_ID:
+                case Comments\Model\DbTable\Message::TWINS_TYPE_ID:
                     $twinsGroups = new DbTable\Item();
                     $object = $twinsGroups->find($itemId)->current();
                     break;
 
-                case DbTable\Comment\Message::VOTINGS_TYPE_ID:
+                case Comments\Model\DbTable\Message::VOTINGS_TYPE_ID:
                     $vTable = new DbTable\Voting();
                     $object = $vTable->find($itemId)->current();
                     break;
 
-                case DbTable\Comment\Message::ARTICLES_TYPE_ID:
+                case Comments\Model\DbTable\Message::ARTICLES_TYPE_ID:
                     $articles = new DbTable\Article();
                     $object = $articles->find($itemId)->current();
                     break;
 
-                case DbTable\Comment\Message::MUSEUMS_TYPE_ID:
+                case Comments\Model\DbTable\Message::MUSEUMS_TYPE_ID:
                     $museums = new DbTable\Item();
                     $object = $museums->find($itemId)->current();
                     break;
@@ -215,7 +219,7 @@ class CommentsController extends AbstractRestfulController
             }
 
             $ip = $request->getServer('REMOTE_ADDR');
-            if (!$ip) {
+            if (! $ip) {
                 $ip = '127.0.0.1';
             }
 

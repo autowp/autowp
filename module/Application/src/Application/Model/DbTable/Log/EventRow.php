@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable\Log;
 
-use Application\Db\Table\Row;
+use Autowp\Commons\Db\Table\Row;
 
 use Zend_Db_Table_Row_Abstract;
 

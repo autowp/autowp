@@ -4,7 +4,7 @@ namespace Application\Model\DbTable;
 
 use Autowp\User\Model\DbTable\User;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 use Zend_Db_Expr;
 

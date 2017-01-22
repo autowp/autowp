@@ -2,7 +2,7 @@
 
 namespace Application\Model\DbTable\Item;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 use Application\Model\DbTable;
 
 use Exception;

@@ -7,9 +7,9 @@ use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator;
 
+use Autowp\Commons\Db\Table;
 use Autowp\User\Model\DbTable\User;
 
-use Application\Db\Table;
 use Application\Service\TelegramService;
 
 /**

@@ -2,7 +2,7 @@
 
 namespace Application\Model;
 
-use Application\Db\Table;
+use Autowp\Commons\Db\Table;
 
 use Zend_Db_Expr;
 

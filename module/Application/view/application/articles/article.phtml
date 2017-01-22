@@ -28,7 +28,7 @@
 <?php if ($this->article->enabled) { ?>
     <div style="text-align:left;margin-bottom:20px;clear:both">
         <?=$this->comments([
-            'type'    => Application\Model\DbTable\Comment\Message::ARTICLES_TYPE_ID,
+            'type'    => Autowp\Comments\Model\DbTable\Message::ARTICLES_TYPE_ID,
             'item_id' => $this->article->id
         ]) ?>
     </div>

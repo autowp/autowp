@@ -6,10 +6,10 @@ use Zend\Mail;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\Comments;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\Comments;
 use Application\Model\Forums;
 
 use DateTime;
@@ -29,17 +29,24 @@ class ForumsController extends AbstractActionController
      */
     private $message;
 
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
     public function __construct(
         $newTopicForm,
         $commentForm,
         $transport,
-        MessageService $message
+        MessageService $message,
+        Comments\CommentsService $comments
     ) {
 
         $this->newTopicForm = $newTopicForm;
         $this->commentForm = $commentForm;
         $this->transport = $transport;
         $this->message = $message;
+        $this->comments = $comments;
     }
 
     private function prepareThemeList(&$themes)
@@ -192,8 +199,7 @@ class ForumsController extends AbstractActionController
                         $userTable = new User();
 
                         if ($values['parent_id']) {
-                            $comments = new Comments();
-                            $authorId = $comments->getMessageAuthorId($values['parent_id']);
+                            $authorId = $this->comments->getMessageAuthorId($values['parent_id']);
                             if ($authorId && ($authorId != $user->id)) {
                                 $parentMessageAuthor = $userTable->fetchRow([
                                     'id = ?' => $authorId,

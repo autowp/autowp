@@ -2,15 +2,21 @@
 
 namespace Application\View\Helper;
 
-use Application\Model\Comments as CommentsModel;
+use Autowp\Comments\CommentsService;
 
 use Zend\View\Helper\AbstractHelper;
 
 class Comments extends AbstractHelper
 {
-    public function __construct($form)
+    /**
+     * @var CommentsService
+     */
+    private $comments;
+
+    public function __construct($form, CommentsService $comments)
     {
         $this->form = $form;
+        $this->comments = $comments;
     }
 
     public function __invoke(array $options)
@@ -26,12 +32,10 @@ class Comments extends AbstractHelper
 
         $user = $this->view->user()->get();
 
-        $model = new CommentsModel();
-
-        $comments = $model->get($type, $item, $user);
+        $comments = $this->comments->get($type, $item, $user);
 
         if ($user) {
-            $model->updateTopicView($type, $item, $user->id);
+            $this->comments->updateTopicView($type, $item, $user->id);
         }
 
         $canAddComments = (bool)$user;

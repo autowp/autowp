@@ -2,19 +2,18 @@
 
 namespace AutowpTest\Message\Controller;
 
-use Application\Controller\Console\MessageController;
+use Autowp\Message\Controller\ConsoleController;
 use Application\Test\AbstractConsoleControllerTestCase;
 
 class ConsoleControllerTest extends AbstractConsoleControllerTestCase
 {
-    protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
+    protected $applicationConfigPath = __DIR__ . '/../_files/application.config.php';
 
     public function testClearOldSystemPM()
     {
         $this->dispatch('message clear-old-system-pm');
 
-        $this->assertModuleName('application');
-        $this->assertControllerName(MessageController::class);
+        $this->assertControllerName(ConsoleController::class);
         $this->assertMatchedRouteName('message');
         $this->assertActionName('clear-old-system-pm');
         $this->assertConsoleOutputContains('messages was deleted');
@@ -24,8 +23,7 @@ class ConsoleControllerTest extends AbstractConsoleControllerTestCase
     {
         $this->dispatch('message clear-deleted-pm');
 
-        $this->assertModuleName('application');
-        $this->assertControllerName(MessageController::class);
+        $this->assertControllerName(ConsoleController::class);
         $this->assertMatchedRouteName('message');
         $this->assertActionName('clear-deleted-pm');
         $this->assertConsoleOutputContains('messages was deleted');
