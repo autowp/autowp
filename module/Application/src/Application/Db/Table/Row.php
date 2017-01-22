@@ -18,13 +18,18 @@ class Row extends Zend_Db_Table_Row
             throw new Exception('Column '.$col.' not found');
         }
 
-        $str = $this[$col];
+        return self::getDateTimeByColumnType($metadata[$col]['DATA_TYPE'], $this[$col]);
+    }
+
+    public static function getDateTimeByColumnType($type, $value)
+    {
+        $str = $value;
 
         $result = null;
-        switch ($metadata[$col]['DATA_TYPE']) {
+        switch ($type) {
             case 'date':
                 $format = 'Y-m-d H:i:s';
-                $str .= '00:00:00';
+                $value .= '00:00:00';
                 break;
 
             case 'datetime':
@@ -36,12 +41,12 @@ class Row extends Zend_Db_Table_Row
                 throw new Exception('Column type not a date type');
         }
 
-        if (! $str) {
+        if (! $value) {
             return null;
         }
 
         $timezone = new DateTimeZone(MYSQL_TIMEZONE);
 
-        return DateTime::createFromFormat($format, $str, $timezone);
+        return DateTime::createFromFormat($format, $value, $timezone);
     }
 }

@@ -2,15 +2,15 @@
 
 namespace Autowp\Message;
 
-use Zend\Paginator\Paginator;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\Paginator;
 
 use Autowp\User\Model\DbTable\User;
 
 use Application\Db\Table;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\TelegramService;
-
-use Zend_Db_Expr;
 
 /**
  * @todo Unlink from Telegram
@@ -18,7 +18,12 @@ use Zend_Db_Expr;
 class MessageService
 {
     /**
-     * @var Table
+     * @var Adapter
+     */
+    private $adapter;
+
+    /**
+     * @var TableGateway
      */
     private $table;
 
@@ -29,12 +34,11 @@ class MessageService
      */
     private $telegram;
 
-    public function __construct(TelegramService $telegram)
+    public function __construct(Adapter $adapter, TelegramService $telegram)
     {
-        $this->table = new Table([
-            'name'    => 'personal_messages',
-            'primary' => 'id'
-        ]);
+        $this->adapter = $adapter;
+        $this->table = new TableGateway('personal_messages', $this->adapter);
+
         $this->telegram = $telegram;
     }
 
@@ -55,7 +59,7 @@ class MessageService
             'from_user_id' => $fromId ? (int)$fromId : null,
             'to_user_id'   => (int)$toId,
             'contents'     => $message,
-            'add_datetime' => new Zend_Db_Expr('NOW()'),
+            'add_datetime' => new Sql\Expression('NOW()'),
             'readen'       => 0
         ]);
 
@@ -66,13 +70,16 @@ class MessageService
 
     public function getNewCount($userId)
     {
-        $db = $this->table->getAdapter();
-        return $db->fetchOne(
-            $db->select()
-                ->from($this->table->info('name'), ['COUNT(1)'])
-                ->where('to_user_id = ?', (int)$userId)
-                ->where('NOT readen')
-        );
+        $row = $this->table->select(function (Sql\Select $select) use ($userId) {
+            $select
+                ->columns(['count' => new Sql\Expression('COUNT(1)')])
+                ->where([
+                    'to_user_id = ?' => (int)$userId,
+                    'NOT readen'
+                ]);
+        })->current();
+
+        return $row ? $row['count'] : null;
     }
 
     public function delete($userId, $messageId)
@@ -127,48 +134,60 @@ class MessageService
 
     private function getSystemSelect($userId)
     {
-        return $this->table->select(true)
-            ->where('to_user_id = ?', (int)$userId)
-            ->where('from_user_id IS NULL')
-            ->where('NOT deleted_by_to')
+        return $this->table->getSql()->select()
+            ->where([
+                'to_user_id = ?' => (int)$userId,
+                'from_user_id IS NULL',
+                'NOT deleted_by_to'
+            ])
             ->order('add_datetime DESC');
     }
 
     private function getInboxSelect($userId)
     {
-        return $this->table->select(true)
-            ->where('to_user_id = ?', (int)$userId)
-            ->where('from_user_id')
-            ->where('NOT deleted_by_to')
+        return $this->table->getSql()->select()
+            ->where([
+                'to_user_id = ?' => (int)$userId,
+                'from_user_id',
+                'NOT deleted_by_to'
+            ])
             ->order('add_datetime DESC');
     }
 
     private function getSentSelect($userId)
     {
-        return $this->table->select(true)
-            ->where('from_user_id = ?', (int)$userId)
-            ->where('NOT deleted_by_from')
+        return $this->table->getSql()->select()
+            ->where([
+                'from_user_id = ?' => (int)$userId,
+                'NOT deleted_by_from'
+            ])
             ->order('add_datetime DESC');
     }
 
     private function getDialogSelect($userId, $withUserId)
     {
-        return $this->table->select(true)
-            ->where('from_user_id = :user_id and to_user_id = :with_user_id and NOT deleted_by_from')
-            ->orWhere('from_user_id = :with_user_id and to_user_id = :user_id and NOT deleted_by_to')
-            ->order('add_datetime DESC')
-            ->bind([
-                'user_id'      => (int)$userId,
-                'with_user_id' => (int)$withUserId
-            ]);
+        $predicate1 = new Sql\Predicate\Predicate();
+        $predicate1->expression('from_user_id = ? and to_user_id = ? and NOT deleted_by_from', [(int)$userId, (int)$withUserId]);
+
+        $predicate2 = new Sql\Predicate\Predicate();
+        $predicate2->expression('from_user_id = ? and to_user_id = ? and NOT deleted_by_to', [(int)$withUserId, (int)$userId]);
+
+        $predicate = new Sql\Predicate\PredicateSet([
+            $predicate1,
+            $predicate2
+        ], Sql\Predicate\PredicateSet::COMBINED_BY_OR);
+
+        return $this->table->getSql()->select()
+            ->where($predicate)
+            ->order('add_datetime DESC');
     }
 
     public function getSystemCount($userId)
     {
         $select = $this->getSystemSelect($userId);
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -179,8 +198,8 @@ class MessageService
         $select = $this->getSystemSelect($userId)
             ->where('NOT readen');
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -190,8 +209,8 @@ class MessageService
     {
         $select = $this->getInboxSelect($userId);
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -202,8 +221,8 @@ class MessageService
         $select = $this->getInboxSelect($userId)
             ->where('NOT readen');
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -213,8 +232,8 @@ class MessageService
     {
         $select = $this->getDialogSelect($userId, $withUserId);
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -224,8 +243,8 @@ class MessageService
     {
         $select = $this->getSentSelect($userId);
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->adapter)
         );
 
         return $paginator->getTotalItemCount();
@@ -242,12 +261,24 @@ class MessageService
         }
     }
 
+    private function markReadenRows($rows, $userId)
+    {
+        $ids = [];
+        foreach ($rows as $message) {
+            if (! $message['readen'] && $message['to_user_id'] == $userId) {
+                $ids[] = $message['id'];
+            }
+        }
+
+        $this->markReaden($ids);
+    }
+
     public function getInbox($userId, $page)
     {
         $select = $this->getInboxSelect($userId);
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->adapter)
         );
 
         $paginator
@@ -256,14 +287,7 @@ class MessageService
 
         $rows = $paginator->getCurrentItems();
 
-        $markReaden = [];
-        foreach ($rows as $message) {
-            if (! $message->readen && $message->to_user_id == $userId) {
-                $markReaden[] = $message->id;
-            }
-        }
-
-        $this->markReaden($markReaden);
+        $this->markReadenRows($rows, $userId);
 
         return [
             'messages'  => $this->prepareList($userId, $rows),
@@ -275,8 +299,8 @@ class MessageService
     {
         $select = $this->getSentSelect($userId);
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->adapter)
         );
 
         $paginator
@@ -295,8 +319,8 @@ class MessageService
     {
         $select = $this->getSystemSelect($userId);
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->adapter)
         );
 
         $paginator
@@ -305,14 +329,7 @@ class MessageService
 
         $rows = $paginator->getCurrentItems();
 
-        $markReaden = [];
-        foreach ($rows as $message) {
-            if (! $message->readen && $message->to_user_id == $userId) {
-                $markReaden[] = $message->id;
-            }
-        }
-
-        $this->markReaden($markReaden);
+        $this->markReadenRows($rows, $userId);
 
         return [
             'messages'  => $this->prepareList($userId, $rows),
@@ -324,8 +341,8 @@ class MessageService
     {
         $select = $this->getDialogSelect($userId, $withUserId);
 
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->adapter)
         );
 
         $paginator
@@ -334,14 +351,7 @@ class MessageService
 
         $rows = $paginator->getCurrentItems();
 
-        $markReaden = [];
-        foreach ($rows as $message) {
-            if (! $message->readen && $message->to_user_id == $userId) {
-                $markReaden[] = $message->id;
-            }
-        }
-
-        $this->markReaden($markReaden);
+        $this->markReadenRows($rows, $userId);
 
         return [
             'messages'  => $this->prepareList($userId, $rows, [
@@ -364,10 +374,10 @@ class MessageService
 
         $messages = [];
         foreach ($rows as $message) {
-            $author = $userTable->find($message->from_user_id)->current();
+            $author = $userTable->find($message['from_user_id'])->current();
 
-            $isNew = $message->to_user_id == $userId && ! $message->readen;
-            $canDelete = $message->from_user_id == $userId || $message->to_user_id == $userId;
+            $isNew = $message['to_user_id'] == $userId && ! $message['readen'];
+            $canDelete = $message['from_user_id'] == $userId || $message['to_user_id'] == $userId;
             $authorIsMe = $author && ($author->id == $userId);
             $canReply = $author && ! $author->deleted && ! $authorIsMe;
 
@@ -385,12 +395,12 @@ class MessageService
             }
 
             $messages[] = [
-                'id'              => $message->id,
+                'id'              => $message['id'],
                 'author'          => $author,
-                'contents'        => $message->contents,
+                'contents'        => $message['contents'],
                 'isNew'           => $isNew,
                 'canDelete'       => $canDelete,
-                'date'            => $message->getDateTime('add_datetime'),
+                'date'            => Table\Row::getDateTimeByColumnType('timestamp', $message['add_datetime']),
                 'canReply'        => $canReply,
                 'dialogCount'     => $dialogCount,
                 'allMessagesLink' => $options['allMessagesLink']
