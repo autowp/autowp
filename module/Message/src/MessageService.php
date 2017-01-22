@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Model;
+namespace Autowp\Message;
 
 use Zend\Paginator\Paginator;
 
@@ -12,7 +12,10 @@ use Application\Service\TelegramService;
 
 use Zend_Db_Expr;
 
-class Message
+/**
+ * @todo Unlink from Telegram
+ */
+class MessageService
 {
     /**
      * @var Table

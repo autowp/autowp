@@ -23,7 +23,7 @@ class ServicesTest extends AbstractHttpControllerTestCase
     public static function servicesProvider()
     {
         return [
-            [\Application\Model\Message::class],
+            [\Autowp\Message\MessageService::class],
             [\Application\ItemNameFormatter::class],
             [\Application\PictureNameFormatter::class],
             [\Autowp\Image\Storage::class],

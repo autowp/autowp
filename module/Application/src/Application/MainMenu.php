@@ -5,10 +5,10 @@ namespace Application;
 use Zend\Cache\Storage\StorageInterface;
 use Zend\Router\Http\TreeRouteStack;
 
+use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Application\Model\DbTable;
-use Application\Model\Message;
 use Application\Language;
 
 class MainMenu
@@ -59,7 +59,7 @@ class MainMenu
     private $languagePicker;
 
     /**
-     * @var Message
+     * @var MessageService
      */
     private $message;
 
@@ -70,7 +70,7 @@ class MainMenu
         $hosts,
         $translator,
         LanguagePicker $languagePicker,
-        Message $message
+        MessageService $message
     ) {
 
         $this->router = $router;

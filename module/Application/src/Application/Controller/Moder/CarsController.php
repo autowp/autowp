@@ -15,12 +15,13 @@ use Application\HostManager;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
-use Application\Model\Message;
 use Application\Model\Modification;
 use Application\Model\PictureItem;
 use Application\Model\VehicleType;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
+
+use Autowp\Message\MessageService;
 
 use geoPHP;
 use Point;
@@ -73,7 +74,7 @@ class CarsController extends AbstractActionController
     private $brandVehicle;
 
     /**
-     * @var Message
+     * @var MessageService
      */
     private $message;
 
@@ -102,7 +103,7 @@ class CarsController extends AbstractActionController
         Form $filterForm,
         Form $logoForm,
         BrandVehicle $brandVehicle,
-        Message $message,
+        MessageService $message,
         SpecificationsService $specificationsService,
         PictureItem $pictureItem,
         array $languages

@@ -15,7 +15,7 @@ class ForumsControllerFactory implements FactoryInterface
             $container->get('ForumsTopicNewForm'),
             $container->get('CommentForm'),
             $container->get(\Zend\Mail\Transport\TransportInterface::class),
-            $container->get(\Application\Model\Message::class)
+            $container->get(\Autowp\Message\MessageService::class)
         );
     }
 }

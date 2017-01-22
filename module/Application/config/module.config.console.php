@@ -10,7 +10,6 @@ return [
             Controller\Console\BuildController::class       => InvokableFactory::class,
             Controller\Console\CatalogueController::class   => Controller\Console\Service\CatalogueControllerFactory::class,
             Controller\Console\MaintenanceController::class => Controller\Console\Service\MaintenanceControllerFactory::class,
-            Controller\Console\MessageController::class     => Controller\Console\Service\MessageControllerFactory::class,
             Controller\Console\MidnightController::class    => Controller\Console\Service\MidnightControllerFactory::class,
             Controller\Console\PicturesController::class    => InvokableFactory::class,
             Controller\Console\RefererController::class     => InvokableFactory::class,
@@ -44,14 +43,6 @@ return [
                         'route'    => 'maintenance (dump|clear-sessions|rebuild-category-parent|rebuild-car-order-cache|comments-replies-count):action',
                         'defaults' => [
                             'controller' => Controller\Console\MaintenanceController::class,
-                        ]
-                    ]
-                ],
-                'message' => [
-                    'options' => [
-                        'route'    => 'message (clear-old-system-pm|clear-deleted-pm):action',
-                        'defaults' => [
-                            'controller' => Controller\Console\MessageController::class,
                         ]
                     ]
                 ],

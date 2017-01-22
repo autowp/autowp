@@ -60,7 +60,7 @@ class TelegramService
 
         $api->addCommands([
             StartCommand::class,
-            new MeCommand($this->serviceManager->get(\Application\Model\Message::class)),
+            new MeCommand($this->serviceManager->get(\Autowp\Message\MessageService::class)),
             NewCommand::class,
             InboxCommand::class,
             MessagesCommand::class

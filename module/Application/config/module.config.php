@@ -108,7 +108,6 @@ return [
             Model\BrandNav::class                => Model\Service\BrandNavFactory::class,
             Model\BrandVehicle::class            => Model\Service\BrandVehicleFactory::class,
             Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
-            Model\Message::class                 => Model\Service\MessageFactory::class,
             PictureNameFormatter::class          => Service\PictureNameFormatterFactory::class,
             Service\SpecificationsService::class => Service\SpecificationsServiceFactory::class,
             Service\TelegramService::class       => Service\TelegramServiceFactory::class,

@@ -9,6 +9,9 @@
         <testsuite name="application">
             <directory>./module/Application/test</directory>
         </testsuite>
+        <testsuite name="application">
+            <directory>./module/Module/test</directory>
+        </testsuite>
         <testsuite name="traffic">
             <directory>./module/Traffic/test</directory>
         </testsuite>
@@ -19,6 +22,7 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./module/Application/src</directory>
+            <directory suffix=".php">./module/Module/src</directory>
             <directory suffix=".php">./module/Traffic/src</directory>
             <directory suffix=".php">./module/User/src</directory>
             <exclude>

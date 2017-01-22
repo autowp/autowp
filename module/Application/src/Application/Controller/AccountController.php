@@ -8,6 +8,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Rename as UserRename;
@@ -18,7 +19,6 @@ use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Model\DbTable\Item;
 use Application\Model\Forums;
-use Application\Model\Message;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
@@ -84,7 +84,7 @@ class AccountController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var Message
+     * @var MessageService
      */
     private $message;
 
@@ -99,7 +99,7 @@ class AccountController extends AbstractActionController
         ExternalLoginServiceFactory $externalLoginFactory,
         array $hosts,
         SpecificationsService $specsService,
-        Message $message
+        MessageService $message
     ) {
 
         $this->service = $service;

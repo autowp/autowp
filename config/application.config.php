@@ -23,6 +23,7 @@ return [
         'Zend\\Validator',
         'Autowp\\User',
         'Autowp\\Image',
+        'Autowp\\Message',
         'Autowp\\TextStorage',
         'Autowp\\Traffic',
         'Autowp\\ZFComponents',

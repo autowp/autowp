@@ -14,7 +14,7 @@ class CommentsControllerFactory implements FactoryInterface
         return new Controller(
             $container->get(\Application\HostManager::class),
             $container->get('CommentForm'),
-            $container->get(\Application\Model\Message::class)
+            $container->get(\Autowp\Message\MessageService::class)
         );
     }
 }

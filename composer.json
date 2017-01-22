@@ -50,6 +50,7 @@
     },
     "autoload": {
         "psr-4": {
+            "Autowp\\Message\\": "module/Message/src",
             "Autowp\\Traffic\\": "module/Traffic/src",
             "Autowp\\User\\": "module/User/src",
             "Application\\": "module/Application/src/Application"

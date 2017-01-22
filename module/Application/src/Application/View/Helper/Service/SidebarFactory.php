@@ -12,7 +12,7 @@ class SidebarFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new Helper(
-            $container->get(\Application\Model\Message::class)
+            $container->get(\Autowp\Message\MessageService::class)
         );
     }
 }

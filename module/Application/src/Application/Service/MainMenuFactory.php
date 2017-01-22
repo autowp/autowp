@@ -18,7 +18,7 @@ class MainMenuFactory implements FactoryInterface
             $container->get('Config')['hosts'],
             $container->get('MvcTranslator'),
             $container->get(\Application\LanguagePicker::class),
-            $container->get(\Application\Model\Message::class)
+            $container->get(\Autowp\Message\MessageService::class)
         );
     }
 }

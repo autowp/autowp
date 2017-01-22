@@ -1,19 +1,19 @@
 <?php
 
-namespace Application\Controller\Console;
+namespace Autowp\Message\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Application\Model\Message;
+use Autowp\Message\MessageService;
 
-class MessageController extends AbstractActionController
+class ConsoleController extends AbstractActionController
 {
     /**
-     * @var Message
+     * @var MessageService
      */
     private $message;
 
-    public function __construct(Message $message)
+    public function __construct(MessageService $message)
     {
         $this->message = $message;
     }

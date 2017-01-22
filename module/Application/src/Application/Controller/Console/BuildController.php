@@ -2,7 +2,6 @@
 
 namespace Application\Controller\Console;
 
-use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\Brand;
@@ -19,6 +18,6 @@ class BuildController extends AbstractActionController
         $brandModel = new Brand();
         $brandModel->createIconsSprite($imageStorage, $destSprite, $destCss);
 
-        Console::getInstance()->writeLine("done");
+        return "done\n";
     }
 }

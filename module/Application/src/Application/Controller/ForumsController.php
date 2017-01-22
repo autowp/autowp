@@ -6,11 +6,11 @@ use Zend\Mail;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
+use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\Comments;
 use Application\Model\Forums;
-use Application\Model\Message;
 
 use DateTime;
 
@@ -25,7 +25,7 @@ class ForumsController extends AbstractActionController
     private $commentForm;
 
     /**
-     * @var Message
+     * @var MessageService
      */
     private $message;
 
@@ -33,7 +33,7 @@ class ForumsController extends AbstractActionController
         $newTopicForm,
         $commentForm,
         $transport,
-        Message $message
+        MessageService $message
     ) {
 
         $this->newTopicForm = $newTopicForm;

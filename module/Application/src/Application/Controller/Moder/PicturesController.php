@@ -7,6 +7,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Message\MessageService;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
@@ -20,7 +21,6 @@ use Application\Model\DbTable;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
-use Application\Model\Message;
 use Application\Model\PictureItem;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
@@ -76,7 +76,7 @@ class PicturesController extends AbstractActionController
     private $telegram;
 
     /**
-     * @var Message
+     * @var MessageService
      */
     private $message;
 
@@ -112,7 +112,7 @@ class PicturesController extends AbstractActionController
         Form $banForm,
         PictureNameFormatter $pictureNameFormatter,
         TelegramService $telegram,
-        Message $message,
+        MessageService $message,
         TrafficControl $trafficControl,
         PictureItem $pictureItem,
         DuplicateFinder $duplicateFinder

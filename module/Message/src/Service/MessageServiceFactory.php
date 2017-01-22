@@ -1,17 +1,20 @@
 <?php
 
-namespace Application\Model\Service;
+namespace Autowp\Message\Service;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\Model\Message as Model;
+use Autowp\Message\MessageService;
 
-class MessageFactory implements FactoryInterface
+/**
+ * @todo Unlink from Telegram
+ */
+class MessageServiceFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Model(
+        return new MessageService(
             $container->get(\Application\Service\TelegramService::class)
         );
     }

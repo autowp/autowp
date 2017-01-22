@@ -10,7 +10,7 @@ use Application\HostManager;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
-use Application\Model\Message;
+use Autowp\Message\MessageService;
 use Application\Model\PictureItem;
 use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
@@ -36,13 +36,18 @@ class CatalogueController extends AbstractActionController
 
     private $textStorage;
 
+    /**
+     * @var MessageService
+     */
+    private $message;
+
     public function __construct(
         BrandVehicle $brandVehicle,
         PictureItem $pictureItem,
         SpecificationsService $specService,
         HostManager $hostManager,
         TelegramService $telegram,
-        Message $message,
+        MessageService $message,
         $textStorage,
         DuplicateFinder $duplicateFinder
     ) {

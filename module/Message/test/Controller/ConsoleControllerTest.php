@@ -1,11 +1,11 @@
 <?php
 
-namespace ApplicationTest\Controller\Frontend;
+namespace AutowpTest\Message\Controller;
 
 use Application\Controller\Console\MessageController;
 use Application\Test\AbstractConsoleControllerTestCase;
 
-class MessageControllerTest extends AbstractConsoleControllerTestCase
+class ConsoleControllerTest extends AbstractConsoleControllerTestCase
 {
     protected $applicationConfigPath = __DIR__ . '/../../_files/application.config.php';
 

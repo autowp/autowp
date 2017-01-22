@@ -6,7 +6,7 @@ use Telegram\Bot\Commands\Command;
 
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\Message;
+use Autowp\Message\MessageService;
 
 class MeCommand extends Command
 {
@@ -19,6 +19,11 @@ class MeCommand extends Command
      * @var string Command Description
      */
     protected $description = "Command to identify you as autowp.ru user";
+
+    /**
+     * @var MessageService
+     */
+    private $message;
 
     public function __construct($message)
     {

@@ -6,11 +6,11 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Application\HostManager;
-use Application\Model\Message;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Attr;
@@ -35,7 +35,7 @@ class CarsController extends AbstractActionController
     private $specsService = null;
 
     /**
-     * @var Message
+     * @var MessageService
      */
     private $message;
 
@@ -43,7 +43,7 @@ class CarsController extends AbstractActionController
         HostManager $hostManager,
         Form $filterForm,
         SpecificationsService $specsService,
-        Message $message
+        MessageService $message
     ) {
 
         $this->hostManager = $hostManager;

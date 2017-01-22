@@ -74,8 +74,6 @@ class CategoryControllerTest extends AbstractHttpControllerTestCase
         // request category page
         $this->reset();
 
-        print $catname;
-
         $this->dispatch('https://www.autowp.ru/category/' . $catname, Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);

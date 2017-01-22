@@ -4,16 +4,16 @@ namespace Application\View\Helper;
 
 use Zend\View\Helper\AbstractHtmlElement;
 
-use Application\Model\Message;
+use Autowp\Message\MessageService;
 
 class Sidebar extends AbstractHtmlElement
 {
     /**
-     * @var Message
+     * @var MessageService
      */
     private $message;
 
-    public function __construct(Message $message)
+    public function __construct(MessageService $message)
     {
         $this->message = $message;
     }
