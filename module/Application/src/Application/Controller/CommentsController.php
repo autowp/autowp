@@ -215,7 +215,7 @@ class CommentsController extends AbstractRestfulController
             }
 
             $ip = $request->getServer('REMOTE_ADDR');
-            if (!$ip) {
+            if (! $ip) {
                 $ip = '127.0.0.1';
             }
 
