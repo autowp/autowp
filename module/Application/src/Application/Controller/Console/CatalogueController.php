@@ -9,6 +9,7 @@ use Application\HostManager;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
 use Application\Model\PictureItem;
+use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
 
@@ -138,5 +139,29 @@ class CatalogueController extends AbstractActionController
         }
 
         return "done\n";
+    }
+
+    public function rebuildCarOrderCacheAction()
+    {
+        $itemTable = new DbTable\Item();
+
+        $select = $itemTable->select(true)
+            ->order('id');
+
+        $paginator = new \Zend\Paginator\Paginator(
+            new Zend1DbTableSelect($select)
+        );
+        $paginator->setItemCountPerPage(100);
+
+        $pagesCount = $paginator->count();
+        for ($i = 1; $i <= $pagesCount; $i++) {
+            $paginator->setCurrentPageNumber($i);
+            foreach ($paginator->getCurrentItems() as $carRow) {
+                print $carRow->id . "\n";
+                $carRow->updateOrderCache();
+            }
+        }
+
+        return "ok\n";
     }
 }
