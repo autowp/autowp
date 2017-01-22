@@ -7,6 +7,7 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Zend\Paginator\Paginator;
 
+use Autowp\Comments;
 use Autowp\User\Model\DbTable\User;
 
 use Application\ItemNameFormatter;
@@ -1715,11 +1716,11 @@ class CatalogueController extends AbstractActionController
 
     private function getBrandModerAttentionCount($brandId)
     {
-        $commentTable = new DbTable\Comment\Message();
+        $commentTable = new Comments\Model\DbTable\Message();
 
         $select = $commentTable->select(true)
-            ->where('comments_messages.moderator_attention = ?', DbTable\Comment\Message::MODERATOR_ATTENTION_REQUIRED)
-            ->where('comments_messages.type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID)
+            ->where('comments_messages.moderator_attention = ?', Comments\Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED)
+            ->where('comments_messages.type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
             ->join('pictures', 'comments_messages.item_id = pictures.id', null)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
@@ -1734,11 +1735,11 @@ class CatalogueController extends AbstractActionController
 
     private function getCarModerAttentionCount($carId)
     {
-        $commentTable = new DbTable\Comment\Message();
+        $commentTable = new Comments\Model\DbTable\Message();
 
         $select = $commentTable->select(true)
-            ->where('comments_messages.moderator_attention = ?', DbTable\Comment\Message::MODERATOR_ATTENTION_REQUIRED)
-            ->where('comments_messages.type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID)
+            ->where('comments_messages.moderator_attention = ?', Comments\Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED)
+            ->where('comments_messages.type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
             ->join('pictures', 'comments_messages.item_id = pictures.id', null)
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)

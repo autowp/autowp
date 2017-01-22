@@ -5,9 +5,9 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Permissions\Acl\Acl;
 
+use Autowp\Comments;
 use Autowp\User\Model\DbTable\User;
 
-use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
 
@@ -83,7 +83,7 @@ class AboutController extends AbstractActionController
         );
         $totalCars = round($totalCars, -3);
 
-        $commentMessageTable = new CommentMessage();
+        $commentMessageTable = new Comments\Model\DbTable\Message();
         $commentMessageTableAdapter = $commentMessageTable->getAdapter();
         $totalComments = $commentMessageTableAdapter->fetchOne(
             $commentMessageTableAdapter->select()

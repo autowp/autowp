@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Model\DbTable\Comment;
+namespace Autowp\Comments\Model\DbTable;
 
 use Zend_Db_Table;
 

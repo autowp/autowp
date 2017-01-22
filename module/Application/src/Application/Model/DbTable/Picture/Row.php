@@ -2,6 +2,7 @@
 
 namespace Application\Model\DbTable\Picture;
 
+use Autowp\Comments;
 use Autowp\Image\Storage\Request;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
@@ -148,9 +149,9 @@ class Row extends \Application\Db\Table\Row
 
     protected function _delete()
     {
-        $comments = new DbTable\Comment\Message();
+        $comments = new Comments\Model\DbTable\Message();
         $comments->delete([
-            'type_id = ?' => DbTable\Comment\Message::PICTURES_TYPE_ID,
+            'type_id = ?' => Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
             'item_id = ?' => $this->id,
         ]);
 

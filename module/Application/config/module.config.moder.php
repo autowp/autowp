@@ -6,7 +6,7 @@ use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
-use Application\Model\DbTable\Comment\Message as CommentMessage;
+use Autowp\Comments\Model\DbTable\Message as CommentMessage;
 
 return [
     'router' => [

@@ -40,7 +40,7 @@ return [
                 ],
                 'maintenance' => [
                     'options' => [
-                        'route'    => 'maintenance (dump|clear-sessions|comments-replies-count):action',
+                        'route'    => 'maintenance (dump|clear-sessions):action',
                         'defaults' => [
                             'controller' => Controller\Console\MaintenanceController::class,
                         ]

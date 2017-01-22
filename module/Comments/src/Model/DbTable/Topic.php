@@ -1,11 +1,8 @@
 <?php
 
-namespace Application\Model\DbTable\Comment;
+namespace Autowp\Comments\Model\DbTable;
 
 use Application\Db\Table;
-
-use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Comment\Topic as CommentTopic;
 
 class Topic extends Table
 {
@@ -15,7 +12,7 @@ class Topic extends Table
     /**
      * @param int $typeId
      * @param int $itemId
-     * @return CommentTopic
+     * @return Topic
      */
     public function getTopic($typeId, $itemId)
     {
@@ -24,7 +21,7 @@ class Topic extends Table
             'type_id = ?' => $typeId
         ]);
         if (! $topic) {
-            $cmTable = new CommentMessage();
+            $cmTable = new Message();
 
             $lastUpdate = $cmTable->getLastUpdate($typeId, $itemId);
             $messagesCount = $cmTable->getMessagesCount($typeId, $itemId);
@@ -47,7 +44,7 @@ class Topic extends Table
      */
     public function updateTopicStat($typeId, $itemId)
     {
-        $cmTable = new CommentMessage();
+        $cmTable = new Message();
 
         $messagesCount = $cmTable->getMessagesCount($typeId, $itemId);
 

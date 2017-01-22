@@ -1,11 +1,12 @@
 <?php
 
-namespace Application\Model\DbTable\Comment;
+namespace Autowp\Comments\Model\DbTable;
 
+/**
+ * @todo remove dependency from application
+ */
 use Application\Db\Table\Row;
 use Application\Model\DbTable\Article;
-use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Comment\Vote as CommentVote;
 use Application\Model\DbTable\Picture;
 
 use Zend_Db_Expr;
@@ -20,7 +21,7 @@ class MessageRow extends Row
     public function getUrl()
     {
         switch ($this->type_id) {
-            case CommentMessage::PICTURES_TYPE_ID:
+            case Message::PICTURES_TYPE_ID:
                 $pictures = new Picture();
                 $picture = $pictures->find($this->item_id)->current();
                 if ($picture) {
@@ -28,13 +29,13 @@ class MessageRow extends Row
                 }
                 return false;
 
-            case CommentMessage::VOTINGS_TYPE_ID:
+            case Message::VOTINGS_TYPE_ID:
                 return '/voting/voting/id/'.(int)$this->item_id.'/';
 
-            case CommentMessage::TWINS_TYPE_ID:
+            case Message::TWINS_TYPE_ID:
                 return '/twins/group'.(int)$this->item_id;
 
-            case CommentMessage::ARTICLES_TYPE_ID:
+            case Message::ARTICLES_TYPE_ID:
                 $articles = new Article();
                 $article = $articles->find($this->item_id)->current();
                 if ($article) {
@@ -42,10 +43,10 @@ class MessageRow extends Row
                 }
                 return false;
 
-            case CommentMessage::FORUMS_TYPE_ID:
+            case Message::FORUMS_TYPE_ID:
                 return '/forums/topic-message/message_id/'.(int)$this->id;
 
-            case CommentMessage::MUSEUMS_TYPE_ID:
+            case Message::MUSEUMS_TYPE_ID:
                 return '/museums/museum/id/'.(int)$this->item_id;
         }
         return null;
@@ -64,7 +65,7 @@ class MessageRow extends Row
 
     public function updateVote()
     {
-        $voteTable = new CommentVote();
+        $voteTable = new Vote();
 
         $this->vote = $voteTable->getAdapter()->fetchOne(
             $voteTable->getAdapter()->select()

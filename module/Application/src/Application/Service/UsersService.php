@@ -4,13 +4,13 @@ namespace Application\Service;
 
 use Zend\Mail;
 
+use Autowp\Comments;
 use Autowp\User\Auth\Adapter\Login as LoginAuthAdapter;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\PasswordRemind as UserPasswordRemind;
 use Autowp\User\Model\DbTable\User\Remember as UserRemember;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
-use Application\Model\DbTable\Comment\Message as CommentMessage;
 use Application\Model\DbTable\Picture;
 use Application\Service\SpecificationsService;
 
@@ -325,7 +325,7 @@ class UsersService
 
         $default = 10;
 
-        $commentTable = new CommentMessage();
+        $commentTable = new Comments\Model\DbTable\Message();
         $db = $commentTable->getAdapter();
 
         $avgVote = $db->fetchOne(

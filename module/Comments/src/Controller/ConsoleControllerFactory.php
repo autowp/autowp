@@ -1,18 +1,15 @@
 <?php
 
-namespace Application\View\Helper\Service;
+namespace Autowp\Comments\Controller;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\View\Helper\Comments as Helper;
-
-class CommentsFactory implements FactoryInterface
+class ConsoleControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Helper(
-            $container->get('CommentForm'),
+        return new ConsoleController(
             $container->get(\Autowp\Comments\CommentsService::class)
         );
     }

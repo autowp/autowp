@@ -10,7 +10,10 @@
             <directory>./module/Application/test</directory>
         </testsuite>
         <testsuite name="application">
-            <directory>./module/Module/test</directory>
+            <directory>./module/Comments/test</directory>
+        </testsuite>
+        <testsuite name="application">
+            <directory>./module/Message/test</directory>
         </testsuite>
         <testsuite name="traffic">
             <directory>./module/Traffic/test</directory>

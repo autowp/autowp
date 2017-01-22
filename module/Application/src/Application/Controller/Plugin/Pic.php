@@ -4,6 +4,7 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+use Autowp\Comments;
 use Autowp\User\Model\DbTable\User as UserTable;
 
 use Application\Model\Brand as BrandModel;
@@ -255,13 +256,13 @@ class Pic extends AbstractPlugin
             // messages
             $messages = [];
             if (! $options['disableBehaviour'] && count($ids)) {
-                $ctTable = new DbTable\Comment\Topic();
+                $ctTable = new Comments\Model\DbTable\Topic();
                 $db = $ctTable->getAdapter();
                 $messages = $db->fetchPairs(
                     $ctTable->select()
                         ->from($ctTable->info('name'), ['item_id', 'messages'])
                         ->where('item_id in (?)', $ids)
-                        ->where('type_id = ?', DbTable\Comment\Message::PICTURES_TYPE_ID)
+                        ->where('type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
                 );
             }
 
@@ -325,7 +326,7 @@ class Pic extends AbstractPlugin
                         'messages'
                     );
 
-                $bind['type_id'] = DbTable\Comment\Message::PICTURES_TYPE_ID;
+                $bind['type_id'] = Comments\Model\DbTable\Message::PICTURES_TYPE_ID;
             }
 
             $rows = $db->fetchAll($select, $bind);
@@ -356,9 +357,9 @@ class Pic extends AbstractPlugin
         // comments
         if (! $options['disableBehaviour']) {
             if ($userId) {
-                $ctTable = new DbTable\Comment\Topic();
+                $ctTable = new Comments\Model\DbTable\Topic();
                 $newMessages = $ctTable->getNewMessages(
-                    DbTable\Comment\Message::PICTURES_TYPE_ID,
+                    Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
                     $ids,
                     $userId
                 );
@@ -1188,7 +1189,7 @@ class Pic extends AbstractPlugin
                 'messages'
             )
             ->bind([
-                'type_id' => DbTable\Comment\Message::PICTURES_TYPE_ID
+                'type_id' => Comments\Model\DbTable\Message::PICTURES_TYPE_ID
             ]);
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -1244,9 +1245,9 @@ class Pic extends AbstractPlugin
         }
 
         if ($userId) {
-            $ctTable = new DbTable\Comment\Topic();
+            $ctTable = new Comments\Model\DbTable\Topic();
             $newMessages = $ctTable->getNewMessages(
-                DbTable\Comment\Message::PICTURES_TYPE_ID,
+                Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
                 $ids,
                 $userId
             );

@@ -87,5 +87,5 @@ return [
                 'path' => __DIR__ . '/pictures/',
             ]
         ],
-    ]
+    ],
 ];

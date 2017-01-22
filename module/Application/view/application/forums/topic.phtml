@@ -16,7 +16,7 @@
     $this->layout()->moduleName = 'default/forums/topic';
 ?>
 
-<section class="forum-topic-page comments" data-module="comments" data-comments-item-id="<?=$this->topic['id']?>" data-comments-type="<?=Application\Model\DbTable\Comment\Message::FORUMS_TYPE_ID?>">
+<section class="forum-topic-page comments" data-module="comments" data-comments-item-id="<?=$this->topic['id']?>" data-comments-type="<?=Autowp\Comments\Model\DbTable\Message::FORUMS_TYPE_ID?>">
     <?=$this->partial('application/comments/messages', [
         'messages'          => $this->messages,
         'canRemoveComments' => $this->canRemoveComments,

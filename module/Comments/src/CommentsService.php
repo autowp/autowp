@@ -1,47 +1,47 @@
 <?php
 
-namespace Application\Model;
+namespace Autowp\Comments;
 
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
+/**
+ * @todo remove dependency from application
+ */
 use Application\Paginator\Adapter\Zend1DbTableSelect;
-use Application\Model\DbTable\Comment\Message as CommentMessage;
-use Application\Model\DbTable\Comment\Topic as CommentTopic;
-use Application\Model\DbTable\Comment\Vote as CommentVote;
 
 use Zend_Db_Expr;
 
-class Comments
+class CommentsService
 {
     /**
-     * @var CommentMessage
+     * @var Model\DbTable\Message
      */
     private $messageTable;
 
     /**
-     * @var CommentVote
+     * @var Model\DbTable\Vote
      */
     private $voteTable;
 
     /**
-     * @return CommentMessage
+     * @return Model\DbTable\Message
      */
     private function getMessageTable()
     {
         return $this->messageTable
             ? $this->messageTable
-            : $this->messageTable = new CommentMessage();
+            : $this->messageTable = new Model\DbTable\Message();
     }
 
     /**
-     * @return CommentVote
+     * @return Model\DbTable\Vote
      */
     private function getVoteTable()
     {
         return $this->voteTable
             ? $this->voteTable
-            : $this->voteTable = new CommentVote();
+            : $this->voteTable = new Model\DbTable\Vote();
     }
 
     /**
@@ -83,8 +83,8 @@ class Comments
             'message'             => (string)$data['message'],
             'ip'                  => new Zend_Db_Expr($db->quoteInto('INET6_ATON(?)', $data['ip'])),
             'moderator_attention' => $data['moderatorAttention']
-                ? CommentMessage::MODERATOR_ATTENTION_REQUIRED
-                : CommentMessage::MODERATOR_ATTENTION_NONE
+                ? Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED
+                : Model\DbTable\Message::MODERATOR_ATTENTION_NONE
         ];
 
         $messageId = $messageTable->insert($data);
@@ -102,7 +102,7 @@ class Comments
             $parentMessage->save();
         }
 
-        $commentTopicTable = new CommentTopic();
+        $commentTopicTable = new Model\DbTable\Topic();
         $commentTopicTable->updateTopicStat($typeId, $itemId);
         $commentTopicTable->updateTopicView($typeId, $itemId, $authorId);
 
@@ -207,7 +207,7 @@ class Comments
      */
     public function updateTopicView($type, $item, $userId)
     {
-        $commentTopicTable = new CommentTopic();
+        $commentTopicTable = new Model\DbTable\Topic();
         $commentTopicTable->updateTopicView($type, $item, $userId);
     }
 
@@ -219,7 +219,7 @@ class Comments
     {
         $comment = $this->getMessageTable()->find($id)->current();
 
-        if ($comment->moderator_attention == CommentMessage::MODERATOR_ATTENTION_REQUIRED) {
+        if ($comment->moderator_attention == Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED) {
             return false;
         }
 
@@ -253,11 +253,11 @@ class Comments
     {
         $comment = $this->getMessageTable()->fetchRow([
             'id = ?'                  => (int)$id,
-            'moderator_attention = ?' => CommentMessage::MODERATOR_ATTENTION_REQUIRED
+            'moderator_attention = ?' => Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED
         ]);
 
         if ($comment) {
-            $comment->moderator_attention = CommentMessage::MODERATOR_ATTENTION_COMPLETED;
+            $comment->moderator_attention = Model\DbTable\Message::MODERATOR_ATTENTION_COMPLETED;
             $comment->save();
         }
     }
@@ -431,7 +431,7 @@ class Comments
         return (bool)$this->getMessageTable()->fetchRow([
             'item_id = ?'             => (int)$item,
             'type_id = ?'             => (int)$type,
-            'moderator_attention = ?' => CommentMessage::MODERATOR_ATTENTION_REQUIRED
+            'moderator_attention = ?' => Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED
         ]);
     }
 
@@ -573,7 +573,7 @@ class Comments
 
         $this->moveMessageRecursive($messageRow->id, $newTypeId, $newItemId);
 
-        $commentTopicTable = new CommentTopic();
+        $commentTopicTable = new Model\DbTable\Topic();
         $commentTopicTable->updateTopicStat($oldTypeId, $oldItemId);
         $commentTopicTable->updateTopicStat($newTypeId, $newItemId);
 

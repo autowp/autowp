@@ -5,8 +5,6 @@ namespace Application\Controller\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Session\SessionManager;
 
-use Application\Model\Comments;
-
 use Exception;
 
 use Zend_Db_Adapter_Abstract;
@@ -84,14 +82,5 @@ class MaintenanceController extends AbstractActionController
         $this->sessionManager->getSaveHandler()->gc($gcMaxLifetime);
 
         return "Garabage collected\n";
-    }
-
-    public function commentsRepliesCountAction()
-    {
-        $comments = new Comments();
-
-        $affected = $comments->updateRepliesCount();
-
-        return "ok $affected\n";
     }
 }

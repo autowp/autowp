@@ -11,6 +11,7 @@ use Application\Model\Twins;
 use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
+use Autowp\Comments;
 use Autowp\TextStorage;
 
 use Zend_Db_Expr;
@@ -206,7 +207,7 @@ class TwinsController extends AbstractActionController
 
     private function prepareList($list)
     {
-        $ctTable = new DbTable\Comment\Topic();
+        $ctTable = new Comments\Model\DbTable\Topic();
         $pictureTable = new DbTable\Picture();
 
         $imageStorage = $this->imageStorage();
@@ -221,7 +222,7 @@ class TwinsController extends AbstractActionController
         $picturesCounts = $this->getTwins()->getGroupPicturesCount($ids);
 
         $commentsStats = $ctTable->getTopicStat(
-            DbTable\Comment\Message::TWINS_TYPE_ID,
+            Comments\Model\DbTable\Message::TWINS_TYPE_ID,
             $ids
         );
 

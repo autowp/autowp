@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Model\DbTable\Comment;
+namespace Autowp\Comments\Model\DbTable;
 
 use Application\Db\Table;
 
@@ -16,7 +16,7 @@ class Vote extends Table
         ],
         'Comment' => [
             'columns'       => ['comment_id'],
-            'refTableClass' => \Application\Model\DbTable\Comment\Message::class,
+            'refTableClass' => Message::class,
             'refColumns'    => ['id']
         ],
     ];
