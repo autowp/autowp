@@ -6,10 +6,10 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend_Db_Expr;
 

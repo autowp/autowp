@@ -8,6 +8,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;
@@ -19,7 +20,6 @@ use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Model\DbTable\Item;
 use Application\Model\Forums;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 use Application\Service\UsersService;
 use Autowp\ExternalLoginService\Factory as ExternalLoginServiceFactory;

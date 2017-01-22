@@ -8,13 +8,13 @@ use Zend\View\Model\ViewModel;
 use Zend\Paginator\Paginator;
 
 use Autowp\Comments;
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\ItemNameFormatter;
 use Application\Model\Brand as BrandModel;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\Mosts;
 use Application\Service\SpecificationsService;
 

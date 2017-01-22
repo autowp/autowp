@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
 use Autowp\Comments;
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Rename as UserRename;
@@ -15,8 +16,6 @@ use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Model\Contact;
-
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend_Db_Expr;
 

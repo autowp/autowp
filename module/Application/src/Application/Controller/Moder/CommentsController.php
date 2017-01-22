@@ -6,10 +6,10 @@ use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\Comments;
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 
 class CommentsController extends AbstractActionController
 {

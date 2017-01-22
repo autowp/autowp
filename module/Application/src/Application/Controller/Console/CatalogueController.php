@@ -9,10 +9,10 @@ use Application\HostManager;
 use Application\Model\BrandVehicle;
 use Application\Model\DbTable;
 use Application\Model\PictureItem;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 use Application\Service\TelegramService;
 
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 use Autowp\User\Auth\Adapter\Id as IdAuthAdapter;
 use Autowp\User\Model\DbTable\User;

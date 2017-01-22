@@ -5,7 +5,8 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Application\Model\DbTable\Picture;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
+
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 
 class PerspectiveController extends AbstractActionController
 {

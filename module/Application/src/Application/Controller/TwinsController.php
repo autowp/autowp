@@ -8,10 +8,10 @@ use Zend\View\Model\ViewModel;
 
 use Application\Model\DbTable;
 use Application\Model\Twins;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
 use Autowp\Comments;
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\TextStorage;
 
 use Zend_Db_Expr;

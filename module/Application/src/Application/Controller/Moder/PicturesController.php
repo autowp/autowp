@@ -8,6 +8,7 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 use Autowp\Comments;
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
@@ -22,7 +23,6 @@ use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
 use Application\Model\PictureItem;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\TelegramService;
 

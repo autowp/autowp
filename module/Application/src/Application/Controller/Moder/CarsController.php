@@ -18,9 +18,9 @@ use Application\Model\DbTable;
 use Application\Model\Modification;
 use Application\Model\PictureItem;
 use Application\Model\VehicleType;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\Service\SpecificationsService;
 
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Message\MessageService;
 
 use geoPHP;

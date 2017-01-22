@@ -5,14 +5,14 @@ namespace Application\Controller\Plugin;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 use Autowp\Comments;
+use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User as UserTable;
 
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
 use Application\Model\PictureItem;
-use Application\Paginator\Adapter\Zend1DbSelect;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
 use Application\PictureNameFormatter;
 use Application\Service\SpecificationsService;
 use Application\ItemNameFormatter;

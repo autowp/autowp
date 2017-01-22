@@ -2,18 +2,18 @@
 
 namespace Application\View\Helper;
 
-use Autowp\Comments;
+use Autowp\Comments\CommentsService;
 
 use Zend\View\Helper\AbstractHelper;
 
 class Comments extends AbstractHelper
 {
     /**
-     * @var Comments\CommentsService
+     * @var CommentsService
      */
     private $comments;
 
-    public function __construct($form, Comments\CommentsService $comments)
+    public function __construct($form, CommentsService $comments)
     {
         $this->form = $form;
         $this->comments = $comments;

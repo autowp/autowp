@@ -3,7 +3,8 @@
 namespace Application\Model;
 
 use Application\Model\DbTable;
-use Application\Paginator\Adapter\Zend1DbTableSelect;
+
+use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 
 use Zend_Db_Expr;
 use Zend_Db_Select;

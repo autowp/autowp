@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Paginator\Adapter;
+namespace Autowp\Commons\Paginator\Adapter;
 
 use Zend\Paginator\Adapter\AdapterInterface;
 
