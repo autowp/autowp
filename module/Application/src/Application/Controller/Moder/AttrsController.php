@@ -19,7 +19,7 @@ class AttrsController extends AbstractActionController
 
         $attributes = new Attr\Attribute();
 
-        $zoneTable = new Application\Model\DbTable\Attr\Zone();
+        $zoneTable = new Attr\Zone();
 
         return [
             'attributes' => $attributes->fetchAll('parent_id IS NULL', 'position'),

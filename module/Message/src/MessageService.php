@@ -256,7 +256,7 @@ class MessageService
             $this->table->update([
                 'readen' => 1
             ], [
-                'id IN (?)' => $ids
+                new Sql\Predicate\In('id', $ids)
             ]);
         }
     }
@@ -265,8 +265,8 @@ class MessageService
     {
         $ids = [];
         foreach ($rows as $message) {
-            if (! $message['readen'] && $message['to_user_id'] == $userId) {
-                $ids[] = $message['id'];
+            if ((! $message['readen']) && ($message['to_user_id'] == $userId)) {
+                $ids[] = (int)$message['id'];
             }
         }
 
