@@ -5,27 +5,25 @@ namespace Application\Form\Element;
 use Zend\Form\Element\Text;
 use Zend\InputFilter\InputProviderInterface;
 
+use Application\Model\Brand as BrandModel;
+
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
-use Application\Model\DbTable;
-
-class CarName extends Text implements InputProviderInterface
+class ItemFullName extends Text implements InputProviderInterface
 {
     protected $attributes = [
         'type'      => 'text',
-        'maxlength' => DbTable\Item::MAX_NAME,
-        'size'      => DbTable\Item::MAX_NAME
+        'maxlength' => BrandModel::MAX_FULLNAME,
+        'size'      => BrandModel::MAX_FULLNAME
     ];
 
     /**
      * @var null|string
      */
-    protected $label = 'moder/vehicle/name';
+    protected $label = 'moder/brands/meta-data/full-name';
 
     /**
      * Provide default input rules for this element
-     *
-     * Attaches a phone number validator.
      *
      * @return array
      */
@@ -33,7 +31,7 @@ class CarName extends Text implements InputProviderInterface
     {
         return [
             'name' => $this->getName(),
-            'required' => true,
+            'required' => false,
             'filters' => [
                 ['name' => 'StringTrim'],
                 ['name' => SingleSpaces::class]
@@ -42,8 +40,7 @@ class CarName extends Text implements InputProviderInterface
                 [
                     'name' => 'StringLength',
                     'options' => [
-                        'min' => 2,
-                        'max' => DbTable\Item::MAX_NAME
+                        'max' => BrandModel::MAX_FULLNAME
                     ]
                 ]
             ]

@@ -168,7 +168,7 @@ class CarsController extends AbstractActionController
         $this->filterForm->get('spec')->setValueOptions(array_replace(['' => '--'], $specOptions));
         $this->filterForm->get('vehicle_type_id')->setValueOptions(array_replace([
             ''      => '--',
-            'empty' => 'moder/vehicles/filter/vehicle-type/empty'
+            'empty' => 'moder/items/filter/vehicle-type/empty'
         ], $vehicleTypeOptions));
         $this->filterForm->get('vehicle_childs_type_id')->setValueOptions(array_replace([
             '' => '--'

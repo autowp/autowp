@@ -60,11 +60,11 @@ class CarOrganize extends Form implements InputFilterProviderInterface
         $elements = [
             [
                 'name'    => 'name',
-                'type'    => \Application\Form\Element\CarName::class
+                'type'    => \Application\Form\Element\ItemName::class
             ],
             'full_name' => [
                 'name'    => 'full_name',
-                'type'    => \Application\Form\Element\BrandFullName::class,
+                'type'    => \Application\Form\Element\ItemFullName::class,
             ],
             'catname' => [
                 'name'    => 'catname',
@@ -75,7 +75,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
             ],
             'body' => [
                 'name'    => 'body',
-                'type'    => \Application\Form\Element\CarBody::class,
+                'type'    => \Application\Form\Element\ItemBody::class,
                 'attributes' => [
                     'style' => 'width: 30%'
                 ]
@@ -106,14 +106,14 @@ class CarOrganize extends Form implements InputFilterProviderInterface
             ],
             'model_year' => [
                 'name'    => 'model_year',
-                'type'    => \Application\Form\Fieldset\CarModelYears::class,
+                'type'    => \Application\Form\Fieldset\ItemModelYears::class,
                 'options' => [
                     'label' => 'moder/vehicle/model-years'
                 ]
             ],
             [
                 'name'    => 'begin',
-                'type'    => \Application\Form\Fieldset\CarBegin::class,
+                'type'    => \Application\Form\Fieldset\ItemBegin::class,
                 'options' => [
                     'label'    => 'moder/vehicle/begin',
                     'language' => $this->language
@@ -121,7 +121,7 @@ class CarOrganize extends Form implements InputFilterProviderInterface
             ],
             [
                 'name'    => 'end',
-                'type'    => \Application\Form\Fieldset\CarEnd::class,
+                'type'    => \Application\Form\Fieldset\ItemEnd::class,
                 'options' => [
                     'label'    => 'moder/vehicle/end',
                     'language' => $this->language
@@ -129,9 +129,9 @@ class CarOrganize extends Form implements InputFilterProviderInterface
             ],
             'produced' => [
                 'name'    => 'produced',
-                'type'    => \Application\Form\Fieldset\CarProduced::class,
+                'type'    => \Application\Form\Fieldset\ItemProduced::class,
                 'options' => [
-                    'label' => 'moder/vehicle/produced'
+                    'label' => 'moder/item/produced'
                 ]
             ],
             'is_concept' => [

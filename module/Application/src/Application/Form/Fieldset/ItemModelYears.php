@@ -5,7 +5,7 @@ namespace Application\Form\Fieldset;
 use Zend\Form\Fieldset;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-class CarProduced extends Fieldset implements InputFilterProviderInterface
+class ItemModelYears extends Fieldset implements InputFilterProviderInterface
 {
     public function __construct($name = null, $options = [])
     {
@@ -13,29 +13,29 @@ class CarProduced extends Fieldset implements InputFilterProviderInterface
 
         $elements = [
             [
-                'name'    => 'count',
-                'type'    => 'Number',
+                'name'    => 'begin',
+                'type'    => \Application\Form\Element\Year::class,
                 'options' => [
-                    'label'   => 'moder/vehicle/produced/number'
+                    'label' => 'moder/vehicle/year/from'
                 ],
                 'attributes' => [
-                    'style' => 'width: 10%',
-                    'min'   => 0,
-                    'max'   => 100000000
+                    'placeholder' => 'moder/vehicle/year/from',
+                    'style'       => 'width: 10%',
+                    'min'         => 1800,
+                    'max'         => date('Y') + 10
                 ]
             ],
             [
-                'name'    => 'exactly',
-                'type'    => 'Select',
+                'name'    => 'end',
+                'type'    => \Application\Form\Element\Year::class,
                 'options' => [
-                    'label'   => 'moder/vehicle/produced/precision',
-                    'options' => [
-                        '0' => 'moder/vehicle/produced/about',
-                        '1' => 'moder/vehicle/produced/exactly'
-                    ]
+                    'label' => 'moder/vehicle/year/to'
                 ],
                 'attributes' => [
-                    'style' => 'width: 20%'
+                    'placeholder' => 'moder/vehicle/year/to',
+                    'style'       => 'width: 10%',
+                    'min'         => 1800,
+                    'max'         => date('Y') + 10
                 ]
             ],
         ];
@@ -56,7 +56,7 @@ class CarProduced extends Fieldset implements InputFilterProviderInterface
     public function getInputFilterSpecification()
     {
         return [
-            'count' => [
+            'begin' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
@@ -65,9 +65,15 @@ class CarProduced extends Fieldset implements InputFilterProviderInterface
                     ['name' => 'Digits']
                 ]
             ],
-            'exactly' => [
-                'required' => false
-            ],
+            'end' => [
+                'required' => false,
+                'filters'  => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    ['name' => 'Digits']
+                ]
+            ]
         ];
     }
 }

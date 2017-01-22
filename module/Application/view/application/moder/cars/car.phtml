@@ -13,7 +13,7 @@
     ]);
 
     $this->layout()->moduleName = 'moder/cars/car';
-    
+
     $specsAllowed = in_array($this->car->item_type_id, [
         Application\Model\DbTable\Item\Type::VEHICLE,
         Application\Model\DbTable\Item\Type::ENGINE
@@ -136,10 +136,10 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><?=$this->escapeHtml($this->translate('moder/vehicle/produced'))?>:</td>
+                    <td><?=$this->escapeHtml($this->translate('moder/item/produced'))?>:</td>
                     <td>
                         <?=$this->car->produced ?>
-                        <?=$this->escapeHtml($this->transalte($this->car->produced_exactly ? 'moder/vehicle/produced/exactly' : 'moder/vehicle/produced/about')) ?>
+                        <?=$this->escapeHtml($this->transalte($this->car->produced_exactly ? 'moder/item/produced/exactly' : 'moder/vehicle/produced/about')) ?>
                     </td>
                 </tr>
                 <tr>

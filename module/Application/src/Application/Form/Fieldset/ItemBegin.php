@@ -5,37 +5,58 @@ namespace Application\Form\Fieldset;
 use Zend\Form\Fieldset;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-class CarModelYears extends Fieldset implements InputFilterProviderInterface
+class ItemBegin extends Fieldset implements InputFilterProviderInterface
 {
+    private $language = 'en';
+
+    /**
+     * @param  array|Traversable $options
+     * @return Element|ElementInterface
+     * @throws Exception\InvalidArgumentException
+     */
+    public function setOptions($options)
+    {
+        parent::setOptions($options);
+
+        if (isset($options['language'])) {
+            $this->language = $options['language'];
+
+            $this->get('month')->setOptions([
+                'language' => $this->language
+            ]);
+        }
+
+        return $this;
+    }
+
     public function __construct($name = null, $options = [])
     {
         parent::__construct($name, $options);
 
         $elements = [
             [
-                'name'    => 'begin',
+                'name'    => 'year',
                 'type'    => \Application\Form\Element\Year::class,
                 'options' => [
-                    'label' => 'moder/vehicle/year/from'
+                    'label' => 'moder/vehicle/year'
                 ],
                 'attributes' => [
-                    'placeholder' => 'moder/vehicle/year/from',
+                    'placeholder' => 'moder/vehicle/year',
                     'style'       => 'width: 10%',
                     'min'         => 1800,
                     'max'         => date('Y') + 10
                 ]
             ],
             [
-                'name'    => 'end',
-                'type'    => \Application\Form\Element\Year::class,
+                'name'    => 'month',
+                'type'    => \Application\Form\Element\Month::class,
                 'options' => [
-                    'label' => 'moder/vehicle/year/to'
+                    'label'    => 'moder/vehicle/month',
+                    'language' => $this->language
                 ],
                 'attributes' => [
-                    'placeholder' => 'moder/vehicle/year/to',
-                    'style'       => 'width: 10%',
-                    'min'         => 1800,
-                    'max'         => date('Y') + 10
+                    'title' => 'moder/vehicle/month',
+                    'style' => 'width: 20%'
                 ]
             ],
         ];
@@ -56,7 +77,7 @@ class CarModelYears extends Fieldset implements InputFilterProviderInterface
     public function getInputFilterSpecification()
     {
         return [
-            'begin' => [
+            'year' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
@@ -65,7 +86,7 @@ class CarModelYears extends Fieldset implements InputFilterProviderInterface
                     ['name' => 'Digits']
                 ]
             ],
-            'end' => [
+            'month' => [
                 'required' => false,
                 'filters'  => [
                     ['name' => 'StringTrim']
@@ -73,7 +94,7 @@ class CarModelYears extends Fieldset implements InputFilterProviderInterface
                 'validators' => [
                     ['name' => 'Digits']
                 ]
-            ]
+            ],
         ];
     }
 }

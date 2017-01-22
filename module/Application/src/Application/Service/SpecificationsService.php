@@ -2826,7 +2826,7 @@ class SpecificationsService
         }
     }
 
-    public function refreshItemConflictFlags($typeId, $itemId)
+    public function refreshItemConflictFlags($itemId)
     {
         $valueTable = $this->getUserValueTable();
         $select = $valueTable->select(true)

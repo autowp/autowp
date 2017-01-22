@@ -7,7 +7,7 @@ use Zend\InputFilter\InputProviderInterface;
 
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
-class CarBody extends Text implements InputProviderInterface
+class ItemBody extends Text implements InputProviderInterface
 {
     protected $attributes = [
         'type'      => 'text',

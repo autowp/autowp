@@ -5,7 +5,7 @@ namespace Application\Form\Fieldset;
 use Zend\Form\Fieldset;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-class CarEnd extends Fieldset implements InputFilterProviderInterface
+class ItemEnd extends Fieldset implements InputFilterProviderInterface
 {
     private $language = 'en';
 

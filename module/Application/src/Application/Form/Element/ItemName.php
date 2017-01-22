@@ -7,18 +7,20 @@ use Zend\InputFilter\InputProviderInterface;
 
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
-class FactoryName extends Text implements InputProviderInterface
+use Application\Model\DbTable;
+
+class ItemName extends Text implements InputProviderInterface
 {
     protected $attributes = [
         'type'      => 'text',
-        'maxlength' => 255,
-        'size'      => 255
+        'maxlength' => DbTable\Item::MAX_NAME,
+        'size'      => DbTable\Item::MAX_NAME
     ];
 
     /**
      * @var null|string
      */
-    protected $label = 'factory/name';
+    protected $label = 'moder/vehicle/name';
 
     /**
      * Provide default input rules for this element
@@ -40,7 +42,8 @@ class FactoryName extends Text implements InputProviderInterface
                 [
                     'name' => 'StringLength',
                     'options' => [
-                        'max' => 255
+                        'min' => 2,
+                        'max' => DbTable\Item::MAX_NAME
                     ]
                 ]
             ]

@@ -80,7 +80,7 @@ return [
                 ],
                 'specs-refresh-item-conflict-flags' => [
                     'options' => [
-                        'route'    => 'specs refresh-item-conflict-flags <type_id> <item_id>',
+                        'route'    => 'specs refresh-item-conflict-flags <item_id>',
                         'defaults' => [
                             'controller' => Controller\Console\SpecsController::class,
                             'action'     => 'refresh-item-conflict-flags'
