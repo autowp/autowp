@@ -111,11 +111,11 @@
         </div>
 
 
-        <?php if (count($this->last_pictures)) { ?>
+        <?php if (count($this->lastPictures)) { ?>
             <h2><?=$this->escapeHtml($this->translate('users/user/recent-uploads'))?></h2>
             <div class="well">
                 <ul>
-                    <?php foreach ($this->last_pictures as $picture) { ?>
+                    <?php foreach ($this->lastPictures as $picture) { ?>
                         <li><?=$this->htmlA([
                             'href'  => $picture['url'],
                             'class' => 'picture-hover-preview'
@@ -125,17 +125,15 @@
             </div>
         <?php } ?>
 
-        <?php if (count($this->last_comments)) { ?>
+        <?php if (count($this->lastComments)) { ?>
             <h2>
                 <?=$this->escapeHtml($this->translate('users/user/recent-comments'))?>
                 <small><?=$this->htmlA($this->url('users/user/comments', [], [], true), $this->translate('all-link'))?></small>
             </h2>
             <div class="well">
                 <ul class="comments">
-                    <?php foreach ($this->last_comments as $comment) { ?>
-                        <li>
-                            <?=$this->htmlA($comment->getUrl(), $comment->getMessagePreview())?>
-                        </li>
+                    <?php foreach ($this->lastComments as $comment) { ?>
+                        <li><?=$this->htmlA($comment['url'], $comment['message'])?></li>
                     <?php } ?>
                     <li>&#xa0;...</li>
                 </ul>

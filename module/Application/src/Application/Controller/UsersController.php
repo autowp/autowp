@@ -16,6 +16,7 @@ use Application\Model\DbTable;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Model\Contact;
+use Application\StringUtils;
 
 use Zend_Db_Expr;
 
@@ -67,6 +68,35 @@ class UsersController extends AbstractActionController
         ]);
     }
 
+    private function getLastComments($user)
+    {
+        /**
+         * @todo Use CommentsService
+         */
+        $commentsTable = new Comments\Model\DbTable\Message();
+        $rows = $commentsTable->fetchAll(
+            $commentsTable->select()
+                ->where('author_id = ?', $user->id)
+                ->where('type_id <> ?', CommentMessage::FORUMS_TYPE_ID)
+                ->where('not deleted')
+                ->order(['datetime DESC'])
+                ->limit(15)
+        );
+
+        $lastComments = [];
+        foreach ($rows as $row) {
+            $lastComments[] = [
+                'url'     => $this->comments->getUrl($row),
+                'message' => StringUtils::getTextPreview($row->message, [
+                    'maxlines'  => 1,
+                    'maxlength' => CommentsService::PREVIEW_LENGTH
+                ])
+            ];
+        }
+
+        return $lastComments;
+    }
+
     public function userAction()
     {
         $users = new User();
@@ -107,19 +137,6 @@ class UsersController extends AbstractActionController
                 'name' => $names[$lastPictureRow->id]
             ];
         }
-
-        /**
-         * @todo Use CommentsService
-         */
-        $commentsTable = new Comments\Model\DbTable\Message();
-        $lastComments = $commentsTable->fetchAll(
-            $commentsTable->select()
-                ->where('author_id = ?', $user->id)
-                ->where('type_id <> ?', CommentMessage::FORUMS_TYPE_ID)
-                ->where('not deleted')
-                ->order(['datetime DESC'])
-                ->limit(15)
-        );
 
         $userRenames = new UserRename();
         $renames = $userRenames->fetchAll(
@@ -171,8 +188,8 @@ class UsersController extends AbstractActionController
             'canBeInContacts' => $canBeInContacts,
             'contactApiUrl'   => sprintf('/api/contacts/%d', $user->id),
             'picturesExists'  => $picturesExists,
-            'last_pictures'   => $lastPictures,
-            'last_comments'   => $lastComments,
+            'lastPictures'    => $lastPictures,
+            'lastComments'    => $this->getLastComments($user),
             'renames'         => $renames
         ];
     }
@@ -481,8 +498,11 @@ class UsersController extends AbstractActionController
         $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $comments[] = [
-                'url'     => $commentRow->getUrl(),
-                'message' => $commentRow->getMessagePreview(),
+                'url'     => $this->comments->getUrl($commentRow),
+                'message' => StringUtils::getTextPreview($commentRow->message, [
+                    'maxlines'  => 1,
+                    'maxlength' => Comments\CommentsService::PREVIEW_LENGTH
+                ]),
                 'vote'    => $commentRow->vote
             ];
         }

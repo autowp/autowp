@@ -2,6 +2,12 @@
 
 namespace Autowp\Comments;
 
+/**
+ * @todo remove dependency from application
+ */
+use Application\Model\DbTable\Article;
+use Application\Model\DbTable\Picture;
+
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
@@ -10,6 +16,8 @@ use Zend_Db_Expr;
 
 class CommentsService
 {
+    const PREVIEW_LENGTH = 60;
+
     /**
      * @var Model\DbTable\Message
      */
@@ -307,12 +315,25 @@ class CommentsService
         $voteRow->vote = $vote;
         $voteRow->save();
 
-        $message->updateVote();
+        $this->updateVote($message);
 
         return [
             'success' => true,
             'vote'    => $message->vote
         ];
+    }
+
+    private function updateVote($message)
+    {
+        $voteTable = $this->getVoteTable();
+        $db = $voteTable->getAdapter();
+
+        $message->vote = $db->fetchOne(
+            $db->select()
+                ->from($voteTable->info('name'), new Zend_Db_Expr('sum(vote)'))
+                ->where('comment_id = ?', $message->id)
+        );
+        $message->save();
     }
 
     /**
@@ -574,5 +595,58 @@ class CommentsService
         $commentTopicTable->updateTopicStat($newTypeId, $newItemId);
 
         return true;
+    }
+
+    public function isNewMessage($messageRow, $userId)
+    {
+        $db = $this->getMessageTable()->getAdapter();
+
+        $viewTime = $db->fetchRow(
+            $db->select()
+                ->from('comment_topic_view', 'timestamp')
+                ->where('comment_topic_view.item_id = ?', $messageRow->item_id)
+                ->where('comment_topic_view.type_id = ?', $messageRow->type_id)
+                ->where('comment_topic_view.user_id = ?', $userId)
+        );
+
+        return $viewTime ? $messageRow->datetime > $viewTime : true;
+    }
+
+    /**
+     * @deprecated
+     * @return string
+     */
+    public function getUrl($message)
+    {
+        switch ($message->type_id) {
+            case Model\DbTable\Message::PICTURES_TYPE_ID:
+                $pictures = new Picture();
+                $picture = $pictures->find($message->item_id)->current();
+                if ($picture) {
+                    return '/picture/'.$picture->identity;
+                }
+                return null;
+
+            case Model\DbTable\Message::VOTINGS_TYPE_ID:
+                return '/voting/voting/id/'.(int)$message->item_id.'/';
+
+            case Model\DbTable\Message::TWINS_TYPE_ID:
+                return '/twins/group'.(int)$message->item_id;
+
+            case Model\DbTable\Message::ARTICLES_TYPE_ID:
+                $articles = new Article();
+                $article = $articles->find($message->item_id)->current();
+                if ($article) {
+                    return '/articles/'.$article->catname.'/';
+                }
+                return null;
+
+            case Model\DbTable\Message::FORUMS_TYPE_ID:
+                return '/forums/topic-message/message_id/'.(int)$message->id;
+
+            case Model\DbTable\Message::MUSEUMS_TYPE_ID:
+                return '/museums/museum/id/'.(int)$message->item_id;
+        }
+        return null;
     }
 }

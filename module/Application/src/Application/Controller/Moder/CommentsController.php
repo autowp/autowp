@@ -10,6 +10,8 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable;
+use Application\StringUtils;
+use Autowp\Comments\CommentsService;
 
 class CommentsController extends AbstractActionController
 {
@@ -18,9 +20,15 @@ class CommentsController extends AbstractActionController
      */
     private $form;
 
-    public function __construct(Form $form)
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
+    public function __construct(Form $form, Comments\CommentsService $comments)
     {
         $this->form = $form;
+        $this->comments = $comments;
     }
 
     public function indexAction()
@@ -30,24 +38,6 @@ class CommentsController extends AbstractActionController
         }
 
         $itemTable = new DbTable\Item();
-
-        $brandRows = $itemTable->fetchAll(
-            $itemTable->select(true)
-                ->where('item_type_id = ?', DbTable\Item\Type::BRAND)
-                /*->join('brand_item', 'brands.id = brand_item.brand_id', null)
-                ->join('item_parent_cache', 'brand_item.item_id = item_parent_cache.parent_id', null)
-                ->join('pictures', 'pictures.item_id = item_parent_cache.item_id', null)
-                ->join('comments_messages', 'comments_messages.item_id = pictures.id', null)
-                ->where('comments_messages.type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
-                ->group('brands.id')*/
-                ->order(['item.position', 'item.name'])
-        );
-        $brandOptions = [
-            '' => '--'
-        ];
-        foreach ($brandRows as $brandRow) {
-            $brandOptions[$brandRow->id] = $brandRow->name;
-        }
 
         if ($this->getRequest()->isPost()) {
             $params = $this->params()->fromPost();
@@ -150,11 +140,14 @@ class CommentsController extends AbstractActionController
             }
 
             $comments[] = [
-                'url'     => $commentRow->getUrl(),
-                'message' => $commentRow->getMessagePreview(),
+                'url'     => $this->comments->getUrl($commentRow),
+                'message' => StringUtils::getTextPreview($commentRow->message, [
+                    'maxlines'  => 1,
+                    'maxlength' => CommentsService::PREVIEW_LENGTH
+                ]),
                 'user'    => $commentRow->findParentRow(User::class),
                 'status'  => $status,
-                'new'     => $commentRow->isNew($this->user()->get()->id)
+                'new'     => $this->comments->isNewMessage($commentRow, $this->user()->get()->id)
             ];
         }
 
