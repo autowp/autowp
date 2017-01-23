@@ -24,7 +24,7 @@ class CommentsService
     private $messageTable;
 
     /**
-     * @var Model\DbTable\Vote
+     * @var Table
      */
     private $voteTable;
 
@@ -39,13 +39,29 @@ class CommentsService
     }
 
     /**
-     * @return Model\DbTable\Vote
+     * @return Table
      */
     private function getVoteTable()
     {
-        return $this->voteTable
-            ? $this->voteTable
-            : $this->voteTable = new Model\DbTable\Vote();
+        if (! $this->voteTable) {
+            $this->voteTable = new Table([
+                'name'         => 'comment_vote',
+                'primary'      => ['user_id', 'comment_id'],
+                'referenceMap' => [
+                    'User' => [
+                        'columns'       => ['user_id'],
+                        'refTableClass' => \Autowp\User\Model\DbTable\User::class,
+                        'refColumns'    => ['id']
+                    ],
+                    'Comment' => [
+                        'columns'       => ['comment_id'],
+                        'refTableClass' => Model\DbTable\Message::class,
+                        'refColumns'    => ['id']
+                    ],
+                ]
+            ]);
+        }
+        return $this->voteTable;
     }
 
     /**
