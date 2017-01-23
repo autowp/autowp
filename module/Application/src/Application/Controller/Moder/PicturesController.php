@@ -1829,9 +1829,8 @@ class PicturesController extends AbstractActionController
             Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
             $picture->id
         );
-        $ctTable = new Comments\Model\DbTable\Topic();
-        $ctTable->updateTopicStat(Comments\Model\DbTable\Message::PICTURES_TYPE_ID, $replacePicture->id);
-        $ctTable->updateTopicStat(Comments\Model\DbTable\Message::PICTURES_TYPE_ID, $picture->id);
+        $this->comments->updateTopicStat(Comments\Model\DbTable\Message::PICTURES_TYPE_ID, $replacePicture->id);
+        $this->comments->updateTopicStat(Comments\Model\DbTable\Message::PICTURES_TYPE_ID, $picture->id);
 
         // pms
         $owner = $picture->findParentRow(User::class, 'Owner');

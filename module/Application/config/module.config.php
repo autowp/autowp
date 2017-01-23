@@ -107,15 +107,16 @@ return [
             MainMenu::class                      => Service\MainMenuFactory::class,
             Model\BrandNav::class                => Model\Service\BrandNavFactory::class,
             Model\BrandVehicle::class            => Model\Service\BrandVehicleFactory::class,
+            Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
+            Model\Forums::class                  => Model\Service\ForumsFactory::class,
+            Model\PictureItem::class             => InvokableFactory::class,
             PictureNameFormatter::class          => Service\PictureNameFormatterFactory::class,
             Service\SpecificationsService::class => Service\SpecificationsServiceFactory::class,
             Service\TelegramService::class       => Service\TelegramServiceFactory::class,
             Service\UsersService::class          => Service\UsersServiceFactory::class,
             ItemNameFormatter::class             => Service\ItemNameFormatterFactory::class,
-            'translator'                         => \Zend\Mvc\I18n\TranslatorFactory::class,
-            Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
-            Model\PictureItem::class             => InvokableFactory::class,
+            'translator'                         => \Zend\Mvc\I18n\TranslatorFactory::class
         ],
         'aliases' => [
             'ZF\OAuth2\Provider\UserId' => Provider\UserId\OAuth2UserIdProvider::class

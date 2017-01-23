@@ -61,6 +61,11 @@ class Pic extends AbstractPlugin
      */
     private $pictureTable;
 
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -68,9 +73,9 @@ class Pic extends AbstractPlugin
         ItemNameFormatter $itemNameFormatter,
         SpecificationsService $specsService,
         PictureItem $pictureItem,
-        $httpRouter
+        $httpRouter,
+        Comments\CommentsService $comments
     ) {
-
         $this->textStorage = $textStorage;
         $this->translator = $translator;
         $this->pictureNameFormatter = $pictureNameFormatter;
@@ -78,6 +83,7 @@ class Pic extends AbstractPlugin
         $this->specsService = $specsService;
         $this->pictureItem = $pictureItem;
         $this->httpRouter = $httpRouter;
+        $this->comments = $comments;
 
         $this->pictureTable = new DbTable\Picture();
     }
@@ -256,13 +262,9 @@ class Pic extends AbstractPlugin
             // messages
             $messages = [];
             if (! $options['disableBehaviour'] && count($ids)) {
-                $ctTable = new Comments\Model\DbTable\Topic();
-                $db = $ctTable->getAdapter();
-                $messages = $db->fetchPairs(
-                    $ctTable->select()
-                        ->from($ctTable->info('name'), ['item_id', 'messages'])
-                        ->where('item_id in (?)', $ids)
-                        ->where('type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
+                $messages = $this->comments->getMessagesCounts(
+                    Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+                    $ids
                 );
             }
 
@@ -357,8 +359,7 @@ class Pic extends AbstractPlugin
         // comments
         if (! $options['disableBehaviour']) {
             if ($userId) {
-                $ctTable = new Comments\Model\DbTable\Topic();
-                $newMessages = $ctTable->getNewMessages(
+                $newMessages = $this->comments->getNewMessages(
                     Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
                     $ids,
                     $userId
@@ -1245,8 +1246,7 @@ class Pic extends AbstractPlugin
         }
 
         if ($userId) {
-            $ctTable = new Comments\Model\DbTable\Topic();
-            $newMessages = $ctTable->getNewMessages(
+            $newMessages = $this->comments->getNewMessages(
                 Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
                 $ids,
                 $userId

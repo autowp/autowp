@@ -14,7 +14,8 @@ class TwinsControllerFactory implements FactoryInterface
         return new Controller(
             $container->get(\Autowp\TextStorage\Service::class),
             $container->get('longCache'),
-            $container->get(\Application\Service\SpecificationsService::class)
+            $container->get(\Application\Service\SpecificationsService::class),
+            $container->get(\Autowp\Comments\CommentsService::class)
         );
     }
 }
