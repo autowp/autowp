@@ -172,7 +172,7 @@ class FactoriesController extends AbstractActionController
             'item_type_id = ?' => DbTable\Item\Type::FACTORY
         ]);
         if (! $factory) {
-            return $this->notFounAction();
+            return $this->notFoundAction();
         }
 
         $paginator = null;
