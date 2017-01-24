@@ -62,7 +62,8 @@ class CommentsController extends AbstractRestfulController
 
     private function needWait()
     {
-        if ($nextMessageTime = $this->nextMessageTime()) {
+        $nextMessageTime = $this->nextMessageTime();
+        if ($nextMessageTime) {
             return $nextMessageTime > new DateTime();
         }
 
@@ -236,6 +237,7 @@ class CommentsController extends AbstractRestfulController
             if (! $messageId) {
                 throw new Exception("Message add fails");
             }
+            $db = $user->getTable()->getAdapter();
 
             $user->last_message_time = new Zend_Db_Expr('NOW()');
             $user->save();
