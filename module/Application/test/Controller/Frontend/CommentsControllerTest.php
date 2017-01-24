@@ -2,14 +2,13 @@
 
 namespace ApplicationTest\Controller\Frontend;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Json\Json;
 use Zend\Http\Header\Cookie;
 use Zend\Http\Request;
 
 use Application\Controller\CommentsController;
 use Application\Test\AbstractHttpControllerTestCase;
-use Zend\Db\Sql\Sql;
-use Zend\Db\Adapter\Adapter;
-use Zend\Json\Json;
 
 class CommentsControllerTest extends AbstractHttpControllerTestCase
 {
@@ -109,6 +108,59 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerName(CommentsController::class);
         $this->assertMatchedRouteName('comments/vote');
         $this->assertActionName('vote');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertTrue($json['ok']);
+    }
+
+    public function testCreateCommentAndDeleteAndRestore()
+    {
+        // create comment
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/comments/add/type_id/1/item_id/1', Request::METHOD_POST, [
+            'moderator_attention' => 0,
+            'parent_id'           => null,
+            'message'             => 'Test comment'
+        ]);
+
+        $this->assertResponseStatusCode(302);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CommentsController::class);
+        $this->assertMatchedRouteName('comments/add');
+        $this->assertActionName('add');
+
+        $comment = $this->fetchLastComment();
+
+        // delete
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/comments/delete', Request::METHOD_POST, [
+            'comment_id' => $comment['id']
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CommentsController::class);
+        $this->assertMatchedRouteName('comments/delete');
+        $this->assertActionName('delete');
+
+        $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
+
+        $this->assertTrue($json['ok']);
+
+        // restore
+        $this->reset();
+        $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
+        $this->dispatch('https://www.autowp.ru/comments/restore', Request::METHOD_POST, [
+            'comment_id' => $comment['id']
+        ]);
+
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('application');
+        $this->assertControllerName(CommentsController::class);
+        $this->assertMatchedRouteName('comments/restore');
+        $this->assertActionName('restore');
 
         $json = Json::decode($this->getResponse()->getContent(), Json::TYPE_ARRAY);
 
