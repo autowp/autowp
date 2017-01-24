@@ -44,13 +44,19 @@ class CatalogueController extends AbstractActionController
      */
     private $itemNameFormatter;
 
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
     public function __construct(
         $textStorage,
         $cache,
         SpecificationsService $specsService,
         BrandVehicle $brandVehicle,
         ItemNameFormatter $itemNameFormatter,
-        $mostsMinCarsCount
+        $mostsMinCarsCount,
+        Comments\CommentsService $comments
     ) {
 
         $this->textStorage = $textStorage;
@@ -59,6 +65,7 @@ class CatalogueController extends AbstractActionController
         $this->brandVehicle = $brandVehicle;
         $this->itemNameFormatter = $itemNameFormatter;
         $this->mostsMinCarsCount = $mostsMinCarsCount;
+        $this->comments = $comments;
     }
 
     private function doBrandAction(callable $callback)
@@ -554,7 +561,7 @@ class CatalogueController extends AbstractActionController
             $requireAttention = 0;
             $isModerator = $this->user()->inheritsRole('moder');
             if ($isModerator) {
-                $requireAttention = $this->getBrandModerAttentionCount($brand['id']);
+                $requireAttention = $this->getItemModerAttentionCount($brand['id']);
             }
 
             return [
@@ -1097,7 +1104,7 @@ class CatalogueController extends AbstractActionController
             $requireAttention = 0;
             $isModerator = $this->user()->inheritsRole('moder');
             if ($isModerator) {
-                $requireAttention = $this->getCarModerAttentionCount($currentCarId);
+                $requireAttention = $this->getItemModerAttentionCount($currentCarId);
             }
 
             $counts = $this->childsTypeCount($currentCarId);
@@ -1469,7 +1476,7 @@ class CatalogueController extends AbstractActionController
         $requireAttention = 0;
         $isModerator = $this->user()->inheritsRole('moder');
         if ($isModerator) {
-            $requireAttention = $this->getCarModerAttentionCount($currentCarId);
+            $requireAttention = $this->getItemModerAttentionCount($currentCarId);
         }
 
         $texts = $this->getItemTexts($currentCar['id']);
@@ -1623,7 +1630,7 @@ class CatalogueController extends AbstractActionController
         $requireAttention = 0;
         $isModerator = $this->user()->inheritsRole('moder');
         if ($isModerator) {
-            $requireAttention = $this->getCarModerAttentionCount($currentCarId);
+            $requireAttention = $this->getItemModerAttentionCount($currentCarId);
         }
 
         $ids = [];
@@ -1714,42 +1721,19 @@ class CatalogueController extends AbstractActionController
         ];
     }
 
-    private function getBrandModerAttentionCount($brandId)
+    private function getItemModerAttentionCount($carId)
     {
-        $commentTable = new Comments\Model\DbTable\Message();
-
-        $select = $commentTable->select(true)
-            ->where('comments_messages.moderator_attention = ?', Comments\Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED)
-            ->where('comments_messages.type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
-            ->join('pictures', 'comments_messages.item_id = pictures.id', null)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->where('item_parent_cache.parent_id = ?', $brandId);
-
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
-        );
-
-        return $paginator->getTotalItemCount();
-    }
-
-    private function getCarModerAttentionCount($carId)
-    {
-        $commentTable = new Comments\Model\DbTable\Message();
-
-        $select = $commentTable->select(true)
-            ->where('comments_messages.moderator_attention = ?', Comments\Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED)
-            ->where('comments_messages.type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
-            ->join('pictures', 'comments_messages.item_id = pictures.id', null)
-            ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-            ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-            ->where('item_parent_cache.parent_id = ?', $carId);
-
-        $paginator = new Paginator(
-            new Zend1DbTableSelect($select)
-        );
-
-        return $paginator->getTotalItemCount();
+        return $this->comments->getTotalMessagesCount([
+            'attention' => Comments\Attention::REQUIRED,
+            'type'      => Comments\CommentsService::PICTURES_TYPE_ID,
+            'callback'  => function(\Zend_Db_Select $select) {
+                $select
+                    ->join('pictures', 'comments_messages.item_id = pictures.id', null)
+                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                    ->where('item_parent_cache.parent_id = ?', $carId);
+            }
+        ]);
     }
 
     private function getCarInboxCount($carId)

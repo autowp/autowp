@@ -12,6 +12,7 @@ use Autowp\User\Model\DbTable\User;
 use Application\Model\DbTable;
 use Application\StringUtils;
 use Autowp\Comments\CommentsService;
+use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 
 class CommentsController extends AbstractActionController
 {
@@ -38,6 +39,7 @@ class CommentsController extends AbstractActionController
         }
 
         $itemTable = new DbTable\Item();
+        $userTable = new \Autowp\User\Model\DbTable\User();
 
         if ($this->getRequest()->isPost()) {
             $params = $this->params()->fromPost();
@@ -50,10 +52,9 @@ class CommentsController extends AbstractActionController
             return $this->redirect()->toUrl($this->url()->fromRoute('moder/comments/params', $params));
         }
 
-        $commentTable = new Comments\Model\DbTable\Message();
-
-        $select = $commentTable->select(true)
-            ->order(['comments_messages.datetime DESC']);
+        $options = [
+            'order' => 'comments_messages.datetime DESC'
+        ];
 
         $this->form->setData($this->params()->fromRoute());
 
@@ -71,31 +72,29 @@ class CommentsController extends AbstractActionController
                     }
                 }
 
-                $select->where('comments_messages.author_id = ?', $values['user']);
+                $options['user'] = $values['user'];
             }
 
             if (strlen($values['moderator_attention'])) {
-                switch ($values['moderator_attention']) {
-                    case Comments\Model\DbTable\Message::MODERATOR_ATTENTION_NONE:
-                    case Comments\Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED:
-                    case Comments\Model\DbTable\Message::MODERATOR_ATTENTION_COMPLETED:
-                        $select->where('comments_messages.moderator_attention = ?', $values['moderator_attention']);
-                        break;
-                }
+                $options['attention'] = $values['moderator_attention'];
             }
 
             if ($values['item_id']) {
-                $select
-                    ->where('comments_messages.type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
-                    ->join('pictures', 'comments_messages.item_id = pictures.id', null)
-                    ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
-                    ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
-                    ->where('item_parent_cache.parent_id = ?', $values['item_id']);
+                $options['type'] = Comments\CommentsService::PICTURES_TYPE_ID;
+                $options['callback'] = function(\Zend_Db_Select $select) use ($values) {
+                    $select
+                        ->join('pictures', 'comments_messages.item_id = pictures.id', null)
+                        ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
+                        ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
+                        ->where('item_parent_cache.parent_id = ?', $values['item_id']);
+                };
             }
         }
 
+        $select = $this->comments->getMessagesSelect($options);
+
         $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
+            new Zend1DbSelect($select)
         );
 
         $paginator
@@ -105,9 +104,9 @@ class CommentsController extends AbstractActionController
         $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $status = '';
-            if ($commentRow->type_id == Comments\Model\DbTable\Message::PICTURES_TYPE_ID) {
+            if ($commentRow['type_id'] == Comments\CommentsService::PICTURES_TYPE_ID) {
                 $pictures = $this->catalogue()->getPictureTable();
-                $picture = $pictures->find($commentRow->item_id)->current();
+                $picture = $pictures->find($commentRow['item_id'])->current();
                 if ($picture) {
                     switch ($picture->status) {
                         case DbTable\Picture::STATUS_ACCEPTED:
@@ -141,11 +140,11 @@ class CommentsController extends AbstractActionController
 
             $comments[] = [
                 'url'     => $this->comments->getUrl($commentRow),
-                'message' => StringUtils::getTextPreview($commentRow->message, [
+                'message' => StringUtils::getTextPreview($commentRow['message'], [
                     'maxlines'  => 1,
                     'maxlength' => CommentsService::PREVIEW_LENGTH
                 ]),
-                'user'    => $commentRow->findParentRow(User::class),
+                'user'    => $userTable->find($commentRow['author_id'])->current(),
                 'status'  => $status,
                 'new'     => $this->comments->isNewMessage($commentRow, $this->user()->get()->id)
             ];

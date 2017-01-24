@@ -5,6 +5,8 @@ namespace Application\Controller\Console;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\Comments;
+
 use Application\ExifGPSExtractor;
 use Application\Model\DbTable\Picture;
 
@@ -17,6 +19,16 @@ use Point;
 
 class PicturesController extends AbstractActionController
 {
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
+    public function __construct(Comments\CommentsService $comments)
+    {
+        $this->comments = $comments;
+    }
+
     public function clearQueueAction()
     {
         $console = Console::getInstance();
@@ -47,6 +59,12 @@ class PicturesController extends AbstractActionController
             $progressBar = new Zend_ProgressBar($adapter, 0, count($pictures));
 
             foreach ($pictures as $idx => $picture) {
+
+                $this->comments->deleteItemComments(
+                    Comments\CommentsService::PICTURES_TYPE_ID,
+                    $picture->id
+                );
+
                 $imageId = $picture->image_id;
                 if ($imageId) {
                     $picture->delete();

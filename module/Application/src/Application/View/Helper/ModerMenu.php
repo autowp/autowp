@@ -10,6 +10,16 @@ use Application\Model\DbTable\Picture;
 
 class ModerMenu extends AbstractHtmlElement
 {
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
+    public function __construct(Comments\CommentsService $comments)
+    {
+        $this->comments = $comments;
+    }
+
     public function __invoke()
     {
         $items = [];
@@ -29,17 +39,14 @@ class ModerMenu extends AbstractHtmlElement
                 'icon'  => 'fa fa-th'
             ];
 
-            $cmTable = new Comments\Model\DbTable\Message();
-            $attentionCount = $cmTable->getAdapter()->fetchOne(
-                $cmTable->getAdapter()->select()
-                    ->from($cmTable->info('name'), 'count(1)')
-                    ->where('moderator_attention = ?', Comments\Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED)
-            );
+            $attentionCount = $this->comments->getTotalMessagesCount([
+                'attention' => Comments\Attention::REQUIRED
+            ]);
 
             $items[] = [
                 'href'  => $this->view->url('moder/comments/params', [
                     'action'              => 'index',
-                    'moderator_attention' => Comments\Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED
+                    'moderator_attention' => Comments\Attention::REQUIRED
                 ]),
                 'label' => $this->view->page(110)->name,
                 'count' => $attentionCount,

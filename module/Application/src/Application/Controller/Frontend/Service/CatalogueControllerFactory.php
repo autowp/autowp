@@ -18,7 +18,8 @@ class CatalogueControllerFactory implements FactoryInterface
             $container->get(\Application\Service\SpecificationsService::class),
             $container->get(\Application\Model\BrandVehicle::class),
             $container->get(\Application\ItemNameFormatter::class),
-            $config['mosts_min_vehicles_count']
+            $config['mosts_min_vehicles_count'],
+            $container->get(\Autowp\Comments\CommentsService::class)
         );
     }
 }

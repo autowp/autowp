@@ -18,9 +18,15 @@ class AboutController extends AbstractActionController
      */
     private $acl;
 
-    public function __construct(Acl $acl)
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
+    public function __construct(Acl $acl, Comments\CommentsService $comments)
     {
         $this->acl = $acl;
+        $this->comments = $comments;
     }
 
     public function indexAction()
@@ -83,12 +89,7 @@ class AboutController extends AbstractActionController
         );
         $totalCars = round($totalCars, -3);
 
-        $commentMessageTable = new Comments\Model\DbTable\Message();
-        $commentMessageTableAdapter = $commentMessageTable->getAdapter();
-        $totalComments = $commentMessageTableAdapter->fetchOne(
-            $commentMessageTableAdapter->select()
-                ->from($commentMessageTable->info('name'), 'count(1)')
-        );
+        $totalComments = $this->comments->getTotalMessagesCount();
         $totalComments = round($totalComments, -3);
 
         return [

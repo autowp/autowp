@@ -96,14 +96,14 @@ class CommentsController extends AbstractRestfulController
     private function messageUrl($typeId, $object, $canonical, $uri = null)
     {
         switch ($typeId) {
-            case Comments\Model\DbTable\Message::PICTURES_TYPE_ID:
+            case Comments\CommentsService::PICTURES_TYPE_ID:
                 $url = $this->pic()->href($object, [
                     'canonical' => $canonical,
                     'uri'       => $uri
                 ]);
                 break;
 
-            case Comments\Model\DbTable\Message::TWINS_TYPE_ID:
+            case Comments\CommentsService::TWINS_TYPE_ID:
                 $url = $this->url()->fromRoute('twins/group', [
                     'id' => $object->id
                 ], [
@@ -112,7 +112,7 @@ class CommentsController extends AbstractRestfulController
                 ]);
                 break;
 
-            case Comments\Model\DbTable\Message::VOTINGS_TYPE_ID:
+            case Comments\CommentsService::VOTINGS_TYPE_ID:
                 $url = $this->url()->fromRoute('votings/voting', [
                     'id' => $object->id
                 ], [
@@ -121,7 +121,7 @@ class CommentsController extends AbstractRestfulController
                 ]);
                 break;
 
-            case Comments\Model\DbTable\Message::ARTICLES_TYPE_ID:
+            case Comments\CommentsService::ARTICLES_TYPE_ID:
                 $url = $this->url()->fromRoute('articles', [
                     'action'          => 'article',
                     'article_catname' => $object->catname
@@ -131,7 +131,7 @@ class CommentsController extends AbstractRestfulController
                 ]);
                 break;
 
-            case Comments\Model\DbTable\Message::MUSEUMS_TYPE_ID:
+            case Comments\CommentsService::MUSEUMS_TYPE_ID:
                 $url = $this->url()->fromRoute('museums/museum', [
                     'id' => $object->id
                 ], [
@@ -178,27 +178,27 @@ class CommentsController extends AbstractRestfulController
 
             $object = null;
             switch ($typeId) {
-                case Comments\Model\DbTable\Message::PICTURES_TYPE_ID:
+                case Comments\CommentsService::PICTURES_TYPE_ID:
                     $pictures = $this->catalogue()->getPictureTable();
                     $object = $pictures->find($itemId)->current();
                     break;
 
-                case Comments\Model\DbTable\Message::TWINS_TYPE_ID:
+                case Comments\CommentsService::TWINS_TYPE_ID:
                     $twinsGroups = new DbTable\Item();
                     $object = $twinsGroups->find($itemId)->current();
                     break;
 
-                case Comments\Model\DbTable\Message::VOTINGS_TYPE_ID:
+                case Comments\CommentsService::VOTINGS_TYPE_ID:
                     $vTable = new DbTable\Voting();
                     $object = $vTable->find($itemId)->current();
                     break;
 
-                case Comments\Model\DbTable\Message::ARTICLES_TYPE_ID:
+                case Comments\CommentsService::ARTICLES_TYPE_ID:
                     $articles = new DbTable\Article();
                     $object = $articles->find($itemId)->current();
                     break;
 
-                case Comments\Model\DbTable\Message::MUSEUMS_TYPE_ID:
+                case Comments\CommentsService::MUSEUMS_TYPE_ID:
                     $museums = new DbTable\Item();
                     $object = $museums->find($itemId)->current();
                     break;

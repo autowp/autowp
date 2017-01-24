@@ -23,6 +23,8 @@ use Zend_Db_Expr;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use Zend\Paginator\Paginator;
+use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 
 class UsersController extends AbstractActionController
 {
@@ -70,26 +72,25 @@ class UsersController extends AbstractActionController
 
     private function getLastComments($user)
     {
-        /**
-         * @todo Use CommentsService
-         */
-        $commentsTable = new Comments\Model\DbTable\Message();
-        $rows = $commentsTable->fetchAll(
-            $commentsTable->select()
-                ->where('author_id = ?', $user->id)
-                ->where('type_id <> ?', CommentMessage::FORUMS_TYPE_ID)
-                ->where('not deleted')
-                ->order(['datetime DESC'])
-                ->limit(15)
+        $select = $this->comments->getMessagesSelect([
+            'user'            => $user->id,
+            'exclude_type'    => Comments\CommentsService::FORUMS_TYPE_ID,
+            'exclude_deleted' => true,
+            'order'           => 'datetime DESC'
+        ]);
+
+        $paginator = new Paginator(
+            new Zend1DbSelect($select)
         );
+        $paginator->setItemCountPerPage(15);
 
         $lastComments = [];
-        foreach ($rows as $row) {
+        foreach ($paginator->getCurrentItems() as $row) {
             $lastComments[] = [
                 'url'     => $this->comments->getUrl($row),
-                'message' => StringUtils::getTextPreview($row->message, [
+                'message' => StringUtils::getTextPreview($row['message'], [
                     'maxlines'  => 1,
-                    'maxlength' => CommentsService::PREVIEW_LENGTH
+                    'maxlength' => Comments\CommentsService::PREVIEW_LENGTH
                 ])
             ];
         }

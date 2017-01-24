@@ -263,7 +263,7 @@ class Pic extends AbstractPlugin
             $messages = [];
             if (! $options['disableBehaviour'] && count($ids)) {
                 $messages = $this->comments->getMessagesCounts(
-                    Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+                    Comments\CommentsService::PICTURES_TYPE_ID,
                     $ids
                 );
             }
@@ -328,7 +328,7 @@ class Pic extends AbstractPlugin
                         'messages'
                     );
 
-                $bind['type_id'] = Comments\Model\DbTable\Message::PICTURES_TYPE_ID;
+                $bind['type_id'] = Comments\CommentsService::PICTURES_TYPE_ID;
             }
 
             $rows = $db->fetchAll($select, $bind);
@@ -360,7 +360,7 @@ class Pic extends AbstractPlugin
         if (! $options['disableBehaviour']) {
             if ($userId) {
                 $newMessages = $this->comments->getNewMessages(
-                    Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+                    Comments\CommentsService::PICTURES_TYPE_ID,
                     $ids,
                     $userId
                 );
@@ -1190,7 +1190,7 @@ class Pic extends AbstractPlugin
                 'messages'
             )
             ->bind([
-                'type_id' => Comments\Model\DbTable\Message::PICTURES_TYPE_ID
+                'type_id' => Comments\CommentsService::PICTURES_TYPE_ID
             ]);
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -1247,7 +1247,7 @@ class Pic extends AbstractPlugin
 
         if ($userId) {
             $newMessages = $this->comments->getNewMessages(
-                Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+                Comments\CommentsService::PICTURES_TYPE_ID,
                 $ids,
                 $userId
             );

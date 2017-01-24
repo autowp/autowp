@@ -14,10 +14,20 @@ use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
 use Zend_Db_Expr;
+use Zend\Paginator\Paginator;
+use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 
 class CommentsService
 {
     const PREVIEW_LENGTH = 60;
+
+    //TODO: extract constants to application
+    const PICTURES_TYPE_ID = 1;
+    const TWINS_TYPE_ID = 2;
+    const VOTINGS_TYPE_ID = 3;
+    const ARTICLES_TYPE_ID = 4;
+    const FORUMS_TYPE_ID = 5;
+    const MUSEUMS_TYPE_ID = 6;
 
     /**
      * @var Model\DbTable\Message
@@ -39,9 +49,26 @@ class CommentsService
      */
     private function getMessageTable()
     {
-        return $this->messageTable
-            ? $this->messageTable
-            : $this->messageTable = new Model\DbTable\Message();
+        if (! $this->messageTable) {
+            $this->messageTable = new Table([
+                'name'         => 'comments_messages',
+                'primary'      => ['id'],
+                'referenceMap' => [
+                    'Author' => [
+                        'columns'       => ['author_id'],
+                        'refTableClass' => \Autowp\User\Model\DbTable\User::class,
+                        'refColumns'    => ['id']
+                    ],
+                    'DeletedBy' => [
+                        'columns'       => ['deleted_by'],
+                        'refTableClass' => \Autowp\User\Model\DbTable\User::class,
+                        'refColumns'    => ['id']
+                    ]
+                ]
+            ]);
+        }
+
+        return $this->messageTable;
     }
 
     /**
@@ -58,12 +85,7 @@ class CommentsService
                         'columns'       => ['user_id'],
                         'refTableClass' => \Autowp\User\Model\DbTable\User::class,
                         'refColumns'    => ['id']
-                    ],
-                    'Comment' => [
-                        'columns'       => ['comment_id'],
-                        'refTableClass' => Model\DbTable\Message::class,
-                        'refColumns'    => ['id']
-                    ],
+                    ]
                 ]
             ]);
         }
@@ -117,8 +139,8 @@ class CommentsService
             'message'             => (string)$data['message'],
             'ip'                  => new Zend_Db_Expr($db->quoteInto('INET6_ATON(?)', $data['ip'])),
             'moderator_attention' => $data['moderatorAttention']
-                ? Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED
-                : Model\DbTable\Message::MODERATOR_ATTENTION_NONE
+                ? Attention::REQUIRED
+                : Attention::NONE
         ];
 
         $messageId = $messageTable->insert($data);
@@ -256,7 +278,7 @@ class CommentsService
     {
         $comment = $this->getMessageTable()->find($id)->current();
 
-        if ($comment->moderator_attention == Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED) {
+        if ($comment->moderator_attention == Attention::REQUIRED) {
             return false;
         }
 
@@ -290,11 +312,11 @@ class CommentsService
     {
         $comment = $this->getMessageTable()->fetchRow([
             'id = ?'                  => (int)$id,
-            'moderator_attention = ?' => Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED
+            'moderator_attention = ?' => Attention::REQUIRED
         ]);
 
         if ($comment) {
-            $comment->moderator_attention = Model\DbTable\Message::MODERATOR_ATTENTION_COMPLETED;
+            $comment->moderator_attention = Attention::COMPLETED;
             $comment->save();
         }
     }
@@ -415,6 +437,9 @@ class CommentsService
             'type_id = ?' => $srcTypeId,
             'item_id = ?' => $srcItemId
         ]);
+
+        $this->updateTopicStat($srcTypeId, $srcItemId);
+        $this->updateTopicStat($dstTypeId, $dstItemId);
     }
 
     /**
@@ -481,7 +506,7 @@ class CommentsService
         return (bool)$this->getMessageTable()->fetchRow([
             'item_id = ?'             => (int)$item,
             'type_id = ?'             => (int)$type,
-            'moderator_attention = ?' => Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED
+            'moderator_attention = ?' => Attention::REQUIRED
         ]);
     }
 
@@ -636,12 +661,12 @@ class CommentsService
         $viewTime = $db->fetchRow(
             $db->select()
                 ->from('comment_topic_view', 'timestamp')
-                ->where('comment_topic_view.item_id = ?', $messageRow->item_id)
-                ->where('comment_topic_view.type_id = ?', $messageRow->type_id)
+                ->where('comment_topic_view.item_id = ?', $messageRow['item_id'])
+                ->where('comment_topic_view.type_id = ?', $messageRow['type_id'])
                 ->where('comment_topic_view.user_id = ?', $userId)
         );
 
-        return $viewTime ? $messageRow->datetime > $viewTime : true;
+        return $viewTime ? $messageRow['datetime'] > $viewTime : true;
     }
 
     /**
@@ -650,34 +675,34 @@ class CommentsService
      */
     public function getUrl($message)
     {
-        switch ($message->type_id) {
-            case Model\DbTable\Message::PICTURES_TYPE_ID:
+        switch ($message['type_id']) {
+            case self::PICTURES_TYPE_ID:
                 $pictures = new Picture();
-                $picture = $pictures->find($message->item_id)->current();
+                $picture = $pictures->find($message['item_id'])->current();
                 if ($picture) {
                     return '/picture/'.$picture->identity;
                 }
                 return null;
 
-            case Model\DbTable\Message::VOTINGS_TYPE_ID:
-                return '/voting/voting/id/'.(int)$message->item_id.'/';
+            case self::VOTINGS_TYPE_ID:
+                return '/voting/voting/id/'.(int)$message['item_id'].'/';
 
-            case Model\DbTable\Message::TWINS_TYPE_ID:
-                return '/twins/group'.(int)$message->item_id;
+            case self::TWINS_TYPE_ID:
+                return '/twins/group'.(int)$message['item_id'];
 
-            case Model\DbTable\Message::ARTICLES_TYPE_ID:
+            case self::ARTICLES_TYPE_ID:
                 $articles = new Article();
-                $article = $articles->find($message->item_id)->current();
+                $article = $articles->find($message['item_id'])->current();
                 if ($article) {
                     return '/articles/'.$article->catname.'/';
                 }
                 return null;
 
-            case Model\DbTable\Message::FORUMS_TYPE_ID:
-                return '/forums/topic-message/message_id/'.(int)$message->id;
+            case self::FORUMS_TYPE_ID:
+                return '/forums/topic-message/message_id/'.(int)$message['id'];
 
-            case Model\DbTable\Message::MUSEUMS_TYPE_ID:
-                return '/museums/museum/id/'.(int)$message->item_id;
+            case self::MUSEUMS_TYPE_ID:
+                return '/museums/museum/id/'.(int)$message['item_id'];
         }
         return null;
     }
@@ -837,11 +862,9 @@ class CommentsService
      * @param int $typeId
      * @param int $itemId
      */
-    public function updateTopicStat($typeId, $itemId)
+    private function updateTopicStat($typeId, $itemId)
     {
-        $messageTable = $this->getMessageTable();
-
-        $messagesCount = $messageTable->getMessagesCount($typeId, $itemId);
+        $messagesCount = $this->countMessages($typeId, $itemId);
 
         $topic = $this->topicTable->fetchRow([
             'item_id = ?' => $itemId,
@@ -849,7 +872,7 @@ class CommentsService
         ]);
 
         if ($messagesCount > 0) {
-            $lastUpdate = $messageTable->getLastUpdate($typeId, $itemId);
+            $lastUpdate = $this->getLastUpdate($typeId, $itemId);
 
             if (! $topic) {
                 $topic = $this->topicTable->createRow([
@@ -947,14 +970,138 @@ class CommentsService
         }
     }
 
+    private function countMessages($typeId, $itemId)
+    {
+        $table = $this->getMessageTable();
+        $db = $table->getAdapter();
+        return $db->fetchOne(
+            $db->select()
+                ->from($table->info('name'), 'COUNT(1)')
+                ->where('item_id = ?', $itemId)
+                ->where('type_id = ?', $typeId)
+        );
+    }
+
     public function getMessagesCounts($typeId, array $itemIds)
     {
         $db = $this->topicTable->getAdapter();
         return $db->fetchPairs(
             $this->topicTable->select()
-                ->from($ctTable->info('name'), ['item_id', 'messages'])
+                ->from($this->topicTable->info('name'), ['item_id', 'messages'])
                 ->where('item_id in (?)', $itemIds)
                 ->where('type_id = ?', (int)$typeId)
+        );
+    }
+
+    private function getLastUpdate($typeId, $itemId)
+    {
+        $table = $this->getMessageTable();
+        $db = $table->getAdapter();
+        return $db->fetchOne(
+            $db->select()
+                ->from($table->info('name'), 'datetime')
+                ->where('item_id = ?', $itemId)
+                ->where('type_id = ?', $typeId)
+                ->order('datetime desc')
+                ->limit(1)
+        );
+    }
+
+    /**
+     * @param array $options
+     * @return \Zend_Db_Select
+     */
+    public function getMessagesSelect(array $options = [])
+    {
+        $defaults = [
+            'attention'       => null,
+            'type'            => null,
+            'user'            => null,
+            'exclude_type'    => null,
+            'exclude_deleted' => false,
+            'callback'        => null,
+            'order'           => null
+        ];
+        $options = array_replace($defaults, $options);
+
+        $table = $this->getMessageTable();
+        $db = $table->getAdapter();
+
+        $select = $db->select()
+            ->from($table->info('name'));
+
+        if (isset($options['attention'])) {
+            $select->where('comments_messages.moderator_attention = ?', $options['attention']);
+        }
+
+        if (isset($options['type'])) {
+            $select->where('comments_messages.type_id = ?', $options['type']);
+        }
+
+        if ($options['user']) {
+            $select->where('comments_messages.author_id = ?', (int)$options['user']);
+        }
+
+        if (isset($options['exclude_type'])) {
+            $select->where('comments_messages.type_id <> ?', $options['exclude_type']);
+        }
+
+        if ($options['exclude_deleted']) {
+            $select->where('not comments_messages.deleted');
+        }
+
+        if (isset($options['order'])) {
+            $select->order($options['order']);
+        }
+
+        if ($options['callback']) {
+            $callback($select);
+        }
+
+        return $select;
+    }
+
+    public function getTotalMessagesCount(array $options = [])
+    {
+        $select = $this->getMessagesSelect($options);
+
+        $paginator = new Paginator(
+            new Zend1DbSelect($select)
+        );
+
+        return $paginator->getTotalItemCount();
+    }
+
+    public function deleteItemComments($typeId, $itemId)
+    {
+        $this->getMessageTable()->delete([
+            'type_id = ?' => (int)$typeId,
+            'item_id = ?' => (int)$itemId
+        ]);
+
+        $this->topicTable->delete([
+            'type_id = ?' => (int)$typeId,
+            'item_id = ?' => (int)$itemId
+        ]);
+
+        $db = $this->topicTable->getAdapter();
+
+        $db->delete('comment_topic_view', [
+            'type_id = ?' => (int)$typeId,
+            'item_id = ?' => (int)$itemId
+        ]);
+    }
+
+    public function getUserAvgVote($userId)
+    {
+        $commentTable = $this->getMessageTable();
+        $db = $commentTable->getAdapter();
+
+        return $db->fetchOne(
+            $db->select()
+                ->from($commentTable->info('name'), new Zend_Db_Expr('avg(vote)'))
+                ->where('author_id = ?', (int)$userId)
+                ->where('vote <> 0')
         );
     }
 }

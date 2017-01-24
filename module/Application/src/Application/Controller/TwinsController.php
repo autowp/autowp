@@ -229,7 +229,7 @@ class TwinsController extends AbstractActionController
 
         //TODO: topic stat for authenticated user
         $commentsStats = $this->comments->getTopicStat(
-            Comments\Model\DbTable\Message::TWINS_TYPE_ID,
+            Comments\CommentsService::TWINS_TYPE_ID,
             $ids
         );
 

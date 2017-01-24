@@ -85,7 +85,7 @@ class Forums
                     ->where('forums_topics.status IN (?)', [self::STATUS_NORMAL, self::STATUS_CLOSED])
                     ->where('forums_theme_parent.parent_id = ?', $row->id)
                     ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', null)
-                    ->where('comment_topic.type_id = ?', Comments\Model\DbTable\Message::FORUMS_TYPE_ID)
+                    ->where('comment_topic.type_id = ?', Comments\CommentsService::FORUMS_TYPE_ID)
                     ->order('comment_topic.last_update DESC')
             );
             if ($lastTopicRow) {
@@ -94,7 +94,7 @@ class Forums
                     'name' => $lastTopicRow->name
                 ];
 
-                $lastMessageRow = $this->comments->getLastMessageRow(Comments\Model\DbTable\Message::FORUMS_TYPE_ID, $lastTopicRow->id);
+                $lastMessageRow = $this->comments->getLastMessageRow(Comments\CommentsService::FORUMS_TYPE_ID, $lastTopicRow->id);
                 if ($lastMessageRow) {
                     $lastMessage = [
                         'id'     => $lastMessageRow->id,
@@ -209,7 +209,7 @@ class Forums
             return false;
         }
 
-        $needAttention = $this->comments->topicHaveModeratorAttention(Comments\Model\DbTable\Message::FORUMS_TYPE_ID, $topic->id);
+        $needAttention = $this->comments->topicHaveModeratorAttention(Comments\CommentsService::FORUMS_TYPE_ID, $topic->id);
 
         if ($needAttention) {
             throw new \Exception("Cannot delete row when moderator attention not closed");
@@ -238,20 +238,16 @@ class Forums
                 ->where('forums_topics.status IN (?)', [self::STATUS_NORMAL, self::STATUS_CLOSED])
         );
 
-        $messages = new Comments\Model\DbTable\Message();
-
-        $db = $messages->getAdapter();
-
-        $theme->messages = $db->fetchOne(
-            $db->select()
-                ->from($messages->info('name'), new Zend_Db_Expr('COUNT(1)'))
-                ->join('forums_topics', 'comments_messages.item_id = forums_topics.id', null)
-                ->where('comments_messages.type_id = ?', Comments\Model\DbTable\Message::FORUMS_TYPE_ID)
-                ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', null)
-                ->where('forums_theme_parent.parent_id = ?', $theme->id)
-                ->where('forums_topics.status IN (?)', [self::STATUS_NORMAL, self::STATUS_CLOSED])
-        );
-
+        $theme->messages = $this->comments->getTotalMessagesCount([
+            'type'     => Comments\CommentsService::FORUMS_TYPE_ID,
+            'callback' => function(\Zend_Db_Select $select) use ($theme) {
+                $select
+                    ->join('forums_topics', 'comments_messages.item_id = forums_topics.id', null)
+                    ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', null)
+                    ->where('forums_theme_parent.parent_id = ?', $theme->id)
+                    ->where('forums_topics.status IN (?)', [self::STATUS_NORMAL, self::STATUS_CLOSED]);
+            }
+        ]);
         $theme->save();
     }
 
@@ -260,7 +256,7 @@ class Forums
         $select = $this->topicTable->select(true)
             ->where('forums_topics.status IN (?)', [self::STATUS_CLOSED, self::STATUS_NORMAL])
             ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', null)
-            ->where('comment_topic.type_id = ?', Comments\Model\DbTable\Message::FORUMS_TYPE_ID)
+            ->where('comment_topic.type_id = ?', Comments\CommentsService::FORUMS_TYPE_ID)
             ->order('comment_topic.last_update DESC');
 
         if ($themeId) {
@@ -280,7 +276,7 @@ class Forums
         $topics = [];
 
         foreach ($paginator->getCurrentItems() as $topicRow) {
-            $topicPaginator = $this->comments->getMessagePaginator(Comments\Model\DbTable\Message::FORUMS_TYPE_ID, $topicRow->id)
+            $topicPaginator = $this->comments->getMessagePaginator(Comments\CommentsService::FORUMS_TYPE_ID, $topicRow->id)
                 ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
                 ->setPageRange(10);
 
@@ -288,7 +284,7 @@ class Forums
 
             if ($userId) {
                 $stat = $this->comments->getTopicStatForUser(
-                    Comments\Model\DbTable\Message::FORUMS_TYPE_ID,
+                    Comments\CommentsService::FORUMS_TYPE_ID,
                     $topicRow->id,
                     $userId
                 );
@@ -296,7 +292,7 @@ class Forums
                 $newMessages = $stat['newMessages'];
             } else {
                 $stat = $this->comments->getTopicStat(
-                    Comments\Model\DbTable\Message::FORUMS_TYPE_ID,
+                    Comments\CommentsService::FORUMS_TYPE_ID,
                     $topicRow->id
                 );
                 $messages = $stat['messages'];
@@ -307,7 +303,7 @@ class Forums
 
             $lastMessage = false;
             if ($messages > 0) {
-                $lastMessageRow = $this->comments->getLastMessageRow(Comments\Model\DbTable\Message::FORUMS_TYPE_ID, $topicRow->id);
+                $lastMessageRow = $this->comments->getLastMessageRow(Comments\CommentsService::FORUMS_TYPE_ID, $topicRow->id);
                 if ($lastMessageRow) {
                     $lastMessage = [
                         'id'     => $lastMessageRow->id,
@@ -406,7 +402,7 @@ class Forums
         $topic->save();
 
         $this->comments->add([
-            'typeId'             => Comments\Model\DbTable\Message::FORUMS_TYPE_ID,
+            'typeId'             => Comments\CommentsService::FORUMS_TYPE_ID,
             'itemId'             => $topic->id,
             'authorId'           => $userId,
             'datetime'           => new Zend_Db_Expr('NOW()'),
@@ -467,7 +463,7 @@ class Forums
             )
             ->order('comment_topic.last_update DESC')
             ->bind([
-                'type_id' => Comments\Model\DbTable\Message::FORUMS_TYPE_ID
+                'type_id' => Comments\CommentsService::FORUMS_TYPE_ID
             ]);
 
         if ($themeId) {
@@ -494,7 +490,7 @@ class Forums
             return false;
         }
 
-        $this->comments->moveMessage($messageId, Comments\Model\DbTable\Message::FORUMS_TYPE_ID, $topic->id);
+        $this->comments->moveMessage($messageId, Comments\CommentsService::FORUMS_TYPE_ID, $topic->id);
 
         return true;
     }
@@ -565,7 +561,7 @@ class Forums
             return false;
         }
 
-        if ($message->type_id != Comments\Model\DbTable\Message::FORUMS_TYPE_ID) {
+        if ($message->type_id != Comments\CommentsService::FORUMS_TYPE_ID) {
             return false;
         }
 
@@ -592,7 +588,7 @@ class Forums
 
         if ($userId) {
             $this->comments->updateTopicView(
-                Comments\Model\DbTable\Message::FORUMS_TYPE_ID,
+                Comments\CommentsService::FORUMS_TYPE_ID,
                 $topicId,
                 $userId
             );
@@ -617,7 +613,7 @@ class Forums
         $this->registerTopicView($topic['id'], $userId);
 
         $messages = $this->comments->get(
-            Comments\Model\DbTable\Message::FORUMS_TYPE_ID,
+            Comments\CommentsService::FORUMS_TYPE_ID,
             $topic['id'],
             $userId,
             self::TOPICS_PER_PAGE,
@@ -625,7 +621,7 @@ class Forums
         );
 
         $paginator = $this->comments->getPaginator(
-            Comments\Model\DbTable\Message::FORUMS_TYPE_ID,
+            Comments\CommentsService::FORUMS_TYPE_ID,
             $topic['id'],
             self::TOPICS_PER_PAGE,
             $page
@@ -651,7 +647,7 @@ class Forums
     public function addMessage($values)
     {
         $messageId = $this->comments->add([
-            'typeId'             => Comments\Model\DbTable\Message::FORUMS_TYPE_ID,
+            'typeId'             => Comments\CommentsService::FORUMS_TYPE_ID,
             'itemId'             => $values['topic_id'],
             'parentId'           => $values['parent_id'] ? $values['parent_id'] : null,
             'authorId'           => $values['user_id'],
@@ -693,14 +689,14 @@ class Forums
                 )
                 ->where('forums_topics_subscribers.user_id = ?', (int)$userId)
                 ->join('comment_topic', 'forums_topics.id = comment_topic.item_id', null)
-                ->where('comment_topic.type_id = ?', Comments\Model\DbTable\Message::FORUMS_TYPE_ID)
+                ->where('comment_topic.type_id = ?', Comments\CommentsService::FORUMS_TYPE_ID)
                 ->order('comment_topic.last_update DESC')
         );
 
         $topics = [];
         foreach ($rows as $row) {
             $stat = $this->comments->getTopicStatForUser(
-                Comments\Model\DbTable\Message::FORUMS_TYPE_ID,
+                Comments\CommentsService::FORUMS_TYPE_ID,
                 $row->id,
                 $userId
             );
@@ -714,7 +710,7 @@ class Forums
             $lastMessage = false;
             if ($messages > 0) {
                 $lastMessageRow = $this->comments->getLastMessageRow(
-                    Comments\Model\DbTable\Message::FORUMS_TYPE_ID,
+                    Comments\CommentsService::FORUMS_TYPE_ID,
                     $row->id
                 );
                 if ($lastMessageRow) {

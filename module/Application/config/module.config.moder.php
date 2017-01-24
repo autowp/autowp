@@ -6,7 +6,7 @@ use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
-use Autowp\Comments\Model\DbTable\Message as CommentMessage;
+use Autowp\Comments;
 
 return [
     'router' => [
@@ -327,10 +327,10 @@ return [
                         'options' => [
                             'label'   => 'moder/comments/filter/moderator_attention',
                             'options' => [
-                                ''                                            => 'moder/comments/filter/moderator_attention/not-matters',
-                                CommentMessage::MODERATOR_ATTENTION_NONE      => 'moder/comments/filter/moderator_attention/not-required',
-                                CommentMessage::MODERATOR_ATTENTION_REQUIRED  => 'moder/comments/filter/moderator_attention/required',
-                                CommentMessage::MODERATOR_ATTENTION_COMPLETED => 'moder/comments/filter/moderator_attention/resolved',
+                                ''                            => 'moder/comments/filter/moderator_attention/not-matters',
+                                Comments\Attention::NONE      => 'moder/comments/filter/moderator_attention/not-required',
+                                Comments\Attention::REQUIRED  => 'moder/comments/filter/moderator_attention/required',
+                                Comments\Attention::COMPLETED => 'moder/comments/filter/moderator_attention/resolved',
                             ]
                         ]
                     ]
