@@ -2652,7 +2652,7 @@ CREATE TABLE `user_remember` (
 --
 
 /*!40000 ALTER TABLE `user_remember` DISABLE KEYS */;
-INSERT INTO `user_remember` (`user_id`, `token`, `date`) VALUES (3,'admin-token','2016-11-25 18:31:51');
+INSERT INTO `user_remember` (`user_id`, `token`, `date`) VALUES (3,'admin-token','2026-11-25 18:31:51'), (1,'token','2026-11-25 18:31:51');
 /*!40000 ALTER TABLE `user_remember` ENABLE KEYS */;
 
 --
@@ -2746,9 +2746,9 @@ CREATE TABLE `users` (
 
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 INSERT INTO `users` (`id`, `login`, `password`, `e_mail`, `name`, `reg_date`, `last_online`, `icq`, `url`, `own_car`, `dream_car`, `forums_topics`, `forums_messages`, `pictures_added`, `e_mail_checked`, `hide_e_mail`, `authority`, `pictures_ratio`, `email_to_check`, `email_check_code`, `role`, `avatar`, `photo`, `messaging_interval`, `last_message_time`, `deleted`, `identity`, `img`, `votes_per_day`, `votes_left`, `timezone`, `specs_volume`, `specs_volume_valid`, `specs_positives`, `specs_negatives`, `specs_weight`, `last_ip`, `language`) 
-VALUES (1,'test','26cc2d23a03a8f07ed1e3d000a244636','test@example.com','tester',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,NULL,NULL,1,0,'Europe/Moscow',0,0,NULL,NULL,0,0x7F000001,'ru'),
-(2,NULL,'',NULL,'tester2',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,'identity',NULL,1,0,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru'),
-(3,NULL,'',NULL,'admin',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'admin',NULL,NULL,0,NULL,0,'admin',NULL,1,0,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru');
+VALUES (1,'test','26cc2d23a03a8f07ed1e3d000a244636','test@example.com','tester',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,NULL,NULL,1,1000000,'Europe/Moscow',0,0,NULL,NULL,0,0x7F000001,'ru'),
+(2,NULL,'',NULL,'tester2',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,'identity',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru'),
+(3,NULL,'',NULL,'admin','2004-11-25 18:31:52','2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'admin',NULL,NULL,0,NULL,0,'admin',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
 --
