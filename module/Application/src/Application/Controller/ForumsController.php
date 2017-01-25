@@ -34,14 +34,20 @@ class ForumsController extends AbstractActionController
      */
     private $comments;
 
+    /**
+     * @var Forums
+     */
+    private $model;
+
     public function __construct(
+        Forums $model,
         $newTopicForm,
         $commentForm,
         $transport,
         MessageService $message,
         Comments\CommentsService $comments
     ) {
-
+        $this->model = $model;
         $this->newTopicForm = $newTopicForm;
         $this->commentForm = $commentForm;
         $this->transport = $transport;
@@ -75,10 +81,7 @@ class ForumsController extends AbstractActionController
         $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
         $isModearator = $this->user()->inheritsRole('moder');
 
-
-        $model = new Forums();
-
-        $data = $model->getThemePage(
+        $data = $this->model->getThemePage(
             $this->params('theme_id'),
             $this->params('page'),
             $userId,
@@ -149,12 +152,10 @@ class ForumsController extends AbstractActionController
 
     public function topicAction()
     {
-        $model = new Forums();
-
         $forumAdmin = $this->user()->isAllowed('forums', 'moderate');
         $isModearator = $this->user()->inheritsRole('moder');
 
-        $topic = $model->getTopic((int)$this->params('topic_id'), [
+        $topic = $this->model->getTopic((int)$this->params('topic_id'), [
             'status'      => [Forums::STATUS_NORMAL, Forums::STATUS_CLOSED],
             'isModerator' => $isModearator
         ]);
@@ -188,7 +189,7 @@ class ForumsController extends AbstractActionController
                         $values['user_id'] = $user->id;
                         $values['ip'] = $request->getServer('REMOTE_ADDR');
                         $values['resolve'] = $isModearator && $values['parent_id'] && $values['resolve'];
-                        $messageId = $model->addMessage($values);
+                        $messageId = $this->model->addMessage($values);
 
                         $user->forums_messages = new Zend_Db_Expr('forums_messages + 1');
                         $user->last_message_time = new Zend_Db_Expr('NOW()');
@@ -222,7 +223,7 @@ class ForumsController extends AbstractActionController
                             }
                         }
 
-                        $ids = $model->getSubscribersIds($topic['id']);
+                        $ids = $this->model->getSubscribersIds($topic['id']);
                         $subscribers = $userTable->find($ids);
 
                         foreach ($subscribers as $subscriber) {
@@ -243,7 +244,7 @@ class ForumsController extends AbstractActionController
             $formMessageNew = $form;
         }
 
-        $data = $model->topicPage(
+        $data = $this->model->topicPage(
             $topic['id'],
             $user ? $user->id : null,
             $this->params('page'),
@@ -310,8 +311,7 @@ class ForumsController extends AbstractActionController
 
         $topicId = (int)$this->params('topic_id');
 
-        $model = new Forums();
-        $model->subscribe($topicId, $user->id);
+        $this->model->subscribe($topicId, $user->id);
 
         $referer = $this->getRequest()->getServer('HTTP_REFERER');
 
@@ -329,8 +329,7 @@ class ForumsController extends AbstractActionController
 
         $topicId = (int)$this->params('topic_id');
 
-        $model = new Forums();
-        $model->unsubscribe($topicId, $user->id);
+        $this->model->unsubscribe($topicId, $user->id);
 
         $referer = $this->getRequest()->getServer('HTTP_REFERER');
 
@@ -357,8 +356,7 @@ class ForumsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $model = new Forums();
-        $theme = $model->getTheme($this->params('theme_id'));
+        $theme = $this->model->getTheme($this->params('theme_id'));
 
         if (! $theme || $theme['disable_topics']) {
             return $this->notFoundAction();
@@ -385,7 +383,7 @@ class ForumsController extends AbstractActionController
                         $values['theme_id'] = $theme['id'];
                         $values['ip'] = $request->getServer('REMOTE_ADDR');
 
-                        $topicId = $model->addTopic($values);
+                        $topicId = $this->model->addTopic($values);
 
                         $user->setFromArray([
                             'forums_topics'     => new Zend_Db_Expr('forums_topics + 1'),
@@ -409,10 +407,8 @@ class ForumsController extends AbstractActionController
 
     public function topicMessageAction()
     {
-        $model = new Forums();
-
         $messageId = $this->params('message_id');
-        $page = $model->getMessagePage($messageId);
+        $page = $this->model->getMessagePage($messageId);
         if (! $page) {
             return $this->notFoundAction();
         }
@@ -435,8 +431,7 @@ class ForumsController extends AbstractActionController
     {
         return $this->authorizedForumModer(function () {
 
-            $model = new Forums();
-            $model->open($this->params()->fromPost('topic_id'));
+            $this->model->open($this->params()->fromPost('topic_id'));
 
             return new JsonModel([
                 'ok' => true
@@ -448,8 +443,7 @@ class ForumsController extends AbstractActionController
     {
         return $this->authorizedForumModer(function () {
 
-            $model = new Forums();
-            $model->close($this->params()->fromPost('topic_id'));
+            $this->model->close($this->params()->fromPost('topic_id'));
 
             return new JsonModel([
                 'ok' => true
@@ -461,8 +455,7 @@ class ForumsController extends AbstractActionController
     {
         return $this->authorizedForumModer(function () {
 
-            $model = new Forums();
-            $model->delete($this->params()->fromPost('topic_id'));
+            $this->model->delete($this->params()->fromPost('topic_id'));
 
             return new JsonModel([
                 'ok' => true
@@ -473,23 +466,21 @@ class ForumsController extends AbstractActionController
     public function moveAction()
     {
         return $this->authorizedForumModer(function () {
-            $model = new Forums();
-
-            $topic = $model->getTopic($this->params('topic_id'));
+            $topic = $this->model->getTopic($this->params('topic_id'));
             if (! $topic) {
                 return $this->notFoundAction();
             }
 
-            $theme = $model->getTheme($this->params()->fromPost('theme_id'));
+            $theme = $this->model->getTheme($this->params()->fromPost('theme_id'));
 
             if ($theme) {
-                $model->moveTopic($topic['id'], $theme['id']);
+                $this->model->moveTopic($topic['id'], $theme['id']);
 
                 return $this->redirect()->toUrl($this->themeUrl($theme['id']));
             }
 
             return [
-                'themes' => $model->getThemes(),
+                'themes' => $this->model->getThemes(),
                 'topic'  => $topic
             ];
         });
@@ -545,20 +536,18 @@ class ForumsController extends AbstractActionController
             $themes = [];
             $topics = [];
 
-            $model = new Forums();
-
-            $theme = $model->getTheme($this->params()->fromQuery('theme_id'));
+            $theme = $this->model->getTheme($this->params()->fromQuery('theme_id'));
             if ($theme) {
                 $topicId = (int)$this->params()->fromQuery('topic_id');
                 if ($topicId) {
-                    $model->moveMessage($messageId, $topicId);
+                    $this->model->moveMessage($messageId, $topicId);
 
                     return $this->redirect()->toUrl($this->topicMessageUrl($messageId));
                 } else {
-                    $topics = $model->getTopics($theme['id']);
+                    $topics = $this->model->getTopics($theme['id']);
                 }
             } else {
-                $themes = $model->getThemes();
+                $themes = $this->model->getThemes();
             }
 
             return [

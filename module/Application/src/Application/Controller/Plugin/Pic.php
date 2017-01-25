@@ -61,6 +61,11 @@ class Pic extends AbstractPlugin
      */
     private $pictureTable;
 
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
     public function __construct(
         $textStorage,
         $translator,
@@ -68,9 +73,9 @@ class Pic extends AbstractPlugin
         ItemNameFormatter $itemNameFormatter,
         SpecificationsService $specsService,
         PictureItem $pictureItem,
-        $httpRouter
+        $httpRouter,
+        Comments\CommentsService $comments
     ) {
-
         $this->textStorage = $textStorage;
         $this->translator = $translator;
         $this->pictureNameFormatter = $pictureNameFormatter;
@@ -78,6 +83,7 @@ class Pic extends AbstractPlugin
         $this->specsService = $specsService;
         $this->pictureItem = $pictureItem;
         $this->httpRouter = $httpRouter;
+        $this->comments = $comments;
 
         $this->pictureTable = new DbTable\Picture();
     }
@@ -256,13 +262,9 @@ class Pic extends AbstractPlugin
             // messages
             $messages = [];
             if (! $options['disableBehaviour'] && count($ids)) {
-                $ctTable = new Comments\Model\DbTable\Topic();
-                $db = $ctTable->getAdapter();
-                $messages = $db->fetchPairs(
-                    $ctTable->select()
-                        ->from($ctTable->info('name'), ['item_id', 'messages'])
-                        ->where('item_id in (?)', $ids)
-                        ->where('type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID)
+                $messages = $this->comments->getMessagesCounts(
+                    \Application\Comments::PICTURES_TYPE_ID,
+                    $ids
                 );
             }
 
@@ -326,7 +328,7 @@ class Pic extends AbstractPlugin
                         'messages'
                     );
 
-                $bind['type_id'] = Comments\Model\DbTable\Message::PICTURES_TYPE_ID;
+                $bind['type_id'] = \Application\Comments::PICTURES_TYPE_ID;
             }
 
             $rows = $db->fetchAll($select, $bind);
@@ -357,9 +359,8 @@ class Pic extends AbstractPlugin
         // comments
         if (! $options['disableBehaviour']) {
             if ($userId) {
-                $ctTable = new Comments\Model\DbTable\Topic();
-                $newMessages = $ctTable->getNewMessages(
-                    Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+                $newMessages = $this->comments->getNewMessages(
+                    \Application\Comments::PICTURES_TYPE_ID,
                     $ids,
                     $userId
                 );
@@ -1190,7 +1191,7 @@ class Pic extends AbstractPlugin
                 'messages'
             )
             ->bind([
-                'type_id' => Comments\Model\DbTable\Message::PICTURES_TYPE_ID
+                'type_id' => \Application\Comments::PICTURES_TYPE_ID
             ]);
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -1246,9 +1247,8 @@ class Pic extends AbstractPlugin
         }
 
         if ($userId) {
-            $ctTable = new Comments\Model\DbTable\Topic();
-            $newMessages = $ctTable->getNewMessages(
-                Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+            $newMessages = $this->comments->getNewMessages(
+                \Application\Comments::PICTURES_TYPE_ID,
                 $ids,
                 $userId
             );

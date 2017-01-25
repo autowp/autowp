@@ -1,18 +1,17 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Application\View\Helper\Service;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\Controller\AboutController as Controller;
+use Application\View\Helper\Pictures as Helper;
 
-class AboutControllerFactory implements FactoryInterface
+class PicturesFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Controller(
-            $container->get(\Zend\Permissions\Acl\Acl::class),
+        return new Helper(
             $container->get(\Autowp\Comments\CommentsService::class)
         );
     }

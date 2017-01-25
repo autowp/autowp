@@ -24,14 +24,19 @@ class Pictures extends AbstractHelper
     private $pictureViewTable = null;
 
     /**
-     * @var Comments\Model\DbTable\Topic
-     */
-    private $commentTopicTable = null;
-
-    /**
      * @var PictureModerVote
      */
     private $moderVoteTable = null;
+
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
+    public function __construct(Comments\CommentsService $comments)
+    {
+        $this->comments = $comments;
+    }
 
     /**
      * @return PictureModerVote
@@ -51,16 +56,6 @@ class Pictures extends AbstractHelper
         return $this->pictureViewTable
             ? $this->pictureViewTable
             : $this->pictureViewTable = new PictureView();
-    }
-
-    /**
-     * @return Comments\Model\DbTable\Topic
-     */
-    private function getCommentTopicTable()
-    {
-        return $this->commentTopicTable
-            ? $this->commentTopicTable
-            : $this->commentTopicTable = new Comments\Model\DbTable\Topic();
     }
 
     private function isPictureModer()
@@ -98,18 +93,17 @@ class Pictures extends AbstractHelper
 
     private function userBehaviour(PictureRow $picture, $isModer)
     {
-        $ctTable = $this->getCommentTopicTable();
         if ($this->view->user()->logedIn()) {
-            $commentsStat = $ctTable->getTopicStatForUser(
-                Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+            $commentsStat = $this->comments->getTopicStatForUser(
+                \Application\Comments::PICTURES_TYPE_ID,
                 $picture->id,
                 $this->view->user()->get()->id
             );
             $msgCount = $commentsStat['messages'];
             $newMsgCount = $commentsStat['newMessages'];
         } else {
-            $commentsStat = $ctTable->getTopicStat(
-                Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+            $commentsStat = $this->comments->getTopicStat(
+                \Application\Comments::PICTURES_TYPE_ID,
                 $picture->id
             );
             $msgCount = $commentsStat['messages'];

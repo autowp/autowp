@@ -299,13 +299,13 @@ class UploadController extends AbstractActionController
             // add comment
             if ($values['note']) {
                 $this->comments->add([
-                    'typeId'             => Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+                    'typeId'             => \Application\Comments::PICTURES_TYPE_ID,
                     'itemId'             => $picture->id,
                     'parentId'           => null,
                     'authorId'           => $user->id,
                     'message'            => $values['note'],
                     'ip'                 => $this->getRequest()->getServer('REMOTE_ADDR'),
-                    'moderatorAttention' => Comments\Model\DbTable\Message::MODERATOR_ATTENTION_NONE
+                    'moderatorAttention' => Comments\Attention::NONE
                 ]);
             }
 

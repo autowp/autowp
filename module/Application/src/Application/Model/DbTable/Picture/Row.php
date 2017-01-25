@@ -2,7 +2,6 @@
 
 namespace Application\Model\DbTable\Picture;
 
-use Autowp\Comments;
 use Autowp\Image\Storage\Request;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
@@ -145,23 +144,6 @@ class Row extends \Autowp\Commons\Db\Table\Row
     public function getFileNameTemplate($ext)
     {
         return $this->getFileNamePattern() . '_%d.' . $ext;
-    }
-
-    protected function _delete()
-    {
-        $comments = new Comments\Model\DbTable\Message();
-        $comments->delete([
-            'type_id = ?' => Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
-            'item_id = ?' => $this->id,
-        ]);
-
-        //$this->flushFormatImages();
-
-        //$this->removeSigned();
-        //$this->removePicture280();
-        //$this->removeThumb();
-        //$this->removePod();
-        //$this->removeSource();
     }
 
     public function getImageOptions($col)

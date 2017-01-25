@@ -5,7 +5,7 @@
 ?>
 <?php foreach ($this->messages as $comment) { ?>
     <?php
-        $moderAttention = $comment['moderator_attention'] == Autowp\Comments\Model\DbTable\Message::MODERATOR_ATTENTION_REQUIRED;
+        $moderAttention = $comment['moderator_attention'] == Autowp\Comments\Attention::REQUIRED;
         $classes = ['message'];
         if ($moderAttention) {
             $classes[] = 'moderator-attention';

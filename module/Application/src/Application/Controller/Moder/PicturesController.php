@@ -444,13 +444,13 @@ class PicturesController extends AbstractActionController
             $expr = 'pictures.id = comment_topic.item_id and ' .
                     $this->table->getAdapter()->quoteInto(
                         'comment_topic.type_id = ?',
-                        Comments\Model\DbTable\Message::PICTURES_TYPE_ID
+                        \Application\Comments::PICTURES_TYPE_ID
                     );
             $select->joinLeft('comment_topic', $expr, null);
         } elseif ($joinComments) {
             $select
                 ->join('comment_topic', 'pictures.id = comment_topic.item_id', null)
-                ->where('comment_topic.type_id = ?', Comments\Model\DbTable\Message::PICTURES_TYPE_ID);
+                ->where('comment_topic.type_id = ?', \Application\Comments::PICTURES_TYPE_ID);
         }
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -1824,14 +1824,11 @@ class PicturesController extends AbstractActionController
 
         // comments
         $this->comments->moveMessages(
-            Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+            \Application\Comments::PICTURES_TYPE_ID,
             $replacePicture->id,
-            Comments\Model\DbTable\Message::PICTURES_TYPE_ID,
+            \Application\Comments::PICTURES_TYPE_ID,
             $picture->id
         );
-        $ctTable = new Comments\Model\DbTable\Topic();
-        $ctTable->updateTopicStat(Comments\Model\DbTable\Message::PICTURES_TYPE_ID, $replacePicture->id);
-        $ctTable->updateTopicStat(Comments\Model\DbTable\Message::PICTURES_TYPE_ID, $picture->id);
 
         // pms
         $owner = $picture->findParentRow(User::class, 'Owner');

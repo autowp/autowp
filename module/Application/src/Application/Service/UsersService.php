@@ -55,7 +55,12 @@ class UsersService
     private $imageStorage;
 
     /**
-     * @return User
+     * @var unknown
+     */
+    private $comments;
+
+    /**
+     * @return Comments\CommentsService
      */
     private function getTable()
     {
@@ -70,7 +75,8 @@ class UsersService
         $translator,
         $transport,
         SpecificationsService $specsService,
-        Image\Storage $imageStorage
+        Image\Storage $imageStorage,
+        Comments\CommentsService $comments
     ) {
 
         $this->salt = $options['salt'];
@@ -81,6 +87,8 @@ class UsersService
         $this->transport = $transport;
         $this->specsService = $specsService;
         $this->imageStorage = $imageStorage;
+
+        $this->comments = $comments;
     }
 
     /**
@@ -325,15 +333,7 @@ class UsersService
 
         $default = 10;
 
-        $commentTable = new Comments\Model\DbTable\Message();
-        $db = $commentTable->getAdapter();
-
-        $avgVote = $db->fetchOne(
-            $db->select()
-                ->from($commentTable->info('name'), new Zend_Db_Expr('avg(vote)'))
-                ->where('author_id = ?', $userRow->id)
-                ->where('vote <> 0')
-        );
+        $avgVote = $this->comments->getUserAvgVote($userRow->id);
 
         $age = 0;
         $regDate = $userRow->getDateTime('reg_date');

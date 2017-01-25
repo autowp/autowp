@@ -11,7 +11,7 @@ return [
             Controller\Console\CatalogueController::class   => Controller\Console\Service\CatalogueControllerFactory::class,
             Controller\Console\MaintenanceController::class => Controller\Console\Service\MaintenanceControllerFactory::class,
             Controller\Console\MidnightController::class    => Controller\Console\Service\MidnightControllerFactory::class,
-            Controller\Console\PicturesController::class    => InvokableFactory::class,
+            Controller\Console\PicturesController::class    => Controller\Console\Service\PicturesControllerFactory::class,
             Controller\Console\RefererController::class     => InvokableFactory::class,
             Controller\Console\SpecsController::class       => Controller\Console\Service\SpecsControllerFactory::class,
             Controller\Console\TelegramController::class    => Controller\Console\Service\TelegramControllerFactory::class,

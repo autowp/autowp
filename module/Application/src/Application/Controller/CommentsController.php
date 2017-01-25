@@ -6,10 +6,10 @@ use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-use Autowp\Comments;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
 
+use Application\Comments;
 use Application\HostManager;
 use Application\Model\DbTable;
 
@@ -21,7 +21,7 @@ use Zend_Db_Expr;
 class CommentsController extends AbstractRestfulController
 {
     /**
-     * @var Comments\CommentsService
+     * @var Comments
      */
     private $comments = null;
 
@@ -41,7 +41,7 @@ class CommentsController extends AbstractRestfulController
         HostManager $hostManager,
         $form,
         MessageService $message,
-        Comments\CommentsService $comments
+        Comments $comments
     ) {
 
         $this->hostManager = $hostManager;
@@ -62,7 +62,8 @@ class CommentsController extends AbstractRestfulController
 
     private function needWait()
     {
-        if ($nextMessageTime = $this->nextMessageTime()) {
+        $nextMessageTime = $this->nextMessageTime();
+        if ($nextMessageTime) {
             return $nextMessageTime > new DateTime();
         }
 
@@ -93,59 +94,7 @@ class CommentsController extends AbstractRestfulController
         ];
     }
 
-    private function messageUrl($typeId, $object, $canonical, $uri = null)
-    {
-        switch ($typeId) {
-            case Comments\Model\DbTable\Message::PICTURES_TYPE_ID:
-                $url = $this->pic()->href($object, [
-                    'canonical' => $canonical,
-                    'uri'       => $uri
-                ]);
-                break;
 
-            case Comments\Model\DbTable\Message::TWINS_TYPE_ID:
-                $url = $this->url()->fromRoute('twins/group', [
-                    'id' => $object->id
-                ], [
-                    'force_canonical' => $canonical,
-                    'uri'             => $uri
-                ]);
-                break;
-
-            case Comments\Model\DbTable\Message::VOTINGS_TYPE_ID:
-                $url = $this->url()->fromRoute('votings/voting', [
-                    'id' => $object->id
-                ], [
-                    'force_canonical' => $canonical,
-                    'uri'             => $uri
-                ]);
-                break;
-
-            case Comments\Model\DbTable\Message::ARTICLES_TYPE_ID:
-                $url = $this->url()->fromRoute('articles', [
-                    'action'          => 'article',
-                    'article_catname' => $object->catname
-                ], [
-                    'force_canonical' => $canonical,
-                    'uri'             => $uri
-                ]);
-                break;
-
-            case Comments\Model\DbTable\Message::MUSEUMS_TYPE_ID:
-                $url = $this->url()->fromRoute('museums/museum', [
-                    'id' => $object->id
-                ], [
-                    'force_canonical' => $canonical,
-                    'uri'             => $uri
-                ]);
-                break;
-
-            default:
-                throw new Exception('Unknown type_id');
-        }
-
-        return $url;
-    }
 
     public function addAction()
     {
@@ -178,29 +127,24 @@ class CommentsController extends AbstractRestfulController
 
             $object = null;
             switch ($typeId) {
-                case Comments\Model\DbTable\Message::PICTURES_TYPE_ID:
+                case \Application\Comments::PICTURES_TYPE_ID:
                     $pictures = $this->catalogue()->getPictureTable();
                     $object = $pictures->find($itemId)->current();
                     break;
 
-                case Comments\Model\DbTable\Message::TWINS_TYPE_ID:
+                case \Application\Comments::ITEM_TYPE_ID:
                     $twinsGroups = new DbTable\Item();
                     $object = $twinsGroups->find($itemId)->current();
                     break;
 
-                case Comments\Model\DbTable\Message::VOTINGS_TYPE_ID:
+                case \Application\Comments::VOTINGS_TYPE_ID:
                     $vTable = new DbTable\Voting();
                     $object = $vTable->find($itemId)->current();
                     break;
 
-                case Comments\Model\DbTable\Message::ARTICLES_TYPE_ID:
+                case \Application\Comments::ARTICLES_TYPE_ID:
                     $articles = new DbTable\Article();
                     $object = $articles->find($itemId)->current();
-                    break;
-
-                case Comments\Model\DbTable\Message::MUSEUMS_TYPE_ID:
-                    $museums = new DbTable\Item();
-                    $object = $museums->find($itemId)->current();
                     break;
 
                 default:
@@ -223,7 +167,7 @@ class CommentsController extends AbstractRestfulController
                 $ip = '127.0.0.1';
             }
 
-            $messageId = $this->comments->add([
+            $messageId = $this->comments->service()->add([
                 'typeId'             => $typeId,
                 'itemId'             => $itemId,
                 'parentId'           => $values['parent_id'] ? $values['parent_id'] : null,
@@ -236,25 +180,26 @@ class CommentsController extends AbstractRestfulController
             if (! $messageId) {
                 throw new Exception("Message add fails");
             }
+            $db = $user->getTable()->getAdapter();
 
             $user->last_message_time = new Zend_Db_Expr('NOW()');
             $user->save();
 
             if ($this->user()->inheritsRole('moder')) {
                 if ($values['parent_id'] && $values['resolve']) {
-                    $this->comments->completeMessage($values['parent_id']);
+                    $this->comments->service()->completeMessage($values['parent_id']);
                 }
             }
 
             if ($values['parent_id']) {
-                $authorId = $this->comments->getMessageAuthorId($values['parent_id']);
+                $authorId = $this->comments->service()->getMessageAuthorId($values['parent_id']);
                 if ($authorId && ($authorId != $user->id)) {
                     $userTable = new User();
                     $parentMessageAuthor = $userTable->find($authorId)->current();
                     if ($parentMessageAuthor && ! $parentMessageAuthor->deleted) {
                         $uri = $this->hostManager->getUriByLanguage($parentMessageAuthor->language);
 
-                        $url = $this->messageUrl($typeId, $object, true, $uri) . '#msg' . $messageId;
+                        $url = $this->comments->getMessageUrl($messageId, true, $uri) . '#msg' . $messageId;
                         $moderUrl = $this->url()->fromRoute('users/user', [
                             'user_id' => $user->identity ? $user->identity : 'user' . $user->id,
                         ], [
@@ -271,7 +216,7 @@ class CommentsController extends AbstractRestfulController
                 }
             }
 
-            $backUrl = $this->messageUrl($typeId, $object, false);
+            $backUrl = $this->comments->getMessageUrl($messageId);
 
             return $this->redirect()->toUrl($backUrl);
         }
@@ -288,10 +233,10 @@ class CommentsController extends AbstractRestfulController
 
         $user = $this->user()->get();
 
-        $comments = $this->comments->get($type, $item, $user);
+        $comments = $this->comments->service()->get($type, $item, $user);
 
         if ($user) {
-            $this->comments->updateTopicView($type, $item, $user->id);
+            $this->comments->service()->updateTopicView($type, $item, $user->id);
         }
 
         $canAddComments = $this->canAddComments();
@@ -324,7 +269,7 @@ class CommentsController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $success = $this->comments->deleteMessage(
+        $success = $this->comments->service()->deleteMessage(
             $this->params()->fromPost('comment_id'),
             $this->user()->get()->id
         );
@@ -343,7 +288,7 @@ class CommentsController extends AbstractRestfulController
             return $this->forbiddenAction();
         }
 
-        $this->comments->restoreMessage($this->params()->fromPost('comment_id'));
+        $this->comments->service()->restoreMessage($this->params()->fromPost('comment_id'));
 
         return new JsonModel([
             'ok' => true,
@@ -371,7 +316,7 @@ class CommentsController extends AbstractRestfulController
             ]);
         }
 
-        $result = $this->comments->voteMessage(
+        $result = $this->comments->service()->voteMessage(
             $this->params()->fromPost('id'),
             $user->id,
             $this->params()->fromPost('vote')
@@ -394,7 +339,7 @@ class CommentsController extends AbstractRestfulController
 
     public function votesAction()
     {
-        $result = $this->comments->getVotes($this->params()->fromQuery('id'));
+        $result = $this->comments->service()->getVotes($this->params()->fromQuery('id'));
         if (! $result) {
             return $this->notFoundAction();
         }

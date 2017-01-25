@@ -35,6 +35,6 @@
 <?php } ?>
 
 <?=$this->comments([
-    'type'    => Autowp\Comments\Model\DbTable\Message::TWINS_TYPE_ID,
+    'type'    => \Application\Comments::ITEM_TYPE_ID,
     'item_id' => $this->group['id']
 ]) ?>

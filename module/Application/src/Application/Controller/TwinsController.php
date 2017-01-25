@@ -34,15 +34,22 @@ class TwinsController extends AbstractActionController
      */
     private $specsService = null;
 
+    /**
+     * @var Comments\CommentsService
+     */
+    private $comments;
+
     public function __construct(
         TextStorage\Service $textStorage,
         $cache,
-        SpecificationsService $specsService
+        SpecificationsService $specsService,
+        Comments\CommentsService $comments
     ) {
 
         $this->textStorage = $textStorage;
         $this->cache = $cache;
         $this->specsService = $specsService;
+        $this->comments = $comments;
     }
 
     /**
@@ -207,7 +214,6 @@ class TwinsController extends AbstractActionController
 
     private function prepareList($list)
     {
-        $ctTable = new Comments\Model\DbTable\Topic();
         $pictureTable = new DbTable\Picture();
 
         $imageStorage = $this->imageStorage();
@@ -221,8 +227,9 @@ class TwinsController extends AbstractActionController
 
         $picturesCounts = $this->getTwins()->getGroupPicturesCount($ids);
 
-        $commentsStats = $ctTable->getTopicStat(
-            Comments\Model\DbTable\Message::TWINS_TYPE_ID,
+        //TODO: topic stat for authenticated user
+        $commentsStats = $this->comments->getTopicStat(
+            \Application\Comments::ITEM_TYPE_ID,
             $ids
         );
 

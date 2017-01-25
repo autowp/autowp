@@ -37,7 +37,8 @@ CREATE TABLE `acl_resources` (
 --
 
 /*!40000 ALTER TABLE `acl_resources` DISABLE KEYS */;
-INSERT INTO `acl_resources` (`id`, `name`) VALUES (12,'attrs'),(1,'brand'),(4,'car'),(14,'category'),(6,'comment'),(8,'engine'),(21,'factory'),(10,'forums'),(15,'hotlinks'),(2,'model'),(19,'museums'),(7,'page'),(5,'picture'),(9,'rights'),(17,'specifications'),(18,'status'),(11,'twins'),(13,'user'),(20,'website');
+INSERT INTO `acl_resources` (`id`, `name`) 
+VALUES (12,'attrs'),(1,'brand'),(4,'car'),(14,'category'),(6,'comment'),(8,'engine'),(21,'factory'),(10,'forums'),(15,'hotlinks'),(2,'model'),(19,'museums'),(7,'page'),(5,'picture'),(9,'rights'),(17,'specifications'),(18,'status'),(11,'twins'),(13,'user'),(20,'website');
 /*!40000 ALTER TABLE `acl_resources` ENABLE KEYS */;
 
 --
@@ -62,7 +63,12 @@ CREATE TABLE `acl_resources_privileges` (
 --
 
 /*!40000 ALTER TABLE `acl_resources_privileges` DISABLE KEYS */;
-INSERT INTO `acl_resources_privileges` (`id`, `resource_id`, `name`) VALUES (4,4,'add'),(1,4,'edit_meta'),(5,4,'move'),(8,5,'move'),(2,11,'edit'),(3,13,'ban'),(7,17,'edit'),(9,17,'edit-engine'),(6,21,'edit');
+INSERT INTO `acl_resources_privileges` (`id`, `resource_id`, `name`) 
+VALUES (4,4,'add'),(1,4,'edit_meta'),(5,4,'move'),(8,5,'move'),
+(2,11,'edit'),(3,13,'ban'),(7,17,'edit'),(9,17,'edit-engine'),(6,21,'edit'),(10,6,'remove');
+
+
+
 /*!40000 ALTER TABLE `acl_resources_privileges` ENABLE KEYS */;
 
 --
@@ -135,7 +141,8 @@ CREATE TABLE `acl_roles_privileges_allowed` (
 --
 
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` DISABLE KEYS */;
-INSERT INTO `acl_roles_privileges_allowed` (`role_id`, `privilege_id`) VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9);
+INSERT INTO `acl_roles_privileges_allowed` (`role_id`, `privilege_id`) 
+VALUES (10,1),(10,2),(10,3),(10,4),(10,5),(58,6),(6,7),(9,8),(5,9),(15,9),(5,10);
 /*!40000 ALTER TABLE `acl_roles_privileges_allowed` ENABLE KEYS */;
 
 --
@@ -2652,7 +2659,7 @@ CREATE TABLE `user_remember` (
 --
 
 /*!40000 ALTER TABLE `user_remember` DISABLE KEYS */;
-INSERT INTO `user_remember` (`user_id`, `token`, `date`) VALUES (3,'admin-token','2016-11-25 18:31:51');
+INSERT INTO `user_remember` (`user_id`, `token`, `date`) VALUES (3,'admin-token','2026-11-25 18:31:51'), (1,'token','2026-11-25 18:31:51');
 /*!40000 ALTER TABLE `user_remember` ENABLE KEYS */;
 
 --
@@ -2746,9 +2753,9 @@ CREATE TABLE `users` (
 
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 INSERT INTO `users` (`id`, `login`, `password`, `e_mail`, `name`, `reg_date`, `last_online`, `icq`, `url`, `own_car`, `dream_car`, `forums_topics`, `forums_messages`, `pictures_added`, `e_mail_checked`, `hide_e_mail`, `authority`, `pictures_ratio`, `email_to_check`, `email_check_code`, `role`, `avatar`, `photo`, `messaging_interval`, `last_message_time`, `deleted`, `identity`, `img`, `votes_per_day`, `votes_left`, `timezone`, `specs_volume`, `specs_volume_valid`, `specs_positives`, `specs_negatives`, `specs_weight`, `last_ip`, `language`) 
-VALUES (1,'test','26cc2d23a03a8f07ed1e3d000a244636','test@example.com','tester',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,NULL,NULL,1,0,'Europe/Moscow',0,0,NULL,NULL,0,0x7F000001,'ru'),
-(2,NULL,'',NULL,'tester2',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,'identity',NULL,1,0,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru'),
-(3,NULL,'',NULL,'admin',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'admin',NULL,NULL,0,NULL,0,'admin',NULL,1,0,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru');
+VALUES (1,'test','26cc2d23a03a8f07ed1e3d000a244636','test@example.com','tester',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,NULL,NULL,1,1000000,'Europe/Moscow',0,0,NULL,NULL,0,0x7F000001,'ru'),
+(2,NULL,'',NULL,'tester2',NULL,'2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'user',NULL,NULL,10,NULL,0,'identity',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru'),
+(3,NULL,'',NULL,'admin','2004-11-25 18:31:52','2016-11-25 18:31:52',0,'','','',0,0,0,0,NULL,0,NULL,NULL,NULL,'admin',NULL,NULL,0,NULL,0,'admin',NULL,1,1000000,'UTC',0,0,NULL,NULL,0,0x7F000001,'ru');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
 --
