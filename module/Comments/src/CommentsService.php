@@ -30,6 +30,21 @@ class CommentsService
     private $topicTable;
 
     /**
+     * @var User
+     */
+    private $userTable;
+
+    /**
+     * @return User
+     */
+    private function getUserTable()
+    {
+        return $this->userTable
+            ? $this->userTable
+            : $this->userTable = new User();
+    }
+
+    /**
      * @return Model\DbTable\Message
      */
     private function getMessageTable()
@@ -190,7 +205,7 @@ class CommentsService
 
         $comments = [];
         foreach ($rows as $row) {
-            $author = $row->findParentRow(User::class, 'Author');
+            $author = $this->getUserTable()->find($row['author_id'])->current();
 
             $vote = null;
             if ($userId) {
@@ -203,7 +218,7 @@ class CommentsService
 
             $deletedBy = null;
             if ($row->deleted) {
-                $deletedBy = $row->findParentRow(User::class, 'DeletedBy');
+                $deletedBy = $this->getUserTable()->find($row['deleted_by'])->current();
             }
 
             if ($row->replies_count > 0) {
@@ -382,22 +397,22 @@ class CommentsService
      */
     public function getVotes($id)
     {
-        $message = $this->getMessageTable()->find($id)->current();
+        $message = $this->getMessageRow($id);
         if (! $message) {
             return false;
         }
 
-        $voteTable = $this->getVoteTable();
-        $voteRows = $voteTable->fetchAll([
-            'comment_id = ?' => $message->id,
+        $voteRows = $this->getVoteTable()->fetchAll([
+            'comment_id = ?' => $message['id'],
         ]);
 
         $positiveVotes = $negativeVotes = [];
         foreach ($voteRows as $voteRow) {
-            if ($voteRow->vote > 0) {
-                $positiveVotes[] = $voteRow->findParentRow(User::class);
-            } elseif ($voteRow->vote < 0) {
-                $negativeVotes[] = $voteRow->findParentRow(User::class);
+            $user = $this->getUserTable()->find($voteRow['user_id'])->current();
+            if ($voteRow['vote'] > 0) {
+                $positiveVotes[] = $user;
+            } elseif ($voteRow['vote'] < 0) {
+                $negativeVotes[] = $user;
             }
         }
 

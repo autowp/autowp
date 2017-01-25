@@ -16,13 +16,11 @@ class Comments
 {
     const PREVIEW_LENGTH = 60;
 
-    //TODO: extract constants to application
     const PICTURES_TYPE_ID = 1;
     const ITEM_TYPE_ID = 2;
     const VOTINGS_TYPE_ID = 3;
     const ARTICLES_TYPE_ID = 4;
     const FORUMS_TYPE_ID = 5;
-    //const MUSEUMS_TYPE_ID = 6;
 
     /**
      * @var CommentsService
