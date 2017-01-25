@@ -115,7 +115,7 @@ class UsersController extends AbstractActionController
         $lastComments = $commentsTable->fetchAll(
             $commentsTable->select()
                 ->where('author_id = ?', $user->id)
-                ->where('type_id <> ?', CommentMessage::FORUMS_TYPE_ID)
+                ->where('type_id <> ?', Comments\Model\DbTable\Message::FORUMS_TYPE_ID)
                 ->where('not deleted')
                 ->order(['datetime DESC'])
                 ->limit(15)

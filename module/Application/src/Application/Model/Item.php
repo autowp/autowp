@@ -29,9 +29,11 @@ class Item
             $parentIds = $db->fetchCol(
                 $db->select()
                     ->from('item_parent_cache', 'parent_id')
-                    ->where('item_id = ?', $vehicleId)
-                    ->where('item_id <> parent_id')
-                    ->order('diff desc')
+                    ->join('item', 'item_parent_cache.parent_id = item.id', null)
+                    ->where('item.item_type_id = ?', DbTable\Item\Type::VEHICLE)
+                    ->where('item_parent_cache.item_id = ?', $vehicleId)
+                    ->where('item_parent_cache.item_id <> item_parent_cache.parent_id')
+                    ->order('item_parent_cache.diff desc')
             );
 
             // remove parents

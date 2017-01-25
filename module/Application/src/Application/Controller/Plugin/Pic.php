@@ -717,6 +717,7 @@ class Pic extends AbstractPlugin
             $vehicles = [];
 
             $vehicleIds = $itemModel->getEngineVehiclesGroups($engineRow->id);
+
             if ($vehicleIds) {
                 $carRows = $itemTable->fetchAll([
                     'id in (?)' => $vehicleIds
