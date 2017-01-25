@@ -8,6 +8,9 @@ use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator\Paginator;
 
 use Zend_Db_Expr;
@@ -15,12 +18,17 @@ use Zend_Db_Expr;
 class CommentsService
 {
     /**
+     * @var Adapter
+     */
+    private $adapter;
+    
+    /**
      * @var Model\DbTable\Message
      */
     private $messageTable;
 
     /**
-     * @var Table
+     * @var TableGateway
      */
     private $voteTable;
 
@@ -33,6 +41,18 @@ class CommentsService
      * @var User
      */
     private $userTable;
+    
+    public function __construct(Adapter $adapter)
+    {
+        $this->adapter = $adapter;
+        
+        $this->topicTable = new Table([
+            'name'    => 'comment_topic',
+            'primary' => ['type_id', 'item_id']
+        ]);
+        
+        $this->voteTable = new TableGateway('comment_vote', $this->adapter);
+    }
 
     /**
      * @return User
@@ -69,35 +89,6 @@ class CommentsService
         }
 
         return $this->messageTable;
-    }
-
-    /**
-     * @return Table
-     */
-    private function getVoteTable()
-    {
-        if (! $this->voteTable) {
-            $this->voteTable = new Table([
-                'name'         => 'comment_vote',
-                'primary'      => ['user_id', 'comment_id'],
-                'referenceMap' => [
-                    'User' => [
-                        'columns'       => ['user_id'],
-                        'refTableClass' => \Autowp\User\Model\DbTable\User::class,
-                        'refColumns'    => ['id']
-                    ]
-                ]
-            ]);
-        }
-        return $this->voteTable;
-    }
-
-    public function __construct()
-    {
-        $this->topicTable = new Table([
-            'name'    => 'comment_topic',
-            'primary' => ['type_id', 'item_id']
-        ]);
     }
 
     /**
@@ -209,11 +200,12 @@ class CommentsService
 
             $vote = null;
             if ($userId) {
-                $voteRow = $this->getVoteTable()->fetchRow([
+                
+                $voteRow = $this->voteTable->select([
                     'comment_id = ?' => $row->id,
                     'user_id = ?'    => (int)$userId
-                ]);
-                $vote = $voteRow ? $voteRow->vote : null;
+                ])->current();
+                $vote = $voteRow ? $voteRow['vote'] : null;
             }
 
             $deletedBy = null;
@@ -337,57 +329,59 @@ class CommentsService
             ];
         }
 
-        if ($message->author_id == $userId) {
+        if ($message['author_id'] == $userId) {
             return [
                 'success' => false,
                 'error'   => 'Self-vote forbidden',
             ];
         }
 
-        $voteTable = $this->getVoteTable();
-        $voteRow = $voteTable->fetchRow([
-            'comment_id = ?' => $message->id,
-            'user_id = ?'    => $userId
-        ]);
+        $voteRow = $this->voteTable->select([
+            'comment_id' => $message['id'],
+            'user_id'    => $userId
+        ])->current();
 
         $vote = (int)$vote > 0 ? 1 : -1;
 
         if (! $voteRow) {
-            $voteRow = $voteTable->createRow([
-                'comment_id' => $message->id,
+            $voteRow = $this->voteTable->insert([
+                'comment_id' => $message['id'],
                 'user_id'    => $userId,
-                'vote'       => 0
+                'vote'       => $vote
+            ]);
+        } else {
+            if ($voteRow['vote'] == $vote) {
+                return [
+                    'success' => false,
+                    'error'   => 'Alreay voted'
+                ];
+            }
+            
+            $this->voteTable->update([
+                'vote' => $vote
+            ], [
+                'comment_id' => $message['id'],
+                'user_id'    => $userId
             ]);
         }
-
-        if ($voteRow->vote == $vote) {
-            return [
-                'success' => false,
-                'error'   => 'Alreay voted'
-            ];
-        }
-
-        $voteRow->vote = $vote;
-        $voteRow->save();
 
         $this->updateVote($message);
 
         return [
             'success' => true,
-            'vote'    => $message->vote
+            'vote'    => $message['vote']
         ];
     }
 
     private function updateVote($message)
     {
-        $voteTable = $this->getVoteTable();
-        $db = $voteTable->getAdapter();
+        $row = $this->voteTable->select(function(Sql\Select $select) use ($message) {
+            $select
+                ->columns(['count' => new Sql\Expression('sum(vote)')])
+                ->where(['comment_id = ?' => $message['id']]);
+        })->current();
 
-        $message->vote = $db->fetchOne(
-            $db->select()
-                ->from($voteTable->info('name'), new Zend_Db_Expr('sum(vote)'))
-                ->where('comment_id = ?', $message->id)
-        );
+        $message->vote = $row['count'];
         $message->save();
     }
 
@@ -402,8 +396,8 @@ class CommentsService
             return false;
         }
 
-        $voteRows = $this->getVoteTable()->fetchAll([
-            'comment_id = ?' => $message['id'],
+        $voteRows = $this->voteTable->select([
+            'comment_id' => $message['id']
         ]);
 
         $positiveVotes = $negativeVotes = [];

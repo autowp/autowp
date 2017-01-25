@@ -123,9 +123,19 @@ class Comments
                     'uri'             => $uri
                 ]);
                 break;
+                
+            case self::FORUMS_TYPE_ID:
+                $url = $this->router->assemble([
+                    'message_id' => $message['id']
+                ], [
+                    'name'            => 'forums/topic-message',
+                    'force_canonical' => $canonical,
+                    'uri'             => $uri
+                ]);
+                break;
 
             default:
-                throw new Exception('Unknown type_id');
+                throw new Exception("Unknown type_id `{$message['type_id']}`");
         }
 
         return $url;
