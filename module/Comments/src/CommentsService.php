@@ -31,9 +31,9 @@ class CommentsService
      * @var TableGateway
      */
     private $voteTable;
-
+    
     /**
-     * @var Table
+     * @var TableGateway
      */
     private $topicTable;
 
@@ -42,16 +42,19 @@ class CommentsService
      */
     private $userTable;
     
+    /**
+     * @var TableGateway
+     */
+    private $topicViewTable;
+    
     public function __construct(Adapter $adapter)
     {
         $this->adapter = $adapter;
         
-        $this->topicTable = new Table([
-            'name'    => 'comment_topic',
-            'primary' => ['type_id', 'item_id']
-        ]);
-        
         $this->voteTable = new TableGateway('comment_vote', $this->adapter);
+        $this->topicTable = new TableGateway('comment_topic', $this->adapter);
+        $this->messageTable2 = new TableGateway('comments_messages', $this->adapter);
+        $this->topicViewTable = new TableGateway('comment_topic_view', $this->adapter);
     }
 
     /**
@@ -259,7 +262,8 @@ class CommentsService
             values (?, ?, ?, NOW())
             on duplicate key update `timestamp` = values(`timestamp`)
         ';
-        $this->topicTable->getAdapter()->query($sql, [$userId, $typeId, $itemId]);
+        $statement = $this->topicTable->getAdapter()->query($sql);
+        $statement->execute([$userId, $typeId, $itemId]);
     }
 
     /**
@@ -268,7 +272,7 @@ class CommentsService
      */
     public function deleteMessage($id, $userId)
     {
-        $comment = $this->getMessageTable()->find($id)->current();
+        $comment = $this->getMessageRow($id);
 
         if ($comment->moderator_attention == Attention::REQUIRED) {
             return false;
@@ -290,7 +294,7 @@ class CommentsService
      */
     public function restoreMessage($id)
     {
-        $comment = $this->getMessageTable()->find($id)->current();
+        $comment = $this->getMessageRow($id);
         if ($comment) {
             $comment->deleted = 0;
             $comment->save();
@@ -321,7 +325,7 @@ class CommentsService
      */
     public function voteMessage($id, $userId, $vote)
     {
-        $message = $this->getMessageTable()->find($id)->current();
+        $message = $this->getMessageRow($id);
         if (! $message) {
             return [
                 'success' => false,
@@ -373,6 +377,9 @@ class CommentsService
         ];
     }
 
+    /**
+     * @todo Change $message to $messageId
+     */
     private function updateVote($message)
     {
         $row = $this->voteTable->select(function(Sql\Select $select) use ($message) {
@@ -671,101 +678,75 @@ class CommentsService
      */
     public function getTopicStatForUser($typeId, $itemId, $userId)
     {
-        $db = $this->topicTable->getAdapter();
-
-        $newMessagesSelect = $db->select()
-            ->from('comments_messages', 'count(1)')
-            ->where('comments_messages.item_id = :item_id')
-            ->where('comments_messages.type_id = :type_id')
-            ->where('comments_messages.datetime > :datetime');
-
-        if (is_array($itemId)) {
-            $result = [];
-
-            if (count($itemId) > 0) {
-                $select = $db->select()
-                    ->from('comment_topic', ['item_id', 'messages'])
-                    ->where('comment_topic.type_id = :type_id')
-                    ->where('comment_topic.item_id in (?)', $itemId)
-                    ->joinLeft(
+        $isArrayRequest = is_array($itemId);
+        
+        $itemId = (array)$itemId;
+        
+        $rows = [];
+        if (count($itemId) > 0) {
+            
+            $rows = $this->topicTable->select(function(Sql\Select $select) use ($typeId, $itemId, $userId) {
+                $select
+                    ->columns(['item_id', 'messages'])
+                    ->where([
+                        'comment_topic.type_id = ?' => $typeId,
+                        new Sql\Predicate\In('comment_topic.item_id', $itemId)
+                    ])
+                    ->join(
                         'comment_topic_view',
-                        'comment_topic.type_id = comment_topic_view.type_id ' .
-                        'and comment_topic.item_id = comment_topic_view.item_id ' .
-                        'and comment_topic_view.user_id = :user_id',
-                        'timestamp'
+                        new Sql\Predicate\PredicateSet([
+                            new Sql\Predicate\Expression('comment_topic.type_id = comment_topic_view.type_id'),
+                            new Sql\Predicate\Expression('comment_topic.item_id = comment_topic_view.item_id'),
+                            new Sql\Predicate\Operator('comment_topic_view.user_id', Sql\Predicate\Operator::OP_EQ, $userId)
+                        ]),
+                        ['timestamp'],
+                        $select::JOIN_LEFT
                     );
+            });
 
-                $rows = $db->fetchAll($select, [
-                    'user_id' => $userId,
-                    'type_id' => $typeId
-                ]);
+        }
+
+        $result = [];
+        foreach ($rows as $row) {
+            $id = $row['item_id'];
+            $viewTime = $row['timestamp'];
+            $messages = (int)$row['messages'];
+
+            if (! $viewTime) {
+                $newMessages = $messages;
             } else {
-                $rows = [];
+                
+                $row = $this->messageTable2->select(function(Sql\Select $select) use ($id, $typeId, $viewTime) {
+                    $select
+                        ->columns(['count' => new Sql\Expression('count(1)')])
+                        ->where([
+                            'comments_messages.item_id'      => $id,
+                            'comments_messages.type_id'      => $typeId,
+                            'comments_messages.datetime > ?' => $viewTime
+                        ]);
+                })->current();
+                
+                $newMessages = $row['count'];
             }
 
-            foreach ($rows as $row) {
-                $id = $row['item_id'];
-                $viewTime = $row['timestamp'];
-                $messages = (int)$row['messages'];
-
-                if (! $viewTime) {
-                    $newMessages = $messages;
-                } else {
-                    $newMessages = (int)$db->fetchOne($newMessagesSelect, [
-                        'item_id'  => $id,
-                        'type_id'  => $typeId,
-                        'datetime' => $viewTime,
-                    ]);
-                }
-
-                $result[$id] = [
-                    'messages'    => $messages,
-                    'newMessages' => $newMessages
-                ];
-            }
-
-            return $result;
-        } else {
-            $messages = 0;
-            $newMessages = 0;
-
-            $topic = $this->topicTable->fetchRow([
-                'item_id = ?' => $itemId,
-                'type_id = ?' => $typeId
-            ]);
-
-            if ($topic) {
-                $messages = (int)$topic->messages;
-
-                $viewTime = $db->fetchOne(
-                    $db->select()
-                        ->from('comment_topic_view', 'timestamp')
-                        ->where('comment_topic_view.item_id = :item_id')
-                        ->where('comment_topic_view.type_id = :type_id')
-                        ->where('comment_topic_view.user_id = :user_id'),
-                    [
-                        'item_id' => $itemId,
-                        'type_id' => $typeId,
-                        'user_id' => $userId,
-                    ]
-                );
-
-                if (! $viewTime) {
-                    $newMessages = $messages;
-                } else {
-                    $newMessages = (int)$db->fetchOne($newMessagesSelect, [
-                        'item_id'  => $itemId,
-                        'type_id'  => $typeId,
-                        'datetime' => $viewTime,
-                    ]);
-                }
-            }
-
-            return [
+            $result[$id] = [
                 'messages'    => $messages,
                 'newMessages' => $newMessages
             ];
         }
+        
+        if ($isArrayRequest) {
+            return $result;
+        }
+        
+        if (count($result) <= 0) {
+            return [
+                'messages'    => 0,
+                'newMessages' => 0
+            ];
+        }
+        
+        return reset($result);
     }
 
     /**
@@ -775,43 +756,40 @@ class CommentsService
      */
     public function getTopicStat($typeId, $itemId)
     {
-        if (is_array($itemId)) {
-            $result = [];
+        $isArrayRequest = is_array($itemId);
+        $itemId = (array)$itemId;
+        
+        $result = [];
 
-            if ($itemId) {
-                $db = $this->topicTable->getAdapter();
+        if (count($itemId) > 0) {
+            
+            $rows = $this->topicTable->select(function(Sql\Select $select) use ($typeId, $itemId) {
+                $select
+                    ->columns(['item_id', 'messages'])
+                    ->where([
+                        'comment_topic.type_id = ?' => $typeId,
+                        new Sql\Predicate\In('comment_topic.item_id', $itemId)
+                    ]);
+            });
 
-                $pairs = $db->fetchPairs(
-                    $db->select()
-                        ->from($this->topicTable->info('name'), ['item_id', 'messages'])
-                        ->where('item_id in (?)', $itemId)
-                        ->where('type_id = ?', $typeId)
-                );
-
-                foreach ($pairs as $itemId => $count) {
-                    $result[$itemId] = [
-                        'messages' => $count
-                    ];
-                }
+            foreach ($rows as $row) {
+                $result[$row['item_id']] = [
+                    'messages' => $row['messages']
+                ];
             }
-        } else {
-            $messages = 0;
-
-            $topic = $this->topicTable->fetchRow([
-                'item_id = ?' => $itemId,
-                'type_id = ?' => $typeId
-            ]);
-
-            if ($topic) {
-                $messages = (int)$topic->messages;
-            }
-
-            $result = [
-                'messages' => $messages,
+        }
+        
+        if ($isArrayRequest) {
+            return $result;
+        }
+        
+        if (count($result) <= 0) {
+            return [
+                'messages' => 0
             ];
         }
-
-        return $result;
+        
+        return reset($result);
     }
 
     /**
@@ -822,31 +800,23 @@ class CommentsService
     {
         $messagesCount = $this->countMessages($typeId, $itemId);
 
-        $topic = $this->topicTable->fetchRow([
-            'item_id = ?' => $itemId,
-            'type_id = ?' => $typeId
-        ]);
-
-        if ($messagesCount > 0) {
-            $lastUpdate = $this->getLastUpdate($typeId, $itemId);
-
-            if (! $topic) {
-                $topic = $this->topicTable->createRow([
-                    'item_id' => $itemId,
-                    'type_id' => $typeId,
-                ]);
-            }
-
-            $topic->setFromArray([
-                'last_update' => $lastUpdate,
-                'messages'    => $messagesCount
+        if ($messagesCount <= 0) {
+            $this->topicTable->delete([
+                'item_id = ?' => $itemId,
+                'type_id = ?' => $typeId
             ]);
-            $topic->save();
-        } else {
-            if ($topic) {
-                $topic->delete();
-            }
+            return;
         }
+        
+        $lastUpdate = $this->getLastUpdate($typeId, $itemId);
+        
+        $sql = '
+            INSERT INTO comment_topic (item_id, type_id, last_update, messages)
+            VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE last_update=VALUES(last_update), messages=VALUES(messages)
+        ';
+        $statement = $this->topicTable->getAdapter()->query($sql);
+        $statement->execute([$itemId, $typeId, $lastUpdate, $messagesCount]);
     }
 
     /**
@@ -857,73 +827,48 @@ class CommentsService
      */
     public function getNewMessages($typeId, $itemId, $userId)
     {
-        $db = $this->topicTable->getAdapter();
+        $isArrayRequest = is_array($itemId);
+        $itemId = (array)$itemId;
 
-        $newMessagesSelect = $db->select()
-            ->from('comments_messages', 'count(1)')
-            ->where('comments_messages.item_id = :item_id')
-            ->where('comments_messages.type_id = :type_id')
-            ->where('comments_messages.datetime > :datetime');
-
-        if (is_array($itemId)) {
-            $result = [];
-
-            if (count($itemId) > 0) {
-                $select = $db->select()
-                    ->from('comment_topic_view', ['item_id', 'timestamp'])
-                    ->where('comment_topic_view.type_id = :type_id')
-                    ->where('comment_topic_view.user_id = :user_id')
-                    ->where('comment_topic_view.item_id in (?)', $itemId);
-
-                $pairs = $db->fetchPairs($select, [
-                    'user_id' => $userId,
-                    'type_id' => $typeId
-                ]);
-            } else {
-                $pairs = [];
-            }
-
-            foreach ($pairs as $id => $viewTime) {
-                if ($viewTime) {
-                    $newMessages = (int)$db->fetchOne($newMessagesSelect, [
-                        'item_id'  => $id,
-                        'type_id'  => $typeId,
-                        'datetime' => $viewTime,
+        $rows = [];
+        if (count($itemId) > 0) {
+            $rows = $this->topicViewTable->select(function(Sql\Select $select) use ($typeId, $userId, $itemId) {
+                $select
+                    ->columns(['item_id', 'timestamp'])
+                    ->where([
+                        'comment_topic_view.type_id = ?' => $typeId,
+                        'comment_topic_view.user_id = ?' => $userId,
+                        new Sql\Predicate\In('comment_topic_view.item_id', $itemId)
                     ]);
-
-                    $result[$id] = $newMessages;
-                }
-            }
-
-            return $result;
-        } else {
-            $newMessages = 0;
-
-            $viewTime = $db->fetchOne(
-                $db->select()
-                    ->from('comment_topic_view', 'timestamp')
-                    ->where('comment_topic_view.item_id = :item_id')
-                    ->where('comment_topic_view.type_id = :type_id')
-                    ->where('comment_topic_view.user_id = :user_id'),
-                [
-                    'item_id' => $itemId,
-                    'type_id' => $typeId,
-                    'user_id' => $userId,
-                ]
-            );
-
-            if (! $viewTime) {
-                $newMessages = null;
-            } else {
-                $newMessages = (int)$db->fetchOne($newMessagesSelect, [
-                    'item_id'  => $itemId,
-                    'type_id'  => $typeId,
-                    'datetime' => $viewTime,
-                ]);
-            }
-
-            return $newMessages;
+            });
         }
+        
+        $db = $this->getMessageTable()->getAdapter();
+
+        $result = [];
+        foreach ($rows as $row) {
+            if ($row['timestamp']) {
+                $id = $row['item_id'];
+                
+                $result[$id] = (int)$db->fetchOne(
+                    $db->select()
+                        ->from('comments_messages', 'count(1)')
+                        ->where('comments_messages.item_id = ?', $id)
+                        ->where('comments_messages.type_id = ?', $typeId)
+                        ->where('comments_messages.datetime > ?', $row['timestamp'])
+                );
+            }
+        }
+
+        if ($isArrayRequest) {
+            return $result;
+        }
+        
+        if (count($result) <= 0) {
+            return 0;
+        }
+        
+        return reset($result);
     }
 
     private function countMessages($typeId, $itemId)
@@ -940,13 +885,21 @@ class CommentsService
 
     public function getMessagesCounts($typeId, array $itemIds)
     {
-        $db = $this->topicTable->getAdapter();
-        return $db->fetchPairs(
-            $this->topicTable->select()
-                ->from($this->topicTable->info('name'), ['item_id', 'messages'])
-                ->where('item_id in (?)', $itemIds)
-                ->where('type_id = ?', (int)$typeId)
-        );
+        $rows = $this->topicTable->select(function(Sql\Select $select) use ($typeId, $itemIds) {
+            $select
+                ->columns(['item_id', 'messages'])
+                ->where([
+                    'type_id = ?' => $typeId,
+                    new Sql\Predicate\In('item_id', $itemIds)
+                ]);
+        });
+        
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['item_id']] = $row['messages'];
+        }
+        
+        return $result;
     }
 
     private function getLastUpdate($typeId, $itemId)
@@ -1040,9 +993,7 @@ class CommentsService
             'item_id = ?' => (int)$itemId
         ]);
 
-        $db = $this->topicTable->getAdapter();
-
-        $db->delete('comment_topic_view', [
+        $this->topicViewTable->delete([
             'type_id = ?' => (int)$typeId,
             'item_id = ?' => (int)$itemId
         ]);
