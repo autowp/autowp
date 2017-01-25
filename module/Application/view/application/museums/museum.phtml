@@ -52,7 +52,7 @@
 
 <div id="comments">
     <?=$this->comments([
-        'type'    => Autowp\Comments\CommentsService::MUSEUMS_TYPE_ID,
+        'type'    => \Application\Comments::ITEM_TYPE_ID,
         'item_id' => $this->museum->id
     ]) ?>
 </div>

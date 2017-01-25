@@ -299,7 +299,7 @@ class UploadController extends AbstractActionController
             // add comment
             if ($values['note']) {
                 $this->comments->add([
-                    'typeId'             => Comments\CommentsService::PICTURES_TYPE_ID,
+                    'typeId'             => \Application\Comments::PICTURES_TYPE_ID,
                     'itemId'             => $picture->id,
                     'parentId'           => null,
                     'authorId'           => $user->id,

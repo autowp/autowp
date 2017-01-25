@@ -444,13 +444,13 @@ class PicturesController extends AbstractActionController
             $expr = 'pictures.id = comment_topic.item_id and ' .
                     $this->table->getAdapter()->quoteInto(
                         'comment_topic.type_id = ?',
-                        Comments\CommentsService::PICTURES_TYPE_ID
+                        \Application\Comments::PICTURES_TYPE_ID
                     );
             $select->joinLeft('comment_topic', $expr, null);
         } elseif ($joinComments) {
             $select
                 ->join('comment_topic', 'pictures.id = comment_topic.item_id', null)
-                ->where('comment_topic.type_id = ?', Comments\CommentsService::PICTURES_TYPE_ID);
+                ->where('comment_topic.type_id = ?', \Application\Comments::PICTURES_TYPE_ID);
         }
 
         $paginator = new \Zend\Paginator\Paginator(
@@ -1824,9 +1824,9 @@ class PicturesController extends AbstractActionController
 
         // comments
         $this->comments->moveMessages(
-            Comments\CommentsService::PICTURES_TYPE_ID,
+            \Application\Comments::PICTURES_TYPE_ID,
             $replacePicture->id,
-            Comments\CommentsService::PICTURES_TYPE_ID,
+            \Application\Comments::PICTURES_TYPE_ID,
             $picture->id
         );
 

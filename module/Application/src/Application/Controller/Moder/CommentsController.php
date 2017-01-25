@@ -5,14 +5,11 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Autowp\Comments;
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
+use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 use Autowp\User\Model\DbTable\User;
 
+use Application\Comments;
 use Application\Model\DbTable;
-use Application\StringUtils;
-use Autowp\Comments\CommentsService;
-use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 
 class CommentsController extends AbstractActionController
 {
@@ -22,11 +19,11 @@ class CommentsController extends AbstractActionController
     private $form;
 
     /**
-     * @var Comments\CommentsService
+     * @var Comments
      */
     private $comments;
 
-    public function __construct(Form $form, Comments\CommentsService $comments)
+    public function __construct(Form $form, Comments $comments)
     {
         $this->form = $form;
         $this->comments = $comments;
@@ -80,7 +77,7 @@ class CommentsController extends AbstractActionController
             }
 
             if ($values['item_id']) {
-                $options['type'] = Comments\CommentsService::PICTURES_TYPE_ID;
+                $options['type'] = \Application\Comments::PICTURES_TYPE_ID;
                 $options['callback'] = function(\Zend_Db_Select $select) use ($values) {
                     $select
                         ->join('pictures', 'comments_messages.item_id = pictures.id', null)
@@ -91,7 +88,7 @@ class CommentsController extends AbstractActionController
             }
         }
 
-        $select = $this->comments->getMessagesSelect($options);
+        $select = $this->comments->service()->getMessagesSelect($options);
 
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbSelect($select)
@@ -104,7 +101,7 @@ class CommentsController extends AbstractActionController
         $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $status = '';
-            if ($commentRow['type_id'] == Comments\CommentsService::PICTURES_TYPE_ID) {
+            if ($commentRow['type_id'] == \Application\Comments::PICTURES_TYPE_ID) {
                 $pictures = $this->catalogue()->getPictureTable();
                 $picture = $pictures->find($commentRow['item_id'])->current();
                 if ($picture) {
@@ -139,14 +136,11 @@ class CommentsController extends AbstractActionController
             }
 
             $comments[] = [
-                'url'     => $this->comments->getUrl($commentRow),
-                'message' => StringUtils::getTextPreview($commentRow['message'], [
-                    'maxlines'  => 1,
-                    'maxlength' => CommentsService::PREVIEW_LENGTH
-                ]),
+                'url'     => $this->comments->getMessageRowUrl($commentRow),
+                'message' => $this->comments->getMessagePreview($commentRow['message']),
                 'user'    => $userTable->find($commentRow['author_id'])->current(),
                 'status'  => $status,
-                'new'     => $this->comments->isNewMessage($commentRow, $this->user()->get()->id)
+                'new'     => $this->comments->service()->isNewMessage($commentRow, $this->user()->get()->id)
             ];
         }
 

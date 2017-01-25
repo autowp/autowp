@@ -2,33 +2,18 @@
 
 namespace Autowp\Comments;
 
-/**
- * @todo remove dependency from application
- */
-use Application\Model\DbTable\Article;
-use Application\Model\DbTable\Picture;
-
 use Autowp\Commons\Db\Table;
+use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
 
-use Zend_Db_Expr;
 use Zend\Paginator\Paginator;
-use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
+
+use Zend_Db_Expr;
 
 class CommentsService
 {
-    const PREVIEW_LENGTH = 60;
-
-    //TODO: extract constants to application
-    const PICTURES_TYPE_ID = 1;
-    const TWINS_TYPE_ID = 2;
-    const VOTINGS_TYPE_ID = 3;
-    const ARTICLES_TYPE_ID = 4;
-    const FORUMS_TYPE_ID = 5;
-    const MUSEUMS_TYPE_ID = 6;
-
     /**
      * @var Model\DbTable\Message
      */
@@ -667,44 +652,6 @@ class CommentsService
         );
 
         return $viewTime ? $messageRow['datetime'] > $viewTime : true;
-    }
-
-    /**
-     * @deprecated
-     * @return string
-     */
-    public function getUrl($message)
-    {
-        switch ($message['type_id']) {
-            case self::PICTURES_TYPE_ID:
-                $pictures = new Picture();
-                $picture = $pictures->find($message['item_id'])->current();
-                if ($picture) {
-                    return '/picture/'.$picture->identity;
-                }
-                return null;
-
-            case self::VOTINGS_TYPE_ID:
-                return '/voting/voting/id/'.(int)$message['item_id'].'/';
-
-            case self::TWINS_TYPE_ID:
-                return '/twins/group'.(int)$message['item_id'];
-
-            case self::ARTICLES_TYPE_ID:
-                $articles = new Article();
-                $article = $articles->find($message['item_id'])->current();
-                if ($article) {
-                    return '/articles/'.$article->catname.'/';
-                }
-                return null;
-
-            case self::FORUMS_TYPE_ID:
-                return '/forums/topic-message/message_id/'.(int)$message['id'];
-
-            case self::MUSEUMS_TYPE_ID:
-                return '/museums/museum/id/'.(int)$message['item_id'];
-        }
-        return null;
     }
 
     /**

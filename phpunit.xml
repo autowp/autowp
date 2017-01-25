@@ -9,10 +9,10 @@
         <testsuite name="application">
             <directory>./module/Application/test</directory>
         </testsuite>
-        <testsuite name="application">
+        <testsuite name="comments">
             <directory>./module/Comments/test</directory>
         </testsuite>
-        <testsuite name="application">
+        <testsuite name="message">
             <directory>./module/Message/test</directory>
         </testsuite>
         <testsuite name="traffic">

@@ -1725,7 +1725,7 @@ class CatalogueController extends AbstractActionController
     {
         return $this->comments->getTotalMessagesCount([
             'attention' => Comments\Attention::REQUIRED,
-            'type'      => Comments\CommentsService::PICTURES_TYPE_ID,
+            'type'      => \Application\Comments::PICTURES_TYPE_ID,
             'callback'  => function(\Zend_Db_Select $select) {
                 $select
                     ->join('pictures', 'comments_messages.item_id = pictures.id', null)

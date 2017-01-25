@@ -5,18 +5,15 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Autowp\Comments;
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\Traffic\TrafficControl;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Rename as UserRename;
 
+use Application\Comments;
 use Application\Model\Brand as BrandModel;
 use Application\Model\DbTable;
-use Application\Model\DbTable\Picture;
-use Application\Model\DbTable\User\Account as UserAccount;
 use Application\Model\Contact;
-use Application\StringUtils;
 
 use Zend_Db_Expr;
 
@@ -36,14 +33,14 @@ class UsersController extends AbstractActionController
     private $trafficControl;
 
     /**
-     * @var Comments\CommentsService
+     * @var Comments
      */
     private $comments;
 
     public function __construct(
         $cache,
         TrafficControl $trafficControl,
-        Comments\CommentsService $comments
+        Comments $comments
     ) {
         $this->cache = $cache;
         $this->trafficControl = $trafficControl;
@@ -72,9 +69,9 @@ class UsersController extends AbstractActionController
 
     private function getLastComments($user)
     {
-        $select = $this->comments->getMessagesSelect([
+        $select = $this->comments->service()->getMessagesSelect([
             'user'            => $user->id,
-            'exclude_type'    => Comments\CommentsService::FORUMS_TYPE_ID,
+            'exclude_type'    => \Application\Comments::FORUMS_TYPE_ID,
             'exclude_deleted' => true,
             'order'           => 'datetime DESC'
         ]);
@@ -87,11 +84,8 @@ class UsersController extends AbstractActionController
         $lastComments = [];
         foreach ($paginator->getCurrentItems() as $row) {
             $lastComments[] = [
-                'url'     => $this->comments->getUrl($row),
-                'message' => StringUtils::getTextPreview($row['message'], [
-                    'maxlines'  => 1,
-                    'maxlength' => Comments\CommentsService::PREVIEW_LENGTH
-                ])
+                'url'     => $this->comments->getMessageRowUrl($row),
+                'message' => $this->comments->getMessagePreview($row['message'])
             ];
         }
 
@@ -114,7 +108,7 @@ class UsersController extends AbstractActionController
             $pictureAdapter->select()
                 ->from('pictures', new Zend_Db_Expr('COUNT(1)'))
                 ->where('owner_id = ?', $user->id)
-                ->where('status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+                ->where('status IN (?)', [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED])
         );
 
         $pictureTable = $this->catalogue()->getPictureTable();
@@ -164,7 +158,7 @@ class UsersController extends AbstractActionController
             }
         }
 
-        $uaTable = new UserAccount();
+        $uaTable = new DbTable\User\Account();
 
         $uaRows = $uaTable->fetchAll([
             'user_id = ?' => $user->id
@@ -221,7 +215,7 @@ class UsersController extends AbstractActionController
                 ->join('picture_item', 'item_parent_cache.item_id = picture_item.item_id', null)
                 ->join('pictures', 'picture_item.picture_id = pictures.id', null)
                 ->where('pictures.owner_id = ?', $user->id)
-                ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+                ->where('pictures.status IN (?)', [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED])
                 ->group('item.id');
         });
 
@@ -267,7 +261,7 @@ class UsersController extends AbstractActionController
             ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
             ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
             ->where('pictures.owner_id = ?', $user->id)
-            ->where('pictures.status IN (?)', [Picture::STATUS_NEW, Picture::STATUS_ACCEPTED])
+            ->where('pictures.status IN (?)', [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED])
             ->where('item_parent_cache.parent_id = ?', $brand['id'])
             ->group('pictures.id')
             ->order(['pictures.add_date DESC', 'pictures.id DESC']);
@@ -486,7 +480,7 @@ class UsersController extends AbstractActionController
 
         $order = $this->params('order');
 
-        $select = $this->comments->getSelectByUser($user->id, $order);
+        $select = $this->comments->service()->getSelectByUser($user->id, $order);
 
         $paginator = new \Zend\Paginator\Paginator(
             new Zend1DbTableSelect($select)
@@ -499,11 +493,8 @@ class UsersController extends AbstractActionController
         $comments = [];
         foreach ($paginator->getCurrentItems() as $commentRow) {
             $comments[] = [
-                'url'     => $this->comments->getUrl($commentRow),
-                'message' => StringUtils::getTextPreview($commentRow->message, [
-                    'maxlines'  => 1,
-                    'maxlength' => Comments\CommentsService::PREVIEW_LENGTH
-                ]),
+                'url'     => $this->comments->getMessageRowUrl($commentRow),
+                'message' => $this->comments->getMessagePreview($commentRow['message']),
                 'vote'    => $commentRow->vote
             ];
         }

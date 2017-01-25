@@ -61,7 +61,7 @@ class PicturesController extends AbstractActionController
             foreach ($pictures as $idx => $picture) {
 
                 $this->comments->deleteItemComments(
-                    Comments\CommentsService::PICTURES_TYPE_ID,
+                    \Application\Comments::PICTURES_TYPE_ID,
                     $picture->id
                 );
 

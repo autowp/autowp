@@ -13,7 +13,7 @@ class CommentsControllerFactory implements FactoryInterface
     {
         return new Controller(
             $container->get('ModerCommentsFilterForm'),
-            $container->get(\Autowp\Comments\CommentsService::class)
+            $container->get(\Application\Comments::class)
         );
     }
 }

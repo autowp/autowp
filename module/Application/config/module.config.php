@@ -98,6 +98,7 @@ return [
     'service_manager' => [
         'factories' => [
             Acl::class                           => Permissions\AclFactory::class,
+            Comments::class                      => Service\CommentsFactory::class,
             DuplicateFinder::class               => Service\DuplicateFinderFactory::class,
             ExternalLoginServiceFactory::class   => Service\ExternalLoginServiceFactory::class,
             FileSize::class                      => InvokableFactory::class,

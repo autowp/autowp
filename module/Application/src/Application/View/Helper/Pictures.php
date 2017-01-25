@@ -95,7 +95,7 @@ class Pictures extends AbstractHelper
     {
         if ($this->view->user()->logedIn()) {
             $commentsStat = $this->comments->getTopicStatForUser(
-                Comments\CommentsService::PICTURES_TYPE_ID,
+                \Application\Comments::PICTURES_TYPE_ID,
                 $picture->id,
                 $this->view->user()->get()->id
             );
@@ -103,7 +103,7 @@ class Pictures extends AbstractHelper
             $newMsgCount = $commentsStat['newMessages'];
         } else {
             $commentsStat = $this->comments->getTopicStat(
-                Comments\CommentsService::PICTURES_TYPE_ID,
+                \Application\Comments::PICTURES_TYPE_ID,
                 $picture->id
             );
             $msgCount = $commentsStat['messages'];

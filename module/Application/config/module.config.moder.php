@@ -6,8 +6,6 @@ use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
-use Autowp\Comments;
-
 return [
     'router' => [
         'routes' => [
@@ -328,9 +326,9 @@ return [
                             'label'   => 'moder/comments/filter/moderator_attention',
                             'options' => [
                                 ''                            => 'moder/comments/filter/moderator_attention/not-matters',
-                                Comments\Attention::NONE      => 'moder/comments/filter/moderator_attention/not-required',
-                                Comments\Attention::REQUIRED  => 'moder/comments/filter/moderator_attention/required',
-                                Comments\Attention::COMPLETED => 'moder/comments/filter/moderator_attention/resolved',
+                                \Autowp\Comments\Attention::NONE      => 'moder/comments/filter/moderator_attention/not-required',
+                                \Autowp\Comments\Attention::REQUIRED  => 'moder/comments/filter/moderator_attention/required',
+                                \Autowp\Comments\Attention::COMPLETED => 'moder/comments/filter/moderator_attention/resolved',
                             ]
                         ]
                     ]
