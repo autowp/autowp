@@ -135,7 +135,7 @@ class Comments
 
     public function getMessagePreview($message)
     {
-        return StringUtils::getTextPreview($message['message'], [
+        return StringUtils::getTextPreview($message, [
             'maxlines'  => 1,
             'maxlength' => self::PREVIEW_LENGTH
         ]);

@@ -1002,7 +1002,7 @@ class CommentsService
         }
 
         if ($options['callback']) {
-            $callback($select);
+            $options['callback']($select);
         }
 
         return $select;
