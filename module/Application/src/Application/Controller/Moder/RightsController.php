@@ -170,7 +170,7 @@ class RightsController extends AbstractActionController
                         $id = $this->roleTable->getLastInsertValue();
 
                         $parentRole = $this->roleTable->select([
-                            'id' => $data['parent_role_id']
+                            'id' => (int)$data['parent_role_id']
                         ])->current();
 
                         if ($parentRole) {
