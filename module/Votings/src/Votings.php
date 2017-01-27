@@ -13,6 +13,21 @@ use DateTime;
 
 class Votings
 {
+    /**
+     * @var TableGateway
+     */
+    private $votingTable;
+    
+    /**
+     * @var TableGateway
+     */
+    private $variantTable;
+    
+    /**
+     * @var TableGateway
+     */
+    private $voteTable;
+    
     public function __construct(Adapter $adapter)
     {
         $this->votingTable = new TableGateway('voting', $adapter);

@@ -16,7 +16,8 @@ class RightsControllerFactory implements FactoryInterface
             $container->get('longCache'),
             $container->get('ModerAclRoleForm'),
             $container->get('ModerAclRuleForm'),
-            $container->get('ModerAclRoleParentForm')
+            $container->get('ModerAclRoleParentForm'),
+            $container->get(\Zend\Db\Adapter\AdapterInterface::class)
         );
     }
 }

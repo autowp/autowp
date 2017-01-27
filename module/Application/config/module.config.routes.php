@@ -452,6 +452,18 @@ return [
                     ],
                 ]
             ],
+            'top-view' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/top-view[/page:page]',
+                    'defaults' => [
+                        'controller'  => Controller\PerspectiveController::class,
+                        'action'      => 'index',
+                        'perspective' => 18,
+                        'page_id'     => 201
+                    ],
+                ]
+            ],
             'donate' => [
                 'type' => Literal::class,
                 'options' => [

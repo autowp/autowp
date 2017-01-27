@@ -7,57 +7,32 @@
         ],
         'pageId' => 71,
     ]);
-
-    $roles = new Application\Model\DbTable\Acl\Role();
-
-    function printRolesRecuirsive($roles, $role) {
-        $select = $roles->select()
-            ->from($roles)
-            ->joinLeft('acl_roles_parents', 'acl_roles.id=acl_roles_parents.role_id', null)
-            ->where('acl_roles_parents.parent_role_id=?', $role->id);
-
-        ?>
-        <?=sprintf('%02d', $role->id) ?>. <?=$role->name ?>
-        <div style="margin-left:16px">
-            <?php foreach ($roles->fetchAll($select) as $role) { ?>
-                <?php printRolesRecuirsive($roles, $role) ?>
-            <?php } ?>
-        </div>
-        <?php
-    }
-
-
-    $select = $roles->select()
-        ->from($roles)
-        ->joinLeft('acl_roles_parents', 'acl_roles.id=acl_roles_parents.role_id', null)
-        ->where('acl_roles_parents.role_id IS NULL');
 ?>
 
-<?php foreach ($roles->fetchAll($select) as $role) { ?>
-    <div>
-        <?php printRolesRecuirsive($roles, $role) ?>
-    </div>
-<?php } ?>
+<ul>
+    <?=$this->partial('application/moder/rights/tree', [
+        'roles' => $this->rolesTree
+    ])?>
+</ul>
 
 <table class="table table-border table-striped">
     <tr>
         <td></td>
         <?php foreach ($this->roles as $role) { ?>
-            <td><?=$role->name ?></td>
+            <td><?=$this->escapeHtml($role['name']) ?></td>
         <?php } ?>
     </tr>
     <?php foreach ($this->resources as $resource) { ?>
         <tr>
-            <td><?=$resource->name ?></td>
+            <td><?=$this->escapeHtml($resource['name']) ?></td>
         </tr>
-        <?php foreach ($resource->findDependentRowset(Application\Model\DbTable\Acl\ResourcePrivilege::class) as $privilege) { ?>
+        <?php foreach ($resource['privileges'] as $privilege) { ?>
             <tr>
-                <td><?=$resource->name ?> / <?=$privilege->name ?></td>
+                <td><?=$this->escapeHtml($resource['name'] . ' / ' . $privilege['name']) ?></td>
                 <?php foreach ($this->roles as $role) { ?>
                     <td class="text-center">
-                        <?php if ($this->acl->isAllowed($role->name, $resource->name, $privilege->name)) { ?>
+                        <?php if ($this->acl->isAllowed($role['name'], $resource['name'], $privilege['name'])) { ?>
                             <i class="fa fa-check"></i>
-                        <?php } else { ?>
                         <?php } ?>
                     </td>
                 <?php } ?>
