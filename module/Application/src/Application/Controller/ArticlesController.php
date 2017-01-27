@@ -2,78 +2,68 @@
 
 namespace Application\Controller;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Paginator;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
+use Autowp\Commons\Db\Table;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable\Article;
 
-use Zend_Db_Table;
-
 class ArticlesController extends AbstractActionController
 {
     const ARTICLES_PER_PAGE = 10;
-    const PREVIEW_CAT_PATH = 'img/articles/preview/';
-
-    private function getTable()
+    const PREVIEW_CAT_PATH = '/img/articles/preview/';
+    
+    public function __construct(Adapter $adapter)
     {
-        return new Zend_Db_Table([
-            'name' => 'articles',
-            'referenceMap' => [
-                'Author' => [
-                    'columns'       => ['author_id'],
-                    'refTableClass' => \Autowp\User\Model\DbTable\User::class,
-                    'refColumns'    => ['id']
-                ],
-                'Html' => [
-                    'columns'       => ['html_id'],
-                    'refTableClass' => \Application\Model\DbTable\Html::class,
-                    'refColumns'    => ['id']
-                ]
-            ]
-        ]);
+        $this->table = new TableGateway('articles', $adapter);
+        $this->htmlTable = new TableGateway('htmls', $adapter);
     }
 
     public function indexAction()
     {
-        $table = $this->getTable();
-
-        $select = $table->select(true)
-            ->where('articles.enabled')
-            ->order(['articles.ratio DESC', 'articles.add_date DESC']);
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
+        $select = new Sql\Select($this->table->getTable());
+        $select
+            ->where('enabled')
+            ->order(['ratio DESC', 'add_date DESC']);
+        
+        $paginator = new Paginator\Paginator(
+            new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
 
         $paginator
             ->setItemCountPerPage(self::ARTICLES_PER_PAGE)
             ->setCurrentPageNumber($this->params('page'));
 
+        $userTable = new User();
+            
         $articles = [];
         foreach ($paginator->getCurrentItems() as $row) {
             $previewUrl = null;
-            if ($row->preview_filename) {
-                $previewUrl = '/' . self::PREVIEW_CAT_PATH . $row->preview_filename;
+            if ($row['preview_filename']) {
+                $previewUrl = self::PREVIEW_CAT_PATH . $row['preview_filename'];
             }
             $articles[] = [
                 'previewUrl'  => $previewUrl,
-                'name'        => $row->name,
-                'description' => $row->description,
-                'author'      => $row->findParentRow(User::class),
-                'date'        => $row->getDateTime('first_enabled_datetime'),
+                'name'        => $row['name'],
+                'description' => $row['description'],
+                'author'      => $userTable->find($row['author_id'])->current(),
+                'date'        => Table\Row::getDateTimeByColumnType('timestamp', $row['first_enabled_datetime']),
                 'url'         => $this->url()->fromRoute('articles', [
                     'action'          => 'article',
-                    'article_catname' => $row->catname
+                    'article_catname' => $row['catname']
                 ])
             ];
         }
 
         return [
-            'paginator'        => $paginator,
-            'articles'         => $articles,
-            'urlParams'        => [
+            'paginator' => $paginator,
+            'articles'  => $articles,
+            'urlParams' => [
                 'action' => 'index'
             ]
         ];
@@ -81,24 +71,25 @@ class ArticlesController extends AbstractActionController
 
     public function articleAction()
     {
-        $table = $this->getTable();
-
-        $article = $table->fetchRow([
+        $article = $this->table->select([
             'catname = ?' => (string)$this->params('article_catname')
-        ]);
+        ])->current();
+        
         if (! $article) {
             return $this->notFoundAction();
         }
 
-        if (! $article->enabled) {
+        if (! $article['enabled']) {
             return $this->notFoundAction();
         }
 
-        $htmlRow = $article->findParentRow(\Application\Model\DbTable\Html::class);
+        $htmlRow = $this->htmlTable->select([
+            'id' => $article['html_id']
+        ])->current();
 
         return [
             'article' => $article,
-            'html'    => $htmlRow ? $htmlRow->html : null
+            'html'    => $htmlRow ? $htmlRow['html'] : null
         ];
     }
 }

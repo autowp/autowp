@@ -6,8 +6,8 @@
         ],
         'pageId' => 32,
         'args'   => [
-            'ARTICLE_NAME'    => $this->article->name,
-            'ARTICLE_CATNAME' => $this->article->catname,
+            'ARTICLE_NAME'    => $this->article['name'],
+            'ARTICLE_CATNAME' => $this->article['catname'],
         ]
     ]);
 ?>
@@ -17,11 +17,11 @@
     </div>
 </div>
 
-<?php if ($this->article->enabled) { ?>
+<?php if ($this->article['enabled']) { ?>
     <div style="text-align:left;margin-bottom:20px;clear:both">
         <?=$this->comments([
             'type'    => \Application\Comments::ARTICLES_TYPE_ID,
-            'item_id' => $this->article->id
+            'item_id' => $this->article['id']
         ]) ?>
     </div>
 <?php } ?>
