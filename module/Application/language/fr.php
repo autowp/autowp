@@ -1128,6 +1128,7 @@ Take part in [the translation of the site](https://github.com/autowp/autowp/tree
     'moder/pictures/filter/order/commented' => 'Commentés',
     'moder/pictures/filter/order/views' => 'Vues',
     'moder/pictures/filter/order/moder-votes' => 'Votes de modérateur',
+    'moder/pictures/filter/order/removing-date' => 'Removing date',
 
     'moder/pictures/acceptance/message' => 'Message',
     'moder/pictures/picture/inbox-mark' => '(nouveau)',

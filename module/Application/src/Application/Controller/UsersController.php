@@ -69,16 +69,13 @@ class UsersController extends AbstractActionController
 
     private function getLastComments($user)
     {
-        $select = $this->comments->service()->getMessagesSelect([
+        $paginator = $this->comments->service()->getMessagesPaginator([
             'user'            => $user->id,
             'exclude_type'    => \Application\Comments::FORUMS_TYPE_ID,
             'exclude_deleted' => true,
             'order'           => 'datetime DESC'
         ]);
 
-        $paginator = new Paginator(
-            new Zend1DbSelect($select)
-        );
         $paginator->setItemCountPerPage(15);
 
         $lastComments = [];
@@ -480,11 +477,7 @@ class UsersController extends AbstractActionController
 
         $order = $this->params('order');
 
-        $select = $this->comments->service()->getSelectByUser($user->id, $order);
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbTableSelect($select)
-        );
+        $paginator = $this->comments->service()->getPaginatorByUser($user->id, $order);
 
         $paginator
             ->setItemCountPerPage(30)
@@ -495,7 +488,7 @@ class UsersController extends AbstractActionController
             $comments[] = [
                 'url'     => $this->comments->getMessageRowUrl($commentRow),
                 'message' => $this->comments->getMessagePreview($commentRow['message']),
-                'vote'    => $commentRow->vote
+                'vote'    => $commentRow['vote']
             ];
         }
 

@@ -241,6 +241,7 @@ class PicturesController extends AbstractActionController
             8 => ['sql' => 'picture_view.views DESC'],
             9 => ['sql' => 'pdr.day_date DESC'],
             10 => ['sql' => 'df_distance.distance ASC'],
+            11 => ['sql' => ['pictures.removing_date DESC', 'pictures.id']]
         ];
 
         if ($this->getRequest()->isPost()) {

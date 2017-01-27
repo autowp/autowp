@@ -493,9 +493,7 @@ class ForumsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $moder = new Forums();
-
-        $topics = $moder->getSubscribedTopics($user->id);
+        $topics = $this->model->getSubscribedTopics($user->id);
 
         $userTable = new User();
 

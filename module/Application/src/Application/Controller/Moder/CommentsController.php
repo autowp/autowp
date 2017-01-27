@@ -88,11 +88,7 @@ class CommentsController extends AbstractActionController
             }
         }
 
-        $select = $this->comments->service()->getMessagesSelect($options);
-
-        $paginator = new \Zend\Paginator\Paginator(
-            new Zend1DbSelect($select)
-        );
+        $paginator = $this->comments->service()->getMessagesPaginator($options);
 
         $paginator
             ->setItemCountPerPage(50)

@@ -73,6 +73,8 @@ class Forums
         if (! $isModerator) {
             $select->where('not is_moderator');
         }
+        
+        $userTable = new User();
 
         $themes = [];
 
@@ -97,9 +99,9 @@ class Forums
                 $lastMessageRow = $this->comments->getLastMessageRow(\Application\Comments::FORUMS_TYPE_ID, $lastTopicRow->id);
                 if ($lastMessageRow) {
                     $lastMessage = [
-                        'id'     => $lastMessageRow->id,
-                        'date'   => $lastMessageRow->getDateTime('datetime'),
-                        'author' => $lastMessageRow->findParentRow(User::class, 'Author')
+                        'id'     => $lastMessageRow['id'],
+                        'date'   => Table\Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
+                        'author' => $userTable->find($lastMessageRow['author_id'])->current(),
                     ];
                 }
             }
@@ -272,11 +274,13 @@ class Forums
         $paginator
             ->setItemCountPerPage(self::TOPICS_PER_PAGE)
             ->setCurrentPageNumber($page);
+        
+        $userTable = new User();
 
         $topics = [];
 
         foreach ($paginator->getCurrentItems() as $topicRow) {
-            $topicPaginator = $this->comments->getMessagePaginator(\Application\Comments::FORUMS_TYPE_ID, $topicRow->id)
+            $topicPaginator = $this->comments->getMessagePaginator(\Application\Comments::FORUMS_TYPE_ID, $topicRow['id'])
                 ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
                 ->setPageRange(10);
 
@@ -306,9 +310,9 @@ class Forums
                 $lastMessageRow = $this->comments->getLastMessageRow(\Application\Comments::FORUMS_TYPE_ID, $topicRow->id);
                 if ($lastMessageRow) {
                     $lastMessage = [
-                        'id'     => $lastMessageRow->id,
-                        'date'   => $lastMessageRow->getDateTime('datetime'),
-                        'author' => $lastMessageRow->findParentRow(User::class, 'Author')
+                        'id'     => $lastMessageRow['id'],
+                        'date'   => Table\Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
+                        'author' => $userTable->find($lastMessageRow['author_id'])->current(),
                     ];
                 }
             }
@@ -561,11 +565,11 @@ class Forums
             return false;
         }
 
-        if ($message->type_id != \Application\Comments::FORUMS_TYPE_ID) {
+        if ($message['type_id'] != \Application\Comments::FORUMS_TYPE_ID) {
             return false;
         }
 
-        $topic = $this->topicTable->find($message->item_id)->current();
+        $topic = $this->topicTable->find($message['item_id'])->current();
         if (! $topic) {
             return false;
         }
@@ -692,6 +696,8 @@ class Forums
                 ->where('comment_topic.type_id = ?', \Application\Comments::FORUMS_TYPE_ID)
                 ->order('comment_topic.last_update DESC')
         );
+        
+        $userTable = new User();
 
         $topics = [];
         foreach ($rows as $row) {
@@ -711,13 +717,13 @@ class Forums
             if ($messages > 0) {
                 $lastMessageRow = $this->comments->getLastMessageRow(
                     \Application\Comments::FORUMS_TYPE_ID,
-                    $row->id
+                    $row['id']
                 );
                 if ($lastMessageRow) {
                     $lastMessage = [
-                        'id'     => $lastMessageRow->id,
-                        'date'   => $lastMessageRow->getDateTime('datetime'),
-                        'author' => $lastMessageRow->findParentRow(User::class, 'Author'),
+                        'id'     => $lastMessageRow['id'],
+                        'date'   => Table\Row::getDateTimeByColumnType('timestamp', $lastMessageRow['datetime']),
+                        'author' => $userTable->find($lastMessageRow['author_id'])->current(),
                     ];
                 }
             }
