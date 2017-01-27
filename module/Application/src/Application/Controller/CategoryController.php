@@ -508,8 +508,9 @@ class CategoryController extends AbstractActionController
             $otherPictures = [];
             $otherItemsCount = 0;
             $isLastPage = $paginator->getCurrentPageNumber() == $paginator->count();
+            $isCategory = $currentCar->item_type_id == DbTable\Item\Type::CATEGORY;
 
-            if ($haveSubcategories && $isLastPage && $currentCar->item_type_id == DbTable\Item\Type::CATEGORY && ! $isOther) {
+            if ($haveSubcategories && $isLastPage && $isCategory && ! $isOther) {
                 $select = $this->itemTable->select(true)
                     ->where('item.item_type_id IN (?)', [
                         DbTable\Item\Type::ENGINE,

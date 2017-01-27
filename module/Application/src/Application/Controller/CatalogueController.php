@@ -596,7 +596,10 @@ class CatalogueController extends AbstractActionController
                 $select->where('picture_item.perspective_id = ?', 22);
                 break;
             default:
-                $select->where('picture_item.perspective_id not in (?) or picture_item.perspective_id is null', [22, 25]);
+                $select->where(
+                    'picture_item.perspective_id not in (?) or picture_item.perspective_id is null',
+                    [22, 25]
+                );
                 break;
         }
 
@@ -714,7 +717,10 @@ class CatalogueController extends AbstractActionController
                     $select->where('pictures.status = ?', DbTable\Picture::STATUS_REMOVING);
                     break;
                 default:
-                    $select->where('pictures.status in (?)', [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED]);
+                    $select->where('pictures.status in (?)', [
+                        DbTable\Picture::STATUS_NEW,
+                        DbTable\Picture::STATUS_ACCEPTED
+                    ]);
                     break;
             }
 
@@ -777,7 +783,11 @@ class CatalogueController extends AbstractActionController
                         'item.body', 'item.today',
                         'item.begin_year', 'item.end_year'
                     ])
-                    ->joinLeft('item_language', 'item.id = item_language.item_id and item_language.language = :lang', null)
+                    ->joinLeft(
+                        'item_language',
+                        'item.id = item_language.item_id and item_language.language = :lang',
+                        null
+                    )
                     ->joinLeft('spec', 'item.spec_id = spec.id', null)
                     ->where('item.id in (?)', $ids),
                 [
@@ -1016,9 +1026,12 @@ class CatalogueController extends AbstractActionController
         $pairs = $db->fetchPairs($select);
 
         return [
-            'stock'  => isset($pairs[DbTable\Item\ParentTable::TYPE_DEFAULT]) ? $pairs[DbTable\Item\ParentTable::TYPE_DEFAULT] : 0,
-            'tuning' => isset($pairs[DbTable\Item\ParentTable::TYPE_TUNING]) ? $pairs[DbTable\Item\ParentTable::TYPE_TUNING] : 0,
-            'sport'  => isset($pairs[DbTable\Item\ParentTable::TYPE_SPORT]) ? $pairs[DbTable\Item\ParentTable::TYPE_SPORT] : 0
+            'stock'  => isset($pairs[DbTable\Item\ParentTable::TYPE_DEFAULT])
+                ? $pairs[DbTable\Item\ParentTable::TYPE_DEFAULT] : 0,
+            'tuning' => isset($pairs[DbTable\Item\ParentTable::TYPE_TUNING])
+                ? $pairs[DbTable\Item\ParentTable::TYPE_TUNING] : 0,
+            'sport'  => isset($pairs[DbTable\Item\ParentTable::TYPE_SPORT])
+                ? $pairs[DbTable\Item\ParentTable::TYPE_SPORT] : 0
         ];
     }
 
@@ -1726,7 +1739,7 @@ class CatalogueController extends AbstractActionController
         return $this->comments->getTotalMessagesCount([
             'attention' => Comments\Attention::REQUIRED,
             'type'      => \Application\Comments::PICTURES_TYPE_ID,
-            'callback'  => function(\Zend\Db\Sql\Select $select) use ($carId) {
+            'callback'  => function (\Zend\Db\Sql\Select $select) use ($carId) {
                 $select
                     ->join('pictures', 'comment_message.item_id = pictures.id', [])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
@@ -1928,7 +1941,10 @@ class CatalogueController extends AbstractActionController
                     $select->where('pictures.status = ?', DbTable\Picture::STATUS_REMOVING);
                     break;
                 default:
-                    $select->where('pictures.status in (?)', [DbTable\Picture::STATUS_NEW, DbTable\Picture::STATUS_ACCEPTED]);
+                    $select->where('pictures.status in (?)', [
+                        DbTable\Picture::STATUS_NEW,
+                        DbTable\Picture::STATUS_ACCEPTED
+                    ]);
                     break;
             }
 

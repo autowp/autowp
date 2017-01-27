@@ -52,7 +52,7 @@ class Comments
     public function getMessageRowUrl($message, $canonical = false, $uri = null)
     {
         $url = null;
-        
+
         switch ($message['type_id']) {
             case self::PICTURES_TYPE_ID:
                 $pictureTable = new DbTable\Picture();
@@ -95,8 +95,12 @@ class Comments
                             'uri'             => $uri
                         ]);
                         break;
-                    /*default:
-                        throw new Exception("Failed to build url form message `{$message['item_id']}` item_type `{$item['item_type_id']}`");*/
+                    default:
+                        throw new Exception(sprintf(
+                            "Failed to build url form message `%s` item_type `%s`",
+                            $message['item_id'],
+                            $item['item_type_id']
+                        ));
                 }
                 break;
 
@@ -125,7 +129,7 @@ class Comments
                     'uri'             => $uri
                 ]);
                 break;
-                
+
             case self::FORUMS_TYPE_ID:
                 $url = $this->router->assemble([
                     'message_id' => $message['id']

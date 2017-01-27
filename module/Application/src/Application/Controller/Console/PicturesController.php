@@ -59,7 +59,6 @@ class PicturesController extends AbstractActionController
             $progressBar = new Zend_ProgressBar($adapter, 0, count($pictures));
 
             foreach ($pictures as $idx => $picture) {
-
                 $this->comments->deleteItemComments(
                     \Application\Comments::PICTURES_TYPE_ID,
                     $picture->id

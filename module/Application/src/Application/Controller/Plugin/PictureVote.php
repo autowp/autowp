@@ -116,7 +116,9 @@ class PictureVote extends AbstractPlugin
             'canDelete'         => $this->pictureCanDelete($picture),
             'canVote'           => ! $voteExists && $controller->user()->isAllowed('picture', 'moder_vote'),
             'voteExists'        => $voteExists,
-            'moderVotes'        => $options['hideVote'] ? null : $picture->findDependentRowset(DbTable\Picture\ModerVote::class),
+            'moderVotes'        => $options['hideVote']
+                ? null
+                : $picture->findDependentRowset(DbTable\Picture\ModerVote::class),
             'pictureDeleteUrl'  => $controller->url()->fromRoute('moder/pictures/params', [
                 'action'     => 'delete-picture',
                 'picture_id' => $picture->id

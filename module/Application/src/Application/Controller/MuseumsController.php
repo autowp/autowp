@@ -11,12 +11,12 @@ use geoPHP;
 class MuseumsController extends AbstractActionController
 {
     private $textStorage;
-    
+
     public function __construct($textStorage)
     {
         $this->textStorage = $textStorage;
     }
-    
+
     public function indexAction()
     {
         return $this->redirect()->toUrl('/map');

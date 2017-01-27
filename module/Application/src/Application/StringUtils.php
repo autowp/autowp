@@ -20,7 +20,7 @@ class StringUtils
 
         if ($maxlines) {
             $lines = explode("\n", $text);
-            $lines = array_slice($lines , 0, $maxlines);
+            $lines = array_slice($lines, 0, $maxlines);
 
             $text = implode("\n", $lines);
         }

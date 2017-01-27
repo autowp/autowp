@@ -5,7 +5,6 @@ namespace Application\Controller\Moder;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
 use Autowp\User\Model\DbTable\User;
 
 use Application\Comments;
@@ -78,7 +77,7 @@ class CommentsController extends AbstractActionController
 
             if ($values['item_id']) {
                 $options['type'] = \Application\Comments::PICTURES_TYPE_ID;
-                $options['callback'] = function(\Zend_Db_Select $select) use ($values) {
+                $options['callback'] = function (\Zend_Db_Select $select) use ($values) {
                     $select
                         ->join('pictures', 'comment_message.item_id = pictures.id', null)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)

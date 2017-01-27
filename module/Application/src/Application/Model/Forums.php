@@ -96,7 +96,10 @@ class Forums
                     'name' => $lastTopicRow->name
                 ];
 
-                $lastMessageRow = $this->comments->getLastMessageRow(\Application\Comments::FORUMS_TYPE_ID, $lastTopicRow->id);
+                $lastMessageRow = $this->comments->getLastMessageRow(
+                    \Application\Comments::FORUMS_TYPE_ID,
+                    $lastTopicRow->id
+                );
                 if ($lastMessageRow) {
                     $lastMessage = [
                         'id'     => $lastMessageRow['id'],
@@ -211,7 +214,10 @@ class Forums
             return false;
         }
 
-        $needAttention = $this->comments->topicHaveModeratorAttention(\Application\Comments::FORUMS_TYPE_ID, $topic->id);
+        $needAttention = $this->comments->topicHaveModeratorAttention(
+            \Application\Comments::FORUMS_TYPE_ID,
+            $topic->id
+        );
 
         if ($needAttention) {
             throw new \Exception("Cannot delete row when moderator attention not closed");
@@ -242,7 +248,7 @@ class Forums
 
         $theme->messages = $this->comments->getTotalMessagesCount([
             'type'     => \Application\Comments::FORUMS_TYPE_ID,
-            'callback' => function(\Zend_Db_Select $select) use ($theme) {
+            'callback' => function (\Zend_Db_Select $select) use ($theme) {
                 $select
                     ->join('forums_topics', 'comment_message.item_id = forums_topics.id', null)
                     ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', null)
@@ -280,7 +286,10 @@ class Forums
         $topics = [];
 
         foreach ($paginator->getCurrentItems() as $topicRow) {
-            $topicPaginator = $this->comments->getMessagePaginator(\Application\Comments::FORUMS_TYPE_ID, $topicRow['id'])
+            $topicPaginator = $this->comments->getMessagePaginator(
+                \Application\Comments::FORUMS_TYPE_ID,
+                $topicRow['id']
+            )
                 ->setItemCountPerPage(self::MESSAGES_PER_PAGE)
                 ->setPageRange(10);
 
@@ -307,7 +316,10 @@ class Forums
 
             $lastMessage = false;
             if ($messages > 0) {
-                $lastMessageRow = $this->comments->getLastMessageRow(\Application\Comments::FORUMS_TYPE_ID, $topicRow->id);
+                $lastMessageRow = $this->comments->getLastMessageRow(
+                    \Application\Comments::FORUMS_TYPE_ID,
+                    $topicRow->id
+                );
                 if ($lastMessageRow) {
                     $lastMessage = [
                         'id'     => $lastMessageRow['id'],

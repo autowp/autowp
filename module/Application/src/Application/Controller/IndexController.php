@@ -579,7 +579,11 @@ class IndexController extends AbstractActionController
                         ]
                     )
                     ->where('category.item_type_id = ?', DbTable\Item\Type::CATEGORY)
-                    ->joinLeft(['top_category_parent' => 'item_parent'], 'category.id = top_category_parent.item_id', null)
+                    ->joinLeft(
+                        ['top_category_parent' => 'item_parent'],
+                        'category.id = top_category_parent.item_id',
+                        null
+                    )
                     ->where('top_category_parent.parent_id is null')
                     ->join('item_parent', 'category.id = item_parent.parent_id', null)
                     ->join(['top_item' => 'item'], 'item_parent.item_id = top_item.id', null)
