@@ -2,18 +2,15 @@
 
 namespace Application\Permissions;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Permissions\Acl\Acl;
 use Zend\Permissions\Acl\Role\GenericRole;
 use Zend\Permissions\Acl\Resource\GenericResource;
 use Interop\Container\ContainerInterface;
-
-use Application\Model\DbTable\Acl\Resource;
-use Application\Model\DbTable\Acl\ResourcePrivilege;
-use Application\Model\DbTable\Acl\Role;
-use Application\Model\DbTable\Acl\RolePrivilegeAllowed;
-use Application\Model\DbTable\Acl\RolePrivilegeDenied;
 
 use Exception;
 
@@ -32,7 +29,10 @@ class AclFactory implements FactoryInterface
         if (! $success) {
             $acl = new Acl();
 
-            $this->load($acl);
+            $this->load(
+                $acl,
+                $container->get(\Zend\Db\Adapter\AdapterInterface::class)
+            );
 
             $cache->setItem($key, $acl);
         }
@@ -53,66 +53,106 @@ class AclFactory implements FactoryInterface
         return $this($controllers, AclFactory::class);
     }
 
-    private function load(Acl $acl)
+    private function load(Acl $acl, Adapter $adapter)
     {
-        $roles = new Role();
+        $roleTable = new TableGateway('acl_roles', $adapter);
+        $resourceTable = new TableGateway('acl_resources', $adapter);
+        $privilegeTable = new TableGateway('acl_resources_privileges', $adapter);
+        $privilegeAllowedTable = new TableGateway('acl_roles_privileges_allowed', $adapter);
+        $privilegeDeniedTable = new TableGateway('acl_roles_privileges_denied', $adapter);
+
         $loaded = [];
-        foreach ($roles->fetchAll() as $role) {
-            $this->addRole($acl, $roles, $role, $loaded, 1);
+        foreach ($roleTable->select([]) as $role) {
+            $this->addRole($acl, $roleTable, $role, $loaded, 1);
         }
 
-        $resources = new Resource();
-        foreach ($resources->fetchAll() as $resource) {
-            $acl->addResource(new GenericResource($resource->name));
+        foreach ($resourceTable->select([]) as $resource) {
+            $acl->addResource(new GenericResource($resource['name']));
         }
 
-        $allowed = new RolePrivilegeAllowed();
-        foreach ($allowed->fetchAll() as $allow) {
-            $privilege = $allow->findParentRow(ResourcePrivilege::class);
-
+        $rows = $privilegeAllowedTable->select(function (Sql\Select $select) {
+            $select
+                ->columns([])
+                ->join(
+                    'acl_resources_privileges',
+                    'acl_roles_privileges_allowed.privilege_id = acl_resources_privileges.id',
+                    ['privilege' => 'name']
+                )
+                ->join(
+                    'acl_resources',
+                    'acl_resources_privileges.resource_id = acl_resources.id',
+                    ['resource' => 'name']
+                )
+                ->join(
+                    'acl_roles',
+                    'acl_roles_privileges_allowed.role_id = acl_roles.id',
+                    ['role' => 'name']
+                );
+        });
+        foreach ($rows as $allow) {
             $acl->allow(
-                $allow->findParentRow(Role::class)->name,
-                $privilege->findParentRow(Resource::class)->name,
-                $privilege->name
+                $allow['role'],
+                $allow['resource'],
+                $allow['privilege']
             );
         }
 
-        $denied = new RolePrivilegeDenied();
-        foreach ($denied->fetchAll() as $deny) {
-            $privilege = $deny->findParentRow(ResourcePrivilege::class);
+        $rows = $privilegeDeniedTable->select(function (Sql\Select $select) {
+            $select
+                ->columns([])
+                ->join(
+                    'acl_resources_privileges',
+                    'acl_roles_privileges_denied.privilege_id = acl_resources_privileges.id',
+                    ['privilege' => 'name']
+                )
+                ->join(
+                    'acl_resources',
+                    'acl_resources_privileges.resource_id = acl_resources.id',
+                    ['resource' => 'name']
+                )
+                ->join(
+                    'acl_roles',
+                    'acl_roles_privileges_denied.role_id = acl_roles.id',
+                    ['role' => 'name']
+                );
+        });
+        foreach ($rows as $deny) {
             $acl->deny(
-                $deny->findParentRow(Role::class)->name,
-                $privilege->findParentRow(Resource::class)->name,
-                $privilege->name
+                $deny['role'],
+                $deny['resource'],
+                $deny['privilege']
             );
         }
     }
 
-    private function addRole(Acl $acl, $roles, $role, array &$loaded, $deep)
+    private function addRole(Acl $acl, TableGateway $roleTable, $role, array &$loaded, $deep)
     {
         if ($deep > 10) {
             throw new Exception('Roles deep overflow');
         }
 
-        if (in_array($role->name, $loaded)) {
+        if (in_array($role['name'], $loaded)) {
             return;
         }
 
         // parent roles
-        $select = $roles->select()
-            ->from($roles)
-            ->join('acl_roles_parents', 'acl_roles.id=acl_roles_parents.parent_role_id', null)
-            ->where('acl_roles_parents.role_id = ?', $role->id);
+        $rows = $roleTable->select(function (Sql\Select $select) use ($role) {
+            $select
+                ->join('acl_roles_parents', 'acl_roles.id = acl_roles_parents.parent_role_id', [])
+                ->where([
+                    'acl_roles_parents.role_id = ?' => $role['id']
+                ]);
+        });
 
         $parents = [];
-        foreach ($roles->fetchAll($select) as $parentRole) {
-            $parents[] = $parentRole->name;
+        foreach ($rows as $parentRole) {
+            $parents[] = $parentRole['name'];
 
-            $this->addRole($acl, $roles, $parentRole, $loaded, $deep + 1);
+            $this->addRole($acl, $roleTable, $parentRole, $loaded, $deep + 1);
         }
 
-        $acl->addRole(new GenericRole($role->name), $parents);
+        $acl->addRole(new GenericRole($role['name']), $parents);
 
-        $loaded[] = $role->name;
+        $loaded[] = $role['name'];
     }
 }

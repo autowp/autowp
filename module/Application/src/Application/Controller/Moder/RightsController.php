@@ -33,18 +33,43 @@ class RightsController extends AbstractActionController
      * @var Form
      */
     private $roleParentForm;
-    
+
     /**
      * @var TableGateway
      */
     private $roleTable;
 
+    /**
+     * @var TableGateway
+     */
+    private $roleParentTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $resourceTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $privilegeTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $privilegeAllowedTable;
+
+    /**
+     * @var TableGateway
+     */
+    private $privilegeDeniedTable;
+
     public function __construct(
-        $acl, 
-        $cache, 
-        Form $roleForm, 
-        Form $ruleForm, 
-        Form $roleParentForm, 
+        $acl,
+        $cache,
+        Form $roleForm,
+        Form $ruleForm,
+        Form $roleParentForm,
         Adapter $adapter
     ) {
         $this->acl = $acl;
@@ -53,14 +78,13 @@ class RightsController extends AbstractActionController
         $this->roleForm = $roleForm;
         $this->ruleForm = $ruleForm;
         $this->roleParentForm = $roleParentForm;
-        
+
         $this->roleTable = new TableGateway('acl_roles', $adapter);
         $this->roleParentTable = new TableGateway('acl_roles_parents', $adapter);
         $this->resourceTable = new TableGateway('acl_resources', $adapter);
         $this->privilegeTable = new TableGateway('acl_resources_privileges', $adapter);
         $this->privilegeAllowedTable = new TableGateway('acl_roles_privileges_allowed', $adapter);
         $this->privilegeDeniedTable = new TableGateway('acl_roles_privileges_denied', $adapter);
-        
     }
 
     private function resetCache()
@@ -85,7 +109,7 @@ class RightsController extends AbstractActionController
             return $this->forbiddenAction();
         }
 
-        $rows = $this->roleTable->select(function(Sql\Select $select) {
+        $rows = $this->roleTable->select(function (Sql\Select $select) {
             $select
                 ->columns(['id', 'name'])
                 ->order('name');
@@ -101,7 +125,7 @@ class RightsController extends AbstractActionController
             $rows = $this->privilegeTable->select([
                 'resource_id' => $id
             ]);
-            
+
             foreach ($rows as $privilege) {
                 $resourceOptions[$id] = $resource['name'] . ' / ' . $privilege['name'];
             }
@@ -210,13 +234,13 @@ class RightsController extends AbstractActionController
         }
 
         $rules = [];
-        
-        $rows = $this->privilegeAllowedTable->select(function(Sql\Select $select) {
+
+        $rows = $this->privilegeAllowedTable->select(function (Sql\Select $select) {
             $select
                 ->columns(['allowed' => new Sql\Expression('1')])
                 ->join(
-                    'acl_resources_privileges', 
-                    'acl_roles_privileges_allowed.privilege_id = acl_resources_privileges.id', 
+                    'acl_resources_privileges',
+                    'acl_roles_privileges_allowed.privilege_id = acl_resources_privileges.id',
                     ['privilege' => 'name']
                 )
                 ->join(
@@ -234,7 +258,7 @@ class RightsController extends AbstractActionController
             $rules[] = $row;
         }
 
-        $rows = $this->privilegeDeniedTable->select(function(Sql\Select $select) {
+        $rows = $this->privilegeDeniedTable->select(function (Sql\Select $select) {
             $select
                 ->columns(['allowed' => new Sql\Expression('0')])
                 ->join(
@@ -256,19 +280,19 @@ class RightsController extends AbstractActionController
         foreach ($rows as $row) {
             $rules[] = $row;
         }
-        
+
         $roles = [];
         foreach ($this->roleTable->select([]) as $role) {
             $roles[] = $role;
         }
-        
+
         $resources = [];
         foreach ($this->resourceTable->select([]) as $resource) {
             $id = $resource['id'];
             $rows = $this->privilegeTable->select([
                 'resource_id' => $id
             ]);
-        
+
             $privileges = [];
             foreach ($rows as $privilege) {
                 $privileges[] = [
@@ -276,14 +300,14 @@ class RightsController extends AbstractActionController
                     'name' => $privilege['name']
                 ];
             }
-            
+
             $resources[] = [
                 'id'         => $resource['id'],
                 'name'       => $resource['name'],
                 'privileges' => $privileges
             ];
         }
-        
+
         return [
             'acl'               => $this->acl,
             'addRuleForm'       => $this->ruleForm,
@@ -295,11 +319,11 @@ class RightsController extends AbstractActionController
             'rules'             => $rules
         ];
     }
-    
+
     private function getRoles($parentId)
     {
         $select = new Sql\Select($this->roleTable->getTable());
-        
+
         if ($parentId) {
             $select
                 ->join('acl_roles_parents', 'acl_roles.id = acl_roles_parents.role_id', [])
@@ -309,7 +333,7 @@ class RightsController extends AbstractActionController
                 ->join('acl_roles_parents', 'acl_roles.id = acl_roles_parents.role_id', [], $select::JOIN_LEFT)
                 ->where('acl_roles_parents.role_id IS NULL');
         }
-        
+
         $roles = [];
         foreach ($this->roleTable->selectWith($select) as $role) {
             $roles[] = [
@@ -318,7 +342,7 @@ class RightsController extends AbstractActionController
                 'childs' => $this->getRoles($role['id'])
             ];
         }
-        
+
         return $roles;
     }
 }
