@@ -2837,6 +2837,8 @@ CREATE TABLE `voting` (
 --
 
 /*!40000 ALTER TABLE `voting` DISABLE KEYS */;
+insert into voting (id, name, multivariant, begin_date, end_date, votes, text)
+values (1, "Test vote", 0, CURDATE(), "2020-01-01", 0, "Voting text");
 /*!40000 ALTER TABLE `voting` ENABLE KEYS */;
 
 --
@@ -2866,6 +2868,9 @@ CREATE TABLE `voting_variant` (
 --
 
 /*!40000 ALTER TABLE `voting_variant` DISABLE KEYS */;
+insert into voting_variant(id, voting_id, name, votes, position, text) 
+values (1, 1, "First variant", 0, 1, "First variant text"),
+(2, 1, "Second variant", 0, 2, "Second variant text");
 /*!40000 ALTER TABLE `voting_variant` ENABLE KEYS */;
 
 --

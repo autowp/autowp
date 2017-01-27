@@ -45,7 +45,6 @@ class CarsControllerTest extends AbstractHttpControllerTestCase
 
     public function testCreateCarAndAddToBrand()
     {
-        //ini_set('xdebug.show_exception_trace', 1);
         $this->getRequest()->getHeaders()->addHeader(Cookie::fromString('Cookie: remember=admin-token'));
         $this->dispatch('https://www.autowp.ru/moder/cars/new/item_type_id/1', Request::METHOD_POST, [
             'name' => 'Test car'

@@ -17,7 +17,7 @@ class ArticlesController extends AbstractActionController
 {
     const ARTICLES_PER_PAGE = 10;
     const PREVIEW_CAT_PATH = '/img/articles/preview/';
-    
+
     public function __construct(Adapter $adapter)
     {
         $this->table = new TableGateway('articles', $adapter);
@@ -30,7 +30,7 @@ class ArticlesController extends AbstractActionController
         $select
             ->where('enabled')
             ->order(['ratio DESC', 'add_date DESC']);
-        
+
         $paginator = new Paginator\Paginator(
             new Paginator\Adapter\DbSelect($select, $this->table->getAdapter())
         );
@@ -40,7 +40,7 @@ class ArticlesController extends AbstractActionController
             ->setCurrentPageNumber($this->params('page'));
 
         $userTable = new User();
-            
+
         $articles = [];
         foreach ($paginator->getCurrentItems() as $row) {
             $previewUrl = null;
@@ -74,7 +74,7 @@ class ArticlesController extends AbstractActionController
         $article = $this->table->select([
             'catname = ?' => (string)$this->params('article_catname')
         ])->current();
-        
+
         if (! $article) {
             return $this->notFoundAction();
         }

@@ -22,7 +22,6 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 
-
 class UsersController extends AbstractActionController
 {
     private $cache;

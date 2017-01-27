@@ -34,13 +34,13 @@ class Votings
         $this->variantTable = new TableGateway('voting_variant', $adapter);
         $this->voteTable = new TableGateway('voting_variant_vote', $adapter);
     }
-    
+
     private function canVote($voting, $userId)
     {
         if (! $userId) {
             return false;
         }
-        
+
         $now = new DateTime();
 
         $beginDate = Table\Row::getDateTimeByColumnType('date', $voting['begin_date']);
@@ -51,12 +51,12 @@ class Votings
         if ($endDate <= $now) {
             return false;
         }
-        
+
         $voted = $this->voteTable->select(function(Sql\Select $select) use ($voting, $userId) {
             $select
                 ->join(
-                    'voting_variant', 
-                    'voting_variant_vote.voting_variant_id = voting_variant.id', 
+                    'voting_variant',
+                    'voting_variant_vote.voting_variant_id = voting_variant.id',
                     []
                 )
                 ->where([
@@ -69,32 +69,31 @@ class Votings
         if ($voted) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     public function getVoting($id, $filter, $userId)
     {
         $voting = $this->votingTable->select([
             'id' => (int)$id
         ])->current();
-        
+
         if (! $voting) {
             return null;
         }
-        
+
         $variants = [];
         $vvRows = $this->variantTable->select(function(Sql\Select $select) use ($voting) {
             $select
                 ->where(['voting_id = ?' => $voting['id']])
                 ->order('position');
         });
-        
+
         $maxVotes = $minVotes = null;
         foreach ($vvRows as $vvRow) {
             switch ($filter) {
                 case 1:
-                    
                     $row = $this->voteTable->select(function(Sql\Select $select) use ($vvRow) {
                         $select
                             ->columns(['count' => new Sql\Expression('count(1)')])
@@ -106,19 +105,22 @@ class Votings
                     })->current();
                     $votes = $row['count'];
                     break;
-        
+
                 default:
                     $votes = $vvRow['votes'];
                     break;
             }
-        
+
             $variants[] = [
-                'id'    => $vvRow['id'],
-                'name'  => $vvRow['name'],
-                'text'  => $vvRow['text'],
-                'votes' => $votes,
+                'id'      => $vvRow['id'],
+                'name'    => $vvRow['name'],
+                'text'    => $vvRow['text'],
+                'votes'   => $votes,
+                'percent' => 0,
+                'isMax'   => false,
+                'isMin'   => false
             ];
-        
+
             if (is_null($maxVotes) || $votes > $maxVotes) {
                 $maxVotes = $votes;
             }
@@ -126,25 +128,20 @@ class Votings
                 $minVotes = $votes;
             }
         }
-        
+
+        $minVotesPercent = 0;
         if ($maxVotes > 0) {
             $minVotesPercent = ceil(100 * $minVotes / $maxVotes);
-        } else {
-            $minVotesPercent = 0;
         }
-        
+
         foreach ($variants as &$variant) {
             if ($maxVotes > 0) {
                 $variant['percent'] = round(100 * $variant['votes'] / $maxVotes, 2);
                 $variant['isMax'] = $variant['percent'] >= 99;
                 $variant['isMin'] = $variant['percent'] <= $minVotesPercent;
-            } else {
-                $variant['percent'] = 0;
-                $variant['isMax'] = false;
-                $variant['isMin'] = false;
             }
         }
-        
+
         $beginDate = Table\Row::getDateTimeByColumnType('date', $voting['begin_date']);
         $endDate   = Table\Row::getDateTimeByColumnType('date', $voting['end_date']);
 
@@ -163,60 +160,60 @@ class Votings
             'filter'   => $filter
         ];
     }
-    
+
     public function getVotes($id)
     {
         $variant = $this->variantTable->select([
             'id' => (int)$id
         ])->current();
-        
+
         if (! $variant) {
             return null;
         }
-        
+
         $uTable = new User();
         $users = $uTable->fetchAll(
             $uTable->select(true)
                 ->join('voting_variant_vote', 'users.id = voting_variant_vote.user_id', null)
                 ->where('voting_variant_vote.voting_variant_id = ?', $variant->id)
         );
-        
+
         return [
             'users' => $users
         ];
     }
-    
+
     public function vote($id, $variantId, $userId)
     {
         $voting = $this->votingTable->select([
             'id' => (int)$id
         ])->current();
-        
+
         if (! $voting) {
             return false;
         }
-        
+
         if (! $this->canVote($voting, $userId)) {
             return false;
         }
-        
+
         $variantId = (array)$variantId;
-        
+
         if (count($variantId) <= 0) {
             return false;
         }
-        
+
         $vvRows = $this->variantTable->select([
             'voting_id' => $voting['id'],
             new Sql\Predicate\In('id', $variantId)
         ]);
-        
+
         if (! $voting['multivariant']) {
             if (count($vvRows) > 1) {
                 return false;
             }
         }
-        
+
         foreach ($vvRows as $vvRow) {
             $vvvRow = $this->voteTable->select([
                 'voting_variant_id' => $vvRow['id'],
@@ -229,15 +226,15 @@ class Votings
                     'timestamp'         => new Sql\Expression('now()')
                 ]);
             }
-        
+
             $this->updateVariantVotesCount($vvRow['id']);
         }
-        
+
         $this->updateVotingVotesCount($voting['id']);
-        
+
         return true;
     }
-    
+
     private function updateVariantVotesCount($variantId)
     {
         $count = $this->voteTable->select(function(Sql\Select $select) use ($variantId) {
@@ -245,14 +242,14 @@ class Votings
                 ->columns(['count' => new Sql\Expression('count(1)')])
                 ->where(['voting_variant_id' => $variantId]);
         })->current();
-        
+
         $this->variantTable->update([
             'votes' => $count['count']
         ], [
             'id' => $variantId
         ]);
     }
-    
+
     private function updateVotingVotesCount($votingId)
     {
         $count = $this->voteTable->select(function(Sql\Select $select) use ($votingId) {
