@@ -6,25 +6,25 @@
         ],
         'pageId' => 157,
         'args'   => [
-            'VOTING_NAME' => $this->voting->name,
-            'VOTING_ID'   => $this->voting->id
+            'VOTING_NAME' => $this->voting['name'],
+            'VOTING_ID'   => $this->voting['id']
         ]
     ]);
 
     $this->layout()->moduleName = 'default/voting/voting';
 ?>
 <div class="well">
-    <p><?=nl2br($this->escapeHtml($this->voting->text))?></p>
+    <p><?=nl2br($this->escapeHtml($this->voting['text']))?></p>
     <hr />
 
     <?php if ($this->canVote) { ?>
         <form action="<?=$this->escapeHtmlAttr($this->url('votings/vote', [
-            'id' => $this->voting->id
+            'id' => $this->voting['id']
         ]))?>" method="post">
             <ul class="unstyled">
                 <?php foreach ($this->variants as $variant) { ?>
                     <li>
-                        <?php if ($this->voting->multivariant) { ?>
+                        <?php if ($this->voting['multivariant']) { ?>
                             <label class="checkbox inline">
                                 <input type="checkbox" name="variant[]" value="<?=$variant['id']?>" />
                                 <?=$this->escapeHtml($variant['name'])?>
@@ -68,12 +68,12 @@
     <p class="pull-right">
         <?php if ($this->filter) { ?>
             <?=$this->htmlA($this->url('votings/voting', [
-                'id'     => $this->voting->id,
+                'id'     => $this->voting['id'],
                 'filter' => null
             ]), $this->translate('votings/voting/voters/show-all'))?>
         <?php } else { ?>
             <?=$this->htmlA($this->url('votings/voting', [
-                'id'     => $this->voting->id,
+                'id'     => $this->voting['id'],
                 'filter' => 1
             ]), $this->translate('votings/voting/voters/show-contributors'))?>
         <?php } ?>
@@ -82,14 +82,14 @@
 <p>
     <?=$this->escapeHtml(sprintf(
         $this->translate('votings/voting/voters/during-%s-%s'),
-        $this->dateFormat($this->voting->getDateTime('begin_date'), IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, $this->language()),
-        $this->dateFormat($this->voting->getDateTime('end_date'), IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, $this->language())
+        $this->dateFormat($this->voting['beginDate'], IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, $this->language()),
+        $this->dateFormat($this->voting['endDate'], IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, $this->language())
     ))?>
 </p>
 
 <div id="comments">
     <?=$this->comments([
         'type'    => \Application\Comments::VOTINGS_TYPE_ID,
-        'item_id' => $this->voting->id
+        'item_id' => $this->voting['id']
     ]) ?>
 </div>

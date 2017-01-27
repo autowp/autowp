@@ -27,6 +27,7 @@ return [
         'Autowp\\Message',
         'Autowp\\TextStorage',
         'Autowp\\Traffic',
+        'Autowp\\Votings',
         'Autowp\\ZFComponents',
         'Application',
         //'ZF\ContentNegotiation',

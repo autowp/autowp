@@ -29,6 +29,7 @@
             <directory suffix=".php">./module/Message/src</directory>
             <directory suffix=".php">./module/Traffic/src</directory>
             <directory suffix=".php">./module/User/src</directory>
+            <directory suffix=".php">./module/Votings/src</directory>
             <exclude>
                 <directory suffix=".php">./vendor</directory>
             </exclude>

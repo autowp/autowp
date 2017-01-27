@@ -45,7 +45,7 @@ return [
             Controller\TwinsController::class           => Controller\Frontend\Service\TwinsControllerFactory::class,
             Controller\UsersController::class           => Controller\Frontend\Service\UsersControllerFactory::class,
             Controller\UploadController::class          => Controller\Frontend\Service\UploadControllerFactory::class,
-            Controller\VotingController::class          => InvokableFactory::class,
+            Controller\VotingController::class          => Controller\Frontend\Service\VotingControllerFactory::class,
             Controller\Api\ContactsController::class    => InvokableFactory::class,
             Controller\Api\PictureController::class     => Controller\Api\Service\PictureControllerFactory::class,
             Controller\Api\UsersController::class       => InvokableFactory::class,
