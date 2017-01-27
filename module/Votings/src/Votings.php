@@ -79,7 +79,6 @@ class Votings
         foreach ($vvRows as $vvRow) {
             switch ($filter) {
                 case 1:
-
                     $row = $this->voteTable->select(function(Sql\Select $select) use ($vvRow) {
                         $select
                             ->columns(['count' => new Sql\Expression('count(1)')])
@@ -98,10 +97,13 @@ class Votings
             }
 
             $variants[] = [
-                'id'    => $vvRow['id'],
-                'name'  => $vvRow['name'],
-                'text'  => $vvRow['text'],
-                'votes' => $votes,
+                'id'      => $vvRow['id'],
+                'name'    => $vvRow['name'],
+                'text'    => $vvRow['text'],
+                'votes'   => $votes,
+                'percent' => 0,
+                'isMax'   => false,
+                'isMin'   => false
             ];
 
             if (is_null($maxVotes) || $votes > $maxVotes) {
@@ -112,10 +114,9 @@ class Votings
             }
         }
 
+        $minVotesPercent = 0;
         if ($maxVotes > 0) {
             $minVotesPercent = ceil(100 * $minVotes / $maxVotes);
-        } else {
-            $minVotesPercent = 0;
         }
 
         foreach ($variants as &$variant) {
@@ -123,10 +124,6 @@ class Votings
                 $variant['percent'] = round(100 * $variant['votes'] / $maxVotes, 2);
                 $variant['isMax'] = $variant['percent'] >= 99;
                 $variant['isMin'] = $variant['percent'] <= $minVotesPercent;
-            } else {
-                $variant['percent'] = 0;
-                $variant['isMax'] = false;
-                $variant['isMin'] = false;
             }
         }
 
