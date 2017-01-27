@@ -8,9 +8,20 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Application\Form\Moder\Attribute as AttributeForm;
 use Application\Form\Moder\AttributeListOption as AttributeListOptionForm;
 use Application\Model\DbTable\Attr;
+use Application\Service\SpecificationsService;
 
 class AttrsController extends AbstractActionController
 {
+    /**
+     * @var SpecificationsService
+     */
+    private $specsService = null;
+
+    public function __construct(SpecificationsService $specsService)
+    {
+        $this->specsService = $specsService;
+    }
+
     public function indexAction()
     {
         if (! $this->user()->isAllowed('attrs', 'edit')) {
@@ -48,13 +59,20 @@ class AttrsController extends AbstractActionController
             return $this->notFoundAction();
         }
 
+        $unitOptions = ['' => '--'];
+        foreach ($this->specsService->getUnits() as $unit) {
+            $unitOptions[$unit['id']] = $unit['name'];
+        }
+
         $formAttributeEdit = new AttributeForm();
+        $formAttributeEdit->get('unit_id')->setValueOptions($unitOptions);
         $formAttributeEdit->setAttribute('action', $this->url()->fromRoute(null, [
             'form' => 'edit'
         ], [], true));
         $formAttributeEdit->populateValues($attribute->toArray());
 
         $formAttributeNew = new AttributeForm();
+        $formAttributeNew->get('unit_id')->setValueOptions($unitOptions);
         $formAttributeNew->setAttribute('action', $this->url()->fromRoute(null, [
             'form' => 'new'
         ], [], true));
@@ -143,9 +161,7 @@ class AttrsController extends AbstractActionController
             'attribute'         => $attribute,
             'formAttributeEdit' => $formAttributeEdit,
             'formAttributeNew'  => $formAttributeNew,
-            'attributes'        => $attributes->fetchAll([
-                'parent_id = ?' => $attribute->id
-            ], 'position'),
+            'attributes'        => $this->getAttributes($attributes, null),
             'options'           => $options->fetchAll(
                 $options->select()
                     ->where('attribute_id = ?', $attribute->id)
@@ -154,6 +170,26 @@ class AttrsController extends AbstractActionController
             ),
             'formListOption'    => $formListOption
         ];
+    }
+
+    private function getAttributes($attributes, $parentId)
+    {
+        $rows = $attributes->fetchAll([
+            'parent_id = ?' => $parentId
+        ], 'position');
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = [
+                'id'     => $row['id'],
+                'name'   => $row['name'],
+                'type'   => $row->findParentRow(Application\Model\DbTable\Attr\Type::class),
+                'unit'   => $this->specsService->getUnit($attribute['unit_id']),
+                'childs' => $this->getAttributes($attributes, $row['id'])
+            ];
+        }
+
+        return $result;
     }
 
     private function zoneUrl($zone)

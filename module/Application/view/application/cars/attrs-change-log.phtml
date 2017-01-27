@@ -42,7 +42,7 @@
                 <td style="text-align:center">
                     <?=$this->escapeHtml($item['value'])?>
                     <?php if ($item['unit']) { ?>
-                        <span class="unit"><?=$this->escapeHtml($item['unit']->abbr) ?></span>
+                        <span class="unit"><?=$this->escapeHtml($item['unit']['abbr']) ?></span>
                     <?php } ?>
                 </td>
                 <td class="link">

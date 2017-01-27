@@ -22,13 +22,6 @@ class Attribute extends Form implements InputFilterProviderInterface
                 ->from($typesTable->info('name'), ['id', 'name'])
         );
 
-        $unitTable = new Attr\Unit();
-        $db = $unitTable->getAdapter();
-        $unitOptions = $db->fetchPairs(
-            $db->select()
-                ->from($unitTable->info('name'), ['id', 'name'])
-        );
-
         $elements = [
             [
                 'name'    => 'name',
@@ -59,7 +52,7 @@ class Attribute extends Form implements InputFilterProviderInterface
                 'type'    => 'Select',
                 'options' => [
                     'label'     => 'attrs/attribute/unit',
-                    'options'   => array_replace(['' => '--'], $unitOptions)
+                    'options'   => ['' => '--']
                 ]
             ],
             [

@@ -2,6 +2,11 @@
 
 namespace Application\Service;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\Paginator\Paginator;
+
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
 use Autowp\User\Model\DbTable\User;
 use Autowp\User\Model\DbTable\User\Row as UserRow;
@@ -49,7 +54,7 @@ class SpecificationsService
     private $listOptionsChilds = [];
 
     /**
-     * @var Attr\Unit
+     * @var TableGateway
      */
     private $unitTable = null;
 
@@ -129,10 +134,13 @@ class SpecificationsService
 
     public function __construct(
         $translator,
-        ItemNameFormatter $itemNameFormatter
+        ItemNameFormatter $itemNameFormatter,
+        Adapter $adapter
     ) {
         $this->translator = $translator;
         $this->itemNameFormatter = $itemNameFormatter;
+
+        $this->unitTable = new TableGateway('attrs_units', $adapter);
     }
 
     /**
@@ -220,13 +228,6 @@ class SpecificationsService
             : $this->listOptionsTable = new Attr\ListOption();
     }
 
-    private function getUnitTable()
-    {
-        return $this->unitTable
-            ? $this->unitTable
-            : $this->unitTable = new Attr\Unit();
-    }
-
     private function getZone($id)
     {
         if ($this->zones === null) {
@@ -244,20 +245,33 @@ class SpecificationsService
         return $this->zones[$id];
     }
 
-    public function getUnit($id)
+    private function loadUnits()
     {
         if ($this->units === null) {
             $units = [];
-            foreach ($this->getUnitTable()->fetchAll() as $unit) {
-                $units[$unit->id] = [
-                    'id'   => (int)$unit->id,
-                    'name' => $unit->name,
-                    'abbr' => $unit->abbr
+            foreach ($this->unitTable->select([]) as $unit) {
+                $id = (int)$unit['id'];
+                $units[$id] = [
+                    'id'   => $id,
+                    'name' => $unit['name'],
+                    'abbr' => $unit['abbr']
                 ];
             }
 
             $this->units = $units;
         }
+    }
+
+    public function getUnits()
+    {
+        $this->loadUnits();
+
+        return $this->units;
+    }
+
+    public function getUnit($id)
+    {
+        $this->loadUnits();
 
         $id = (int)$id;
 
@@ -2201,7 +2215,7 @@ class SpecificationsService
      * @throws Exception
      * @return array
      */
-    public function getZoneUserValues($zoneId, $itemId, $userId)
+    private function getZoneUserValues($zoneId, $itemId, $userId)
     {
         if (! $itemId) {
             throw new Exception("Item_id not set");
@@ -2271,7 +2285,7 @@ class SpecificationsService
      * @throws Exception
      * @return array
      */
-    public function getZoneUsersValues($zoneId, $itemId)
+    private function getZoneUsersValues($zoneId, $itemId)
     {
         if (! $itemId) {
             throw new Exception("Item_id not set");
@@ -2575,7 +2589,7 @@ class SpecificationsService
      * @throws Exception
      * @return array
      */
-    public function getZoneActualValues($zoneId, $itemId)
+    private function getZoneActualValues($zoneId, $itemId)
     {
         if (! $itemId) {
             throw new Exception("Item_id not set");
@@ -2865,7 +2879,7 @@ class SpecificationsService
 
         $userValueTable = $this->getUserValueTable();
 
-        $paginator = new \Zend\Paginator\Paginator(
+        $paginator = new Paginator(
             new Zend1DbTableSelect($select)
         );
 
@@ -2975,24 +2989,12 @@ class SpecificationsService
             '1.5 * ((1 + IFNULL((' . $pSelect . '), 0)) / (1 + IFNULL((' . $nSelect . '), 0)))'
         );
 
-        //print $expr . PHP_EOL;
-
         $db->update('users', [
             'specs_weight' => $expr,
         ]);
     }
 
-    /*public static function valueWeight($positives, $negatives) {
-        if ($negatives <= 1) {
-            $negatives = 1;
-        }
-        if ($positives <= 1) {
-            $positives = 1;
-        }
-        return 1 * $positives / ($negatives / 1.5);
-    }*/
-
-    public function getUserValueWeight($userId)
+    private function getUserValueWeight($userId)
     {
         if (! array_key_exists($userId, $this->valueWeights)) {
             $userRow = $this->getUserTable()->find($userId)->current();

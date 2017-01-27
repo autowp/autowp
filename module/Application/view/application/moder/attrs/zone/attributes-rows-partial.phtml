@@ -31,7 +31,7 @@
             <?=$this->htmlA($this->url('moder/attrs/params', [
                 'action'       => 'attribute',
                 'attribute_id' => $attribute->id
-            ]), $attribute->name) ?>
+            ]), $this->translate($attribute['name'])) ?>
         </td>
     </tr>
     <?=$this->partial('application/moder/attrs/zone/attributes-rows-partial', [

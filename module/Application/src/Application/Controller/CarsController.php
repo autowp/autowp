@@ -352,7 +352,7 @@ class CarsController extends AbstractActionController
         foreach ($rows as $row) {
             $attribute = $row->findParentRow(Attr\Attribute::class);
             $user = $row->findParentRow(User::class);
-            $unit = $attribute->findParentRow(Attr\Unit::class);
+            $unit =$this->specsService->getUnit($attribute['unit_id']);
             $values[] = [
                 'attribute' => $attribute,
                 'unit'      => $unit,
@@ -507,7 +507,7 @@ class CarsController extends AbstractActionController
                     $user->id,
                     $language
                 ),
-                'unit'     => $attribute->findParentRow(Attr\Unit::class)
+                'unit'     => $this->specsService->getUnit($attribute['unit_id'])
             ];
         }
 

@@ -5,8 +5,7 @@ namespace Application\Most\Adapter;
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 
-use Application\Model\DbTable\Attr\Attribute;
-use Application\Model\DbTable\Attr\Unit;
+use Application\Model\DbTable;
 
 use Exception;
 
@@ -28,7 +27,7 @@ class Attr extends AbstractAdapter
 
     public function getCars(Zend_Db_Table_Select $select, $language)
     {
-        $attributes = new Attribute();
+        $attributes = new DbTable\Attr\Attribute();
 
         $attribute = $attributes->find($this->attribute)->current();
         if (! $attribute) {
@@ -59,7 +58,7 @@ class Attr extends AbstractAdapter
         }
 
         return [
-            'unit' => $attribute->findParentRow(Unit::class),
+            'unit' => $specService->getUnit($attribute['unit_id']),
             'cars' => $result,
         ];
     }

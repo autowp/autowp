@@ -3,29 +3,26 @@
         <td>
             <?=str_repeat('—', $this->deep) ?>
             <?=$this->htmlA($this->url('moder/attrs/params', [
-                'attribute_id' => $attribute->id
-            ], [], true), $attribute->name) ?>
+                'attribute_id' => $attribute['id']
+            ], [], true), $this->translate($attribute['name'])) ?>
         </td>
         <td>
-            <?php if ($type = $attribute->findParentRow(Application\Model\DbTable\Attr\Type::class)) { ?>
-                <?=$this->escapeHtml($type->name) ?>
+            <?php if ($attribute['type']) { ?>
+                <?=$this->escapeHtml($attribute['type']['name']) ?>
             <?php } else { ?>
                 —
             <?php } ?>
         </td>
         <td>
-            <?php if ($unit = $attribute->findParentRow(Application\Model\DbTable\Attr\Unit::class)) { ?>
-                <?=$this->escapeHtml($unit->name) ?>
+            <?php if ($attribute['unit']) { ?>
+                <?=$this->escapeHtml($this->translate($attribute['unit']['name'])) ?>
             <?php } else { ?>
                 —
             <?php } ?>
         </td>
     </tr>
     <?=$this->partial('application/moder/attrs/attribute/attributes-rows-partial', [
-        'attributes' =>  $attribute->getTable()->fetchAll(
-            $attribute->getTable()->select()
-                ->where('parent_id = ?', $attribute->id)
-        ),
-        'deep'       =>  $this->deep + 1
+        'attributes' => $attribute['childs'],
+        'deep'       => $this->deep + 1
     ]) ?>
 <?php } ?>

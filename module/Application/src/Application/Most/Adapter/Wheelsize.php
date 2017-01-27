@@ -2,8 +2,7 @@
 
 namespace Application\Most\Adapter;
 
-use Application\Model\DbTable\Attr\Attribute;
-use Application\Model\DbTable\Attr\Unit;
+use Application\Model\DbTable;
 use Application\WheelSize as WheelsizeObject;
 
 use Zend_Db_Expr;
@@ -22,7 +21,7 @@ class Wheelsize extends AbstractAdapter
     {
         parent::__construct($options);
 
-        $this->attributesTable = new Attribute();
+        $this->attributesTable = new DbTable\Attr\Attribute();
     }
 
     public function setAttributes(array $value)

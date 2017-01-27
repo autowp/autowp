@@ -270,7 +270,7 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\Moder\AttrsController::class        => InvokableFactory::class,
+            Controller\Moder\AttrsController::class        => Controller\Moder\Service\AttrsControllerFactory::class,
             Controller\Moder\ItemParentController::class   => Controller\Moder\Service\ItemParentControllerFactory::class,
             Controller\Moder\CarsController::class         => Controller\Moder\Service\CarsControllerFactory::class,
             Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
