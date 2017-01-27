@@ -9,15 +9,37 @@ use Autowp\User\Model\DbTable\User;
 
 use Application\Model\DbTable\Article;
 
+use Zend_Db_Table;
+
 class ArticlesController extends AbstractActionController
 {
     const ARTICLES_PER_PAGE = 10;
+    const PREVIEW_CAT_PATH = 'img/articles/preview/';
+
+    private function getTable()
+    {
+        return new Zend_Db_Table([
+            'name' => 'articles',
+            'referenceMap' => [
+                'Author' => [
+                    'columns'       => ['author_id'],
+                    'refTableClass' => \Autowp\User\Model\DbTable\User::class,
+                    'refColumns'    => ['id']
+                ],
+                'Html' => [
+                    'columns'       => ['html_id'],
+                    'refTableClass' => \Application\Model\DbTable\Html::class,
+                    'refColumns'    => ['id']
+                ]
+            ]
+        ]);
+    }
 
     public function indexAction()
     {
-        $articles = new Article();
+        $table = $this->getTable();
 
-        $select = $articles->select(true)
+        $select = $table->select(true)
             ->where('articles.enabled')
             ->order(['articles.ratio DESC', 'articles.add_date DESC']);
 
@@ -32,8 +54,8 @@ class ArticlesController extends AbstractActionController
         $articles = [];
         foreach ($paginator->getCurrentItems() as $row) {
             $previewUrl = null;
-            if ($row->previewExists()) {
-                $previewUrl = '/' . Article::PREVIEW_CAT_PATH . $row->preview_filename;
+            if ($row->preview_filename) {
+                $previewUrl = '/' . self::PREVIEW_CAT_PATH . $row->preview_filename;
             }
             $articles[] = [
                 'previewUrl'  => $previewUrl,
@@ -59,9 +81,11 @@ class ArticlesController extends AbstractActionController
 
     public function articleAction()
     {
-        $articles = new Article();
+        $table = $this->getTable();
 
-        $article = $articles->findRowByCatname($this->params('article_catname'));
+        $article = $table->fetchRow([
+            'catname = ?' => (string)$this->params('article_catname')
+        ]);
         if (! $article) {
             return $this->notFoundAction();
         }
@@ -70,8 +94,11 @@ class ArticlesController extends AbstractActionController
             return $this->notFoundAction();
         }
 
+        $htmlRow = $article->findParentRow(\Application\Model\DbTable\Html::class);
+
         return [
             'article' => $article,
+            'html'    => $htmlRow ? $htmlRow->html : null
         ];
     }
 }

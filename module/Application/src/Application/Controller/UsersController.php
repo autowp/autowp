@@ -3,6 +3,7 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
 
 use Autowp\Commons\Paginator\Adapter\Zend1DbTableSelect;
@@ -20,8 +21,7 @@ use Zend_Db_Expr;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
-use Zend\Paginator\Paginator;
-use Autowp\Commons\Paginator\Adapter\Zend1DbSelect;
+
 
 class UsersController extends AbstractActionController
 {
@@ -263,7 +263,7 @@ class UsersController extends AbstractActionController
             ->group('pictures.id')
             ->order(['pictures.add_date DESC', 'pictures.id DESC']);
 
-        $paginator = new \Zend\Paginator\Paginator(
+        $paginator = new Paginator(
             new Zend1DbTableSelect($select)
         );
 
