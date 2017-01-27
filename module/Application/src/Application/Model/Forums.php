@@ -73,7 +73,7 @@ class Forums
         if (! $isModerator) {
             $select->where('not is_moderator');
         }
-        
+
         $userTable = new User();
 
         $themes = [];
@@ -244,7 +244,7 @@ class Forums
             'type'     => \Application\Comments::FORUMS_TYPE_ID,
             'callback' => function(\Zend_Db_Select $select) use ($theme) {
                 $select
-                    ->join('forums_topics', 'comments_messages.item_id = forums_topics.id', null)
+                    ->join('forums_topics', 'comment_message.item_id = forums_topics.id', null)
                     ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', null)
                     ->where('forums_theme_parent.parent_id = ?', $theme->id)
                     ->where('forums_topics.status IN (?)', [self::STATUS_NORMAL, self::STATUS_CLOSED]);
@@ -274,7 +274,7 @@ class Forums
         $paginator
             ->setItemCountPerPage(self::TOPICS_PER_PAGE)
             ->setCurrentPageNumber($page);
-        
+
         $userTable = new User();
 
         $topics = [];
@@ -696,7 +696,7 @@ class Forums
                 ->where('comment_topic.type_id = ?', \Application\Comments::FORUMS_TYPE_ID)
                 ->order('comment_topic.last_update DESC')
         );
-        
+
         $userTable = new User();
 
         $topics = [];

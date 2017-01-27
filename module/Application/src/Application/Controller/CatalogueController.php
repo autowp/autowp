@@ -1728,7 +1728,7 @@ class CatalogueController extends AbstractActionController
             'type'      => \Application\Comments::PICTURES_TYPE_ID,
             'callback'  => function(\Zend\Db\Sql\Select $select) use ($carId) {
                 $select
-                    ->join('pictures', 'comments_messages.item_id = pictures.id', [])
+                    ->join('pictures', 'comment_message.item_id = pictures.id', [])
                     ->join('picture_item', 'pictures.id = picture_item.picture_id', [])
                     ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', [])
                     ->where(['item_parent_cache.parent_id = ?' => $carId]);

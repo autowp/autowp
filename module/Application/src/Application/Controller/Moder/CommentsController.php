@@ -50,7 +50,7 @@ class CommentsController extends AbstractActionController
         }
 
         $options = [
-            'order' => 'comments_messages.datetime DESC'
+            'order' => 'comment_message.datetime DESC'
         ];
 
         $this->form->setData($this->params()->fromRoute());
@@ -80,7 +80,7 @@ class CommentsController extends AbstractActionController
                 $options['type'] = \Application\Comments::PICTURES_TYPE_ID;
                 $options['callback'] = function(\Zend_Db_Select $select) use ($values) {
                     $select
-                        ->join('pictures', 'comments_messages.item_id = pictures.id', null)
+                        ->join('pictures', 'comment_message.item_id = pictures.id', null)
                         ->join('picture_item', 'pictures.id = picture_item.picture_id', null)
                         ->join('item_parent_cache', 'picture_item.item_id = item_parent_cache.item_id', null)
                         ->where('item_parent_cache.parent_id = ?', $values['item_id']);

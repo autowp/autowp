@@ -21,7 +21,7 @@ class CommentsService
      * @var TableGateway
      */
     private $voteTable;
-    
+
     /**
      * @var TableGateway
      */
@@ -31,24 +31,24 @@ class CommentsService
      * @var User
      */
     private $userTable;
-    
+
     /**
      * @var TableGateway
      */
     private $topicViewTable;
-    
+
     /**
      * @var TableGateway
      */
     private $messageTable2;
-    
+
     public function __construct(Adapter $adapter)
     {
         $this->adapter = $adapter;
-        
+
         $this->voteTable = new TableGateway('comment_vote', $this->adapter);
         $this->topicTable = new TableGateway('comment_topic', $this->adapter);
-        $this->messageTable = new TableGateway('comments_messages', $this->adapter);
+        $this->messageTable = new TableGateway('comment_message', $this->adapter);
         $this->topicViewTable = new TableGateway('comment_topic_view', $this->adapter);
     }
 
@@ -114,7 +114,7 @@ class CommentsService
 
         return $messageId;
     }
-    
+
     private function updateMessageRepliesCount($messageId)
     {
         $row = $this->messageTable->select(function(Sql\Select $select) use ($messageId) {
@@ -122,7 +122,7 @@ class CommentsService
                 ->columns(['count' => new Sql\Expression('count(1)')])
                 ->where(['parent_id = ?' => $messageId]);
         })->current();
-        
+
         $this->messageTable->update([
             'replies_count' => $row['count']
         ], [
@@ -175,7 +175,7 @@ class CommentsService
 
             $vote = null;
             if ($userId) {
-                
+
                 $voteRow = $this->voteTable->select([
                     'comment_id = ?' => $row['id'],
                     'user_id = ?'    => (int)$userId
@@ -253,7 +253,7 @@ class CommentsService
         if (! $comment) {
             return false;
         }
-        
+
         $this->messageTable->update([
             'deleted'    => 1,
             'deleted_by' => $userId
@@ -335,7 +335,7 @@ class CommentsService
                     'error'   => 'Alreay voted'
                 ];
             }
-            
+
             $this->voteTable->update([
                 'vote' => $vote
             ], [
@@ -362,7 +362,7 @@ class CommentsService
                 ->columns(['count' => new Sql\Expression('sum(vote)')])
                 ->where(['comment_id = ?' => $message['id']]);
         })->current();
-        
+
         $this->messageTable->update([
             'vote' => $row['count']
         ], [
@@ -437,7 +437,7 @@ class CommentsService
                 ->limit(1);
         })->current();
     }
-    
+
     public function getPaginatorByUser($userId, $order)
     {
         $select = new Sql\Select($this->messageTable->getTable());
@@ -519,7 +519,7 @@ class CommentsService
     public function getMessagePage($message, $perPage)
     {
         $root = $this->getMessageRoot($message);
-        
+
         $row = $this->messageTable->select(function(Sql\Select $select) use ($root) {
             $select
                 ->columns(['count' => new Sql\Expression('COUNT(1)')])
@@ -530,7 +530,7 @@ class CommentsService
                     'parent_id is null'
                 ]);
         })->current();
-        
+
         return ceil(($row['count'] + 1) / $perPage);
     }
 
@@ -555,16 +555,16 @@ class CommentsService
         $db->query('
             create temporary table __cms
             select type_id, item_id, parent_id as id, count(1) as count
-            from comments_messages
+            from comment_message
             where parent_id is not null
             group by type_id, item_id, parent_id
         ', $db::QUERY_MODE_EXECUTE);
 
         $statement = $db->query('
-            update comments_messages
+            update comment_message
                 inner join __cms
                 using(type_id, item_id, id)
-            set comments_messages.replies_count = __cms.count
+            set comment_message.replies_count = __cms.count
         ');
         $result = $statement->execute();
 
@@ -576,7 +576,7 @@ class CommentsService
         $newTypeId = (int)$newTypeId;
         $newItemId = (int)$newItemId;
         $parentId = (int)$parentId;
-        
+
         $this->messageTable->update([
             'item_id' => $newItemId,
             'type_id' => $newTypeId
@@ -602,14 +602,14 @@ class CommentsService
 
         $newTypeId = (int)$newTypeId;
         $newItemId = (int)$newItemId;
-        
+
         $oldTypeId = $messageRow['type_id'];
         $oldItemId = $messageRow['item_id'];
 
         if ($oldItemId == $newItemId && $oldTypeId == $newTypeId) {
             return false;
         }
-        
+
         $this->messageTable->update([
             'item_id'   => $newItemId,
             'type_id'   => $newTypeId,
@@ -650,12 +650,12 @@ class CommentsService
     public function getTopicStatForUser($typeId, $itemId, $userId)
     {
         $isArrayRequest = is_array($itemId);
-        
+
         $itemId = (array)$itemId;
-        
+
         $rows = [];
         if (count($itemId) > 0) {
-            
+
             $rows = $this->topicTable->select(function(Sql\Select $select) use ($typeId, $itemId, $userId) {
                 $select
                     ->columns(['item_id', 'messages'])
@@ -694,18 +694,18 @@ class CommentsService
                 'newMessages' => $newMessages
             ];
         }
-        
+
         if ($isArrayRequest) {
             return $result;
         }
-        
+
         if (count($result) <= 0) {
             return [
                 'messages'    => 0,
                 'newMessages' => 0
             ];
         }
-        
+
         return reset($result);
     }
 
@@ -718,11 +718,11 @@ class CommentsService
     {
         $isArrayRequest = is_array($itemId);
         $itemId = (array)$itemId;
-        
+
         $result = [];
 
         if (count($itemId) > 0) {
-            
+
             $rows = $this->topicTable->select(function(Sql\Select $select) use ($typeId, $itemId) {
                 $select
                     ->columns(['item_id', 'messages'])
@@ -738,17 +738,17 @@ class CommentsService
                 ];
             }
         }
-        
+
         if ($isArrayRequest) {
             return $result;
         }
-        
+
         if (count($result) <= 0) {
             return [
                 'messages' => 0
             ];
         }
-        
+
         return reset($result);
     }
 
@@ -767,9 +767,9 @@ class CommentsService
             ]);
             return;
         }
-        
+
         $lastUpdate = $this->getLastUpdate($typeId, $itemId);
-        
+
         $sql = '
             INSERT INTO comment_topic (item_id, type_id, last_update, messages)
             VALUES (?, ?, ?, ?)
@@ -778,7 +778,7 @@ class CommentsService
         $statement = $this->topicTable->getAdapter()->query($sql);
         $statement->execute([$itemId, $typeId, $lastUpdate, $messagesCount]);
     }
-    
+
     private function getMessagesCountFromTimestamp($typeId, $itemId, $timestamp)
     {
         $countRow = $this->messageTable->select(function(Sql\Select $select) use ($itemId, $typeId, $timestamp) {
@@ -790,7 +790,7 @@ class CommentsService
                     'datetime > ?' => $timestamp
                 ]);
         })->current();
-        
+
         return $countRow['count'];
     }
 
@@ -817,7 +817,7 @@ class CommentsService
                     ]);
             });
         }
-        
+
         $result = [];
         foreach ($rows as $row) {
             if ($row['timestamp']) {
@@ -829,11 +829,11 @@ class CommentsService
         if ($isArrayRequest) {
             return $result;
         }
-        
+
         if (count($result) <= 0) {
             return 0;
         }
-        
+
         return reset($result);
     }
 
@@ -847,7 +847,7 @@ class CommentsService
                     'type_id = ?' => $typeId
                 ]);
         })->current();
-        
+
         return $countRow['count'];
     }
 
@@ -861,12 +861,12 @@ class CommentsService
                     new Sql\Predicate\In('item_id', $itemIds)
                 ]);
         });
-        
+
         $result = [];
         foreach ($rows as $row) {
             $result[$row['item_id']] = $row['messages'];
         }
-        
+
         return $result;
     }
 
@@ -882,10 +882,10 @@ class CommentsService
                 ->order('datetime desc')
                 ->limit(1);
         })->current();
-        
+
         return $row ? $row['datetime'] : null;
     }
-    
+
     /**
      * @param array $options
      * @return \Zend\Paginator\Paginator
@@ -893,15 +893,15 @@ class CommentsService
     public function getMessagesPaginator(array $options = [])
     {
         $select = $this->getMessagesSelect($options);
-        
+
         return new \Zend\Paginator\Paginator(
             new \Zend\Paginator\Adapter\DbSelect(
-                $select, 
+                $select,
                 $this->messageTable->getAdapter()
             )
         );
     }
-    
+
     /**
      * @param int $type
      * @param int $item
@@ -910,7 +910,7 @@ class CommentsService
     public function getMessagePaginator($type, $item)
     {
         $select = new Sql\Select($this->messageTable->getTable());
-        
+
         $select
             ->where([
                 'item_id = ?' => (int)$item,
@@ -918,7 +918,7 @@ class CommentsService
                 'parent_id is null'
             ])
             ->order('datetime');
-    
+
         return new \Zend\Paginator\Paginator(
             new \Zend\Paginator\Adapter\DbSelect(
                 $select,
@@ -943,35 +943,35 @@ class CommentsService
             'order'           => null
         ];
         $options = array_replace($defaults, $options);
-        
+
         $select = new Sql\Select($this->messageTable->getTable());
 
         if (isset($options['attention'])) {
             $select->where([
-                'comments_messages.moderator_attention = ?' => $options['attention']
+                'comment_message.moderator_attention = ?' => $options['attention']
             ]);
         }
 
         if (isset($options['type'])) {
             $select->where([
-                'comments_messages.type_id = ?' => $options['type']
+                'comment_message.type_id = ?' => $options['type']
             ]);
         }
 
         if ($options['user']) {
             $select->where([
-                'comments_messages.author_id = ?' => (int)$options['user']
+                'comment_message.author_id = ?' => (int)$options['user']
             ]);
         }
 
         if (isset($options['exclude_type'])) {
             $select->where([
-                'comments_messages.type_id <> ?' => $options['exclude_type']
+                'comment_message.type_id <> ?' => $options['exclude_type']
             ]);
         }
 
         if ($options['exclude_deleted']) {
-            $select->where(['not comments_messages.deleted']);
+            $select->where(['not comment_message.deleted']);
         }
 
         if (isset($options['order'])) {
@@ -1020,7 +1020,7 @@ class CommentsService
                     'vote <> 0'
                 ]);
         })->current();
-        
+
         return $row ? $row['avg_vote'] : 0;
     }
 }

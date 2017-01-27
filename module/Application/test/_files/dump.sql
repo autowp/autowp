@@ -887,7 +887,7 @@ CREATE TABLE `comment_vote` (
   `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`comment_id`,`user_id`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `comment_vote_ibfk_1` FOREIGN KEY (`comment_id`) REFERENCES `comments_messages` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `comment_vote_ibfk_1` FOREIGN KEY (`comment_id`) REFERENCES `comment_message` (`id`) ON DELETE CASCADE,
   CONSTRAINT `comment_vote_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -900,13 +900,13 @@ CREATE TABLE `comment_vote` (
 /*!40000 ALTER TABLE `comment_vote` ENABLE KEYS */;
 
 --
--- Table structure for table `comments_messages`
+-- Table structure for table `comment_message`
 --
 
-DROP TABLE IF EXISTS `comments_messages`;
+DROP TABLE IF EXISTS `comment_message`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `comments_messages` (
+CREATE TABLE `comment_message` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned DEFAULT NULL,
   `type_id` tinyint(11) unsigned NOT NULL,
@@ -927,26 +927,26 @@ CREATE TABLE `comments_messages` (
   KEY `deleted_by` (`deleted_by`),
   KEY `parent_id` (`parent_id`),
   KEY `moderator_attention` (`moderator_attention`),
-  CONSTRAINT `comments_messages_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `comments_messages_ibfk_2` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`id`)
+  CONSTRAINT `comment_message_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `comment_message_ibfk_2` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=932834 DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=266 COMMENT='InnoDB free: 124928 kB; (`author_id`)';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `comments_messages`
+-- Dumping data for table `comment_message`
 --
 
-/*!40000 ALTER TABLE `comments_messages` DISABLE KEYS */;
-/*!40000 ALTER TABLE `comments_messages` ENABLE KEYS */;
+/*!40000 ALTER TABLE `comment_message` DISABLE KEYS */;
+/*!40000 ALTER TABLE `comment_message` ENABLE KEYS */;
 
 --
--- Table structure for table `comments_types`
+-- Table structure for table `comment_type`
 --
 
-DROP TABLE IF EXISTS `comments_types`;
+DROP TABLE IF EXISTS `comment_type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `comments_types` (
+CREATE TABLE `comment_type` (
   `id` tinyint(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
@@ -955,11 +955,17 @@ CREATE TABLE `comments_types` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `comments_types`
+-- Dumping data for table `comment_type`
 --
 
-/*!40000 ALTER TABLE `comments_types` DISABLE KEYS */;
-/*!40000 ALTER TABLE `comments_types` ENABLE KEYS */;
+/*!40000 ALTER TABLE `comment_type` DISABLE KEYS */;
+INSERT INTO `comment_type` (`id`, `name`) VALUES
+(2, 'К группам близнецов и музеям'),
+(1, 'К картинкам'),
+(3, 'К опросам'),
+(4, 'К статьям'),
+(5, 'Форум');
+/*!40000 ALTER TABLE `comment_type` ENABLE KEYS */;
 
 --
 -- Table structure for table `contact`

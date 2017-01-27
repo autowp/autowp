@@ -19,7 +19,7 @@ class CommentsControllerTest extends AbstractHttpControllerTestCase
         // get comment row
         $db = $this->getApplication()->getServiceManager()->get(\Zend\Db\Adapter\AdapterInterface::class);
         return $db->query(
-            'select * from comments_messages order by id desc limit 1',
+            'select * from comment_message order by id desc limit 1',
             Adapter::QUERY_MODE_EXECUTE
         )->current();
     }
