@@ -418,6 +418,10 @@ class Forums
 
         $db = $this->topicTable->getAdapter();
 
+        if (!$values['ip']) {
+            $values['ip'] = '127.0.0.1';
+        }
+
         $this->topicTable->insert([
             'theme_id'     => $theme['id'],
             'name'         => $values['name'],
@@ -691,6 +695,10 @@ class Forums
 
     public function addMessage($values)
     {
+        if (!$values['ip']) {
+            $values['ip'] = '127.0.0.1';
+        }
+
         $messageId = $this->comments->add([
             'typeId'             => \Application\Comments::FORUMS_TYPE_ID,
             'itemId'             => $values['topic_id'],

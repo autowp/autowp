@@ -171,7 +171,6 @@ class ForumsController extends AbstractActionController
 
         $formMessageNew = null;
         if ($canAddComments) {
-            $form = $this->commentForm;
             $this->commentForm->setAttribute('action', $this->url()->fromRoute('forums/topic', [
                 'topic_id' => $topic['id']
             ]));
@@ -179,10 +178,10 @@ class ForumsController extends AbstractActionController
 
             $request = $this->getRequest();
             if ($request->isPost()) {
-                $form->setData($request->getPost());
-                if ($form->isValid()) {
+                $this->commentForm->setData($request->getPost());
+                if ($this->commentForm->isValid()) {
                     if (! $needWait) {
-                        $values = $form->getData();
+                        $values = $this->commentForm->getData();
 
                         $values['topic_id'] = $topic['id'];
                         $values['user_id'] = $user->id;
@@ -240,7 +239,7 @@ class ForumsController extends AbstractActionController
                 }
             }
 
-            $formMessageNew = $form;
+            $formMessageNew = $this->commentForm;
         }
 
         $data = $this->model->topicPage(
@@ -365,7 +364,6 @@ class ForumsController extends AbstractActionController
 
         $user = $this->user()->get();
         if ($user) {
-            $form = $this->newTopicForm;
             $this->newTopicForm->setAttribute('action', $this->url()->fromRoute('forums/new', [
                 'theme_id' => $theme['id']
             ]));
