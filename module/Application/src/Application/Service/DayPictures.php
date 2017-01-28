@@ -81,7 +81,7 @@ class DayPictures
 
     /**
      * @param array $options
-     * @return Application_Service_DayPictures
+     * @return DayPictures
      */
     public function setOptions(array $options)
     {
@@ -100,7 +100,7 @@ class DayPictures
 
     /**
      * @param string $timezone
-     * @return Application_Service_DayPictures
+     * @return DayPictures
      */
     public function setTimeZone($timezone)
     {
@@ -111,7 +111,7 @@ class DayPictures
 
     /**
      * @param string $timezone
-     * @return Application_Service_DayPictures
+     * @return DayPictures
      */
     public function setDbTimeZone($timezone)
     {
@@ -122,7 +122,7 @@ class DayPictures
 
     /**
      * @param Zend_Db_Table_Select $select
-     * @return Application_Service_DayPictures
+     * @return DayPictures
      */
     public function setSelect(Zend_Db_Table_Select $select)
     {
@@ -133,7 +133,7 @@ class DayPictures
 
     /**
      * @param DateTime $date
-     * @return Application_Service_DayPictures
+     * @return DayPictures
      */
     public function setMinDate(DateTime $date)
     {
@@ -144,7 +144,7 @@ class DayPictures
 
     /**
      * @param string $column
-     * @return Application_Service_DayPictures
+     * @return DayPictures
      */
     public function setOrderColumn($column)
     {
@@ -190,7 +190,7 @@ class DayPictures
     /**
      * @param string|DateTime $date
      * @throws Exception
-     * @return Application_Service_DayPictures
+     * @return DayPictures
      */
     public function setCurrentDate($date)
     {
@@ -251,7 +251,7 @@ class DayPictures
     }
 
     /**
-     * @return Application_Service_DayPictures
+     * @return DayPictures
      */
     private function calcPrevDate()
     {
@@ -323,7 +323,7 @@ class DayPictures
     }
 
     /**
-     * @return Application_Service_DayPictures
+     * @return DayPictures
      */
     private function calcNextDate()
     {
@@ -430,7 +430,7 @@ class DayPictures
     }
 
     /**
-     * @return Application_Service_DayPictures
+     * @return DayPictures
      */
     private function reset()
     {

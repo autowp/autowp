@@ -7,10 +7,9 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
 use Autowp\Comments;
+use Autowp\Forums\Forums;
 use Autowp\Message\MessageService;
 use Autowp\User\Model\DbTable\User;
-
-use Application\Model\Forums;
 
 use DateTime;
 

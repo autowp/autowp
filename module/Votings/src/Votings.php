@@ -17,17 +17,17 @@ class Votings
      * @var TableGateway
      */
     private $votingTable;
-    
+
     /**
      * @var TableGateway
      */
     private $variantTable;
-    
+
     /**
      * @var TableGateway
      */
     private $voteTable;
-    
+
     public function __construct(Adapter $adapter)
     {
         $this->votingTable = new TableGateway('voting', $adapter);
@@ -52,7 +52,7 @@ class Votings
             return false;
         }
 
-        $voted = $this->voteTable->select(function(Sql\Select $select) use ($voting, $userId) {
+        $voted = $this->voteTable->select(function (Sql\Select $select) use ($voting, $userId) {
             $select
                 ->join(
                     'voting_variant',
@@ -84,7 +84,7 @@ class Votings
         }
 
         $variants = [];
-        $vvRows = $this->variantTable->select(function(Sql\Select $select) use ($voting) {
+        $vvRows = $this->variantTable->select(function (Sql\Select $select) use ($voting) {
             $select
                 ->where(['voting_id = ?' => $voting['id']])
                 ->order('position');
@@ -94,7 +94,7 @@ class Votings
         foreach ($vvRows as $vvRow) {
             switch ($filter) {
                 case 1:
-                    $row = $this->voteTable->select(function(Sql\Select $select) use ($vvRow) {
+                    $row = $this->voteTable->select(function (Sql\Select $select) use ($vvRow) {
                         $select
                             ->columns(['count' => new Sql\Expression('count(1)')])
                             ->join('users', 'voting_variant_vote.user_id = users.id', [])
@@ -237,7 +237,7 @@ class Votings
 
     private function updateVariantVotesCount($variantId)
     {
-        $count = $this->voteTable->select(function(Sql\Select $select) use ($variantId) {
+        $count = $this->voteTable->select(function (Sql\Select $select) use ($variantId) {
             $select
                 ->columns(['count' => new Sql\Expression('count(1)')])
                 ->where(['voting_variant_id' => $variantId]);
@@ -252,7 +252,7 @@ class Votings
 
     private function updateVotingVotesCount($votingId)
     {
-        $count = $this->voteTable->select(function(Sql\Select $select) use ($votingId) {
+        $count = $this->voteTable->select(function (Sql\Select $select) use ($votingId) {
             $select
                 ->columns(['count' => new Sql\Expression('count(distinct voting_variant_vote.user_id)')])
                 ->join('voting_variant', 'voting_variant_vote.voting_variant_id = voting_variant.id', [])

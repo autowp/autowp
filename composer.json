@@ -52,6 +52,7 @@
         "psr-4": {
             "Autowp\\Comments\\": "module/Comments/src",
             "Autowp\\Commons\\": "module/Commons/src",
+            "Autowp\\Forums\\": "module/Forums/src",
             "Autowp\\Message\\": "module/Message/src",
             "Autowp\\Traffic\\": "module/Traffic/src",
             "Autowp\\User\\": "module/User/src",

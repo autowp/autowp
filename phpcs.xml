@@ -10,4 +10,12 @@
     <file>module/Traffic/test</file>
     <file>module/User/src</file>
     <file>module/User/test</file>
+    <file>module/Comments/src</file>
+    <file>module/Comments/test</file>
+    <file>module/Messages/src</file>
+    <file>module/Messages/test</file>
+    <file>module/Forums/src</file>
+    <file>module/Forums/test</file>
+    <file>module/Votings/src</file>
+    <file>module/Votings/test</file>
 </ruleset>

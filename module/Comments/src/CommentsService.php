@@ -117,7 +117,7 @@ class CommentsService
 
     private function updateMessageRepliesCount($messageId)
     {
-        $row = $this->messageTable->select(function(Sql\Select $select) use ($messageId) {
+        $row = $this->messageTable->select(function (Sql\Select $select) use ($messageId) {
             $select
                 ->columns(['count' => new Sql\Expression('count(1)')])
                 ->where(['parent_id = ?' => $messageId]);
@@ -175,7 +175,6 @@ class CommentsService
 
             $vote = null;
             if ($userId) {
-
                 $voteRow = $this->voteTable->select([
                     'comment_id = ?' => $row['id'],
                     'user_id = ?'    => (int)$userId
@@ -357,7 +356,7 @@ class CommentsService
      */
     private function updateVote($message)
     {
-        $row = $this->voteTable->select(function(Sql\Select $select) use ($message) {
+        $row = $this->voteTable->select(function (Sql\Select $select) use ($message) {
             $select
                 ->columns(['count' => new Sql\Expression('sum(vote)')])
                 ->where(['comment_id = ?' => $message['id']]);
@@ -427,7 +426,7 @@ class CommentsService
      */
     public function getLastMessageRow($type, $item)
     {
-        return $this->messageTable->select(function(Sql\Select $select) use ($type, $item) {
+        return $this->messageTable->select(function (Sql\Select $select) use ($type, $item) {
             $select
                 ->where([
                     'type_id = ?' => (int)$type,
@@ -520,7 +519,7 @@ class CommentsService
     {
         $root = $this->getMessageRoot($message);
 
-        $row = $this->messageTable->select(function(Sql\Select $select) use ($root) {
+        $row = $this->messageTable->select(function (Sql\Select $select) use ($root) {
             $select
                 ->columns(['count' => new Sql\Expression('COUNT(1)')])
                 ->where([
@@ -628,7 +627,7 @@ class CommentsService
 
     public function isNewMessage($messageRow, $userId)
     {
-        $row = $this->topicViewTable->select(function(Sql\Select $select) use ($messageRow, $userId) {
+        $row = $this->topicViewTable->select(function (Sql\Select $select) use ($messageRow, $userId) {
             $select
                 ->columns(['timestamp'])
                 ->where([
@@ -655,8 +654,7 @@ class CommentsService
 
         $rows = [];
         if (count($itemId) > 0) {
-
-            $rows = $this->topicTable->select(function(Sql\Select $select) use ($typeId, $itemId, $userId) {
+            $rows = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemId, $userId) {
                 $select
                     ->columns(['item_id', 'messages'])
                     ->where([
@@ -674,7 +672,6 @@ class CommentsService
                         $select::JOIN_LEFT
                     );
             });
-
         }
 
         $result = [];
@@ -722,8 +719,7 @@ class CommentsService
         $result = [];
 
         if (count($itemId) > 0) {
-
-            $rows = $this->topicTable->select(function(Sql\Select $select) use ($typeId, $itemId) {
+            $rows = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemId) {
                 $select
                     ->columns(['item_id', 'messages'])
                     ->where([
@@ -781,7 +777,7 @@ class CommentsService
 
     private function getMessagesCountFromTimestamp($typeId, $itemId, $timestamp)
     {
-        $countRow = $this->messageTable->select(function(Sql\Select $select) use ($itemId, $typeId, $timestamp) {
+        $countRow = $this->messageTable->select(function (Sql\Select $select) use ($itemId, $typeId, $timestamp) {
             $select
                 ->columns(['count' => new Sql\Expression('count(1)')])
                 ->where([
@@ -807,7 +803,7 @@ class CommentsService
 
         $rows = [];
         if (count($itemId) > 0) {
-            $rows = $this->topicViewTable->select(function(Sql\Select $select) use ($typeId, $userId, $itemId) {
+            $rows = $this->topicViewTable->select(function (Sql\Select $select) use ($typeId, $userId, $itemId) {
                 $select
                     ->columns(['item_id', 'timestamp'])
                     ->where([
@@ -839,7 +835,7 @@ class CommentsService
 
     private function countMessages($typeId, $itemId)
     {
-        $countRow = $this->messageTable->select(function(Sql\Select $select) use ($itemId, $typeId) {
+        $countRow = $this->messageTable->select(function (Sql\Select $select) use ($itemId, $typeId) {
             $select
                 ->columns(['count' => new Sql\Expression('count(1)')])
                 ->where([
@@ -853,7 +849,7 @@ class CommentsService
 
     public function getMessagesCounts($typeId, array $itemIds)
     {
-        $rows = $this->topicTable->select(function(Sql\Select $select) use ($typeId, $itemIds) {
+        $rows = $this->topicTable->select(function (Sql\Select $select) use ($typeId, $itemIds) {
             $select
                 ->columns(['item_id', 'messages'])
                 ->where([
@@ -872,7 +868,7 @@ class CommentsService
 
     private function getLastUpdate($typeId, $itemId)
     {
-        $row = $this->messageTable->select(function(Sql\Select $select) use ($itemId, $typeId) {
+        $row = $this->messageTable->select(function (Sql\Select $select) use ($itemId, $typeId) {
             $select
                 ->columns(['datetime'])
                 ->where([
@@ -1012,7 +1008,7 @@ class CommentsService
 
     public function getUserAvgVote($userId)
     {
-        $row = $this->messageTable->select(function(Sql\Select $select) use ($userId) {
+        $row = $this->messageTable->select(function (Sql\Select $select) use ($userId) {
             $select
                 ->columns(['avg_vote' => new Sql\Expression('avg(vote)')])
                 ->where([

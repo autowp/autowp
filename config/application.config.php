@@ -23,6 +23,7 @@ return [
         'Zend\\Validator',
         'Autowp\\User',
         'Autowp\\Comments',
+        'Autowp\\Forums',
         'Autowp\\Image',
         'Autowp\\Message',
         'Autowp\\TextStorage',

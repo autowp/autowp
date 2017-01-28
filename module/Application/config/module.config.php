@@ -110,7 +110,6 @@ return [
             Model\BrandVehicle::class            => Model\Service\BrandVehicleFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
-            Model\Forums::class                  => Model\Service\ForumsFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,
             PictureNameFormatter::class          => Service\PictureNameFormatterFactory::class,
             Service\SpecificationsService::class => Service\SpecificationsServiceFactory::class,
