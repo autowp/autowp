@@ -5,7 +5,7 @@ namespace ApplicationTest\Controller\Frontend;
 use Zend\Http\Request;
 use Application\Test\AbstractHttpControllerTestCase;
 
-use Application\Controller\ForumsController;
+use Autowp\Forums\Controller\FrontendController;
 use Zend\Http\Header\Cookie;
 use Zend\Json\Json;
 
@@ -18,8 +18,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/forums', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums');
         $this->assertActionName('index');
     }
@@ -29,8 +28,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/forums/topic/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums/topic');
         $this->assertActionName('topic');
     }
@@ -48,8 +46,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/forums/new/theme_id/1', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums/new');
         $this->assertActionName('new');
     }
@@ -65,8 +62,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         ]);
 
         $this->assertResponseStatusCode(302);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums/new');
         $this->assertActionName('new');
 
@@ -83,8 +79,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/forums/unsubscribe/topic_id/' . $topicId, Request::METHOD_POST);
 
         $this->assertResponseStatusCode(302);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums/unsubscribe');
         $this->assertActionName('unsubscribe');
 
@@ -94,8 +89,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/forums/subscribe/topic_id/' . $topicId, Request::METHOD_POST);
 
         $this->assertResponseStatusCode(302);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums/subscribe');
         $this->assertActionName('subscribe');
 
@@ -107,8 +101,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         ]);
 
         $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums/close');
         $this->assertActionName('close');
 
@@ -123,8 +116,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         ]);
 
         $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums/open');
         $this->assertActionName('open');
 
@@ -137,8 +129,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('https://www.autowp.ru/forums/subscribes', Request::METHOD_GET);
 
         $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums/subscribes');
         $this->assertActionName('subscribes');
 
@@ -152,8 +143,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         ]);
 
         $this->assertResponseStatusCode(302);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums/topic');
         $this->assertActionName('topic');
 
@@ -165,8 +155,7 @@ class ForumsControllerTest extends AbstractHttpControllerTestCase
         ]);
 
         $this->assertResponseStatusCode(200);
-        $this->assertModuleName('application');
-        $this->assertControllerName(ForumsController::class);
+        $this->assertControllerName(FrontendController::class);
         $this->assertMatchedRouteName('forums/delete');
         $this->assertActionName('delete');
 

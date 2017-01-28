@@ -15,9 +15,11 @@ class Module implements
     {
         $provider = new ConfigProvider();
         return [
+            'controllers'     => $provider->getControllersConfig(),
+            'forms'           => $provider->getFormsConfig(),
+            'router'          => $provider->getRouterConfig(),
             'service_manager' => $provider->getDependencyConfig(),
-            'translator'      => $provider->getTranslatorConfig(),
-            'forms'           => $provider->getFormsConfig()
+            'translator'      => $provider->getTranslatorConfig()
         ];
     }
 

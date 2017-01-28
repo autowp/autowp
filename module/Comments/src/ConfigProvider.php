@@ -12,7 +12,8 @@ class ConfigProvider
         return [
             'console'      => $this->getConsoleConfig(),
             'controllers'  => $this->getControllersConfig(),
-            'dependencies' => $this->getDependencyConfig()
+            'dependencies' => $this->getDependencyConfig(),
+            'forms'        => $this->getFormsConfig()
         ];
     }
 
@@ -59,6 +60,74 @@ class ConfigProvider
         return [
             'factories' => [
                 CommentsService::class => CommentsServiceFactory::class
+            ]
+        ];
+    }
+
+    public function getFormsConfig()
+    {
+        return [
+            'CommentForm' => [
+                'type'     => \Zend\Form\Form::class,
+                'attributes'  => [
+                    'method' => 'post',
+                    'legend' => 'comments/form-title',
+                    'id'     => 'form-add-comment'
+                ],
+                'elements' => [
+                    [
+                        'spec' => [
+                            'type' => 'Textarea',
+                            'name' => 'message',
+                            'options' => [
+                                'label'     => 'forums/topic/text',
+                            ],
+                            'attributes' => [
+                                'cols'      => 80,
+                                'rows'      => 5,
+                                'maxlength' => 1024*16
+                            ]
+                        ],
+                    ],
+                    [
+                        'spec' => [
+                            'type' => 'Checkbox',
+                            'name' => 'moderator_attention',
+                            'options' => [
+                                'label' => 'comments/it-requires-attention-of-moderators',
+                            ]
+                        ],
+                    ],
+                    [
+                        'spec' => [
+                            'type' => 'Hidden',
+                            'name' => 'parent_id',
+                        ],
+                    ],
+                    [
+                        'spec' => [
+                            'type' => 'Hidden',
+                            'name' => 'resolve',
+                        ],
+                    ]
+                ],
+                'input_filter' => [
+                    'message' => [
+                        'required'   => true,
+                        'filters'  => [
+                            ['name' => 'StringTrim']
+                        ],
+                        'validators' => [
+                            [
+                                'name' => 'StringLength',
+                                'options' => [
+                                    'min' => 0,
+                                    'max' => 1024*16
+                                ]
+                            ]
+                        ]
+                    ],
+                ],
             ]
         ];
     }

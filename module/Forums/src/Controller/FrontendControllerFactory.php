@@ -1,17 +1,15 @@
 <?php
 
-namespace Application\Controller\Frontend\Service;
+namespace Autowp\Forums\Controller;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Application\Controller\ForumsController as Controller;
-
-class ForumsControllerFactory implements FactoryInterface
+class FrontendControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Controller(
+        return new FrontendController(
             $container->get(\Autowp\Forums\Forums::class),
             $container->get('ForumsTopicNewForm'),
             $container->get('CommentForm'),

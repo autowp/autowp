@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Controller;
+namespace Autowp\Forums\Controller;
 
 use Zend\Mail;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -15,7 +15,7 @@ use DateTime;
 
 use Zend_Db_Expr;
 
-class ForumsController extends AbstractActionController
+class FrontendController extends AbstractActionController
 {
     private $transport;
 

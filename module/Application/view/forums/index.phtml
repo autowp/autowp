@@ -44,8 +44,8 @@
                     <p><?=$this->escapeHtml($theme['description']) ?></p>
                 <?php } ?>
                 <p>
-                    <?=$this->escapeHtml(sprintf($this->translate('%1$s topics', null, $theme['topics']), $theme['topics']))?>,
-                    <?=$this->escapeHtml(sprintf($this->translate('%1$s messages', null, $theme['messages']), $theme['messages']))?>
+                    <?=$this->escapeHtml(sprintf($this->translatePlural('%1$s topics', null, $theme['topics']), $theme['topics']))?>,
+                    <?=$this->escapeHtml(sprintf($this->translatePlural('%1$s messages', null, $theme['messages']), $theme['messages']))?>
                 </p>
                 <?php if (count($theme['subthemes'])) { ?>
                     <?=$this->escapeHtml($this->translate('forums/subforums'))?>:

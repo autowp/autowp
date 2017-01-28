@@ -21,7 +21,8 @@ class Module implements
         return [
             'console'         => $provider->getConsoleConfig(),
             'controllers'     => $provider->getControllersConfig(),
-            'service_manager' => $provider->getDependencyConfig()
+            'service_manager' => $provider->getDependencyConfig(),
+            'forms'           => $provider->getFormsConfig()
         ];
     }
 
