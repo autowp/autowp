@@ -240,7 +240,7 @@ class Forums
 
         $select = new Sql\Select($this->topicTable->getTable());
         $select
-            ->columns(['count' => Sql\Expression('count(1)')])
+            ->columns(['count' => new Sql\Expression('count(1)')])
             ->join('forums_theme_parent', 'forums_topics.theme_id = forums_theme_parent.forum_theme_id', [])
             ->where([
                 'forums_theme_parent.parent_id = ?' => $theme['id'],

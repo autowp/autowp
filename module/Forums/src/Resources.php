@@ -24,7 +24,7 @@ final class Resources
     /**
      * @return string
      */
-    public static function getPatternForViewHelpers()
+    public static function getPattern()
     {
         return '%s.php';
     }

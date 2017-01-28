@@ -108,6 +108,9 @@
             <?php foreach ($this->topics as $topic) { ?>
                 <tr>
                     <td>
+                        <?php if ($topic['status'] == Autowp\Forums\Forums::STATUS_CLOSED) { ?>
+                            <span class="fa fa-lock"></span>
+                        <?php } ?>
                         <?=$this->htmlA($topic['url'], $topic['name']) ?>
                         <span class="badge"><?=$topic['oldMessages'] ?><?php if ($topic['newMessages'] > 0) { ?>+<?=$topic['newMessages']?><?php } ?></span>
                         <?=$this->paginationControl($topic['paginator'], 'Sliding', 'application/forums/paginator', [

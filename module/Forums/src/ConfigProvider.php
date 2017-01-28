@@ -23,7 +23,7 @@ class ConfigProvider
                 [
                     'type'     => \Zend\I18n\Translator\Loader\PhpArray::class,
                     'base_dir' => Resources::getBasePath(),
-                    'pattern'  => Resources::getPatternForViewHelpers()
+                    'pattern'  => Resources::getPattern()
                 ],
             ]
         ];
