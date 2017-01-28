@@ -4,7 +4,7 @@
             <li>
                 <?=$this->htmlA($this->url('moder/attrs/params', [
                     'option_id' =>  $option['id']
-                ], [], true), $option['name']) ?>
+                ], [], true), $this->translate($option['name'])) ?>
                 <?=$this->partial('application/moder/attrs/attribute/options-partial', [
                     'options' => $option['childs']
                 ]) ?>

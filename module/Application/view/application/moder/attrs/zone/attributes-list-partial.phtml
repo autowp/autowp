@@ -4,7 +4,7 @@
             <li>
                 <label>
                     <input type="checkbox" name="attribute_id[]" id="attribute_id_<?=$attribute->id?>" value="<?=$attribute->id?>" <?=$this->zone->hasAttribute($attribute) ? 'checked' : ''?> />
-                    <?=$this->escapeHtml($attribute->name) ?>
+                    <?=$this->escapeHtml($this->translate($attribute->name)) ?>
                 </label>
                 <?=$this->partial('application/moder/attrs/zone/attributes-list-partial', [
                     'zone'       =>  $this->zone,

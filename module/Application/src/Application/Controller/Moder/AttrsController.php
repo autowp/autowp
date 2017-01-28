@@ -182,7 +182,7 @@ class AttrsController extends AbstractActionController
             'attribute'         => $attribute,
             'formAttributeEdit' => $formAttributeEdit,
             'formAttributeNew'  => $formAttributeNew,
-            'attributes'        => $this->getAttributes($attributes, null),
+            'attributes'        => $this->getAttributes($attributes, $attribute['id']),
             'options'           => $this->getListOptions($attribute['id'], null),
             'formListOption'    => $formListOption
         ];
@@ -217,7 +217,7 @@ class AttrsController extends AbstractActionController
     {
         $select = new Sql\Select($this->listOptionTable->getTable());
         $select
-            ->where(['attribute_id = ?' => $attribute->id])
+            ->where(['attribute_id = ?' => $attributeId])
             ->order('position');
 
         if ($parentId) {
@@ -251,8 +251,8 @@ class AttrsController extends AbstractActionController
             $result[] = [
                 'id'     => $row['id'],
                 'name'   => $row['name'],
-                'type'   => $row->findParentRow(Application\Model\DbTable\Attr\Type::class),
-                'unit'   => $this->specsService->getUnit($attribute['unit_id']),
+                'type'   => $row->findParentRow(\Application\Model\DbTable\Attr\Type::class),
+                'unit'   => $this->specsService->getUnit($row['unit_id']),
                 'childs' => $this->getAttributes($attributes, $row['id'])
             ];
         }
