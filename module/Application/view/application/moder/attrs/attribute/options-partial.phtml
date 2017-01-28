@@ -3,14 +3,10 @@
         <?php foreach ($this->options as $option) { ?>
             <li>
                 <?=$this->htmlA($this->url('moder/attrs/params', [
-                    'option_id' =>  $option->id
-                ], [], true), $option->name) ?>
+                    'option_id' =>  $option['id']
+                ], [], true), $option['name']) ?>
                 <?=$this->partial('application/moder/attrs/attribute/options-partial', [
-                    'options'    =>  $option->getTable()->fetchAll(
-                        $option->getTable()->select()
-                            ->where('parent_id = ?', $option->id)
-                            ->where('attribute_id = ?', $option->attribute_id)
-                    )
+                    'options' => $option['childs']
                 ]) ?>
             </li>
         <?php } ?>

@@ -42,7 +42,7 @@ class SpecificationsService
     private $attributeTable = null;
 
     /**
-     * @var Attr\ListOption
+     * @var TableGateway
      */
     private $listOptionsTable = null;
 
@@ -141,6 +141,7 @@ class SpecificationsService
         $this->itemNameFormatter = $itemNameFormatter;
 
         $this->unitTable = new TableGateway('attrs_units', $adapter);
+        $this->listOptionsTable = new TableGateway('attrs_list_options', $adapter);
     }
 
     /**
@@ -219,13 +220,6 @@ class SpecificationsService
         return $this->userValueTable
             ? $this->userValueTable
             : $this->userValueTable = new Attr\UserValue();
-    }
-
-    private function getListOptionsTable()
-    {
-        return $this->listOptionsTable
-            ? $this->listOptionsTable
-            : $this->listOptionsTable = new Attr\ListOption();
     }
 
     private function getZone($id)
@@ -358,18 +352,20 @@ class SpecificationsService
         $ids = array_diff($attributeIds, array_keys($this->listOptions));
 
         if (count($ids)) {
-            $rows = $this->getListOptionsTable()->fetchAll([
-                'attribute_id IN (?)' => $ids
-            ], 'position');
+            $select = new Sql\Select($this->listOptionsTable->getTable());
+            $select
+                ->where(new Sql\Predicate\In('attribute_id', $ids))
+                ->order('position');
+            $rows = $this->listOptionsTable->selectWith($select);
 
             foreach ($rows as $row) {
-                $aid = (int)$row->attribute_id;
-                $id = (int)$row->id;
-                $pid = (int)$row->parent_id;
+                $aid = (int)$row['attribute_id'];
+                $id = (int)$row['id'];
+                $pid = (int)$row['parent_id'];
                 if (! isset($this->listOptions[$aid])) {
                     $this->listOptions[$aid] = [];
                 }
-                $this->listOptions[$aid][$id] = $row->name;
+                $this->listOptions[$aid][$id] = $row['name'];
                 if (! isset($this->listOptionsChilds[$aid][$pid])) {
                     $this->listOptionsChilds[$aid][$pid] = [$id];
                 } else {

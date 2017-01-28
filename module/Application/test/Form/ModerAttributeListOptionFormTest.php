@@ -13,12 +13,7 @@ class ModerAttributeListOptionFormTest extends AbstractHttpControllerTestCase
     {
         $serviceManager = $this->getApplicationServiceLocator();
 
-        $table = new \Application\Model\DbTable\Attr\ListOption();
-        $row = $table->fetchRow([]);
-
-        $form = new \Application\Form\Moder\AttributeListOption(null, [
-            'attribute' => $row
-        ]);
+        $form = new \Application\Form\Moder\AttributeListOption(null);
 
         $form->setData([]);
         $form->isValid();

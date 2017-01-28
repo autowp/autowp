@@ -2,6 +2,9 @@
 
 namespace Application\Controller\Moder;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
 
@@ -17,9 +20,22 @@ class AttrsController extends AbstractActionController
      */
     private $specsService = null;
 
-    public function __construct(SpecificationsService $specsService)
+    /**
+     * @var Adapter
+     */
+    private $adapter;
+
+    /**
+     * @var TableGateway
+     */
+    private $listOptionTable;
+
+    public function __construct(SpecificationsService $specsService, Adapter $adapter)
     {
         $this->specsService = $specsService;
+        $this->adapter = $adapter;
+
+        $this->listOptionTable = new TableGateway('attrs_list_options', $this->adapter);
     }
 
     public function indexAction()
@@ -80,11 +96,15 @@ class AttrsController extends AbstractActionController
         $formListOption = new AttributeListOptionForm(null, [
             'attribute' => $attribute
         ]);
+        $formListOption->get('parent_id')->setValueOptions(
+            array_merge(
+                ['' => '--'],
+                $this->getListOptionsParents($attribute['id'], null)
+            )
+        );
         $formListOption->setAttribute('action', $this->url()->fromRoute(null, [
             'form' => 'option'
         ], [], true));
-
-        $options = new Attr\ListOption();
 
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -138,8 +158,7 @@ class AttrsController extends AbstractActionController
                     if ($formListOption->isValid()) {
                         $values = $formListOption->getData();
 
-                        $new = $options->fetchNew();
-                        $new->setFromArray([
+                        $new = $options->createRow([
                             'name'          => $values['name'],
                             'attribute_id'  => $attribute->id,
                             'parent_id'     => $values['parent_id'] ? $values['parent_id'] : null,
@@ -157,19 +176,68 @@ class AttrsController extends AbstractActionController
             }
         }
 
+
+
         return [
             'attribute'         => $attribute,
             'formAttributeEdit' => $formAttributeEdit,
             'formAttributeNew'  => $formAttributeNew,
             'attributes'        => $this->getAttributes($attributes, null),
-            'options'           => $options->fetchAll(
-                $options->select()
-                    ->where('attribute_id = ?', $attribute->id)
-                    ->where('parent_id IS NULL')
-                    ->order('position')
-            ),
+            'options'           => $this->getListOptions($attribute['id'], null),
             'formListOption'    => $formListOption
         ];
+    }
+
+    private function getListOptionsParents($attributeId, $parentId)
+    {
+        $select = new Sql\Select($this->listOptionTable->getTable());
+        $select
+            ->where(['attribute_id = ?' => $attributeId])
+            ->order('position');
+
+        if ($parentId) {
+            $select->where(['parent_id = ?' => $parentId]);
+        } else {
+            $select->where(['parent_id IS NULL']);
+        }
+
+        $rows = $this->listOptionTable->selectWith($select);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $id = $row['id'];
+            $result[$id] = $row['name'];
+            $result = array_replace($result, $this->getListOptionsParents($attributeId, $id));
+        }
+
+        return $result;
+    }
+
+    private function getListOptions($attributeId, $parentId)
+    {
+        $select = new Sql\Select($this->listOptionTable->getTable());
+        $select
+            ->where(['attribute_id = ?' => $attribute->id])
+            ->order('position');
+
+        if ($parentId) {
+            $select->where(['parent_id = ?' => $parentId]);
+        } else {
+            $select->where(['parent_id IS NULL']);
+        }
+
+        $rows = $this->listOptionTable->selectWith($select);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = [
+                'id'     => $row['id'],
+                'name'   => $row['name'],
+                'childs' => $this->getListOptions($attributeId, $row['id'])
+            ];
+        }
+
+        return $result;
     }
 
     private function getAttributes($attributes, $parentId)

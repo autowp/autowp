@@ -14,11 +14,6 @@ class Attribute extends Table
             'refTableClass' => self::class,
             'refColumns'    => ['id']
         ],
-        'Unit' => [
-            'columns'       => ['unit_id'],
-            'refTableClass' => Unit::class,
-            'refColumns'    => ['id']
-        ],
         'Type' => [
             'columns'       => ['type_id'],
             'refTableClass' => Type::class,
