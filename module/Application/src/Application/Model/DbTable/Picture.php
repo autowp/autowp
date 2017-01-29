@@ -6,6 +6,7 @@ use Autowp\Image;
 
 use Autowp\Commons\Db\Table;
 use Application\Model\PictureItem;
+use Application\Model\Log;
 
 use Zend_Db_Expr;
 
@@ -237,7 +238,7 @@ class Picture extends Table
         return true;
     }
 
-    public function addToCar(PictureItem $pictureItem, $pictureId, $id, $userId, array $options)
+    public function addToCar(PictureItem $pictureItem, $pictureId, $id, $userId, Log $log)
     {
         $picture = $this->find($pictureId)->current();
         if (! $picture) {
@@ -259,40 +260,7 @@ class Picture extends Table
             ]);
         }
 
-        $log = new Log\Event();
-        $log($userId, sprintf(
-            'Картинка %s связана с автомобилем %s',
-            htmlspecialchars($picture->id),
-            htmlspecialchars('#' . $car->id)
-        ), [$car, $picture]);
-
-        return true;
-    }
-
-    public function moveToCar(PictureItem $pictureItem, $pictureId, $id, $userId, array $options)
-    {
-        $picture = $this->find($pictureId)->current();
-        if (! $picture) {
-            return false;
-        }
-
-        $itemTable = new Item();
-        $car = $itemTable->find($id)->current();
-
-        if (! $car) {
-            return false;
-        }
-
-        $pictureItem->setPictureItems($picture->id, [$car->id]);
-
-        if ($picture->image_id) {
-            $this->imageStorage->changeImageName($picture->image_id, [
-                'pattern' => $picture->getFileNamePattern(),
-            ]);
-        }
-
-        $log = new Log\Event();
-        $log($userId, sprintf(
+        $log->addEvent($userId, sprintf(
             'Картинка %s связана с автомобилем %s',
             htmlspecialchars($picture->id),
             htmlspecialchars('#' . $car->id)

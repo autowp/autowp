@@ -22,6 +22,7 @@ use Application\Model\DbTable;
 use Application\Model\DbTable\Perspective;
 use Application\Model\DbTable\Picture;
 use Application\Model\DbTable\Item;
+use Application\Model\Log;
 use Application\Model\PictureItem;
 use Application\PictureNameFormatter;
 use Application\Service\TelegramService;
@@ -121,7 +122,8 @@ class PicturesController extends AbstractActionController
         TrafficControl $trafficControl,
         PictureItem $pictureItem,
         DuplicateFinder $duplicateFinder,
-        Comments\CommentsService $comments
+        Comments\CommentsService $comments,
+        Log $log
     ) {
 
         $this->hostManager = $hostManager;
@@ -138,6 +140,7 @@ class PicturesController extends AbstractActionController
         $this->pictureItem = $pictureItem;
         $this->duplicateFinder = $duplicateFinder;
         $this->comments = $comments;
+        $this->log = $log;
     }
 
     public function ownerTypeaheadAction()
@@ -2036,10 +2039,7 @@ class PicturesController extends AbstractActionController
                     $picture->id,
                     $itemId,
                     $userId,
-                    [
-                        'language'             => $this->language(),
-                        'pictureNameFormatter' => $this->pictureNameFormatter
-                    ]
+                    $this->log
                 );
 
                 if (! $success) {
