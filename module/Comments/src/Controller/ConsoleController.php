@@ -24,4 +24,11 @@ class ConsoleController extends AbstractActionController
 
         return "ok. Affected: $affected\n";
     }
+
+    public function cleanupDeletedAction()
+    {
+        $affected = $this->service->cleanupDeleted();
+
+        return "ok. Deleted: $affected\n";
+    }
 }

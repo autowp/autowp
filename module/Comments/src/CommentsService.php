@@ -12,6 +12,8 @@ use Zend\Paginator\Paginator;
 
 class CommentsService
 {
+    const DELETE_TTL_DAYS = 300;
+
     /**
      * @var Adapter
      */
@@ -40,7 +42,7 @@ class CommentsService
     /**
      * @var TableGateway
      */
-    private $messageTable2;
+    private $messageTable;
 
     public function __construct(Adapter $adapter)
     {
@@ -1018,5 +1020,32 @@ class CommentsService
         })->current();
 
         return $row ? $row['avg_vote'] : 0;
+    }
+
+    public function cleanupDeleted()
+    {
+        $select = new Sql\Select($this->messageTable->getTable());
+        $select->columns(['type_id', 'item_id'])
+            ->where([
+                'deleted',
+                new Sql\Expression('delete_date < DATE_SUB(NOW(), INTERVAL ? DAY)', self::DELETE_TTL_DAYS)
+            ])
+            ->group(['type_id', 'item_id']);
+
+        $rows = $this->messageTable->selectWith($select);
+
+        $affected = 0;
+        foreach ($rows as $row) {
+            $affected += $this->messageTable->delete([
+                'type_id' => $row['type_id'],
+                'item_id' => $row['item_id'],
+                'deleted',
+                new Sql\Expression('delete_date < DATE_SUB(NOW(), INTERVAL ? DAY)', self::DELETE_TTL_DAYS)
+            ]);
+
+            $this->updateTopicStat($row['type_id'], $row['item_id']);
+        }
+
+        return $affected;
     }
 }

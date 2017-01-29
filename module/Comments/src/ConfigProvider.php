@@ -27,7 +27,7 @@ class ConfigProvider
                 'routes' => [
                     'comments' => [
                         'options' => [
-                            'route'    => 'comments (refresh-replies-count):action',
+                            'route'    => 'comments (refresh-replies-count|cleanup-deleted):action',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
                             ]

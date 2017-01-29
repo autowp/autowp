@@ -46,6 +46,7 @@ class Module implements
     {
         return [
             'comments refresh-replies-count' => 'Refresh replies count',
+            'comments cleanup-deleted' => 'Cleanup deleted messages with expired ttl',
         ];
     }
 }

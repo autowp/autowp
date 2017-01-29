@@ -18,4 +18,14 @@ class ConsoleControllerTest extends AbstractConsoleControllerTestCase
         $this->assertActionName('refresh-replies-count');
         $this->assertConsoleOutputContains('ok');
     }
+
+    public function testCleanupDeleted()
+    {
+        $this->dispatch('comments cleanup-deleted');
+
+        $this->assertControllerName(ConsoleController::class);
+        $this->assertMatchedRouteName('comments');
+        $this->assertActionName('cleanup-deleted');
+        $this->assertConsoleOutputContains('ok');
+    }
 }

@@ -5,11 +5,8 @@ namespace Application\View\Helper;
 use Application\Language as AppLanguage;
 
 use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\View\Helper\AbstractHelper;
-
-use Application\Model\DbTable;
 
 class PageEnv extends AbstractHelper
 {

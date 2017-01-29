@@ -939,6 +939,8 @@ CREATE TABLE `comment_message` (
 /*!40000 ALTER TABLE `comment_message` DISABLE KEYS */;
 /*!40000 ALTER TABLE `comment_message` ENABLE KEYS */;
 
+ALTER TABLE `comment_message` ADD `delete_date` TIMESTAMP NULL DEFAULT NULL AFTER `ip`, ADD INDEX (`delete_date`);
+
 --
 -- Table structure for table `comment_type`
 --
