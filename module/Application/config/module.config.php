@@ -37,7 +37,7 @@ return [
             Controller\PerspectiveController::class     => InvokableFactory::class,
             Controller\PictureController::class         => InvokableFactory::class,
             Controller\PictureFileController::class     => InvokableFactory::class,
-            Controller\PulseController::class           => InvokableFactory::class,
+            Controller\PulseController::class           => Controller\Frontend\Service\PulseControllerFactory::class,
             Controller\RegistrationController::class    => Controller\Frontend\Service\RegistrationControllerFactory::class,
             Controller\RestorePasswordController::class => Controller\Frontend\Service\RestorePasswordControllerFactory::class,
             Controller\DocController::class             => InvokableFactory::class,

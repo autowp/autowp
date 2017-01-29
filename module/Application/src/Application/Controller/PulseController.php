@@ -2,17 +2,23 @@
 
 namespace Application\Controller;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Controller\AbstractActionController;
 
 use Autowp\User\Model\DbTable\User;
-
-use Application\Model\DbTable\Log\Event as LogEvent;
 
 use DateInterval;
 use DateTime;
 
 class PulseController extends AbstractActionController
 {
+    /**
+     * @var TableGateway
+     */
+    private $logTable;
+    
     private $lastColor = 0;
 
     private $colors = [
@@ -29,6 +35,11 @@ class PulseController extends AbstractActionController
         '#880088',
         '#008888',
     ];
+    
+    public function __construct(Adapter $adapter)
+    {
+        $this->logTable = new TableGateway('log_events', $adapter);
+    }
 
     private function randomColor()
     {
@@ -38,8 +49,7 @@ class PulseController extends AbstractActionController
     public function indexAction()
     {
         $userTable = new User();
-        $logTable = new LogEvent();
-        $logAdapter = $logTable->getAdapter();
+        
         $now = new DateTime();
 
         switch ($this->params()->fromQuery('period')) {
@@ -51,9 +61,9 @@ class PulseController extends AbstractActionController
                 $format = 'Y-n';
                 $columns = [
                     'user_id',
-                    'year' => 'year(add_datetime)',
-                    'month' => 'month(add_datetime)',
-                    'value' => 'count(1)'
+                    'year'  => new Sql\Expression('year(add_datetime)'),
+                    'month' => new Sql\Expression('month(add_datetime)'),
+                    'value' => new Sql\Expression('count(1)')
                 ];
                 break;
             case 'month':
@@ -64,8 +74,8 @@ class PulseController extends AbstractActionController
                 $format = 'Y-m-d';
                 $columns = [
                     'user_id',
-                    'date' => 'date(add_datetime)',
-                    'value' => 'count(1)'
+                    'date'  => new Sql\Expression('date(add_datetime)'),
+                    'value' => new Sql\Expression('count(1)')
                 ];
                 break;
             default:
@@ -76,20 +86,26 @@ class PulseController extends AbstractActionController
                 $format = 'Y-m-d G';
                 $columns = [
                     'user_id',
-                    'date'  => 'date(add_datetime)',
-                    'hour'  => 'hour(add_datetime)',
-                    'value' => 'count(1)'
+                    'date'  => new Sql\Expression('date(add_datetime)'),
+                    'hour'  => new Sql\Expression('hour(add_datetime)'),
+                    'value' => new Sql\Expression('count(1)')
                 ];
                 break;
         }
+        
+        $select = new Sql\Select($this->logTable->getTable());
+        $select
+            ->columns($columns)
+            ->where([
+                new Sql\Predicate\Between(
+                    'add_datetime', 
+                    $from->format(MYSQL_DATETIME_FORMAT), 
+                    $now->format(MYSQL_DATETIME_FORMAT)
+                )
+            ])
+            ->group($group);
 
-        $rows = $logAdapter->fetchAll(
-            $logAdapter->select()
-                ->from($logTable->info('name'), $columns)
-                ->where('add_datetime >= ?', $from->format(MYSQL_DATETIME_FORMAT))
-                ->where('add_datetime <= ?', $now->format(MYSQL_DATETIME_FORMAT))
-                ->group($group)
-        );
+        $rows = $this->logTable->selectWith($select);
 
         $data = [];
         foreach ($rows as $row) {

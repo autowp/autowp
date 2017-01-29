@@ -6,14 +6,12 @@ use Application\Language as AppLanguage;
 
 use Zend\View\Helper\AbstractHelper;
 
-use Application\Model\DbTable\Page as PageTable;
-
-use Zend_Db_Table;
+use Application\Model\DbTable;
 
 class PageEnv extends AbstractHelper
 {
     /**
-     * @var Zend_Db_Table
+     * @var DbTable\Page
      */
     private $pageTable;
 
@@ -29,7 +27,7 @@ class PageEnv extends AbstractHelper
 
     public function __construct(AppLanguage $language)
     {
-        $this->pageTable = new PageTable();
+        $this->pageTable = new DbTable\Page();
 
         $this->language = $language->getLanguage();
     }
@@ -48,7 +46,7 @@ class PageEnv extends AbstractHelper
             'breadcrumbsReplace' => null
         ];
 
-        $options = array_merge($defaults, $options);
+        $options = array_replace($defaults, $options);
 
         $view = $this->view;
 
