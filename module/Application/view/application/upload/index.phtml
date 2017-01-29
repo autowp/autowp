@@ -17,10 +17,10 @@
         ])
     ];
 ?>
-<div class="well">
-    <?=$this->markdown($this->translate('upload/description'))?>
 
-    <?php if ($this->selected) { ?>
+<?php if ($this->selected) { ?>
+    <div class="well">
+        <?=$this->markdown($this->translate('upload/description'))?>
         <div style="margin:20px 0">
             <p style="margin:10px">
                 <strong><?=$this->escapeHtml($this->selectedName) ?></strong>
@@ -34,13 +34,17 @@
         </div>
 
         <div class="progress-area"></div>
-    <?php } else { ?>
+    </div>
+    
+    <div class="pictures"></div>
+<?php } else { ?>
+    <div class="well">
+        <?=$this->markdown($this->translate('upload/description'))?>
         <p style="margin:10px"><?=$this->htmlA([
             'class' => 'btn btn-primary btn-lg',
             'href'  => $this->url(null, [
                 'action' => 'select-brand'
             ], [], true)
         ], '<i class="fa fa-upload"></i> ' . $this->escapeHtml($this->translate('upload/add-picture')), false) ?></p>
-    <?php } ?>
-</div>
-<div class="pictures"></div>
+    </div>
+<?php } ?>

@@ -100,24 +100,23 @@ class UploadController extends AbstractActionController
         $perspectiveId = null;
 
         if ($replacePicture) {
-            $carIds = $this->pictureItem->getPictureItems($replacePicture->id);
+            $itemIds = $this->pictureItem->getPictureItems($replacePicture->id);
         } else {
-            $carId = (int)$this->params('item_id');
-            $carIds = $carId ? [$carId] : [];
+            $itemId = (int)$this->params('item_id');
+            $itemIds = $itemId ? [$itemId] : [];
             $perspectiveId = (int)$this->params('perspective_id');
         }
 
         $selected = false;
 
-        $cars = new DbTable\Item();
-        $cars = $cars->find($carIds);
+        $itemTable = new DbTable\Item();
+        $items = $itemTable->find($itemIds);
         $names = [];
-        foreach ($cars as $car) {
+        foreach ($items as $item) {
             $selected = true;
-            $names[] = $this->car()->formatName($car, $this->language());
+            $names[] = $this->car()->formatName($item, $this->language());
         }
         $selectedName = implode(', ', $names);
-
 
         $form = null;
 
@@ -125,75 +124,9 @@ class UploadController extends AbstractActionController
             $form = new UploadForm(null, [
                 'multipleFiles' => ! $replacePicture,
             ]);
-
-            $form->setAttribute('action', $this->url()->fromRoute('upload/params', [], [], true));
-
-            $request = $this->getRequest();
-
-            if ($request->isPost()) {
-                $data = array_merge_recursive(
-                    $request->getPost()->toArray(),
-                    $request->getFiles()->toArray()
-                );
-                $form->setData($data);
-                if ($form->isValid()) {
-                    $pictures = $this->saveUpload($form, $carIds, $perspectiveId, $replacePicture);
-
-                    if ($request->isXmlHttpRequest()) {
-                        /*$urls = [];
-                        foreach ($pictures as $picture) {
-                            $identity = $picture->identity;
-
-                            $urls[] = $this->view->serverUrl($this->_helper->url->url([
-                                'module'     => 'default',
-                                'controller' => 'picture',
-                                'action'     => 'index',
-                                'picture_id' => $identity
-                            ], 'picture', true));
-                        }*/
-
-                        $result = [];
-                        foreach ($pictures as $picture) {
-                            $image = $this->imageStorage()->getFormatedImage(
-                                $picture->getFormatRequest(),
-                                'picture-gallery-full'
-                            );
-
-                            if ($image) {
-                                $picturesData = $this->pic()->listData([$picture]);
-
-                                $html = $this->partial->__invoke('application/picture', array_replace(
-                                    $picturesData['items'][0],
-                                    [
-                                        'disableBehaviour' => false,
-                                        'isModer'          => false
-                                    ]
-                                ));
-
-                                $result[] = [
-                                    'id'     => $picture->id,
-                                    'html'   => $html,
-                                    'width'  => $picture->width,
-                                    'height' => $picture->height,
-                                    'src'    => $image->getSrc()
-                                ];
-                            }
-                        }
-
-                        $this->getResponse()->setStatusCode(200);
-                        return new JsonModel($result);
-                    } else {
-                        return $this->forward()->dispatch(self::class, [
-                            'action' => 'success'
-                        ]);
-                    }
-                } else {
-                    if ($request->isXmlHttpRequest()) {
-                        $this->getResponse()->setStatusCode(400);
-                        return new JsonModel($form->getMessages());
-                    }
-                }
-            }
+            $form->setAttribute('action', $this->url()->fromRoute('upload/params', [
+                'action' => 'send'
+            ], [], true));
         }
 
         return [
@@ -203,7 +136,7 @@ class UploadController extends AbstractActionController
         ];
     }
 
-    private function saveUpload($form, $carIds, $perspectiveId, $replacePicture)
+    private function saveUpload($form, $itemIds, $perspectiveId, $replacePicture)
     {
         $user = $this->user()->get();
 
@@ -276,8 +209,8 @@ class UploadController extends AbstractActionController
             ]);
             $picture->save();
 
-            if ($carIds) {
-                $this->pictureItem->setPictureItems($picture->id, $carIds);
+            if ($itemIds) {
+                $this->pictureItem->setPictureItems($picture->id, $itemIds);
                 if ($perspectiveId) {
                     $this->pictureItem->setProperties($picture->id, $brandId, [
                         'perspective' => $perspectiveId
@@ -458,29 +391,19 @@ class UploadController extends AbstractActionController
         ];
     }
 
-
-    public function successAction()
-    {
-        return [
-            'moreUrl' => $this->url()->fromRoute('upload/params', [
-                'action' => 'index'
-            ], [], true)
-        ];
-    }
-
     private function prepareCars($rows)
     {
         $itemParentTable = $this->getCarParentTable();
         $itemParentAdapter = $itemParentTable->getAdapter();
 
-        $cars = [];
+        $items = [];
         foreach ($rows as $row) {
             $haveChilds = (bool)$itemParentAdapter->fetchOne(
                 $itemParentAdapter->select()
                     ->from($itemParentTable->info('name'), new Zend_Db_Expr('1'))
                     ->where('parent_id = ?', $row['id'])
             );
-            $cars[] = [
+            $items[] = [
                 'begin_model_year' => $row['begin_model_year'],
                 'end_model_year'   => $row['end_model_year'],
                 'spec'             => $row['spec'],
@@ -504,7 +427,7 @@ class UploadController extends AbstractActionController
             ];
         }
 
-        return $cars;
+        return $items;
     }
 
     private function prepareCarParentRows($rows)
@@ -715,5 +638,96 @@ class UploadController extends AbstractActionController
             'ok'  => true,
             'src' => $image->getSrc()
         ]);
+    }
+    
+    public function sendAction()
+    {
+        $user = $this->user()->get();
+        
+        if (! $user || $user->deleted) {
+            return $this->forward()->dispatch(self::class, [
+                'action' => 'only-registered'
+            ]);
+        }
+        
+        $request = $this->getRequest();
+        
+        if (! $request->isPost()) {
+            return $this->forbiddenAction();
+        }
+        
+        $pictureTable = $this->catalogue()->getPictureTable();
+        
+        $replace = $this->params('replace');
+        $replacePicture = false;
+        if ($replace) {
+            $replacePicture = $pictureTable->fetchRow([
+                'identity = ?' => $replace
+            ]);
+        }
+        
+        $perspectiveId = null;
+        
+        if ($replacePicture) {
+            $itemIds = $this->pictureItem->getPictureItems($replacePicture->id);
+        } else {
+            $itemId = (int)$this->params('item_id');
+            $itemIds = $itemId ? [$itemId] : [];
+            $perspectiveId = (int)$this->params('perspective_id');
+        }
+        
+        $itemTable = new DbTable\Item();
+        $selectedItems = $itemTable->find($itemIds);
+        
+        if (count($selectedItems) <= 0) {
+            return $this->forbiddenAction();
+        }
+        
+        $form = new UploadForm(null, [
+            'multipleFiles' => ! $replacePicture,
+        ]);
+        
+        $data = array_merge_recursive(
+            $request->getPost()->toArray(),
+            $request->getFiles()->toArray()
+        );
+        $form->setData($data);
+        if (! $form->isValid()) {
+            $this->getResponse()->setStatusCode(400);
+            return new JsonModel($form->getMessages());
+        }
+        
+        $pictures = $this->saveUpload($form, $itemIds, $perspectiveId, $replacePicture);
+
+        $result = [];
+        foreach ($pictures as $picture) {
+            $image = $this->imageStorage()->getFormatedImage(
+                $picture->getFormatRequest(),
+                'picture-gallery-full'
+            );
+
+            if ($image) {
+                $picturesData = $this->pic()->listData([$picture]);
+
+                $html = $this->partial->__invoke('application/picture', array_replace(
+                    $picturesData['items'][0],
+                    [
+                        'disableBehaviour' => false,
+                        'isModer'          => false
+                    ]
+                ));
+
+                $result[] = [
+                    'id'     => $picture->id,
+                    'html'   => $html,
+                    'width'  => $picture->width,
+                    'height' => $picture->height,
+                    'src'    => $image->getSrc()
+                ];
+            }
+        }
+
+        $this->getResponse()->setStatusCode(200);
+        return new JsonModel($result);
     }
 }

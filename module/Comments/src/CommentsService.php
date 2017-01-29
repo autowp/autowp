@@ -256,8 +256,9 @@ class CommentsService
         }
 
         $this->messageTable->update([
-            'deleted'    => 1,
-            'deleted_by' => $userId
+            'deleted'     => 1,
+            'deleted_by'  => $userId,
+            'delete_date' => new Sql\Expression('NOW()')
         ], [
             'id = ?' => $comment['id']
         ]);
@@ -273,7 +274,8 @@ class CommentsService
         $comment = $this->getMessageRow($id);
         if ($comment) {
             $this->messageTable->update([
-                'deleted' => 0
+                'deleted'     => 0,
+                'delete_date' => null
             ], [
                 'id = ?' => $comment['id']
             ]);
@@ -1024,23 +1026,28 @@ class CommentsService
 
     public function cleanupDeleted()
     {
+        $subSelect = new Sql\Select($this->messageTable->getTable());
+        $subSelect
+            ->quantifier(Sql\Select::QUANTIFIER_DISTINCT)
+            ->columns(['parent_id'])
+            ->where(['parent_id']);
+        
         $select = new Sql\Select($this->messageTable->getTable());
-        $select->columns(['type_id', 'item_id'])
+        $select->columns(['id', 'type_id', 'item_id'])
             ->where([
-                'deleted',
-                new Sql\Expression('delete_date < DATE_SUB(NOW(), INTERVAL ? DAY)', self::DELETE_TTL_DAYS)
-            ])
-            ->group(['type_id', 'item_id']);
+            new Sql\Predicate\NotIn('id', $subSelect),
+            'deleted',
+            new Sql\Predicate\Expression('delete_date < DATE_SUB(NOW(), INTERVAL ? DAY)', [self::DELETE_TTL_DAYS])
+        ]);
 
         $rows = $this->messageTable->selectWith($select);
 
         $affected = 0;
         foreach ($rows as $row) {
             $affected += $this->messageTable->delete([
+                'id'      => $row['id'],
                 'type_id' => $row['type_id'],
                 'item_id' => $row['item_id'],
-                'deleted',
-                new Sql\Expression('delete_date < DATE_SUB(NOW(), INTERVAL ? DAY)', self::DELETE_TTL_DAYS)
             ]);
 
             $this->updateTopicStat($row['type_id'], $row['item_id']);
