@@ -133,8 +133,8 @@ class Forums
                 'description' => $row['description'],
                 'lastTopic'   => $lastTopic,
                 'lastMessage' => $lastMessage,
-                'topics'      => null,//$row['topics'],
-                'messages'    => null,//$row['messages'],
+                'topics'      => $row['topics'],
+                'messages'    => $row['messages'],
                 'subthemes'   => $subthemes
             ];
         }
@@ -385,8 +385,8 @@ class Forums
             $themeData = [
                 'id'             => $currentTheme['id'],
                 'name'           => $currentTheme['name'],
-                'topics'         => null, //$currentTheme['topics'],
-                'messages'       => null, //$currentTheme['messages'],
+                'topics'         => $currentTheme['topics'],
+                'messages'       => $currentTheme['messages'],
                 'disable_topics' => $currentTheme['disable_topics'],
             ];
         }

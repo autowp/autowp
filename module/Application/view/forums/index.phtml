@@ -113,7 +113,7 @@
                         <?php } ?>
                         <?=$this->htmlA($topic['url'], $topic['name']) ?>
                         <span class="badge"><?=$topic['oldMessages'] ?><?php if ($topic['newMessages'] > 0) { ?>+<?=$topic['newMessages']?><?php } ?></span>
-                        <?=$this->paginationControl($topic['paginator'], 'Sliding', 'application/forums/paginator', [
+                        <?=$this->paginationControl($topic['paginator'], 'Sliding', 'autowp/forums/frontend/paginator', [
                             'topic_id' => $topic['id']
                         ]) ?>
                     </td>
@@ -183,7 +183,13 @@
 <?php if ($this->theme) { ?>
     <p class="text-right small">
         <?=$this->escapeHtml($this->translate('forums/theme/total:'))?>
-        <?=$this->escapeHtml(sprintf($this->translate('%1$s topics', null, $this->theme['topics']), $this->theme['topics']))?>,
-        <?=$this->escapeHtml(sprintf($this->translate('%1$s messages', null, $this->theme['messages']), $this->theme['messages']))?>
+        <?=$this->escapeHtml(sprintf(
+            $this->translatePlural('%1$s topics', '%1$s topics', $this->theme['topics']), 
+            $this->theme['topics']
+        ))?>,
+        <?=$this->escapeHtml(sprintf(
+            $this->translatePlural('%1$s messages', '%1$s messages', $this->theme['messages']), 
+            $this->theme['messages']
+        ))?>
     </p>
 <?php } ?>

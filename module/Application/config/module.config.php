@@ -28,7 +28,7 @@ return [
             Controller\IndexController::class           => Controller\Frontend\Service\IndexControllerFactory::class,
             Controller\InboxController::class           => InvokableFactory::class,
             Controller\InfoController::class            => Controller\Frontend\Service\InfoControllerFactory::class,
-            Controller\LogController::class             => InvokableFactory::class,
+            Controller\LogController::class             => Controller\Frontend\Service\LogControllerFactory::class,
             Controller\LoginController::class           => Controller\Frontend\Service\LoginControllerFactory::class,
             Controller\MapController::class             => Controller\Frontend\Service\MapControllerFactory::class,
             Controller\MostsController::class           => Controller\Frontend\Service\MostsControllerFactory::class,
@@ -54,7 +54,6 @@ return [
     'controller_plugins' => [
         'invokables' => [
             'catalogue'       => Controller\Plugin\Catalogue::class,
-            'log'             => Controller\Plugin\Log::class,
             'pictureVote'     => Controller\Plugin\PictureVote::class,
             'forbiddenAction' => Controller\Plugin\ForbiddenAction::class
         ],
@@ -62,6 +61,7 @@ return [
             'car'       => Controller\Plugin\Service\CarFactory::class,
             'fileSize'  => Controller\Plugin\Service\FileSizeFactory::class,
             'language'  => Controller\Plugin\Service\LanguageFactory::class,
+            'log'       => Controller\Plugin\Service\LogFactory::class,
             'oauth2'    => Factory\OAuth2PluginFactory::class,
             'pic'       => Controller\Plugin\Service\PicFactory::class,
             'sidebar'   => Controller\Plugin\Service\SidebarFactory::class,
@@ -110,6 +110,7 @@ return [
             Model\BrandVehicle::class            => Model\Service\BrandVehicleFactory::class,
             Model\CarOfDay::class                => Model\Service\CarOfDayFactory::class,
             Model\DbTable\Picture::class         => Model\Service\DbTablePictureFactory::class,
+            Model\Log::class                     => Model\Service\LogFactory::class,
             Model\PictureItem::class             => InvokableFactory::class,
             PictureNameFormatter::class          => Service\PictureNameFormatterFactory::class,
             Service\SpecificationsService::class => Service\SpecificationsServiceFactory::class,
