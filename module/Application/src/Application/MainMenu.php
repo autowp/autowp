@@ -3,6 +3,9 @@
 namespace Application;
 
 use Zend\Cache\Storage\StorageInterface;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\TreeRouteStack;
 
 use Autowp\Message\MessageService;
@@ -14,7 +17,7 @@ use Application\Language;
 class MainMenu
 {
     /**
-     * @var DbTable\Page
+     * @var TableGateway
      */
     private $pageTable;
 
@@ -62,7 +65,7 @@ class MainMenu
      * @var MessageService
      */
     private $message;
-
+    
     public function __construct(
         TreeRouteStack $router,
         Language $language,
@@ -70,7 +73,8 @@ class MainMenu
         $hosts,
         $translator,
         LanguagePicker $languagePicker,
-        MessageService $message
+        MessageService $message,
+        Adapter $adapter
     ) {
 
         $this->router = $router;
@@ -78,7 +82,7 @@ class MainMenu
         $this->hosts = $hosts;
         $this->cache = $cache;
 
-        $this->pageTable = new DbTable\Page();
+        $this->pageTable = new TableGateway('pages', $adapter);
 
         $this->translator = $translator;
         $this->languagePicker = $languagePicker;
@@ -94,21 +98,20 @@ class MainMenu
     private function getMenuData($id, $logedIn, $language)
     {
         $db = $this->pageTable->getAdapter();
-
-        $select = $db->select()
-            ->from($this->pageTable->info('name'), [
-                'id', 'url', 'class'
-            ])
-            ->where('pages.parent_id = ?', $id)
+        
+        $select = new Sql\Select($this->pageTable->getTable());
+        $select
+            ->columns(['id', 'url', 'class'])
+            ->where(['pages.parent_id' => $id])
             ->order('pages.position');
         if ($logedIn) {
-            $select->where('NOT pages.guest_only');
+            $select->where(['NOT pages.guest_only']);
         } else {
-            $select->where('NOT pages.registered_only');
+            $select->where(['NOT pages.registered_only']);
         }
 
         $result = [];
-        foreach ($db->fetchAll($select) as $row) {
+        foreach ($this->pageTable->selectWith($select) as $row) {
             $key = 'page/' . $row['id'] . '/name';
 
             $name = $this->translator->translate($key);
@@ -185,7 +188,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '12_' . $language;
+        $key = 'ZF2_SECOND_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '13_' . $language;
 
         $secondMenu = $this->cache->getItem($key, $success);
         if (! $success) {
@@ -212,7 +215,7 @@ class MainMenu
     {
         $language = $this->language->getLanguage();
 
-        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '_7_' . $language;
+        $key = 'ZF2_MAIN_MENU_' . ($logedIn ? 'LOGED' : 'NOTLOGED') . '_8_' . $language;
 
         $pages = $this->cache->getItem($key, $success);
         if (! $success) {

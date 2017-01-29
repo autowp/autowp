@@ -1,94 +1,94 @@
 <?php
-    $items = [
-        [
-            'active' => $this->page(129)->onPath,
-            'url'    => $this->url('account/profile'),
-            'icon'   => 'user',
-            'name'   => $this->page(129)->name,
-        ],
-        [
-            'active' => $this->page(198)->onPath,
-            'url'    => $this->url('account/contacts'),
-            'icon'   => 'users',
-            'name'   => $this->page(198)->name,
-        ],
-        [
-            'active' => $this->page(55)->onPath,
-            'url'    => $this->url('account/email'),
-            'icon'   => 'envelope-o',
-            'name'   => $this->page(55)->name,
-        ],
-        [
-            'active' => $this->page(133)->onPath,
-            'url'    => $this->url('account/access'),
-            'icon'   => 'lock',
-            'name'   => $this->page(133)->name,
-        ],
-        [
-            'active' => $this->page(123)->onPath,
-            'url'    => $this->url('account/accounts'),
-            'icon'   => 'asterisk',
-            'name'   => $this->page(123)->name,
-        ],
-        [
-            'active' => $this->page(130)->onPath,
-            'url'    => $this->url('users/user/pictures', [
-                'user_id'  => $this->user()->get()->identity ? $this->user()->get()->identity : 'user' . $this->user()->get()->id
-            ]),
-            'icon'   => 'th',
-            'name'   => $this->page(130)->name,
-            'count'    => $this->picsCount,
-        ],
-        [
-            'active' => $this->page(94)->onPath,
-            'url'    => $this->url('account/not-taken-pictures'),
-            'icon'   => 'th',
-            'name'   => $this->page(94)->name,
-            'count'    => $this->notTakenPicturesCount,
-        ],
-        [
-            'active' => $this->page(57)->onPath,
-            'url'    => '/forums/subscribes',
-            'icon'   => 'bookmark',
-            'name'   => $this->page(57)->name,
-            'count'    => $this->subscribesCount,
-        ],
-        [
-            'name'   => $this->translate('catalogue/specifications'),
-        ],
-        [
-            'active' => $this->page(188)->onPath,
-            'url'    => $this->url('account/specs-conflicts'),
-            'icon'   => 'exclamation-triangle',
-            'name'   => $this->page(188)->name
-        ],
-        [
-            'name'   => $this->page(49)->name,
-        ],
-        [
-            'active' => $this->page(128)->onPath,
-            'url'    => $this->url('account/personal-messages'),
-            'icon'   => 'comments-o',
-            'name'   => $this->page(128)->name,
-            'count'    => $this->pmCount,
-            'newCount' => $this->newPmCount
-        ],
-        [
-            'active' => $this->page(80)->onPath,
-            'url'    => $this->url('account/personal-messages/sent'),
-            'icon'   => 'comments-o',
-            'name'   => $this->page(80)->name,
-            'count'    => $this->omCount,
-        ],
-        [
-            'active' => $this->page(81)->onPath,
-            'url'    => $this->url('account/personal-messages/system'),
-            'icon'   => 'comments',
-            'name'   => $this->page(81)->name,
-            'count'    => $this->smCount,
-            'newCount' => $this->newSmCount
-        ],
-    ];
+$items = [
+    [
+        'active' => $this->pageEnv()->isOnPath(129),
+        'url'    => $this->url('account/profile'),
+        'icon'   => 'user',
+        'name'   => $this->page(129)->name,
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(198),
+        'url'    => $this->url('account/contacts'),
+        'icon'   => 'users',
+        'name'   => $this->page(198)->name,
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(55),
+        'url'    => $this->url('account/email'),
+        'icon'   => 'envelope-o',
+        'name'   => $this->page(55)->name,
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(133),
+        'url'    => $this->url('account/access'),
+        'icon'   => 'lock',
+        'name'   => $this->page(133)->name,
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(123),
+        'url'    => $this->url('account/accounts'),
+        'icon'   => 'asterisk',
+        'name'   => $this->page(123)->name,
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(130),
+        'url'    => $this->url('users/user/pictures', [
+            'user_id'  => $this->user()->get()->identity ? $this->user()->get()->identity : 'user' . $this->user()->get()->id
+        ]),
+        'icon'   => 'th',
+        'name'   => $this->page(130)->name,
+        'count'    => $this->picsCount,
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(94),
+        'url'    => $this->url('account/not-taken-pictures'),
+        'icon'   => 'th',
+        'name'   => $this->page(94)->name,
+        'count'    => $this->notTakenPicturesCount,
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(57),
+        'url'    => '/forums/subscribes',
+        'icon'   => 'bookmark',
+        'name'   => $this->page(57)->name,
+        'count'    => $this->subscribesCount,
+    ],
+    [
+        'name'   => $this->translate('catalogue/specifications'),
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(188),
+        'url'    => $this->url('account/specs-conflicts'),
+        'icon'   => 'exclamation-triangle',
+        'name'   => $this->page(188)->name
+    ],
+    [
+        'name'   => $this->page(49)->name,
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(128),
+        'url'    => $this->url('account/personal-messages'),
+        'icon'   => 'comments-o',
+        'name'   => $this->page(128)->name,
+        'count'    => $this->pmCount,
+        'newCount' => $this->newPmCount
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(80),
+        'url'    => $this->url('account/personal-messages/sent'),
+        'icon'   => 'comments-o',
+        'name'   => $this->page(80)->name,
+        'count'    => $this->omCount,
+    ],
+    [
+        'active' => $this->pageEnv()->isOnPath(81),
+        'url'    => $this->url('account/personal-messages/system'),
+        'icon'   => 'comments',
+        'name'   => $this->page(81)->name,
+        'count'    => $this->smCount,
+        'newCount' => $this->newSmCount
+    ],
+];
 ?>
 <div class="well">
     <ul class="nav nav-pills nav-stacked">

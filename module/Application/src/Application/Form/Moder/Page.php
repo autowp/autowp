@@ -5,7 +5,7 @@ namespace Application\Form\Moder;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-use Application\Model\DbTable\Page as PageTable;
+use Application\Model\Page as PageModel;
 
 use Autowp\ZFComponents\Filter\SingleSpaces;
 
@@ -145,7 +145,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => PageTable::MAX_NAME
+                            'max' => PageModel::MAX_NAME
                         ]
                     ]
                 ]
@@ -160,7 +160,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => PageTable::MAX_TITLE
+                            'max' => PageModel::MAX_TITLE
                         ]
                     ]
                 ]
@@ -175,7 +175,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => PageTable::MAX_BREADCRUMBS
+                            'max' => PageModel::MAX_BREADCRUMBS
                         ]
                     ]
                 ]
@@ -190,7 +190,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => PageTable::MAX_URL
+                            'max' => PageModel::MAX_URL
                         ]
                     ]
                 ]
@@ -214,7 +214,7 @@ class Page extends Form implements InputFilterProviderInterface
                     [
                         'name' => 'StringLength',
                         'options' => [
-                            'max' => PageTable::MAX_CLASS
+                            'max' => PageModel::MAX_CLASS
                         ]
                     ]
                 ]

@@ -2,17 +2,14 @@
 
 namespace Application\View\Helper;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\View\Helper\AbstractHelper;
-
-use Application\Model\DbTable\Page as PageTable;
-
-use Zend_Db_Table;
-use Zend_Db_Table_Row;
 
 class Page extends AbstractHelper
 {
     /**
-     * @var Zend_Db_Table
+     * @var TableGateway
      */
     private $pageTable;
 
@@ -31,9 +28,9 @@ class Page extends AbstractHelper
      */
     private $pages = [];
 
-    public function __construct()
+    public function __construct(Adapter $adapter)
     {
-        $this->pageTable = new PageTable();
+        $this->pageTable = new TableGateway('pages', $adapter);
     }
 
     public function __invoke($value)
@@ -41,7 +38,7 @@ class Page extends AbstractHelper
         if ($value) {
             $doc = null;
 
-            if ($value instanceof Zend_Db_Table_Row) {
+            if (($value instanceof \ArrayObject) || is_array($value)) {
                 $doc = $value;
             } elseif (is_numeric($value)) {
                 $doc = $this->getPageById($value);
@@ -62,7 +59,7 @@ class Page extends AbstractHelper
             case 'name':
             case 'title':
             case 'breadcrumbs':
-                $key = 'page/' . $this->doc->id. '/' . $name;
+                $key = 'page/' . $this->doc['id']. '/' . $name;
 
                 $result = $this->view->translate($key);
                 if (! $result || $result == $key) {
@@ -70,7 +67,7 @@ class Page extends AbstractHelper
                 }
 
                 if ((! $result || $result == $key) && ($name != 'name')) {
-                    $key = 'page/' . $this->doc->id. '/name';
+                    $key = 'page/' . $this->doc['id']. '/name';
 
                     $result = $this->view->translate($key);
                     if (! $result || $result == $key) {
@@ -79,10 +76,6 @@ class Page extends AbstractHelper
                 }
 
                 return $result;
-
-            case 'onPath':
-                return $this->isParentOrSelf($this->_currentPage, $this->doc);
-                break;
         }
 
         return '';
@@ -94,8 +87,14 @@ class Page extends AbstractHelper
         if (isset($this->pages[$id])) {
             return $this->pages[$id];
         }
+        
+        $row = $this->pageTable->select([
+            'id' => (int)$id
+        ])->current();
 
-        return $this->pages[$id] = $this->pageTable->find($id)->current();
+        $this->pages[$id] = $row;
+        
+        return $row;
     }
 
     private function isParentOrSelf($child, $parent)
@@ -103,23 +102,26 @@ class Page extends AbstractHelper
         if (! $parent || ! $child) {
             return false;
         }
+        
+        $childId = $child['id'];
+        $parentId = $parent['id'];
 
-        if ($parent->id == $child->id) {
+        if ($parentId == $childId) {
             return true;
         }
 
-        if ($parent->id == $child->parent_id) {
+        if ($parentId == $child['parent_id']) {
             return true;
         }
 
-        if (isset($this->parentsCache[$child->id][$parent->id])) {
-            return $this->parentsCache[$child->id][$parent->id];
+        if (isset($this->parentsCache[$childId][$parentId])) {
+            return $this->parentsCache[$childId][$parentId];
         }
 
-        $cParent = $child->parent_id ? $this->getPageById($child->parent_id) : false;
+        $cParent = $child['parent_id'] ? $this->getPageById($child['parent_id']) : false;
         $result = $this->isParentOrSelf($cParent, $parent);
 
-        $this->parentsCache[$child->id][$parent->id] = $result;
+        $this->parentsCache[$childId][$parentId] = $result;
 
         return $result;
     }

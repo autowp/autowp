@@ -52,7 +52,7 @@
                         <?=$this->htmlA('/account/pm', '<i class="fa fa-comment"></i>' . ($this->pm ? ' <span class="badge">'.$this->pm.'</span>' : ''), false)?>
                     </li>
                 <?php } else { ?>
-                    <li<?=$this->page(79)->onPath ? ' class="active"' : ''?>>
+                    <li<?=$this->pageEnv()->isOnPath(79) ? ' class="active"' : ''?>>
                         <?=$this->htmlA('/login', '<i class="fa fa-sign-in"></i> ' . $this->escapeHtml($this->translate('login/sign-in')), false)?>
                     </li>
                 <?php } ?>

@@ -4,6 +4,9 @@ namespace Application\View\Helper;
 
 use Application\Language as AppLanguage;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\View\Helper\AbstractHelper;
 
 use Application\Model\DbTable;
@@ -11,7 +14,7 @@ use Application\Model\DbTable;
 class PageEnv extends AbstractHelper
 {
     /**
-     * @var DbTable\Page
+     * @var TableGateway
      */
     private $pageTable;
 
@@ -25,9 +28,9 @@ class PageEnv extends AbstractHelper
      */
     private $language = 'en';
 
-    public function __construct(AppLanguage $language)
+    public function __construct(AppLanguage $language, Adapter $adapter)
     {
-        $this->pageTable = new DbTable\Page();
+        $this->pageTable = new TableGateway('pages', $adapter);
 
         $this->language = $language->getLanguage();
     }
@@ -69,7 +72,9 @@ class PageEnv extends AbstractHelper
 
         $page = null;
         if (isset($options['pageId'])) {
-            $page = $this->pageTable->find($options['pageId'])->current();
+            $page = $this->pageTable->select([
+                'id' => $options['pageId']
+            ])->current();
         }
 
         if ($page) {
@@ -92,16 +97,16 @@ class PageEnv extends AbstractHelper
 
             $currentDoc = $page;
             do {
-                $this->onPath[] = $currentDoc->id;
+                $this->onPath[] = $currentDoc['id'];
 
-                if (! $currentDoc->is_group_node) {
-                    if ($replace && ($replace['pageId'] == $currentDoc->id)) {
+                if (! $currentDoc['is_group_node']) {
+                    if ($replace && ($replace['pageId'] == $currentDoc['id'])) {
                         foreach (array_reverse($replace['breadcrumbs']) as $breadcrumb) {
                             $view->breadcrumbs($breadcrumb['url'], $breadcrumb['name'], 'prepend');
                         }
                     } else {
                         $currentUrl = $this->replaceArgs(
-                            $currentDoc->url,
+                            $currentDoc['url'],
                             $preparedUrlArgs
                         );
 
@@ -115,7 +120,9 @@ class PageEnv extends AbstractHelper
                         $view->breadcrumbs($currentUrl, $currentName, 'prepend');
                     }
                 }
-                $currentDoc = $this->pageTable->find($currentDoc->parent_id)->current();
+                $currentDoc = $this->pageTable->select([
+                    'id' => $currentDoc['parent_id']
+                ])->current();
             } while ($currentDoc);
         }
 

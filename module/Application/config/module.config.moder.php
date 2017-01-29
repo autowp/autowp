@@ -276,7 +276,7 @@ return [
             Controller\Moder\CommentsController::class     => Controller\Moder\Service\CommentsControllerFactory::class,
             Controller\Moder\HotlinkController::class      => InvokableFactory::class,
             Controller\Moder\IndexController::class        => InvokableFactory::class,
-            Controller\Moder\PagesController::class        => InvokableFactory::class,
+            Controller\Moder\PagesController::class        => Controller\Moder\Service\PagesControllerFactory::class,
             Controller\Moder\PerspectivesController::class => InvokableFactory::class,
             Controller\Moder\PictureItemController::class  => Controller\Moder\Service\PictureItemControllerFactory::class,
             Controller\Moder\PicturesController::class     => Controller\Moder\Service\PicturesControllerFactory::class,

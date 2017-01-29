@@ -34,7 +34,6 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
-            'page'              => View\Helper\Page::class,
             'pageTitle'         => View\Helper\PageTitle::class,
             'breadcrumbs'       => View\Helper\Breadcrumbs::class,
             'markdown'          => View\Helper\Markdown::class,
@@ -58,9 +57,10 @@ return [
             'languagePicker' => View\Helper\Service\LanguagePickerFactory::class,
             'mainMenu'       => View\Helper\Service\MainMenuFactory::class,
             'moderMenu'      => View\Helper\Service\ModerMenuFactory::class,
+            'page'           => View\Helper\Service\PageFactory::class,
+            'pageEnv'        => View\Helper\Service\PageEnvFactory::class,
             'pic'            => View\Helper\Service\PicFactory::class,
             'pictures'       => View\Helper\Service\PicturesFactory::class,
-            'pageEnv'        => View\Helper\Service\PageEnvFactory::class,
             'sidebar'        => View\Helper\Service\SidebarFactory::class,
             'userText'       => View\Helper\Service\UserTextFactory::class,
         ]
